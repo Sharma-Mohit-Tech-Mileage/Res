@@ -4,6 +4,7 @@ import { Provider } from 'react-redux'
 import store from './src/redux/configureStore.js'
 const App = () => {
   return (
+    
   <Provider store={store}>
     <UserNavigations/>
   </Provider>
