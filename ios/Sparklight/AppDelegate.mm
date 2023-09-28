@@ -1,4 +1,5 @@
 #import "AppDelegate.h"
+#import <React/RCTLinkingManager.h>
 
 #import <React/RCTBundleURLProvider.h>
 
@@ -12,6 +13,14 @@
   self.initialProps = @{};
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
+}
+
+// Deep linking
+- (BOOL)application:(UIApplication *)application
+   openURL:(NSURL *)url
+   options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
+{
+  return [RCTLinkingManager application:application openURL:url options:options];
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge

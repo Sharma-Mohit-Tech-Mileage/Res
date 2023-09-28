@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { WebView,WebViewNavigation } from 'react-native-webview';
-const LoginSSO='https://customer.uat.sparklight.com/SecureLogin/login.aspx'
+
+import { useKeycloak } from '@react-keycloak/native';
 const LoginScreen = ({navigation}) => {
+  const { keycloak } = useKeycloak();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
@@ -32,10 +34,13 @@ const LoginScreen = ({navigation}) => {
 
   return (
     
-        <WebView source={{ uri: LoginSSO }} style={{ flex: 1 }}
-        onNavigationStateChange={onNavigationStateChange} 
-        />
-      
+        // <WebView source={{ uri: LoginSSO }} style={{ flex: 1 }}
+        // onNavigationStateChange={onNavigationStateChange} 
+        // />
+        <View style={styles.container}>
+        <Text>{`Welcome ${keycloak?.authenticated} - ${keycloak?.token}!`}</Text>
+        <Button onPress={() => keycloak?.login()} title="Login" />
+      </View>
     
   );
 };
@@ -43,7 +48,6 @@ const LoginScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'#333333',
     justifyContent: 'center',
     alignItems: 'center',
   },
