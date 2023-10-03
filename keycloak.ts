@@ -5,7 +5,7 @@ import { RNKeycloak } from '@react-keycloak/native';
 const keycloak = new RNKeycloak({
   url: 'https://customer.uat.sparklight.com/SecureLogin/login.aspx',
   realm: 'kc-realm',
-  clientId: 'web',
+  clientId: 'web-portal',
 });
 
 export default keycloak;
