@@ -1,11 +1,11 @@
 #import "AppDelegate.h"
 #import <React/RCTLinkingManager.h>
-
 #import <React/RCTBundleURLProvider.h>
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+  
 {
   self.moduleName = @"Sparklight";
   // You can add your custom initial props in the dictionary below.
@@ -20,6 +20,9 @@
    openURL:(NSURL *)url
    options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
 {
+  if ([self.authorizationFlowManagerDelegate resumeExternalUserAgentFlowWithURL:url]) {
+       return YES;
+     }
   return [RCTLinkingManager application:application openURL:url options:options];
 }
 

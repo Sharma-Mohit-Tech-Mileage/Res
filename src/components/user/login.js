@@ -1,69 +1,55 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { WebView,WebViewNavigation } from 'react-native-webview';
+import { View, Text, Button, StyleSheet,Alert } from 'react-native';
+import { useAuth0 } from 'react-native-auth0';
+const LoginScreen = () => {
+  
+  const { authorize, clearSession, user, getCredentials, error } = useAuth0();
 
-import { useKeycloak } from '@react-keycloak/native';
-const LoginScreen = ({navigation}) => {
-  const { keycloak } = useKeycloak();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  
-  const onNavigationStateChange = (navigationState) => {
-    const url = navigationState.url;
-  
-    // parseURLParams is a pseudo function.
-    // Make sure to write your own function or install a package
-    //const params = parseURLParams(url);
-    console.log('URL Params',JSON.stringify(url))
-   
-    
-//     if(url.redirect_uri){
-//         const queryParams = new URLSearchParams(url)
-//         const param1=queryParams.get('redirect_uri')
-//         console.log('param',param1)
-//     for (const [key, value] of queryParams) {
-//   console.log({ key, value }) // {key: 'term', value: 'pizza'} {key: 'location', value: 'Bangalore'}
-//   }
-// }
-  
-    //if (params.token) {
-      // Save token for native requests & move to the next screen
-    //}
+  const onLogin = async () => {
+    await authorize();
+    const credentials = await getCredentials(undefined, 0, {});
+    Alert.alert('AccessToken: ' + credentials?.accessToken);
   };
-  
+
+  const loggedIn = user !== undefined && user !== null;
+
+  const onLogout = async () => {
+    await clearSession();
+  };
 
   return (
-    
-        // <WebView source={{ uri: LoginSSO }} style={{ flex: 1 }}
-        // onNavigationStateChange={onNavigationStateChange} 
-        // />
-        <View style={styles.container}>
-        <Text>{`Welcome ${keycloak?.authenticated} - ${keycloak?.token}!`}</Text>
-        <Button onPress={() => keycloak?.login()} title="Login" />
-      </View>
-    
+    <View style={styles.container}>
+      <Text style={styles.header}> Auth0Sample - Login </Text>
+      {user && <Text>You are logged in as {user.name}</Text>}
+      {!user && <Text>You are not logged in</Text>}
+      <Button
+        onPress={loggedIn ? onLogout : onLogin}
+        title={loggedIn ? 'Log Out' : 'Log In'}
+      />
+      {error && <Text style={styles.error}>{error.message}</Text>}
+    </View>
   );
+  
+  
 };
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#F5FCFF',
   },
-  title: {
-    fontSize: 24,
-    color:'white',
-    marginBottom: 20,
+  header: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
   },
-  input: {
-    width: '80%',
-    height: 40,
-    color:'white',
-    borderColor: '#c8c8c8',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingLeft: 10,
+  error: {
+    margin: 20,
+    textAlign: 'center',
+    color: '#D8000C',
   },
 });
 
