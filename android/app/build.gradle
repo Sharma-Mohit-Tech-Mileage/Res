@@ -78,7 +78,9 @@ android {
         applicationId "com.sparklight"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        manifestPlaceholders = [ appAuthRedirectScheme:  'com.sparklight.customer.app']
+        manifestPlaceholders = [ appAuthRedirectScheme:  'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/android/com.sparklight.customer.app/callback',
+                                 appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
+        ]
         versionCode 1
         versionName "1.0"
     }
