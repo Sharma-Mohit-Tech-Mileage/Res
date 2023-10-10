@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import UserNavigations from "./src/navigations/HomeDrawer";
+import {Linking} from 'react-native'
 import { Provider } from "react-redux";
 import store from "./src/redux/configureStore.js";
 import LoginScreen from "./src/components/user/SettingsScreen";
@@ -10,12 +11,15 @@ const config = {
   clientId: "sparklight-customer-mobile-app",
   redirectUrl:
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
-  scopes: ["openid", "profile", 'email'],
+  scopes: ['openid', 'profile', 'email', 'phone', 'address'],
   iosPrefersEphemeralSession:false,
   additionalParameters: {prompt: 'login'}
 };
 const App = () => {
   const [data, setData] = useState(undefined);
+  const [url, setUrl] = useState(null);
+  const [processing, setProcessing] = useState(true);
+
   useEffect(() => {
     const loginAuth = async () => {
       try {
@@ -29,6 +33,13 @@ const App = () => {
     };
     loginAuth();
   }, []);
+
+  
+
+  useEffect(() => {
+    
+  }, []);
+
 
   return (
     (data && data.accessToken)?
