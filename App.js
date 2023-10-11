@@ -4,6 +4,7 @@ import {Linking} from 'react-native'
 import { Provider } from "react-redux";
 import store from "./src/redux/configureStore.js";
 import LoginScreen from "./src/components/user/SettingsScreen";
+import jwt_decode from "jwt-decode";
 import { authorize } from "react-native-app-auth";
 
 const config = {
@@ -26,6 +27,9 @@ const App = () => {
         const result = await authorize(config);
         // result includes accessToken, accessTokenExpirationDate and refreshToken
         console.log("result", result);
+        var decoded = jwt_decode(result.idToken);
+
+        console.log('User Details',decoded);
         setData(result);
       } catch (error) {
         console.log(error);
