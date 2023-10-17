@@ -39,6 +39,6 @@ steps:
     jarsign: true
     jarsignerKeystoreFile: 'Sparklight.keystore'
     jarsignerKeystorePassword: '$(jarsignerKeystorePassword)'
-    jarsignerKeystoreAlias: 'private_key.pepk'
+    jarsignerKeystoreAlias: 'sparklight'
     jarsignerKeyPassword: '$(jarsignerKeyPassword)'
     zipalign: true
