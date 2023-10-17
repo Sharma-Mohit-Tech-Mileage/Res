@@ -1,34 +1,47 @@
-import React,{useCallback} from 'react';
-import { View, Text, Button,StyleSheet,Linking } from 'react-native';
-
-
+import React, { useCallback, useState } from "react";
+import { View, Text, Button, StyleSheet, Linking } from "react-native";
+import CTAButton from "../common/customui/CTAButton";
+import SparkLightInputField from "../common/customui/SparkLightInputField";
+import SparkLightPasswordField from "../common/customui/SparkLightPasswordField";
 
 const Settings = () => {
-  
+  const [email, setEmail] = useState("");
   return (
-    <View style={styles.container}>
-      <Text>{`Welcome Settings`}</Text>
-      
+    <View style={styles.screenContainer}>
+      <SparkLightInputField
+        onChangeText={(value) => setEmail(value)} //update state onChange
+        focus={true} //initial focus on this TextInput
+        style={{ marginTop: 20 }}
+        placeholder="Email"
+      />
+
+      <SparkLightPasswordField
+        onChangeText={(value) => setEmail(value)} //update state onChange
+        focus={true} //initial focus on this TextInput
+        style={{ marginTop: 20 }}
+        placeholder="Password"
+      />
+      <CTAButton title="Login" />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screenContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    justifyContent: "center",
+    flexDirection: "column",
+    padding: 16,
   },
   header: {
     fontSize: 20,
-    textAlign: 'center',
+    textAlign: "center",
     margin: 10,
   },
   error: {
     margin: 20,
-    textAlign: 'center',
-    color: '#D8000C',
+    textAlign: "center",
+    color: "#D8000C",
   },
 });
 

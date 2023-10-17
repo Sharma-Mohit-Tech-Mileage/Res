@@ -485,10 +485,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = W486HD85BD;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = W486HD85BD;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Sparklight/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Sparklight;
@@ -505,7 +507,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sparklight.customer.app;
 				PRODUCT_NAME = Sparklight;
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "sparklight-customer-Dev";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "sparklight-customer-Prod";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -518,10 +521,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = W486HD85BD;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = W486HD85BD;
 				INFOPLIST_FILE = Sparklight/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Sparklight;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
@@ -537,7 +542,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sparklight.customer.app;
 				PRODUCT_NAME = Sparklight;
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "sparklight-customer-Prod";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "sparklight-customer-Dev";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

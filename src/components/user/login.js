@@ -1,18 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { View, Text, Button, StyleSheet,Alert } from 'react-native';
-//import {CTAButton,PrimaryButtom,SecondaryButton} from '@customui'
-//import CTAButton from '@customui/CTAButton.js'
+import jwt_decode from "jwt-decode";
+import { authorize } from "react-native-app-auth";
+import MyTabs from '../../navigations/MyTab';
 
-const LoginScreen = () => {
+const config = {
+  issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
+  clientId: "sparklight-customer-mobile-app",
+  redirectUrl:
+    "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
+  scopes: ['openid', 'profile', 'email', 'phone', 'address'],
+  iosPrefersEphemeralSession:false,
+  additionalParameters: {prompt: 'login'}
   
+};
+const LoginScreen = ({navigation}) => {
+  const [data, setData] = useState(undefined);
+ 
+
+  useEffect(() => {
+    const loginAuth = async () => {
+      try {
+        const result = await authorize(config);
+        // result includes accessToken, accessTokenExpirationDate and refreshToken
+        console.log("result",result);
+        var decoded = jwt_decode(result.idToken);
+        console.log('data',decoded)
+        if(result.accessToken){
+          navigation.navigate('Home', {
+            email: decoded.email,
+            name: decoded.name,
+          });
+        }
+
+        setData(result);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    loginAuth();
+  }, []);
+
+
   
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}> Auth0Sample - Login </Text>
+    
+     <View>
+      <Text>Login</Text>
+     </View>
       
       
-    </View>
+    
   );
   
   

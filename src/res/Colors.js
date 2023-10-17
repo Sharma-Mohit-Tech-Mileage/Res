@@ -1,6 +1,6 @@
 const colors = {
 
-    sparklight_purple:'#353091',
+    sparklight_purple_blue:'#353091',
     sparklight_grey:'#4C5458',
     snow_white:'#FFFFFF',
     sparklight_bright_purple:'#8D3B90',
@@ -12,6 +12,7 @@ const colors = {
     grey:'#E1E1E1',
     dark_grey:'#767676',
     darkest_grey:'#001321',
+    splash_bg:'#8D3B90'
 
   }
   
