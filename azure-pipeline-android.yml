@@ -24,11 +24,11 @@ steps:
 
 - task: Gradle@2
   inputs:
-    workingDirectory: 'src/android'
+    workingDirectory: 'android'
     versionSpec: '11'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: 'PreInstalled'
-    gradleWrapperFile: 'src/android/gradlew'
+    gradleWrapperFile: 'android/gradlew'
     gradleOptions: '-Xmx3072m'
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
