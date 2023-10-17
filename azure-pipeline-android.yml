@@ -37,8 +37,8 @@ steps:
   inputs:
     apkFiles: '**/*.apk'
     jarsign: true
-    jarsignerKeystoreFile: 'android.keystore'
+    jarsignerKeystoreFile: 'Sparklight.keystore'
     jarsignerKeystorePassword: '$(jarsignerKeystorePassword)'
-    jarsignerKeystoreAlias: 'react-native-pipeline-key'
+    jarsignerKeystoreAlias: 'private_key.pepk'
     jarsignerKeyPassword: '$(jarsignerKeyPassword)'
     zipalign: true
