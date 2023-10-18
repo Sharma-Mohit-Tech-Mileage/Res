@@ -4,6 +4,13 @@ import AccountScreen from '../components/home/Account';
 import ShopScreen from '../components/home/Shop';
 import SupportScreen from '../components/home/Support';
 import HomeScreen from '../components/home/Home';
+import HomeIconSelected from '../res/svgIcons/HomeIconSelected';
+import HomeIcone from '../res/svgIcons/HomeIcon';
+import ShopIcon from '../res/svgIcons/ShopIcon';
+import ShopIconSelected from '../res/svgIcons/ShopIconSelected';
+import SupportIcon from '../res/svgIcons/SupportIcon';
+import AccountIcon from '../res/svgIcons/AccountIcone';
+
 const Tab = createBottomTabNavigator();
 
 const MyTabs=()=> {
@@ -12,18 +19,19 @@ const MyTabs=()=> {
       name='MyTab'
       initialRouteName="Home"
       screenOptions={{
-        tabBarActiveTintColor: '#e91e63',
+        tabBarStyle: { position: 'absolute',height:90 },
+        tabBarActiveTintColor: '#353091',
+        tabBarInactiveTintColor:'#767676'
       }}
     >
       <Tab.Screen
         name="Home"
         component={HomeScreen}
-        
         options={{
           tabBarLabel: 'Home',
-          //tabBarIcon: ({ color, size }) => (
-            //<MaterialCommunityIcons name="home" color={color} size={size} />
-          //),
+          tabBarIcon: ({ focused, size }) => (
+           (focused)? <HomeIconSelected />:<HomeIcone/>
+          ),
         }}
       />
       <Tab.Screen
@@ -31,10 +39,10 @@ const MyTabs=()=> {
         component={ShopScreen}
         options={{
           tabBarLabel: 'Shop',
-        //   tabBarIcon: ({ color, size }) => (
-        //     <MaterialCommunityIcons name="bell" color={color} size={size} />
-        //   ),
-          tabBarBadge: 3,
+          tabBarIcon: ({ focused, size }) => (
+            focused?<ShopIconSelected/>:<ShopIcon/>
+          ),
+          
         }}
       />
       <Tab.Screen
@@ -42,9 +50,9 @@ const MyTabs=()=> {
         component={SupportScreen}
         options={{
           tabBarLabel: 'Support',
-        //   tabBarIcon: ({ color, size }) => (
-        //     <MaterialCommunityIcons name="account" color={color} size={size} />
-        //   ),
+          tabBarIcon: ({ focused, size }) => (
+            <SupportIcon focused={focused} />
+          ),
         }}
       />
       <Tab.Screen
@@ -52,9 +60,9 @@ const MyTabs=()=> {
         component={AccountScreen}
         options={{
           tabBarLabel: 'Account',
-        //   tabBarIcon: ({ color, size }) => (
-        //     <MaterialCommunityIcons name="account" color={color} size={size} />
-        //   ),
+          tabBarIcon: ({ color, size }) => (
+            <AccountIcon />
+          ),
         }}
       />
     </Tab.Navigator>
