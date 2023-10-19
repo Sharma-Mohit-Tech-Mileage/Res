@@ -13,7 +13,7 @@ import AccountIcon from '../res/svgIcons/AccountIcone';
 
 const Tab = createBottomTabNavigator();
 
-const MyTabs=()=> {
+const MyTabs=({route,navigation})=> {
   return (
     <Tab.Navigator
       name='MyTab'
@@ -27,6 +27,7 @@ const MyTabs=()=> {
       <Tab.Screen
         name="Home"
         component={HomeScreen}
+        initialParams={{data:route}}
         options={{
           tabBarLabel: 'Home',
           tabBarIcon: ({ focused, size }) => (
@@ -61,7 +62,7 @@ const MyTabs=()=> {
         options={{
           tabBarLabel: 'Account',
           tabBarIcon: ({ focused, size }) => (
-            <AccountIcon focused={focused} />
+            <AccountIcon focused={focused} data={route} />
           ),
         }}
       />

@@ -2,9 +2,9 @@ import React,{useState,useEffect} from 'react';
 import { View, Text, Button } from 'react-native';
 
 const HomeScreen = ({route, navigation }) => {
-const { email, name } = {email:'test',name:'name'};
+const { email, name } = {email:route.params.data.params.email,name:route.params.data.params.name};
 useEffect(()=>{
-  console.log('data')
+  console.log('data',JSON.stringify(route.params.data.params.email))
 
 },[])
   return (

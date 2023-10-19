@@ -8,7 +8,7 @@ import SplashScreen from "./src/components/user/SplashScreen";
 const App = () => {
   return (
     <Provider store={store}>
-      <SplashScreen />
+      <UserNavigations />
     </Provider>
   );
 };

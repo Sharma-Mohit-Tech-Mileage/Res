@@ -4,16 +4,7 @@ import jwt_decode from "jwt-decode";
 import { authorize } from "react-native-app-auth";
 import MyTabs from '../../navigations/MyTab';
 
-const config = {
-  issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
-  clientId: "sparklight-customer-mobile-app",
-  redirectUrl:
-    "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
-  scopes: ['openid', 'profile', 'email', 'phone', 'address'],
-  iosPrefersEphemeralSession:false,
-  additionalParameters: {prompt: 'login'}
-  
-};
+
 const LoginScreen = ({navigation}) => {
   const [data, setData] = useState(undefined);
  
