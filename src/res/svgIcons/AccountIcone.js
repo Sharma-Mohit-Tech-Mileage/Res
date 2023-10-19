@@ -1,28 +1,30 @@
-import * as React from "react"
-import {Svg, Circle, G, Path, Line, Rect} from 'react-native-svg';
+import * as React from "react";
+import { Svg, Circle, G, Path, Line, Rect, Text } from "react-native-svg";
+const width = 50;
+const height = 50;
+const size = width < height ? width - 16 : height - 8;
+const strokeWidth = 12;
+const radius = (size - strokeWidth) / 2;
+const circunference = radius * 2 * Math.PI;
 const AccountIcon = (props) => (
-  <Svg
-    xmlns="http://www.w3.org/2000/svg"
-    width={33}
-    height={32}
-    fill="none"
-    {...props}
-  >
-    <Rect width={32} height={32} x={0.25} fill="#767676" rx={16} />
-    <Rect
-      width={31.5}
-      height={31.5}
-      x={0.5}
-      y={0.25}
-      stroke="#001321"
-      strokeWidth={0.5}
-      opacity={0.08}
-      rx={15.75}
+  <Svg width={width} height={size}>
+    <Circle
+      stroke="#767676"
+      fill={props.focused ? "#353091" : "#767676"}
+      cx={(size / 2)+5}
+      cy={size / 2}
+      r={radius}
+      strokeDasharray={`${circunference} ${circunference}`}
     />
-    <Path
-      fill="#fff"
-      d="M7.777 11.273H9.71l2.591 6.324h.103l2.59-6.324h1.935V20h-1.517v-5.996h-.08l-2.413 5.97h-1.133l-2.412-5.982h-.081V20H7.777v-8.727Zm15.618 2.399a1.163 1.163 0 0 0-.503-.87c-.293-.207-.673-.31-1.142-.31-.33 0-.612.05-.848.149-.236.1-.416.234-.541.405a.984.984 0 0 0-.192.583c0 .182.041.34.123.473.086.134.2.247.346.341.144.091.305.168.481.23.176.063.354.115.533.158l.818.205c.33.076.646.18.95.31.307.131.581.296.823.495.244.199.437.439.58.72.141.281.212.61.212.989 0 .511-.13.961-.392 1.35-.261.387-.639.69-1.133.908-.492.216-1.087.324-1.786.324-.679 0-1.268-.105-1.768-.315a2.634 2.634 0 0 1-1.168-.92c-.278-.404-.429-.896-.451-1.475h1.555c.023.304.116.557.281.758.165.202.38.353.644.452.267.1.565.15.895.15.343 0 .644-.052.903-.154.261-.105.466-.25.614-.435a1.05 1.05 0 0 0 .225-.656.835.835 0 0 0-.2-.563 1.47 1.47 0 0 0-.55-.375 5.302 5.302 0 0 0-.818-.272l-.993-.256c-.719-.185-1.287-.465-1.704-.84-.415-.377-.622-.879-.622-1.504 0-.514.139-.964.417-1.35a2.759 2.759 0 0 1 1.146-.9c.483-.216 1.03-.324 1.641-.324.62 0 1.162.108 1.628.324.469.213.837.51 1.104.89.267.379.404.813.413 1.305h-1.521Z"
-    />
+    <Text
+      stroke="white"
+      fontSize="15"
+      x={size / 2+5}
+      y={size / 2 + 5}
+      textAnchor="middle"
+    >
+      MS
+    </Text>
   </Svg>
-)
-export default AccountIcon
+);
+export default AccountIcon;

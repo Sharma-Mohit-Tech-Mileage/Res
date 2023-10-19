@@ -60,8 +60,8 @@ const MyTabs=()=> {
         component={AccountScreen}
         options={{
           tabBarLabel: 'Account',
-          tabBarIcon: ({ color, size }) => (
-            <AccountIcon />
+          tabBarIcon: ({ focused, size }) => (
+            <AccountIcon focused={focused} />
           ),
         }}
       />
