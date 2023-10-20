@@ -10,6 +10,7 @@ import ShopIcon from '../res/svgIcons/ShopIcon';
 import ShopIconSelected from '../res/svgIcons/ShopIconSelected';
 import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
+import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
 
 const Tab = createBottomTabNavigator();
 
@@ -29,6 +30,7 @@ const MyTabs=({route,navigation})=> {
         component={HomeScreen}
         initialParams={{data:route}}
         options={{
+          headerShown:false,
           tabBarLabel: 'Home',
           tabBarIcon: ({ focused, size }) => (
            (focused)? <HomeIconSelected />:<HomeIcone/>
@@ -52,7 +54,7 @@ const MyTabs=({route,navigation})=> {
         options={{
           tabBarLabel: 'Support',
           tabBarIcon: ({ focused, size }) => (
-            <SupportIcon focused={focused} />
+           (focused)?<SupportIconSelected/>: <SupportIcon  />
           ),
         }}
       />
