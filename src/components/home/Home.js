@@ -5,6 +5,9 @@ import colors from "../../res/Colors";
 import BellIcon from "../../res/svgIcons/bellIcon";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
+import InternetHealthChart from "../common/InternetHealthChart";
+
+
 const HomeScreen = ({ route, navigation }) => {
   const { email, name } = {
     email: route.params.data.params.email,
@@ -46,8 +49,12 @@ const HomeScreen = ({ route, navigation }) => {
           </View>
         </View>
         
-          <View style={{backgroundColor:'#EBEEF1', flex:2}}>
-          <Text style={{textAlign:'center', alignSelf:'center',fontSize:16, marginTop:200}}> Welcome to the Dashboard</Text>
+          <View style={{backgroundColor:'#EBEEF1', flex:2, alignItems:'center',marginTop:50}}>
+            <View style={[styles.card, styles.shadowProp,{marginTop: -40}]} >
+            <InternetHealthChart/>
+            </View>
+          
+         
 
           </View>
       
@@ -60,6 +67,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.splash_bg,
+  }, card: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    paddingVertical: 45,
+    paddingHorizontal: 25,
+    width: '87%',
+    
+  },
+  shadowProp: {
+    shadowColor: '#171717',
+    shadowOffset: {width: -2, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
   },
 });
 
