@@ -29,7 +29,8 @@
     "react-native-webview": "^13.6.0",
     "react-redux": "^8.1.2",
     "redux": "^4.2.1",
-    "redux-saga": "^1.2.3"
+    "redux-saga": "^1.2.3",
+    "ruby": "^0.6.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

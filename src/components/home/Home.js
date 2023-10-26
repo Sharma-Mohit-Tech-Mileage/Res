@@ -1,30 +1,54 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  StatusBar,
+} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
 import BellIcon from "../../res/svgIcons/bellIcon";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import { ScrollView } from "react-native-gesture-handler";
 import InternetHealthChart from "../common/InternetHealthChart";
-
+import InfoIcon from "../../res/svgIcons/InfoIcon";
+import DownArrow from "../../res/svgIcons/DownArrow";
+import UpArrow from "../../res/svgIcons/UpArrow";
+import NetworkDetails from "../common/NetworkDetails";
+import Billpaidicon from "../../res/svgIcons/Billpaidicon";
+import Myplanicon from "../../res/svgIcons/Myplanicon";
+import MyInternetDetials from "../common/MyInternetDetails";
+import Wallet2icon from "../../res/svgIcons/Wallet2icon";
 
 const HomeScreen = ({ route, navigation }) => {
   const { email, name } = {
     email: route.params.data.params.email,
     name: route.params.data.params.name,
   };
+  const [isInternetDetails, setIsInternetDetails] = useState(false);
+
+  const myData = [
+    {
+      icon: <Wallet2icon />,
+      title: "Bill Summary",
+      subText: "$64.00",
+      date: "Due date 16 Oct, 2023",
+    },
+    {
+      icon: <Myplanicon/>,
+      title: "My Plan",
+      subText: "300 mb/s",
+      date: undefined,
+    },
+    
+  ];
   useEffect(() => {
-    console.log("data", JSON.stringify(route.params.data.params.email));
+    //console.log("data", JSON.stringify(route.params.data.params.email));
   }, []);
   return (
-    // <View>
-    //   <View style={{padding:20,marginHorizontal:20}}>
-    //   <Text>Name:{name} </Text>
-    //   <Text style={{marginTop:10}}>Email:{email} </Text>
-    //   </View>
-
-    // </View>
-
     <LinearGradient
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
@@ -48,16 +72,68 @@ const HomeScreen = ({ route, navigation }) => {
             <BellIcon />
           </View>
         </View>
-        
-          <View style={{backgroundColor:'#EBEEF1', flex:2, alignItems:'center',marginTop:50}}>
-            <View style={[styles.card, styles.shadowProp,{marginTop: -40}]} >
-            <InternetHealthChart/>
-            </View>
-          
-         
+        <ScrollView style={{ height: "100%" }}>
+          <View
+            style={{
+              backgroundColor: "#EBEEF1",
+              flex: 2,
+              alignItems: "center",
+              marginTop: 50,
+            }}
+          >
+            <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
+              <Text style={styles.internetHealth}>Internet Health</Text>
+              <InternetHealthChart />
+              <View style={styles.internetStatusSection}>
+                <View style={{ marginTop: 5 }}>
+                  <InfoIcon />
+                </View>
+                <Text style={styles.internetStatusTxt}>
+                  {" "}
+                  Your Internet Health has no recent issues.{" "}
+                </Text>
+              </View>
 
+              <View
+                style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 40 }}
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  setIsInternetDetails(!isInternetDetails);
+                }}
+                style={{
+                  height: 50,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  padding: 5,
+                  marginTop: 10,
+                }}
+              >
+                <Text style={styles.hideShowDetails}>
+                  {isInternetDetails ? "Collaps Details" : "Expand Details"}
+                </Text>
+                <View style={{ marginTop: 15 }}>
+                  {isInternetDetails ? (
+                    <View style={{ marginTop: -10 }}>
+                      <UpArrow />
+                    </View>
+                  ) : (
+                    <DownArrow />
+                  )}
+                </View>
+              </TouchableOpacity>
+              {isInternetDetails ? <NetworkDetails /> : <></>}
+            </View>
+
+            <ScrollView horizontal={true} >
+            {myData.map((item, index) => (
+              <View style={{marginVertical:20,width:"87%",alignItems: "center"}}>
+                <MyInternetDetials key={index} icon={item.icon} title={item.title} subTitle={item.subText}/>
+             </View>
+        ))}
+            </ScrollView>
           </View>
-      
+        </ScrollView>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -67,19 +143,49 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.splash_bg,
-  }, card: {
-    backgroundColor: 'white',
+  },
+  card: {
+    backgroundColor: "white",
     borderRadius: 8,
-    paddingVertical: 45,
+    paddingTop: 45,
     paddingHorizontal: 25,
-    width: '87%',
-    
+    width: "87%",
   },
   shadowProp: {
-    shadowColor: '#171717',
-    shadowOffset: {width: -2, height: 4},
+    shadowColor: "#171717",
+    shadowOffset: { width: -2, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
+  },
+  internetHealth: {
+    color: colors.darkest_grey,
+    fontSize: 22,
+    marginTop: -20,
+    fontStyle: "normal",
+    fontWeight: 400,
+    lineHeight: 22 /* 100% */,
+  },
+  internetStatusSection: {
+    backgroundColor: "#EBEEF120",
+    borderRadius: 5,
+    padding: 10,
+    marginTop: 25,
+    flexDirection: "row",
+  },
+  internetStatusTxt: {
+    color: colors.darkest_grey,
+    textAlign: "center",
+    alignSelf: "center",
+    fontSize: 14,
+    fontStyle: "normal",
+    fontWeight: 400,
+    lineHeight: 28,
+  },
+  hideShowDetails: {
+    fontSize: 16,
+    marginVertical: 5,
+    lineHeight: 20,
+    fontWeight: "600",
   },
 });
 

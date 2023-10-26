@@ -13,7 +13,7 @@ const config = {
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
   scopes: ["openid", "profile", "email", "phone", "address"],
   iosPrefersEphemeralSession: false,
-  additionalParameters: { prompt: "login" },
+//   additionalParameters: { prompt: "login" },
 };
 
 const SplashScreen = ({ navigation }) => {
