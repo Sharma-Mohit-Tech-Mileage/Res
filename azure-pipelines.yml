@@ -1,0 +1,43 @@
+trigger:
+  branches:
+    include:
+      - Sparklight
+variables:
+  - group: iOSBuildGroup
+pool:
+  vmImage: 'macos-latest'
+steps:
+  - checkout: self
+    persistCredentials: true
+    clean: true
+  - script: yarn install
+  - task: InstallAppleCertificate@2
+    displayName: Install Apple Certificate
+    inputs:
+      certSecureFile: 'Certificates.p12'
+      certPwd: '$(AppleCertificatePassword)'
+      keychain: 'temp'
+      deleteCert: true
+  - task: InstallAppleProvisioningProfile@1
+    displayName: 'Install Apple Provisioning Profile'
+    inputs:
+      provisioningProfileLocation: 'secureFiles'
+      provProfileSecureFile: 'sparklightcustomerDev.mobileprovision'
+      removeProfile: true
+  - task: CocoaPods@0
+    displayName: 'Install CocoaPods'
+    inputs:
+      workingDirectory: 'ios'
+  - task: Xcode@5
+    displayName: 'Build IPA'
+    inputs:
+      actions: 'build'
+      configuration: 'Release'
+      sdk: 'iphoneos'
+      xcWorkspacePath: 'ios/Sparklight.xcworkspace'
+      scheme: 'myproject'
+      packageApp: true
+      exportPath: 'output'
+      signingOption: 'manual'
+      signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
+      provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
