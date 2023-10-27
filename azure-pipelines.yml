@@ -35,7 +35,7 @@ steps:
       configuration: 'Release'
       sdk: 'iphoneos'
       xcWorkspacePath: 'ios/Sparklight.xcworkspace'
-      scheme: 'myproject'
+      scheme: 'xcshareddata'
       packageApp: true
       exportPath: 'output'
       signingOption: 'manual'
