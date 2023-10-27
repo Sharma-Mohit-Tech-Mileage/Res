@@ -84,5 +84,5 @@
    <ArchiveAction
       buildConfiguration = "Release"
       revealArchiveInOrganizer = "YES">
-   </ArchiveAction>
+   </ArchiveAction> 
 </Scheme>
