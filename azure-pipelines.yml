@@ -11,6 +11,10 @@ steps:
     persistCredentials: true
     clean: true
   - script: yarn install
+  - task: NodeTool@0
+    displayName: 'Install Node'
+    inputs:
+      versionSpec: '20.6.1'
   - task: InstallAppleCertificate@2
     displayName: Install Apple Certificate
     inputs:
@@ -34,7 +38,7 @@ steps:
       actions: 'build'
       configuration: 'Release'
       sdk: 'iphoneos'
-      xcWorkspacePath: '/Sparklight.xcworkspace/contents.xcworkspacedata'
+      xcWorkspacePath: '/ios/Sparklight.xcworkspace'
       scheme: '/ios/Sparklight.xcodeproj/xcshareddata/xcschemes/Sparklight.xcscheme'
       packageApp: true
       exportPath: 'output'
