@@ -1,4 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Platform } from 'react-native';
 //import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AccountScreen from '../components/home/Account';
 import ShopScreen from '../components/home/Shop';
@@ -20,9 +21,10 @@ const MyTabs=({route,navigation})=> {
       name='MyTab'
       initialRouteName="Home"
       screenOptions={{
-        tabBarStyle: { position: 'absolute',height:90 },
+        tabBarStyle: {position: 'absolute',height:(Platform.OS=='ios')? 90:60 },
         tabBarActiveTintColor: '#353091',
         tabBarInactiveTintColor:'#767676'
+
       }}
     >
       <Tab.Screen

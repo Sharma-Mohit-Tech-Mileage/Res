@@ -41,7 +41,7 @@ const InternetHealthChart= () => {
 
   useEffect(()=>{
     //moment().format("MMM Do YY");
-    let currentDate = moment().format("MMM Do YYYY")
+    let currentDate = moment().format('ll')
     setTodayDate(currentDate)
   },[])
 
@@ -60,8 +60,8 @@ const InternetHealthChart= () => {
       >
         {metaData => (
           <Pressable onPress={_handlePress} style={{ alignItems: 'center' }}>
-            <Text style={{ fontSize: 24, paddingTop: 20,fontWeight:'600' }}>{metaData.lastFilledSegment.data.label}</Text>
-            <Text style={{ marginTop:10, fontSize: 14,color:'#767676',textAlign:'center' }}>Updated {todayDate}</Text>
+            <Text style={{ fontSize: 24, paddingTop: 20,fontWeight:"600" }}>{metaData.lastFilledSegment.data.label}</Text>
+            <Text style={{ marginTop:10, fontSize: 12,color:'#767676',textAlign:'center' }}>Updated {todayDate}</Text>
           </Pressable>
         )}
       </SegmentedArc>

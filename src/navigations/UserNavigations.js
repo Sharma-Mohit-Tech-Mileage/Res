@@ -19,7 +19,7 @@ const UserNavigations = (props) => {
           
         /> 
         <Stack.Screen
-          name="Home"
+          name="MyTab"
           component={MyTabs}
           initialParams={{user:props.data}}
           options={{
