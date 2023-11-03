@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Image, StyleSheet, Text } from "react-native";
 import colors from "../../res/Colors";
-import UserNavigations from "../../navigations/UserNavigations";
 import LinearGradient from "react-native-linear-gradient";
 import jwt_decode from "jwt-decode";
 import { authorize } from "react-native-app-auth";
@@ -13,7 +12,7 @@ const config = {
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
   scopes: ["openid", "profile", "email", "phone", "address"],
   iosPrefersEphemeralSession: false,
-//   additionalParameters: { prompt: "login" },
+   ///additionalParameters: { prompt: "login" },
 };
 
 const SplashScreen = ({ navigation }) => {
@@ -31,7 +30,7 @@ const SplashScreen = ({ navigation }) => {
         console.log("data", decoded);
         if (result.accessToken) {
           //setIsSplashReady(true);
-          navigation.navigate('Home', {
+          navigation.navigate('MyTab', {
             email: decoded.email,
             name: decoded.name,
           });
@@ -49,9 +48,7 @@ const SplashScreen = ({ navigation }) => {
     // }, 3000); // Adjust the duration as needed
   }, []);
 
-  return  (isSplashReady) ? (
-    <UserNavigations data={data} />
-  ) : (
+  return  (
     <LinearGradient
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   StatusBar,
+  Platform
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
@@ -22,6 +23,7 @@ import Billpaidicon from "../../res/svgIcons/Billpaidicon";
 import Myplanicon from "../../res/svgIcons/Myplanicon";
 import MyInternetDetials from "../common/MyInternetDetails";
 import Wallet2icon from "../../res/svgIcons/Wallet2icon";
+import MyServicePlan from "../common/MyServicePlan";
 
 const HomeScreen = ({ route, navigation }) => {
   const { email, name } = {
@@ -35,15 +37,16 @@ const HomeScreen = ({ route, navigation }) => {
       icon: <Wallet2icon />,
       title: "Bill Summary",
       subText: "$64.00",
-      date: "Due date 16 Oct, 2023",
+      date: "Due date Nov 16, 2023",
+      key:'2'
     },
     {
-      icon: <Myplanicon/>,
+      icon: <Myplanicon />,
       title: "My Plan",
       subText: "300 mb/s",
       date: undefined,
+      key:'3'
     },
-    
   ];
   useEffect(() => {
     //console.log("data", JSON.stringify(route.params.data.params.email));
@@ -58,10 +61,11 @@ const HomeScreen = ({ route, navigation }) => {
       <SafeAreaView style={{ flex: 1 }}>
         <View
           style={{
-            height: 60,
+            height: (Platform.OS=='ios')?60:50,
             flexDirection: "row",
             justifyContent: "space-between",
             marginHorizontal: 20,
+            marginTop:(Platform.OS=='ios')?0:20,
           }}
         >
           <Image
@@ -72,10 +76,10 @@ const HomeScreen = ({ route, navigation }) => {
             <BellIcon />
           </View>
         </View>
-        <ScrollView style={{ height: "100%" }}>
+        <ScrollView style={{ height: "100%", paddingBottom: 100 }}>
           <View
             style={{
-              backgroundColor: "#EBEEF1",
+              backgroundColor: colors.backgound_blue,
               flex: 2,
               alignItems: "center",
               marginTop: 50,
@@ -110,7 +114,7 @@ const HomeScreen = ({ route, navigation }) => {
                 }}
               >
                 <Text style={styles.hideShowDetails}>
-                  {isInternetDetails ? "Collaps Details" : "Expand Details"}
+                  {isInternetDetails ? "Collapse Details" : "Expand Details"}
                 </Text>
                 <View style={{ marginTop: 15 }}>
                   {isInternetDetails ? (
@@ -124,14 +128,16 @@ const HomeScreen = ({ route, navigation }) => {
               </TouchableOpacity>
               {isInternetDetails ? <NetworkDetails /> : <></>}
             </View>
-
-            <ScrollView horizontal={true} >
+             <ScrollView horizontal={true}style={{marginStart:20}} >
             {myData.map((item, index) => (
-              <View style={{marginVertical:20,width:"87%",alignItems: "center"}}>
-                <MyInternetDetials key={index} icon={item.icon} title={item.title} subTitle={item.subText}/>
+              <View style={{marginHorizontal:10}}>
+                <MyInternetDetials key={item.key} date={item.date} icon={item.icon} title={item.title} subTitle={item.subText}/>
              </View>
-        ))}
-            </ScrollView>
+             ))}
+            </ScrollView> 
+             
+             <MyServicePlan/>
+
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -162,12 +168,12 @@ const styles = StyleSheet.create({
     fontSize: 22,
     marginTop: -20,
     fontStyle: "normal",
-    fontWeight: 400,
+    fontWeight: "400",
     lineHeight: 22 /* 100% */,
   },
   internetStatusSection: {
-    backgroundColor: "#EBEEF120",
-    borderRadius: 5,
+    backgroundColor: "#EBEEF180",
+    borderRadius: 10,
     padding: 10,
     marginTop: 25,
     flexDirection: "row",
@@ -178,7 +184,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontSize: 14,
     fontStyle: "normal",
-    fontWeight: 400,
+    fontWeight: "400",
     lineHeight: 28,
   },
   hideShowDetails: {

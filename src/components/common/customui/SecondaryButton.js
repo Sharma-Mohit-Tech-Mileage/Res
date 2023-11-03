@@ -6,7 +6,7 @@ const SecondaryButton=(props)=>{
   
     return (
       <TouchableOpacity style={styles.TouchableOpacityButton}>
-        <Text>{props.text}</Text>
+        <Text style={styles.txtStyle}>{props.text}</Text>
       </TouchableOpacity>
     );
   
@@ -14,12 +14,18 @@ const SecondaryButton=(props)=>{
 
 const styles = StyleSheet.create({
   TouchableOpacityButton: {
-    backgroundColor: colors.sparklight_yellow,
+    backgroundColor: colors.backgound_blue,
     marginTop: 10,
     paddingVertical: 10,
     paddingHorizontal: 10,
-    borderRadius: 10,
-  },
+    borderRadius: 2,
+  },txtStyle:{
+    color:colors.sparklight_purple_blue,
+    textAlign:'center',
+    fontStyle:'normal',
+    fontSize:16,
+    fontWeight:'400'
+  }
 });
 
 export default SecondaryButton
