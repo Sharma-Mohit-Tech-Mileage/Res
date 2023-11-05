@@ -1,0 +1,4 @@
+const FETCH_DATA = 'FETCH_DATA';
+const LIST_FETCHED = 'LIST_FETCHED';
+const API_CALLED = 'API_CALLED';
+export const Action = { FETCH_DATA,LIST_FETCHED,API_CALLED };

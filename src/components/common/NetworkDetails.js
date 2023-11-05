@@ -5,7 +5,9 @@ import Modemicon from "../../res/svgIcons/Modemicon";
 import Billpaidicon from "../../res/svgIcons/Billpaidicon";
 import Outageicon from "../../res/svgIcons/Outageicon";
 import colors from "../../res/Colors";
+import strings from "../../res/Strings";
 
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 const NetworkDetails = () => {
   useEffect(() => {
     console.log("data");
@@ -26,14 +28,14 @@ const NetworkDetails = () => {
               <Outageicon />
               <GreenCircle/>
             </View>
-          <Text style={styles.text}> No Outages</Text>
+          <Text style={styles.text}> {strings.noOutageTxt}</Text>
         </View>
         <View style={styles.item}>
         <View style ={styles.iconBg}>
           <WifiIcon />
           <GreenCircle/>
           </View>
-          <Text style={styles.text}>Connected to Wifi</Text>
+          <Text style={styles.text}>{strings.connect_wifi_txt}</Text>
         </View>
       </View>
 
@@ -43,14 +45,14 @@ const NetworkDetails = () => {
           <Modemicon />
           <GreenCircle/>
           </View>
-          <Text style={styles.text}> No Modem Issues</Text>
+          <Text style={styles.text}> {strings.no_modem_issue}</Text>
         </View>
         <View style={styles.item}>
         <View style ={styles.iconBg}>
          <Billpaidicon/>
          <GreenCircle/>
          </View>
-         <Text style={styles.text}> Bill Paid</Text>
+         <Text style={styles.text}> {strings.bill_paid}</Text>
           
         </View>
       </View>
@@ -72,15 +74,15 @@ const styles = StyleSheet.create({
     alignContent:'center',
     alignSelf:'center',
     alignItems:'center',
-    paddingTop:20,
-    width:180,
-    height:120
-    
+    padding:wp('5%'),
+    width:wp('38%'),
+    height:hp('13%')
+
   },iconBg:{
     backgroundColor:'#F4F4F5',
     padding:5,
-    width:50,
-    height:50,
+    width:wp('10%'),
+    height:wp('10%'),
     borderRadius:25,
     alignContent:'center',
     alignItems:'center',

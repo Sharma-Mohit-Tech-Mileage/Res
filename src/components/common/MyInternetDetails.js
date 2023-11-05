@@ -3,6 +3,7 @@ import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import RightArrow from "../../res/svgIcons/RightArrow";
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 const MyInternetDetials = ({ icon, title, subTitle, date }) => {
   return (
     <View style={[styles.card, styles.shadowProp, { flexDirection: "column",marginVertical:20}]}>
@@ -12,8 +13,8 @@ const MyInternetDetials = ({ icon, title, subTitle, date }) => {
           end={{ x: 1, y: 0 }}
           colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
           style={{
-            width: 50,
-            height: 50,
+            width:wp('10%'),
+            height:wp('10%'),
             borderRadius: 10,
             justifyContent: "center",
             alignItems: "center",
@@ -31,7 +32,7 @@ const MyInternetDetials = ({ icon, title, subTitle, date }) => {
       <TouchableOpacity
         onPress={() => {}}
         style={{
-          height: 40,
+          height: wp("10%"),
           flexDirection: "row",
           justifyContent: "space-between",
           padding: 5,
@@ -42,7 +43,6 @@ const MyInternetDetials = ({ icon, title, subTitle, date }) => {
           style={{
             fontSize: 16,
             marginVertical: 5,
-            lineHeight: 20,
             fontWeight: "600",
             color:colors.sparklight_purple_blue
           }}
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 20,
     paddingHorizontal: 20,
-    width: 360,
+    width: wp('82%'),
   },
   shadowProp: {
     shadowColor: "#171717",
