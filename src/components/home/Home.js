@@ -10,6 +10,7 @@ import {
   StatusBar,
   Platform
 } from "react-native";
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
 import BellIcon from "../../res/svgIcons/bellIcon";
@@ -19,7 +20,7 @@ import InfoIcon from "../../res/svgIcons/InfoIcon";
 import DownArrow from "../../res/svgIcons/DownArrow";
 import UpArrow from "../../res/svgIcons/UpArrow";
 import NetworkDetails from "../common/NetworkDetails";
-import Billpaidicon from "../../res/svgIcons/Billpaidicon";
+import strings from "../../res/Strings";
 import Myplanicon from "../../res/svgIcons/Myplanicon";
 import MyInternetDetials from "../common/MyInternetDetails";
 import Wallet2icon from "../../res/svgIcons/Wallet2icon";
@@ -94,7 +95,7 @@ const HomeScreen = ({ route, navigation }) => {
                 </View>
                 <Text style={styles.internetStatusTxt}>
                   {" "}
-                  Your Internet Health has no recent issues.{" "}
+                  {strings.internetStatus}
                 </Text>
               </View>
 
@@ -114,7 +115,7 @@ const HomeScreen = ({ route, navigation }) => {
                 }}
               >
                 <Text style={styles.hideShowDetails}>
-                  {isInternetDetails ? "Collapse Details" : "Expand Details"}
+                  {isInternetDetails ? strings.collapseTxt : strings.expandTxt}
                 </Text>
                 <View style={{ marginTop: 15 }}>
                   {isInternetDetails ? (
@@ -130,7 +131,7 @@ const HomeScreen = ({ route, navigation }) => {
             </View>
              <ScrollView horizontal={true}style={{marginStart:20}} >
             {myData.map((item, index) => (
-              <View style={{marginHorizontal:10}}>
+              <View key={item.key} style={{marginHorizontal:10}}>
                 <MyInternetDetials key={item.key} date={item.date} icon={item.icon} title={item.title} subTitle={item.subText}/>
              </View>
              ))}
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingTop: 45,
     paddingHorizontal: 25,
-    width: "87%",
+    width: wp("87%"),
   },
   shadowProp: {
     shadowColor: "#171717",
@@ -186,6 +187,7 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontWeight: "400",
     lineHeight: 28,
+    paddingHorizontal:5
   },
   hideShowDetails: {
     fontSize: 16,
