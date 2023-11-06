@@ -1,10 +1,10 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Platform } from 'react-native';
-//import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import AccountScreen from '../components/home/Account';
+import AccountStackScreen from '../navigations/stackNavigation/AccountStack';
 import ShopScreen from '../components/home/Shop';
 import SupportScreen from '../components/home/Support';
 import HomeScreen from '../components/home/Home';
+import SupportStack from '../navigations/stackNavigation/SupportStack';
 import HomeIconSelected from '../res/svgIcons/HomeIconSelected';
 import HomeIcone from '../res/svgIcons/HomeIcon';
 import ShopIcon from '../res/svgIcons/ShopIcon';
@@ -52,8 +52,9 @@ const MyTabs=({route,navigation})=> {
       />
       <Tab.Screen
         name="Support"
-        component={SupportScreen}
+        component={SupportStack}
         options={{
+          headerShown: false,
           tabBarLabel: 'Support',
           tabBarIcon: ({ focused, size }) => (
            (focused)?<SupportIconSelected/>: <SupportIcon  />
@@ -62,8 +63,9 @@ const MyTabs=({route,navigation})=> {
       />
       <Tab.Screen
         name="Account"
-        component={AccountScreen}
+        component={AccountStackScreen}
         options={{
+          headerShown: false,
           tabBarLabel: 'Account',
           tabBarIcon: ({ focused, size }) => (
             <AccountIcon focused={focused} data={route} />

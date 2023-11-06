@@ -1,0 +1,486 @@
+import * as React from "react";
+import { Image, StyleSheet, Text, Pressable, View , SafeAreaView , ScrollView } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
+
+const UserManagement = () => {
+
+  const navigation = useNavigation();
+  const users = [
+    {
+      initials: 'MS',
+      name: 'Melissa Smith',
+      status: 'Logged In',
+      username: 'MelSmith',
+      memberType: 'PRIMARY ADMIN',
+      email: 'melissa@gmail.com',
+    },
+    {
+      initials: 'TN',
+      name: 'Taylor Nickum',
+      username: 'Taylor123',
+      memberType: 'ADMIN',
+      email: 'taylor123@gmail.com',
+    },
+    // Add more user objects as needed
+  ];
+  const renderUserCard = (user) => (
+    <View style={[styles.frameParent3, styles.frameBorder]}>
+      <View style={[styles.frameParent1, styles.navigationBorder]}>
+        <View style={styles.rightActionableParent}>
+          <View style={[styles.rightActionable1, styles.rightLayout]}>
+            <View style={styles.avatarContrastInnerBorder} />
+            <Text style={[styles.text, styles.textClr]}>{user.initials}</Text>
+          </View>
+          <Text style={[styles.taylorNickum, styles.melissaSmithTypo]}>
+            {user.name}
+          </Text>
+        </View>
+        <View style={styles.frameParent2}>
+          <Pressable
+            style={styles.rightFlexBox}
+            onPress={() => navigation.navigate("UserManagementEdit")}
+          >
+            <Image
+              style={styles.rightActionableIcon}
+              resizeMode="cover"
+              source={require("../../../assets/right-actionable5.png")}
+            />
+          </Pressable>
+          <Pressable
+            style={[
+              styles.rightActionableContainer,
+              styles.rightFlexBox,
+            ]}
+            onPress={() => navigation.navigate("UserManagementEdit")}
+          >
+            <Image
+              style={styles.rightActionableIcon}
+              resizeMode="cover"
+              source={require("../../../assets/right-actionable6.png")}
+            />
+          </Pressable>
+        </View>
+      </View>
+      <View style={styles.frameWrapper}>
+        <View style={styles.usernameParent}>
+          <Text style={[styles.username, styles.usersFlexBox]}>
+            Username
+          </Text>
+          <Text style={styles.melsmith}>{user.username}</Text>
+        </View>
+      </View>
+      <View style={styles.frameWrapper}>
+        <View style={styles.usernameParent}>
+          <Text style={[styles.username, styles.usersFlexBox]}>
+            Member Type
+          </Text>
+          <View style={[styles.badge1, styles.badgeBorder]}>
+            <Text style={[styles.text3, styles.textTypo]}>{user.memberType}</Text>
+          </View>
+
+        </View>
+      </View>
+      <View style={[styles.frameWrapper2, styles.frameSpaceBlock]}>
+        <View style={styles.usernameParent}>
+          <Text style={[styles.username, styles.usersFlexBox]}>
+            Email
+          </Text>
+          <Text style={styles.melsmith}>{user.email}</Text>
+        </View>
+      </View>
+    </View>
+  );
+  return (
+   
+    <View style={styles.userManagement}>
+          <ProfileSettingsHeader
+            title="User Management"
+            onPressBack={() => navigation.navigate('Account')}
+          />
+      <SafeAreaView>
+        <ScrollView>
+      <View style={[styles.frameParent, styles.frameSpaceBlock1]}>
+        <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
+          <View style={[styles.usersParent, styles.frameGroupSpaceBlock]}>
+            <Text style={[styles.users, styles.usersFlexBox]}>Users</Text>
+            <Pressable
+              style={[styles.buttons,styles.buttonsBg]}
+              onPress={() => navigation.navigate("UserManagementEdit")}
+            >
+              <Text style={[styles.makePayment, styles.textClr]}>Add User</Text>
+            </Pressable>
+          </View>
+                <View style={styles.frameContainer}>
+                  {users.map((user, index) => (
+                    <React.Fragment key={index}>
+                      {renderUserCard(user)}
+                    </React.Fragment>
+                  ))}
+          </View>
+        </View>
+        <View style={styles.frameChild} />
+      </View>
+        </ScrollView>
+      </SafeAreaView>
+    </View>
+      
+  );
+};
+
+const styles = StyleSheet.create({
+  userManagementChildLayout: {
+    maxWidth: "100%",
+    overflow: "hidden",
+    width: "100%",
+  },
+  parentPosition: {
+    left: 0,
+    width: '100%',
+    position: "absolute",
+  },
+  textClr: {
+    color: Color.sparklightWhite,
+    textAlign: "center",
+  },
+  iconPosition: {
+    display: "none",
+    marginTop: -12,
+    top: "50%",
+    position: "absolute",
+  },
+  iconLayout: {
+    width: 32,
+    height: 32,
+    overflow: "hidden",
+  },
+  frameSpaceBlock1: {
+    paddingBottom: Padding.p_base,
+    paddingHorizontal: Padding.p_base,
+  },
+  frameGroupSpaceBlock: {
+    paddingBottom: Padding.p_5xl,
+    paddingTop: Padding.p_base,
+    alignSelf: "stretch",
+  },
+  usersFlexBox: {
+    textAlign: "left",
+    color: Color.colorDimgray,
+  },
+  frameBorder: {
+    borderWidth: 1,
+    borderColor: Color.colorGainsboro_100,
+    borderStyle: "solid",
+    borderRadius: Border.br_11xs,
+  },
+  navigationBorder: {
+    borderColor: Color.colorGainsboro_100,
+    borderStyle: "solid",
+    alignItems: "center",
+  },
+  rightLayout: {
+    borderRadius: Border.br_181xl,
+    height: 32,
+    width: 32,
+  },
+  melissaSmithTypo: {
+    color: Color.colorGray_200,
+    fontSize: FontSize.size_base,
+    textAlign: "left",
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "600",
+  },
+  rightFlexBox: {
+    padding: Padding.p_9xs,
+    borderRadius: Border.br_81xl,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  badgeBorder: {
+    paddingVertical: Padding.p_11xs,
+    paddingHorizontal: Padding.p_5xs,
+    alignItems: "center",
+    flexDirection: "row",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderRadius: Border.br_11xs,
+  },
+  textTypo: {
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "600",
+  },
+  frameSpaceBlock: {
+    paddingTop: Padding.p_5xs,
+    alignSelf: "stretch",
+  },
+  userManagementChild: {
+    height: "10.73%",
+    top: "0%",
+    right: "0%",
+    bottom: "89.27%",
+    left: "0%",
+    maxHeight: "100%",
+    position: "absolute",
+    maxWidth: "100%",
+  },
+  iosstatusBarwhiteIcon: {
+    height: 44,
+    alignSelf: "stretch",
+  },
+  title: {
+    marginLeft: -80,
+    fontSize: FontSize.size_lg,
+    textAlign: "center",
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "600",
+    lineHeight: 18,
+    left: "50%",
+    marginTop: -9,
+    color: Color.sparklightWhite,
+    top: "50%",
+    position: "absolute",
+  },
+  icon: {
+    height: "100%",
+    marginTop: -12,
+    overflow: "hidden",
+    width: "100%",
+  },
+  chevronLeft: {
+    left: 18,
+    height: 24,
+    width: 24,
+    top: "50%",
+    position: "absolute",
+  },
+  plusIcon: {
+    right: 24,
+    height: 24,
+    width: 24,
+    overflow: "hidden",
+  },
+  heartIcon: {
+    right: 52,
+    height: 32,
+    display: "none",
+    marginTop: -12,
+    top: "50%",
+    position: "absolute",
+  },
+  navBar: {
+    height: 56,
+    width: '100%',
+  },
+  users: {
+    fontSize: FontSize.size_3xl,
+    fontFamily: FontFamily.openSansRegular,
+    lineHeight: 28,
+    flex: 1,
+  },
+  makePayment: {
+    fontSize: FontSize.textXsSemibold_size,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+    color: Color.sparklightWhite,
+  },
+  buttonsBg: {
+    paddingHorizontal: Padding.p_base,
+    height: 32,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: Border.br_11xs,
+  },
+  buttons: {
+    marginLeft: 10,
+    backgroundColor: Color.sparkLightPurple,
+  },
+  usersParent: {
+    alignItems: "center",
+    flexDirection: "row",
+    paddingHorizontal: Padding.p_5xl,
+  },
+  avatarContrastInnerBorder: {
+    right: 0,
+    borderColor: Color.colorGray_200,
+    borderWidth: 0.5,
+    opacity: 0.08,
+    bottom: 0,
+    borderRadius: Border.br_181xl,
+    borderStyle: "solid",
+    left: 0,
+    top: 0,
+    position: "absolute",
+    overflow: "hidden",
+  },
+  text: {
+    marginLeft: -12,
+    fontFamily: FontFamily.textSmSemibold,
+    fontSize: FontSize.size_xs,
+    width: 24,
+    textAlign: "center",
+    fontWeight: "600",
+    color: Color.sparklightWhite,
+    lineHeight: 18,
+    left: "50%",
+    top: "50%",
+    marginTop: -9,
+    position: "absolute",
+  },
+  rightActionable: {
+    backgroundColor: Color.colorMidnightblue,
+  },
+  melissaSmith: {
+    lineHeight: 16,
+  },
+  loggedIn: {
+    lineHeight: 12,
+    marginTop: 4,
+    fontSize: FontSize.size_xs,
+    fontFamily: FontFamily.openSansRegular,
+  },
+  melissaSmithParent: {
+    marginLeft: 8,
+    justifyContent: "center",
+  },
+  rightActionableParent: {
+    alignItems: "center",
+    flexDirection: "row",
+    flex: 1,
+  },
+  rightActionableIcon: {
+    height: 24,
+    width: 24,
+    overflow: "hidden",
+  },
+  rightActionableContainer: {
+    marginLeft: 16,
+  },
+  frameParent2: {
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  frameParent1: {
+    borderBottomWidth: 1,
+    paddingVertical: Padding.p_base,
+    alignItems: "center",
+    flexDirection: "row",
+    paddingHorizontal: Padding.p_5xl,
+    alignSelf: "stretch",
+  },
+  username: {
+    fontSize: FontSize.textXsSemibold_size,
+    lineHeight: 28,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "600",
+  },
+  melsmith: {
+    fontSize: FontSize.size_base,
+    textAlign: "left",
+    color: Color.colorDimgray,
+    fontFamily: FontFamily.openSansRegular,
+    lineHeight: 28,
+  },
+  usernameParent: {
+    justifyContent: "center",
+    alignSelf: "stretch",
+  },
+  frameWrapper: {
+    paddingBottom: Padding.p_5xs,
+    justifyContent: "center",
+    paddingTop: Padding.p_base,
+    paddingHorizontal: Padding.p_5xl,
+    alignSelf: "stretch",
+  },
+  text1: {
+    color: Color.success700,
+    fontSize: FontSize.size_xs,
+    textAlign: "center",
+    lineHeight: 18,
+    fontFamily: FontFamily.openSansSemiBold,
+  },
+  badge: {
+    backgroundColor: Color.success50,
+    borderColor: Color.colorAquamarine,
+  },
+  badgeWrapper: {
+    marginTop: 2,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  frameWrapper1: {
+    paddingVertical: Padding.p_5xs,
+    justifyContent: "center",
+    paddingHorizontal: Padding.p_5xl,
+    alignSelf: "stretch",
+  },
+  frameWrapper2: {
+    borderBottomRightRadius: Border.br_11xs,
+    borderBottomLeftRadius: Border.br_11xs,
+    justifyContent: "center",
+    paddingBottom: Padding.p_base,
+    paddingHorizontal: Padding.p_5xl,
+  },
+  frameView: {
+    alignSelf: "stretch",
+  },
+  rightActionable1: {
+    backgroundColor: Color.sparklightBrightPurple,
+  },
+  taylorNickum: {
+    marginLeft: 8,
+    lineHeight: 28,
+  },
+  text3: {
+    color: Color.colorGray_200,
+    fontSize: FontSize.size_xs,
+    textAlign: "center",
+    lineHeight: 18,
+    fontFamily: FontFamily.openSansSemiBold,
+  },
+  badge1: {
+    backgroundColor: Color.colorAquamarine,
+    borderColor: Color.colorWhitesmoke_300,
+    marginTop: 2,
+  },
+  frameParent3: {
+    marginTop: 16,
+    alignSelf: "stretch",
+  },
+  rightActionable2: {
+    backgroundColor: Color.colorForestgreen,
+  },
+  frameContainer: {
+    paddingHorizontal: Padding.p_base,
+    paddingVertical: 0,
+    alignSelf: "stretch",
+  },
+  frameGroup: {
+    borderWidth: 1,
+    borderColor: Color.colorGainsboro_100,
+    borderStyle: "solid",
+    borderRadius: Border.br_11xs,
+    backgroundColor: Color.sparklightWhite,
+    overflow: "hidden",
+  },
+  frameChild: {
+    marginTop: 10,
+    borderRadius: Border.br_11xs,
+    height: 24,
+    alignSelf: "stretch",
+  },
+  frameParent: {
+    top: 100,
+    paddingTop: Padding.p_5xl,
+    width: '100%',
+    marginBottom:200
+  },
+  rightActionableIcon6: {
+    height: 32,
+  },
+  userManagement: {
+    flex: 1
+  },
+});
+
+export default UserManagement;
