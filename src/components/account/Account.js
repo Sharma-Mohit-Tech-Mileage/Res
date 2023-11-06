@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, View, Pressable } from "react-native";
+import { Image, StyleSheet, Text, View, Pressable, StatusBar } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, Padding, FontSize, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
@@ -7,6 +7,7 @@ const Account = () => {
   const navigation = useNavigation();
   return (
     <View style={styles.account}>
+      <StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />
       <LinearGradient
         style={[styles.accountChild]}
         locations={[0, 1]}
@@ -28,10 +29,7 @@ const Account = () => {
         <View style={styles.rightActionableParent}>
           <View style={styles.rightActionable}>
             <View
-              style={[
-                styles.avatarContrastInnerBorder,
-                styles.avatarInnerBorder,
-              ]}
+
             />
             <Text style={[styles.text, styles.textTypo]}>MS</Text>
           </View>
@@ -202,10 +200,10 @@ const styles = StyleSheet.create({
   },
  
   accountChild: {
-    height: "15.77%",
+    //height: "15.77%",
     top: "0%",
     right: "0%",
-    bottom: "84.23%",
+    bottom: "82.23%",
     left: "0%",
     maxHeight: "100%",
     position: "absolute",
@@ -218,7 +216,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginTop: -9,
     fontWeight: "600",
-    top: "50%",
+    top: 19,
   },
   chevronLeftIcon: {
     left: 18,
@@ -228,31 +226,12 @@ const styles = StyleSheet.create({
     marginTop: -12,
     overflow: "hidden",
   },
-  settingsIcon: {
-    right: 24,
-    height: 24,
-    display: "none",
-    width: 24,
-    marginTop: -12,
-    overflow: "hidden",
-  },
-  heartIcon: {
-    right: 52,
-    display: "none",
-    marginTop: -12,
-    top: "50%",
-    position: "absolute",
-    height: 32,
-    width: 32,
-  },
   navBar: {
-    height: 56,
-    width: 430,
+    top:56,
+    width: '100%',
   },
   iosstatusBarwhiteParent: {
-    width: 430,
-    top: 0,
-    left: 0,
+    width: '100%',
   },
   avatarContrastInnerBorder: {
     right: 8,
@@ -265,9 +244,9 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: -22,
-    marginLeft: -28,
+    marginLeft: -24,
     fontSize: 24,
-    lineHeight: 36,
+    lineHeight: 40,
     width: 48,
     textAlign: "center",
     fontWeight: "600",
@@ -336,7 +315,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   buttons: {
-    width: 382,
+    width: '100%',
     paddingHorizontal: 0,
     marginTop: 16,
     borderRadius: Border.br_11xs,
@@ -358,24 +337,6 @@ const styles = StyleSheet.create({
     left: 0,
     position: "absolute",
     overflow: "hidden",
-  },
-  home: {
-    color: Color.sparklightDarkGray,
-    fontSize: FontSize.textXsSemibold_size,
-    fontFamily: FontFamily.openSansSemiBold,
-  },
-  tabs: {
-    justifyContent: "center",
-    flex: 1,
-  },
-  navigation: {
-    top: 847,
-    borderTopWidth: 1,
-    height: 85,
-    alignItems: "center",
-    width: 430,
-    left: 0,
-    position: "absolute",
   },
   account: {
     height: 932,

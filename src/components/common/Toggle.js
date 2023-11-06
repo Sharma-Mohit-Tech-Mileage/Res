@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Animated, TouchableWithoutFeedback, View, StyleSheet, Easing } from 'react-native';
+import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
 
 const Toggle = ({ onToggle }) => {
     const [isActive, setIsActive] = useState(false);
@@ -18,8 +19,8 @@ const Toggle = ({ onToggle }) => {
         }).start();
     };
 
-    const activeColor = '#4CAF50';
-    const inactiveColor = '#ccc';
+    const activeColor = Color.sparklightGreen;
+    const inactiveColor = Color.sparklightDarkGray;
 
     return (
         <TouchableWithoutFeedback

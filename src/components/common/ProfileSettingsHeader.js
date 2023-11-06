@@ -25,7 +25,6 @@ const ProfileSettingsHeader = ({ title, onPressBack }) => {
             />
             <View style={[styles.iosstatusBarwhiteParent, styles.iosstatusBarwhiteParentPosition]}>
                 <View style={styles.navBar}>
-                    <Text style={styles.title}>{title}</Text>
                     <Pressable
                         style={[styles.chevronLeft, styles.chevronLeftLayout]}
                         onPress={onPressBack}
@@ -41,8 +40,10 @@ const ProfileSettingsHeader = ({ title, onPressBack }) => {
                             accessible={false} // Image is decorative
                         />
                     </Pressable>
+                    <Text style={styles.title}>{title}</Text>
                 </View>
             </View>
+
         </>
     );
 };
@@ -95,9 +96,6 @@ const styles = StyleSheet.create({
     chevronLeft: {
         position: 'absolute', // Ensure position is absolute
         left: 18,
-        top: 30, // Adjusted to center the icon vertically
-        height: 48, // Ensure touch target is 48x48
-        width: 48,
         justifyContent: 'center', // Center the icon
         alignItems: 'center',
         zIndex:1
