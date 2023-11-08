@@ -1,12 +1,11 @@
-import {combineReducers,  } from 'redux';
-import { configureStore } from '@reduxjs/toolkit';
+import createSagaMiddleware from "@redux-saga/core";
+import { configureStore } from "@reduxjs/toolkit";
+import { combinedReducers } from "./reducers/MainReducer";
+const sagaMiddleware = createSagaMiddleware();
 
-import profile from './reducers/UserReducer.js';
-
-const rootReducer = combineReducers({
-  user: profile
+const store = configureStore({
+  reducer: {combinedReducers},
+  middleware: [sagaMiddleware],
 });
-const store=configureStore({reducer:rootReducer})
-
 
 export default store;
