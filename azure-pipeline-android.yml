@@ -18,9 +18,9 @@ steps:
   inputs:
     versionSpec: '20.6.1'
 
-- script: npm update react-native-svg-charts
+- script: rm -rf node_modules/
   workingDirectory: src
-  displayName: 'update react-native-svg-charts'
+  displayName: 'Cleaning npm modules '
 
 - script: npm install
   workingDirectory: src
