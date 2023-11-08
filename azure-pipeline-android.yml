@@ -22,7 +22,7 @@ steps:
   workingDirectory: src
   displayName: 'Cleaning npm modules '
 
-- script: npm install
+- script: npm install --legacy-peer-deps
   workingDirectory: src
   displayName: 'Install node dependencies'
 
