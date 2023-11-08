@@ -1,0 +1,83 @@
+// AccountStack.js
+
+import React from 'react'; 
+import { createStackNavigator } from '@react-navigation/stack';
+import AccountScreen from '../../components/account/Account';
+import ProfileSettings from '../../components/userProfile/ProfileSettings';
+import ProfileSettingsEdit from '../../components/userProfile/ProfileSettingsEdit';
+import PasswordSecurity from '../../components/userProfile/PasswordSecurity';
+import PasswordSecurityEdit from '../../components/userProfile/PasswordSecurityEdit';
+import Notifications from '../../components/notifiction/Notifications';
+import EmailNotifications from '../../components/notifiction/EmailNotifications'
+import InAppNotifications from '../../components/notifiction/InAppNotifications'
+import TextNotifications from '../../components/notifiction/TextNotifications'
+import UserManagement from '../../components/userManagement/UserManagement';
+import UserManagementEdit from '../../components/userManagement/UserManagementEdit';
+
+
+const AccountStack = createStackNavigator();
+
+function AccountStackScreen() {
+    return (
+        <AccountStack.Navigator initialRouteName="Account">
+            <AccountStack.Screen
+                name="Account"
+                component={AccountScreen}
+                options={{ headerShown: false }}
+            />
+            <AccountStack.Screen
+                name="ProfileSettings"
+                component={ProfileSettings}
+                options={{ headerShown: false }}
+            />
+            <AccountStack.Screen
+                name="ProfileSettingsEdit"
+                component={ProfileSettingsEdit}
+                options={{ headerShown: false }}
+            />
+            <AccountStack.Screen
+                name="PasswordSecurity"
+                component={PasswordSecurity}
+                options={{ headerShown: false }}
+            />
+            <AccountStack.Screen
+                name="PasswordSecurityEdit"
+                component={PasswordSecurityEdit}
+                options={{ headerShown: false }}
+            />
+             <AccountStack.Screen
+                name="Notifications"
+                component={Notifications}
+                options={{ headerShown: false }}
+            />
+            <AccountStack.Screen
+                name="EmailNotifications"
+                component={EmailNotifications}
+                options={{ headerShown: false }}
+            />
+            <AccountStack.Screen
+                name="TextNotifications"
+                component={TextNotifications}
+                options={{ headerShown: false }}
+            />
+            <AccountStack.Screen
+                name="InAppNotifications"
+                component={InAppNotifications}
+                options={{ headerShown: false }}
+            />
+            <AccountStack.Screen
+                name="UserManagement"
+                component={UserManagement}
+                options={{ headerShown: false }}
+            />
+            <AccountStack.Screen
+                name="UserManagementEdit"
+                component={UserManagementEdit}
+                options={{ headerShown: false }}
+            />
+            {/* Add other account-related screens here, if any */}
+        </AccountStack.Navigator>
+    );
+}
+
+export default AccountStackScreen;
