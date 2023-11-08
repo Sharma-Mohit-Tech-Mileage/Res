@@ -18,7 +18,7 @@ steps:
   inputs:
     versionSpec: '20.6.1'
 
-- script: rm -rf node_modules/
+- script: npm cache clean --force 
   workingDirectory: src
   displayName: 'Cleaning npm modules '
 
