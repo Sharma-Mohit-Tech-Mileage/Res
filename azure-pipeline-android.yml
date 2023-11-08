@@ -18,6 +18,10 @@ steps:
   inputs:
     versionSpec: '20.6.1'
 
+- script: npm update react-native-svg-charts
+  workingDirectory: src
+  displayName: 'update react-native-svg-charts'
+
 - script: npm install
   workingDirectory: src
   displayName: 'Install node dependencies'
