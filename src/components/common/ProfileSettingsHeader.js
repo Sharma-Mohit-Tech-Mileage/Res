@@ -13,17 +13,20 @@ import LinearGradient from 'react-native-linear-gradient';
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
 
 const ProfileSettingsHeader = ({ title, onPressBack }) => {
+    // Example of a platform-specific style adjustment
+    const statusBarHeight = Platform.OS === 'ios' ? 44 : 40;
+
     return (
         <>
             <StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />
             <LinearGradient
-                style={[styles.profileSettingsChild, styles.iosstatusBarwhiteIconLayout]}
+                style={[styles.profileSettingsChild, styles.iosstatusBarwhiteIconLayout, { paddingTop: statusBarHeight }]}
                 locations={[0, 1]}
                 colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
                 useAngle={true}
                 angle={90}
             />
-            <View style={[styles.iosstatusBarwhiteParent, styles.iosstatusBarwhiteParentPosition]}>
+            <View style={[styles.iosstatusBarwhiteParent, styles.iosstatusBarwhiteParentPosition, { top: statusBarHeight }]}>
                 <View style={styles.navBar}>
                     <Pressable
                         style={[styles.chevronLeft, styles.chevronLeftLayout]}
@@ -47,6 +50,7 @@ const ProfileSettingsHeader = ({ title, onPressBack }) => {
         </>
     );
 };
+
 
 
 const styles = StyleSheet.create({

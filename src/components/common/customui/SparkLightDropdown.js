@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, FlatList, Image } from 'react-native';
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../../GlobalStyles";
 
 const SparkLightDropdown = ({ items, selectedValue, onValueChange, style }) => {
@@ -24,7 +24,11 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style }) => {
                 accessibilityLabel="Dropdown Button"
                 accessibilityHint="Tap to open dropdown menu"
             >
-                <Text>{selectedValue || 'Select an option'}</Text>
+                <Text style={styles.dropdownText}>{selectedValue || 'Select an option'}</Text>
+                <Image
+                    source={require('../../../../assets/chevrondown.png')}
+                    style={styles.iconStyle}
+                />
             </TouchableOpacity>
 
             {showDropdown && (
@@ -36,7 +40,7 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style }) => {
                         accessibilityLabel="Overlay Button"
                         accessibilityHint="Tap anywhere to close dropdown menu"
                     >
-                        <View style={[styles.listContainer, { padding: 20 }]}>
+                        <View style={[styles.listContainer, { padding: Padding.p_xs }]}>
                             {validItems.length > 0 ? (
                                 <FlatList
                                     data={validItems}
@@ -69,25 +73,38 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style }) => {
 const styles = StyleSheet.create({
     container: {
         marginTop: 8,
-        padding:20
     },
+    // ... your other styles,
     dropdown: {
-        borderColor: Color.colorGray_100,
+        flexDirection: 'row', // Ensure text and icon are in a row
+        justifyContent: 'space-between', // Space the text and icon
+        alignItems: 'center', // Center the items vertically
+        borderColor: Color.sparklightDarkGray,
         borderWidth: 1,
         borderRadius: 2,
-        paddingHorizontal: 8,
-        paddingVertical: 12,
         backgroundColor: Color.snow_white,
+        paddingHorizontal: Padding.p_base,
+        paddingVertical:Padding.p_xs
+    },
+    dropdownText: {
+        flex: 1, // Text should take up the majority of the space
+    },
+    iconStyle: {
+        // Style your icon as needed
+        width: 20,
+        height: 20,
+        resizeMode: 'contain',
     },
     listContainer: {
         marginTop: 50,
-        marginHorizontal: 20,
+        marginHorizontal: Padding.p_base,
         borderRadius: 2,
         backgroundColor: 'white',
         overflow: 'hidden',
+        
     },
     item: {
-        padding: 12,
+        padding: Padding.p_base,
         borderBottomWidth: 1,
         borderColor: '#ccc',
     },
@@ -97,7 +114,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.5)',
     },
     emptyDropdown: {
-        padding: 20,
+        padding: Padding.p_base,
         alignItems: 'center',
         justifyContent: 'center',
     },

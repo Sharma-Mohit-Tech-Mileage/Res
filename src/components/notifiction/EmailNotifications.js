@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Image, StyleSheet, Text, Pressable, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
-import Toggle from '../common/Toggle'; 
+import Toggle from '../common/Toggle';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 
 const EmailNotifications = () => {
@@ -16,7 +16,7 @@ const EmailNotifications = () => {
   const navigation = useNavigation();
 
   return (
-    <View style={styles.emailNotifications} accessible accessibilityLabel="Email Notifications">
+    <View style={{ flex: 1, backgroundColor: Color.sparklightBlue }} accessible accessibilityLabel="Email Notifications">
       <ProfileSettingsHeader
         title="Edit Email Notifications"
         onPressBack={() => navigation.navigate('Notifications')}
@@ -124,7 +124,7 @@ const EmailNotifications = () => {
 
 
 const styles = StyleSheet.create({
- 
+
   navigationBorder: {
     borderColor: Color.colorGainsboro_100,
     justifyContent: "center",
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignSelf: "stretch",
   },
-  
+
   receiveTypo: {
     fontSize: FontSize.textXsSemibold_size,
     color: Color.colorGray_100,
@@ -244,21 +244,11 @@ const styles = StyleSheet.create({
   },
   emailNotificationsInner: {
     top: 100,
-    height: 632,
-    paddingTop: Padding.p_5xl,
+    marginTop: Padding.p_base,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     width: '100%',
-    left: 0,
-    position: "absolute",
     overflow: "hidden",
-  },
-  emailNotifications: {
-    height: 932,
-    overflow: "hidden",
-    width: "100%",
-    flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
   },
 });
 

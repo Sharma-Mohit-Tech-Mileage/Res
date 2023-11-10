@@ -21,7 +21,9 @@ const PasswordSecurity = () => {
             </Text>
             <Pressable
               style={[styles.buttons, styles.buttonsBg]}
+
               onPress={() => navigation.navigate("PasswordSecurityEdit")}
+              accessible={true}
               accessibilityLabel="Edit Password"
               accessibilityRole="button"
               accessibilityHint="Navigate to PasswordSecurityEdit to edit password"
@@ -33,7 +35,7 @@ const PasswordSecurity = () => {
           </View>
           <View style={styles.frameGroup}>
             <View style={styles.passwordGroup}>
-              <Text style={[styles.password, styles.passwordFlexBox]}>
+              <Text style={[ styles.passwordFlexBox]}>
                 Password
               </Text>
               <Text style={[styles.text, styles.passwordFlexBox]} accessibilityRole="text">
@@ -51,7 +53,7 @@ const PasswordSecurity = () => {
               </View>
               <View style={styles.passwordGroup}>
                 <View style={styles.nameOfYourFirstPetParent}>
-                  <Text style={[styles.password, styles.passwordFlexBox]}>
+                  <Text style={[ styles.passwordFlexBox]}>
                     Name of your first pet?
                   </Text>
                   <Text style={[styles.text, styles.passwordFlexBox]} accessibilityRole="text">
@@ -160,18 +162,10 @@ const styles = StyleSheet.create({
   },
   passwordSecurityInner: {
     top: 100,
-    height: 748,
-    paddingTop: Padding.p_5xl,
-    width: '100%',
-    left: 0,
-    position: "absolute",
-    overflow: "hidden",
+    paddingTop: Padding.p_base,
   },
   passwordSecurity: {
     backgroundColor: Color.sparklightBlue,
-    height: 932,
-    overflow: "hidden",
-    width: "100%",
     flex: 1,
   },
 });

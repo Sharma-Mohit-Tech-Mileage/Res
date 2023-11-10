@@ -153,7 +153,7 @@ const ProfileSettingsEdit = () => {
 
               <Pressable
                 style={[styles.buttons, styles.buttonsLayout]}
-                onPress={() => navigation.navigate("Account")}
+                onPress={() => navigation.navigate("ProfileSettings")}
                 accessible={true}
                 accessibilityRole="button"
                 accessibilityLabel="Save button"
@@ -163,7 +163,7 @@ const ProfileSettingsEdit = () => {
               </Pressable>
               <Pressable
                 style={[styles.buttons1, styles.buttonsLayout]}
-                onPress={() => navigation.navigate("Account")}
+                onPress={() => navigation.navigate("ProfileSettings")}
                 accessible={true}
                 accessibilityRole="button"
                 accessibilityLabel="Cancel button"
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   profileSettingsEditInner: {
     top: 100,
     height: '100%',
-    paddingTop: Padding.p_5xl,
+    paddingTop: Padding.p_base,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",

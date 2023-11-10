@@ -34,7 +34,6 @@ const PasswordSecurityEdit = () => {
                   Password
                 </Text>
               </View>
-              <View style={styles.frameParent}>
                 <View style={styles.frameParent}>
                   <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                     <View style={styles.textinput}>
@@ -64,27 +63,43 @@ const PasswordSecurityEdit = () => {
                     </View>
                   </View>
                   <View style={[styles.itMustBeDifferentThanYourWrapper, styles.wrapperSpaceBlock]}>
-                    <Text style={[styles.itMustBe, styles.passwordFlexBox]} accessibilityRole="text">
-                      {`It must be different than your user name.
-It must contain 8 to 20 characters.
-It must include an upper and lower case letter and a number.
-You may include special characters %,&,_,?,#,=,-.
-Your new password cannot have any spaces`}
-                    </Text>
+                  <View style={styles.passwordFlexBox}>
+                    {[
+                      "It must be different than your user name.",
+                      "It must contain 8 to 20 characters.",
+                      "It must include an upper and lower case letter and a number.",
+                      "You may include special characters %,&,_,?,#,=,-.",
+                      "Your new password cannot have any spaces."
+                    ].map((point, index) => (
+                      <View key={`point-${index}`} style={styles.bulletPointContainer}>
+                        <Text style={styles.bulletPoint}>•</Text>
+                        <Text style={styles.itMustBe}>{point}</Text>
+                      </View>
+                    ))}
+                  </View>
                   </View>
                 </View>
+              <View style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}>
+                <View style={styles.frameChild} />
+              </View>
                 <View style={styles.frameParent1}>
                   <View style={styles.securityQuestionWrapper}>
                     <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header">
                       Security Question
                     </Text>
                   </View>
-
-                  <SparkLightDropdown
-                    items={securityQuestions}
-                    accessibilityLabel="Security Question Dropdown"
-                    accessibilityHint="Dropdown for selecting a security question"
-                  />
+                  <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                    <View style={styles.textinput}>
+                      <Text style={[styles.firstName1, styles.firstTypo]} accessibilityRole="header">
+                      Password Reset Question
+                      </Text>
+                      <SparkLightDropdown
+                        items={securityQuestions}
+                        accessibilityLabel="Security Question Dropdown"
+                        accessibilityHint="Dropdown for selecting a security question"
+                      />
+                    </View>
+                  </View>
                   <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                     <View style={styles.textinput}>
                       <Text style={[styles.firstName1, styles.firstTypo]} accessibilityRole="header">
@@ -125,7 +140,6 @@ Your new password cannot have any spaces`}
               </Pressable>
             </View>
           </View>
-        </View>
       </ScrollView>
       </View>
   );
@@ -135,6 +149,14 @@ const styles = StyleSheet.create({
   wrapperSpaceBlock1: {
     paddingVertical: Padding.p_base,
     alignSelf: "stretch",
+  },
+  bulletPointContainer: {
+    flexDirection: 'row', // Align bullet and text horizontally
+    alignItems: 'flex-start', // Align items to the start of the flex container
+    marginBottom: 5, // Space between bullet points
+  },
+  bulletPoint: {
+    marginRight: 10, // Space between bullet and text
   },
   passwordFlexBox: {
     textAlign: "left",
@@ -274,7 +296,7 @@ const styles = StyleSheet.create({
   },
   passwordSecurityEditInner: {
     top: 100,
-    paddingTop: Padding.p_5xl,
+    paddingTop: Padding.p_base,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",

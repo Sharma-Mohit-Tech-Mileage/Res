@@ -13,9 +13,9 @@ const TextNotifications = ({ navigation }) => {
     };
     return (
 
-        <View style={styles.textNotifications} accessibilityLabel="Text Notifications Section">
+        <View style={{ flex: 1, backgroundColor: Color.sparklightBlue }} accessibilityLabel="Text Notifications Section">
             <ProfileSettingsHeader
-                title="Text Notifications"
+                title="Edit Text Notifications"
                 onPressBack={() => navigation.navigate('Notifications')}
                 accessibilityLabel="Text Notifications Header"
                 accessibilityHint="Navigates back to the Notifications screen"
@@ -234,7 +234,7 @@ const TextNotifications = ({ navigation }) => {
                             <View style={styles.buttonsParent} accessibilityLabel="Buttons Section">
                                 <Pressable
                                     style={[styles.buttons, styles.buttonsLayout]}
-                                    onPress={() => navigation.navigate("Account")}
+                                    onPress={() => navigation.navigate("Notifications")}
                                     accessibilityLabel="Save Button"
                                     accessibilityRole="button"
                                     accessibilityHint="Saves changes and navigates back to the Account screen"
@@ -243,7 +243,7 @@ const TextNotifications = ({ navigation }) => {
                                 </Pressable>
                                 <Pressable
                                     style={[styles.buttonsLayout]}
-                                    onPress={() => navigation.navigate("Account")}
+                                    onPress={() => navigation.navigate("Notifications")}
                                     accessibilityLabel="Cancel Button"
                                     accessibilityRole="button"
                                     accessibilityHint="Cancels changes and navigates back to the Account screen"
@@ -263,35 +263,10 @@ const TextNotifications = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    iosstatusBarwhiteIconLayout: {
-        maxWidth: "100%",
-        overflow: "hidden",
-        width: "100%",
-    },
-    navigationPosition: {
-        width: '100%',
-        left: 0,
-        position: "absolute",
-    },
-    titleClr: {
-        color: Color.sparklightWhite,
-        textAlign: "center",
-    },
-    chevronLeftLayout: {
-        height: 24,
-        width: 24,
-    },
-    iconPosition: {
-        display: "none",
-        marginTop: -12,
-        top: "50%",
-        position: "absolute",
-        overflow: "hidden",
-    },
-    iconLayout: {
-        height: 32,
-        width: 32,
-    },
+
+
+
+
     navigationBorder: {
         borderColor: Color.sparklightWhite,
         justifyContent: "center",
@@ -333,36 +308,8 @@ const styles = StyleSheet.create({
         fontFamily: FontFamily.openSansRegular,
     },
     accountClr: {
-        color: Color.sparklightBrightPurple,
+        color: Color.sparkLightPurple,
         textAlign: "center",
-    },
-    title: {
-        marginLeft: -96,
-        fontSize: FontSize.size_lg,
-        textAlign: "center",
-        fontFamily: FontFamily.openSansSemiBold,
-        fontWeight: "600",
-        lineHeight: 18,
-        left: "50%",
-        top: "50%",
-        position: "absolute",
-        marginTop: -9,
-        color: Color.sparklightWhite,
-    },
-    icon: {
-        height: "100%",
-        marginTop: -12,
-        overflow: "hidden",
-        width: "100%",
-    },
-    chevronLeft: {
-        left: 18,
-        top: "50%",
-        position: "absolute",
-    },
-    navBar: {
-        height: 56,
-        width: '100%',
     },
     infoCircleIcon: {
         width: 16,
@@ -390,7 +337,7 @@ const styles = StyleSheet.create({
     },
     frameView: {
         borderRadius: 8,
-        backgroundColor: "#f8f8f8",
+        backgroundColor: Color.colorWhitesmoke_100,
         width: 334,
         paddingHorizontal: Padding.p_base,
         paddingVertical: 6,
@@ -421,21 +368,6 @@ const styles = StyleSheet.create({
     buttonIcon: {
         width: 21,
         height: 20,
-    },
-    toggleBase: {
-        borderRadius: Border.br_xs,
-        backgroundColor: Color.sparklightGreen,
-        width: 36,
-        justifyContent: "flex-end",
-        padding: Padding.p_11xs,
-        height: 20,
-        flexDirection: "row",
-        alignItems: "center",
-        overflow: "hidden",
-    },
-    toggle: {
-        alignItems: "flex-end",
-        justifyContent: "center",
     },
     frameParent4: {
         flexDirection: "row",
@@ -525,17 +457,12 @@ const styles = StyleSheet.create({
     },
     textNotificationsInner: {
         top: 100,
-        paddingTop: Padding.p_5xl,
+        paddingTop: Padding.p_base,
         flex: 1,
-        paddingTop: Padding.p_5xl,
         paddingHorizontal: Padding.p_base,
         width: '100%',
-        marginBottom:200
-    },
-
-    textNotifications: {
-        flex: 1
-    },
+        marginBottom: 200,
+    }
 });
 
 export default TextNotifications;

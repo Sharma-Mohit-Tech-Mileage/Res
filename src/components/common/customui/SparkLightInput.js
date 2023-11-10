@@ -12,10 +12,11 @@ const SparkLightInput = ({ placeholder, onChangeText, style, accessibilityLabel,
     };
 
     return (
-        <View style={[styles.container, isFocused ? { borderColor: Color.sparklightBrightPurple } : {}, style]}>
+        <View style={[styles.outerContainer, isFocused ? { borderColor: Color.sparklightBrightPurple } : {}, style]}>
+            <View style={styles.container}>
             <TextInput
-                placeholder={placeholder}
-                value={"value"}
+               // placeholder={placeholder}
+                value={"sparklight"}
                 onChangeText={handleInputChange}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
@@ -27,25 +28,31 @@ const SparkLightInput = ({ placeholder, onChangeText, style, accessibilityLabel,
                 {...props}
             />
         </View>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
+    outerContainer: {
+        // Apply the border to this outer container instead
         marginTop: 8,
-        paddingVertical: Padding.p_5xs,
-        paddingHorizontal: Padding.p_xs,
-        height: 40,
-        borderColor: Color.colorGray_100,
+        height: 42, // Increase the height by the border width to keep input size
+        borderColor: Color.sparklightDarkGray,
         borderWidth: 1,
         borderRadius: Border.br_11xs,
+        justifyContent: 'center',
+        overflow: 'hidden', // Ensures the child View conforms to this View's border radius
+    },
+    container: {
+        height: 40,
         justifyContent: 'center',
     },
     textInput: {
         color: Color.colorGray_100,
         fontSize: FontSize.size_base,
+        paddingHorizontal: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,
-        flex: 1,
+       
     },
 });
 

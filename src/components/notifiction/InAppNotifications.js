@@ -11,15 +11,12 @@ const InAppNotifications = () => {
 
   const handleToggle = (isActive) => {
     setIsToggleActive(isActive);
-    // // Announce the change to screen readers
-    // const newState = isActive ? "enabled" : "disabled";
-    // AccessibilityInfo.announceForAccessibility(`Notifications ${newState}`);
   };
 
   return (
     <View style={styles.inAppNotifications} accessible accessibilityLabel="In-App Notifications">
       <ProfileSettingsHeader
-        title="Edit Email Notifications"
+        title="Edit In-App Notifications"
         onPressBack={() => navigation.navigate('Notifications')}
         accessibilityLabel="Back to Account"
         accessibilityHint="Navigates back to the Notifications screen"
@@ -220,8 +217,7 @@ const styles = StyleSheet.create({
   },
   inAppNotificationsInner: {
     top: 100,
-    height: 632,
-    paddingTop: Padding.p_5xl,
+    paddingTop: Padding.p_base,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     width: '100%',
@@ -230,9 +226,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   inAppNotifications: {
-    height: 932,
-    overflow: "hidden",
-    width: "100%",
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
   },

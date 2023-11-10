@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, View, Pressable, ScrollView, StatusBar } from "react-native";
+import { Image, StyleSheet, Text, View, Pressable, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -7,19 +7,16 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 const ProfileSettings = () => {
   const navigation = useNavigation();
   return (
-    <View style={styles.profileSettings}>
-        <ProfileSettingsHeader
-          title="Profile Settings"
-          onPressBack={() => navigation.navigate('Account')}
-          accessibilityHint="Navigate back to the Account page."
-        />
-        <ScrollView accessibilityLabel="Profile settings page.">
+    <View style={{ zIndex: 1 }}>
+      <ProfileSettingsHeader
+        title="Profile Settings"
+        onPressBack={() => navigation.navigate('Account')}
+        accessibilityHint="Navigate back to the Account page."
+      />
+      <ScrollView accessibilityLabel="Profile settings page.">
         <View style={styles.frameParent}>
           <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
-            <View
-              style={[
-                styles.generalInformationParent
-              ]}
+            <View style={[styles.generalInformationParent]}
               accessible={true}
               accessibilityLabel="General Information section."
             >
@@ -81,15 +78,16 @@ const ProfileSettings = () => {
                         />
                         <View style={styles.creditCardWillExpireSoonParent}>
                           <Text style={styles.creditCardWill} accessible={true} accessibilityLabel="Primary Admin Notification">Primary Admin</Text>
-                          <Text style={[styles.yourSavedCard, styles.makeTypo]} accessible={true} accessibilityLabel="Primary admin account information.">
-                            You are currently the primary admin account. You can
-                            make another account the primary admin account. By
-                            doing so you will become an admin user under the new
-                            primary admin account.
+                          <Text style={[styles.yourSavedCard]} accessible={true} accessibilityLabel="Primary admin account information.">
+                            You are currently the primary admin
+                            account. You can make another account
+                            the primary admin account. By doing so
+                            you will become an admin user under the
+                            new primary admin account.
                           </Text>
                           <View style={[styles.buttons1, styles.buttonsLayout]}>
                             <Text
-                              style={[styles.makePayment, styles.accountClr]}
+                              style={[styles.makePayment1, styles.accountClr]}
                               accessibilityRole="button"
                               accessibilityLabel="Change Primary Admin"
                             >
@@ -117,7 +115,7 @@ const ProfileSettings = () => {
                 <View style={styles.frameChild} />
               </View>
               <View style={styles.frameParent1SpaceBlock}>
-                <View style={styles.contactInformationWrapper} accessible={true} accessibilityLabel="Contact Information section.">
+                <View style={styles.contactInformationWrapper}>
                   <Text style={[styles.generalInformation, styles.melissaTypo]}>
                     Contact Information
                   </Text>
@@ -132,18 +130,17 @@ const ProfileSettings = () => {
             </View>
           </View>
         </View>
-        </ScrollView>
-      </View>
+      </ScrollView>
+    </View>
   );
 };
 
 
 const styles = StyleSheet.create({
   frameGroupSpaceBlock: {
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
+    paddingVertical: Padding.p_13xl,
     alignSelf: "stretch",
-    marginBottom: 200, 
+    marginBottom: 200,
   },
   melissaTypo: {
     color: Color.sparklightGray1,
@@ -163,7 +160,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   accountClr: {
-    color: Color.sparklightBrightPurple,
+    color: Color.sparkLightPurple,
     textAlign: "center",
   },
   badgeBorder: {
@@ -175,10 +172,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontSize: FontSize.textXsSemibold_size,
     fontWeight: "600",
-  },
-  makeTypo: {
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
   },
   rightIconLayout: {
     height: 18,
@@ -193,6 +186,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_3xl,
     textAlign: "left",
     flex: 1,
+    fontWeight: '400'
   },
   makePayment: {
     textAlign: "center",
@@ -205,7 +199,9 @@ const styles = StyleSheet.create({
   },
   buttons1: {
     marginTop: 8,
-    backgroundColor: Color.sparklightGray,
+    backgroundColor: Color.colorWhitesmoke_200,
+    height: 32,
+    marginEnd: 100
   },
   generalInformationParent: {
     paddingHorizontal: Padding.p_5xl,
@@ -218,11 +214,12 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_sm,
     textAlign: "left",
     color: Color.sparklightGray1,
-    lineHeight: 28,
+    lineHeight: 28/* 200% */,
   },
   melissa: {
     fontSize: FontSize.size_base,
     textAlign: "left",
+    fontWeight: '400'
   },
   firstNameParent: {
     paddingVertical: Padding.p_5xs,
@@ -266,10 +263,8 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_sm,
     textAlign: "left",
     alignSelf: "stretch",
-  },
-  makePayment: {
-    fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_sm,
   },
 
   creditCardWillExpireSoonParent: {
@@ -324,10 +319,8 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   frameGroup: {
-    paddingHorizontal: 0,
     borderWidth: 1,
     borderStyle: "solid",
-    borderRadius: Border.br_11xs,
     borderColor: Color.sparklightGray,
     backgroundColor: Color.sparklightWhite,
     overflow: "hidden",
@@ -336,10 +329,6 @@ const styles = StyleSheet.create({
     top: 100,
     padding: Padding.p_base,
     width: '100%',
-  },
-  profileSettings: {
-    zIndex:1,
-    flex: 1,
   },
 });
 

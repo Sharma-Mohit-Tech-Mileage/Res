@@ -11,7 +11,7 @@ const Notifications = () => {
     
    <View style={styles.notifications}>
           <ProfileSettingsHeader
-            title="Text Notifications"
+            title="Notifications"
             onPressBack={() => navigation.navigate('Account')}
           />
       <SafeAreaView style={{ flex: 1 }}>
@@ -23,11 +23,10 @@ const Notifications = () => {
               infoText={`Text alerts are sent to `}
               number="433-839-2398"
               navigationTarget="TextNotifications"
-              //types={['Appointments', 'Outage', 'Billing']}
               additionalSettings={[
-                { type: 'Appointments', status: 'Unsubscribe' },
-                { type: 'Outage', status: 'Unsubscribe' },
-                { type: 'Billing', status: 'Subscribe' },
+                { type: 'Appointments', status: 'Unsubscribed' },
+                { type: 'Outage', status: 'Unsubscribed' },
+                { type: 'Billing', status: 'Subscribed' },
               ]}
             />
             {/* Email Notifications Section */}
@@ -39,7 +38,7 @@ const Notifications = () => {
               //types={['Paperless Billing', 'Marketing']}
               additionalSettings={[
                 { type: 'Paperless Billing', status: 'Off' },
-                { type: 'Marketing', status: 'On' },
+                { type: 'Offers & Promotions', status: 'On' },
               ]}
             />
             {/* In-App Notifications Section */}
@@ -68,7 +67,6 @@ const NotificationSection = ({
   number,
   email,
   navigationTarget,
-  types,
   additionalSettings = [],
 }) => {
   const navigation = useNavigation();
@@ -86,8 +84,6 @@ const NotificationSection = ({
           <Text style={styles.makePayment}>Edit</Text>
         </Pressable>
       </View>
-      <View style={styles.frameParent3}>
-        <View style={styles.frameWrapper7}>
           <View style={styles.frameWrapper}>
             <View style={styles.frameView}>
               <View style={styles.infoCircleWrapper}>
@@ -99,15 +95,10 @@ const NotificationSection = ({
                   accessibilityLabel="Information Icon"
                 />
               </View>
-              <Text
-                style={[
-                  styles.notificationsSentFrom,
-                  styles.notificationsSentFromTypo,
-                ]}
-              >
+              <Text style={[styles.notificationsSentFrom,styles.notificationsSentFromTypo]}>
                 {infoText}
                 {number && (
-                  <Text style={styles.text} accessibilityLabel={`Phone Number: ${number}`}>
+                  <Text style={[styles.text]} accessibilityLabel={`Phone Number: ${number}`}>
                     {number}
                   </Text>
                 )}
@@ -118,16 +109,11 @@ const NotificationSection = ({
                 )}
               </Text>
             </View>
-          </View>
         </View>
-        {/* {(types||[]).map((type, index) => (
-          <NotificationType key={index} type={type} status="Subscribed" />
-        ))} */}
         {additionalSettings.map((setting, index) => (
           <NotificationType key={index} type={setting.type} status={setting.status} />
         ))}
       </View>
-    </View>
   );
 };
 
@@ -137,12 +123,12 @@ const NotificationType = ({ type, status }) => {
 
   switch (status) {
     case 'On':
-    case 'Subscribe':
+    case 'Subscribed':
       displayStatus = status;
       imageSource = require("../../../assets/checkcircle.png");
       break;
     case 'Off':
-    case 'Unsubscribe':
+    case 'Unsubscribed':
       displayStatus = status;
       imageSource = require("../../../assets/checkcircle1.png");
       break;
@@ -155,7 +141,7 @@ const NotificationType = ({ type, status }) => {
 
   return (
     <View style={styles.frameWrapperBorder}>
-      <View style={[styles.appointmentsParent, styles.parentSpaceBlock]}>
+      <View style={[ styles.parentSpaceBlock]}>
         <Text style={[styles.appointments, styles.subscribedTypo]}>{type}</Text>
         <View style={styles.checkCircleParent}>
           <Image
@@ -175,7 +161,7 @@ const NotificationType = ({ type, status }) => {
 
 const styles = StyleSheet.create({
   frameBorder: {
-    paddingTop: Padding.p_base,
+    paddingTop: Padding.p_xl,
     borderWidth: 1,
     justifyContent: "center",
     borderColor: Color.colorGainsboro_100,
@@ -201,11 +187,11 @@ const styles = StyleSheet.create({
   },
   frameWrapperBorder: {
     borderBottomWidth: 1,
-    alignItems: "center",
-    flexDirection: "row",
     borderColor: Color.colorGainsboro_100,
     borderStyle: "solid",
     alignSelf: "stretch",
+    alignItems: "center",
+    flexDirection: "row",
   },
   subscribedTypo: {
     fontSize: FontSize.size_base,
@@ -228,13 +214,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Color.sparklightWhite,
   },
-  buttons: {
-    padding: Padding.p_base,
-    marginLeft: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: Border.br_11xs,
-  },
   textNotificationsParent: {
     alignSelf: "stretch",
   },
@@ -248,15 +227,9 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_5xs,
     flexDirection: "row",
   },
-  textAlertsAre: {
-    fontFamily: FontFamily.openSansRegular,
-  },
   text: {
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "600",
-  },
-  textAlertsAreContainer: {
-    marginLeft: 8,
   },
   frameView: {
     borderRadius: Border.br_5xs,
@@ -268,10 +241,12 @@ const styles = StyleSheet.create({
   },
   frameWrapper: {
     width: 382,
-    paddingVertical: 0,
+    paddingVertical: Padding.p_base,
     paddingHorizontal: Padding.p_5xl,
     alignItems: "center",
     justifyContent: "center",
+    borderBottomWidth: 1,
+    borderColor: Color.colorGainsboro_100,
   },
   appointments: {
     flex: 1,
@@ -283,66 +258,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
-  appointmentsParent: {
-    flex: 1,
-  },
-  frameWrapper1: {
-    borderTopWidth: 1,
-  },
-  frameParent1: {
-    marginTop: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "stretch",
-  },
-  frameContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "stretch",
-  },
-  frameGroup: {
-    alignItems: "flex-end",
-  },
-  frameChild: {
-    height: 1,
-    backgroundColor: Color.colorGainsboro_100,
-    alignSelf: "stretch",
-  },
-  rectangleWrapper: {
-    width: '100%',
-    marginTop: 16,
-  },
-  frameParent3: {
-    alignItems: "center",
-    alignSelf: "stretch",
-  },
   frameParent2: {
-    marginTop: 16,
+    marginTop: Padding.p_5xs,
     alignItems: "center",
   },
   notificationsSentFrom: {
     marginLeft: 8,
     fontFamily: FontFamily.openSansRegular,
   },
-  frameWrapper7: {
-    alignItems: "center",
-    flexDirection: "row",
-    alignSelf: "stretch",
-  },
-  frameParent8: {
-    marginTop: 16,
-    marginBottom: 16,
-    alignItems: "center",
-    alignSelf: "stretch",
-  },
-  frameParent: {
-    height: '100%',
-    paddingBottom: 36,
-    alignSelf: "stretch",
-  },
   notificationsInner: {
     top: 100,
-    height: '100%',
     padding: Padding.p_base,
     marginBottom:250
   },

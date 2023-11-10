@@ -1,125 +1,121 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, View, Pressable, StatusBar } from "react-native";
+import { Image, StyleSheet, Text, View, Pressable, StatusBar, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, Padding, FontSize, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
+import chevronRightIcon from '../../../assets/chevronright.png';
+import profileSettingsIcon from '../../../assets/right-actionable15.png';
+import passwordSecurityIcon from '../../../assets/right-actionable16.png';
+import notificationsIcon from '../../../assets/right-actionable17.png';
+import userManagementIcon from '../../../assets/right-actionable18.png';
+
 const Account = () => {
   const navigation = useNavigation();
+  
+  const menuItems = [
+    {
+      name: 'Profile Settings',
+      onPress: () => navigation.navigate('ProfileSettings'),
+      icon: profileSettingsIcon,
+      accessibilityLabel: 'Navigate to profile settings',
+    },
+    {
+      name: 'Password & Security',
+      onPress: () => navigation.navigate('PasswordSecurity'),
+      icon: passwordSecurityIcon,
+      accessibilityLabel: 'Navigate to password and security settings',
+    },
+    {
+      name: 'Notifications',
+      onPress: () => navigation.navigate('Notifications'),
+      icon: notificationsIcon,
+      accessibilityLabel: 'Navigate to notifications settings',
+    },
+    {
+      name: 'User Management',
+      onPress: () => navigation.navigate('UserManagement'),
+      icon: userManagementIcon,
+      accessibilityLabel: 'Navigate to user management settings',
+    },
+  ];
+
   return (
-    <View style={styles.account}>
-      <StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />
+    <View style={{ flex: 1 }} accessibilityLabel="Account screen">
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       <LinearGradient
         style={[styles.accountChild]}
         locations={[0, 1]}
         colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
-        useAngle={true}
+        useAngle
         angle={90}
       />
-      <View style={[styles.iosstatusBarwhiteParent]}>
+      <View>
         <View style={styles.navBar}>
-          <Text style={[styles.title, styles.textTypo]}>Account</Text>
-          <Image
-            style={[styles.chevronLeftIcon, styles.iconPosition]}
-            resizeMode="cover"
-            source={require("../../../assets/chevronleft.png")}
-          />
+          {/* Screen header */}
+          <Text style={[styles.title, styles.textTypo]} accessible={true} accessibilityRole="header">
+            Account
+          </Text>
         </View>
       </View>
       <View style={[styles.frameParent, styles.buttonsSpaceBlock]}>
         <View style={styles.rightActionableParent}>
           <View style={styles.rightActionable}>
-            <View
-
-            />
-            <Text style={[styles.text, styles.textTypo]}>MS</Text>
-          </View>
-          <View style={styles.melissaSmithWrapper}>
-            <Text style={[styles.melissaSmith, styles.melissaSmithClr]}>
-              Melissa Smith
+            {/* Initials or profile picture alternative text */}
+            <View />
+            <Text style={[styles.text, styles.textTypo]} accessibilityLabel="Initials M S">
+              MS
             </Text>
           </View>
+          {/* Full name for profile */}
+          <Text style={styles.melissaSmith} accessibilityLabel="Profile name: Melissa Smith">
+            Melissa Smith
+          </Text>
         </View>
         <View style={styles.frameGroup}>
-          <View style={[styles.frameContainer, styles.navigationBorder]}>
-            <Pressable
-              style={[styles.rightActionableGroup, styles.tabsFlexBox]}
-              onPress={() => navigation.navigate("ProfileSettings")}
-            >
-              <Image
-                style={styles.rightIconLayout}
-                resizeMode="cover"
-                source={require("../../../assets/right-actionable15.png")}
-              />
-              <Text style={[styles.profileSettings, styles.makePaymentTypo]}>
-                Profile Settings
-              </Text>
-              <Image
-                style={[styles.rightActionableIcon1, styles.rightIconLayout]}
-                resizeMode="cover"
-                source={require("../../../assets/chevronright.png")}
-              />
-            </Pressable>
-            <View style={styles.frameChild} />
-            <Pressable
-              style={[styles.rightActionableGroup, styles.tabsFlexBox]}
-              onPress={() => navigation.navigate("PasswordSecurity")}
-            >
-              <Image
-                style={styles.rightIconLayout}
-                resizeMode="cover"
-                source={require("../../../assets/right-actionable16.png")}
-              />
-              <Text
-                style={[styles.profileSettings, styles.makePaymentTypo]}
-              >{`Password & Security`}</Text>
-              <Image
-                style={[styles.rightActionableIcon1, styles.rightIconLayout]}
-                resizeMode="cover"
-                source={require("../../../assets/chevronright.png")}
-              />
-            </Pressable>
-            <View style={styles.frameChild} />
-            <Pressable
-              style={[styles.rightActionableGroup, styles.tabsFlexBox]}
-              onPress={() => { navigation.navigate('Notifications') }}
-            >
-              <Image
-                style={styles.rightIconLayout}
-                resizeMode="cover"
-                source={require("../../../assets/right-actionable17.png")}
-              />
-              <Text style={[styles.profileSettings, styles.makePaymentTypo]}>
-                Notifications
-              </Text>
-              <Image
-                style={[styles.rightActionableIcon1, styles.rightIconLayout]}
-                resizeMode="cover"
-                source={require("../../../assets/chevronright.png")}
-              />
-            </Pressable>
-            <View style={styles.frameChild} />
-            <Pressable
-              style={[styles.rightActionableGroup, styles.tabsFlexBox]}
-              onPress={() => { navigation.navigate('UserManagement') }}
-            >
-              <Image
-                style={styles.rightIconLayout}
-                resizeMode="cover"
-                source={require("../../../assets/right-actionable18.png")}
-              />
-              <Text style={[styles.profileSettings, styles.makePaymentTypo]}>
-                User Management
-              </Text>
-              <Image
-                style={[styles.rightActionableIcon1, styles.rightIconLayout]}
-                resizeMode="cover"
-                source={require("../../../assets/chevronright.png")}
-              />
-            </Pressable>
+          <View style={styles.navigationBorder}>
+            {/* Mapping through menu items */}
+            {menuItems.map((item, index) => (
+              <React.Fragment key={item.name}>
+                <Pressable
+                  style={[styles.rightActionableGroup, styles.tabsFlexBox]}
+                  onPress={item.onPress}
+                  accessibilityLabel={item.name}
+                  accessibilityHint={`Navigates to ${item.name}`}
+                  accessibilityRole="button"
+                >
+                  {/* Menu item icon */}
+                  <Image
+                    style={styles.rightIconLayout}
+                    resizeMode="cover"
+                    source={item.icon}
+                    accessible
+                    accessibilityLabel={`${item.name} icon`}
+                  />
+                  {/* Menu item text */}
+                  <Text style={[styles.profileSettings, styles.makePaymentTypo]}>
+                    {item.name}
+                  </Text>
+                  {/* Chevron/Arrow icon */}
+                  <Image
+                    style={[styles.rightActionableIcon1, styles.rightIconLayout]}
+                    resizeMode="cover"
+                    source={chevronRightIcon}
+                    accessible
+                    accessibilityLabel="Arrow right"
+                  />
+                </Pressable>
+                {/* Divider, if not the last item */}
+                {index < menuItems.length - 1 && <View style={styles.frameChild} />}
+              </React.Fragment>
+            ))}
           </View>
+          {/* Logout button */}
           <Pressable
+            accessible={true}
+            accessibilityLabel="Logout button"
+            accessibilityRole="button"
+            accessibilityHint="Logs you out of the account"
             style={[styles.buttons, styles.buttonsSpaceBlock]}
-            onPress={() => { }}
           >
             <Text style={[styles.makePayment, styles.makePaymentTypo]}>
               Logout
@@ -127,22 +123,11 @@ const Account = () => {
           </Pressable>
         </View>
       </View>
-
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  accountChildLayout: {
-    maxWidth: "100%",
-    overflow: "hidden",
-    width: "100%",
-  },
-  parentPosition: {
-    left: 0,
-    width: 430,
-    position: "absolute",
-  },
   textTypo: {
     color: Color.sparklightWhite,
     fontWeight: "600",
@@ -152,32 +137,9 @@ const styles = StyleSheet.create({
     left: "50%",
     position: "absolute",
   },
-  iconPosition: {
-    display: "none",
-    marginTop: -12,
-    top: "50%",
-    position: "absolute",
-  },
-  iconLayout: {
-    height: 32,
-    width: 32,
-    overflow: "hidden",
-  },
   buttonsSpaceBlock: {
     paddingVertical: Padding.p_base,
     alignItems: "center",
-  },
-  avatarInnerBorder: {
-    opacity: 0.08,
-    borderColor: Color.sparklightDarkestGray,
-    borderStyle: "solid",
-    left: 0,
-    top: 0,
-    overflow: "hidden",
-  },
-  melissaSmithClr: {
-    color: Color.sparklightDarkestGray,
-    lineHeight: 28,
   },
   navigationBorder: {
     borderColor: Color.sparklightGray,
@@ -196,11 +158,9 @@ const styles = StyleSheet.create({
   rightIconLayout: {
     height: 20,
     width: 20,
-    overflow: "hidden",
   },
- 
+
   accountChild: {
-    //height: "15.77%",
     top: "0%",
     right: "0%",
     bottom: "82.23%",
@@ -212,35 +172,10 @@ const styles = StyleSheet.create({
   title: {
     marginLeft: -35,
     fontSize: FontSize.size_lg,
-    textAlign: "center",
-    lineHeight: 18,
-    marginTop: -9,
-    fontWeight: "600",
-    top: 19,
-  },
-  chevronLeftIcon: {
-    left: 18,
-    height: 24,
-    display: "none",
-    width: 24,
-    marginTop: -12,
-    overflow: "hidden",
   },
   navBar: {
-    top:56,
+    top: 70,
     width: '100%',
-  },
-  iosstatusBarwhiteParent: {
-    width: '100%',
-  },
-  avatarContrastInnerBorder: {
-    right: 8,
-    bottom: 8,
-    borderWidth: 1,
-    borderRadius: Border.br_381xl,
-    opacity: 0.08,
-    borderColor: Color.sparklightDarkestGray,
-    position: "absolute",
   },
   text: {
     marginTop: -22,
@@ -269,12 +204,6 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     textAlign: "center",
   },
-  melissaSmithWrapper: {
-    marginTop: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    alignSelf: "stretch",
-  },
   rightActionableParent: {
     paddingBottom: Padding.p_base,
     justifyContent: "center",
@@ -302,13 +231,6 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: Color.sparklightGray,
   },
-  frameContainer: {
-    alignItems: "flex-end",
-    borderRadius: Border.br_11xs,
-    borderWidth: 1,
-    alignSelf: "stretch",
-    overflow: "hidden",
-  },
   makePayment: {
     width: 282,
     color: Color.sparkLightPurple,
@@ -322,7 +244,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     height: 56,
     paddingVertical: Padding.p_base,
-    backgroundColor: Color.sparklightBlue,
   },
   frameGroup: {
     marginTop: 10,
@@ -330,21 +251,12 @@ const styles = StyleSheet.create({
   },
   frameParent: {
     top: 100,
-    height: 748,
     paddingHorizontal: Padding.p_5xl,
     paddingVertical: Padding.p_base,
     width: '100%',
     left: 0,
-    position: "absolute",
-    overflow: "hidden",
-  },
-  account: {
-    height: 932,
-    overflow: "hidden",
-    width: "100%",
-    flex: 1,
-    backgroundColor: Color.sparklightBlue,
-  },
+    zIndex:9
+  }
 });
 
 export default Account;

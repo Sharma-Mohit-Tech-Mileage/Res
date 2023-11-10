@@ -199,19 +199,21 @@ const UserManagementEdit = () => {
                         />
                       </View>
                     </View>
-                    <View
-                      style={[
-                        styles.itMustBeDifferentThanYourWrapper,
-                        styles.wrapperSpaceBlock,
-                      ]}
-                    >
-                      <Text
-                        style={[styles.itMustBe, styles.firstClr]}
-                      >{`It must be different than your user name.
-It must contain 8 to 20 characters.
-It must include an upper and lower case letter and a number.
-You may include special characters %,&,_,?,#,=,-.
-Your new password cannot have any spaces`}</Text>
+                    <View style={[styles.itMustBeDifferentThanYourWrapper, styles.wrapperSpaceBlock]}>
+                      <View style={styles.passwordFlexBox}>
+                        {[
+                          "It must be different than your user name.",
+                          "It must contain 8 to 20 characters.",
+                          "It must include an upper and lower case letter and a number.",
+                          "You may include special characters %,&,_,?,#,=,-.",
+                          "Your new password cannot have any spaces."
+                        ].map((point, index) => (
+                          <View key={`point-${index}`} style={styles.bulletPointContainer}>
+                            <Text style={styles.bulletPoint}>•</Text>
+                            <Text style={styles.itMustBe}>{point}</Text>
+                          </View>
+                        ))}
+                      </View>
                     </View>
                     <View
                       style={[
@@ -283,7 +285,7 @@ Your new password cannot have any spaces`}</Text>
                       ]}
                     >
                       <View style={styles.textinput}>
-                        <Text style={[styles.firstName, styles.firstClr]}>
+                        <Text style={[ styles.firstClr]}>
                           Password Reset Question
                         </Text>
                         <View
@@ -315,7 +317,7 @@ Your new password cannot have any spaces`}</Text>
                       ]}
                     >
                       <View style={styles.textinput}>
-                        <Text style={[styles.firstName, styles.firstClr]}>
+                        <Text style={[ styles.firstClr]}>
                           Password Reset Answer
                         </Text>
                         <View
@@ -377,6 +379,14 @@ const styles = StyleSheet.create({
     color: Color.colorDimgray,
     textAlign: "left",
   },
+  bulletPointContainer: {
+    flexDirection: 'row', // Align bullet and text horizontally
+    alignItems: 'flex-start', // Align items to the start of the flex container
+    marginBottom: 5, // Space between bullet points
+  },
+  bulletPoint: {
+    marginRight: 10, // Space between bullet and text
+  },
   wrapperBorder: {
     paddingVertical: Padding.p_5xs,
     paddingHorizontal: Padding.p_xs,
@@ -390,6 +400,12 @@ const styles = StyleSheet.create({
     color: Color.colorGray_200,
     fontFamily: FontFamily.openSansRegular,
     textAlign: "left",
+  },
+  passwordFlexBox: {
+    textAlign: "left",
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.sparklightDarkGray,
+    flex: 1,
   },
   rightIconLayout: {
     height: 18,
@@ -580,10 +596,7 @@ const styles = StyleSheet.create({
   },
   itMustBe: {
     lineHeight: 19,
-    fontSize: FontSize.size_xs,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-    flex: 1,
+    fontSize: FontSize.textXsSemibold_size,
   },
   itMustBeDifferentThanYourWrapper: {
     alignItems: "center",
