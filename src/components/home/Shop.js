@@ -5,7 +5,7 @@ import { View, Text, Button } from 'react-native';
 const ShopScreen = ({route, navigation }) => {
 
 useEffect(()=>{
-  console.log('data')
+  //console.log('data')
 
 },[])
   return (

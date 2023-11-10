@@ -11,7 +11,7 @@ const MyServicePlan = () => {
   const [tabIndex, setTabIndex] = useState(0);
 
   useEffect(() => {
-    console.log("data");
+    //console.log("data");
   }, []);
   return (
     <View

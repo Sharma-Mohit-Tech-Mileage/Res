@@ -1,32 +1,27 @@
 import { Action } from '../constants/index';
 
 const initialState = {
-  profile: {
-    firstName: '',
-    lastName: '',
-    telephone: '',
-    age: 28,
-    email: '',
-    state: '',
-    country: '',
-    address: 'Home',
-    address1: '',
-    address2: '',
-    interests: [],
-    profileImage: '',
-    subscribenewsletter: false
-  },
-  formSubmitted: false
+  
+    "accountId": "900254640",
+    "userId": "900254640",
+    "download_Kbps": 343892,
+    "upload_Kbps": 295816,
+    "ping_ms": 7.00,
+    "jitter_ms": 1.00,
+    "host": "phoenix1.cabospeed.com",
+    "createdOn": "2023-10-13T15:58:11.43+00:00"
+
+  
 }
 
 const userReducer = (state = initialState, action) => {
   switch (action) {
-    case Action.FETCH_DATA:
-    console.log('login', action.payload.user)
+    case Action.GET_INTERNET_SPEED:
+    console.log('login', action.payload)
       return {
         ...state,
-        profile: action.payload.user,
-        formSubmitted: false // after update user formsubmition reset
+        data: action.payload,
+        
       }
     case Action.LIST_FETCHED:
       return {

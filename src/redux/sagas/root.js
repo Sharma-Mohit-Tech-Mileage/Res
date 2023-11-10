@@ -1,9 +1,9 @@
 import { all } from 'redux-saga/effects';
-import homeSaga from './HomeSaga';
+import appSagas from './HomeSaga';
 
 function* rootSaga() {
   yield all([
-    homeSaga(),
+    appSagas(),
   ]);
 }
 

@@ -25,8 +25,11 @@ import Myplanicon from "../../res/svgIcons/Myplanicon";
 import MyInternetDetials from "../common/MyInternetDetails";
 import Wallet2icon from "../../res/svgIcons/Wallet2icon";
 import MyServicePlan from "../common/MyServicePlan";
+import { storeListData, getCurrentSpeed } from "../../redux/actions/DashboardAction";
+import { useDispatch, useSelector } from 'react-redux';
 
 const HomeScreen = ({ route, navigation }) => {
+  const dispatch = useDispatch();
   const { email, name } = {
     email: route.params.data.params.email,
     name: route.params.data.params.name,
@@ -39,6 +42,7 @@ const HomeScreen = ({ route, navigation }) => {
       title: "Bill Summary",
       subText: "$64.00",
       date: "Due date Nov 16, 2023",
+      action:'View Details',
       key:'2'
     },
     {
@@ -46,11 +50,13 @@ const HomeScreen = ({ route, navigation }) => {
       title: "My Plan",
       subText: "300 mb/s",
       date: undefined,
+      action:'Upgrade Plan',
       key:'3'
     },
   ];
   useEffect(() => {
-    //console.log("data", JSON.stringify(route.params.data.params.email));
+   
+    dispatch(getCurrentSpeed('900254640'))
   }, []);
   return (
     <LinearGradient
@@ -132,7 +138,7 @@ const HomeScreen = ({ route, navigation }) => {
              <ScrollView horizontal={true}style={{marginStart:20}} >
             {myData.map((item, index) => (
               <View key={item.key} style={{marginHorizontal:10}}>
-                <MyInternetDetials key={item.key} date={item.date} icon={item.icon} title={item.title} subTitle={item.subText}/>
+                <MyInternetDetials key={item.key} date={item.date} icon={item.icon} title={item.title} subTitle={item.subText} actionTxt={item.action}/>
              </View>
              ))}
             </ScrollView> 
@@ -192,6 +198,7 @@ const styles = StyleSheet.create({
   hideShowDetails: {
     fontSize: 16,
     marginVertical: 5,
+    color:colors.sparklight_purple_blue,
     lineHeight: 20,
     fontWeight: "600",
   },

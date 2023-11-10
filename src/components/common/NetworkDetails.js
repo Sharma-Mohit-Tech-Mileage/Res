@@ -10,7 +10,7 @@ import strings from "../../res/Strings";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 const NetworkDetails = () => {
   useEffect(() => {
-    console.log("data");
+    //console.log("data");
   }, []);
  
   const GreenCircle=()=>{

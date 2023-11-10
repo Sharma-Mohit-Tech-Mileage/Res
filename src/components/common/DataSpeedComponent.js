@@ -14,6 +14,7 @@ import SecondaryButton from "./customui/SecondaryButton";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import TimerInfo from "../../res/svgIcons/TimerInfo";
+import strings from "../../res/Strings";
 
 const DataSpeedComponent = () => {
   const roundImage = require("../../res/images/roundbg.png");
@@ -117,9 +118,20 @@ const DataSpeedComponent = () => {
         <View style={{ marginTop: 5 }}>
           <InfoIcon />
         </View>
+        <View>
         <Text style={styles.internetStatusTxt}>
-          Speed test related information.{" "}
+          {strings.test_speed_info}
         </Text>
+        <View style={{flexDirection:'row',marginLeft:10,marginTop:10}}> 
+          <TouchableOpacity>
+          <Text style={styles.learnMore}>{strings.learn_more}</Text>
+          </TouchableOpacity>
+          <View style={styles.verticle_saperator}/> 
+          <TouchableOpacity>
+          <Text style={styles.learnMore}>{strings.test_with_eero}</Text>
+            </TouchableOpacity>
+        </View>
+        </View>
       </View>
       <TestSpeedResultSection />
       <View style={{ backgroundColor: "#F4F4F5", height: 2, marginTop: 10 }} />
@@ -204,7 +216,14 @@ const styles = StyleSheet.create({
     marginLeft:5,
     fontSize:14,
     fontWeight:'400'
-},timerInfo2:{marginLeft:5,color:colors.darkest_grey,fontSize:14,fontWeight:'400'}
+},timerInfo2:{marginLeft:5,color:colors.darkest_grey,fontSize:14,fontWeight:'400'},
+ learnMore:{
+  color:colors.darkest_grey,
+  fontSize: 14,
+    fontStyle: "normal",
+    fontWeight: "600",
+
+},verticle_saperator:{marginHorizontal:15,height:15,backgroundColor:colors.dark_grey,width:1}
 });
 
 export default DataSpeedComponent;

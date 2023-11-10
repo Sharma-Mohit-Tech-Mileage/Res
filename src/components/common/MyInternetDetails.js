@@ -4,7 +4,7 @@ import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-const MyInternetDetials = ({ icon, title, subTitle, date }) => {
+const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
   return (
     <View style={[styles.card, styles.shadowProp, { flexDirection: "column",marginVertical:20}]}>
       <View style={{ flexDirection: "row" }}>
@@ -47,7 +47,7 @@ const MyInternetDetials = ({ icon, title, subTitle, date }) => {
             color:colors.sparklight_purple_blue
           }}
         >
-          View Details
+          {actionTxt}
         </Text>
         <View style={{ marginTop: 5 }}>
           <RightArrow />

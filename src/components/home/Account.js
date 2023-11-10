@@ -4,7 +4,7 @@ import { View, Text, Button } from 'react-native';
 const AccountScreen = ({route, navigation }) => {
 
 useEffect(()=>{
-  console.log('data')
+  //console.log('data')
 
 },[])
   return (

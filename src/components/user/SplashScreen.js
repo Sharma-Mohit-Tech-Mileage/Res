@@ -25,7 +25,7 @@ const SplashScreen = ({ navigation }) => {
       try {
         const result = await authorize(config);
         // result includes accessToken, accessTokenExpirationDate and refreshToken
-        console.log("result", result);
+        //console.log("result", result);
         var decoded = jwt_decode(result.idToken);
         console.log("data", decoded);
         if (result.accessToken) {

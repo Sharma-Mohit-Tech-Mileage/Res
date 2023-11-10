@@ -1,7 +1,9 @@
 import { Action } from '../constants';
-export const fetchList= () => {
+export const getCurrentSpeed= (accountId) => {
+   
    return {
-      type: Action.FETCH_DATA,
+      type: Action.GET_INTERNET_SPEED,
+      payload:accountId
     };
 };
 export const storeListData= (result) => {

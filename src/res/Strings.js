@@ -11,7 +11,10 @@ let strings = new LocalizedStrings({
    no_modem_issue:'No Modem Issues',
    bill_paid:'Bill Paid',
    my_service_txt:'My Service',
-   my_plan_details_txt:'Plan Details'
+   my_plan_details_txt:'Plan Details',
+   test_speed_info:'Wi-Fi speeds on mobile devices are \n typically lower than wired speeds.',
+   learn_more:'Learn More',
+   test_with_eero:'Test with Eero'
  },
  
 });
