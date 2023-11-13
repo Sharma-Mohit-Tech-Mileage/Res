@@ -6,7 +6,6 @@ import {
     Pressable,
     Image,
     StyleSheet,
-    AccessibilityInfo,
     Platform
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -14,7 +13,7 @@ import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalSty
 
 const ProfileSettingsHeader = ({ title, onPressBack }) => {
     // Example of a platform-specific style adjustment
-    const statusBarHeight = Platform.OS === 'ios' ? 44 : 40;
+    const statusBarHeight = 40;
 
     return (
         <>
@@ -65,7 +64,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         overflow: "hidden",
         width: "100%",
-        zIndex:1
+        zIndex: 1
     },
     iosstatusBarwhiteIconLayout: {
         maxWidth: "100%",
@@ -95,20 +94,19 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: Color.sparklightWhite,
         fontFamily: FontFamily.openSansSemiBold,
-        zIndex: 1
+        zIndex: 9
     },
     chevronLeft: {
         position: 'absolute', // Ensure position is absolute
         left: 18,
         justifyContent: 'center', // Center the icon
         alignItems: 'center',
-        zIndex:1
+        zIndex: 9
     },
     chevronLeftLayout: {
         height: 24,
         width: 24,
     },
-    
     icon: {
         height: 24, // Adjusted size
         width: 24,
