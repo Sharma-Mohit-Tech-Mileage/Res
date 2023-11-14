@@ -1,12 +1,12 @@
 import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
-import {DashboardApi} from "../../network/apis/account/dashboard.service";
+import {getCurrentSpeedInfo} from "../../network/apis/account/dashboard.service";
 import { Action } from "../constants";
 import { storeListData, apiCalled } from "../actions/DashboardAction";
 // yield pauses and resume the generator functions
 function* getInternetSpeed(action) {
-  console.log("getCurrentSpeed",JSON.stringify(action));
+  console.log("getCurrentSpeed",action.payload);
    try {
-     const response = yield call(DashboardApi.SpeedTestApi.getCurrentSpeedInfo,action.paylod)
+     const response = yield call(getCurrentSpeedInfo,action.payload)
      if (response.status == 200) {
       console.log('Response Data',response)
        // to fire another action, use put method
@@ -19,7 +19,7 @@ function* getInternetSpeed(action) {
     } catch (error) {
       console.log(error);
     } finally {
-      yield put(apiCalled());
+      //yield put(apiCalled());
     }
 }
 function* appSagas() { 

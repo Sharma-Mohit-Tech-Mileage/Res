@@ -1,18 +1,14 @@
 // Project Sources
 import _axios from "../../RestApiClient";
 
-const DashboardService = {
-    getDashboardInfo (payload) {
-        
-        return _axios.post('/dashboard',payload);
-    },
+const getDashboardInfo =(params) =>{
+        return _axios.post('/dashboard',params);
 };
 
-const SpeedTestApi = {
-    getCurrentSpeedInfo (accountId) {
-        console.log('AccountId',accountId)
-        return _axios.get(`/Internet/api/internet/900254640/speedTest/Get`);
-    },
+const getCurrentSpeedInfo = async(params)=> {
+        console.log('AccountId',JSON.stringify(params))
+        return _axios.get(`/Internet/api/internet/${params}/speedTest/Get`);
+    
 };
 
-export const DashboardApi={SpeedTestApi,DashboardService}
+export {getDashboardInfo,getCurrentSpeedInfo}

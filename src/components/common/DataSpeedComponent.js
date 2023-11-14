@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     fontWeight:'400'
 },timerInfo2:{marginLeft:5,color:colors.darkest_grey,fontSize:14,fontWeight:'400'},
  learnMore:{
-  color:colors.darkest_grey,
+  color:colors.sparklight_purple_blue,
   fontSize: 14,
     fontStyle: "normal",
     fontWeight: "600",

@@ -1,6 +1,5 @@
 import React, { useState,useEffect } from 'react';
 import { View, Text, Button, StyleSheet,Alert } from 'react-native';
-import jwt_decode from "jwt-decode";
 import { authorize } from "react-native-app-auth";
 import MyTabs from '../../navigations/MyTab';
 
@@ -15,8 +14,8 @@ const LoginScreen = ({navigation}) => {
         const result = await authorize(config);
         // result includes accessToken, accessTokenExpirationDate and refreshToken
         console.log("result",result);
-        var decoded = jwt_decode(result.idToken);
-        console.log('data',decoded)
+    
+        
         if(result.accessToken){
           navigation.navigate('Home', {
             email: decoded.email,

@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { View, Image, StyleSheet, Text } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
-import jwt_decode from "jwt-decode";
+import * as Keychain from 'react-native-keychain';
 import { authorize } from "react-native-app-auth";
+import { useDispatch } from 'react-redux';
+import { ssoLoginAction } from "../../redux/actions/UserAction";
+
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -12,30 +15,35 @@ const config = {
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
   scopes: ["openid", "profile", "email", "phone", "address"],
   iosPrefersEphemeralSession: false,
-  //additionalParameters: { prompt: "login" },
+  additionalParameters: { prompt: "login" },
 };
 
 const SplashScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [isSplashReady, setIsSplashReady] = useState(false);
   const [data, setData] = useState(undefined);
 
   useEffect(() => {
+   
     // Simulate a delay for the splash screen
     const loginAuth = async () => {
       try {
         const result = await authorize(config);
         // result includes accessToken, accessTokenExpirationDate and refreshToken
         //console.log("result", result);
-        var decoded = jwt_decode(result.idToken);
-        console.log("data", decoded);
+        const data={idToken:result.idToken}
+         //dispatch(ssoLoginAction(data))
+         //callAPI(data)
+        //await Keychain.setInternetCredentials('IdToken', 'IdToken', result.idToken);
+        
         if (result.accessToken) {
           //setIsSplashReady(true);
           navigation.navigate('MyTab', {
-            email: decoded.email,
-            name: decoded.name,
+            email: "",
+            name: "",
           });
         }
-        setData(decoded);
+        //setData(decoded);
       } catch (error) {
         console.log(error);
       }
@@ -47,6 +55,21 @@ const SplashScreen = ({ navigation }) => {
 
     // }, 3000); // Adjust the duration as needed
   }, []);
+
+  const callAPI=(data)=>{
+    fetch('https://customer.uat.cableone.net/apiWrapper/mobile/api/gettoken', {
+  method: 'GET',
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(
+  data
+  )
+}).then((response) => response.json())
+.then((json) => setData(json))
+.catch((error) => console.error(error));
+  }
 
   return  (
     <LinearGradient

@@ -41,7 +41,7 @@ const HomeScreen = ({ route, navigation }) => {
       icon: <Wallet2icon />,
       title: "Bill Summary",
       subText: "$64.00",
-      date: "Due date Nov 16, 2023",
+      date: "Due on Nov 26, 2023",
       action:'View Details',
       key:'2'
     },
@@ -56,7 +56,7 @@ const HomeScreen = ({ route, navigation }) => {
   ];
   useEffect(() => {
    
-    dispatch(getCurrentSpeed('900254640'))
+    //dispatch(getCurrentSpeed('900254640'))
   }, []);
   return (
     <LinearGradient
@@ -79,9 +79,9 @@ const HomeScreen = ({ route, navigation }) => {
             resizeMode="contain"
             source={require("../../res/images/header_logo.png")}
           />
-          <View>
+          {/* <View>
             <BellIcon />
-          </View>
+          </View> */}
         </View>
         <ScrollView style={{ height: "100%", paddingBottom: 100 }}>
           <View

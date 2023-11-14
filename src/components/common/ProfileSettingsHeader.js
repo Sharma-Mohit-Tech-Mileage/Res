@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 const ProfileSettingsHeader = ({ title, onPressBack }) => {
     // Example of a platform-specific style adjustment
@@ -24,7 +25,7 @@ const ProfileSettingsHeader = ({ title, onPressBack }) => {
                 colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
                 useAngle={true}
                 angle={90}
-            />
+            >
             <View style={[styles.iosstatusBarwhiteParent, styles.iosstatusBarwhiteParentPosition, { top: statusBarHeight }]}>
                 <View style={styles.navBar}>
                     <Pressable
@@ -45,6 +46,7 @@ const ProfileSettingsHeader = ({ title, onPressBack }) => {
                     <Text style={styles.title}>{title}</Text>
                 </View>
             </View>
+            </LinearGradient>
 
         </>
     );
@@ -82,10 +84,11 @@ const styles = StyleSheet.create({
         left: 0,
     },
     navBar: {
-        height: 56,
+        height: wp("15%"),
         flexDirection: 'row', // Added for proper layout of children
         alignItems: 'center', // Added to center the title vertically
-        paddingHorizontal: 32, // Added padding to ensure text has space to center
+         // Added padding to ensure text has space to center
+         
     },
     title: {
         flex: 1, // Added to ensure text takes up available space
@@ -94,6 +97,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: Color.sparklightWhite,
         fontFamily: FontFamily.openSansSemiBold,
+        padding:8,
         zIndex: 9
     },
     chevronLeft: {
