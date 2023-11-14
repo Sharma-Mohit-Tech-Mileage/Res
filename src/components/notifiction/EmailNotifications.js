@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Image, StyleSheet, Text, Pressable, View } from "react-native";
+import { StyleSheet, Text, Pressable, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import Toggle from '../common/Toggle';
@@ -56,40 +56,6 @@ const EmailNotifications = () => {
                   >
                     Receive billing statements via email and no longer receive
                     paper statements in the mail.
-                  </Text>
-                </View>
-              </View>
-              <View style={[styles.frameWrapper1, styles.frameFlexBox]} >
-                <View style={styles.frameParent1}>
-                  <View
-                    style={[
-                      styles.paperlessBillingParent,
-                      styles.frameFlexBox,
-                    ]}
-                    accessible
-                    accessibilityRole="switch"
-                    accessibilityLabel="Offers and Promotions"
-                    accessibilityHint="Toggle receipt of offers and promotions emails on or off"
-                    accessibilityValue={{ text: isToggleActive ? "On" : "Off" }}
-                  >
-                    <Text
-                      style={styles.paperlessBilling}
-                    >{`Offers & Promotions`}</Text>
-                    <View>
-                      <Toggle onToggle={handleToggle} />
-                    </View>
-                  </View>
-                  <Text
-                    style={[
-                      styles.receiveMarketingEmailsContainer,
-                      styles.receiveTypo,
-                    ]}
-                    accessibilityRole="text"
-                  >
-                    <Text
-                      style={styles.receiveMarketingEmails}
-                    >{`Receive marketing emails containing offers and `}</Text>
-                    <Text style={styles.promotions}>promotions.</Text>
                   </Text>
                 </View>
               </View>

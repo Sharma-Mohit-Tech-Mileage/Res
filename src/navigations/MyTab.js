@@ -1,12 +1,12 @@
+import { TouchableOpacity, Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Platform } from 'react-native';
 import AccountStackScreen from '../navigations/stackNavigation/AccountStack';
 import ShopScreen from '../components/home/Shop';
 import SupportScreen from '../components/home/Support';
 import HomeScreen from '../components/home/Home';
 import SupportStack from '../navigations/stackNavigation/SupportStack';
 import HomeIconSelected from '../res/svgIcons/HomeIconSelected';
-import HomeIcone from '../res/svgIcons/HomeIcon';
+import HomeIcon from '../res/svgIcons/HomeIcon';
 import ShopIcon from '../res/svgIcons/ShopIcon';
 import ShopIconSelected from '../res/svgIcons/ShopIconSelected';
 import SupportIcon from '../res/svgIcons/SupportIcon';
@@ -40,12 +40,19 @@ const MyTabs=({route,navigation})=> {
         }}
       />
       <Tab.Screen
-        name="Shope"
+        name="Shop"
         component={ShopScreen}
-        options={{
-          tabBarLabel: 'Shop',
-          tabBarIcon: ({ focused, size }) => (
-            focused?<ShopIconSelected/>:<ShopIcon/>
+        options={({ navigation }) => ({
+          // headerShown: false,
+          presentation: 'modal',
+          tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected /> : <ShopIcon />),
+          headerTitle: "Shop",
+          headerTitleAlign: 'center', // This centers the title
+          headerRight: () => (
+            <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: 10 }}>
+              {/* Assuming you have an icon component for the close button */}
+              <Text >Close</Text>
+            </TouchableOpacity>
           ),
           
         }}

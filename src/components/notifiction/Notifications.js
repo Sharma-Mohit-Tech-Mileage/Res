@@ -38,7 +38,6 @@ const Notifications = () => {
               //types={['Paperless Billing', 'Marketing']}
               additionalSettings={[
                 { type: 'Paperless Billing', status: 'Off' },
-                { type: 'Offers & Promotions', status: 'On' },
               ]}
             />
             {/* In-App Notifications Section */}
@@ -252,7 +251,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   subscribed: {
-    marginLeft: 8,
+    marginLeft: 10,
+    alignItems:'left'
   },
   checkCircleParent: {
     alignItems: "center",
