@@ -52,8 +52,7 @@ const MyTabs=({route,navigation})=> {
               <Text >Close</Text>
             </TouchableOpacity>
           ),
-          
-        }}
+        })}
       />
       <Tab.Screen
         name="Support"
