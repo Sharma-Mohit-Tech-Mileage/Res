@@ -34,9 +34,7 @@ const MyTabs=({route,navigation})=> {
         options={{
           headerShown:false,
           tabBarLabel: 'Home',
-          tabBarIcon: ({ focused, size }) => (
-           (focused)? <HomeIconSelected />:<HomeIcone/>
-          ),
+          tabBarIcon: ({ focused }) => focused ? <HomeIconSelected /> : <HomeIcon />
         }}
       />
       <Tab.Screen
