@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_5xl,
   },
   frameChild: {
-    width: 358,
+    paddingHorizontal: Padding.p_5xl,
     height: 1,
     backgroundColor: Color.sparklightGray,
   },
