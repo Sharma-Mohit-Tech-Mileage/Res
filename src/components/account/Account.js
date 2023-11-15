@@ -153,6 +153,9 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_base,
     alignItems: "center",
   },
+  buttonsSpaceBlock1: {
+    alignItems: "center",
+  },
   navigationBorder: {
     borderColor: Color.sparklightGray,
     backgroundColor: Color.sparklightWhite,

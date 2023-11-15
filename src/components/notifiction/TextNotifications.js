@@ -20,7 +20,6 @@ const TextNotifications = ({ navigation }) => {
                 accessibilityLabel="Text Notifications Header"
                 accessibilityHint="Navigates back to the Notifications screen"
             />
-            <SafeAreaView style={{ flex: 1 }} accessibilityLabel="Main Container">
                 <ScrollView accessibilityLabel="Scroll View">
                     <View style={styles.textNotificationsInner} accessibilityLabel="Text Notifications Inner Container">
                         <View style={styles.frameParent}>
@@ -257,7 +256,6 @@ const TextNotifications = ({ navigation }) => {
                     </View>
 
                 </ScrollView>
-            </SafeAreaView>
         </View>
     );
 };

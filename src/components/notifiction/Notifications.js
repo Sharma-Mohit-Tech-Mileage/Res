@@ -1,10 +1,8 @@
 import React from "react";
-import { SafeAreaView,Image, StyleSheet, Text, Pressable, View, ScrollView, Platform } from "react-native";
+import { SafeAreaView,Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import  ProfileSettingsHeader  from '../common/ProfileSettingsHeader';
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import colors from "../../res/Colors";
 
 const Notifications = () => {
   const navigation = useNavigation();
@@ -14,11 +12,8 @@ const Notifications = () => {
    <View style={styles.notifications}>
           <ProfileSettingsHeader
             title="Notifications"
-            onPressBack={() =>{ 
-              console.log('Back Pressed')
-              navigation.goBack()}}
+            onPressBack={() => navigation.navigate('Account')}
           />
-      <SafeAreaView style={{ flex: 1 }}>
         <ScrollView accessibilityLabel="Main Scroll View">
           <View style={[styles.notificationsInner]}>
             {/* Text Notifications Section */}
@@ -59,7 +54,6 @@ const Notifications = () => {
           </View>
           
       </ScrollView>
-    </SafeAreaView>
   </View>
   );
 };
@@ -164,7 +158,6 @@ const NotificationType = ({ type, status }) => {
 
 const styles = StyleSheet.create({
   frameBorder: {
-    paddingTop: Padding.p_xl,
     borderWidth: 1,
     justifyContent: "center",
     borderColor: Color.colorGainsboro_100,
@@ -176,7 +169,7 @@ const styles = StyleSheet.create({
   },
   parentSpaceBlock: {
     paddingVertical: Padding.p_base,
-    paddingHorizontal: Padding.p_5xl,
+    paddingHorizontal: Padding.p_base,
     alignItems: "center",
     flexDirection: "row",
   },
@@ -231,7 +224,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   text: {
-    color: colors.darkest_grey,
+    color: Color.sparklightDarkestGray,
     fontWeight: "600",
     fontSize:14
   },
@@ -257,26 +250,24 @@ const styles = StyleSheet.create({
   },
   subscribed: {
     marginLeft: 10,
-    alignItems:'left'
   },
   checkCircleParent: {
     alignItems: "center",
     flexDirection: "row",
   },
   frameParent2: {
-    marginTop: Padding.p_5xs,
     alignItems: "center",
   },
   notificationsSentFrom: {
     marginLeft: 8,
-    color:colors.darkest_grey,
+    color: Color.sparklightDarkestGray,
     fontWeight:'400',
     
   },
   notificationsInner: {
-    top: (Platform.OS=='android')?wp("25%"):wp("10%"),
+    top: 100,
     padding: Padding.p_base,
-    marginBottom:250
+    marginBottom:200
   },
   buttonsBg: {
     paddingHorizontal: Padding.p_base,
@@ -291,9 +282,6 @@ const styles = StyleSheet.create({
   },
   notifications: {
     backgroundColor: Color.colorWhitesmoke_200,
-    minHeight: 932,
-    overflow: "hidden",
-    width: '100%',
   },
 });
 

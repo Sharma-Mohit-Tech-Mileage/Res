@@ -16,7 +16,7 @@ const EmailNotifications = () => {
   const navigation = useNavigation();
 
   return (
-    <View style={{ flex: 1, backgroundColor: Color.sparklightBlue }} accessible accessibilityLabel="Email Notifications">
+    <View style={{ flex: 1, backgroundColor: Color.sparklightBlue }}>
       <ProfileSettingsHeader
         title="Edit Email Notifications"
         onPressBack={() => navigation.navigate('Notifications')}

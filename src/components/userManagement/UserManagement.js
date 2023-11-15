@@ -1,9 +1,8 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, Pressable, View, SafeAreaView, ScrollView, Platform } from "react-native";
+import { Image, StyleSheet, Text, Pressable, View, SafeAreaView, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 const UserManagement = () => {
 
@@ -115,7 +114,6 @@ const UserManagement = () => {
         title="User Management"
         onPressBack={() => navigation.navigate('Account')}
       />
-      <SafeAreaView>
         <ScrollView>
           <View style={[styles.frameParent, styles.frameSpaceBlock1]}>
             <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
@@ -139,7 +137,6 @@ const UserManagement = () => {
             <View style={styles.frameChild} />
           </View>
         </ScrollView>
-      </SafeAreaView>
     </View>
 
   );
@@ -396,7 +393,7 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   frameParent: {
-    top: (Platform.OS=='android')?wp("25%"):wp("10%"),
+    top: 100,
     paddingTop: Padding.p_base,
     width: '100%',
     marginBottom: 200

@@ -21,7 +21,6 @@ const UserManagementEdit = () => {
         />
       <ScrollView>
         <View style={[styles.userManagementEditInner]}>
-          <View style={styles.frameParent}>
             <View style={styles.frameWrapper}>
               <View
                 style={[styles.frameGroup, styles.textinputWrapperSpaceBlock]}
@@ -356,7 +355,6 @@ const UserManagementEdit = () => {
               </Pressable>
             </View>
           </View>
-        </View>
     </ScrollView>
       </View>
   );
@@ -655,14 +653,11 @@ const styles = StyleSheet.create({
   
   userManagementEditInner: {
     top: 100,
-    paddingTop: Padding.p_5xl,
-    paddingBottom: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
+    padding: Padding.p_base,
     marginBottom:200
   },
 
   userManagementEdit: {
-  
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
   },
