@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -14,6 +14,7 @@ import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-nativ
 
 const ProfileSettingsHeader = ({ title, onPressBack }) => {
     // Example of a platform-specific style adjustment
+    const [iconPressed, setIconPressed] = useState(false); // State to manage icon press effect
     const statusBarHeight = 40;
 
     return (
@@ -35,9 +36,12 @@ const ProfileSettingsHeader = ({ title, onPressBack }) => {
                         accessibilityHint="Go back to the previous screen"
                         accessibilityRole="button"
                         accessible={true}
+                        hitSlop={20} // Increase touchable area
+                        onPressIn={() => setIconPressed(true)} // Change state on press in
+                        onPressOut={() => setIconPressed(false)} // Change state on press out
                     >
                         <Image
-                            style={styles.icon}
+                            style={[styles.icon, iconPressed ? styles.iconPressed : null]} // Change style on press
                             resizeMode="cover"
                             source={require("../../../assets/chevronleft.png")}
                             accessible={false} // Image is decorative
@@ -97,15 +101,14 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: Color.sparklightWhite,
         fontFamily: FontFamily.openSansSemiBold,
-        padding:8,
-        zIndex: 9
+        padding: 8,
     },
     chevronLeft: {
-        position: 'absolute', // Ensure position is absolute
+        position: 'absolute',
         left: 18,
         justifyContent: 'center', // Center the icon
         alignItems: 'center',
-        zIndex: 9
+        zIndex: 1
     },
     chevronLeftLayout: {
         height: 24,
@@ -114,6 +117,9 @@ const styles = StyleSheet.create({
     icon: {
         height: 24, // Adjusted size
         width: 24,
+    },
+    iconPressed: { // Style for icon when pressed
+        opacity: 0.5, // Change opacity on press
     },
 });
 

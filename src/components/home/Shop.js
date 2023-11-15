@@ -1,6 +1,6 @@
 import React,{useState,useEffect} from 'react';
 import { View, Text, Button } from 'react-native';
-import Article from '../support/ArticleModal';
+import Article from '../support/ArticleModal1';
 
 
 const ShopScreen = ({route, navigation }) => {
@@ -13,7 +13,7 @@ const ShopScreen = ({route, navigation }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      {showWebView ? <Article /> : null}
+      <Article onPress1={handlePress} />
     </View>
   );
   }

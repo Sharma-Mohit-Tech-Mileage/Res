@@ -146,7 +146,7 @@ const NotificationType = ({ type, status }) => {
     <View style={styles.frameWrapperBorder}>
       <View style={[ styles.parentSpaceBlock]}>
         <Text style={[styles.appointments, styles.subscribedTypo]}>{type}</Text>
-        <View style={styles.checkCircleParent}>
+        <View style={[styles.checkCircleParent, { marginRight: displayStatus =='Subscribed' ? 18 : 0 }]}>
           <Image
             style={styles.infoCircleIcon}
             resizeMode="cover"

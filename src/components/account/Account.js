@@ -109,6 +109,18 @@ const Account = () => {
               </React.Fragment>
             ))}
           </View>
+          <Pressable
+            accessible={true}
+            accessibilityLabel="Logout button"
+            accessibilityRole="button"
+            accessibilityHint="Logs you out of the account"
+            style={[styles.buttons, styles.buttonsSpaceBlock1]}
+          >
+            <Text style={[styles.makePayment, { fontStyle: 'italic', color: '#4169E1' }]}>
+              View our Privacy Policy and Terms & Condition
+            </Text>
+
+          </Pressable>
           {/* Logout button */}
           <Pressable
             accessible={true}

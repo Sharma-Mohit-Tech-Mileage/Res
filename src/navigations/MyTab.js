@@ -1,4 +1,4 @@
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, StatusBar,View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AccountStackScreen from '../navigations/stackNavigation/AccountStack';
 import ShopScreen from '../components/home/Shop';
@@ -12,8 +12,28 @@ import ShopIconSelected from '../res/svgIcons/ShopIconSelected';
 import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
-
+import LinearGradient from 'react-native-linear-gradient';
 const Tab = createBottomTabNavigator();
+
+const CustomHeader = ({ navigation, title }) => {
+  return (
+    <View>
+    <StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />
+    <LinearGradient
+      style={styles.header}
+      locations={[0, 1]}
+      colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+      useAngle={true}
+      angle={90}
+    >
+      <Text style={styles.title}>{title}</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
+        <Text>Close</Text>
+      </TouchableOpacity>
+    </LinearGradient>
+    </View>
+  );
+};
 
 const MyTabs=({route,navigation})=> {
   return (
@@ -41,17 +61,9 @@ const MyTabs=({route,navigation})=> {
         name="Shop"
         component={ShopScreen}
         options={({ navigation }) => ({
-          // headerShown: false,
           presentation: 'modal',
           tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected /> : <ShopIcon />),
-          headerTitle: "Shop",
-          headerTitleAlign: 'center', // This centers the title
-          headerRight: () => (
-            <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: 10 }}>
-              {/* Assuming you have an icon component for the close button */}
-              <Text >Close</Text>
-            </TouchableOpacity>
-          ),
+          header: () => <CustomHeader navigation={navigation} title="Shop" />,
         })}
       />
       <Tab.Screen
@@ -79,5 +91,22 @@ const MyTabs=({route,navigation})=> {
     </Tab.Navigator>
   );
 }
-
+const styles = StyleSheet.create({
+  header: {
+    height: 100, // Adjust as needed
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    flex: 1,
+    textAlign: 'center',
+    color: 'white', // Adjust as needed
+    // Other styling for the title
+  },
+  closeButton: {
+    marginRight: 10,
+    // Other styling for the close button
+  },
+});
 export default MyTabs;
