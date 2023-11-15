@@ -30,16 +30,16 @@ const NetworkDetails = () => {
             </View>
           <Text style={styles.text}> {strings.noOutageTxt}</Text>
         </View>
-        <View style={styles.item}>
+        {/* <View style={styles.item}>
         <View style ={styles.iconBg}>
           <WifiIcon />
           <GreenCircle/>
           </View>
           <Text style={styles.text}>{strings.connect_wifi_txt}</Text>
-        </View>
+        </View> */}
       </View>
 
-      <View style={styles.rowContainer}>
+      <View style={[styles.rowContaine]}>
         <View style={styles.item}>
         <View style ={styles.iconBg}>
           <Modemicon />
@@ -47,6 +47,7 @@ const NetworkDetails = () => {
           </View>
           <Text style={styles.text}> {strings.no_modem_issue}</Text>
         </View>
+        <View style={styles.rowContainer}>
         <View style={styles.item}>
         <View style ={styles.iconBg}>
          <Billpaidicon/>
@@ -55,6 +56,7 @@ const NetworkDetails = () => {
          <Text style={styles.text}> {strings.bill_paid}</Text>
           
         </View>
+        </View>
       </View>
     </View>
   );
@@ -62,21 +64,22 @@ const NetworkDetails = () => {
 
 const styles = StyleSheet.create({
    mainContainer:{
-    backgroundColor: "#EAECF0" ,
-    alignContent:'center',
-    alignItems:'center'
+    alignContent:'flex-start',
+    alignItems:'flex-start',
+    marginBottom:10,
    }, 
   rowContainer: {
-    flexDirection: "row",
+    flexDirection: 'column',
   },item:{
+    flexDirection:'row',
     backgroundColor:'white',
+    width:wp("80%"),
     margin:1,
     alignContent:'center',
-    alignSelf:'center',
     alignItems:'center',
-    padding:wp('5%'),
-    width:wp('38%'),
-    height:hp('13%')
+    paddingVertical:wp('3%'),
+    borderColor:colors.grey,
+    borderTopWidth:0.5,
 
   },iconBg:{
     backgroundColor:'#F4F4F5',
@@ -90,7 +93,8 @@ const styles = StyleSheet.create({
 
   },text:{
     marginTop:5,
-    textAlign:'center'
+    textAlign:'center',
+    marginLeft:10
   },greenTick:{
     width:14,
     height:14,

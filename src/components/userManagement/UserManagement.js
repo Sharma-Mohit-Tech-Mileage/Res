@@ -1,8 +1,9 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, Pressable, View, SafeAreaView, ScrollView } from "react-native";
+import { Image, StyleSheet, Text, Pressable, View, SafeAreaView, ScrollView, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 
 const UserManagement = () => {
 
@@ -395,7 +396,7 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   frameParent: {
-    top: 100,
+    top: (Platform.OS=='android')?wp("25%"):wp("10%"),
     paddingTop: Padding.p_base,
     width: '100%',
     marginBottom: 200

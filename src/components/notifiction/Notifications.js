@@ -1,8 +1,10 @@
 import React from "react";
-import { SafeAreaView,Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import { SafeAreaView,Image, StyleSheet, Text, Pressable, View, ScrollView, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import  ProfileSettingsHeader  from '../common/ProfileSettingsHeader';
+import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import colors from "../../res/Colors";
 
 const Notifications = () => {
   const navigation = useNavigation();
@@ -12,7 +14,9 @@ const Notifications = () => {
    <View style={styles.notifications}>
           <ProfileSettingsHeader
             title="Notifications"
-            onPressBack={() => navigation.navigate('Account')}
+            onPressBack={() =>{ 
+              console.log('Back Pressed')
+              navigation.goBack()}}
           />
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView accessibilityLabel="Main Scroll View">
@@ -227,8 +231,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   text: {
-    fontFamily: FontFamily.openSansSemiBold,
+    color: colors.darkest_grey,
     fontWeight: "600",
+    fontSize:14
   },
   frameView: {
     borderRadius: Border.br_5xs,
@@ -264,10 +269,12 @@ const styles = StyleSheet.create({
   },
   notificationsSentFrom: {
     marginLeft: 8,
-    fontFamily: FontFamily.openSansRegular,
+    color:colors.darkest_grey,
+    fontWeight:'400',
+    
   },
   notificationsInner: {
-    top: 100,
+    top: (Platform.OS=='android')?wp("25%"):wp("10%"),
     padding: Padding.p_base,
     marginBottom:250
   },
