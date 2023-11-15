@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
         zIndex: 1
     },
     navBar: {
-        height: wp("10.73%"),
+        height: wp("15.73%"),
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center', // Center items in navBar

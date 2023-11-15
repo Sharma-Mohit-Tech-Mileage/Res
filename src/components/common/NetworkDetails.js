@@ -94,7 +94,8 @@ const styles = StyleSheet.create({
   },text:{
     marginTop:5,
     textAlign:'center',
-    marginLeft:10
+    marginLeft:10,
+    color:colors.darkest_grey
   },greenTick:{
     width:14,
     height:14,

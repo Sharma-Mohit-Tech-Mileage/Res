@@ -11,80 +11,69 @@ const _axios = axios.create({
     }
 });
 
-// _axios.interceptors.request.use(
-//     (config) => {
-//         // eslint-disable-next-line no-console
-//         console.log('interceptorRequest', config);
-//         //const token = sessionStorage.getItem('loginInfo') ? 'Bearer ' + JSON.parse(sessionStorage.getItem('loginInfo')).token : null;
-//         const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5MDAyNTQ2NDAiLCJnaXZlbl9uYW1lIjoiVGVzdCIsImZhbWlseV9uYW1lIjoiU2hlcm1hbiIsImp0aSI6IjI4MGY5MDljLTQwMjYtNDY2Yy1hZjI2LWY1ZDliYWU1ZjRmMSIsImlhdCI6MTY5OTYzMjUyOCwiVXNlck5hbWUiOiI5MDAyNTQ2NDAiLCJuYW1lIjoiVGVzdCBTaGVybWFuIiwiZW1haWwiOiI5MDAyNTQ2NDBAY2FibGVvbmUubmV0IiwiZXh0ZXJuYWxfaWQiOiI5MDAyNTQ2NDAiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiOTAwMjU0NjQwIiwiaWQiOiIyOWQ5MDM0NC00NjRhLTRjYWItODg5ZS01YzI1N2U3ODUwNzEiLCJjdXN0b21lcl90eXBlIjoiUmVzaWRlbnRpYWwiLCJyb2xlcyI6IlJlc2lkZW50aWFsIiwibGVnYWN5X2NvbXBhbnkiOiJDYWJsZSBPbmUiLCJuYmYiOjE2OTk2MzI1MjgsImV4cCI6MTY5OTYzOTcyOCwiaXNzIjoiV05XRUJTVkNVMDEiLCJhdWQiOiIxMC4xNDAuMzYuMjgifQ.X69Rudc9exM3y97i1JtsgLhTuRnIIrWjcVP7Zj_VTNM'
-//         config.headers.Authorization = token ;
-//         return config;
-//     },
-//     (error) => {
-//         // eslint-disable-next-line no-console
-//         console.log('interceptorRequestError', error);
-//         error = {
-//             status: 400,
-//             title: 'Error',
-//             message: 'This is an invalid request.',
-//         };
-//         return Promise.reject(error);
-//     }
-// );
 
-// _axios.interceptors.response.use(
-//     (response) => {
-//         return responseData;
-//         // eslint-disable-next-line no-console
-//         console.log('interceptorResponse', response);
-//         const responseData = response.data;
-//         if (parseInt(response.status, 10) === 200) {
-//             return responseData;
-//         } else if (
-//             parseInt(responseData.code, 10) === 401 || parseInt(responseData.code, 10) === 403 || responseData.message === 'token_not_provided'
-//         ) {
-//             //sessionStorage.removeItem('loginInfo');
-//         } else {
-//             const error = {
-//                 status: response.status || 500,
-//                 title: 'Error',
-//                 message: responseData.data.message || 'Please try again in a few minutes.',
-//             };
-//             return Promise.reject(error);
-//         }
-//     },
-//     (error) => {
-//         // eslint-disable-next-line no-console
-//         console.log('interceptorResponseError', error);
-//         if (error.response) {
-//             const status = error.response.status;
-//             let statusCode = parseInt(status, 10);
-//             if (statusCode === 401 || statusCode === 403) {
-//                // sessionStorage.removeItem('userInfo');
-//             }
-//         } else {
-//             if (error.message.indexOf('timeout') >= 0) {
-//                 error = {
-//                     status: 400,
-//                     title: 'The request timed out.',
-//                     message: 'Please try again later.',
-//                 };
-//             } else if (error.message.indexOf('Network Error') >= 0) {
-//                 error = {
-//                     status: 400,
-//                     title: 'The network connection is not smooth.',
-//                     message: 'Please try again later.',
-//                 };
-//             } else {
-//                 error = {
-//                     status: error.status || 500,
-//                     title: error.title || 'The network connection is not smooth.',
-//                     message: error.message || 'Please try again later.',
-//                 };
-//             }
-//             return Promise.reject(error);
-//         }
-//     }
-// );
+/**
+ * Setup axios
+ */
+export const setupAxios = (store) => {
+    // get token
+    //const token = window.localStorage.getItem('token');
+      const token="";
+    // if token exists set token
+    // dispatch login action
+    if (token && token !== '' && token !== 'null') {
+        // store.dispatch(userActions.login(token));
+    }
+
+    // reqeust intercpetor
+    axios.interceptors.request.use(
+        config => {
+            // config token as default per request
+            const _token = window.localStorage.getItem('token');
+            if (_token) {
+                config.headers.Authorization = `Bearer ${_token}`;
+            }
+            return config;
+        },
+    );
+
+    // Add a response interceptor
+    axios.interceptors.response.use(
+        (response) => {
+            // if error: "No permission!"
+            // logout & go to login page
+            if (response && response.data && response.data.error === 'No permission!') {
+                // store.dispatch(userActions.logout());
+            }
+
+            return response;
+        },
+        (error) => {
+            const _error = { ...error };
+
+            if (_error.response && _error.response.status === 401) {
+                // Unauthorized Request
+                // store.dispatch(userActions.logout());
+            } else if (_error.response && _error.response.status === 403) {
+                // Forbiden Request
+                // store.dispatch(forbidenRequest());
+            } else if (_error.response && _error.response.status === 404) {
+                // route not found
+                // store.dispatch(erroredRequest());
+                console.error('error 404');
+                //history.push('/error/404');
+            } else if (!_error.response) {
+                // route not found
+                // store.dispatch(erroredRequest());
+                console.error('error 404');
+                //history.push('/error/404');
+            }
+
+            return Promise.reject(_error);
+        }
+    );
+};
+
+
 
 export default _axios;

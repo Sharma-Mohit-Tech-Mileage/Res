@@ -3,6 +3,7 @@ import React, { useState,useEffect } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { SegmentedArc } from '../common/arcchart/SegmentedArc';
 import moment from 'moment';
+import colors from '../../res/Colors';
 
 const InternetHealthChart= () => {
   const [showArcRanges, setShowArcRanges] = useState(false);
@@ -60,7 +61,7 @@ const InternetHealthChart= () => {
       >
         {metaData => (
           <Pressable onPress={_handlePress} style={{ alignItems: 'center' }}>
-            <Text style={{ fontSize: 24, paddingTop: 20,fontWeight:"600" }}>{metaData.lastFilledSegment.data.label}</Text>
+            <Text style={{ fontSize: 24, paddingTop: 20,fontWeight:"600",color:colors.darkest_grey }}>{metaData.lastFilledSegment.data.label}</Text>
             <Text style={{ marginTop:10, fontSize: 12,color:'#767676',textAlign:'center' }}>Updated {todayDate}</Text>
           </Pressable>
         )}
