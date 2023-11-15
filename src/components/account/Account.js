@@ -110,16 +110,12 @@ const Account = () => {
             ))}
           </View>
           <Pressable
-            accessible={true}
-            accessibilityLabel="Logout button"
-            accessibilityRole="button"
-            accessibilityHint="Logs you out of the account"
             style={[styles.buttons, styles.buttonsSpaceBlock1]}
+           // onPress={() => Linking.openURL('https://your-privacy-policy-url.com')}
           >
-            <Text style={[styles.makePayment, { fontStyle: 'italic', color: '#4169E1' }]}>
+            <Text style={[{ fontStyle: 'italic', color: '#4169E1' }]}>
               View our Privacy Policy and Terms & Condition
             </Text>
-
           </Pressable>
           {/* Logout button */}
           <Pressable
