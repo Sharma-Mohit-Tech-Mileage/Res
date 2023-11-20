@@ -7,13 +7,13 @@ const strokeWidth = 12;
 const radius = (size - strokeWidth) / 2;
 const circunference = radius * 2 * Math.PI;
 const AccountIcon = (props) => {
-   const Fname= props.data.given_name
+   const Fname= props.data.params.fname.charAt(0);
+   const Lname= props.data.params.lname.charAt(0);
+  
 
-  React.useEffect(() => {
-
-    console.log("AA",JSON.stringify(props.data.given_name))
-    console.log("AA",JSON.stringify(props.data.family_name))
-  });
+    //console.log("FName",props.data.params.fname)
+    //console.log("Lname",props.data.params.lname)
+  
   return (
     <Svg width={width} height={size}>
       <Circle
@@ -26,12 +26,12 @@ const AccountIcon = (props) => {
       />
       <Text
         stroke="white"
-        fontSize="15"
-        x={size / 2 + 5}
+        fontSize="14"
+        x={size / 2}
         y={size / 2 + 5}
         textAnchor="middle"
       >
-        MS
+        {Fname}{Lname}
       </Text>
     </Svg>
   );

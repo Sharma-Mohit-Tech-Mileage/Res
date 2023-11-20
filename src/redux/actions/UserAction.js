@@ -1,7 +1,14 @@
-import { Action } from '../constants';
+import { SSO_LOGIN_REQUEST,SAVE_USER_INFO } from '../constants';
 export const ssoLoginAction = (request) => {
    return {
-      type: Action.SSO_LOGIN_REQUEST,
+      type: SSO_LOGIN_REQUEST,
       payload:request
+    };
+};
+
+export const saveUserInfo = (response) => {
+   return {
+      type: SAVE_USER_INFO,
+      payload:response
     };
 };
