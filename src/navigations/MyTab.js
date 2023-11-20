@@ -17,8 +17,7 @@ const Tab = createBottomTabNavigator();
 
 
 const MyTabs = ({ route, navigation }) => {
-  //const { tabBarVisible } = useTabBarVisibility();
-  let  tabBarVisible  =true
+  const { tabBarVisible } = useTabBarVisibility();
   return (
     <Tab.Navigator
       name='MyTab'

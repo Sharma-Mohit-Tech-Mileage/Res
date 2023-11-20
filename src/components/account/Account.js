@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Image, StyleSheet, Text, View, Pressable, StatusBar, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import {useSelector } from 'react-redux';
 import { Color, FontFamily, Padding, FontSize, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
 import chevronRightIcon from '../../../assets/chevronright.png';
@@ -12,17 +11,6 @@ import userManagementIcon from '../../../assets/right-actionable18.png';
 
 const Account = () => {
   const navigation = useNavigation();
-  const [userInfo,setUserInfo]=React.useState({})
-  // const userData = useSelector((state) =>{ 
-  //   //console.log('respose1',JSON.stringify(state.combinedReducers.user))
-  //    if(state.combinedReducers.user && Object.keys(state.combinedReducers.user.userData).length!=0){
-  //     let userInfo=state.combinedReducers.user.userData.userInfo
-  //     console.log('user info profile',userInfo)
-  //     setUserInfo(userInfo)
-      
-  //   }
-    
-  // });
   
   const menuItems = [
     {

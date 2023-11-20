@@ -1,22 +1,17 @@
-import { SAVE_USER_INFO,SSO_LOGIN_REQUEST } from '../constants/index';
+import { Action } from '../constants/index';
 
 const initialState ={
   isLoading:false,
-  userData:{},
-  erro: ""
+  userInfo:{},
+  jwtToken: ""
 }
 
 const userReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case SSO_LOGIN_REQUEST:
-      return{
-        ...state,
-        isLoading:true
-      }
-    case SAVE_USER_INFO:
+  switch (action) {
+    case Action.SSO_LOGIN_RESPONSE:
       return {
-        isLoading:false,
-        userData: action.payload,
+        ...state,
+        userInfo: action.payload,
         
       }
     

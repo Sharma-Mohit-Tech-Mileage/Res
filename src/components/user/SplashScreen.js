@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { View, Image, StyleSheet, Text } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
+import * as Keychain from 'react-native-keychain';
 import { authorize } from "react-native-app-auth";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { ssoLoginAction } from "../../redux/actions/UserAction";
 
 
@@ -21,27 +22,6 @@ const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [isSplashReady, setIsSplashReady] = useState(false);
   const [data, setData] = useState(undefined);
-  const userData = useSelector((state) =>{ 
-    //console.log('respose1',JSON.stringify(state.combinedReducers.user))
-     if(state.combinedReducers.user && Object.keys(state.combinedReducers.user.userData).length!=0){
-      
-      let  token = state.combinedReducers.user.userData.jwtToken;
-      let userInfo=state.combinedReducers.user.userData.userInfo
-      console.log('token',token)
-      console.log('user info',userInfo)
-      navigation.navigate('MyTab', {
-        fname: userInfo.firstName,
-        lname: userInfo.lastName,
-      
-      });
-    }
-    
-  });
-
-  useEffect(()=>{
-   
-  },[userData])
-  
 
   useEffect(() => {
    
@@ -52,14 +32,16 @@ const SplashScreen = ({ navigation }) => {
         // result includes accessToken, accessTokenExpirationDate and refreshToken
         //console.log("result", result);
         const data={idToken:result.idToken}
-        
-         dispatch(ssoLoginAction(data))
+         //dispatch(ssoLoginAction(data))
          //callAPI(data)
-        //
+        //await Keychain.setInternetCredentials('IdToken', 'IdToken', result.idToken);
         
         if (result.accessToken) {
           //setIsSplashReady(true);
-          
+          navigation.navigate('MyTab', {
+            email: "",
+            name: "",
+          });
         }
         //setData(decoded);
       } catch (error) {
@@ -76,7 +58,7 @@ const SplashScreen = ({ navigation }) => {
 
   const callAPI=(data)=>{
     fetch('https://customer.uat.cableone.net/apiWrapper/mobile/api/gettoken', {
-  method: 'POST',
+  method: 'GET',
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json'
@@ -85,7 +67,7 @@ const SplashScreen = ({ navigation }) => {
   data
   )
 }).then((response) => response.json())
-.then((json) => {console.log(json)})
+.then((json) => setData(json))
 .catch((error) => console.error(error));
   }
 

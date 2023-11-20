@@ -32,23 +32,24 @@ const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
       <TouchableOpacity
         onPress={() => {}}
         style={{
-          
+          height: wp("10%"),
           flexDirection: "row",
           justifyContent: "space-between",
-         
-          marginTop: 15,
+          padding: 5,
+          marginTop: 10,
         }}
       >
         <Text
           style={{
             fontSize: 16,
+            marginVertical: 5,
             fontWeight: "600",
             color:colors.sparklight_purple_blue
           }}
         >
           {actionTxt}
         </Text>
-        <View >
+        <View style={{ marginTop: 5 }}>
           <RightArrow />
         </View>
       </TouchableOpacity>

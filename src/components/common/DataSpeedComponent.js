@@ -42,8 +42,8 @@ const DataSpeedComponent = () => {
               marginBottom: 20,
             }}
           >
-            <View style={[styles.downloadbg]}>
-            <Image source={require('../../../assets/frame-1645.png')}/>
+            <View style={styles.downloadbg}>
+              <Myservicedownarrow />
             </View>
 
             <View style={{ flexDirection: "row" }}>
@@ -73,8 +73,8 @@ const DataSpeedComponent = () => {
               marginBottom: 20,
             }}
           >
-            <View style={[styles.downloadbg]}>
-              <Image source={require('../../../assets/frame-1646.png')}/>
+            <View style={styles.downloadbg}>
+              <Myserviceuparrow />
             </View>
 
             <View style={{ flexDirection: "row" }}>
@@ -201,19 +201,17 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontWeight: "600",
     lineHeight: 20 /* 142.857% */,
-  },downloadbg: {
+  },
+  downloadbg: {
     backgroundColor: "white",
     borderRadius: 8,
     paddingVertical: 8,
     paddingHorizontal: 8,
-  },
-  shadowProp: {
     shadowColor: "#171717",
     shadowOffset: { width: -2, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
-  },
-  timerInfo1:
+  },timerInfo1:
   {color:colors.dark_grey,
     marginLeft:5,
     fontSize:14,

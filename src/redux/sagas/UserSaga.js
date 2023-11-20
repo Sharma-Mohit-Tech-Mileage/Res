@@ -1,29 +1,27 @@
 import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
 import {ssoLoginApi} from "../../network/apis/account/LoginService";
-import { SSO_LOGIN_REQUEST } from "../constants";
- import { saveUserInfo } from "../actions/UserAction";
+import { Action } from "../constants";
 
 // yield pauses and resume the generator functions
- function* ssoLogin(action) {
+function* ssoLogin(action) {
    try {
      const response = yield call(ssoLoginApi,action.payload)
-     console.log('Response Data1',response.data)
-     yield put(saveUserInfo(response.data))
      if (response.status == 200) {
-      if(response.data){
-       //put(saveUserInfo(response.data))
-      }
-       
+      console.log('Response Data',response)
+       // to fire another action, use put method
+       // here I am storing the data by firing action LIST_FETCHED
+       //yield put(storeListData(response.data));
+       // for calling another generator funtion use call method
      } else {
         // handle other response code
      }
     } catch (error) {
-      console.log("Server Error");
+      console.log(error);
     } finally {
       //yield put(apiCalled());
     }
 }
 function* userSagas() { 
-    yield takeLatest(SSO_LOGIN_REQUEST, ssoLogin);
+    yield takeLatest(Action.SSO_LOGIN_REQUEST, ssoLogin);
 }
 export default userSagas;

@@ -7,7 +7,7 @@ const _axios = axios.create({
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
-        
+        ...headers
     }
 });
 
@@ -29,7 +29,7 @@ export const setupAxios = (store) => {
     axios.interceptors.request.use(
         config => {
             // config token as default per request
-            const _token = ""
+            const _token = window.localStorage.getItem('token');
             if (_token) {
                 config.headers.Authorization = `Bearer ${_token}`;
             }

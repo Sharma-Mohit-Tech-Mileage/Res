@@ -73,12 +73,11 @@ const styles = StyleSheet.create({
   },item:{
     flexDirection:'row',
     backgroundColor:'white',
-    width:wp("85%"),
+    width:wp("80%"),
     margin:1,
     alignContent:'center',
     alignItems:'center',
     paddingVertical:wp('3%'),
-    paddingHorizontal:25,
     borderColor:colors.grey,
     borderTopWidth:0.5,
 
