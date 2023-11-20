@@ -1,8 +1,8 @@
-import { TouchableOpacity, Text, StyleSheet, StatusBar,View } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, StatusBar, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useTabBarVisibility } from './TabBarVisibilityContext';
 import AccountStackScreen from '../navigations/stackNavigation/AccountStack';
 import ShopScreen from '../components/home/Shop';
-import SupportScreen from '../components/home/Support';
 import HomeScreen from '../components/home/Home';
 import SupportStack from '../navigations/stackNavigation/SupportStack';
 import HomeIconSelected from '../res/svgIcons/HomeIconSelected';
@@ -12,60 +12,48 @@ import ShopIconSelected from '../res/svgIcons/ShopIconSelected';
 import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
-import LinearGradient from 'react-native-linear-gradient';
 const Tab = createBottomTabNavigator();
 
-const CustomHeader = ({ navigation, title }) => {
-  return (
-    <View>
-    <StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />
-    <LinearGradient
-      style={styles.header}
-      locations={[0, 1]}
-      colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
-      useAngle={true}
-      angle={90}
-    >
-      <Text style={styles.title}>{title}</Text>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
-        <Text>Close</Text>
-      </TouchableOpacity>
-    </LinearGradient>
-    </View>
-  );
-};
 
-const MyTabs=({route,navigation})=> {
+
+const MyTabs = ({ route, navigation }) => {
+  const { tabBarVisible } = useTabBarVisibility();
   return (
     <Tab.Navigator
       name='MyTab'
       initialRouteName="Home"
       screenOptions={{
-        tabBarStyle: {position: 'absolute',height:(Platform.OS=='ios')? 90:60 },
+        tabBarStyle: { position: 'absolute', height: (Platform.OS == 'ios') ? 90 : 60, display: tabBarVisible ? 'flex' : 'none' },
         tabBarActiveTintColor: '#353091',
-        tabBarInactiveTintColor:'#767676'
+        tabBarInactiveTintColor: '#767676'
 
       }}
     >
       <Tab.Screen
         name="Home"
         component={HomeScreen}
-        initialParams={{data:route}}
+        initialParams={{ data: route }}
         options={{
-          headerShown:false,
+          headerShown: false,
           tabBarLabel: 'Home',
           tabBarIcon: ({ focused }) => focused ? <HomeIconSelected /> : <HomeIcon />
         }}
       />
       <Tab.Screen
         name="Shop"
-        component={ShopScreen}
-        options={({ navigation }) => ({
-          presentation: 'modal',
-          tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected /> : <ShopIcon />),
-          header: () => <CustomHeader navigation={navigation} title="Shop" />,
+        component={ShopScreen} // This will not be used, since we will override the onPress
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/115009159707-Data-Plans', title :'Shop'});
+          },
         })}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected /> : <ShopIcon />)
+        }}
       />
+
       <Tab.Screen
         name="Support"
         component={SupportStack}
@@ -73,7 +61,7 @@ const MyTabs=({route,navigation})=> {
           headerShown: false,
           tabBarLabel: 'Support',
           tabBarIcon: ({ focused, size }) => (
-           (focused)?<SupportIconSelected/>: <SupportIcon  />
+            (focused) ? <SupportIconSelected /> : <SupportIcon />
           ),
         }}
       />
@@ -91,22 +79,4 @@ const MyTabs=({route,navigation})=> {
     </Tab.Navigator>
   );
 }
-const styles = StyleSheet.create({
-  header: {
-    height: 100, // Adjust as needed
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    flex: 1,
-    textAlign: 'center',
-    color: 'white', // Adjust as needed
-    // Other styling for the title
-  },
-  closeButton: {
-    marginRight: 10,
-    // Other styling for the close button
-  },
-});
 export default MyTabs;

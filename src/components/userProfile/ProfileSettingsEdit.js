@@ -270,10 +270,10 @@ const styles = StyleSheet.create({
     width: 282,
   },
   buttons: {
-    backgroundColor: Color.sparkLightPurple,
+    backgroundColor: Color.colorMidnightblue,
   },
   makePayment1: {
-    color: Color.sparkLightPurple,
+    color: Color.colorMidnightblue,
   },
   buttons1: {
     marginTop: 16,

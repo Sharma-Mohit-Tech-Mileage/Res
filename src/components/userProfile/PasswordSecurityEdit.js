@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_5xl,
   },
   firstName: {
-    color: Color.colorDimgray,
+    color: Color.sparklightGray1,
     fontSize: FontSize.textXsSemibold_size,
     flex: 1,
   },
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   },
   frameChild: {
     height: 1,
-    backgroundColor: Color.colorGainsboro_100,
+    backgroundColor: Color.sparklightGray,
     alignSelf: "stretch",
   },
   rectangleWrapper: {
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   firstName1: {
-    color: Color.colorDimgray,
+    color: Color.sparklightGray1,
     fontSize: FontSize.textXsSemibold_size,
     alignSelf: "stretch",
   },
@@ -285,10 +285,10 @@ const styles = StyleSheet.create({
     color: Color.sparklightWhite,
   },
   buttons: {
-    backgroundColor: Color.sparkLightPurple,
+    backgroundColor: Color.colorMidnightblue,
   },
   makePayment1: {
-    color: Color.sparkLightPurple,
+    color: Color.colorMidnightblue,
   },
   buttons1: {
     marginTop: 16,
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   },
   passwordSecurityEdit: {
     flex: 1,
-    backgroundColor: Color.sparklightBlue,
+    backgroundColor: Color.colorWhitesmoke_200,
   },
 });
 

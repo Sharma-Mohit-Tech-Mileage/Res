@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   firstClr: {
-    color: Color.colorDimgray,
+    color: Color.sparklightGray1,
     textAlign: "left",
   },
   bulletPointContainer: {
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     flexDirection: "row",
     borderWidth: 1,
-    borderColor: Color.colorGainsboro_100,
+    borderColor: Color.sparklightGray,
     borderStyle: "solid",
     borderRadius: Border.br_11xs,
     alignSelf: "stretch",
@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
   },
   frameChild: {
     height: 1,
-    backgroundColor: Color.colorGainsboro_100,
+    backgroundColor: Color.sparklightGray,
     alignSelf: "stretch",
   },
   rectangleWrapper: {
@@ -631,7 +631,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingVertical: Padding.p_base,
     borderWidth: 1,
-    borderColor: Color.colorGainsboro_100,
+    borderColor: Color.sparklightGray,
     borderStyle: "solid",
     backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_11xs,

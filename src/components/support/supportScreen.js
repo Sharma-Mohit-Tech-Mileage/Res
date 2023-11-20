@@ -1,960 +1,564 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Image, Text, Pressable, Button, ScrollView } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
-import { FontFamily, Border, Padding, Color, FontSize } from "../../../GlobalStyles";
-import WebView from 'react-native-webview';
-const Support = ({ navigation }) => {
-   
+import React, { useState } from "react";
+import {
+    StyleSheet,
+    View,
+    Image,
+    Text,
+    Pressable,
+    ScrollView,
+} from "react-native";
+import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
+import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import LinearGradient from 'react-native-linear-gradient';
+import { useNavigation } from "@react-navigation/native";
+
+const Support = () => {
+    const navigation = useNavigation();
+    const items = [
+        {
+            key: 'searchIssues',
+            text: 'Search issues',
+            icon: require("../../../assets/search-md.png"),
+            iconAlignment: 'left', // Icon to the left of the text
+            navigateTo: 'searchArticles',
+        },
+        {
+            key: 'moreOptions',
+            text: 'General',
+            icon: require("../../../assets/chevronright.png"),
+            iconAlignment: 'right', // Icon to the right of the text
+            navigateTo: 'moreOptions',
+        },
+        {
+            key: 'moreOptions',
+            text: 'Billing',
+            icon: require("../../../assets/chevronright.png"),
+            iconAlignment: 'right', // Icon to the right of the text
+            navigateTo: 'moreOptions',
+        },
+        {
+            key: 'moreOptions',
+            text: 'Service',
+            icon: require("../../../assets/chevronright.png"),
+            iconAlignment: 'right', // Icon to the right of the text
+            navigateTo: 'moreOptions',
+        },
+        {
+            key: 'moreOptions',
+            text: 'Popular Articals',
+            icon: require("../../../assets/chevronright.png"),
+            iconAlignment: 'right', // Icon to the right of the text
+            navigateTo: 'moreOptions',
+        }
+        // Add more items as needed
+    ];
+
     return (
-        <ScrollView >
         <View style={styles.support}>
-            <View style={[styles.mainContainer, styles.barContainerLayout]}>
-                <LinearGradient
-                    style={[styles.mainContainerChild, styles.barContainerLayout]}
-                    locations={[0, 1]}
-                    colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
-                    useAngle={true}
-                    angle={90}
-                />
-                <View style={[styles.container, styles.containerFlexBox]}>
-                    <View style={styles.header}>
-                        <View style={styles.featuredIcon}>
-                            <Image
-                                style={[styles.lifeBuoy02Icon, styles.iconLayout2]}
-                                resizeMode="cover"
-                                source={require("../../../assets/right-actionable19.png")}
-                            />
-                        </View>
-                        <View
-                            style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}
-                        >
-                            <Text style={styles.wereHereTo}>We’re Here to Help</Text>
-                        </View>
-                    </View>
-                    <View style={styles.issuesFlexBox}>
-                        <Pressable style={styles.search} onPress={() => { }}>
-                            <View
-                                style={[styles.searchMdParent, styles.integrationCardBorder]}
-                            >
+            <ProfileSettingsHeader
+                title="Support"
+                onPressBack={() => navigation.navigate('Home')}
+            />
+            <ScrollView>
+                <View style={[styles.mainContainer]}>
+                    <LinearGradient
+                        style={[styles.mainContainerChild, styles.barContainerLayout]}
+                        locations={[0, 1]}
+                        colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+                        useAngle={true}
+                        angle={90}
+                    />
+                    <View style={[styles.container, styles.containerFlexBox]}>
+                        <View style={styles.header}>
+                            <View style={styles.featuredIcon}>
                                 <Image
-                                    style={[styles.searchMdIcon, styles.iconLayout1]}
+                                    style={[styles.lifeBuoy02Icon, styles.lifeBuoy02IconLayout]}
                                     resizeMode="cover"
-                                    source={require("../../../assets/searchsm.png")}
+                                    source={require("../../../assets/right-actionable19.png")}
                                 />
-                                <Text style={[styles.email, styles.headingTypo]}>
-                                    Search issues
+                            </View>
+                            <View
+                                style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}
+                            >
+                                <Text style={styles.wereHereTo}>We’re Here to Help</Text>
+                            </View>
+                        </View>
+                        <View style={styles.issuesFlexBox}>
+                            {items.map((item, index) => (
+                                <React.Fragment key={item.name}>
+                                    <Pressable key={item.key} style={[styles.search, styles.navigationBorder]}
+                                        onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/115009159707-Data-Plans', name: item.text })}>
+                                        <View style={[styles.pressableContent, item.iconAlignment === 'right' && { flexDirection: 'row-reverse' }]}>
+                                            <Image
+                                                source={item.icon}
+                                                style={[styles.iconStyle, item.iconAlignment === 'right' ? styles.iconRight : styles.iconLeft]}
+                                            />
+                                            {item.iconAlignment === 'right' ? <Text style={[styles.searchChild, styles.textTypoRight]}>
+                                                {item.text}
+                                            </Text>
+                                                : <Text style={[styles.searchChild]}>
+                                                {item.text}
+                                            </Text>}
+                                        </View>
+                                    </Pressable>
+                                    {index < items.length - 1 && <View style={styles.frameChild} />}
+                                </React.Fragment>
+                            ))}
+                        </View>
+                        <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
+                            <View style={[styles.headingContainer,styles.headingContainerSpaceBlock]}>
+                                <Text style={[styles.heading, styles.headingTypo]}>
+                                    Additional Support
                                 </Text>
                             </View>
-                        </Pressable>
-                        <View style={[styles.helpTopics, styles.helpTopicsPosition]}>
+                            <View style={styles.integrationCardMobileWrapper}>
+                                <View
+                                    style={[styles.integrationCardMobile,styles.integrationCardBorder]}>
+                                    <View style={[styles.content, styles.contentSpaceBlock]}>
+                                        <View style={styles.headingAndToggle}>
+                                            <View style={styles.headingAndIcon}>
+                                                <View style={[ styles.icon]}>
+                                                <Image
+                                                    resizeMode="cover"
+                                                    source={require("../../../assets/featured-icon.png")}
+                                                /></View>
+                                                <View style={styles.frameParent}>
+                                                    <View style={styles.headingAndToggle}>
+                                                        <Text style={[styles.heading2, styles.headingTypo]}>
+                                                            Live Support
+                                                        </Text>
+                                                        <Image
+                                                            style={[
+                                                                styles.chevronRightIcon,
+                                                                styles.chevronIconLayout,
+                                                            ]}
+                                                            resizeMode="cover"
+                                                            source={require("../../../assets/chevronright.png")}
+                                                        />
+                                                    </View>
+                                                    <Text
+                                                        style={[
+                                                            styles.supportingText,
+                                                            styles.supportingTypo1,
+                                                        ]}
+                                                    >
+                                                        No agents available right now. Agents are typically
+                                                        available from 5:00am- 9:00pm PST
+                                                    </Text>
+                                                </View>
+                                                <View style={styles.badgeWrapper}>
+                                                    <View
+                                                        style={[styles.badge, styles.integrationCardBorder]}
+                                                    >
+                                                        <Text style={[styles.text, styles.textTypo]}>
+                                                            CURRENT
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
+                            <Pressable
+                                style={[
+                                    styles.integrationCardMobileContainer,
+                                    styles.contentSpaceBlock,
+                                ]}
+                                onPress={() => { }}
+                            >
+                                <View
+                                    style={[
+                                        styles.integrationCardMobile1,
+                                        styles.integrationCardBorder,
+                                    ]}
+                                >
+                                    <View style={[styles.content, styles.contentSpaceBlock]}>
+                                        <View style={styles.headingAndToggle}>
+                                            <View style={styles.headingAndIcon}>
+                                                <View style={[
+                                                    styles.icon
+                                                ]}>
+                                                <Image
+                                                   // style={styles.featuredIcon1}
+                                                    resizeMode="cover"
+                                                    source={require("../../../assets/tool-02.png")}
+                                                /></View>
+                                                <View style={styles.frameParent}>
+                                                    <View style={styles.headingAndToggle}>
+                                                        <Text style={[styles.heading3, styles.headingTypo]}>
+                                                            Troubleshooting
+                                                        </Text>
+                                                        <Image
+                                                            style={styles.chevronIconLayout}
+                                                            resizeMode="cover"
+                                                            source={require("../../../assets/chevronright.png")}
+                                                        />
+                                                    </View>
+                                                    <Text
+                                                        style={[
+                                                            styles.supportingText,
+                                                            styles.supportingTypo1,
+                                                        ]}
+                                                    >
+                                                        Explore instant solutions to issues.
+                                                    </Text>
+                                                </View>
+                                                <View style={styles.badgeWrapper}>
+                                                    <View
+                                                        style={[styles.badge, styles.integrationCardBorder]}
+                                                    >
+                                                        <Text style={[styles.text, styles.textTypo]}>
+                                                            CURRENT
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+                            </Pressable>
                             <View
                                 style={[
-                                    styles.headingWrapper,
+                                    styles.integrationCardMobileContainer,
+                                    styles.contentSpaceBlock,
+                                ]}
+                            >
+                                <Pressable
+                                    style={[
+                                        styles.integrationCardMobile1,
+                                        styles.integrationCardBorder,
+                                    ]}
+                                    onPress={() => { }}
+                                >
+                                    <View style={[styles.content, styles.contentSpaceBlock]}>
+                                        <View style={styles.headingAndToggle}>
+                                            <View style={styles.headingAndIcon}>
+                                                <View style={[
+                                                    styles.icon
+                                                ]}>
+                                                <Image
+                                                   // style={styles.featuredIcon1}
+                                                    resizeMode="cover"
+                                                    source={require("../../../assets/modem-02.png")}
+                                                /></View>
+                                                <View style={styles.frameParent}>
+                                                    <View style={styles.headingAndToggle}>
+                                                        <Text style={[styles.heading3, styles.headingTypo]}>
+                                                            Equipment Management
+                                                        </Text>
+                                                        <Image
+                                                            style={styles.chevronIconLayout}
+                                                            resizeMode="cover"
+                                                            source={require("../../../assets/chevronright.png")}
+                                                        />
+                                                    </View>
+                                                    <Text
+                                                        style={[
+                                                            styles.supportingText,
+                                                            styles.supportingTypo1,
+                                                        ]}
+                                                    >
+                                                        View and manage equipment.
+                                                    </Text>
+                                                </View>
+                                                <View style={styles.badgeWrapper}>
+                                                    <View
+                                                        style={[styles.badge, styles.integrationCardBorder]}
+                                                    >
+                                                        <Text style={[styles.text, styles.textTypo]}>
+                                                            CURRENT
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </Pressable>
+                            </View>
+                            <View
+                                style={[
+                                    styles.integrationCardMobileContainer,
+                                    styles.contentSpaceBlock,
+                                ]}
+                            >
+                                <Pressable
+                                    style={[
+                                        styles.integrationCardMobile1,
+                                        styles.integrationCardBorder,
+                                    ]}
+                                    onPress={() => { navigation.navigate('TicketSupport') }}
+                                >
+                                    <View style={[styles.content, styles.contentSpaceBlock]}>
+                                        <View style={styles.headingAndToggle}>
+                                            <View style={styles.headingAndIcon}>
+                                                <View style={[
+                                                    styles.icon
+                                                ]}>
+                                                <Image
+                                                    resizeMode="cover"
+                                                    source={require("../../../assets/ticket-03.png")}
+                                                /></View>
+                                                <View style={styles.frameParent}>
+                                                    <View style={styles.headingAndToggle}>
+                                                        <Text style={[styles.heading3, styles.headingTypo]}>
+                                                            Ticket Support
+                                                        </Text>
+                                                        <Image
+                                                            style={styles.chevronIconLayout}
+                                                            resizeMode="cover"
+                                                            source={require("../../../assets/chevronright.png")}
+                                                        />
+                                                    </View>
+                                                    <Text
+                                                        style={[
+                                                            styles.supportingText,
+                                                            styles.supportingTypo1,
+                                                        ]}
+                                                    >
+                                                        Open a support ticket for us to help.
+                                                    </Text>
+                                                </View>
+                                                <View style={styles.badgeWrapper}>
+                                                    <View
+                                                        style={[styles.badge, styles.integrationCardBorder]}
+                                                    >
+                                                        <Text style={[styles.text, styles.textTypo]}>
+                                                            CURRENT
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </Pressable>
+                            </View>
+                        </View>
+                        <View
+                            style={[styles.additionalSupport, styles.integrationCardBorder]}
+                        >
+                            <View
+                                style={[
+                                    styles.headingContainer,
                                     styles.headingContainerSpaceBlock,
                                 ]}
                             >
                                 <Text style={[styles.heading, styles.headingTypo]}>
-                                    Help Topics
+                                    Contact Us
                                 </Text>
                             </View>
-                            <View style={[styles.accordion, styles.accordionLayout]}>
-                                <Image
-                                    style={[styles.dividerIcon, styles.iconLayout]}
-                                    resizeMode="cover"
-                                    source={require("../../../assets/divider.png")}
-                                />
-                                <View style={styles.content}>
-                                    <View style={styles.button}>
-                                        <Image
-                                            style={[
-                                                styles.placeholderIcon,
-                                                styles.placeholderIconLayout,
-                                            ]}
-                                            resizeMode="cover"
-                                            source={require("../../../assets/placeholder.png")}
-                                        />
-                                        <Text style={[styles.text, styles.textLayout]}>
-                                            Learn more
-                                        </Text>
-                                        <Image
-                                            style={[
-                                                styles.placeholderIcon1,
-                                                styles.placeholderIconLayout,
-                                            ]}
-                                            resizeMode="cover"
-                                            source={require("../../../assets/placeholder.png")}
-                                        />
-                                    </View>
-                                    <View style={styles.actions}>
-                                        <View style={styles.button1}>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                            <Text style={[styles.text, styles.textLayout]}>
-                                                Tertiary
-                                            </Text>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon1,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                        </View>
-                                        <View style={[styles.button2, styles.buttonShadowBox]}>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                            <Text style={[styles.text2, styles.textLayout]}>
-                                                Secondary
-                                            </Text>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon1,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                        </View>
-                                        <View style={styles.button3}>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                            <Text style={[styles.text3, styles.textTypo]}>
-                                                General
-                                            </Text>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon1,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                        </View>
-                                        <Image
-                                            style={[
-                                                styles.chevronDownIcon,
-                                                styles.placeholderIconLayout,
-                                            ]}
-                                            resizeMode="cover"
-                                            source={require("../../../assets/chevrondown.png")}
-                                        />
-                                    </View>
-                                </View>
-                            </View>
-                            <View style={styles.accordionLayout}>
-                               
-                                <View style={styles.content}>
-                                    <View style={styles.button}>
-                                        <Image
-                                            style={[
-                                                styles.placeholderIcon,
-                                                styles.placeholderIconLayout,
-                                            ]}
-                                            resizeMode="cover"
-                                            source={require("../../../assets/placeholder.png")}
-                                        />
-                                        <Text style={[styles.text, styles.textLayout]}>
-                                            Learn more
-                                        </Text>
-                                        <Image
-                                            style={[
-                                                styles.placeholderIcon1,
-                                                styles.placeholderIconLayout,
-                                            ]}
-                                            resizeMode="cover"
-                                            source={require("../../../assets/placeholder.png")}
-                                        />
-                                    </View>
-                                    <View style={styles.actions}>
-                                        <View style={styles.button1}>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                            <Text style={[styles.text, styles.textLayout]}>
-                                                Tertiary
-                                            </Text>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon1,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                        </View>
-                                        <View style={[styles.button6, styles.buttonShadowBox]}>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                            <Text style={[styles.text2, styles.textLayout]}>
-                                                Secondary
-                                            </Text>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon1,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                        </View>
-                                        <View style={styles.button3}>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                            <Text style={[styles.text3, styles.textTypo]}>
-                                                Billing
-                                            </Text>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon1,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                        </View>
-                                        <Image
-                                            style={[
-                                                styles.chevronDownIcon,
-                                                styles.placeholderIconLayout,
-                                            ]}
-                                            resizeMode="cover"
-                                            source={require("../../../assets/chevrondown1.png")}
-                                        />
-                                    </View>
-                                </View>
-                            </View>
-                            <View style={styles.accordionLayout}>
-                                <Image
-                                    style={[styles.dividerIcon, styles.iconLayout]}
-                                    resizeMode="cover"
-                                    source={require("../../../assets/divider.png")}
-                                />
-                                <View style={styles.content}>
-                                    <View style={styles.button}>
-                                        <Image
-                                            style={[
-                                                styles.placeholderIcon,
-                                                styles.placeholderIconLayout,
-                                            ]}
-                                            resizeMode="cover"
-                                            source={require("../../../assets/placeholder.png")}
-                                        />
-                                        <Text style={[styles.text, styles.textLayout]}>
-                                            Learn more
-                                        </Text>
-                                        <Image
-                                            style={[
-                                                styles.placeholderIcon1,
-                                                styles.placeholderIconLayout,
-                                            ]}
-                                            resizeMode="cover"
-                                            source={require("../../../assets/placeholder.png")}
-                                        />
-                                    </View>
-                                    <View style={styles.actions}>
-                                        <View style={styles.button1}>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                            <Text style={[styles.text, styles.textLayout]}>
-                                                Tertiary
-                                            </Text>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon1,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                        </View>
-                                        <View style={[styles.button10, styles.buttonShadowBox]}>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                            <Text style={[styles.text2, styles.textLayout]}>
-                                                Secondary
-                                            </Text>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon1,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                        </View>
-                                        <View style={styles.button3}>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                            <Text style={[styles.text3, styles.textTypo]}>
-                                                Service
-                                            </Text>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon1,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                        </View>
-                                        <Image
-                                            style={[
-                                                styles.chevronDownIcon,
-                                                styles.placeholderIconLayout,
-                                            ]}
-                                            resizeMode="cover"
-                                            source={require("../../../assets/chevrondown.png")}
-                                        />
-                                    </View>
-                                </View>
-                            </View>
-                            <View style={[styles.accordion3, styles.accordionLayout]}>
-                                <Image
-                                    style={[styles.dividerIcon, styles.iconLayout]}
-                                    resizeMode="cover"
-                                    source={require("../../../assets/divider.png")}
-                                />
-                                <View style={styles.content}>
-                                    <View style={styles.button}>
-                                        <Image
-                                            style={[
-                                                styles.placeholderIcon,
-                                                styles.placeholderIconLayout,
-                                            ]}
-                                            resizeMode="cover"
-                                            source={require("../../../assets/placeholder.png")}
-                                        />
-                                        <Text style={[styles.text, styles.textLayout]}>
-                                            Learn more
-                                        </Text>
-                                        <Image
-                                            style={[
-                                                styles.placeholderIcon1,
-                                                styles.placeholderIconLayout,
-                                            ]}
-                                            resizeMode="cover"
-                                            source={require("../../../assets/placeholder.png")}
-                                        />
-                                    </View>
-                                    <View style={styles.actions}>
-                                        <View style={styles.button1}>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                            <Text style={[styles.text, styles.textLayout]}>
-                                                Tertiary
-                                            </Text>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon1,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                        </View>
-                                        <View style={[styles.button14, styles.buttonShadowBox]}>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                            <Text style={[styles.text2, styles.textLayout]}>
-                                                Secondary
-                                            </Text>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon1,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                        </View>
-                                        <View style={styles.button3}>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                            <Text style={[styles.text3, styles.textTypo]}>
-                                                Popular Articles
-                                            </Text>
-                                            <Image
-                                                style={[
-                                                    styles.placeholderIcon1,
-                                                    styles.placeholderIconLayout,
-                                                ]}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/placeholder.png")}
-                                            />
-                                        </View>
-                                        <Image
-                                            style={[
-                                                styles.chevronDownIcon,
-                                                styles.placeholderIconLayout,
-                                            ]}
-                                            resizeMode="cover"
-                                            source={require("../../../assets/chevrondown.png")}
-                                        />
-                                    </View>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                    <View
-                        style={[styles.additionalSupport, styles.integrationCardBorder]}
-                    >
-                        <View
-                            style={[
-                                styles.headingContainer,
-                                styles.headingContainerSpaceBlock,
-                            ]}
-                        >
-                            <Text style={[styles.heading, styles.headingTypo]}>
-                                Additional Support
-                            </Text>
-                        </View>
-                        <View style={styles.integrationCardMobileWrapper}>
                             <View
                                 style={[
-                                    styles.integrationCardMobile,
-                                    styles.integrationCardBorder,
+                                    styles.integrationCardMobileContainer,
+                                    styles.contentSpaceBlock,
                                 ]}
                             >
-                                <View style={[styles.content4, styles.content4SpaceBlock]}>
-                                    <View style={styles.headingAndToggle}>
-                                        <View style={styles.headingAndIcon}>
-                                            <Image
-                                                style={styles.featuredIcon1}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/featured-icon.png")}
-                                            />
+                                <View
+                                    style={[
+                                        styles.integrationCardMobile1,
+                                        styles.integrationCardBorder,
+                                    ]}
+                                >
+                                    <View style={[styles.content, styles.contentSpaceBlock]}>
+                                        <View style={styles.headingAndToggle4}>
+                                            <View style={styles.headingAndIcon4}>
+                                                <View style={[
+                                                    styles.icon
+                                                ]}>
+                                                <Image
+                                                    //style={styles.featuredIcon1}
+                                                    resizeMode="cover"
+                                                    source={require("../../../assets/wallet-03.png")}
+                                                /></View>
                                                 <View style={styles.frameParent}>
-                                                    <Pressable onPress={() => navigation.navigate('Support Article')} style={styles.pressable}>
-                                                        <Text style={styles.linkText}>Support Article</Text>
-                                                    </Pressable>
-                                                 
+                                                    <View style={styles.headingAndToggle}>
+                                                        <Text style={[styles.heading3, styles.headingTypo]}>
+                                                            Billing Support
+                                                        </Text>
+                                                        <Image
+                                                            style={styles.chevronIconLayout}
+                                                            resizeMode="cover"
+                                                            source={require("../../../assets/phone-outgoing-01.png")}
+                                                        />
+                                                    </View>
+                                                    <View style={styles.supportingTextWrapper}>
+                                                        <Text
+                                                            style={[
+                                                                styles.supportingText4,
+                                                                styles.support1Typo,
+                                                            ]}
+                                                        >
+                                                            877-692-2253
+                                                        </Text>
+                                                    </View>
+                                                    <Text
+                                                        style={[
+                                                            styles.supportingText5,
+                                                            styles.supportingTypo1,
+                                                        ]}
+                                                    >
+                                                        Want to upgrade your service, make a change, or have a
+                                                        billing question? Give us a call for assistance.
+                                                    </Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.supportingText6,
+                                                            styles.supportingTypo,
+                                                        ]}
+                                                    >{`Call Center Hours: `}</Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.supportingText7,
+                                                            styles.supportingTypo,
+                                                        ]}
+                                                    >
+                                                        M-F 8:00 AM-5:00 PM MST
+                                                    </Text>
                                                 </View>
-
-                                            <View style={styles.badgeWrapper}>
-                                                <View
-                                                    style={[styles.badge, styles.integrationCardBorder]}
-                                                >
-                                                    <Text style={styles.text16}>CURRENT</Text>
+                                                <View style={styles.badgeWrapper}>
+                                                    <View
+                                                        style={[styles.badge, styles.integrationCardBorder]}
+                                                    >
+                                                        <Text style={[styles.text, styles.textTypo]}>
+                                                            CURRENT
+                                                        </Text>
+                                                    </View>
                                                 </View>
                                             </View>
                                         </View>
                                     </View>
                                 </View>
                             </View>
-                        </View>
-                        <Pressable
-                            style={[
-                                styles.integrationCardMobileContainer,
-                                styles.content4SpaceBlock,
-                            ]}
-                            onPress={() => { }}
-                        >
                             <View
                                 style={[
-                                    styles.integrationCardMobile1,
-                                    styles.integrationCardBorder,
+                                    styles.integrationCardMobileContainer,
+                                    styles.contentSpaceBlock,
                                 ]}
                             >
-                                <View style={[styles.content4, styles.content4SpaceBlock]}>
-                                    <View style={styles.headingAndToggle}>
-                                        <View style={styles.headingAndIcon}>
-                                            <Image
-                                                style={styles.featuredIcon1}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/featured-icon.png")}
-                                            />
-                                            <View style={styles.frameParent}>
-                                                <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.heading3, styles.headingTypo]}>
-                                                        Troubleshooting
-                                                    </Text>
-                                                    <Image
+                                <View
+                                    style={[
+                                        styles.integrationCardMobile1,
+                                        styles.integrationCardBorder,
+                                    ]}
+                                >
+                                    <View style={[styles.content, styles.contentSpaceBlock]}>
+                                        <View style={styles.headingAndToggle4}>
+                                            <View style={styles.headingAndIcon4}>
+                                                <View style={[
+                                                    styles.icon
+                                                ]}>
+                                                <Image
+                                                   // style={styles.featuredIcon1}
+                                                    resizeMode="cover"
+                                                    source={require("../../../assets/tool-01.png")}
+                                                /></View>
+                                                <View style={styles.frameParent}>
+                                                    <View style={styles.headingAndToggle}>
+                                                        <Text style={[styles.heading3, styles.headingTypo]}>
+                                                            Tech Support
+                                                        </Text>
+                                                        <Image
+                                                            style={styles.chevronIconLayout}
+                                                            resizeMode="cover"
+                                                            source={require("../../../assets/phone-outgoing-01.png")}
+                                                        />
+                                                    </View>
+                                                    <View style={styles.supportingTextWrapper}>
+                                                        <Text
+                                                            style={[
+                                                                styles.supportingText4,
+                                                                styles.support1Typo,
+                                                            ]}
+                                                        >
+                                                            877-692-2253
+                                                        </Text>
+                                                    </View>
+                                                    <Text
                                                         style={[
-                                                            styles.chevronRightIcon1,
-                                                            styles.placeholderIconLayout,
+                                                            styles.supportingText5,
+                                                            styles.supportingTypo1,
                                                         ]}
-                                                        resizeMode="cover"
-                                                        source={require("../../../assets/chevronright.png")}
-                                                    />
+                                                    >
+                                                        Need a little help with your Sparklight® service?
+                                                        We're here 24 hours a day, seven days a week to
+                                                        support you.
+                                                    </Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.supportingText6,
+                                                            styles.supportingTypo,
+                                                        ]}
+                                                    >{`Call Center Hours: `}</Text>
+                                                    <Text
+                                                        style={[
+                                                            styles.supportingText7,
+                                                            styles.supportingTypo,
+                                                        ]}
+                                                    >
+                                                        24h/7 days a week
+                                                    </Text>
                                                 </View>
-                                                <Text
-                                                    style={[styles.supportingText, styles.textLayout]}
-                                                >
-                                                    Explore instant solutions to issues.
-                                                </Text>
-                                            </View>
-                                            <View style={styles.badgeWrapper}>
-                                                <View
-                                                    style={[styles.badge, styles.integrationCardBorder]}
-                                                >
-                                                    <Text style={styles.text16}>CURRENT</Text>
+                                                <View style={styles.badgeWrapper}>
+                                                    <View
+                                                        style={[styles.badge, styles.integrationCardBorder]}
+                                                    >
+                                                        <Text style={[styles.text, styles.textTypo]}>
+                                                            CURRENT
+                                                        </Text>
+                                                    </View>
                                                 </View>
                                             </View>
                                         </View>
                                     </View>
                                 </View>
                             </View>
-                        </Pressable>
-                        <View
-                            style={[
-                                styles.integrationCardMobileContainer,
-                                styles.content4SpaceBlock,
-                            ]}
-                        >
-                            <Pressable
-                                style={[
-                                    styles.integrationCardMobile1,
-                                    styles.integrationCardBorder,
-                                ]}
-                                onPress={() => { }}
-                            >
-                                <View style={[styles.content4, styles.content4SpaceBlock]}>
-                                    <View style={styles.headingAndToggle}>
-                                        <View style={styles.headingAndIcon}>
-                                            <Image
-                                                style={styles.featuredIcon1}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/featured-icon.png")}
-                                            />
-                                            <View style={styles.frameParent}>
-                                                <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.heading3, styles.headingTypo]}>
-                                                        Equipment Management
-                                                    </Text>
-                                                    <Image
-                                                        style={[
-                                                            styles.chevronRightIcon1,
-                                                            styles.placeholderIconLayout,
-                                                        ]}
-                                                        resizeMode="cover"
-                                                        source={require("../../../assets/chevronright.png")}
-                                                    />
-                                                </View>
-                                                <Text
-                                                    style={[styles.supportingText, styles.textLayout]}
-                                                >
-                                                    View and manage equipment.
-                                                </Text>
-                                            </View>
-                                            <View style={styles.badgeWrapper}>
-                                                <View
-                                                    style={[styles.badge, styles.integrationCardBorder]}
-                                                >
-                                                    <Text style={styles.text16}>CURRENT</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </Pressable>
                         </View>
-                        <View
-                            style={[
-                                styles.integrationCardMobileContainer,
-                                styles.content4SpaceBlock,
-                            ]}
-                        >
-                            <Pressable
-                                style={[
-                                    styles.integrationCardMobile1,
-                                    styles.integrationCardBorder,
-                                ]}
-                                onPress={() => { }}
-                            >
-                                <View style={[styles.content4, styles.content4SpaceBlock]}>
-                                    <View style={styles.headingAndToggle}>
-                                        <View style={styles.headingAndIcon}>
-                                            <Image
-                                                style={styles.featuredIcon1}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/featured-icon.png")}
-                                            />
-                                            <View style={styles.frameParent}>
-                                                <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.heading3, styles.headingTypo]}>
-                                                        Ticket Support
-                                                    </Text>
-                                                    <Image
-                                                        style={[
-                                                            styles.chevronRightIcon1,
-                                                            styles.placeholderIconLayout,
-                                                        ]}
-                                                        resizeMode="cover"
-                                                        source={require("../../../assets/chevronright.png")}
-                                                    />
-                                                </View>
-                                                <Text
-                                                    style={[styles.supportingText, styles.textLayout]}
-                                                >
-                                                    Open a support ticket for us to help.
-                                                </Text>
-                                            </View>
-                                            <View style={styles.badgeWrapper}>
-                                                <View
-                                                    style={[styles.badge, styles.integrationCardBorder]}
-                                                >
-                                                    <Text style={styles.text16}>CURRENT</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </Pressable>
-                        </View>
+                        <View style={[styles.issuesFlexBox]} />
                     </View>
-                    <View
-                        style={[styles.additionalSupport, styles.integrationCardBorder]}
-                    >
-                        <View
-                            style={[
-                                styles.headingContainer,
-                                styles.headingContainerSpaceBlock,
-                            ]}
-                        >
-                            <Text style={[styles.heading, styles.headingTypo]}>
-                                Contact Us
-                            </Text>
-                        </View>
-                        <View
-                            style={[
-                                styles.integrationCardMobileContainer,
-                                styles.content4SpaceBlock,
-                            ]}
-                        >
-                            <View
-                                style={[
-                                    styles.integrationCardMobile1,
-                                    styles.integrationCardBorder,
-                                ]}
-                            >
-                                <View style={[styles.content4, styles.content4SpaceBlock]}>
-                                    <View style={styles.headingAndToggle4}>
-                                        <View style={styles.headingAndIcon4}>
-                                            <Image
-                                                style={styles.featuredIcon1}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/featured-icon.png")}
-                                            />
-                                            <View style={styles.frameParent}>
-                                                <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.heading3, styles.headingTypo]}>
-                                                        Billing Support
-                                                    </Text>
-                                                    <Image
-                                                        style={[
-                                                            styles.chevronRightIcon1,
-                                                            styles.placeholderIconLayout,
-                                                        ]}
-                                                        resizeMode="cover"
-                                                        source={require("../../../assets/phone-outgoing-01.png")}
-                                                    />
-                                                </View>
-                                                <View style={styles.supportingTextWrapper}>
-                                                    <Text
-                                                        style={[styles.supportingText4, styles.textTypo]}
-                                                    >
-                                                        877-692-2253
-                                                    </Text>
-                                                </View>
-                                                <Text
-                                                    style={[styles.supportingText5, styles.textLayout]}
-                                                >
-                                                    Want to upgrade your service, make a change, or have a
-                                                    billing question? Give us a call for assistance.
-                                                </Text>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText6,
-                                                        styles.supportingTypo,
-                                                    ]}
-                                                >{`Call Center Hours: `}</Text>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText7,
-                                                        styles.supportingTypo,
-                                                    ]}
-                                                >
-                                                    M-F 8:00 AM-5:00 PM MST
-                                                </Text>
-                                            </View>
-                                            <View style={styles.badgeWrapper}>
-                                                <View
-                                                    style={[styles.badge, styles.integrationCardBorder]}
-                                                >
-                                                    <Text style={styles.text16}>CURRENT</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                        </View>
-                        <View
-                            style={[
-                                styles.integrationCardMobileContainer,
-                                styles.content4SpaceBlock,
-                            ]}
-                        >
-                            <View
-                                style={[
-                                    styles.integrationCardMobile1,
-                                    styles.integrationCardBorder,
-                                ]}
-                            >
-                                <View style={[styles.content4, styles.content4SpaceBlock]}>
-                                    <View style={styles.headingAndToggle4}>
-                                        <View style={styles.headingAndIcon4}>
-                                            <Image
-                                                style={styles.featuredIcon1}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/featured-icon.png")}
-                                            />
-                                            <View style={styles.frameParent}>
-                                                <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.heading3, styles.headingTypo]}>
-                                                        Tech Support
-                                                    </Text>
-                                                    <Image
-                                                        style={[
-                                                            styles.chevronRightIcon1,
-                                                            styles.placeholderIconLayout,
-                                                        ]}
-                                                        resizeMode="cover"
-                                                        source={require("../../../assets/phone-outgoing-01.png")}
-                                                    />
-                                                </View>
-                                                <View style={styles.supportingTextWrapper}>
-                                                    <Text
-                                                        style={[styles.supportingText4, styles.textTypo]}
-                                                    >
-                                                        877-692-2253
-                                                    </Text>
-                                                </View>
-                                                <Text
-                                                    style={[styles.supportingText5, styles.textLayout]}
-                                                >
-                                                    Need a little help with your Sparklight® service?
-                                                    We're here 24 hours a day, seven days a week to
-                                                    support you.
-                                                </Text>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText6,
-                                                        styles.supportingTypo,
-                                                    ]}
-                                                >{`Call Center Hours: `}</Text>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText7,
-                                                        styles.supportingTypo,
-                                                    ]}
-                                                >
-                                                    24h/7 days a week
-                                                </Text>
-                                            </View>
-                                            <View style={styles.badgeWrapper}>
-                                                <View
-                                                    style={[styles.badge, styles.integrationCardBorder]}
-                                                >
-                                                    <Text style={styles.text16}>CURRENT</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                        </View>
-                        <View style={styles.integrationCardMobileWrapper}>
-                            <View
-                                style={[
-                                    styles.integrationCardMobile1,
-                                    styles.integrationCardBorder,
-                                ]}
-                            >
-                                <View style={[styles.content4, styles.content4SpaceBlock]}>
-                                    <View style={styles.headingAndToggle4}>
-                                        <View style={styles.headingAndIcon4}>
-                                            <Image
-                                                style={styles.featuredIcon1}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/featured-icon.png")}
-                                            />
-                                            <View style={styles.frameParent}>
-                                                <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.heading3, styles.headingTypo]}>
-                                                        Sales Support
-                                                    </Text>
-                                                    <Image
-                                                        style={[
-                                                            styles.chevronRightIcon1,
-                                                            styles.placeholderIconLayout,
-                                                        ]}
-                                                        resizeMode="cover"
-                                                        source={require("../../../assets/phone-outgoing-01.png")}
-                                                    />
-                                                </View>
-                                                <View style={styles.supportingTextWrapper}>
-                                                    <Text
-                                                        style={[styles.supportingText4, styles.textTypo]}
-                                                    >
-                                                        888-573-0441
-                                                    </Text>
-                                                </View>
-                                                <Text
-                                                    style={[styles.supportingText5, styles.textLayout]}
-                                                >
-                                                    Would you like to purchase new services? Our sales
-                                                    team is here to assist you.
-                                                </Text>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText6,
-                                                        styles.supportingTypo,
-                                                    ]}
-                                                >{`Call Center Hours: `}</Text>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText7,
-                                                        styles.supportingTypo,
-                                                    ]}
-                                                >
-                                                    M-F 7:00 AM-7:00 PM MST
-                                                </Text>
-                                            </View>
-                                            <View style={styles.badgeWrapper}>
-                                                <View
-                                                    style={[styles.badge, styles.integrationCardBorder]}
-                                                >
-                                                    <Text style={styles.text16}>CURRENT</Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={[styles.containerChild, styles.issuesFlexBox]} />
                 </View>
-            </View>
-            <Image
-                style={[styles.supportChild, styles.iconLayout]}
-                resizeMode="cover"
-                source={require("../../../assets/rectangle-763.png")}
-            />
-            <View style={[styles.topBar, styles.topBarPosition]}>
-                <Image
-                    style={[styles.iosstatusBarwhiteIcon, styles.iconLayout]}
-                    resizeMode="cover"
-                    source={require("../../../assets/iosstatus-barwhite.png")}
-                />
-            </View>
-            <View style={[styles.navBar, styles.barContainerLayout]}>
-                <Text style={[styles.title, styles.titlePosition]}>Support</Text>
-                <Image
-                    style={[styles.chevronLeftIcon, styles.iconPosition]}
-                    resizeMode="cover"
-                    source={require("../../../assets/chevronleft.png")}
-                />
-                <Image
-                    style={[styles.thumbsUpIcon, styles.iconPosition]}
-                    resizeMode="cover"
-                    source={require("../../../assets/thumbs-up.png")}
-                />
-                <Image
-                    style={[styles.heartIcon, styles.iconPosition]}
-                    resizeMode="cover"
-                    source={require("../../../assets/heart.png")}
-                />
-            </View>
+            </ScrollView>
         </View>
-        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
+    pressableContent: {
+        flexDirection: 'row', // Default direction
+        alignItems: 'center',
+        height: '100%',
+    },
+    textTypoRight: {
+        FontFamily: FontFamily.openSansRegular,
+        fontWeight: 600,/* Corresponds to semi-bold in Open Sans */
+        fontSize: FontSize.size_base,
+        lineHeight: 20,
+        color: Color.colorMidnightblue,/* Spark Light Purple */
+    },
+    frameChild: {
+        paddingHorizontal: Padding.p_5xl,
+        height: 1,
+        backgroundColor: Color.sparklightGray,
+    },
+    navigationBorder: {
+        borderColor: Color.sparklightGray,
+        backgroundColor: Color.sparklightWhite,
+        borderStyle: "solid",
+        justifyContent: "center",
+    },
+    iconLeft: {
+        marginLeft: Padding.p_xs,
+    },
+    iconRight: {
+        marginRight: Padding.p_xs,
+    },
     barContainerLayout: {
-        width: 430,
         position: "absolute",
     },
     containerFlexBox: {
-        marginTop: 16,
         alignSelf: "stretch",
         alignItems: "center",
     },
-    iconLayout2: {
+    lifeBuoy02IconLayout: {
         height: 32,
         width: 32,
     },
@@ -962,13 +566,22 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderStyle: "solid",
     },
-    iconLayout1: {
-        height: 24,
-        width: 24,
+    icon: {
+        width: 48, // Width as per Figma design
+        height: 48, // Height as per Figma design
+        borderRadius: 24, // This will make it a circle
+        padding: 12, // Padding as per Figma design
+        justifyContent: 'center', // Center content vertically
+        alignItems: 'center', // Center content horizontally
+        borderColor: '#F4F4F5', // Border color from Figma design
+        borderWidth: 8, // Border width from Figma design (calculated based on Figma properties)
+        backgroundColor: '#F4F4F5', // Background color from Figma design
     },
-    headingTypo: {
-        textAlign: "left",
-        fontFamily: FontFamily.openSansRegular,
+    iconStyle: {
+        width: 20, // Set according to your icon size
+        height: 20, // Set according to your icon size
+        resizeMode: 'contain',
+        marginRight: 8, // Add some margin if needed
     },
     helpTopicsPosition: {
         borderBottomLeftRadius: Border.br_11xs,
@@ -976,60 +589,46 @@ const styles = StyleSheet.create({
     },
     headingContainerSpaceBlock: {
         paddingBottom: Padding.p_base,
-        backgroundColor: Color.baseWhite,
+        backgroundColor: Color.sparklightWhite,
         alignItems: "center",
+    },
+    headingTypo: {
+        textAlign: "left",
+        lineHeight: 18,
+        fontSize: FontSize.size_lg,
+        fontFamily: FontFamily.openSansRegular,
+        flex: 1,
     },
     accordionLayout: {
         width: 382,
         paddingBottom: Padding.p_base,
-        backgroundColor: Color.baseWhite,
+        backgroundColor: Color.sparklightWhite,
         justifyContent: "center",
     },
-    iconLayout: {
-        maxWidth: "100%",
-        overflow: "hidden",
-        width: "100%",
+    contentSpaceBlock: {
+        paddingHorizontal: Padding.p_base,
+        alignSelf: "stretch",
     },
-    placeholderIconLayout: {
+    chevronIconLayout: {
+        marginLeft: 8,
         height: 20,
         width: 20,
         overflow: "hidden",
     },
-    textLayout: {
+    supportingTypo1: {
         lineHeight: 20,
+        fontSize: FontSize.textSmSemibold_size,
         textAlign: "left",
     },
-    buttonShadowBox: {
-        borderColor: Color.colorLightgray,
-        shadowOpacity: 1,
-        elevation: 2,
-        shadowRadius: 2,
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
-        shadowColor: "rgba(16, 24, 40, 0.05)",
-        marginLeft: 12,
-        paddingVertical: Padding.p_3xs,
-        paddingHorizontal: Padding.p_base,
-        borderRadius: Border.br_5xs,
-        display: "none",
-        borderWidth: 1,
-        backgroundColor: Color.baseWhite,
-        justifyContent: "center",
-        flexDirection: "row",
-        borderStyle: "solid",
-        alignItems: "center",
-        overflow: "hidden",
-    },
     textTypo: {
-        color: Color.sparkLightPurple,
+        fontSize: FontSize.textXsSemibold_size,
+        lineHeight: 18,
+        textAlign: "center",
+    },
+    support1Typo: {
+        color: Color.colorMidnightblue,
         fontFamily: FontFamily.openSansSemiBold,
         fontWeight: "600",
-    },
-    content4SpaceBlock: {
-        paddingHorizontal: Padding.p_base,
-        alignSelf: "stretch",
     },
     supportingTypo: {
         lineHeight: 14,
@@ -1044,24 +643,19 @@ const styles = StyleSheet.create({
         alignSelf: "stretch",
         alignItems: "center",
     },
-    topBarPosition: {
-        top: 0,
-        left: 0,
+    supportChildLayout: {
+        maxWidth: "100%",
+        overflow: "hidden",
+        width: "100%",
     },
-    titlePosition: {
-        color: Color.baseWhite,
+    chevronLeftIconLayout: {
+        height: 24,
+        width: 24,
         top: "50%",
-        marginTop: -9,
-        left: "50%",
-        fontWeight: "600",
-        lineHeight: 18,
-        textAlign: "center",
         position: "absolute",
     },
-    iconPosition: {
+    iconSpaceBlock: {
         marginTop: -12,
-        top: "50%",
-        position: "absolute",
         overflow: "hidden",
     },
     framePressableFlexBox: {
@@ -1079,19 +673,18 @@ const styles = StyleSheet.create({
         width: 134,
     },
     mainContainerChild: {
-        top: -2,
-        height: 59,
+        height: '4.5%', // Responsive height based on screen size
         backgroundColor: "transparent",
-        zIndex: 0,
-        left: 0,
-        width: 430,
+        left: 0, // Ensure it takes the full width
+        right:0,
+        alignSelf: 'stretch', // Stretches to the parent's width if not already doing so
     },
     lifeBuoy02Icon: {
         overflow: "hidden",
     },
     featuredIcon: {
-        backgroundColor: Color.sparkLightPurple,
-        borderColor: Color.sparklightBlue,
+        backgroundColor: Color.colorMidnightblue,
+        borderColor: Color.colorWhitesmoke_200,
         borderWidth: 4,
         width: 72,
         height: 72,
@@ -1107,7 +700,7 @@ const styles = StyleSheet.create({
         lineHeight: 28,
         width: 210,
         textAlign: "center",
-        color: Color.sparklightDarkestGray,
+        color: Color.colorGray_100,
         fontFamily: FontFamily.openSansRegular,
     },
     wereHereToHelpWrapper: {
@@ -1117,173 +710,38 @@ const styles = StyleSheet.create({
         alignSelf: "stretch",
         alignItems: "center",
     },
-    searchMdIcon: {
-        overflow: "hidden",
-    },
-    email: {
-        marginLeft: 10,
-        color: Color.sparklightDarkGray,
+    searchChild: {
+        flex: 1,
+        paddingHorizontal: Padding.p_base,
+        paddingVertical: Padding.p_base,
         fontSize: FontSize.size_base,
-    },
-    searchMdParent: {
-        height: 58,
-        paddingHorizontal: Padding.p_xs,
-        paddingVertical: Padding.p_5xs,
-        borderColor: Color.sparklightGray,
-        borderTopRightRadius: Border.br_11xs,
-        borderTopLeftRadius: Border.br_11xs,
-        flexDirection: "row",
-        alignSelf: "stretch",
-        alignItems: "center",
+        fontFamily: FontFamily.openSansRegular,
     },
     search: {
-        backgroundColor: Color.baseWhite,
-        borderRadius: Border.br_11xs,
         justifyContent: "center",
         alignSelf: "stretch",
+        height: 58, // Set a fixed height for the search container
     },
     heading: {
+        color: Color.colorGray_100,
+        textAlign: "left",
         lineHeight: 18,
         fontSize: FontSize.size_lg,
-        color: Color.sparklightDarkestGray,
-        flex: 1,
-    },
-    headingWrapper: {
-        display: "none",
-        paddingTop: Padding.p_5xl,
-        paddingBottom: Padding.p_base,
-        paddingHorizontal: Padding.p_5xl,
-        flexDirection: "row",
-        alignSelf: "stretch",
-    },
-    dividerIcon: {
-        height: 1,
-        alignSelf: "stretch",
-    },
-    placeholderIcon: {
-        display: "none",
-    },
-    text: {
-        color: Color.gray600,
-        marginLeft: 8,
-        fontFamily: FontFamily.textXsSemibold,
-        fontWeight: "600",
-        fontSize: FontSize.textSmSemibold_size,
-        lineHeight: 20,
-    },
-    placeholderIcon1: {
-        marginLeft: 8,
-        display: "none",
-    },
-    linkText: {
-        color: 'blue',
-        textDecorationLine: 'underline',
-        marginTop: 10,
-    },
-    button: {
-        display: "none",
-        justifyContent: "center",
-        flexDirection: "row",
-        alignItems: "center",
-        overflow: "hidden",
-    },
-    button1: {
-        paddingVertical: Padding.p_3xs,
-        borderRadius: Border.br_5xs,
-        paddingHorizontal: Padding.p_base,
-        display: "none",
-        justifyContent: "center",
-        flexDirection: "row",
-        alignItems: "center",
-        overflow: "hidden",
-    },
-    text2: {
-        color: Color.gray700,
-        marginLeft: 8,
-        fontFamily: FontFamily.textXsSemibold,
-        fontWeight: "600",
-        fontSize: FontSize.textSmSemibold_size,
-        lineHeight: 20,
-    },
-    button2: {
-        marginLeft: 12,
-    },
-    text3: {
-        marginLeft: 8,
-        lineHeight: 20,
-        textAlign: "left",
-        fontSize: FontSize.size_base,
-    },
-    button3: {
-        marginLeft: 12,
-        flexDirection: "row",
-        alignItems: "center",
-        overflow: "hidden",
-        flex: 1,
-    },
-    chevronDownIcon: {
-        marginLeft: 12,
-    },
-    actions: {
-        marginLeft: 16,
-        flexDirection: "row",
-        alignItems: "center",
-        flex: 1,
-    },
-    content: {
-        paddingVertical: 0,
-        paddingHorizontal: Padding.p_5xl,
-        flexDirection: "row",
-        marginTop: 16,
-        alignSelf: "stretch",
-        alignItems: "center",
-    },
-    accordion: {
-        borderTopRightRadius: Border.br_11xs,
-        borderTopLeftRadius: Border.br_11xs,
-    },
-    button6: {
-        marginLeft: 12,
-    },
-    button10: {
-        marginLeft: 12,
-    },
-    button14: {
-        marginLeft: 12,
-    },
-    accordion3: {
-        borderBottomLeftRadius: Border.br_11xs,
-        borderBottomRightRadius: Border.br_11xs,
-    },
-    helpTopics: {
-        borderWidth: 1,
-        borderStyle: "solid",
-        borderColor: Color.sparklightGray,
-        alignItems: "center",
     },
     headingContainer: {
         paddingTop: Padding.p_5xl,
-        paddingBottom: Padding.p_base,
         paddingHorizontal: Padding.p_5xl,
+        paddingBottom: Padding.p_base,
         flexDirection: "row",
         alignSelf: "stretch",
         borderTopRightRadius: Border.br_11xs,
         borderTopLeftRadius: Border.br_11xs,
     },
-    featuredIcon1: {
-        borderRadius: Border.br_5xl,
-        width: 48,
-        height: 48,
-    },
     heading2: {
-        lineHeight: 18,
-        fontSize: FontSize.size_lg,
-        color: Color.sparklightDarkGray,
-        flex: 1,
+        color: Color.colorGray_100,
     },
     chevronRightIcon: {
         opacity: 0,
-        marginLeft: 8,
     },
     headingAndToggle: {
         flexDirection: "row",
@@ -1292,8 +750,6 @@ const styles = StyleSheet.create({
     },
     supportingText: {
         marginTop: 8,
-        fontSize: FontSize.textSmSemibold_size,
-        lineHeight: 20,
         color: Color.sparklightDarkGray,
         fontFamily: FontFamily.openSansRegular,
         alignSelf: "stretch",
@@ -1303,13 +759,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         flex: 1,
     },
-    text16: {
+    text: {
         color: Color.success700,
-        fontSize: FontSize.textXsSemibold_size,
         fontFamily: FontFamily.openSansSemiBold,
         fontWeight: "600",
-        lineHeight: 18,
-        textAlign: "center",
     },
     badge: {
         backgroundColor: Color.success50,
@@ -1331,7 +784,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         flex: 1,
     },
-    content4: {
+    content: {
         paddingVertical: Padding.p_xl,
     },
     integrationCardMobile: {
@@ -1342,28 +795,22 @@ const styles = StyleSheet.create({
     },
     integrationCardMobileWrapper: {
         padding: Padding.p_base,
-        backgroundColor: Color.baseWhite,
+        backgroundColor: Color.sparklightWhite,
         alignSelf: "stretch",
         alignItems: "center",
     },
     heading3: {
-        color: Color.gray900,
-        lineHeight: 18,
-        fontSize: FontSize.size_lg,
-        flex: 1,
-    },
-    chevronRightIcon1: {
-        marginLeft: 8,
+        color: Color.colorGray_100,
     },
     integrationCardMobile1: {
         borderColor: Color.sparklightGray,
-        backgroundColor: Color.baseWhite,
+        backgroundColor: Color.sparklightWhite,
         borderRadius: Border.br_11xs,
         alignSelf: "stretch",
     },
     integrationCardMobileContainer: {
         paddingBottom: Padding.p_base,
-        backgroundColor: Color.baseWhite,
+        backgroundColor: Color.sparklightWhite,
         alignItems: "center",
     },
     additionalSupport: {
@@ -1375,8 +822,8 @@ const styles = StyleSheet.create({
     },
     supportingText4: {
         lineHeight: 20,
+        fontSize: FontSize.textXsSemibold_size,
         textAlign: "left",
-        fontSize: FontSize.textSmSemibold_size,
         flex: 1,
     },
     supportingTextWrapper: {
@@ -1387,8 +834,6 @@ const styles = StyleSheet.create({
     },
     supportingText5: {
         marginTop: 10,
-        fontSize: FontSize.textSmSemibold_size,
-        lineHeight: 20,
         color: Color.sparklightDarkGray,
         fontFamily: FontFamily.openSansRegular,
         alignSelf: "stretch",
@@ -1408,159 +853,15 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignSelf: "stretch",
     },
-    containerChild: {
-        height: 8,
-        borderRadius: Border.br_11xs,
-    },
-    container: {
-        zIndex: 1,
-    },
     mainContainer: {
-        top: 100,
-        height: 748,
-        padding: Padding.p_5xl,
-        alignItems: "center",
-        left: 0,
-        width: 430,
-    },
-    supportChild: {
-        height: "10.73%",
-        top: "0%",
-        right: "0%",
-        bottom: "89.27%",
-        left: "0%",
-        maxHeight: "100%",
-        position: "absolute",
-        maxWidth: "100%",
-    },
-    iosstatusBarwhiteIcon: {
-        height: 44,
-        alignSelf: "stretch",
-    },
-    topBar: {
-        width: 430,
-        position: "absolute",
-    },
-    title: {
-        marginLeft: -35,
-        fontFamily: FontFamily.openSansSemiBold,
-        fontSize: FontSize.size_lg,
-    },
-    chevronLeftIcon: {
-        left: 18,
-        display: "none",
-        height: 24,
-        width: 24,
-    },
-    thumbsUpIcon: {
-        right: 24,
-        height: 24,
-        width: 24,
-    },
-    heartIcon: {
-        right: 52,
-        display: "none",
-        height: 32,
-        width: 32,
-    },
-    navBar: {
-        top: 44,
-        height: 56,
-        left: 0,
-        width: 430,
-    },
-    home: {
-        fontSize: FontSize.textXsSemibold_size,
-        fontFamily: FontFamily.openSansSemiBold,
-        fontWeight: "600",
-        lineHeight: 18,
-        color: Color.sparklightDarkGray,
-        textAlign: "center",
-    },
-    support1: {
-        fontSize: FontSize.textXsSemibold_size,
-        lineHeight: 18,
-        textAlign: "center",
-    },
-    avatarContrastInnerBorder: {
-        right: 0,
-        borderColor: Color.sparklightDarkestGray,
-        borderWidth: 0.5,
-        opacity: 0.08,
-        borderRadius: Border.br_181xl,
-        top: 0,
-        left: 0,
-        borderStyle: "solid",
-        overflow: "hidden",
-    },
-    text23: {
-        marginLeft: -12,
-        fontSize: FontSize.textXsSemibold_size,
-        fontFamily: FontFamily.textXsSemibold,
-        width: 24,
-        color: Color.baseWhite,
-        top: "50%",
-        marginTop: -9,
-    },
-    container: {
-        flex: 1,
-        marginTop: 20,
-    },
-    pressable: {
-        margin: 10,
-    },
-    linkText: {
-        color: 'blue',
-        textDecorationLine: 'underline',
-    },
-    rightActionable: {
-        backgroundColor: Color.sparklightDarkGray,
-        borderRadius: Border.br_181xl,
-    },
-    framePressable: {
-        justifyContent: "center",
-    },
-    tabs: {
-        justifyContent: "center",
-        flexDirection: "row",
-        alignSelf: "stretch",
-        flex: 1,
-    },
-    homeIndicator1: {
-        marginLeft: -67,
-        backgroundColor: Color.sparklightGray,
-        bottom: 0,
-        position: "absolute",
-        left: "50%",
-        height: 4,
-        width: 134,
-        borderRadius: Border.br_81xl,
-    },
-    iphoneUi: {
-        paddingBottom: Padding.p_5xs,
-        marginTop: 10,
-    },
-    tabsParent: {
-        justifyContent: "center",
-        alignSelf: "stretch",
-        alignItems: "center",
-        flex: 1,
-    },
-    navigation: {
-        top: 847,
-        borderTopWidth: 1,
-        height: 85,
-        borderColor: Color.sparklightGray,
-        backgroundColor: Color.baseWhite,
-        justifyContent: "center",
-        borderStyle: "solid",
-        alignItems: "center",
-        left: 0,
-        width: 430,
+        padding: Padding.p_5xl, // Ensure padding is responsive
+        alignItems: "center", // Center children if needed
+        alignSelf: 'stretch', // If you want to ensure it takes the full width of its parent
+        marginBottom: '30%', // Use percentage for responsiveness or consider using flex to push it up
+        top: '5%',
     },
     support: {
-        backgroundColor: Color.sparklightBlue,
-        height: 932,
+        backgroundColor: Color.colorWhitesmoke_200,
         overflow: "hidden",
         width: "100%",
         flex: 1,
