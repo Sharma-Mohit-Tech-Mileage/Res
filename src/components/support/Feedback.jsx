@@ -7,7 +7,7 @@ const Feedback = () => {
         <View style={styles.feedback}>
             <ProfileSettingsHeader
                 title="FeedBack"
-                onPressBack={() => navigation.navigate('Home')}
+                onPressBack={() => navigation.navigate('support')}
             />
             <View style={[styles.feedbackInner, styles.frameWrapperLayout]}>
                 <View style={styles.frameWrapperLayout}>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import { Image, StyleSheet, Text, Pressable, View } from "react-native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { Padding, Border, FontSize, Color, FontFamily } from "../../../GlobalStyles";
 
@@ -10,10 +10,11 @@ const ThumbsUp = ({ navigation }) => {
                 title="Feedback"
                 onPressBack={() => navigation.navigate('Home')}
             />
-            <ScrollView contentContainerStyle={styles.scrollViewContent}>
+            <View style={styles.content}>
                 <View style={styles.frameParent}>
-                    <View style={styles.frameChild}>
+                    <View style={styles.containerImage}>
                         <Image
+                            style={styles.image}
                             resizeMode="cover"
                             source={require("../../../assets/thumbsup.png")}
                         />
@@ -24,15 +25,15 @@ const ThumbsUp = ({ navigation }) => {
                         </Text>
                         <Text style={styles.yourFeedbackMeans}>
                             Your feedback means a lot to us! We will use it
-                            to continue improving our services for both you and the
-                            communities we serve.
+                            to continue improving our services for both you and
+                            the communities we serve.
                         </Text>
                     </View>
-                    <Pressable style={styles.button}>
-                        <Text style={styles.buttonText}>Button Text</Text>
-                    </Pressable>
                 </View>
-            </ScrollView>
+                <Pressable style={styles.button}>
+                    <Text style={styles.buttonText}>Done</Text>
+                </Pressable>
+            </View>
         </View>
     );
 };
@@ -40,35 +41,47 @@ const ThumbsUp = ({ navigation }) => {
 const styles = StyleSheet.create({
     feedback: {
         flex: 1,
-        backgroundColor: Color.colorWhitesmoke_200,
+        backgroundColor: Color.sparklightWhite,
+        
     },
-    scrollViewContent: {
-        flexGrow: 1,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingTop: Padding.p_5xl,
+    content: {
+        justifyContent: 'space-between', // This will push your button to the bottom
+        top:'10%',
+        height:'90%',
+         backgroundColor: Color.sparklightWhite,
     },
     frameParent: {
         backgroundColor: Color.sparklightWhite,
         borderStyle: "solid",
         borderColor: "#e1e1e1",
-        borderWidth: 1,
         borderRadius: Border.br_11xs,
         alignSelf: "stretch",
         overflow: "hidden",
         alignItems: 'center',
         padding: Padding.p_5xl,
+        paddingTop: Padding.p_5xl + Padding.p_base, 
     },
-    frameChild: {
-        width: 128,
-        height: 128,
-        borderRadius: 64,
-        borderColor: Color.colorAquamarine,
-        borderWidth: 1,
-        alignItems: "center",
+    containerImage: {
+        width: 128, // from the layout width
+        height: 128, // from the layout height
+        borderRadius: 100, // from the radius property
+        alignItems: 'center',
         justifyContent: 'center',
-        alignSelf: "center",
+        backgroundColor: '#ffffff', // assuming a white background
+        shadowColor: "#101828",
+        shadowOffset: {
+            width: 0,
+            height: 6.1, // rounded from 6.09523868560791
+        },
+        shadowOpacity: 0.06, // 6% opacity from the first shadow
+        shadowRadius: 12.2, // rounded from 12.19047737121582
+        elevation: 10, // this is for Android, you may need to adjust this
     },
+    image: {
+        width: 73.14, // from the icon width
+        height: 73.14, // from the icon height
+    },
+    
     textContainer: {
         marginTop: Padding.p_base,
         alignItems: 'center',
@@ -91,14 +104,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: Padding.p_sm,
     },
     button: {
-        marginTop: 16,
         backgroundColor: Color.colorMidnightblue,
         width: '90%', // Adjust width as needed
         height: 56,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: Border.br_11xs,
-        marginBottom: 20,
+        alignSelf: 'center',
+        marginBottom: Padding.p_base, // You can adjust this value to increase or decrease the bottom margin
     },
     buttonText: {
         color: 'white',
