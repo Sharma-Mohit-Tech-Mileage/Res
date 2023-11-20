@@ -16,7 +16,7 @@ const SupportStack = createStackNavigator();
 function SupportStackScreen() {
     const { setTabBarVisible } = useTabBarVisibility();
     return (
-        <SupportStack.Navigator initialRouteName="ThumbsUp">
+        <SupportStack.Navigator initialRouteName="supportScreen">
             <SupportStack.Screen
                 name="support"
                 component={supportScreen}
