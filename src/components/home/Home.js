@@ -113,11 +113,12 @@ const HomeScreen = ({ route, navigation }) => {
                   setIsInternetDetails(!isInternetDetails);
                 }}
                 style={{
-                  height: 50,
+                  
                   flexDirection: "row",
                   justifyContent: "space-between",
                   padding: 5,
-                  marginTop: 10,
+                  marginVertical:10,
+                  marginHorizontal:25
                 }}
               >
                 <Text style={styles.hideShowDetails}>
@@ -161,7 +162,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 8,
     paddingTop: 45,
-    paddingHorizontal: 25,
     width: wp("87%"),
   },
   shadowProp: {
@@ -174,6 +174,7 @@ const styles = StyleSheet.create({
     color: colors.darkest_grey,
     fontSize: 22,
     marginTop: -20,
+    paddingHorizontal: 25,
     fontStyle: "normal",
     fontWeight: "400",
     lineHeight: 22 /* 100% */,
@@ -184,6 +185,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 25,
     flexDirection: "row",
+    marginHorizontal: 25,
   },
   internetStatusTxt: {
     color: colors.darkest_grey,
