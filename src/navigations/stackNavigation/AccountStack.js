@@ -2,7 +2,7 @@
 
 import React from 'react'; 
 import { createStackNavigator } from '@react-navigation/stack';
-import AccountScreen from '../../components/account/Account';
+import AccountScreen from '../../components/account/AccountOverview';
 import ProfileSettings from '../../components/userProfile/ProfileSettings';
 import ProfileSettingsEdit from '../../components/userProfile/ProfileSettingsEdit';
 import PasswordSecurity from '../../components/userProfile/PasswordSecurity';
