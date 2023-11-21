@@ -77,7 +77,8 @@ const ProfileSettings = () => {
                           accessibilityLabel="Right actionable icon."
                         />
                         <View style={styles.creditCardWillExpireSoonParent}>
-                          <Text style={styles.creditCardWill} accessible={true} accessibilityLabel="Primary Admin Notification">Primary Admin</Text>
+                          <Text style={styles.creditCardWill} accessible={true} 
+                          accessibilityLabel="Primary Admin Notification">Primary Admin</Text>
                           <Text style={[styles.yourSavedCard]} accessible={true} accessibilityLabel="Primary admin account information.">
                             You are currently the primary admin
                             account. You can make another account
@@ -85,15 +86,6 @@ const ProfileSettings = () => {
                             you will become an admin user under the
                             new primary admin account.
                           </Text>
-                          <View style={[styles.buttons1, styles.buttonsLayout]}>
-                            <Text
-                              style={[styles.makePayment1, styles.accountClr]}
-                              accessibilityRole="button"
-                              accessibilityLabel="Change Primary Admin"
-                            >
-                              Change Primary Admin
-                            </Text>
-                          </View>
                         </View>
                       </View>
                       <Image
@@ -156,11 +148,7 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_11xs,
   },
   text1Clr: {
-    color: Color.sparklightBlue,
-    textAlign: "center",
-  },
-  accountClr: {
-    color: Color.sparkLightPurple,
+    color: Color.colorWhitesmoke_200,
     textAlign: "center",
   },
   badgeBorder: {
@@ -195,13 +183,7 @@ const styles = StyleSheet.create({
   },
   buttons: {
     marginLeft: 10,
-    backgroundColor: Color.sparkLightPurple,
-  },
-  buttons1: {
-    marginTop: 8,
-    backgroundColor: Color.colorWhitesmoke_200,
-    height: 32,
-    marginEnd: 100
+    backgroundColor: Color.colorMidnightblue,
   },
   generalInformationParent: {
     paddingHorizontal: Padding.p_5xl,
@@ -248,7 +230,7 @@ const styles = StyleSheet.create({
   notificationsChild: {
     width: 3,
     alignSelf: "stretch",
-    maxHeight: "100%",
+    //maxHeight: "100%",
   },
   creditCardWill: {
     fontWeight: "700",
@@ -286,6 +268,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     backgroundColor: Color.sparklightWhite,
+    alignSelf: "stretch",
     flex: 1,
   },
   notifications: {

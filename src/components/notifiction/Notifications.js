@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
   frameBorder: {
     borderWidth: 1,
     justifyContent: "center",
-    borderColor: Color.colorGainsboro_100,
+    borderColor: Color.sparklightGray,
     borderStyle: "solid",
     backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_11xs,
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   frameWrapperBorder: {
     borderBottomWidth: 1,
-    borderColor: Color.colorGainsboro_100,
+    borderColor: Color.sparklightGray,
     borderStyle: "solid",
     alignSelf: "stretch",
     alignItems: "center",
@@ -198,14 +198,14 @@ const styles = StyleSheet.create({
   },
   textNotifications: {
     fontSize: FontSize.size_3xl,
-    color: Color.colorDimgray,
+    color: Color.sparklightGray1,
     textAlign: "left",
     lineHeight: 28,
     fontFamily: FontFamily.openSansRegular,
     flex: 1,
   },
   makePayment: {
-    fontSize: FontSize.textXsSemibold_size,
+    fontSize: FontSize.size_xs,
     fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
     color: Color.sparklightWhite,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderBottomWidth: 1,
-    borderColor: Color.colorGainsboro_100,
+    borderColor: Color.sparklightGray,
   },
   appointments: {
     flex: 1,
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   },
   buttons: {
     marginLeft: 10,
-    backgroundColor: Color.sparkLightPurple,
+    backgroundColor: Color.colorMidnightblue,
   },
   notifications: {
     backgroundColor: Color.colorWhitesmoke_200,

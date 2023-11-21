@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Image, StyleSheet, Text, View, Pressable, StatusBar, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import {useSelector } from 'react-redux';
 import { Color, FontFamily, Padding, FontSize, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
 import chevronRightIcon from '../../../assets/chevronright.png';
@@ -11,6 +12,17 @@ import userManagementIcon from '../../../assets/right-actionable18.png';
 
 const Account = () => {
   const navigation = useNavigation();
+  const [userInfo,setUserInfo]=React.useState({})
+  // const userData = useSelector((state) =>{ 
+  //   //console.log('respose1',JSON.stringify(state.combinedReducers.user))
+  //    if(state.combinedReducers.user && Object.keys(state.combinedReducers.user.userData).length!=0){
+  //     let userInfo=state.combinedReducers.user.userData.userInfo
+  //     console.log('user info profile',userInfo)
+  //     setUserInfo(userInfo)
+      
+  //   }
+    
+  // });
   
   const menuItems = [
     {
@@ -45,7 +57,7 @@ const Account = () => {
       <LinearGradient
         style={[styles.accountChild]}
         locations={[0, 1]}
-        colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+        colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
         useAngle
         angle={90}
       />
@@ -60,14 +72,12 @@ const Account = () => {
       <View style={[styles.frameParent, styles.buttonsSpaceBlock]}>
         <View style={styles.rightActionableParent}>
           <View style={styles.rightActionable}>
-            {/* Initials or profile picture alternative text */}
-            <View />
-            <Text style={[styles.text, styles.textTypo]} accessibilityLabel="Initials M S">
+            <Text style={styles.text}>
               MS
             </Text>
           </View>
           {/* Full name for profile */}
-          <Text style={styles.melissaSmith} accessibilityLabel="Profile name: Melissa Smith">
+          <Text style={styles.melissaSmith} >
             Melissa Smith
           </Text>
         </View>
@@ -188,35 +198,35 @@ const styles = StyleSheet.create({
     top: 70,
     width: '100%',
   },
-  text: {
-    marginTop: -22,
-    marginLeft: -24,
-    fontSize: 24,
-    lineHeight: 40,
-    width: 48,
-    textAlign: "center",
-    fontWeight: "600",
-    top: "50%",
-  },
   rightActionable: {
-    borderColor: Color.sparklightBlue,
+    borderColor: Color.colorWhitesmoke_200,
     borderWidth: 4,
     width: 72,
     height: 72,
-    borderStyle: "solid",
-    backgroundColor: Color.sparkLightPurple,
-    borderRadius: Border.br_381xl,
+    backgroundColor: Color.colorMidnightblue,
+    borderRadius: 36, // Make sure this is always half of the width and height to create a circle
+    alignItems: 'center', // Center children horizontally
+    justifyContent: 'center', // Center children vertically
   },
+
+  text: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: Color.sparklightWhite,
+    fontFamily: FontFamily.openSansSemiBold,
+    // Remove margins, line-height, and absolute positioning
+  },
+
   melissaSmith: {
-    fontSize: 22,
+    fontSize: FontSize.size_3xl,
     width: 210,
     fontFamily: FontFamily.openSansRegular,
-    color: Color.sparklightDarkestGray,
+    color: Color.colorGray_200,
     lineHeight: 28,
     textAlign: "center",
   },
   rightActionableParent: {
-    paddingBottom: Padding.p_base,
+    //paddingBottom: Padding.p_base,
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "stretch",
@@ -224,7 +234,7 @@ const styles = StyleSheet.create({
   profileSettings: {
     textAlign: "left",
     marginLeft: 10,
-    color: Color.sparklightDarkestGray,
+    color: Color.colorGray_100,
     lineHeight: 28,
     fontSize: FontSize.size_base,
     flex: 1,
@@ -244,7 +254,7 @@ const styles = StyleSheet.create({
   },
   makePayment: {
     width: 282,
-    color: Color.sparkLightPurple,
+    color: Color.colorMidnightblue,
     textAlign: "center",
   },
   buttons: {

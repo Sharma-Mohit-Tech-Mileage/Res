@@ -94,7 +94,7 @@ const NotificationSetting = ({ title, description, onToggle }) => (
 const styles = StyleSheet.create({
 
   frameBorder: {
-    borderColor: Color.colorGainsboro_100,
+    borderColor: Color.sparklightGray,
     backgroundColor: Color.sparklightWhite,
     alignItems: "center",
     borderStyle: "solid",
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   appointments: {
-    color: Color.colorDimgray,
+    color: Color.sparklightGray1,
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,

@@ -158,11 +158,11 @@ const styles = StyleSheet.create({
   },
   usersFlexBox: {
     textAlign: "left",
-    color: Color.colorDimgray,
+    color: Color.sparklightGray1,
   },
   frameBorder: {
     borderWidth: 1,
-    borderColor: Color.colorGainsboro_100,
+    borderColor: Color.sparklightGray,
     borderStyle: "solid",
     borderRadius: Border.br_11xs,
   },
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   navigationBorder: {
-    borderColor: Color.colorGainsboro_100,
+    borderColor: Color.sparklightGray,
     borderStyle: "solid",
     alignItems: "center",
   },
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   },
   buttons: {
     marginLeft: 10,
-    backgroundColor: Color.sparkLightPurple,
+    backgroundColor: Color.colorMidnightblue,
   },
   usersParent: {
     alignItems: "center",
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   melsmith: {
     fontSize: FontSize.size_base,
     textAlign: "left",
-    color: Color.colorDimgray,
+    color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 28,
   },
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
   },
   frameGroup: {
     borderWidth: 1,
-    borderColor: Color.colorGainsboro_100,
+    borderColor: Color.sparklightGray,
     borderStyle: "solid",
     borderRadius: Border.br_11xs,
     backgroundColor: Color.sparklightWhite,

@@ -120,14 +120,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.sparklight_purple_blue,
     borderRadius: 2,
     borderColor: colors.dark_grey,
-    paddingVertical: 8,
+    paddingVertical: 5,
     paddingHorizontal: 32,
     width:wp('40%')
   },
   defaultTab: {
+    backgroundColor: 'white',
     borderRadius: 2,
     borderColor: colors.dark_grey,
-    paddingVertical: 8,
+    paddingVertical: 5,
     paddingHorizontal: 32,
     width:wp('40%')
   },

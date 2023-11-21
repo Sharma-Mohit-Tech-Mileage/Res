@@ -8,7 +8,7 @@ import {
     StyleSheet
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { Padding, Color, FontFamily, FontSize } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 const ProfileSettingsHeader = ({ title, onPressBack }) => {
@@ -20,7 +20,7 @@ const ProfileSettingsHeader = ({ title, onPressBack }) => {
             <LinearGradient
                 style={[styles.profileSettingsChild, { paddingTop: 40 }]}
                 locations={[0, 1]}
-                colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+                colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
                 useAngle={true}
                 angle={90}
             >
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
         zIndex: 1
     },
     navBar: {
-        height: wp("15.73%"),
+        height: wp("15%"),
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center', // Center items in navBar

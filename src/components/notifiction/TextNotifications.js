@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Image, StyleSheet, Text, Pressable, View, SafeAreaView, ScrollView } from "react-native";
+import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import Toggle from '../common/Toggle';
@@ -13,7 +13,7 @@ const TextNotifications = ({ navigation }) => {
     };
     return (
 
-        <View style={{ flex: 1, backgroundColor: Color.sparklightBlue }} accessibilityLabel="Text Notifications Section">
+        <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }} accessibilityLabel="Text Notifications Section">
             <ProfileSettingsHeader
                 title="Edit Text Notifications"
                 onPressBack={() => navigation.navigate('Notifications')}
@@ -234,9 +234,6 @@ const TextNotifications = ({ navigation }) => {
                                 <Pressable
                                     style={[styles.buttons, styles.buttonsLayout]}
                                     onPress={() => navigation.navigate("Notifications")}
-                                    accessibilityLabel="Save Button"
-                                    accessibilityRole="button"
-                                    accessibilityHint="Saves changes and navigates back to the Account screen"
                                 >
                                     <Text style={[styles.makePayment, styles.makeTypo]}>Save</Text>
                                 </Pressable>
@@ -306,7 +303,7 @@ const styles = StyleSheet.create({
         fontFamily: FontFamily.openSansRegular,
     },
     accountClr: {
-        color: Color.sparkLightPurple,
+        color: Color.colorMidnightblue,
         textAlign: "center",
     },
     infoCircleIcon: {
@@ -447,7 +444,6 @@ const styles = StyleSheet.create({
     buttons: {
         marginTop: 16,
         backgroundColor: Color.colorMidnightblue,
-        width: 382,
     },
     buttonsParent: {
         marginTop: 16,

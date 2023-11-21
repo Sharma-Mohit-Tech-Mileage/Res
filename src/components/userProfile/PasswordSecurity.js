@@ -35,7 +35,7 @@ const PasswordSecurity = () => {
           </View>
           <View style={styles.frameGroup}>
             <View style={styles.passwordGroup}>
-              <Text style={[ styles.passwordFlexBox]}>
+              <Text style={[styles.passwordFlexBox]}>
                 Password
               </Text>
               <Text style={[styles.text, styles.passwordFlexBox]} accessibilityRole="text">
@@ -53,7 +53,7 @@ const PasswordSecurity = () => {
               </View>
               <View style={styles.passwordGroup}>
                 <View style={styles.nameOfYourFirstPetParent}>
-                  <Text style={[ styles.passwordFlexBox]}>
+                  <Text style={[styles.passwordFlexBox]}>
                     Name of your first pet?
                   </Text>
                   <Text style={[styles.text, styles.passwordFlexBox]} accessibilityRole="text">
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   passwordFlexBox: {
     textAlign: "left",
-    color: Color.colorDimgray,
+    color: Color.sparklightGray1,
     lineHeight: 28,
   },
   buttonsBg: {
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
   buttons: {
     marginLeft: 10,
-    backgroundColor: Color.sparkLightPurple,
+    backgroundColor: Color.colorMidnightblue,
   },
   passwordParent: {
     alignItems: "center",
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   },
   frameChild: {
     height: 1,
-    backgroundColor: Color.colorGainsboro_100,
+    backgroundColor: Color.sparklightGray,
     alignSelf: "stretch",
   },
   rectangleWrapper: {
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     paddingTop: Padding.p_base,
   },
   passwordSecurity: {
-    backgroundColor: Color.sparklightBlue,
+    backgroundColor: Color.colorWhitesmoke_200,
     flex: 1,
   },
 });

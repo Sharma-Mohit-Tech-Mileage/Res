@@ -16,7 +16,7 @@ const EmailNotifications = () => {
   const navigation = useNavigation();
 
   return (
-    <View style={{ flex: 1, backgroundColor: Color.sparklightBlue }}>
+    <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
       <ProfileSettingsHeader
         title="Edit Email Notifications"
         onPressBack={() => navigation.navigate('Notifications')}
@@ -92,7 +92,7 @@ const EmailNotifications = () => {
 const styles = StyleSheet.create({
 
   navigationBorder: {
-    borderColor: Color.colorGainsboro_100,
+    borderColor: Color.sparklightGray,
     justifyContent: "center",
     alignItems: "center",
     borderStyle: "solid",
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     flexDirection: "row",
     alignItems: "center",
-    borderColor: Color.colorGainsboro_100,
+    borderColor: Color.sparklightGray,
     borderStyle: "solid",
     borderTopWidth: 1,
   },
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     flexDirection: "row",
     alignItems: "center",
-    borderColor: Color.colorGainsboro_100,
+    borderColor: Color.sparklightGray,
     borderStyle: "solid",
     backgroundColor: Color.sparklightWhite,
   },
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: Border.br_11xs,
-    borderColor: Color.colorGainsboro_100,
+    borderColor: Color.sparklightGray,
     alignSelf: "stretch",
     overflow: "hidden",
   },
