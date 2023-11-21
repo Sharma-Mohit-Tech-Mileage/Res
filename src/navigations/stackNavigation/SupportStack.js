@@ -67,7 +67,7 @@ function SupportStackScreen() {
                 component={Feedback}
                 options={{ headerShown: false, presentation: 'modal' }}
                 listeners={{
-                    focus: () => setTabBarVisible(true),
+                    focus: () => setTabBarVisible(false),
                     blur: () => setTabBarVisible(true)
                 }}
             />

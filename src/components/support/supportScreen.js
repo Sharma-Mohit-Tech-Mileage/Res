@@ -20,35 +20,35 @@ const Support = () => {
             text: 'Search issues',
             icon: require("../../../assets/search-md.png"),
             iconAlignment: 'left', // Icon to the left of the text
-            navigateTo: 'searchArticles',
+            navigateTo: 'searchArticals',
         },
         {
             key: 'moreOptions',
             text: 'General',
             icon: require("../../../assets/chevronright.png"),
             iconAlignment: 'right', // Icon to the right of the text
-            navigateTo: 'moreOptions',
+            navigateTo: 'ArticalWindowUtility',
         },
         {
             key: 'moreOptions',
             text: 'Billing',
             icon: require("../../../assets/chevronright.png"),
             iconAlignment: 'right', // Icon to the right of the text
-            navigateTo: 'moreOptions',
+            navigateTo: 'ArticalWindowUtility',
         },
         {
             key: 'moreOptions',
             text: 'Service',
             icon: require("../../../assets/chevronright.png"),
             iconAlignment: 'right', // Icon to the right of the text
-            navigateTo: 'moreOptions',
+            navigateTo: 'ArticalWindowUtility',
         },
         {
             key: 'moreOptions',
             text: 'Popular Articals',
             icon: require("../../../assets/chevronright.png"),
             iconAlignment: 'right', // Icon to the right of the text
-            navigateTo: 'moreOptions',
+            navigateTo: 'ArticalWindowUtility',
         }
         // Add more items as needed
     ];
@@ -57,7 +57,9 @@ const Support = () => {
         <View style={styles.support}>
             <ProfileSettingsHeader
                 title="Support"
-                onPressBack={() => navigation.navigate('Home')}
+                onPressBack={() => navigation.navigate('Feedback')}
+                iconAlignment="left"
+                iconSource={require("../../../assets/message-alert-circle.png")}
             />
             <ScrollView>
                 <View style={[styles.mainContainer]}>
@@ -87,7 +89,13 @@ const Support = () => {
                             {items.map((item, index) => (
                                 <React.Fragment key={item.name}>
                                     <Pressable key={item.key} style={[styles.search, styles.navigationBorder]}
-                                        onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/115009159707-Data-Plans', name: item.text })}>
+                                        onPress={() => {
+                                            if(item.iconAlignment==='left'){
+                                                navigation.navigate(item.navigateTo)
+                                            }else{
+                                                navigation.navigate(item.navigateTo, { url: 'https://support.sparklight.com/hc/en-us/articles/115009159707-Data-Plans', name: item.text })
+                                            }
+                                        }}>
                                         <View style={[styles.pressableContent, item.iconAlignment === 'right' && { flexDirection: 'row-reverse' }]}>
                                             <Image
                                                 source={item.icon}
@@ -97,8 +105,8 @@ const Support = () => {
                                                 {item.text}
                                             </Text>
                                                 : <Text style={[styles.searchChild]}>
-                                                {item.text}
-                                            </Text>}
+                                                    {item.text}
+                                                </Text>}
                                         </View>
                                     </Pressable>
                                     {index < items.length - 1 && <View style={styles.frameChild} />}
@@ -106,22 +114,22 @@ const Support = () => {
                             ))}
                         </View>
                         <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
-                            <View style={[styles.headingContainer,styles.headingContainerSpaceBlock]}>
+                            <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
                                 <Text style={[styles.heading, styles.headingTypo]}>
                                     Additional Support
                                 </Text>
                             </View>
                             <View style={styles.integrationCardMobileWrapper}>
                                 <View
-                                    style={[styles.integrationCardMobile,styles.integrationCardBorder]}>
+                                    style={[styles.integrationCardMobile, styles.integrationCardBorder]}>
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
                                         <View style={styles.headingAndToggle}>
                                             <View style={styles.headingAndIcon}>
-                                                <View style={[ styles.icon]}>
-                                                <Image
-                                                    resizeMode="cover"
-                                                    source={require("../../../assets/featured-icon.png")}
-                                                /></View>
+                                                <View style={[styles.icon]}>
+                                                    <Image
+                                                        resizeMode="cover"
+                                                        source={require("../../../assets/featured-icon.png")}
+                                                    /></View>
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
                                                         <Text style={[styles.heading2, styles.headingTypo]}>
@@ -179,11 +187,11 @@ const Support = () => {
                                                 <View style={[
                                                     styles.icon
                                                 ]}>
-                                                <Image
-                                                   // style={styles.featuredIcon1}
-                                                    resizeMode="cover"
-                                                    source={require("../../../assets/tool-02.png")}
-                                                /></View>
+                                                    <Image
+                                                        // style={styles.featuredIcon1}
+                                                        resizeMode="cover"
+                                                        source={require("../../../assets/tool-02.png")}
+                                                    /></View>
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
                                                         <Text style={[styles.heading3, styles.headingTypo]}>
@@ -237,11 +245,11 @@ const Support = () => {
                                                 <View style={[
                                                     styles.icon
                                                 ]}>
-                                                <Image
-                                                   // style={styles.featuredIcon1}
-                                                    resizeMode="cover"
-                                                    source={require("../../../assets/modem-02.png")}
-                                                /></View>
+                                                    <Image
+                                                        // style={styles.featuredIcon1}
+                                                        resizeMode="cover"
+                                                        source={require("../../../assets/modem-02.png")}
+                                                    /></View>
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
                                                         <Text style={[styles.heading3, styles.headingTypo]}>
@@ -295,10 +303,10 @@ const Support = () => {
                                                 <View style={[
                                                     styles.icon
                                                 ]}>
-                                                <Image
-                                                    resizeMode="cover"
-                                                    source={require("../../../assets/ticket-03.png")}
-                                                /></View>
+                                                    <Image
+                                                        resizeMode="cover"
+                                                        source={require("../../../assets/ticket-03.png")}
+                                                    /></View>
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
                                                         <Text style={[styles.heading3, styles.headingTypo]}>
@@ -365,11 +373,11 @@ const Support = () => {
                                                 <View style={[
                                                     styles.icon
                                                 ]}>
-                                                <Image
-                                                    //style={styles.featuredIcon1}
-                                                    resizeMode="cover"
-                                                    source={require("../../../assets/wallet-03.png")}
-                                                /></View>
+                                                    <Image
+                                                        //style={styles.featuredIcon1}
+                                                        resizeMode="cover"
+                                                        source={require("../../../assets/wallet-03.png")}
+                                                    /></View>
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
                                                         <Text style={[styles.heading3, styles.headingTypo]}>
@@ -447,11 +455,11 @@ const Support = () => {
                                                 <View style={[
                                                     styles.icon
                                                 ]}>
-                                                <Image
-                                                   // style={styles.featuredIcon1}
-                                                    resizeMode="cover"
-                                                    source={require("../../../assets/tool-01.png")}
-                                                /></View>
+                                                    <Image
+                                                        // style={styles.featuredIcon1}
+                                                        resizeMode="cover"
+                                                        source={require("../../../assets/tool-01.png")}
+                                                    /></View>
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
                                                         <Text style={[styles.heading3, styles.headingTypo]}>
@@ -676,7 +684,7 @@ const styles = StyleSheet.create({
         height: '4.5%', // Responsive height based on screen size
         backgroundColor: "transparent",
         left: 0, // Ensure it takes the full width
-        right:0,
+        right: 0,
         alignSelf: 'stretch', // Stretches to the parent's width if not already doing so
     },
     lifeBuoy02Icon: {

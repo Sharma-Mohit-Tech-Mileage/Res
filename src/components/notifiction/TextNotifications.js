@@ -20,239 +20,239 @@ const TextNotifications = ({ navigation }) => {
                 accessibilityLabel="Text Notifications Header"
                 accessibilityHint="Navigates back to the Notifications screen"
             />
-                <ScrollView accessibilityLabel="Scroll View">
-                    <View style={styles.textNotificationsInner} accessibilityLabel="Text Notifications Inner Container">
-                        <View style={styles.frameParent}>
-                            <View style={[styles.frameContainer, styles.navigationBorder]}>
-                                <View style={styles.frameGroup}>
-                                    <View style={styles.frameView}>
-                                        <View style={styles.infoCircleWrapper}>
-                                            <Image
-                                                style={styles.infoCircleIcon}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/infocircle.png")}
-                                            />
-                                        </View>
-                                        <Text
-                                            style={[
-                                                styles.youAreSubscribedContainer,
-                                                styles.containerTypo,
-                                            ]}
-                                        >
-                                            <Text
-                                                style={styles.youAreSubscribed}
-                                            >{`You are subscribed to text message alerts. `}</Text>
-                                            <Text style={styles.replyStopTo}>
-                                                Reply STOP to cancel at any time. Call 1-800-123-0456 for
-                                                support, Message and data rates may apply.
-                                            </Text>
-                                        </Text>
+            <ScrollView accessibilityLabel="Scroll View">
+                <View style={styles.textNotificationsInner} accessibilityLabel="Text Notifications Inner Container">
+                    <View style={styles.frameParent}>
+                        <View style={[styles.frameContainer, styles.navigationBorder]}>
+                            <View style={styles.frameGroup}>
+                                <View style={styles.frameView}>
+                                    <View style={styles.infoCircleWrapper}>
+                                        <Image
+                                            style={styles.infoCircleIcon}
+                                            resizeMode="cover"
+                                            source={require("../../../assets/infocircle.png")}
+                                        />
                                     </View>
-                                    <View style={styles.frameParent1}>
-                                        <View style={styles.rectangleWrapper}>
-                                            <View style={styles.frameChild} />
+                                    <Text
+                                        style={[
+                                            styles.youAreSubscribedContainer,
+                                            styles.containerTypo,
+                                        ]}
+                                    >
+                                        <Text
+                                            style={styles.youAreSubscribed}
+                                        >{`You are subscribed to text message alerts. `}</Text>
+                                        <Text style={styles.replyStopTo}>
+                                            Reply STOP to cancel at any time. Call 1-800-123-0456 for
+                                            support, Message and data rates may apply.
+                                        </Text>
+                                    </Text>
+                                </View>
+                                <View style={styles.frameParent1}>
+                                    <View style={styles.rectangleWrapper}>
+                                        <View style={styles.frameChild} />
+                                    </View>
+                                    <View style={styles.frameGroup}>
+                                        <View style={styles.frameWrapperBorder}>
+                                            <View style={styles.frameWrapper2}>
+                                                <View style={styles.frameParent3}>
+                                                    <View style={styles.frameParent4}>
+                                                        <View style={styles.frameParent3}>
+                                                            <View style={styles.mobilePhoneParent}>
+                                                                <Text style={styles.mobilePhoneTypo}>
+                                                                    Mobile Phone
+                                                                </Text>
+                                                                <Text style={styles.text}>340-203-2039</Text>
+                                                            </View>
+                                                        </View>
+                                                        <View >
+                                                            <Toggle
+                                                                onToggle={handleToggle}
+                                                                accessibilityLabel="Billing Notifications Toggle"
+                                                                accessibilityHint="Toggles billing notifications on or off"
+                                                                accessibilityRole="switch"
+                                                                accessible={true}
+                                                            />
+                                                        </View>
+                                                    </View>
+                                                    <Text
+                                                        style={[
+                                                            styles.messageAndDataContainer,
+                                                            styles.containerTypo,
+                                                        ]}
+                                                    >
+                                                        <Text
+                                                            style={styles.youAreSubscribed}
+                                                        >{`Message and data rates may apply. Message `}</Text>
+                                                        <Text style={styles.frequencyMayVary}>
+                                                            frequency may vary. Text STOP to opt out or HELP
+                                                            for help.
+                                                        </Text>
+                                                    </Text>
+                                                </View>
+                                            </View>
                                         </View>
-                                        <View style={styles.frameGroup}>
-                                            <View style={styles.frameWrapperBorder}>
-                                                <View style={styles.frameWrapper2}>
-                                                    <View style={styles.frameParent3}>
-                                                        <View style={styles.frameParent4}>
-                                                            <View style={styles.frameParent3}>
-                                                                <View style={styles.mobilePhoneParent}>
-                                                                    <Text style={styles.mobilePhoneTypo}>
-                                                                        Mobile Phone
-                                                                    </Text>
-                                                                    <Text style={styles.text}>340-203-2039</Text>
-                                                                </View>
-                                                            </View>
-                                                            <View >
-                                                                <Toggle
-                                                                    onToggle={handleToggle}
-                                                                    accessibilityLabel="Billing Notifications Toggle"
-                                                                    accessibilityHint="Toggles billing notifications on or off"
-                                                                    accessibilityRole="switch"
-                                                                    accessible={true}
-                                                                />
-                                                            </View>
-                                                        </View>
+                                        <View
+                                            style={[styles.frameWrapper4, styles.frameWrapperBorder]}
+                                        >
+                                            <View style={styles.frameWrapper2}>
+                                                <View style={styles.frameParent3}>
+                                                    <View style={styles.frameParent4}>
                                                         <Text
                                                             style={[
-                                                                styles.messageAndDataContainer,
-                                                                styles.containerTypo,
+                                                                styles.appointments,
+                                                                styles.mobilePhoneTypo,
                                                             ]}
                                                         >
-                                                            <Text
-                                                                style={styles.youAreSubscribed}
-                                                            >{`Message and data rates may apply. Message `}</Text>
-                                                            <Text style={styles.frequencyMayVary}>
-                                                                frequency may vary. Text STOP to opt out or HELP
-                                                                for help.
-                                                            </Text>
+                                                            Appointments
                                                         </Text>
+                                                        <View >
+                                                            <Toggle
+                                                                onToggle={handleToggle}
+                                                                accessibilityLabel="Billing Notifications Toggle"
+                                                                accessibilityHint="Toggles billing notifications on or off"
+                                                                accessibilityRole="switch"
+                                                                accessible={true}
+                                                            />
+                                                        </View>
                                                     </View>
+                                                    <Text
+                                                        style={[
+                                                            styles.messageAndDataContainer,
+                                                            styles.containerTypo,
+                                                        ]}
+                                                    >
+                                                        <Text
+                                                            style={styles.youAreSubscribed}
+                                                        >{`Receive text notifications when your appointments `}</Text>
+                                                        <Text style={styles.replyStopTo}>
+                                                            have updates.
+                                                        </Text>
+                                                    </Text>
                                                 </View>
                                             </View>
-                                            <View
-                                                style={[styles.frameWrapper4, styles.frameWrapperBorder]}
-                                            >
-                                                <View style={styles.frameWrapper2}>
-                                                    <View style={styles.frameParent3}>
-                                                        <View style={styles.frameParent4}>
-                                                            <Text
-                                                                style={[
-                                                                    styles.appointments,
-                                                                    styles.mobilePhoneTypo,
-                                                                ]}
-                                                            >
-                                                                Appointments
-                                                            </Text>
-                                                            <View >
-                                                                <Toggle
-                                                                    onToggle={handleToggle}
-                                                                    accessibilityLabel="Billing Notifications Toggle"
-                                                                    accessibilityHint="Toggles billing notifications on or off"
-                                                                    accessibilityRole="switch"
-                                                                    accessible={true}
-                                                                />
-                                                            </View>
-                                                        </View>
+                                        </View>
+                                        <View
+                                            style={[styles.frameWrapper4, styles.frameWrapperBorder]}
+                                        >
+                                            <View style={styles.frameWrapper2}>
+                                                <View style={styles.frameParent3}>
+                                                    <View style={styles.frameParent4}>
                                                         <Text
                                                             style={[
-                                                                styles.messageAndDataContainer,
-                                                                styles.containerTypo,
+                                                                styles.appointments,
+                                                                styles.mobilePhoneTypo,
                                                             ]}
                                                         >
-                                                            <Text
-                                                                style={styles.youAreSubscribed}
-                                                            >{`Receive text notifications when your appointments `}</Text>
-                                                            <Text style={styles.replyStopTo}>
-                                                                have updates.
-                                                            </Text>
+                                                            Outage Alerts
                                                         </Text>
+                                                        <View >
+                                                            <Toggle
+                                                                onToggle={handleToggle}
+                                                                accessibilityLabel="Billing Notifications Toggle"
+                                                                accessibilityHint="Toggles billing notifications on or off"
+                                                                accessibilityRole="switch"
+                                                                accessible={true}
+                                                            />
+                                                        </View>
                                                     </View>
+                                                    <Text
+                                                        style={[
+                                                            styles.receiveTextNotifications1,
+                                                            styles.containerTypo,
+                                                        ]}
+                                                    >
+                                                        Receive text notifications when outages occur.
+                                                    </Text>
                                                 </View>
                                             </View>
-                                            <View
-                                                style={[styles.frameWrapper4, styles.frameWrapperBorder]}
-                                            >
-                                                <View style={styles.frameWrapper2}>
-                                                    <View style={styles.frameParent3}>
-                                                        <View style={styles.frameParent4}>
-                                                            <Text
-                                                                style={[
-                                                                    styles.appointments,
-                                                                    styles.mobilePhoneTypo,
-                                                                ]}
-                                                            >
-                                                                Outage Alerts
-                                                            </Text>
-                                                            <View >
-                                                                <Toggle
-                                                                    onToggle={handleToggle}
-                                                                    accessibilityLabel="Billing Notifications Toggle"
-                                                                    accessibilityHint="Toggles billing notifications on or off"
-                                                                    accessibilityRole="switch"
-                                                                    accessible={true}
-                                                                />
-                                                            </View>
-                                                        </View>
+                                        </View>
+                                        <View
+                                            style={[styles.frameWrapper4, styles.frameWrapperBorder]}
+                                        >
+                                            <View style={styles.frameWrapper2}>
+                                                <View style={styles.frameParent3}>
+                                                    <View style={styles.frameParent4}>
                                                         <Text
                                                             style={[
-                                                                styles.receiveTextNotifications1,
-                                                                styles.containerTypo,
+                                                                styles.appointments,
+                                                                styles.mobilePhoneTypo,
                                                             ]}
                                                         >
-                                                            Receive text notifications when outages occur.
+                                                            Billing
                                                         </Text>
+                                                        <View >
+                                                            <Toggle
+                                                                onToggle={handleToggle}
+                                                                accessibilityLabel="Billing Notifications Toggle"
+                                                                accessibilityHint="Toggles billing notifications on or off"
+                                                                accessibilityRole="switch"
+                                                                accessible={true}
+                                                            />
+                                                        </View>
                                                     </View>
+                                                    <Text
+                                                        style={[
+                                                            styles.receiveTextNotifications1,
+                                                            styles.containerTypo,
+                                                        ]}
+                                                    >
+                                                        Receive text notifications for billing.
+                                                    </Text>
                                                 </View>
                                             </View>
-                                            <View
-                                                style={[styles.frameWrapper4, styles.frameWrapperBorder]}
-                                            >
-                                                <View style={styles.frameWrapper2}>
-                                                    <View style={styles.frameParent3}>
-                                                        <View style={styles.frameParent4}>
-                                                            <Text
-                                                                style={[
-                                                                    styles.appointments,
-                                                                    styles.mobilePhoneTypo,
-                                                                ]}
-                                                            >
-                                                                Billing
-                                                            </Text>
-                                                            <View >
-                                                                <Toggle
-                                                                    onToggle={handleToggle}
-                                                                    accessibilityLabel="Billing Notifications Toggle"
-                                                                    accessibilityHint="Toggles billing notifications on or off"
-                                                                    accessibilityRole="switch"
-                                                                    accessible={true}
-                                                                />
-                                                            </View>
-                                                        </View>
+                                        </View>
+                                        <View style={styles.frameWrapper10}>
+                                            <View style={styles.frameWrapper2}>
+                                                <View style={styles.frameParent3}>
+                                                    <Text
+                                                        style={[
+                                                            styles.byOptingInContainer,
+                                                            styles.containerTypo,
+                                                        ]}
+                                                    >
                                                         <Text
-                                                            style={[
-                                                                styles.receiveTextNotifications1,
-                                                                styles.containerTypo,
-                                                            ]}
-                                                        >
-                                                            Receive text notifications for billing.
+                                                            style={styles.youAreSubscribed}
+                                                        >{`By opting in for outage alerts, you agree to receive text `}</Text>
+                                                        <Text style={styles.frequencyMayVary}>
+                                                            messages regarding new service outages affecting
+                                                            your home internet service and updates regarding
+                                                            existing outages (updates go out about every two
+                                                            hours for existing outages). We will not send
+                                                            messages between 9 PM and 6 AM.
                                                         </Text>
-                                                    </View>
-                                                </View>
-                                            </View>
-                                            <View style={styles.frameWrapper10}>
-                                                <View style={styles.frameWrapper2}>
-                                                    <View style={styles.frameParent3}>
-                                                        <Text
-                                                            style={[
-                                                                styles.byOptingInContainer,
-                                                                styles.containerTypo,
-                                                            ]}
-                                                        >
-                                                            <Text
-                                                                style={styles.youAreSubscribed}
-                                                            >{`By opting in for outage alerts, you agree to receive text `}</Text>
-                                                            <Text style={styles.frequencyMayVary}>
-                                                                messages regarding new service outages affecting
-                                                                your home internet service and updates regarding
-                                                                existing outages (updates go out about every two
-                                                                hours for existing outages). We will not send
-                                                                messages between 9 PM and 6 AM.
-                                                            </Text>
-                                                        </Text>
-                                                    </View>
+                                                    </Text>
                                                 </View>
                                             </View>
                                         </View>
                                     </View>
                                 </View>
                             </View>
+                        </View>
 
-                            <View style={styles.buttonsParent} accessibilityLabel="Buttons Section">
-                                <Pressable
-                                    style={[styles.buttons, styles.buttonsLayout]}
-                                    onPress={() => navigation.navigate("Notifications")}
-                                >
-                                    <Text style={[styles.makePayment, styles.makeTypo]}>Save</Text>
-                                </Pressable>
-                                <Pressable
-                                    style={[styles.buttonsLayout]}
-                                    onPress={() => navigation.navigate("Notifications")}
-                                    accessibilityLabel="Cancel Button"
-                                    accessibilityRole="button"
-                                    accessibilityHint="Cancels changes and navigates back to the Account screen"
-                                >
-                                    <Text style={[styles.accountClr]}>
-                                        Cancel
-                                    </Text>
-                                </Pressable>
-                            </View>
+                        <View style={styles.buttonsParent} accessibilityLabel="Buttons Section">
+                            <Pressable
+                                style={[styles.buttons, styles.buttonsLayout]}
+                                onPress={() => navigation.navigate("Notifications")}
+                            >
+                                <Text style={[styles.makePayment, styles.makeTypo]}>Save</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[styles.buttonsLayout]}
+                                onPress={() => navigation.navigate("Notifications")}
+                                accessibilityLabel="Cancel Button"
+                                accessibilityRole="button"
+                                accessibilityHint="Cancels changes and navigates back to the Account screen"
+                            >
+                                <Text style={[styles.accountClr]}>
+                                    Cancel
+                                </Text>
+                            </Pressable>
                         </View>
                     </View>
+                </View>
 
-                </ScrollView>
+            </ScrollView>
         </View>
     );
 };
@@ -277,12 +277,12 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         flexDirection: "row",
         alignItems: "center",
-        borderColor: Color.sparklightGray,
+        borderColor: Color.sparklightGray1,
         borderStyle: "solid",
         alignSelf: "stretch",
     },
     mobilePhoneTypo: {
-        color: Color.sparklightDarkestGray,
+        color: Color.colorGray_100,
         fontSize: FontSize.size_base,
         lineHeight: 28,
         textAlign: "left",
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     },
     youAreSubscribedContainer: {
         marginLeft: 8,
-        color: Color.sparklightDarkestGray,
+        color: Color.sparklightGray1,
         textAlign: "left",
         fontFamily: FontFamily.openSansRegular,
         fontSize: FontSize.size_sm,
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     },
     frameChild: {
         height: 1,
-        backgroundColor: Color.sparklightGray,
+        backgroundColor: Color.sparklightGray1,
         alignSelf: "stretch",
     },
     rectangleWrapper: {
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
         fontSize: FontSize.size_base,
         lineHeight: 28,
         textAlign: "left",
-        color: Color.sparklightDarkestGray,
+        color: Color.colorGray_100,
         fontFamily: FontFamily.openSansRegular,
     },
     mobilePhoneParent: {
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
         backgroundColor: Color.sparklightWhite,
     },
     receiveTextNotifications1: {
-        color: Color.sparklightDarkGray,
+        color: Color.colorGray_100,
         lineHeight: 28,
         fontFamily: FontFamily.openSansRegular,
         textAlign: "left",

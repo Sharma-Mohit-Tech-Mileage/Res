@@ -11,8 +11,14 @@ import LinearGradient from 'react-native-linear-gradient';
 import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
-const ProfileSettingsHeader = ({ title, onPressBack }) => {
-    const [iconPressed, setIconPressed] = useState(false); // State to manage icon press effect
+const ProfileSettingsHeader = ({
+    title,
+    onPressBack,
+    iconAlignment = 'right',
+    iconSource = require("../../../assets/chevronleft.png") // Default icon source
+}) => {
+    const [iconPressed, setIconPressed] = useState(false);
+    const iconStyle = iconAlignment === 'left' ? styles.chevronRight : styles.chevronLeft;
 
     return (
         <>
@@ -26,20 +32,20 @@ const ProfileSettingsHeader = ({ title, onPressBack }) => {
             >
                 <View style={[styles.navBar]}>
                     <Pressable
-                        style={[styles.chevronLeft, styles.chevronLeftLayout]}
+                        style={[iconStyle, styles.chevronLayout]}
                         onPress={onPressBack}
                         accessibilityLabel="Back"
                         accessibilityHint="Go back to the previous screen"
                         accessibilityRole="button"
                         accessible={true}
-                        hitSlop={20} // Increase touchable area
-                        onPressIn={() => setIconPressed(true)} // Change state on press in
-                        onPressOut={() => setIconPressed(false)} // Change state on press out
+                        hitSlop={20}
+                        onPressIn={() => setIconPressed(true)}
+                        onPressOut={() => setIconPressed(false)}
                     >
                         <Image
-                            style={[styles.icon, iconPressed ? styles.iconPressed : null]} // Change style on press
+                            style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                             resizeMode="cover"
-                            source={require("../../../assets/chevronleft.png")}
+                            source={iconSource}
                             accessible={false}
                         />
                     </Pressable>
@@ -49,7 +55,6 @@ const ProfileSettingsHeader = ({ title, onPressBack }) => {
         </>
     );
 };
-
 const styles = StyleSheet.create({
     profileSettingsChild: {
         height: "10.73%",
@@ -83,8 +88,16 @@ const styles = StyleSheet.create({
     chevronLeft: {
         position: 'absolute',
         left: 18,
+    },
+    chevronRight: {
+        position: 'absolute',
+        right: 18,
+    },
+    chevronLayout: {
         justifyContent: 'center',
         alignItems: 'center',
+        height: 24,
+        width: 24,
         zIndex: 1
     },
     chevronLeftLayout: {
