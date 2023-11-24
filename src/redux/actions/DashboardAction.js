@@ -1,19 +1,14 @@
-import { Action } from '../constants';
+import { GET_INTERNET_SPEED,UPDATE_INTERNET_SPEED } from '../constants';
 export const getCurrentSpeed= (accountId) => {
    
    return {
-      type: Action.GET_INTERNET_SPEED,
+      type: GET_INTERNET_SPEED,
       payload:accountId
     };
 };
-export const storeListData= (result) => {
+export const updateCurrentSpeed= (result) => {
    return {
-      type: Action.LIST_FETCHED,
-      data : result,
-    };
-};
-export const apiCalled = () => {
-   return {
-      type: Action.API_CALLED,
+      type: UPDATE_INTERNET_SPEED,
+      payload : result,
     };
 };

@@ -6,11 +6,13 @@ import { TabBarVisibilityProvider } from './src/navigations/TabBarVisibilityCont
 
 const App = () => {
   return (
+    
     <Provider store={store}>
     <TabBarVisibilityProvider>
       <UserNavigations />
       </TabBarVisibilityProvider>
     </Provider>
+  
   );
 };
 

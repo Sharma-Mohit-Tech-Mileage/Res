@@ -69,7 +69,7 @@ const MyServicePlan = () => {
         </TouchableOpacity>
       </View>
       
-      {tabIndex==0?<DataSpeedComponent/>:<DataUsageComponent/>}
+      {tabIndex==0?<DataSpeedComponent />:<DataUsageComponent/>}
 
     </View>
   );

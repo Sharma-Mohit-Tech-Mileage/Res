@@ -1,6 +1,8 @@
 import { combineReducers } from 'redux';
-import UserReducer from '../reducers/UserReducer';
+import userReducer from './UserReducer';
+import dashboardReducer from './DashboardReducer';
 
 export const combinedReducers = combineReducers({
-  user: UserReducer,
+  user: userReducer,
+  home: dashboardReducer
 });

@@ -1,4 +1,5 @@
 import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
+import {delay} from 'redux-saga';
 import {ssoLoginApi} from "../../network/apis/account/LoginService";
 import { SSO_LOGIN_REQUEST } from "../constants";
  import { saveUserInfo } from "../actions/UserAction";
@@ -7,18 +8,9 @@ import { SSO_LOGIN_REQUEST } from "../constants";
  function* ssoLogin(action) {
    try {
      const response = yield call(ssoLoginApi,action.payload)
-     console.log('Response Data1',response.data)
-     yield put(saveUserInfo(response.data))
-     if (response.status == 200) {
-      if(response.data){
-       //put(saveUserInfo(response.data))
-      }
-       
-     } else {
-        // handle other response code
-     }
+      yield put(saveUserInfo(response))
     } catch (error) {
-      console.log("Server Error");
+      console.log("Server Error",error);
     } finally {
       //yield put(apiCalled());
     }

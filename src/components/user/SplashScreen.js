@@ -5,6 +5,7 @@ import LinearGradient from "react-native-linear-gradient";
 import { authorize } from "react-native-app-auth";
 import { useDispatch, useSelector } from 'react-redux';
 import { ssoLoginAction } from "../../redux/actions/UserAction";
+import { storeUser } from "../../redux/utils/LocalStorage";
 
 
 const config = {
@@ -24,11 +25,16 @@ const SplashScreen = ({ navigation }) => {
   const userData = useSelector((state) =>{ 
     //console.log('respose1',JSON.stringify(state.combinedReducers.user))
      if(state.combinedReducers.user && Object.keys(state.combinedReducers.user.userData).length!=0){
-      
       let  token = state.combinedReducers.user.userData.jwtToken;
-      let userInfo=state.combinedReducers.user.userData.userInfo
-      console.log('token',token)
-      console.log('user info',userInfo)
+      let userInfo=state.combinedReducers.user.userData.userInfo;
+      let user={
+       userInfo: userInfo,
+       token:token
+      }
+       if(token){
+        storeUser(user)
+       }
+     
       navigation.navigate('MyTab', {
         fname: userInfo.firstName,
         lname: userInfo.lastName,
@@ -44,15 +50,10 @@ const SplashScreen = ({ navigation }) => {
   
 
   useEffect(() => {
-   
-    // Simulate a delay for the splash screen
     const loginAuth = async () => {
       try {
         const result = await authorize(config);
-        // result includes accessToken, accessTokenExpirationDate and refreshToken
-        //console.log("result", result);
         const data={idToken:result.idToken}
-        
          dispatch(ssoLoginAction(data))
          //callAPI(data)
         //

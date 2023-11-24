@@ -25,8 +25,9 @@ import Myplanicon from "../../res/svgIcons/Myplanicon";
 import MyInternetDetials from "../common/MyInternetDetails";
 import Wallet2icon from "../../res/svgIcons/Wallet2icon";
 import MyServicePlan from "../common/MyServicePlan";
-import { storeListData, getCurrentSpeed } from "../../redux/actions/DashboardAction";
+
 import { useDispatch, useSelector } from 'react-redux';
+
 
 const HomeScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ const HomeScreen = ({ route, navigation }) => {
     name: route.params.data.params.name,
   };
   const [isInternetDetails, setIsInternetDetails] = useState(false);
-
+  
   const myData = [
     {
       icon: <Wallet2icon />,
@@ -54,10 +55,8 @@ const HomeScreen = ({ route, navigation }) => {
       key:'3'
     },
   ];
-  useEffect(() => {
-   
-    //dispatch(getCurrentSpeed('900254640'))
-  }, []);
+  
+
   return (
     <LinearGradient
       start={{ x: 0, y: 0 }}
@@ -144,7 +143,7 @@ const HomeScreen = ({ route, navigation }) => {
              ))}
             </ScrollView> 
              
-             <MyServicePlan/>
+             <MyServicePlan />
 
           </View>
         </ScrollView>

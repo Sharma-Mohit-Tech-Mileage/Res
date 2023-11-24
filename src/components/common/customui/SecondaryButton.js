@@ -5,7 +5,7 @@ import colors from '../../../res/Colors';
 const SecondaryButton=(props)=>{
   
     return (
-      <TouchableOpacity style={styles.TouchableOpacityButton}>
+      <TouchableOpacity style={styles.TouchableOpacityButton} onPress={props.onPress}>
         <Text style={styles.txtStyle}>{props.text}</Text>
       </TouchableOpacity>
     );
