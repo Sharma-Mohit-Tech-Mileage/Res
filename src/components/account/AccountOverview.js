@@ -37,6 +37,12 @@ const AccountOverview = () => {
       icon: userManagementIcon,
       accessibilityLabel: 'Navigate to user management settings',
     },
+    {
+      name: 'FeedBack',
+      onPress: () => navigation.navigate('Feedback'),
+      icon: userManagementIcon,
+      accessibilityLabel: 'Navigate to user management settings',
+    }
   ];
 
   return (

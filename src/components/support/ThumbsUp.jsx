@@ -10,7 +10,7 @@ const ThumbsUp = () => {
         <View style={styles.feedback}>
             <ProfileSettingsHeader
                 title="Feedback"
-                onPressBack={() => navigation.navigate('support')}
+                onPressBack={() => navigation.navigate('Account')}
             />
             <View style={styles.content}>
                 <View style={styles.frameParent}>
@@ -32,7 +32,7 @@ const ThumbsUp = () => {
                         </Text>
                     </View>
                 </View>
-                <Pressable style={styles.button} onPress={() => { navigation.navigate('support') }}>
+                <Pressable style={styles.button} onPress={() => { navigation.navigate('Account') }}>
                     <Text style={styles.buttonText}>Done</Text>
                 </Pressable>
             </View>

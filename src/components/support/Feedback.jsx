@@ -26,7 +26,7 @@ const Feedback = () => {
                 <View style={styles.feedback}>
                     <ProfileSettingsHeader
                         title="FeedBack"
-                        onPressBack={() => navigation.navigate('support')}
+                        onPressBack={() => navigation.navigate('Account')}
                     />
                     <View style={[styles.feedbackInner]}>
                 <View style={[styles.frameParent, styles.parentSpaceBlock]}>
@@ -94,7 +94,7 @@ const Feedback = () => {
                         </Pressable>
                         <Pressable
                             style={[styles.buttons1, styles.buttonsLayout]}
-                            onPress={() => { navigation.navigate('support') }}
+                                    onPress={() => { navigation.navigate('Account') }}
                         >
                             <Text style={[styles.makePayment1, styles.makeTypo]}>
                                 Cancel

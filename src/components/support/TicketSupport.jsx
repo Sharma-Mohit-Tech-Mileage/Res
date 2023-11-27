@@ -11,7 +11,7 @@ const TicketSupportNone = () => {
         <View style={styles.ticketSupportNone}>
             <ProfileSettingsHeader
                 title="Ticket Support"
-                onPressBack={() => navigation.navigate('Home')}
+                onPressBack={() => navigation.navigate('support')}
             />
             <View style={styles.frameParent}>
                 <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>

@@ -13,11 +13,15 @@ import InAppNotifications from '../../components/notifiction/InAppNotifications'
 import TextNotifications from '../../components/notifiction/TextNotifications'
 import UserManagement from '../../components/userManagement/UserManagement';
 import UserManagementEdit from '../../components/userManagement/UserManagementEdit';
+import Feedback from '../../components/support/Feedback';
+import ThumbsUp from '../../components/support/ThumbsUp';
+import { useTabBarVisibility } from '../TabBarVisibilityContext';
 
 
 const AccountStack = createStackNavigator();
 
 function AccountStackScreen() {
+    const { setTabBarVisible } = useTabBarVisibility();
     return (
         <AccountStack.Navigator initialRouteName="Account">
             <AccountStack.Screen
@@ -76,6 +80,24 @@ function AccountStackScreen() {
                 options={{ headerShown: false }}
             />
             {/* Add other account-related screens here, if any */}
+            <AccountStack.Screen
+                name="Feedback"
+                component={Feedback}
+                options={{ headerShown: false, presentation: 'modal' }}
+                listeners={{
+                    focus: () => setTabBarVisible(false),
+                    blur: () => setTabBarVisible(true)
+                }}
+            />
+            <AccountStack.Screen
+                name="ThumbsUp"
+                component={ThumbsUp}
+                options={{ headerShown: false, presentation: 'modal' }}
+                listeners={{
+                    focus: () => setTabBarVisible(false),
+                    blur: () => setTabBarVisible(true)
+                }}
+            />
         </AccountStack.Navigator>
     );
 }
