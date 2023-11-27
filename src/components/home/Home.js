@@ -7,7 +7,8 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  StatusBar,
+  BackHandler,
+  Alert,
   Platform
 } from "react-native";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
@@ -30,6 +31,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 
 const HomeScreen = ({ route, navigation }) => {
+
   const dispatch = useDispatch();
   const { email, name } = {
     email: route.params.data.params.email,
@@ -55,6 +57,32 @@ const HomeScreen = ({ route, navigation }) => {
       key:'3'
     },
   ];
+
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert(
+        'Confirm Exit',
+        'Are you sure you want to exit the app?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {
+            text: 'Exit',
+            onPress: () => BackHandler.exitApp(),
+          },
+        ],
+        { cancelable: false }
+      );
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  }, []);
   
 
   return (
