@@ -1,4 +1,3 @@
-import { TouchableOpacity, Text, StyleSheet, StatusBar, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTabBarVisibility } from './TabBarVisibilityContext';
 import AccountStackScreen from '../navigations/stackNavigation/AccountStack';
@@ -17,8 +16,7 @@ const Tab = createBottomTabNavigator();
 
 
 const MyTabs = ({ route, navigation }) => {
-  //const { tabBarVisible } = useTabBarVisibility();
-  let  tabBarVisible  =true
+  const { tabBarVisible } = useTabBarVisibility();
   return (
     <Tab.Navigator
       name='MyTab'

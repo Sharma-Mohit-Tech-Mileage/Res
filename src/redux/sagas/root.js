@@ -1,11 +1,11 @@
-import { all } from 'redux-saga/effects';
+import { all, fork } from 'redux-saga/effects';
 import appSagas from './HomeSaga';
 import userSagas from './UserSaga';
 
 function* rootSaga() {
   yield all([
-    userSagas(),
-    appSagas(),
+    fork (userSagas),
+    fork (appSagas),
   ]);
 }
 

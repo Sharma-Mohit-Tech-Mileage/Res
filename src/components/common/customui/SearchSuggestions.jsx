@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo , useRef, useEffect } from 'react';
 import {
     StyleSheet,
     View,
@@ -11,6 +11,16 @@ import {
 import { Padding, Color, FontSize, FontFamily } from '../../../../GlobalStyles';
 
 const SearchSuggestions = memo(({ placeholder, input, onChangeInput, suggestions }) => {
+
+    // Creating a ref for the TextInput
+    const inputRef = useRef(null);
+
+    // Focus the TextInput after the component mounts or updates
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    });
 
     const renderSuggestion = ({ item }) => (
         <TouchableOpacity style={styles.suggestionItem}>
@@ -32,6 +42,7 @@ const SearchSuggestions = memo(({ placeholder, input, onChangeInput, suggestions
                 style={[styles.searchIcon, styles.leftIcon]}
             />
             <TextInput
+                ref={inputRef} // Attach the ref to the TextInput
                 style={styles.searchInput}
                 placeholder={placeholder}
                 value={input}
@@ -47,7 +58,6 @@ const SearchSuggestions = memo(({ placeholder, input, onChangeInput, suggestions
             data={suggestions}
             ListHeaderComponent={ListHeader}
             renderItem={renderSuggestion}
-            keyExtractor={(item, index) => index.toString()}
             style={styles.flatList}
         />
     );

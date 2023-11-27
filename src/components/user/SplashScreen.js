@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text } from "react-native";
+import { View, Image, StyleSheet, Text,ActivityIndicator } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize } from "react-native-app-auth";
 import { useDispatch, useSelector } from 'react-redux';
 import { ssoLoginAction } from "../../redux/actions/UserAction";
+import { storeUser } from "../../redux/utils/LocalStorage";
 
 
 const config = {
@@ -19,16 +20,25 @@ const config = {
 
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-  const [isSplashReady, setIsSplashReady] = useState(false);
-  const [data, setData] = useState(undefined);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(false);
   const userData = useSelector((state) =>{ 
     //console.log('respose1',JSON.stringify(state.combinedReducers.user))
      if(state.combinedReducers.user && Object.keys(state.combinedReducers.user.userData).length!=0){
-      
       let  token = state.combinedReducers.user.userData.jwtToken;
-      let userInfo=state.combinedReducers.user.userData.userInfo
-      console.log('token',token)
-      console.log('user info',userInfo)
+      let userInfo=state.combinedReducers.user.userData.userInfo;
+      let user={
+       userInfo: userInfo,
+       token:token
+      }
+      if(!loading){
+        setLoading(true)
+      }
+       if(token){
+        storeUser(user)
+        
+       }
+     
       navigation.navigate('MyTab', {
         fname: userInfo.firstName,
         lname: userInfo.lastName,
@@ -38,56 +48,25 @@ const SplashScreen = ({ navigation }) => {
     
   });
 
-  useEffect(()=>{
-   
-  },[userData])
+ 
   
 
   useEffect(() => {
-   
-    // Simulate a delay for the splash screen
     const loginAuth = async () => {
       try {
         const result = await authorize(config);
-        // result includes accessToken, accessTokenExpirationDate and refreshToken
-        //console.log("result", result);
         const data={idToken:result.idToken}
-        
+        setLoading(true)
          dispatch(ssoLoginAction(data))
-         //callAPI(data)
-        //
-        
-        if (result.accessToken) {
-          //setIsSplashReady(true);
-          
-        }
-        //setData(decoded);
+         
       } catch (error) {
         console.log(error);
       }
     };
     loginAuth();
-    // setTimeout(() => {
-
-    //   setIsSplashReady(true);
-
-    // }, 3000); // Adjust the duration as needed
+    
   }, []);
 
-  const callAPI=(data)=>{
-    fetch('https://customer.uat.cableone.net/apiWrapper/mobile/api/gettoken', {
-  method: 'POST',
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(
-  data
-  )
-}).then((response) => response.json())
-.then((json) => {console.log(json)})
-.catch((error) => console.error(error));
-  }
 
   return  (
     <LinearGradient
@@ -98,6 +77,7 @@ const SplashScreen = ({ navigation }) => {
     >
       <View style={styles.splashContainer}>
         {/* Your centered logo */}
+        {loading ? <ActivityIndicator size="large" color={'white'}/> :<></>}
         <Image
           resizeMode="contain"
           source={require("../../res/images/Logo.png")}

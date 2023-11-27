@@ -7,7 +7,7 @@ const { width, height } = Dimensions.get('window');
 
 const ArticalWindowUtility = ({ navigation, route }) => {
     const [progress, setProgress] = useState(0);
-    const [screenName, setTitle] = useState(route.params?.name);
+    const [name, setTitle] = useState(route.params?.name);
     const [isError, setIsError] = useState(false);
     const [url, setUrl] = useState(route.params?.url);
     const [modalOpen, setModalOpen] = useState(true);
@@ -16,27 +16,22 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     useEffect(() => {
         setProgress(0);
         setIsError(false);
-    }, [url, modalOpen]);
+    }, [url, name, modalOpen]);
 
     // Optionally, if you want to reset state when the modal is re-opened
     useEffect(() => {
         if (modalOpen) {
             // The modal has been opened again, reset the URL if needed
             setUrl(route.params?.url);
-        }
-    }, [modalOpen]);
-    useEffect(() => {
-        if (modalOpen) {
-            // The modal has been opened again, reset the URL if needed
             setTitle(route.params?.name);
         }
     }, [modalOpen]);
-    // Optionally, if you want to reset state when the modal is re-opened
+   
 
 
     return (
         <View style={{ flex: 1 }}>
-            <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={'Support'} />
+            <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />
             {progress < 1 ? (
                 <View style={{ ...styles.progressBar, marginTop: '23%' }}>
                     <View style={{ ...styles.progress, width: `${progress * 100}%` }} />
@@ -68,7 +63,7 @@ const styles = StyleSheet.create({
     },
     progress: {
         height: '100%',
-        backgroundColor: 'blue',
+        backgroundColor: 'rgba(141, 59, 144, 1)',
     },
     errorContainer: {
         flex: 1,

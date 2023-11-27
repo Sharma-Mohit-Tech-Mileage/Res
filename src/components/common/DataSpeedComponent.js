@@ -6,24 +6,67 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Linking
 } from "react-native";
 import colors from "../../res/Colors";
-import Myservicedownarrow from "../../res/svgIcons/Myservicedownarrow";
-import Myserviceuparrow from "../../res/svgIcons/Myserviceuparrow";
 import SecondaryButton from "./customui/SecondaryButton";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import TimerInfo from "../../res/svgIcons/TimerInfo";
 import strings from "../../res/Strings";
+import { getCurrentSpeed } from "../../redux/actions/DashboardAction";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser } from "../../redux/utils/LocalStorage"
+import WebViewModal from "./customui/WebViewModal";
 
 const DataSpeedComponent = () => {
-  const roundImage = require("../../res/images/roundbg.png");
+  const dispatch = useDispatch();
+  const [showModal, setShowModal] = useState(false);
+
+  const toggleModal = () => {
+    setShowModal(!showModal);
+  };
+  const [visible, setVisible] = useState(false);
+  const [download, setDownload] = useState(0);
+  const [upload, setUpload] = useState(0);
+  const [downloadFrac, setDownloadFrac] = useState(0);
+  const [uploadFrac, setUploadFrac] = useState(0);
+  const [speed, setSpeed] = useState(false);
+  const userData = useSelector((state) => {
+    if (state.combinedReducers.home.speed.hasOwnProperty("download_Kbps")) {
+      let downloadSpeed = state.combinedReducers.home.speed.download_Kbps;
+        let uploadSpeed = state.combinedReducers.home.speed.upload_Kbps;
+        let speedInMbps_download = (downloadSpeed / 1024).toFixed(2);
+        let speedInMbps_upload = (uploadSpeed / 1024).toFixed(2);
+        let upl = speedInMbps_upload.toString().split(".");
+        let downl = speedInMbps_download.toString().split(".");
+      if (!speed) {
+        
+        setDownload(downl[0]);
+        setUpload(upl[0]);
+        setDownloadFrac(downl[1]);
+        setUploadFrac(upl[1]);
+        setSpeed(true);
+      }
+    }
+    
+  });
+
   useEffect(() => {
-    console.log("data");
+    if (!speed) {
+      let re = getUser().then((res) => {
+        console.log("res", res.userInfo.accountNumber);
+        dispatch(getCurrentSpeed(res.userInfo.accountNumber));
+      });
+    }
   }, []);
 
+
+  
   const TestSpeedResultSection = () => {
     return (
+      <>
+       
       <View
         style={{
           borderColor: colors.grey,
@@ -43,12 +86,12 @@ const DataSpeedComponent = () => {
             }}
           >
             <View style={[styles.downloadbg]}>
-            <Image source={require('../../../assets/frame-1645.png')}/>
+              <Image source={require("../../../assets/frame-1645.png")} />
             </View>
 
             <View style={{ flexDirection: "row" }}>
-              <Text style={styles.speedtextLarge}>100</Text>
-              <Text style={[styles.speedtextLarge, { fontSize: 16 }]}>.78</Text>
+              <Text style={styles.speedtextLarge}>{download}</Text>
+              <Text style={[styles.speedtextLarge, { fontSize: 16 }]}>.{downloadFrac}</Text>
             </View>
 
             <View style={{ flexDirection: "row" }}>
@@ -74,12 +117,12 @@ const DataSpeedComponent = () => {
             }}
           >
             <View style={[styles.downloadbg]}>
-              <Image source={require('../../../assets/frame-1646.png')}/>
+              <Image source={require("../../../assets/frame-1646.png")} />
             </View>
 
             <View style={{ flexDirection: "row" }}>
-              <Text style={styles.speedtextLarge}>100</Text>
-              <Text style={[styles.speedtextLarge, { fontSize: 16 }]}>.78</Text>
+              <Text style={styles.speedtextLarge}>{upload}</Text>
+              <Text style={[styles.speedtextLarge, { fontSize: 16 }]}>.{uploadFrac}</Text>
             </View>
             <View style={{ flexDirection: "row" }}>
               <Text style={styles.downloadText}>Upload</Text>
@@ -95,20 +138,23 @@ const DataSpeedComponent = () => {
           </View>
         </View>
         <View style={{ margin: 10 }}>
-          <SecondaryButton text={"Test Speed"} />
+          <SecondaryButton text={"Test Speed"} onPress={()=>{
+            toggleModal()
+          }} />
         </View>
         <View
           style={{ backgroundColor: "#F4F4F5", height: 2, marginTop: 20 }}
         />
 
-        <View style={{flexDirection:'row',paddingVertical:10, paddingLeft:10}}>
-         <TimerInfo/>
-         <Text style={styles.timerInfo1}>Last run</Text>
-         <Text style={styles.timerInfo2}>10/05/23  11:32am</Text>
-         
+        <View
+          style={{ flexDirection: "row", paddingVertical: 10, paddingLeft: 10 }}
+        >
+          <TimerInfo />
+          <Text style={styles.timerInfo1}>Last run</Text>
+          <Text style={styles.timerInfo2}>10/05/23 11:32am</Text>
         </View>
-        
       </View>
+      </>
     );
   };
 
@@ -119,24 +165,26 @@ const DataSpeedComponent = () => {
           <InfoIcon />
         </View>
         <View>
-        <Text style={styles.internetStatusTxt}>
-          {strings.test_speed_info}
-        </Text>
-        <View style={{flexDirection:'row',marginLeft:10,marginTop:10}}> 
-          <TouchableOpacity>
-          <Text style={styles.learnMore}>{strings.learn_more}</Text>
-          </TouchableOpacity>
-          <View style={styles.verticle_saperator}/> 
-          <TouchableOpacity>
-          <Text style={styles.learnMore}>{strings.test_with_eero}</Text>
+          <Text style={styles.internetStatusTxt}>
+            {strings.test_speed_info}
+          </Text>
+          <View style={{ flexDirection: "row", marginLeft: 10, marginTop: 10 }}>
+            <TouchableOpacity>
+              <Text style={styles.learnMore}>{strings.learn_more}</Text>
             </TouchableOpacity>
-        </View>
+            <View style={styles.verticle_saperator} />
+            <TouchableOpacity>
+              <Text style={styles.learnMore}>{strings.test_with_eero}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
       <TestSpeedResultSection />
       <View style={{ backgroundColor: "#F4F4F5", height: 2, marginTop: 10 }} />
       <TouchableOpacity
-        onPress={() => {}}
+        onPress={() => {
+          Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
+        }}
         style={{
           height: 40,
           flexDirection: "row",
@@ -151,7 +199,7 @@ const DataSpeedComponent = () => {
             marginVertical: 5,
             lineHeight: 20,
             fontWeight: "600",
-            color:colors.sparklight_purple_blue
+            color: colors.sparklight_purple_blue,
           }}
         >
           Upgrade Plan
@@ -160,6 +208,13 @@ const DataSpeedComponent = () => {
           <RightArrow />
         </View>
       </TouchableOpacity>
+
+      {showModal && (
+        <WebViewModal
+          url="https://cableone.speedtestcustom.com/" 
+          onClose={toggleModal}
+        />
+      )}
     </View>
   );
 };
@@ -179,7 +234,7 @@ const styles = StyleSheet.create({
   internetStatusTxt: {
     color: colors.darkest_grey,
     fontSize: 14,
-    marginLeft:5,
+    marginLeft: 5,
     fontStyle: "normal",
     fontWeight: "400",
     lineHeight: 28,
@@ -201,7 +256,8 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontWeight: "600",
     lineHeight: 20 /* 142.857% */,
-  },downloadbg: {
+  },
+  downloadbg: {
     backgroundColor: "white",
     borderRadius: 8,
     paddingVertical: 8,
@@ -213,19 +269,30 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
-  timerInfo1:
-  {color:colors.dark_grey,
-    marginLeft:5,
-    fontSize:14,
-    fontWeight:'400'
-},timerInfo2:{marginLeft:5,color:colors.darkest_grey,fontSize:14,fontWeight:'400'},
- learnMore:{
-  color:colors.sparklight_purple_blue,
-  fontSize: 14,
+  timerInfo1: {
+    color: colors.dark_grey,
+    marginLeft: 5,
+    fontSize: 14,
+    fontWeight: "400",
+  },
+  timerInfo2: {
+    marginLeft: 5,
+    color: colors.darkest_grey,
+    fontSize: 14,
+    fontWeight: "400",
+  },
+  learnMore: {
+    color: colors.sparklight_purple_blue,
+    fontSize: 14,
     fontStyle: "normal",
     fontWeight: "600",
-
-},verticle_saperator:{marginHorizontal:15,height:15,backgroundColor:colors.dark_grey,width:1}
+  },
+  verticle_saperator: {
+    marginHorizontal: 15,
+    height: 15,
+    backgroundColor: colors.dark_grey,
+    width: 1,
+  },
 });
 
 export default DataSpeedComponent;

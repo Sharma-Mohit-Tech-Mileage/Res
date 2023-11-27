@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Image, StyleSheet, Text, View, Pressable, StatusBar, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import {useSelector } from 'react-redux';
 import { Color, FontFamily, Padding, FontSize, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
 import chevronRightIcon from '../../../assets/chevronright.png';
@@ -10,19 +9,8 @@ import passwordSecurityIcon from '../../../assets/right-actionable16.png';
 import notificationsIcon from '../../../assets/right-actionable17.png';
 import userManagementIcon from '../../../assets/right-actionable18.png';
 
-const Account = () => {
+const AccountOverview = () => {
   const navigation = useNavigation();
-  const [userInfo,setUserInfo]=React.useState({})
-  // const userData = useSelector((state) =>{ 
-  //   //console.log('respose1',JSON.stringify(state.combinedReducers.user))
-  //    if(state.combinedReducers.user && Object.keys(state.combinedReducers.user.userData).length!=0){
-  //     let userInfo=state.combinedReducers.user.userData.userInfo
-  //     console.log('user info profile',userInfo)
-  //     setUserInfo(userInfo)
-      
-  //   }
-    
-  // });
   
   const menuItems = [
     {
@@ -49,6 +37,12 @@ const Account = () => {
       icon: userManagementIcon,
       accessibilityLabel: 'Navigate to user management settings',
     },
+    {
+      name: 'FeedBack',
+      onPress: () => navigation.navigate('Feedback'),
+      icon: userManagementIcon,
+      accessibilityLabel: 'Navigate to user management settings',
+    }
   ];
 
   return (
@@ -280,4 +274,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Account;
+export default AccountOverview;

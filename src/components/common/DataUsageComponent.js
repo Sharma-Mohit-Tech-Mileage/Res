@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet,TouchableOpacity } from "react-native";
+import { View, Text, Button, StyleSheet,TouchableOpacity, Linking } from "react-native";
 import { ProgressCircle } from "react-native-svg-charts";
 import colors from "../../res/Colors";
 import RightArrow from "../../res/svgIcons/RightArrow";
@@ -82,7 +82,9 @@ const DataUsageComponent = () => {
       </View>
       <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 20 }} />
       <TouchableOpacity
-        onPress={() => {}}
+        onPress={() => {
+          Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
+        }}
         style={{
           height: 40,
           flexDirection: "row",

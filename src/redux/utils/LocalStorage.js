@@ -1,11 +1,21 @@
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const setUserToken = async (data) => {
-    try {
-      await AsyncStorage.setItem("USER_TOKEN", data)
-    } catch (e) {
-      console.log('Failed to save the data to the storage')
-    }
+export const storeUser = async (value) => {
+  try {
+    await AsyncStorage.setItem("user", JSON.stringify(value));
+  } catch (error) {
+    console.log(error);
   }
+};
 
-  export {setUserToken}
+// getting data
+export const getUser = async () => {
+  try {
+    const userData = JSON.parse(await AsyncStorage.getItem("user"))
+    return userData;
+  } catch (error) {
+   console.log(error); 
+  }
+};
+
+

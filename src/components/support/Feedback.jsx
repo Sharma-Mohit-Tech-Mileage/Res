@@ -1,160 +1,127 @@
-import * as React from "react";
-import { Image, StyleSheet, Text, Pressable, View } from "react-native";
-import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
+import React,{useState} from 'react';
+import { ScrollView, KeyboardAvoidingView, Platform, Image, StyleSheet, Text, Pressable, View, TextInput } from 'react-native';
+import { Color, FontFamily, FontSize, Border,Padding } from '../../../GlobalStyles';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import { useNavigation } from '@react-navigation/native';
+const feedbackOptions = [
+    { name: 'facesad', text: 'Terrible', image: require("../../../assets/facesad.png"), selectedImage: require("../../../assets/Smiley-VeryUnsatisfied-sel.png") },
+    { name: 'facefrown', text: 'Unsatisfied', image: require("../../../assets/facefrown.png"), selectedImage: require("../../../assets/Smiley-Unsatisfied-sel.png") },
+    { name: 'faceneutral', text: 'Neutral', image: require("../../../assets/faceneutral.png"), selectedImage: require("../../../assets/Smiley-Neutral-sel.png") },
+    { name: 'facesmile', text: 'Satisfied', image: require("../../../assets/facesmile.png"), selectedImage: require("../../../assets/Smiley-Satisfied-sel.png") },
+    { name: 'facehappy', text: 'Great', image: require("../../../assets/facehappy.png"), selectedImage: require("../../../assets/Smiley-VerySatisfied-sel.png") },
+];
 const Feedback = () => {
+    const navigation = useNavigation();
+    const [selectedFeedback, setSelectedFeedback] = useState(null);
+
+    const handleIconPress = (optionName) => {
+        setSelectedFeedback(optionName);
+    };
     return (
-        <View style={styles.feedback}>
-            <ProfileSettingsHeader
-                title="FeedBack"
-                onPressBack={() => navigation.navigate('support')}
-            />
-            <View style={[styles.feedbackInner, styles.frameWrapperLayout]}>
-                <View style={styles.frameWrapperLayout}>
-                    <View style={[styles.frameParent, styles.parentSpaceBlock]}>
-                        <View style={styles.howWouldYourRateYourExperWrapper}>
-                            <Text style={[styles.howWouldYour, styles.firstNameFlexBox]}>
-                                How would your rate your experience using the Sparklight app?
-                            </Text>
-                        </View>
-                        <View
-                            style={[styles.frameContainer, styles.frameContainerSpaceBlock]}
-                        >
-                            <View style={[styles.frameGroup, styles.frameFlexBox]}>
-                                <View style={[styles.faceSadParent, styles.parentSpaceBlock]}>
-                                    <Image
-                                        style={styles.iconLayout}
-                                        resizeMode="cover"
-                                        source={require("../../../assets/facesad.png")}
-                                    />
-                                    <Text style={[styles.terrible, styles.greatTypo]}>
-                                        Terrible
-                                    </Text>
-                                </View>
-                                <View style={[styles.faceSadParent, styles.parentSpaceBlock]}>
-                                    <Image
-                                        style={styles.iconLayout}
-                                        resizeMode="cover"
-                                        source={require("../../../assets/facefrown.png")}
-                                    />
-                                    <Text style={[styles.terrible, styles.greatTypo]}>
-                                        Unsatisfied
-                                    </Text>
-                                </View>
-                                <View style={[styles.faceSadParent, styles.parentSpaceBlock]}>
-                                    <Image
-                                        style={styles.iconLayout}
-                                        resizeMode="cover"
-                                        source={require("../../../assets/faceneutral.png")}
-                                    />
-                                    <Text style={[styles.terrible, styles.greatTypo]}>
-                                        Neutral
-                                    </Text>
-                                </View>
-                                <View style={[styles.faceSadParent, styles.parentSpaceBlock]}>
-                                    <Image
-                                        style={styles.iconLayout}
-                                        resizeMode="cover"
-                                        source={require("../../../assets/facesmile.png")}
-                                    />
-                                    <Text style={[styles.terrible, styles.greatTypo]}>
-                                        Satisfied
-                                    </Text>
-                                </View>
-                                <View style={[styles.faceHappyParent, styles.parentSpaceBlock]}>
-                                    <Image
-                                        style={styles.iconLayout}
-                                        resizeMode="cover"
-                                        source={require("../../../assets/facehappy.png")}
-                                    />
-                                    <Text style={[styles.great, styles.greatTypo]}>Great</Text>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.container}
+        >
+            <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                <View style={styles.feedback}>
+                    <ProfileSettingsHeader
+                        title="FeedBack"
+                        onPressBack={() => navigation.navigate('Account')}
+                    />
+                    <View style={[styles.feedbackInner]}>
+                <View style={[styles.frameParent, styles.parentSpaceBlock]}>
+                    <View style={styles.howWouldYourRateYourExperWrapper}>
+                        <Text style={[styles.howWouldYour, styles.firstNameFlexBox]}>
+                            How would your rate your experience using the Sparklight app?
+                        </Text>
+                    </View>
+
+                            <View style={[styles.frameContainer, styles.frameContainerSpaceBlock]}>
+                                <View style={[styles.frameGroup, styles.frameFlexBox]}>
+                                    {feedbackOptions.map((option) => (
+                                        <Pressable
+                                            key={option.name}
+                                            style={[styles.faceSadParent, styles.parentSpaceBlock]}
+                                            onPress={() => handleIconPress(option.name)}
+                                        >
+                                            <Image
+                                                style={styles.iconLayout}
+                                                resizeMode="cover"
+                                                source={selectedFeedback === option.name ? option.selectedImage : option.image}
+                                            />
+                                            <Text style={[styles.terrible, styles.greatTypo]}>
+                                                {option.text}
+                                            </Text>
+                                        </Pressable>
+                                    ))}
                                 </View>
                             </View>
-                        </View>
                         <View style={styles.frameView}>
-                            <View style={styles.frameView}>
-                                <View
-                                    style={[styles.textinputWrapper, styles.textinputFlexBox]}
-                                >
-                                    <View style={styles.textinputFlexBox}>
-                                        <View
-                                            style={[styles.firstNameWrapper, styles.frameFlexBox]}
-                                        >
-                                            <Text style={[styles.firstName, styles.firstNameFlexBox]}>
-                                                Additional Feedback
-                                            </Text>
-                                        </View>
-                                        <View
-                                            style={[
-                                                styles.myExperienceHasBeenGreatParent,
-                                                styles.text1SpaceBlock,
-                                            ]}
-                                        >
-                                            <Text style={[styles.myExperienceHas, styles.textTypo]}>
-                                                My experience has been great, thank you!
-                                            </Text>
-                                            <Text style={[styles.text, styles.textTypo]}>{` `}</Text>
-                                        </View>
-                                        <Text style={[styles.text1, styles.text1SpaceBlock]}>
-                                            40/500
+                            <View
+                                style={[styles.textinputWrapper, styles.textinputFlexBox]}
+                            >
+                                <View style={styles.textinputFlexBox}>
+                                    <View
+                                        style={[styles.firstNameWrapper, styles.frameFlexBox]}
+                                    >
+                                        <Text style={[styles.firstName, styles.firstNameFlexBox]}>
+                                            Additional Feedback
                                         </Text>
                                     </View>
+                                    <View
+                                        style={[
+                                            styles.myExperienceHasBeenGreatParent,
+                                            styles.text1SpaceBlock,
+                                        ]}
+                                    >
+                                        <TextInput style={[styles.myExperienceHas, styles.textTypo]} />
+                                        <Text style={[styles.text, styles.textTypo]}>{` `}</Text>
+                                    </View>
+                                    <Text style={[styles.text1, styles.text1SpaceBlock]}>
+                                        40/500
+                                    </Text>
                                 </View>
                             </View>
                         </View>
-                        <View style={[styles.buttonsParent, styles.textinputFlexBox]}>
-                            <Pressable
-                                style={[styles.buttons, styles.buttonsLayout]}
-                                onPress={() => { }}
-                            >
-                                <Text style={[styles.makePayment, styles.makeTypo]}>
-                                    Submit Feedback
-                                </Text>
-                            </Pressable>
-                            <Pressable
-                                style={[styles.buttons1, styles.buttonsLayout]}
-                                onPress={() => { }}
-                            >
-                                <Text style={[styles.makePayment1, styles.makeTypo]}>
-                                    Cancel
-                                </Text>
-                            </Pressable>
-                        </View>
+                    <View style={[styles.buttonsParent, styles.textinputFlexBox]}>
+                        <Pressable
+                            style={[styles.buttons, styles.buttonsLayout]}
+                            onPress={() => { navigation.navigate('ThumbsUp') }}
+                        >
+                            <Text style={[styles.makePayment, styles.makeTypo]}>
+                                Submit Feedback
+                            </Text>
+                        </Pressable>
+                        <Pressable
+                            style={[styles.buttons1, styles.buttonsLayout]}
+                                    onPress={() => { navigation.navigate('Account') }}
+                        >
+                            <Text style={[styles.makePayment1, styles.makeTypo]}>
+                                Cancel
+                            </Text>
+                        </Pressable>
                     </View>
                 </View>
             </View>
+            
         </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 };
 
 const styles = StyleSheet.create({
-    feedbackChildLayout: {
-        maxWidth: "100%",
-        overflow: "hidden",
-        width: "100%",
+    container: {
+        flex: 1,
+        backgroundColor: Color.colorWhitesmoke_200,
     },
-    titleTypo: {
-        fontFamily: FontFamily.openSansSemiBold,
-        fontWeight: "600",
-    },
-    xCloseLayout: {
-        height: 24,
-        width: 24,
-    },
-    iconPosition: {
-        display: "none",
-        marginTop: -12,
-        top: "50%",
-        position: "absolute",
+    scrollViewContent: {
+        flexGrow: 1,
+        justifyContent: 'space-between',
     },
     iconLayout: {
         height: 32,
         width: 32,
-        overflow: "hidden",
-    },
-    frameWrapperLayout: {
-        height: 832,
-        width: 430,
         overflow: "hidden",
     },
     parentSpaceBlock: {
@@ -164,7 +131,7 @@ const styles = StyleSheet.create({
     },
     firstNameFlexBox: {
         textAlign: "left",
-        color: Color.sparklightGray,
+        color: Color.gray600,
         flex: 1,
     },
     frameContainerSpaceBlock: {
@@ -207,69 +174,6 @@ const styles = StyleSheet.create({
         fontFamily: FontFamily.openSansRegular,
         textAlign: "center",
     },
-    feedbackChild: {
-        height: "10.73%",
-        top: "0%",
-        right: "0%",
-        bottom: "89.27%",
-        left: "0%",
-        maxHeight: "100%",
-        position: "absolute",
-        maxWidth: "100%",
-    },
-    iosstatusBarwhiteIcon: {
-        height: 44,
-        alignSelf: "stretch",
-    },
-    title: {
-        marginTop: -9,
-        marginLeft: -41,
-        left: "50%",
-        fontSize: FontSize.size_lg,
-        textAlign: "center",
-        color: Color.sparklightWhite,
-        lineHeight: 18,
-        fontFamily: FontFamily.openSansSemiBold,
-        fontWeight: "600",
-        top: "50%",
-        position: "absolute",
-    },
-    icon: {
-        height: "100%",
-        marginTop: -12,
-        overflow: "hidden",
-        width: "100%",
-    },
-    xClose: {
-        left: 18,
-        top: "50%",
-        height: 24,
-        width: 24,
-        position: "absolute",
-    },
-    settingsIcon: {
-        right: 24,
-        height: 24,
-        width: 24,
-        overflow: "hidden",
-    },
-    heartIcon: {
-        right: 52,
-        display: "none",
-        marginTop: -12,
-        top: "50%",
-        position: "absolute",
-    },
-    navBar: {
-        height: 56,
-        width: 430,
-    },
-    iosstatusBarwhiteParent: {
-        top: 0,
-        width: 430,
-        left: 0,
-        position: "absolute",
-    },
     howWouldYour: {
         fontSize: 22,
         lineHeight: 28,
@@ -284,7 +188,7 @@ const styles = StyleSheet.create({
     },
     terrible: {
         marginTop: 16,
-        color: Color.sparklightDarkestGray,
+        color: Color.colorGray_100,
         fontFamily: FontFamily.openSansRegular,
         textAlign: "center",
     },
@@ -296,23 +200,12 @@ const styles = StyleSheet.create({
         paddingVertical: Padding.p_base,
         paddingHorizontal: 0,
     },
-    great: {
-        fontWeight: "700",
-        fontFamily: FontFamily.openSansBold,
-        color: Color.sparklightGreen,
-        marginTop: 16,
-        textAlign: "center",
-    },
-    faceHappyParent: {
-        backgroundColor: "rgba(43, 169, 72, 0.1)",
-        alignItems: "center",
-    },
     frameGroup: {
         borderRadius: 8,
         alignItems: "center",
         borderWidth: 1,
         borderStyle: "solid",
-        borderColor: Color.colorGainsboro,
+        borderColor: Color.colorGainsboro_200,
         flex: 1,
     },
     frameContainer: {
@@ -330,14 +223,14 @@ const styles = StyleSheet.create({
         alignSelf: "stretch",
     },
     myExperienceHas: {
-        color: "#000",
+        color: Color.colorGray_100,
     },
     text: {
         marginTop: 10,
-        color: Color.sparklightDarkestGray,
+        color: Color.colorGray_100,
     },
     myExperienceHasBeenGreatParent: {
-        borderColor: Color.sparklightDarkGray,
+        borderColor: Color.gray600,
         height: 130,
         paddingHorizontal: 12,
         paddingVertical: 8,
@@ -346,7 +239,7 @@ const styles = StyleSheet.create({
         borderRadius: Border.br_11xs,
     },
     text1: {
-        color: Color.sparklightDarkGray,
+        color: Color.gray600,
         textAlign: "right",
         fontSize: FontSize.size_xs,
         lineHeight: 18,
@@ -386,8 +279,9 @@ const styles = StyleSheet.create({
         overflow: "hidden",
     },
     feedbackInner: {
-        top: 100,
-        marginBottom:200
+        top: '10%',
+        flex: 1,
+        marginBottom:'20%'
     },
     feedback: {
         backgroundColor: Color.colorWhitesmoke_200,

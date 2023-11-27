@@ -1,14 +1,16 @@
 import React from "react";
 import { Image, StyleSheet, Text, Pressable, View } from "react-native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import { useNavigation } from "@react-navigation/native";
 import { Padding, Border, FontSize, Color, FontFamily } from "../../../GlobalStyles";
 
-const ThumbsUp = ({ navigation }) => {
+const ThumbsUp = () => {
+    const navigation = useNavigation();
     return (
         <View style={styles.feedback}>
             <ProfileSettingsHeader
                 title="Feedback"
-                onPressBack={() => navigation.navigate('Home')}
+                onPressBack={() => navigation.navigate('Account')}
             />
             <View style={styles.content}>
                 <View style={styles.frameParent}>
@@ -30,7 +32,7 @@ const ThumbsUp = ({ navigation }) => {
                         </Text>
                     </View>
                 </View>
-                <Pressable style={styles.button}>
+                <Pressable style={styles.button} onPress={() => { navigation.navigate('Account') }}>
                     <Text style={styles.buttonText}>Done</Text>
                 </Pressable>
             </View>
@@ -42,13 +44,13 @@ const styles = StyleSheet.create({
     feedback: {
         flex: 1,
         backgroundColor: Color.sparklightWhite,
-        
+
     },
     content: {
         justifyContent: 'space-between', // This will push your button to the bottom
-        top:'10%',
-        height:'90%',
-         backgroundColor: Color.sparklightWhite,
+        top: '10%',
+        height: '90%',
+        backgroundColor: Color.sparklightWhite,
     },
     frameParent: {
         backgroundColor: Color.sparklightWhite,
@@ -59,7 +61,7 @@ const styles = StyleSheet.create({
         overflow: "hidden",
         alignItems: 'center',
         padding: Padding.p_5xl,
-        paddingTop: Padding.p_5xl + Padding.p_base, 
+        paddingTop: Padding.p_5xl + Padding.p_base,
     },
     containerImage: {
         width: 128, // from the layout width
@@ -81,7 +83,7 @@ const styles = StyleSheet.create({
         width: 73.14, // from the icon width
         height: 73.14, // from the icon height
     },
-    
+
     textContainer: {
         marginTop: Padding.p_base,
         alignItems: 'center',

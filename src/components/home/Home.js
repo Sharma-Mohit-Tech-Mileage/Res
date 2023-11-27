@@ -7,7 +7,8 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  StatusBar,
+  BackHandler,
+  Alert,
   Platform
 } from "react-native";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
@@ -25,17 +26,19 @@ import Myplanicon from "../../res/svgIcons/Myplanicon";
 import MyInternetDetials from "../common/MyInternetDetails";
 import Wallet2icon from "../../res/svgIcons/Wallet2icon";
 import MyServicePlan from "../common/MyServicePlan";
-import { storeListData, getCurrentSpeed } from "../../redux/actions/DashboardAction";
+
 import { useDispatch, useSelector } from 'react-redux';
 
+
 const HomeScreen = ({ route, navigation }) => {
+
   const dispatch = useDispatch();
   const { email, name } = {
     email: route.params.data.params.email,
     name: route.params.data.params.name,
   };
   const [isInternetDetails, setIsInternetDetails] = useState(false);
-
+  
   const myData = [
     {
       icon: <Wallet2icon />,
@@ -54,10 +57,34 @@ const HomeScreen = ({ route, navigation }) => {
       key:'3'
     },
   ];
+
   useEffect(() => {
-   
-    //dispatch(getCurrentSpeed('900254640'))
+    const backAction = () => {
+      Alert.alert(
+        'Confirm Exit',
+        'Are you sure you want to exit the app?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
+          },
+          {
+            text: 'Exit',
+            onPress: () => BackHandler.exitApp(),
+          },
+        ],
+        { cancelable: false }
+      );
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
   }, []);
+  
+
   return (
     <LinearGradient
       start={{ x: 0, y: 0 }}
@@ -144,7 +171,7 @@ const HomeScreen = ({ route, navigation }) => {
              ))}
             </ScrollView> 
              
-             <MyServicePlan/>
+             <MyServicePlan />
 
           </View>
         </ScrollView>
