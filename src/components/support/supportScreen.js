@@ -54,7 +54,6 @@ const Support = () => {
             navigateTo: 'ArticalWindowUtility',
             url: 'https://support.sparklight.com/hc/en-us'
         }
-        // Add more items as needed
     ];
 
     return (
@@ -65,20 +64,20 @@ const Support = () => {
                 iconAlignment="left"
                 showIcon={false} // New prop to control icon visibility
             />
-            <ScrollView>
+            <ScrollView >
                 <View style={[styles.mainContainer]}>
                     <LinearGradient
-                        style={[styles.mainContainerChild, styles.barContainerLayout]}
+                        style={[styles.mainContainerChild]}
                         locations={[0, 1]}
                         colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
                         useAngle={true}
                         angle={90}
                     />
-                    <View style={[styles.container, styles.containerFlexBox]}>
+                    <View style={[styles.containerFlexBox]}>
                         <View style={styles.header}>
                             <View style={styles.featuredIcon}>
                                 <Image
-                                    style={[styles.lifeBuoy02Icon, styles.lifeBuoy02IconLayout]}
+                                    style={[styles.lifeBuoy02IconLayout]}
                                     resizeMode="cover"
                                     source={require("../../../assets/right-actionable19.png")}
                                 />
@@ -97,7 +96,7 @@ const Support = () => {
                                             if (item.iconAlignment === 'left') {
                                                 navigation.navigate(item.navigateTo)
                                             } else {
-                                                navigation.navigate(item.navigateTo, { url: 'https://support.sparklight.com/hc/en-us/articles/115009159707-Data-Plans', name: item.text })
+                                                navigation.navigate(item.navigateTo, { url: item.url, name: item.text })
                                             }
                                         }}>
                                         <View style={[styles.pressableContent, item.iconAlignment === 'right' && { flexDirection: 'row-reverse' }]}>
@@ -140,14 +139,12 @@ const Support = () => {
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
                                         <View style={styles.headingAndToggle}>
                                             <View style={styles.headingAndIcon}>
-                                                <View style={[
-                                                    styles.icon
-                                                ]}>
+                                                <View style={[styles.icon]}>
                                                     <Image
-                                                        // style={styles.featuredIcon1}
                                                         resizeMode="cover"
                                                         source={require("../../../assets/tool-02.png")}
-                                                    /></View>
+                                                    />
+                                                </View>
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
                                                         <Text style={[styles.heading3, styles.headingTypo]}>
@@ -168,15 +165,6 @@ const Support = () => {
                                                         Explore instant solutions to issues.
                                                     </Text>
                                                 </View>
-                                                {/* <View style={styles.badgeWrapper}>
-                                                    <View
-                                                        style={[styles.badge, styles.integrationCardBorder]}
-                                                    >
-                                                        <Text style={[styles.text, styles.textTypo]}>
-                                                            CURRENT
-                                                        </Text>
-                                                    </View>
-                                                </View> */}
                                             </View>
                                         </View>
                                     </View>
@@ -251,7 +239,6 @@ const Support = () => {
                                                     styles.icon
                                                 ]}>
                                                     <Image
-                                                        // style={styles.featuredIcon1}
                                                         resizeMode="cover"
                                                         source={require("../../../assets/modem-02.png")}
                                                     /></View>
@@ -282,15 +269,8 @@ const Support = () => {
                             </View>
 
                         </View>
-                        <View
-                            style={[styles.additionalSupport, styles.integrationCardBorder]}
-                        >
-                            <View
-                                style={[
-                                    styles.headingContainer,
-                                    styles.headingContainerSpaceBlock,
-                                ]}
-                            >
+                        <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
+                            <View style={[styles.headingContainer,styles.headingContainerSpaceBlock]} >
                                 <Text style={[styles.heading, styles.headingTypo]}>
                                     Contact Us
                                 </Text>
@@ -314,7 +294,6 @@ const Support = () => {
                                                         </Text>
                                                         <Image
                                                             style={[
-                                                                styles.chevronRightIcon,
                                                                 styles.chevronIconLayout,
                                                             ]}
                                                             resizeMode="cover"
@@ -568,9 +547,6 @@ const styles = StyleSheet.create({
     iconRight: {
         marginRight: Padding.p_xs,
     },
-    barContainerLayout: {
-        position: "absolute",
-    },
     containerFlexBox: {
         alignSelf: "stretch",
         alignItems: "center",
@@ -600,10 +576,6 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
         marginRight: 8, // Add some margin if needed
     },
-    helpTopicsPosition: {
-        borderBottomLeftRadius: Border.br_11xs,
-        borderBottomRightRadius: Border.br_11xs,
-    },
     headingContainerSpaceBlock: {
         paddingBottom: Padding.p_base,
         backgroundColor: Color.sparklightWhite,
@@ -615,12 +587,6 @@ const styles = StyleSheet.create({
         fontSize: FontSize.size_lg,
         fontFamily: FontFamily.openSansRegular,
         flex: 1,
-    },
-    accordionLayout: {
-        width: 382,
-        paddingBottom: Padding.p_base,
-        backgroundColor: Color.sparklightWhite,
-        justifyContent: "center",
     },
     contentSpaceBlock: {
         paddingHorizontal: Padding.p_base,
@@ -636,11 +602,6 @@ const styles = StyleSheet.create({
         lineHeight: 20,
         fontSize: FontSize.textXsSemibold_size,
         textAlign: "left",
-    },
-    textTypo: {
-        fontSize: FontSize.textXsSemibold_size,
-        lineHeight: 18,
-        textAlign: "center",
     },
     support1Typo: {
         color: Color.colorMidnightblue,
@@ -660,46 +621,12 @@ const styles = StyleSheet.create({
         alignSelf: "stretch",
         alignItems: "center",
     },
-    supportChildLayout: {
-        maxWidth: "100%",
-        overflow: "hidden",
-        width: "100%",
-    },
-    chevronLeftIconLayout: {
-        height: 24,
-        width: 24,
-        top: "50%",
-        position: "absolute",
-    },
-    iconSpaceBlock: {
-        marginTop: -12,
-        overflow: "hidden",
-    },
-    framePressableFlexBox: {
-        paddingTop: Padding.p_5xs,
-        alignSelf: "stretch",
-        alignItems: "center",
-        flex: 1,
-    },
-    homeIndicator1Position: {
-        bottom: 0,
-        position: "absolute",
-    },
-    homeLayout: {
-        height: 4,
-        width: 134,
-    },
     mainContainerChild: {
-        marginTop: -10,
+        position: 'absolute',
         height: '4%',
         backgroundColor: "transparent",
         left: 0, // Ensure it takes the full width
         right: 0,
-        alignSelf: 'stretch', // Stretches to the parent's width if not already doing so
-        flex: 2
-    },
-    lifeBuoy02Icon: {
-        overflow: "hidden",
     },
     featuredIcon: {
         backgroundColor: Color.colorMidnightblue,
@@ -731,7 +658,7 @@ const styles = StyleSheet.create({
     },
     searchChild: {
         flex: 1,
-        paddingHorizontal: Padding.p_base,
+        paddingHorizontal: Padding.p_5xl,
         paddingVertical: Padding.p_base,
         fontSize: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,
@@ -749,7 +676,7 @@ const styles = StyleSheet.create({
     },
     headingContainer: {
         paddingTop: Padding.p_5xl,
-        paddingHorizontal: Padding.p_5xl,
+        paddingHorizontal: Padding.p_base,
         paddingBottom: Padding.p_base,
         flexDirection: "row",
         alignSelf: "stretch",
@@ -758,9 +685,6 @@ const styles = StyleSheet.create({
     },
     heading2: {
         color: Color.colorGray_100,
-    },
-    chevronRightIcon: {
-        opacity: 0,
     },
     headingAndToggle: {
         flexDirection: "row",
@@ -777,26 +701,6 @@ const styles = StyleSheet.create({
         marginLeft: 12,
         justifyContent: "center",
         flex: 1,
-    },
-    text: {
-        color: Color.success700,
-        fontFamily: FontFamily.openSansSemiBold,
-        fontWeight: "600",
-    },
-    badge: {
-        backgroundColor: Color.success50,
-        borderColor: Color.colorAquamarine,
-        paddingHorizontal: Padding.p_5xs,
-        paddingVertical: Padding.p_11xs,
-        borderRadius: Border.br_11xs,
-        flexDirection: "row",
-        alignItems: "center",
-    },
-    badgeWrapper: {
-        marginLeft: 12,
-        display: "none",
-        flexDirection: "row",
-        alignItems: "center",
     },
     headingAndIcon: {
         flexDirection: "row",
@@ -883,7 +787,6 @@ const styles = StyleSheet.create({
         backgroundColor: Color.colorWhitesmoke_200,
         overflow: "hidden",
         width: "100%",
-        flex: 1,
     },
 });
 

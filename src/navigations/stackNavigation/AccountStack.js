@@ -1,6 +1,4 @@
-// AccountStack.js
-
-import React from 'react';
+import React from 'react'; 
 import { createStackNavigator } from '@react-navigation/stack';
 import AccountScreen from '../../components/account/AccountOverview';
 import ProfileSettings from '../../components/userProfile/ProfileSettings';
@@ -16,10 +14,7 @@ import UserManagementEdit from '../../components/userManagement/UserManagementEd
 import Feedback from '../../components/support/Feedback';
 import ThumbsUp from '../../components/support/ThumbsUp';
 import { useTabBarVisibility } from '../TabBarVisibilityContext';
-
-
 const AccountStack = createStackNavigator();
-
 function AccountStackScreen() {
     const { setTabBarVisible } = useTabBarVisibility();
     return (
@@ -69,7 +64,7 @@ function AccountStackScreen() {
                     blur: () => setTabBarVisible(true)
                 }}
             />
-            <AccountStack.Screen
+             <AccountStack.Screen
                 name="Notifications"
                 component={Notifications}
                 options={{ headerShown: false }}

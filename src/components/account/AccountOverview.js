@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, View, Pressable, StatusBar, Alert } from "react-native";
+import { Image, StyleSheet, Text, View, Pressable, StatusBar } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, Padding, FontSize, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
@@ -11,7 +11,7 @@ import userManagementIcon from '../../../assets/right-actionable18.png';
 
 const AccountOverview = () => {
   const navigation = useNavigation();
-  
+
   const menuItems = [
     {
       name: 'Profile Settings',
@@ -115,7 +115,7 @@ const AccountOverview = () => {
           </View>
           <Pressable
             style={[styles.buttons, styles.buttonsSpaceBlock1]}
-           // onPress={() => Linking.openURL('https://your-privacy-policy-url.com')}
+          // onPress={() => Linking.openURL('https://your-privacy-policy-url.com')}
           >
             <Text style={[{ fontStyle: 'italic', color: '#4169E1' }]}>
               View our Privacy Policy and Terms & Condition
@@ -220,7 +220,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   rightActionableParent: {
-    //paddingBottom: Padding.p_base,
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "stretch",
@@ -270,7 +269,7 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_base,
     width: '100%',
     left: 0,
-    zIndex:9
+    zIndex: 9
   }
 });
 

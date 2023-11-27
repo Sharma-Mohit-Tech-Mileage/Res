@@ -10,6 +10,7 @@ const ThumbsUp = () => {
         <View style={styles.feedback}>
             <ProfileSettingsHeader
                 title="Feedback"
+                iconSource={require("../../../assets/xclose.png")}
                 onPressBack={() => navigation.navigate('Account')}
             />
             <View style={styles.content}>

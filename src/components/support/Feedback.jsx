@@ -26,7 +26,9 @@ const Feedback = () => {
                 <View style={styles.feedback}>
                     <ProfileSettingsHeader
                         title="FeedBack"
+                        iconSource= {require("../../../assets/xclose.png")}
                         onPressBack={() => navigation.navigate('Account')}
+                        i
                     />
                     <View style={[styles.feedbackInner]}>
                 <View style={[styles.frameParent, styles.parentSpaceBlock]}>
@@ -75,10 +77,9 @@ const Feedback = () => {
                                         ]}
                                     >
                                         <TextInput style={[styles.myExperienceHas, styles.textTypo]} />
-                                        <Text style={[styles.text, styles.textTypo]}>{` `}</Text>
                                     </View>
                                     <Text style={[styles.text1, styles.text1SpaceBlock]}>
-                                        40/500
+                                        0/500
                                     </Text>
                                 </View>
                             </View>
