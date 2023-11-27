@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Linking
 } from "react-native";
 import colors from "../../res/Colors";
 import SecondaryButton from "./customui/SecondaryButton";
@@ -35,7 +36,6 @@ const DataSpeedComponent = () => {
     if (state.combinedReducers.home.speed.hasOwnProperty("download_Kbps")) {
       let downloadSpeed = state.combinedReducers.home.speed.download_Kbps;
         let uploadSpeed = state.combinedReducers.home.speed.upload_Kbps;
-
         let speedInMbps_download = (downloadSpeed / 1024).toFixed(2);
         let speedInMbps_upload = (uploadSpeed / 1024).toFixed(2);
         let upl = speedInMbps_upload.toString().split(".");
@@ -49,14 +49,10 @@ const DataSpeedComponent = () => {
         setSpeed(true);
       }
     }
-    //if(!isEmpty(state.combinedReducers.home.speed)){
-
-    //console.log('Home',JSON.stringify(state.combinedReducers.home.speed))
-    //}
+    
   });
 
   useEffect(() => {
-    console.log("request data");
     if (!speed) {
       let re = getUser().then((res) => {
         console.log("res", res.userInfo.accountNumber);
@@ -186,7 +182,9 @@ const DataSpeedComponent = () => {
       <TestSpeedResultSection />
       <View style={{ backgroundColor: "#F4F4F5", height: 2, marginTop: 10 }} />
       <TouchableOpacity
-        onPress={() => {}}
+        onPress={() => {
+          Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
+        }}
         style={{
           height: 40,
           flexDirection: "row",

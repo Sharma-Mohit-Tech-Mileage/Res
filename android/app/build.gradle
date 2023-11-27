@@ -81,8 +81,8 @@ android {
         manifestPlaceholders = [ appAuthRedirectScheme:  'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/android/com.sparklight.customer.app/callback',
                                  appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
         ]
-        versionCode 7
-        versionName "1.1.3"
+        versionCode 8
+        versionName "1.1.4"
     }
     signingConfigs {
         debug {

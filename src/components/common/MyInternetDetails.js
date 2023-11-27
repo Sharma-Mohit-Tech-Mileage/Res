@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity,Linking } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import RightArrow from "../../res/svgIcons/RightArrow";
@@ -30,7 +30,13 @@ const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
       </View>
       <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
       <TouchableOpacity
-        onPress={() => {}}
+        onPress={() => {
+          if(actionTxt==='Upgrade Plan'){
+            Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
+          }else if(actionTxt==='View Details'){
+            Linking.openURL('https://customer.uat.sparklight.com/residential/billing') 
+          }
+        }}
         style={{
           
           flexDirection: "row",

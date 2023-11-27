@@ -28,6 +28,13 @@ const WebViewModal = ({ url, onClose }) => {
       onRequestClose={closeModal}
     >
       <SafeAreaView style={{ flex: 1 }}>
+        <View style={{flex:1}}>
+        <View style={styles.header}>
+        <TouchableOpacity onPress={closeModal}>
+            <Text style={styles.closeButton}>Close</Text>
+          </TouchableOpacity>
+          </View>
+          <View style={{width:'100%',height:'80%',}}>
         <WebView
           key={url}
           source={{ uri: url }}
@@ -37,6 +44,8 @@ const WebViewModal = ({ url, onClose }) => {
 
           // You can add other WebView props here
         />
+        </View>  
+        </View>
       </SafeAreaView>
     </Modal>
   );
@@ -56,6 +65,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   closeButton: {
+    alignSelf:'flex-end',
     color: "blue",
     fontSize: 16,
   },
