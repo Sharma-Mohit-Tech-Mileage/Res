@@ -10,12 +10,13 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
-
 const ProfileSettingsHeader = ({
     title,
     onPressBack,
     iconAlignment = 'right',
-    iconSource = require("../../../assets/chevronleft.png") // Default icon source
+    iconSource = require("../../../assets/chevronleft.png"), // Default icon source
+    navbarHeightPercentage = "15%", // New prop for dynamic navbar height
+    showIcon = true // New prop to control icon visibility
 }) => {
     const [iconPressed, setIconPressed] = useState(false);
     const iconStyle = iconAlignment === 'left' ? styles.chevronRight : styles.chevronLeft;
@@ -30,31 +31,81 @@ const ProfileSettingsHeader = ({
                 useAngle={true}
                 angle={90}
             >
-                <View style={[styles.navBar]}>
-                    <Pressable
-                        style={[iconStyle, styles.chevronLayout]}
-                        onPress={onPressBack}
-                        accessibilityLabel="Back"
-                        accessibilityHint="Go back to the previous screen"
-                        accessibilityRole="button"
-                        accessible={true}
-                        hitSlop={20}
-                        onPressIn={() => setIconPressed(true)}
-                        onPressOut={() => setIconPressed(false)}
-                    >
-                        <Image
-                            style={[styles.icon, iconPressed ? styles.iconPressed : null]}
-                            resizeMode="cover"
-                            source={iconSource}
-                            accessible={false}
-                        />
-                    </Pressable>
+                <View style={[styles.navBar, { height: wp(navbarHeightPercentage) }]}>
+                    {showIcon && (
+                        <Pressable
+                            style={[iconStyle, styles.chevronLayout]}
+                            onPress={onPressBack}
+                            accessibilityLabel="Back"
+                            accessibilityHint="Go back to the previous screen"
+                            accessibilityRole="button"
+                            accessible={true}
+                            hitSlop={20}
+                            onPressIn={() => setIconPressed(true)}
+                            onPressOut={() => setIconPressed(false)}
+                        >
+                            <Image
+                                style={[styles.icon, iconPressed ? styles.iconPressed : null]}
+                                resizeMode="cover"
+                                source={iconSource}
+                                accessible={false}
+                            />
+                        </Pressable>
+                    )}
                     <Text style={styles.title}>{title}</Text>
                 </View>
             </LinearGradient>
         </>
     );
 };
+
+// Rest of the component remains the same
+
+
+// const ProfileSettingsHeader = ({
+//     title,
+//     onPressBack,
+//     iconAlignment = 'right',
+//     iconSource = require("../../../assets/chevronleft.png") // Default icon source
+// }) => {
+//     const [iconPressed, setIconPressed] = useState(false);
+//     const iconStyle = iconAlignment === 'left' ? styles.chevronRight : styles.chevronLeft;
+
+//     return (
+//         <>
+//             <StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />
+//             <LinearGradient
+//                 style={[styles.profileSettingsChild, { paddingTop: 40 }]}
+//                 locations={[0, 1]}
+//                 colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+//                 useAngle={true}
+//                 angle={90}
+//             >
+//                 <View style={[styles.navBar]}>
+//                     <Pressable
+//                         style={[iconStyle, styles.chevronLayout]}
+//                         onPress={onPressBack}
+//                         accessibilityLabel="Back"
+//                         accessibilityHint="Go back to the previous screen"
+//                         accessibilityRole="button"
+//                         accessible={true}
+//                         hitSlop={20}
+//                         onPressIn={() => setIconPressed(true)}
+//                         onPressOut={() => setIconPressed(false)}
+//                     >
+//                         <Image
+//                             style={[styles.icon, iconPressed ? styles.iconPressed : null]}
+//                             resizeMode="cover"
+//                             source={iconSource}
+//                             accessible={false}
+//                         />
+//                     </Pressable>
+//                     <Text style={styles.title}>{title}</Text>
+//                 </View>
+//             </LinearGradient>
+//         </>
+//     );
+// };
 const styles = StyleSheet.create({
     profileSettingsChild: {
         height: "10.73%",

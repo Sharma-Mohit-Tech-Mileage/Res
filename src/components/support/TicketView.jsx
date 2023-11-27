@@ -9,7 +9,7 @@ const TicketView = () => {
         <View style={styles.ticketSupport}>
             <ProfileSettingsHeader
                 title="View Ticket"
-                onPressBack={() => navigation.navigate('Home')}
+                onPressBack={() => navigation.navigate('support')}
             />
             <View
                 style={[styles.ticketSupportInner]}

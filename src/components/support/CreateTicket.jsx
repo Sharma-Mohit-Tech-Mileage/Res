@@ -14,7 +14,7 @@ const CreateTicket = () => {
         <View style={styles.ticketSupportNone}>
             <ProfileSettingsHeader
                 title="Create Ticket"
-                onPressBack={() => navigation.navigate('Support')}
+                onPressBack={() => navigation.navigate('support')}
             />
             <View style={styles.frameParent}>
                 <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>

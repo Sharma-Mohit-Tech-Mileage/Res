@@ -1,0 +1,444 @@
+import * as React from "react";
+import { Image, StyleSheet, Text, View } from "react-native";
+import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
+import MyServicePlan from "../common/MyServicePlan";
+import { ScrollView } from "react-native-gesture-handler";
+import { useNavigation } from "@react-navigation/native";
+
+const ManageEquipment = () => {
+    const navigation = useNavigation();
+    return (
+        <View style={styles.manageEquipment}>
+            <ProfileSettingsHeader
+                title="Equipment Management"
+                onPressBack={() => navigation.navigate('support')}
+            />
+            <ScrollView>
+            <View style={styles.myModemParent}>
+                <View style={[styles.myModem, styles.myModemSpaceBlock]}>
+                    <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
+                        <Text style={[styles.myModem1, styles.myModem1Typo]}>My Modem</Text>
+                    </View>
+                    <View style={styles.frameParentSpaceBlock1}>
+                        <View style={[styles.frameWrapper, styles.contentSpaceBlock]}>
+                            <View style={styles.frameContainer}>
+                                <View style={styles.docsis31Parent}>
+                                    <Image
+                                        style={styles.docsis31Icon}
+                                        resizeMode="cover"
+                                        source={require("../../../assets/DOCSIS.png")}
+                                    />
+                                    <View style={styles.motorolaParent}>
+                                        <Text style={[styles.motorola, styles.myModem1Typo]}>
+                                            Motorola
+                                        </Text>
+                                        <Text style={styles.mb8600Docsis}>
+                                            MB8600 • DOCSIS 3.1; 32x8
+                                        </Text>
+                                        <View style={styles.poorHealthParent}>
+                                            <Text style={[styles.poorHealth, styles.textTypo2]}>
+                                                Poor Health
+                                            </Text>
+                                            <Image
+                                                style={styles.frameChild}
+                                                resizeMode="cover"
+                                                source={require("../../../assets/Ellipse.png")}
+                                            />
+                                        </View>
+                                        <View style={[styles.badge, styles.parentBorder]}>
+                                            <Text style={[styles.text, styles.textTypo1]}>
+                                                LEASED
+                                            </Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+                        <View
+                            style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}
+                        >
+                            <View style={[styles.notifications, styles.parentBorder]}>
+                                <Image
+                                    //style={styles.notificationsChild}
+                                    resizeMode="cover"
+                                    source={require("../../../assets/rectangle-529.png")}
+                                />
+                                <View style={styles.bannerWarning}>
+                                    <View style={styles.rightActionableParent}>
+                                        <Image
+                                            resizeMode="cover"
+                                            source={require("../../../assets/alertred.png")}
+                                        />
+                                        <View style={styles.creditCardWillExpireSoonParent}>
+                                            <Text style={styles.creditCardWill}>
+                                                Modem has poor health
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    styles.yourSavedCard,
+                                                    styles.yourSavedCardSpaceBlock,
+                                                ]}
+                                            >
+                                                Try one of the options below to resolve.
+                                            </Text>
+                                        </View>
+                                    </View>
+                                    <Image
+                                        style={[
+                                            styles.rightActionableIcon1,
+                                            styles.rightIconLayout,
+                                        ]}
+                                        resizeMode="cover"
+                                    />
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                    <View
+                        style={[styles.supportAccordionParent, styles.supportParentFlexBox]}
+                    >
+                        <View style={[styles.frameItem, styles.frameLayout]} />
+                        <View
+                            style={[
+                                styles.rightActionableGroup,
+                                styles.frame9defaultSpaceBlock,
+                            ]}
+                        >
+                            <Image
+                                style={[styles.rightActionableIcon2, styles.iconLayout]}
+                                resizeMode="cover"
+                                source={require("../../../assets/key-02.png")}
+                            />
+                            <Text style={styles.modemHealthSupport}>Update Password</Text>
+                            <Image
+                                style={[styles.rightActionableIcon3, styles.iconLayout]}
+                                resizeMode="cover"
+                                source={require("../../../assets/chevronright.png")}
+                            />
+                        </View>
+                        <View style={[styles.frameItem, styles.frameLayout]} />
+                        <View
+                            style={[
+                                styles.rightActionableGroup,
+                                styles.frame9defaultSpaceBlock,
+                            ]}
+                        >
+                            <Image
+                                style={[styles.rightActionableIcon2, styles.iconLayout]}
+                                resizeMode="cover"
+                                source={require("../../../assets/refresh.png")}
+                            />
+                            <Text style={styles.modemHealthSupport}>Restart Modem</Text>
+                            <Image
+                                style={[styles.rightActionableIcon3, styles.iconLayout]}
+                                resizeMode="cover"
+                                source={require("../../../assets/chevronright.png")}
+                            />
+                        </View>
+                    </View>
+                </View>
+                
+                    <View style={[styles.frameGroup, styles.frameFlexBox]}>
+                        <MyServicePlan/>
+                    </View>
+                </View>
+            </ScrollView>
+            </View>
+            
+    );
+};
+
+const styles = StyleSheet.create({
+    
+    textTypo2: {
+        fontFamily: FontFamily.openSansSemiBold,
+        fontWeight: "600",
+    },
+    myModemSpaceBlock: {
+        paddingTop: Padding.p_base,
+        alignSelf: "stretch",
+    },
+    frameParentSpaceBlock1: {
+        paddingBottom: Padding.p_5xl,
+        alignSelf: "stretch",
+    },
+    myModem1Typo: {
+        color: Color.colorGray_100,
+        textAlign: "left",
+        fontFamily: FontFamily.openSansRegular,
+        lineHeight: 28,
+    },
+    contentSpaceBlock: {
+        paddingVertical: 0,
+        alignSelf: "stretch",
+    },
+    parentBorder: {
+        borderWidth: 1,
+        borderStyle: "solid",
+    },
+    textTypo1: {
+        fontSize: FontSize.textXsSemibold_size,
+        textAlign: "center",
+        lineHeight: 18,
+    },
+    yourSavedCardSpaceBlock: {
+        marginTop: 8,
+        alignSelf: "stretch",
+    },
+    rightIconLayout: {
+        height: 18,
+        width: 18,
+        overflow: "hidden",
+    },
+    supportParentFlexBox: {
+        alignItems: "flex-end",
+        justifyContent: "center",
+    },
+    frame9defaultSpaceBlock: {
+        paddingVertical: Padding.p_base,
+        alignItems: "center",
+        flexDirection: "row",
+        paddingHorizontal: Padding.p_5xl,
+    },
+    iconLayout: {
+        height: 20,
+        width: 20,
+    },
+    frameLayout: {
+        width: 358,
+        height: 1,
+        backgroundColor: Color.sparklightGray,
+    },
+    frameFlexBox: {
+        padding: Padding.p_5xl,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    textTypo: {
+        fontFamily: FontFamily.textXsSemibold,
+        fontWeight: "600",
+    },
+    myModem1: {
+        textAlign: "left",
+        fontSize: FontSize.size_3xl,
+        flex: 1,
+    },
+    myModemWrapper: {
+        paddingTop: Padding.p_5xs,
+        alignItems: "center",
+        flexDirection: "row",
+        paddingHorizontal: Padding.p_5xl,
+    },
+    docsis31Icon: {
+        width: 87,
+        height: 104,
+    },
+    motorola: {
+        fontSize: FontSize.size_base,
+        textAlign: "left",
+    },
+    mb8600Docsis: {
+        color: Color.sparklightDarkGray,
+        fontSize: FontSize.textXsSemibold_size,
+        textAlign: "left",
+        fontFamily: FontFamily.openSansRegular,
+        lineHeight: 28,
+    },
+    poorHealth: {
+        color: Color.colorGray_100,
+        fontSize: FontSize.textXsSemibold_size,
+        textAlign: "left",
+        lineHeight: 28,
+    },
+    frameChild: {
+        width: 8,
+        height: 8,
+        marginLeft: 8,
+    },
+    poorHealthParent: {
+        alignItems: "center",
+        flexDirection: "row",
+    },
+    text: {
+        color: Color.colorGray_200,
+        fontFamily: FontFamily.openSansSemiBold,
+        fontWeight: "600",
+    },
+    badge: {
+        backgroundColor: Color.gray50,
+        borderColor: Color.colorWhitesmoke_200,
+        paddingHorizontal: Padding.p_5xs,
+        paddingVertical: Padding.p_11xs,
+        alignItems: "center",
+        flexDirection: "row",
+        borderRadius: Border.br_11xs,
+    },
+    motorolaParent: {
+        marginLeft: 24,
+        justifyContent: "center",
+        flex: 1,
+    },
+    docsis31Parent: {
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
+        alignSelf: "stretch",
+    },
+    frameContainer: {
+        justifyContent: "center",
+        alignItems: "center",
+        alignSelf: "stretch",
+    },
+    frameWrapper: {
+        paddingHorizontal: Padding.p_base,
+        paddingVertical: 0,
+    },
+    notificationsChild: {
+        width: 3,
+        height: 66,
+    },
+    creditCardWill: {
+        fontWeight: "700",
+        fontFamily: FontFamily.interBold,
+        color: Color.sparkLightRed,
+        fontSize: FontSize.textXsSemibold_size,
+        textAlign: "left",
+    },
+    yourSavedCard: {
+        color: Color.colorGray_100,
+        fontSize: FontSize.textXsSemibold_size,
+        textAlign: "left",
+        fontFamily: FontFamily.openSansRegular,
+    },
+    creditCardWillExpireSoonParent: {
+        marginLeft: 10,
+        flex: 1,
+    },
+    rightActionableParent: {
+        flexDirection: "row",
+        flex: 1,
+    },
+    rightActionableIcon1: {
+        marginLeft: 10,
+        display: "none",
+    },
+    bannerWarning: {
+        borderTopRightRadius: Border.br_11xs,
+        borderBottomRightRadius: Border.br_11xs,
+        padding: Padding.p_3xs,
+        alignItems: "center",
+        flexDirection: "row",
+        backgroundColor: Color.sparklightWhite,
+        alignSelf: "stretch",
+        flex: 1,
+    },
+    notifications: {
+        flexDirection: "row",
+        borderColor: Color.sparklightGray,
+        borderRadius: Border.br_11xs,
+        alignSelf: "stretch",
+    },
+    notificationsWrapper: {
+        marginTop: 24,
+        justifyContent: "center",
+        paddingHorizontal: Padding.p_5xl,
+    },
+    rightActionableIcon2: {
+        overflow: "hidden",
+    },
+    modemHealthSupport: {
+        marginLeft: 10,
+        color: Color.colorGray_100,
+        fontSize: FontSize.size_base,
+        textAlign: "left",
+        fontFamily: FontFamily.openSansRegular,
+        lineHeight: 28,
+        flex: 1,
+    },
+    rightActionableIcon3: {
+        marginLeft: 10,
+        overflow: "hidden",
+    },
+    frame9default: {
+        width: 382,
+        backgroundColor: Color.colorGray_200,
+        paddingVertical: Padding.p_base,
+    },
+    frameItem: {
+        height: 1,
+    },
+    rightActionableIcon6: {
+        display: "none",
+        overflow: "hidden",
+    },
+    frame9default2: {
+        width: 382,
+        backgroundColor: Color.colorGray_200,
+        paddingVertical: Padding.p_base,
+        display: "none",
+    },
+    frame9defaultParent: {
+        backgroundColor: Color.colorTomato_100,
+    },
+    rightActionableGroup: {
+        alignSelf: "stretch",
+    },
+    frameChild2: {
+        height: 1,
+        display: "none",
+    },
+    supportAccordionParent: {
+        borderWidth: 1,
+        borderStyle: "solid",
+        borderColor: Color.sparklightWhite,
+        backgroundColor: Color.sparklightWhite,
+        borderRadius: Border.br_11xs,
+        alignSelf: "stretch",
+        overflow: "hidden",
+    },
+    myModem: {
+        borderWidth: 1,
+        borderStyle: "solid",
+        borderColor: Color.sparklightWhite,
+        backgroundColor: Color.sparklightWhite,
+        borderRadius: Border.br_11xs,
+        overflow: "hidden",
+    },
+    frameGroup: {
+        alignSelf: "stretch",
+    },
+    myData: {
+        marginTop: 24,
+        alignItems: "center",
+        borderColor: Color.sparklightWhite,
+        backgroundColor: Color.baseWhite,
+        borderRadius: Border.br_11xs,
+    },
+    myModemParent: {
+        top: 100,
+        paddingTop: Padding.p_5xl,
+        paddingBottom: Padding.p_base,
+        paddingHorizontal: Padding.p_5xl,
+        left: 0,
+        marginBottom:'15%'
+    },
+    support: {
+        color: Color.colorMidnightblue,
+        fontFamily: FontFamily.openSansSemiBold,
+        fontWeight: "600",
+    },
+    rightActionable: {
+        backgroundColor: Color.sparklightDarkGray,
+        borderRadius: Border.br_181xl,
+        height: 32,
+    },
+    manageEquipment: {
+        overflow: "hidden",
+        width: "100%",
+        flex: 1,
+        backgroundColor: Color.sparklightBlue,
+    },
+});
+
+export default ManageEquipment;

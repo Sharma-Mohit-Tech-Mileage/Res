@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaView,Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import  ProfileSettingsHeader  from '../common/ProfileSettingsHeader';
@@ -23,9 +23,9 @@ const Notifications = () => {
               number="433-839-2398"
               navigationTarget="TextNotifications"
               additionalSettings={[
-                { type: 'Appointments', status: 'Unsubscribed' },
-                { type: 'Outage', status: 'Unsubscribed' },
-                { type: 'Billing', status: 'Subscribed' },
+                { type: 'Appointments', status: 'Off' },
+                { type: 'Outage', status: 'Off' },
+                { type: 'Billing', status: 'On' },
               ]}
             />
             {/* Email Notifications Section */}
@@ -34,7 +34,6 @@ const Notifications = () => {
               infoText={`Emails are sent to `}
               email="Melissa@gmail.com"
               navigationTarget="EmailNotifications"
-              //types={['Paperless Billing', 'Marketing']}
               additionalSettings={[
                 { type: 'Paperless Billing', status: 'Off' },
               ]}
@@ -44,7 +43,6 @@ const Notifications = () => {
               title="In-App Notifications"
               infoText="Notifications sent from your application."
               navigationTarget="InAppNotifications"
-              //types={['Appointments', 'Outage', 'Billing']}
               additionalSettings={[
                 { type: 'Appointments', status: 'On' },
                 { type: 'Outage', status: 'On' },
@@ -67,7 +65,6 @@ const NotificationSection = ({
   additionalSettings = [],
 }) => {
   const navigation = useNavigation();
-
   return (
     <View style={[styles.frameParent2, styles.frameBorder]}>
       <View style={[styles.textNotificationsParent, styles.parentSpaceBlock]}>
@@ -224,7 +221,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   text: {
-    color: Color.sparklightDarkestGray,
+    color: Color.colorGray_100,
     fontWeight: "600",
     fontSize:14
   },
@@ -260,7 +257,7 @@ const styles = StyleSheet.create({
   },
   notificationsSentFrom: {
     marginLeft: 8,
-    color: Color.sparklightDarkestGray,
+    color: Color.colorGray_100,
     fontWeight:'400',
     
   },

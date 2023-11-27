@@ -40,6 +40,7 @@ export const Color = {
     colorAquamarine: "#abefc6",
     success700: "#067647",
     gray600: "#475467",
+    sparkLightRed: "#EF4E3E",
 };
 export const Padding = {
     p_5xs: 8,

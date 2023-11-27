@@ -42,10 +42,8 @@ const Search = ({ navigation }) => {
     }, []);
 
     return (
-        <KeyboardAvoidingView
+        <View
             style={styles.support}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
         >
             <ProfileSettingsHeader
                 title="Search"
@@ -83,7 +81,7 @@ const Search = ({ navigation }) => {
                     </View>
                 </View>
             </View>
-        </KeyboardAvoidingView>
+        </View>
     );
 };
 
