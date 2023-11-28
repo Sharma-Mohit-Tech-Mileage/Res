@@ -52,7 +52,7 @@ const CreateTicket = () => {
                 <View >
                     <PrimaryButtom
                         title="Cancel"
-                        onPress={() => navigation.navigate("support")}
+                        onPress={() => navigation.navigate("TicketSupport")}
                         buttonType="cancel"
                     />
                 </View>

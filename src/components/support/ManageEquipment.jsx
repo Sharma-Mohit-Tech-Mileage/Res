@@ -11,7 +11,7 @@ const ManageEquipment = () => {
     return (
         <View style={styles.manageEquipment}>
             <ProfileSettingsHeader
-                title="Equipment Management"
+                title="Manage Equipment "
                 onPressBack={() => navigation.navigate('support')}
             />
             <ScrollView>

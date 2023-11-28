@@ -122,7 +122,7 @@ function AccountStackScreen() {
             <AccountStack.Screen
                 name="Feedback"
                 component={Feedback}
-                options={{ headerShown: false, presentation: 'modal' }}
+                options={{ headerShown: false }}
                 listeners={{
                     focus: () => setTabBarVisible(false),
                     blur: () => setTabBarVisible(true)
@@ -131,7 +131,7 @@ function AccountStackScreen() {
             <AccountStack.Screen
                 name="ThumbsUp"
                 component={ThumbsUp}
-                options={{ headerShown: false, presentation: 'modal' }}
+                options={{ headerShown: false }}
                 listeners={{
                     focus: () => setTabBarVisible(false),
                     blur: () => setTabBarVisible(true)

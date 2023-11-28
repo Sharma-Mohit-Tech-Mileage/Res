@@ -51,6 +51,7 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions }) => 
                     placeholder={placeholder}
                     value={input}
                     onChangeText={setInput}
+                    placeholderTextColor={Color.gray600}
                     autoCorrect={false}
                     clearButtonMode="always"
             />

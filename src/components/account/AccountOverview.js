@@ -38,7 +38,7 @@ const AccountOverview = () => {
       accessibilityLabel: 'Navigate to user management settings',
     },
     {
-      name: 'FeedBack',
+      name: 'Feedback',
       onPress: () => navigation.navigate('Feedback'),
       icon: userManagementIcon,
       accessibilityLabel: 'Navigate to user management settings',
@@ -113,26 +113,24 @@ const AccountOverview = () => {
               </React.Fragment>
             ))}
           </View>
-          <Pressable
-            style={[styles.buttons, styles.buttonsSpaceBlock1]}
-          // onPress={() => Linking.openURL('https://your-privacy-policy-url.com')}
-          >
-            <Text style={[{ fontStyle: 'italic', color: '#4169E1' }]}>
-              View our Privacy Policy and Terms & Condition
-            </Text>
-          </Pressable>
-          {/* Logout button */}
+         
           <Pressable
             accessible={true}
-            accessibilityLabel="Logout button"
-            accessibilityRole="button"
-            accessibilityHint="Logs you out of the account"
             style={[styles.buttons, styles.buttonsSpaceBlock]}
           >
             <Text style={[styles.makePayment, styles.makePaymentTypo]}>
               Logout
             </Text>
           </Pressable>
+          <Pressable
+            style={[styles.buttons, styles.buttonsSpaceBlock1]}
+          // onPress={() => Linking.openURL('https://your-privacy-policy-url.com')}
+          >
+            <Text style={[{ fontStyle: 'italic', color: Color.gray600 }]}>
+              View our Privacy Policy and Terms & Condition
+            </Text>
+          </Pressable>
+          {/* Logout button */}
         </View>
       </View>
     </View>
@@ -254,9 +252,8 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 0,
     marginTop: 16,
-    borderRadius: Border.br_11xs,
     justifyContent: "center",
-    height: 56,
+   // height: 56,
     paddingVertical: Padding.p_base,
   },
   frameGroup: {
