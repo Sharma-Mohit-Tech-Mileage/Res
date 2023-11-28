@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, View, Pressable, StatusBar } from "react-native";
+import { Image, StyleSheet, Text, View, Pressable, StatusBar, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, Padding, FontSize, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
@@ -52,7 +52,7 @@ const logoutConfirmationPopuo=(navigation)=>{
 
 const AccountOverview = () => {
   const navigation = useNavigation();
-
+  
   const menuItems = [
     {
       name: 'Profile Settings',
@@ -79,7 +79,7 @@ const AccountOverview = () => {
       accessibilityLabel: 'Navigate to user management settings',
     },
     {
-      name: 'Feedback',
+      name: 'FeedBack',
       onPress: () => navigation.navigate('Feedback'),
       icon: userManagementIcon,
       accessibilityLabel: 'Navigate to user management settings',
@@ -154,28 +154,30 @@ const AccountOverview = () => {
               </React.Fragment>
             ))}
           </View>
-         
+          <Pressable
+            style={[styles.buttons, styles.buttonsSpaceBlock1]}
+           // onPress={() => Linking.openURL('https://your-privacy-policy-url.com')}
+          >
+            <Text style={[{ fontStyle: 'italic', color: '#4169E1' }]}>
+              View our Privacy Policy and Terms & Condition
+            </Text>
+          </Pressable>
+          {/* Logout button */}
           <Pressable
            onPress={()=>{
             logoutConfirmationPopuo(navigation)
             console.log('Logout')
            }} 
             accessible={true}
+            accessibilityLabel="Logout button"
+            accessibilityRole="button"
+            accessibilityHint="Logs you out of the account"
             style={[styles.buttons, styles.buttonsSpaceBlock]}
           >
             <Text style={[styles.makePayment, styles.makePaymentTypo]}>
               Logout
             </Text>
           </Pressable>
-          <Pressable
-            style={[styles.buttons, styles.buttonsSpaceBlock1]}
-          // onPress={() => Linking.openURL('https://your-privacy-policy-url.com')}
-          >
-            <Text style={[{ fontStyle: 'italic', color: Color.gray600 }]}>
-              View our Privacy Policy and Terms & Condition
-            </Text>
-          </Pressable>
-          {/* Logout button */}
         </View>
       </View>
     </View>
@@ -263,6 +265,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   rightActionableParent: {
+    //paddingBottom: Padding.p_base,
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "stretch",
@@ -297,8 +300,9 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 0,
     marginTop: 16,
+    borderRadius: Border.br_11xs,
     justifyContent: "center",
-   // height: 56,
+    height: 56,
     paddingVertical: Padding.p_base,
   },
   frameGroup: {
@@ -311,7 +315,7 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_base,
     width: '100%',
     left: 0,
-    zIndex: 9
+    zIndex:9
   }
 });
 
