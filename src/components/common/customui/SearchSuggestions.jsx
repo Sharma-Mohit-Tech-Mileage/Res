@@ -1,4 +1,4 @@
-import React, { memo , useRef, useEffect } from 'react';
+import React, { memo , useRef, useEffect,useState } from 'react';
 import {
     StyleSheet,
     View,
@@ -10,20 +10,23 @@ import {
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../../GlobalStyles';
 
-const SearchSuggestions = memo(({ placeholder, input, onChangeInput, suggestions }) => {
-
-    // Creating a ref for the TextInput
+const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions }) => {
     const inputRef = useRef(null);
+    const [input, setInput] = useState('');
 
-    // Focus the TextInput after the component mounts or updates
     useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.focus();
-        }
-    });
+        // Assuming `onChangeInput` is a debounced function that updates `suggestions`
+        onChangeInput(input);
+    }, [input, onChangeInput]);
+
+    const handleSuggestionClick = (suggestion) => {
+        setInput(suggestion);
+        // Optionally close the keyboard
+    };
+
 
     const renderSuggestion = ({ item }) => (
-        <TouchableOpacity style={styles.suggestionItem}>
+        <TouchableOpacity onPress={() => handleSuggestionClick(item)} style={styles.suggestionItem}>
             <Image
                 source={require('../../../../assets/file-05.png')}
                 style={{ marginRight: 8 }}
@@ -35,31 +38,30 @@ const SearchSuggestions = memo(({ placeholder, input, onChangeInput, suggestions
         </TouchableOpacity>
     );
 
-    const ListHeader = () => (
+    return (
+        <View style={styles.flatList}>
         <View style={styles.inputContainer}>
             <Image
                 source={require('../../../../assets/search-md-1.png')}
                 style={[styles.searchIcon, styles.leftIcon]}
             />
             <TextInput
-                ref={inputRef} // Attach the ref to the TextInput
-                style={styles.searchInput}
-                placeholder={placeholder}
-                value={input}
-                onChangeText={onChangeInput}
-                autoCorrect={false}
-                clearButtonMode="always"
+                    ref={inputRef}
+                    style={styles.searchInput}
+                    placeholder={placeholder}
+                    value={input}
+                    onChangeText={setInput}
+                    placeholderTextColor={Color.gray600}
+                    autoCorrect={false}
+                    clearButtonMode="always"
             />
         </View>
-    );
-
-    return (
         <FlatList
             data={suggestions}
-            ListHeaderComponent={ListHeader}
+            keyExtractor={(item, index) => index.toString()}
             renderItem={renderSuggestion}
-            style={styles.flatList}
         />
+        </View>
     );
 });
 

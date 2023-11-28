@@ -1,6 +1,6 @@
-import React,{useState} from 'react';
+import React, { useState } from 'react';
 import { ScrollView, KeyboardAvoidingView, Platform, Image, StyleSheet, Text, Pressable, View, TextInput } from 'react-native';
-import { Color, FontFamily, FontSize, Border,Padding } from '../../../GlobalStyles';
+import { Color, FontFamily, FontSize, Border, Padding } from '../../../GlobalStyles';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useNavigation } from '@react-navigation/native';
 const feedbackOptions = [
@@ -13,28 +13,37 @@ const feedbackOptions = [
 const Feedback = () => {
     const navigation = useNavigation();
     const [selectedFeedback, setSelectedFeedback] = useState(null);
+    const [inputText, setInputText] = useState('');
+    const [charCount, setCharCount] = useState(0);
+
+    const handleTextInputChange = (text) => {
+        if (text.length <= 500) {
+            setInputText(text);
+            setCharCount(text.length);
+        }
+    };
+
 
     const handleIconPress = (optionName) => {
         setSelectedFeedback(optionName);
     };
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.container}
-        >
+        <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollViewContent}>
                 <View style={styles.feedback}>
                     <ProfileSettingsHeader
-                        title="FeedBack"
+                        title="Feedback"
+                        iconSource={require("../../../assets/xclose.png")}
                         onPressBack={() => navigation.navigate('Account')}
+                        i
                     />
                     <View style={[styles.feedbackInner]}>
-                <View style={[styles.frameParent, styles.parentSpaceBlock]}>
-                    <View style={styles.howWouldYourRateYourExperWrapper}>
-                        <Text style={[styles.howWouldYour, styles.firstNameFlexBox]}>
-                            How would your rate your experience using the Sparklight app?
-                        </Text>
-                    </View>
+                        <View style={[styles.frameParent, styles.parentSpaceBlock]}>
+                            <View style={styles.howWouldYourRateYourExperWrapper}>
+                                <Text style={[styles.howWouldYour, styles.firstNameFlexBox]}>
+                                    How would your rate your experience using the Sparklight app?
+                                </Text>
+                            </View>
 
                             <View style={[styles.frameContainer, styles.frameContainerSpaceBlock]}>
                                 <View style={[styles.frameGroup, styles.frameFlexBox]}>
@@ -56,57 +65,65 @@ const Feedback = () => {
                                     ))}
                                 </View>
                             </View>
-                        <View style={styles.frameView}>
-                            <View
-                                style={[styles.textinputWrapper, styles.textinputFlexBox]}
-                            >
-                                <View style={styles.textinputFlexBox}>
-                                    <View
-                                        style={[styles.firstNameWrapper, styles.frameFlexBox]}
-                                    >
-                                        <Text style={[styles.firstName, styles.firstNameFlexBox]}>
-                                            Additional Feedback
+                            <View style={styles.frameView}>
+                                <View
+                                    style={[styles.textinputWrapper, styles.textinputFlexBox]}
+                                >
+                                    <View style={styles.textinputFlexBox}>
+                                        <View
+                                            style={[styles.firstNameWrapper, styles.frameFlexBox]}
+                                        >
+                                            <Text style={[styles.firstName, styles.firstNameFlexBox]}>
+                                                Additional Feedback
+                                            </Text>
+                                        </View>
+                                        <View
+                                            style={[
+                                                styles.myExperienceHasBeenGreatParent,
+                                                styles.text1SpaceBlock,
+                                            ]}
+                                        >
+                                            <TextInput
+                                                style={[styles.myExperienceHas, styles.textTypo]}
+                                                onChangeText={handleTextInputChange}
+                                                value={inputText}
+                                                multiline={true} // Set this to true if the input is expected to be multi-line
+                                                maxLength={500} // Optional, adds a native limit
+                                            // ... other props
+                                            />
+
+                                        </View>
+                                        <Text style={[styles.text1, styles.text1SpaceBlock]}>
+                                            {charCount}/500
                                         </Text>
+
                                     </View>
-                                    <View
-                                        style={[
-                                            styles.myExperienceHasBeenGreatParent,
-                                            styles.text1SpaceBlock,
-                                        ]}
-                                    >
-                                        <TextInput style={[styles.myExperienceHas, styles.textTypo]} />
-                                        <Text style={[styles.text, styles.textTypo]}>{` `}</Text>
-                                    </View>
-                                    <Text style={[styles.text1, styles.text1SpaceBlock]}>
-                                        40/500
-                                    </Text>
                                 </View>
                             </View>
-                        </View>
-                    <View style={[styles.buttonsParent, styles.textinputFlexBox]}>
-                        <Pressable
-                            style={[styles.buttons, styles.buttonsLayout]}
-                            onPress={() => { navigation.navigate('ThumbsUp') }}
-                        >
-                            <Text style={[styles.makePayment, styles.makeTypo]}>
-                                Submit Feedback
-                            </Text>
-                        </Pressable>
-                        <Pressable
-                            style={[styles.buttons1, styles.buttonsLayout]}
+                            <View style={[styles.buttonsParent, styles.textinputFlexBox]}>
+                                <Pressable
+                                    style={[styles.buttons, styles.buttonsLayout]}
+                                    onPress={() => { navigation.navigate('ThumbsUp') }}
+                                >
+                                    <Text style={[styles.makePayment, styles.makeTypo]}>
+                                        Submit Feedback
+                                    </Text>
+                                </Pressable>
+                                <Pressable
+                                    style={[styles.buttons1, styles.buttonsLayout]}
                                     onPress={() => { navigation.navigate('Account') }}
-                        >
-                            <Text style={[styles.makePayment1, styles.makeTypo]}>
-                                Cancel
-                            </Text>
-                        </Pressable>
+                                >
+                                    <Text style={[styles.makePayment1, styles.makeTypo]}>
+                                        Cancel
+                                    </Text>
+                                </Pressable>
+                            </View>
+                        </View>
                     </View>
+
                 </View>
-            </View>
-            
-        </View>
             </ScrollView>
-        </KeyboardAvoidingView>
+        </View>
     );
 };
 
@@ -281,7 +298,7 @@ const styles = StyleSheet.create({
     feedbackInner: {
         top: '10%',
         flex: 1,
-        marginBottom:'20%'
+        marginBottom: '20%'
     },
     feedback: {
         backgroundColor: Color.colorWhitesmoke_200,

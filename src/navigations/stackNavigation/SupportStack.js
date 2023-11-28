@@ -30,7 +30,7 @@ function SupportStackScreen() {
             <SupportStack.Screen
                 name="searchArticals"
                 component={Search}
-                options={{ headerShown: false, presentation: 'modal' }}
+                options={{ headerShown: false }}
                 listeners={{
                     focus: () => setTabBarVisible(true),
                     blur: () => setTabBarVisible(true)
