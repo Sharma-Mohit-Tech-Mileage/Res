@@ -19,3 +19,22 @@ export const getUser = async () => {
 };
 
 
+export const storeSsoToken = async (value) => {
+  try {
+    await AsyncStorage.setItem("idToken", JSON.stringify(value));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// getting data
+export const getSsoToken = async () => {
+  try {
+    const userData = JSON.parse(await AsyncStorage.getItem("idToken"))
+    return userData;
+  } catch (error) {
+   console.log(error); 
+  }
+};
+
+

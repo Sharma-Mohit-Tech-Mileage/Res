@@ -5,7 +5,8 @@ import LinearGradient from "react-native-linear-gradient";
 import { authorize } from "react-native-app-auth";
 import { useDispatch, useSelector } from 'react-redux';
 import { ssoLoginAction } from "../../redux/actions/UserAction";
-import { storeUser } from "../../redux/utils/LocalStorage";
+import { storeUser,storeSsoToken } from "../../redux/utils/LocalStorage";
+import { PostAuthApiRequest } from "../../network/APIClient";
 
 
 const config = {
@@ -25,15 +26,26 @@ const SplashScreen = ({ navigation }) => {
   const userData = useSelector((state) =>{ 
     //console.log('respose1',JSON.stringify(state.combinedReducers.user))
      if(state.combinedReducers.user && Object.keys(state.combinedReducers.user.userData).length!=0){
-      let  token = state.combinedReducers.user.userData.jwtToken;
-      let userInfo=state.combinedReducers.user.userData.userInfo;
+     }
+    
+  });
+
+  const callSSOLoginApi=(request)=>{
+    setLoading(true)
+    PostAuthApiRequest('/mobile/api/gettoken',request , onSuccess,onError)
+  }
+ 
+  const onSuccess=(res)=>{
+    setLoading(false)
+    console.log('callSSOLoginApi',res)
+    if(res){
+      let  token = res.jwtToken;
+      let userInfo=res.userInfo;
       let user={
        userInfo: userInfo,
        token:token
       }
-      if(!loading){
-        setLoading(true)
-      }
+      
        if(token){
         storeUser(user)
         
@@ -44,12 +56,13 @@ const SplashScreen = ({ navigation }) => {
         lname: userInfo.lastName,
       
       });
-    }
     
-  });
+    }
+  }
 
- 
-  
+  const onError=(error)=>{
+    console.log(' callSSOLoginApi error',error)
+  }
 
   useEffect(() => {
     const loginAuth = async () => {
@@ -57,7 +70,9 @@ const SplashScreen = ({ navigation }) => {
         const result = await authorize(config);
         const data={idToken:result.idToken}
         setLoading(true)
-         dispatch(ssoLoginAction(data))
+         //dispatch(ssoLoginAction(data))
+         callSSOLoginApi(data)
+         storeSsoToken(data)
          
       } catch (error) {
         console.log(error);

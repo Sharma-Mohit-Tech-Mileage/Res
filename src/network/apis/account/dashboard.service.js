@@ -1,8 +1,28 @@
 // Project Sources
 import {_axios} from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
-const getDashboardInfo =(params) =>{
-        return _axios.post('/dashboard',params);
+
+
+
+const getInternetPlan = async(accountId) =>{
+    let res= await getUser();
+    const config = {
+            headers: {
+                Authorization: "Bearer " + res.token
+            }
+        };
+
+    return _axios.get(`/internet/api/internet/${accountId}/plan`,{...config}).then(res=>res.data).catch(error=>{ throw error})
+};
+const getAccountInfo = async(accountId) =>{
+        let res= await getUser();
+        const config = {
+                headers: {
+                    Authorization: "Bearer " + res.token
+                }
+            };
+
+        return _axios.get(`/account/api/account/${accountId}`,{...config}).then(res=>res.data).catch(error=>{ throw error})
 };
 
 const getCurrentSpeedInfo = async(params)=> {
@@ -18,4 +38,4 @@ const getCurrentSpeedInfo = async(params)=> {
     
 };
 
-export {getDashboardInfo,getCurrentSpeedInfo}
+export {getAccountInfo,getCurrentSpeedInfo,getInternetPlan}

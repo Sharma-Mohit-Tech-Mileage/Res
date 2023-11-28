@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   TouchableOpacity,
   Image,
-  Linking
+  Linking,
+  
 } from "react-native";
+
 import colors from "../../res/Colors";
 import SecondaryButton from "./customui/SecondaryButton";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
@@ -18,6 +19,8 @@ import { getCurrentSpeed } from "../../redux/actions/DashboardAction";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../../redux/utils/LocalStorage"
 import WebViewModal from "./customui/WebViewModal";
+import moment from "moment";
+
 
 const DataSpeedComponent = () => {
   const dispatch = useDispatch();
@@ -25,23 +28,33 @@ const DataSpeedComponent = () => {
 
   const toggleModal = () => {
     setShowModal(!showModal);
+    let re = getUser().then((res) => {
+      console.log("res", res.userInfo.accountNumber);
+      dispatch(getCurrentSpeed(res.userInfo.accountNumber));
+    });
   };
-  const [visible, setVisible] = useState(false);
+
+ 
+
   const [download, setDownload] = useState(0);
   const [upload, setUpload] = useState(0);
   const [downloadFrac, setDownloadFrac] = useState(0);
   const [uploadFrac, setUploadFrac] = useState(0);
   const [speed, setSpeed] = useState(false);
+  const [testDate, setTestDate]=useState(0)
   const userData = useSelector((state) => {
-    if (state.combinedReducers.home.speed.hasOwnProperty("download_Kbps")) {
+
+    if (Object.hasOwn(state.combinedReducers.home.speed,"download_Kbps")) {
       let downloadSpeed = state.combinedReducers.home.speed.download_Kbps;
         let uploadSpeed = state.combinedReducers.home.speed.upload_Kbps;
+        let date = state.combinedReducers.home.speed.createdOn;
         let speedInMbps_download = (downloadSpeed / 1024).toFixed(2);
         let speedInMbps_upload = (uploadSpeed / 1024).toFixed(2);
         let upl = speedInMbps_upload.toString().split(".");
         let downl = speedInMbps_download.toString().split(".");
       if (!speed) {
-        
+        const format1 = "YYYY-MM-DD hh:mm a"
+        setTestDate(moment(date).format(format1))
         setDownload(downl[0]);
         setUpload(upl[0]);
         setDownloadFrac(downl[1]);
@@ -59,7 +72,7 @@ const DataSpeedComponent = () => {
         dispatch(getCurrentSpeed(res.userInfo.accountNumber));
       });
     }
-  }, []);
+  }, [showModal]);
 
 
   
@@ -151,7 +164,7 @@ const DataSpeedComponent = () => {
         >
           <TimerInfo />
           <Text style={styles.timerInfo1}>Last run</Text>
-          <Text style={styles.timerInfo2}>10/05/23 11:32am</Text>
+          <Text style={styles.timerInfo2}>{testDate}</Text>
         </View>
       </View>
       </>
@@ -169,7 +182,9 @@ const DataSpeedComponent = () => {
             {strings.test_speed_info}
           </Text>
           <View style={{ flexDirection: "row", marginLeft: 10, marginTop: 10 }}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={()=>{
+              Linking.openURL('https://support.sparklight.com/hc/en-us/articles/115010349927-Can-I-Run-an-Internet-Speed-Test-')
+            }}>
               <Text style={styles.learnMore}>{strings.learn_more}</Text>
             </TouchableOpacity>
             <View style={styles.verticle_saperator} />
@@ -212,7 +227,7 @@ const DataSpeedComponent = () => {
       {showModal && (
         <WebViewModal
           url="https://cableone.speedtestcustom.com/" 
-          onClose={toggleModal}
+          onClose={()=>toggleModal()}
         />
       )}
     </View>
