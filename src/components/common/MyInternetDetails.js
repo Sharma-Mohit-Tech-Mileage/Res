@@ -129,7 +129,8 @@ const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
   <Text style={styles.title}>{planName}</Text>
 </View>
 <View style={styles.subSec}>
-  <Text style={styles.subTitle}>{planSpeed}mb/ps</Text>
+  
+  <Text style={styles.subTitle}>{planSpeed} mb/s</Text>
  
 </View>
 <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
