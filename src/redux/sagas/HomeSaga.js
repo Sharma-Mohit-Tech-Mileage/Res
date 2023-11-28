@@ -1,10 +1,9 @@
 import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
-import {getCurrentSpeedInfo} from "../../network/apis/account/dashboard.service";
-import { GET_INTERNET_SPEED } from "../constants";
-import { updateCurrentSpeed } from "../actions/DashboardAction";
+import {getCurrentSpeedInfo,getAccountInfo} from "../../network/apis/account/dashboard.service";
+import { GET_ACCOUNT_INFO, GET_INTERNET_SPEED } from "../constants";
+import { updateCurrentSpeed,updateAccountInfo } from "../actions/DashboardAction";
 // yield pauses and resume the generator functions
 function* getInternetSpeed(action) {
-  console.log("getCurrentSpeed",action.payload);
    try {
      const response = yield call(getCurrentSpeedInfo,action.payload)
      yield put(updateCurrentSpeed(response));
@@ -15,7 +14,21 @@ function* getInternetSpeed(action) {
       //yield put(apiCalled());
     }
 }
+function* getUserAccountInfo(action) {
+  try {
+    const response = yield call(getAccountInfo,action.payload)
+    console.log('Account Info',response)
+    yield put(updateAccountInfo(response));
+    
+   } catch (error) {
+     console.log(error);
+   } finally {
+     //yield put(apiCalled());
+   }
+}
+
 function* appSagas() { 
     yield takeLatest(GET_INTERNET_SPEED, getInternetSpeed);
+    yield takeLatest(GET_ACCOUNT_INFO, getUserAccountInfo);
 }
 export default appSagas;

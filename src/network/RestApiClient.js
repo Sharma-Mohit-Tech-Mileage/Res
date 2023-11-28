@@ -13,9 +13,12 @@ const _axios_auth = axios.create({
 
 const _axios = axios.create({
     baseURL: BASE_URL,
+    withCredentials: false,
+    crossDomain: true,
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
         
     }
 });

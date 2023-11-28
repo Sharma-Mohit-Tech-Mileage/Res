@@ -617,6 +617,8 @@ PODS:
     - React-Core
   - RNCAsyncStorage (1.19.6):
     - React-Core
+  - RNExitApp (2.0.0):
+    - React-Core
   - RNFBApp (18.6.2):
     - Firebase/CoreOnly (= 10.18.0)
     - React-Core
@@ -741,6 +743,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - ReactNativeLocalization (from `../node_modules/react-native-localization`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - RNExitApp (from `../node_modules/react-native-exit-app`)
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -870,6 +873,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-localization"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNExitApp:
+    :path: "../node_modules/react-native-exit-app"
   RNFBApp:
     :path: "../node_modules/@react-native-firebase/app"
   RNFBMessaging:
@@ -957,6 +962,7 @@ SPEC CHECKSUMS:
   ReactCommon: 4b2bdcb50a3543e1c2b2849ad44533686610826d
   ReactNativeLocalization: fb171138cdc80d5d0d4f20243d2fc82c2b3cc48f
   RNCAsyncStorage: 191a99459b4a6d174cfe51579d34b5267201bbf3
+  RNExitApp: 00036cabe7bacbb413d276d5520bf74ba39afa6a
   RNFBApp: 5a4df14a5094dab69fc29049be3cf54af07b0435
   RNFBMessaging: ad43f856329b726580e8f3898335a2382e5294e1
   RNGestureHandler: 38aa38413896620338948fbb5c90579a7b1c3fde

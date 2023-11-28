@@ -30,6 +30,7 @@ import MyServicePlan from "../common/MyServicePlan";
 import { useDispatch, useSelector } from 'react-redux';
 
 
+
 const HomeScreen = ({ route, navigation }) => {
 
   const dispatch = useDispatch();
@@ -39,26 +40,13 @@ const HomeScreen = ({ route, navigation }) => {
   };
   const [isInternetDetails, setIsInternetDetails] = useState(false);
   
-  const myData = [
-    {
-      icon: <Wallet2icon />,
-      title: "Bill Summary",
-      subText: "$64.00",
-      date: "Due on Nov 26, 2023",
-      action:'View Details',
-      key:'2'
-    },
-    {
-      icon: <Myplanicon />,
-      title: "My Plan",
-      subText: "300 mb/s",
-      date: undefined,
-      action:'Upgrade Plan',
-      key:'3'
-    },
-  ];
+  
+
+  
 
   useEffect(() => {
+   //getUserAccountDetails();
+
     const backAction = () => {
       Alert.alert(
         'Confirm Exit',
@@ -164,11 +152,10 @@ const HomeScreen = ({ route, navigation }) => {
               {isInternetDetails ? <NetworkDetails /> : <></>}
             </View>
              <ScrollView horizontal={true}style={{marginStart:20}} >
-            {myData.map((item, index) => (
-              <View key={item.key} style={{marginHorizontal:10}}>
-                <MyInternetDetials key={item.key} date={item.date} icon={item.icon} title={item.title} subTitle={item.subText} actionTxt={item.action}/>
+              <View style={{marginHorizontal:10}}>
+                <MyInternetDetials />
              </View>
-             ))}
+            
             </ScrollView> 
              
              <MyServicePlan />

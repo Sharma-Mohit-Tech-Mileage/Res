@@ -4,15 +4,15 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.sparklight",
+  "applicationId": "com.sparklight.customer.app",
   "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 3,
-      "versionName": "1.3",
+      "versionCode": 8,
+      "versionName": "1.1.4",
       "outputFile": "app-release.apk"
     }
   ],
