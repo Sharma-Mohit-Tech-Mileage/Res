@@ -62,7 +62,7 @@ const InternetHealthChart= () => {
         {metaData => (
           <Pressable onPress={_handlePress} style={{ alignItems: 'center' }}>
             <Text style={{ fontSize: 24, paddingTop: 20,fontWeight:"600",color:colors.darkest_grey }}>{metaData.lastFilledSegment.data.label}</Text>
-            <Text style={{ marginTop:10, fontSize: 12,color:'#767676',textAlign:'center' }}>Updated {todayDate}</Text>
+            <Text style={{ marginTop:10, fontSize: 11.7,color:'#767676',textAlign:'center' }}>Updated {todayDate}</Text>
           </Pressable>
         )}
       </SegmentedArc>
