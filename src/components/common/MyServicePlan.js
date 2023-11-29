@@ -1,18 +1,72 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity,FlatList } from "react-native";
 import colors from "../../res/Colors";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import DataSpeedComponent from "./DataSpeedComponent";
 import DataUsageComponent from "./DataUsageComponent";
 import strings from "../../res/Strings";
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import SwipeUpDownModal from 'react-native-swipe-modal-up-down';
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import SwipeUpDownModal from "react-native-swipe-modal-up-down";
 
 const MyServicePlan = () => {
   const [tabIndex, setTabIndex] = useState(0);
-  let [ShowComment, setShowModelComment] = useState(false);
-  let [animateModal, setanimateModal] = useState(false);
+  const [ShowComment, setModelComment] = useState(false);
+  const [animateModal, setanimateModal] = useState(false);
+
+  const MyPlanDetails = () => {
+    const data=[ { 
+      id:"1", 
+      title:"Data Structures"
+    }, 
+    { 
+      id:"2", 
+      title:"STL"
+    }, 
+    { 
+      id:"3", 
+      title:"C++"
+    }, 
+    { 
+      id:"4", 
+      title:"Java"
+    }, 
+    { 
+      id:"5", 
+      title:"Python"
+    }, 
+    { 
+      id:"6", 
+      title:"CP"
+    }, ]
+    
+    
+    return (
+      <SwipeUpDownModal
+        modalVisible={ShowComment}
+        PressToanimate={animateModal}
+        
+        ContentModal={
+          <View style={[styles.containerContent,styles.card,styles.shadowProp]}>
+            {data.map((item,index)=>{
+              return(
+              <View>
+              <Text>{item.title} {index}</Text>
+              </View>
+              )
+            })}
+          </View>
+        }
+        ContentModalStyle={styles.Modal}
+        onClose={() => {
+          setModelComment(false);
+          setanimateModal(false);
+        }}
+      />
+    );
+  };
 
   useEffect(() => {
     //console.log("data");
@@ -22,22 +76,25 @@ const MyServicePlan = () => {
       style={[
         styles.card,
         styles.shadowProp,
-        { flexDirection: "column",marginBottom:hp("10%") },
+        { flexDirection: "column", marginBottom: hp("10%") },
       ]}
     >
       <View style={styles.subSec}>
         <Text style={styles.subTitle}>{strings.my_service_txt}</Text>
-        <View style={{flexDirection:'row',alignItems:'center'}}>
-
-          <InfoIcon/>
+        <TouchableOpacity style={{ flexDirection: "row", alignItems: "center" }}
+        onPress={()=>setModelComment(true)}>
+          <InfoIcon />
           <Text style={styles.date}>{strings.my_plan_details_txt}</Text>
-         
-          
-        </View>
-       
+        </TouchableOpacity>
       </View>
 
-      <View style={{ flexDirection: "row", justifyContent: "center" ,marginTop:wp('5%')}}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          marginTop: wp("5%"),
+        }}
+      >
         <TouchableOpacity
           style={[
             tabIndex == 0 ? styles.selectedTab : styles.defaultTab,
@@ -45,12 +102,17 @@ const MyServicePlan = () => {
           ]}
           onPress={() => setTabIndex(0)}
         >
-          <Text style={{
+          <Text
+            style={{
               color: tabIndex == 0 ? "white" : "#000",
               fontSize: 16,
               fontStyle: "normal",
               fontWeight: "400",
-            }}> Data Speed</Text>
+            }}
+          >
+            {" "}
+            Data Speed
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
@@ -64,8 +126,8 @@ const MyServicePlan = () => {
               color: tabIndex == 1 ? "white" : "#000",
               fontSize: 16,
               fontStyle: "normal",
-              textAlign:'center',
-              textAlignVertical:'center',
+              textAlign: "center",
+              textAlignVertical: "center",
               fontWeight: "400",
             }}
           >
@@ -74,9 +136,9 @@ const MyServicePlan = () => {
           </Text>
         </TouchableOpacity>
       </View>
-      
-      {tabIndex==0?<DataSpeedComponent />:<DataUsageComponent/>}
 
+      {tabIndex == 0 ? <DataSpeedComponent /> : <DataUsageComponent />}
+      <MyPlanDetails/>
     </View>
   );
 };
@@ -102,7 +164,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontStyle: "normal",
     fontWeight: "400",
-    
   },
   subTitle: {
     color: colors.darkest_grey,
@@ -112,15 +173,14 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 14,
-    color:colors.sparklight_purple_blue,
-    textAlignVertical:'center',
-    marginLeft:5,
+    color: colors.sparklight_purple_blue,
+    textAlignVertical: "center",
+    marginLeft: 5,
   },
   subSec: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingRight: 5,
-    
   },
   selectedTab: {
     backgroundColor: colors.sparklight_purple_blue,
@@ -128,15 +188,32 @@ const styles = StyleSheet.create({
     borderColor: colors.dark_grey,
     paddingVertical: 5,
     paddingHorizontal: 32,
-    width:wp('40%')
+    width: wp("40%"),
   },
   defaultTab: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 2,
     borderColor: colors.dark_grey,
     paddingVertical: 5,
     paddingHorizontal: 32,
-    width:wp('40%')
+    width: wp("40%"),
+  },
+  containerContent: { flex: 1, marginTop: 40 },
+  containerHeader: {
+    flex: 1,
+    alignContent: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 40,
+    backgroundColor: "red",
+  },
+  headerContent: {
+    marginTop: 0,
+  },
+  Modal: {
+    backgroundColor: "#fff",
+    marginTop: hp('20%'),
+    
   },
 });
 
