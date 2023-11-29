@@ -216,13 +216,10 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   inAppNotificationsInner: {
-    top: 100,
-    paddingTop: Padding.p_base,
+    paddingTop: Padding.p_5xl,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     width: '100%',
-    left: 0,
-    position: "absolute",
     overflow: "hidden",
   },
   inAppNotifications: {

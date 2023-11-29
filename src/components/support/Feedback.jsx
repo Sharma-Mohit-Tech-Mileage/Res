@@ -15,28 +15,24 @@ const Feedback = () => {
     const [selectedFeedback, setSelectedFeedback] = useState(null);
     const [inputText, setInputText] = useState('');
     const [charCount, setCharCount] = useState(0);
-
     const handleTextInputChange = (text) => {
         if (text.length <= 500) {
             setInputText(text);
             setCharCount(text.length);
         }
     };
-
-
     const handleIconPress = (optionName) => {
         setSelectedFeedback(optionName);
     };
     return (
         <View style={styles.container}>
+            <ProfileSettingsHeader
+                title="Feedback"
+                iconSource={require("../../../assets/xclose.png")}
+                onPressBack={() => navigation.navigate('Account')}
+            />
             <ScrollView contentContainerStyle={styles.scrollViewContent}>
                 <View style={styles.feedback}>
-                    <ProfileSettingsHeader
-                        title="Feedback"
-                        iconSource={require("../../../assets/xclose.png")}
-                        onPressBack={() => navigation.navigate('Account')}
-                        i
-                    />
                     <View style={[styles.feedbackInner]}>
                         <View style={[styles.frameParent, styles.parentSpaceBlock]}>
                             <View style={styles.howWouldYourRateYourExperWrapper}>
@@ -77,21 +73,15 @@ const Feedback = () => {
                                                 Additional Feedback
                                             </Text>
                                         </View>
-                                        <View
-                                            style={[
-                                                styles.myExperienceHasBeenGreatParent,
-                                                styles.text1SpaceBlock,
-                                            ]}
-                                        >
+                                        <View style={[styles.text1SpaceBlock]}>
                                             <TextInput
-                                                style={[styles.myExperienceHas, styles.textTypo]}
+                                                style={[styles.myExperienceHasBeenGreatParent]}
                                                 onChangeText={handleTextInputChange}
                                                 value={inputText}
-                                                multiline={true} // Set this to true if the input is expected to be multi-line
-                                                maxLength={500} // Optional, adds a native limit
-                                            // ... other props
+                                                multiline={true}
+                                                maxLength={500}
+                                                numberOfLines={6} // Set the number of lines
                                             />
-
                                         </View>
                                         <Text style={[styles.text1, styles.text1SpaceBlock]}>
                                             {charCount}/500
@@ -120,7 +110,6 @@ const Feedback = () => {
                             </View>
                         </View>
                     </View>
-
                 </View>
             </ScrollView>
         </View>
@@ -248,7 +237,6 @@ const styles = StyleSheet.create({
     },
     myExperienceHasBeenGreatParent: {
         borderColor: Color.gray600,
-        height: 130,
         paddingHorizontal: 12,
         paddingVertical: 8,
         borderWidth: 1,
@@ -296,9 +284,7 @@ const styles = StyleSheet.create({
         overflow: "hidden",
     },
     feedbackInner: {
-        top: '10%',
         flex: 1,
-        marginBottom: '20%'
     },
     feedback: {
         backgroundColor: Color.colorWhitesmoke_200,

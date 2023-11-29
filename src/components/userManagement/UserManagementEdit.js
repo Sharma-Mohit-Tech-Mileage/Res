@@ -652,8 +652,7 @@ const styles = StyleSheet.create({
   },
   
   userManagementEditInner: {
-    top: 100,
-    padding: Padding.p_base,
+    padding: Padding.p_5xl,
     marginBottom:200
   },
 
