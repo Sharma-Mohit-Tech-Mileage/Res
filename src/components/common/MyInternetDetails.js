@@ -80,7 +80,7 @@ const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
       </View>
       <View style={styles.subSec}>
         <Text style={styles.subTitle}>${billAmt}</Text>
-        <Text style={styles.date}>{dueDate}</Text>
+        <Text style={styles.date}>Due on {dueDate}</Text>
       </View>
       <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
       <TouchableOpacity
@@ -126,7 +126,7 @@ const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
   >
     <Myplanicon/>
   </LinearGradient>
-  <Text style={styles.title}>{planName}</Text>
+  <Text style={styles.title}>My Plan</Text>
 </View>
 <View style={styles.subSec}>
   

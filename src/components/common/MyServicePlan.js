@@ -6,9 +6,13 @@ import DataSpeedComponent from "./DataSpeedComponent";
 import DataUsageComponent from "./DataUsageComponent";
 import strings from "../../res/Strings";
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import SwipeUpDownModal from 'react-native-swipe-modal-up-down';
+
 
 const MyServicePlan = () => {
   const [tabIndex, setTabIndex] = useState(0);
+  let [ShowComment, setShowModelComment] = useState(false);
+  let [animateModal, setanimateModal] = useState(false);
 
   useEffect(() => {
     //console.log("data");
@@ -27,6 +31,8 @@ const MyServicePlan = () => {
 
           <InfoIcon/>
           <Text style={styles.date}>{strings.my_plan_details_txt}</Text>
+         
+          
         </View>
        
       </View>
