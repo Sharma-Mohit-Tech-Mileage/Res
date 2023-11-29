@@ -309,8 +309,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   frameParent: {
-    top: 100,
-    padding: Padding.p_base,
+    paddingVertical: Padding.p_5xl,
+    paddingHorizontal:Padding.p_base,
     width: '100%',
   },
 });

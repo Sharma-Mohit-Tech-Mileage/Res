@@ -49,7 +49,6 @@ const styles = StyleSheet.create({
     },
     content: {
         justifyContent: 'space-between', // This will push your button to the bottom
-        top: '10%',
         height: '90%',
         backgroundColor: Color.sparklightWhite,
     },

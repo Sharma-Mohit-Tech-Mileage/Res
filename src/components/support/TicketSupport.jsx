@@ -61,8 +61,8 @@ const styles = StyleSheet.create({
     },
     frameParent: {
         // flex: 1,
-        top: 100,
-        padding: Padding.p_base,
+        paddingHorizontal: Padding.p_base,
+        paddingVertical: Padding.p_5xl
     },
     frameGroup: {
         //flex: 1,
