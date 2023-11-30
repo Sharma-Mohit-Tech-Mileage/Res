@@ -262,8 +262,8 @@ const styles = StyleSheet.create({
     
   },
   notificationsInner: {
-    top: 100,
-    padding: Padding.p_base,
+    paddingVertical:Padding.p_5xl,
+    paddingHorizontal: Padding.p_base,
     marginBottom:200
   },
   buttonsBg: {

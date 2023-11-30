@@ -53,11 +53,9 @@ const Support = () => {
         <View style={styles.support}>
             <ProfileSettingsHeader
                 title="Support"
-                onPressBack={() => navigation.navigate('Feedback')}
-                iconAlignment="left"
+                iconAlignment="right"
                 showIcon={false} // New prop to control icon visibility
             />
-            
             <ScrollView >
             <LinearGradient
                 style={styles.linearGradientStyle}
@@ -116,20 +114,8 @@ const Support = () => {
                                     Additional Support
                                 </Text>
                             </View>
-
-                            <Pressable
-                                style={[
-                                    styles.integrationCardMobileContainer,
-                                    styles.contentSpaceBlock,
-                                ]}
-                                onPress={() => { }}
-                            >
-                                <View
-                                    style={[
-                                        styles.integrationCardMobile1,
-                                        styles.integrationCardBorder,
-                                    ]}
-                                >
+                            <Pressable style={[styles.integrationCardMobileContainer,styles.contentSpaceBlock]} onPress={() => { }}>
+                                <View style={[styles.integrationCardMobile1,styles.integrationCardBorder ]}>
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
                                         <View style={styles.headingAndIcon}>
                                             <View style={[styles.icon]}>
@@ -162,24 +148,14 @@ const Support = () => {
                                     </View>
                                 </View>
                             </Pressable>
-                            <View
-                                style={[
-                                    styles.integrationCardMobileContainer,
-                                    styles.contentSpaceBlock,
-                                ]}
-                            >
+                            <View style={[styles.integrationCardMobileContainer,styles.contentSpaceBlock]} >
                                 <Pressable
-                                    style={[
-                                        styles.integrationCardMobile1,
-                                        styles.integrationCardBorder,
-                                    ]}
+                                    style={[styles.integrationCardMobile1,styles.integrationCardBorder,]}
                                     onPress={() => { navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/18929657224855', name: 'FAQ' }) }}
                                 >
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
                                         <View style={styles.headingAndIcon}>
-                                            <View style={[
-                                                styles.icon
-                                            ]}>
+                                            <View style={[]}>
                                                 <Image
                                                     style={styles.icon}
                                                     resizeMode="cover"
@@ -209,28 +185,19 @@ const Support = () => {
                                     </View>
                                 </Pressable>
                             </View>
-                            <View
-                                style={[
-                                    styles.integrationCardMobileContainer,
-                                    styles.contentSpaceBlock,
-                                ]}
-                            >
+                            <View style={[styles.integrationCardMobileContainer,styles.contentSpaceBlock]}>
                                 <Pressable
-                                    style={[
-                                        styles.integrationCardMobile1,
-                                        styles.integrationCardBorder,
-                                    ]}
+                                    style={[styles.integrationCardMobile1,styles.integrationCardBorder]}
                                     onPress={() => { navigation.navigate('ManageEquipment') }}
                                 >
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
                                         <View style={styles.headingAndIcon}>
-                                            <View style={[
-                                                styles.icon
-                                            ]}>
+                                            <View style={[styles.icon]}>
                                                 <Image
                                                     resizeMode="cover"
                                                     source={require("../../../assets/modem-02.png")}
-                                                /></View>
+                                                />
+                                            </View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
                                                     <Text style={[styles.heading3, styles.headingTypo]}>
@@ -530,7 +497,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center', // Center content vertically
         alignItems: 'center', // Center content horizontally
         borderColor: '#F4F4F5', // Border color from Figma design
-        borderWidth: 8, // Border width from Figma design (calculated based on Figma properties)
         backgroundColor: '#F4F4F5', // Background color from Figma design
     },
     iconStyle: {
@@ -545,7 +511,7 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
     },
     headingTypo: {
-        textAlign: "left",
+        textAlign: "auto",
         lineHeight: 18,
         fontSize: FontSize.size_lg,
         fontFamily: FontFamily.openSansRegular,
@@ -657,13 +623,12 @@ const styles = StyleSheet.create({
     },
     supportingText: {
         marginTop: 8,
-        color: Color.gray600,
+        color: Color.sparklightDarkGray,
         fontFamily: FontFamily.openSansRegular,
         alignSelf: "stretch",
     },
     frameParent: {
-        marginLeft: 12,
-        justifyContent: "center",
+        marginLeft: Padding.p_xs,
         flex: 1,
     },
     headingAndIcon: {
@@ -737,11 +702,10 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     mainContainer: {
-        padding: Padding.p_5xl,
+        padding: Padding.p_base,
         alignItems: "center",
         alignSelf: 'stretch',
         marginBottom: '30%',
-        top: '5%',
     },
     support: {
         flex: 1,
@@ -753,11 +717,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         top: 0,
-        bottom: '92%',
-    },
-    scrollView: {
-        flex: 1,
-        backgroundColor: 'transparent', // Make sure ScrollView background is transparent
+        bottom: '97%',
     },
 });
 

@@ -281,9 +281,7 @@ const styles = StyleSheet.create({
     width: 382,
   },
   profileSettingsEditInner: {
-    top: 100,
-    height: '100%',
-    paddingTop: Padding.p_base,
+    paddingTop: Padding.p_5xl,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",

@@ -161,8 +161,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   passwordSecurityInner: {
-    top: 100,
-    paddingTop: Padding.p_base,
+    paddingTop: Padding.p_5xl,
   },
   passwordSecurity: {
     backgroundColor: Color.colorWhitesmoke_200,

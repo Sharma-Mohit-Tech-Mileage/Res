@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
         marginLeft: 8,
         fontSize: FontSize.size_sm,
         textAlign: "left",
-        color: Color.sparklightDarkestGray,
+        color: Color.colorGray_100,
         lineHeight: 28,
     },
     billingTypo: {
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     issueType: {
         fontSize: FontSize.size_sm,
         textAlign: "left",
-        color: Color.sparklightDarkestGray,
+        color: Color.colorGray_100,
         lineHeight: 28,
         fontFamily: FontFamily.openSansSemiBold,
         fontWeight: "600",
@@ -302,10 +302,9 @@ const styles = StyleSheet.create({
         overflow: "hidden",
     },
     ticketSupportInner: {
-        top: 100,
         paddingTop: Padding.p_5xl,
         paddingBottom: Padding.p_base,
-        paddingHorizontal: Padding.p_5xl,
+        paddingHorizontal: Padding.p_base,
     },
     ticketSupport: {
         backgroundColor: Color.colorWhitesmoke_200,

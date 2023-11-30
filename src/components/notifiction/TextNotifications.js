@@ -450,8 +450,7 @@ const styles = StyleSheet.create({
         alignSelf: "stretch",
     },
     textNotificationsInner: {
-        top: 100,
-        paddingTop: Padding.p_base,
+        paddingTop: Padding.p_5xl,
         flex: 1,
         paddingHorizontal: Padding.p_base,
         width: '100%',

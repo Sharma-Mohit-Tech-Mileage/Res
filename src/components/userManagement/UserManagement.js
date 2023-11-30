@@ -393,8 +393,7 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   frameParent: {
-    top: 100,
-    paddingTop: Padding.p_base,
+    paddingTop: Padding.p_5xl,
     width: '100%',
     marginBottom: 200
   },
