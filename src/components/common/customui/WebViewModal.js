@@ -6,11 +6,12 @@ import {
   TouchableOpacity,
   Text,
   SafeAreaView,
-  Pressable
+  Pressable,
+  Alert
 } from "react-native";
 import WebView from "react-native-webview";
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../../GlobalStyles";
-const WebViewModal = ({ url, onClose }) => {
+const WebViewModal = ({ url, onClose,onNavigationStateChange }) => {
   const [modalVisible, setModalVisible] = useState(true);
   console.log(url);
   React.useEffect(() => {
@@ -19,6 +20,11 @@ const WebViewModal = ({ url, onClose }) => {
   const closeModal = () => {
     setModalVisible(false);
     onClose(); // You might want to perform additional actions on modal close
+  };
+
+  const handleMessage = (message = null) => {
+    //Alert(JSON.stringify(message?.nativeEvent?.data));
+    console.log(JSON.stringify(message?.nativeEvent?.data))
   };
 
   return (
@@ -45,9 +51,18 @@ const WebViewModal = ({ url, onClose }) => {
           key={url}
           source={{ uri: url }}
           style={styles.webview}
-          javaScriptEnabled={true}
-          cacheEnabled={false}
-          useWebKit={true}
+          mediaCapturePermissionGrantType="grant"
+          userAgent="Mozilla/5.0 (Macintosh; Intel Mac OS X 13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+          startInLoadingState
+          javaScriptEnabled
+          domStorageEnabled
+          cacheEnabled
+          thirdPartyCookiesEnabled
+          allowsProtectedMedia
+          allowUniversalAccessFromFileURLs
+          allowsInlineMediaPlayback
+          mediaPlaybackRequiresUserAction={false}
+          onMessage={handleMessage}
           
         />
         </View>  
