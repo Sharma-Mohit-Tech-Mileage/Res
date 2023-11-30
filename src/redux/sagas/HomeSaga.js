@@ -6,6 +6,7 @@ import { updateCurrentSpeed,updateAccountInfo } from "../actions/DashboardAction
 function* getInternetSpeed(action) {
    try {
      const response = yield call(getCurrentSpeedInfo,action.payload)
+     console.log('data',response)
      yield put(updateCurrentSpeed(response));
      
     } catch (error) {

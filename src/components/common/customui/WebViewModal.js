@@ -46,9 +46,9 @@ const WebViewModal = ({ url, onClose }) => {
           source={{ uri: url }}
           style={styles.webview}
           javaScriptEnabled={true}
-          domStorageEnabled={true}
-
-          // You can add other WebView props here
+          cacheEnabled={false}
+          useWebKit={true}
+          
         />
         </View>  
         </View>
