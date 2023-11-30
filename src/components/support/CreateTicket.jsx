@@ -35,7 +35,7 @@ const CreateTicket = () => {
                         </View>
                         <View style={styles.frameBorder}>
                                 <TextInput
-                                    //style={styles.frameView}
+                                    style={{ textAlignVertical: 'top' }}
                                     multiline={true} // Enable multiline input
                                     numberOfLines={6} // Set the number of lines
                                 />

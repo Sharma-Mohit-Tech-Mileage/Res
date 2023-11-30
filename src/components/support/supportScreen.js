@@ -126,7 +126,7 @@ const Support = () => {
                                             </View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.heading3, styles.headingTypo]}>
+                                                    <Text style={[ styles.headingTypo]}>
                                                         Troubleshooting
                                                     </Text>
                                                     <Image
@@ -163,7 +163,7 @@ const Support = () => {
                                                 /></View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.heading3, styles.headingTypo]}>
+                                                    <Text style={[styles.headingTypo]}>
                                                         FAQ
                                                     </Text>
                                                     <Image
@@ -200,7 +200,7 @@ const Support = () => {
                                             </View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.heading3, styles.headingTypo]}>
+                                                    <Text style={[ styles.headingTypo]}>
                                                         Equipment Management
                                                     </Text>
                                                     <Image
@@ -285,7 +285,7 @@ const Support = () => {
                                                 /></View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.heading3, styles.headingTypo]}>
+                                                    <Text style={[ styles.headingTypo]}>
                                                         Ticket Support
                                                     </Text>
                                                     <Image
@@ -315,10 +315,11 @@ const Support = () => {
                                                 <Image
                                                     resizeMode="cover"
                                                     source={require("../../../assets/tool-01.png")}
-                                                /></View>
+                                                />
+                                            </View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.heading3, styles.headingTypo]}>
+                                                    <Text style={[ styles.headingTypo]}>
                                                         Tech Support
                                                     </Text>
                                                     <Image
@@ -390,7 +391,7 @@ const Support = () => {
                                                     /></View>
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
-                                                        <Text style={[styles.heading3, styles.headingTypo]}>
+                                                        <Text style={[ styles.headingTypo]}>
                                                             Billing Support
                                                         </Text>
                                                         <Image
@@ -512,6 +513,7 @@ const styles = StyleSheet.create({
     },
     headingTypo: {
         textAlign: "auto",
+        color:Color.colorGray_100,
         lineHeight: 18,
         fontSize: FontSize.size_lg,
         fontFamily: FontFamily.openSansRegular,
@@ -613,9 +615,6 @@ const styles = StyleSheet.create({
         borderTopRightRadius: Border.br_11xs,
         borderTopLeftRadius: Border.br_11xs,
     },
-    heading2: {
-        color: Color.colorGray_100,
-    },
     headingAndToggle: {
         flexDirection: "row",
         alignSelf: "stretch",
@@ -623,7 +622,7 @@ const styles = StyleSheet.create({
     },
     supportingText: {
         marginTop: 8,
-        color: Color.gray600,
+        color: Color.sparklightaddGray,
         fontFamily: FontFamily.openSansRegular,
         alignSelf: "stretch",
     },
@@ -640,7 +639,7 @@ const styles = StyleSheet.create({
         paddingVertical: Padding.p_xl,
     },
     integrationCardMobile: {
-        backgroundColor: "#f8f8f8",
+        backgroundColor: Color.colorWhitesmoke_100,
         borderColor: Color.sparklightGray,
         borderRadius: Border.br_11xs,
         alignSelf: "stretch",
@@ -650,9 +649,6 @@ const styles = StyleSheet.create({
         backgroundColor: Color.sparklightWhite,
         alignSelf: "stretch",
         alignItems: "center",
-    },
-    heading3: {
-        color: Color.colorGray_100,
     },
     integrationCardMobile1: {
         borderColor: Color.sparklightGray,
@@ -686,7 +682,7 @@ const styles = StyleSheet.create({
     },
     supportingText5: {
         marginTop: 10,
-        color: Color.gray600,
+        color: Color.sparklightaddGray,
         fontFamily: FontFamily.openSansRegular,
         alignSelf: "stretch",
     },
@@ -705,7 +701,7 @@ const styles = StyleSheet.create({
         padding: Padding.p_base,
         alignItems: "center",
         alignSelf: 'stretch',
-        marginBottom: '30%',
+        marginBottom: '20%',
     },
     support: {
         flex: 1,
