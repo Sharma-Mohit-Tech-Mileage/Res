@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, View, Pressable, StatusBar } from "react-native";
+import { Image, StyleSheet, Text, View, Pressable, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, Padding, FontSize, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
@@ -10,7 +10,47 @@ import notificationsIcon from '../../../assets/right-actionable17.png';
 import userManagementIcon from '../../../assets/right-actionable18.png';
 import feedbackicon from '../../../assets/message-alert-circle.png';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { ScrollView } from "react-native-gesture-handler";
+import { logout } from 'react-native-app-auth';
+import { getSsoToken } from "../../redux/utils/LocalStorage";
+import RNExitApp from 'react-native-exit-app';
+
+const config = {
+  issuer: 'https://login.uat.cableone.net/auth/realms/external-sso-realm',
+};
+
+const logoutConfirmationPopuo = (navigation) => {
+  Alert.alert(
+    'Confirm Logout',
+    'Are you sure you want to Logout the app?',
+    [
+      {
+        text: 'Cancel',
+        onPress: () => null,
+        style: 'cancel',
+      },
+      {
+        text: 'Logout',
+        onPress: () => {
+          let re = getSsoToken().then((res) => {
+            let token = res.idToken;
+            console.log('Logout', token)
+            logout(config, {
+              idToken: token,
+              postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
+            }).then((result) => {
+              console.log('Logout', result)
+              RNExitApp.exitApp()
+              //navigation.navigate('Splash')
+            })
+
+          });
+        },
+      },
+    ],
+    { cancelable: true }
+  );
+
+}
 
 const AccountOverview = () => {
   const navigation = useNavigation();
@@ -116,6 +156,10 @@ const AccountOverview = () => {
           </View>
 
           <Pressable
+              onPress={() => {
+                logoutConfirmationPopuo(navigation)
+                console.log('Logout')
+              }} 
             accessible={true}
             style={[styles.buttons, styles.buttonsSpaceBlock]}
           >
