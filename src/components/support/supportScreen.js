@@ -623,7 +623,7 @@ const styles = StyleSheet.create({
     },
     supportingText: {
         marginTop: 8,
-        color: Color.sparklightDarkGray,
+        color: Color.gray600,
         fontFamily: FontFamily.openSansRegular,
         alignSelf: "stretch",
     },
@@ -686,7 +686,7 @@ const styles = StyleSheet.create({
     },
     supportingText5: {
         marginTop: 10,
-        color: Color.sparklightDarkGray,
+        color: Color.gray600,
         fontFamily: FontFamily.openSansRegular,
         alignSelf: "stretch",
     },
