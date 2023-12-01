@@ -30,7 +30,6 @@ export const Color = {
     colorMidnightblue: "#353091",
     colorGray_200: "#001321",
     sparklightGreen: "#2ba948",
-    gray100: "#f2f4f7",
     sparklightGray: "#e1e1e1",
     sparklightDarkGray: "#767676",
     sparklightaddGray:"#666666",

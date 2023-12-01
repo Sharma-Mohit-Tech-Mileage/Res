@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     marginBottom: 200,
   },
   melissaTypo: {
-    color: Color.sparklightaddGray,
+    color: Color.sparklightGray1,
     lineHeight: 28,
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_sm,
     textAlign: "left",
     color: Color.colorGray_100,
-    lineHeight: 28/* 200% */,
+    lineHeight: 28,
   },
   melissa: {
     fontSize: FontSize.size_base,
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   yourSavedCard: {
-    color: Color.sparklightaddGray,
+    color: Color.colorGray_200,
     marginTop: 8,
     fontSize: FontSize.size_sm,
     textAlign: "left",

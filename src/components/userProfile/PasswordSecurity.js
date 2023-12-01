@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   },
   passwordFlexBox: {
     textAlign: "left",
-    color: Color.sparklightaddGray,
+    color: Color.sparklightGray1,
     lineHeight: 28,
   },
   buttonsBg: {

@@ -33,11 +33,11 @@ const ThumbsUp = () => {
                             </Text>
                         </View>
                     </View>
+                    <Pressable style={styles.button} onPress={() => { navigation.navigate('Account') }}>
+                        <Text style={styles.buttonText}>Done</Text>
+                    </Pressable>
                 </View>
             </ScrollView>
-            <Pressable style={styles.button} onPress={() => { navigation.navigate('Account') }}>
-                <Text style={styles.buttonText}>Done</Text>
-            </Pressable>
         </View>
     );
 };
@@ -48,12 +48,13 @@ const styles = StyleSheet.create({
         backgroundColor: Color.sparklightWhite,
     },
     content: {
-        flex: 1, // This will make sure the content and the button take up the full height
+        flex: 1,
         justifyContent: 'space-between',
         backgroundColor: Color.sparklightWhite,
+        marginBottom:'20%'
     },
     scrollViewContent: {
-        flexGrow: 1, // This will ensure the content takes up the available space
+        flexGrow: 1,
     },
     frameParent: {
         backgroundColor: Color.sparklightWhite,

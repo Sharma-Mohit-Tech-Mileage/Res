@@ -5,7 +5,6 @@ import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalSty
 import MyServicePlan from "../common/MyServicePlan";
 import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
-
 const ManageEquipment = () => {
     const navigation = useNavigation();
     return (
@@ -15,142 +14,124 @@ const ManageEquipment = () => {
                 onPressBack={() => navigation.navigate('support')}
             />
             <ScrollView>
-            <View style={styles.myModemParent}>
-                <View style={[styles.myModem, styles.myModemSpaceBlock]}>
-                    <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
-                        <Text style={[styles.myModem1, styles.myModem1Typo]}>My Modem</Text>
-                    </View>
-                    <View style={styles.frameParentSpaceBlock1}>
-                        <View style={[styles.frameWrapper, styles.contentSpaceBlock]}>
-                            <View style={styles.frameContainer}>
-                                <View style={styles.docsis31Parent}>
-                                    <Image
-                                        style={styles.docsis31Icon}
-                                        resizeMode="cover"
-                                        source={require("../../../assets/DOCSIS.png")}
-                                    />
-                                    <View style={styles.motorolaParent}>
-                                        <Text style={[styles.motorola, styles.myModem1Typo]}>
-                                            Motorola
-                                        </Text>
-                                        <Text style={styles.mb8600Docsis}>
-                                            MB8600 • DOCSIS 3.1; 32x8
-                                        </Text>
-                                        <View style={styles.poorHealthParent}>
-                                            <Text style={[styles.poorHealth, styles.textTypo2]}>
-                                                Poor Health
-                                            </Text>
-                                            <Image
-                                                style={styles.frameChild}
-                                                resizeMode="cover"
-                                                source={require("../../../assets/Ellipse.png")}
-                                            />
-                                        </View>
-                                        <View style={[styles.badge, styles.parentBorder]}>
-                                            <Text style={[styles.text, styles.textTypo1]}>
-                                                LEASED
-                                            </Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
+                <View style={styles.myModemParent}>
+                    <View style={[styles.myModem, styles.myModemSpaceBlock]}>
+                        <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
+                            <Text style={[styles.myModem1, styles.myModem1Typo]}>My Modem</Text>
                         </View>
-                        <View
-                            style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}
-                        >
-                            <View style={[styles.notifications, styles.parentBorder]}>
-                                <Image
-                                    //style={styles.notificationsChild}
-                                    resizeMode="cover"
-                                    source={require("../../../assets/rectangle-529.png")}
-                                />
-                                <View style={styles.bannerWarning}>
-                                    <View style={styles.rightActionableParent}>
+                        <View style={styles.frameParentSpaceBlock1}>
+                            <View style={[styles.frameWrapper, styles.contentSpaceBlock]}>
+                                <View style={styles.frameContainer}>
+                                    <View style={styles.docsis31Parent}>
                                         <Image
+                                            style={styles.docsis31Icon}
                                             resizeMode="cover"
-                                            source={require("../../../assets/alertred.png")}
+                                            source={require("../../../assets/DOCSIS.png")}
                                         />
-                                        <View style={styles.creditCardWillExpireSoonParent}>
-                                            <Text style={styles.creditCardWill}>
-                                                Modem has poor health
+                                        <View style={styles.motorolaParent}>
+                                            <Text style={[styles.motorola, styles.myModem1Typo]}>
+                                                Motorola
                                             </Text>
-                                            <Text
-                                                style={[
-                                                    styles.yourSavedCard,
-                                                    styles.yourSavedCardSpaceBlock,
-                                                ]}
-                                            >
-                                                Try one of the options below to resolve.
+                                            <Text style={styles.mb8600Docsis}>
+                                                MB8600 • DOCSIS 3.1; 32x8
                                             </Text>
+                                            <View style={styles.poorHealthParent}>
+                                                <Text style={[styles.poorHealth, styles.textTypo2]}>
+                                                    Poor Health
+                                                </Text>
+                                                <Image
+                                                    style={styles.frameChild}
+                                                    resizeMode="cover"
+                                                    source={require("../../../assets/Ellipse.png")}
+                                                />
+                                            </View>
+                                            <View style={[styles.badge, styles.parentBorder]}>
+                                                <Text style={[styles.text, styles.textTypo1]}>
+                                                    LEASED
+                                                </Text>
+                                            </View>
                                         </View>
                                     </View>
+                                </View>
+                            </View>
+                            <View style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}>
+                                <View style={[styles.notifications, styles.parentBorder]}>
                                     <Image
-                                        style={[
-                                            styles.rightActionableIcon1,
-                                            styles.rightIconLayout,
-                                        ]}
+                                        //style={styles.notificationsChild}
                                         resizeMode="cover"
+                                        source={require("../../../assets/rectangle-529.png")}
                                     />
+                                    <View style={styles.bannerWarning}>
+                                        <View style={styles.rightActionableParent}>
+                                            <Image
+                                                style={{ height: '100%' }} // Set both width and height to '100%'
+                                                resizeMode="stretch" // Change resizeMode to stretch
+                                                source={require("../../../assets/alertred.png")}
+                                            />
+                                            <View style={styles.creditCardWillExpireSoonParent}>
+                                                <Text style={styles.creditCardWill}>
+                                                    Modem has poor health
+                                                </Text>
+                                                <Text style={[styles.yourSavedCard, styles.yourSavedCardSpaceBlock,]} >
+                                                    Try one of the options below to resolve.
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    </View>
                                 </View>
                             </View>
                         </View>
-                    </View>
-                    <View
-                        style={[styles.supportAccordionParent, styles.supportParentFlexBox]}
-                    >
-                        <View style={[styles.frameItem, styles.frameLayout]} />
-                        <View
-                            style={[
-                                styles.rightActionableGroup,
-                                styles.frame9defaultSpaceBlock,
-                            ]}
-                        >
-                            <Image
-                                style={[styles.rightActionableIcon2, styles.iconLayout]}
-                                resizeMode="cover"
-                                source={require("../../../assets/key-02.png")}
-                            />
-                            <Text style={styles.modemHealthSupport}>Update Password</Text>
-                            <Image
-                                style={[styles.rightActionableIcon3, styles.iconLayout]}
-                                resizeMode="cover"
-                                source={require("../../../assets/chevronright.png")}
-                            />
-                        </View>
-                        <View style={[styles.frameItem, styles.frameLayout]} />
-                        <View
-                            style={[
-                                styles.rightActionableGroup,
-                                styles.frame9defaultSpaceBlock,
-                            ]}
-                        >
-                            <Image
-                                style={[styles.rightActionableIcon2, styles.iconLayout]}
-                                resizeMode="cover"
-                                source={require("../../../assets/refresh.png")}
-                            />
-                            <Text style={styles.modemHealthSupport}>Restart Modem</Text>
-                            <Image
-                                style={[styles.rightActionableIcon3, styles.iconLayout]}
-                                resizeMode="cover"
-                                source={require("../../../assets/chevronright.png")}
-                            />
+                        <View style={[styles.supportAccordionParent, styles.supportParentFlexBox]} >
+                            <View style={[styles.frameLayout,]} />
+                            <View style={[styles.frame9defaultSpaceBlock,]} >
+                                <Image
+                                    resizeMode="stretch"
+                                    source={require("../../../assets/repeat-01.png")}
+                                />
+                                <Text style={styles.modemHealthSupport}>Exchange Modem</Text>
+                                <Image
+                                    resizeMode="stretch"
+                                    source={require("../../../assets/chevronright.png")}
+                                />
+                            </View>
+                            <View style={[styles.frameLayout]} />
+                            <View style={[styles.frame9defaultSpaceBlock,]} >
+                                <Image
+                                    resizeMode="stretch"
+                                    source={require("../../../assets/key-02.png")}
+                                />
+                                <Text style={styles.modemHealthSupport}>Update Password</Text>
+                                <Image
+                                    resizeMode="stretchstretch"
+                                    source={require("../../../assets/chevronright.png")}
+                                />
+                            </View>
+                            <View style={[styles.frameLayout]} />
+                            <View style={[styles.frame9defaultSpaceBlock,]} >
+                                <Image
+                                    resizeMode="stretch"
+                                    source={require("../../../assets/refresh.png")}
+                                />
+                                <Text style={styles.modemHealthSupport}>Restart Modem</Text>
+                                <Image
+                                    resizeMode="stretch"
+                                    source={require("../../../assets/chevronright.png")}
+                                />
+                            </View>
                         </View>
                     </View>
-                </View>
-                
-                    <View style={[styles.frameGroup, styles.frameFlexBox]}>
-                        <MyServicePlan/>
+
+                    <View style={[styles.frameFlexBox]}>
+                        <MyServicePlan />
                     </View>
                 </View>
             </ScrollView>
-            </View>
-            
+        </View>
+
     );
 };
 
 const styles = StyleSheet.create({
-    
     textTypo2: {
         fontFamily: FontFamily.openSansSemiBold,
         fontWeight: "600",
@@ -186,11 +167,6 @@ const styles = StyleSheet.create({
         marginTop: 8,
         alignSelf: "stretch",
     },
-    rightIconLayout: {
-        height: 18,
-        width: 18,
-        overflow: "hidden",
-    },
     supportParentFlexBox: {
         alignItems: "flex-end",
         justifyContent: "center",
@@ -200,10 +176,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         flexDirection: "row",
         paddingHorizontal: Padding.p_5xl,
-    },
-    iconLayout: {
-        height: 20,
-        width: 20,
     },
     frameLayout: {
         width: 358,
@@ -294,10 +266,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: Padding.p_base,
         paddingVertical: 0,
     },
-    notificationsChild: {
-        width: 3,
-        height: 66,
-    },
     creditCardWill: {
         fontWeight: "700",
         fontFamily: FontFamily.interBold,
@@ -324,9 +292,7 @@ const styles = StyleSheet.create({
         display: "none",
     },
     bannerWarning: {
-        borderTopRightRadius: Border.br_11xs,
-        borderBottomRightRadius: Border.br_11xs,
-        padding: Padding.p_3xs,
+        //padding: Padding.p_3xs,
         alignItems: "center",
         flexDirection: "row",
         backgroundColor: Color.sparklightWhite,
@@ -344,9 +310,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         paddingHorizontal: Padding.p_5xl,
     },
-    rightActionableIcon2: {
-        overflow: "hidden",
-    },
     modemHealthSupport: {
         marginLeft: 10,
         color: Color.colorGray_100,
@@ -356,36 +319,17 @@ const styles = StyleSheet.create({
         lineHeight: 28,
         flex: 1,
     },
-    rightActionableIcon3: {
-        marginLeft: 10,
-        overflow: "hidden",
-    },
     frame9default: {
-        width: 382,
         backgroundColor: Color.colorGray_200,
         paddingVertical: Padding.p_base,
-    },
-    frameItem: {
-        height: 1,
     },
     rightActionableIcon6: {
         display: "none",
         overflow: "hidden",
     },
     frame9default2: {
-        width: 382,
         backgroundColor: Color.colorGray_200,
         paddingVertical: Padding.p_base,
-        display: "none",
-    },
-    frame9defaultParent: {
-        backgroundColor: Color.colorTomato_100,
-    },
-    rightActionableGroup: {
-        alignSelf: "stretch",
-    },
-    frameChild2: {
-        height: 1,
         display: "none",
     },
     supportAccordionParent: {
@@ -405,9 +349,6 @@ const styles = StyleSheet.create({
         borderRadius: Border.br_11xs,
         overflow: "hidden",
     },
-    frameGroup: {
-        alignSelf: "stretch",
-    },
     myData: {
         marginTop: 24,
         alignItems: "center",
@@ -420,7 +361,7 @@ const styles = StyleSheet.create({
         paddingBottom: Padding.p_base,
         paddingHorizontal: Padding.p_5xl,
         left: 0,
-        marginBottom:'15%'
+        marginBottom: '15%'
     },
     support: {
         color: Color.colorMidnightblue,
