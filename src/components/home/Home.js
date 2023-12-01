@@ -26,6 +26,8 @@ import Myplanicon from "../../res/svgIcons/Myplanicon";
 import MyInternetDetials from "../common/MyInternetDetails";
 import Wallet2icon from "../../res/svgIcons/Wallet2icon";
 import MyServicePlan from "../common/MyServicePlan";
+import { getUser } from "../../redux/utils/LocalStorage";
+import { GetApiRequest } from "../../network/APIClient";
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -33,19 +35,33 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const HomeScreen = ({ route, navigation }) => {
 
-  const dispatch = useDispatch();
-  const { email, name } = {
-    email: route.params.data.params.email,
-    name: route.params.data.params.name,
-  };
+ 
+  // const { email, name } = {
+  //   email: route.params.data.params.email,
+  //   name: route.params.data.params.name,
+  // };
   const [isInternetDetails, setIsInternetDetails] = useState(false);
-  
-  
+  const [plans,setPlans]=useState([])
+  const getInternetPlanDetails=()=>{
+    let re = getUser().then((res) => {
+      const request=`internet/api/internet/${res.userInfo.accountNumber}/plan`
+      GetApiRequest(request,onSuccessPlan,onError)
+    });
+  }
+
+  const onSuccessPlan=(res)=>{
+    if(res){
+        setPlans(res)
+    }
+  }
+  const onError=(error)=>{
+    console.log('error',error)
+  }
 
   
 
   useEffect(() => {
-   //getUserAccountDetails();
+   getInternetPlanDetails();
 
     const backAction = () => {
       Alert.alert(
@@ -153,12 +169,12 @@ const HomeScreen = ({ route, navigation }) => {
             </View>
              <ScrollView horizontal={true}style={{marginStart:20}} >
               <View style={{marginHorizontal:10}}>
-                <MyInternetDetials />
+                <MyInternetDetials plans={plans}/>
              </View>
             
             </ScrollView> 
              
-             <MyServicePlan />
+             <MyServicePlan plans={plans} />
 
           </View>
         </ScrollView>

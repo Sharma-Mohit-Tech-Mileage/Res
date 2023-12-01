@@ -13,11 +13,11 @@ import Myplanicon from "../../res/svgIcons/Myplanicon";
 
 
 
-const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
+const MyInternetDetials = ({ plans }) => {
   const [billAmt,setBillAmt]=useState(0)
-  const [planName,setPlanName]=useState('')
-  const [planSpeed,setPlanSpeed]=useState('')
+  const [planSpeed,setPlanSpeed]=useState([])
   const [dueDate,setDueDate]=useState('')
+
 
   const getUserAccountDetails=()=>{
     let re = getUser().then((res) => {
@@ -27,19 +27,7 @@ const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
   }
 
 
-  const getInternetPlanDetails=()=>{
-    let re = getUser().then((res) => {
-      const request=`internet/api/internet/${res.userInfo.accountNumber}/plan`
-      GetApiRequest(request,onSuccessPlan,onError)
-    });
-  }
-
-  const onSuccessPlan=(res)=>{
-    if(res){
-        setPlanName(res[0].planName)
-        setPlanSpeed(res[0].downloadSpeed)
-    }
-  }
+  
 
   const onSuccess=(res)=>{
     console.log('getUserAccountDetails',res)
@@ -56,8 +44,11 @@ const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
 
   useEffect(()=>{
     getUserAccountDetails();
-    getInternetPlanDetails();
-  },[])
+    if(plans.length!=0){
+     setPlanSpeed(plans[0].downloadSpeed)
+    }
+   console.log('plans',JSON.stringify(plans))
+  })
   return (
     <View style={{flexDirection:'row'}}>
     <View style={[styles.card, styles.shadowProp, { flexDirection: "column",marginVertical:20}]}>

@@ -11,37 +11,34 @@ import {
 } from "react-native-responsive-screen";
 import SwipeUpDownModal from "react-native-swipe-modal-up-down";
 
-const MyServicePlan = () => {
+const MyServicePlan = ({plans}) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [ShowComment, setModelComment] = useState(false);
   const [animateModal, setanimateModal] = useState(false);
 
   const MyPlanDetails = () => {
-    const data=[ { 
-      id:"1", 
-      title:"Data Structures"
-    }, 
-    { 
-      id:"2", 
-      title:"STL"
-    }, 
-    { 
-      id:"3", 
-      title:"C++"
-    }, 
-    { 
-      id:"4", 
-      title:"Java"
-    }, 
-    { 
-      id:"5", 
-      title:"Python"
-    }, 
-    { 
-      id:"6", 
-      title:"CP"
-    }, ]
     
+    useEffect(()=>{
+      
+    },[])
+
+    const PlanDetailsItem=({item,index})=>{
+      console.log('PlanDetailsItem',item)
+      return(
+        <View key={index} style={{backgroundColor:'red'}}>
+        <Text style={styles.planDetailsRow} >{item.planName}</Text>
+        <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} />
+        <Text style={styles.planDetailsRow}>Download Speen Up To {item.downloadSpeed} Mbps</Text>
+        <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} />
+        <Text style={styles.planDetailsRow} >Upload Speed Up To {item.uploadSpeed} Mbps</Text>
+        <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} />
+          <View style={styles.planDetailsRow}>
+          <Text>Data Plan {item.dataQuotaGB}GB*</Text>
+          </View>
+          <View style={{ backgroundColor: colors.grey, height: 1,width:'100%', marginTop: 5 }} />
+        </View>
+      )
+    }
     
     return (
       <SwipeUpDownModal
@@ -49,12 +46,10 @@ const MyServicePlan = () => {
         PressToanimate={animateModal}
         
         ContentModal={
-          <View style={[styles.containerContent,styles.card,styles.shadowProp]}>
-            {data.map((item,index)=>{
+          <View style={{marginVertical:20}}>
+            {plans.map((item,index)=>{
               return(
-              <View>
-              <Text>{item.title} {index}</Text>
-              </View>
+                <PlanDetailsItem item={item} index={index} key={index}/>
               )
             })}
           </View>
@@ -214,7 +209,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginTop: hp('20%'),
     
-  },
+  },planDetailsRow:{
+    padding:wp('3%')
+  }
 });
 
 export default MyServicePlan;
