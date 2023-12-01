@@ -24,7 +24,7 @@ const ManageEquipment = () => {
                                 <View style={styles.frameContainer}>
                                     <View style={styles.docsis31Parent}>
                                         <Image
-                                            style={styles.docsis31Icon}
+                                            //style={styles.docsis31Icon}
                                             resizeMode="cover"
                                             source={require("../../../assets/DOCSIS.png")}
                                         />
@@ -57,7 +57,6 @@ const ManageEquipment = () => {
                             <View style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}>
                                 <View style={[styles.notifications, styles.parentBorder]}>
                                     <Image
-                                        //style={styles.notificationsChild}
                                         resizeMode="cover"
                                         source={require("../../../assets/rectangle-529.png")}
                                     />
@@ -82,8 +81,8 @@ const ManageEquipment = () => {
                             </View>
                         </View>
                         <View style={[styles.supportAccordionParent, styles.supportParentFlexBox]} >
-                            <View style={[styles.frameLayout,]} />
-                            <View style={[styles.frame9defaultSpaceBlock,]} >
+                            <View style={[styles.frameLayout]} />
+                            <View style={[styles.frame9defaultSpaceBlock]} >
                                 <Image
                                     resizeMode="stretch"
                                     source={require("../../../assets/repeat-01.png")}
@@ -95,7 +94,7 @@ const ManageEquipment = () => {
                                 />
                             </View>
                             <View style={[styles.frameLayout]} />
-                            <View style={[styles.frame9defaultSpaceBlock,]} >
+                            <View style={[styles.frame9defaultSpaceBlock]} >
                                 <Image
                                     resizeMode="stretch"
                                     source={require("../../../assets/key-02.png")}
@@ -107,7 +106,7 @@ const ManageEquipment = () => {
                                 />
                             </View>
                             <View style={[styles.frameLayout]} />
-                            <View style={[styles.frame9defaultSpaceBlock,]} >
+                            <View style={[styles.frame9defaultSpaceBlock]} >
                                 <Image
                                     resizeMode="stretch"
                                     source={require("../../../assets/refresh.png")}
@@ -120,7 +119,6 @@ const ManageEquipment = () => {
                             </View>
                         </View>
                     </View>
-
                     <View style={[styles.frameFlexBox]}>
                         <MyServicePlan />
                     </View>
@@ -178,7 +176,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: Padding.p_5xl,
     },
     frameLayout: {
-        width: 358,
+        width: '100%',
         height: 1,
         backgroundColor: Color.sparklightGray,
     },
@@ -201,10 +199,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         flexDirection: "row",
         paddingHorizontal: Padding.p_5xl,
-    },
-    docsis31Icon: {
-        width: 87,
-        height: 104,
     },
     motorola: {
         fontSize: FontSize.size_base,
@@ -287,12 +281,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         flex: 1,
     },
-    rightActionableIcon1: {
-        marginLeft: 10,
-        display: "none",
-    },
     bannerWarning: {
-        //padding: Padding.p_3xs,
         alignItems: "center",
         flexDirection: "row",
         backgroundColor: Color.sparklightWhite,
@@ -319,23 +308,7 @@ const styles = StyleSheet.create({
         lineHeight: 28,
         flex: 1,
     },
-    frame9default: {
-        backgroundColor: Color.colorGray_200,
-        paddingVertical: Padding.p_base,
-    },
-    rightActionableIcon6: {
-        display: "none",
-        overflow: "hidden",
-    },
-    frame9default2: {
-        backgroundColor: Color.colorGray_200,
-        paddingVertical: Padding.p_base,
-        display: "none",
-    },
     supportAccordionParent: {
-        borderWidth: 1,
-        borderStyle: "solid",
-        borderColor: Color.sparklightWhite,
         backgroundColor: Color.sparklightWhite,
         borderRadius: Border.br_11xs,
         alignSelf: "stretch",
@@ -349,35 +322,16 @@ const styles = StyleSheet.create({
         borderRadius: Border.br_11xs,
         overflow: "hidden",
     },
-    myData: {
-        marginTop: 24,
-        alignItems: "center",
-        borderColor: Color.sparklightWhite,
-        backgroundColor: Color.baseWhite,
-        borderRadius: Border.br_11xs,
-    },
     myModemParent: {
         paddingTop: Padding.p_5xl,
         paddingBottom: Padding.p_base,
         paddingHorizontal: Padding.p_5xl,
-        left: 0,
         marginBottom: '15%'
     },
-    support: {
-        color: Color.colorMidnightblue,
-        fontFamily: FontFamily.openSansSemiBold,
-        fontWeight: "600",
-    },
-    rightActionable: {
-        backgroundColor: Color.sparklightDarkGray,
-        borderRadius: Border.br_181xl,
-        height: 32,
-    },
     manageEquipment: {
-        overflow: "hidden",
         width: "100%",
         flex: 1,
-        backgroundColor: Color.sparklightBlue,
+        backgroundColor: Color.colorWhitesmoke_200,
     },
 });
 

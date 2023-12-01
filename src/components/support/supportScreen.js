@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     textTypoRight: {
-        FontFamily: FontFamily.openSansRegular,
+        fontFamily: FontFamily.openSansRegular,
         fontWeight: 600,/* Corresponds to semi-bold in Open Sans */
         fontSize: FontSize.size_base,
         lineHeight: 20,
