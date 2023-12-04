@@ -2,7 +2,7 @@
 export const FontFamily = {
     openSansSemiBold: "OpenSans-SemiBold",
     textXsSemibold: "Inter-SemiBold",
-    openSansRegular: "OpenSans-Regular",
+    openSansRegular: 'OpenSans_Regular',
     interBold: "Inter-Bold",
     textXsMedium: "Inter-Medium",
 };

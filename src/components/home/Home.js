@@ -14,23 +14,17 @@ import {
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
-import BellIcon from "../../res/svgIcons/bellIcon";
-import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import InternetHealthChart from "../common/InternetHealthChart";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import DownArrow from "../../res/svgIcons/DownArrow";
 import UpArrow from "../../res/svgIcons/UpArrow";
 import NetworkDetails from "../common/NetworkDetails";
 import strings from "../../res/Strings";
-import Myplanicon from "../../res/svgIcons/Myplanicon";
 import MyInternetDetials from "../common/MyInternetDetails";
-import Wallet2icon from "../../res/svgIcons/Wallet2icon";
 import MyServicePlan from "../common/MyServicePlan";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
-
-import { useDispatch, useSelector } from 'react-redux';
-
 
 
 const HomeScreen = ({ route, navigation }) => {
@@ -41,7 +35,8 @@ const HomeScreen = ({ route, navigation }) => {
   //   name: route.params.data.params.name,
   // };
   const [isInternetDetails, setIsInternetDetails] = useState(false);
-  const [plans,setPlans]=useState([])
+  let data=[{"planName":"100MB/3MB HSD","modemName":null,"macAddress":"00:40:36:3F:A7:E4","downloadSpeed":100,"uploadSpeed":3,"emailAddressQuota":"20","dataQuotaGB":1000,"unlimited":false}]
+  const [plans,setPlans]=useState(data)
   const getInternetPlanDetails=()=>{
     let re = getUser().then((res) => {
       const request=`internet/api/internet/${res.userInfo.accountNumber}/plan`
@@ -50,6 +45,7 @@ const HomeScreen = ({ route, navigation }) => {
   }
 
   const onSuccessPlan=(res)=>{
+    console.log('getInternetPlanDetails',res)
     if(res){
         setPlans(res)
     }
@@ -137,7 +133,7 @@ const HomeScreen = ({ route, navigation }) => {
               </View>
 
               <View
-                style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 40 }}
+                style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}
               />
               <TouchableOpacity
                 onPress={() => {
@@ -148,7 +144,7 @@ const HomeScreen = ({ route, navigation }) => {
                   flexDirection: "row",
                   justifyContent: "space-between",
                   padding: 5,
-                  marginVertical:10,
+                  marginVertical:5,
                   marginHorizontal:25
                 }}
               >
@@ -190,7 +186,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "white",
-    borderRadius: 8,
+    borderRadius: 5,
     paddingTop: 45,
     width: wp("87%"),
   },
@@ -213,7 +209,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#EBEEF180",
     borderRadius: 10,
     padding: 10,
-    marginTop: 25,
+    marginTop: 15,
     flexDirection: "row",
     marginHorizontal: 25,
   },

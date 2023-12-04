@@ -39,7 +39,7 @@ const NetworkDetails = () => {
         </View> */}
       </View>
 
-      <View style={[styles.rowContaine]}>
+      <View style={[styles.rowContainer]}>
         <View style={styles.item}>
         <View style ={styles.iconBg}>
           <Modemicon />

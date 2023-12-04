@@ -23,8 +23,8 @@ const styles = StyleSheet.create({
     color:colors.sparklight_purple_blue,
     textAlign:'center',
     fontStyle:'normal',
-    fontSize:16,
-    fontWeight:'400'
+    fontSize:14,
+    
   }
 });
 

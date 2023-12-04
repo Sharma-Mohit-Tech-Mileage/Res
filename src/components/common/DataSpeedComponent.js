@@ -223,24 +223,21 @@ const DataSpeedComponent = () => {
         </View>
       </View>
       <TestSpeedResultSection />
-      <View style={{ backgroundColor: "#F4F4F5", height: 2, marginTop: 10 }} />
+      <View style={{ backgroundColor: "#F4F4F5", height: 1, marginVertical: 10 }} />
       <TouchableOpacity
         onPress={() => {
           Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
         }}
         style={{
-          height: 40,
+          height: 30,
           flexDirection: "row",
           justifyContent: "space-between",
           padding: 5,
-          marginTop: 10,
         }}
       >
         <Text
           style={{
             fontSize: 16,
-            marginVertical: 5,
-            lineHeight: 20,
             fontWeight: "600",
             color: colors.sparklight_purple_blue,
           }}
