@@ -25,6 +25,7 @@ import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
+import moment from "moment";
 
 
 const HomeScreen = ({ route, navigation }) => {
@@ -35,8 +36,12 @@ const HomeScreen = ({ route, navigation }) => {
   //   name: route.params.data.params.name,
   // };
   const [isInternetDetails, setIsInternetDetails] = useState(false);
-  let data=[{"planName":"100MB/3MB HSD","modemName":null,"macAddress":"00:40:36:3F:A7:E4","downloadSpeed":100,"uploadSpeed":3,"emailAddressQuota":"20","dataQuotaGB":1000,"unlimited":false}]
-  const [plans,setPlans]=useState(data)
+  
+  const [plans,setPlans]=useState([])
+  const [billAmt,setBillAmt]=useState(0)
+  const [dueDate,setDueDate]=useState('')
+  //const [is]
+
   const getInternetPlanDetails=()=>{
     let re = getUser().then((res) => {
       const request=`internet/api/internet/${res.userInfo.accountNumber}/plan`
@@ -54,10 +59,34 @@ const HomeScreen = ({ route, navigation }) => {
     console.log('error',error)
   }
 
+
+  const getUserAccountDetails=()=>{
+    let re = getUser().then((res) => {
+      const request=`account/api/account/${res.userInfo.accountNumber}`
+      GetApiRequest(request,onSuccessBill,onErrorBill)
+    });
+  }
+
+
+  
+
+  const onSuccessBill=(res)=>{
+    console.log('getUserAccountDetails',res)
+    if(res){
+      let dueDate = moment(res.paymentDueDate).format('ll')
+      setDueDate(dueDate)
+      setBillAmt(res.currentBalance)
+    }
+  }
+
+  const onErrorBill=(error)=>{
+    console.log('error',error)
+  }
   
 
   useEffect(() => {
    getInternetPlanDetails();
+   getUserAccountDetails();
 
     const backAction = () => {
       Alert.alert(
@@ -165,7 +194,7 @@ const HomeScreen = ({ route, navigation }) => {
             </View>
              <ScrollView horizontal={true}style={{marginStart:20}} >
               <View style={{marginHorizontal:10}}>
-                <MyInternetDetials plans={plans}/>
+                <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate}/>
              </View>
             
             </ScrollView> 

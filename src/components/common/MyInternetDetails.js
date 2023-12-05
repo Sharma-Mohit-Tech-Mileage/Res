@@ -13,41 +13,24 @@ import Myplanicon from "../../res/svgIcons/Myplanicon";
 
 
 
-const MyInternetDetials = ({ plans }) => {
-  const [billAmt,setBillAmt]=useState(0)
+const MyInternetDetials = ({ plans , billAmt,dueDate}) => {
+  //const [billAmt,setBillAmt]=useState(0)
   const [planSpeed,setPlanSpeed]=useState([])
-  const [dueDate,setDueDate]=useState('')
+  //const [dueDate,setDueDate]=useState('')
+  const [myPlan,setMyPlan]=useState(plans)
 
 
-  const getUserAccountDetails=()=>{
-    let re = getUser().then((res) => {
-      const request=`account/api/account/${res.userInfo.accountNumber}`
-      GetApiRequest(request,onSuccess,onError)
-    });
-  }
-
-
-  
-
-  const onSuccess=(res)=>{
-    console.log('getUserAccountDetails',res)
-    if(res){
-      let dueDate = moment(res.paymentDueDate).format('ll')
-      setDueDate(dueDate)
-      setBillAmt(res.currentBalance)
-    }
-  }
 
   const onError=(error)=>{
     console.log('error',error)
   }
 
   useEffect(()=>{
-    getUserAccountDetails();
-    if(plans.length!=0){
-     setPlanSpeed(plans[0].downloadSpeed)
+    //getUserAccountDetails();
+    if(myPlan.length!=0){
+     setPlanSpeed(myPlan[0].downloadSpeed)
     }
-   console.log('plans',JSON.stringify(plans))
+  
   })
   return (
     <View style={{flexDirection:'row'}}>

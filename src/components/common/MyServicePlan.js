@@ -140,7 +140,7 @@ const MyServicePlan = ({ plans }) => {
               />
               </TouchableOpacity>
             </View>
-            {plans.map((item, index) => {
+            {plans?.map((item, index) => {
               return <PlanDetailsItem item={item} index={index} key={index} />;
             })}
           </View>
