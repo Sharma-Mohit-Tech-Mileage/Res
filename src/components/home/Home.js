@@ -14,38 +14,90 @@ import {
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
-import BellIcon from "../../res/svgIcons/bellIcon";
-import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import InternetHealthChart from "../common/InternetHealthChart";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import DownArrow from "../../res/svgIcons/DownArrow";
 import UpArrow from "../../res/svgIcons/UpArrow";
 import NetworkDetails from "../common/NetworkDetails";
 import strings from "../../res/Strings";
-import Myplanicon from "../../res/svgIcons/Myplanicon";
 import MyInternetDetials from "../common/MyInternetDetails";
-import Wallet2icon from "../../res/svgIcons/Wallet2icon";
 import MyServicePlan from "../common/MyServicePlan";
-
-import { useDispatch, useSelector } from 'react-redux';
-
+import { getUser } from "../../redux/utils/LocalStorage";
+import { GetApiRequest } from "../../network/APIClient";
+import moment from "moment";
 
 
 const HomeScreen = ({ route, navigation }) => {
 
-  const dispatch = useDispatch();
-  const { email, name } = {
-    email: route.params.data.params.email,
-    name: route.params.data.params.name,
-  };
+ 
+  // const { email, name } = {
+  //   email: route.params.data.params.email,
+  //   name: route.params.data.params.name,
+  // };
   const [isInternetDetails, setIsInternetDetails] = useState(false);
   
+  const [plans,setPlans]=useState([])
+  const [billAmt,setBillAmt]=useState(0)
+  const [dueDate,setDueDate]=useState('')
+  const [currentHealth,setCurrentHealth]= useState('Poor')
+  const [billPaid,setBillPaid]=useState(false)
+  
+  const getInternetHealth=(type)=> {
+    var currentHealth = {
+      'Poor': 20,
+      'Good': 50,
+      'Optimal': 80,
+      'default': 80
+    };
+    return  (currentHealth[type] || currentHealth['default']);
+  }
+
+  const getInternetPlanDetails=()=>{
+    let re = getUser().then((res) => {
+      const request=`internet/api/internet/${res.userInfo.accountNumber}/plan`
+      GetApiRequest(request,onSuccessPlan,onError)
+    });
+  }
+
+  const onSuccessPlan=(res)=>{
+    console.log('getInternetPlanDetails',res)
+    if(res){
+        setPlans(res)
+    }
+  }
+  const onError=(error)=>{
+    console.log('error',error)
+  }
+
+
+  const getUserAccountDetails=()=>{
+    let re = getUser().then((res) => {
+      const request=`account/api/account/${res.userInfo.accountNumber}`
+      GetApiRequest(request,onSuccessBill,onErrorBill)
+    });
+  }
+
+
   
 
+  const onSuccessBill=(res)=>{
+    console.log('getUserAccountDetails',res)
+    if(res){
+      let dueDate = moment(res.paymentDueDate).format('ll')
+      setDueDate(dueDate)
+      setBillAmt(res.currentBalance)
+    }
+  }
+
+  const onErrorBill=(error)=>{
+    console.log('error',error)
+  }
   
 
   useEffect(() => {
-   //getUserAccountDetails();
+   getInternetPlanDetails();
+   getUserAccountDetails();
 
     const backAction = () => {
       Alert.alert(
@@ -109,7 +161,7 @@ const HomeScreen = ({ route, navigation }) => {
           >
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <Text style={styles.internetHealth}>Internet Health</Text>
-              <InternetHealthChart />
+              <InternetHealthChart currentValue={getInternetHealth(currentHealth)} />
               <View style={styles.internetStatusSection}>
                 <View style={{ marginTop: 5 }}>
                   <InfoIcon />
@@ -121,7 +173,7 @@ const HomeScreen = ({ route, navigation }) => {
               </View>
 
               <View
-                style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 40 }}
+                style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}
               />
               <TouchableOpacity
                 onPress={() => {
@@ -132,7 +184,7 @@ const HomeScreen = ({ route, navigation }) => {
                   flexDirection: "row",
                   justifyContent: "space-between",
                   padding: 5,
-                  marginVertical:10,
+                  marginVertical:5,
                   marginHorizontal:25
                 }}
               >
@@ -149,16 +201,16 @@ const HomeScreen = ({ route, navigation }) => {
                   )}
                 </View>
               </TouchableOpacity>
-              {isInternetDetails ? <NetworkDetails /> : <></>}
+              {isInternetDetails ? <NetworkDetails billPaid={billPaid}/> : <></>}
             </View>
              <ScrollView horizontal={true}style={{marginStart:20}} >
               <View style={{marginHorizontal:10}}>
-                <MyInternetDetials />
+                <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate}/>
              </View>
             
             </ScrollView> 
              
-             <MyServicePlan />
+             <MyServicePlan plans={plans} />
 
           </View>
         </ScrollView>
@@ -174,7 +226,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "white",
-    borderRadius: 8,
+    borderRadius: 5,
     paddingTop: 45,
     width: wp("87%"),
   },
@@ -197,7 +249,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#EBEEF180",
     borderRadius: 10,
     padding: 10,
-    marginTop: 25,
+    marginTop: 15,
     flexDirection: "row",
     marginHorizontal: 25,
   },

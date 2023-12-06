@@ -15,7 +15,7 @@ const DataUsageComponent = () => {
         flexDirection: "column",
         justifyContent: "center",
         marginTop: 20,
-        marginHorizontal:20
+      
       }}
     >
       <ProgressCircle
@@ -80,24 +80,21 @@ const DataUsageComponent = () => {
           <Text style={styles.useDataLbl}>{" "}160GB</Text>
         </View>
       </View>
-      <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 20 }} />
+      <View style={{ backgroundColor: colors.grey, height: 1, marginVertical: 10 }} />
       <TouchableOpacity
         onPress={() => {
           Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
         }}
         style={{
-          height: 40,
+          height: 30,
           flexDirection: "row",
           justifyContent: "space-between",
-          
-          marginTop: 10,
+          padding: 5,
         }}
       >
         <Text
           style={{
             fontSize: 16,
-            marginVertical: 5,
-            lineHeight: 20,
             fontWeight: "600",
             color:colors.sparklight_purple_blue
           }}

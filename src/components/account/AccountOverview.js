@@ -37,7 +37,10 @@ const logoutConfirmationPopuo=(navigation)=>{
             postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
           }).then((result)=>{
               console.log('Logout',result)
-              RNExitApp.exitApp()
+              console.log('Logout',JSON.stringify(navigation))
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Splash' }]}) 
               //navigation.navigate('Splash')
           })
             

@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Linking,
-  
+  Alert,
 } from "react-native";
 
 import colors from "../../res/Colors";
@@ -17,11 +17,10 @@ import TimerInfo from "../../res/svgIcons/TimerInfo";
 import strings from "../../res/Strings";
 import { getCurrentSpeed } from "../../redux/actions/DashboardAction";
 import { useDispatch, useSelector } from "react-redux";
-import { getUser } from "../../redux/utils/LocalStorage"
-//import WebViewModal from "./customui/WebViewModal";
+import { getUser } from "../../redux/utils/LocalStorage";
 import SpeedTestModal from "./customui/SpeedTestModal";
+import { GetApiRequest } from "../../network/APIClient";
 import moment from "moment";
-
 
 const DataSpeedComponent = () => {
   const dispatch = useDispatch();
@@ -35,15 +34,12 @@ const DataSpeedComponent = () => {
     });
   };
 
- 
-
   const [download, setDownload] = useState(0);
   const [upload, setUpload] = useState(0);
   const [downloadFrac, setDownloadFrac] = useState(0);
   const [uploadFrac, setUploadFrac] = useState(0);
   const [speed, setSpeed] = useState(false);
-  const [testDate, setTestDate]=useState(0)
-  const userData = useSelector((state) => {
+  const [testDate, setTestDate] = useState(0);
 
     if (Object.hasOwn(state.combinedReducers.home.speed,"download_Kbps")) {
       let downloadSpeed = state.combinedReducers.home.speed.download_Kbps;
@@ -63,9 +59,11 @@ const DataSpeedComponent = () => {
         setSpeed(true);
       }
     }
-    
-  });
+  };
 
+  const onError = (error) => {
+    console.log("error", error);
+  };
   useEffect(() => {
     if (!speed) {
       getUser().then((res) => {
@@ -74,106 +72,125 @@ const DataSpeedComponent = () => {
     }
   }, [showModal]);
 
-
-  
   const TestSpeedResultSection = () => {
     return (
       <>
-       
-      <View
-        style={{
-          borderColor: colors.grey,
-          borderWidth: 1,
-          borderRadius: 8,
-          marginTop: 15,
-        }}
-      >
-        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-          <View
-            style={{
-              flexDirection: "column",
-              alignContent: "center",
-              alignItems: "center",
-              marginTop: 20,
-              marginBottom: 20,
-            }}
-          >
-            <View style={[styles.downloadbg]}>
-              <Image source={require("../../../assets/frame-1645.png")} />
-            </View>
-
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.speedtextLarge}>{download}</Text>
-              <Text style={[styles.speedtextLarge, { fontSize: 16 }]}>.{downloadFrac}</Text>
-            </View>
-
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.downloadText}>Download</Text>
-              <Text
-                style={[
-                  styles.downloadText,
-                  { color: colors.dark_grey, fontWeight: "400", marginLeft: 5 },
-                ]}
-              >
-                Mbps
-              </Text>
-            </View>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "column",
-              alignContent: "center",
-              alignItems: "center",
-              marginTop: 20,
-              marginBottom: 20,
-            }}
-          >
-            <View style={[styles.downloadbg]}>
-              <Image source={require("../../../assets/frame-1646.png")} />
-            </View>
-
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.speedtextLarge}>{upload}</Text>
-              <Text style={[styles.speedtextLarge, { fontSize: 16 }]}>.{uploadFrac}</Text>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <Text style={styles.downloadText}>Upload</Text>
-              <Text
-                style={[
-                  styles.downloadText,
-                  { color: colors.dark_grey, fontWeight: "400", marginLeft: 5 },
-                ]}
-              >
-                Mbps
-              </Text>
-            </View>
-          </View>
-        </View>
-        <View style={{ margin: 10 }}>
-          <SecondaryButton text={"Test Speed"} onPress={()=>{
-            toggleModal()
-          }} />
-        </View>
         <View
-          style={{ backgroundColor: "#F4F4F5", height: 2, marginTop: 20 }}
-        />
-
-        <View
-          style={{ flexDirection: "row", paddingVertical: 10, paddingLeft: 10 }}
+          style={{
+            borderColor: colors.grey,
+            borderWidth: 1,
+            borderRadius: 8,
+            marginTop: 15,
+            marginHorizontal:20
+          }}
         >
-          <TimerInfo />
-          <Text style={styles.timerInfo1}>Last run</Text>
-          <Text style={styles.timerInfo2}>{testDate}</Text>
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-around" }}
+          >
+            <View
+              style={{
+                flexDirection: "column",
+                alignContent: "center",
+                alignItems: "center",
+                marginTop: 20,
+                marginBottom: 20,
+              }}
+            >
+              <View style={[styles.downloadbg]}>
+                <Image source={require("../../../assets/frame-1645.png")} />
+              </View>
+
+              <View style={{ flexDirection: "row" }}>
+                <Text style={styles.speedtextLarge}>{download}</Text>
+                <Text style={[styles.speedtextLarge, { fontSize: 16 }]}>
+                  .{downloadFrac}
+                </Text>
+              </View>
+
+              <View style={{ flexDirection: "row" }}>
+                <Text style={styles.downloadText}>Download</Text>
+                <Text
+                  style={[
+                    styles.downloadText,
+                    {
+                      color: colors.dark_grey,
+                      fontWeight: "400",
+                      marginLeft: 5,
+                    },
+                  ]}
+                >
+                  Mbps
+                </Text>
+              </View>
+            </View>
+
+            <View
+              style={{
+                flexDirection: "column",
+                alignContent: "center",
+                alignItems: "center",
+                marginTop: 20,
+                marginBottom: 20,
+              }}
+            >
+              <View style={[styles.downloadbg]}>
+                <Image source={require("../../../assets/frame-1646.png")} />
+              </View>
+
+              <View style={{ flexDirection: "row" }}>
+                <Text style={styles.speedtextLarge}>{upload}</Text>
+                <Text style={[styles.speedtextLarge, { fontSize: 16 }]}>
+                  .{uploadFrac}
+                </Text>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <Text style={styles.downloadText}>Upload</Text>
+                <Text
+                  style={[
+                    styles.downloadText,
+                    {
+                      color: colors.dark_grey,
+                      fontWeight: "400",
+                      marginLeft: 5,
+                    },
+                  ]}
+                >
+                  Mbps
+                </Text>
+              </View>
+            </View>
+          </View>
+          <View style={{ margin: 10 }}>
+            <SecondaryButton
+              text={"Test Speed"}
+              onPress={() => {
+                toggleModal();
+              }}
+            />
+          </View>
+          <View
+            style={{ backgroundColor: "#F4F4F5", height: 2, marginTop: 20 }}
+          />
+
+          <View
+            style={{
+              flexDirection: "row",
+              paddingVertical: 10,
+              paddingLeft: 10,
+            }}
+          >
+            <TimerInfo />
+            <Text style={styles.timerInfo1}>Last run</Text>
+            <Text style={styles.timerInfo2}>{testDate}</Text>
+          </View>
         </View>
-      </View>
       </>
     );
   };
 
   return (
     <View style={{ flexDirection: "column" }}>
-      <View style={styles.internetStatusSection}>
+      <View style={[styles.internetStatusSection,{marginHorizontal:20}]}>
         <View style={{ marginTop: 5 }}>
           <InfoIcon />
         </View>
@@ -182,9 +199,13 @@ const DataSpeedComponent = () => {
             {strings.test_speed_info}
           </Text>
           <View style={{ flexDirection: "row", marginLeft: 10, marginTop: 10 }}>
-            <TouchableOpacity onPress={()=>{
-              Linking.openURL('https://support.sparklight.com/hc/en-us/articles/115010349927-Can-I-Run-an-Internet-Speed-Test-')
-            }}>
+            <TouchableOpacity
+              onPress={() => {
+                Linking.openURL(
+                  "https://support.sparklight.com/hc/en-us/articles/115010349927-Can-I-Run-an-Internet-Speed-Test-"
+                );
+              }}
+            >
               <Text style={styles.learnMore}>{strings.learn_more}</Text>
             </TouchableOpacity>
             <View style={styles.verticle_saperator} />
@@ -195,24 +216,25 @@ const DataSpeedComponent = () => {
         </View>
       </View>
       <TestSpeedResultSection />
-      <View style={{ backgroundColor: "#F4F4F5", height: 2, marginTop: 10 }} />
+      <View
+        style={{ backgroundColor: "#F4F4F5", height: 1, marginVertical: 10 }}
+      />
       <TouchableOpacity
         onPress={() => {
-          Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
+          Linking.openURL(
+            "https://customer.uat.sparklight.com/residential/services/upgrade"
+          );
         }}
         style={{
-          height: 40,
+          height: 30,
           flexDirection: "row",
           justifyContent: "space-between",
           padding: 5,
-          marginTop: 10,
         }}
       >
         <Text
           style={{
             fontSize: 16,
-            marginVertical: 5,
-            lineHeight: 20,
             fontWeight: "600",
             color: colors.sparklight_purple_blue,
           }}
@@ -252,7 +274,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     fontStyle: "normal",
     fontWeight: "400",
-    lineHeight: 28,
+    lineHeight: 22,
   },
   speedtextLarge: {
     color: colors.sparklight_bright_purple,
@@ -300,13 +322,14 @@ const styles = StyleSheet.create({
     color: colors.sparklight_purple_blue,
     fontSize: 14,
     fontStyle: "normal",
-    fontWeight: "600",
+    fontWeight: "400",
   },
   verticle_saperator: {
-    marginHorizontal: 15,
+    marginHorizontal: 10,
+    alignSelf:'center',
     height: 15,
     backgroundColor: colors.dark_grey,
-    width: 1,
+    width: 0.2,
   },
 });
 

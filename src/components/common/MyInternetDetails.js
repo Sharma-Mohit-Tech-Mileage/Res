@@ -13,55 +13,25 @@ import Myplanicon from "../../res/svgIcons/Myplanicon";
 
 
 
-const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
-  const [billAmt,setBillAmt]=useState(0)
-  const [planName,setPlanName]=useState('')
+const MyInternetDetials = ({ plans , billAmt,dueDate}) => {
+  //const [billAmt,setBillAmt]=useState(0)
   const [planSpeed,setPlanSpeed]=useState('')
-  const [dueDate,setDueDate]=useState('')
-
-  const getUserAccountDetails=()=>{
-    let re = getUser().then((res) => {
-      const request=`account/api/account/${res.userInfo.accountNumber}`
-      GetApiRequest(request,onSuccess,onError)
-    });
-  }
+  //const [dueDate,setDueDate]=useState('')
+  
 
 
-  const getInternetPlanDetails=()=>{
-    let re = getUser().then((res) => {
-      const request=`internet/api/internet/${res.userInfo.accountNumber}/plan`
-      GetApiRequest(request,onSuccessPlan,onError)
-    });
-  }
-
-  const onSuccessPlan=(res)=>{
-    if(res){
-        setPlanName(res[0].planName)
-        setPlanSpeed(res[0].downloadSpeed)
-    }
-  }
-
-  const onSuccess=(res)=>{
-    console.log('getUserAccountDetails',res)
-    if(res){
-      let dueDate = moment(res.paymentDueDate).format('ll')
-      setDueDate(dueDate)
-      setBillAmt(res.currentBalance)
-    }
-  }
-
-  const onError=(error)=>{
-    console.log('error',error)
-  }
 
   useEffect(()=>{
-    getUserAccountDetails();
-    getInternetPlanDetails();
-  },[])
+    
+    if(plans.length!=0){
+     setPlanSpeed(plans[0].downloadSpeed)
+    }
+  
+  })
   return (
     <View style={{flexDirection:'row'}}>
     <View style={[styles.card, styles.shadowProp, { flexDirection: "column",marginVertical:20}]}>
-      <View style={{ flexDirection: "row" }}>
+      <View style={{ flexDirection: "row",paddingHorizontal: 20, }}>
         <LinearGradient
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
@@ -79,8 +49,12 @@ const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
         <Text style={styles.title}>{'Bill Summary'}</Text>
       </View>
       <View style={styles.subSec}>
-        <Text style={styles.subTitle}>${billAmt}</Text>
-        <Text style={styles.date}>Due on {dueDate}</Text>
+        <View style={{flexDirection:'row'}}>
+        <Text style={{fontSize:14,alignSelf:'center',color: colors.darkest_grey,fontWeight: "400"}}>$</Text>
+        <Text style={styles.subTitle}>{billAmt}</Text>
+        </View>
+        
+        <Text style={[styles.date,{paddingRight:10}]}>Due on {dueDate}</Text>
       </View>
       <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
       <TouchableOpacity
@@ -88,10 +62,10 @@ const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
           Linking.openURL('https://customer.uat.sparklight.com/residential/billing')
         }}
         style={{
-          
+          paddingBottom:5,
           flexDirection: "row",
           justifyContent: "space-between",
-         
+          paddingHorizontal: 20,
           marginTop: 15,
         }}
       >
@@ -110,8 +84,8 @@ const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
       </TouchableOpacity>
     </View>
 
-<View style={[styles.card, styles.shadowProp, { flexDirection: "column",marginVertical:20,marginHorizontal:10}]}>
-<View style={{ flexDirection: "row" }}>
+<View style={[styles.card, styles.shadowProp, { flexDirection: "column",marginVertical:20,marginHorizontal:20}]}>
+<View style={{ flexDirection: "row" ,paddingHorizontal: 20,}}>
   <LinearGradient
     start={{ x: 0, y: 0 }}
     end={{ x: 1, y: 0 }}
@@ -130,7 +104,11 @@ const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
 </View>
 <View style={styles.subSec}>
   
-  <Text style={styles.subTitle}>{planSpeed} mb/s</Text>
+<View style={{flexDirection:'row'}}>
+<Text style={styles.subTitle}>{planSpeed}</Text>
+        <Text style={{fontSize:14,alignSelf:'center',color: colors.darkest_grey,fontWeight: "400",marginTop:2}}>mb/s</Text>
+        
+        </View>
  
 </View>
 <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
@@ -139,10 +117,10 @@ const MyInternetDetials = ({ icon, title, subTitle, date,actionTxt }) => {
     Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
   }}
   style={{
-    
+    paddingBottom:5,
     flexDirection: "row",
     justifyContent: "space-between",
-   
+    paddingHorizontal: 20,
     marginTop: 15,
   }}
 >
@@ -170,12 +148,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#EAECF0",
     alignContent: "center",
     alignItems: "center",
+    
   },
   card: {
     backgroundColor: "white",
-    borderRadius: 8,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
+    borderRadius: 5,
+    paddingVertical: 10,
+    
     width: wp('82%'),
   },
   shadowProp: {
@@ -201,7 +180,8 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 14,
-    color: colors.dark_grey
+    color: colors.dark_grey,
+    alignSelf:'center'
   },
   subSec: {
     flexDirection: "row",
@@ -209,6 +189,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingRight: 5,
     marginTop: 10,
+    paddingHorizontal: 20,
   },
 });
 export default MyInternetDetials;

@@ -1,61 +1,147 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity,FlatList } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import colors from "../../res/Colors";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import DataSpeedComponent from "./DataSpeedComponent";
 import DataUsageComponent from "./DataUsageComponent";
 import strings from "../../res/Strings";
+import LinearGradient from "react-native-linear-gradient";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import SwipeUpDownModal from "react-native-swipe-modal-up-down";
+import InternetIcon from "../../res/svgIcons/InternetIcon";
+import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
+import TickIcon from "../../res/svgIcons/TickIcon";
 
-const MyServicePlan = () => {
+const MyServicePlan = ({ plans }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [ShowComment, setModelComment] = useState(false);
   const [animateModal, setanimateModal] = useState(false);
 
   const MyPlanDetails = () => {
-    const data=[ { 
-      id:"1", 
-      title:"Data Structures"
-    }, 
-    { 
-      id:"2", 
-      title:"STL"
-    }, 
-    { 
-      id:"3", 
-      title:"C++"
-    }, 
-    { 
-      id:"4", 
-      title:"Java"
-    }, 
-    { 
-      id:"5", 
-      title:"Python"
-    }, 
-    { 
-      id:"6", 
-      title:"CP"
-    }, ]
-    
-    
+    useEffect(() => {}, []);
+
+    const PlanDetailsItem = ({ item, index }) => {
+      console.log("PlanDetailsItem", item);
+      return (
+        <View key={index}>
+          <View
+            style={{
+              flexDirection: "row",
+              backgroundColor: colors.backgound_blue,
+              padding: wp("3%"),
+            }}
+          >
+            <LinearGradient
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+              style={{
+                width: wp("10%"),
+                height: wp("10%"),
+                borderRadius: 10,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <InternetIcon />
+            </LinearGradient>
+            <Text style={styles.planDetailsRowHeader}>
+              Internet {item.planName}
+            </Text>
+          </View>
+
+          <View style={[styles.planDetailsRow]}>
+            <TickIcon />
+            <Text style={styles.planDetailsTxt}>
+              Download Speed Up To {item.downloadSpeed} Mbps
+            </Text>
+          </View>
+
+          <View
+            style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }}
+          />
+          <View style={[styles.planDetailsRow]}>
+            <TickIcon />
+            <Text style={styles.planDetailsTxt}>
+              Upload Speed Up To {item.uploadSpeed} Mbps
+            </Text>
+          </View>
+          <View
+            style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }}
+          />
+          <View
+            style={{
+              flexDirection: "column",
+              padding: wp("4%"),
+              marginLeft: 10,
+            }}
+          >
+            <View style={{ flexDirection: "row" }}>
+              <TickIcon />
+              <Text style={styles.planDetailsTxt}>
+                Data Plan {item.dataQuotaGB}GB*
+              </Text>
+            </View>
+            <Text
+              style={{
+                fontSize: FontSize.size_xs,
+                color: colors.sparklight_grey,
+                fontWeight: "400",
+                marginLeft: 10,
+                marginTop: 5,
+              }}
+            >
+              * $10 charge for each add'l 100GB; Up to $40/mo.
+            </Text>
+          </View>
+          <View
+            style={{
+              backgroundColor: colors.grey,
+              height: 1,
+              width: "100%",
+              marginTop: 5,
+            }}
+          />
+        </View>
+      );
+    };
+
     return (
       <SwipeUpDownModal
         modalVisible={ShowComment}
         PressToanimate={animateModal}
-        
         ContentModal={
-          <View style={[styles.containerContent,styles.card,styles.shadowProp]}>
-            {data.map((item,index)=>{
-              return(
-              <View>
-              <Text>{item.title} {index}</Text>
-              </View>
-              )
+          <View style={{ marginVertical: 10, borderRadius: 10 }}>
+            <View
+              style={{ flexDirection: "row", flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            marginHorizontal:20,
+          marginVertical:10}}
+            >
+              <Text style={{textAlign:'center',fontSize:FontSize.size_3xl,color:colors.sparklight_grey,fontWeight:'400'}}>Plan Details</Text>
+              <TouchableOpacity onPress={()=>{
+                setModelComment(false)
+              }}>
+              <Image 
+                style={{ height: 32, width: 32, overflow: "hidden" }}
+                resizeMode="cover"
+                source={require("../../../assets/right-actionable7.png")}
+              />
+              </TouchableOpacity>
+            </View>
+            {plans?.map((item, index) => {
+              return <PlanDetailsItem item={item} index={index} key={index} />;
             })}
           </View>
         }
@@ -79,10 +165,12 @@ const MyServicePlan = () => {
         { flexDirection: "column", marginBottom: hp("10%") },
       ]}
     >
-      <View style={styles.subSec}>
+      <View style={[styles.subSec,{marginHorizontal:20}]}>
         <Text style={styles.subTitle}>{strings.my_service_txt}</Text>
-        <TouchableOpacity style={{ flexDirection: "row", alignItems: "center" }}
-        onPress={()=>setModelComment(true)}>
+        <TouchableOpacity
+          style={{ flexDirection: "row", alignItems: "center" }}
+          onPress={() => setModelComment(true)}
+        >
           <InfoIcon />
           <Text style={styles.date}>{strings.my_plan_details_txt}</Text>
         </TouchableOpacity>
@@ -127,6 +215,7 @@ const MyServicePlan = () => {
               fontSize: 16,
               fontStyle: "normal",
               textAlign: "center",
+              fontFamily:FontFamily.openSansRegular,
               textAlignVertical: "center",
               fontWeight: "400",
             }}
@@ -138,7 +227,7 @@ const MyServicePlan = () => {
       </View>
 
       {tabIndex == 0 ? <DataSpeedComponent /> : <DataUsageComponent />}
-      <MyPlanDetails/>
+      <MyPlanDetails />
     </View>
   );
 };
@@ -146,14 +235,13 @@ const MyServicePlan = () => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
-    borderRadius: 8,
+    borderRadius: 5,
     paddingVertical: 15,
-    paddingHorizontal: 20,
     width: wp("87%"),
   },
   shadowProp: {
     shadowColor: "#171717",
-    shadowOffset: { width: -2, height: 4 },
+    shadowOffset: { width: -2, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
@@ -176,6 +264,7 @@ const styles = StyleSheet.create({
     color: colors.sparklight_purple_blue,
     textAlignVertical: "center",
     marginLeft: 5,
+    fontWeight:'600'
   },
   subSec: {
     flexDirection: "row",
@@ -184,16 +273,16 @@ const styles = StyleSheet.create({
   },
   selectedTab: {
     backgroundColor: colors.sparklight_purple_blue,
-    borderRadius: 2,
-    borderColor: colors.dark_grey,
+    borderRadius: 0.5,
+    borderColor:'#76767680',
     paddingVertical: 5,
     paddingHorizontal: 32,
     width: wp("40%"),
   },
   defaultTab: {
     backgroundColor: "white",
-    borderRadius: 2,
-    borderColor: colors.dark_grey,
+    borderRadius: 0.5,
+    borderColor:'#76767680',
     paddingVertical: 5,
     paddingHorizontal: 32,
     width: wp("40%"),
@@ -212,8 +301,26 @@ const styles = StyleSheet.create({
   },
   Modal: {
     backgroundColor: "#fff",
-    marginTop: hp('20%'),
-    
+    marginTop: hp("20%"),
+    borderTopLeftRadius:16,
+    borderTopRightRadius:16
+  },
+  planDetailsRow: {
+    padding: wp("4%"),
+    flexDirection: "row",
+    marginLeft: 10,
+  },
+  planDetailsRowHeader: {
+    color: colors.darkest_grey,
+    fontSize: FontSize.size_3xl,
+    marginLeft: 10,
+    alignSelf: "center",
+  },
+  planDetailsTxt: {
+    color: colors.darkest_grey,
+    fontSize: FontSize.size_base,
+    marginLeft: 10,
+    fontWeight: "400",
   },
 });
 

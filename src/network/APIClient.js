@@ -26,11 +26,7 @@ export const PostAuthApiRequest=(endpoint,body, onSuccess,onError)=>{
         })
         .catch(exception => {
             onError(exception)
-            console.log(new Map([
-                [TypeError, "There was a problem fetching the response."],
-                [SyntaxError, "There was a problem parsing the response."],
-                [Error, exception.message]
-            ]).get(exception.constructor()));
+           
         });
     
     }
@@ -54,15 +50,12 @@ fetch(`${BASE_URL}/${endpoint}`, {
         if (!response.ok || !response.status === 201) { // We should get a 201 (Created) status code if everything is fine/working
             throw Error(`Respsonse status ${response.status} (${response.statusText}): ${json.message}`);
         }
+        onSuccess(json)
         // console.log(json);
         // Whatever you want to do next after the POST request - maybe dispatch something?
     })
     .catch(exception => {
-        console.log(new Map([
-            [TypeError, "There was a problem fetching the response."],
-            [SyntaxError, "There was a problem parsing the response."],
-            [Error, exception.message]
-        ]).get(exception.constructor()));
+        onError(exception.message)
     });
 
 }
@@ -90,11 +83,8 @@ fetch(`${BASE_URL}/${endpoint}`, {
         // Whatever you want to do next after fetching - maybe dispatch something?
     })
     .catch(exception => {
-        console.log(new Map([
-            [TypeError, "There was a problem fetching the response."],
-            [SyntaxError, "There was a problem parsing the response."],
-            [Error, exception.message]
-        ]).get(exception.constructor()));
+        onError(exception.message)
+        
     });
 
 }
@@ -161,66 +151,3 @@ fetch(`${BASE_URL}/${endpoint}`, {
 
 
 
-// // Example PATCH resquest - with token and encodeURIComponent
-// fetch(`${baseUrl}/whatever-endpoint/${encodeURIComponent(userId)}`, {
-//     method: 'PATCH',
-//     headers: {
-//         'Content-Type': 'application/json',
-//         'Authorization': `Bearer ${JWT}`
-//     },
-//     body: JSON.stringify({
-//         sendSomething,
-//         sendSomething2,
-//         sendSomething3
-//     })
-// })
-//     .then(response => Promise.all([response, response.json()]))
-//     .then(([response, json]) => {
-//         // console.log('response', response);
-//         if (!response.ok || !response.status === 204) { // We should get a 200 (OK) or 204 (No Content) status code if everything is fine/working
-//             throw Error(`Respsonse status ${response.status} (${response.statusText}): ${json.message}`);
-//         }
-//         // console.log(json);
-//         // Whatever you want to do next after the PATCH request - maybe dispatch something?
-//     })
-//     .catch(exception => {
-//         console.log(new Map([
-//             [TypeError, "There was a problem fetching the response."],
-//             [SyntaxError, "There was a problem parsing the response."],
-//             [Error, exception.message]
-//         ]).get(exception.constructor()));
-//     });
-
-
-
-
-// // Example DELETE resquest - with token and encodeURIComponent
-// fetch(`${baseUrl}/whatever-endpoint/${encodeURIComponent(userId)}`, {
-//     method: 'DELETE',
-//     headers: {
-//         'Content-Type': 'application/json',
-//         'Authorization': `Bearer ${JWT}`
-//     },
-//     body: JSON.stringify({
-//         sendSomething,
-//         sendSomething2,
-//         sendSomething3
-//     })
-// })
-//     .then(response => Promise.all([response, response.json()]))
-//     .then(([response, json]) => {
-//         // console.log('response', response);
-//         if (!response.ok) { // We should get a 200 (OK) status code if everything is fine/working
-//             throw Error(`Respsonse status ${response.status} (${response.statusText}): ${json.message}`);
-//         }
-//         // console.log(json);
-//         // Whatever you want to do next after the DELETE request - maybe dispatch something?
-//     })
-//     .catch(exception => {
-//         console.log(new Map([
-//             [TypeError, "There was a problem fetching the response."],
-//             [SyntaxError, "There was a problem parsing the response."],
-//             [Error, exception.message]
-//         ]).get(exception.constructor()));
-//     });
- 

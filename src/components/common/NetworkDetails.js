@@ -8,7 +8,9 @@ import colors from "../../res/Colors";
 import strings from "../../res/Strings";
 
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-const NetworkDetails = () => {
+const NetworkDetails = ({billPaid}) => {
+
+ 
   useEffect(() => {
     //console.log("data");
   }, []);
@@ -16,6 +18,13 @@ const NetworkDetails = () => {
   const GreenCircle=()=>{
     return(
       <View style={styles.greenTick}>
+      </View>
+    )
+  }
+
+  const RedCircle=()=>{
+    return(
+      <View style={styles.redTick}>
       </View>
     )
   }
@@ -39,7 +48,7 @@ const NetworkDetails = () => {
         </View> */}
       </View>
 
-      <View style={[styles.rowContaine]}>
+      <View style={[styles.rowContainer]}>
         <View style={styles.item}>
         <View style ={styles.iconBg}>
           <Modemicon />
@@ -51,7 +60,7 @@ const NetworkDetails = () => {
         <View style={styles.item}>
         <View style ={styles.iconBg}>
          <Billpaidicon/>
-         <GreenCircle/>
+         { (billPaid)?<GreenCircle/> :<RedCircle/>}
          </View>
          <Text style={styles.text}> {strings.bill_paid}</Text>
           
@@ -96,7 +105,8 @@ const styles = StyleSheet.create({
     marginTop:5,
     textAlign:'center',
     marginLeft:10,
-    color:colors.darkest_grey
+    color:colors.darkest_grey,
+    fontWeight:'600'
   },greenTick:{
     width:14,
     height:14,
@@ -105,6 +115,17 @@ const styles = StyleSheet.create({
     bottom:0,
     right:-3,
     backgroundColor:colors.sparklight_green,
+    borderWidth:2,
+    borderColor:'white'
+
+  },redTick:{
+    width:14,
+    height:14,
+    borderRadius: 7,
+    position:'absolute',
+    bottom:0,
+    right:-3,
+    backgroundColor:colors.sparklight_red,
     borderWidth:2,
     borderColor:'white'
 
