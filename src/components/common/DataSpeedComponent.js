@@ -18,7 +18,8 @@ import strings from "../../res/Strings";
 import { getCurrentSpeed } from "../../redux/actions/DashboardAction";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../../redux/utils/LocalStorage"
-import WebViewModal from "./customui/WebViewModal";
+//import WebViewModal from "./customui/WebViewModal";
+import SpeedTestModal from "./customui/SpeedTestModal";
 import moment from "moment";
 
 
@@ -28,8 +29,8 @@ const DataSpeedComponent = () => {
 
   const toggleModal = () => {
     setShowModal(!showModal);
-    let re = getUser().then((res) => {
-      console.log("res", res.userInfo.accountNumber);
+    setSpeed(false);
+    getUser().then((res) => {
       dispatch(getCurrentSpeed(res.userInfo.accountNumber));
     });
   };
@@ -48,8 +49,8 @@ const DataSpeedComponent = () => {
       let downloadSpeed = state.combinedReducers.home.speed.download_Kbps;
         let uploadSpeed = state.combinedReducers.home.speed.upload_Kbps;
         let date = state.combinedReducers.home.speed.createdOn;
-        let speedInMbps_download = (downloadSpeed / 1024).toFixed(2);
-        let speedInMbps_upload = (uploadSpeed / 1024).toFixed(2);
+        let speedInMbps_download = (downloadSpeed / 1000).toFixed(2);
+        let speedInMbps_upload = (uploadSpeed / 1000).toFixed(2);
         let upl = speedInMbps_upload.toString().split(".");
         let downl = speedInMbps_download.toString().split(".");
       if (!speed) {
@@ -67,8 +68,7 @@ const DataSpeedComponent = () => {
 
   useEffect(() => {
     if (!speed) {
-      let re = getUser().then((res) => {
-        console.log("res", res.userInfo.accountNumber);
+      getUser().then((res) => {
         dispatch(getCurrentSpeed(res.userInfo.accountNumber));
       });
     }
@@ -225,7 +225,7 @@ const DataSpeedComponent = () => {
       </TouchableOpacity>
 
       {showModal && (
-        <WebViewModal
+        <SpeedTestModal
           url="https://cableone.speedtestcustom.com/" 
           onClose={()=>toggleModal()}
         />
