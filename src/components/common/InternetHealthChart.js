@@ -5,7 +5,7 @@ import { SegmentedArc } from '../common/arcchart/SegmentedArc';
 import moment from 'moment';
 import colors from '../../res/Colors';
 
-const InternetHealthChart= () => {
+const InternetHealthChart= ({currentValue}) => {
   const [showArcRanges, setShowArcRanges] = useState(false);
   const [ todayDate, setTodayDate]= useState("");
 
@@ -50,7 +50,7 @@ const InternetHealthChart= () => {
     <View style={{  alignItems: 'center', justifyContent: 'center'}}>
       <SegmentedArc
         segments={segments}
-        fillValue={90}
+        fillValue={currentValue}
         isAnimated={true}
         animationDelay={1000}
         showArcRanges={showArcRanges}

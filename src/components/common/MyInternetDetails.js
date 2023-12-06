@@ -15,20 +15,16 @@ import Myplanicon from "../../res/svgIcons/Myplanicon";
 
 const MyInternetDetials = ({ plans , billAmt,dueDate}) => {
   //const [billAmt,setBillAmt]=useState(0)
-  const [planSpeed,setPlanSpeed]=useState([])
+  const [planSpeed,setPlanSpeed]=useState('')
   //const [dueDate,setDueDate]=useState('')
-  const [myPlan,setMyPlan]=useState(plans)
+  
 
 
-
-  const onError=(error)=>{
-    console.log('error',error)
-  }
 
   useEffect(()=>{
-    //getUserAccountDetails();
-    if(myPlan.length!=0){
-     setPlanSpeed(myPlan[0].downloadSpeed)
+    
+    if(plans.length!=0){
+     setPlanSpeed(plans[0].downloadSpeed)
     }
   
   })
@@ -54,7 +50,7 @@ const MyInternetDetials = ({ plans , billAmt,dueDate}) => {
       </View>
       <View style={styles.subSec}>
         <View style={{flexDirection:'row'}}>
-        <Text style={{fontSize:14,alignSelf:'center',color: colors.darkest_grey,}}>$</Text>
+        <Text style={{fontSize:14,alignSelf:'center',color: colors.darkest_grey,fontWeight: "400"}}>$</Text>
         <Text style={styles.subTitle}>{billAmt}</Text>
         </View>
         
@@ -88,7 +84,7 @@ const MyInternetDetials = ({ plans , billAmt,dueDate}) => {
       </TouchableOpacity>
     </View>
 
-<View style={[styles.card, styles.shadowProp, { flexDirection: "column",marginVertical:20,marginHorizontal:10}]}>
+<View style={[styles.card, styles.shadowProp, { flexDirection: "column",marginVertical:20,marginHorizontal:20}]}>
 <View style={{ flexDirection: "row" ,paddingHorizontal: 20,}}>
   <LinearGradient
     start={{ x: 0, y: 0 }}
@@ -110,7 +106,7 @@ const MyInternetDetials = ({ plans , billAmt,dueDate}) => {
   
 <View style={{flexDirection:'row'}}>
 <Text style={styles.subTitle}>{planSpeed}</Text>
-        <Text style={{fontSize:14,alignSelf:'flex-end',color: colors.darkest_grey,}}>mb/s</Text>
+        <Text style={{fontSize:14,alignSelf:'center',color: colors.darkest_grey,fontWeight: "400",marginTop:2}}>mb/s</Text>
         
         </View>
  
@@ -184,7 +180,8 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 14,
-    color: colors.dark_grey
+    color: colors.dark_grey,
+    alignSelf:'center'
   },
   subSec: {
     flexDirection: "row",

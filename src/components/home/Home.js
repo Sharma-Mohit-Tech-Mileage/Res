@@ -40,7 +40,18 @@ const HomeScreen = ({ route, navigation }) => {
   const [plans,setPlans]=useState([])
   const [billAmt,setBillAmt]=useState(0)
   const [dueDate,setDueDate]=useState('')
-  //const [is]
+  const [currentHealth,setCurrentHealth]= useState('Poor')
+  const [billPaid,setBillPaid]=useState(false)
+  
+  const getInternetHealth=(type)=> {
+    var currentHealth = {
+      'Poor': 20,
+      'Good': 50,
+      'Optimal': 80,
+      'default': 80
+    };
+    return  (currentHealth[type] || currentHealth['default']);
+  }
 
   const getInternetPlanDetails=()=>{
     let re = getUser().then((res) => {
@@ -150,7 +161,7 @@ const HomeScreen = ({ route, navigation }) => {
           >
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <Text style={styles.internetHealth}>Internet Health</Text>
-              <InternetHealthChart />
+              <InternetHealthChart currentValue={getInternetHealth(currentHealth)} />
               <View style={styles.internetStatusSection}>
                 <View style={{ marginTop: 5 }}>
                   <InfoIcon />
@@ -190,7 +201,7 @@ const HomeScreen = ({ route, navigation }) => {
                   )}
                 </View>
               </TouchableOpacity>
-              {isInternetDetails ? <NetworkDetails /> : <></>}
+              {isInternetDetails ? <NetworkDetails billPaid={billPaid}/> : <></>}
             </View>
              <ScrollView horizontal={true}style={{marginStart:20}} >
               <View style={{marginHorizontal:10}}>

@@ -165,7 +165,7 @@ const MyServicePlan = ({ plans }) => {
         { flexDirection: "column", marginBottom: hp("10%") },
       ]}
     >
-      <View style={styles.subSec}>
+      <View style={[styles.subSec,{marginHorizontal:20}]}>
         <Text style={styles.subTitle}>{strings.my_service_txt}</Text>
         <TouchableOpacity
           style={{ flexDirection: "row", alignItems: "center" }}
@@ -237,7 +237,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 5,
     paddingVertical: 15,
-    paddingHorizontal: 20,
     width: wp("87%"),
   },
   shadowProp: {
@@ -274,16 +273,16 @@ const styles = StyleSheet.create({
   },
   selectedTab: {
     backgroundColor: colors.sparklight_purple_blue,
-    borderRadius: 2,
-    borderColor: colors.dark_grey,
+    borderRadius: 0.5,
+    borderColor:'#76767680',
     paddingVertical: 5,
     paddingHorizontal: 32,
     width: wp("40%"),
   },
   defaultTab: {
     backgroundColor: "white",
-    borderRadius: 2,
-    borderColor: colors.dark_grey,
+    borderRadius: 0.5,
+    borderColor:'#76767680',
     paddingVertical: 5,
     paddingHorizontal: 32,
     width: wp("40%"),
