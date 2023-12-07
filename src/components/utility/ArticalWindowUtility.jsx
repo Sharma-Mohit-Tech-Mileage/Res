@@ -52,6 +52,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     <Text style={styles.errorText}>Failed to load. Please try again later.</Text>
                 </View>
             ) : null}
+            
         </View>
     );
 };

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Image, Text, Pressable, ScrollView } from "react-native";
+import { StyleSheet, View, Image, Text, Pressable, ScrollView, Linking } from "react-native";
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
@@ -7,6 +7,18 @@ import { useNavigation } from "@react-navigation/native";
 
 const Support = () => {
     const navigation = useNavigation();
+    const makeCall = (number) => {
+        let phoneNumber = '';
+
+        if (Platform.OS === 'android') {
+            phoneNumber = `tel:${number}`;
+        } else {
+            phoneNumber = `telprompt:${number}`;
+        }
+
+        Linking.openURL(phoneNumber);
+    };
+
     const items = [
         {
             key: 'searchIssues',
@@ -57,26 +69,24 @@ const Support = () => {
                 showIcon={false} // New prop to control icon visibility
             />
             <ScrollView >
-            <LinearGradient
-                style={styles.linearGradientStyle}
-                locations={[0, 1]}
-                colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
-                useAngle={true}
-                angle={90}
-            />
+                <LinearGradient
+                    style={styles.linearGradientStyle}
+                    locations={[0, 1]}
+                    colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+                    useAngle={true}
+                    angle={90}
+                />
                 <View style={[styles.mainContainer]}>
                     <View style={[styles.containerFlexBox]}>
                         <View style={styles.header}>
                             <View style={styles.featuredIcon}>
                                 <Image
                                     style={[styles.lifeBuoy02IconLayout]}
-                                    resizeMode="cover"
+                                    resizeMode="stretch"
                                     source={require("../../../assets/right-actionable19.png")}
                                 />
                             </View>
-                            <View
-                                style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}
-                            >
+                            <View style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}>
                                 <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                             </View>
                         </View>
@@ -99,7 +109,7 @@ const Support = () => {
                                             {item.iconAlignment === 'right' ? <Text style={[styles.searchChild, styles.textTypoRight]}>
                                                 {item.text}
                                             </Text>
-                                                : <Text style={[styles.searchChild, { color: Color.colorGray_100 }]}>
+                                                : <Text style={[{ paddingHorizontal: Padding.p_3xs,color: Color.sparklightGray1 }]}>
                                                     {item.text}
                                                 </Text>}
                                         </View>
@@ -114,33 +124,28 @@ const Support = () => {
                                     Additional Support
                                 </Text>
                             </View>
-                            <Pressable style={[styles.integrationCardMobileContainer,styles.contentSpaceBlock]} onPress={() => { }}>
-                                <View style={[styles.integrationCardMobile1,styles.integrationCardBorder ]}>
+                            <Pressable style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} onPress={() => { }}>
+                                <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
                                         <View style={styles.headingAndIcon}>
                                             <View style={[styles.icon]}>
                                                 <Image
-                                                    resizeMode="cover"
+                                                    resizeMode="stretch"
                                                     source={require("../../../assets/tool-02.png")}
                                                 />
                                             </View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
-                                                    <Text style={[ styles.headingTypo]}>
+                                                    <Text style={[styles.headingTypo]}>
                                                         Troubleshooting
                                                     </Text>
                                                     <Image
                                                         style={styles.chevronIconLayout}
-                                                        resizeMode="cover"
+                                                        resizeMode="stretch"
                                                         source={require("../../../assets/chevronright.png")}
                                                     />
                                                 </View>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText,
-                                                        styles.supportingTypo1,
-                                                    ]}
-                                                >
+                                                <Text style={[styles.supportingText, styles.supportingTypo1,]} >
                                                     Explore instant solutions to issues.
                                                 </Text>
                                             </View>
@@ -148,9 +153,9 @@ const Support = () => {
                                     </View>
                                 </View>
                             </Pressable>
-                            <View style={[styles.integrationCardMobileContainer,styles.contentSpaceBlock]} >
+                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} >
                                 <Pressable
-                                    style={[styles.integrationCardMobile1,styles.integrationCardBorder,]}
+                                    style={[styles.integrationCardMobile1, styles.integrationCardBorder,]}
                                     onPress={() => { navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/18929657224855', name: 'FAQ' }) }}
                                 >
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
@@ -158,7 +163,7 @@ const Support = () => {
                                             <View style={[]}>
                                                 <Image
                                                     style={styles.icon}
-                                                    resizeMode="cover"
+                                                    resizeMode="stretch"
                                                     source={require("../../../assets/icon-faq.png")}
                                                 /></View>
                                             <View style={styles.frameParent}>
@@ -168,16 +173,11 @@ const Support = () => {
                                                     </Text>
                                                     <Image
                                                         style={styles.chevronIconLayout}
-                                                        resizeMode="cover"
+                                                        resizeMode="stretch"
                                                         source={require("../../../assets/chevronright.png")}
                                                     />
                                                 </View>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText,
-                                                        styles.supportingTypo1,
-                                                    ]}
-                                                >
+                                                <Text style={[styles.supportingText, styles.supportingTypo1]}>
                                                     Review common questions.
                                                 </Text>
                                             </View>
@@ -185,36 +185,31 @@ const Support = () => {
                                     </View>
                                 </Pressable>
                             </View>
-                            <View style={[styles.integrationCardMobileContainer,styles.contentSpaceBlock]}>
+                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
                                 <Pressable
-                                    style={[styles.integrationCardMobile1,styles.integrationCardBorder]}
+                                    style={[styles.integrationCardMobile1, styles.integrationCardBorder]}
                                     onPress={() => { navigation.navigate('ManageEquipment') }}
                                 >
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
                                         <View style={styles.headingAndIcon}>
                                             <View style={[styles.icon]}>
                                                 <Image
-                                                    resizeMode="cover"
+                                                    resizeMode="stretch"
                                                     source={require("../../../assets/modem-02.png")}
                                                 />
                                             </View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
-                                                    <Text style={[ styles.headingTypo]}>
+                                                    <Text style={[styles.headingTypo]}>
                                                         Equipment Management
                                                     </Text>
                                                     <Image
                                                         style={styles.chevronIconLayout}
-                                                        resizeMode="cover"
+                                                        resizeMode="stretch"
                                                         source={require("../../../assets/chevronright.png")}
                                                     />
                                                 </View>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText,
-                                                        styles.supportingTypo1,
-                                                    ]}
-                                                >
+                                                <Text style={[styles.supportingText, styles.supportingTypo1,]}>
                                                     View and manage equipment.
                                                 </Text>
                                             </View>
@@ -237,22 +232,17 @@ const Support = () => {
                                         <View style={styles.headingAndIcon}>
                                             <View style={[styles.icon]}>
                                                 <Image
-                                                    resizeMode="cover"
+                                                    resizeMode="stretch"
                                                     source={require("../../../assets/featured-icon.png")}
                                                 />
                                             </View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.supportingText, styles.headingTypo]}>
+                                                    <Text style={[styles.supportingText, styles.headingTypo1]}>
                                                         Live Support
                                                     </Text>
                                                 </View>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText,
-                                                        styles.supportingTypo1,
-                                                    ]}
-                                                >
+                                                <Text style={[styles.supportingText, styles.supportingTypo1]} >
                                                     No agents available right now. Agents are typically
                                                     available from 5:00am- 9:00pm PST
                                                 </Text>
@@ -261,45 +251,29 @@ const Support = () => {
                                     </View>
                                 </View>
                             </View>
-                            <View
-                                style={[
-                                    styles.integrationCardMobileContainer,
-                                    styles.contentSpaceBlock,
-                                ]}
-                            >
+                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}>
                                 <Pressable
-                                    style={[
-                                        styles.integrationCardMobile1,
-                                        styles.integrationCardBorder,
-                                    ]}
-                                    onPress={() => { navigation.navigate('TicketSupport') }}
-                                >
+                                    style={[styles.integrationCardMobile1, styles.integrationCardBorder,]}
+                                    onPress={() => { navigation.navigate('TicketSupport') }} >
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
                                         <View style={styles.headingAndIcon}>
-                                            <View style={[
-                                                styles.icon
-                                            ]}>
+                                            <View style={[styles.icon]}>
                                                 <Image
-                                                    resizeMode="cover"
+                                                    resizeMode="stretch"
                                                     source={require("../../../assets/ticket-03.png")}
                                                 /></View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
-                                                    <Text style={[ styles.headingTypo]}>
+                                                    <Text style={[styles.headingTypo]}>
                                                         Ticket Support
                                                     </Text>
                                                     <Image
                                                         style={styles.chevronIconLayout}
-                                                        resizeMode="cover"
+                                                        resizeMode="stretch"
                                                         source={require("../../../assets/chevronright.png")}
                                                     />
                                                 </View>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText,
-                                                        styles.supportingTypo1,
-                                                    ]}
-                                                >
+                                                <Text style={[styles.supportingText, styles.supportingTypo1,]}>
                                                     Open a support ticket for us to help.
                                                 </Text>
                                             </View>
@@ -313,53 +287,37 @@ const Support = () => {
                                         <View style={styles.headingAndIcon4}>
                                             <View style={[styles.icon]}>
                                                 <Image
-                                                    resizeMode="cover"
+                                                    resizeMode="stretch"
                                                     source={require("../../../assets/tool-01.png")}
                                                 />
                                             </View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
-                                                    <Text style={[ styles.headingTypo]}>
+                                                    <Text style={[styles.headingTypo]}>
                                                         Tech Support
                                                     </Text>
-                                                    <Image
-                                                        style={styles.chevronIconLayout}
-                                                        resizeMode="cover"
-                                                        source={require("../../../assets/phone-outgoing-01.png")}
-                                                    />
+                                                    <Pressable onPress={() => makeCall('877-692-2253')}>
+                                                        <Image
+                                                            style={styles.chevronIconLayout}
+                                                            resizeMode="stretch"
+                                                            source={require("../../../assets/phone-outgoing-01.png")}
+                                                        />
+                                                    </Pressable>
                                                 </View>
-                                                <View style={styles.supportingTextWrapper}>
-                                                    <Text
-                                                        style={[
-                                                            styles.supportingText4,
-                                                            styles.support1Typo,
-                                                        ]}
-                                                    >
-                                                        877-692-2253
-                                                    </Text>
-                                                </View>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText5,
-                                                        styles.supportingTypo1,
-                                                    ]}
-                                                >
-                                                    Need a little help with your Sparklight® service?
-                                                    We're here 24 hours a day, seven days a week to
-                                                    support you.
+                                                <Pressable onPress={() => makeCall('877-692-2253')}>
+                                                    <View style={styles.supportingTextWrapper}>
+                                                        <Text style={[styles.supportingText4, styles.support1Typo,]}>
+                                                            877-692-2253
+                                                        </Text>
+                                                    </View>
+                                                </Pressable>
+                                                <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
+                                                    Need a little help with your Sparklight® service? We're here 24 hours a day, seven days a week to support you.
                                                 </Text>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText6,
-                                                        styles.supportingTypo,
-                                                    ]}
-                                                >{`Call Center Hours: `}</Text>
-                                                <Text
-                                                    style={[
-                                                        styles.supportingText7,
-                                                        styles.supportingTypo,
-                                                    ]}
-                                                >
+                                                <Text style={[styles.supportingText6, styles.supportingTypo,]}>
+                                                    {`Call Center Hours: `}
+                                                </Text>
+                                                <Text style={[styles.supportingText7, styles.supportingTypo,]}>
                                                     24h/7 days a week
                                                 </Text>
                                             </View>
@@ -367,70 +325,44 @@ const Support = () => {
                                     </View>
                                 </View>
                             </View>
-                            <View
-                                style={[
-                                    styles.integrationCardMobileContainer,
-                                    styles.contentSpaceBlock,
-                                ]}
-                            >
-                                <View
-                                    style={[
-                                        styles.integrationCardMobile1,
-                                        styles.integrationCardBorder,
-                                    ]}
-                                >
+                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}>
+                                <View style={[styles.integrationCardMobile1, styles.integrationCardBorder,]} >
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
                                         <View style={styles.headingAndToggle}>
                                             <View style={styles.headingAndIcon4}>
-                                                <View style={[
-                                                    styles.icon
-                                                ]}>
+                                                <View style={[styles.icon]}>
                                                     <Image
-                                                        resizeMode="cover"
+                                                        resizeMode="stretch"
                                                         source={require("../../../assets/wallet-03.png")}
                                                     /></View>
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
-                                                        <Text style={[ styles.headingTypo]}>
+                                                        <Text style={[styles.headingTypo]}>
                                                             Billing Support
                                                         </Text>
-                                                        <Image
-                                                            style={styles.chevronIconLayout}
-                                                            resizeMode="cover"
-                                                            source={require("../../../assets/phone-outgoing-01.png")}
-                                                        />
+                                                        <Pressable onPress={() => makeCall('877-692-2253')}>
+                                                            <Image
+                                                                style={styles.chevronIconLayout}
+                                                                resizeMode="stretch"
+                                                                source={require("../../../assets/phone-outgoing-01.png")}
+                                                            />
+                                                        </Pressable>
                                                     </View>
-                                                    <View style={styles.supportingTextWrapper}>
-                                                        <Text
-                                                            style={[
-                                                                styles.supportingText4,
-                                                                styles.support1Typo,
-                                                            ]}
-                                                        >
-                                                            877-692-2253
-                                                        </Text>
-                                                    </View>
-                                                    <Text
-                                                        style={[
-                                                            styles.supportingText5,
-                                                            styles.supportingTypo1,
-                                                        ]}
-                                                    >
+                                                    <Pressable onPress={() => makeCall('877-692-2253')}>
+                                                        <View style={styles.supportingTextWrapper}>
+                                                            <Text style={[styles.supportingText4, styles.support1Typo,]}>
+                                                                877-692-2253
+                                                            </Text>
+                                                        </View>
+                                                    </Pressable>
+                                                    <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
                                                         Want to upgrade your service, make a change, or have a
                                                         billing question? Give us a call for assistance.
                                                     </Text>
-                                                    <Text
-                                                        style={[
-                                                            styles.supportingText6,
-                                                            styles.supportingTypo,
-                                                        ]}
-                                                    >{`Call Center Hours: `}</Text>
-                                                    <Text
-                                                        style={[
-                                                            styles.supportingText7,
-                                                            styles.supportingTypo,
-                                                        ]}
-                                                    >
+                                                    <Text style={[styles.supportingText6, styles.supportingTypo,]}>
+                                                        {`Call Center Hours: `}
+                                                    </Text>
+                                                    <Text style={[styles.supportingText7, styles.supportingTypo,]} >
                                                         M-F 8:00 AM-5:00 PM MST
                                                     </Text>
                                                 </View>
@@ -439,7 +371,6 @@ const Support = () => {
                                     </View>
                                 </View>
                             </View>
-
                         </View>
                         <View style={[styles.issuesFlexBox]} />
                     </View>
@@ -456,7 +387,7 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     textTypoRight: {
-        FontFamily: FontFamily.openSansRegular,
+        fontFamily: FontFamily.openSansRegular,
         fontWeight: 600,/* Corresponds to semi-bold in Open Sans */
         fontSize: FontSize.size_base,
         lineHeight: 20,
@@ -513,7 +444,15 @@ const styles = StyleSheet.create({
     },
     headingTypo: {
         textAlign: "auto",
-        color:Color.colorGray_100,
+        color: Color.colorGray_100,
+        lineHeight: 18,
+        fontSize: FontSize.size_lg,
+        fontFamily: FontFamily.openSansRegular,
+        flex: 1,
+    },
+    headingTypo1: {
+        textAlign: "auto",
+        color: Color.sparklightaddGray,
         lineHeight: 18,
         fontSize: FontSize.size_lg,
         fontFamily: FontFamily.openSansRegular,
@@ -555,7 +494,7 @@ const styles = StyleSheet.create({
     mainContainerChild: {
         position: 'absolute',
         height: '4%',
-        flex:1,
+        flex: 1,
         backgroundColor: "transparent",
         left: 0, // Ensure it takes the full width
         right: 0,
@@ -590,7 +529,7 @@ const styles = StyleSheet.create({
     },
     searchChild: {
         flex: 1,
-        paddingHorizontal: Padding.p_5xl,
+        paddingHorizontal: Padding.p_base,
         paddingVertical: Padding.p_base,
         fontSize: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,

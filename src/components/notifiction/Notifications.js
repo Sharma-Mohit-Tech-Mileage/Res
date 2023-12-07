@@ -28,6 +28,7 @@ const Notifications = () => {
                 { type: 'Billing', status: 'On' },
               ]}
             />
+          <View style={{ marginBottom: Padding.p_base }} />
             {/* Email Notifications Section */}
             <NotificationSection
               title="Email Notifications"
@@ -38,6 +39,7 @@ const Notifications = () => {
                 { type: 'Paperless Billing', status: 'Off' },
               ]}
             />
+          <View style={{ marginBottom: Padding.p_base }} />
             {/* In-App Notifications Section */}
             <NotificationSection
               title="In-App Notifications"
@@ -83,7 +85,7 @@ const NotificationSection = ({
               <View style={styles.infoCircleWrapper}>
                 <Image
                   style={styles.infoCircleIcon}
-                  resizeMode="cover"
+                  resizeMode="stretch"
                   source={require("../../../assets/infocircle.png")}
                   accessible={true}
                   accessibilityLabel="Information Icon"
@@ -137,7 +139,7 @@ const NotificationType = ({ type, status }) => {
     <View style={styles.frameWrapperBorder}>
       <View style={[ styles.parentSpaceBlock]}>
         <Text style={[styles.appointments, styles.subscribedTypo]}>{type}</Text>
-        <View style={[styles.checkCircleParent, { marginRight: displayStatus =='Subscribed' ? 18 : 0 }]}>
+        <View style={[styles.checkCircleParent]}>
           <Image
             style={styles.infoCircleIcon}
             resizeMode="cover"
@@ -171,7 +173,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   notificationsSentFromTypo: {
-    color: Color.colorGray_100,
+    color: Color.colorGray_200,
     marginLeft: 8,
     fontSize: FontSize.textXsSemibold_size,
     textAlign: "left",
@@ -188,10 +190,11 @@ const styles = StyleSheet.create({
   },
   subscribedTypo: {
     fontSize: FontSize.size_base,
-    color: Color.sparklightDarkGray,
+    color: Color.colorGray_200,
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 28,
+    fontWeight:'400'
   },
   textNotifications: {
     fontSize: FontSize.size_3xl,
@@ -200,6 +203,7 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     fontFamily: FontFamily.openSansRegular,
     flex: 1,
+    fontWeight:'400'
   },
   makePayment: {
     fontSize: FontSize.size_xs,

@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   firstTypo: {
     fontSize: FontSize.size_sm,
     textAlign: "left",
-    color: Color.sparklightaddGray,
+    color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "600",
   },

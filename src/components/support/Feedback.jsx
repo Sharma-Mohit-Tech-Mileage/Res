@@ -30,7 +30,7 @@ const Feedback = () => {
                 title="Feedback"
                 onPressBack={() => navigation.navigate('Account')}
             />
-            <ScrollView >
+            <ScrollView style={{marginBottom:'20%'}}>
                 <View style={styles.howWouldYourRateYourExperWrapper}>
                     <Text style={[styles.howWouldYour]}>
                         How would your rate your experience using the Sparklight app?
@@ -70,6 +70,7 @@ const Feedback = () => {
                             multiline={true}
                             maxLength={500}
                             numberOfLines={6} // Set the number of lines
+                            minHeight= {FontSize.size_base * 6 + 16}
                         />
                     </View>
                     <Text style={[styles.text1, styles.text1SpaceBlock]}>
@@ -77,17 +78,17 @@ const Feedback = () => {
                     </Text>
 
                 </View>
+                <View style={styles.buttonContainer}>
+                    <Pressable style={styles.button} onPress={() => navigation.navigate('ThumbsUp')}>
+                        <Text style={styles.buttonText}>Submit Feedback</Text>
+                    </Pressable>
+                </View>
+                <View style={styles.buttonContainer}>
+                    <Pressable onPress={() => navigation.navigate('Account')} >
+                        <Text style={{ color: Color.colorMidnightblue }}>Cancel</Text>
+                    </Pressable>
+                </View>
             </ScrollView>
-            <View style={styles.buttonContainer}>
-                <Pressable style={styles.button} onPress={() => navigation.navigate('ThumbsUp')}>
-                    <Text style={styles.buttonText}>Submit Feedback</Text>
-                </Pressable>
-            </View>
-            <View style={styles.buttonContainer}>
-                <Pressable onPress={() => navigation.navigate('Account')} >
-                    <Text style={{ color: Color.colorMidnightblue }}>Cancel</Text>
-                </Pressable>
-            </View>
         </View>
     );
 };

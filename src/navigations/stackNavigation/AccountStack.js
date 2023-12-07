@@ -124,7 +124,7 @@ function AccountStackScreen() {
                 component={Feedback}
                 options={{ headerShown: false }}
                 listeners={{
-                    focus: () => setTabBarVisible(false),
+                    focus: () => setTabBarVisible(true),
                     blur: () => setTabBarVisible(true)
                 }}
             />
@@ -133,7 +133,7 @@ function AccountStackScreen() {
                 component={ThumbsUp}
                 options={{ headerShown: false }}
                 listeners={{
-                    focus: () => setTabBarVisible(false),
+                    focus: () => setTabBarVisible(true),
                     blur: () => setTabBarVisible(true)
                 }}
             />
