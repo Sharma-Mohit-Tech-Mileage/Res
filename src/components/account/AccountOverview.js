@@ -169,7 +169,7 @@ const AccountOverview = () => {
           </Pressable>
           <Pressable
             style={[styles.buttons, styles.buttonsSpaceBlock1]}
-          // onPress={() => Linking.openURL('https://your-privacy-policy-url.com')}
+              onPress={() => { navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/privacy-policy', name: 'Privacy Policy' }) }}
           >
             <Text style={[{ fontStyle: 'italic', color: Color.gray600 }]}>
               View our Privacy Policy and Terms & Condition

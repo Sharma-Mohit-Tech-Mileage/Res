@@ -3,8 +3,6 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
 import WebView from 'react-native-webview';
 const { width, height } = Dimensions.get('window');
-
-
 const ArticalWindowUtility = ({ navigation, route }) => {
     const [progress, setProgress] = useState(0);
     const [name, setTitle] = useState(route.params?.name);

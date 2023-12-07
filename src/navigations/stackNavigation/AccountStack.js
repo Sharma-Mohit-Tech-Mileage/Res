@@ -13,6 +13,7 @@ import UserManagement from '../../components/userManagement/UserManagement';
 import UserManagementEdit from '../../components/userManagement/UserManagementEdit';
 import Feedback from '../../components/support/Feedback';
 import ThumbsUp from '../../components/support/ThumbsUp';
+import ArticalWindowUtility from '../../components/utility/ArticalWindowUtility';
 import { useTabBarVisibility } from '../TabBarVisibilityContext';
 const AccountStack = createStackNavigator();
 function AccountStackScreen() {
@@ -119,6 +120,18 @@ function AccountStackScreen() {
                 }}
             />
             {/* Add other account-related screens here, if any */}
+            <AccountStack.Screen
+                name="ArticalWindowUtility"
+                component={ArticalWindowUtility}
+                options={{
+                    headerBackVisible: false,
+                    headerShown: false
+                }}
+                listeners={{
+                    focus: () => setTabBarVisible(true),
+                    blur: () => setTabBarVisible(true)
+                }}
+            />
             <AccountStack.Screen
                 name="Feedback"
                 component={Feedback}

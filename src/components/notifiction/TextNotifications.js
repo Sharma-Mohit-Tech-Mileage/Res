@@ -56,7 +56,6 @@ const TextNotifications = ({ navigation }) => {
                                 </Text>
                             </View>
                         </View>
-
                         <View style={styles.frameChild} />
                         <View style={styles.frameGroup}>
                             <View style={styles.frameParent3}>
@@ -250,7 +249,7 @@ const styles = StyleSheet.create({
         lineHeight: 22,
     },
     frameWrapper2: {
-        paddingVertical: Padding.p_5xs,
+        //paddingVertical: Padding.p_5xs,
         flexDirection: "row",
         alignItems: "center",
         flex: 1,
@@ -283,7 +282,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         alignSelf: "stretch",
-        paddingVertical: Padding.p_5xs,
+        paddingVertical: Padding.p_base,
         paddingHorizontal: Padding.p_base,
     },
     makePayment: {
