@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        marginTop: wp("23.5%"),
+        //marginTop: wp("23.5%"),
     },
     bottomButtonsWrapper: {
         borderTopWidth: 1,
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     },
     searchContainer: {
         width: '100%', // Ensure the container takes full width
-        top: '13.5%'
+       // top: '13.5%'
     },
     buttonText: {
         marginLeft: 10,

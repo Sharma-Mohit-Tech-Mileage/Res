@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Linking,
-  Alert,
+  
 } from "react-native";
 
 import colors from "../../res/Colors";
@@ -17,10 +17,10 @@ import TimerInfo from "../../res/svgIcons/TimerInfo";
 import strings from "../../res/Strings";
 import { getCurrentSpeed } from "../../redux/actions/DashboardAction";
 import { useDispatch, useSelector } from "react-redux";
-import { getUser } from "../../redux/utils/LocalStorage";
-import WebViewModal from "./customui/WebViewModal";
-import { GetApiRequest } from "../../network/APIClient";
+import { getUser } from "../../redux/utils/LocalStorage"
+import SpeedTestModal from "./customui/SpeedTestModal";
 import moment from "moment";
+
 
 const DataSpeedComponent = () => {
   const dispatch = useDispatch();
@@ -28,47 +28,50 @@ const DataSpeedComponent = () => {
 
   const toggleModal = () => {
     setShowModal(!showModal);
-    getCurrentSpeed();
+    setSpeed(false);
+    getUser().then((res) => {
+      dispatch(getCurrentSpeed(res.userInfo.accountNumber));
+    });
   };
+
+ 
 
   const [download, setDownload] = useState(0);
   const [upload, setUpload] = useState(0);
   const [downloadFrac, setDownloadFrac] = useState(0);
   const [uploadFrac, setUploadFrac] = useState(0);
   const [speed, setSpeed] = useState(false);
-  const [testDate, setTestDate] = useState(0);
+  const [testDate, setTestDate]=useState(0)
+  useSelector((state) => {
 
-  const getCurrentSpeed = () => {
-    let re = getUser().then((res) => {
-      const request = `/Internet/api/internet/${res.userInfo.accountNumber}/speedTest/Get`;
-      GetApiRequest(request, onSuccess, onError);
-    });
-  };
-  const onSuccess = (res) => {
-    console.log("getCurrentSpeed", res);
-    if (res) {
-      let downloadSpeed = res.download_Kbps;
-      let uploadSpeed = res.upload_Kbps;
-      let date = res.createdOn;
-      let speedInMbps_download = (downloadSpeed / 1024).toFixed(2);
-      let speedInMbps_upload = (uploadSpeed / 1024).toFixed(2);
-      let upl = speedInMbps_upload.toString().split(".");
-      let downl = speedInMbps_download.toString().split(".");
-      const format1 = "DD/MM/YY hh:mma";
-      setTestDate(moment(date).format(format1));
-      setDownload(downl[0]);
-      setDownloadFrac(downl[1]);
-      setUploadFrac(upl[1]);
-      setSpeed(true);
+    if (Object.hasOwn(state.combinedReducers.home.speed,"download_Kbps")) {
+      let downloadSpeed = state.combinedReducers.home.speed.download_Kbps;
+        let uploadSpeed = state.combinedReducers.home.speed.upload_Kbps;
+        let date = state.combinedReducers.home.speed.createdOn;
+        let speedInMbps_download = (downloadSpeed / 1000).toFixed(2);
+        let speedInMbps_upload = (uploadSpeed / 1000).toFixed(2);
+        let upl = speedInMbps_upload.toString().split(".");
+        let downl = speedInMbps_download.toString().split(".");
+      if (!speed) {
+        const format1 = "YYYY-MM-DD hh:mm a"
+        setTestDate(moment(date).format(format1))
+        setDownload(downl[0]);
+        setUpload(upl[0]);
+        setDownloadFrac(downl[1]);
+        setUploadFrac(upl[1]);
+        setSpeed(true);
+      }
     }
-  };
+    
+  });
 
-  const onError = (error) => {
-    console.log("error", error);
-  };
   useEffect(() => {
-    getCurrentSpeed();
-  }, []);
+    if (!speed) {
+      getUser().then((res) => {
+        dispatch(getCurrentSpeed(res.userInfo.accountNumber));
+      });
+    }
+  }, [showModal]);
 
   const TestSpeedResultSection = () => {
     return (
@@ -245,10 +248,9 @@ const DataSpeedComponent = () => {
       </TouchableOpacity>
 
       {showModal && (
-        <WebViewModal
-          url="https://cableone.speedtestcustom.com/"
-          onClose={() => toggleModal()}
-          onNavigationStateChange={(event) => testCompleted(event)}
+        <SpeedTestModal
+          url="https://cableone.speedtestcustom.com/" 
+          onClose={()=>toggleModal()}
         />
       )}
     </View>

@@ -73,7 +73,9 @@ const PasswordSecurityEdit = () => {
                     ].map((point, index) => (
                       <View key={`point-${index}`} style={styles.bulletPointContainer}>
                         <Text style={styles.bulletPoint}>•</Text>
-                        <Text style={styles.itMustBe}>{point}</Text>
+                        <Text style={[styles.itMustBe, {
+                          color: Color.sparklightGray1,
+                          fontWeight: '400'}]}>{point}</Text>
                       </View>
                     ))}
                   </View>
@@ -100,6 +102,18 @@ const PasswordSecurityEdit = () => {
                       />
                     </View>
                   </View>
+                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                  <View style={styles.textinput}>
+                    <Text style={[styles.firstName1, styles.firstTypo]} accessibilityRole="header">
+                      Type your Question
+                    </Text>
+                    <SparkLightInput
+                      placeholder="Enter text here"
+                      accessibilityLabel="Password Reset Answer Input Field"
+                      accessibilityHint="Input the answer for your security question"
+                    />
+                  </View>
+                </View>
                   <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                     <View style={styles.textinput}>
                       <Text style={[styles.firstName1, styles.firstTypo]} accessibilityRole="header">
@@ -157,11 +171,13 @@ const styles = StyleSheet.create({
   },
   bulletPoint: {
     marginRight: 10, // Space between bullet and text
+    color:Color.sparklightGray1,
+    fontWeight:'400'
   },
   passwordFlexBox: {
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     flex: 1,
   },
   firstTypo: {
@@ -238,7 +254,7 @@ const styles = StyleSheet.create({
   },
   itMustBe: {
     lineHeight: 19,
-    fontSize: FontSize.textXsSemibold_size,
+    fontSize: FontSize.size_xs,
   },
   itMustBeDifferentThanYourWrapper: {
     alignItems: "center",
@@ -295,8 +311,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   passwordSecurityEditInner: {
-    top: 100,
-    paddingTop: Padding.p_base,
+    paddingVertical:Padding.p_5xl,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",

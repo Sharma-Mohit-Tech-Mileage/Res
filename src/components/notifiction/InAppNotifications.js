@@ -1,5 +1,5 @@
 import { useState } from "react"; 
-import { Image, StyleSheet, Text, Pressable, View } from "react-native";
+import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontSize, FontFamily, Padding, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
@@ -21,6 +21,7 @@ const InAppNotifications = () => {
         accessibilityLabel="Back to Account"
         accessibilityHint="Navigates back to the Notifications screen"
       />
+      <ScrollView>
       <View style={styles.inAppNotificationsInner}>
         <View style={styles.frameParent} accessible >
           <View style={[styles.frameGroup, styles.frameBorder]}>
@@ -63,6 +64,7 @@ const InAppNotifications = () => {
           </View>
         </View>
       </View>
+      </ScrollView>
     </View>
   );
 };
@@ -105,7 +107,7 @@ const styles = StyleSheet.create({
   },
   receiveTypo: {
     fontSize: FontSize.textXsSemibold_size,
-    color: Color.colorGray_100,
+    color: Color.sparklightaddGray,
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
     alignSelf: "stretch",
@@ -138,7 +140,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   appointments: {
-    color: Color.sparklightGray1,
+    color: Color.colorGray_100,
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
@@ -197,7 +199,6 @@ const styles = StyleSheet.create({
   },
   makePayment: {
     color: Color.sparklightWhite,
-    width: 282,
   },
   buttons: {
     backgroundColor: Color.colorMidnightblue,
@@ -209,20 +210,16 @@ const styles = StyleSheet.create({
     marginTop: 16,
     backgroundColor: Color.colorWhitesmoke_200,
     paddingHorizontal: 0,
-    width: '100%',
   },
   buttonsParent: {
     marginTop: 16,
     alignSelf: "stretch",
   },
   inAppNotificationsInner: {
-    top: 100,
-    paddingTop: Padding.p_base,
+    paddingTop: Padding.p_5xl,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     width: '100%',
-    left: 0,
-    position: "absolute",
     overflow: "hidden",
   },
   inAppNotifications: {

@@ -5,7 +5,6 @@ import { Color, Padding, FontSize, FontFamily, Border } from "../../../GlobalSty
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 const PasswordSecurity = () => {
   const navigation = useNavigation();
-
   return (
     <View style={styles.passwordSecurity}>
       <ProfileSettingsHeader
@@ -21,12 +20,7 @@ const PasswordSecurity = () => {
             </Text>
             <Pressable
               style={[styles.buttons, styles.buttonsBg]}
-
               onPress={() => navigation.navigate("PasswordSecurityEdit")}
-              accessible={true}
-              accessibilityLabel="Edit Password"
-              accessibilityRole="button"
-              accessibilityHint="Navigate to PasswordSecurityEdit to edit password"
             >
               <Text style={[styles.makePayment, styles.titleFlexBox]}>
                 Edit
@@ -47,7 +41,7 @@ const PasswordSecurity = () => {
             </View>
             <View style={styles.frameContainerSpaceBlock}>
               <View style={[styles.securityQuestionWrapper, styles.tabsFlexBox]}>
-                <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header">
+                <Text style={[styles.password, styles.passwordFlexBox]}>
                   Security Question
                 </Text>
               </View>
@@ -56,7 +50,7 @@ const PasswordSecurity = () => {
                   <Text style={[styles.passwordFlexBox]}>
                     Name of your first pet?
                   </Text>
-                  <Text style={[styles.text, styles.passwordFlexBox]} accessibilityRole="text">
+                  <Text style={[styles.text, styles.passwordFlexBox]}>
                     ******
                   </Text>
                 </View>
@@ -161,8 +155,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   passwordSecurityInner: {
-    top: 100,
-    paddingTop: Padding.p_base,
+    paddingTop: Padding.p_5xl,
   },
   passwordSecurity: {
     backgroundColor: Color.colorWhitesmoke_200,

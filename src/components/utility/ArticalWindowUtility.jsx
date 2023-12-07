@@ -3,8 +3,6 @@ import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
 import WebView from 'react-native-webview';
 const { width, height } = Dimensions.get('window');
-
-
 const ArticalWindowUtility = ({ navigation, route }) => {
     const [progress, setProgress] = useState(0);
     const [name, setTitle] = useState(route.params?.name);
@@ -33,9 +31,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         <View style={{ flex: 1 }}>
             <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />
             {progress < 1 ? (
-                <View style={{ ...styles.progressBar, marginTop: '23%' }}>
+                <View style={{ ...styles.progressBar}}>
                     <View style={{ ...styles.progress, width: `${progress * 100}%` }} />
-                </View>) : (<View style={{ marginTop: '20%' }}>
+                </View>) : (<View >
                 </View>)}
             {modalOpen && (
 
@@ -52,6 +50,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     <Text style={styles.errorText}>Failed to load. Please try again later.</Text>
                 </View>
             ) : null}
+            
         </View>
     );
 };

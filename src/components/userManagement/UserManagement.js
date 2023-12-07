@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, Pressable, View, SafeAreaView, ScrollView } fr
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
+import { ROLE_COLORS } from '../utility/constant';
 
 const UserManagement = () => {
 
@@ -19,124 +20,131 @@ const UserManagement = () => {
     {
       initials: 'TN',
       name: 'Taylor Nickum',
-      status:null,
+      status: null,
       username: 'Taylor123',
       memberType: 'ADMIN',
       email: 'taylor123@gmail.com',
     },
+    {
+      initials: 'KK',
+      name: 'Kapil Kumar',
+      status: null,
+      username: 'Taylor123',
+      memberType: 'VIEW ONLY',
+      email: 'kumark@gmail.com',
+    }
     // Add more user objects as needed
   ];
-  const renderUserCard = (user) => (
-    <View style={[styles.frameParent3, styles.frameBorder]}>
-      <View style={[styles.frameParent1, styles.navigationBorder]}>
-        <View style={styles.rightActionableParent}>
-          <View style={[styles.rightActionable1, styles.rightLayout]}>
-            <View style={styles.avatarContrastInnerBorder} />
-            <Text style={[styles.text, styles.textClr]}>{user.initials}</Text>
-          </View>
-          <View>
-          <Text style={[styles.taylorNickum, styles.melissaSmithTypo]}>
-            {user.name}
-          </Text>
-            {user.status && (
-              <View style={styles.userParent}>
-              <Text style={[styles.loggedIn, styles.usersFlexBox]}>
-                {user.status}
+  const renderUserCard = (user) => {
+    const normalizedRole = user.memberType.replace(/\s+/g, '').toLowerCase();
+    const avatarColor = ROLE_COLORS[normalizedRole] || Color.sparklightGreen;
+    return (
+      <View style={[styles.frameParent3, styles.frameBorder]}>
+        <View style={[styles.frameParent1, styles.navigationBorder]}>
+          <View style={styles.rightActionableParent}>
+            <View style={[{ backgroundColor: avatarColor }, styles.rightLayout]}>
+              <View style={styles.avatarContrastInnerBorder} />
+              <Text style={[styles.text, styles.textClr]}>{user.initials}</Text>
+            </View>
+            <View>
+              <Text style={[styles.taylorNickum, styles.melissaSmithTypo]}>
+                {user.name}
               </Text>
-              </View>
-            )}
-          </View>
-        </View>
-        <View style={styles.frameParent2}>
-          <Pressable
-            style={styles.rightFlexBox}
-            onPress={() => navigation.navigate("UserManagementEdit")}
-          >
-            <Image
-              style={styles.rightActionableIcon}
-              resizeMode="cover"
-              source={require("../../../assets/right-actionable5.png")}
-            />
-          </Pressable>
-          <Pressable
-            style={[
-              styles.rightActionableContainer,
-              styles.rightFlexBox,
-            ]}
-            onPress={() => navigation.navigate("UserManagementEdit")}
-          >
-            <Image
-              style={styles.rightActionableIcon}
-              resizeMode="cover"
-              source={require("../../../assets/right-actionable6.png")}
-            />
-          </Pressable>
-        </View>
-      </View>
-      <View style={styles.frameWrapper}>
-        <View style={styles.usernameParent}>
-          <Text style={[styles.username, styles.usersFlexBox]}>
-            Username
-          </Text>
-          <Text style={styles.melsmith}>{user.username}</Text>
-        </View>
-      </View>
-      <View style={styles.frameWrapper}>
-        <View style={styles.usernameParent}>
-          <Text style={[styles.username, styles.usersFlexBox]}>
-            Member Type
-          </Text>
-          <View style={styles.badgeWrapper}>
-            <View style={[user.memberType === 'PRIMARY ADMIN' ? styles.badge : styles.badge1, styles.badgeBorder]}>
-              <Text style={[styles.text3, styles.textTypo]}>
-                {user.memberType}
-              </Text>
-
+              {user.status && (
+                <View style={styles.userParent}>
+                  <Text style={[styles.loggedIn, styles.usersFlexBox]}>
+                    {user.status}
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
+          {/* <View style={styles.frameParent2}>
+            <Pressable
+              style={styles.rightFlexBox}
+              onPress={() => navigation.navigate("UserManagementEdit")}
+            >
+              <Image
+                style={styles.rightActionableIcon}
+                resizeMode="cover"
+                source={require("../../../assets/right-actionable5.png")}
+              />
+            </Pressable>
+            <Pressable style={[styles.rightActionableContainer,styles.rightFlexBox, ]}
+              onPress={() => navigation.navigate("UserManagementEdit")}
+            >
+              <Image
+                style={styles.rightActionableIcon}
+                resizeMode="cover"
+                source={require("../../../assets/right-actionable6.png")}
+              />
+            </Pressable>
+          </View> */}
+        </View>
+        <View style={styles.frameWrapper}>
+          <View style={styles.usernameParent}>
+            <Text style={[styles.username, styles.usersFlexBox]}>
+              Username
+            </Text>
+            <Text style={styles.melsmith}>{user.username}</Text>
+          </View>
+        </View>
+        <View style={styles.frameWrapper}>
+          <View style={styles.usernameParent}>
+            <Text style={[styles.username, styles.usersFlexBox]}>
+              Member Type
+            </Text>
+            <View style={styles.badgeWrapper}>
+              <View style={[user.memberType === 'PRIMARY ADMIN' ? styles.badge : styles.badge1, styles.badgeBorder]}>
+                <Text style={[styles.text3]}>
+                  {user.memberType}
+                </Text>
 
+              </View>
+            </View>
+
+          </View>
+        </View>
+        <View style={[styles.frameWrapper2, styles.frameSpaceBlock]}>
+          <View style={styles.usernameParent}>
+            <Text style={[styles.username, styles.usersFlexBox]}>
+              Email
+            </Text>
+            <Text style={styles.melsmith}>{user.email}</Text>
+          </View>
         </View>
       </View>
-      <View style={[styles.frameWrapper2, styles.frameSpaceBlock]}>
-        <View style={styles.usernameParent}>
-          <Text style={[styles.username, styles.usersFlexBox]}>
-            Email
-          </Text>
-          <Text style={styles.melsmith}>{user.email}</Text>
-        </View>
-      </View>
-    </View>
-  );
+    )
+  };
   return (
-
     <View style={{ flex: 1 }}>
       <ProfileSettingsHeader
         title="User Management"
         onPressBack={() => navigation.navigate('Account')}
       />
-        <ScrollView>
-          <View style={[styles.frameParent, styles.frameSpaceBlock1]}>
-            <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
-              <View style={[styles.usersParent, styles.frameGroupSpaceBlock]}>
-                <Text style={[styles.users, styles.usersFlexBox]}>Users</Text>
-                <Pressable
+      <ScrollView>
+        <View style={[styles.frameParent, styles.frameSpaceBlock1]}>
+          <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
+            <View style={[styles.usersParent, styles.frameGroupSpaceBlock]}>
+              <Text style={[styles.users, styles.usersFlexBox]}>Users</Text>
+              {/* <Pressable
                   style={[styles.buttons, styles.buttonsBg]}
                   onPress={() => navigation.navigate("UserManagementEdit")}
                 >
                   <Text style={[styles.makePayment, styles.textClr]}>Add User</Text>
-                </Pressable>
-              </View>
-              <View style={styles.frameContainer}>
-                {users.map((user, index) => (
-                  <React.Fragment key={index}>
-                    {renderUserCard(user)}
-                  </React.Fragment>
-                ))}
-              </View>
+                </Pressable> */}
             </View>
-            <View style={styles.frameChild} />
+            <View style={styles.frameContainer}>
+              {users.map((user, index) => (
+                <React.Fragment key={index}>
+                  {renderUserCard(user)}
+                </React.Fragment>
+              ))}
+            </View>
           </View>
-        </ScrollView>
+          <View style={styles.frameChild} />
+        </View>
+      </ScrollView>
     </View>
 
   );
@@ -328,21 +336,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
   },
- 
-  badgeWrapper: {
-    marginTop: 2,
-    alignItems: "center",
-    flexDirection: "row",
-  },
+
   frameWrapper2: {
     borderBottomRightRadius: Border.br_11xs,
     borderBottomLeftRadius: Border.br_11xs,
     justifyContent: "center",
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_5xl,
-  },
-  rightActionable1: {
-    backgroundColor: Color.sparklightBrightPurple,
   },
   taylorNickum: {
     marginLeft: 8,
@@ -352,6 +352,10 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansSemiBold,
     textAlign: "center",
+    lineHeight: 18,
+    fontSize: FontSize.size_xs,
+    fontWeight: "600",
+
   },
   badge: {
     backgroundColor: Color.success50,
@@ -393,8 +397,7 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   frameParent: {
-    top: 100,
-    paddingTop: Padding.p_base,
+    paddingTop: Padding.p_5xl,
     width: '100%',
     marginBottom: 200
   },

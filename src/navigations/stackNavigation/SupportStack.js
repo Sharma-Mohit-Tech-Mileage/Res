@@ -5,8 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import supportScreen from '../../components/support/supportScreen';
 import Search from '../../components/support/Search';
 import CreateTicket from '../../components/support/CreateTicket';
-import Feedback from '../../components/support/Feedback';
-import ThumbsUp from '../../components/support/ThumbsUp';
+import ArticalWindowUtility from '../../components/utility/ArticalWindowUtility';
 import TicketSupport from '../../components/support/TicketSupport';
 import TicketView from '../../components/support/TicketView';
 import ManageEquipment from '../../components/support/ManageEquipment';
@@ -30,7 +29,7 @@ function SupportStackScreen() {
             <SupportStack.Screen
                 name="searchArticals"
                 component={Search}
-                options={{ headerShown: false, presentation: 'modal' }}
+                options={{ headerShown: false }}
                 listeners={{
                     focus: () => setTabBarVisible(true),
                     blur: () => setTabBarVisible(true)
@@ -58,6 +57,18 @@ function SupportStackScreen() {
                 name="TicketView"
                 component={TicketView}
                 options={{ headerShown: false,  }}
+                listeners={{
+                    focus: () => setTabBarVisible(true),
+                    blur: () => setTabBarVisible(true)
+                }}
+            />
+            <SupportStack.Screen
+                name="ArticalWindowUtility"
+                component={ArticalWindowUtility}
+                options={{
+                    headerBackVisible: false,
+                    headerShown: false
+                }}
                 listeners={{
                     focus: () => setTabBarVisible(true),
                     blur: () => setTabBarVisible(true)

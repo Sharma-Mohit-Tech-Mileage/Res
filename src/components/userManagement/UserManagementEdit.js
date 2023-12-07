@@ -1,374 +1,268 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, Pressable, View } from "react-native";
+import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontFamily, Padding, Color, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import SparkLightInput from '../common/customui/SparkLightInput';
-import { ScrollView } from "react-native-gesture-handler";
 
 const UserManagementEdit = () => {
   const navigation = useNavigation();
 
   return (
-   
-      <View style={styles.userManagementEdit}>
-        <ProfileSettingsHeader
-          title="Edit User"
-          onPressBack={() => navigation.navigate('UserManagement')}
-          accessibilityLabel="Go back to User Management"
-          accessibilityRole="button"
-          accessibilityHint="Navigates back to the User Management screen"
-        />
+
+    <View style={styles.userManagementEdit}>
+      <ProfileSettingsHeader
+        title="Edit User"
+        onPressBack={() => navigation.navigate('UserManagement')}
+        accessibilityLabel="Go back to User Management"
+        accessibilityRole="button"
+        accessibilityHint="Navigates back to the User Management screen"
+      />
       <ScrollView>
         <View style={[styles.userManagementEditInner]}>
-            <View style={styles.frameWrapper}>
-              <View
-                style={[styles.frameGroup, styles.textinputWrapperSpaceBlock]}
-              >
-                <View style={styles.generalInformationWrapper}>
-                  <Text style={[styles.generalInformation, styles.firstClr]}>
-                    General Information
-                  </Text>
-                </View>
+          <View style={styles.frameWrapper}>
+            <View style={[styles.frameGroup, styles.textinputWrapperSpaceBlock]} >
+              <View style={styles.generalInformationWrapper}>
+                <Text style={[styles.generalInformation, styles.firstClr]}>
+                  General Information
+                </Text>
+              </View>
+              <View style={styles.frameWrapper}>
                 <View style={styles.frameWrapper}>
-                  <View style={styles.frameWrapper}>
-                    <View
-                      style={[
-                        styles.textinputWrapper,
-                        styles.textinputWrapperSpaceBlock,
-                      ]}
-                    >
-                      <View style={styles.textinput}>
-                        <Text style={[styles.firstName, styles.firstClr]}>
-                          First Name
-                        </Text>
-                        <SparkLightInput
-                          placeholder="Enter text here"
-                          accessibilityLabel="First Name Input Field"
-                          accessibilityHint="Input field for the First name"
-                        />
-                      </View>
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]} >
+                    <View style={styles.textinput}>
+                      <Text style={[styles.firstName, styles.firstClr]}>
+                        First Name
+                      </Text>
+                      <SparkLightInput placeholder="Enter text here" />
                     </View>
-                    <View
-                      style={[
-                        styles.textinputWrapper,
-                        styles.textinputWrapperSpaceBlock,
-                      ]}
-                    >
-                      <View style={styles.textinput}>
-                        <Text style={[styles.firstName, styles.firstClr]}>
-                          Last Name
-                        </Text>
-                        <SparkLightInput
-                          placeholder="Enter text here"
-                          accessibilityLabel="Last Name Input Field"
-                          accessibilityHint="Input field for the Last name"
-                        />
-                      </View>
+                  </View>
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]}>
+                    <View style={styles.textinput}>
+                      <Text style={[styles.firstName, styles.firstClr]}>
+                        Last Name
+                      </Text>
+                      <SparkLightInput placeholder="Enter text here" />
                     </View>
-                    <View
-                      style={[
-                        styles.textinputWrapper,
-                        styles.textinputWrapperSpaceBlock,
-                      ]}
-                    >
-                      <View style={styles.textinput}>
-                        <Text style={[styles.firstName, styles.firstClr]}>
-                          Username
-                        </Text>
-
-                        <SparkLightInput
-                          placeholder="Enter text here"
-                          accessibilityLabel="User Name Input Field"
-                          accessibilityHint="Input field for the User name"
-                        />
-                      </View>
+                  </View>
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]} >
+                    <View style={styles.textinput}>
+                      <Text style={[styles.firstName, styles.firstClr]}>
+                        Username
+                      </Text>
+                      <SparkLightInput placeholder="Enter text here" />
                     </View>
-                    <View
-                      style={[
-                        styles.textinputWrapper,
-                        styles.textinputWrapperSpaceBlock,
-                      ]}
-                    >
-                      <View style={styles.textinput}>
-                        <Text style={[styles.firstName, styles.firstClr]}>
-                          Member Type
-                        </Text>
-                        <View style={styles.notifications}>
-                          <Image
-                            style={styles.notificationsChild}
-                            resizeMode="cover"
-                            source={require("../../../assets/rectangle-5281.png")}
-                          />
-                          <View style={styles.bannerWarning}>
-                            <View style={styles.rightActionableParent}>
-                              <Image
-                                style={styles.rightIconLayout}
-                                resizeMode="cover"
-                                source={require("../../../assets/right-actionable3.png")}
-                              />
-                              <View style={styles.creditCardWillExpireSoonParent}>
-                                <Text style={styles.creditCardWill}>Admin</Text>
-                                <Text
-                                  style={[
-                                    styles.yourSavedCard,
-                                    styles.taylorTypo,
-                                  ]}
-                                >
-                                  Users added here will have full access to My
-                                  Account, which includes the power to add, edit
-                                  and delete accounts.
+                  </View>
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]} >
+                    <View style={styles.textinput}>
+                      <Text style={[styles.firstName, styles.firstClr]}>
+                        Member Type
+                      </Text>
+                      <View style={styles.notifications}>
+                        <Image
+                          style={{ height: '100%' }}
+                          resizeMode="stretch"
+                          source={require("../../../assets/rectangle-5281.png")}
+                        />
+                        <View style={styles.bannerWarning}>
+                          <View style={styles.rightActionableParent}>
+                            <Image
+                              style={styles.rightIconLayout}
+                              resizeMode="stretch"
+                              source={require("../../../assets/right-actionable3.png")}
+                            />
+                            <View style={styles.creditCardWillExpireSoonParent}>
+                              <Text style={styles.creditCardWill}>Admin</Text>
+                              <Text style={[styles.yourSavedCard, styles.taylorTypo,]} >
+                                Users added here will have full access to My
+                                Account, which includes the power to add, edit
+                                and delete accounts.
+                              </Text>
+                              <View style={styles.buttons}>
+                                <Text style={styles.makePayment}>
+                                  Change Primary Admin
                                 </Text>
-                                <View style={styles.buttons}>
-                                  <Text style={styles.makePayment}>
-                                    Change Primary Admin
-                                  </Text>
-                                </View>
                               </View>
                             </View>
-                            <Image
-                              style={[
-                                styles.rightActionableIcon1,
-                                styles.rightIconLayout,
-                              ]}
-                              resizeMode="cover"
-                              source={require("../../../assets/right-actionable4.png")}
-                            />
                           </View>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                  <View
-                    style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}
-                  >
-                    <View style={styles.frameChild} />
-                  </View>
-                  <View style={styles.frameParent1}>
-                    <View style={styles.contactInformationWrapper}>
-                      <Text style={[styles.generalInformation, styles.firstClr]}>
-                        Contact Information
-                      </Text>
-                    </View>
-                    <View
-                      style={[
-                        styles.textinputWrapper,
-                        styles.textinputWrapperSpaceBlock,
-                      ]}
-                    >
-                      <View style={styles.textinput}>
-                        <Text style={[styles.firstName, styles.firstClr]}>
-                          Email
-                        </Text>
-
-                        <SparkLightInput
-                          placeholder="Enter text here"
-                          accessibilityLabel="Email Input Field"
-                          accessibilityHint="Input field for the Email"
-                        />
-                      </View>
-                    </View>
-                  </View>
-                  <View
-                    style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}
-                  >
-                    <View style={styles.frameChild} />
-                  </View>
-                  <View style={styles.frameParent1}>
-                    <View style={styles.contactInformationWrapper}>
-                      <Text style={[styles.generalInformation, styles.firstClr]}>
-                        Password
-                      </Text>
-                    </View>
-                    <View
-                      style={[
-                        styles.textinputWrapper,
-                        styles.textinputWrapperSpaceBlock,
-                      ]}
-                    >
-                      <View style={styles.textinput}>
-                        <Text style={[styles.firstName, styles.firstClr]}>
-                          New Password
-                        </Text>
-
-                        <SparkLightInput
-                          placeholder="Enter text here"
-                          accessibilityLabel="Email Input Field"
-                          accessibilityHint="Input field for the Email"
-                        />
-                      </View>
-                    </View>
-                    <View style={[styles.itMustBeDifferentThanYourWrapper, styles.wrapperSpaceBlock]}>
-                      <View style={styles.passwordFlexBox}>
-                        {[
-                          "It must be different than your user name.",
-                          "It must contain 8 to 20 characters.",
-                          "It must include an upper and lower case letter and a number.",
-                          "You may include special characters %,&,_,?,#,=,-.",
-                          "Your new password cannot have any spaces."
-                        ].map((point, index) => (
-                          <View key={`point-${index}`} style={styles.bulletPointContainer}>
-                            <Text style={styles.bulletPoint}>•</Text>
-                            <Text style={styles.itMustBe}>{point}</Text>
-                          </View>
-                        ))}
-                      </View>
-                    </View>
-                    <View
-                      style={[
-                        styles.textinputWrapper4,
-                        styles.textinputWrapperSpaceBlock,
-                      ]}
-                    >
-                      <View style={styles.textinput}>
-                        <Text style={[styles.firstName, styles.firstClr]}>
-                          Password Reset Question
-                        </Text>
-                        <View
-                          style={[
-                            styles.favoriteAuthorParent,
-                            styles.wrapperBorder,
-                          ]}
-                        >
-                          <Text
-                            style={[styles.favoriteAuthor, styles.taylorTypo]}
-                          >
-                            Favorite Author
-                          </Text>
-                          <Image
-                            style={[
-                              styles.chevronDownIcon,
-                              styles.chevronIconLayout,
-                            ]}
-                            resizeMode="cover"
-                            source={require("../../../assets/chevrondown.png")}
+                          <Image style={[styles.rightActionableIcon1, styles.rightIconLayout,]}
+                            resizeMode="stretch"
+                            source={require("../../../assets/right-actionable4.png")}
                           />
                         </View>
                       </View>
                     </View>
-                    <View
-                      style={[
-                        styles.textinputWrapper4,
-                        styles.textinputWrapperSpaceBlock,
-                      ]}
-                    >
-                      <View style={styles.textinput}>
-                        <Text style={[styles.firstName, styles.firstClr]}>
-                          Password Reset Answer
-                        </Text>
-                        <View
-                          style={[styles.taylorWrapper, styles.wrapperBorder]}
-                        >
-                          <Text style={[styles.taylor, styles.taylorTypo]}>
-                            Someone
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
+                  </View>
+                </View>
+                <View style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]} >
+                  <View style={styles.frameChild} />
+                </View>
+                <View style={styles.frameParent1}>
+                  <View style={styles.contactInformationWrapper}>
+                    <Text style={[styles.generalInformation, styles.firstClr]}>
+                      Contact Information
+                    </Text>
                   </View>
                   <View
-                    style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}
+                    style={[
+                      styles.textinputWrapper,
+                      styles.textinputWrapperSpaceBlock,
+                    ]}
                   >
-                    <View style={styles.frameChild} />
-                  </View>
-                  <View style={styles.frameParent1}>
-                    <View style={styles.contactInformationWrapper}>
-                      <Text style={[styles.generalInformation, styles.firstClr]}>
-                        Security Question
+                    <View style={styles.textinput}>
+                      <Text style={[styles.firstName, styles.firstClr]}>
+                        Email
                       </Text>
+                      <SparkLightInput
+                        placeholder="Enter text here"
+                        accessibilityLabel="Email Input Field"
+                        accessibilityHint="Input field for the Email"
+                      />
                     </View>
-                    <View
-                      style={[
-                        styles.textinputWrapper,
-                        styles.textinputWrapperSpaceBlock,
-                      ]}
-                    >
-                      <View style={styles.textinput}>
-                        <Text style={[ styles.firstClr]}>
-                          Password Reset Question
-                        </Text>
-                        <View
-                          style={[
-                            styles.favoriteAuthorParent,
-                            styles.wrapperBorder,
-                          ]}
-                        >
-                          <Text
-                            style={[styles.favoriteAuthor, styles.taylorTypo]}
-                          >
-                            Favorite Author
-                          </Text>
-                          <Image
-                            style={[
-                              styles.chevronDownIcon,
-                              styles.chevronIconLayout,
-                            ]}
-                            resizeMode="cover"
-                            source={require("../../../assets/chevrondown.png")}
-                          />
+                  </View>
+                </View>
+                <View style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]} >
+                  <View style={styles.frameChild} />
+                </View>
+                <View style={styles.frameParent1}>
+                  <View style={styles.contactInformationWrapper}>
+                    <Text style={[styles.generalInformation, styles.firstClr]}>
+                      Password
+                    </Text>
+                  </View>
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]}>
+                    <View style={styles.textinput}>
+                      <Text style={[styles.firstName, styles.firstClr]}>
+                        New Password
+                      </Text>
+                      <SparkLightInput placeholder="Enter text here" />
+                    </View>
+                  </View>
+                  <View style={[styles.itMustBeDifferentThanYourWrapper, styles.wrapperSpaceBlock]}>
+                    <View style={styles.passwordFlexBox}>
+                      {[
+                        "It must be different than your user name.",
+                        "It must contain 8 to 20 characters.",
+                        "It must include an upper and lower case letter and a number.",
+                        "You may include special characters %,&,_,?,#,=,-.",
+                        "Your new password cannot have any spaces."
+                      ].map((point, index) => (
+                        <View key={`point-${index}`} style={styles.bulletPointContainer}>
+                          <Text style={styles.bulletPoint}>•</Text>
+                          <Text style={[styles.itMustBe, {
+                            color: Color.sparklightGray1,
+                            fontWeight: '400'
+                          }]}>{point}</Text>
                         </View>
+                      ))}
+                    </View>
+                  </View>
+                  <View style={[styles.textinputWrapper4, styles.textinputWrapperSpaceBlock,]}  >
+                    <View style={styles.textinput}>
+                      <Text style={[styles.firstName, styles.firstClr]}>
+                        Password Reset Question
+                      </Text>
+                      <View style={[styles.favoriteAuthorParent, styles.wrapperBorder,]}>
+                        <Text style={[styles.favoriteAuthor, styles.taylorTypo]}>
+                          Favorite Author
+                        </Text>
+                        <Image style={[styles.chevronDownIcon, styles.chevronIconLayout,]}
+                          resizeMode="stretch"
+                          source={require("../../../assets/chevrondown.png")}
+                        />
                       </View>
                     </View>
-                    <View
-                      style={[
-                        styles.textinputWrapper,
-                        styles.textinputWrapperSpaceBlock,
-                      ]}
-                    >
-                      <View style={styles.textinput}>
-                        <Text style={[ styles.firstClr]}>
-                          Password Reset Answer
+                  </View>
+                  <View style={[styles.textinputWrapper4, styles.textinputWrapperSpaceBlock,]}>
+                    <View style={styles.textinput}>
+                      <Text style={[styles.firstName, styles.firstClr]}>
+                        Password Reset Answer
+                      </Text>
+                      <View style={[styles.taylorWrapper, styles.wrapperBorder]} >
+                        <Text style={[styles.taylor, styles.taylorTypo]}>
+                          Someone
                         </Text>
-                        <View
-                          style={[styles.taylorWrapper, styles.wrapperBorder]}
-                        >
-                          <Text style={[styles.taylor, styles.taylorTypo]}>
-                            Someone
-                          </Text>
-                        </View>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+                <View style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]} >
+                  <View style={styles.frameChild} />
+                </View>
+                <View style={styles.frameParent1}>
+                  <View style={styles.contactInformationWrapper}>
+                    <Text style={[styles.generalInformation, styles.firstClr]}>
+                      Security Question
+                    </Text>
+                  </View>
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]}>
+                    <View style={styles.textinput}>
+                      <Text style={[styles.firstClr]}>
+                        Password Reset Question
+                      </Text>
+                      <View style={[styles.favoriteAuthorParent, styles.wrapperBorder,]} >
+                        <Text style={[styles.favoriteAuthor, styles.taylorTypo]} >
+                          Favorite Author
+                        </Text>
+                        <Image style={[styles.chevronDownIcon, styles.chevronIconLayout,]}
+                          resizeMode="stretch"
+                          source={require("../../../assets/chevrondown.png")}
+                        />
+                      </View>
+                    </View>
+                  </View>
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]}>
+                    <View style={styles.textinput}>
+                      <Text style={[styles.firstClr]}>
+                        Type your Question
+                      </Text>
+                      <View style={[styles.taylorWrapper, styles.wrapperBorder]}>
+                        <Text style={[styles.taylor, styles.taylorTypo]}>
+                          your nickname
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]}>
+                    <View style={styles.textinput}>
+                      <Text style={[styles.firstClr]}>
+                        Password Reset Answer
+                      </Text>
+                      <View style={[styles.taylorWrapper, styles.wrapperBorder]}>
+                        <Text style={[styles.taylor, styles.taylorTypo]}>
+                          Someone
+                        </Text>
                       </View>
                     </View>
                   </View>
                 </View>
               </View>
             </View>
-            <View style={styles.frameChild1SpaceBlock}>
-              <View style={[styles.buttons1, styles.buttonsLayout]}>
-                <Pressable
-                  style={[styles.buttons1, styles.buttonsLayout]}
-                  onPress={() => {/* Add your save logic here */ }}
-                  accessibilityLabel="Save changes"
-                  accessibilityRole="button"
-                  accessibilityHint="Saves the changes made to the user's profile"
-                >
-                  <Text style={[styles.makePayment1, styles.makeTypo]}>Save</Text>
-                </Pressable>
-              </View>
+          </View>
+          <View style={styles.frameChild1SpaceBlock}>
+            <View style={[styles.buttons1, styles.buttonsLayout]}>
               <Pressable
-                style={[styles.buttons2, styles.buttonsLayout]}
-                onPress={() => navigation.navigate("UserManagement")}
-                accessibilityLabel="Cancel"
-                accessibilityRole="button"
-                accessibilityHint="Cancels the edit and returns to the User Management screen"
+                style={[styles.buttons1, styles.buttonsLayout]}
+                onPress={() => {/* Add your save logic here */ }}
               >
-                <Text style={[styles.makePayment2, styles.makeTypo]}>Cancel</Text>
+                <Text style={[styles.makePayment1, styles.makeTypo]}>Save</Text>
               </Pressable>
             </View>
+            <Pressable
+              style={[styles.buttons2, styles.buttonsLayout]}
+              onPress={() => navigation.navigate("UserManagement")}
+            >
+              <Text style={[styles.makePayment2, styles.makeTypo]}>Cancel</Text>
+            </Pressable>
           </View>
-    </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  firstTypo: {
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
-  },
-  chevronIconLayout: {
-    height: 24,
-    width: 24,
-  },
+
   textinputWrapperSpaceBlock: {
     paddingVertical: Padding.p_base,
     alignSelf: "stretch",
@@ -384,6 +278,8 @@ const styles = StyleSheet.create({
   },
   bulletPoint: {
     marginRight: 10, // Space between bullet and text
+    color: Color.sparklightGray1,
+    fontWeight: '400'
   },
   wrapperBorder: {
     paddingVertical: Padding.p_5xs,
@@ -433,18 +329,14 @@ const styles = StyleSheet.create({
   frameChild1SpaceBlock: {
     marginTop: 24,
     alignSelf: "stretch",
-  },
-  rightFlexBox: {
-    paddingTop: Padding.p_5xs,
-    alignItems: "center",
-    alignSelf: "stretch",
-    flex: 1,
+
   },
   generalInformation: {
     fontSize: FontSize.size_3xl,
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 28,
+    fontWeight: '400',
     flex: 1,
   },
   generalInformationWrapper: {
@@ -456,7 +348,6 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   firstName: {
-    width: 98,
     fontSize: FontSize.textXsSemibold_size,
     textAlign: "left",
     fontFamily: FontFamily.openSansSemiBold,
@@ -479,11 +370,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: Padding.p_5xl,
   },
-  notificationsChild: {
-    width: 3,
-    alignSelf: "stretch",
-    maxHeight: "100%",
-  },
   creditCardWill: {
     fontWeight: "700",
     fontFamily: FontFamily.interBold,
@@ -498,7 +384,7 @@ const styles = StyleSheet.create({
   },
   makePayment: {
     color: Color.colorMidnightblue,
-    fontSize: FontSize.textSmSemibold_size,
+    fontSize: FontSize.textXsSemibold_size,
     fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
   },
@@ -549,6 +435,7 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: Color.sparklightGray,
     alignSelf: "stretch",
+    marginBottom: Padding.p_base
   },
   rectangleWrapper: {
     marginTop: 16,
@@ -560,38 +447,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
   },
-  taylor123gmailcomWrapper: {
-    marginTop: -7,
-    marginLeft: -167,
-    width: 334,
-    justifyContent: "center",
-    left: "50%",
-    top: "50%",
-    position: "absolute",
-  },
-  
-  eyeIcon: {
-    width: 16,
-    height: 16,
-    overflow: "hidden",
-  },
-  show: {
-    marginLeft: 6,
-    color: Color.colorMidnightblue,
-    fontSize: FontSize.textSmSemibold_size,
-    textAlign: "left",
-    lineHeight: 28,
-  },
-  eyeParent: {
-    marginLeft: 8,
-    alignItems: "center",
-    flexDirection: "row",
-  },
-  firstNameParent: {
-    alignItems: "center",
-    flexDirection: "row",
-    alignSelf: "stretch",
-  },
+
   itMustBe: {
     lineHeight: 19,
     fontSize: FontSize.textXsSemibold_size,
@@ -599,13 +455,6 @@ const styles = StyleSheet.create({
   itMustBeDifferentThanYourWrapper: {
     alignItems: "center",
     flexDirection: "row",
-  },
-  firstName6: {
-    fontSize: FontSize.textXsSemibold_size,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
-    alignSelf: "stretch",
   },
   favoriteAuthor: {
     fontSize: FontSize.size_base,
@@ -650,13 +499,10 @@ const styles = StyleSheet.create({
     marginTop: 16,
     backgroundColor: Color.colorWhitesmoke_200,
   },
-  
   userManagementEditInner: {
-    top: 100,
     padding: Padding.p_base,
-    marginBottom:200
+    marginBottom: 200
   },
-
   userManagementEdit: {
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
