@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Linking,
-  Alert,
+  
 } from "react-native";
 
 import colors from "../../res/Colors";
@@ -17,10 +17,10 @@ import TimerInfo from "../../res/svgIcons/TimerInfo";
 import strings from "../../res/Strings";
 import { getCurrentSpeed } from "../../redux/actions/DashboardAction";
 import { useDispatch, useSelector } from "react-redux";
-import { getUser } from "../../redux/utils/LocalStorage";
+import { getUser } from "../../redux/utils/LocalStorage"
 import SpeedTestModal from "./customui/SpeedTestModal";
-import { GetApiRequest } from "../../network/APIClient";
 import moment from "moment";
+
 
 const DataSpeedComponent = () => {
   const dispatch = useDispatch();
@@ -34,12 +34,15 @@ const DataSpeedComponent = () => {
     });
   };
 
+ 
+
   const [download, setDownload] = useState(0);
   const [upload, setUpload] = useState(0);
   const [downloadFrac, setDownloadFrac] = useState(0);
   const [uploadFrac, setUploadFrac] = useState(0);
   const [speed, setSpeed] = useState(false);
-  const [testDate, setTestDate] = useState(0);
+  const [testDate, setTestDate]=useState(0)
+  useSelector((state) => {
 
     if (Object.hasOwn(state.combinedReducers.home.speed,"download_Kbps")) {
       let downloadSpeed = state.combinedReducers.home.speed.download_Kbps;
@@ -59,11 +62,9 @@ const DataSpeedComponent = () => {
         setSpeed(true);
       }
     }
-  };
+    
+  });
 
-  const onError = (error) => {
-    console.log("error", error);
-  };
   useEffect(() => {
     if (!speed) {
       getUser().then((res) => {
