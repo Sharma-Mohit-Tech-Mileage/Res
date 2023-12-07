@@ -25,6 +25,14 @@ const UserManagement = () => {
       memberType: 'ADMIN',
       email: 'taylor123@gmail.com',
     },
+    {
+      initials: 'KK',
+      name: 'Kapil Kumar',
+      status: null,
+      username: 'Taylor123',
+      memberType: 'VIEW ONLY',
+      email: 'kumark@gmail.com',
+    }
     // Add more user objects as needed
   ];
   const renderUserCard = (user) => {
@@ -88,7 +96,7 @@ const UserManagement = () => {
             </Text>
             <View style={styles.badgeWrapper}>
               <View style={[user.memberType === 'PRIMARY ADMIN' ? styles.badge : styles.badge1, styles.badgeBorder]}>
-                <Text style={[styles.text3, styles.textTypo]}>
+                <Text style={[styles.text3]}>
                   {user.memberType}
                 </Text>
 
@@ -329,11 +337,6 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
 
-  badgeWrapper: {
-    marginTop: 2,
-    alignItems: "center",
-    flexDirection: "row",
-  },
   frameWrapper2: {
     borderBottomRightRadius: Border.br_11xs,
     borderBottomLeftRadius: Border.br_11xs,
@@ -349,6 +352,10 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansSemiBold,
     textAlign: "center",
+    lineHeight: 18,
+    fontSize: FontSize.size_xs,
+    fontWeight: "600",
+
   },
   badge: {
     backgroundColor: Color.success50,

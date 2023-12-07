@@ -73,7 +73,9 @@ const PasswordSecurityEdit = () => {
                     ].map((point, index) => (
                       <View key={`point-${index}`} style={styles.bulletPointContainer}>
                         <Text style={styles.bulletPoint}>•</Text>
-                        <Text style={styles.itMustBe}>{point}</Text>
+                        <Text style={[styles.itMustBe, {
+                          color: Color.sparklightGray1,
+                          fontWeight: '400'}]}>{point}</Text>
                       </View>
                     ))}
                   </View>
@@ -252,7 +254,7 @@ const styles = StyleSheet.create({
   },
   itMustBe: {
     lineHeight: 19,
-    fontSize: FontSize.textXsSemibold_size,
+    fontSize: FontSize.size_xs,
   },
   itMustBeDifferentThanYourWrapper: {
     alignItems: "center",

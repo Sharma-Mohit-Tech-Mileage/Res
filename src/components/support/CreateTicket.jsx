@@ -39,9 +39,13 @@ const CreateTicket = () => {
                                 </View>
                                 <View style={styles.frameBorder}>
                                     <TextInput
-                                        style={{ textAlignVertical: 'top' }}
-                                        multiline={true} // Enable multiline input
-                                        numberOfLines={6} // Set the number of lines
+                                        style={{
+                                            textAlignVertical: 'top',
+                                            color: 'black', // Or any visible color
+                                            fontSize: 16, // Or appropriate size
+                                        }}
+                                        multiline={true}
+                                        numberOfLines={6}
                                         minHeight={FontSize.size_base * 6 + 16}
                                     />
 
@@ -81,7 +85,8 @@ const styles = StyleSheet.create({
     },
     frameParent: {
         paddingHorizontal: Padding.p_base,
-        paddingVertical: Padding.p_5xl
+        paddingVertical: Padding.p_5xl,
+        marginBottom:200
     },
     frameGroup: {
         //flex: 1,

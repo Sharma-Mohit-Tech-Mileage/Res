@@ -44,7 +44,7 @@ const MyTabs = ({ route, navigation }) => {
         listeners={({ navigation }) => ({
           tabPress: (e) => {
             e.preventDefault();
-            navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/115009159707-Data-Plans', title :'Shop'});
+            navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/115009159707-Data-Plans', name :'Shop'});
           },
         })}
         options={{

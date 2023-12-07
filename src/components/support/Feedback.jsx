@@ -64,7 +64,7 @@ const Feedback = () => {
                     </View>
                     <View style={[styles.text1SpaceBlock]}>
                         <TextInput
-                            style={[styles.myExperienceHasBeenGreatParent, {textAlignVertical: 'top' }]}
+                            style={[styles.myExperienceHasBeenGreatParent]}
                             onChangeText={handleTextInputChange}
                             value={inputText}
                             multiline={true}
@@ -198,6 +198,10 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         borderWidth: 1,
         borderStyle: "solid",
+        textAlignVertical: 'top',
+        fontWeight: '600', // Set text to bold
+        fontSize:FontSize.size_base,
+        fontFamily: FontFamily.openSansRegular, 
     },
     text1: {
         color: Color.gray600,

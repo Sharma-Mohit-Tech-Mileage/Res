@@ -26,14 +26,7 @@ const UserNavigations = (props) => {
             headerShown: false
           }}
         />
-        <Stack.Screen
-          name="ArticalWindowUtility"
-          component={ArticalWindowUtility}
-          options={{
-            headerBackVisible: false,
-            headerShown: false
-          }}
-        />
+      
       </Stack.Navigator>
     </NavigationContainer>
   );
