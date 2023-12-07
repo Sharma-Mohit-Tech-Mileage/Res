@@ -47,3 +47,9 @@ buck-out/
 \.buckd/
 android/app/libs
 android/keystores/debug.keystore
+
+# Additional Filters
+*.iml
+/captures
+.externalNativeBuild
+.cxx

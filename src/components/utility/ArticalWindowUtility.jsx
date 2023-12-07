@@ -33,9 +33,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         <View style={{ flex: 1 }}>
             <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />
             {progress < 1 ? (
-                <View style={{ ...styles.progressBar, marginTop: '23%' }}>
+                <View style={{ ...styles.progressBar}}>
                     <View style={{ ...styles.progress, width: `${progress * 100}%` }} />
-                </View>) : (<View style={{ marginTop: '20%' }}>
+                </View>) : (<View >
                 </View>)}
             {modalOpen && (
 

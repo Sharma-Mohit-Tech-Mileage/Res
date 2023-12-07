@@ -1,4 +1,10 @@
-import { GET_INTERNET_SPEED,UPDATE_INTERNET_SPEED ,GET_ACCOUNT_INFO,UPDATE_ACCOUNT_INFO} from '../constants/index';
+import { 
+  GET_INTERNET_SPEED, 
+  POST_INTERNET_SPEED, 
+  UPDATE_INTERNET_SPEED, 
+  GET_ACCOUNT_INFO, 
+  UPDATE_ACCOUNT_INFO
+} from '../constants/index';
 
 const initialState ={
   isLoading:false,
@@ -14,20 +20,24 @@ const dashboardReducer = (state = initialState, action) => {
         ...state,
         isLoading:true
       }
+    case POST_INTERNET_SPEED:
+      return {
+        isLoading: false,
+        speed: action.payload,
+      }      
     case UPDATE_INTERNET_SPEED:
       return {
-        isLoading:false,
+        isLoading: false,
         speed: action.payload,
-        
       }
-      case GET_ACCOUNT_INFO:
+    case GET_ACCOUNT_INFO:
       return{
         ...state,
-        isLoading:true
+        isLoading: true
       }
-      case UPDATE_ACCOUNT_INFO:
+    case UPDATE_ACCOUNT_INFO:
         return {
-          isLoading:false,
+          isLoading: false,
           accountInfo: action.payload,
           
         }

@@ -11,7 +11,7 @@ const ManageEquipment = () => {
     return (
         <View style={styles.manageEquipment}>
             <ProfileSettingsHeader
-                title="Equipment Management"
+                title="Manage Equipment "
                 onPressBack={() => navigation.navigate('support')}
             />
             <ScrollView>
@@ -416,7 +416,6 @@ const styles = StyleSheet.create({
         borderRadius: Border.br_11xs,
     },
     myModemParent: {
-        top: 100,
         paddingTop: Padding.p_5xl,
         paddingBottom: Padding.p_base,
         paddingHorizontal: Padding.p_5xl,

@@ -295,8 +295,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   passwordSecurityEditInner: {
-    top: 100,
-    paddingTop: Padding.p_base,
+    paddingVertical:Padding.p_5xl,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",

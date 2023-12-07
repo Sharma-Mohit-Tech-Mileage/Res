@@ -1,12 +1,11 @@
 import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
-import {getCurrentSpeedInfo,getAccountInfo} from "../../network/apis/account/dashboard.service";
-import { GET_ACCOUNT_INFO, GET_INTERNET_SPEED } from "../constants";
+import {getCurrentSpeedInfo, postCurrentSpeedInfo, getAccountInfo} from "../../network/apis/account/dashboard.service";
+import { GET_ACCOUNT_INFO, GET_INTERNET_SPEED, POST_INTERNET_SPEED } from "../constants";
 import { updateCurrentSpeed,updateAccountInfo } from "../actions/DashboardAction";
 // yield pauses and resume the generator functions
 function* getInternetSpeed(action) {
    try {
-     const response = yield call(getCurrentSpeedInfo,action.payload)
-     console.log('data',response)
+     const response = yield call(getCurrentSpeedInfo)
      yield put(updateCurrentSpeed(response));
      
     } catch (error) {
@@ -15,6 +14,26 @@ function* getInternetSpeed(action) {
       //yield put(apiCalled());
     }
 }
+
+function* postInternetSpeed(action) {
+  try {
+    const response = yield call(postCurrentSpeedInfo,action.payload);
+    //Doing this because call fails on uat
+    const getResults = yield call(getCurrentSpeedInfo);
+    console.log('getResults:', getResults);
+    yield put(updateCurrentSpeed(getResults));
+   } catch (error) {
+     console.log(error);
+     //Doing this because call fails on uat
+     const getResults = yield call(getCurrentSpeedInfo);
+     console.log('getResults:', getResults);
+     yield put(updateCurrentSpeed(getResults));
+
+   } finally {
+     //yield put(apiCalled());
+   }
+}
+
 function* getUserAccountInfo(action) {
   try {
     const response = yield call(getAccountInfo,action.payload)
@@ -30,6 +49,7 @@ function* getUserAccountInfo(action) {
 
 function* appSagas() { 
     yield takeLatest(GET_INTERNET_SPEED, getInternetSpeed);
+    yield takeLatest(POST_INTERNET_SPEED, postInternetSpeed);
     yield takeLatest(GET_ACCOUNT_INFO, getUserAccountInfo);
 }
 export default appSagas;

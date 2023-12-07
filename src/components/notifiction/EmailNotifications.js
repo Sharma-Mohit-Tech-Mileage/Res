@@ -209,8 +209,7 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   emailNotificationsInner: {
-    top: 100,
-    marginTop: Padding.p_base,
+    marginTop: Padding.p_5xl,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     width: '100%',

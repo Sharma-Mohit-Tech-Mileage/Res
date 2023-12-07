@@ -33,91 +33,84 @@ const ProfileSettings = () => {
               </Pressable>
             </View>
             <View style={styles.frameContainer}>
-              <View style={styles.frameContainer}>
-                <View style={styles.firstNameParent} accessible={true} accessibilityLabel="First Name: Melissa">
-                  <Text style={styles.firstName}>First Name</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo]}>
-                    Melissa
-                  </Text>
-                </View>
-                <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Last Name: Smith">
-                  <Text style={styles.firstName}>Last Name</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo]}>Smith</Text>
-                </View>
-                <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Username: MelSmith">
-                  <Text style={styles.firstName}>Username</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo]}>
-                    MelSmith
-                  </Text>
-                </View>
-                <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Member Type: PRIMARY ADMIN">
-                  <Text style={styles.firstName}>Member Type</Text>
-                  <View style={styles.badgeWrapper}>
-                    <View style={[styles.badge, styles.badgeBorder]}>
-                      <Text style={[styles.text, styles.textTypo]}>
-                        PRIMARY ADMIN
-                      </Text>
-                    </View>
+              <View style={styles.firstNameParent} accessible={true} accessibilityLabel="First Name: Melissa">
+                <Text style={styles.firstName}>First Name</Text>
+                <Text style={[styles.melissa, styles.melissaTypo]}>
+                  Melissa
+                </Text>
+              </View>
+              <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Last Name: Smith">
+                <Text style={styles.firstName}>Last Name</Text>
+                <Text style={[styles.melissa, styles.melissaTypo]}>Smith</Text>
+              </View>
+              <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Username: MelSmith">
+                <Text style={styles.firstName}>Username</Text>
+                <Text style={[styles.melissa, styles.melissaTypo]}>
+                  MelSmith
+                </Text>
+              </View>
+              <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Member Type: PRIMARY ADMIN">
+                <Text style={styles.firstName}>Member Type</Text>
+                <View style={styles.badgeWrapper}>
+                  <View style={[styles.badge, styles.badgeBorder]}>
+                    <Text style={[styles.text, styles.textTypo]}>
+                      PRIMARY ADMIN
+                    </Text>
                   </View>
                 </View>
-                <View style={styles.notificationsWrapper}>
-                  <View style={[styles.notifications, styles.badgeBorder]}>
-                    <Image
-                      style={styles.notificationsChild}
-                      resizeMode="cover"
-                      source={require("../../../assets/rectangle-528.png")}
-                      accessibilityLabel="Notification image."
-                    />
-                    <View style={styles.bannerWarning}>
-                      <View style={styles.rightActionableParent}>
-                        <Image
-                          style={styles.rightIconLayout}
-                          resizeMode="cover"
-                          source={require("../../../assets/right-actionable3.png")}
-                          accessibilityLabel="Right actionable icon."
-                        />
-                        <View style={styles.creditCardWillExpireSoonParent}>
-                          <Text style={styles.creditCardWill} accessible={true} 
-                          accessibilityLabel="Primary Admin Notification">Primary Admin</Text>
-                          <Text style={[styles.yourSavedCard]} accessible={true} accessibilityLabel="Primary admin account information.">
-                            You are currently the primary admin
-                            account. You can make another account
-                            the primary admin account. By doing so
-                            you will become an admin user under the
-                            new primary admin account.
-                          </Text>
-                        </View>
-                      </View>
+              </View>
+              <View style={styles.notificationsWrapper}>
+                <View style={[styles.notifications, styles.badgeBorder]}>
+                  <Image
+                    style={{ height: '100%' }}
+                    resizeMode="stretch"
+                    source={require("../../../assets/rectangle-528.png")}
+                    accessibilityLabel="Notification image."
+                  />
+                  <View style={styles.bannerWarning}>
+                    <View style={styles.rightActionableParent}>
                       <Image
-                        style={[
-                          styles.rightActionableIcon1,
-                          styles.rightIconLayout,
-                        ]}
+                        style={styles.rightIconLayout}
                         resizeMode="cover"
-                        source={require("../../../assets/right-actionable1.png")}
+                        source={require("../../../assets/right-actionable3.png")}
                         accessibilityLabel="Right actionable icon."
                       />
+                      <View style={styles.creditCardWillExpireSoonParent}>
+                        <Text style={styles.creditCardWill} accessible={true}
+                          accessibilityLabel="Primary Admin Notification">Primary Admin</Text>
+                        <Text style={[styles.yourSavedCard]} accessible={true} accessibilityLabel="Primary admin account information.">
+                          You are currently the primary admin
+                          account. You can make another account
+                          the primary admin account. By doing so
+                          you will become an admin user under the
+                          new primary admin account.
+                        </Text>
+                      </View>
                     </View>
                   </View>
                 </View>
               </View>
-              <View
-                style={[styles.rectangleWrapper, styles.frameParent1SpaceBlock]}
-              >
-                <View style={styles.frameChild} />
+            </View>
+            <View style={[styles.rectangleWrapper, styles.frameParent1SpaceBlock]}>
+              <View style={styles.frameChild} />
+            </View>
+            <View style={styles.frameParent1SpaceBlock}>
+              <View style={styles.contactInformationWrapper}>
+                <Text style={[styles.generalInformation, styles.melissaTypo]}>
+                  Contact Information
+                </Text>
               </View>
-              <View style={styles.frameParent1SpaceBlock}>
-                <View style={styles.contactInformationWrapper}>
-                  <Text style={[styles.generalInformation, styles.melissaTypo]}>
-                    Contact Information
-                  </Text>
-                </View>
-                <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Email: melissa@gmail.com">
-                  <Text style={styles.firstName}>Email</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo]}>
-                    melissa@gmail.com
-                  </Text>
-                </View>
+              <View style={styles.firstNameParent} accessible={true} >
+                <Text style={styles.firstName}>Email</Text>
+                <Text style={[styles.melissa, styles.melissaTypo]}>
+                  melissa@gmail.com
+                </Text>
+              </View>
+              <View style={styles.firstNameParent} accessible={true} >
+                <Text style={styles.firstName}>Phone</Text>
+                <Text style={[styles.melissa, styles.melissaTypo]}>
+                  4805671011
+                </Text>
               </View>
             </View>
           </View>
@@ -135,7 +128,7 @@ const styles = StyleSheet.create({
     marginBottom: 200,
   },
   melissaTypo: {
-    color: Color.sparklightGray1,
+    color: Color.sparklightaddGray,
     lineHeight: 28,
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
@@ -195,7 +188,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: FontSize.size_sm,
     textAlign: "left",
-    color: Color.sparklightGray1,
+    color: Color.colorGray_100,
     lineHeight: 28/* 200% */,
   },
   melissa: {
@@ -218,7 +211,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.success50,
     borderColor: Color.colorAquamarine,
     paddingHorizontal: Padding.p_5xs,
-    paddingVertical: Padding.p_11xs,
+    paddingVertical: 4,
     alignItems: "center",
     flexDirection: "row",
   },
@@ -240,13 +233,12 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   yourSavedCard: {
-    color: Color.sparklightDarkestGray,
+    color: Color.sparklightaddGray,
     marginTop: 8,
     fontSize: FontSize.size_sm,
     textAlign: "left",
     alignSelf: "stretch",
     fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
   },
 
   creditCardWillExpireSoonParent: {
@@ -256,10 +248,6 @@ const styles = StyleSheet.create({
   rightActionableParent: {
     flexDirection: "row",
     flex: 1,
-  },
-  rightActionableIcon1: {
-    display: "none",
-    marginLeft: 10,
   },
   bannerWarning: {
     borderTopRightRadius: Border.br_11xs,
@@ -284,6 +272,7 @@ const styles = StyleSheet.create({
   },
   frameContainer: {
     alignSelf: "stretch",
+    marginTop:16
   },
   frameChild: {
     height: 1,
@@ -291,7 +280,6 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   rectangleWrapper: {
-    paddingVertical: 0,
     paddingHorizontal: Padding.p_5xl,
   },
   contactInformationWrapper: {
@@ -309,8 +297,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   frameParent: {
-    top: 100,
-    padding: Padding.p_base,
+    paddingVertical: Padding.p_5xl,
+    paddingHorizontal: Padding.p_base,
     width: '100%',
   },
 });

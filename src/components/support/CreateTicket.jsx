@@ -1,5 +1,7 @@
 import * as React from "react";
-import { Image, StyleSheet, TextInput, Text, View } from "react-native";
+import {
+    Image, StyleSheet, TextInput, Text, View, TouchableWithoutFeedback,
+    Keyboard, } from "react-native";
 import { Padding, FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import SparkLightDropdown from '../../components/common/customui/SparkLightDropdown'
@@ -10,7 +12,7 @@ const CreateTicket = () => {
     const navigation = useNavigation();
     const items = ["Item 1", "Item 2", "Item 3"];
     return (
-
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.ticketSupportNone}>
             <ProfileSettingsHeader
                 title="Create Ticket"
@@ -32,13 +34,12 @@ const CreateTicket = () => {
                             <Text style={[styles.text, { marginBottom: Padding.p_5xs }]} >Describe Issue</Text>
                         </View>
                         <View style={styles.frameBorder}>
-                            <View style={styles.frameView}>
                                 <TextInput
+                                    style={{ textAlignVertical: 'top' }}
                                     multiline={true} // Enable multiline input
-                                    placeholder="Enter text here..." // Placeholder text
+                                    numberOfLines={6} // Set the number of lines
                                 />
 
-                            </View>
                         </View>
                     </View> 
                 </View>
@@ -52,13 +53,14 @@ const CreateTicket = () => {
                 <View >
                     <PrimaryButtom
                         title="Cancel"
-                        onPress={() => navigation.navigate("support")}
+                        onPress={() => navigation.navigate("TicketSupport")}
                         buttonType="cancel"
                     />
                 </View>
             </View>
             
         </View>
+        </TouchableWithoutFeedback>
     );
 };
 
@@ -73,8 +75,8 @@ const styles = StyleSheet.create({
         paddingTop: Padding.p_13xl,
     },
     frameParent: {
-        top: 100,
-        padding: Padding.p_base,
+        paddingHorizontal: Padding.p_base,
+        paddingVertical: Padding.p_5xl
     },
     frameGroup: {
         //flex: 1,
