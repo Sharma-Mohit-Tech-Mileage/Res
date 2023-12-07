@@ -100,6 +100,18 @@ const PasswordSecurityEdit = () => {
                       />
                     </View>
                   </View>
+                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                  <View style={styles.textinput}>
+                    <Text style={[styles.firstName1, styles.firstTypo]} accessibilityRole="header">
+                      Type your Question
+                    </Text>
+                    <SparkLightInput
+                      placeholder="Enter text here"
+                      accessibilityLabel="Password Reset Answer Input Field"
+                      accessibilityHint="Input the answer for your security question"
+                    />
+                  </View>
+                </View>
                   <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                     <View style={styles.textinput}>
                       <Text style={[styles.firstName1, styles.firstTypo]} accessibilityRole="header">
@@ -157,11 +169,13 @@ const styles = StyleSheet.create({
   },
   bulletPoint: {
     marginRight: 10, // Space between bullet and text
+    color:Color.sparklightGray1,
+    fontWeight:'400'
   },
   passwordFlexBox: {
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
-    color: Color.sparklightDarkGray,
+    color: Color.sparklightGray1,
     flex: 1,
   },
   firstTypo: {

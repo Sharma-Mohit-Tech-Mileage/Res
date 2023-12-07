@@ -16,7 +16,7 @@ const SparkLightInput = ({ placeholder, onChangeText, style, accessibilityLabel,
             <View style={styles.container}>
             <TextInput
                // placeholder={placeholder}
-                value={"sparklight"}
+                value={value}
                 onChangeText={handleInputChange}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     textInput: {
-        color: Color.colorGray_100,
+        color: Color.colorGray_200,
         fontSize: FontSize.size_base,
         paddingHorizontal: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,

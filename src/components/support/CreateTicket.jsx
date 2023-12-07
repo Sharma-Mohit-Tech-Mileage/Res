@@ -1,65 +1,70 @@
 import * as React from "react";
 import {
     Image, StyleSheet, TextInput, Text, View, TouchableWithoutFeedback,
-    Keyboard, } from "react-native";
+    Keyboard,
+} from "react-native";
 import { Padding, FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import SparkLightDropdown from '../../components/common/customui/SparkLightDropdown'
 import PrimaryButtom from '../common/customui/PrimaryButton'
 import { useNavigation } from "@react-navigation/native";
+import { ScrollView } from "react-native-gesture-handler";
 
 const CreateTicket = () => {
     const navigation = useNavigation();
     const items = ["Item 1", "Item 2", "Item 3"];
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.ticketSupportNone}>
-            <ProfileSettingsHeader
-                title="Create Ticket"
-                onPressBack={() => navigation.navigate('support')}
-            />
-            <View style={styles.frameParent}>
-                <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
-                    <View style={styles.ticketsParent}>
-                        <Text style={styles.tickets}>Tickets Details</Text>
-                    </View>
-                    <View style={styles.frameWrapper}>
-                        <View style={styles.textView}>
-                            <Text style={styles.text} >Describe Issue</Text>
-                            <SparkLightDropdown items={items} />
-                        </View>
-                    </View>
-                    <View style={styles.frameWrapper}>
-                        <View style={styles.textView}>
-                            <Text style={[styles.text, { marginBottom: Padding.p_5xs }]} >Describe Issue</Text>
-                        </View>
-                        <View style={styles.frameBorder}>
-                                <TextInput
-                                    style={{ textAlignVertical: 'top' }}
-                                    multiline={true} // Enable multiline input
-                                    numberOfLines={6} // Set the number of lines
-                                />
 
+            <View style={styles.ticketSupportNone}>
+                <ProfileSettingsHeader
+                    title="Create Ticket"
+                    onPressBack={() => navigation.navigate('support')}
+                />
+                <ScrollView>
+                    <View style={styles.frameParent}>
+                        <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
+                            <View style={styles.ticketsParent}>
+                                <Text style={styles.tickets}>Tickets Details</Text>
+                            </View>
+                            <View style={styles.frameWrapper}>
+                                <View style={styles.textView}>
+                                    <Text style={styles.text} >Describe Issue</Text>
+                                    <SparkLightDropdown items={items} />
+                                </View>
+                            </View>
+                            <View style={styles.frameWrapper}>
+                                <View style={styles.textView}>
+                                    <Text style={[styles.text, { marginBottom: Padding.p_5xs }]} >Describe Issue</Text>
+                                </View>
+                                <View style={styles.frameBorder}>
+                                    <TextInput
+                                        style={{ textAlignVertical: 'top' }}
+                                        multiline={true} // Enable multiline input
+                                        numberOfLines={6} // Set the number of lines
+                                        minHeight={FontSize.size_base * 6 + 16}
+                                    />
+
+                                </View>
+                            </View>
                         </View>
-                    </View> 
-                </View>
-                <View >
-                    <PrimaryButtom
-                        title="Submit"
-                        onPress={() => navigation.navigate("TicketView")}
-                        buttonType="submit"
-                    />
-                </View>
-                <View >
-                    <PrimaryButtom
-                        title="Cancel"
-                        onPress={() => navigation.navigate("TicketSupport")}
-                        buttonType="cancel"
-                    />
-                </View>
+                        <View >
+                            <PrimaryButtom
+                                title="Submit"
+                                onPress={() => navigation.navigate("TicketView")}
+                                buttonType="submit"
+                            />
+                        </View>
+                        <View >
+                            <PrimaryButtom
+                                title="Cancel"
+                                onPress={() => navigation.navigate("TicketSupport")}
+                                buttonType="cancel"
+                            />
+                        </View>
+                    </View>
+                </ScrollView>
             </View>
-            
-        </View>
         </TouchableWithoutFeedback>
     );
 };
@@ -90,7 +95,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column', // Children are arranged in a column
         justifyContent: 'center', // Children are centered vertically
         alignSelf: 'stretch', // The element itself stretches to fill its container   
-       // width: 98.05
+        // width: 98.05
     },
     text: {
         color: Color.sparklightGray1,

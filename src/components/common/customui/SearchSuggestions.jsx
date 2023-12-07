@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: Padding.p_base, // Example padding
         fontSize: FontSize.size_base, // Example font size
-        color: Color.sparklightDarkGray, 
+        color: Color.sparklightGray1, 
     },
     suggestionsContainer: {
         marginTop: 0, // Gap from the design

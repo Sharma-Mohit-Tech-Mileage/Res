@@ -30,15 +30,7 @@ const EmailNotifications = () => {
               <View style={[styles.frameView, styles.frameFlexBox]}>
                 <View style={styles.frameParent1} >
                   <View
-                    style={[
-                      styles.paperlessBillingParent,
-                      styles.frameFlexBox,
-                    ]}
-                    accessible
-                    accessibilityRole="switch"
-                    accessibilityLabel="Paperless Billing"
-                    accessibilityHint="Toggle paperless billing on or off"
-                    accessibilityValue={{ text: isToggleActive ? "On" : "Off" }}
+                    style={[styles.paperlessBillingParent,styles.frameFlexBox,]}
                   >
                     <Text style={styles.paperlessBilling}>
                       Paperless Billing
@@ -47,12 +39,7 @@ const EmailNotifications = () => {
                       <Toggle onToggle={handleToggle} />
                     </View>
                   </View>
-                  <Text
-                    style={[
-                      styles.receiveBillingStatements,
-                      styles.receiveTypo,
-                    ]}
-                    accessibilityRole="text"
+                  <Text style={[styles.receiveBillingStatements, styles.receiveTypo,]}
                   >
                     Receive billing statements via email and no longer receive
                     paper statements in the mail.
@@ -105,7 +92,7 @@ const styles = StyleSheet.create({
 
   receiveTypo: {
     fontSize: FontSize.textXsSemibold_size,
-    color: Color.colorGray_100,
+    color: Color.sparklightaddGray,
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
     alignSelf: "stretch",

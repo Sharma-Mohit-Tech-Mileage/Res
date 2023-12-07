@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, Pressable, View } from "react-native";
+import { Image, StyleSheet, Text, ScrollView, View } from "react-native";
 import { Padding, Border, FontSize, Color, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useNavigation } from "@react-navigation/native";
@@ -11,9 +11,8 @@ const TicketView = () => {
                 title="View Ticket"
                 onPressBack={() => navigation.navigate('support')}
             />
-            <View
-                style={[styles.ticketSupportInner]}
-            >
+            <ScrollView>
+            <View style={[styles.ticketSupportInner]}>
                 <View style={[styles.frameParent, styles.parentSpaceBlock]}>
                     <View style={[styles.ticket101Parent, styles.parentSpaceBlock]}>
                         <Text style={styles.ticket101}>Ticket # 101</Text>
@@ -109,6 +108,7 @@ const TicketView = () => {
                     </View>
                 </View>
             </View>
+            </ScrollView>
         </View>
     );
 };
@@ -305,6 +305,7 @@ const styles = StyleSheet.create({
         paddingTop: Padding.p_5xl,
         paddingBottom: Padding.p_base,
         paddingHorizontal: Padding.p_base,
+        marginBottom:200
     },
     ticketSupport: {
         backgroundColor: Color.colorWhitesmoke_200,
