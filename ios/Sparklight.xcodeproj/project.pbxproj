@@ -526,7 +526,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = W486HD85BD;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = W486HD85BD;
 				ENABLE_BITCODE = NO;
@@ -537,7 +537,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.6.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -547,8 +547,11 @@
 				PRODUCT_NAME = Sparklight;
 				PROVISIONING_PROFILE_SPECIFIER = "sparklight-customer-Dev";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "sparklight-customer-Prod";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -564,7 +567,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 15;
+				CURRENT_PROJECT_VERSION = 17;
 				DEVELOPMENT_TEAM = W486HD85BD;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = W486HD85BD;
 				INFOPLIST_FILE = Sparklight/Info.plist;
@@ -574,7 +577,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.6.0;
+				MARKETING_VERSION = 1.6.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -584,7 +587,10 @@
 				PRODUCT_NAME = Sparklight;
 				PROVISIONING_PROFILE_SPECIFIER = "sparklight-customer-Prod";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "sparklight-customer-Prod";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;

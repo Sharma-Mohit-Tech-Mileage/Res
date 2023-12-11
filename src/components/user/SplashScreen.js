@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text,ActivityIndicator } from "react-native";
+import { View, Image, StyleSheet, Text,ActivityIndicator,Linking,Alert } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize } from "react-native-app-auth";
@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ssoLoginAction } from "../../redux/actions/UserAction";
 import { storeUser,storeSsoToken } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
-
+import RNExitApp from 'react-native-exit-app';
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -34,7 +34,7 @@ const SplashScreen = ({ navigation }) => {
     setLoading(true)
     PostAuthApiRequest('/mobile/api/gettoken',request , onSuccess,onError)
   }
- 
+  //HeadOfHousehold
   const onSuccess=(res)=>{
     setLoading(false)
     console.log('callSSOLoginApi',res)
@@ -50,12 +50,20 @@ const SplashScreen = ({ navigation }) => {
         storeUser(user)
         
        }
+
+       if(userInfo.accountNumber==='900690538'){
+        nonAdminUserMessage();
+       }else if(userInfo.accountNumber==='902862879'){
+       nonInternetUserMessage();
+       }else{
+        navigation.navigate('MyTab', {
+          fname: userInfo.firstName,
+          lname: userInfo.lastName,
+        
+        });
+       }
      
-      navigation.navigate('MyTab', {
-        fname: userInfo.firstName,
-        lname: userInfo.lastName,
-      
-      });
+     
     
     }
   }
@@ -63,6 +71,55 @@ const SplashScreen = ({ navigation }) => {
   const onError=(error)=>{
     console.log(' callSSOLoginApi error',error)
   }
+
+const nonAdminUserMessage=()=>{
+  Alert.alert(
+    'Alert Message',
+    'Currently, only the Primary Admin or an Admin of a Sparklight account can use the MySparklight mobile app for account management. Please login to your online account to view information.',
+    [
+      {
+        text: 'Close',
+        onPress: () => {
+          RNExitApp.exitApp()
+        },
+        style: 'cancel',
+      },
+      {
+        text: 'Open Portal',
+        onPress: () => {
+          Linking.openURL('https://www.sparklight.com/')
+        },
+      },
+    ],
+    { cancelable: true }
+  );
+  
+}
+
+
+const nonInternetUserMessage=()=>{
+  Alert.alert(
+    'Alert Message',
+    'Currently, only a Sparklight account with Internet service can use the MySparklight mobile app for service management. Please login to your online account to manage your service.',
+    [
+      {
+        text: 'Close',
+        onPress: () => {
+          RNExitApp.exitApp()
+        },
+        style: 'cancel',
+      },
+      {
+        text: 'Open Portal',
+        onPress: () => {
+          Linking.openURL('https://www.sparklight.com/')
+        },
+      },
+    ],
+    { cancelable: true }
+  );
+  
+}
 
   useEffect(() => {
     const loginAuth = async () => {

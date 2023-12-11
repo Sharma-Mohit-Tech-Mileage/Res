@@ -4,7 +4,7 @@ import { ProgressCircle } from "react-native-svg-charts";
 import colors from "../../res/Colors";
 import RightArrow from "../../res/svgIcons/RightArrow";
 
-const DataUsageComponent = () => {
+const DataUsageComponent = ({navigation}) => {
   useEffect(() => {
     console.log("data");
   }, []);
@@ -67,7 +67,7 @@ const DataUsageComponent = () => {
         </View>
       </ProgressCircle>
 
-      <View style={{ flexDirection: "row", justifyContent: "space-between" ,marginTop:20}}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" ,marginTop:20, marginHorizontal:20}}>
         <View style={{ flexDirection: "row" }}>
           <View style={styles.dataUsageIndicator} />
           <Text style={styles.useLbl}>Used</Text>
@@ -83,13 +83,15 @@ const DataUsageComponent = () => {
       <View style={{ backgroundColor: colors.grey, height: 1, marginVertical: 10 }} />
       <TouchableOpacity
         onPress={() => {
-          Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
+          navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name: 'Upgrade Plan' })
+          //Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
         }}
         style={{
           height: 30,
           flexDirection: "row",
           justifyContent: "space-between",
           padding: 5,
+          marginHorizontal:20
         }}
       >
         <Text

@@ -22,7 +22,7 @@ import SpeedTestModal from "./customui/SpeedTestModal";
 import moment from "moment";
 
 
-const DataSpeedComponent = () => {
+const DataSpeedComponent = ({navigation}) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
 
@@ -202,17 +202,18 @@ const DataSpeedComponent = () => {
           <View style={{ flexDirection: "row", marginLeft: 10, marginTop: 10 }}>
             <TouchableOpacity
               onPress={() => {
-                Linking.openURL(
-                  "https://support.sparklight.com/hc/en-us/articles/115010349927-Can-I-Run-an-Internet-Speed-Test-"
-                );
+                navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/115010349927-Can-I-Run-an-Internet-Speed-Test-', name: ' More Details' })
+                // Linking.openURL(
+                //   "https://support.sparklight.com/hc/en-us/articles/115010349927-Can-I-Run-an-Internet-Speed-Test-"
+                // );
               }}
             >
               <Text style={styles.learnMore}>{strings.learn_more}</Text>
             </TouchableOpacity>
-            <View style={styles.verticle_saperator} />
+            {/* <View style={styles.verticle_saperator} />
             <TouchableOpacity>
               <Text style={styles.learnMore}>{strings.test_with_eero}</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </View>
@@ -222,15 +223,17 @@ const DataSpeedComponent = () => {
       />
       <TouchableOpacity
         onPress={() => {
-          Linking.openURL(
-            "https://customer.uat.sparklight.com/residential/services/upgrade"
-          );
+          navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name: 'Upgrade Plan' })
+          // Linking.openURL(
+          //   "https://customer.uat.sparklight.com/residential/services/upgrade"
+          // );
         }}
         style={{
           height: 30,
           flexDirection: "row",
           justifyContent: "space-between",
           padding: 5,
+          marginHorizontal:20
         }}
       >
         <Text
@@ -330,7 +333,7 @@ const styles = StyleSheet.create({
     alignSelf:'center',
     height: 15,
     backgroundColor: colors.dark_grey,
-    width: 0.2,
+    width: 1,
   },
 });
 

@@ -9,9 +9,12 @@ import {
   ScrollView,
   BackHandler,
   Alert,
-  Platform
+  Platform,
 } from "react-native";
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -27,90 +30,99 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import moment from "moment";
 
-
 const HomeScreen = ({ route, navigation }) => {
-
- 
   // const { email, name } = {
   //   email: route.params.data.params.email,
   //   name: route.params.data.params.name,
   // };
   const [isInternetDetails, setIsInternetDetails] = useState(false);
-  
-  const [plans,setPlans]=useState([])
-  const [billAmt,setBillAmt]=useState(0)
-  const [dueDate,setDueDate]=useState('')
-  const [currentHealth,setCurrentHealth]= useState('Poor')
-  const [billPaid,setBillPaid]=useState(false)
-  
-  const getInternetHealth=(type)=> {
+
+  const [plans, setPlans] = useState([]);
+  const [billAmt, setBillAmt] = useState(0);
+  const [dueDate, setDueDate] = useState("");
+  const [currentHealth, setCurrentHealth] = useState("Optimal");
+  const [billPaid, setBillPaid] = useState(false);
+
+  const getInternetHealth = (type) => {
     var currentHealth = {
-      'Poor': 20,
-      'Good': 50,
-      'Optimal': 80,
-      'default': 80
+      Offline: 20,
+      Poor: 50,
+      Optimal: 80,
+      default: 80,
     };
-    return  (currentHealth[type] || currentHealth['default']);
-  }
+    return currentHealth[type] || currentHealth["default"];
+  };
 
-  const getInternetPlanDetails=()=>{
+  const getInternetPlanDetails = () => {
     let re = getUser().then((res) => {
-      const request=`internet/api/internet/${res.userInfo.accountNumber}/plan`
-      GetApiRequest(request,onSuccessPlan,onError)
+      const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
+      GetApiRequest(request, onSuccessPlan, onError);
     });
-  }
+  };
 
-  const onSuccessPlan=(res)=>{
-    console.log('getInternetPlanDetails',res)
-    if(res){
-        setPlans(res)
+  const onSuccessPlan = (res) => {
+    console.log("getInternetPlanDetails", res);
+    if (res) {
+      setPlans(res);
     }
-  }
-  const onError=(error)=>{
-    console.log('error',error)
-  }
+  };
+  const onError = (error) => {
+    console.log("error", error);
+  };
 
-
-  const getUserAccountDetails=()=>{
+  const getUserAccountDetails = () => {
     let re = getUser().then((res) => {
-      const request=`account/api/account/${res.userInfo.accountNumber}`
-      GetApiRequest(request,onSuccessBill,onErrorBill)
+      const request = `account/api/account/${res.userInfo.accountNumber}`;
+      GetApiRequest(request, onSuccessBill, onErrorBill);
     });
-  }
+  };
 
+  const updateInternetHealth = (dueDate) => {
 
-  
-
-  const onSuccessBill=(res)=>{
-    console.log('getUserAccountDetails',res)
-    if(res){
-      let dueDate = moment(res.paymentDueDate).format('ll')
-      setDueDate(dueDate)
-      setBillAmt(res.currentBalance)
+    var date = new Date(dueDate);
+    var now =new Date();
+    if (date> now) {
+      
+    } else {
+      //if(date.diff)
+      const diffTime = Math.abs(now.getTime() - date.getTime());
+       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+      setCurrentHealth("Offline");
+      console.log('Good',diffDays )
+     
     }
-  }
+  };
 
-  const onErrorBill=(error)=>{
-    console.log('error',error)
-  }
-  
+  const onSuccessBill = (res) => {
+    console.log("getUserAccountDetails", res);
+    if (res) {
+      let dueDate = moment(res.paymentDueDate).format("ll");
+      setDueDate(dueDate);
+      setBillAmt(res.currentBalance);
+      updateInternetHealth(res.paymentDueDat);
+    }
+  };
+
+  const onErrorBill = (error) => {
+    console.log("error", error);
+  };
 
   useEffect(() => {
-   getInternetPlanDetails();
-   getUserAccountDetails();
+    getInternetPlanDetails();
+    getUserAccountDetails();
 
     const backAction = () => {
       Alert.alert(
-        'Confirm Exit',
-        'Are you sure you want to exit the app?',
+        "Confirm Exit",
+        "Are you sure you want to exit the app?",
         [
           {
-            text: 'Cancel',
+            text: "Cancel",
             onPress: () => null,
-            style: 'cancel',
+            style: "cancel",
           },
           {
-            text: 'Exit',
+            text: "Exit",
             onPress: () => BackHandler.exitApp(),
           },
         ],
@@ -119,11 +131,13 @@ const HomeScreen = ({ route, navigation }) => {
       return true;
     };
 
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
 
     return () => backHandler.remove();
   }, []);
-  
 
   return (
     <LinearGradient
@@ -135,11 +149,11 @@ const HomeScreen = ({ route, navigation }) => {
       <SafeAreaView style={{ flex: 1 }}>
         <View
           style={{
-            height: (Platform.OS=='ios')?60:50,
+            height: Platform.OS == "ios" ? 60 : 50,
             flexDirection: "row",
             justifyContent: "space-between",
             marginHorizontal: 20,
-            marginTop:(Platform.OS=='ios')?0:20,
+            marginTop: Platform.OS == "ios" ? 0 : 20,
           }}
         >
           <Image
@@ -161,7 +175,9 @@ const HomeScreen = ({ route, navigation }) => {
           >
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <Text style={styles.internetHealth}>Internet Health</Text>
-              <InternetHealthChart currentValue={getInternetHealth(currentHealth)} />
+              <InternetHealthChart
+                currentValue={getInternetHealth(currentHealth)} key={currentHealth}
+              />
               <View style={styles.internetStatusSection}>
                 <View style={{ marginTop: 5 }}>
                   <InfoIcon />
@@ -180,12 +196,11 @@ const HomeScreen = ({ route, navigation }) => {
                   setIsInternetDetails(!isInternetDetails);
                 }}
                 style={{
-                  
                   flexDirection: "row",
                   justifyContent: "space-between",
                   padding: 5,
-                  marginVertical:5,
-                  marginHorizontal:25
+                  marginVertical: 5,
+                  marginHorizontal: 25,
                 }}
               >
                 <Text style={styles.hideShowDetails}>
@@ -201,17 +216,24 @@ const HomeScreen = ({ route, navigation }) => {
                   )}
                 </View>
               </TouchableOpacity>
-              {isInternetDetails ? <NetworkDetails billPaid={billPaid}/> : <></>}
+              {isInternetDetails ? (
+                <NetworkDetails billPaid={billPaid} />
+              ) : (
+                <></>
+              )}
             </View>
-             <ScrollView horizontal={true}style={{marginStart:20}} >
-              <View style={{marginHorizontal:10}}>
-                <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate}/>
-             </View>
-            
-            </ScrollView> 
-             
-             <MyServicePlan plans={plans} />
+            <ScrollView horizontal={true} style={{ marginStart: 20 }}>
+              <View style={{ marginHorizontal: 10 }}>
+                <MyInternetDetials
+                  plans={plans}
+                  billAmt={billAmt}
+                  dueDate={dueDate}
+                  navigation={navigation}
+                />
+              </View>
+            </ScrollView>
 
+            <MyServicePlan plans={plans} navigation={navigation} />
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -261,12 +283,12 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontWeight: "400",
     lineHeight: 28,
-    paddingHorizontal:5
+    paddingHorizontal: 5,
   },
   hideShowDetails: {
     fontSize: 16,
     marginVertical: 5,
-    color:colors.sparklight_purple_blue,
+    color: colors.sparklight_purple_blue,
     lineHeight: 20,
     fontWeight: "600",
   },
