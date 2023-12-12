@@ -236,8 +236,9 @@ const styles = StyleSheet.create({
         borderColor: Color.colorWhitesmoke_200,
         paddingHorizontal: Padding.p_5xs,
         paddingVertical: Padding.p_11xs,
+        alignSelf: 'flex-start',
         alignItems: "center",
-        flexDirection: "row",
+        flexDirection: "column",
         borderRadius: Border.br_11xs,
     },
     motorolaParent: {

@@ -107,7 +107,7 @@ const ProfileSettings = () => {
                 </Text>
               </View>
               <View style={styles.firstNameParent} accessible={true} >
-                <Text style={styles.firstName}>Phone</Text>
+                <Text style={styles.firstName}>Mobile Phone</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
                   4805671011
                 </Text>
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   },
   textTypo: {
     lineHeight: 18,
-    fontSize: FontSize.textXsSemibold_size,
+    fontSize: FontSize.size_xs,
     fontWeight: "600",
   },
   rightIconLayout: {
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.success50,
     borderColor: Color.colorAquamarine,
     paddingHorizontal: Padding.p_5xs,
-    paddingVertical: 4,
+    paddingVertical: Padding.p_11xs,
     alignItems: "center",
     flexDirection: "row",
   },
@@ -239,6 +239,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
     alignSelf: "stretch",
     fontFamily: FontFamily.openSansRegular,
+    fontWeight:'400'
   },
 
   creditCardWillExpireSoonParent: {

@@ -13,7 +13,7 @@ import Myplanicon from "../../res/svgIcons/Myplanicon";
 
 
 
-const MyInternetDetials = ({ plans , billAmt,dueDate}) => {
+const MyInternetDetials = ({ plans , billAmt,dueDate,navigation}) => {
   //const [billAmt,setBillAmt]=useState(0)
   const [planSpeed,setPlanSpeed]=useState('')
   //const [dueDate,setDueDate]=useState('')
@@ -59,7 +59,8 @@ const MyInternetDetials = ({ plans , billAmt,dueDate}) => {
       <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
       <TouchableOpacity
         onPress={() => {
-          Linking.openURL('https://customer.uat.sparklight.com/residential/billing')
+          navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/billing', name: 'Billing Details' }) 
+          //Linking.openURL('https://customer.uat.sparklight.com/residential/billing')
         }}
         style={{
           paddingBottom:5,
@@ -114,7 +115,8 @@ const MyInternetDetials = ({ plans , billAmt,dueDate}) => {
 <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
 <TouchableOpacity
   onPress={() => {
-    Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
+    navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name: 'Upgrade Plan' })
+    //Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
   }}
   style={{
     paddingBottom:5,

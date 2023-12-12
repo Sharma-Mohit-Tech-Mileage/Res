@@ -181,6 +181,7 @@ const AccountOverview = () => {
               Logout
             </Text>
           </Pressable>
+
         </View>
       </View>
     </View>

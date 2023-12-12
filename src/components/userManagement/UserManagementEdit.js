@@ -50,7 +50,7 @@ const UserManagementEdit = () => {
                       <Text style={[styles.firstName, styles.firstClr]}>
                         Username
                       </Text>
-                      <SparkLightInput placeholder="Enter text here"/>
+                      <SparkLightInput placeholder="Enter text here" />
                     </View>
                   </View>
                   <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]} >
@@ -135,7 +135,7 @@ const UserManagementEdit = () => {
                       <Text style={[styles.firstName, styles.firstClr]}>
                         New Password
                       </Text>
-                      <SparkLightInput placeholder="Enter text here"/>
+                      <SparkLightInput placeholder="Enter text here" />
                     </View>
                   </View>
                   <View style={[styles.itMustBeDifferentThanYourWrapper, styles.wrapperSpaceBlock]}>
@@ -149,7 +149,10 @@ const UserManagementEdit = () => {
                       ].map((point, index) => (
                         <View key={`point-${index}`} style={styles.bulletPointContainer}>
                           <Text style={styles.bulletPoint}>•</Text>
-                          <Text style={styles.itMustBe}>{point}</Text>
+                          <Text style={[styles.itMustBe, {
+                            color: Color.sparklightGray1,
+                            fontWeight: '400'
+                          }]}>{point}</Text>
                         </View>
                       ))}
                     </View>

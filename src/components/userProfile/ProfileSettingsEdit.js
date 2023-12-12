@@ -77,7 +77,7 @@ const ProfileSettingsEdit = () => {
               </View>
               <View style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}>
                 <View style={styles.textinput}>
-                  <Text style={[styles.firstTypo]}>Phone</Text>
+                  <Text style={[styles.firstTypo]}>Mobile Phone</Text>
                   <View ><SparkLightInput placeholder="Enter text here" />
                   </View>
                 </View>

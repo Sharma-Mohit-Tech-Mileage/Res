@@ -8,21 +8,18 @@ import colors from '../../res/Colors';
 const InternetHealthChart= ({currentValue}) => {
   const [showArcRanges, setShowArcRanges] = useState(false);
   const [ todayDate, setTodayDate]= useState("");
-
-
-
   const segments = [
     {
       scale: 0.33,
       filledColor: '#DF2600',
       emptyColor: '#DF2600',
-      data: { label: 'Poor' }
+      data: { label: 'Offline' }
     },
     {
       scale: 0.33,
       filledColor: '#FBB231',
       emptyColor: '#FBB231',
-      data: { label: 'Good' }
+      data: { label: 'Poor' }
     },
     {
       scale: 0.33,
@@ -38,13 +35,27 @@ const InternetHealthChart= ({currentValue}) => {
   const _handlePress = () => {
     setShowArcRanges(!showArcRanges);
   };
+  
+  const getIndicatorColor=(currentValue)=>{
 
+    if(currentValue < 33 && currentValue >0){
+      return '#DF2600'
+    }else if(currentValue >=33 && currentValue <66){
+      return '#FBB231'
+    }else if(currentValue >=66 && currentValue <99){
+      return '#2BA948'
+    }else{
+      return '#2BA948'
+    }
+
+  }
 
   useEffect(()=>{
     //moment().format("MMM Do YY");
     let currentDate = moment().format('ll')
     setTodayDate(currentDate)
-  },[])
+    console.log('CurrentValue',currentValue)
+  },[currentValue])
 
   return (
     <View style={{  alignItems: 'center', justifyContent: 'center'}}>
@@ -56,7 +67,7 @@ const InternetHealthChart= ({currentValue}) => {
         showArcRanges={showArcRanges}
         ranges={ranges}
         radius={110}
-        capInnerColor='#2BA948'
+        capInnerColor={getIndicatorColor(currentValue)}
         
       >
         {metaData => (

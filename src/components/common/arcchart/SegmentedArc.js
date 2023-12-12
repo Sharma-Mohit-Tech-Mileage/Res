@@ -105,7 +105,7 @@ export const SegmentedArc = ({
   const lastFilledSegment = arcs.find(a => a.filled !== a.end) || arcs[arcs.length - 1];
 
   useEffect(() => {
-    if (!lastFilledSegment) return;
+    //if (!lastFilledSegment) return;
     if (animationRunning.current) return;
     if (!isAnimated) return;
     animationRunning.current = true;
