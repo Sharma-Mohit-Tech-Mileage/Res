@@ -40,7 +40,7 @@ const HomeScreen = ({ route, navigation }) => {
   const [plans, setPlans] = useState([]);
   const [billAmt, setBillAmt] = useState(0);
   const [dueDate, setDueDate] = useState("");
-  const [currentHealth, setCurrentHealth] = useState("Optimal");
+  const [currentHealth, setCurrentHealth] = useState("Poor");
   const [billPaid, setBillPaid] = useState(false);
 
   const getInternetHealth = (type) => {
@@ -77,20 +77,16 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
-  const updateInternetHealth = (dueDate) => {
-
-    var date = new Date(dueDate);
-    var now =new Date();
-    if (date> now) {
-      
-    } else {
-      //if(date.diff)
-      const diffTime = Math.abs(now.getTime() - date.getTime());
-       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-      setCurrentHealth("Offline");
-      console.log('Good',diffDays )
-     
+  const updateInternetHealth = (dueAmount) => {
+    if(dueAmount<=0){
+     setCurrentHealth('Optimal')
+     setIsInternetDetails(false)
+     setBillPaid(true)
+    }else{
+      setCurrentHealth('Poor')
+      setIsInternetDetails(true)
     }
+   
   };
 
   const onSuccessBill = (res) => {
@@ -99,7 +95,7 @@ const HomeScreen = ({ route, navigation }) => {
       let dueDate = moment(res.paymentDueDate).format("ll");
       setDueDate(dueDate);
       setBillAmt(res.currentBalance);
-      updateInternetHealth(res.paymentDueDat);
+      updateInternetHealth(res.currentBalance);
     }
   };
 
@@ -217,7 +213,7 @@ const HomeScreen = ({ route, navigation }) => {
                 </View>
               </TouchableOpacity>
               {isInternetDetails ? (
-                <NetworkDetails billPaid={billPaid} />
+                <NetworkDetails billPaid={billPaid} navigation={navigation} />
               ) : (
                 <></>
               )}
