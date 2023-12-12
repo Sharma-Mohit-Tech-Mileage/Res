@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text,ActivityIndicator } from "react-native";
+import { View, Image, StyleSheet, Text,ActivityIndicator, Pressable } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize } from "react-native-app-auth";
@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ssoLoginAction } from "../../redux/actions/UserAction";
 import { storeUser,storeSsoToken } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
+import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 
 
 const config = {
@@ -64,7 +65,7 @@ const SplashScreen = ({ navigation }) => {
     console.log(' callSSOLoginApi error',error)
   }
 
-  useEffect(() => {
+  const onLogin = () => {
     const loginAuth = async () => {
       try {
         const result = await authorize(config);
@@ -79,7 +80,24 @@ const SplashScreen = ({ navigation }) => {
       }
     };
     loginAuth();
-    
+  }
+
+  useEffect(() => {
+    // const loginAuth = async () => {
+    //   try {
+    //     const result = await authorize(config);
+    //     const data={idToken:result.idToken}
+    //     setLoading(true)
+    //      //dispatch(ssoLoginAction(data))
+    //      callSSOLoginApi(data)
+    //      storeSsoToken(data)
+         
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // };
+    // loginAuth();
+    // navigation.navigate('Terms');
   }, []);
 
 
@@ -99,6 +117,20 @@ const SplashScreen = ({ navigation }) => {
           style={styles.logo}
         />
       </View>
+      <View style={styles.buttonContainer}>
+        <Pressable
+            style={[styles.buttons, styles.buttonsLayout]}
+            onPress={onLogin}
+        >
+            <Text style={styles.accept}>Login</Text>
+        </Pressable>
+        <Pressable
+            style={[styles.buttons, styles.buttonsLayout]}
+            onPress={() => navigation.navigate("Terms")}
+        >
+            <Text style={styles.accept}>First Time Entry</Text>
+        </Pressable> 
+      </View>     
     </LinearGradient>
   );
 };
@@ -123,6 +155,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: colors.snow_white,
   },
+  buttonContainer: {
+    alignItems: 'center'
+  },
+  buttons: {
+    backgroundColor: Color.colorWhitesmoke_300,
+  },
+  buttonsLayout: {
+      paddingVertical: Padding.p_base,
+      paddingHorizontal: 0,
+      justifyContent: "center",
+      alignItems: "center",
+      borderRadius: Border.br_11xs,
+      height: 50,
+      width: '45%',
+      marginTop: 20
+  },   
 });
 
 export default SplashScreen;
