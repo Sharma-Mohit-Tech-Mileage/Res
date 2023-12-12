@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTabBarVisibility } from './TabBarVisibilityContext';
 import AccountStackScreen from '../navigations/stackNavigation/AccountStack';
+import HomeStackScreen from './stackNavigation/HomeStack';
 import ShopScreen from '../components/home/Shop';
 import HomeScreen from '../components/home/Home';
 import SupportStack from '../navigations/stackNavigation/SupportStack';
@@ -30,7 +31,7 @@ const MyTabs = ({ route, navigation }) => {
     >
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeStackScreen}
         initialParams={{ data: route }}
         options={{
           headerShown: false,

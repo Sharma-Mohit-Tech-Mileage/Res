@@ -78,7 +78,7 @@ fetch(`${BASE_URL}/${endpoint}`, {
         if (!response.ok) { // We should get a 200 (OK) status code if everything is fine/working
             throw Error(`Respsonse status ${response.status} (${response.statusText}): ${json.message}`);
         }
-        console.log("Response",json);
+        //console.log("Response",json);
         onSuccess(json)
         // Whatever you want to do next after fetching - maybe dispatch something?
     })
