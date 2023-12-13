@@ -8,7 +8,7 @@ import {
   Linking,
   Alert,
   TouchableOpacity,
-  Modal
+  Modal,
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
@@ -23,6 +23,8 @@ import {
 } from "react-native-responsive-screen";
 import RNExitApp from "react-native-exit-app";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
+import CloseIcon from "../../res/svgIcons/CloseIcon";
+import strings from "../../res/Strings";
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -39,7 +41,7 @@ const SplashScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
- 
+  const [errorMessage,setErrorMessage]=useState('')
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -62,9 +64,19 @@ const SplashScreen = ({ navigation }) => {
       }
 
       if (userInfo.accountNumber === "900690538") {
-        nonAdminUserMessage();
+       
+        setErrorMessage(strings.nonAdminUserMsg)
+        setTimeout(()=>{
+          setModalVisible(true);
+        },100)
+       
       } else if (userInfo.accountNumber === "902862879") {
-        nonInternetUserMessage();
+        
+        setErrorMessage(strings.nonInternetUserMessage)
+        setTimeout(()=>{
+          setModalVisible(true);
+        },100)
+        
       } else {
         navigation.navigate("MyTab", {
           fname: userInfo.firstName,
@@ -78,83 +90,83 @@ const SplashScreen = ({ navigation }) => {
     console.log(" callSSOLoginApi error", error);
   };
 
-  const nonAdminUserMessage = () => {
-    Alert.alert(
-      "Alert Message",
-      "Currently, only the Primary Admin or an Admin of a Sparklight account can use the MySparklight mobile app for account management. Please login to your online account to view information.",
-      [
-        {
-          text: "Close",
-          onPress: () => {
-            RNExitApp.exitApp();
-          },
-          style: "cancel",
-        },
-        {
-          text: "Open Portal",
-          onPress: () => {
-            Linking.openURL("https://www.sparklight.com/");
-          },
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  const nonInternetUserMessage = () => {
-    Alert.alert(
-      "Alert Message",
-      "Currently, only a Sparklight account with Internet service can use the MySparklight mobile app for service management. Please login to your online account to manage your service.",
-      [
-        {
-          text: "Close",
-          onPress: () => {
-            RNExitApp.exitApp();
-          },
-          style: "cancel",
-        },
-        {
-          text: "Open Portal",
-          onPress: () => {
-            Linking.openURL("https://www.sparklight.com/");
-          },
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-const AlertMessage = () => {
-  
-  return (
-    <View>
+  const CustomAlertModal = ({ visible, message, onClose }) => {
+    return (
       <Modal
+        visible={visible}
+        transparent
         animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(!modalVisible);
-        }}
+        onRequestClose={onClose}
       >
-        <View style={{flexDirection:'column', backgroundColor:'white'}}>
-
-          <View style={{flexDirection:'row'}}>
-          <View style={{flexDirection:'row'}}>
-            <AlertIcon/>
-            <Text>Alert Message</Text>
-
+        <View style={styles.overlay}>
+          <View style={styles.alertContainer}>
+            <View
+              style={{ flexDirection: "row", justifyContent:'space-between' }}
+            >
+              <View style={{ flexDirection: "row", alignSelf: "flex-start" }}>
+                <AlertIcon />
+                <Text style={{color:colors.sparklight_grey,fontSize:22,fontWeight:'400', marginLeft:5}}>Alert Message</Text>
+              </View>
+              <TouchableOpacity onPress={onClose}>
+                <CloseIcon />
+              </TouchableOpacity>
             </View>
-            <Image source={require('../../../assets/xclose.png')}/>
+            <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
+            <Text style={styles.message}>{message}</Text>
+            <TouchableOpacity
+              style={{
+                backgroundColor: colors.sparklight_purple_blue,
+                justifyContent: "center",
+                width:'100%',
+                marginTop:20
+              }}
+              onPress={() => {
+                Linking.openURL("https://www.sparklight.com/");
+              }}
+            >
+              <Text
+                style={{
+                  color: colors.snow_white,
+                  textAlign: "center",
+                  padding: 8,
+                  fontSize: 16,
+                }}
+              >
+                Open Portal
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{
+                backgroundColor: colors.backgound_blue,
+                justifyContent: "center",
+                width:'100%',
+                marginTop:15
+              }}
+              onPress={onClose}
+            >
+              <Text
+                style={{
+                  color: colors.sparklight_purple_blue,
+                  textAlign: "center",
+                  padding: 8,
+                  fontSize: 16,
+                }}
+              >
+                Close
+              </Text>
+            </TouchableOpacity>
           </View>
-          
         </View>
       </Modal>
+    );
+  };
 
-      
-    </View>
-  );
-};
+  
 
+  const handleCloseAlert = () => {
+    setModalVisible(false);
+  };
 
   const loginAuth = async () => {
     try {
@@ -191,10 +203,16 @@ const AlertMessage = () => {
         style={styles.SSoBtnContainer}
         onPress={() => {
           loginAuth();
+          
         }}
       >
-        <Text style={styles.SSoBtn}>SSO Login</Text>
+        <Text style={styles.SSoBtn}>Login</Text>
       </TouchableOpacity>
+      <CustomAlertModal
+        visible={modalVisible}
+        message={errorMessage}
+        onClose={handleCloseAlert}
+      />
     </LinearGradient>
   );
 };
@@ -231,6 +249,36 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: 16,
     fontSize: 16,
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  alertContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 5,
+    width: "85%",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    padding: 5,
+  },
+  closeText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "black",
+  },
+  message: {
+    color: colors.darkest_grey,
+    fontSize: 14,
+    fontWeight: "400",
+    lineHeight: 28,
+    marginTop:10
   },
 });
 
