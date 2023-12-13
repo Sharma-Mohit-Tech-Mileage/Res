@@ -1,54 +1,53 @@
-import * as React from "react";
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Image, StyleSheet, Text, Pressable, View, SafeAreaView, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import { ROLE_COLORS } from '../utility/constant';
+import { executeUserList } from '../../redux/actions/ProfileActionSuite'
 
 const UserManagement = () => {
-
   const navigation = useNavigation();
-  const users = [
-    {
-      initials: 'MS',
-      name: 'Melissa Smith',
-      status: 'Logged In',
-      username: 'MelSmith',
-      memberType: 'PRIMARY ADMIN',
-      email: 'melissa@gmail.com',
-    },
-    {
-      initials: 'TN',
-      name: 'Taylor Nickum',
-      status: null,
-      username: 'Taylor123',
-      memberType: 'ADMIN',
-      email: 'taylor123@gmail.com',
-    },
-    {
-      initials: 'KK',
-      name: 'Kapil Kumar',
-      status: null,
-      username: 'Taylor123',
-      memberType: 'VIEW ONLY',
-      email: 'kumark@gmail.com',
-    }
-    // Add more user objects as needed
-  ];
+
+  const dispatch = useDispatch();
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const userList = profile.userList || []; // Defaulting to an empty array if userList is undefined
+
+  useEffect(() => {
+    dispatch(executeUserList(0));
+  }, [dispatch]);
+ 
   const renderUserCard = (user) => {
     const normalizedRole = user.memberType.replace(/\s+/g, '').toLowerCase();
     const avatarColor = ROLE_COLORS[normalizedRole] || Color.sparklightGreen;
+    // Extracting fullName and initials
+    const firstName = user?.firstName || '';
+    const lastName = user?.lastName || '';
+
+    let initials = '';
+    if (firstName.length > 0) {
+      initials += firstName.charAt(0).toUpperCase();
+    }
+    if (lastName.length > 0) {
+      initials += lastName.charAt(0).toUpperCase();
+    }
+    // Camel Case Full Name
+    const fullNameCamelCase = [firstName, lastName]
+      .map(name => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase())
+      .join(' ');
+
     return (
       <View style={[styles.frameParent3, styles.frameBorder]}>
         <View style={[styles.frameParent1, styles.navigationBorder]}>
           <View style={styles.rightActionableParent}>
             <View style={[{ backgroundColor: avatarColor }, styles.rightLayout]}>
               <View style={styles.avatarContrastInnerBorder} />
-              <Text style={[styles.text, styles.textClr]}>{user.initials}</Text>
+              <Text style={[styles.text, styles.textClr]}>{initials}</Text>
             </View>
             <View>
               <Text style={[styles.taylorNickum, styles.melissaSmithTypo]}>
-                {user.name}
+                {fullNameCamelCase}
               </Text>
               {user.status && (
                 <View style={styles.userParent}>
@@ -86,7 +85,7 @@ const UserManagement = () => {
             <Text style={[styles.username, styles.usersFlexBox]}>
               Username
             </Text>
-            <Text style={styles.melsmith}>{user.username}</Text>
+            <Text style={styles.melsmith}>{user.userName}</Text>
           </View>
         </View>
         <View style={styles.frameWrapper}>
@@ -135,7 +134,7 @@ const UserManagement = () => {
                 </Pressable> */}
             </View>
             <View style={styles.frameContainer}>
-              {users.map((user, index) => (
+              {userList.map((user, index) => (
                 <React.Fragment key={index}>
                   {renderUserCard(user)}
                 </React.Fragment>
