@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Alert } from "react-native";
+import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import BellIcon from "../../res/svgIcons/bellIcon";
-import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
+import PhoneRingingIcon from "../../res/svgIcons/PhoneRingingIcon";
+import EntryInput from "./EntryInput";
+import CheckBox from '@react-native-community/checkbox';
 
-const EmailNotifications = ({ navigation }) => {
+const TextNotifications = ({ navigation }) => {
+    const [input, setInput] = useState('');
+    const [toggleCheckBox, setToggleCheckBox] = useState(false);
+
+    const onChangeText = (text) => {
+        setInput(text);
+    };    
 
     const terms = [
         {
@@ -40,29 +48,49 @@ const EmailNotifications = ({ navigation }) => {
                 <View>
                     <View style={styles.headerIconViewContainer}>
                         <View style={styles.headerIconView}>
-                            <MailRingingIcon />
+                            <PhoneRingingIcon />
                         </View>
                     </View>
                     <View style={styles.header}>
-                        <Text style={styles.headerText}>Turn on Email Notifications</Text>
+                        <Text style={styles.headerText}>Turn on Text Notifications</Text>
                     </View>         
                     <View style={styles.subHeader}>
-                        <Text style={styles.subHeaderText}>Receive email alerts related to your account, updates and more from Sparklight.</Text>
+                        <Text style={styles.subHeaderText}>Receive text alerts related to your account, updates and more from Sparklight.</Text>
                     </View>   
-                </View>            
+                </View>
+                <View style={styles.subInput}>
+                    <EntryInput
+                        iconImage={require('../../../assets/phone.png')}
+                        placeholder="Phone number"
+                        input={input}
+                        onChangeText={onChangeText}
+                        keyboardType="numeric"
+                    />                
+                </View>                            
+            </View>
+            <View style={styles.checkBoxArea}>
+                <CheckBox
+                    disabled={false}
+                    value={toggleCheckBox}
+                    onValueChange={(newValue) => setToggleCheckBox(newValue)}
+                    style={styles.checkBox}
+                />   
+                <View style={styles.checkBoxAreaView}>
+                    <Text style={styles.checkBoxAreaViewText}>I agree that message and data rates may apply. Message frequency may vary.</Text>
+                </View>             
             </View>
             <View style={styles.bottomBar}>
                 <Pressable
                     style={[styles.button, styles.buttonsLayout]}
-                    onPress={() => Alert.alert('Email Success')}
+                    onPress={() => navigation.navigate("EmailNotifications")}
                 >
-                    <Text style={styles.accept}>Allow Notifications</Text>
+                    <Text style={styles.accept}>Enable Text Notifications</Text>
                 </Pressable>                
                 <View style={styles.buttonsParent} 
                     accessibilityLabel="Buttons Section">
                     <Pressable
                         style={[styles.buttonDecline, styles.buttonsLayout]}
-                        onPress={() => Alert.alert('Email Skip')}
+                        onPress={() => navigation.navigate("EmailNotifications")}
                         accessibilityLabel="Decline Button"
                         accessibilityRole="button"
                         accessibilityHint="Decline Terms and Conditions"
@@ -84,7 +112,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',  
     },
     buttonDecline: {
-        marginBottom: 50
+        marginBottom: 20
     },    
     button: {
         backgroundColor: Color.colorMidnightblue,
@@ -101,7 +129,29 @@ const styles = StyleSheet.create({
     },    
     buttonsParent: {
         width: '90%',
-    },    
+    },
+    checkBox: {
+        marginLeft: 10,
+        marginRight: 10
+    },
+    checkBoxArea: {
+        backgroundColor: Color.colorWhitesmoke_100,
+        flexDirection: 'row',
+        marginBottom: 20,
+        paddingVertical: 20,
+        marginLeft: 20,
+        marginRight: 20,
+        width: '90%',    
+    },
+    checkBoxAreaView: {
+        marginRight: 20
+    },
+    checkBoxAreaViewText: {
+        fontSize: 14,
+        fontFamily: FontFamily.openSansRegular,   
+        lineHeight: 20,    
+        marginRight: 20
+    },
     accept: {
         fontSize: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,
@@ -169,7 +219,7 @@ const styles = StyleSheet.create({
         marginLeft: 10
     },
     headerTabThree: {
-        backgroundColor: Color.colorMidnightblue,
+        backgroundColor: Color.colorWhitesmoke_300,
         width: 100,
         height: 5,
         marginLeft: 10
@@ -192,12 +242,15 @@ const styles = StyleSheet.create({
         lineHeight: 20,
         textAlign: 'center'
     }, 
+    subInput: {
+        marginTop: 10
+    },
     viewContainer: {
-        height: '60%',
+        flex: 1,
         width: '100%',
         alignItems: 'center',
         marginTop: 20
     }
 });
 
-export default EmailNotifications;
+export default TextNotifications;

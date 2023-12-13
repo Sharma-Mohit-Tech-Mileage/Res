@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable } from "react-native";
+import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Alert } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import BellIcon from "../../res/svgIcons/bellIcon";
-import PhoneRingingIcon from "../../res/svgIcons/PhoneRingingIcon";
+import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
+import EntryInput from "./EntryInput";
 
-const TextNotifications = ({ navigation }) => {
+const EmailNotifications = ({ navigation }) => {
+    const [input, setInput] = useState('');
+
+    const onChangeText = (text) => {
+        setInput(text);
+    };    
 
     const terms = [
         {
@@ -40,29 +46,38 @@ const TextNotifications = ({ navigation }) => {
                 <View>
                     <View style={styles.headerIconViewContainer}>
                         <View style={styles.headerIconView}>
-                            <PhoneRingingIcon />
+                            <MailRingingIcon />
                         </View>
                     </View>
                     <View style={styles.header}>
-                        <Text style={styles.headerText}>Turn on Text Notifications</Text>
+                        <Text style={styles.headerText}>Turn on Email Notifications</Text>
                     </View>         
                     <View style={styles.subHeader}>
-                        <Text style={styles.subHeaderText}>Receive text alerts related to your account, updates and more from Sparklight.</Text>
+                        <Text style={styles.subHeaderText}>Receive email alerts related to your account, updates and more from Sparklight.</Text>
                     </View>   
-                </View>            
+                </View>     
+                <View style={styles.subInput}>
+                    <EntryInput
+                        iconImage={require('../../../assets/mail.png')}
+                        placeholder="Email Address"
+                        input={input}
+                        onChangeText={onChangeText}
+                        keyboardType="email"
+                    />                
+                </View>                          
             </View>
             <View style={styles.bottomBar}>
                 <Pressable
                     style={[styles.button, styles.buttonsLayout]}
-                    onPress={() => navigation.navigate("EmailNotifications")}
+                    onPress={() => Alert.alert('Email Success')}
                 >
-                    <Text style={styles.accept}>Enable Text Notifications</Text>
+                    <Text style={styles.accept}>Allow Notifications</Text>
                 </Pressable>                
                 <View style={styles.buttonsParent} 
                     accessibilityLabel="Buttons Section">
                     <Pressable
                         style={[styles.buttonDecline, styles.buttonsLayout]}
-                        onPress={() => navigation.navigate("EmailNotifications")}
+                        onPress={() => Alert.alert('Email Skip')}
                         accessibilityLabel="Decline Button"
                         accessibilityRole="button"
                         accessibilityHint="Decline Terms and Conditions"
@@ -169,7 +184,7 @@ const styles = StyleSheet.create({
         marginLeft: 10
     },
     headerTabThree: {
-        backgroundColor: Color.colorWhitesmoke_300,
+        backgroundColor: Color.colorMidnightblue,
         width: 100,
         height: 5,
         marginLeft: 10
@@ -192,12 +207,15 @@ const styles = StyleSheet.create({
         lineHeight: 20,
         textAlign: 'center'
     }, 
+    subInput: {
+        marginTop: 10
+    },    
     viewContainer: {
-        height: '60%',
+        flex: 1,
         width: '100%',
         alignItems: 'center',
         marginTop: 20
     }
 });
 
-export default TextNotifications;
+export default EmailNotifications;

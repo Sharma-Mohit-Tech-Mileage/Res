@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
         textAlign: 'center'
     }, 
     viewContainer: {
-        height: '60%',
+        flex: 1,
         width: '100%',
         alignItems: 'center',
         marginTop: 20
