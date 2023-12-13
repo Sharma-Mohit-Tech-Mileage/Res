@@ -9,6 +9,7 @@ import {
   Alert,
   TouchableOpacity,
   Modal,
+  Pressable
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
@@ -25,6 +26,7 @@ import RNExitApp from "react-native-exit-app";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import strings from "../../res/Strings";
+ import { Color,Padding,Border } from "../../../GlobalStyles";
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -213,6 +215,15 @@ const SplashScreen = ({ navigation }) => {
         message={errorMessage}
         onClose={handleCloseAlert}
       />
+
+<View style={styles.buttonContainer}>
+        <Pressable
+            style={[styles.buttons, styles.buttonsLayout]}
+            onPress={() => navigation.navigate("Terms")}
+        >
+            <Text style={styles.accept}>First Time Flow</Text>
+        </Pressable> 
+      </View>      
     </LinearGradient>
   );
 };
@@ -279,7 +290,23 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     lineHeight: 28,
     marginTop:10
+  },buttonContainer: {
+    alignItems: 'center'
   },
+  buttons: {
+    backgroundColor: Color.colorWhitesmoke_300,
+  },
+  buttonsLayout: {
+      paddingVertical: Padding.p_base,
+      paddingHorizontal: 0,
+      justifyContent: "center",
+      alignItems: "center",
+      borderRadius: Border.br_11xs,
+      height: 50,
+      width: '45%',
+      marginTop: 20
+  },
+ 
 });
 
 export default SplashScreen;
