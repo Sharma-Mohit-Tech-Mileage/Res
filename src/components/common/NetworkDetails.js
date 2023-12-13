@@ -24,6 +24,9 @@ const NetworkDetails = ({ navigation, billPaid }) => {
   const RedCircle = () => {
     return <View style={styles.redTick}></View>;
   };
+  const OrangeCircle = () => {
+    return <View style={styles.orangeTick}></View>;
+  };
 
   return (
     <View style={styles.mainContainer}>
@@ -56,7 +59,7 @@ const NetworkDetails = ({ navigation, billPaid }) => {
           <View style={styles.item}>
             <View style={styles.iconBg}>
               <Billpaidicon />
-              {billPaid ? <GreenCircle /> : <RedCircle />}
+              {billPaid ? <GreenCircle /> : <OrangeCircle />}
             </View>
             <Text style={styles.text}> {strings.bill_paid}</Text>
           </View>
@@ -143,6 +146,16 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: -3,
     backgroundColor: colors.sparklight_red,
+    borderWidth: 2,
+    borderColor: "white",
+  },orangeTick: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    position: "absolute",
+    bottom: 0,
+    right: -3,
+    backgroundColor: colors.sparklight_yellow,
     borderWidth: 2,
     borderColor: "white",
   },
