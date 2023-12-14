@@ -29,6 +29,8 @@ const EntryInput = ({ input, placeholder, onChangeText, iconImage, keyboardType 
                 autoCorrect={false}
                 clearButtonMode="always"
                 keyboardType={keyboardType}
+                returnKeyType="done"
+                enterKeyHint="done"
             />
         </View>
     );

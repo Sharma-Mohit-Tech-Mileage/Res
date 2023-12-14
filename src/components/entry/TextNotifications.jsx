@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable } from "react-native";
+import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Keyboard, Pressable, KeyboardAvoidingView, TouchableWithoutFeedback, Platform } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
@@ -16,7 +16,11 @@ const TextNotifications = ({ navigation }) => {
 
     const onChangeText = (text) => {
         setInput(text);
-    };    
+    };   
+    
+    const keyboardDismiss = () => {
+        Keyboard.dismiss();
+    }; 
 
     const terms = [
         {
@@ -35,72 +39,80 @@ const TextNotifications = ({ navigation }) => {
 
     return  (
         <View style={styles.container}>
-            <ProfileSettingsHeader 
-                showIcon={false}
-                title={'Notifications'}
-            />
-            <View style={styles.headerTabView}>
-                <View style={styles.headerTabOne} />
-                <View style={styles.headerTabTwo} />
-                <View style={styles.headerTabThree} />
-            </View>
-            <View style={styles.viewContainer}>
-                <View>
-                    <View style={styles.headerIconViewContainer}>
-                        <View style={styles.headerIconView}>
-                            <PhoneRingingIcon />
-                        </View>
-                    </View>
-                    <View style={styles.header}>
-                        <Text style={styles.headerText}>Turn on Text Notifications</Text>
-                    </View>         
-                    <View style={styles.subHeader}>
-                        <Text style={styles.subHeaderText}>Receive text alerts related to your account, updates and more from Sparklight.</Text>
-                    </View>   
-                </View>
-                <View style={styles.subInput}>
-                    <EntryInput
-                        iconImage={require('../../../assets/phone.png')}
-                        placeholder="Phone number"
-                        input={input}
-                        onChangeText={onChangeText}
-                        keyboardType="numeric"
-                    />                
-                </View>                            
-            </View>
-            <View style={styles.checkBoxArea}>
-                <CheckBox
-                    disabled={false}
-                    value={toggleCheckBox}
-                    onValueChange={(newValue) => setToggleCheckBox(newValue)}
-                    style={styles.checkBox}
-                />   
-                <View style={styles.checkBoxAreaView}>
-                    <Text style={styles.checkBoxAreaViewText}>I agree that message and data rates may apply. Message frequency may vary.</Text>
-                </View>             
-            </View>
-            <View style={styles.bottomBar}>
-                <Pressable
-                    style={[styles.button, styles.buttonsLayout]}
-                    onPress={() => navigation.navigate("EmailNotifications")}
+            <TouchableWithoutFeedback onPress={keyboardDismiss}>
+                <ScrollView 
+                    style={styles.inner}
+                    contentContainerStyle={styles.innerContent}
                 >
-                    <Text style={styles.accept}>Enable Text Notifications</Text>
-                </Pressable>                
-                <View style={styles.buttonsParent} 
-                    accessibilityLabel="Buttons Section">
-                    <Pressable
-                        style={[styles.buttonDecline, styles.buttonsLayout]}
-                        onPress={() => navigation.navigate("EmailNotifications")}
-                        accessibilityLabel="Decline Button"
-                        accessibilityRole="button"
-                        accessibilityHint="Decline Terms and Conditions"
-                    >
-                        <Text style={styles.decline}>
-                            Skip for now
-                        </Text>
-                    </Pressable>
-                </View>    
-            </View>
+                    <ProfileSettingsHeader 
+                        showIcon={false}
+                        title={'Notifications'}
+                    />
+                    <View style={styles.headerTabView}>
+                        <View style={styles.headerTabOne} />
+                        <View style={styles.headerTabTwo} />
+                        <View style={styles.headerTabThree} />
+                    </View>
+                    <View style={styles.viewContainer}>
+                        <View>
+                            <View style={styles.headerIconViewContainer}>
+                                <View style={styles.headerIconView}>
+                                    <PhoneRingingIcon />
+                                </View>
+                            </View>
+                            <View style={styles.header}>
+                                <Text style={styles.headerText}>Turn on Text Notifications</Text>
+                            </View>         
+                            <View style={styles.subHeader}>
+                                <Text style={styles.subHeaderText}>Receive text alerts related to your account, updates and more from Sparklight.</Text>
+                            </View>   
+                        </View>
+                        <View style={styles.subInput}>
+                            <EntryInput
+                                iconImage={require('../../../assets/phone.png')}
+                                placeholder="Phone number"
+                                input={input}
+                                onChangeText={onChangeText}
+                                keyboardType="number-pad"
+                            />                
+                        </View>                            
+                    </View>
+                    <View style={styles.checkBoxArea}>
+                        <CheckBox
+                            disabled={false}
+                            value={toggleCheckBox}
+                            onValueChange={(newValue) => setToggleCheckBox(newValue)}
+                            style={styles.checkBox}
+                            boxType="square"
+                        />   
+                        <View style={styles.checkBoxAreaView}>
+                            <Text style={styles.checkBoxAreaViewText}>I agree that message and data rates may apply. Message frequency may vary.</Text>
+                        </View>             
+                    </View>
+                    <View style={styles.bottomBar}>
+                        <Pressable
+                            style={[styles.button, styles.buttonsLayout]}
+                            onPress={() => navigation.navigate("EmailNotifications")}
+                        >
+                            <Text style={styles.accept}>Enable Text Notifications</Text>
+                        </Pressable>                
+                        <View style={styles.buttonsParent} 
+                            accessibilityLabel="Buttons Section">
+                            <Pressable
+                                style={[styles.buttonDecline, styles.buttonsLayout]}
+                                onPress={() => navigation.navigate("EmailNotifications")}
+                                accessibilityLabel="Decline Button"
+                                accessibilityRole="button"
+                                accessibilityHint="Decline Terms and Conditions"
+                            >
+                                <Text style={styles.decline}>
+                                    Skip for now
+                                </Text>
+                            </Pressable>
+                        </View>    
+                    </View>
+                </ScrollView>
+            </TouchableWithoutFeedback>
         </View>
     );
 };
@@ -162,6 +174,13 @@ const styles = StyleSheet.create({
         color: Color.colorMidnightblue,
         textAlign: "center",
     },    
+    inner: {
+        flex: 1,
+    },    
+    innerContent: {
+        justifyContent: 'space-around',
+        flex: 1
+    },        
     container: {
         flex: 1,
         backgroundColor: '#FFF',
@@ -249,7 +268,7 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
         alignItems: 'center',
-        marginTop: 20
+        marginTop: 20,
     }
 });
 

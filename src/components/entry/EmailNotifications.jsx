@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Alert } from "react-native";
+import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Alert, TouchableWithoutFeedback, Keyboard  } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
@@ -15,6 +15,10 @@ const EmailNotifications = ({ navigation }) => {
     const onChangeText = (text) => {
         setInput(text);
     };    
+
+    const keyboardDismiss = () => {
+        Keyboard.dismiss();
+    };     
 
     const terms = [
         {
@@ -33,61 +37,68 @@ const EmailNotifications = ({ navigation }) => {
 
     return  (
         <View style={styles.container}>
-            <ProfileSettingsHeader 
-                showIcon={false}
-                title={'Notifications'}
-            />
-            <View style={styles.headerTabView}>
-                <View style={styles.headerTabOne} />
-                <View style={styles.headerTabTwo} />
-                <View style={styles.headerTabThree} />
-            </View>
-            <View style={styles.viewContainer}>
-                <View>
-                    <View style={styles.headerIconViewContainer}>
-                        <View style={styles.headerIconView}>
-                            <MailRingingIcon />
-                        </View>
+            <TouchableWithoutFeedback onPress={keyboardDismiss}>
+                <ScrollView 
+                    style={styles.inner}
+                    contentContainerStyle={styles.innerContent}
+                >          
+                    <ProfileSettingsHeader 
+                        showIcon={false}
+                        title={'Notifications'}
+                    />
+                    <View style={styles.headerTabView}>
+                        <View style={styles.headerTabOne} />
+                        <View style={styles.headerTabTwo} />
+                        <View style={styles.headerTabThree} />
                     </View>
-                    <View style={styles.header}>
-                        <Text style={styles.headerText}>Turn on Email Notifications</Text>
-                    </View>         
-                    <View style={styles.subHeader}>
-                        <Text style={styles.subHeaderText}>Receive email alerts related to your account, updates and more from Sparklight.</Text>
-                    </View>   
-                </View>     
-                <View style={styles.subInput}>
-                    <EntryInput
-                        iconImage={require('../../../assets/mail.png')}
-                        placeholder="Email Address"
-                        input={input}
-                        onChangeText={onChangeText}
-                        keyboardType="email"
-                    />                
-                </View>                          
-            </View>
-            <View style={styles.bottomBar}>
-                <Pressable
-                    style={[styles.button, styles.buttonsLayout]}
-                    onPress={() => Alert.alert('Email Success')}
-                >
-                    <Text style={styles.accept}>Allow Notifications</Text>
-                </Pressable>                
-                <View style={styles.buttonsParent} 
-                    accessibilityLabel="Buttons Section">
-                    <Pressable
-                        style={[styles.buttonDecline, styles.buttonsLayout]}
-                        onPress={() => Alert.alert('Email Skip')}
-                        accessibilityLabel="Decline Button"
-                        accessibilityRole="button"
-                        accessibilityHint="Decline Terms and Conditions"
-                    >
-                        <Text style={styles.decline}>
-                            Skip for now
-                        </Text>
-                    </Pressable>
-                </View>    
-            </View>
+                    <View style={styles.viewContainer}>
+                        <View>
+                            <View style={styles.headerIconViewContainer}>
+                                <View style={styles.headerIconView}>
+                                    <MailRingingIcon />
+                                </View>
+                            </View>
+                            <View style={styles.header}>
+                                <Text style={styles.headerText}>Turn on Email Notifications</Text>
+                            </View>         
+                            <View style={styles.subHeader}>
+                                <Text style={styles.subHeaderText}>Receive email alerts related to your account, updates and more from Sparklight.</Text>
+                            </View>   
+                        </View>     
+                        <View style={styles.subInput}>
+                            <EntryInput
+                                iconImage={require('../../../assets/mail.png')}
+                                placeholder="Email Address"
+                                input={input}
+                                onChangeText={onChangeText}
+                                keyboardType="email"
+                            />                
+                        </View>                          
+                    </View>
+                    <View style={styles.bottomBar}>
+                        <Pressable
+                            style={[styles.button, styles.buttonsLayout]}
+                            onPress={() => Alert.alert('Email Success')}
+                        >
+                            <Text style={styles.accept}>Enable Email Notifications</Text>
+                        </Pressable>                
+                        <View style={styles.buttonsParent} 
+                            accessibilityLabel="Buttons Section">
+                            <Pressable
+                                style={[styles.buttonDecline, styles.buttonsLayout]}
+                                onPress={() => Alert.alert('Email Skip')}
+                                accessibilityLabel="Decline Button"
+                                accessibilityRole="button"
+                                accessibilityHint="Decline Terms and Conditions"
+                            >
+                                <Text style={styles.decline}>
+                                    Skip for now
+                                </Text>
+                            </Pressable>
+                        </View>    
+                    </View>
+                </ScrollView>
+            </TouchableWithoutFeedback>
         </View>
     );
 };
@@ -127,6 +138,13 @@ const styles = StyleSheet.create({
         color: Color.colorMidnightblue,
         textAlign: "center",
     },    
+    inner: {
+        flex: 1,
+    },    
+    innerContent: {
+        justifyContent: 'space-around',
+        flex: 1
+    },      
     container: {
         flex: 1,
         backgroundColor: '#FFF',
