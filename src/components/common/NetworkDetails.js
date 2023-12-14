@@ -12,7 +12,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import RightArrow from "../../res/svgIcons/RightArrow";
-const NetworkDetails = ({ navigation, billPaid }) => {
+const NetworkDetails = ({ navigation, billPaid, accountStatus }) => {
   useEffect(() => {
     //console.log("data");
   }, []);
@@ -59,7 +59,7 @@ const NetworkDetails = ({ navigation, billPaid }) => {
           <View style={styles.item}>
             <View style={styles.iconBg}>
               <Billpaidicon />
-              {billPaid ? <GreenCircle /> : <OrangeCircle />}
+             {(accountStatus=='Disconnect')? <RedCircle/> : billPaid ? <GreenCircle /> : <OrangeCircle />}
             </View>
             <Text style={styles.text}> {strings.bill_paid}</Text>
           </View>

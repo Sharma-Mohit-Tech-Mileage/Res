@@ -9,7 +9,7 @@ import {
   Alert,
   TouchableOpacity,
   Modal,
-  Pressable
+  Pressable,
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
@@ -26,7 +26,7 @@ import RNExitApp from "react-native-exit-app";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import strings from "../../res/Strings";
- import { Color,Padding,Border } from "../../../GlobalStyles";
+import { Color, Padding, Border } from "../../../GlobalStyles";
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -43,7 +43,7 @@ const SplashScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [errorMessage,setErrorMessage]=useState('')
+  const [errorMessage, setErrorMessage] = useState("");
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -66,19 +66,15 @@ const SplashScreen = ({ navigation }) => {
       }
 
       if (userInfo.accountNumber === "900690538") {
-       
-        setErrorMessage(strings.nonAdminUserMsg)
-        setTimeout(()=>{
+        setErrorMessage(strings.nonAdminUserMsg);
+        setTimeout(() => {
           setModalVisible(true);
-        },100)
-       
+        }, 100);
       } else if (userInfo.accountNumber === "902862879") {
-        
-        setErrorMessage(strings.nonInternetUserMessage)
-        setTimeout(()=>{
+        setErrorMessage(strings.nonInternetUserMessage);
+        setTimeout(() => {
           setModalVisible(true);
-        },100)
-        
+        }, 100);
       } else {
         navigation.navigate("MyTab", {
           fname: userInfo.firstName,
@@ -103,27 +99,27 @@ const SplashScreen = ({ navigation }) => {
         <View style={styles.overlay}>
           <View style={styles.alertContainer}>
             <View
-              style={{ flexDirection: "row", justifyContent:'space-between' }}
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
               <View style={{ flexDirection: "row", alignSelf: "flex-start" }}>
                 <AlertIcon />
-                <Text style={{color:colors.sparklight_grey,fontSize:22,fontWeight:'400', marginLeft:5}}>Alert Message</Text>
+                <Text
+                  style={styles.alertTitle}
+                >
+                  {" "}
+                  Access Denied
+                </Text>
               </View>
-              <TouchableOpacity onPress={onClose}>
-                <CloseIcon />
-              </TouchableOpacity>
+              
             </View>
-            <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
+            <View
+              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
+            />
             <Text style={styles.message}>{message}</Text>
             <TouchableOpacity
-              style={{
-                backgroundColor: colors.sparklight_purple_blue,
-                justifyContent: "center",
-                width:'100%',
-                marginTop:20
-              }}
+              style={styles.openBtn}
               onPress={() => {
-                Linking.openURL("https://www.sparklight.com/");
+                Linking.openURL("https://customer.uat.sparklight.com/SecureLogin/login.aspx");
               }}
             >
               <Text
@@ -139,12 +135,7 @@ const SplashScreen = ({ navigation }) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={{
-                backgroundColor: colors.backgound_blue,
-                justifyContent: "center",
-                width:'100%',
-                marginTop:15
-              }}
+              style={styles.closeBtn}
               onPress={onClose}
             >
               <Text
@@ -163,8 +154,6 @@ const SplashScreen = ({ navigation }) => {
       </Modal>
     );
   };
-
-  
 
   const handleCloseAlert = () => {
     setModalVisible(false);
@@ -205,7 +194,6 @@ const SplashScreen = ({ navigation }) => {
         style={styles.SSoBtnContainer}
         onPress={() => {
           loginAuth();
-          
         }}
       >
         <Text style={styles.SSoBtn}>Login</Text>
@@ -216,14 +204,14 @@ const SplashScreen = ({ navigation }) => {
         onClose={handleCloseAlert}
       />
 
-<View style={styles.buttonContainer}>
+      <View style={styles.buttonContainer}>
         <Pressable
-            style={[styles.buttons, styles.buttonsLayout]}
-            onPress={() => navigation.navigate("Terms")}
+          style={[styles.buttons, styles.buttonsLayout]}
+          onPress={() => navigation.navigate("Terms")}
         >
-            <Text style={styles.accept}>First Time Flow</Text>
-        </Pressable> 
-      </View>      
+          <Text style={styles.accept}>First Time Flow</Text>
+        </Pressable>
+      </View>
     </LinearGradient>
   );
 };
@@ -250,7 +238,7 @@ const styles = StyleSheet.create({
   },
   SSoBtnContainer: {
     backgroundColor: colors.sparklight_yellow,
-    borderRadius: 10,
+    borderRadius: 5,
     justifyContent: "center",
     marginTop: hp("25%"),
     marginHorizontal: wp("10%"),
@@ -289,24 +277,42 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 28,
-    marginTop:10
-  },buttonContainer: {
-    alignItems: 'center'
+    marginTop: 10,
+  },
+  buttonContainer: {
+    alignItems: "center",
   },
   buttons: {
     backgroundColor: Color.colorWhitesmoke_300,
   },
   buttonsLayout: {
-      paddingVertical: Padding.p_base,
-      paddingHorizontal: 0,
-      justifyContent: "center",
-      alignItems: "center",
-      borderRadius: Border.br_11xs,
-      height: 50,
-      width: '45%',
-      marginTop: 20
-  },
- 
+    paddingVertical: Padding.p_base,
+    paddingHorizontal: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: Border.br_11xs,
+    height: 50,
+    width: "45%",
+    marginTop: 20,
+  },alertTitle:
+  {
+    color: colors.sparklight_grey,
+    fontSize: 22,
+    fontWeight: "400",
+    marginLeft: 5,
+  },openBtn:
+  {
+    backgroundColor: colors.sparklight_purple_blue,
+    justifyContent: "center",
+    width: "100%",
+    marginTop: 20,
+  },closeBtn:
+  {
+    backgroundColor: colors.backgound_blue,
+    justifyContent: "center",
+    width: "100%",
+    marginTop: 15,
+  }
 });
 
 export default SplashScreen;

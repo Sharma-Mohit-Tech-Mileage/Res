@@ -42,6 +42,7 @@ const HomeScreen = ({ route, navigation }) => {
   const [dueDate, setDueDate] = useState("");
   const [currentHealth, setCurrentHealth] = useState("Poor");
   const [billPaid, setBillPaid] = useState(false);
+  const [accountStatus,setAccountStatus]=useState('Active')
 
   const getInternetHealth = (type) => {
     var currentHealth = {
@@ -96,6 +97,7 @@ const HomeScreen = ({ route, navigation }) => {
       setDueDate(dueDate);
       setBillAmt(res.currentBalance);
       updateInternetHealth(res.currentBalance);
+      setAccountStatus(res.accountStatus)
     }
   };
 
@@ -135,6 +137,12 @@ const HomeScreen = ({ route, navigation }) => {
     return () => backHandler.remove();
   }, []);
 
+  useEffect(()=>{
+   if(accountStatus==='Disconnect'){
+    setCurrentHealth('Offline')
+   }
+  },[accountStatus])
+
   return (
     <LinearGradient
       start={{ x: 0, y: 0 }}
@@ -172,7 +180,8 @@ const HomeScreen = ({ route, navigation }) => {
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <Text style={styles.internetHealth}>Internet Health</Text>
               <InternetHealthChart
-                currentValue={getInternetHealth(currentHealth)} key={currentHealth}
+                currentValue={getInternetHealth(currentHealth)}
+                 key={currentHealth}
               />
               <View style={styles.internetStatusSection}>
                 <View style={{ marginTop: 5 }}>
@@ -180,7 +189,7 @@ const HomeScreen = ({ route, navigation }) => {
                 </View>
                 <Text style={styles.internetStatusTxt}>
                   {" "}
-                  {strings.internetStatus}
+                  {billPaid?strings.internetStatus:strings.internetStatusIssue}
                 </Text>
               </View>
 
@@ -213,7 +222,7 @@ const HomeScreen = ({ route, navigation }) => {
                 </View>
               </TouchableOpacity>
               {isInternetDetails ? (
-                <NetworkDetails billPaid={billPaid} navigation={navigation} />
+                <NetworkDetails billPaid={billPaid} navigation={navigation} accountStatus={accountStatus} />
               ) : (
                 <></>
               )}
@@ -269,6 +278,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 15,
     flexDirection: "row",
+    justifyContent:'center',
     marginHorizontal: 25,
   },
   internetStatusTxt: {
