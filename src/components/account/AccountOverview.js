@@ -196,6 +196,7 @@ const AccountOverview = () => {
             <Pressable
               accessible={true}
               style={[styles.buttons, styles.buttonsSpaceBlock]}
+              onPress={()=>{logoutConfirmationPopuo(navigation)}}
             >
               <Text style={[styles.makePayment, styles.makePaymentTypo]}>
                 Logout
