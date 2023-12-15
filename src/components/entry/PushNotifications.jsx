@@ -7,8 +7,14 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import BellIcon from "../../res/svgIcons/bellIcon";
 import BellRingingIcon from "../../res/svgIcons/BellRingingIcon";
+import {
+  getFcmToken,
+  requestUserPermission,
+  notificationListener,
+} from '../../firebase/FirebaseUtils';
 
 const PushNotifications = ({ navigation }) => {
+    const [generatedToken, setGeneratedToken] = useState();
 
     const terms = [
         {
@@ -25,54 +31,73 @@ const PushNotifications = ({ navigation }) => {
         }                
     ];
 
+    // const enableNotifications = () => {
+    //     const fetchToken = async () => {
+    //     const token = await getFcmToken();
+    //         if (token) {
+    //             setGeneratedToken(token);
+    //         }
+    //     };
+        
+    //     void fetchToken();
+    //     void requestUserPermission();
+    //     void notificationListener();
+    // };
+
     return  (
         <View style={styles.container}>
-            <ProfileSettingsHeader 
-                showIcon={false}
-                title={'Notifications'}
-            />
-            <View style={styles.headerTabView}>
-                <View style={styles.headerTabOne} />
-                <View style={styles.headerTabTwo} />
-                <View style={styles.headerTabThree} />
-            </View>
-            <View style={styles.viewContainer}>
-                <View>
-                    <View style={styles.headerIconViewContainer}>
-                        <View style={styles.headerIconView}>
-                            <BellRingingIcon />
+            <ScrollView 
+                style={styles.inner}
+                contentContainerStyle={styles.innerContent}
+            >                    
+                <ProfileSettingsHeader 
+                    showIcon={false}
+                    title={'Notifications'}
+                />
+                <View style={styles.headerTabView}>
+                    <View style={styles.headerTabOne} />
+                    <View style={styles.headerTabTwo} />
+                    <View style={styles.headerTabThree} />
+                </View>
+                <View style={styles.viewContainer}>
+                    <View>
+                        <View style={styles.headerIconViewContainer}>
+                            <View style={styles.headerIconView}>
+                                <BellRingingIcon />
+                            </View>
                         </View>
-                    </View>
-                    <View style={styles.header}>
-                        <Text style={styles.headerText}>Turn on App Notifications</Text>
-                    </View>         
-                    <View style={styles.subHeader}>
-                        <Text style={styles.subHeaderText}>Receive app alerts related to your account, updates and more from Sparklight.</Text>
-                    </View>   
-                </View>            
-            </View>
-            <View style={styles.bottomBar}>
-                <Pressable
-                    style={[styles.button, styles.buttonsLayout]}
-                    onPress={() => navigation.navigate("TextNotifications")}
-                >
-                    <Text style={styles.accept}>Allow Notifications</Text>
-                </Pressable>                
-                <View style={styles.buttonsParent} 
-                    accessibilityLabel="Buttons Section">
+                        <View style={styles.header}>
+                            <Text style={styles.headerText}>Turn on App Notifications</Text>
+                        </View>         
+                        <View style={styles.subHeader}>
+                            <Text style={styles.subHeaderText}>Receive app alerts related to your account, updates and more from Sparklight.</Text>
+                        </View>   
+                    </View>            
+                </View>
+                <View style={styles.bottomBar}>
                     <Pressable
-                        style={[styles.buttonDecline, styles.buttonsLayout]}
-                        onPress={() => navigation.navigate("TextNotifications")}
-                        accessibilityLabel="Decline Button"
-                        accessibilityRole="button"
-                        accessibilityHint="Decline Terms and Conditions"
+                        style={[styles.button, styles.buttonsLayout]}
+                        onPress={() => navigation.navigate("TextNotifications")} 
+                        //onPress={enableNotifications}
                     >
-                        <Text style={styles.decline}>
-                            Skip for now
-                        </Text>
-                    </Pressable>
-                </View>    
-            </View>
+                        <Text style={styles.accept}>Allow Notifications</Text>
+                    </Pressable>                
+                    <View style={styles.buttonsParent} 
+                        accessibilityLabel="Buttons Section">
+                        <Pressable
+                            style={[styles.buttonDecline, styles.buttonsLayout]}
+                            onPress={() => navigation.navigate("TextNotifications")}
+                            accessibilityLabel="Decline Button"
+                            accessibilityRole="button"
+                            accessibilityHint="Decline Terms and Conditions"
+                        >
+                            <Text style={styles.decline}>
+                                Skip for now
+                            </Text>
+                        </Pressable>
+                    </View>    
+                </View>
+            </ScrollView>                
         </View>
     );
 };
@@ -111,7 +136,14 @@ const styles = StyleSheet.create({
     decline: {
         color: Color.colorMidnightblue,
         textAlign: "center",
+    },
+    inner: {
+        flex: 1,
     },    
+    innerContent: {
+        justifyContent: 'space-around',
+        flex: 1
+    },       
     container: {
         flex: 1,
         backgroundColor: '#FFF',
@@ -149,12 +181,13 @@ const styles = StyleSheet.create({
         shadowColor: "#171717",
         shadowOffset: { width: -2, height: 1 },
         shadowOpacity: 0.2,
-        shadowRadius: 10,     
+        shadowRadius: 10,
+        marginBottom: 10,     
     },
     headerTabView: {
         flexDirection: 'row',
         width: '100%',
-        marginTop: 20,
+        marginTop: 30,
         justifyContent: 'center'
     },
     headerTabOne: {
@@ -178,25 +211,27 @@ const styles = StyleSheet.create({
         paddingTop: 10,
     },    
     headerText: {
-        fontWeight: "600",
-        fontFamily: FontFamily.openSansSemiBold,
-        fontSize: 18,
-        textAlign: 'center'
+        fontFamily: FontFamily.openSansRegular,
+        fontSize: 22,
+        textAlign: 'center',
+        color: Color.colorGray_100,
     },
     subHeader: {
         paddingTop: 10,
     },
     subHeaderText: {
-        fontFamily: FontFamily.openSansSemiBold,
-        fontSize: 12,
-        lineHeight: 20,
-        textAlign: 'center'
+        fontFamily: FontFamily.openSansRegular,
+        fontSize: 16,
+        lineHeight: 25,
+        textAlign: 'center',
+        color: Color.colorGray_100,
+        paddingHorizontal: 20
     }, 
     viewContainer: {
         flex: 1,
         width: '100%',
         alignItems: 'center',
-        marginTop: 20
+        marginTop: 50
     }
 });
 

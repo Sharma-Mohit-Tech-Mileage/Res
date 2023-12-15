@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
         marginTop: 10
     },
     sparklightImage: {
-        tintColor: '#CCC',
+        tintColor: '#999',
         width: '100%',
         height: '100%'
     },  
@@ -146,24 +146,27 @@ const styles = StyleSheet.create({
         paddingTop: 10,
     },    
     termsHeaderText: {
-        fontWeight: "600",
         fontFamily: FontFamily.openSansSemiBold,
-        fontSize: 18
+        fontSize: 22,
+        color: Color.colorGray_100
     },
     termsTitle: {
         paddingTop: 10
     },    
     termsTitleText: {
         fontFamily: FontFamily.openSansSemiBold,
-        fontSize: 14
+        fontSize: 16,
+        color: Color.colorGray_100,  
+        marginVertical: 10              
     },
     termsDescription: {
         paddingTop: 10,
     },
     termsDescriptionText: {
-        fontFamily: FontFamily.openSansSemiBold,
-        fontSize: 12,
-        lineHeight: 20
+        fontFamily: FontFamily.openSansRegular,
+        fontSize: 16,
+        lineHeight: 25,
+        color: Color.colorGray_100,        
     }, 
 });
 

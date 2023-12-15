@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',  
     },
     buttonDecline: {
-        marginBottom: 20
+        marginBottom: 50
     },    
     button: {
         backgroundColor: Color.colorMidnightblue,
@@ -219,11 +219,12 @@ const styles = StyleSheet.create({
         shadowOffset: { width: -2, height: 1 },
         shadowOpacity: 0.2,
         shadowRadius: 10,     
+        marginBottom: 10,            
     },
     headerTabView: {
         flexDirection: 'row',
         width: '100%',
-        marginTop: 20,
+        marginTop: 30,
         justifyContent: 'center'
     },
     headerTabOne: {
@@ -247,19 +248,21 @@ const styles = StyleSheet.create({
         paddingTop: 10,
     },    
     headerText: {
-        fontWeight: "600",
-        fontFamily: FontFamily.openSansSemiBold,
-        fontSize: 18,
-        textAlign: 'center'
+        fontFamily: FontFamily.openSansRegular,
+        fontSize: 22,
+        textAlign: 'center',
+        color: Color.colorGray_100,
     },
     subHeader: {
         paddingTop: 10,
     },
     subHeaderText: {
-        fontFamily: FontFamily.openSansSemiBold,
-        fontSize: 12,
-        lineHeight: 20,
-        textAlign: 'center'
+        fontFamily: FontFamily.openSansRegular,
+        fontSize: 16,
+        lineHeight: 25,
+        textAlign: 'center',
+        color: Color.colorGray_100,
+        paddingHorizontal: 20
     }, 
     subInput: {
         marginTop: 10
@@ -268,7 +271,7 @@ const styles = StyleSheet.create({
         flex: 1,
         width: '100%',
         alignItems: 'center',
-        marginTop: 20,
+        marginTop: 50,
     }
 });
 

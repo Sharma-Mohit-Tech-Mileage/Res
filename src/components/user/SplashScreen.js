@@ -236,7 +236,7 @@ const SplashScreen = ({ navigation }) => {
             style={[styles.buttons, styles.buttonsLayout]}
             onPress={() => navigation.navigate("Terms")}
         >
-            <Text style={styles.accept}>First Time Flow</Text>
+            <Text style={styles.buttonTextFirstTime}>First Time Flow</Text>
         </Pressable> 
       </View>        
     </LinearGradient>
@@ -248,6 +248,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.splash_bg,
   },
+  buttonTextFirstTime: {
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 16,
+    textAlign: 'center',
+    color: Color.colorGray_100,
+  },  
   splashContainer: {
     marginTop: 250,
     justifyContent: "center",
