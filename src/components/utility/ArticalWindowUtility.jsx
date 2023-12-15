@@ -42,7 +42,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     source={{ uri: url }}
                     onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
                     onError={() => setIsError(true)}
-                    onNavigationStateChange={(navState) => setUrl(navState.url)}
+                    //onNavigationStateChange={(navState) => setUrl(navState.url)}
                 />
             )}
             {isError ? (

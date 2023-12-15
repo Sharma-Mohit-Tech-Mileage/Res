@@ -1,11 +1,14 @@
-import * as React from "react";
+import React, { useEffect } from 'react';
 import { Image, StyleSheet, Text, View, Pressable, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-
+import { useDispatch, useSelector } from 'react-redux';
 const ProfileSettings = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   return (
     <View style={{ zIndex: 1 }}>
       <ProfileSettingsHeader
@@ -36,17 +39,17 @@ const ProfileSettings = () => {
               <View style={styles.firstNameParent} accessible={true} accessibilityLabel="First Name: Melissa">
                 <Text style={styles.firstName}>First Name</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  Melissa
+                  {profileDetails.firstName}
                 </Text>
               </View>
               <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Last Name: Smith">
                 <Text style={styles.firstName}>Last Name</Text>
-                <Text style={[styles.melissa, styles.melissaTypo]}>Smith</Text>
+                <Text style={[styles.melissa, styles.melissaTypo]}>{profileDetails.lastName}</Text>
               </View>
               <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Username: MelSmith">
                 <Text style={styles.firstName}>Username</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  MelSmith
+                  {profileDetails.userName}
                 </Text>
               </View>
               <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Member Type: PRIMARY ADMIN">
@@ -54,7 +57,7 @@ const ProfileSettings = () => {
                 <View style={styles.badgeWrapper}>
                   <View style={[styles.badge, styles.badgeBorder]}>
                     <Text style={[styles.text, styles.textTypo]}>
-                      PRIMARY ADMIN
+                      {profileDetails.memberType}
                     </Text>
                   </View>
                 </View>
@@ -103,13 +106,13 @@ const ProfileSettings = () => {
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Email</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  melissa@gmail.com
+                  {profileDetails.svEmailAddress}
                 </Text>
               </View>
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Mobile Phone</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  4805671011
+                  {profileDetails.phone || 'N/A'}
                 </Text>
               </View>
             </View>
@@ -239,7 +242,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
     alignSelf: "stretch",
     fontFamily: FontFamily.openSansRegular,
-    fontWeight:'400'
+    fontWeight: '400'
   },
 
   creditCardWillExpireSoonParent: {
@@ -273,7 +276,7 @@ const styles = StyleSheet.create({
   },
   frameContainer: {
     alignSelf: "stretch",
-    marginTop:16
+    marginTop: 16
   },
   frameChild: {
     height: 1,

@@ -3,8 +3,12 @@ import { Image, StyleSheet, Text, Pressable, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Color, Padding, FontSize, FontFamily, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import { useDispatch, useSelector } from 'react-redux';
 const PasswordSecurity = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   return (
     <View style={styles.passwordSecurity}>
       <ProfileSettingsHeader
@@ -48,7 +52,7 @@ const PasswordSecurity = () => {
               <View style={styles.passwordGroup}>
                 <View style={styles.nameOfYourFirstPetParent}>
                   <Text style={[styles.passwordFlexBox]}>
-                    Name of your first pet?
+                    {profileDetails.securityQuestion} 
                   </Text>
                   <Text style={[styles.text, styles.passwordFlexBox]}>
                     ******

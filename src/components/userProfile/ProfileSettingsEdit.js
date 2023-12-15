@@ -4,9 +4,14 @@ import { useNavigation } from "@react-navigation/native";
 import { Padding, FontSize, Color, FontFamily, Border } from "../../../GlobalStyles";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
+import { useDispatch, useSelector } from 'react-redux';
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
+
   return (
     <View style={styles.profileSettingsEdit}>
       <ProfileSettingsHeader
@@ -29,7 +34,7 @@ const ProfileSettingsEdit = () => {
                     First Name
                   </Text>
                   <View >
-                    <SparkLightInput placeholder="Enter text here" />
+                    <SparkLightInput placeholder="Enter text here" value={profileDetails.firstName} />
                   </View>
                 </View>
               </View>
@@ -40,7 +45,7 @@ const ProfileSettingsEdit = () => {
                     Last Name
                   </Text>
                   <View >
-                    <SparkLightInput placeholder="Enter text here" />
+                    <SparkLightInput placeholder="Enter text here" value={profileDetails.lastName} />
                   </View>
                 </View>
               </View>
@@ -51,7 +56,7 @@ const ProfileSettingsEdit = () => {
                     Username
                   </Text>
                   <View >
-                    <SparkLightInput placeholder="Enter text here" />
+                    <SparkLightInput placeholder="Enter text here" value={profileDetails.userName} />
                   </View>
                 </View>
               </View>
@@ -71,14 +76,14 @@ const ProfileSettingsEdit = () => {
                     Email
                   </Text>
                   <View >
-                    <SparkLightInput placeholder="Enter text here" />
+                    <SparkLightInput placeholder="Enter text here" value={profileDetails.svEmailAddress} />
                   </View>
                 </View>
               </View>
               <View style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}>
                 <View style={styles.textinput}>
                   <Text style={[styles.firstTypo]}>Mobile Phone</Text>
-                  <View ><SparkLightInput placeholder="Enter text here" />
+                  <View ><SparkLightInput placeholder="Enter text here" value={profileDetails.phone} />
                   </View>
                 </View>
               </View>

@@ -42,6 +42,7 @@ const HomeScreen = ({ route, navigation }) => {
   const [dueDate, setDueDate] = useState("");
   const [currentHealth, setCurrentHealth] = useState("Poor");
   const [billPaid, setBillPaid] = useState(false);
+  const [accountStatus,setAccountStatus]=useState('Active')
 
   const getInternetHealth = (type) => {
     var currentHealth = {
@@ -60,6 +61,22 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
+  const getSoftDisconnectStatus=()=>{
+   let re = getUser().then((res) => {
+    const request = `/SeasonalReconnect/api/SeasonalReconnect/${res.userInfo.accountNumber}/CheckEligibility`;
+    GetApiRequest(request, (response)=>{
+     console.log('getSoftDisconnectStatus',response)
+          if(response===true){
+            setAccountStatus('Disconnect')
+            setIsInternetDetails(true)
+          }
+          getUserAccountDetails(response)
+    }, (error)=>{
+
+    });
+  });
+  }
+
   const onSuccessPlan = (res) => {
     console.log("getInternetPlanDetails", res);
     if (res) {
@@ -70,10 +87,21 @@ const HomeScreen = ({ route, navigation }) => {
     console.log("error", error);
   };
 
-  const getUserAccountDetails = () => {
+  const getUserAccountDetails = (isDisconnect=false) => {
     let re = getUser().then((res) => {
       const request = `account/api/account/${res.userInfo.accountNumber}`;
-      GetApiRequest(request, onSuccessBill, onErrorBill);
+      GetApiRequest(request, (res)=>{
+        console.log("getUserAccountDetails", res);
+        if (res) {
+          let dueDate = moment(res.paymentDueDate).format("ll");
+          setDueDate(dueDate);
+          setBillAmt(res.currentBalance);
+          if(!isDisconnect){
+            updateInternetHealth(res.currentBalance);
+          }
+          
+        }
+      }, onErrorBill);
     });
   };
 
@@ -89,23 +117,16 @@ const HomeScreen = ({ route, navigation }) => {
    
   };
 
-  const onSuccessBill = (res) => {
-    console.log("getUserAccountDetails", res);
-    if (res) {
-      let dueDate = moment(res.paymentDueDate).format("ll");
-      setDueDate(dueDate);
-      setBillAmt(res.currentBalance);
-      updateInternetHealth(res.currentBalance);
-    }
-  };
+  
 
   const onErrorBill = (error) => {
     console.log("error", error);
   };
 
   useEffect(() => {
+    getSoftDisconnectStatus();
     getInternetPlanDetails();
-    getUserAccountDetails();
+   
 
     const backAction = () => {
       Alert.alert(
@@ -134,6 +155,12 @@ const HomeScreen = ({ route, navigation }) => {
 
     return () => backHandler.remove();
   }, []);
+
+  useEffect(()=>{
+   if(accountStatus==='Disconnect'){
+    setCurrentHealth('Offline')
+   }
+  },[accountStatus])
 
   return (
     <LinearGradient
@@ -172,7 +199,8 @@ const HomeScreen = ({ route, navigation }) => {
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <Text style={styles.internetHealth}>Internet Health</Text>
               <InternetHealthChart
-                currentValue={getInternetHealth(currentHealth)} key={currentHealth}
+                currentValue={getInternetHealth(currentHealth)}
+                 key={currentHealth}
               />
               <View style={styles.internetStatusSection}>
                 <View style={{ marginTop: 5 }}>
@@ -180,7 +208,7 @@ const HomeScreen = ({ route, navigation }) => {
                 </View>
                 <Text style={styles.internetStatusTxt}>
                   {" "}
-                  {strings.internetStatus}
+                  {billPaid?strings.internetStatus:strings.internetStatusIssue}
                 </Text>
               </View>
 
@@ -213,7 +241,7 @@ const HomeScreen = ({ route, navigation }) => {
                 </View>
               </TouchableOpacity>
               {isInternetDetails ? (
-                <NetworkDetails billPaid={billPaid} navigation={navigation} />
+                <NetworkDetails billPaid={billPaid} navigation={navigation} accountStatus={accountStatus} />
               ) : (
                 <></>
               )}
@@ -269,6 +297,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 15,
     flexDirection: "row",
+    justifyContent:'center',
     marginHorizontal: 25,
   },
   internetStatusTxt: {

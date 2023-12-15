@@ -9,22 +9,24 @@ import {
   Alert,
   TouchableOpacity,
   Modal,
+  Pressable,
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
-import { authorize } from "react-native-app-auth";
+import { authorize, revoke } from "react-native-app-auth";
 import { useDispatch, useSelector } from "react-redux";
 import { ssoLoginAction } from "../../redux/actions/UserAction";
-import { storeUser, storeSsoToken } from "../../redux/utils/LocalStorage";
+import { storeUser, storeSsoToken,getSsoToken } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import RNExitApp from "react-native-exit-app";
+import RNExitApp from "react-native-exit-app"
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import strings from "../../res/Strings";
+import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -39,9 +41,9 @@ const config = {
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState(false);
+  const [data, setData] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
-  const [errorMessage,setErrorMessage]=useState('')
+  const [errorMessage, setErrorMessage] = useState("");
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -64,19 +66,15 @@ const SplashScreen = ({ navigation }) => {
       }
 
       if (userInfo.accountNumber === "900690538") {
-       
-        setErrorMessage(strings.nonAdminUserMsg)
-        setTimeout(()=>{
+        setErrorMessage(strings.nonAdminUserMsg);
+        setTimeout(() => {
           setModalVisible(true);
-        },100)
-       
+        }, 100);
       } else if (userInfo.accountNumber === "902862879") {
-        
-        setErrorMessage(strings.nonInternetUserMessage)
-        setTimeout(()=>{
+        setErrorMessage(strings.nonInternetUserMessage);
+        setTimeout(() => {
           setModalVisible(true);
-        },100)
-        
+        }, 100);
       } else {
         navigation.navigate("MyTab", {
           fname: userInfo.firstName,
@@ -101,27 +99,28 @@ const SplashScreen = ({ navigation }) => {
         <View style={styles.overlay}>
           <View style={styles.alertContainer}>
             <View
-              style={{ flexDirection: "row", justifyContent:'space-between' }}
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
               <View style={{ flexDirection: "row", alignSelf: "flex-start" }}>
                 <AlertIcon />
-                <Text style={{color:colors.sparklight_grey,fontSize:22,fontWeight:'400', marginLeft:5}}>Alert Message</Text>
+                <Text
+                  style={styles.alertTitle}
+                >
+                  {" "}
+                  Access Denied
+                </Text>
               </View>
-              <TouchableOpacity onPress={onClose}>
-                <CloseIcon />
-              </TouchableOpacity>
+              
             </View>
-            <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
+            <View
+              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
+            />
             <Text style={styles.message}>{message}</Text>
             <TouchableOpacity
-              style={{
-                backgroundColor: colors.sparklight_purple_blue,
-                justifyContent: "center",
-                width:'100%',
-                marginTop:20
-              }}
+              style={styles.openBtn}
               onPress={() => {
-                Linking.openURL("https://www.sparklight.com/");
+                Linking.openURL("https://customer.uat.sparklight.com/SecureLogin/login.aspx");
+
               }}
             >
               <Text
@@ -137,12 +136,7 @@ const SplashScreen = ({ navigation }) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={{
-                backgroundColor: colors.backgound_blue,
-                justifyContent: "center",
-                width:'100%',
-                marginTop:15
-              }}
+              style={styles.closeBtn}
               onPress={onClose}
             >
               <Text
@@ -162,20 +156,32 @@ const SplashScreen = ({ navigation }) => {
     );
   };
 
-  
-
   const handleCloseAlert = () => {
     setModalVisible(false);
+    // let re = getSsoToken().then((res) => {
+    //   let token=res.accessToken;
+    //   console.log('revoke',token)
+    //   const result =  revoke(config, {
+    //     tokenToRevoke: token,
+    //     includeBasicAuth: true,
+    //     sendClientId: true,
+    //   }).then((result)=>{
+    //     console.log('revoke result',result)
+    //   });
+
+    //   });
+    
   };
 
   const loginAuth = async () => {
     try {
       const result = await authorize(config);
-      const data = { idToken: result.idToken };
+      const data = { idToken: result.idToken,accessToken:result.accessToken };
       setLoading(true);
       //dispatch(ssoLoginAction(data))
       callSSOLoginApi(data);
       storeSsoToken(data);
+      setData(result)
     } catch (error) {
       console.log(error);
     }
@@ -203,7 +209,6 @@ const SplashScreen = ({ navigation }) => {
         style={styles.SSoBtnContainer}
         onPress={() => {
           loginAuth();
-          
         }}
       >
         <Text style={styles.SSoBtn}>Login</Text>
@@ -213,6 +218,15 @@ const SplashScreen = ({ navigation }) => {
         message={errorMessage}
         onClose={handleCloseAlert}
       />
+
+      <View style={styles.buttonContainer}>
+        <Pressable
+          style={[styles.buttons, styles.buttonsLayout]}
+          onPress={() => navigation.navigate("Terms")}
+        >
+            <Text style={styles.buttonTextFirstTime}>First Time Flow</Text>
+        </Pressable> 
+      </View>        
     </LinearGradient>
   );
 };
@@ -222,8 +236,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.splash_bg,
   },
+  buttonTextFirstTime: {
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 16,
+    textAlign: 'center',
+    color: Color.colorGray_100,
+  },  
   splashContainer: {
-    marginTop: 250,
+    marginTop: hp('20%'),
     justifyContent: "center",
     alignItems: "center",
     // Customize your splash screen background color
@@ -239,7 +259,7 @@ const styles = StyleSheet.create({
   },
   SSoBtnContainer: {
     backgroundColor: colors.sparklight_yellow,
-    borderRadius: 10,
+    borderRadius: 5,
     justifyContent: "center",
     marginTop: hp("25%"),
     marginHorizontal: wp("10%"),
@@ -278,8 +298,42 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 28,
-    marginTop:10
+    marginTop: 10,
   },
+  buttonContainer: {
+    alignItems: "center",
+  },
+  buttons: {
+    backgroundColor: Color.colorWhitesmoke_300,
+  },
+  buttonsLayout: {
+    paddingVertical: Padding.p_base,
+    paddingHorizontal: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: Border.br_11xs,
+    height: 50,
+    width: "45%",
+    marginTop: 20,
+  },alertTitle:
+  {
+    color: colors.sparklight_grey,
+    fontSize: 22,
+    fontWeight: "400",
+    marginLeft: 5,
+  },openBtn:
+  {
+    backgroundColor: colors.sparklight_purple_blue,
+    justifyContent: "center",
+    width: "100%",
+    marginTop: 20,
+  },closeBtn:
+  {
+    backgroundColor: colors.backgound_blue,
+    justifyContent: "center",
+    width: "100%",
+    marginTop: 15,
+  }
 });
 
 export default SplashScreen;

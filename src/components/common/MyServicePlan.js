@@ -180,6 +180,7 @@ const MyServicePlan = ({ plans,navigation }) => {
         style={{
           flexDirection: "row",
           justifyContent: "center",
+          alignItems:'center',
           marginTop: wp("5%"),
         }}
       >
@@ -196,6 +197,8 @@ const MyServicePlan = ({ plans,navigation }) => {
               fontSize: 16,
               fontStyle: "normal",
               fontWeight: "400",
+              textAlign:'center',
+              textAlignVertical:'center'
             }}
           >
             {" "}
@@ -276,7 +279,7 @@ const styles = StyleSheet.create({
     borderRadius: 0.5,
     borderColor:'#76767680',
     paddingVertical: 5,
-    paddingHorizontal: 32,
+    paddingHorizontal: 5,
     width: wp("40%"),
   },
   defaultTab: {
@@ -284,7 +287,7 @@ const styles = StyleSheet.create({
     borderRadius: 0.5,
     borderColor:'#76767680',
     paddingVertical: 5,
-    paddingHorizontal: 32,
+    paddingHorizontal: 5,
     width: wp("40%"),
   },
   containerContent: { flex: 1, marginTop: 40 },
