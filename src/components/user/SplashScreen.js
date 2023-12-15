@@ -26,7 +26,7 @@ import RNExitApp from "react-native-exit-app";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import strings from "../../res/Strings";
-import { Color, Padding, Border } from "../../../GlobalStyles";
+import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
