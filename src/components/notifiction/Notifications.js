@@ -1,11 +1,23 @@
-import React from "react";
+import React,{useEffect} from "react";
 import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import { fetchSMSSelection } from '../../redux/actions/ProfileActionSuite';
+import { transformResponse } from '../../components/utility/constant';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Notifications = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const smsSubscription = profile.smsSubscription || [];
+  console.log("smsSubscription==================", smsSubscription)
+  const data = transformResponse(smsSubscription);
+  console.log("transformed==================", data)
+  useEffect(() => {
+    dispatch(fetchSMSSelection());
+  }, [dispatch]);
 
   return (
 
@@ -20,13 +32,9 @@ const Notifications = () => {
           <NotificationSection
             title="Text Notifications"
             infoText={`Text alerts are sent to `}
-            number="433-839-2398"
+            number={data.phoneNum}
             navigationTarget="TextNotifications"
-            additionalSettings={[
-              { type: 'Appointments', status: 'Off' },
-              { type: 'Outage', status: 'Off' },
-              { type: 'Billing', status: 'On' },
-            ]}
+            additionalSettings={data.subscriptionDetails}
           />
           <View style={{ marginBottom: Padding.p_base }} />
           {/* Email Notifications Section */}

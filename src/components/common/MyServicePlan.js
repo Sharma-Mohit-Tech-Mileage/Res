@@ -92,7 +92,7 @@ const MyServicePlan = ({ plans,navigation }) => {
                 Data Plan {item.dataQuotaGB}GB*
               </Text>
             </View>
-            <Text
+            {/* <Text
               style={{
                 fontSize: FontSize.size_xs,
                 color: colors.sparklight_grey,
@@ -102,7 +102,7 @@ const MyServicePlan = ({ plans,navigation }) => {
               }}
             >
               * $10 charge for each add'l 100GB; Up to $40/mo.
-            </Text>
+            </Text> */}
           </View>
           <View
             style={{
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   },
   Modal: {
     backgroundColor: "#fff",
-    marginTop: hp("20%"),
+    marginTop: hp("40%"),
     borderTopLeftRadius:16,
     borderTopRightRadius:16
   },

@@ -58,6 +58,7 @@ const TextNotifications = ({ navigation }) => {
                         </View>
                         <View style={styles.frameChild} />
                         <View style={styles.frameGroup}>
+                            <View style={styles.frameWrapper2}>
                             <View style={styles.frameParent3}>
                                 <View style={styles.frameParent4}>
                                     <Text style={[styles.appointments, styles.mobilePhoneTypo,]}>
@@ -70,6 +71,7 @@ const TextNotifications = ({ navigation }) => {
                                 <Text style={[styles.receiveTextNotifications1, styles.containerTypo,]} >
                                     Receive text notifications when your appointments have updates.
                                 </Text>
+                            </View>
                             </View>
                         </View>
                         <View style={styles.frameChild} />

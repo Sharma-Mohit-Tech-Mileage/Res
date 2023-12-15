@@ -2,32 +2,42 @@ import React, { useState } from 'react';
 import { View, TextInput, StyleSheet } from 'react-native';
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../../GlobalStyles";
 
-const SparkLightInput = ({ placeholder, onChangeText, style, accessibilityLabel, ...props }) => {
+const SparkLightInput = ({ name, placeholder, value, onChangeText, style, accessibilityLabel, secure = false, ...props }) => {
     const [isFocused, setIsFocused] = useState(false);
-    const [value, setValue] = useState('');
 
     const handleInputChange = (text) => {
-        setValue(text);
-        if (onChangeText) onChangeText(text);
+        if (onChangeText) {
+            // Creating a synthetic event object
+            const event = {
+                target: {
+                    name,
+                    value: text,
+                },
+                preventDefault: () => { }, // Include this if needed
+            };
+            onChangeText(event);
+        }
     };
+
 
     return (
         <View style={[styles.outerContainer, isFocused ? { borderColor: Color.sparklightBrightPurple } : {}, style]}>
             <View style={styles.container}>
-            <TextInput
-               // placeholder={placeholder}
-                value={value}
-                onChangeText={handleInputChange}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                style={styles.textInput}
-                accessibilityLabel={accessibilityLabel || placeholder}
-                accessibilityHint={`Input field for ${accessibilityLabel || placeholder}`}
-                importantForAccessibility="yes"
-                caretColor={Color.colorGray_100} // Explicitly set the caret color
-                {...props}
-            />
-        </View>
+                <TextInput
+                    // placeholder={placeholder} // Uncomment this if placeholder is needed
+                    value={value} // Controlled by the parent component
+                    onChangeText={handleInputChange}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    style={styles.textInput}
+                    secureTextEntry={secure} 
+                    accessibilityLabel={accessibilityLabel || placeholder}
+                    accessibilityHint={`Input field for ${accessibilityLabel || placeholder}`}
+                    importantForAccessibility="yes"
+                    caretColor={Color.colorGray_100}
+                    {...props}
+                />
+            </View>
         </View>
     );
 };

@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../../redux/utils/LocalStorage"
 import SpeedTestModal from "./customui/SpeedTestModal";
 import moment from "moment";
+import { GetApiRequest } from "../../network/APIClient";
 
 
 const DataSpeedComponent = ({navigation}) => {
@@ -28,50 +29,49 @@ const DataSpeedComponent = ({navigation}) => {
 
   const toggleModal = () => {
     setShowModal(!showModal);
-    setSpeed(false);
-    getUser().then((res) => {
-      dispatch(getCurrentSpeed(res.userInfo.accountNumber));
-    });
+    getCurrentSpeed();
   };
-
- 
 
   const [download, setDownload] = useState(0);
   const [upload, setUpload] = useState(0);
   const [downloadFrac, setDownloadFrac] = useState(0);
   const [uploadFrac, setUploadFrac] = useState(0);
   const [speed, setSpeed] = useState(false);
-  const [testDate, setTestDate]=useState(0)
-  useSelector((state) => {
+  const [testDate, setTestDate] = useState(0);
 
-    if (Object.hasOwn(state.combinedReducers.home.speed,"download_Kbps")) {
-      let downloadSpeed = state.combinedReducers.home.speed.download_Kbps;
-        let uploadSpeed = state.combinedReducers.home.speed.upload_Kbps;
-        let date = state.combinedReducers.home.speed.createdOn;
-        let speedInMbps_download = (downloadSpeed / 1000).toFixed(2);
-        let speedInMbps_upload = (uploadSpeed / 1000).toFixed(2);
-        let upl = speedInMbps_upload.toString().split(".");
-        let downl = speedInMbps_download.toString().split(".");
-      if (!speed) {
-        const format1 = "YYYY-MM-DD hh:mm a"
-        setTestDate(moment(date).format(format1))
-        setDownload(downl[0]);
-        setUpload(upl[0]);
-        setDownloadFrac(downl[1]);
-        setUploadFrac(upl[1]);
-        setSpeed(true);
-      }
+  const getCurrentSpeed = () => {
+    let re = getUser().then((res) => {
+      const request = `/Internet/api/internet/${res.userInfo.accountNumber}/speedTest/Get`;
+      GetApiRequest(request, onSuccess, onError);
+    });
+  };
+  const onSuccess = (res) => {
+    console.log("getCurrentSpeed", res);
+    if (res) {
+      let downloadSpeed = res.download_Kbps;
+      let uploadSpeed = res.upload_Kbps;
+      let date = res.createdOn;
+      let speedInMbps_download = (downloadSpeed / 1000).toFixed(2);
+      let speedInMbps_upload = (uploadSpeed / 1000).toFixed(2);
+      let upl = speedInMbps_upload.toString().split(".");
+      let downl = speedInMbps_download.toString().split(".");
+      const format1 = "DD/MM/YY hh:mma";
+      setTestDate(moment(date).format(format1));
+      setDownload(downl[0]);
+      setDownloadFrac(downl[1]);
+      setUpload(upl[0])
+      setUploadFrac(upl[1]);
+      setSpeed(true);
     }
-    
-  });
+  };
 
+  const onError = (error) => {
+    console.log("error", error);
+  };
   useEffect(() => {
-    if (!speed) {
-      getUser().then((res) => {
-        dispatch(getCurrentSpeed(res.userInfo.accountNumber));
-      });
-    }
-  }, [showModal]);
+    getCurrentSpeed();
+  }, []);
+
 
   const TestSpeedResultSection = () => {
     return (
