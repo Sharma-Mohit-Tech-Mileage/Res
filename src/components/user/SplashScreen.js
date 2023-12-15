@@ -13,16 +13,16 @@ import {
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
-import { authorize } from "react-native-app-auth";
+import { authorize, revoke } from "react-native-app-auth";
 import { useDispatch, useSelector } from "react-redux";
 import { ssoLoginAction } from "../../redux/actions/UserAction";
-import { storeUser, storeSsoToken } from "../../redux/utils/LocalStorage";
+import { storeUser, storeSsoToken,getSsoToken } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import RNExitApp from "react-native-exit-app";
+import RNExitApp from "react-native-exit-app"
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import strings from "../../res/Strings";
@@ -41,7 +41,7 @@ const config = {
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState(false);
+  const [data, setData] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -120,6 +120,7 @@ const SplashScreen = ({ navigation }) => {
               style={styles.openBtn}
               onPress={() => {
                 Linking.openURL("https://customer.uat.sparklight.com/SecureLogin/login.aspx");
+
               }}
             >
               <Text
@@ -157,16 +158,30 @@ const SplashScreen = ({ navigation }) => {
 
   const handleCloseAlert = () => {
     setModalVisible(false);
+    // let re = getSsoToken().then((res) => {
+    //   let token=res.accessToken;
+    //   console.log('revoke',token)
+    //   const result =  revoke(config, {
+    //     tokenToRevoke: token,
+    //     includeBasicAuth: true,
+    //     sendClientId: true,
+    //   }).then((result)=>{
+    //     console.log('revoke result',result)
+    //   });
+
+    //   });
+    
   };
 
   const loginAuth = async () => {
     try {
       const result = await authorize(config);
-      const data = { idToken: result.idToken };
+      const data = { idToken: result.idToken,accessToken:result.accessToken };
       setLoading(true);
       //dispatch(ssoLoginAction(data))
       callSSOLoginApi(data);
       storeSsoToken(data);
+      setData(result)
     } catch (error) {
       console.log(error);
     }
@@ -228,7 +243,7 @@ const styles = StyleSheet.create({
     color: Color.colorGray_100,
   },  
   splashContainer: {
-    marginTop: 250,
+    marginTop: hp('20%'),
     justifyContent: "center",
     alignItems: "center",
     // Customize your splash screen background color

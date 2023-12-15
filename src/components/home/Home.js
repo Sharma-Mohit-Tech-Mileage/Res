@@ -61,6 +61,22 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
+  const getSoftDisconnectStatus=()=>{
+   let re = getUser().then((res) => {
+    const request = `/SeasonalReconnect/api/SeasonalReconnect/${res.userInfo.accountNumber}/CheckEligibility`;
+    GetApiRequest(request, (response)=>{
+     console.log('getSoftDisconnectStatus',response)
+          if(response===true){
+            setAccountStatus('Disconnect')
+            setIsInternetDetails(true)
+          }
+          getUserAccountDetails(response)
+    }, (error)=>{
+
+    });
+  });
+  }
+
   const onSuccessPlan = (res) => {
     console.log("getInternetPlanDetails", res);
     if (res) {
@@ -71,10 +87,21 @@ const HomeScreen = ({ route, navigation }) => {
     console.log("error", error);
   };
 
-  const getUserAccountDetails = () => {
+  const getUserAccountDetails = (isDisconnect=false) => {
     let re = getUser().then((res) => {
       const request = `account/api/account/${res.userInfo.accountNumber}`;
-      GetApiRequest(request, onSuccessBill, onErrorBill);
+      GetApiRequest(request, (res)=>{
+        console.log("getUserAccountDetails", res);
+        if (res) {
+          let dueDate = moment(res.paymentDueDate).format("ll");
+          setDueDate(dueDate);
+          setBillAmt(res.currentBalance);
+          if(!isDisconnect){
+            updateInternetHealth(res.currentBalance);
+          }
+          
+        }
+      }, onErrorBill);
     });
   };
 
@@ -90,24 +117,16 @@ const HomeScreen = ({ route, navigation }) => {
    
   };
 
-  const onSuccessBill = (res) => {
-    console.log("getUserAccountDetails", res);
-    if (res) {
-      let dueDate = moment(res.paymentDueDate).format("ll");
-      setDueDate(dueDate);
-      setBillAmt(res.currentBalance);
-      updateInternetHealth(res.currentBalance);
-      setAccountStatus(res.accountStatus)
-    }
-  };
+  
 
   const onErrorBill = (error) => {
     console.log("error", error);
   };
 
   useEffect(() => {
+    getSoftDisconnectStatus();
     getInternetPlanDetails();
-    getUserAccountDetails();
+   
 
     const backAction = () => {
       Alert.alert(
