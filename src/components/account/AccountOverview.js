@@ -1,5 +1,5 @@
-import * as React from "react";
-import { Image, StyleSheet, Text, View, Pressable, StatusBar, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Image, StyleSheet, Text, View, Pressable, StatusBar, Alert,ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, Padding, FontSize, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
@@ -8,6 +8,11 @@ import profileSettingsIcon from '../../../assets/right-actionable15.png';
 import passwordSecurityIcon from '../../../assets/right-actionable16.png';
 import notificationsIcon from '../../../assets/right-actionable17.png';
 import userManagementIcon from '../../../assets/right-actionable18.png';
+import feedbackicon from '../../../assets/message-alert-circle.png';
+import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUser } from "../../redux/utils/LocalStorage";
+import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
 import { getSsoToken } from "../../redux/utils/LocalStorage";
 import RNExitApp from 'react-native-exit-app';
@@ -30,17 +35,14 @@ const logoutConfirmationPopuo=(navigation)=>{
         text: 'Logout',
         onPress: () => {
           let re = getSsoToken().then((res) => {
-          let token=res.idToken;
-          console.log('Logout',token)
-          logout(config, {
-            idToken:token,
-            postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
-          }).then((result)=>{
-              console.log('Logout',result)
-              console.log('Logout',JSON.stringify(navigation))
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'Splash' }]}) 
+            let token = res.idToken;
+            console.log('Logout', token)
+            logout(config, {
+              idToken: token,
+              postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
+            }).then((result) => {
+              console.log('Logout', result)
+              RNExitApp.exitApp()
               //navigation.navigate('Splash')
           })
             
@@ -55,7 +57,8 @@ const logoutConfirmationPopuo=(navigation)=>{
 
 const AccountOverview = () => {
   const navigation = useNavigation();
-  
+  const [fullName, setFullName] = useState('');
+  const [initials, setInitials] = useState('');
   const menuItems = [
     {
       name: 'Profile Settings',
@@ -82,132 +85,141 @@ const AccountOverview = () => {
       accessibilityLabel: 'Navigate to user management settings',
     },
     {
-      name: 'FeedBack',
+      name: 'Feedback',
       onPress: () => navigation.navigate('Feedback'),
-      icon: userManagementIcon,
+      icon: feedbackicon,
       accessibilityLabel: 'Navigate to user management settings',
     }
   ];
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const data = await getUser();
+      if (data) {
+        // Extracting fullName and initials
+        const firstName = data.userInfo?.firstName || '';
+        const lastName = data.userInfo?.lastName || '';
+
+        let initials = '';
+        if (firstName.length > 0) {
+          initials += firstName.charAt(0).toUpperCase();
+        }
+        if (lastName.length > 0) {
+          initials += lastName.charAt(0).toUpperCase();
+        }
+        // Camel Case Full Name
+        const fullNameCamelCase = [firstName, lastName]
+          .map(name => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase())
+          .join(' ');
+        setFullName(fullNameCamelCase);
+        setInitials(initials);
+      }
+    };
+    fetchUserData();
+  }, []);
+
   return (
     <View style={{ flex: 1 }} accessibilityLabel="Account screen">
-      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
-      <LinearGradient
-        style={[styles.accountChild]}
-        locations={[0, 1]}
-        colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
-        useAngle
-        angle={90}
+      <ProfileSettingsHeader
+        title="Account"
+        iconAlignment="right"
+        showIcon={false} // New prop to control icon visibility
       />
-      <View>
-        <View style={styles.navBar}>
-          {/* Screen header */}
-          <Text style={[styles.title, styles.textTypo]} accessible={true} accessibilityRole="header">
-            Account
-          </Text>
-        </View>
-      </View>
-      <View style={[styles.frameParent, styles.buttonsSpaceBlock]}>
-        <View style={styles.rightActionableParent}>
-          <View style={styles.rightActionable}>
-            <Text style={styles.text}>
-              MS
+      <ScrollView>
+        <View style={[styles.frameParent, styles.buttonsSpaceBlock]}>
+          <LinearGradient
+            style={styles.linearGradientStyle}
+            locations={[0, 1]}
+            colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+            useAngle={true}
+            angle={90}
+          />
+
+          <View style={styles.rightActionableParent}>
+            <View style={styles.rightActionable}>
+              <Text style={styles.text}>
+                {initials}
+              </Text>
+            </View>
+            {/* Full name for profile */}
+            <Text style={styles.melissaSmith} >
+              {fullName}
             </Text>
           </View>
-          {/* Full name for profile */}
-          <Text style={styles.melissaSmith} >
-            Melissa Smith
-          </Text>
-        </View>
-        <View style={styles.frameGroup}>
-          <View style={styles.navigationBorder}>
-            {/* Mapping through menu items */}
-            {menuItems.map((item, index) => (
-              <React.Fragment key={item.name}>
-                <Pressable
-                  style={[styles.rightActionableGroup, styles.tabsFlexBox]}
-                  onPress={item.onPress}
-                  accessibilityLabel={item.name}
-                  accessibilityHint={`Navigates to ${item.name}`}
-                  accessibilityRole="button"
-                >
-                  {/* Menu item icon */}
-                  <Image
-                    style={styles.rightIconLayout}
-                    resizeMode="cover"
-                    source={item.icon}
-                    accessible
-                    accessibilityLabel={`${item.name} icon`}
-                  />
-                  {/* Menu item text */}
-                  <Text style={[styles.profileSettings, styles.makePaymentTypo]}>
-                    {item.name}
-                  </Text>
-                  {/* Chevron/Arrow icon */}
-                  <Image
-                    style={[styles.rightActionableIcon1, styles.rightIconLayout]}
-                    resizeMode="cover"
-                    source={chevronRightIcon}
-                    accessible
-                    accessibilityLabel="Arrow right"
-                  />
-                </Pressable>
-                {/* Divider, if not the last item */}
-                {index < menuItems.length - 1 && <View style={styles.frameChild} />}
-              </React.Fragment>
-            ))}
-          </View>
+          <View style={styles.frameGroup}>
+            <View style={styles.navigationBorder}>
+              {/* Mapping through menu items */}
+              {menuItems.map((item, index) => (
+                <React.Fragment key={item.name}>
+                  <Pressable
+                    style={[styles.rightActionableGroup, styles.tabsFlexBox]}
+                    onPress={item.onPress}
+                    accessibilityLabel={item.name}
+                    accessibilityHint={`Navigates to ${item.name}`}
+                    accessibilityRole="button"
+                  >
+                    {/* Menu item icon */}
+                    <Image
+                      style={styles.rightIconLayout}
+                      resizeMode="cover"
+                      source={item.icon}
+                      accessible
+                      accessibilityLabel={`${item.name} icon`}
+                    />
+                    {/* Menu item text */}
+                    <Text style={[styles.profileSettings, styles.makePaymentTypo]}>
+                      {item.name}
+                    </Text>
+                    {/* Chevron/Arrow icon */}
+                    <Image
+                      style={[styles.rightActionableIcon1, styles.rightIconLayout]}
+                      resizeMode="cover"
+                      source={chevronRightIcon}
+                      accessible
+                      accessibilityLabel="Arrow right"
+                    />
+                  </Pressable>
+                  {/* Divider, if not the last item */}
+                  {index < menuItems.length - 1 && <View style={styles.frameChild} />}
+                </React.Fragment>
+              ))}
+            </View>
+
           <Pressable
-            style={[styles.buttons, styles.buttonsSpaceBlock1]}
-           // onPress={() => Linking.openURL('https://your-privacy-policy-url.com')}
-          >
-            <Text style={[{ fontStyle: 'italic', color: '#4169E1' }]}>
-              View our Privacy Policy and Terms & Condition
-            </Text>
-          </Pressable>
-          {/* Logout button */}
-          <Pressable
-           onPress={()=>{
-            logoutConfirmationPopuo(navigation)
-            console.log('Logout')
-           }} 
+              onPress={() => {
+                logoutConfirmationPopuo(navigation)
+                console.log('Logout')
+              }} 
             accessible={true}
-            accessibilityLabel="Logout button"
-            accessibilityRole="button"
-            accessibilityHint="Logs you out of the account"
             style={[styles.buttons, styles.buttonsSpaceBlock]}
           >
             <Text style={[styles.makePayment, styles.makePaymentTypo]}>
               Logout
             </Text>
           </Pressable>
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<AUTO GENERATED BY CONFLICT EXTENSION<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Development
-====================================AUTO GENERATED BY CONFLICT EXTENSION====================================
           <Pressable
             style={[styles.buttons, styles.buttonsSpaceBlock1]}
               onPress={() => { navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/privacy-policy', name: 'Privacy Policy' }) }}
-          >
-            <Text style={[{ fontStyle: 'italic', color: Color.gray600 }]}>
-              View our Privacy Policy and Terms & Condition
-            </Text>
-          </Pressable>
-          {/* Logout button */}
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>AUTO GENERATED BY CONFLICT EXTENSION>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Sparklight_v2
+            >
+              <Text style={[{ fontStyle: 'italic', color: Color.gray600 }]}>
+                View our Privacy Policy and Terms & Condition
+              </Text>
+            </Pressable>
+            {/* Logout button */}
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  textTypo: {
-    color: Color.sparklightWhite,
-    fontWeight: "600",
-    top: "50%",
-    textAlign: "center",
-    fontFamily: FontFamily.openSansSemiBold,
-    left: "50%",
-    position: "absolute",
+  linearGradientStyle: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: '95.5%',
   },
   buttonsSpaceBlock: {
     paddingVertical: Padding.p_base,
@@ -234,23 +246,9 @@ const styles = StyleSheet.create({
     height: 20,
     width: 20,
   },
-
-  accountChild: {
-    top: "0%",
-    right: "0%",
-    bottom: "82.23%",
-    left: "0%",
-    maxHeight: "100%",
-    position: "absolute",
-    maxWidth: "100%",
-  },
   title: {
     marginLeft: -35,
     fontSize: FontSize.size_lg,
-  },
-  navBar: {
-    top: 70,
-    width: '100%',
   },
   rightActionable: {
     borderColor: Color.colorWhitesmoke_200,
@@ -268,7 +266,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Color.sparklightWhite,
     fontFamily: FontFamily.openSansSemiBold,
-    // Remove margins, line-height, and absolute positioning
   },
 
   melissaSmith: {
@@ -280,7 +277,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   rightActionableParent: {
-    //paddingBottom: Padding.p_base,
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "stretch",
@@ -314,25 +310,21 @@ const styles = StyleSheet.create({
   buttons: {
     width: '100%',
     paddingHorizontal: 0,
-    marginTop: 16,
-    borderRadius: Border.br_11xs,
     justifyContent: "center",
-    height: 56,
     paddingVertical: Padding.p_base,
   },
   frameGroup: {
-    marginTop: 10,
+    marginTop: Padding.p_5xl,
     alignSelf: "stretch",
   },
   frameParent: {
-    top: 100,
     paddingHorizontal: Padding.p_5xl,
     paddingVertical: Padding.p_base,
     width: '100%',
     left: 0,
-    zIndex:9
+    marginBottom: "20%",
+    zIndex: 9
   }
 });
 
 export default AccountOverview;
-

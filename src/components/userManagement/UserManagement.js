@@ -4,7 +4,7 @@ import { Image, StyleSheet, Text, Pressable, View, SafeAreaView, ScrollView } fr
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
-import { ROLE_COLORS } from '../utility/constant';
+import { ROLE_COLORS, BOX_COLORS, getUserType } from '../utility/constant';
 import { executeUserList } from '../../redux/actions/ProfileActionSuite'
 
 const UserManagement = () => {
@@ -17,10 +17,12 @@ const UserManagement = () => {
   useEffect(() => {
     dispatch(executeUserList(0));
   }, [dispatch]);
- 
+
   const renderUserCard = (user) => {
-    const normalizedRole = user.memberType.replace(/\s+/g, '').toLowerCase();
+    const convertedRole = getUserType(user.memberType);
+    const normalizedRole = convertedRole.replace(/\s+/g, '').toLowerCase();
     const avatarColor = ROLE_COLORS[normalizedRole] || Color.sparklightGreen;
+    const BoxColor = BOX_COLORS[normalizedRole] || Color.colorWhitesmoke_100;
     // Extracting fullName and initials
     const firstName = user?.firstName || '';
     const lastName = user?.lastName || '';
@@ -94,9 +96,9 @@ const UserManagement = () => {
               Member Type
             </Text>
             <View style={styles.badgeWrapper}>
-              <View style={[user.memberType === 'PRIMARY ADMIN' ? styles.badge : styles.badge1, styles.badgeBorder]}>
+              <View style={[styles.badge, styles.badgeBorder, { backgroundColor: BoxColor }]}>
                 <Text style={[styles.text3]}>
-                  {user.memberType}
+                  {getUserType(user.memberType)}
                 </Text>
 
               </View>
@@ -357,21 +359,13 @@ const styles = StyleSheet.create({
 
   },
   badge: {
-    backgroundColor: Color.success50,
     borderColor: Color.colorAquamarine,
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,
     alignItems: "center",
     flexDirection: "row",
   },
-  badge1: {
-    backgroundColor: Color.colorWhitesmoke_200,
-    borderColor: Color.sparklightWhite,
-    paddingHorizontal: Padding.p_5xs,
-    paddingVertical: Padding.p_11xs,
-    alignItems: "center",
-    flexDirection: "row",
-  },
+
   frameParent3: {
     marginTop: 16,
     alignSelf: "stretch",
