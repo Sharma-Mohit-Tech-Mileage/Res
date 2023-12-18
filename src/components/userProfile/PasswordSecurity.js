@@ -1,10 +1,32 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, Pressable, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation , useRoute} from "@react-navigation/native";
 import { Color, Padding, FontSize, FontFamily, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import { useDispatch, useSelector } from 'react-redux';
+import NotificationAlert from '../common/customui/NotificationAlert';
+import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 const PasswordSecurity = () => {
   const navigation = useNavigation();
+  const route = useRoute(); // Use the useRoute hook
+  const dispatch = useDispatch();
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
+  useEffect(() => {
+    if (route.params?.updateSuccess) {
+      setShowSuccessAlert(true);
+      dispatch(fetchProfileDetails());
+      // Reset the parameter so subsequent navigations are detected
+      navigation.setParams({ updateSuccess: undefined });
+    }
+  }, [route.params?.updateSuccess, navigation, dispatch]);
+  useEffect(() => {
+    if (profileDetails) {
+      dispatch(fetchProfileDetails());
+    }
+  }, [dispatch]);
+
   return (
     <View style={styles.passwordSecurity}>
       <ProfileSettingsHeader
@@ -13,6 +35,14 @@ const PasswordSecurity = () => {
         accessibilityHint="Go back to Account"
       />
       <View style={[styles.passwordSecurityInner, styles.securitySpaceBlock]}>
+        <NotificationAlert
+          type="success"
+          title="Update Successful"
+          message="Your password and security has been updated successfully."
+          showCloseIcon={true}
+          isVisible={showSuccessAlert}
+          onClose={() => setShowSuccessAlert(false)}
+        />
         <View style={[styles.frameParent, styles.navigationBorder]}>
           <View style={[styles.passwordParent, styles.tabsFlexBox]}>
             <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header">
@@ -48,7 +78,7 @@ const PasswordSecurity = () => {
               <View style={styles.passwordGroup}>
                 <View style={styles.nameOfYourFirstPetParent}>
                   <Text style={[styles.passwordFlexBox]}>
-                    Name of your first pet?
+                    {profileDetails.securityQuestion} 
                   </Text>
                   <Text style={[styles.text, styles.passwordFlexBox]}>
                     ******

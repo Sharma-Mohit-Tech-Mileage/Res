@@ -1,32 +1,66 @@
-import * as React from "react";
-import { Image, StyleSheet, Text, Pressable, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect, useRef } from "react";
+import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
-import { ScrollView } from "react-native-gesture-handler";
+import { validatePassword, securityQuestions, passwordTerms } from "../utility/constant";
 import SparkLightInput from '../common/customui/SparkLightInput';
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-const securityQuestions = [
-  "What was your childhood nickname?",
-  "What is the name of your favorite childhood friend?",
-  "In what city or town did your mother and father meet?",
-  "What is the middle name of your oldest child?",
-  "What is your favorite team?"
-];
+import { useDispatch, useSelector } from 'react-redux';
+import NotificationAlert from '../common/customui/NotificationAlert';
+import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
 const PasswordSecurityEdit = () => {
+
   const navigation = useNavigation();
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const route = useRoute(); // Use the useRoute hook
+  const dispatch = useDispatch();
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
+  const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
+  const scrollViewRef = useRef(null);
+  const handleChange = (e) => {
+    setLocalProfile({ ...profileDetails, [e.target.name]: e.target.value });
+  };
+
+  // Handler for when the security question dropdown value changes
+  const handleSecurityQuestionChange = (itemValue) => {
+    console.log("securityQuestion", itemValue)
+    setLocalProfile({ ...profileDetails, securityQuestion: itemValue });
+    setIsCustomQuestionSelected(itemValue === "Add your own question");
+  };
+
+  const handleSave = () => {
+    dispatch(updateProfileSecurity(profileDetails, navigation));
+  };
+
+  useEffect(() => {
+    if (route.params?.updateFailed) {
+      setShowErrorAlert(true);
+      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+      // Reset the parameter so subsequent navigations are detected
+      navigation.setParams({ updateFailed: undefined });
+    }
+  }, [route.params?.updateFailed, navigation, dispatch]);
 
   return (
-    
-      <View style={styles.passwordSecurityEdit}>
-        <ProfileSettingsHeader
-          title="Edit Password & Security"
-          onPressBack={() => navigation.navigate('PasswordSecurity')}
-          accessibilityLabel="Edit Password & Security Header"
-          accessibilityHint="Navigate back to Password & Security settings"
-        />
-      <ScrollView accessibilityLabel="Scroll view for Password and Security Edit">
+    <View style={styles.passwordSecurityEdit}>
+      <ProfileSettingsHeader
+        title="Edit Password & Security"
+        onPressBack={() => navigation.navigate('PasswordSecurity')}
+      />
+      <ScrollView ref={scrollViewRef}>
         <View style={styles.passwordSecurityEditInner}>
+          <NotificationAlert
+            type="error"
+            title="Failed"
+            message="Your password and security update failed."
+            showCloseIcon={true}
+            isVisible={showErrorAlert}
+            onClose={() => setShowErrorAlert(false)}
+          />
           <View style={styles.frameParent}>
             <View style={[styles.frameGroup, styles.wrapperSpaceBlock1]}>
               <View style={[styles.passwordWrapper, styles.wrapperSpaceBlock1]}>
@@ -34,128 +68,133 @@ const PasswordSecurityEdit = () => {
                   Password
                 </Text>
               </View>
-                <View style={styles.frameParent}>
-                  <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
-                    <View style={styles.textinput}>
-                      <View style={styles.firstNameParent}>
-                        <Text style={[styles.firstName, styles.firstTypo]} accessibilityRole="header">
-                          New Password
-                        </Text>
+              <View style={styles.frameParent}>
+                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                  <View style={styles.textinput}>
+                    <View style={styles.firstNameParent}>
+                      <Text style={[styles.firstName, styles.firstTypo]} accessibilityRole="header">
+                        New Password
+                      </Text>
+                      <Pressable onPress={() => setPasswordVisible(!passwordVisible)}>
                         <View style={styles.eyeParent}>
-                          <Image
+                          {!passwordVisible ? <Image
                             style={styles.eyeIcon}
-                            resizeMode="cover"
+                            resizeMode="stretch"
                             source={require("../../../assets/eye.png")}
-                            accessibilityRole="image"
-                            accessibilityLabel="Eye Icon for password visibility"
-                            accessibilityHint="Toggle password visibility"
-                          />
+                          /> : <Image
+                            style={styles.eyeIcon}
+                            resizeMode="stretch"
+                            source={require("../../../assets/HidePassword-01.png")}
+                          />}
                           <Text style={[styles.show, styles.firstTypo]}>
-                            Show
+                            {passwordVisible ? 'Hide' : 'Show'}
                           </Text>
                         </View>
-                      </View>
-                      <SparkLightInput
-                        placeholder="Enter text here"
-                        accessibilityLabel="New Password Input Field"
-                        accessibilityHint="Input field for the new password"
-                      />
+                      </Pressable>
                     </View>
+                    <SparkLightInput
+                      name="newPassword"
+                      value={profileDetails.newPassword}
+                      onChangeText={handleChange}
+                      secure={!passwordVisible} // Toggle visibility
+                    />
                   </View>
-                  <View style={[styles.itMustBeDifferentThanYourWrapper, styles.wrapperSpaceBlock]}>
+                </View>
+                <View style={[styles.itMustBeDifferentThanYourWrapper, styles.wrapperSpaceBlock]}>
                   <View style={styles.passwordFlexBox}>
-                    {[
-                      "It must be different than your user name.",
-                      "It must contain 8 to 20 characters.",
-                      "It must include an upper and lower case letter and a number.",
-                      "You may include special characters %,&,_,?,#,=,-.",
-                      "Your new password cannot have any spaces."
-                    ].map((point, index) => (
+                    {validatePassword(profileDetails.newPassword, profileDetails.userName).map((isValid, index) => (
                       <View key={`point-${index}`} style={styles.bulletPointContainer}>
-                        <Text style={styles.bulletPoint}>•</Text>
-                        <Text style={[styles.itMustBe, {
-                          color: Color.sparklightGray1,
-                          fontWeight: '400'}]}>{point}</Text>
+                        <Text style={[styles.bulletPoint, { color: isValid ? Color.sparklightGreen : Color.colorGray_200 }]}>•</Text>
+                        <Text style={[styles.itMustBe, { color: Color.sparklightGray1, fontWeight: '400' }]}>
+                          {passwordTerms[index]}
+                        </Text>
                       </View>
                     ))}
                   </View>
-                  </View>
+
                 </View>
+              </View>
               <View style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}>
                 <View style={styles.frameChild} />
               </View>
-                <View style={styles.frameParent1}>
-                  <View style={styles.securityQuestionWrapper}>
-                    <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header">
-                      Security Question
+              <View style={styles.frameParent1}>
+                <View style={styles.securityQuestionWrapper}>
+                  <Text style={[styles.password, styles.passwordFlexBox]} >
+                    Security Question
+                  </Text>
+                </View>
+                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                  <View style={styles.textinput}>
+                    <Text style={[styles.firstName1, styles.firstTypo]} >
+                      Password Reset Question
                     </Text>
+                    <SparkLightDropdown
+                      items={securityQuestions}
+                      selectedValue={profileDetails.securityQuestion}
+                      onValueChange={handleSecurityQuestionChange}
+                    />
                   </View>
+                </View>
+                {isCustomQuestionSelected && (
                   <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                     <View style={styles.textinput}>
-                      <Text style={[styles.firstName1, styles.firstTypo]} accessibilityRole="header">
-                      Password Reset Question
+                      <Text style={[styles.firstName1, styles.firstTypo]} >
+                        Type your Question
                       </Text>
-                      <SparkLightDropdown
-                        items={securityQuestions}
-                        accessibilityLabel="Security Question Dropdown"
-                        accessibilityHint="Dropdown for selecting a security question"
+                      <SparkLightInput
+                        placeholder="Enter text here"
+                        value={profileDetails.customSecurityQuestion || ''}
+                        onChangeText={(text) => setLocalProfile({ ...profileDetails, customSecurityQuestion: text })}
                       />
                     </View>
                   </View>
-                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                )}
+                {/* <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                   <View style={styles.textinput}>
-                    <Text style={[styles.firstName1, styles.firstTypo]} accessibilityRole="header">
+                    <Text style={[styles.firstName1, styles.firstTypo]} >
                       Type your Question
                     </Text>
                     <SparkLightInput
                       placeholder="Enter text here"
-                      accessibilityLabel="Password Reset Answer Input Field"
-                      accessibilityHint="Input the answer for your security question"
+                      value={profileDetails.customSecurityQuestion || ''}
+                      onChangeText={(text) => setLocalProfile({ ...profileDetails, customSecurityQuestion: text })}
                     />
                   </View>
-                </View>
-                  <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
-                    <View style={styles.textinput}>
-                      <Text style={[styles.firstName1, styles.firstTypo]} accessibilityRole="header">
-                        Password Reset Answer
-                      </Text>
-                      <SparkLightInput
-                        placeholder="Enter text here"
-                        accessibilityLabel="Password Reset Answer Input Field"
-                        accessibilityHint="Input the answer for your security question"
-                      />
-                    </View>
+                </View> */}
+                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                  <View style={styles.textinput}>
+                    <Text style={[styles.firstName1, styles.firstTypo]} >
+                      Password Reset Answer
+                    </Text>
+                    <SparkLightInput
+                      placeholder="Enter text here"
+                    />
                   </View>
                 </View>
               </View>
             </View>
-            <View style={styles.frameParent1}>
-              <Pressable
-                style={[styles.buttons, styles.buttonsLayout]}
-                onPress={() => navigation.navigate("Account")}
-                accessibilityRole="button"
-                accessibilityLabel="Save Button"
-                accessibilityHint="Save the edited details and navigate to Account"
-              >
-                <Text style={[styles.makePayment, styles.makeTypo]}>
-                  Save
-                </Text>
-              </Pressable>
-              <Pressable
-                style={[styles.buttons1, styles.buttonsLayout]}
-                onPress={() => navigation.navigate("PasswordSecurity")}
-                accessibilityRole="button"
-                accessibilityLabel="Cancel Button"
-                accessibilityHint="Cancel editing and navigate back to Password & Security settings"
-              >
-                <Text style={[styles.makePayment1, styles.makeTypo]}>
-                  Cancel
-                </Text>
-              </Pressable>
-            </View>
           </View>
+          <View style={styles.frameParent1}>
+            <Pressable
+              style={[styles.buttons, styles.buttonsLayout]}
+              onPress={handleSave}
+            >
+              <Text style={[styles.makePayment, styles.makeTypo]}>
+                Save
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.buttons1, styles.buttonsLayout]}
+              onPress={() => navigation.navigate("PasswordSecurity")}
+            >
+              <Text style={[styles.makePayment1, styles.makeTypo]}>
+                Cancel
+              </Text>
+            </Pressable>
+          </View>
+        </View>
       </ScrollView>
-      </View>
+    </View>
   );
 };
 
@@ -171,8 +210,7 @@ const styles = StyleSheet.create({
   },
   bulletPoint: {
     marginRight: 10, // Space between bullet and text
-    color:Color.sparklightGray1,
-    fontWeight:'400'
+    fontSize: 15
   },
   passwordFlexBox: {
     textAlign: "left",
@@ -206,7 +244,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
   },
- 
+
   password: {
     fontSize: FontSize.size_3xl,
     lineHeight: 28,
@@ -311,11 +349,11 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   passwordSecurityEditInner: {
-    paddingVertical:Padding.p_5xl,
+    paddingVertical: Padding.p_5xl,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",
-    marginBottom:200
+    marginBottom: 200
   },
   passwordSecurityEdit: {
     flex: 1,

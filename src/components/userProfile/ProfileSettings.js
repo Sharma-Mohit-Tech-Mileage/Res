@@ -1,24 +1,61 @@
-import * as React from "react";
-import { Image, StyleSheet, Text, View, Pressable, ScrollView } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, Pressable, ScrollView } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-
+import { useDispatch, useSelector } from 'react-redux';
+import { getUserType, BOX_COLORS } from '../utility/constant';
+import NotificationAlert from '../common/customui/NotificationAlert';
+import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 const ProfileSettings = () => {
   const navigation = useNavigation();
+  const route = useRoute(); // Use the useRoute hook
+  const dispatch = useDispatch();
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {};
+
+  // Ensure getUserType handles undefined inputs safely
+  const convertedRole = getUserType(profileDetails.memberType || '');
+
+  // Use optional chaining and provide a default empty string if undefined
+  const normalizedRole = convertedRole?.replace(/\s+/g, '').toLowerCase() || '';
+
+  const boxBackground = BOX_COLORS[normalizedRole] || Color.colorWhitesmoke_200;
+
+  useEffect(() => {
+    if (route.params?.updateSuccess) {
+      setShowSuccessAlert(true);
+      dispatch(fetchProfileDetails());
+      // Reset the parameter so subsequent navigations are detected
+      navigation.setParams({ updateSuccess: undefined });
+    }
+  }, [route.params?.updateSuccess, navigation, dispatch]);
+  
+  useEffect(() => {
+    if (profileDetails) {
+      dispatch(fetchProfileDetails());
+    }
+  }, [dispatch]);
+
   return (
     <View style={{ zIndex: 1 }}>
       <ProfileSettingsHeader
         title="Profile Settings"
         onPressBack={() => navigation.navigate('Account')}
-        accessibilityHint="Navigate back to the Account page."
       />
       <ScrollView accessibilityLabel="Profile settings page.">
         <View style={styles.frameParent}>
+          <NotificationAlert
+            type="success"
+            title="Update Successful"
+            message="Your profile has been updated successfully."
+            showCloseIcon={true}
+            isVisible={showSuccessAlert}
+            onClose={() => setShowSuccessAlert(false)}
+          />
           <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
             <View style={[styles.generalInformationParent]}
-              accessible={true}
-              accessibilityLabel="General Information section."
             >
               <Text style={[styles.generalInformation, styles.melissaTypo]}>
                 General Information
@@ -26,8 +63,6 @@ const ProfileSettings = () => {
               <Pressable
                 style={[styles.buttons, styles.buttonsLayout]}
                 onPress={() => navigation.navigate("ProfileSettingsEdit")}
-                accessibilityRole="button"
-                accessibilityLabel="Edit General Information"
               >
                 <Text style={[styles.makePayment, styles.text1Clr]}>Edit</Text>
               </Pressable>
@@ -36,59 +71,40 @@ const ProfileSettings = () => {
               <View style={styles.firstNameParent} accessible={true} accessibilityLabel="First Name: Melissa">
                 <Text style={styles.firstName}>First Name</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  Melissa
+                  {profileDetails.firstName}
                 </Text>
               </View>
               <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Last Name: Smith">
                 <Text style={styles.firstName}>Last Name</Text>
-                <Text style={[styles.melissa, styles.melissaTypo]}>Smith</Text>
+                <Text style={[styles.melissa, styles.melissaTypo]}>{profileDetails.lastName}</Text>
               </View>
               <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Username: MelSmith">
                 <Text style={styles.firstName}>Username</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  MelSmith
+                  {profileDetails.userName}
                 </Text>
               </View>
               <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Member Type: PRIMARY ADMIN">
                 <Text style={styles.firstName}>Member Type</Text>
                 <View style={styles.badgeWrapper}>
-                  <View style={[styles.badge, styles.badgeBorder]}>
+                  <View style={[styles.badge, styles.badgeBorder, { backgroundColor: boxBackground }]}>
                     <Text style={[styles.text, styles.textTypo]}>
-                      PRIMARY ADMIN
+                      {convertedRole}
                     </Text>
                   </View>
                 </View>
               </View>
               <View style={styles.notificationsWrapper}>
-                <View style={[styles.notifications, styles.badgeBorder]}>
-                  <Image
-                    style={{ height: '100%' }}
-                    resizeMode="stretch"
-                    source={require("../../../assets/rectangle-528.png")}
-                    accessibilityLabel="Notification image."
-                  />
-                  <View style={styles.bannerWarning}>
-                    <View style={styles.rightActionableParent}>
-                      <Image
-                        style={styles.rightIconLayout}
-                        resizeMode="cover"
-                        source={require("../../../assets/right-actionable3.png")}
-                        accessibilityLabel="Right actionable icon."
-                      />
-                      <View style={styles.creditCardWillExpireSoonParent}>
-                        <Text style={styles.creditCardWill} accessible={true}
-                          accessibilityLabel="Primary Admin Notification">Primary Admin</Text>
-                        <Text style={[styles.yourSavedCard]} accessible={true} accessibilityLabel="Primary admin account information.">
-                          You are currently the primary admin
+                <NotificationAlert
+                  type="info" // "info", "success", "warning"
+                  title="Primary Admin"
+                  showCloseIcon={false}
+                  message="You are currently the primary admin
                           account. You can make another account
                           the primary admin account. By doing so
                           you will become an admin user under the
-                          new primary admin account.
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
+                          new primary admin account."
+                />
               </View>
             </View>
             <View style={[styles.rectangleWrapper, styles.frameParent1SpaceBlock]}>
@@ -103,13 +119,13 @@ const ProfileSettings = () => {
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Email</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  melissa@gmail.com
+                  {profileDetails.svEmailAddress}
                 </Text>
               </View>
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Mobile Phone</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  4805671011
+                  {profileDetails.phone || 'N/A'}
                 </Text>
               </View>
             </View>
@@ -153,11 +169,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontSize: FontSize.size_xs,
     fontWeight: "600",
-  },
-  rightIconLayout: {
-    height: 18,
-    width: 18,
-    overflow: "hidden",
   },
   frameParent1SpaceBlock: {
     marginTop: 16,
@@ -208,7 +219,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   badge: {
-    backgroundColor: Color.success50,
     borderColor: Color.colorAquamarine,
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,
@@ -223,48 +233,8 @@ const styles = StyleSheet.create({
   notificationsChild: {
     width: 3,
     alignSelf: "stretch",
-    //maxHeight: "100%",
-  },
-  creditCardWill: {
-    fontWeight: "700",
-    fontFamily: FontFamily.interBold,
-    color: Color.sparklightBrightPurple,
-    fontSize: FontSize.size_sm,
-    textAlign: "left",
-  },
-  yourSavedCard: {
-    color: Color.colorGray_200,
-    marginTop: 8,
-    fontSize: FontSize.size_sm,
-    textAlign: "left",
-    alignSelf: "stretch",
-    fontFamily: FontFamily.openSansRegular,
-    fontWeight:'400'
   },
 
-  creditCardWillExpireSoonParent: {
-    marginLeft: 10,
-    flex: 1,
-  },
-  rightActionableParent: {
-    flexDirection: "row",
-    flex: 1,
-  },
-  bannerWarning: {
-    borderTopRightRadius: Border.br_11xs,
-    borderBottomRightRadius: Border.br_11xs,
-    padding: Padding.p_3xs,
-    alignItems: "center",
-    flexDirection: "row",
-    backgroundColor: Color.sparklightWhite,
-    alignSelf: "stretch",
-    flex: 1,
-  },
-  notifications: {
-    flexDirection: "row",
-    borderColor: Color.sparklightGray,
-    alignSelf: "stretch",
-  },
   notificationsWrapper: {
     paddingTop: Padding.p_base,
     paddingBottom: Padding.p_5xs,
@@ -273,7 +243,7 @@ const styles = StyleSheet.create({
   },
   frameContainer: {
     alignSelf: "stretch",
-    marginTop:16
+    marginTop: 16
   },
   frameChild: {
     height: 1,

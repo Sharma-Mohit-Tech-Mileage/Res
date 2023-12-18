@@ -1,32 +1,79 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import { fetchSMSSelection, fetchBillingStatus, fetchBillingPaper } from '../../redux/actions/ProfileActionSuite';
+import { transformResponse } from '../../components/utility/constant';
+import { useDispatch, useSelector } from 'react-redux';
+import NotificationAlert from "../common/customui/NotificationAlert";
 
 const Notifications = () => {
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const route = useRoute(); // Use the useRoute hook
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const smsSubscription = profile.smsSubscription || [];
+  const paperlessStatus = profile.paperlessStatus || false;
+  const paperLessDetails = profile.paperLessDetails || {};
+  console.log('new deatils smsSubscription----------------------------------', smsSubscription);
+  console.log('new deatils paperLessDetails----------------------------------', paperLessDetails);
+  const data = transformResponse(smsSubscription);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+         await dispatch(fetchBillingStatus());
+        // await dispatch(fetchBillingPaper());
+        await dispatch(fetchSMSSelection());
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
+
+    fetchData();
+  }, [dispatch]);
+
+
+  useEffect(() => {
+    if (route.params?.updateSuccess) {
+      const updatedType = route.params.updatedType || 'Notification';
+      const successMessage = `${updatedType} settings have been updated successfully.`;
+      setShowSuccessAlert(true);
+      setSuccessMessage(successMessage); // New state to store the success message
+      dispatch(fetchSMSSelection());
+
+      // Reset the parameters
+      navigation.setParams({ updateSuccess: undefined, updatedType: undefined });
+    }
+  }, [route.params, navigation, dispatch]);
+
 
   return (
-
     <View style={styles.notifications}>
       <ProfileSettingsHeader
         title="Notifications"
         onPressBack={() => navigation.navigate('Account')}
       />
-      <ScrollView accessibilityLabel="Main Scroll View">
+      <ScrollView>
         <View style={[styles.notificationsInner]}>
+          <NotificationAlert
+            type="success"
+            title="Update Successful"
+            message={successMessage}
+            showCloseIcon={true}
+            isVisible={showSuccessAlert}
+            onClose={() => setShowSuccessAlert(false)}
+          />
           {/* Text Notifications Section */}
           <NotificationSection
             title="Text Notifications"
             infoText={`Text alerts are sent to `}
-            number="433-839-2398"
+            number={data.phoneNum}
+            transformedData={data}
             navigationTarget="TextNotifications"
-            additionalSettings={[
-              { type: 'Appointments', status: 'Off' },
-              { type: 'Outage', status: 'Off' },
-              { type: 'Billing', status: 'On' },
-            ]}
+            additionalSettings={data.subscriptionDetails}
           />
           <View style={{ marginBottom: Padding.p_base }} />
           {/* Email Notifications Section */}
@@ -36,7 +83,7 @@ const Notifications = () => {
             email="Melissa@gmail.com"
             navigationTarget="EmailNotifications"
             additionalSettings={[
-              { type: 'Paperless Billing', status: 'Off' },
+              { type: 'Paperless Billing', status: paperlessStatus?'Off':'On' },
             ]}
           />
           <View style={{ marginBottom: Padding.p_base }} />
@@ -62,6 +109,7 @@ const NotificationSection = ({
   title,
   infoText,
   number,
+  transformedData,
   email,
   navigationTarget,
   additionalSettings = [],
@@ -73,7 +121,7 @@ const NotificationSection = ({
         <Text style={styles.textNotifications}>{title}</Text>
         <Pressable
           style={[styles.buttons, styles.buttonsBg]}
-          onPress={() => navigation.navigate(navigationTarget)}
+          onPress={() => navigation.navigate(navigationTarget, { additionalData: transformedData })}
           accessibilityRole="button"
           accessibilityLabel={`Edit ${title}`}
         >

@@ -1,20 +1,57 @@
-import * as React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, FontSize, Color, FontFamily, Border } from "../../../GlobalStyles";
 import SparkLightInput from "../common/customui/SparkLightInput";
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
+import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import { useDispatch, useSelector } from 'react-redux';
+import {updateProfileRequest} from '../../redux/actions/ProfileActionSuite';
+import NotificationAlert from '../common/customui/NotificationAlert';
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
+  const route = useRoute(); // Use the useRoute hook
+  const dispatch = useDispatch();
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
+  const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
+  const scrollViewRef = useRef(null);
+
+  const handleChange = (e) => {
+    console.log("Account field change", e)
+    setLocalProfile({ ...profileDetails, [e.target.name]: e.target.value });
+  };
+  const handleSave = () => {
+    dispatch(updateProfileRequest(profileDetails, navigation));
+  };
+  useEffect(() => {
+    if (route.params?.updateFailed) {
+      setShowErrorAlert(true);
+      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+
+      // Reset the parameter so subsequent navigations are detected
+      navigation.setParams({ updateFailed: undefined });
+    }
+  }, [route.params?.updateFailed, navigation]);
+
+
   return (
     <View style={styles.profileSettingsEdit}>
       <ProfileSettingsHeader
         title="Edit Profile"
         onPressBack={() => navigation.navigate('ProfileSettings')}
       />
-      <ScrollView >
+      <ScrollView ref={scrollViewRef}>
         <View style={[styles.profileSettingsEditInner]}>
+          <NotificationAlert
+            type="error"
+            title="Failed"
+            message="Your profile update failed."
+            showCloseIcon={true}
+            isVisible={showErrorAlert}
+            onClose={() => setShowErrorAlert(false)}
+          />
           <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
             <View style={[styles.generalInformationWrapper, styles.informationWrapperFlexBox]}>
               <Text style={styles.generalInformation} >
@@ -29,7 +66,10 @@ const ProfileSettingsEdit = () => {
                     First Name
                   </Text>
                   <View >
-                    <SparkLightInput placeholder="Enter text here" />
+                    <SparkLightInput
+                      name="firstName"
+                      onChangeText={handleChange}
+                      value={profileDetails.firstName} />
                   </View>
                 </View>
               </View>
@@ -40,7 +80,10 @@ const ProfileSettingsEdit = () => {
                     Last Name
                   </Text>
                   <View >
-                    <SparkLightInput placeholder="Enter text here" />
+                    <SparkLightInput
+                      name="lastName"
+                      onChangeText={handleChange}
+                      value={profileDetails.lastName} />
                   </View>
                 </View>
               </View>
@@ -51,7 +94,10 @@ const ProfileSettingsEdit = () => {
                     Username
                   </Text>
                   <View >
-                    <SparkLightInput placeholder="Enter text here" />
+                    <SparkLightInput
+                      name="userName"
+                      onChangeText={handleChange}
+                      value={profileDetails.userName} />
                   </View>
                 </View>
               </View>
@@ -71,21 +117,28 @@ const ProfileSettingsEdit = () => {
                     Email
                   </Text>
                   <View >
-                    <SparkLightInput placeholder="Enter text here" />
+                    <SparkLightInput
+                      name="svEmailAddress"
+                      onChangeText={handleChange}
+                      value={profileDetails.svEmailAddress} />
                   </View>
                 </View>
               </View>
               <View style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}>
                 <View style={styles.textinput}>
                   <Text style={[styles.firstTypo]}>Mobile Phone</Text>
-                  <View ><SparkLightInput placeholder="Enter text here" />
+                  <View >
+                    <SparkLightInput
+                      name="phone"
+                      onChangeText={handleChange}
+                      value={profileDetails.phone} />
                   </View>
                 </View>
               </View>
             </View>
           </View>
           <View style={{ marginTop: Padding.p_base }}>
-            <Pressable style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]} onPress={() => navigation.navigate("ProfileSettings")}>
+            <Pressable style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]} onPress={handleSave}>
               <Text style={[{ color: Color.sparklightWhite }, styles.makeTypo]}>Save</Text>
             </Pressable>
             <Pressable style={[styles.buttonsLayout]} onPress={() => navigation.navigate("ProfileSettings")}>

@@ -1,15 +1,35 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Animated, TouchableWithoutFeedback, View, StyleSheet, Easing } from 'react-native';
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
 
-const Toggle = ({ onToggle }) => {
-    const [isActive, setIsActive] = useState(false);
-    const translateX = useRef(new Animated.Value(-8)).current;
+const Toggle = ({ name, onToggle, initialValue = false }) => {
+    const [isActive, setIsActive] = useState(initialValue);
+    const translateX = useRef(new Animated.Value(isActive ? 8 : -8)).current;
+
+    // Adjust the position of the toggle when initialValue changes
+    useEffect(() => {
+        Animated.timing(translateX, {
+            toValue: initialValue ? 8 : -8,
+            duration: 0, // Instant change
+            useNativeDriver: true
+        }).start();
+        setIsActive(initialValue);
+    }, [initialValue, translateX]);
 
     const handleToggle = () => {
         const nextState = !isActive;
         setIsActive(nextState);
-        onToggle && onToggle(nextState);
+
+        // Create a synthetic event object
+        const event = {
+            target: {
+                name,
+                value: nextState,
+                type: 'toggle',
+            },
+        };
+
+        onToggle && onToggle(event);
 
         Animated.timing(translateX, {
             toValue: nextState ? 8 : -8,
@@ -25,11 +45,6 @@ const Toggle = ({ onToggle }) => {
     return (
         <TouchableWithoutFeedback
             onPress={handleToggle}
-            accessible={true}
-            accessibilityRole="switch"
-            accessibilityState={{ checked: isActive }}
-            accessibilityHint="Toggles between on and off state."
-            accessibilityLabel={isActive ? "Switch is on" : "Switch is off"}
         >
             <View style={styles.toggle}>
                 <View style={[styles.toggleBase, { backgroundColor: isActive ? activeColor : inactiveColor }]}>
