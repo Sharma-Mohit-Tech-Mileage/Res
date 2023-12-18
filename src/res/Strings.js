@@ -4,7 +4,7 @@ import LocalizedStrings from 'react-native-localization';
 let strings = new LocalizedStrings({
  en:{
    internetStatus:"Your Internet Health has no recent issues.",
-   internetStatusIssue:"Your Internet has some issues.",
+   internetStatusIssue:"An issue has been detected.",
    expandTxt:'Expand Details',
    collapseTxt:'Collapse Details',
    noOutageTxt:'No Outages',

@@ -198,7 +198,8 @@ const MyServicePlan = ({ plans,navigation }) => {
               fontStyle: "normal",
               fontWeight: "400",
               textAlign:'center',
-              textAlignVertical:'center'
+              textAlignVertical:'center',
+              fontFamily:FontFamily.openSansRegular,
             }}
           >
             {" "}
@@ -220,7 +221,7 @@ const MyServicePlan = ({ plans,navigation }) => {
               textAlign: "center",
               fontFamily:FontFamily.openSansRegular,
               textAlignVertical: "center",
-              fontWeight: "400",
+              fontWeight:'400',
             }}
           >
             {" "}
