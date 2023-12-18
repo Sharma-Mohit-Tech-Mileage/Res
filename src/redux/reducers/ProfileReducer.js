@@ -1,10 +1,16 @@
-import { USER_PROFILE_DETAILS, SAVE_USER_LIST, SAVE_SMS_SELECTION } from '../constants/index';
+import { 
+    USER_PROFILE_DETAILS, SAVE_USER_LIST, 
+    SAVE_SMS_SELECTION, SAVE_EMIAL_SELECTION, 
+    SAVE_PAPERLESS_DETAILS 
+} from '../constants/index';
 
 const initialState = {
     isLoading: false,
     profileDetails: {},
     userList: [],
     smsSubscription: [],
+    paperlessStatus: false,
+    paperLessDetails: {},
     erro: ""
 }
 
@@ -24,6 +30,16 @@ const ProfileReducer = (state = initialState, action) => {
             return {
                 isLoading: false,
                 smsSubscription: action.payload,
+            }
+        case SAVE_EMIAL_SELECTION:
+            return {
+                isLoading: false,
+                paperlessStatus: action.payload,
+            }
+        case SAVE_PAPERLESS_DETAILS:
+            return {
+                isLoading: false,
+                paperLessDetails: action.payload,
             }
         default:
             return state;

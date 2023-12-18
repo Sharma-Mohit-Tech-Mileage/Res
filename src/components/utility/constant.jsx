@@ -2,7 +2,12 @@ import { Color } from '../../../GlobalStyles'
 export const ROLE_COLORS = {
     primaryadmin: Color.colorMidnightblue,
     admin: Color.sparklightBrightPurple,
-    user: Color.sparklightGreen,
+    viewonly: Color.sparklightGreen,
+};
+export const BOX_COLORS = {
+    primaryadmin: Color.success50,
+    admin: Color.success50,
+    viewonly: Color.colorWhitesmoke_200,
 };
 export const validatePassword = (newPassword, userName) => {
     if (!newPassword) {
@@ -38,7 +43,7 @@ export const passwordTerms = [
 
 export const transformResponse = (responseArray) => {
     // Set default values
-    const defaultPhoneNumber = "N/A";
+    const defaultPhoneNumber = "";
     const defaultSubscriptionDetails = [];
 
     // Check if the response is an array and not empty
@@ -62,11 +67,12 @@ export const transformResponse = (responseArray) => {
     // Extract the phone number and smsMessageType array
     const { phoneNum, smsMessageType } = firstResponse;
 
-    // Transform the smsMessageType array into the required format
-    const subscriptionDetails = smsMessageType.map(msgType => ({
-        type: msgType.messageType,
-        status: msgType.optOutFlag ? 'Off' : 'On'
-    }));
+    const subscriptionDetails = smsMessageType.map(msgType => {
+        return {
+            type: msgType.messageType,
+            status: msgType.optOutFlag ? 'On' : 'Off'
+        };
+    });
 
     // Return an object with the phone number and transformed subscription details
     return {
@@ -74,3 +80,62 @@ export const transformResponse = (responseArray) => {
         subscriptionDetails
     };
 };
+
+export const getUserType = (input) => {
+    // Check for null or empty input
+    if (input === null || input.trim() === '') {
+        return '';
+    }
+
+    // Convert input to lower case for case-insensitive comparison
+    const inputLower = input.toLowerCase();
+
+    // Define the mapping
+    const mapping = {
+        'admin': 'ADMIN',
+        'limited': 'VIEW ONLY',
+        'restricted': 'VIEW ONLY',
+        'headofhousehold': 'PRIMARY ADMIN'
+    };
+    // Return the corresponding value or a default message
+    return mapping[inputLower] || '';
+};
+
+export const initializeSettings = (additionalData) => {
+    // Default settings if additionalData or its properties are undefined
+    if (!additionalData || !additionalData.phoneNum || !additionalData.subscriptionDetails) {
+        return {
+            accountNumber: "",
+            phoneNumber: "",
+            optOut: false,
+            outageOptOut: false,
+            billingOptOutStatus: false,
+        };
+    }
+
+    const defaultSettings = {
+        accountNumber: "",
+        phoneNumber: additionalData.phoneNum,
+        optOut: false,
+        outageOptOut: false,
+        billingOptOutStatus: false,
+    };
+
+    additionalData.subscriptionDetails.forEach((detail) => {
+        const status = detail.status?.toLowerCase() === 'on';
+        const type = detail.type?.toLowerCase();
+
+        if (type === "appointment") {
+            defaultSettings.optOut = status;
+        }
+        if (type === "outage") {
+            defaultSettings.outageOptOut = status;
+        }
+        if (type === "billing") {
+            defaultSettings.billingOptOutStatus = status;
+        }
+    });
+
+    return defaultSettings;
+};
+

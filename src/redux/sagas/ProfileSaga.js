@@ -1,43 +1,100 @@
 import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
-import { getProfileDetails, fetchUserList, fetchSmsSubscription } from "../../network/apis/account/profile.service";
-import { FETCH_PROFILE_DETAILS, FETCH_USER_LIST,FETCH_SMS_SELECTION } from "../constants";
-import { fetchProfileSuccess, fetchUserListSuccess , saveSMSSelection} from "../actions/ProfileActionSuite";
+import {
+    getProfileDetails, fetchUserList,
+    fetchSmsSubscription, fetchBillingStatus,
+    postProfileInfo, postTextNotifictionInfo,
+    fetchPaperLessDetails
+} from "../../network/apis/account/profile.service";
+import {
+    FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
+    FETCH_SMS_SELECTION, UPDATE_PROFILE_REQUEST,
+    UPDATE_PROFILE_SECURITY, UPDATE_TEXT_NOTIFICATION,
+    FETCH_EMIAL_SELECTION, FETCH_PAPERLESS_SELECTION
+} from "../constants";
+import {
+    fetchProfileSuccess, fetchUserListSuccess,
+    saveSMSSelection, saveEmailBillings,
+    savePaperlessDetails
+} from "../actions/ProfileActionSuite";
 
 function* getProfileUsers(action) {
     try {
         const response = yield call(fetchUserList)
         yield put(fetchUserListSuccess(response));
-
     } catch (error) {
-        console.log(error);
-    } finally {
-        //yield put(apiCalled());
+        console.error('API Error Response:', error);
     }
 }
 
 function* fetchProfileDetails(action) {
     try {
         const response = yield call(getProfileDetails)
-        //console.log("getProfileDetails API Called", response);
         yield put(fetchProfileSuccess(response));
-
     } catch (error) {
-        console.log(error);
-    } finally {
-        //yield put(apiCalled());
+        console.error('API Error Response:', error);
     }
 }
 
 function* fetchSMSSubs(action) {
     try {
         const response = yield call(fetchSmsSubscription)
-        //console.log("fetchSmsSubscription API Called", response);
         yield put(saveSMSSelection(response));
-
     } catch (error) {
-        console.log(error);
-    } finally {
-        //yield put(apiCalled());
+        console.error('API Error Response:', error);
+    }
+}
+
+function* fetchPaperlessBills(action) {
+    try {
+        const billingStatusResponse = yield call(fetchBillingStatus);
+        yield put(saveEmailBillings(billingStatusResponse));
+    } catch (error) {
+        console.error('Fetch Billing Status API Error:', error);
+        // Optionally, dispatch an action to handle this error state
+    }
+}
+
+function* fetchPaperlessDetails(action) {
+      try {
+        const paperlessDetailsResponse = yield call(fetchPaperLessDetails);
+       // yield put(savePaperlessDetails(paperlessDetailsResponse));
+    } catch (error) {
+        console.error('Fetch Paperless Details API Error:', error);
+        // Optionally, dispatch an action to handle this error state
+    }
+}
+
+function* updateProfile(action) {
+    try {
+        const response = yield call(postProfileInfo, action.payload);
+        console.log('API Success Response:', response); // Log the success response
+        // action.navigation.navigate('ProfileSettingsEdit', { updateFailed: true });
+        action.navigation.navigate('ProfileSettings', { updateSuccess: true });
+    } catch (error) {
+        action.navigation.navigate('ProfileSettingsEdit', { updateFailed: true });
+        console.error('API Error Response:', error, action.payload); // Log the error response
+    }
+}
+
+function* updateProfileSecurity(action) {
+    try {
+        const response = yield call(postProfileInfo, action.payload);
+        console.log('API Success Response:', response); // Log the success response
+        action.navigation.navigate('PasswordSecurity', { updateSuccess: true });
+    } catch (error) {
+        action.navigation.navigate('PasswordSecurityEdit', { updateFailed: true });
+        console.error('API Error Response:', error, action.payload); // Log the error response
+    }
+}
+
+function* updateTextNotification(action) {
+    try {
+        const response = yield call(postTextNotifictionInfo, action.payload);
+        console.log('API Success Response:', response); // Log the success response
+        navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Text' });
+    } catch (error) {
+        action.navigation.navigate('TextNotifications', { updateFailed: true });
+        console.error('API Error Response:', error, action.payload); // Log the error response
     }
 }
 
@@ -45,5 +102,10 @@ function* ProfileSagas() {
     yield takeLatest(FETCH_PROFILE_DETAILS, fetchProfileDetails);
     yield takeLatest(FETCH_USER_LIST, getProfileUsers);
     yield takeLatest(FETCH_SMS_SELECTION, fetchSMSSubs);
+    yield takeLatest(FETCH_EMIAL_SELECTION, fetchPaperlessBills);
+    yield takeLatest(FETCH_PAPERLESS_SELECTION, fetchPaperlessDetails);
+    yield takeLatest(UPDATE_PROFILE_REQUEST, updateProfile);
+    yield takeLatest(UPDATE_PROFILE_SECURITY, updateProfileSecurity);
+    yield takeLatest(UPDATE_TEXT_NOTIFICATION, updateTextNotification);
 }
 export default ProfileSagas;

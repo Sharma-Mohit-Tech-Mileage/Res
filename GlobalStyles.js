@@ -35,12 +35,14 @@ export const Color = {
     sparklightaddGray:"#666666",
     colorGray_100: "#101828",
     sparklightGray1: "#4C5458",
-    sparklightBrightPurple: "#8d3b90",
+    sparklightBrightPurple: "#8D3B90",
     success50: "#ecfdf3",
     colorAquamarine: "#abefc6",
     success700: "#067647",
     gray600: "#475467",
     sparkLightRed: "#EF4E3E",
+    sparkLightInfo:'#F88700',
+    Gray300: '#EAEAEA'
 };
 export const Padding = {
     p_5xs: 8,
