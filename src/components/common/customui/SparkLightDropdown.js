@@ -14,9 +14,10 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style }) => {
                 accessibilityLabel="Choose Service"
                 placeholder="Select an option"
                 _selectedItem={{
-                    bg: "teal.600",
+                    bg: Color.Gray300,
                     endIcon: <CheckIcon size="5" />,
                 }}
+                style={styles.dropdown}
                 onValueChange={itemValue => onValueChange(itemValue)}
             >
                 {validItems.map((item, index) => (
@@ -33,6 +34,13 @@ const styles = StyleSheet.create({
         borderColor: Color.sparklightDarkGray, // Set the border color here
         borderWidth: 1, // Set the border width here
         borderRadius: 2, // Set the border radius here
+    },
+    dropdown: {
+        flexDirection: 'row', // Ensure text and icon are in a row
+        justifyContent: 'space-between', // Space the text and icon
+        alignItems: 'center', // Center the items vertically
+        paddingHorizontal: Padding.p_base,
+        paddingVertical: Padding.p_xs
     },
     item: {
         padding: Padding.p_base,
