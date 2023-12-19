@@ -3,13 +3,14 @@ import {
     getProfileDetails, fetchUserList,
     fetchSmsSubscription, fetchBillingStatus,
     postProfileInfo, postTextNotifictionInfo,
-    fetchPaperLessDetails
+    fetchPaperLessDetails, postEmailNotification
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
     FETCH_SMS_SELECTION, UPDATE_PROFILE_REQUEST,
     UPDATE_PROFILE_SECURITY, UPDATE_TEXT_NOTIFICATION,
-    FETCH_EMIAL_SELECTION, FETCH_PAPERLESS_SELECTION
+    FETCH_EMIAL_SELECTION, FETCH_PAPERLESS,
+    UPDATE_EMAIL_NOTIFICATION
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
@@ -55,9 +56,9 @@ function* fetchPaperlessBills(action) {
 }
 
 function* fetchPaperlessDetails(action) {
-      try {
+    try {
         const paperlessDetailsResponse = yield call(fetchPaperLessDetails);
-       // yield put(savePaperlessDetails(paperlessDetailsResponse));
+        yield put(savePaperlessDetails(paperlessDetailsResponse));
     } catch (error) {
         console.error('Fetch Paperless Details API Error:', error);
         // Optionally, dispatch an action to handle this error state
@@ -68,7 +69,6 @@ function* updateProfile(action) {
     try {
         const response = yield call(postProfileInfo, action.payload);
         console.log('API Success Response:', response); // Log the success response
-        // action.navigation.navigate('ProfileSettingsEdit', { updateFailed: true });
         action.navigation.navigate('ProfileSettings', { updateSuccess: true });
     } catch (error) {
         action.navigation.navigate('ProfileSettingsEdit', { updateFailed: true });
@@ -90,11 +90,17 @@ function* updateProfileSecurity(action) {
 function* updateTextNotification(action) {
     try {
         const response = yield call(postTextNotifictionInfo, action.payload);
-        console.log('API Success Response:', response); // Log the success response
-        navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Text' });
+        action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Text' });
     } catch (error) {
         action.navigation.navigate('TextNotifications', { updateFailed: true });
-        console.error('API Error Response:', error, action.payload); // Log the error response
+    }
+}
+function* updateEmailNotification(action) {
+    try {
+        const response = yield call(postEmailNotification, action.payload);
+        action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Email' });
+    } catch (error) {
+        action.navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Email' });
     }
 }
 
@@ -103,9 +109,10 @@ function* ProfileSagas() {
     yield takeLatest(FETCH_USER_LIST, getProfileUsers);
     yield takeLatest(FETCH_SMS_SELECTION, fetchSMSSubs);
     yield takeLatest(FETCH_EMIAL_SELECTION, fetchPaperlessBills);
-    yield takeLatest(FETCH_PAPERLESS_SELECTION, fetchPaperlessDetails);
+    yield takeLatest(FETCH_PAPERLESS, fetchPaperlessDetails);
     yield takeLatest(UPDATE_PROFILE_REQUEST, updateProfile);
     yield takeLatest(UPDATE_PROFILE_SECURITY, updateProfileSecurity);
     yield takeLatest(UPDATE_TEXT_NOTIFICATION, updateTextNotification);
+    yield takeLatest(UPDATE_EMAIL_NOTIFICATION, updateEmailNotification);
 }
 export default ProfileSagas;

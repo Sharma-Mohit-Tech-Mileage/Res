@@ -17,21 +17,18 @@ const Notifications = () => {
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const smsSubscription = profile.smsSubscription || [];
   const paperlessStatus = profile.paperlessStatus || false;
-  const paperLessDetails = profile.paperLessDetails || {};
-  console.log('new deatils smsSubscription----------------------------------', smsSubscription);
-  console.log('new deatils paperLessDetails----------------------------------', paperLessDetails);
+  const paperLessInfo = profile.paperLessInfo || {};
   const data = transformResponse(smsSubscription);
   useEffect(() => {
     const fetchData = async () => {
       try {
-         await dispatch(fetchBillingStatus());
-        // await dispatch(fetchBillingPaper());
+        await dispatch(fetchBillingStatus());
+        await dispatch(fetchBillingPaper());
         await dispatch(fetchSMSSelection());
       } catch (error) {
         console.error("Error fetching data", error);
       }
     };
-
     fetchData();
   }, [dispatch]);
 
@@ -80,10 +77,14 @@ const Notifications = () => {
           <NotificationSection
             title="Email Notifications"
             infoText={`Emails are sent to `}
-            email="Melissa@gmail.com"
+            email={paperLessInfo.emailAddress}
             navigationTarget="EmailNotifications"
+            transformedData={{
+              status: paperlessStatus,
+              email: paperLessInfo.emailAddress
+            }}
             additionalSettings={[
-              { type: 'Paperless Billing', status: paperlessStatus?'Off':'On' },
+              { type: 'Paperless Billing', status: !paperlessStatus?'Off':'On' },
             ]}
           />
           <View style={{ marginBottom: Padding.p_base }} />
