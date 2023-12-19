@@ -1,27 +1,81 @@
-import * as React from "react";
-import { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import Toggle from '../common/Toggle';
+import { useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
+import { useDispatch } from 'react-redux';
+import { initializeSettings } from '../utility/constant';
+import NotificationAlert from "../common/customui/NotificationAlert";
+import {updateTextNotification} from '../../redux/actions/ProfileActionSuite'
 
 const TextNotifications = ({ navigation }) => {
-    const [isToggleActive, setIsToggleActive] = useState(false);
+    const [initialize, setInitializeSettings] = useState({});
+    const [showErrorAlert, setShowErrorAlert] = useState(false);
+    const route = useRoute(); // Use the useRoute hook
+    const additionalData = route.params?.additionalData;
+    const dispatch = useDispatch();
+    const scrollViewRef = useRef(null);
+    const isFocused = useIsFocused(); // Hook to determine if the screen is focused
 
-    const handleToggle = (isActive) => {
-        setIsToggleActive(isActive);
+    useEffect(() => {
+        // Check if the screen is focused
+        if (isFocused) {
+            // Initialize settings based on additionalData
+            const initializedSettings = initializeSettings(additionalData);
+            console.log("Default settings if additionalData or its properties are undefined 1", additionalData);
+            console.log("Default settings if additionalData or its properties are undefined 2", initializedSettings);
+            setInitializeSettings(initializedSettings);
+        }
+
+        // Cleanup function
+        return () => {
+            if (isFocused) {
+                setInitializeSettings({}); // Reset state when leaving the screen
+            }
+        };
+    }, [isFocused, additionalData]); // Depend on isFocused and additionalData
+    const handleToggleChange = (e) => {
+        const { name, value } = e.target;
+        setInitializeSettings(initialize => {
+            const updatedSettings = {
+                ...initialize,
+                [name]: value
+            };
+            return updatedSettings;
+        });
     };
+
+    useEffect(() => {
+        if (route.params?.updateFailed) {
+            setShowErrorAlert(true);
+            scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+            // Reset the parameter so subsequent navigations are detected
+            navigation.setParams({ updateFailed: undefined });
+        }
+    }, [route.params?.updateFailed, navigation, dispatch]);
+
+    const handleSave = () => {
+        dispatch(updateTextNotification(initialize, navigation));
+    };
+
     return (
 
-        <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }} accessibilityLabel="Text Notifications Section">
+        <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }} >
             <ProfileSettingsHeader
                 title="Edit Text Notifications"
                 onPressBack={() => navigation.navigate('Notifications')}
-                accessibilityLabel="Text Notifications Header"
-                accessibilityHint="Navigates back to the Notifications screen"
             />
-            <ScrollView accessibilityLabel="Scroll View">
+            <ScrollView ref={scrollViewRef}>
                 <View style={styles.textNotificationsInner} >
+                    <NotificationAlert
+                        type="error"
+                        title="Failed"
+                        message="Notifications updated failed."
+                        showCloseIcon={true}
+                        isVisible={showErrorAlert}
+                        onClose={() => setShowSuccessAlert(false)}
+                    />
                     <View style={[styles.navigationBorder]}>
                         <View style={styles.frameGroup}>
                             <View style={styles.frameView}>
@@ -49,7 +103,7 @@ const TextNotifications = ({ navigation }) => {
                                 <Text style={styles.mobilePhoneTypo}>
                                     Mobile Phone
                                 </Text>
-                                <Text style={styles.text}>340-203-2039</Text>
+                                <Text style={styles.text}>{initialize.phoneNumber}</Text>
                                 <Text style={[styles.receiveTextNotifications1, styles.containerTypo,]}>
                                     Message and data rates may apply. Message frequency may vary. Text STOP to opt out or HELP
                                     for help.
@@ -59,19 +113,23 @@ const TextNotifications = ({ navigation }) => {
                         <View style={styles.frameChild} />
                         <View style={styles.frameGroup}>
                             <View style={styles.frameWrapper2}>
-                            <View style={styles.frameParent3}>
-                                <View style={styles.frameParent4}>
-                                    <Text style={[styles.appointments, styles.mobilePhoneTypo,]}>
-                                        Appointments
-                                    </Text>
-                                    <View >
-                                        <Toggle onToggle={handleToggle} />
+                                <View style={styles.frameParent3}>
+                                    <View style={styles.frameParent4}>
+                                        <Text style={[styles.appointments, styles.mobilePhoneTypo,]}>
+                                            Appointments
+                                        </Text>
+                                        <View >
+                                            <Toggle
+                                                name="optOut"
+                                                initialValue={initialize.optOut}
+                                                onToggle={handleToggleChange}
+                                            />
+                                        </View>
                                     </View>
+                                    <Text style={[styles.receiveTextNotifications1, styles.containerTypo,]} >
+                                        Receive text notifications when your appointments have updates.
+                                    </Text>
                                 </View>
-                                <Text style={[styles.receiveTextNotifications1, styles.containerTypo,]} >
-                                    Receive text notifications when your appointments have updates.
-                                </Text>
-                            </View>
                             </View>
                         </View>
                         <View style={styles.frameChild} />
@@ -83,7 +141,11 @@ const TextNotifications = ({ navigation }) => {
                                             Outage Alerts
                                         </Text>
                                         <View >
-                                            <Toggle onToggle={handleToggle} />
+                                            <Toggle
+                                                name="outageOptOut"
+                                                initialValue={initialize.outageOptOut}
+                                                onToggle={handleToggleChange}
+                                            />
                                         </View>
                                     </View>
                                     <Text style={[styles.receiveTextNotifications1, styles.containerTypo,]}>
@@ -102,8 +164,9 @@ const TextNotifications = ({ navigation }) => {
                                         </Text>
                                         <View >
                                             <Toggle
-                                                onToggle={handleToggle}
-                                            />
+                                                name="billingOptOutStatus"
+                                                initialValue={initialize.billingOptOutStatus}
+                                                onToggle={handleToggleChange} />
                                         </View>
                                     </View>
                                     <Text style={[styles.receiveTextNotifications1, styles.containerTypo,]}>
@@ -137,16 +200,13 @@ const TextNotifications = ({ navigation }) => {
                     <View style={styles.buttonsParent} accessibilityLabel="Buttons Section">
                         <Pressable
                             style={[styles.buttons, styles.buttonsLayout]}
-                            onPress={() => navigation.navigate("Notifications")}
+                            onPress={handleSave}
                         >
                             <Text style={[styles.makePayment, styles.makeTypo]}>Save</Text>
                         </Pressable>
                         <Pressable
                             style={[styles.buttonsLayout]}
                             onPress={() => navigation.navigate("Notifications")}
-                            accessibilityLabel="Cancel Button"
-                            accessibilityRole="button"
-                            accessibilityHint="Cancels changes and navigates back to the Account screen"
                         >
                             <Text style={[styles.accountClr]}>
                                 Cancel

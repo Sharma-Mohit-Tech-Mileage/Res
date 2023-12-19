@@ -1,46 +1,66 @@
-import React, { useState } from "react";
-import { Image, StyleSheet, Text, Pressable, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect, useRef } from "react";
+import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
 import { validatePassword, securityQuestions, passwordTerms } from "../utility/constant";
-import { ScrollView } from "react-native-gesture-handler";
 import SparkLightInput from '../common/customui/SparkLightInput';
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
+import NotificationAlert from '../common/customui/NotificationAlert';
+import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
 const PasswordSecurityEdit = () => {
 
   const navigation = useNavigation();
   const [passwordVisible, setPasswordVisible] = useState(false);
-  // State to track if the "Add your own question" is selected
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const route = useRoute(); // Use the useRoute hook
   const dispatch = useDispatch();
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
-
+  const scrollViewRef = useRef(null);
   const handleChange = (e) => {
-    console.log("Account field change", e)
     setLocalProfile({ ...profileDetails, [e.target.name]: e.target.value });
   };
 
   // Handler for when the security question dropdown value changes
   const handleSecurityQuestionChange = (itemValue) => {
-    console.log("securityQuestion",itemValue)
+    console.log("securityQuestion", itemValue)
     setLocalProfile({ ...profileDetails, securityQuestion: itemValue });
     setIsCustomQuestionSelected(itemValue === "Add your own question");
   };
+
+  const handleSave = () => {
+    dispatch(updateProfileSecurity(profileDetails, navigation));
+  };
+
+  useEffect(() => {
+    if (route.params?.updateFailed) {
+      setShowErrorAlert(true);
+      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+      // Reset the parameter so subsequent navigations are detected
+      navigation.setParams({ updateFailed: undefined });
+    }
+  }, [route.params?.updateFailed, navigation, dispatch]);
 
   return (
     <View style={styles.passwordSecurityEdit}>
       <ProfileSettingsHeader
         title="Edit Password & Security"
         onPressBack={() => navigation.navigate('PasswordSecurity')}
-        accessibilityLabel="Edit Password & Security Header"
-        accessibilityHint="Navigate back to Password & Security settings"
       />
-      <ScrollView accessibilityLabel="Scroll view for Password and Security Edit">
+      <ScrollView ref={scrollViewRef}>
         <View style={styles.passwordSecurityEditInner}>
+          <NotificationAlert
+            type="error"
+            title="Failed"
+            message="Your password and security update failed."
+            showCloseIcon={true}
+            isVisible={showErrorAlert}
+            onClose={() => setShowErrorAlert(false)}
+          />
           <View style={styles.frameParent}>
             <View style={[styles.frameGroup, styles.wrapperSpaceBlock1]}>
               <View style={[styles.passwordWrapper, styles.wrapperSpaceBlock1]}>
@@ -57,11 +77,15 @@ const PasswordSecurityEdit = () => {
                       </Text>
                       <Pressable onPress={() => setPasswordVisible(!passwordVisible)}>
                         <View style={styles.eyeParent}>
-                          <Image
+                          {!passwordVisible ? <Image
                             style={styles.eyeIcon}
                             resizeMode="stretch"
                             source={require("../../../assets/eye.png")}
-                          />
+                          /> : <Image
+                            style={styles.eyeIcon}
+                            resizeMode="stretch"
+                            source={require("../../../assets/HidePassword-01.png")}
+                          />}
                           <Text style={[styles.show, styles.firstTypo]}>
                             {passwordVisible ? 'Hide' : 'Show'}
                           </Text>
@@ -80,7 +104,7 @@ const PasswordSecurityEdit = () => {
                   <View style={styles.passwordFlexBox}>
                     {validatePassword(profileDetails.newPassword, profileDetails.userName).map((isValid, index) => (
                       <View key={`point-${index}`} style={styles.bulletPointContainer}>
-                        <Text style={[styles.bulletPoint, { color: isValid ? 'green' : 'black' }]}>•</Text>
+                        <Text style={[styles.bulletPoint, { color: isValid ? Color.sparklightGreen : Color.colorGray_200 }]}>•</Text>
                         <Text style={[styles.itMustBe, { color: Color.sparklightGray1, fontWeight: '400' }]}>
                           {passwordTerms[index]}
                         </Text>
@@ -153,7 +177,7 @@ const PasswordSecurityEdit = () => {
           <View style={styles.frameParent1}>
             <Pressable
               style={[styles.buttons, styles.buttonsLayout]}
-              onPress={() => navigation.navigate("Account")}
+              onPress={handleSave}
             >
               <Text style={[styles.makePayment, styles.makeTypo]}>
                 Save
@@ -186,8 +210,7 @@ const styles = StyleSheet.create({
   },
   bulletPoint: {
     marginRight: 10, // Space between bullet and text
-    color: Color.sparklightGray1,
-    fontWeight: '400'
+    fontSize: 15
   },
   passwordFlexBox: {
     textAlign: "left",

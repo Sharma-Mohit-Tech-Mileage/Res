@@ -55,7 +55,7 @@ const DataSpeedComponent = ({navigation}) => {
       let speedInMbps_upload = (uploadSpeed / 1000).toFixed(2);
       let upl = speedInMbps_upload.toString().split(".");
       let downl = speedInMbps_download.toString().split(".");
-      const format1 = "DD/MM/YY hh:mma";
+      const format1 = "MM/DD/YY hh:mma";
       setTestDate(moment(date).format(format1));
       setDownload(downl[0]);
       setDownloadFrac(downl[1]);
