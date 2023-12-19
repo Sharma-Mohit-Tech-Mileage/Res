@@ -3,8 +3,9 @@ import {
     FETCH_USER_LIST, FETCH_PROFILE_DETAILS,
     FETCH_SMS_SELECTION, SAVE_SMS_SELECTION,
     UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SECURITY,
-    UPDATE_TEXT_NOTIFICATION, SAVE_EMIAL_SELECTION, 
-    FETCH_EMIAL_SELECTION, SAVE_PAPERLESS_DETAILS, FETCH_PAPERLESS_SELECTION
+    UPDATE_TEXT_NOTIFICATION, SAVE_EMIAL_SELECTION,
+    FETCH_EMIAL_SELECTION, SAVE_PAPERLESS_DETAILS,
+    FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION
 } from '../constants';
 export const fetchProfileSuccess = (response) => {
     return {
@@ -46,7 +47,7 @@ export const fetchBillingStatus = () => {
 // Action creator for fetching the SMS selection status
 export const fetchBillingPaper = () => {
     return {
-        type: FETCH_PAPERLESS_SELECTION
+        type: FETCH_PAPERLESS
     };
 };
 // Action creator for saving the SMS selection
@@ -86,5 +87,9 @@ export const updateTextNotification = (data, navigation) => ({
     payload: data,
     navigation,
 });
-
+export const updateEmailNotification = (data, navigation) => ({
+    type: UPDATE_EMAIL_NOTIFICATION,
+    payload: data,
+    navigation,
+});
 

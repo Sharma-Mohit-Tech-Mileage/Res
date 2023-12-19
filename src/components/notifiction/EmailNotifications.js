@@ -1,19 +1,46 @@
-import * as React from "react";
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { StyleSheet, Text, Pressable, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import Toggle from '../common/Toggle';
+import { useDispatch } from 'react-redux';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-
+import NotificationAlert from "../common/customui/NotificationAlert";
+import { updateEmailNotification } from '../../redux/actions/ProfileActionSuite'
 const EmailNotifications = () => {
-  const [isToggleActive, setIsToggleActive] = useState(false);
-
-  const handleToggle = (isActive) => {
-    setIsToggleActive(isActive);
-  };
-
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [initialize, setInitializeSettings] = useState({});
+  const route = useRoute(); // Use the useRoute hook
+  const paperlessdata = route.params?.additionalData;
+  const dispatch = useDispatch();
   const navigation = useNavigation();
+  const scrollViewRef = useRef(null);
+  const handleToggleChange = (e) => {
+    const { name, value } = e.target;
+    setInitializeSettings(paperlessdata => {
+      const updatedSettings = {
+        ...paperlessdata,
+        [name]: value
+      };
+      return updatedSettings;
+    });
+  };
+  useEffect(() => {
+    if (paperlessdata) {
+      setInitializeSettings(paperlessdata);
+    }
+  }, [paperlessdata]);
+  useEffect(() => {
+    if (route.params?.updateFailed) {
+      setShowErrorAlert(true);
+      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+      navigation.setParams({ updateFailed: undefined });
+    }
+  }, [route.params?.updateFailed, navigation, dispatch]);
+
+  const handleSave = () => {
+    dispatch(updateEmailNotification(initialize.email, navigation));
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
@@ -24,19 +51,29 @@ const EmailNotifications = () => {
         accessibilityHint="Navigates back to the Notifications screen"
       />
       <View style={styles.emailNotificationsInner}>
+        <NotificationAlert
+          type="error"
+          title="Failed"
+          message="Notifications updated failed."
+          showCloseIcon={true}
+          isVisible={showErrorAlert}
+          onClose={() => setShowErrorAlert(false)}
+        />
         <View style={styles.frameParent}>
           <View style={[styles.frameContainer, styles.navigationBorder]} accessible >
             <View style={styles.frameGroup}>
               <View style={[styles.frameView, styles.frameFlexBox]}>
                 <View style={styles.frameParent1} >
                   <View
-                    style={[styles.paperlessBillingParent,styles.frameFlexBox,]}
+                    style={[styles.paperlessBillingParent, styles.frameFlexBox,]}
                   >
                     <Text style={styles.paperlessBilling}>
                       Paperless Billing
                     </Text>
                     <View>
-                      <Toggle onToggle={handleToggle} />
+                      <Toggle name="status"
+                        initialValue={initialize.status}
+                        onToggle={handleToggleChange} />
                     </View>
                   </View>
                   <Text style={[styles.receiveBillingStatements, styles.receiveTypo,]}
@@ -51,7 +88,7 @@ const EmailNotifications = () => {
           <View style={styles.buttonsParent} accessible >
             <Pressable
               style={[styles.buttons, styles.buttonsLayout]}
-              onPress={() => {/* Save function */ }}
+              onPress={handleSave}
               accessible
               accessibilityRole="button"
               accessibilityLabel="Save"

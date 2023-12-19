@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-nati
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import Toggle from '../common/Toggle';
-import { useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
+import { useRoute, useIsFocused } from "@react-navigation/native";
 import { useDispatch } from 'react-redux';
 import { initializeSettings } from '../utility/constant';
 import NotificationAlert from "../common/customui/NotificationAlert";
@@ -23,8 +23,6 @@ const TextNotifications = ({ navigation }) => {
         if (isFocused) {
             // Initialize settings based on additionalData
             const initializedSettings = initializeSettings(additionalData);
-            console.log("Default settings if additionalData or its properties are undefined 1", additionalData);
-            console.log("Default settings if additionalData or its properties are undefined 2", initializedSettings);
             setInitializeSettings(initializedSettings);
         }
 
@@ -74,7 +72,7 @@ const TextNotifications = ({ navigation }) => {
                         message="Notifications updated failed."
                         showCloseIcon={true}
                         isVisible={showErrorAlert}
-                        onClose={() => setShowSuccessAlert(false)}
+                        onClose={() => setShowErrorAlert(false)}
                     />
                     <View style={[styles.navigationBorder]}>
                         <View style={styles.frameGroup}>

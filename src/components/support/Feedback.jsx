@@ -12,7 +12,7 @@ const feedbackOptions = [
 ];
 const Feedback = () => {
     const navigation = useNavigation();
-    const [selectedFeedback, setSelectedFeedback] = useState(null);
+    const [selectedFeedback, setSelectedFeedback] = useState("facehappy");
     const [inputText, setInputText] = useState('');
     const [charCount, setCharCount] = useState(0);
     const handleTextInputChange = (text) => {

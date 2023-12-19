@@ -167,7 +167,9 @@ const PasswordSecurityEdit = () => {
                       Password Reset Answer
                     </Text>
                     <SparkLightInput
-                      placeholder="Enter text here"
+                      name="securityAnswer"
+                      value={profileDetails.securityAnswer}
+                      onChangeText={handleChange}
                     />
                   </View>
                 </View>
