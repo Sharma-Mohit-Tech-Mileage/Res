@@ -21,6 +21,7 @@ import { getUser } from "../../redux/utils/LocalStorage"
 import SpeedTestModal from "./customui/SpeedTestModal";
 import moment from "moment";
 import { GetApiRequest } from "../../network/APIClient";
+import { FontFamily } from "../../../GlobalStyles";
 
 
 const DataSpeedComponent = ({navigation}) => {
@@ -241,6 +242,7 @@ const DataSpeedComponent = ({navigation}) => {
             fontSize: 16,
             fontWeight: "600",
             color: colors.sparklight_purple_blue,
+            fontFamily:FontFamily.openSansRegular,
           }}
         >
           Upgrade Plan
@@ -274,6 +276,7 @@ const styles = StyleSheet.create({
   },
   internetStatusTxt: {
     color: colors.darkest_grey,
+    fontFamily:FontFamily.openSansRegular,
     fontSize: 14,
     marginLeft: 5,
     fontStyle: "normal",
@@ -282,6 +285,7 @@ const styles = StyleSheet.create({
   },
   speedtextLarge: {
     color: colors.sparklight_bright_purple,
+    fontFamily:FontFamily.openSansRegular,
     textAlign: "center",
     marginTop: 10,
     fontSize: 24,
@@ -291,6 +295,7 @@ const styles = StyleSheet.create({
   },
   downloadText: {
     color: colors.darkest_grey,
+    fontFamily:FontFamily.openSansRegular,
     textAlign: "center",
     fontSize: 14,
     marginTop: 10,
@@ -314,17 +319,20 @@ const styles = StyleSheet.create({
     color: colors.dark_grey,
     marginLeft: 5,
     fontSize: 14,
+    fontFamily:FontFamily.openSansRegular,
     fontWeight: "400",
   },
   timerInfo2: {
     marginLeft: 5,
     color: colors.darkest_grey,
     fontSize: 14,
+    fontFamily:FontFamily.openSansRegular,
     fontWeight: "400",
   },
   learnMore: {
     color: colors.sparklight_purple_blue,
     fontSize: 14,
+    fontFamily:FontFamily.openSansRegular,
     fontStyle: "normal",
     fontWeight: "400",
   },

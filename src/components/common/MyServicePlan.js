@@ -31,7 +31,7 @@ const MyServicePlan = ({ plans,navigation }) => {
     useEffect(() => {}, []);
 
     const PlanDetailsItem = ({ item, index }) => {
-      console.log("PlanDetailsItem", item);
+     
       return (
         <View key={index}>
           <View
@@ -129,7 +129,7 @@ const MyServicePlan = ({ plans,navigation }) => {
             marginHorizontal:20,
           marginVertical:10}}
             >
-              <Text style={{textAlign:'center',fontSize:FontSize.size_3xl,color:colors.sparklight_grey,fontWeight:'400'}}>Plan Details</Text>
+              <Text style={{textAlign:'center',fontSize:FontSize.size_3xl,color:colors.sparklight_grey,fontWeight:'400', fontFamily:FontFamily.openSansRegular}}>Plan Details</Text>
               <TouchableOpacity onPress={()=>{
                 setModelComment(false)
               }}>
@@ -262,6 +262,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontStyle: "normal",
     fontWeight: "400",
+    fontFamily:FontFamily.openSansRegular
   },
   date: {
     fontSize: 14,
@@ -319,10 +320,12 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_3xl,
     marginLeft: 10,
     alignSelf: "center",
+    fontFamily:FontFamily.openSansRegular
   },
   planDetailsTxt: {
     color: colors.darkest_grey,
     fontSize: FontSize.size_base,
+    fontFamily:FontFamily.openSansRegular,
     marginLeft: 10,
     fontWeight: "400",
   },

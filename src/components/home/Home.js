@@ -29,6 +29,7 @@ import MyServicePlan from "../common/MyServicePlan";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import moment from "moment";
+import { FontFamily } from "../../../GlobalStyles";
 
 const HomeScreen = ({ route, navigation }) => {
   // const { email, name } = {
@@ -286,6 +287,7 @@ const styles = StyleSheet.create({
     color: colors.darkest_grey,
     fontSize: 22,
     marginTop: -20,
+    fontFamily:FontFamily.openSansRegular,
     paddingHorizontal: 25,
     fontStyle: "normal",
     fontWeight: "400",
@@ -302,6 +304,7 @@ const styles = StyleSheet.create({
   },
   internetStatusTxt: {
     color: colors.darkest_grey,
+    fontFamily:FontFamily.openSansRegular,
     textAlign: "center",
     alignSelf: "center",
     fontSize: 14,
@@ -311,6 +314,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   hideShowDetails: {
+    fontFamily:FontFamily.openSansRegular,
     fontSize: 16,
     marginVertical: 5,
     color: colors.sparklight_purple_blue,

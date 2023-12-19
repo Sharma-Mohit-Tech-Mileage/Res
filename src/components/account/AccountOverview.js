@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUser } from "../../redux/utils/LocalStorage";
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
-import { getSsoToken } from "../../redux/utils/LocalStorage";
+import { cleanUserData } from "../../redux/utils/LocalStorage";
 import RNExitApp from 'react-native-exit-app';
 
 const config = {
@@ -34,22 +34,23 @@ const logoutConfirmationPopuo=(navigation)=>{
       {
         text: 'Logout',
         onPress: () => {
-          let re = getSsoToken().then((res) => {
-          let token=res.idToken;
-          console.log('Logout',token)
-          logout(config, {
-            idToken:token,
-            postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
-          }).then((result)=>{
-              console.log('Logout',result)
-              console.log('Logout',JSON.stringify(navigation))
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'Splash' }]}) 
-              //navigation.navigate('Splash')
-          })
+          cleanUserData();
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Splash' }]}) 
+          // let re = getSsoToken().then((res) => {
+          // let token=res.idToken;
+          // console.log('Logout',token)
+          // logout(config, {
+          //   idToken:token,
+          //   postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
+          // }).then((result)=>{
             
-          });
+              
+          //     //navigation.navigate('Splash')
+          // })
+            
+          // });
         },
       },
     ],
