@@ -146,7 +146,6 @@ const MyTabs = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   tabItem: {
-    flex: 1,
     textAlign: "center",
   },
 });
