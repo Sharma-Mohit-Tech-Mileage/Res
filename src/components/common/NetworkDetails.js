@@ -12,6 +12,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import RightArrow from "../../res/svgIcons/RightArrow";
+import { FontFamily } from "../../../GlobalStyles";
 const NetworkDetails = ({ navigation, billPaid, accountStatus }) => {
   useEffect(() => {
     //console.log("data");
@@ -122,6 +123,7 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: 5,
+    fontFamily:FontFamily.openSansRegular,
     textAlign: "center",
     marginLeft: 10,
     color: colors.darkest_grey,

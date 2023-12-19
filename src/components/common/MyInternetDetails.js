@@ -14,6 +14,7 @@ import {
 } from "react-native-responsive-screen";
 import Wallet2icon from "../../res/svgIcons/Wallet2icon";
 import Myplanicon from "../../res/svgIcons/Myplanicon";
+import { FontFamily } from "../../../GlobalStyles";
 
 const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
   //const [billAmt,setBillAmt]=useState(0)
@@ -59,6 +60,7 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
                 alignSelf: "center",
                 color: colors.darkest_grey,
                 fontWeight: "400",
+                fontFamily:FontFamily.openSansRegular,
               }}
             >
               $
@@ -94,6 +96,7 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
               fontSize: 16,
               fontWeight: "600",
               color: colors.sparklight_purple_blue,
+              fontFamily:FontFamily.openSansRegular,
             }}
           >
             {"View Details"}
@@ -137,6 +140,7 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
                 alignSelf: "center",
                 color: colors.darkest_grey,
                 fontWeight: "400",
+                fontFamily:FontFamily.openSansRegular,
                 marginTop: 4,
                 marginLeft:4
               }}
@@ -169,6 +173,7 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
               fontSize: 16,
               fontWeight: "600",
               color: colors.sparklight_purple_blue,
+              fontFamily:FontFamily.openSansRegular,
             }}
           >
             {"Upgrade Plan"}
@@ -204,6 +209,7 @@ const styles = StyleSheet.create({
   title: {
     color: colors.darkest_grey,
     fontSize: 20,
+    fontFamily:FontFamily.openSansRegular,
     textAlign: "center",
     fontStyle: "normal",
     fontWeight: "400",
@@ -212,6 +218,7 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     color: colors.darkest_grey,
+    fontFamily:FontFamily.openSansRegular,
     fontSize: 22,
     fontStyle: "normal",
     fontWeight: "400",
@@ -220,6 +227,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.dark_grey,
     alignSelf: "center",
+    fontFamily:FontFamily.openSansRegular,
   },
   subSec: {
     flexDirection: "row",
