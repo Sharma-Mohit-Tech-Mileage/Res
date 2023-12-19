@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import store from "./src/redux/configureStore.js";
 import { TabBarVisibilityProvider } from './src/navigations/TabBarVisibilityContext';
 import { NativeBaseProvider } from 'native-base'; // Import NativeBaseProvider
+import { CopilotProvider } from "react-native-copilot";
 // import messaging from '@react-native-firebase/messaging';
 // import {
 //   getFcmToken,
@@ -17,15 +18,15 @@ const App = () => {
   const [generatedToken, setGeneratedToken] = useState();
 
   return (
-
     <Provider store={store}>
       <NativeBaseProvider>
         <TabBarVisibilityProvider>
-          <UserNavigations />
+          <CopilotProvider stopOnOutsideClick androidStatusBarVisible>
+            <UserNavigations />
+          </CopilotProvider>
         </TabBarVisibilityProvider>
       </NativeBaseProvider>
     </Provider>
-
   );
 };
 

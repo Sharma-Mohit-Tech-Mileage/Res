@@ -3,8 +3,16 @@ import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import { useSelector, useDispatch } from 'react-redux'
 
 const Terms = ({ navigation }) => {
+
+    const stateData = useSelector(state => state);
+    const combinedReducers = useSelector(state => state.combinedReducers);
+    const userData = useSelector(state => state.combinedReducers.user.userData);
+    console.log('userData: ', userData);
+    console.log('combinedReducers: ', combinedReducers);
+    console.log('stateData: ', JSON.stringify(stateData));
 
     const terms = [
         {

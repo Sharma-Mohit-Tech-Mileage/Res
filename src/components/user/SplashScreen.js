@@ -15,7 +15,7 @@ import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize } from "react-native-app-auth";
 import { useDispatch, useSelector } from "react-redux";
-import { ssoLoginAction } from "../../redux/actions/UserAction";
+import { ssoLoginAction, saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import {
@@ -37,6 +37,7 @@ const config = {
   iosPrefersEphemeralSession: false,
   additionalParameters: { prompt: "login" },
 };
+
 
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -64,6 +65,17 @@ const SplashScreen = ({ navigation }) => {
       if (token) {
         storeUser(user);
       }
+
+      dispatch(saveUserInfo(user));
+
+      // if (userInfo.accountNumber === "900690538") {
+      //   navigation.navigate("Terms");
+      // } else {
+      //   navigation.navigate("MyTab", {
+      //     fname: userInfo.firstName,
+      //     lname: userInfo.lastName,
+      //   });
+      // }
 
       if (userInfo.accountNumber === "900690538") {
         setErrorMessage(strings.nonAdminUserMsg);
@@ -171,6 +183,7 @@ const SplashScreen = ({ navigation }) => {
       console.log(error);
     }
   };
+
   useEffect(() => {}, []);
 
   return (
