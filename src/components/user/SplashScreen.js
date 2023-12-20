@@ -27,6 +27,7 @@ import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
+import { getFirstTime, storeFirstTime } from "../../redux/utils/LocalStorage";
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -50,8 +51,8 @@ const SplashScreen = ({ navigation }) => {
     setLoading(true);
     PostAuthApiRequest("/mobile/api/gettoken", request, onSuccess, onError);
   };
-  //HeadOfHousehold
-  const onSuccess = (res) => {
+  
+  const onSuccess = async (res) => {
     setLoading(false);
     console.log("callSSOLoginApi", res);
     if (res) {
@@ -62,11 +63,44 @@ const SplashScreen = ({ navigation }) => {
         token: token,
       };
 
+      console.log('user: ', user);
+
       if (token) {
         storeUser(user);
       }
 
       dispatch(saveUserInfo(user));
+
+      const data = await getFirstTime();
+
+      if (true) {
+      // if (data !== null 
+      //   && data.accountNumber === userInfo.accountNumber) {
+          if (userInfo.accountNumber === "900690538") {
+            setErrorMessage(strings.nonAdminUserMsg);
+            setTimeout(() => {
+              setModalVisible(true);
+            }, 100);
+          } else if (userInfo.accountNumber === "902862879") {
+            setErrorMessage(strings.nonInternetUserMessage);
+            setTimeout(() => {
+              setModalVisible(true);
+            }, 100);
+          } else {
+            navigation.navigate("MyTab", {
+              fname: userInfo.firstName,
+              lname: userInfo.lastName,
+            });
+          }         
+      } else {
+        //User is here for the first time
+        console.log('storeFirstTime: ', userInfo.accountNumber);
+        storeFirstTime({
+          accountNumber: userInfo.accountNumber
+        });        
+        navigation.navigate("Terms");
+      }
+
 
       // if (userInfo.accountNumber === "900690538") {
       //   navigation.navigate("Terms");
@@ -77,22 +111,22 @@ const SplashScreen = ({ navigation }) => {
       //   });
       // }
 
-      if (userInfo.accountNumber === "900690538") {
-        setErrorMessage(strings.nonAdminUserMsg);
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
-      } else if (userInfo.accountNumber === "902862879") {
-        setErrorMessage(strings.nonInternetUserMessage);
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
-      } else {
-        navigation.navigate("MyTab", {
-          fname: userInfo.firstName,
-          lname: userInfo.lastName,
-        });
-      }
+      // if (userInfo.accountNumber === "900690538") {
+      //   setErrorMessage(strings.nonAdminUserMsg);
+      //   setTimeout(() => {
+      //     setModalVisible(true);
+      //   }, 100);
+      // } else if (userInfo.accountNumber === "902862879") {
+      //   setErrorMessage(strings.nonInternetUserMessage);
+      //   setTimeout(() => {
+      //     setModalVisible(true);
+      //   }, 100);
+      // } else {
+      //   navigation.navigate("MyTab", {
+      //     fname: userInfo.firstName,
+      //     lname: userInfo.lastName,
+      //   });
+      // }
     }
   };
 
@@ -199,6 +233,11 @@ const SplashScreen = ({ navigation }) => {
     }
   };
 
+  const loginFirstTimeFlow = async () => {
+    storeFirstTime(null);   
+    await loginAuth();
+  };
+
   useEffect(() => {}, []);
 
   return (
@@ -231,15 +270,14 @@ const SplashScreen = ({ navigation }) => {
         message={errorMessage}
         onClose={handleCloseAlert}
       />
-
-      <View style={styles.buttonContainer}>
+      {/* <View style={styles.buttonContainer}>
         <Pressable
           style={[styles.buttons, styles.buttonsLayout]}
-          onPress={() => navigation.navigate("Terms")}
+          onPress={loginFirstTimeFlow}
         >
             <Text style={styles.buttonTextFirstTime}>First Time Flow</Text>
         </Pressable> 
-      </View>        
+      </View>         */}
     </LinearGradient>
   );
 };

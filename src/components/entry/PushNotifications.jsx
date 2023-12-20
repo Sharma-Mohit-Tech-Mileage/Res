@@ -12,9 +12,29 @@ import {
   requestUserPermission,
   notificationListener,
 } from '../../firebase/FirebaseUtils';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchSMSSelection, fetchBillingStatus } from '../../redux/actions/ProfileActionSuite';
 
 const PushNotifications = ({ navigation }) => {
     const [generatedToken, setGeneratedToken] = useState();
+    const dispatch = useDispatch();
+    const profile = useSelector(state => state.combinedReducers.profile || {});
+
+    console.log('profile: ', profile);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                await dispatch(fetchBillingStatus());
+                // await dispatch(fetchBillingPaper());
+                await dispatch(fetchSMSSelection());
+            } catch (error) {
+                console.error("Error fetching data", error);
+            }
+        };
+
+        fetchData();
+    }, [dispatch]);    
 
     const terms = [
         {
@@ -30,6 +50,9 @@ const PushNotifications = ({ navigation }) => {
             description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
         }                
     ];
+
+
+
 
     // const enableNotifications = () => {
     //     const fetchToken = async () => {

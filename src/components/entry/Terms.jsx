@@ -3,7 +3,8 @@ import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux';
+import { storeFirstTime } from "../../redux/utils/LocalStorage";
 
 const Terms = ({ navigation }) => {
 
@@ -13,6 +14,14 @@ const Terms = ({ navigation }) => {
     console.log('userData: ', userData);
     console.log('combinedReducers: ', combinedReducers);
     console.log('stateData: ', JSON.stringify(stateData));
+
+    const termsAccepted = () => {
+        navigation.navigate("PushNotifications");
+    };
+
+    const termsCanceled = () => {
+        navigation.navigate("PushNotifications");
+    };    
 
     const terms = [
         {
@@ -65,7 +74,7 @@ const Terms = ({ navigation }) => {
                     accessibilityLabel="Buttons Section">
                     <Pressable
                         style={[styles.buttonDecline, styles.buttonsLayout]}
-                        onPress={() => navigation.navigate("PushNotifications")}
+                        onPress={termsAccepted}
                         accessibilityLabel="Decline Button"
                         accessibilityRole="button"
                         accessibilityHint="Decline Terms and Conditions"
@@ -76,7 +85,7 @@ const Terms = ({ navigation }) => {
                     </Pressable>                
                     <Pressable
                         style={[styles.buttons, styles.buttonsLayout]}
-                        onPress={() => navigation.navigate("PushNotifications")}
+                        onPress={termsCanceled}
                     >
                         <Text style={styles.accept}>Accept</Text>
                     </Pressable>
@@ -88,7 +97,7 @@ const Terms = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     bottomBar: {
-        height: 100,
+        height: 150,
         backgroundColor: '#FFF',
         borderTopColor: '#CCC',
         borderTopWidth: 1,

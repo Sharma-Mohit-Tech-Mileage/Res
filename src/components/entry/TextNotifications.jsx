@@ -9,10 +9,16 @@ import BellIcon from "../../res/svgIcons/bellIcon";
 import PhoneRingingIcon from "../../res/svgIcons/PhoneRingingIcon";
 import EntryInput from "./EntryInput";
 import CheckBox from '@react-native-community/checkbox';
+import { useSelector, useDispatch } from 'react-redux';
 
 const TextNotifications = ({ navigation }) => {
     const [input, setInput] = useState('');
     const [toggleCheckBox, setToggleCheckBox] = useState(false);
+    const user = useSelector(state => state.combinedReducers.user.userData);
+
+    useEffect(() => {
+        setInput(user.phone);
+    }, []);  
 
     const onChangeText = (text) => {
         setInput(text);
@@ -162,7 +168,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: FontFamily.openSansRegular,   
         lineHeight: 20,    
-        marginRight: 20
+        marginRight: 20,
+        color: Color.colorGray_200
     },
     accept: {
         fontSize: FontSize.size_base,

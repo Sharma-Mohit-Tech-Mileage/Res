@@ -37,4 +37,21 @@ export const getSsoToken = async () => {
   }
 };
 
+export const storeFirstTime = async (value) => {
+  try {
+    await AsyncStorage.setItem("firsTime", JSON.stringify(value));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// getting data
+export const getFirstTime = async () => {
+  try {
+    const userData = JSON.parse(await AsyncStorage.getItem("firsTime"))
+    return userData;
+  } catch (error) {
+   console.log(error); 
+  }
+};
 
