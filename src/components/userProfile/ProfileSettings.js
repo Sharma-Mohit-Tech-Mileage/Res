@@ -17,10 +17,8 @@ const ProfileSettings = () => {
 
   // Ensure getUserType handles undefined inputs safely
   const convertedRole = getUserType(profileDetails.memberType || '');
-
   // Use optional chaining and provide a default empty string if undefined
   const normalizedRole = convertedRole?.replace(/\s+/g, '').toLowerCase() || '';
-
   const boxBackground = BOX_COLORS[normalizedRole] || Color.colorWhitesmoke_200;
 
   useEffect(() => {
@@ -125,7 +123,7 @@ const ProfileSettings = () => {
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Mobile Phone</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {profileDetails.phone || 'N/A'}
+                  {profileDetails.phone || ''}
                 </Text>
               </View>
             </View>
