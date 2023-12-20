@@ -18,7 +18,7 @@ export const validatePassword = (newPassword, userName) => {
         newPassword !== userName, // It must be different than your user name.
         newPassword.length >= 8 && newPassword.length <= 20, // It must contain 8 to 20 characters.
         /[A-Z]/.test(newPassword) && /[a-z]/.test(newPassword) && /[0-9]/.test(newPassword), // It must include an upper and lower case letter and a number.
-        /[%&_,?#=.-]/.test(newPassword), // You may include special characters %,&,_,?,#,=,-.
+        /[^a-zA-Z0-9]/.test(newPassword), // You may include special characters %,&,_,?,#,=,-.
         !/\s/.test(newPassword) // Your new password cannot have any spaces.
     ];
     return conditions;
@@ -37,7 +37,7 @@ export const passwordTerms = [
     "It must be different than your user name.",
     "It must contain 8 to 20 characters.",
     "It must include an upper and lower case letter and a number.",
-    "You may include special characters %,&,_,?,#,=,-.",
+    "It must include at least one special character such as %, &, _, ?, #, =, -",
     "Your new password cannot have any spaces."
 ]
 

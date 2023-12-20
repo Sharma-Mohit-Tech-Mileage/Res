@@ -3,6 +3,7 @@ import { View, Text, Button, StyleSheet,TouchableOpacity, Linking } from "react-
 import { ProgressCircle } from "react-native-svg-charts";
 import colors from "../../res/Colors";
 import RightArrow from "../../res/svgIcons/RightArrow";
+import { FontFamily } from "../../../GlobalStyles";
 
 const DataUsageComponent = ({navigation}) => {
   useEffect(() => {
@@ -98,7 +99,8 @@ const DataUsageComponent = ({navigation}) => {
           style={{
             fontSize: 16,
             fontWeight: "600",
-            color:colors.sparklight_purple_blue
+            color:colors.sparklight_purple_blue,
+            fontFamily:FontFamily.openSansRegular,
           }}
         >
           Upgrade Plan
@@ -114,6 +116,7 @@ const DataUsageComponent = ({navigation}) => {
 const styles = StyleSheet.create({
   dataText: {
     color: colors.darkest_grey,
+    fontFamily:FontFamily.openSansRegular,
     textAlign: "center",
     fontSize: 24,
     fontStyle: "normal",
@@ -121,6 +124,7 @@ const styles = StyleSheet.create({
   },
   dataPlanTxt: {
     color: colors.sparklight_bright_purple,
+    fontFamily:FontFamily.openSansRegular,
     textAlign: "center",
     fontSize: 12,
     fontStyle: "normal",
@@ -138,6 +142,7 @@ const styles = StyleSheet.create({
   },
   useLbl: {
     color: colors.dark_grey,
+    fontFamily:FontFamily.openSansRegular,
     fontSize: 14,
     fontStyle: "normal",
     fontWeight: "400",
@@ -146,6 +151,7 @@ const styles = StyleSheet.create({
   },
   useDataLbl: {
     color: colors.sparklight_black,
+    fontFamily:FontFamily.openSansRegular,
     fontSize: 14,
     fontStyle: "normal",
     fontWeight: "600",

@@ -86,11 +86,11 @@ const fetchPaperLessDetails = async () => {
 
     return _axios.get(`/account/api/account/${accountNumber}/paperless`, { ...config })
         .then(res => {
-            console.log('fetching fetching /account/api/account/`${accountNumber}`/paperless', JSON.stringify(res.data, null, 2));
+            console.log('fetching fetchPaperLessDetails /account/api/account/`${accountNumber}`/paperless', JSON.stringify(res.data, null, 2));
             return res.data;  // Return the actual data, not the stringified version
         })
         .catch(error => {
-            console.error('Error fetching /account/api/account/`${accountNumber}`/paperless', error);
+            console.error('Error fetching fetchPaperLessDetails /account/api/account/`${accountNumber}`/paperless', error);
             throw error;
         });
 };
@@ -136,5 +136,31 @@ const postTextNotifictionInfo = async (data) => {
     }
 };
 
+const postEmailNotification = async (email) => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
 
-export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails }
+    // Log the request endpoint and data
+    console.log(`Making API Call to /account/api/account/${accountNumber}/paperless with email:`, email);
+
+    try {
+        const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
+
+        // Log the successful response
+        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless, Response:`, response);
+        return response;
+    } catch (error) {
+        // Log the error with a descriptive message
+        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless:`, error);
+        throw error;
+    }
+};
+
+
+
+export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, postEmailNotification }

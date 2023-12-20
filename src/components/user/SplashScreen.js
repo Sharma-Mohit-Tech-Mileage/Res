@@ -170,12 +170,7 @@ const SplashScreen = ({ navigation }) => {
               }}
             >
               <Text
-                style={{
-                  color: colors.snow_white,
-                  textAlign: "center",
-                  padding: 8,
-                  fontSize: 16,
-                }}
+                style={styles.openPortaltxt}
               >
                 Open Portal
               </Text>
@@ -186,12 +181,7 @@ const SplashScreen = ({ navigation }) => {
               onPress={onClose}
             >
               <Text
-                style={{
-                  color: colors.sparklight_purple_blue,
-                  textAlign: "center",
-                  padding: 8,
-                  fontSize: 16,
-                }}
+                style={styles.closeAlertTxt}
               >
                 Close
               </Text>
@@ -317,6 +307,7 @@ const styles = StyleSheet.create({
   },
   SSoBtn: {
     color: colors.darkest_grey,
+    fontFamily:FontFamily.openSansRegular,
     textAlign: "center",
     padding: 16,
     fontSize: 16,
@@ -343,9 +334,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "black",
+    fontFamily:FontFamily.openSansRegular,
   },
   message: {
     color: colors.darkest_grey,
+    fontFamily:FontFamily.openSansRegular,
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 28,
@@ -369,6 +362,7 @@ const styles = StyleSheet.create({
   },alertTitle:
   {
     color: colors.sparklight_grey,
+    fontFamily:FontFamily.openSansRegular,
     fontSize: 22,
     fontWeight: "400",
     marginLeft: 5,
@@ -384,6 +378,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
     marginTop: 15,
+  },openPortaltxt:
+  {
+    color: colors.snow_white,
+    textAlign: "center",
+    padding: 8,
+    fontSize: 16,
+    fontFamily:FontFamily.openSansRegular,
+  },closeAlertTxt:
+  {
+    color: colors.sparklight_purple_blue,
+    textAlign: "center",
+    padding: 8,
+    fontSize: 16,
+    fontFamily:FontFamily.openSansRegular,
   }
 });
 

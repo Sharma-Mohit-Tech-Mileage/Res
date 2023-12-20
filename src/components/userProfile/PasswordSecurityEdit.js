@@ -149,25 +149,15 @@ const PasswordSecurityEdit = () => {
                     </View>
                   </View>
                 )}
-                {/* <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
-                  <View style={styles.textinput}>
-                    <Text style={[styles.firstName1, styles.firstTypo]} >
-                      Type your Question
-                    </Text>
-                    <SparkLightInput
-                      placeholder="Enter text here"
-                      value={profileDetails.customSecurityQuestion || ''}
-                      onChangeText={(text) => setLocalProfile({ ...profileDetails, customSecurityQuestion: text })}
-                    />
-                  </View>
-                </View> */}
                 <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                   <View style={styles.textinput}>
                     <Text style={[styles.firstName1, styles.firstTypo]} >
                       Password Reset Answer
                     </Text>
                     <SparkLightInput
-                      placeholder="Enter text here"
+                      name="securityAnswer"
+                      value={profileDetails.securityAnswer}
+                      onChangeText={handleChange}
                     />
                   </View>
                 </View>

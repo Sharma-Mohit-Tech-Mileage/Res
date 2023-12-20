@@ -36,6 +36,15 @@ export const getSsoToken = async () => {
    console.log(error); 
   }
 };
+// getting data
+export const cleanUserData = async () => {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    await AsyncStorage.multiRemove(keys);
+} catch (error) {
+    console.error('Error clearing app data.');
+}
+};
 
 export const storeFirstTime = async (value) => {
   try {
