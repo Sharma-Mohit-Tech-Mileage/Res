@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, FontSize, Color, FontFamily, Border } from "../../../GlobalStyles";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
-import {updateProfileRequest} from '../../redux/actions/ProfileActionSuite';
+import { updateProfileRequest } from '../../redux/actions/ProfileActionSuite';
 import NotificationAlert from '../common/customui/NotificationAlert';
+import validationSchema from '../utility/validationSchema'; // Update the path as necessary
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
@@ -14,23 +17,28 @@ const ProfileSettingsEdit = () => {
   const dispatch = useDispatch();
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const profile = useSelector(state => state.combinedReducers.profile || {});
-  const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
-  const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
+  const profileDetailsfromStore = profile.profileDetails || {};
   const scrollViewRef = useRef(null);
+  const handleSave = (data) => {
+    console.log(data); // Here you get the validated data
+    dispatch(updateProfileRequest(data, navigation));
+  };
 
-  const handleChange = (e) => {
-    console.log("Account field change", e)
-    setLocalProfile({ ...profileDetails, [e.target.name]: e.target.value });
-  };
-  const handleSave = () => {
-    dispatch(updateProfileRequest(profileDetails, navigation));
-  };
+  const { control, handleSubmit, reset, formState: { errors } } = useForm({
+    resolver: yupResolver(validationSchema),
+    defaultValues: { // You can spread the profileDetailsfromStore object
+      ...profileDetailsfromStore
+    }
+  });
+
+  // useEffect to update the form's default values when profileDetailsfromStore changes
+  useEffect(() => {
+    reset({ ...profileDetailsfromStore }); // This will reset the form with new default values
+  }, [profileDetailsfromStore, reset]);
   useEffect(() => {
     if (route.params?.updateFailed) {
       setShowErrorAlert(true);
       scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-
-      // Reset the parameter so subsequent navigations are detected
       navigation.setParams({ updateFailed: undefined });
     }
   }, [route.params?.updateFailed, navigation]);
@@ -66,10 +74,19 @@ const ProfileSettingsEdit = () => {
                     First Name
                   </Text>
                   <View >
-                    <SparkLightInput
+                    <Controller
+                      control={control}
                       name="firstName"
-                      onChangeText={handleChange}
-                      value={profileDetails.firstName} />
+                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                        <SparkLightInput
+                          placeholder="First Name"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          error={error?.message}
+                        />
+                      )}
+                    />
                   </View>
                 </View>
               </View>
@@ -80,10 +97,19 @@ const ProfileSettingsEdit = () => {
                     Last Name
                   </Text>
                   <View >
-                    <SparkLightInput
+                    <Controller
+                      control={control}
                       name="lastName"
-                      onChangeText={handleChange}
-                      value={profileDetails.lastName} />
+                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                        <SparkLightInput
+                          placeholder="First Name"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          error={error?.message}
+                        />
+                      )}
+                    />
                   </View>
                 </View>
               </View>
@@ -94,10 +120,20 @@ const ProfileSettingsEdit = () => {
                     Username
                   </Text>
                   <View >
-                    <SparkLightInput
+                    <Controller
+                      control={control}
                       name="userName"
-                      onChangeText={handleChange}
-                      value={profileDetails.userName} />
+                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                        <SparkLightInput
+                          placeholder="First Name"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          editable={false}
+                          error={error?.message}
+                        />
+                      )}
+                    />
                   </View>
                 </View>
               </View>
@@ -117,10 +153,20 @@ const ProfileSettingsEdit = () => {
                     Email
                   </Text>
                   <View >
-                    <SparkLightInput
+                    <Controller
+                      control={control}
                       name="svEmailAddress"
-                      onChangeText={handleChange}
-                      value={profileDetails.svEmailAddress} />
+                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                        <SparkLightInput
+                          placeholder="First Name"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          editable={false}
+                          error={error?.message}
+                        />
+                      )}
+                    />
                   </View>
                 </View>
               </View>
@@ -128,17 +174,26 @@ const ProfileSettingsEdit = () => {
                 <View style={styles.textinput}>
                   <Text style={[styles.firstTypo]}>Mobile Phone</Text>
                   <View >
-                    <SparkLightInput
+                    <Controller
+                      control={control}
                       name="phone"
-                      onChangeText={handleChange}
-                      value={profileDetails.phone} />
+                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                        <SparkLightInput
+                          placeholder="Mobile number"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          error={error?.message}
+                        />
+                      )}
+                    />
                   </View>
                 </View>
               </View>
             </View>
           </View>
           <View style={{ marginTop: Padding.p_base }}>
-            <Pressable style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]} onPress={handleSave}>
+            <Pressable style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]} onPress={handleSubmit(handleSave)}>
               <Text style={[{ color: Color.sparklightWhite }, styles.makeTypo]}>Save</Text>
             </Pressable>
             <Pressable style={[styles.buttonsLayout]} onPress={() => navigation.navigate("ProfileSettings")}>
