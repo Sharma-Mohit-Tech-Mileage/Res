@@ -31,7 +31,7 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions }) => 
                 source={require('../../../../assets/file-05.png')}
                 style={{ marginRight: 8 }}
             />
-            <Text style={styles.suggestionText}>{item}</Text>
+            <Text style={styles.suggestionText}>{item.title}</Text>
             <Image
                 source={require('../../../../assets/share-04.png')}
             />

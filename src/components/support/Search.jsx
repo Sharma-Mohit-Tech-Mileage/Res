@@ -4,23 +4,50 @@ import { Color, FontFamily, FontSize, Padding, Border } from '../../../GlobalSty
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import SearchSuggestions from '../common/customui/SearchSuggestions';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import { GetApiRequest } from '../../network/APIClient';
+
+
 import debounce from 'lodash.debounce';
 
 const Search = ({ navigation }) => {
     const [input, setInput] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
-    const allSuggestions = ['Support title 1', 'Support title 2', 'Support title 3'];
+    const [allSuggestions,setAllSuggestions] = useState(['Support title 1', 'Support title 2', 'Support title 3']);
+
+
+    const callSearchApi=(query)=>{
+       
+    }
+
+    const onSuccess = (res) => {
+        console.log("getModemDetails", res);
+        if (res) {
+            setAllSuggestions(res)
+        }
+      };
+      const onError = (error) => {
+        console.log("error", error);
+      };
 
     // Function to filter suggestions
     const filterSuggestions = (query) => {
-        if (query.trim()) {
-            const filtered = allSuggestions.filter((item) =>
-                item.toLowerCase().includes(query.toLowerCase())
-            );
-            setFilteredSuggestions(filtered);
-        } else {
-            setFilteredSuggestions([]); // Set to empty array when there's no input
-        }
+        const request = `/support/api/Articles/search/${query}`;
+        GetApiRequest(request, (res)=>{
+            if (query.trim() && query.length>2) {
+                //console.log('Data',res)
+                const filtered = res.filter((item) =>
+                    item.title.toLowerCase().includes(query.toLowerCase())
+                );
+                setFilteredSuggestions(filtered);
+            } else {
+                setFilteredSuggestions([]); // Set to empty array when there's no input
+            }
+
+        }, (error)=>{
+
+        });
+
+       
     };
 
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Image, Text, Pressable, ScrollView, Linking } from "react-native";
+import { StyleSheet, View, Image, Text, Pressable, ScrollView, Linking, TouchableOpacity } from "react-native";
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
@@ -237,11 +237,15 @@ const Support = () => {
                                                 />
                                             </View>
                                             <View style={styles.frameParent}>
-                                                <View style={styles.headingAndToggle}>
+                                                <Pressable style={styles.headingAndToggle}
+                                                onPress={()=>{
+                                                    navigation.navigate('LiveChatTicketSupport') 
+                                                }}
+                                                >
                                                     <Text style={[styles.supportingText, styles.headingTypo1]}>
                                                         Live Support
                                                     </Text>
-                                                </View>
+                                                </Pressable>
                                                 <Text style={[styles.supportingText, styles.supportingTypo1]} >
                                                     No agents available right now. Agents are typically
                                                     available from 5:00am- 9:00pm PST
