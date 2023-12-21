@@ -114,6 +114,16 @@ const ProfileSettings = () => {
                   Contact Information
                 </Text>
               </View>
+              {!profileDetails.svEmailAddress && (
+                <View style={styles.notificationsWrapper}>
+                  <NotificationAlert
+                    type="warning" // "info", "success", "warning"
+                    title="No Email on file"
+                    showCloseIcon={true}
+                    message="Please update your email."
+                  />
+                </View>
+              )}
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Email</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>

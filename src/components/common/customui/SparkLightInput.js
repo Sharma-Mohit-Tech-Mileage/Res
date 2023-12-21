@@ -14,7 +14,7 @@ const SparkLightInput = ({ name, placeholder, value, onChangeText, style, access
 
 
     return (
-        <View style={[styles.outerContainer, style]}>
+        <View style={[styles.outerContainer, style, error && styles.outerContainerError]}>
 
             <TextInput
                 //placeholder={placeholder}
@@ -47,7 +47,7 @@ const SparkLightInput = ({ name, placeholder, value, onChangeText, style, access
 const styles = StyleSheet.create({
     outerContainer: {
         marginTop: 8,
-        height: 48, // Adjusted height to accommodate the error text
+        minHeight: 48, // Use minHeight instead of height
         borderColor: Color.sparklightWhite,
         borderWidth: 1,
         borderRadius: Border.br_11xs,
@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     textInput: {
+        height: 48, // Keep the input field height
         color: Color.colorGray_200,
         fontSize: FontSize.size_base,
         paddingHorizontal: FontSize.size_base,
@@ -68,11 +69,9 @@ const styles = StyleSheet.create({
     },
 
     errorContainer: {
-        position: 'absolute', // Use absolute positioning
-        bottom: -24, // Position below the input field
-        left: 0,
         flexDirection: 'row',
         alignItems: 'center',
+        marginTop: 4, // Space between the input and the error message
     },
     errorIcon: {
         width: 20,
@@ -87,6 +86,9 @@ const styles = StyleSheet.create({
     disabledInput: {
         backgroundColor: Color.Gray300, // Light gray background
         opacity: 1, // Make it look faded
+    },
+    outerContainerError: {
+        paddingBottom: 0, // Add padding to accommodate the error message
     },
 
 });
