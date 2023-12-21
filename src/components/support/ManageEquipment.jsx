@@ -5,8 +5,40 @@ import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalSty
 import MyServicePlan from "../common/MyServicePlan";
 import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
+import { getUser } from "../../redux/utils/LocalStorage";
+import { GetApiRequest } from "../../network/APIClient";
 const ManageEquipment = () => {
     const navigation = useNavigation();
+
+    const [manufacturer,setManufacturer]=React.useState('')
+    const [model,setModel]=React.useState('')
+    const [transmissionType,setTransmissionType]=React.useState('')
+
+    const getModemDetails = () => {
+        let re = getUser().then((res) => {
+          const request = `internet/api/internet/${res.userInfo.accountNumber}/modem`;
+          GetApiRequest(request, onSuccess, onError);
+        });
+      };
+
+      const onSuccess = (res) => {
+        console.log("getModemDetails", res);
+        if (res) {
+            setManufacturer(res.manufacturer);
+            setModel(res.model)
+            setTransmissionType(res.transmissionType)
+        }
+      };
+      const onError = (error) => {
+        console.log("error", error);
+      };
+
+    React.useEffect(()=>{
+       getModemDetails();
+
+    },[])
+
+
     return (
         <View style={styles.manageEquipment}>
             <ProfileSettingsHeader
@@ -30,10 +62,10 @@ const ManageEquipment = () => {
                                         />
                                         <View style={styles.motorolaParent}>
                                             <Text style={[styles.motorola, styles.myModem1Typo]}>
-                                                Motorola
+                                                {manufacturer}
                                             </Text>
                                             <Text style={styles.mb8600Docsis}>
-                                                MB8600 • DOCSIS 3.1; 32x8
+                                                {model}:{transmissionType}
                                             </Text>
                                             <View style={styles.poorHealthParent}>
                                                 <Text style={[styles.poorHealth, styles.textTypo2]}>
