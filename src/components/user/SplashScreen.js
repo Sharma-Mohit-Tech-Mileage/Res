@@ -28,6 +28,7 @@ import CloseIcon from "../../res/svgIcons/CloseIcon";
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import { getFirstTime, storeFirstTime } from "../../redux/utils/LocalStorage";
+import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -54,16 +55,19 @@ const SplashScreen = ({ navigation }) => {
   
   const onSuccess = async (res) => {
     setLoading(false);
-    console.log("callSSOLoginApi", res);
+
+    console.log('onSuccess res: ', res);
+
     if (res) {
       let token = res.jwtToken;
       let userInfo = res.userInfo;
       let user = {
         userInfo: userInfo,
         token: token,
+        tokenGuid: res.idTokenGuid
       };
 
-      console.log('user: ', user);
+      setCookieForWebView(user.token, user.tokenGuid);
 
       if (token) {
         storeUser(user);
@@ -73,9 +77,9 @@ const SplashScreen = ({ navigation }) => {
 
       const data = await getFirstTime();
 
-      if (true) {
-      // if (data !== null 
-      //   && data.accountNumber === userInfo.accountNumber) {
+      // if (true) {
+      if (data !== null 
+        && data.accountNumber === userInfo.accountNumber) {
           if (userInfo.accountNumber === "900690538") {
             setErrorMessage(strings.nonAdminUserMsg);
             setTimeout(() => {
@@ -98,35 +102,13 @@ const SplashScreen = ({ navigation }) => {
         storeFirstTime({
           accountNumber: userInfo.accountNumber
         });        
-        navigation.navigate("Terms");
+
+        if (user.userInfo.mobileTCAcceptanceFlag) {
+          navigation.navigate("PushNotifications");
+        } else {
+          navigation.navigate("Terms");
+        }
       }
-
-
-      // if (userInfo.accountNumber === "900690538") {
-      //   navigation.navigate("Terms");
-      // } else {
-      //   navigation.navigate("MyTab", {
-      //     fname: userInfo.firstName,
-      //     lname: userInfo.lastName,
-      //   });
-      // }
-
-      // if (userInfo.accountNumber === "900690538") {
-      //   setErrorMessage(strings.nonAdminUserMsg);
-      //   setTimeout(() => {
-      //     setModalVisible(true);
-      //   }, 100);
-      // } else if (userInfo.accountNumber === "902862879") {
-      //   setErrorMessage(strings.nonInternetUserMessage);
-      //   setTimeout(() => {
-      //     setModalVisible(true);
-      //   }, 100);
-      // } else {
-      //   navigation.navigate("MyTab", {
-      //     fname: userInfo.firstName,
-      //     lname: userInfo.lastName,
-      //   });
-      // }
     }
   };
 
@@ -212,7 +194,12 @@ const SplashScreen = ({ navigation }) => {
   const loginAuth = async () => {
     try {
       const result = await authorize(config);
-      const data = { idToken: result.idToken,accessToken:result.accessToken };
+
+      const data = { 
+        idToken: result.idToken,accessToken:result.accessToken,
+        idTokenGuid: result.authorizeAdditionalParameters.session_state
+      };
+
       setLoading(true);
       //dispatch(ssoLoginAction(data))
       callSSOLoginApi(data);
@@ -224,9 +211,17 @@ const SplashScreen = ({ navigation }) => {
   };
 
   const loginFirstTimeFlow = async () => {
-    storeFirstTime(null);   
+    storeFirstTime(null);
     await loginAuth();
   };
+
+  const termsAndConditionsFlow = async () => {
+    storeFirstTime(null);
+    dispatch(updateTermsAndConditions(false, navigation));
+    await loginAuth();
+  };  
+
+
 
   useEffect(() => {}, []);
 
@@ -260,14 +255,22 @@ const SplashScreen = ({ navigation }) => {
         message={errorMessage}
         onClose={handleCloseAlert}
       />
-      {/* <View style={styles.buttonContainer}>
+      <View style={styles.buttonContainer}>
         <Pressable
           style={[styles.buttons, styles.buttonsLayout]}
           onPress={loginFirstTimeFlow}
         >
             <Text style={styles.buttonTextFirstTime}>First Time Flow</Text>
         </Pressable> 
-      </View>         */}
+      </View>    
+      <View style={styles.buttonContainer}>
+        <Pressable
+          style={[styles.buttons, styles.buttonsLayout]}
+          onPress={termsAndConditionsFlow}
+        >
+            <Text style={styles.buttonTextFirstTime}>Terms And Conditions</Text>
+        </Pressable> 
+      </View>             
     </LinearGradient>
   );
 };

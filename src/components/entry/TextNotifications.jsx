@@ -14,6 +14,7 @@ import { useSelector, useDispatch } from 'react-redux';
 const TextNotifications = ({ navigation }) => {
     const [input, setInput] = useState('');
     const [toggleCheckBox, setToggleCheckBox] = useState(false);
+    const [enableButton, setEnableButton] = useState(false);
     const user = useSelector(state => state.combinedReducers.user.userData);
 
     useEffect(() => {
@@ -23,6 +24,12 @@ const TextNotifications = ({ navigation }) => {
     const onChangeText = (text) => {
         setInput(text);
     };   
+
+    const onCheckBox = (value) => {
+        console.log('onCheckBox: ', value);
+        setEnableButton(value);
+        setToggleCheckBox(value);
+    };  
     
     const keyboardDismiss = () => {
         Keyboard.dismiss();
@@ -87,7 +94,7 @@ const TextNotifications = ({ navigation }) => {
                         <CheckBox
                             disabled={false}
                             value={toggleCheckBox}
-                            onValueChange={(newValue) => setToggleCheckBox(newValue)}
+                            onValueChange={onCheckBox}
                             style={styles.checkBox}
                             boxType="square"
                         />   
@@ -97,10 +104,11 @@ const TextNotifications = ({ navigation }) => {
                     </View>
                     <View style={styles.bottomBar}>
                         <Pressable
-                            style={[styles.button, styles.buttonsLayout]}
+                            disabled={!enableButton}
+                            style={enableButton ? [styles.button, styles.buttonsLayout] : [styles.button, styles.buttonsLayout, styles.buttonDisabled]}
                             onPress={() => navigation.navigate("EmailNotifications")}
                         >
-                            <Text style={styles.accept}>Enable Text Notifications</Text>
+                            <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]}>Enable Text Notifications</Text>
                         </Pressable>                
                         <View style={styles.buttonsParent} 
                             accessibilityLabel="Buttons Section">
@@ -137,6 +145,13 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         width: '90%',
     },
+    buttonDisabled: {
+        backgroundColor: Color.colorWhitesmoke_300,
+        color: Color.colorGray_200
+    },
+    buttonDisabledText: {
+        color: Color.sparklightaddGray
+    },    
     buttonsLayout: {
         paddingVertical: Padding.p_base,
         paddingHorizontal: 0,

@@ -51,21 +51,30 @@ const PushNotifications = ({ navigation }) => {
         }                
     ];
 
+    const enableNotifications = async () => {
+        // const fetchToken = async () => {
+        //     const token = await getFcmToken();
+        //     if (token) {
+        //         setGeneratedToken(token);
+        //     }
+        // };
 
+        const enabledPermission = await requestUserPermission();
 
-
-    // const enableNotifications = () => {
-    //     const fetchToken = async () => {
-    //     const token = await getFcmToken();
-    //         if (token) {
-    //             setGeneratedToken(token);
-    //         }
-    //     };
+        if (enabledPermission) {
+            const token = await getFcmToken();
+            if (token) {
+                setGeneratedToken(token);
+            }
+            navigation.navigate("TextNotifications");
+        } else {
+            navigation.navigate("TextNotifications");
+        }
         
-    //     void fetchToken();
-    //     void requestUserPermission();
-    //     void notificationListener();
-    // };
+        //void fetchToken();
+        //void requestUserPermission();
+        //void notificationListener();
+    };
 
     return  (
         <View style={styles.container}>
@@ -95,13 +104,15 @@ const PushNotifications = ({ navigation }) => {
                         <View style={styles.subHeader}>
                             <Text style={styles.subHeaderText}>Receive app alerts related to your account, updates and more from Sparklight.</Text>
                         </View>   
+                        <View style={styles.subHeader}>
+                            <Text style={styles.subHeaderText}>{generatedToken}</Text>
+                        </View>                           
                     </View>            
                 </View>
                 <View style={styles.bottomBar}>
                     <Pressable
                         style={[styles.button, styles.buttonsLayout]}
-                        onPress={() => navigation.navigate("TextNotifications")} 
-                        //onPress={enableNotifications}
+                        onPress={enableNotifications}
                     >
                         <Text style={styles.accept}>Allow Notifications</Text>
                     </Pressable>                

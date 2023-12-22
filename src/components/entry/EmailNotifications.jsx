@@ -8,9 +8,13 @@ import InfoIcon from "../../res/svgIcons/InfoIcon";
 import BellIcon from "../../res/svgIcons/bellIcon";
 import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
 import EntryInput from "./EntryInput";
+import { useSelector, useDispatch } from 'react-redux';
 
 const EmailNotifications = ({ navigation }) => {
     const [input, setInput] = useState('');
+    const user = useSelector(state => state.combinedReducers.user.userData);
+
+    console.log('EmailNotifications: ', user);
 
     const onChangeText = (text) => {
         setInput(text);
@@ -78,7 +82,12 @@ const EmailNotifications = ({ navigation }) => {
                     <View style={styles.bottomBar}>
                         <Pressable
                             style={[styles.button, styles.buttonsLayout]}
-                            onPress={() => Alert.alert('Email Success')}
+                            onPress={() => {
+                                navigation.navigate("MyTab", {
+                                    fname: user.userInfo.firstName,
+                                    lname: user.userInfo.lastName,
+                                });
+                            }}
                         >
                             <Text style={styles.accept}>Enable Email Notifications</Text>
                         </Pressable>                

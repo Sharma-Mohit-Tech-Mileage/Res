@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
 import WebView from 'react-native-webview';
+
 const { width, height } = Dimensions.get('window');
 const ArticalWindowUtility = ({ navigation, route }) => {
     const [progress, setProgress] = useState(0);
@@ -24,8 +25,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             setTitle(route.params?.name);
         }
     }, [modalOpen]);
-   
-
 
     return (
         <View style={{ flex: 1 }}>
@@ -42,8 +41,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     source={{ uri: url }}
                     onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
                     onError={() => setIsError(true)}
+                    sharedCookiesEnabled={true}
                     //onNavigationStateChange={(navState) => setUrl(navState.url)}
-                />
+                />            
             )}
             {isError ? (
                 <View style={[styles.errorContainer, { marginTop: '23%' }]}>

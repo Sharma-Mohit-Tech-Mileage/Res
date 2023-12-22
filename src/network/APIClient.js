@@ -4,8 +4,11 @@ import { getUser } from "../redux/utils/LocalStorage";
 const BASE_URL = 'https://customer.uat.sparklight.com/apiWrapper/' 
 const BASE_URL_AUTH="https://customer.uat.cableone.net/apiWrapper/"
 
-export const PostAuthApiRequest=(endpoint,body, onSuccess,onError)=>{
+export const PostAuthApiRequest=(endpoint, body, onSuccess, onError)=>{
+    const idTokenGuid = body.idTokenGuid;
     
+    delete body.idTokenGuid;
+
     fetch(`${BASE_URL_AUTH}/${endpoint}`, {
         method: 'POST',
         headers: {
@@ -16,12 +19,8 @@ export const PostAuthApiRequest=(endpoint,body, onSuccess,onError)=>{
     })
         .then(response => Promise.all([response, response.json()]))
         .then(([response, json]) => {
-             //console.log('response', response);
-            //if (!response.ok || !response.status === 201) { // We should get a 201 (Created) status code if everything is fine/working
-             //   throw Error(`Respsonse status ${response.status} (${response.statusText}): ${json.message}`);
-            //}
-            // console.log(json);
-            // Whatever you want to do next after the POST request - maybe dispatch something?
+            //Add Token Guid
+            json.idTokenGuid = idTokenGuid;
             onSuccess(json)
         })
         .catch(exception => {
