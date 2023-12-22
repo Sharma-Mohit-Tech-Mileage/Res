@@ -35,14 +35,19 @@ const TextNotifications = ({ navigation }) => {
     }, [isFocused, additionalData]); // Depend on isFocused and additionalData
     const handleToggleChange = (e) => {
         const { name, value } = e.target;
+
+        // Log the name and value for debugging
+        console.log(`Name: ${name}, Value: ${value}`);
+
         setInitializeSettings(initialize => {
             const updatedSettings = {
                 ...initialize,
-                [name]: value
+                [name]: !value
             };
             return updatedSettings;
         });
     };
+
 
     useEffect(() => {
         if (route.params?.updateFailed) {
@@ -119,7 +124,7 @@ const TextNotifications = ({ navigation }) => {
                                         <View >
                                             <Toggle
                                                 name="optOut"
-                                                initialValue={initialize.optOut}
+                                                initialValue={!initialize.optOut}
                                                 onToggle={handleToggleChange}
                                             />
                                         </View>
@@ -141,7 +146,7 @@ const TextNotifications = ({ navigation }) => {
                                         <View >
                                             <Toggle
                                                 name="outageOptOut"
-                                                initialValue={initialize.outageOptOut}
+                                                initialValue={!initialize.outageOptOut}
                                                 onToggle={handleToggleChange}
                                             />
                                         </View>
@@ -163,7 +168,7 @@ const TextNotifications = ({ navigation }) => {
                                         <View >
                                             <Toggle
                                                 name="billingOptOutStatus"
-                                                initialValue={initialize.billingOptOutStatus}
+                                                initialValue={!initialize.billingOptOutStatus}
                                                 onToggle={handleToggleChange} />
                                         </View>
                                     </View>

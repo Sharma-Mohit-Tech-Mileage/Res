@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Select, Box, CheckIcon } from 'native-base';
-import { Padding, Color } from "../../../../GlobalStyles";
+import { Padding, Color,FontFamily,FontSize } from "../../../../GlobalStyles";
 
 const SparkLightDropdown = ({ items, selectedValue, onValueChange, style }) => {
     const validItems = Array.isArray(items) ? items : [];
@@ -40,7 +40,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between', // Space the text and icon
         alignItems: 'center', // Center the items vertically
         paddingHorizontal: Padding.p_base,
-        paddingVertical: Padding.p_xs
+        color: Color.colorGray_200,
+        fontSize: FontSize.size_base,
+        fontFamily: FontFamily.openSansRegular,
+        paddingVertical: Padding.p_xs,
+        height:48
     },
     item: {
         padding: Padding.p_base,

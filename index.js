@@ -8,6 +8,7 @@ import App from './App.js';
 import messaging from '@react-native-firebase/messaging';
 import OklaSpeedTest from './src/components/home/OklaSpeedTest.js';
 import {name as appName} from './app.json';
+import LiveSupportChat from './src/components/support/LiveSupportChat.js';
 
 // Register background handler
 // messaging().setBackgroundMessageHandler(async remoteMessage => {

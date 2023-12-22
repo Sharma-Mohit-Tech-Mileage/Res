@@ -5,7 +5,7 @@ import { Color, Padding, FontSize, FontFamily, Border } from "../../../GlobalSty
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from '../common/customui/NotificationAlert';
-import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
+import { fetchProfileDetails, fetchSMSSelection } from '../../redux/actions/ProfileActionSuite'
 const PasswordSecurity = () => {
   const navigation = useNavigation();
   const route = useRoute(); // Use the useRoute hook
@@ -17,7 +17,6 @@ const PasswordSecurity = () => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
       dispatch(fetchProfileDetails());
-      // Reset the parameter so subsequent navigations are detected
       navigation.setParams({ updateSuccess: undefined });
     }
   }, [route.params?.updateSuccess, navigation, dispatch]);

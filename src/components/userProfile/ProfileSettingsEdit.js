@@ -9,23 +9,28 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateProfileRequest } from '../../redux/actions/ProfileActionSuite';
 import NotificationAlert from '../common/customui/NotificationAlert';
-import validationSchema from '../utility/validationSchema'; // Update the path as necessary
+import { profileSchema } from '../utility/validationSchema'; // Update the path as necessary
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
   const route = useRoute(); // Use the useRoute hook
   const dispatch = useDispatch();
   const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [initialEmailAddress, setInitialEmailAddress] = useState('');
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetailsfromStore = profile.profileDetails || {};
   const scrollViewRef = useRef(null);
   const handleSave = (data) => {
-    console.log(data); // Here you get the validated data
+    const emailChanged = data.svEmailAddress !== initialEmailAddress;
+    if (emailChanged) {
+      data.email = data.svEmailAddress;
+    }
+    console.log('Here you get the validated data', data); // Here you get the validated data
     dispatch(updateProfileRequest(data, navigation));
   };
 
   const { control, handleSubmit, reset, formState: { errors } } = useForm({
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver(profileSchema),
     defaultValues: { // You can spread the profileDetailsfromStore object
       ...profileDetailsfromStore
     }
@@ -35,6 +40,7 @@ const ProfileSettingsEdit = () => {
   useEffect(() => {
     reset({ ...profileDetailsfromStore }); // This will reset the form with new default values
   }, [profileDetailsfromStore, reset]);
+
   useEffect(() => {
     if (route.params?.updateFailed) {
       setShowErrorAlert(true);
@@ -43,6 +49,10 @@ const ProfileSettingsEdit = () => {
     }
   }, [route.params?.updateFailed, navigation]);
 
+  // When the component mounts or the profileDetailsfromStore changes, update the initial email address
+  useEffect(() => {
+    setInitialEmailAddress(profileDetailsfromStore.svEmailAddress || '');
+  }, [profileDetailsfromStore]);
 
   return (
     <View style={styles.profileSettingsEdit}>
@@ -52,15 +62,15 @@ const ProfileSettingsEdit = () => {
       />
       <ScrollView ref={scrollViewRef}>
         <View style={[styles.profileSettingsEditInner]}>
-          <NotificationAlert
-            type="error"
-            title="Failed"
-            message="Your profile update failed."
-            showCloseIcon={true}
-            isVisible={showErrorAlert}
-            onClose={() => setShowErrorAlert(false)}
-          />
           <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
+            <NotificationAlert
+              type="error"
+              title="Failed"
+              message="Your profile update failed."
+              showCloseIcon={true}
+              isVisible={showErrorAlert}
+              onClose={() => setShowErrorAlert(false)}
+            />
             <View style={[styles.generalInformationWrapper, styles.informationWrapperFlexBox]}>
               <Text style={styles.generalInformation} >
                 General Information
@@ -162,7 +172,7 @@ const ProfileSettingsEdit = () => {
                           onBlur={onBlur}
                           onChangeText={onChange}
                           value={value}
-                          editable={false}
+                          editable={!profileDetailsfromStore.multipleEmails}
                           error={error?.message}
                         />
                       )}

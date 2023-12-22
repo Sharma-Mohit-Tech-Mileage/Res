@@ -66,7 +66,7 @@ const Notifications = () => {
           {/* Text Notifications Section */}
           <NotificationSection
             title="Text Notifications"
-            infoText={`Text alerts are sent to `}
+            infoText={data.phoneNum ? `Text alerts are sent to ` :'Go to profile settings to update your mobile No.'}
             number={data.phoneNum}
             transformedData={data}
             navigationTarget="TextNotifications"
@@ -76,7 +76,7 @@ const Notifications = () => {
           {/* Email Notifications Section */}
           <NotificationSection
             title="Email Notifications"
-            infoText={`Emails are sent to `}
+            infoText={paperLessInfo.emailAddress?`Emails are sent to `: 'Go to profile settings to update your email.'}
             email={paperLessInfo.emailAddress}
             navigationTarget="EmailNotifications"
             transformedData={{

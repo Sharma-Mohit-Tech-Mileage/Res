@@ -42,9 +42,12 @@ export const passwordTerms = [
 ]
 
 export const transformResponse = (responseArray) => {
-    // Set default values
     const defaultPhoneNumber = "";
-    const defaultSubscriptionDetails = [];
+    const defaultSubscriptionDetails = [
+        { type: 'Appointments', status: 'Off' },
+        { type: 'Outage', status: 'Off' },
+        { type: 'Billing', status: 'On' },
+    ];
 
     // Check if the response is an array and not empty
     if (!Array.isArray(responseArray) || responseArray.length === 0) {
@@ -70,7 +73,7 @@ export const transformResponse = (responseArray) => {
     const subscriptionDetails = smsMessageType.map(msgType => {
         return {
             type: msgType.messageType,
-            status: msgType.optOutFlag ? 'On' : 'Off'
+            status: !msgType.optOutFlag ? 'On' : 'Off'
         };
     });
 
@@ -107,35 +110,33 @@ export const initializeSettings = (additionalData) => {
         return {
             accountNumber: "",
             phoneNumber: "",
-            optOut: false,
-            outageOptOut: false,
-            billingOptOutStatus: false,
+            optOut: true,
+            outageOptOut: true,
+            billingOptOutStatus: true,
         };
     }
 
     const defaultSettings = {
         accountNumber: "",
         phoneNumber: additionalData.phoneNum,
-        optOut: false,
-        outageOptOut: false,
-        billingOptOutStatus: false,
+        optOut: true,
+        outageOptOut: true,
+        billingOptOutStatus: true,
     };
 
     additionalData.subscriptionDetails.forEach((detail) => {
         const status = detail.status?.toLowerCase() === 'on';
         const type = detail.type?.toLowerCase();
-
         if (type === "appointment") {
-            defaultSettings.optOut = status;
+            defaultSettings.optOut = !status;
         }
         if (type === "outage") {
-            defaultSettings.outageOptOut = status;
+            defaultSettings.outageOptOut = !status;
         }
         if (type === "billing") {
-            defaultSettings.billingOptOutStatus = status;
+            defaultSettings.billingOptOutStatus = !status;
         }
     });
-
     return defaultSettings;
 };
 
