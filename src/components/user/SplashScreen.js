@@ -47,6 +47,7 @@ const SplashScreen = ({ navigation }) => {
   const [data, setData] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [overrideTerms, setOverrideTerms] = useState(true);
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -66,9 +67,7 @@ const SplashScreen = ({ navigation }) => {
         token: token,
         tokenGuid: res.idTokenGuid
       };
-
-      setCookieForWebView(user.token, user.tokenGuid);
-
+      
       if (token) {
         storeUser(user);
       }
@@ -103,7 +102,7 @@ const SplashScreen = ({ navigation }) => {
           accountNumber: userInfo.accountNumber
         });        
 
-        if (user.userInfo.mobileTCAcceptanceFlag) {
+        if (user.userInfo.mobileTCAcceptanceFlag && overrideTerms) {
           navigation.navigate("PushNotifications");
         } else {
           navigation.navigate("Terms");
@@ -216,12 +215,10 @@ const SplashScreen = ({ navigation }) => {
   };
 
   const termsAndConditionsFlow = async () => {
+    setOverrideTerms(false);
     storeFirstTime(null);
-    dispatch(updateTermsAndConditions(false, navigation));
     await loginAuth();
   };  
-
-
 
   useEffect(() => {}, []);
 
