@@ -47,7 +47,6 @@ const SplashScreen = ({ navigation }) => {
   const [data, setData] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [overrideTerms, setOverrideTerms] = useState(true);
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -67,7 +66,7 @@ const SplashScreen = ({ navigation }) => {
         token: token,
         tokenGuid: res.idTokenGuid
       };
-      
+
       if (token) {
         storeUser(user);
       }
@@ -100,9 +99,9 @@ const SplashScreen = ({ navigation }) => {
         console.log('storeFirstTime: ', userInfo.accountNumber);
         storeFirstTime({
           accountNumber: userInfo.accountNumber
-        });        
+        });     
 
-        if (user.userInfo.mobileTCAcceptanceFlag && overrideTerms) {
+        if (user.userInfo.mobileTCAcceptanceFlag) {
           navigation.navigate("PushNotifications");
         } else {
           navigation.navigate("Terms");
@@ -215,8 +214,8 @@ const SplashScreen = ({ navigation }) => {
   };
 
   const termsAndConditionsFlow = async () => {
-    setOverrideTerms(false);
     storeFirstTime(null);
+    dispatch(updateTermsAndConditions(false, null));
     await loginAuth();
   };  
 

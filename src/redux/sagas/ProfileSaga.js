@@ -110,9 +110,13 @@ function* updateTermsAndConditions(action) {
     console.log('updateTermsAndConditions: ', action);
     try {
         yield call(postTermsAndConditions, action.payload);
-        action.navigation.navigate('PushNotifications');
+        if (action.navigation !== null) {
+            action.navigation.navigate('PushNotifications');
+        }
     } catch (error) {
-        action.navigation.navigate('Terms', { updateFailed: true });
+        if (action.navigation !== null) {
+            action.navigation.navigate('Terms', { updateFailed: true });
+        }
     }
 }
 
