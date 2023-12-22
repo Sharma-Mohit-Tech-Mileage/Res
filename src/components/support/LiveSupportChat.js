@@ -22,14 +22,14 @@ const LiveSupportChat = () => {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Chat | ${title}</title>
+    <title>Chat </title>
     <!-- Start of Zendesk Widget script -->
-    <script id="ze-snippet"
-      src="https://static.zdassets.com/ekr/snippet.js?key=${zendesk_chat_key}"> </script>
+    <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=ad791f41-3c05-490b-8bb3-55afe1751f92"></script>
     <!-- End of Zendesk Widget script -->
     <style type="text/css">html { background: #FFF; }</style>
   </head>
   <body>
+
   <script>
   document.addEventListener( 'DOMContentLoaded', function( event ) {
     // zE('webWidget', 'prefill', {
@@ -73,13 +73,26 @@ const LiveSupportChat = () => {
 
   return (
      <SafeAreaView style={{flex:1,marginBottom:100}} visible={true}>
+        {/* <WebView
+          style={{ flex: 1 }}
+          hideKeyboardAccessoryView
+         // source={{ uri: 'https://static.zdassets.com/admin/contributor/admin_center_framework_web_widget/60a0bd4a58d143fd4e90c50b06785f5196811dce/e7d54baed37b06d7a525edcca692734f.html#key=939402da-c188-4f5e-a869-46922a124b52&instructions=Save+your+changes+to+see+them+here.+They+may+take+a+moment+to+appear.&dir=ltr&locale=en-us&hasCustomLauncher=false&customLauncherOpen=Open+Web+Widget&title=Cable+ONE+Business' }}
+          showsVerticalScrollIndicator={false}
+          source={{html:customHTML}}
+          javaScriptEnabled={true}
+          
+          // shouldStartLoadWithRequestHandler={({ url }) => url.startsWith("about:blank")}
+        /> */}
         <WebView
           style={{ flex: 1 }}
           hideKeyboardAccessoryView
-          source={{ uri: 'https://static.zdassets.com/admin/contributor/admin_center_framework_web_widget/60a0bd4a58d143fd4e90c50b06785f5196811dce/e7d54baed37b06d7a525edcca692734f.html#key=939402da-c188-4f5e-a869-46922a124b52&instructions=Save+your+changes+to+see+them+here.+They+may+take+a+moment+to+appear.&dir=ltr&locale=en-us&hasCustomLauncher=false&customLauncherOpen=Open+Web+Widget&title=Cable+ONE+Business' }}
+          source={{ html: customHTML }}
           showsVerticalScrollIndicator={false}
-         
-          
+          applicationNameForUserAgent={userAgent}
+          onMessage={({ nativeEvent }) => {
+            //nativeEvent.data === "close" && this.setState({ showChat: false });
+          }}
+          originWhitelist={["about:blank"]}
           // shouldStartLoadWithRequestHandler={({ url }) => url.startsWith("about:blank")}
         />
       </SafeAreaView>

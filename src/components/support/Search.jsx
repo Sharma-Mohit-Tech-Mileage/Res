@@ -15,25 +15,14 @@ const Search = ({ navigation }) => {
     const [allSuggestions,setAllSuggestions] = useState(['Support title 1', 'Support title 2', 'Support title 3']);
 
 
-    const callSearchApi=(query)=>{
-       
-    }
-
-    const onSuccess = (res) => {
-        console.log("getModemDetails", res);
-        if (res) {
-            setAllSuggestions(res)
-        }
-      };
-      const onError = (error) => {
-        console.log("error", error);
-      };
+   
 
     // Function to filter suggestions
     const filterSuggestions = (query) => {
         const request = `/support/api/Articles/search/${query}`;
         GetApiRequest(request, (res)=>{
-            if (query.trim() && query.length>2) {
+            if(res){
+            if (query.trim() ) {
                 //console.log('Data',res)
                 const filtered = res.filter((item) =>
                     item.title.toLowerCase().includes(query.toLowerCase())
@@ -42,6 +31,7 @@ const Search = ({ navigation }) => {
             } else {
                 setFilteredSuggestions([]); // Set to empty array when there's no input
             }
+        }
 
         }, (error)=>{
 
@@ -66,6 +56,9 @@ const Search = ({ navigation }) => {
 
     const onChangeInput = useCallback((text) => {
         setInput(text);
+        if(text.length==0){
+            setFilteredSuggestions([]);
+        }
     }, []);
 
     return (
@@ -82,13 +75,14 @@ const Search = ({ navigation }) => {
                     input={input}
                     onChangeInput={onChangeInput}
                     suggestions={filteredSuggestions}
+                    navigation={navigation}
                 />
             </View>
 
-            {/* Bottom buttons wrapper */}
+            {/* Bottom buttons wrapper 
             <View style={styles.bottomButtonsWrapper}>
                 <View style={styles.buttonsParent}>
-                    {/* Troubleshooting Button */}
+                    
                     <View style={styles.buttons}>
                         <Image
                             style={styles.buttonIcon}
@@ -97,7 +91,7 @@ const Search = ({ navigation }) => {
                         />
                         <Text style={styles.buttonText}>Troubleshooting</Text>
                     </View>
-                    {/* Live Support Button */}
+                   
                     <View style={styles.buttons}>
                         <Image
                             style={styles.buttonIcon}
@@ -107,7 +101,9 @@ const Search = ({ navigation }) => {
                         <Text style={[styles.makePayment, styles.titleTypo]}>Live Support</Text>
                     </View>
                 </View>
+                
             </View>
+            */}
         </View>
     );
 };

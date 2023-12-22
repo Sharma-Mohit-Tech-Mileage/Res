@@ -7,6 +7,11 @@ import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
+import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
+import {
+    widthPercentageToDP as wp,
+    heightPercentageToDP as hp,
+  } from "react-native-responsive-screen";
 const ManageEquipment = () => {
     const navigation = useNavigation();
 
@@ -55,11 +60,9 @@ const ManageEquipment = () => {
                             <View style={[styles.frameWrapper, styles.contentSpaceBlock]}>
                                 <View style={styles.frameContainer}>
                                     <View style={styles.docsis31Parent}>
-                                        <Image
-                                            //style={styles.docsis31Icon}
-                                            resizeMode="cover"
-                                            source={require("../../../assets/DOCSIS.png")}
-                                        />
+                                    <View style={styles.iconBg}>
+                                       <ModemIcon1 />
+                                          </View>
                                         <View style={styles.motorolaParent}>
                                             <Text style={[styles.motorola, styles.myModem1Typo]}>
                                                 {manufacturer}
@@ -365,7 +368,16 @@ const styles = StyleSheet.create({
         width: "100%",
         flex: 1,
         backgroundColor: Color.colorWhitesmoke_200,
-    },
+    },iconBg: {
+        backgroundColor: "#F4F4F5",
+        padding: 5,
+        width: wp("20%"),
+        height: wp("20%"),
+        borderRadius: 10,
+        alignContent: "center",
+        alignItems: "center",
+        justifyContent: "center",
+      },
 });
 
 export default ManageEquipment;
