@@ -9,8 +9,7 @@ import {
     Image,
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../../GlobalStyles';
-
-const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions }) => {
+const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,navigation }) => {
     const inputRef = useRef(null);
     const [input, setInput] = useState('');
 
@@ -20,8 +19,9 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions }) => 
     }, [input, onChangeInput]);
 
     const handleSuggestionClick = (suggestion) => {
-        setInput(suggestion);
+        setInput(suggestion.title);
         // Optionally close the keyboard
+        navigation.navigate('ArticalWindowUtility', { url: suggestion.html_url, name: 'Search Result' }) 
     };
 
 
@@ -144,7 +144,9 @@ const styles = StyleSheet.create({
         flex: 1, // To ensure text takes up the remaining space
         fontSize: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,
-        color: Color.colorMidnightblue, // Spark Light Purple from the design
+        color: Color.colorMidnightblue,
+        width:'90%'
+         // Spark Light Purple from the design
     },
     overlayStyle: {
         position: 'absolute',
