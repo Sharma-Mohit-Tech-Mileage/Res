@@ -75,37 +75,35 @@ const SplashScreen = ({ navigation }) => {
 
       const data = await getFirstTime();
 
-      if (data !== null 
-        && data.accountNumber === userInfo.accountNumber) {
-          if (userInfo.accountNumber === "900690538") {
-            setErrorMessage(strings.nonAdminUserMsg);
-            setTimeout(() => {
-              setModalVisible(true);
-            }, 100);
-          } else if (userInfo.accountNumber === "902862879") {
-            setErrorMessage(strings.nonInternetUserMessage);
-            setTimeout(() => {
-              setModalVisible(true);
-            }, 100);
-          } else {
-            navigation.navigate("MyTab", {
-              fname: userInfo.firstName,
-              lname: userInfo.lastName,
-            });
-          }         
-      } else {
-        //User is here for the first time
-        console.log('storeFirstTime: ', userInfo.accountNumber);
-        storeFirstTime({
-          accountNumber: userInfo.accountNumber
-        });     
-
-        if (user.userInfo.mobileTCAcceptanceFlag) {
-          navigation.navigate("EntryPushNotifications");
+        if (userInfo.accountNumber === "900690538") {
+          setErrorMessage(strings.nonAdminUserMsg);
+          setTimeout(() => {
+            setModalVisible(true);
+          }, 100);
+        } else if (userInfo.accountNumber === "902862879") {
+          setErrorMessage(strings.nonInternetUserMessage);
+          setTimeout(() => {
+            setModalVisible(true);
+          }, 100);
         } else {
-          navigation.navigate("Terms");
-        }
-      }
+          if (data !== null 
+            && data.accountNumber === userInfo.accountNumber) {
+              navigation.navigate("MyTab", {
+                fname: userInfo.firstName,
+                lname: userInfo.lastName,
+              });
+          } else {
+            storeFirstTime({
+              accountNumber: userInfo.accountNumber
+            });     
+
+            if (user.userInfo.mobileTCAcceptanceFlag) {
+              navigation.navigate("EntryPushNotifications");
+            } else {
+              navigation.navigate("Terms");
+            }
+          }
+        }         
     }
   };
 
@@ -249,23 +247,7 @@ const SplashScreen = ({ navigation }) => {
         visible={modalVisible}
         message={errorMessage}
         onClose={handleCloseAlert}
-      />
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={[styles.buttons, styles.buttonsLayout]}
-          onPress={loginFirstTimeFlow}
-        >
-            <Text style={styles.buttonTextFirstTime}>First Time Flow</Text>
-        </Pressable> 
-      </View>    
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={[styles.buttons, styles.buttonsLayout]}
-          onPress={termsAndConditionsFlow}
-        >
-            <Text style={styles.buttonTextFirstTime}>Terms And Conditions</Text>
-        </Pressable> 
-      </View>             
+      />           
     </LinearGradient>
   );
 };
