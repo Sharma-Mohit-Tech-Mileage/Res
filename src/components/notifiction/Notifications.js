@@ -11,6 +11,7 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 const Notifications = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [updatedSection, setUpdatedSection] = useState('');
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const route = useRoute(); // Use the useRoute hook
@@ -36,15 +37,16 @@ const Notifications = () => {
   useEffect(() => {
     if (route.params?.updateSuccess) {
       const updatedType = route.params.updatedType || 'Notification';
-      const successMessage = `${updatedType} settings have been updated successfully.`;
+      setUpdatedSection(updatedType); // Update the updatedSection state
+      setSuccessMessage(`${updatedType} settings have been updated successfully.`);
       setShowSuccessAlert(true);
-      setSuccessMessage(successMessage); // New state to store the success message
       dispatch(fetchSMSSelection());
 
       // Reset the parameters
       navigation.setParams({ updateSuccess: undefined, updatedType: undefined });
     }
   }, [route.params, navigation, dispatch]);
+
 
 
   return (
@@ -55,18 +57,14 @@ const Notifications = () => {
       />
       <ScrollView>
         <View style={[styles.notificationsInner]}>
-          <NotificationAlert
-            type="success"
-            title="Update Successful"
-            message={successMessage}
-            showCloseIcon={true}
-            isVisible={showSuccessAlert}
-            onClose={() => setShowSuccessAlert(false)}
-          />
           {/* Text Notifications Section */}
           <NotificationSection
             title="Text Notifications"
-            infoText={data.phoneNum ? `Text alerts are sent to ` :'Go to profile settings to update your mobile No.'}
+            successMessage={successMessage}
+            showNotification={updatedSection === 'Text'}
+            showSuccessAlert={showSuccessAlert}
+            setShowSuccessAlert={() => setShowSuccessAlert(false)}
+            infoText={data.phoneNum ? `Text alerts are sent to ` : 'Go to profile settings to update your mobile No.'}
             number={data.phoneNum}
             transformedData={data}
             navigationTarget="TextNotifications"
@@ -76,7 +74,11 @@ const Notifications = () => {
           {/* Email Notifications Section */}
           <NotificationSection
             title="Email Notifications"
-            infoText={paperLessInfo.emailAddress?`Emails are sent to `: 'Go to profile settings to update your email.'}
+            successMessage={successMessage}
+            showNotification={updatedSection === 'Email'}
+            showSuccessAlert={showSuccessAlert}
+            setShowSuccessAlert={() => setShowSuccessAlert(false)}
+            infoText={paperLessInfo.emailAddress ? `Emails are sent to ` : 'Go to profile settings to update your email.'}
             email={paperLessInfo.emailAddress}
             navigationTarget="EmailNotifications"
             transformedData={{
@@ -84,13 +86,17 @@ const Notifications = () => {
               email: paperLessInfo.emailAddress
             }}
             additionalSettings={[
-              { type: 'Paperless Billing', status: !paperlessStatus?'Off':'On' },
+              { type: 'Paperless Billing', status: !paperlessStatus ? 'Off' : 'On' },
             ]}
           />
           <View style={{ marginBottom: Padding.p_base }} />
           {/* In-App Notifications Section */}
           <NotificationSection
             title="In-App Notifications"
+            successMessage={successMessage}
+            showNotification={updatedSection === 'App'}
+            showSuccessAlert={showSuccessAlert}
+            setShowSuccessAlert={() => setShowSuccessAlert(false)}
             infoText="Notifications sent from your application."
             navigationTarget="InAppNotifications"
             additionalSettings={[
@@ -108,6 +114,10 @@ const Notifications = () => {
 
 const NotificationSection = ({
   title,
+  successMessage,
+  showNotification,
+  showSuccessAlert,
+  setShowSuccessAlert,
   infoText,
   number,
   transformedData,
@@ -116,8 +126,23 @@ const NotificationSection = ({
   additionalSettings = [],
 }) => {
   const navigation = useNavigation();
+  // Example usage in a close handler
+  const handleClose = () => {
+    console.log('Example usage in a close handler')
+    setShowSuccessAlert(false);
+  };
   return (
     <View style={[styles.frameParent2, styles.frameBorder]}>
+      {showNotification && (
+        <View style={styles.infoWrapper}><NotificationAlert
+          type="success"
+          title="Update Successful"
+          message={successMessage}
+          showCloseIcon={true}
+          isVisible={showSuccessAlert}
+          onClose={handleClose} // Using the passed function here
+        /></View>
+      )}
       <View style={[styles.textNotificationsParent, styles.parentSpaceBlock]}>
         <Text style={styles.textNotifications}>{title}</Text>
         <Pressable
@@ -278,6 +303,10 @@ const styles = StyleSheet.create({
     color: Color.colorGray_100,
     fontWeight: "600",
     fontSize: 14
+  },
+  infoWrapper: {
+    paddingHorizontal: Padding.p_5xl,
+    alignSelf: "stretch",
   },
   frameView: {
     borderRadius: Border.br_5xs,

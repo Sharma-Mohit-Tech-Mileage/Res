@@ -205,10 +205,23 @@ const AccountOverview = () => {
             </Pressable>
             <Pressable
               style={[styles.buttons, styles.buttonsSpaceBlock1]}
-              onPress={() => { navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/privacy-policy', name: 'Privacy Policy' }) }}
+              onPress={() => { /* Handle press event if necessary for the entire line */ }}
             >
-              <Text style={[{ fontStyle: 'italic', color: Color.gray600 }]}>
-                View our Privacy Policy and Terms & Condition
+              <Text style={{ fontStyle: 'italic', color: Color.colorMidnightblue }}>
+                { 'View our '}
+                <Text
+                  style={{ textDecorationLine: 'underline' }}
+                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/privacy-policy', name: 'Privacy Policy' })}
+                >
+                  Privacy Policy
+                </Text>
+                {' and '}
+                <Text
+                  style={{ textDecorationLine: 'underline' }}
+                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/terms-conditions', name: 'Terms & Conditions' })}
+                >
+                  Terms & Conditions
+                </Text>
               </Text>
             </Pressable>
             {/* Logout button */}

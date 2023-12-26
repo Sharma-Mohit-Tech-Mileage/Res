@@ -140,3 +140,25 @@ export const initializeSettings = (additionalData) => {
     return defaultSettings;
 };
 
+export const getRoleBasedMessage = (input) => {
+    // Check for null or empty input
+    if (!input || input.trim() === '') {
+        return '';
+    }
+
+    // Convert input to lower case for case-insensitive comparison
+    const inputLower = input.toLowerCase();
+
+    // Define the mapping
+    const mapping = {
+        'admin': 'As an admin, you can manage this account, but you are not the primary contact for this account.',
+        'limited': 'VIEW ONLY',
+        'restricted': 'VIEW ONLY',
+        'headofhousehold': 'As the primary admin, you are the main contact and have full control over this account.'
+    };
+
+    // Return the corresponding value from the mapping or an empty string if not found
+    return mapping[inputLower] || '';
+};
+
+

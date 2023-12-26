@@ -9,36 +9,53 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateProfileRequest } from '../../redux/actions/ProfileActionSuite';
 import NotificationAlert from '../common/customui/NotificationAlert';
-import { profileSchema } from '../utility/validationSchema'; // Update the path as necessary
+import { profileSchema } from '../utility/validationSchema';
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
   const route = useRoute(); // Use the useRoute hook
   const dispatch = useDispatch();
   const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [showValidationAlert, setShowValidationAlert] = useState(false);
   const [initialEmailAddress, setInitialEmailAddress] = useState('');
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetailsfromStore = profile.profileDetails || {};
   const scrollViewRef = useRef(null);
-  const handleSave = (data) => {
-    const emailChanged = data.svEmailAddress !== initialEmailAddress;
+  const [smsPayload, setSmsPayload] = useState(route.params?.smsPayload || {});
+
+  const handleSave = async (data) => {
+    const newData = { ...data };
+    delete newData.phoneNumber; // Safe operation even if phoneNumber does not exist
+    const emailChanged = newData.svEmailAddress !== initialEmailAddress;
     if (emailChanged) {
-      data.email = data.svEmailAddress;
+      newData.email = initialEmailAddress;
     }
-    console.log('Here you get the validated data', data); // Here you get the validated data
-    dispatch(updateProfileRequest(data, navigation));
+    dispatch(updateProfileRequest(newData, smsPayload, navigation));
   };
 
   const { control, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: yupResolver(profileSchema),
-    defaultValues: { // You can spread the profileDetailsfromStore object
-      ...profileDetailsfromStore
+    defaultValues: {
+      ...profileDetailsfromStore,
+      phoneNumber: smsPayload.phoneNumber
     }
   });
 
-  // useEffect to update the form's default values when profileDetailsfromStore changes
+  const updateSmsPayloadPhoneNumber = (e) => {
+    const { value } = e.target;
+    setSmsPayload(smsPayload => ({
+      ...smsPayload,
+      'phoneNumber': value
+    }));
+  };
+
+  const handleValidationError = () => {
+    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+    setShowValidationAlert(true);
+  };
+
   useEffect(() => {
-    reset({ ...profileDetailsfromStore }); // This will reset the form with new default values
+    reset({ ...profileDetailsfromStore });
   }, [profileDetailsfromStore, reset]);
 
   useEffect(() => {
@@ -49,10 +66,17 @@ const ProfileSettingsEdit = () => {
     }
   }, [route.params?.updateFailed, navigation]);
 
-  // When the component mounts or the profileDetailsfromStore changes, update the initial email address
   useEffect(() => {
     setInitialEmailAddress(profileDetailsfromStore.svEmailAddress || '');
   }, [profileDetailsfromStore]);
+
+  useEffect(() => {
+    // Cleanup function to close notifications on unmount
+    return () => {
+      setShowErrorAlert(false);
+      setShowValidationAlert(false);
+    };
+  }, []); // The empty array ensures this runs on unmount only
 
   return (
     <View style={styles.profileSettingsEdit}>
@@ -63,14 +87,24 @@ const ProfileSettingsEdit = () => {
       <ScrollView ref={scrollViewRef}>
         <View style={[styles.profileSettingsEditInner]}>
           <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
-            <NotificationAlert
-              type="error"
-              title="Failed"
-              message="Your profile update failed."
-              showCloseIcon={true}
-              isVisible={showErrorAlert}
-              onClose={() => setShowErrorAlert(false)}
-            />
+            <View style={styles.infoWrapper}>
+              <NotificationAlert
+                type="error"
+                title="Failed"
+                message="Your profile update failed."
+                showCloseIcon={true}
+                isVisible={showErrorAlert}
+                onClose={() => setShowErrorAlert(false)}
+              />
+              <NotificationAlert
+                type="error"
+                title="Error"
+                message="Please enter valid information to continue."
+                showCloseIcon={true}
+                isVisible={showValidationAlert}
+                onClose={() => setShowValidationAlert(false)}
+              />
+            </View>
             <View style={[styles.generalInformationWrapper, styles.informationWrapperFlexBox]}>
               <Text style={styles.generalInformation} >
                 General Information
@@ -186,14 +220,17 @@ const ProfileSettingsEdit = () => {
                   <View >
                     <Controller
                       control={control}
-                      name="phone"
-                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                      name="phoneNumber" // This should be the name used in your validation schema
+                      render={({ field: { onChange, onBlur, value } }) => (
                         <SparkLightInput
                           placeholder="Mobile number"
                           onBlur={onBlur}
-                          onChangeText={onChange}
+                          onChangeText={(text) => {
+                            onChange(text);
+                            updateSmsPayloadPhoneNumber(text);
+                          }}
                           value={value}
-                          error={error?.message}
+                          error={errors.phoneNumber?.message}
                         />
                       )}
                     />
@@ -203,7 +240,7 @@ const ProfileSettingsEdit = () => {
             </View>
           </View>
           <View style={{ marginTop: Padding.p_base }}>
-            <Pressable style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]} onPress={handleSubmit(handleSave)}>
+            <Pressable style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]} onPress={handleSubmit(handleSave, handleValidationError)}>
               <Text style={[{ color: Color.sparklightWhite }, styles.makeTypo]}>Save</Text>
             </Pressable>
             <Pressable style={[styles.buttonsLayout]} onPress={() => navigation.navigate("ProfileSettings")}>
@@ -278,7 +315,7 @@ const styles = StyleSheet.create({
   },
   rectangleWrapper: {
     paddingVertical: 0,
-    marginTop: 16,
+    marginTop: Padding.p_base,
     paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
   },
@@ -303,6 +340,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",
     marginBottom: 200,
+  },
+  infoWrapper: {
+    paddingHorizontal: Padding.p_5xl,
+    alignSelf: "stretch",
   },
   profileSettingsEdit: {
     flex: 1,
