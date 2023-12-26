@@ -22,12 +22,8 @@ const Search = ({ navigation }) => {
         const request = `/support/api/Articles/search/${query}`;
         GetApiRequest(request, (res)=>{
             if(res){
-            if (query.trim() ) {
-                //console.log('Data',res)
-                const filtered = res.filter((item) =>
-                    item.title.toLowerCase().includes(query.toLowerCase())
-                );
-                setFilteredSuggestions(filtered);
+            if (query.trim() &&  query.length>0 ) {
+                setFilteredSuggestions(res);
             } else {
                 setFilteredSuggestions([]); // Set to empty array when there's no input
             }
