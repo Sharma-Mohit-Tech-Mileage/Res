@@ -3,11 +3,18 @@ import * as yup from 'yup';
 export const profileSchema = yup.object({
     firstName: yup.string().required('First Name is required'),
     lastName: yup.string().required('Last Name is required'),
-    phone: yup.string()
-        .nullable()
-        .matches(/^(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}$/, 'Invalid US mobile phone number'),
+    phoneNumber: yup.string()
+        .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number.'),
   
 });
+export const phoneSchema = yup.object({
+    phone: yup.string()
+        .nullable()
+        .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid US mobile phone number with optional extension'),
+});
+
+
+
 export const passwordSchema = (isCustomQuestionSelected) => yup.object({
     securityAnswer: yup.string()
         .required('Security answer is required'),

@@ -69,7 +69,8 @@ function* fetchPaperlessDetails(action) {
 function* updateProfile(action) {
     try {
         const response = yield call(postProfileInfo, action.payload);
-        console.log('API Success Response:', response); // Log the success response
+        console.log('action.smsPayload', action.smsPayload)
+        const textNotifiction = yield call(postTextNotifictionInfo, action.smsPayload);
         action.navigation.navigate('ProfileSettings', { updateSuccess: true });
     } catch (error) {
         action.navigation.navigate('ProfileSettingsEdit', { updateFailed: true });
@@ -79,6 +80,7 @@ function* updateProfile(action) {
 
 function* updateProfileSecurity(action) {
     try {
+
         const response = yield call(postProfileInfo, action.payload);
         console.log('API Success Response:', response); // Log the success response
         action.navigation.navigate('PasswordSecurity', { updateSuccess: true });

@@ -71,16 +71,17 @@ const TextNotifications = ({ navigation }) => {
             />
             <ScrollView ref={scrollViewRef}>
                 <View style={styles.textNotificationsInner} >
-                    <NotificationAlert
-                        type="error"
-                        title="Failed"
-                        message="Notifications updated failed."
-                        showCloseIcon={true}
-                        isVisible={showErrorAlert}
-                        onClose={() => setShowErrorAlert(false)}
-                    />
+                    
                     <View style={[styles.navigationBorder]}>
                         <View style={styles.frameGroup}>
+                            <NotificationAlert
+                                type="error"
+                                title="Failed"
+                                message="Notifications updated failed."
+                                showCloseIcon={true}
+                                isVisible={showErrorAlert}
+                                onClose={() => setShowErrorAlert(false)}
+                            />
                             <View style={styles.frameView}>
                                 <View style={styles.infoCircleWrapper}>
                                     <Image
