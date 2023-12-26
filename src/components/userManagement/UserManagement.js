@@ -97,10 +97,7 @@ const UserManagement = () => {
             </Text>
             <View style={styles.badgeWrapper}>
               <View style={[styles.badge, styles.badgeBorder, { backgroundColor: BoxColor }]}>
-                <Text style={[styles.text3]}>
-                  {getUserType(user.memberType)}
-                </Text>
-
+                <Text style={[styles.text3]}>{getUserType(user.memberType)}</Text>
               </View>
             </View>
 
@@ -331,9 +328,8 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   frameWrapper: {
-    paddingBottom: Padding.p_5xs,
+    paddingVertical: Padding.p_5xs,
     justifyContent: "center",
-    paddingTop: Padding.p_base,
     paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
   },

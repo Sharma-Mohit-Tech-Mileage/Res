@@ -51,22 +51,22 @@ const EmailNotifications = () => {
         accessibilityHint="Navigates back to the Notifications screen"
       />
       <View style={styles.emailNotificationsInner}>
-        <NotificationAlert
-          type="error"
-          title="Failed"
-          message="Notifications updated failed."
-          showCloseIcon={true}
-          isVisible={showErrorAlert}
-          onClose={() => setShowErrorAlert(false)}
-        />
+        
         <View style={styles.frameParent}>
+        
           <View style={[styles.frameContainer, styles.navigationBorder]} accessible >
             <View style={styles.frameGroup}>
               <View style={[styles.frameView, styles.frameFlexBox]}>
                 <View style={styles.frameParent1} >
-                  <View
-                    style={[styles.paperlessBillingParent, styles.frameFlexBox,]}
-                  >
+                  <NotificationAlert
+                    type="error"
+                    title="Failed"
+                    message="Notifications updated failed."
+                    showCloseIcon={true}
+                    isVisible={showErrorAlert}
+                    onClose={() => setShowErrorAlert(false)}
+                  />
+                  <View style={[styles.paperlessBillingParent, styles.frameFlexBox,]}>
                     <Text style={styles.paperlessBilling}>
                       Paperless Billing
                     </Text>

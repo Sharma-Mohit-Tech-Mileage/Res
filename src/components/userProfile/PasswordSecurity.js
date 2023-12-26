@@ -34,17 +34,19 @@ const PasswordSecurity = () => {
         accessibilityHint="Go back to Account"
       />
       <View style={[styles.passwordSecurityInner, styles.securitySpaceBlock]}>
-        <NotificationAlert
-          type="success"
-          title="Update Successful"
-          message="Your password and security has been updated successfully."
-          showCloseIcon={true}
-          isVisible={showSuccessAlert}
-          onClose={() => setShowSuccessAlert(false)}
-        />
         <View style={[styles.frameParent, styles.navigationBorder]}>
+          <View style={styles.infoWrapper}>
+            <NotificationAlert
+              type="success"
+              title="Update Successful"
+              message="Your password and security has been updated successfully."
+              showCloseIcon={true}
+              isVisible={showSuccessAlert}
+              onClose={() => setShowSuccessAlert(false)}
+            />
+          </View>
           <View style={[styles.passwordParent, styles.tabsFlexBox]}>
-            <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header">
+            <Text style={[styles.password, styles.passwordFlexBox]}>
               Password
             </Text>
             <Pressable
@@ -123,7 +125,7 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_11xs,
   },
   frameContainerSpaceBlock: {
-    marginTop: 16,
+    marginTop: Padding.p_base,
     alignSelf: "stretch",
   },
   password: {
@@ -161,6 +163,10 @@ const styles = StyleSheet.create({
   frameChild: {
     height: 1,
     backgroundColor: Color.sparklightGray,
+    alignSelf: "stretch",
+  },
+  infoWrapper: {
+    paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
   },
   rectangleWrapper: {
