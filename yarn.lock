@@ -8197,6 +8197,11 @@ react-native-webview@^13.6.3:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"
 
+react-native-zendesk-messaging@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-zendesk-messaging/-/react-native-zendesk-messaging-0.2.1.tgz#5edf91313b5f05936df22132da56d0cc80bcf87c"
+  integrity sha512-hDb2bG+ven/v2hAtnIrq+abjBjgfzoYSYtlhpfJ9GVgfFogaOcI4FjcX6XO/1IStVLKPcQit5CBTycVPT5CSCA==
+
 react-native@0.72.4:
   version "0.72.4"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.72.4.tgz"

@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { StyleSheet, View, Image, Text, Pressable, ScrollView, Linking, TouchableOpacity } from "react-native";
+import React, { useState,useEffect } from "react";
+import { StyleSheet, View, Image, Text, Pressable, ScrollView, Linking, Platform } from "react-native";
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
+import * as Zendesk from 'react-native-zendesk-messaging';
 
 const Support = () => {
     const navigation = useNavigation();
@@ -18,6 +19,8 @@ const Support = () => {
 
         Linking.openURL(phoneNumber);
     };
+
+
 
     const items = [
         {
@@ -60,6 +63,24 @@ const Support = () => {
             url: 'https://support.sparklight.com/hc/en-us'
         }
     ];
+
+    useEffect(() => {
+        Zendesk.initialize({ channelKey:  Platform.OS === 'android'
+        ? 'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTYxNTQwMjg1MS56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUhKSkQyQ0VZUko5RUFNRVgxR1NHQlg2MC5qc29uIn0='
+        : 'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTYxNTQwMjg1MS56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUhKSkM2QVNWNFNDTkZGVFdYRVFYNjJQNC5qc29uIn0=' })
+          .then(() => {
+            Zendesk.clearConversationFields()
+          })
+          .catch((error) =>{
+    
+          });
+      }, []);
+    
+      const handlePressOpenButton = () => {
+       
+        Zendesk.openMessagingView();
+      };
+    
 
     return (
         <View style={styles.support}>
@@ -239,7 +260,8 @@ const Support = () => {
                                             <View style={styles.frameParent}>
                                                 <Pressable style={styles.headingAndToggle}
                                                 onPress={()=>{
-                                                    navigation.navigate('LiveChatTicketSupport') 
+                                                   // navigation.navigate('LiveChatTicketSupport') 
+                                                   handlePressOpenButton()
                                                 }}
                                                 >
                                                     <Text style={[styles.supportingText, styles.headingTypo1]}>

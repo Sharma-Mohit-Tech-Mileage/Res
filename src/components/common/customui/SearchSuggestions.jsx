@@ -9,6 +9,7 @@ import {
     Image,
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../../GlobalStyles';
+import { widthPercentageToDP as wp,} from 'react-native-responsive-screen';
 const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,navigation }) => {
     const inputRef = useRef(null);
     const [input, setInput] = useState('');
@@ -58,7 +59,7 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
         </View>
         <FlatList
             data={suggestions}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(item, index) => item.id.toString()}
             renderItem={renderSuggestion}
         />
         </View>
@@ -131,7 +132,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: Color.sparklightGray, // Sparklight Dark Gray from the design
         backgroundColor: '#F8F8F8', // Hex color from the design
-        height: 53, // Height from the design
+        
     },
     iconStyle: {
         // Styles for the icons
@@ -145,7 +146,8 @@ const styles = StyleSheet.create({
         fontSize: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,
         color: Color.colorMidnightblue,
-        width:'90%'
+        flexWrap:'wrap',
+        maxWidth:wp('90%')
          // Spark Light Purple from the design
     },
     overlayStyle: {
