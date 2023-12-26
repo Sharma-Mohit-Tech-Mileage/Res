@@ -82,7 +82,6 @@ const PushNotifications = ({ navigation }) => {
             console.log('enableNotifications: ', data);
             console.log('enableNotifications navigation: ', navigation);
             await dispatch(updatePushNotifications(data, navigation));
-            //navigation.navigate("EntryTextNotifications");
         } else {
             navigation.navigate("EntryTextNotifications");
         }
