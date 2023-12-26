@@ -10,8 +10,10 @@ import PhoneRingingIcon from "../../res/svgIcons/PhoneRingingIcon";
 import EntryInput from "./EntryInput";
 import CheckBox from '@react-native-community/checkbox';
 import { useSelector, useDispatch } from 'react-redux';
+import { updateTextNotification } from '../../redux/actions/ProfileActionSuite';
 
 const TextNotifications = ({ navigation }) => {
+    const dispatch = useDispatch();
     const [input, setInput] = useState('');
     const [toggleCheckBox, setToggleCheckBox] = useState(false);
     const [enableButton, setEnableButton] = useState(false);
@@ -34,6 +36,20 @@ const TextNotifications = ({ navigation }) => {
     const keyboardDismiss = () => {
         Keyboard.dismiss();
     }; 
+
+    const enableTextNotifications = () => {
+        const data = {
+            accountNumber: user.userInfo.accountNumber, 
+            billingOptOutStatus: false, 
+            optOut: false, 
+            outageOptOut: false, 
+            phoneNumber: input
+        }
+        console.log('enableTextNotifications: ', data);
+        //{"accountNumber": "900690538", "billingOptOutStatus": false, "optOut": false, "outageOptOut": false, "phoneNumber": ""}
+        dispatch(updateTextNotification(data, null));
+        navigation.navigate("EntryEmailNotifications");
+    };
 
     const terms = [
         {
@@ -106,7 +122,7 @@ const TextNotifications = ({ navigation }) => {
                         <Pressable
                             disabled={!enableButton}
                             style={enableButton ? [styles.button, styles.buttonsLayout] : [styles.button, styles.buttonsLayout, styles.buttonDisabled]}
-                            onPress={() => navigation.navigate("EmailNotifications")}
+                            onPress={enableTextNotifications}
                         >
                             <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]}>Enable Text Notifications</Text>
                         </Pressable>                
@@ -114,7 +130,7 @@ const TextNotifications = ({ navigation }) => {
                             accessibilityLabel="Buttons Section">
                             <Pressable
                                 style={[styles.buttonDecline, styles.buttonsLayout]}
-                                onPress={() => navigation.navigate("EmailNotifications")}
+                                onPress={() => navigation.navigate("EntryEmailNotifications")}
                                 accessibilityLabel="Decline Button"
                                 accessibilityRole="button"
                                 accessibilityHint="Decline Terms and Conditions"

@@ -75,7 +75,6 @@ const SplashScreen = ({ navigation }) => {
 
       const data = await getFirstTime();
 
-      // if (true) {
       if (data !== null 
         && data.accountNumber === userInfo.accountNumber) {
           if (userInfo.accountNumber === "900690538") {
@@ -102,7 +101,7 @@ const SplashScreen = ({ navigation }) => {
         });     
 
         if (user.userInfo.mobileTCAcceptanceFlag) {
-          navigation.navigate("PushNotifications");
+          navigation.navigate("EntryPushNotifications");
         } else {
           navigation.navigate("Terms");
         }

@@ -20,6 +20,7 @@ const EntryInput = ({ input, placeholder, onChangeText, iconImage, keyboardType 
                 style={[styles.searchIcon, styles.leftIcon]}
             />
             <TextInput
+                autoCapitalize="none"
                 ref={inputRef}
                 style={styles.searchInput}
                 placeholder={placeholder}

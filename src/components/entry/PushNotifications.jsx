@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable } from "react-native";
+import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Platform } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
@@ -14,11 +14,14 @@ import {
 } from '../../firebase/FirebaseUtils';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchSMSSelection, fetchBillingStatus } from '../../redux/actions/ProfileActionSuite';
+import moment from 'moment';
+import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
 
 const PushNotifications = ({ navigation }) => {
     const [generatedToken, setGeneratedToken] = useState();
     const dispatch = useDispatch();
     const profile = useSelector(state => state.combinedReducers.profile || {});
+    const user = useSelector(state => state.combinedReducers.user.userData);
 
     console.log('profile: ', profile);
 
@@ -66,9 +69,22 @@ const PushNotifications = ({ navigation }) => {
             if (token) {
                 setGeneratedToken(token);
             }
-            navigation.navigate("TextNotifications");
+            const data = {
+                accountNumber: user.userInfo.accountNumber,
+                deviceToken: token,
+                deviceTokenTimestamp: moment().format(),
+                optOut: false,
+                outageOptOut: false,
+                billingOptOutStatus: false,
+                userName: user.userInfo.userName,
+                isAndroid: Platform.OS == "android",
+            };
+            console.log('enableNotifications: ', data);
+            console.log('enableNotifications navigation: ', navigation);
+            await dispatch(updatePushNotifications(data, navigation));
+            //navigation.navigate("EntryTextNotifications");
         } else {
-            navigation.navigate("TextNotifications");
+            navigation.navigate("EntryTextNotifications");
         }
         
         //void fetchToken();
@@ -103,10 +119,7 @@ const PushNotifications = ({ navigation }) => {
                         </View>         
                         <View style={styles.subHeader}>
                             <Text style={styles.subHeaderText}>Receive app alerts related to your account, updates and more from Sparklight.</Text>
-                        </View>   
-                        <View style={styles.subHeader}>
-                            <Text style={styles.subHeaderText}>{generatedToken}</Text>
-                        </View>                           
+                        </View>                         
                     </View>            
                 </View>
                 <View style={styles.bottomBar}>
@@ -120,7 +133,7 @@ const PushNotifications = ({ navigation }) => {
                         accessibilityLabel="Buttons Section">
                         <Pressable
                             style={[styles.buttonDecline, styles.buttonsLayout]}
-                            onPress={() => navigation.navigate("TextNotifications")}
+                            onPress={() => navigation.navigate("EntryTextNotifications")}
                             accessibilityLabel="Decline Button"
                             accessibilityRole="button"
                             accessibilityHint="Decline Terms and Conditions"

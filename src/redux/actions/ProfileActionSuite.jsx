@@ -6,7 +6,8 @@ import {
     UPDATE_TEXT_NOTIFICATION, SAVE_EMIAL_SELECTION,
     FETCH_EMIAL_SELECTION, SAVE_PAPERLESS_DETAILS,
     FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION,
-    UPDATE_TERMS_AND_CONDITIONS
+    UPDATE_TERMS_AND_CONDITIONS,
+    UPDATE_PUSH_NOTIFICATIONS
 } from '../constants';
 export const fetchProfileSuccess = (response) => {
     return {
@@ -103,6 +104,12 @@ export const updateEmailNotification = (data, navigation) => ({
 
 export const updateTermsAndConditions = (data, navigation) => ({
     type: UPDATE_TERMS_AND_CONDITIONS,
+    payload: data,
+    navigation,
+});
+
+export const updatePushNotifications = (data, navigation) => ({
+    type: UPDATE_PUSH_NOTIFICATIONS,
     payload: data,
     navigation,
 });

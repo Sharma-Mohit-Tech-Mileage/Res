@@ -9,12 +9,12 @@ import BellIcon from "../../res/svgIcons/bellIcon";
 import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
 import EntryInput from "./EntryInput";
 import { useSelector, useDispatch } from 'react-redux';
+import { updateEmailNotification } from '../../redux/actions/ProfileActionSuite';
 
 const EmailNotifications = ({ navigation }) => {
+    const dispatch = useDispatch();
     const [input, setInput] = useState('');
     const user = useSelector(state => state.combinedReducers.user.userData);
-
-    console.log('EmailNotifications: ', user);
 
     const onChangeText = (text) => {
         setInput(text);
@@ -22,8 +22,18 @@ const EmailNotifications = ({ navigation }) => {
 
     const keyboardDismiss = () => {
         Keyboard.dismiss();
-    };     
+    };
 
+    const enableEmailNotifications = () => {
+        console.log('enableEmailNotifications');
+        dispatch(updateEmailNotification(input, null));
+        navigation.navigate("MyTab", {
+            fname: user.userInfo.firstName,
+            lname: user.userInfo.lastName,
+        });
+    };
+        
+    
     const terms = [
         {
             title: 'Title',
@@ -82,12 +92,7 @@ const EmailNotifications = ({ navigation }) => {
                     <View style={styles.bottomBar}>
                         <Pressable
                             style={[styles.button, styles.buttonsLayout]}
-                            onPress={() => {
-                                navigation.navigate("MyTab", {
-                                    fname: user.userInfo.firstName,
-                                    lname: user.userInfo.lastName,
-                                });
-                            }}
+                            onPress={enableEmailNotifications}
                         >
                             <Text style={styles.accept}>Enable Email Notifications</Text>
                         </Pressable>                
@@ -95,7 +100,12 @@ const EmailNotifications = ({ navigation }) => {
                             accessibilityLabel="Buttons Section">
                             <Pressable
                                 style={[styles.buttonDecline, styles.buttonsLayout]}
-                                onPress={() => Alert.alert('Email Skip')}
+                                onPress={() => {
+                                    navigation.navigate("MyTab", {
+                                        fname: user.userInfo.firstName,
+                                        lname: user.userInfo.lastName,
+                                    });
+                                }}
                                 accessibilityLabel="Decline Button"
                                 accessibilityRole="button"
                                 accessibilityHint="Decline Terms and Conditions"
