@@ -21,6 +21,7 @@ const ProfileSettings = () => {
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || '');
   const normalizedRole = convertedRole?.replace(/\s+/g, '').toLowerCase() || '';
   const boxBackground = BOX_COLORS[normalizedRole] || Color.colorWhitesmoke_200;
+  const emailAlertNeeded = !profileDetails.svEmailAddress || profileDetails.multipleEmails;
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
@@ -114,16 +115,19 @@ const ProfileSettings = () => {
                   Contact Information
                 </Text>
               </View>
-              {!profileDetails.svEmailAddress && (
-                <View style={styles.notificationsWrapper}>
+              <View style={styles.notificationsWrapper}>
+                {emailAlertNeeded && (
                   <NotificationAlert
-                    type="warning" // "info", "success", "warning"
-                    title="No Email on file"
-                    showCloseIcon={true}
-                    message="Please update your email."
+                    type={"warning"}
+                    title={profileDetails.multipleEmails ? "Multiple Emails Associated" : "No Email on file"}
+                    showCloseIcon={false}
+                    message={
+                      profileDetails.multipleEmails ? "This account has multiple email addresses associated with it. Please update your email."
+                        : "Please update your email."
+                    }
                   />
-                </View>
-              )}
+                )}
+              </View>
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Email</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>

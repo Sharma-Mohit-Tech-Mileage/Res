@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Image, StyleSheet, Text, Pressable, View, SafeAreaView, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
@@ -9,7 +9,6 @@ import { executeUserList } from '../../redux/actions/ProfileActionSuite'
 
 const UserManagement = () => {
   const navigation = useNavigation();
-
   const dispatch = useDispatch();
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const userList = profile.userList || []; // Defaulting to an empty array if userList is undefined

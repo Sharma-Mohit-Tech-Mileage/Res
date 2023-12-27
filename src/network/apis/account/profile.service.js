@@ -1,4 +1,4 @@
-import { _axios } from "../../RestApiClient";
+import { _axios, _axios_cableone } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 
 const getProfileDetails = async () => {
@@ -161,6 +161,57 @@ const postEmailNotification = async (email) => {
     }
 };
 
+const unsubscribPaperLess = async () => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+
+    // Log the request endpoint and data
+    console.log(`Making API Call to /account/api/account/${accountNumber}/paperless/ with accountNumber:`, accountNumber);
+
+    try {
+        const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/unsubscribe`, {}, config);
+
+        // Log the successful response
+        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless/unsubscribe, Response:`, response);
+        return response;
+    } catch (error) {
+        // Log the error with a descriptive message
+        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless/unsubscribe:`, error);
+        throw error;
+    }
+};
+
+const postTermsAndConditions = async (flag) => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const userName = user.userInfo?.userName || null;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+
+    // Log the request endpoint and data
+    console.log(`Making API Call to /mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}:`);
+
+    try {
+        const response = await _axios_cableone.put(`/mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}`, {}, config);
+
+        // Log the successful response
+        console.log(`API Call Successful to /mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}, Response:`, response);
+        return response;
+    } catch (error) {
+        // Log the error with a descriptive message
+        console.error(`Error in API Call to /mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}:`, error);
+        throw error;
+    }
+};
 
 
-export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, postEmailNotification }
+
+export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, postEmailNotification, postTermsAndConditions, unsubscribPaperLess }

@@ -1,9 +1,9 @@
 import axios from 'axios';
-const BASE_URL_AUTH="https://customer.uat.cableone.net/apiWrapper/"
+const BASE_URL_CABLEONE="https://customer.uat.cableone.net/apiWrapper/"
 const BASE_URL="https://customer.uat.sparklight.com/apiWrapper/"
 
 const _axios_auth = axios.create({
-    baseURL: BASE_URL_AUTH,
+    baseURL: BASE_URL_CABLEONE,
     timeout: 15000,
     headers: {
         'Content-Type': 'application/json',
@@ -22,6 +22,20 @@ const _axios = axios.create({
         
     }
 });
+
+const _axios_cableone = axios.create({
+    baseURL: BASE_URL_CABLEONE,
+    withCredentials: false,
+    crossDomain: true,
+    timeout: 10000,
+    headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        
+    }
+});
+
+//https://customer.uat.cableone.net/apiWrapper/mobile/api/mobileuser/900690538/updatemobiletcacceptanceflag/900690538/true
 
 
 // /**
@@ -88,4 +102,4 @@ const _axios = axios.create({
 
 
 
-export  {_axios,_axios_auth};
+export  {_axios, _axios_auth, _axios_cableone};

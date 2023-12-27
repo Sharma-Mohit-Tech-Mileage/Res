@@ -6,7 +6,7 @@ import Toggle from '../common/Toggle';
 import { useDispatch } from 'react-redux';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { updateEmailNotification } from '../../redux/actions/ProfileActionSuite'
+import { updateEmailNotification, unsubscribePaperless } from '../../redux/actions/ProfileActionSuite'
 const EmailNotifications = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [initialize, setInitializeSettings] = useState({});
@@ -17,6 +17,7 @@ const EmailNotifications = () => {
   const scrollViewRef = useRef(null);
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
+    console.log('paperlessdata',e)
     setInitializeSettings(paperlessdata => {
       const updatedSettings = {
         ...paperlessdata,
@@ -39,8 +40,15 @@ const EmailNotifications = () => {
   }, [route.params?.updateFailed, navigation, dispatch]);
 
   const handleSave = () => {
-    dispatch(updateEmailNotification(initialize.email, navigation));
+    if (initialize.status) {
+      // If toggle is true/on, call updateEmailNotification
+      dispatch(updateEmailNotification(initialize.email, navigation));
+    } else {
+      // If toggle is false/off, call unsubscribePaperless
+      dispatch(unsubscribePaperless(navigation));
+    }
   };
+
 
   return (
     <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>

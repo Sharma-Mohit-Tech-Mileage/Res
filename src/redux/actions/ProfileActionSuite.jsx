@@ -5,7 +5,8 @@ import {
     UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SECURITY,
     UPDATE_TEXT_NOTIFICATION, SAVE_EMIAL_SELECTION,
     FETCH_EMIAL_SELECTION, SAVE_PAPERLESS_DETAILS,
-    FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION
+    FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION,
+    UPDATE_TERMS_AND_CONDITIONS, UNSUBSCRIBE_PAPERLESS
 } from '../constants';
 export const fetchProfileSuccess = (response) => {
     return {
@@ -16,6 +17,12 @@ export const fetchProfileSuccess = (response) => {
 export const fetchProfileDetails = () => {
     return {
         type: FETCH_PROFILE_DETAILS
+    };
+};
+export const unsubscribePaperless = (navigation) => {
+    return {
+        type: UNSUBSCRIBE_PAPERLESS,
+        navigation
     };
 };
 export const fetchUserListSuccess = (response) => {
@@ -50,6 +57,7 @@ export const fetchBillingPaper = () => {
         type: FETCH_PAPERLESS
     };
 };
+
 // Action creator for saving the SMS selection
 export const saveSMSSelection = (data) => {
     return {
@@ -57,6 +65,7 @@ export const saveSMSSelection = (data) => {
         payload: data
     };
 };
+
 // Action creator for saving the SMS selection
 export const saveEmailBillings = (data) => {
     return {
@@ -64,12 +73,14 @@ export const saveEmailBillings = (data) => {
         payload: data
     };
 };
+
 export const savePaperlessDetails = (data) => {
     return {
         type: SAVE_PAPERLESS_DETAILS,
         payload: data
     };
 };
+
 // Action creator
 export const updateProfileRequest = (data, smsPayload, navigation) => ({
     type: UPDATE_PROFILE_REQUEST,
@@ -77,20 +88,28 @@ export const updateProfileRequest = (data, smsPayload, navigation) => ({
     smsPayload: smsPayload,
     navigation,
 });
+
 // Action creator
 export const updateProfileSecurity = (data, navigation) => ({
     type: UPDATE_PROFILE_SECURITY,
     payload: data,
     navigation,
 });
+
 export const updateTextNotification = (data, navigation) => ({
     type: UPDATE_TEXT_NOTIFICATION,
     payload: data,
     navigation,
 });
+
 export const updateEmailNotification = (data, navigation) => ({
     type: UPDATE_EMAIL_NOTIFICATION,
     payload: data,
     navigation,
 });
 
+export const updateTermsAndConditions = (data, navigation) => ({
+    type: UPDATE_TERMS_AND_CONDITIONS,
+    payload: data,
+    navigation,
+});

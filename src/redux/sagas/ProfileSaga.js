@@ -3,14 +3,16 @@ import {
     getProfileDetails, fetchUserList,
     fetchSmsSubscription, fetchBillingStatus,
     postProfileInfo, postTextNotifictionInfo,
-    fetchPaperLessDetails, postEmailNotification
+    fetchPaperLessDetails, postEmailNotification,
+    postTermsAndConditions, unsubscribPaperLess
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
     FETCH_SMS_SELECTION, UPDATE_PROFILE_REQUEST,
     UPDATE_PROFILE_SECURITY, UPDATE_TEXT_NOTIFICATION,
     FETCH_EMIAL_SELECTION, FETCH_PAPERLESS,
-    UPDATE_EMAIL_NOTIFICATION
+    UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS,
+    UNSUBSCRIBE_PAPERLESS
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
@@ -97,12 +99,36 @@ function* updateTextNotification(action) {
         action.navigation.navigate('TextNotifications', { updateFailed: true });
     }
 }
+
 function* updateEmailNotification(action) {
     try {
         const response = yield call(postEmailNotification, action.payload);
         action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Email' });
     } catch (error) {
         action.navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Email' });
+    }
+}
+
+function* unsubscribPaperLessSaga(action) {
+    try {
+        const response = yield call(unsubscribPaperLess, action.payload);
+        action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Email' });
+    } catch (error) {
+        action.navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Email' });
+    }
+}
+
+function* updateTermsAndConditions(action) {
+    console.log('updateTermsAndConditions: ', action);
+    try {
+        yield call(postTermsAndConditions, action.payload);
+        if (action.navigation !== null) {
+            action.navigation.navigate('PushNotifications');
+        }
+    } catch (error) {
+        if (action.navigation !== null) {
+            action.navigation.navigate('Terms', { updateFailed: true });
+        }
     }
 }
 
@@ -116,5 +142,8 @@ function* ProfileSagas() {
     yield takeLatest(UPDATE_PROFILE_SECURITY, updateProfileSecurity);
     yield takeLatest(UPDATE_TEXT_NOTIFICATION, updateTextNotification);
     yield takeLatest(UPDATE_EMAIL_NOTIFICATION, updateEmailNotification);
-}
+    yield takeLatest(UPDATE_TERMS_AND_CONDITIONS, updateTermsAndConditions);
+    yield takeLatest(UNSUBSCRIBE_PAPERLESS, unsubscribPaperLessSaga);
+} 
+
 export default ProfileSagas;

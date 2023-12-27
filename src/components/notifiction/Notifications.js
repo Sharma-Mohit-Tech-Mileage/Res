@@ -41,7 +41,6 @@ const Notifications = () => {
       setSuccessMessage(`${updatedType} settings have been updated successfully.`);
       setShowSuccessAlert(true);
       dispatch(fetchSMSSelection());
-
       // Reset the parameters
       navigation.setParams({ updateSuccess: undefined, updatedType: undefined });
     }
@@ -64,7 +63,9 @@ const Notifications = () => {
             showNotification={updatedSection === 'Text'}
             showSuccessAlert={showSuccessAlert}
             setShowSuccessAlert={() => setShowSuccessAlert(false)}
-            infoText={data.phoneNum ? `Text alerts are sent to ` : 'Go to profile settings to update your mobile No.'}
+            isDisabled={!data.phoneNum}
+            notificationsTitle="Mobile No is missing"
+            infoText={data.phoneNum ? `Text alerts are sent to ` : 'Please go to profile settings to update your mobile number.'}
             number={data.phoneNum}
             transformedData={data}
             navigationTarget="TextNotifications"
@@ -78,7 +79,9 @@ const Notifications = () => {
             showNotification={updatedSection === 'Email'}
             showSuccessAlert={showSuccessAlert}
             setShowSuccessAlert={() => setShowSuccessAlert(false)}
-            infoText={paperLessInfo.emailAddress ? `Emails are sent to ` : 'Go to profile settings to update your email.'}
+            isDisabled={!paperLessInfo.emailAddress}
+            notificationsTitle="Email is missing"
+            infoText={paperLessInfo.emailAddress ? `Emails are sent to ` : 'Please go to profile settings to update your email.'}
             email={paperLessInfo.emailAddress}
             navigationTarget="EmailNotifications"
             transformedData={{
@@ -97,6 +100,8 @@ const Notifications = () => {
             showNotification={updatedSection === 'App'}
             showSuccessAlert={showSuccessAlert}
             setShowSuccessAlert={() => setShowSuccessAlert(false)}
+            isDisabled={false}
+            notificationsTitle="Mobile No is missing"
             infoText="Notifications sent from your application."
             navigationTarget="InAppNotifications"
             additionalSettings={[
@@ -118,6 +123,8 @@ const NotificationSection = ({
   showNotification,
   showSuccessAlert,
   setShowSuccessAlert,
+  isDisabled,
+  notificationsTitle,
   infoText,
   number,
   transformedData,
@@ -134,51 +141,58 @@ const NotificationSection = ({
   return (
     <View style={[styles.frameParent2, styles.frameBorder]}>
       {showNotification && (
-        <View style={styles.infoWrapper}><NotificationAlert
+        <View style={styles.infoWrapper}>
+        <NotificationAlert
           type="success"
           title="Update Successful"
           message={successMessage}
           showCloseIcon={true}
           isVisible={showSuccessAlert}
           onClose={handleClose} // Using the passed function here
-        /></View>
+        />
+        </View>
       )}
       <View style={[styles.textNotificationsParent, styles.parentSpaceBlock]}>
         <Text style={styles.textNotifications}>{title}</Text>
         <Pressable
-          style={[styles.buttons, styles.buttonsBg]}
-          onPress={() => navigation.navigate(navigationTarget, { additionalData: transformedData })}
+          style={[styles.buttons, styles.buttonsBg, isDisabled && styles.disabledButton]}
+          onPress={() => isDisabled ? {} : navigation.navigate(navigationTarget, { additionalData: transformedData })}
           accessibilityRole="button"
           accessibilityLabel={`Edit ${title}`}
+          disabled={isDisabled}
         >
           <Text style={styles.makePayment}>Edit</Text>
         </Pressable>
       </View>
       <View style={styles.frameWrapper}>
-        <View style={styles.frameView}>
-          <View style={styles.infoCircleWrapper}>
-            <Image
-              style={styles.infoCircleIcon}
-              resizeMode="stretch"
-              source={require("../../../assets/infocircle.png")}
-              accessible={true}
-              accessibilityLabel="Information Icon"
-            />
-          </View>
-          <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
-            {infoText}
-            {number && (
-              <Text style={[styles.text]} accessibilityLabel={`Phone Number: ${number}`}>
-                {number}
-              </Text>
-            )}
-            {email && (
-              <Text style={styles.text} accessibilityLabel={`Email Address: ${email}`}>
-                {email}
-              </Text>
-            )}
-          </Text>
-        </View>
+        {isDisabled ? <NotificationAlert
+          type="warning"
+          title={notificationsTitle}
+          showCloseIcon={false}
+          message={infoText}
+        />
+          : <View style={styles.frameView}>
+            <View style={styles.infoCircleWrapper}>
+              <Image
+                style={styles.infoCircleIcon}
+                resizeMode="stretch"
+                source={require("../../../assets/infocircle.png")}
+              />
+            </View>
+            <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
+              {infoText}
+              {number && (
+                <Text style={[styles.text]} accessibilityLabel={`Phone Number: ${number}`}>
+                  {number}
+                </Text>
+              )}
+              {email && (
+                <Text style={styles.text} accessibilityLabel={`Email Address: ${email}`}>
+                  {email}
+                </Text>
+              )}
+            </Text>
+          </View>}
       </View>
       {additionalSettings.map((setting, index) => (
         <NotificationType key={index} type={setting.type} status={setting.status} />
@@ -363,6 +377,7 @@ const styles = StyleSheet.create({
   notifications: {
     backgroundColor: Color.colorWhitesmoke_200,
   },
+
 });
 
 export default Notifications;
