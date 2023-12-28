@@ -13,7 +13,7 @@ import {
   notificationListener,
 } from '../../firebase/FirebaseUtils';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchSMSSelection, fetchBillingStatus } from '../../redux/actions/ProfileActionSuite';
+import { fetchSMSSelection, fetchBillingStatus, fetchPushNotifications } from '../../redux/actions/ProfileActionSuite';
 import moment from 'moment';
 import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
 
@@ -23,7 +23,7 @@ const PushNotifications = ({ navigation }) => {
     const profile = useSelector(state => state.combinedReducers.profile || {});
     const user = useSelector(state => state.combinedReducers.user.userData);
 
-    console.log('profile: ', profile);
+    console.log('profile: ', JSON.stringify(profile));
 
     useEffect(() => {
         const fetchData = async () => {
@@ -31,6 +31,7 @@ const PushNotifications = ({ navigation }) => {
                 await dispatch(fetchBillingStatus());
                 // await dispatch(fetchBillingPaper());
                 await dispatch(fetchSMSSelection());
+                await dispatch(fetchPushNotifications());
             } catch (error) {
                 console.error("Error fetching data", error);
             }

@@ -5,10 +5,13 @@ import {
     UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SECURITY,
     UPDATE_TEXT_NOTIFICATION, SAVE_EMIAL_SELECTION,
     FETCH_EMIAL_SELECTION, SAVE_PAPERLESS_DETAILS,
-    FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION,
+    FETCH_PAPERLESS, FETCH_PUSH_NOTIFICATIONS,
+    SAVE_PUSH_NOTIFICATIONS,
+    UPDATE_EMAIL_NOTIFICATION,
     UPDATE_TERMS_AND_CONDITIONS,
     UPDATE_PUSH_NOTIFICATIONS
 } from '../constants';
+
 export const fetchProfileSuccess = (response) => {
     return {
         type: USER_PROFILE_DETAILS,
@@ -53,6 +56,13 @@ export const fetchBillingPaper = () => {
     };
 };
 
+// Action creator for fetching the SMS selection status
+export const fetchPushNotifications = () => {
+    return {
+        type: FETCH_PUSH_NOTIFICATIONS
+    };
+};
+
 // Action creator for saving the SMS selection
 export const saveSMSSelection = (data) => {
     return {
@@ -72,6 +82,13 @@ export const saveEmailBillings = (data) => {
 export const savePaperlessDetails = (data) => {
     return {
         type: SAVE_PAPERLESS_DETAILS,
+        payload: data
+    };
+};
+
+export const savePushNotifications = (data) => {
+    return {
+        type: SAVE_PUSH_NOTIFICATIONS,
         payload: data
     };
 };

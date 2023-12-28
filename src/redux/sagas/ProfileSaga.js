@@ -4,7 +4,8 @@ import {
     fetchSmsSubscription, fetchBillingStatus,
     postProfileInfo, postTextNotifictionInfo,
     fetchPaperLessDetails, postEmailNotification,
-    postTermsAndConditions, postPushNotifications
+    postTermsAndConditions, postPushNotifications,
+    fetchPushNotifications
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
@@ -12,12 +13,12 @@ import {
     UPDATE_PROFILE_SECURITY, UPDATE_TEXT_NOTIFICATION,
     FETCH_EMIAL_SELECTION, FETCH_PAPERLESS,
     UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS,
-    UPDATE_PUSH_NOTIFICATIONS
+    UPDATE_PUSH_NOTIFICATIONS, FETCH_PUSH_NOTIFICATIONS
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
     saveSMSSelection, saveEmailBillings,
-    savePaperlessDetails
+    savePaperlessDetails, savePushNotifications
 } from "../actions/ProfileActionSuite";
 
 function* getProfileUsers(action) {
@@ -61,6 +62,16 @@ function* fetchPaperlessDetails(action) {
     try {
         const paperlessDetailsResponse = yield call(fetchPaperLessDetails);
         yield put(savePaperlessDetails(paperlessDetailsResponse));
+    } catch (error) {
+        console.error('Fetch Paperless Details API Error:', error);
+        // Optionally, dispatch an action to handle this error state
+    }
+}
+
+function* getPushNotifications(action) {
+    try {
+        const response = yield call(fetchPushNotifications, action.payload);
+        yield put(savePushNotifications(response));
     } catch (error) {
         console.error('Fetch Paperless Details API Error:', error);
         // Optionally, dispatch an action to handle this error state
@@ -151,6 +162,7 @@ function* ProfileSagas() {
     yield takeLatest(FETCH_SMS_SELECTION, fetchSMSSubs);
     yield takeLatest(FETCH_EMIAL_SELECTION, fetchPaperlessBills);
     yield takeLatest(FETCH_PAPERLESS, fetchPaperlessDetails);
+    yield takeLatest(FETCH_PUSH_NOTIFICATIONS, getPushNotifications);
     yield takeLatest(UPDATE_PROFILE_REQUEST, updateProfile);
     yield takeLatest(UPDATE_PROFILE_SECURITY, updateProfileSecurity);
     yield takeLatest(UPDATE_TEXT_NOTIFICATION, updateTextNotification);

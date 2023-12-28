@@ -95,6 +95,33 @@ const fetchPaperLessDetails = async () => {
         });
 };
 
+const fetchPushNotifications = async () => {
+    let user = await getUser();
+    const userName = user.userInfo?.userName || null;
+    const config = {
+        headers: {
+            Authorization: "Bearer " + user.token
+        }
+    };
+
+    //https://customer.uat.cableone.net/apiWrapper/mobile/api/mobilenotificationpreferences/{UserName}/mobilepreferences
+
+    // Log the request endpoint and data
+    console.log(`Making API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`);    
+
+    try {
+        const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, { ...config });
+
+        // Log the successful response
+        console.log(`API Call Successful to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:`, response.data);
+        return response.data;
+    } catch (error) {
+        // Log the error with a descriptive message
+        console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, error);
+        throw error;
+    }
+};
+
 const postProfileInfo = async (data) => {
     let user = await getUser();
 
@@ -217,4 +244,4 @@ const postPushNotifications = async (data) => {
 
 
 
-export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, postEmailNotification, postTermsAndConditions, postPushNotifications }
+export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, postEmailNotification, postTermsAndConditions, postPushNotifications, fetchPushNotifications }
