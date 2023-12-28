@@ -56,7 +56,7 @@ const Support = () => {
         },
         {
             key: 'moreOptions',
-            text: 'More',
+            text: 'More ...',
             icon: require("../../../assets/chevronright.png"),
             iconAlignment: 'right', // Icon to the right of the text
             navigateTo: 'ArticalWindowUtility',
@@ -69,7 +69,7 @@ const Support = () => {
         ? 'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTYxNTQwMjg1MS56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUhKSkQyQ0VZUko5RUFNRVgxR1NHQlg2MC5qc29uIn0='
         : 'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTYxNTQwMjg1MS56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUhKSkM2QVNWNFNDTkZGVFdYRVFYNjJQNC5qc29uIn0=' })
           .then(() => {
-            Zendesk.clearConversationFields()
+            
           })
           .catch((error) =>{
     
@@ -248,7 +248,7 @@ const Support = () => {
                             </View>
                             <View style={styles.integrationCardMobileWrapper}>
                                 <View
-                                    style={[styles.integrationCardMobile, styles.integrationCardBorder]}>
+                                    style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
                                         <View style={styles.headingAndIcon}>
                                             <View style={[styles.icon]}>
@@ -277,7 +277,7 @@ const Support = () => {
                                     </View>
                                 </View>
                             </View>
-                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}>
+                            {/* <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}> 
                                 <Pressable
                                     style={[styles.integrationCardMobile1, styles.integrationCardBorder,]}
                                     onPress={() => { navigation.navigate('TicketSupport') }} >
@@ -307,6 +307,7 @@ const Support = () => {
                                     </View>
                                 </Pressable>
                             </View>
+                            */}
                             <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
                                 <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                     <View style={[styles.content, styles.contentSpaceBlock]}>

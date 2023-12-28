@@ -6,7 +6,7 @@ import 'react-native-url-polyfill/auto';
 import {AppRegistry} from 'react-native';
 import App from './App.js';
 import messaging from '@react-native-firebase/messaging';
-import OklaSpeedTest from './src/components/home/OklaSpeedTest.js';
+import ModemReboot from './src/components/support/ModemReboot.js';
 import {name as appName} from './app.json';
 
 // Register background handler

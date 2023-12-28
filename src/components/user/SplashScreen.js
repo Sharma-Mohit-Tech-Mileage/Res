@@ -24,7 +24,7 @@ import {
 } from "react-native-responsive-screen";
 import RNExitApp from "react-native-exit-app"
 import AlertIcon from "../../res/svgIcons/AlertIcon";
-import CloseIcon from "../../res/svgIcons/CloseIcon";
+import * as Zendesk from 'react-native-zendesk-messaging';
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 
@@ -64,7 +64,7 @@ const SplashScreen = ({ navigation }) => {
       if (token) {
         storeUser(user);
       }
-
+      Zendesk.login(token)
       if (userInfo.accountNumber === "900690538") {
         setErrorMessage(strings.nonAdminUserMsg);
         setTimeout(() => {
@@ -85,7 +85,7 @@ const SplashScreen = ({ navigation }) => {
   };
 
   const onError = (error) => {
-    console.log(" callSSOLoginApi error", error);
+    console.log(" callSSOLoginApi error", JSON.stringify(error));
   };
 
   const CustomAlertModal = ({ visible, message, onClose }) => {
