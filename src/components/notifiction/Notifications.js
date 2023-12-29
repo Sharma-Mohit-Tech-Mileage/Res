@@ -20,6 +20,7 @@ const Notifications = () => {
   const profileDetails = profile.profileDetails || {};
   const paperLessInfo = profile.paperLessInfo || {};
   const transformedNotification = transformNotificationPreferences(profile.pushNotifications||{});
+  console.log(' Default structure for when data is missing or in an unexpected format 2', JSON.stringify(transformedNotification))
   const data = transformResponse(smsSubscription);
   const emailAddress = paperLessInfo.emailAddress || '';
   const emailStatus = paperLessInfo.emailStatus || 'Pending';
@@ -62,6 +63,7 @@ const Notifications = () => {
       setShowSuccessAlert(true);
       dispatch(fetchBillingPaper());
       dispatch(fetchSMSSelection());
+      dispatch(fetchPushNotifications());
       navigation.setParams({ updateSuccess: undefined, updatedType: undefined });
     }
   }, [route.params, navigation, dispatch]);

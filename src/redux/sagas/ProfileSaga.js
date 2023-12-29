@@ -14,7 +14,7 @@ import {
     FETCH_EMIAL_SELECTION, FETCH_PAPERLESS,
     UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS,
     UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS,
-    FETCH_PUSH_NOTIFICATIONS
+    FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
@@ -165,6 +165,19 @@ function* updatePushNotifications(action) {
         }
     }
 }
+function* updatePushNotificationsV2(action) {
+    console.log('updatePushNotification v2 paayload==========================================: ', action.payload);
+    try {
+        yield call(postPushNotifications, action.payload);
+        if (action.navigation !== null) {
+            action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'App' });
+        }
+    } catch (error) {
+        if (action.navigation !== null) {
+            action.navigation.navigate('InAppNotifications', { updateFailed: true, updatedType: 'App' });
+        }
+    }
+}
 
 function* ProfileSagas() {
     yield takeLatest(FETCH_PROFILE_DETAILS, fetchProfileDetails);
@@ -179,6 +192,7 @@ function* ProfileSagas() {
     yield takeLatest(UPDATE_EMAIL_NOTIFICATION, updateEmailNotification);
     yield takeLatest(UPDATE_TERMS_AND_CONDITIONS, updateTermsAndConditions);
     yield takeLatest(UPDATE_PUSH_NOTIFICATIONS, updatePushNotifications);
+    yield takeLatest(UPDATE_PUSH_NOTIFICATIONS_V2, updatePushNotificationsV2);
     yield takeLatest(UNSUBSCRIBE_PAPERLESS, unsubscribPaperLessSaga);
 }
 export default ProfileSagas;

@@ -167,54 +167,55 @@ export const getRoleBasedMessage = (input) => {
 };
 
 export const transformNotificationPreferences = (response) => {
-    // Default structure for when data is missing or in an unexpected format
+   // console.log('Default structure for when data is missing or in an unexpected format', JSON.stringify(response));
     const defaultStructure = [
         { type: 'Appointments', status: 'Off' },
         { type: 'Outage', status: 'Off' },
         { type: 'Billing', status: 'Off' }
     ];
 
-    // Check if response or pushMessageType array is undefined
-    if (!response || !Array.isArray(response.pushMessageType)) {
+    if (!response || !Array.isArray(response) || response.length === 0) {
         return defaultStructure;
     }
 
-    // Convert and map data to desired structure
-    return response.pushMessageType.map(item => {
-        // Mapping messageType to a more readable format
+    const pushMessageTypeArray = response[0].pushMessageType;
+    if (!pushMessageTypeArray || !Array.isArray(pushMessageTypeArray)) {
+        return defaultStructure;
+    }
+
+    return pushMessageTypeArray.map(item => {
         const typeMapping = {
-            'Appointment': 'Appointments',
-            'Outage': 'Outage',
-            'Billing': 'Billing'
+            'appointment': 'Appointments',
+            'outage': 'Outage',
+            'billing': 'Billing'
         };
 
-        // Convert messageType and determine status based on optOutFlag
-        const type = typeMapping[item.messageType] || 'Unknown';
+        const messageTypeLower = item.messageType.toLowerCase();
+        const type = typeMapping[messageTypeLower] || 'Unknown';
         const status = item.optOutFlag ? 'Off' : 'On';
 
         return { type, status };
     });
 };
 
+
+
 export const transformToUserPreferences = (data) => {
-    // Check if data is undefined or not an array
+    console.log('Data is undefined or not an array, returning default transformToUserPreferences=======================', data);
     if (!Array.isArray(data)) {
-        console.log('Data is undefined or not an array, returning default values');
+       
         return {
             accountNumber: '',
             deviceToken: '',
             deviceTokenTimestamp: '',
-            optOut: false, // Default value
-            outageOptOut: false, // Default value
-            billingOptOutStatus: false, // Default value
+            optOut: true, // Default value
+            outageOptOut: true, // Default value
+            billingOptOutStatus: true, // Default value
             userName: '',
             isAndroid: ''
         };
     }
 
-    console.log('Data is valid, proceeding with transformation');
-
-    // Initialize with default values
     const transformedData = {
         accountNumber: '',
         deviceToken: '',
@@ -226,7 +227,6 @@ export const transformToUserPreferences = (data) => {
         isAndroid: ''
     };
 
-    // Update values based on the data array
     data.forEach(item => {
         const itemType = item.type.toLowerCase();
         const itemStatus = item.status.toLowerCase();
@@ -246,7 +246,7 @@ export const transformToUserPreferences = (data) => {
                 break;
         }
     });
-    console.log('Update values based on the data array', transformedData)
+    console.log('final Update values based on the data array-------------------------', transformedData)
     return transformedData;
 };
 
