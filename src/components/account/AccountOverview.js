@@ -15,7 +15,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
 import { cleanUserData } from "../../redux/utils/LocalStorage";
-import RNExitApp from 'react-native-exit-app';
+import * as Zendesk from 'react-native-zendesk-messaging';
 
 const config = {
   issuer: 'https://login.uat.cableone.net/auth/realms/external-sso-realm',
@@ -35,21 +35,13 @@ const logoutConfirmationPopuo=(navigation)=>{
         text: 'Logout',
         onPress: () => {
           cleanUserData();
+          Zendesk.logout()
           navigation.reset({
             index: 0,
             routes: [{ name: 'Splash' }]}) 
           // let re = getSsoToken().then((res) => {
           // let token=res.idToken;
-          // console.log('Logout',token)
-          // logout(config, {
-          //   idToken:token,
-          //   postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
-          // }).then((result)=>{
-            
-              
-          //     //navigation.navigate('Splash')
-          // })
-            
+          // console.log('Logout',token) 
           // });
         },
       },
@@ -103,7 +95,6 @@ const AccountOverview = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       const data = await getUser();
-      console.log("UserData", data);
       if (data) {
         // Extracting fullName and initials
         const firstName = data.userInfo?.firstName || '';
