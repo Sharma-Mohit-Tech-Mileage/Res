@@ -21,6 +21,7 @@ const ProfileSettings = () => {
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || '');
   const normalizedRole = convertedRole?.replace(/\s+/g, '').toLowerCase() || '';
   const boxBackground = BOX_COLORS[normalizedRole] || Color.colorWhitesmoke_200;
+  const emailAlertNeeded = !profileDetails.svEmailAddress || profileDetails.multipleEmails;
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
@@ -114,22 +115,34 @@ const ProfileSettings = () => {
                   Contact Information
                 </Text>
               </View>
-              {!profileDetails.svEmailAddress && (
+              {emailAlertNeeded && (
                 <View style={styles.notificationsWrapper}>
                   <NotificationAlert
-                    type="warning" // "info", "success", "warning"
-                    title="No Email on file"
-                    showCloseIcon={true}
-                    message="Please update your email."
-                  />
-                </View>
+                    type={"warning"}
+                    title={profileDetails.multipleEmails ? "There is a problem retrieving your email address" : "No email address on file"}
+                    showCloseIcon={false}
+                    message={
+                      profileDetails.multipleEmails ? "We are not able to retrieve the email address for your account. Please contact us for assistance"
+                        : "We don't have your email address on file. Please add your email."
+                    }
+                  /></View>
               )}
+
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Email</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
                   {profileDetails.svEmailAddress}
                 </Text>
               </View>
+              {!smsPayload.phoneNumber && (
+                <View style={styles.notificationsWrapper}>
+                  <NotificationAlert
+                    type={"warning"}
+                    title={"No mobile phone number on file"}
+                    showCloseIcon={false}
+                    message={"We don't have your phone number on file. Please add your phone number"}
+                  /></View>
+              )}
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Mobile Phone</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>

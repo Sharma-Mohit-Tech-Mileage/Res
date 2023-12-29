@@ -242,6 +242,31 @@ const postPushNotifications = async (data) => {
     }
 };
 
+const unsubscribPaperLess = async () => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+
+    // Log the request endpoint and data
+    console.log(`Making API Call to /account/api/account/${accountNumber}/paperless/ with accountNumber:`, accountNumber);
+
+    try {
+        const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/unsubscribe`, {}, config);
+
+        // Log the successful response
+        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless/unsubscribe, Response:`, response);
+        return response;
+    } catch (error) {
+        // Log the error with a descriptive message
+        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless/unsubscribe:`, error);
+        throw error;
+    }
+};
 
 
-export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, postEmailNotification, postTermsAndConditions, postPushNotifications, fetchPushNotifications }
+
+export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications }
