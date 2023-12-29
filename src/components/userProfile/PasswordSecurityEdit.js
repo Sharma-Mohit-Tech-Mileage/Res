@@ -84,7 +84,8 @@ const PasswordSecurityEdit = () => {
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
             <View style={[styles.frameGroup, styles.wrapperSpaceBlock1]}>
-              <View style={styles.infoWrapper}><NotificationAlert
+              <View style={styles.infoWrapper}>
+              <NotificationAlert
                 type="error"
                 title="Failed"
                 message="Password and security update failed."
@@ -298,7 +299,7 @@ const styles = StyleSheet.create({
   bullet: {
     width: 7,
     height: 7,
-    borderRadius: 5,
+    borderRadius: 3.5,
     marginRight: 10, 
   },
   firstName: {

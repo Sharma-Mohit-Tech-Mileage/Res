@@ -5,7 +5,7 @@ import {
     postProfileInfo, postTextNotifictionInfo,
     fetchPaperLessDetails, postEmailNotification,
     postTermsAndConditions, postPushNotifications,
-    fetchPushNotifications
+    unsubscribPaperLess, fetchPushNotifications
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
@@ -13,7 +13,8 @@ import {
     UPDATE_PROFILE_SECURITY, UPDATE_TEXT_NOTIFICATION,
     FETCH_EMIAL_SELECTION, FETCH_PAPERLESS,
     UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS,
-    UPDATE_PUSH_NOTIFICATIONS, FETCH_PUSH_NOTIFICATIONS
+    UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS,
+    FETCH_PUSH_NOTIFICATIONS
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
@@ -142,6 +143,15 @@ function* updateTermsAndConditions(action) {
     }
 }
 
+function* unsubscribPaperLessSaga(action) {
+    try {
+        const response = yield call(unsubscribPaperLess, action.payload);
+        action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Email' });
+    } catch (error) {
+        action.navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Email' });
+    }
+}
+
 function* updatePushNotifications(action) {
     console.log('updatePushNotification: ', action);
     try {
@@ -168,6 +178,7 @@ function* ProfileSagas() {
     yield takeLatest(UPDATE_TEXT_NOTIFICATION, updateTextNotification);
     yield takeLatest(UPDATE_EMAIL_NOTIFICATION, updateEmailNotification);
     yield takeLatest(UPDATE_TERMS_AND_CONDITIONS, updateTermsAndConditions);
-    yield takeLatest(UPDATE_PUSH_NOTIFICATIONS, updatePushNotifications);     
+    yield takeLatest(UPDATE_PUSH_NOTIFICATIONS, updatePushNotifications);
+    yield takeLatest(UNSUBSCRIBE_PAPERLESS, unsubscribPaperLessSaga);
 }
 export default ProfileSagas;

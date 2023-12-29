@@ -6,7 +6,12 @@ export const ROLE_COLORS = {
 };
 export const BOX_COLORS = {
     primaryadmin: Color.success50,
-    admin: Color.success50,
+    admin: Color.colorWhitesmoke_200,
+    viewonly: Color.colorWhitesmoke_200,
+};
+export const BORDER_COLORS = {
+    primaryadmin: Color.colorAquamarine,
+    admin: Color.colorWhitesmoke_200,
     viewonly: Color.colorWhitesmoke_200,
 };
 export const validatePassword = (newPassword, userName) => {
@@ -160,5 +165,91 @@ export const getRoleBasedMessage = (input) => {
     // Return the corresponding value from the mapping or an empty string if not found
     return mapping[inputLower] || '';
 };
+
+export const transformNotificationPreferences = (response) => {
+    // Default structure for when data is missing or in an unexpected format
+    const defaultStructure = [
+        { type: 'Appointments', status: 'Off' },
+        { type: 'Outage', status: 'Off' },
+        { type: 'Billing', status: 'Off' }
+    ];
+
+    // Check if response or pushMessageType array is undefined
+    if (!response || !Array.isArray(response.pushMessageType)) {
+        return defaultStructure;
+    }
+
+    // Convert and map data to desired structure
+    return response.pushMessageType.map(item => {
+        // Mapping messageType to a more readable format
+        const typeMapping = {
+            'Appointment': 'Appointments',
+            'Outage': 'Outage',
+            'Billing': 'Billing'
+        };
+
+        // Convert messageType and determine status based on optOutFlag
+        const type = typeMapping[item.messageType] || 'Unknown';
+        const status = item.optOutFlag ? 'Off' : 'On';
+
+        return { type, status };
+    });
+};
+
+export const transformToUserPreferences = (data) => {
+    // Check if data is undefined or not an array
+    if (!Array.isArray(data)) {
+        console.log('Data is undefined or not an array, returning default values');
+        return {
+            accountNumber: '',
+            deviceToken: '',
+            deviceTokenTimestamp: '',
+            optOut: false, // Default value
+            outageOptOut: false, // Default value
+            billingOptOutStatus: false, // Default value
+            userName: '',
+            isAndroid: ''
+        };
+    }
+
+    console.log('Data is valid, proceeding with transformation');
+
+    // Initialize with default values
+    const transformedData = {
+        accountNumber: '',
+        deviceToken: '',
+        deviceTokenTimestamp: '',
+        optOut: true, // Default value
+        outageOptOut: true, // Default value
+        billingOptOutStatus: true, // Default value
+        userName: '',
+        isAndroid: ''
+    };
+
+    // Update values based on the data array
+    data.forEach(item => {
+        const itemType = item.type.toLowerCase();
+        const itemStatus = item.status.toLowerCase();
+
+        switch (itemType) {
+            case 'appointments':
+                transformedData.optOut = itemStatus === 'off';
+                break;
+            case 'outage':
+                transformedData.outageOptOut = itemStatus === 'off';
+                break;
+            case 'billing':
+                transformedData.billingOptOutStatus = itemStatus === 'off';
+                break;
+            default:
+                // Handle unexpected type or ignore
+                break;
+        }
+    });
+    console.log('Update values based on the data array', transformedData)
+    return transformedData;
+};
+
+
 
 
