@@ -1,5 +1,12 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, View, ScrollView } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import {
@@ -14,19 +21,29 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import colors from "../../res/Colors";
+import ModemInfo from "../../res/svgIcons/ModemInfo";
+import RightArrow from "../../res/svgIcons/RightArrow";
+import VideoIcon from "../../res/svgIcons/VideoIcon";
+import SparkLightButton from "../common/customui/SparkLightButton";
 
 const ModemReboot = () => {
-  // const navigation = useNavigation();
+   const navigation = useNavigation();
 
   return (
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
         title="Modem Reboot"
-        // onPressBack={() => navigation.navigate("support")}
+        onPressBack={() => navigation.navigate("support")}
       />
       <ScrollView>
-        <View style={[styles.card, styles.shadowProp]}>
-          <View style={{ flexDirection: "column" }}>
+        <View style={{ flexDirection: "column" }}>
+          <View
+            style={[
+              styles.card,
+              styles.shadowProp,
+              { flexDirection: "column" },
+            ]}
+          >
             <Text style={styles.rebootModemTxt}>Modem Reboot</Text>
             <Image
               style={styles.frameChild}
@@ -57,17 +74,67 @@ const ModemReboot = () => {
               </View>
             </View>
             <View
-              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
-            />
-
-               <View style={{flexDirection:'row'}}>
-                
-
-               </View>
-
-            <View
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}
             />
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginHorizontal: 20,
+                alignItems: "center",
+                paddingVertical: 15,
+              }}
+            >
+              <View style={{ flexDirection: "row", alignContent: "center" }}>
+                <ModemInfo />
+                <Text style={styles.modemInstruction}>
+                  Modem Reboot Instructions
+                </Text>
+              </View>
+              <RightArrow />
+            </View>
+
+            <View style={{ backgroundColor: "#F4F4F5", height: 1 }} />
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginHorizontal: 20,
+                alignItems: "center",
+                paddingVertical: 15,
+              }}
+            >
+              <View style={{ flexDirection: "row", alignContent: "center" }}>
+                <VideoIcon />
+                <Text style={styles.modemInstruction}>Modem Reboot Video</Text>
+              </View>
+              <RightArrow />
+            </View>
+
+            <View style={{ backgroundColor: "#F4F4F5", height: 1 }} />
+          </View>
+          <View style={{ marginTop: 20 }}>
+            <TouchableOpacity
+              style={styles.BtnContainer}
+              onPress={() => {
+                
+              }}
+            >
+              <Text style={styles.Btn}>Modem Reboot</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={{ marginTop: 20 }}>
+            <TouchableOpacity
+              style={[styles.BtnContainer,{backgroundColor:'#00000000'}]}
+              onPress={() => {
+                
+              }}
+            >
+              <Text style={[styles.Btn,{color:colors.sparklight_purple_blue}]}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -134,6 +201,25 @@ const styles = StyleSheet.create({
     borderColor: Color.sparklightGray,
     borderRadius: Border.br_11xs,
     borderWidth: 1,
+  },
+  modemInstruction: {
+    color: Color.colorGray_200,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 16,
+    fontStyle: "normal",
+    fontWeight: "400",
+    marginLeft: 10,
+  },
+  BtnContainer: {
+    backgroundColor: colors.sparklight_purple_blue,
+    justifyContent: "center",
+  },
+  Btn: {
+    color: colors.snow_white,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+    padding: 16,
+    fontSize: 16,
   },
 });
 
