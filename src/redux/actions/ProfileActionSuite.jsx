@@ -8,7 +8,7 @@ import {
     FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION,
     UPDATE_TERMS_AND_CONDITIONS, UNSUBSCRIBE_PAPERLESS,
     UPDATE_PUSH_NOTIFICATIONS, FETCH_PUSH_NOTIFICATIONS,
-    SAVE_PUSH_NOTIFICATIONS
+    SAVE_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2
 } from '../constants';
 export const fetchProfileSuccess = (response) => {
     return {
@@ -129,6 +129,11 @@ export const updateTermsAndConditions = (data, navigation) => ({
 
 export const updatePushNotifications = (data, navigation) => ({
     type: UPDATE_PUSH_NOTIFICATIONS,
+    payload: data,
+    navigation,
+});
+export const updatePushNotificationsv2 = (data, navigation) => ({
+    type: UPDATE_PUSH_NOTIFICATIONS_V2,
     payload: data,
     navigation,
 });

@@ -6,7 +6,7 @@ import { useRoute, useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector } from 'react-redux';
 import { transformToUserPreferences } from '../utility/constant';
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
+import { updatePushNotificationsv2 } from '../../redux/actions/ProfileActionSuite';
 import moment from 'moment';
 import Toggle from '../common/Toggle';
 import { getFcmToken, requestUserPermission } from '../../firebase/FirebaseUtils';
@@ -17,7 +17,6 @@ const InAppNotifications = ({ navigation }) => {
   const route = useRoute(); // Use the useRoute hook
   const additionalData = route.params?.additionalData;
   const dispatch = useDispatch();
-  const user = useSelector(state => state.combinedReducers.user.userData);
   const scrollViewRef = useRef(null);
   const isFocused = useIsFocused(); // Hook to determine if the screen is focused
 
@@ -63,18 +62,10 @@ const InAppNotifications = ({ navigation }) => {
       if (token) {
         setGeneratedToken(token);
       }
-      const data = {
-        accountNumber: user.userInfo.accountNumber,
-        deviceToken: token,
-        deviceTokenTimestamp: moment().format(),
-        optOut: false,
-        outageOptOut: false,
-        billingOptOutStatus: false,
-        userName: user.userInfo.userName,
-        isAndroid: Platform.OS === "android",
-      }
-      console.log('updatePushNotifications==============================', data);
-      await dispatch(updatePushNotifications(data, navigation));
+      initialize.deviceToken = token;  // Replace 'token' with your actual token variable
+      initialize.deviceTokenTimestamp = moment().format();  // Assuming 'moment' is imported and available
+      initialize.isAndroid = Platform.OS === "android"
+      await dispatch(updatePushNotificationsv2(initialize, navigation));
     };
 
   }
@@ -101,21 +92,21 @@ const InAppNotifications = ({ navigation }) => {
                 <NotificationSetting
                   title="Appointments"
                   name='optOut'
-                  initialValue={!initialize.optOut}
+                  value={!initialize.optOut}
                   description="Receive app notifications when your appointments have updates."
                   onChange={handleToggleChange}
                 />
                 <NotificationSetting
                   title="Outage Alerts"
                   name='outageOptOut'
-                  initialValue={!initialize.outageOptOut}
+                  value={!initialize.outageOptOut}
                   description="Receive app notifications when outages occur."
                   onChange={handleToggleChange}
                 />
                 <NotificationSetting
                   title="Billing"
                   name='billingOptOutStatus'
-                  initialValue={!initialize.billingOptOutStatus}
+                  value={!initialize.billingOptOutStatus}
                   description="Receive app notifications for billing."
                   onChange={handleToggleChange}
                 />
