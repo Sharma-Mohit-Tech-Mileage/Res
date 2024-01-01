@@ -17,7 +17,15 @@ const TextNotifications = ({ navigation }) => {
     const [input, setInput] = useState('');
     const [toggleCheckBox, setToggleCheckBox] = useState(false);
     const [enableButton, setEnableButton] = useState(false);
+    const [nextScreen, setNextScreen] = useState('EntryEmailNotifications');
     const user = useSelector(state => state.combinedReducers.user.userData);
+    const profile = useSelector(state => state.combinedReducers.profile || {});
+
+    useEffect(() => {
+        if (profile.paperlessStatus) {
+            setNextScreen('MyTab');                      
+        }
+    }, []); 
 
     useEffect(() => {
         setInput(user.phone);
@@ -25,12 +33,20 @@ const TextNotifications = ({ navigation }) => {
 
     const onChangeText = (text) => {
         setInput(text);
+        if (input.length > 0) {
+            setEnableButton(true);
+        } else {
+            setEnableButton(false);
+        }
     };   
 
     const onCheckBox = (value) => {
-        console.log('onCheckBox: ', value);
-        setEnableButton(value);
         setToggleCheckBox(value);
+        if (value && input.length > 0) {
+            setEnableButton(value);
+        } else {
+            setEnableButton(false);
+        }
     };  
     
     const keyboardDismiss = () => {
@@ -48,7 +64,7 @@ const TextNotifications = ({ navigation }) => {
         console.log('enableTextNotifications: ', data);
         //{"accountNumber": "900690538", "billingOptOutStatus": false, "optOut": false, "outageOptOut": false, "phoneNumber": ""}
         dispatch(updateTextNotification(data, null));
-        navigation.navigate("EntryEmailNotifications");
+        navigation.navigate(nextScreen);
     };
 
     const terms = [

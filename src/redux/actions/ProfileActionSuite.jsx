@@ -3,7 +3,7 @@ import {
     FETCH_USER_LIST, FETCH_PROFILE_DETAILS,
     FETCH_SMS_SELECTION, SAVE_SMS_SELECTION,
     UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SECURITY,
-    UPDATE_TEXT_NOTIFICATION, SAVE_EMIAL_SELECTION,
+    UPDATE_TEXT_NOTIFICATION, SAVE_EMAIL_SELECTION,
     FETCH_EMIAL_SELECTION, SAVE_PAPERLESS_DETAILS,
     FETCH_PAPERLESS, FETCH_PUSH_NOTIFICATIONS,
     SAVE_PUSH_NOTIFICATIONS,
@@ -74,7 +74,7 @@ export const saveSMSSelection = (data) => {
 // Action creator for saving the SMS selection
 export const saveEmailBillings = (data) => {
     return {
-        type: SAVE_EMIAL_SELECTION,
+        type: SAVE_EMAIL_SELECTION,
         payload: data
     };
 };

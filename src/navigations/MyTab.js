@@ -19,6 +19,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { useSelector } from 'react-redux';
 
 const Tab = createBottomTabNavigator();
 
@@ -29,6 +30,7 @@ const MyTabs = ({ route, navigation }) => {
   const [secondStepActive, setSecondStepActive] = useState(true);
   const [lastEvent, setLastEvent] = useState(null);
   const { tabBarVisible } = useTabBarVisibility();
+  const user = useSelector(state => state.combinedReducers.user.userData);
 
   useEffect(() => {
     copilotEvents.on("stepChange", (step) => {
@@ -133,7 +135,7 @@ const MyTabs = ({ route, navigation }) => {
                 name="third"
               >
                 <WalkthroughableView style={styles.tabItem}>
-                  <AccountIcon focused={focused} data={route} />
+                  <AccountIcon focused={focused} data={user.userInfo} />
                 </WalkthroughableView>
               </CopilotStep>   
             );

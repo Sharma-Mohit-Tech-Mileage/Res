@@ -15,9 +15,15 @@ const EmailNotifications = ({ navigation }) => {
     const dispatch = useDispatch();
     const [input, setInput] = useState('');
     const user = useSelector(state => state.combinedReducers.user.userData);
+    const [enableButton, setEnableButton] = useState(false);
 
     const onChangeText = (text) => {
         setInput(text);
+        if (input.length > 0) {
+            setEnableButton(true);
+        } else {
+            setEnableButton(false);
+        }        
     };    
 
     const keyboardDismiss = () => {
@@ -27,10 +33,7 @@ const EmailNotifications = ({ navigation }) => {
     const enableEmailNotifications = () => {
         console.log('enableEmailNotifications');
         dispatch(updateEmailNotification(input, null));
-        navigation.navigate("MyTab", {
-            fname: user.userInfo.firstName,
-            lname: user.userInfo.lastName,
-        });
+        navigation.navigate("MyTab");
     };
         
     
@@ -91,6 +94,7 @@ const EmailNotifications = ({ navigation }) => {
                     </View>
                     <View style={styles.bottomBar}>
                         <Pressable
+                            disabled={!enableButton}
                             style={[styles.button, styles.buttonsLayout]}
                             onPress={enableEmailNotifications}
                         >
@@ -101,10 +105,7 @@ const EmailNotifications = ({ navigation }) => {
                             <Pressable
                                 style={[styles.buttonDecline, styles.buttonsLayout]}
                                 onPress={() => {
-                                    navigation.navigate("MyTab", {
-                                        fname: user.userInfo.firstName,
-                                        lname: user.userInfo.lastName,
-                                    });
+                                    navigation.navigate("MyTab");
                                 }}
                                 accessibilityLabel="Decline Button"
                                 accessibilityRole="button"
