@@ -7,7 +7,7 @@ import { useRoute, useIsFocused } from "@react-navigation/native";
 import { useDispatch } from 'react-redux';
 import { initializeSettings } from '../utility/constant';
 import NotificationAlert from "../common/customui/NotificationAlert";
-import {updateTextNotification} from '../../redux/actions/ProfileActionSuite'
+import {updateTextNotification} from '../../redux/actions/ProfileActionSuite';
 
 const TextNotifications = ({ navigation }) => {
     const [initialize, setInitializeSettings] = useState({});

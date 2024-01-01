@@ -5,13 +5,11 @@ import {
     UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SECURITY,
     UPDATE_TEXT_NOTIFICATION, SAVE_EMAIL_SELECTION,
     FETCH_EMIAL_SELECTION, SAVE_PAPERLESS_DETAILS,
-    FETCH_PAPERLESS, FETCH_PUSH_NOTIFICATIONS,
-    SAVE_PUSH_NOTIFICATIONS,
-    UPDATE_EMAIL_NOTIFICATION,
-    UPDATE_TERMS_AND_CONDITIONS,
-    UPDATE_PUSH_NOTIFICATIONS
+    FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION,
+    UPDATE_TERMS_AND_CONDITIONS, UNSUBSCRIBE_PAPERLESS,
+    UPDATE_PUSH_NOTIFICATIONS, FETCH_PUSH_NOTIFICATIONS,
+    SAVE_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2
 } from '../constants';
-
 export const fetchProfileSuccess = (response) => {
     return {
         type: USER_PROFILE_DETAILS,
@@ -21,6 +19,12 @@ export const fetchProfileSuccess = (response) => {
 export const fetchProfileDetails = () => {
     return {
         type: FETCH_PROFILE_DETAILS
+    };
+};
+export const unsubscribePaperless = (navigation) => {
+    return {
+        type: UNSUBSCRIBE_PAPERLESS,
+        navigation
     };
 };
 export const fetchUserListSuccess = (response) => {
@@ -55,14 +59,18 @@ export const fetchBillingPaper = () => {
         type: FETCH_PAPERLESS
     };
 };
-
 // Action creator for fetching the SMS selection status
 export const fetchPushNotifications = () => {
     return {
         type: FETCH_PUSH_NOTIFICATIONS
     };
 };
-
+export const savePushNotifications = (data) => {
+    return {
+        type: SAVE_PUSH_NOTIFICATIONS,
+        payload: data
+    };
+};
 // Action creator for saving the SMS selection
 export const saveSMSSelection = (data) => {
     return {
@@ -82,13 +90,6 @@ export const saveEmailBillings = (data) => {
 export const savePaperlessDetails = (data) => {
     return {
         type: SAVE_PAPERLESS_DETAILS,
-        payload: data
-    };
-};
-
-export const savePushNotifications = (data) => {
-    return {
-        type: SAVE_PUSH_NOTIFICATIONS,
         payload: data
     };
 };
@@ -131,3 +132,9 @@ export const updatePushNotifications = (data, navigation) => ({
     payload: data,
     navigation,
 });
+export const updatePushNotificationsv2 = (data, navigation) => ({
+    type: UPDATE_PUSH_NOTIFICATIONS_V2,
+    payload: data,
+    navigation,
+});
+

@@ -199,6 +199,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderStyle: "solid",
         textAlignVertical: 'top',
+        color: Color.colorGray_200,
         fontWeight: '600', // Set text to bold
         fontSize:FontSize.size_base,
         fontFamily: FontFamily.openSansRegular, 

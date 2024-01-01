@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     iconStyle: {
-        marginTop: 4, // Adjust top margin to align with the title
+        marginTop: 2, // Adjust top margin to align with the title
     },
     closeButton: {
         position: 'absolute', // Position the button absolutely

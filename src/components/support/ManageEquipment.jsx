@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
 import MyServicePlan from "../common/MyServicePlan";
@@ -141,7 +141,10 @@ const ManageEquipment = () => {
                                 />
                             </View>
                             <View style={[styles.frameLayout]} />
-                            <View style={[styles.frame9defaultSpaceBlock]} >
+                            <TouchableOpacity style={[styles.frame9defaultSpaceBlock]}
+                            onPress={()=>{
+                                navigation.navigate('ModemRebootScreen')
+                            }} >
                                 <Image
                                     resizeMode="stretch"
                                     source={require("../../../assets/refresh.png")}
@@ -151,7 +154,7 @@ const ManageEquipment = () => {
                                     resizeMode="stretch"
                                     source={require("../../../assets/chevronright.png")}
                                 />
-                            </View>
+                            </TouchableOpacity>
                         </View>
                     </View>
                     <View style={[styles.frameFlexBox]}>

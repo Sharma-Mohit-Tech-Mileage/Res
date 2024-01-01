@@ -113,7 +113,7 @@ const fetchPushNotifications = async () => {
         const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, { ...config });
 
         // Log the successful response
-        console.log(`API Call Successful to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:`, response.data);
+        console.log(`API Call Successful to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:;;;;;;;;;;;;;;;;;`, JSON.stringify(response.data));
         return response.data;
     } catch (error) {
         // Log the error with a descriptive message
@@ -218,6 +218,10 @@ const postPushNotifications = async (data) => {
     let user = await getUser();
     const accountNumber = user.userInfo?.accountNumber || null;
     const userName = user.userInfo?.userName || null;
+    // Update data object with accountNumber and userName
+    data.accountNumber = accountNumber;
+    data.userName = userName;
+
     const config = {
         headers: {
             Authorization: `Bearer ${user.token}`
@@ -227,7 +231,7 @@ const postPushNotifications = async (data) => {
     //https://customer.uat.cableone.net/apiWrapper/mobile/api/mobilenotificationpreferences/{UserName}/mobilepreferences
 
     // Log the request endpoint and data
-    console.log(`Making API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`);
+    console.log(`Making API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences with payload`, data);
 
     try {
         const response = await _axios_cableone.post(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, data, config);
@@ -242,6 +246,32 @@ const postPushNotifications = async (data) => {
     }
 };
 
+const unsubscribPaperLess = async () => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+
+    // Log the request endpoint and data
+    console.log(`Making API Call to /account/api/account/${accountNumber}/paperless/ with accountNumber:`, accountNumber);
+
+    try {
+        const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/unsubscribe`, {}, config);
+
+        // Log the successful response
+        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless/unsubscribe, Response:`, response);
+        return response;
+    } catch (error) {
+        // Log the error with a descriptive message
+        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless/unsubscribe:`, error);
+        throw error;
+    }
+};
 
 
-export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, postEmailNotification, postTermsAndConditions, postPushNotifications, fetchPushNotifications }
+
+export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications }

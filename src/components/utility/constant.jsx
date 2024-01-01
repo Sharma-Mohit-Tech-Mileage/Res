@@ -6,7 +6,12 @@ export const ROLE_COLORS = {
 };
 export const BOX_COLORS = {
     primaryadmin: Color.success50,
-    admin: Color.success50,
+    admin: Color.colorWhitesmoke_200,
+    viewonly: Color.colorWhitesmoke_200,
+};
+export const BORDER_COLORS = {
+    primaryadmin: Color.colorAquamarine,
+    admin: Color.colorWhitesmoke_200,
     viewonly: Color.colorWhitesmoke_200,
 };
 export const validatePassword = (newPassword, userName) => {
@@ -160,5 +165,91 @@ export const getRoleBasedMessage = (input) => {
     // Return the corresponding value from the mapping or an empty string if not found
     return mapping[inputLower] || '';
 };
+
+export const transformNotificationPreferences = (response) => {
+   // console.log('Default structure for when data is missing or in an unexpected format', JSON.stringify(response));
+    const defaultStructure = [
+        { type: 'Appointments', status: 'Off' },
+        { type: 'Outage', status: 'Off' },
+        { type: 'Billing', status: 'Off' }
+    ];
+
+    if (!response || !Array.isArray(response) || response.length === 0) {
+        return defaultStructure;
+    }
+
+    const pushMessageTypeArray = response[0].pushMessageType;
+    if (!pushMessageTypeArray || !Array.isArray(pushMessageTypeArray)) {
+        return defaultStructure;
+    }
+
+    return pushMessageTypeArray.map(item => {
+        const typeMapping = {
+            'appointment': 'Appointments',
+            'outage': 'Outage',
+            'billing': 'Billing'
+        };
+
+        const messageTypeLower = item.messageType.toLowerCase();
+        const type = typeMapping[messageTypeLower] || 'Unknown';
+        const status = item.optOutFlag ? 'Off' : 'On';
+
+        return { type, status };
+    });
+};
+
+
+
+export const transformToUserPreferences = (data) => {
+    console.log('Data is undefined or not an array, returning default transformToUserPreferences=======================', data);
+    if (!Array.isArray(data)) {
+       
+        return {
+            accountNumber: '',
+            deviceToken: '',
+            deviceTokenTimestamp: '',
+            optOut: true, // Default value
+            outageOptOut: true, // Default value
+            billingOptOutStatus: true, // Default value
+            userName: '',
+            isAndroid: ''
+        };
+    }
+
+    const transformedData = {
+        accountNumber: '',
+        deviceToken: '',
+        deviceTokenTimestamp: '',
+        optOut: true, // Default value
+        outageOptOut: true, // Default value
+        billingOptOutStatus: true, // Default value
+        userName: '',
+        isAndroid: ''
+    };
+
+    data.forEach(item => {
+        const itemType = item.type.toLowerCase();
+        const itemStatus = item.status.toLowerCase();
+
+        switch (itemType) {
+            case 'appointments':
+                transformedData.optOut = itemStatus === 'off';
+                break;
+            case 'outage':
+                transformedData.outageOptOut = itemStatus === 'off';
+                break;
+            case 'billing':
+                transformedData.billingOptOutStatus = itemStatus === 'off';
+                break;
+            default:
+                // Handle unexpected type or ignore
+                break;
+        }
+    });
+    console.log('final Update values based on the data array-------------------------', transformedData)
+    return transformedData;
+};
+
+
 
 

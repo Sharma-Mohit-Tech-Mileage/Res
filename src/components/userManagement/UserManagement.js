@@ -1,19 +1,18 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Image, StyleSheet, Text, Pressable, View, SafeAreaView, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
-import { ROLE_COLORS, BOX_COLORS, getUserType } from '../utility/constant';
+import { ROLE_COLORS, BOX_COLORS, BORDER_COLORS, getUserType } from '../utility/constant';
 import { executeUserList } from '../../redux/actions/ProfileActionSuite'
 
 const UserManagement = () => {
   const navigation = useNavigation();
-
   const dispatch = useDispatch();
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const userList = profile.userList || []; // Defaulting to an empty array if userList is undefined
-
+  const userData = useSelector(state => state.combinedReducers.user.userData);
   useEffect(() => {
     dispatch(executeUserList(0));
   }, [dispatch]);
@@ -21,8 +20,12 @@ const UserManagement = () => {
   const renderUserCard = (user) => {
     const convertedRole = getUserType(user.memberType);
     const normalizedRole = convertedRole.replace(/\s+/g, '').toLowerCase();
+    console.log('normalizedRole======================', user?.userName === userData.userInfo.userName)
     const avatarColor = ROLE_COLORS[normalizedRole] || Color.sparklightGreen;
     const BoxColor = BOX_COLORS[normalizedRole] || Color.colorWhitesmoke_100;
+    const BorderColor = BORDER_COLORS[normalizedRole] || Color.colorWhitesmoke_100;
+    // Check if the username matches the logged-in user's username
+    const isLoggedInUser = user.userName === userData.userInfo.userName;
     // Extracting fullName and initials
     const firstName = user?.firstName || '';
     const lastName = user?.lastName || '';
@@ -51,10 +54,10 @@ const UserManagement = () => {
               <Text style={[styles.taylorNickum, styles.melissaSmithTypo]}>
                 {fullNameCamelCase}
               </Text>
-              {user.status && (
+              {isLoggedInUser && (
                 <View style={styles.userParent}>
                   <Text style={[styles.loggedIn, styles.usersFlexBox]}>
-                    {user.status}
+                    {'Logged In'}
                   </Text>
                 </View>
               )}
@@ -96,11 +99,10 @@ const UserManagement = () => {
               Member Type
             </Text>
             <View style={styles.badgeWrapper}>
-              <View style={[styles.badge, styles.badgeBorder, { backgroundColor: BoxColor }]}>
+              <View style={[styles.badge, styles.badgeBorder, { backgroundColor: BoxColor, borderColor: BorderColor }]}>
                 <Text style={[styles.text3]}>{getUserType(user.memberType)}</Text>
               </View>
             </View>
-
           </View>
         </View>
         <View style={[styles.frameWrapper2, styles.frameSpaceBlock]}>
@@ -355,7 +357,6 @@ const styles = StyleSheet.create({
 
   },
   badge: {
-    borderColor: Color.colorAquamarine,
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,
     alignItems: "center",
