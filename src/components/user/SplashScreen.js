@@ -148,18 +148,7 @@ const SplashScreen = ({ navigation }) => {
 
   const handleCloseAlert = () => {
     setModalVisible(false);
-    // let re = getSsoToken().then((res) => {
-    //   let token=res.accessToken;
-    //   console.log('revoke',token)
-    //   const result =  revoke(config, {
-    //     tokenToRevoke: token,
-    //     includeBasicAuth: true,
-    //     sendClientId: true,
-    //   }).then((result)=>{
-    //     console.log('revoke result',result)
-    //   });
-
-    //   });
+    
     
   };
 

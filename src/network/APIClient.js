@@ -34,7 +34,7 @@ export const PostAuthApiRequest=(endpoint,body, onSuccess,onError)=>{
 
 export const PostApiRequest=(endpoint,body, onSuccess,onError)=>{
 // Example POST request
-fetch(`${BASE_URL}/${endpoint}`, {
+fetch(`${BASE_URL_AUTH}/${endpoint}`, {
     method: 'GET',
     headers: {
         'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ fetch(`${BASE_URL}/${endpoint}`, {
 
 export const GetApiRequest= async(endpoint, onSuccess,onError)=>{
  const user= await getUser()
-fetch(`${BASE_URL}/${endpoint}`, {
+fetch(`${BASE_URL_AUTH}/${endpoint}`, {
     method: 'GET',
     headers: {
         'Content-Type': 'application/json',

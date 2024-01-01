@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -6,6 +6,9 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
+  Linking,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -24,16 +27,87 @@ import colors from "../../res/Colors";
 import ModemInfo from "../../res/svgIcons/ModemInfo";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import VideoIcon from "../../res/svgIcons/VideoIcon";
-import SparkLightButton from "../common/customui/SparkLightButton";
+
+import { getUser } from "../../redux/utils/LocalStorage";
+import { GetApiRequest } from "../../network/APIClient";
 
 const ModemReboot = () => {
-   const navigation = useNavigation();
+  const navigation = useNavigation();
+  const [modemStatus, setModemStatus] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const LoadingOverlay = () => {
+    return (
+      <Modal
+        visible={loading}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          setLoading(false);
+        }}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.alertContainer}>
+            <ActivityIndicator size="large" color={Color.colorGainsboro_200} />
+            <Text style={styles.loadingTxt}>Modem Rebooting</Text>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
+  const rebootModemAction = () => {
+    setLoading(true);
+    let re = getUser().then((res) => {
+      const request = `mobile/api/Device/RebootModem?accountnumber=${res.userInfo.accountNumber}`;
+      GetApiRequest(
+        request,
+        (res) => {
+          console.log("rebootModemAction", res);
+          setModemStatus(res.status);
+          setLoading(false);
+        },
+        (error) => {
+          console.log("rebootModemAction Error", error);
+          setLoading(false);
+        }
+      );
+    });
+  };
+
+  useEffect(() => {}, []);
+
+  const RenderErrorBox = () => {
+    return (
+      <View style={styles.errorBox}>
+        <View style={{ flexDirection: "row" }}>
+          <View style={{ backgroundColor: "#F88700", width: 4 }} />
+          <View style={{ flexDirection: "column", padding: 10 }}>
+            <View style={{ flexDirection: "row" }}>
+              <Image
+                style={styles.frameChild}
+                resizeMode="cover"
+                tintColor={"#F88700"}
+                source={require("../../../assets/info-circle.png")}
+              />
+              <Text style={styles.modemError1}>
+                Uh-oh, experiencing internet issues?
+              </Text>
+            </View>
+            <Text style={styles.modemError2}>
+              Click the Reboot Modem button below to quickly restart your modem.
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
         title="Modem Reboot"
-        onPressBack={() => navigation.navigate("support")}
+        onPressBack={() => navigation.goBack()}
       />
       <ScrollView>
         <View style={{ flexDirection: "column" }}>
@@ -51,39 +125,25 @@ const ModemReboot = () => {
               source={require("../../../assets/modemReboot.png")}
             />
 
-            <View style={styles.errorBox}>
-              <View style={{ flexDirection: "row" }}>
-                <View style={{ backgroundColor: "#F88700", width: 4 }} />
-                <View style={{ flexDirection: "column", padding: 10 }}>
-                  <View style={{ flexDirection: "row" }}>
-                    <Image
-                      style={styles.frameChild}
-                      resizeMode="cover"
-                      tintColor={"#F88700"}
-                      source={require("../../../assets/info-circle.png")}
-                    />
-                    <Text style={styles.modemError1}>
-                      Uh-oh, experiencing internet issues?
-                    </Text>
-                  </View>
-                  <Text style={styles.modemError2}>
-                    Click the Reboot Modem button below to quickly restart your
-                    modem.
-                  </Text>
-                </View>
-              </View>
-            </View>
+            {modemStatus === "" ? (
+              <RenderErrorBox />
+            ) : (
+              <Text style={{ alignSelf: "center", marginTop:10 }}>Modem is connected</Text>
+            )}
             <View
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}
             />
 
-            <View
+            <TouchableOpacity
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
                 marginHorizontal: 20,
                 alignItems: "center",
                 paddingVertical: 15,
+              }}
+              onPress={() => {
+                navigation.navigate("ModemRebootInstructions");
               }}
             >
               <View style={{ flexDirection: "row", alignContent: "center" }}>
@@ -93,11 +153,11 @@ const ModemReboot = () => {
                 </Text>
               </View>
               <RightArrow />
-            </View>
+            </TouchableOpacity>
 
             <View style={{ backgroundColor: "#F4F4F5", height: 1 }} />
 
-            <View
+            <TouchableOpacity
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
@@ -105,13 +165,16 @@ const ModemReboot = () => {
                 alignItems: "center",
                 paddingVertical: 15,
               }}
+              onPress={() => {
+                Linking.openURL("https://youtu.be/hVvi9e338KI");
+              }}
             >
               <View style={{ flexDirection: "row", alignContent: "center" }}>
                 <VideoIcon />
                 <Text style={styles.modemInstruction}>Modem Reboot Video</Text>
               </View>
               <RightArrow />
-            </View>
+            </TouchableOpacity>
 
             <View style={{ backgroundColor: "#F4F4F5", height: 1 }} />
           </View>
@@ -119,7 +182,7 @@ const ModemReboot = () => {
             <TouchableOpacity
               style={styles.BtnContainer}
               onPress={() => {
-                
+                rebootModemAction();
               }}
             >
               <Text style={styles.Btn}>Modem Reboot</Text>
@@ -128,14 +191,19 @@ const ModemReboot = () => {
 
           <View style={{ marginTop: 20 }}>
             <TouchableOpacity
-              style={[styles.BtnContainer,{backgroundColor:'#00000000'}]}
+              style={[styles.BtnContainer, { backgroundColor: "#00000000" }]}
               onPress={() => {
-                
+                navigation.goBack();
               }}
             >
-              <Text style={[styles.Btn,{color:colors.sparklight_purple_blue}]}>Cancel</Text>
+              <Text
+                style={[styles.Btn, { color: colors.sparklight_purple_blue }]}
+              >
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
+          <LoadingOverlay />
         </View>
       </ScrollView>
     </View>
@@ -220,6 +288,26 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: 16,
     fontSize: 16,
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  alertContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 5,
+    width: "40%",
+  },
+  loadingTxt: {
+    color: Color.sparklightGray1,
+    textAlign: "center",
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 22,
+    fontStyle: "normal",
+    fontWeight: "400",
   },
 });
 
