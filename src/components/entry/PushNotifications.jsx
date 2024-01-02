@@ -19,6 +19,7 @@ import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite'
 
 const PushNotifications = ({ navigation }) => {
     const [generatedToken, setGeneratedToken] = useState();
+    const [nextScreen, setNextScreen] = useState('EntryTextNotifications');
     const dispatch = useDispatch();
     const profile = useSelector(state => state.combinedReducers.profile || {});
     const user = useSelector(state => state.combinedReducers.user.userData);
@@ -29,9 +30,17 @@ const PushNotifications = ({ navigation }) => {
         const fetchData = async () => {
             try {
                 await dispatch(fetchBillingStatus());
-                // await dispatch(fetchBillingPaper());
                 await dispatch(fetchSMSSelection());
                 await dispatch(fetchPushNotifications());
+
+                if (profile.smsSubscription.length > 0) {
+                    if (profile.paperlessStatus) {
+                        setNextScreen('MyTab');                      
+                    } else {
+                        setNextScreen('EntryEmailNotifications');  
+                    }
+                } 
+
             } catch (error) {
                 console.error("Error fetching data", error);
             }
@@ -82,9 +91,10 @@ const PushNotifications = ({ navigation }) => {
             };
             console.log('enableNotifications: ', data);
             console.log('enableNotifications navigation: ', navigation);
-            await dispatch(updatePushNotifications(data, navigation));
+            await dispatch(updatePushNotifications(data, null));
+            navigation.navigate(nextScreen);
         } else {
-            navigation.navigate("EntryTextNotifications");
+            navigation.navigate(nextScreen);
         }
         
         //void fetchToken();

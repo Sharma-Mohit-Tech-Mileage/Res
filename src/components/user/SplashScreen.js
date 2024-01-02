@@ -88,14 +88,11 @@ const SplashScreen = ({ navigation }) => {
         } else {
           if (data !== null 
             && data.accountNumber === userInfo.accountNumber) {
-              navigation.navigate("MyTab", {
-                fname: userInfo.firstName,
-                lname: userInfo.lastName,
-              });
+              navigation.navigate("MyTab");
           } else {
             storeFirstTime({
               accountNumber: userInfo.accountNumber
-            });     
+            });
 
             if (user.userInfo.mobileTCAcceptanceFlag) {
               navigation.navigate("EntryPushNotifications");
