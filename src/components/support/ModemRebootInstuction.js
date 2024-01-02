@@ -24,14 +24,14 @@ import {
 const ModemReboot = () => {
   const navigation = useNavigation();
   const [inst1, setInst1] = React.useState(
-    "You can reboot your modem by clicking <B>“Reboot Modem”</B> button through the app. During the reboot, your internet service will be temporarily unavailable, and the lights on the front of the modem will start flashing. Your modem is ready once the status symbol light on the front of the modem is solid. This can take up to 10 minutes."
+    " button through the app. During the reboot, your internet service will be temporarily unavailable, and the lights on the front of the modem will start flashing. Your modem is ready once the status symbol light on the front of the modem is solid. This can take up to 10 minutes."
   );
 
   const [inst2, setInst2] = React.useState(
     "If you're still having issues, try a hard reboot of the modem by unplugging it from power, waiting 30 seconds, and then plugging it back in. Wait up to 10 minutes for your modem to come back online."
   );
   const [inst3, setInst3] = React.useState(
-    "If neither option fixes your issue, please don't hesitate to contact us for further assistance."
+    "If neither option fixes your issue, please don't hesitate to "
   );
   return (
     <View style={styles.modemRebootContainer}>
@@ -39,8 +39,8 @@ const ModemReboot = () => {
         title="Modem Reboot Instructions"
          onPressBack={() => navigation.goBack()}
       />
-      <ScrollView>
-        <View style={{ flexDirection: "column" }}>
+      <ScrollView >
+        <View style={{ flexDirection: "column",paddingBottom:hp('15%') }}>
           <View
             style={[
               styles.card,
@@ -57,7 +57,10 @@ const ModemReboot = () => {
             <View
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}
             />
-            <Text style={styles.text}>{inst1}</Text>
+            <Text style={styles.text}>
+            {'You can reboot your modem by clicking '} 
+            <Text style={[styles.text,{fontWeight:'600'}]}> “Reboot Modem”</Text>{inst1}
+              </Text>
           </View>
 
           <View
@@ -92,7 +95,10 @@ const ModemReboot = () => {
             />
             
             
-            <Text style={styles.textContactUs}>{inst3}</Text>
+            <Text style={styles.textContactUs}>
+            {inst3}
+            <Text style={[styles.textContactUs,{fontWeight:'600'}]}> contact us</Text>{' for further assistance.'}
+              </Text>
           </View>
         </View>
       </ScrollView>
@@ -127,9 +133,9 @@ const styles = StyleSheet.create({
     height: 70,
   }, contactUs: {
     alignSelf: "center",
-    width: 50,
-    height: 60,
-    marginLeft:20
+    width: 40,
+    height: 40,
+    marginLeft:10
   },
 
   modemInstruction: {
@@ -164,7 +170,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontStyle: "normal",
     fontWeight: "400",
-    paddingLeft:10,
+    paddingLeft:5,
     width:wp('70%'),
     flexWrap:'wrap'
     

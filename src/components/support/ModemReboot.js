@@ -130,9 +130,7 @@ const ModemReboot = () => {
             ) : (
               <Text style={{ alignSelf: "center", marginTop:10 }}>Modem is connected</Text>
             )}
-            <View
-              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}
-            />
+             <View style={styles.borderSec} />
 
             <TouchableOpacity
               style={{
@@ -155,7 +153,7 @@ const ModemReboot = () => {
               <RightArrow />
             </TouchableOpacity>
 
-            <View style={{ backgroundColor: "#F4F4F5", height: 1 }} />
+            <View style={styles.borderSec} />
 
             <TouchableOpacity
               style={{
@@ -176,7 +174,7 @@ const ModemReboot = () => {
               <RightArrow />
             </TouchableOpacity>
 
-            <View style={{ backgroundColor: "#F4F4F5", height: 1 }} />
+            <View style={styles.borderSec} />
           </View>
           <View style={{ marginTop: 20 }}>
             <TouchableOpacity
@@ -265,7 +263,7 @@ const styles = StyleSheet.create({
   errorBox: {
     flexDirection: "column",
     marginHorizontal: 15,
-    marginTop: 20,
+    marginVertical: 20,
     borderColor: Color.sparklightGray,
     borderRadius: Border.br_11xs,
     borderWidth: 1,
@@ -308,7 +306,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontStyle: "normal",
     fontWeight: "400",
-  },
+  },borderSec: {
+    width: '100%',
+    height: 1,
+    backgroundColor: Color.sparklightGray,
+},
 });
 
 export default ModemReboot;
