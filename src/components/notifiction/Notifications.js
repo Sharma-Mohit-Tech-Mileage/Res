@@ -20,7 +20,6 @@ const Notifications = () => {
   const profileDetails = profile.profileDetails || {};
   const paperLessInfo = profile.paperLessInfo || {};
   const transformedNotification = transformNotificationPreferences(profile.pushNotifications||{});
-  console.log(' Default structure for when data is missing or in an unexpected format 2', JSON.stringify(transformedNotification))
   const data = transformResponse(smsSubscription);
   const emailAddress = paperLessInfo.emailAddress || '';
   const emailStatus = paperLessInfo.emailStatus || 'Pending';
@@ -37,7 +36,7 @@ const Notifications = () => {
       infoText = "We are not able to retrieve the email address for your account. Please contact us for assistance";
     } else {
       notificationsTitle = "No email address on file";
-      infoText = "We don’t have your email address on file. Please add your email.";
+      infoText = "We don’t have your email address on file. Go to Profile Settings to add your email.";
     }
     isDisabled = true;
   }
@@ -101,8 +100,8 @@ const Notifications = () => {
             infoText={infoText}
             email={paperLessInfo.emailAddress}
             navigationTarget="EmailNotifications"
-            transformedData={{ status: isEmailVerified, email: paperLessInfo.emailAddress }}
-            additionalSettings={[{ type: 'Paperless Billing', status: !isEmailVerified ? 'Off' : 'On' }]}
+            transformedData={{ status: paperLessInfo?.paperlessStatus === 'Active', email: paperLessInfo.emailAddress }}
+            additionalSettings={[{ type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off' }]}
           />
           <View style={{ marginBottom: Padding.p_base }} />
           <NotificationSection

@@ -91,14 +91,11 @@ const SplashScreen = ({ navigation }) => {
         } else {
           if (data !== null 
             && data.accountNumber === userInfo.accountNumber) {
-              navigation.navigate("MyTab", {
-                fname: userInfo.firstName,
-                lname: userInfo.lastName,
-              });
+              navigation.navigate("MyTab");
           } else {
             storeFirstTime({
               accountNumber: userInfo.accountNumber
-            });     
+            });
 
             if (user.userInfo.mobileTCAcceptanceFlag) {
               navigation.navigate("EntryPushNotifications");
@@ -174,18 +171,7 @@ const SplashScreen = ({ navigation }) => {
 
   const handleCloseAlert = () => {
     setModalVisible(false);
-    // let re = getSsoToken().then((res) => {
-    //   let token=res.accessToken;
-    //   console.log('revoke',token)
-    //   const result =  revoke(config, {
-    //     tokenToRevoke: token,
-    //     includeBasicAuth: true,
-    //     sendClientId: true,
-    //   }).then((result)=>{
-    //     console.log('revoke result',result)
-    //   });
-
-    //   });
+    
     
   };
 
