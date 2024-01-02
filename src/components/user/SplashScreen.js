@@ -257,15 +257,7 @@ const SplashScreen = ({ navigation }) => {
         >
             <Text style={styles.buttonTextFirstTime}>Terms And Conditions</Text>
         </Pressable> 
-      </View>           
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={[styles.buttons, styles.buttonsLayout]}
-          onPress={articleWindowUtility}
-        >
-            <Text style={styles.buttonTextFirstTime}>Web View Open</Text>
-        </Pressable> 
-      </View>            
+      </View>       
     </LinearGradient>
   );
 };
