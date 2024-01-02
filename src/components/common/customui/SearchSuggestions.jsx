@@ -9,7 +9,7 @@ import {
     Image,
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../../GlobalStyles';
-import { widthPercentageToDP as wp,} from 'react-native-responsive-screen';
+import { widthPercentageToDP as wp,heightPercentageToDP as hp} from 'react-native-responsive-screen';
 const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,navigation }) => {
     const inputRef = useRef(null);
     const [input, setInput] = useState('');
@@ -57,11 +57,13 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
                     clearButtonMode="always"
             />
         </View>
+        <View style={{height:hp('70%')}}>
         <FlatList
             data={suggestions}
             keyExtractor={(item, index) => item.id.toString()}
             renderItem={renderSuggestion}
         />
+        </View>
         </View>
     );
 });

@@ -18,6 +18,20 @@ const ManageEquipment = () => {
     const [manufacturer,setManufacturer]=React.useState('')
     const [model,setModel]=React.useState('')
     const [transmissionType,setTransmissionType]=React.useState('')
+    const [leased,setLeased]=React.useState('')
+
+    const getLeasedDetails=()=>{
+        let re = getUser().then((res) => {
+            const request = `mobile/api/Device/GetOwnershipInfo?accountnumber=${res.userInfo.accountNumber}`;
+            GetApiRequest(request, (res)=>{
+                console.log("getLeasedDetails", res);
+               setLeased(res.modemOwnership)
+            }, (error)=>{
+                console.log("getLeasedDetails Error", error);
+            });
+          });
+
+    }
 
     const getModemDetails = () => {
         let re = getUser().then((res) => {
@@ -40,6 +54,7 @@ const ManageEquipment = () => {
 
     React.useEffect(()=>{
        getModemDetails();
+       getLeasedDetails();
 
     },[])
 
@@ -82,7 +97,7 @@ const ManageEquipment = () => {
                                             </View>
                                             <View style={[styles.badge, styles.parentBorder]}>
                                                 <Text style={[styles.text, styles.textTypo1]}>
-                                                    LEASED
+                                                    {leased.toLocaleUpperCase()}
                                                 </Text>
                                             </View>
                                         </View>
@@ -128,7 +143,7 @@ const ManageEquipment = () => {
                                     source={require("../../../assets/chevronright.png")}
                                 />
                             </View>
-                            <View style={[styles.frameLayout]} />
+                            {/* <View style={[styles.frameLayout]} />
                             <View style={[styles.frame9defaultSpaceBlock]} >
                                 <Image
                                     resizeMode="stretch"
@@ -139,7 +154,7 @@ const ManageEquipment = () => {
                                     resizeMode="stretchstretch"
                                     source={require("../../../assets/chevronright.png")}
                                 />
-                            </View>
+                            </View> */}
                             <View style={[styles.frameLayout]} />
                             <TouchableOpacity style={[styles.frame9defaultSpaceBlock]}
                             onPress={()=>{
