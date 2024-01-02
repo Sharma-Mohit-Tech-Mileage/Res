@@ -39,7 +39,12 @@ const UserNavigations = (props) => {
           name="Terms"
           component={Terms}
           options={{ headerShown: false }}
-        />                        
+        />   
+        <Stack.Screen
+          name="ArticalWindowUtility"
+          component={ArticalWindowUtility}
+          options={{ headerShown: false }}
+        />                               
         <Stack.Screen
           name="MyTab"
           component={MyTabs}

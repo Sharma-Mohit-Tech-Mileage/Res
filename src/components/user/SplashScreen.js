@@ -64,7 +64,8 @@ const SplashScreen = ({ navigation }) => {
       let user = {
         userInfo: userInfo,
         token: token,
-        tokenGuid: res.idTokenGuid
+        tokenGuid: res.idTokenGuid,
+        refreshToken: res.refreshToken
       };
 
       if (token) {
@@ -74,6 +75,8 @@ const SplashScreen = ({ navigation }) => {
       dispatch(saveUserInfo(user));
 
       const data = await getFirstTime();
+
+      return;
 
         if (userInfo.accountNumber === "900690538") {
           setErrorMessage(strings.nonAdminUserMsg);
@@ -190,9 +193,12 @@ const SplashScreen = ({ navigation }) => {
     try {
       const result = await authorize(config);
 
+      console.log('loginAuthResult: ', result);
+
       const data = { 
         idToken: result.idToken,accessToken:result.accessToken,
-        idTokenGuid: result.authorizeAdditionalParameters.session_state
+        idTokenGuid: result.authorizeAdditionalParameters.session_state,
+        refreshToken: result.refreshToken
       };
 
       setLoading(true);
@@ -215,6 +221,10 @@ const SplashScreen = ({ navigation }) => {
     dispatch(updateTermsAndConditions(false, null));
     await loginAuth();
   };  
+
+  const articleWindowUtility = async () => {
+    navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name :'Upgrade Plan'});
+  };
 
   useEffect(() => {}, []);
 
@@ -263,7 +273,15 @@ const SplashScreen = ({ navigation }) => {
         >
             <Text style={styles.buttonTextFirstTime}>Terms And Conditions</Text>
         </Pressable> 
-      </View>             
+      </View>           
+      <View style={styles.buttonContainer}>
+        <Pressable
+          style={[styles.buttons, styles.buttonsLayout]}
+          onPress={articleWindowUtility}
+        >
+            <Text style={styles.buttonTextFirstTime}>Web View Open</Text>
+        </Pressable> 
+      </View>            
     </LinearGradient>
   );
 };

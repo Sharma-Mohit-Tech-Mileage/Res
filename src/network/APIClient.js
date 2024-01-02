@@ -6,8 +6,10 @@ const BASE_URL_AUTH="https://customer.uat.cableone.net/apiWrapper/"
 
 export const PostAuthApiRequest=(endpoint, body, onSuccess, onError)=>{
     const idTokenGuid = body.idTokenGuid;
+    const refreshToken = body.refreshToken;
     
     delete body.idTokenGuid;
+    delete body.refreshToken;
 
     fetch(`${BASE_URL_AUTH}/${endpoint}`, {
         method: 'POST',
@@ -21,6 +23,7 @@ export const PostAuthApiRequest=(endpoint, body, onSuccess, onError)=>{
         .then(([response, json]) => {
             //Add Token Guid
             json.idTokenGuid = idTokenGuid;
+            json.refreshToken = refreshToken;
             onSuccess(json)
         })
         .catch(exception => {
