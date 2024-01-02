@@ -30,22 +30,15 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }, [modalOpen]);
 
     useEffect(() => {
-
-        console.log('ArticalWindowUtilityUser: ', user);
-
-        const SAVE_FROM_RN = `(function() {
-            localStorage.setItem('jwt_token', '${user.token}');
-            localStorage.setItem('upgrades_token', '${user.refreshToken}');
-            localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
-          })();`;        
-
-        // const SAVE_FROM_RN = `(function() {
-        //     ${allKeys.map((key) => `localStorage.setItem(${key}, ${AsyncStorage.getItem(key)});`)}
-        //   })();`;
-
-        console.log('SAVE_FROM_RN: ', SAVE_FROM_RN);
-      
-        setInitScript(SAVE_FROM_RN);
+        if (user.token !== undefined) {
+            const SAVE_FROM_RN = `(function() {
+                localStorage.setItem('jwt_token', '${user.token}');
+                localStorage.setItem('upgrades_token', '${user.refreshToken}');
+                localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
+              })();`;        
+          
+            setInitScript(SAVE_FROM_RN);
+        }
     }, []);
 
     return (
@@ -64,7 +57,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
                     onError={() => setIsError(true)}
                     sharedCookiesEnabled={true}
-                    injectedJavaScript={initScript}
+                    injectedJavaScriptBeforeContentLoaded={initScript}
                     //onNavigationStateChange={(navState) => setUrl(navState.url)}
                 />            
             )}

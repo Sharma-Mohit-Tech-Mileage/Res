@@ -76,8 +76,6 @@ const SplashScreen = ({ navigation }) => {
 
       const data = await getFirstTime();
 
-      return;
-
         if (userInfo.accountNumber === "900690538") {
           setErrorMessage(strings.nonAdminUserMsg);
           setTimeout(() => {
