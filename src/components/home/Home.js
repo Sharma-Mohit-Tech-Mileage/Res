@@ -44,6 +44,7 @@ const HomeScreen = ({ route, navigation }) => {
   const [currentHealth, setCurrentHealth] = useState("Poor");
   const [billPaid, setBillPaid] = useState(false);
   const [accountStatus,setAccountStatus]=useState('Active')
+  const [hasOutage,setHasOutage]=useState(false)
 
   const getInternetHealth = (type) => {
     var currentHealth = {
@@ -77,6 +78,23 @@ const HomeScreen = ({ route, navigation }) => {
     });
   });
   }
+
+  const checkModemOutagStatus=()=>{
+    let re = getUser().then((res) => {
+     const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${res.userInfo.accountNumber}`;
+     GetApiRequest(request, (response)=>{
+      console.log('checkModemOutagStatus',response)
+           if(response.hasOutage===true){
+             setAccountStatus('Disconnect')
+             setIsInternetDetails(true)
+             setHasOutage(true)
+           }
+           
+     }, (error)=>{
+ 
+     });
+   });
+   }
 
   const onSuccessPlan = (res) => {
     console.log("getInternetPlanDetails", res);
@@ -127,6 +145,7 @@ const HomeScreen = ({ route, navigation }) => {
   useEffect(() => {
     getSoftDisconnectStatus();
     getInternetPlanDetails();
+    checkModemOutagStatus();
    
 
     const backAction = () => {
@@ -242,7 +261,7 @@ const HomeScreen = ({ route, navigation }) => {
                 </View>
               </TouchableOpacity>
               {isInternetDetails ? (
-                <NetworkDetails billPaid={billPaid} navigation={navigation} accountStatus={accountStatus} />
+                <NetworkDetails billPaid={billPaid} hasOutage={hasOutage} navigation={navigation} accountStatus={accountStatus} />
               ) : (
                 <></>
               )}
