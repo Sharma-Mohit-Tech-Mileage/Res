@@ -13,7 +13,7 @@ import {
 } from "react-native-responsive-screen";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
-const NetworkDetails = ({ navigation, billPaid, accountStatus }) => {
+const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
   useEffect(() => {
     //console.log("data");
   }, []);
@@ -35,7 +35,7 @@ const NetworkDetails = ({ navigation, billPaid, accountStatus }) => {
         <View style={styles.item}>
           <View style={styles.iconBg}>
             <Outageicon />
-            <GreenCircle />
+            {(hasOutage)?<RedCircle/>:<GreenCircle />}
           </View>
           <Text style={styles.text}> {strings.noOutageTxt}</Text>
         </View>

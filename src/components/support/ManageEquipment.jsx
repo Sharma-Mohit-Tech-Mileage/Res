@@ -132,7 +132,10 @@ const ManageEquipment = () => {
                         </View>
                         <View style={[styles.supportAccordionParent, styles.supportParentFlexBox]} >
                             <View style={[styles.frameLayout]} />
-                            <View style={[styles.frame9defaultSpaceBlock]} >
+                            <TouchableOpacity style={[styles.frame9defaultSpaceBlock]} 
+                            onPress={()=>{
+                                navigation.navigate('ModemExchange')
+                            }}>
                                 <Image
                                     resizeMode="stretch"
                                     source={require("../../../assets/repeat-01.png")}
@@ -142,7 +145,7 @@ const ManageEquipment = () => {
                                     resizeMode="stretch"
                                     source={require("../../../assets/chevronright.png")}
                                 />
-                            </View>
+                            </TouchableOpacity>
                             {/* <View style={[styles.frameLayout]} />
                             <View style={[styles.frame9defaultSpaceBlock]} >
                                 <Image
