@@ -241,23 +241,7 @@ const SplashScreen = ({ navigation }) => {
         visible={modalVisible}
         message={errorMessage}
         onClose={handleCloseAlert}
-      />    
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={[styles.buttons, styles.buttonsLayout]}
-          onPress={loginFirstTimeFlow}
-        >
-            <Text style={styles.buttonTextFirstTime}>First Time Flow</Text>
-        </Pressable> 
-      </View>    
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={[styles.buttons, styles.buttonsLayout]}
-          onPress={termsAndConditionsFlow}
-        >
-            <Text style={styles.buttonTextFirstTime}>Terms And Conditions</Text>
-        </Pressable> 
-      </View>       
+      />   
     </LinearGradient>
   );
 };
