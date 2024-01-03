@@ -85,7 +85,7 @@ const ModemReboot = () => {
           <View style={{ flexDirection: "column", padding: 10 }}>
             <View style={{ flexDirection: "row" }}>
               <Image
-                style={styles.frameChild}
+                style={{alignSelf:'center'}}
                 resizeMode="cover"
                 tintColor={"#F88700"}
                 source={require("../../../assets/info-circle.png")}
@@ -122,13 +122,13 @@ const ModemReboot = () => {
             <Image
               style={styles.frameChild}
               resizeMode="cover"
-              source={require("../../../assets/modemReboot.png")}
+              source={(modemStatus === "") ?require("../../../assets/modemReboot.png"):require("../../../assets/modem-connected.png")}
             />
 
             {modemStatus === "" ? (
               <RenderErrorBox />
             ) : (
-              <Text style={{ alignSelf: "center", marginTop:10 }}>Modem is connected</Text>
+              <Text style={{ alignSelf: "center", marginVertical:10 }}>Modem is connected</Text>
             )}
              <View style={styles.borderSec} />
 
@@ -161,7 +161,7 @@ const ModemReboot = () => {
                 justifyContent: "space-between",
                 marginHorizontal: 20,
                 alignItems: "center",
-                paddingVertical: 15,
+                paddingTop: 15,
               }}
               onPress={() => {
                 Linking.openURL("https://youtu.be/hVvi9e338KI");
@@ -174,7 +174,7 @@ const ModemReboot = () => {
               <RightArrow />
             </TouchableOpacity>
 
-            <View style={styles.borderSec} />
+        
           </View>
           <View style={{ marginTop: 20 }}>
             <TouchableOpacity
@@ -231,6 +231,8 @@ const styles = StyleSheet.create({
   },
   frameChild: {
     alignSelf: "center",
+    width:70,
+    height:70
   },
   rebootModemTxt: {
     color: colors.sparklight_grey,

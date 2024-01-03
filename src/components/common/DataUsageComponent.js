@@ -23,7 +23,7 @@ const DataUsageComponent = ({navigation}) => {
         style={{ height: 200 }}
         progress={0.8}
         progressColor={"#8D3B90"}
-        backgroundColor={"#8D3B9090"}
+        backgroundColor={"#8D3B9050"}
         cornerRadius={5}
         strokeWidth={12}
         startAngle={-Math.PI * 0.85}

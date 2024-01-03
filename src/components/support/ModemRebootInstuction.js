@@ -39,7 +39,7 @@ const ModemReboot = () => {
         title="Modem Reboot Instructions"
          onPressBack={() => navigation.goBack()}
       />
-      <ScrollView >
+      <ScrollView showsVerticalScrollIndicator={false} >
         <View style={{ flexDirection: "column",paddingBottom:hp('15%') }}>
           <View
             style={[
@@ -97,7 +97,9 @@ const ModemReboot = () => {
             
             <Text style={styles.textContactUs}>
             {inst3}
-            <Text style={[styles.textContactUs,{fontWeight:'600'}]}> contact us</Text>{' for further assistance.'}
+            <Text style={[styles.textContactUs,{fontWeight:'600'}]} onPress={()=>{
+                navigation.navigate('support')
+            }}> contact us</Text>{' for further assistance.'}
               </Text>
           </View>
         </View>
