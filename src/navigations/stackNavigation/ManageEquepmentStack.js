@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import ManageEquipment from "../../components/support/ManageEquipment";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemRebootStack from "./ModemRebootStack";
+import ModemExchangeInstructions from "../../components/support/ModemExchangeInstructions";
 
 const ModemStack = createStackNavigator();
 
@@ -30,7 +31,15 @@ function ModemStackScreen() {
           blur: () => setTabBarVisible(true),
         }}
       />
-      
+       <ModemStack.Screen
+        name="ModemExchange"
+        component={ModemExchangeInstructions}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
      
       
     </ModemStack.Navigator>
