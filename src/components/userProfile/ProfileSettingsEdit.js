@@ -1,40 +1,82 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, FontSize, Color, FontFamily, Border } from "../../../GlobalStyles";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
-import {updateProfileRequest} from '../../redux/actions/ProfileActionSuite';
+import { updateProfileRequest } from '../../redux/actions/ProfileActionSuite';
 import NotificationAlert from '../common/customui/NotificationAlert';
+import { profileSchema } from '../utility/validationSchema';
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
   const route = useRoute(); // Use the useRoute hook
   const dispatch = useDispatch();
   const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [showValidationAlert, setShowValidationAlert] = useState(false);
+  const [initialEmailAddress, setInitialEmailAddress] = useState('');
   const profile = useSelector(state => state.combinedReducers.profile || {});
-  const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
-  const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
+  const profileDetailsfromStore = profile.profileDetails || {};
   const scrollViewRef = useRef(null);
+  const [smsPayload, setSmsPayload] = useState(route.params?.smsPayload || {});
 
-  const handleChange = (e) => {
-    console.log("Account field change", e)
-    setLocalProfile({ ...profileDetails, [e.target.name]: e.target.value });
+  const handleSave = async (data) => {
+    const newData = { ...data };
+    delete newData.phoneNumber; // Safe operation even if phoneNumber does not exist
+    const emailChanged = newData.svEmailAddress !== initialEmailAddress;
+    if (emailChanged) {
+      newData.email = initialEmailAddress;
+    }
+    dispatch(updateProfileRequest(newData, smsPayload, navigation));
   };
-  const handleSave = () => {
-    dispatch(updateProfileRequest(profileDetails, navigation));
+
+  const { control, handleSubmit, reset, formState: { errors } } = useForm({
+    resolver: yupResolver(profileSchema),
+    defaultValues: {
+      ...profileDetailsfromStore,
+      phoneNumber: smsPayload.phoneNumber
+    }
+  });
+
+  const updateSmsPayloadPhoneNumber = (e) => {
+    const { value } = e.target;
+    setSmsPayload(smsPayload => ({
+      ...smsPayload,
+      'phoneNumber': value
+    }));
   };
+
+  const handleValidationError = () => {
+    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+    setShowValidationAlert(true);
+  };
+
+  useEffect(() => {
+    reset({ ...profileDetailsfromStore });
+  }, [profileDetailsfromStore, reset]);
+
   useEffect(() => {
     if (route.params?.updateFailed) {
       setShowErrorAlert(true);
       scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-
-      // Reset the parameter so subsequent navigations are detected
       navigation.setParams({ updateFailed: undefined });
     }
   }, [route.params?.updateFailed, navigation]);
 
+  useEffect(() => {
+    setInitialEmailAddress(profileDetailsfromStore.svEmailAddress || '');
+  }, [profileDetailsfromStore]);
+
+  useEffect(() => {
+    // Cleanup function to close notifications on unmount
+    return () => {
+      setShowErrorAlert(false);
+      setShowValidationAlert(false);
+    };
+  }, []); // The empty array ensures this runs on unmount only
 
   return (
     <View style={styles.profileSettingsEdit}>
@@ -44,15 +86,25 @@ const ProfileSettingsEdit = () => {
       />
       <ScrollView ref={scrollViewRef}>
         <View style={[styles.profileSettingsEditInner]}>
-          <NotificationAlert
-            type="error"
-            title="Failed"
-            message="Your profile update failed."
-            showCloseIcon={true}
-            isVisible={showErrorAlert}
-            onClose={() => setShowErrorAlert(false)}
-          />
           <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
+            <View style={styles.infoWrapper}>
+              <NotificationAlert
+                type="error"
+                title="Failed"
+                message="Your profile update failed."
+                showCloseIcon={true}
+                isVisible={showErrorAlert}
+                onClose={() => setShowErrorAlert(false)}
+              />
+              <NotificationAlert
+                type="error"
+                title="Error"
+                message="Please enter valid information to continue."
+                showCloseIcon={true}
+                isVisible={showValidationAlert}
+                onClose={() => setShowValidationAlert(false)}
+              />
+            </View>
             <View style={[styles.generalInformationWrapper, styles.informationWrapperFlexBox]}>
               <Text style={styles.generalInformation} >
                 General Information
@@ -66,10 +118,19 @@ const ProfileSettingsEdit = () => {
                     First Name
                   </Text>
                   <View >
-                    <SparkLightInput
+                    <Controller
+                      control={control}
                       name="firstName"
-                      onChangeText={handleChange}
-                      value={profileDetails.firstName} />
+                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                        <SparkLightInput
+                          placeholder="First Name"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          error={error?.message}
+                        />
+                      )}
+                    />
                   </View>
                 </View>
               </View>
@@ -80,10 +141,19 @@ const ProfileSettingsEdit = () => {
                     Last Name
                   </Text>
                   <View >
-                    <SparkLightInput
+                    <Controller
+                      control={control}
                       name="lastName"
-                      onChangeText={handleChange}
-                      value={profileDetails.lastName} />
+                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                        <SparkLightInput
+                          placeholder="First Name"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          error={error?.message}
+                        />
+                      )}
+                    />
                   </View>
                 </View>
               </View>
@@ -94,10 +164,20 @@ const ProfileSettingsEdit = () => {
                     Username
                   </Text>
                   <View >
-                    <SparkLightInput
+                    <Controller
+                      control={control}
                       name="userName"
-                      onChangeText={handleChange}
-                      value={profileDetails.userName} />
+                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                        <SparkLightInput
+                          placeholder="First Name"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          editable={false}
+                          error={error?.message}
+                        />
+                      )}
+                    />
                   </View>
                 </View>
               </View>
@@ -117,10 +197,20 @@ const ProfileSettingsEdit = () => {
                     Email
                   </Text>
                   <View >
-                    <SparkLightInput
+                    <Controller
+                      control={control}
                       name="svEmailAddress"
-                      onChangeText={handleChange}
-                      value={profileDetails.svEmailAddress} />
+                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                        <SparkLightInput
+                          placeholder="First Name"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          editable={!profileDetailsfromStore.multipleEmails}
+                          error={error?.message}
+                        />
+                      )}
+                    />
                   </View>
                 </View>
               </View>
@@ -128,17 +218,29 @@ const ProfileSettingsEdit = () => {
                 <View style={styles.textinput}>
                   <Text style={[styles.firstTypo]}>Mobile Phone</Text>
                   <View >
-                    <SparkLightInput
-                      name="phone"
-                      onChangeText={handleChange}
-                      value={profileDetails.phone} />
+                    <Controller
+                      control={control}
+                      name="phoneNumber" // This should be the name used in your validation schema
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <SparkLightInput
+                          placeholder="Mobile number"
+                          onBlur={onBlur}
+                          onChangeText={(text) => {
+                            onChange(text);
+                            updateSmsPayloadPhoneNumber(text);
+                          }}
+                          value={value}
+                          error={errors.phoneNumber?.message}
+                        />
+                      )}
+                    />
                   </View>
                 </View>
               </View>
             </View>
           </View>
           <View style={{ marginTop: Padding.p_base }}>
-            <Pressable style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]} onPress={handleSave}>
+            <Pressable style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]} onPress={handleSubmit(handleSave, handleValidationError)}>
               <Text style={[{ color: Color.sparklightWhite }, styles.makeTypo]}>Save</Text>
             </Pressable>
             <Pressable style={[styles.buttonsLayout]} onPress={() => navigation.navigate("ProfileSettings")}>
@@ -213,7 +315,7 @@ const styles = StyleSheet.create({
   },
   rectangleWrapper: {
     paddingVertical: 0,
-    marginTop: 16,
+    marginTop: Padding.p_base,
     paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
   },
@@ -238,6 +340,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",
     marginBottom: 200,
+  },
+  infoWrapper: {
+    paddingHorizontal: Padding.p_5xl,
+    alignSelf: "stretch",
   },
   profileSettingsEdit: {
     flex: 1,

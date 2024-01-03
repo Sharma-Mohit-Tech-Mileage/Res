@@ -4,87 +4,90 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserType, BOX_COLORS } from '../utility/constant';
+import { getUserType, BOX_COLORS, transformResponse, initializeSettings, getRoleBasedMessage } from '../utility/constant';
 import NotificationAlert from '../common/customui/NotificationAlert';
-import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
+import { fetchProfileDetails, fetchSMSSelection } from '../../redux/actions/ProfileActionSuite'
 const ProfileSettings = () => {
   const navigation = useNavigation();
-  const route = useRoute(); // Use the useRoute hook
+  const route = useRoute();
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
-
-  // Ensure getUserType handles undefined inputs safely
+  const smsSubscription = profile.smsSubscription || [];
+  const data = transformResponse(smsSubscription);
+  const smsPayload = initializeSettings(data);
   const convertedRole = getUserType(profileDetails.memberType || '');
-
-  // Use optional chaining and provide a default empty string if undefined
+  const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || '');
   const normalizedRole = convertedRole?.replace(/\s+/g, '').toLowerCase() || '';
-
   const boxBackground = BOX_COLORS[normalizedRole] || Color.colorWhitesmoke_200;
-
+  const emailAlertNeeded = !profileDetails.svEmailAddress || profileDetails.multipleEmails;
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
       dispatch(fetchProfileDetails());
-      // Reset the parameter so subsequent navigations are detected
+      dispatch(fetchSMSSelection());
       navigation.setParams({ updateSuccess: undefined });
     }
   }, [route.params?.updateSuccess, navigation, dispatch]);
-  
+
   useEffect(() => {
     if (profileDetails) {
       dispatch(fetchProfileDetails());
     }
+    dispatch(fetchSMSSelection());
   }, [dispatch]);
+
+  useEffect(() => {
+    return () => {
+      setShowSuccessAlert(false);
+    };
+  }, []); // The empty array ensures this runs on unmount only
 
   return (
     <View style={{ zIndex: 1 }}>
-      <ProfileSettingsHeader
-        title="Profile Settings"
-        onPressBack={() => navigation.navigate('Account')}
-      />
+      <ProfileSettingsHeader title="Profile Settings" onPressBack={() => navigation.navigate('Account')} />
       <ScrollView accessibilityLabel="Profile settings page.">
         <View style={styles.frameParent}>
-          <NotificationAlert
-            type="success"
-            title="Update Successful"
-            message="Your profile has been updated successfully."
-            showCloseIcon={true}
-            isVisible={showSuccessAlert}
-            onClose={() => setShowSuccessAlert(false)}
-          />
-          <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
-            <View style={[styles.generalInformationParent]}
-            >
+          <View style={[styles.frameGroup]}>
+            <View style={styles.infoWrapper}>
+              <NotificationAlert
+                type="success"
+                title="Success"
+                message="Your profile settings have been successfully saved."
+                showCloseIcon={true}
+                isVisible={showSuccessAlert}
+                onClose={() => setShowSuccessAlert(false)}
+              />
+            </View>
+            <View style={[styles.generalInformationParent]}>
               <Text style={[styles.generalInformation, styles.melissaTypo]}>
                 General Information
               </Text>
               <Pressable
                 style={[styles.buttons, styles.buttonsLayout]}
-                onPress={() => navigation.navigate("ProfileSettingsEdit")}
-              >
+                onPress={() => navigation.navigate("ProfileSettingsEdit", { smsPayload: smsPayload })}>
                 <Text style={[styles.makePayment, styles.text1Clr]}>Edit</Text>
               </Pressable>
             </View>
             <View style={styles.frameContainer}>
-              <View style={styles.firstNameParent} accessible={true} accessibilityLabel="First Name: Melissa">
+              <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>First Name</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
                   {profileDetails.firstName}
                 </Text>
               </View>
-              <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Last Name: Smith">
+              <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Last Name</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>{profileDetails.lastName}</Text>
               </View>
-              <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Username: MelSmith">
+              <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Username</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
                   {profileDetails.userName}
                 </Text>
               </View>
-              <View style={styles.firstNameParent} accessible={true} accessibilityLabel="Member Type: PRIMARY ADMIN">
+              <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Member Type</Text>
                 <View style={styles.badgeWrapper}>
                   <View style={[styles.badge, styles.badgeBorder, { backgroundColor: boxBackground }]}>
@@ -97,35 +100,53 @@ const ProfileSettings = () => {
               <View style={styles.notificationsWrapper}>
                 <NotificationAlert
                   type="info" // "info", "success", "warning"
-                  title="Primary Admin"
+                  title={convertedRole}
                   showCloseIcon={false}
-                  message="You are currently the primary admin
-                          account. You can make another account
-                          the primary admin account. By doing so
-                          you will become an admin user under the
-                          new primary admin account."
+                  message={roleBasedInfo}
                 />
               </View>
             </View>
-            <View style={[styles.rectangleWrapper, styles.frameParent1SpaceBlock]}>
+            <View style={[{ paddingHorizontal: Padding.p_5xl }, styles.frameParentSpaceBlock]}>
               <View style={styles.frameChild} />
             </View>
-            <View style={styles.frameParent1SpaceBlock}>
+            <View style={styles.frameParentSpaceBlock}>
               <View style={styles.contactInformationWrapper}>
                 <Text style={[styles.generalInformation, styles.melissaTypo]}>
                   Contact Information
                 </Text>
               </View>
+              {emailAlertNeeded && (
+                <View style={styles.notificationsWrapper}>
+                  <NotificationAlert
+                    type={"warning"}
+                    title={profileDetails.multipleEmails ? "There is a problem retrieving your email address" : "No email address on file"}
+                    showCloseIcon={false}
+                    message={
+                      profileDetails.multipleEmails ? "We are not able to retrieve the email address for your account. Please contact us for assistance"
+                        : "We don't have your email address on file. Please add your email."
+                    }
+                  /></View>
+              )}
+
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Email</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
                   {profileDetails.svEmailAddress}
                 </Text>
               </View>
+              {!smsPayload.phoneNumber && (
+                <View style={styles.notificationsWrapper}>
+                  <NotificationAlert
+                    type={"warning"}
+                    title={"No mobile phone number on file"}
+                    showCloseIcon={false}
+                    message={"We don't have your phone number on file. Please add your phone number"}
+                  /></View>
+              )}
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Mobile Phone</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {profileDetails.phone || 'N/A'}
+                  {smsPayload.phoneNumber || ''}
                 </Text>
               </View>
             </View>
@@ -138,11 +159,6 @@ const ProfileSettings = () => {
 
 
 const styles = StyleSheet.create({
-  frameGroupSpaceBlock: {
-    paddingVertical: Padding.p_13xl,
-    alignSelf: "stretch",
-    marginBottom: 200,
-  },
   melissaTypo: {
     color: Color.sparklightGray1,
     lineHeight: 28,
@@ -170,14 +186,14 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_xs,
     fontWeight: "600",
   },
-  frameParent1SpaceBlock: {
-    marginTop: 16,
+  frameParentSpaceBlock: {
+    marginTop: Padding.p_base,
     alignSelf: "stretch",
   },
   generalInformation: {
+    flex: 1,
     fontSize: FontSize.size_3xl,
     textAlign: "left",
-    flex: 1,
     fontWeight: '400'
   },
   makePayment: {
@@ -186,7 +202,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   buttons: {
-    marginLeft: 10,
+    marginLeft: Padding.p_3xs,
     backgroundColor: Color.colorMidnightblue,
   },
   generalInformationParent: {
@@ -230,28 +246,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
-  notificationsChild: {
-    width: 3,
-    alignSelf: "stretch",
-  },
-
   notificationsWrapper: {
     paddingTop: Padding.p_base,
     paddingBottom: Padding.p_5xs,
     paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
   },
+  infoWrapper: {
+    paddingVertical: Padding.p_base,
+    paddingHorizontal: Padding.p_5xl,
+    alignSelf: "stretch",
+  },
   frameContainer: {
     alignSelf: "stretch",
-    marginTop: 16
+    marginTop: Padding.p_base
   },
   frameChild: {
     height: 1,
     backgroundColor: Color.sparklightGray,
     alignSelf: "stretch",
-  },
-  rectangleWrapper: {
-    paddingHorizontal: Padding.p_5xl,
   },
   contactInformationWrapper: {
     paddingBottom: Padding.p_base,
@@ -271,6 +284,7 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_5xl,
     paddingHorizontal: Padding.p_base,
     width: '100%',
+    marginBottom: 200,
   },
 });
 

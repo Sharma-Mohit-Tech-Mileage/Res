@@ -9,18 +9,63 @@ import BellIcon from "../../res/svgIcons/bellIcon";
 import PhoneRingingIcon from "../../res/svgIcons/PhoneRingingIcon";
 import EntryInput from "./EntryInput";
 import CheckBox from '@react-native-community/checkbox';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateTextNotification } from '../../redux/actions/ProfileActionSuite';
 
 const TextNotifications = ({ navigation }) => {
+    const dispatch = useDispatch();
     const [input, setInput] = useState('');
     const [toggleCheckBox, setToggleCheckBox] = useState(false);
+    const [enableButton, setEnableButton] = useState(false);
+    const [nextScreen, setNextScreen] = useState('EntryEmailNotifications');
+    const user = useSelector(state => state.combinedReducers.user.userData);
+    const profile = useSelector(state => state.combinedReducers.profile || {});
+
+    useEffect(() => {
+        if (profile.paperlessStatus) {
+            setNextScreen('MyTab');                      
+        }
+    }, []); 
+
+    useEffect(() => {
+        setInput(user.phone);
+    }, []);  
 
     const onChangeText = (text) => {
         setInput(text);
+        if (input.length > 0) {
+            setEnableButton(true);
+        } else {
+            setEnableButton(false);
+        }
     };   
+
+    const onCheckBox = (value) => {
+        setToggleCheckBox(value);
+        if (value && input.length > 0) {
+            setEnableButton(value);
+        } else {
+            setEnableButton(false);
+        }
+    };  
     
     const keyboardDismiss = () => {
         Keyboard.dismiss();
     }; 
+
+    const enableTextNotifications = () => {
+        const data = {
+            accountNumber: user.userInfo.accountNumber, 
+            billingOptOutStatus: false, 
+            optOut: false, 
+            outageOptOut: false, 
+            phoneNumber: input
+        }
+        console.log('enableTextNotifications: ', data);
+        //{"accountNumber": "900690538", "billingOptOutStatus": false, "optOut": false, "outageOptOut": false, "phoneNumber": ""}
+        dispatch(updateTextNotification(data, null));
+        navigation.navigate(nextScreen);
+    };
 
     const terms = [
         {
@@ -81,7 +126,7 @@ const TextNotifications = ({ navigation }) => {
                         <CheckBox
                             disabled={false}
                             value={toggleCheckBox}
-                            onValueChange={(newValue) => setToggleCheckBox(newValue)}
+                            onValueChange={onCheckBox}
                             style={styles.checkBox}
                             boxType="square"
                         />   
@@ -91,16 +136,17 @@ const TextNotifications = ({ navigation }) => {
                     </View>
                     <View style={styles.bottomBar}>
                         <Pressable
-                            style={[styles.button, styles.buttonsLayout]}
-                            onPress={() => navigation.navigate("EmailNotifications")}
+                            disabled={!enableButton}
+                            style={enableButton ? [styles.button, styles.buttonsLayout] : [styles.button, styles.buttonsLayout, styles.buttonDisabled]}
+                            onPress={enableTextNotifications}
                         >
-                            <Text style={styles.accept}>Enable Text Notifications</Text>
+                            <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]}>Enable Text Notifications</Text>
                         </Pressable>                
                         <View style={styles.buttonsParent} 
                             accessibilityLabel="Buttons Section">
                             <Pressable
                                 style={[styles.buttonDecline, styles.buttonsLayout]}
-                                onPress={() => navigation.navigate("EmailNotifications")}
+                                onPress={() => navigation.navigate("EntryEmailNotifications")}
                                 accessibilityLabel="Decline Button"
                                 accessibilityRole="button"
                                 accessibilityHint="Decline Terms and Conditions"
@@ -131,6 +177,13 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         width: '90%',
     },
+    buttonDisabled: {
+        backgroundColor: Color.colorWhitesmoke_300,
+        color: Color.colorGray_200
+    },
+    buttonDisabledText: {
+        color: Color.sparklightaddGray
+    },    
     buttonsLayout: {
         paddingVertical: Padding.p_base,
         paddingHorizontal: 0,
@@ -162,7 +215,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: FontFamily.openSansRegular,   
         lineHeight: 20,    
-        marginRight: 20
+        marginRight: 20,
+        color: Color.colorGray_200
     },
     accept: {
         fontSize: FontSize.size_base,

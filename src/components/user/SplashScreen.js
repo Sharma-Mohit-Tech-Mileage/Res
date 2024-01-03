@@ -15,8 +15,8 @@ import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, revoke } from "react-native-app-auth";
 import { useDispatch, useSelector } from "react-redux";
-import { ssoLoginAction } from "../../redux/actions/UserAction";
-import { storeUser, storeSsoToken,getSsoToken } from "../../redux/utils/LocalStorage";
+import { ssoLoginAction, saveUserInfo } from "../../redux/actions/UserAction";
+import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import {
   widthPercentageToDP as wp,
@@ -24,9 +24,11 @@ import {
 } from "react-native-responsive-screen";
 import RNExitApp from "react-native-exit-app"
 import AlertIcon from "../../res/svgIcons/AlertIcon";
-import * as Zendesk from 'react-native-zendesk-messaging';
+import CloseIcon from "../../res/svgIcons/CloseIcon";
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
+import { getFirstTime, storeFirstTime } from "../../redux/utils/LocalStorage";
+import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -37,6 +39,7 @@ const config = {
   iosPrefersEphemeralSession: false,
   additionalParameters: { prompt: "login" },
 };
+
 
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -49,43 +52,61 @@ const SplashScreen = ({ navigation }) => {
     setLoading(true);
     PostAuthApiRequest("/mobile/api/gettoken", request, onSuccess, onError);
   };
-  //HeadOfHousehold
-  const onSuccess = (res) => {
+  
+  const onSuccess = async (res) => {
     setLoading(false);
-    console.log("callSSOLoginApi", res);
+
+    console.log('onSuccess res: ', res);
+
     if (res) {
       let token = res.jwtToken;
       let userInfo = res.userInfo;
       let user = {
         userInfo: userInfo,
         token: token,
+        tokenGuid: res.idTokenGuid,
+        refreshToken: res.refreshToken
       };
 
       if (token) {
         storeUser(user);
       }
-      Zendesk.login(token)
-      if (userInfo.accountNumber === "900690538") {
-        setErrorMessage(strings.nonAdminUserMsg);
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
-      } else if (userInfo.accountNumber === "902862879") {
-        setErrorMessage(strings.nonInternetUserMessage);
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
-      } else {
-        navigation.navigate("MyTab", {
-          fname: userInfo.firstName,
-          lname: userInfo.lastName,
-        });
-      }
+
+      dispatch(saveUserInfo(user));
+
+      const data = await getFirstTime();
+
+        if (userInfo.accountNumber === "900690538") {
+          setErrorMessage(strings.nonAdminUserMsg);
+          setTimeout(() => {
+            setModalVisible(true);
+          }, 100);
+        } else if (userInfo.accountNumber === "902862879") {
+          setErrorMessage(strings.nonInternetUserMessage);
+          setTimeout(() => {
+            setModalVisible(true);
+          }, 100);
+        } else {
+          if (data !== null 
+            && data.accountNumber === userInfo.accountNumber) {
+              navigation.navigate("MyTab");
+          } else {
+            storeFirstTime({
+              accountNumber: userInfo.accountNumber
+            });
+
+            if (user.userInfo.mobileTCAcceptanceFlag) {
+              navigation.navigate("EntryPushNotifications");
+            } else {
+              navigation.navigate("Terms");
+            }
+          }
+        }         
     }
   };
 
   const onError = (error) => {
-    console.log(" callSSOLoginApi error", JSON.stringify(error));
+    console.log(" callSSOLoginApi error", error);
   };
 
   const CustomAlertModal = ({ visible, message, onClose }) => {
@@ -155,7 +176,15 @@ const SplashScreen = ({ navigation }) => {
   const loginAuth = async () => {
     try {
       const result = await authorize(config);
-      const data = { idToken: result.idToken,accessToken:result.accessToken };
+
+      console.log('loginAuthResult: ', result);
+
+      const data = { 
+        idToken: result.idToken,accessToken:result.accessToken,
+        idTokenGuid: result.authorizeAdditionalParameters.session_state,
+        refreshToken: result.refreshToken
+      };
+
       setLoading(true);
       //dispatch(ssoLoginAction(data))
       callSSOLoginApi(data);
@@ -165,6 +194,22 @@ const SplashScreen = ({ navigation }) => {
       console.log(error);
     }
   };
+
+  const loginFirstTimeFlow = async () => {
+    storeFirstTime(null);
+    await loginAuth();
+  };
+
+  const termsAndConditionsFlow = async () => {
+    storeFirstTime(null);
+    dispatch(updateTermsAndConditions(false, null));
+    await loginAuth();
+  };  
+
+  const articleWindowUtility = async () => {
+    navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name :'Upgrade Plan'});
+  };
+
   useEffect(() => {}, []);
 
   return (
@@ -196,16 +241,23 @@ const SplashScreen = ({ navigation }) => {
         visible={modalVisible}
         message={errorMessage}
         onClose={handleCloseAlert}
-      />
-
+      />    
       <View style={styles.buttonContainer}>
         <Pressable
           style={[styles.buttons, styles.buttonsLayout]}
-          onPress={() => navigation.navigate("Terms")}
+          onPress={loginFirstTimeFlow}
         >
             <Text style={styles.buttonTextFirstTime}>First Time Flow</Text>
         </Pressable> 
-      </View>        
+      </View>    
+      <View style={styles.buttonContainer}>
+        <Pressable
+          style={[styles.buttons, styles.buttonsLayout]}
+          onPress={termsAndConditionsFlow}
+        >
+            <Text style={styles.buttonTextFirstTime}>Terms And Conditions</Text>
+        </Pressable> 
+      </View>       
     </LinearGradient>
   );
 };

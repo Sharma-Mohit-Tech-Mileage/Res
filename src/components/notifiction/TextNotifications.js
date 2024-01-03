@@ -3,11 +3,11 @@ import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-nati
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import Toggle from '../common/Toggle';
-import { useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
+import { useRoute, useIsFocused } from "@react-navigation/native";
 import { useDispatch } from 'react-redux';
 import { initializeSettings } from '../utility/constant';
 import NotificationAlert from "../common/customui/NotificationAlert";
-import {updateTextNotification} from '../../redux/actions/ProfileActionSuite'
+import {updateTextNotification} from '../../redux/actions/ProfileActionSuite';
 
 const TextNotifications = ({ navigation }) => {
     const [initialize, setInitializeSettings] = useState({});
@@ -23,8 +23,6 @@ const TextNotifications = ({ navigation }) => {
         if (isFocused) {
             // Initialize settings based on additionalData
             const initializedSettings = initializeSettings(additionalData);
-            console.log("Default settings if additionalData or its properties are undefined 1", additionalData);
-            console.log("Default settings if additionalData or its properties are undefined 2", initializedSettings);
             setInitializeSettings(initializedSettings);
         }
 
@@ -37,14 +35,19 @@ const TextNotifications = ({ navigation }) => {
     }, [isFocused, additionalData]); // Depend on isFocused and additionalData
     const handleToggleChange = (e) => {
         const { name, value } = e.target;
+
+        // Log the name and value for debugging
+        console.log(`Name: ${name}, Value: ${value}`);
+
         setInitializeSettings(initialize => {
             const updatedSettings = {
                 ...initialize,
-                [name]: value
+                [name]: !value
             };
             return updatedSettings;
         });
     };
+
 
     useEffect(() => {
         if (route.params?.updateFailed) {
@@ -68,16 +71,17 @@ const TextNotifications = ({ navigation }) => {
             />
             <ScrollView ref={scrollViewRef}>
                 <View style={styles.textNotificationsInner} >
-                    <NotificationAlert
-                        type="error"
-                        title="Failed"
-                        message="Notifications updated failed."
-                        showCloseIcon={true}
-                        isVisible={showErrorAlert}
-                        onClose={() => setShowSuccessAlert(false)}
-                    />
+                    
                     <View style={[styles.navigationBorder]}>
                         <View style={styles.frameGroup}>
+                            <NotificationAlert
+                                type="error"
+                                title="Failed"
+                                message="Notifications updated failed."
+                                showCloseIcon={true}
+                                isVisible={showErrorAlert}
+                                onClose={() => setShowErrorAlert(false)}
+                            />
                             <View style={styles.frameView}>
                                 <View style={styles.infoCircleWrapper}>
                                     <Image
@@ -121,7 +125,7 @@ const TextNotifications = ({ navigation }) => {
                                         <View >
                                             <Toggle
                                                 name="optOut"
-                                                initialValue={initialize.optOut}
+                                                initialValue={!initialize.optOut}
                                                 onToggle={handleToggleChange}
                                             />
                                         </View>
@@ -143,7 +147,7 @@ const TextNotifications = ({ navigation }) => {
                                         <View >
                                             <Toggle
                                                 name="outageOptOut"
-                                                initialValue={initialize.outageOptOut}
+                                                initialValue={!initialize.outageOptOut}
                                                 onToggle={handleToggleChange}
                                             />
                                         </View>
@@ -165,7 +169,7 @@ const TextNotifications = ({ navigation }) => {
                                         <View >
                                             <Toggle
                                                 name="billingOptOutStatus"
-                                                initialValue={initialize.billingOptOutStatus}
+                                                initialValue={!initialize.billingOptOutStatus}
                                                 onToggle={handleToggleChange} />
                                         </View>
                                     </View>

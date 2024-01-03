@@ -12,12 +12,46 @@ import ShopIconSelected from '../res/svgIcons/ShopIconSelected';
 import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
+import { CopilotStep, walkthroughable, useCopilot } from "react-native-copilot";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Alert,
+} from "react-native";
+import { useSelector } from 'react-redux';
+
 const Tab = createBottomTabNavigator();
 
-
+const WalkthroughableView = walkthroughable(View);
 
 const MyTabs = ({ route, navigation }) => {
+  const { start, copilotEvents } = useCopilot();
+  const [secondStepActive, setSecondStepActive] = useState(true);
+  const [lastEvent, setLastEvent] = useState(null);
   const { tabBarVisible } = useTabBarVisibility();
+  const user = useSelector(state => state.combinedReducers.user.userData);
+
+  useEffect(() => {
+    copilotEvents.on("stepChange", (step) => {
+      setLastEvent(`stepChange: ${step.name}`);
+    });
+    copilotEvents.on("start", () => {
+      setLastEvent(`start`);
+    });
+    copilotEvents.on("stop", () => {
+      setLastEvent(`stop`);
+    });
+  }, [copilotEvents]);  
+  
+  useEffect(() => {
+    // Alert.alert(('hello'));
+    // setTimeout(() => {
+    // start();
+    //   Alert.alert(('timeout'));
+    // }, 10000);
+  }, []);
+
   return (
     <Tab.Navigator
       name='MyTab'
@@ -36,7 +70,19 @@ const MyTabs = ({ route, navigation }) => {
         options={{
           headerShown: false,
           tabBarLabel: 'Home',
-          tabBarIcon: ({ focused }) => focused ? <HomeIconSelected /> : <HomeIcon />
+          tabBarIcon: ({ focused }) => {
+            return (
+              <CopilotStep
+                text="View information related to your internet health, billing, service and more."
+                order={1}
+                name="first"
+              >
+                <WalkthroughableView style={styles.tabItem}>
+                  {focused ? <HomeIconSelected /> : <HomeIcon />}
+                </WalkthroughableView>
+              </CopilotStep>   
+            );
+          }
         }}
       />
       <Tab.Screen
@@ -60,9 +106,19 @@ const MyTabs = ({ route, navigation }) => {
         options={{
           headerShown: false,
           tabBarLabel: 'Support',
-          tabBarIcon: ({ focused, size }) => (
-            (focused) ? <SupportIconSelected /> : <SupportIcon />
-          ),
+          tabBarIcon: ({ focused }) => {
+            return (
+              <CopilotStep
+                text="View information related to your internet health, billing, service and more."
+                order={2}
+                name="second"
+              >
+                <WalkthroughableView style={styles.tabItem}>
+                  {focused ? <SupportIconSelected /> : <SupportIcon />}
+                </WalkthroughableView>
+              </CopilotStep>   
+            );
+          }
         }}
       />
       <Tab.Screen
@@ -71,12 +127,29 @@ const MyTabs = ({ route, navigation }) => {
         options={{
           headerShown: false,
           tabBarLabel: 'Account',
-          tabBarIcon: ({ focused, size }) => (
-            <AccountIcon focused={focused} data={route} />
-          ),
+          tabBarIcon: ({ focused }) => {
+            return (
+              <CopilotStep
+                text="Manage your profile settings, notifications, users and more."
+                order={3}
+                name="third"
+              >
+                <WalkthroughableView style={styles.tabItem}>
+                  <AccountIcon focused={focused} data={user.userInfo} />
+                </WalkthroughableView>
+              </CopilotStep>   
+            );
+          }          
         }}
       />
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  tabItem: {
+    textAlign: "center",
+  },
+});
+
 export default MyTabs;

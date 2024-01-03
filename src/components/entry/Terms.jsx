@@ -3,8 +3,32 @@ import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import { useSelector, useDispatch } from 'react-redux';
+import { cleanUserData, storeFirstTime } from "../../redux/utils/LocalStorage";
+import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
 
 const Terms = ({ navigation }) => {
+    const dispatch = useDispatch();
+    const stateData = useSelector(state => state);
+    const combinedReducers = useSelector(state => state.combinedReducers);
+    const userData = useSelector(state => state.combinedReducers.user.userData);
+    console.log('userData: ', userData);
+    console.log('combinedReducers: ', combinedReducers);
+    console.log('stateData: ', JSON.stringify(stateData));
+
+    const termsAccepted = () => {
+        console.log('termsAccepted');
+        dispatch(updateTermsAndConditions(true, navigation));
+    };
+
+    const termsCanceled = () => {
+        cleanUserData();
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Splash' }]}) 
+        //dispatch(updateTermsAndConditions(false, navigation));
+        //navigation.navigate("PushNotifications");
+    };    
 
     const terms = [
         {
@@ -57,7 +81,7 @@ const Terms = ({ navigation }) => {
                     accessibilityLabel="Buttons Section">
                     <Pressable
                         style={[styles.buttonDecline, styles.buttonsLayout]}
-                        onPress={() => navigation.navigate("PushNotifications")}
+                        onPress={termsCanceled}
                         accessibilityLabel="Decline Button"
                         accessibilityRole="button"
                         accessibilityHint="Decline Terms and Conditions"
@@ -68,7 +92,7 @@ const Terms = ({ navigation }) => {
                     </Pressable>                
                     <Pressable
                         style={[styles.buttons, styles.buttonsLayout]}
-                        onPress={() => navigation.navigate("PushNotifications")}
+                        onPress={termsAccepted}
                     >
                         <Text style={styles.accept}>Accept</Text>
                     </Pressable>
@@ -80,7 +104,7 @@ const Terms = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     bottomBar: {
-        height: 100,
+        height: 150,
         backgroundColor: '#FFF',
         borderTopColor: '#CCC',
         borderTopWidth: 1,

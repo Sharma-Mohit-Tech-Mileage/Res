@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable } from "react-native";
+import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Platform } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
@@ -12,9 +12,42 @@ import {
   requestUserPermission,
   notificationListener,
 } from '../../firebase/FirebaseUtils';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchSMSSelection, fetchBillingStatus, fetchPushNotifications } from '../../redux/actions/ProfileActionSuite';
+import moment from 'moment';
+import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
 
 const PushNotifications = ({ navigation }) => {
     const [generatedToken, setGeneratedToken] = useState();
+    const [nextScreen, setNextScreen] = useState('EntryTextNotifications');
+    const dispatch = useDispatch();
+    const profile = useSelector(state => state.combinedReducers.profile || {});
+    const user = useSelector(state => state.combinedReducers.user.userData);
+
+    console.log('profile: ', JSON.stringify(profile));
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                await dispatch(fetchBillingStatus());
+                await dispatch(fetchSMSSelection());
+                await dispatch(fetchPushNotifications());
+
+                if (profile.smsSubscription.length > 0) {
+                    if (profile.paperlessStatus) {
+                        setNextScreen('MyTab');                      
+                    } else {
+                        setNextScreen('EntryEmailNotifications');  
+                    }
+                } 
+
+            } catch (error) {
+                console.error("Error fetching data", error);
+            }
+        };
+
+        fetchData();
+    }, [dispatch]);    
 
     const terms = [
         {
@@ -31,18 +64,43 @@ const PushNotifications = ({ navigation }) => {
         }                
     ];
 
-    // const enableNotifications = () => {
-    //     const fetchToken = async () => {
-    //     const token = await getFcmToken();
-    //         if (token) {
-    //             setGeneratedToken(token);
-    //         }
-    //     };
+    const enableNotifications = async () => {
+        // const fetchToken = async () => {
+        //     const token = await getFcmToken();
+        //     if (token) {
+        //         setGeneratedToken(token);
+        //     }
+        // };
+
+        const enabledPermission = await requestUserPermission();
+
+        if (enabledPermission) {
+            const token = await getFcmToken();
+            if (token) {
+                setGeneratedToken(token);
+            }
+            const data = {
+                accountNumber: user.userInfo.accountNumber,
+                deviceToken: token,
+                deviceTokenTimestamp: moment().format(),
+                optOut: false,
+                outageOptOut: false,
+                billingOptOutStatus: false,
+                userName: user.userInfo.userName,
+                isAndroid: Platform.OS == "android",
+            };
+            console.log('enableNotifications: ', data);
+            console.log('enableNotifications navigation: ', navigation);
+            await dispatch(updatePushNotifications(data, null));
+            navigation.navigate(nextScreen);
+        } else {
+            navigation.navigate(nextScreen);
+        }
         
-    //     void fetchToken();
-    //     void requestUserPermission();
-    //     void notificationListener();
-    // };
+        //void fetchToken();
+        //void requestUserPermission();
+        //void notificationListener();
+    };
 
     return  (
         <View style={styles.container}>
@@ -71,14 +129,13 @@ const PushNotifications = ({ navigation }) => {
                         </View>         
                         <View style={styles.subHeader}>
                             <Text style={styles.subHeaderText}>Receive app alerts related to your account, updates and more from Sparklight.</Text>
-                        </View>   
+                        </View>                         
                     </View>            
                 </View>
                 <View style={styles.bottomBar}>
                     <Pressable
                         style={[styles.button, styles.buttonsLayout]}
-                        onPress={() => navigation.navigate("TextNotifications")} 
-                        //onPress={enableNotifications}
+                        onPress={enableNotifications}
                     >
                         <Text style={styles.accept}>Allow Notifications</Text>
                     </Pressable>                
@@ -86,7 +143,7 @@ const PushNotifications = ({ navigation }) => {
                         accessibilityLabel="Buttons Section">
                         <Pressable
                             style={[styles.buttonDecline, styles.buttonsLayout]}
-                            onPress={() => navigation.navigate("TextNotifications")}
+                            onPress={() => navigation.navigate("EntryTextNotifications")}
                             accessibilityLabel="Decline Button"
                             accessibilityRole="button"
                             accessibilityHint="Decline Terms and Conditions"

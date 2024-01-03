@@ -12,7 +12,7 @@ const feedbackOptions = [
 ];
 const Feedback = () => {
     const navigation = useNavigation();
-    const [selectedFeedback, setSelectedFeedback] = useState(null);
+    const [selectedFeedback, setSelectedFeedback] = useState("facehappy");
     const [inputText, setInputText] = useState('');
     const [charCount, setCharCount] = useState(0);
     const handleTextInputChange = (text) => {
@@ -199,6 +199,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderStyle: "solid",
         textAlignVertical: 'top',
+        color: Color.colorGray_200,
         fontWeight: '600', // Set text to bold
         fontSize:FontSize.size_base,
         fontFamily: FontFamily.openSansRegular, 

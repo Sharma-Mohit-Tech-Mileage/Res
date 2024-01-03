@@ -5,7 +5,7 @@ import { Color, Padding, FontSize, FontFamily, Border } from "../../../GlobalSty
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from '../common/customui/NotificationAlert';
-import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
+import { fetchProfileDetails, fetchSMSSelection } from '../../redux/actions/ProfileActionSuite'
 const PasswordSecurity = () => {
   const navigation = useNavigation();
   const route = useRoute(); // Use the useRoute hook
@@ -17,7 +17,6 @@ const PasswordSecurity = () => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
       dispatch(fetchProfileDetails());
-      // Reset the parameter so subsequent navigations are detected
       navigation.setParams({ updateSuccess: undefined });
     }
   }, [route.params?.updateSuccess, navigation, dispatch]);
@@ -35,17 +34,19 @@ const PasswordSecurity = () => {
         accessibilityHint="Go back to Account"
       />
       <View style={[styles.passwordSecurityInner, styles.securitySpaceBlock]}>
-        <NotificationAlert
-          type="success"
-          title="Update Successful"
-          message="Your password and security has been updated successfully."
-          showCloseIcon={true}
-          isVisible={showSuccessAlert}
-          onClose={() => setShowSuccessAlert(false)}
-        />
         <View style={[styles.frameParent, styles.navigationBorder]}>
+          <View style={styles.infoWrapper}>
+            <NotificationAlert
+              type="success"
+              title="Update Successful"
+              message="Your password and security has been updated successfully."
+              showCloseIcon={true}
+              isVisible={showSuccessAlert}
+              onClose={() => setShowSuccessAlert(false)}
+            />
+          </View>
           <View style={[styles.passwordParent, styles.tabsFlexBox]}>
-            <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header">
+            <Text style={[styles.password, styles.passwordFlexBox]}>
               Password
             </Text>
             <Pressable
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_11xs,
   },
   frameContainerSpaceBlock: {
-    marginTop: 16,
+    marginTop: Padding.p_base,
     alignSelf: "stretch",
   },
   password: {
@@ -162,6 +163,10 @@ const styles = StyleSheet.create({
   frameChild: {
     height: 1,
     backgroundColor: Color.sparklightGray,
+    alignSelf: "stretch",
+  },
+  infoWrapper: {
+    paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
   },
   rectangleWrapper: {

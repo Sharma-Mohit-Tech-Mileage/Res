@@ -1,69 +1,96 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
+import { View, TextInput, Text, StyleSheet, Image } from 'react-native';
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../../GlobalStyles";
+import warningIcon from '../../../../assets/alertTriangle.png';
 
-const SparkLightInput = ({ name, placeholder, value, onChangeText, style, accessibilityLabel, secure = false, ...props }) => {
+const SparkLightInput = ({ name, placeholder, value, onChangeText, style, accessibilityLabel, secure = false, error, editable = true, ...props }) => {
     const [isFocused, setIsFocused] = useState(false);
 
     const handleInputChange = (text) => {
         if (onChangeText) {
-            // Creating a synthetic event object
-            const event = {
-                target: {
-                    name,
-                    value: text,
-                },
-                preventDefault: () => { }, // Include this if needed
-            };
-            onChangeText(event);
+            onChangeText({ target: { name, value: text } });
         }
     };
 
 
     return (
-        <View style={[styles.outerContainer, isFocused ? { borderColor: Color.sparklightBrightPurple } : {}, style]}>
-            <View style={styles.container}>
-                <TextInput
-                    // placeholder={placeholder} // Uncomment this if placeholder is needed
-                    value={value} // Controlled by the parent component
-                    onChangeText={handleInputChange}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    style={styles.textInput}
-                    secureTextEntry={secure} 
-                    accessibilityLabel={accessibilityLabel || placeholder}
-                    accessibilityHint={`Input field for ${accessibilityLabel || placeholder}`}
-                    importantForAccessibility="yes"
-                    caretColor={Color.colorGray_100}
-                    {...props}
-                />
-            </View>
+        <View style={[styles.outerContainer, style, error && styles.outerContainerError]}>
+
+            <TextInput
+                //placeholder={placeholder}
+                value={value}
+                onChangeText={handleInputChange}  // Updated to use handleInputChange
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                editable={editable}
+                style={[
+                    styles.textInput,
+                    !editable && styles.disabledInput,
+                    isFocused && !error && { borderColor: Color.sparklightBrightPurple },
+                    error && { borderColor: 'red' },
+                    !isFocused && !error && { borderColor: Color.sparklightDarkGray } // Revert to default border color when not focused and no error
+                ]}
+                secureTextEntry={secure}
+                accessibilityLabel={accessibilityLabel || placeholder}
+                {...props}
+            />
+            {error && (
+                <View style={styles.errorContainer}>
+                    <Image source={warningIcon} style={styles.errorIcon} />
+                    <Text style={styles.errorText}>{error}</Text>
+                </View>
+            )}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     outerContainer: {
-        // Apply the border to this outer container instead
         marginTop: 8,
-        height: 42, // Increase the height by the border width to keep input size
-        borderColor: Color.sparklightDarkGray,
+        minHeight: 48, // Use minHeight instead of height
+        borderColor: Color.sparklightWhite,
         borderWidth: 1,
         borderRadius: Border.br_11xs,
         justifyContent: 'center',
-        overflow: 'hidden', // Ensures the child View conforms to this View's border radius
+        position: 'relative', // For absolute positioning of the error text
     },
     container: {
-        height: 40,
+        height: 40, // Keep the input field height
         justifyContent: 'center',
     },
     textInput: {
+        height: 48, // Keep the input field height
         color: Color.colorGray_200,
         fontSize: FontSize.size_base,
         paddingHorizontal: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,
-       
+        borderWidth: 1,
+        borderRadius: Border.br_11xs,
     },
+
+    errorContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 4, // Space between the input and the error message
+    },
+    errorIcon: {
+        width: 20,
+        height: 20,
+        marginRight: Padding.p_xs,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: FontSize.size_sm,
+        fontFamily: FontFamily.openSansRegular,
+    },
+    disabledInput: {
+        backgroundColor: Color.Gray300, // Light gray background
+        opacity: 1, // Make it look faded
+    },
+    outerContainerError: {
+        paddingBottom: 0, // Add padding to accommodate the error message
+    },
+
 });
 
 export default SparkLightInput;

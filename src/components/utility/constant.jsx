@@ -6,7 +6,12 @@ export const ROLE_COLORS = {
 };
 export const BOX_COLORS = {
     primaryadmin: Color.success50,
-    admin: Color.success50,
+    admin: Color.colorWhitesmoke_200,
+    viewonly: Color.colorWhitesmoke_200,
+};
+export const BORDER_COLORS = {
+    primaryadmin: Color.colorAquamarine,
+    admin: Color.colorWhitesmoke_200,
     viewonly: Color.colorWhitesmoke_200,
 };
 export const validatePassword = (newPassword, userName) => {
@@ -18,7 +23,7 @@ export const validatePassword = (newPassword, userName) => {
         newPassword !== userName, // It must be different than your user name.
         newPassword.length >= 8 && newPassword.length <= 20, // It must contain 8 to 20 characters.
         /[A-Z]/.test(newPassword) && /[a-z]/.test(newPassword) && /[0-9]/.test(newPassword), // It must include an upper and lower case letter and a number.
-        /[%&_,?#=.-]/.test(newPassword), // You may include special characters %,&,_,?,#,=,-.
+        /[^a-zA-Z0-9]/.test(newPassword), // You may include special characters %,&,_,?,#,=,-.
         !/\s/.test(newPassword) // Your new password cannot have any spaces.
     ];
     return conditions;
@@ -37,14 +42,17 @@ export const passwordTerms = [
     "It must be different than your user name.",
     "It must contain 8 to 20 characters.",
     "It must include an upper and lower case letter and a number.",
-    "You may include special characters %,&,_,?,#,=,-.",
+    "It must include at least one special character such as %, &, _, ?, #, =, -",
     "Your new password cannot have any spaces."
 ]
 
 export const transformResponse = (responseArray) => {
-    // Set default values
     const defaultPhoneNumber = "";
-    const defaultSubscriptionDetails = [];
+    const defaultSubscriptionDetails = [
+        { type: 'Appointments', status: 'Off' },
+        { type: 'Outage', status: 'Off' },
+        { type: 'Billing', status: 'On' },
+    ];
 
     // Check if the response is an array and not empty
     if (!Array.isArray(responseArray) || responseArray.length === 0) {
@@ -70,7 +78,7 @@ export const transformResponse = (responseArray) => {
     const subscriptionDetails = smsMessageType.map(msgType => {
         return {
             type: msgType.messageType,
-            status: msgType.optOutFlag ? 'On' : 'Off'
+            status: !msgType.optOutFlag ? 'On' : 'Off'
         };
     });
 
@@ -107,35 +115,141 @@ export const initializeSettings = (additionalData) => {
         return {
             accountNumber: "",
             phoneNumber: "",
-            optOut: false,
-            outageOptOut: false,
-            billingOptOutStatus: false,
+            optOut: true,
+            outageOptOut: true,
+            billingOptOutStatus: true,
         };
     }
 
     const defaultSettings = {
         accountNumber: "",
         phoneNumber: additionalData.phoneNum,
-        optOut: false,
-        outageOptOut: false,
-        billingOptOutStatus: false,
+        optOut: true,
+        outageOptOut: true,
+        billingOptOutStatus: true,
     };
 
     additionalData.subscriptionDetails.forEach((detail) => {
         const status = detail.status?.toLowerCase() === 'on';
         const type = detail.type?.toLowerCase();
-
         if (type === "appointment") {
-            defaultSettings.optOut = status;
+            defaultSettings.optOut = !status;
         }
         if (type === "outage") {
-            defaultSettings.outageOptOut = status;
+            defaultSettings.outageOptOut = !status;
         }
         if (type === "billing") {
-            defaultSettings.billingOptOutStatus = status;
+            defaultSettings.billingOptOutStatus = !status;
         }
     });
-
     return defaultSettings;
 };
+
+export const getRoleBasedMessage = (input) => {
+    // Check for null or empty input
+    if (!input || input.trim() === '') {
+        return '';
+    }
+
+    // Convert input to lower case for case-insensitive comparison
+    const inputLower = input.toLowerCase();
+
+    // Define the mapping
+    const mapping = {
+        'admin': 'As an admin, you can manage this account, but you are not the primary contact for this account.',
+        'limited': 'VIEW ONLY',
+        'restricted': 'VIEW ONLY',
+        'headofhousehold': 'As the primary admin, you are the main contact and have full control over this account.'
+    };
+
+    // Return the corresponding value from the mapping or an empty string if not found
+    return mapping[inputLower] || '';
+};
+
+export const transformNotificationPreferences = (response) => {
+   // console.log('Default structure for when data is missing or in an unexpected format', JSON.stringify(response));
+    const defaultStructure = [
+        { type: 'Appointments', status: 'Off' },
+        { type: 'Outage', status: 'Off' },
+        { type: 'Billing', status: 'Off' }
+    ];
+
+    if (!response || !Array.isArray(response) || response.length === 0) {
+        return defaultStructure;
+    }
+
+    const pushMessageTypeArray = response[0].pushMessageType;
+    if (!pushMessageTypeArray || !Array.isArray(pushMessageTypeArray)) {
+        return defaultStructure;
+    }
+
+    return pushMessageTypeArray.map(item => {
+        const typeMapping = {
+            'appointment': 'Appointments',
+            'outage': 'Outage',
+            'billing': 'Billing'
+        };
+
+        const messageTypeLower = item.messageType.toLowerCase();
+        const type = typeMapping[messageTypeLower] || 'Unknown';
+        const status = item.optOutFlag ? 'Off' : 'On';
+
+        return { type, status };
+    });
+};
+
+
+
+export const transformToUserPreferences = (data) => {
+    console.log('Data is undefined or not an array, returning default transformToUserPreferences=======================', data);
+    if (!Array.isArray(data)) {
+       
+        return {
+            accountNumber: '',
+            deviceToken: '',
+            deviceTokenTimestamp: '',
+            optOut: true, // Default value
+            outageOptOut: true, // Default value
+            billingOptOutStatus: true, // Default value
+            userName: '',
+            isAndroid: ''
+        };
+    }
+
+    const transformedData = {
+        accountNumber: '',
+        deviceToken: '',
+        deviceTokenTimestamp: '',
+        optOut: true, // Default value
+        outageOptOut: true, // Default value
+        billingOptOutStatus: true, // Default value
+        userName: '',
+        isAndroid: ''
+    };
+
+    data.forEach(item => {
+        const itemType = item.type.toLowerCase();
+        const itemStatus = item.status.toLowerCase();
+
+        switch (itemType) {
+            case 'appointments':
+                transformedData.optOut = itemStatus === 'off';
+                break;
+            case 'outage':
+                transformedData.outageOptOut = itemStatus === 'off';
+                break;
+            case 'billing':
+                transformedData.billingOptOutStatus = itemStatus === 'off';
+                break;
+            default:
+                // Handle unexpected type or ignore
+                break;
+        }
+    });
+    console.log('final Update values based on the data array-------------------------', transformedData)
+    return transformedData;
+};
+
+
+
 

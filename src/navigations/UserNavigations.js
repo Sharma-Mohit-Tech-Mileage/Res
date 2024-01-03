@@ -21,17 +21,17 @@ const UserNavigations = (props) => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="EmailNotifications"
+          name="EntryEmailNotifications"
           component={EmailNotifications}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="PushNotifications"
+          name="EntryPushNotifications"
           component={PushNotifications}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="TextNotifications"
+          name="EntryTextNotifications"
           component={TextNotifications}
           options={{ headerShown: false }}
         />
@@ -39,7 +39,12 @@ const UserNavigations = (props) => {
           name="Terms"
           component={Terms}
           options={{ headerShown: false }}
-        />                        
+        />   
+        <Stack.Screen
+          name="ArticalWindowUtility"
+          component={ArticalWindowUtility}
+          options={{ headerShown: false }}
+        />                               
         <Stack.Screen
           name="MyTab"
           component={MyTabs}

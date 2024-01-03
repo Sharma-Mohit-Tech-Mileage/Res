@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
@@ -9,41 +11,68 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
+import { passwordSchema } from '../utility/validationSchema'; // Update the path as necessary
 const PasswordSecurityEdit = () => {
 
   const navigation = useNavigation();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
+  const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
   const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [showValidationAlert, setShowValidationAlert] = useState(false);
   const route = useRoute(); // Use the useRoute hook
   const dispatch = useDispatch();
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const scrollViewRef = useRef(null);
-  const handleChange = (e) => {
-    setLocalProfile({ ...profileDetails, [e.target.name]: e.target.value });
-  };
-
   // Handler for when the security question dropdown value changes
   const handleSecurityQuestionChange = (itemValue) => {
     console.log("securityQuestion", itemValue)
     setLocalProfile({ ...profileDetails, securityQuestion: itemValue });
+    setCustomSecurityQuestion(itemValue);
     setIsCustomQuestionSelected(itemValue === "Add your own question");
   };
 
-  const handleSave = () => {
-    dispatch(updateProfileSecurity(profileDetails, navigation));
+  const handleSave = (formData) => {
+    dispatch(updateProfileSecurity(formData, navigation)); // Dispatch with formData
   };
+
+  const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
+    resolver: yupResolver(passwordSchema(isCustomQuestionSelected)),
+    defaultValues: profileDetails
+  });
+
+  const handleValidationError = () => {
+    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+    setShowValidationAlert(true);
+  };
+
+  useEffect(() => {
+    // Reset the form with the updated profile details
+    reset(profileDetails);
+  }, [profileDetails, reset]);
+
+
+  useEffect(() => {
+    const storedSecurityQuestion = profileDetails.securityQuestion;
+    const isCustomQuestion = storedSecurityQuestion && !securityQuestions.includes(storedSecurityQuestion);
+    setIsCustomQuestionSelected(isCustomQuestion);
+    if (isCustomQuestion) {
+      setCustomSecurityQuestion("Add your own question");
+    } else {
+      setCustomSecurityQuestion(storedSecurityQuestion);
+    }
+  }, []);
 
   useEffect(() => {
     if (route.params?.updateFailed) {
       setShowErrorAlert(true);
       scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-      // Reset the parameter so subsequent navigations are detected
       navigation.setParams({ updateFailed: undefined });
     }
   }, [route.params?.updateFailed, navigation, dispatch]);
+
 
   return (
     <View style={styles.passwordSecurityEdit}>
@@ -53,16 +82,26 @@ const PasswordSecurityEdit = () => {
       />
       <ScrollView ref={scrollViewRef}>
         <View style={styles.passwordSecurityEditInner}>
-          <NotificationAlert
-            type="error"
-            title="Failed"
-            message="Your password and security update failed."
-            showCloseIcon={true}
-            isVisible={showErrorAlert}
-            onClose={() => setShowErrorAlert(false)}
-          />
           <View style={styles.frameParent}>
             <View style={[styles.frameGroup, styles.wrapperSpaceBlock1]}>
+              <View style={styles.infoWrapper}>
+              <NotificationAlert
+                type="error"
+                title="Failed"
+                message="Password and security update failed."
+                showCloseIcon={true}
+                isVisible={showErrorAlert}
+                onClose={() => setShowErrorAlert(false)}
+              />
+                <NotificationAlert
+                  type="error"
+                  title="Error"
+                  message="Please enter valid information to continue."
+                  showCloseIcon={true}
+                  isVisible={showValidationAlert}
+                  onClose={() => setShowValidationAlert(false)}
+                />
+              </View>
               <View style={[styles.passwordWrapper, styles.wrapperSpaceBlock1]}>
                 <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header">
                   Password
@@ -77,41 +116,44 @@ const PasswordSecurityEdit = () => {
                       </Text>
                       <Pressable onPress={() => setPasswordVisible(!passwordVisible)}>
                         <View style={styles.eyeParent}>
-                          {!passwordVisible ? <Image
+                          <Image
                             style={styles.eyeIcon}
                             resizeMode="stretch"
-                            source={require("../../../assets/eye.png")}
-                          /> : <Image
-                            style={styles.eyeIcon}
-                            resizeMode="stretch"
-                            source={require("../../../assets/HidePassword-01.png")}
-                          />}
+                            source={!passwordVisible ? require("../../../assets/eye.png") : require("../../../assets/HidePassword-01.png")}
+                          />
                           <Text style={[styles.show, styles.firstTypo]}>
                             {passwordVisible ? 'Hide' : 'Show'}
                           </Text>
                         </View>
                       </Pressable>
                     </View>
-                    <SparkLightInput
+                    <Controller
+                      control={control}
                       name="newPassword"
-                      value={profileDetails.newPassword}
-                      onChangeText={handleChange}
-                      secure={!passwordVisible} // Toggle visibility
+                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                        <>
+                          <SparkLightInput
+                            placeholder="New Password"
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}
+                            secure={!passwordVisible}
+                            error={error?.message}
+                          />
+                          <View style={[styles.passwordFlexBox, { marginTop: Padding.p_base }]}>
+                            {validatePassword(value, profileDetails.userName).map((isValid, index) => (
+                              <View key={`point-${index}`} style={styles.bulletPointContainer}>
+                                <View style={{ marginTop: 7 }}>
+                                  <Text style={[styles.bullet, { backgroundColor: isValid ? Color.sparklightGreen : Color.colorGray_200 }]} />
+                                </View>
+                                <Text style={styles.bulletPoiint}>{passwordTerms[index]}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        </>
+                      )}
                     />
                   </View>
-                </View>
-                <View style={[styles.itMustBeDifferentThanYourWrapper, styles.wrapperSpaceBlock]}>
-                  <View style={styles.passwordFlexBox}>
-                    {validatePassword(profileDetails.newPassword, profileDetails.userName).map((isValid, index) => (
-                      <View key={`point-${index}`} style={styles.bulletPointContainer}>
-                        <Text style={[styles.bulletPoint, { color: isValid ? Color.sparklightGreen : Color.colorGray_200 }]}>•</Text>
-                        <Text style={[styles.itMustBe, { color: Color.sparklightGray1, fontWeight: '400' }]}>
-                          {passwordTerms[index]}
-                        </Text>
-                      </View>
-                    ))}
-                  </View>
-
                 </View>
               </View>
               <View style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}>
@@ -119,18 +161,14 @@ const PasswordSecurityEdit = () => {
               </View>
               <View style={styles.frameParent1}>
                 <View style={styles.securityQuestionWrapper}>
-                  <Text style={[styles.password, styles.passwordFlexBox]} >
-                    Security Question
-                  </Text>
+                  <Text style={[styles.password, styles.passwordFlexBox]} >Security Question</Text>
                 </View>
                 <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                   <View style={styles.textinput}>
-                    <Text style={[styles.firstName1, styles.firstTypo]} >
-                      Password Reset Question
-                    </Text>
+                    <Text style={[styles.firstName1, styles.firstTypo]} > Password Reset Question</Text>
                     <SparkLightDropdown
                       items={securityQuestions}
-                      selectedValue={profileDetails.securityQuestion}
+                      selectedValue={customSecurityQuestion}
                       onValueChange={handleSecurityQuestionChange}
                     />
                   </View>
@@ -138,36 +176,42 @@ const PasswordSecurityEdit = () => {
                 {isCustomQuestionSelected && (
                   <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                     <View style={styles.textinput}>
-                      <Text style={[styles.firstName1, styles.firstTypo]} >
-                        Type your Question
-                      </Text>
-                      <SparkLightInput
-                        placeholder="Enter text here"
-                        value={profileDetails.customSecurityQuestion || ''}
-                        onChangeText={(text) => setLocalProfile({ ...profileDetails, customSecurityQuestion: text })}
+                      <Text style={[styles.firstName1, styles.firstTypo]} >Type your Question</Text>
+                      <Controller
+                        control={control}
+                        name="securityQuestion"
+                        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                          <>
+                            <SparkLightInput
+                              onBlur={onBlur}
+                              onChangeText={onChange}
+                              value={value}
+                              error={error?.message}
+                            />
+                          </>
+                        )}
                       />
                     </View>
                   </View>
                 )}
-                {/* <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
-                  <View style={styles.textinput}>
-                    <Text style={[styles.firstName1, styles.firstTypo]} >
-                      Type your Question
-                    </Text>
-                    <SparkLightInput
-                      placeholder="Enter text here"
-                      value={profileDetails.customSecurityQuestion || ''}
-                      onChangeText={(text) => setLocalProfile({ ...profileDetails, customSecurityQuestion: text })}
-                    />
-                  </View>
-                </View> */}
                 <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                   <View style={styles.textinput}>
                     <Text style={[styles.firstName1, styles.firstTypo]} >
                       Password Reset Answer
                     </Text>
-                    <SparkLightInput
-                      placeholder="Enter text here"
+                    <Controller
+                      control={control}
+                      name="securityAnswer"
+                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                        <>
+                          <SparkLightInput
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}
+                            error={error?.message}
+                          />
+                        </>
+                      )}
                     />
                   </View>
                 </View>
@@ -175,21 +219,12 @@ const PasswordSecurityEdit = () => {
             </View>
           </View>
           <View style={styles.frameParent1}>
-            <Pressable
-              style={[styles.buttons, styles.buttonsLayout]}
-              onPress={handleSave}
-            >
-              <Text style={[styles.makePayment, styles.makeTypo]}>
-                Save
-              </Text>
+            <Pressable style={[styles.buttons, styles.buttonsLayout]}
+              onPress={handleSubmit(handleSave, handleValidationError)}>
+              <Text style={[styles.makePayment, styles.makeTypo]}> Save </Text>
             </Pressable>
-            <Pressable
-              style={[styles.buttons1, styles.buttonsLayout]}
-              onPress={() => navigation.navigate("PasswordSecurity")}
-            >
-              <Text style={[styles.makePayment1, styles.makeTypo]}>
-                Cancel
-              </Text>
+            <Pressable style={[styles.buttons1, styles.buttonsLayout]} onPress={() => navigation.navigate("PasswordSecurity")}>
+              <Text style={[styles.makePayment1, styles.makeTypo]}> Cancel</Text>
             </Pressable>
           </View>
         </View>
@@ -203,20 +238,27 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_base,
     alignSelf: "stretch",
   },
-  bulletPointContainer: {
-    flexDirection: 'row', // Align bullet and text horizontally
-    alignItems: 'flex-start', // Align items to the start of the flex container
-    marginBottom: 5, // Space between bullet points
+  infoWrapper: {
+    paddingHorizontal: Padding.p_5xl,
+    alignSelf: "stretch",
   },
-  bulletPoint: {
-    marginRight: 10, // Space between bullet and text
-    fontSize: 15
+  bulletPoiint: {
+    color: Color.sparklightGray1, 
+    fontFamily: FontFamily.openSansRegular, 
+    fontSize: FontSize.size_xs, 
+    fontStyle: 'normal',
+    fontWeight: '400', 
+    lineHeight: 19,
+  },
+  bulletPointContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 5,
   },
   passwordFlexBox: {
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
-    flex: 1,
   },
   firstTypo: {
     fontSize: FontSize.textXsSemibold_size,
@@ -254,6 +296,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: Padding.p_5xl,
   },
+  bullet: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    marginRight: 10, 
+  },
   firstName: {
     color: Color.sparklightGray1,
     fontSize: FontSize.textXsSemibold_size,
@@ -279,9 +327,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignSelf: "stretch",
   },
-  textWrapper: {
-    justifyContent: "center",
-  },
   textinput: {
     justifyContent: "center",
     alignSelf: "stretch",
@@ -294,10 +339,6 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     fontSize: FontSize.size_xs,
   },
-  itMustBeDifferentThanYourWrapper: {
-    alignItems: "center",
-    flexDirection: "row",
-  },
   frameParent: {
     alignSelf: "stretch",
   },
@@ -307,7 +348,7 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   rectangleWrapper: {
-    marginTop: 16,
+    marginTop: Padding.p_base,
   },
   securityQuestionWrapper: {
     paddingBottom: Padding.p_5xs,
