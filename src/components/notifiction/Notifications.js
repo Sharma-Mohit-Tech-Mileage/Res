@@ -160,11 +160,11 @@ const NotificationSection = ({
       <View style={[styles.textNotificationsParent, styles.parentSpaceBlock]}>
         <Text style={styles.textNotifications}>{title}</Text>
         <Pressable
-          style={[styles.buttons, styles.buttonsBg, isDisabled && styles.disabledButton]}
+          style={[styles.buttons, styles.buttonsBg, isDisabled && styles.buttonDisabled]}
           onPress={() => isDisabled ? {} : navigation.navigate(navigationTarget, { additionalData: transformedData })}
           disabled={isDisabled}
         >
-          <Text style={styles.makePayment}>Edit</Text>
+          <Text style={isDisabled?styles.makePaymentDisabled:styles.makePayment}>Edit</Text>
         </Pressable>
       </View>
       <View style={styles.frameWrapper}>
@@ -299,6 +299,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Color.sparklightWhite,
   },
+  makePaymentDisabled: {
+    fontSize: FontSize.size_xs,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+    color: Color.colorGray_200,
+  },
   textNotificationsParent: {
     alignSelf: "stretch",
   },
@@ -376,7 +382,10 @@ const styles = StyleSheet.create({
   notifications: {
     backgroundColor: Color.colorWhitesmoke_200,
   },
-
+  buttonDisabled: {
+    backgroundColor: Color.colorWhitesmoke_300,
+    color: Color.colorGray_200
+  },
 });
 
 export default Notifications;
