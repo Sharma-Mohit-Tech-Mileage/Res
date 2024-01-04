@@ -16,6 +16,22 @@ const EmailNotifications = ({ navigation }) => {
     const [input, setInput] = useState('');
     const user = useSelector(state => state.combinedReducers.user.userData);
     const [enableButton, setEnableButton] = useState(false);
+    const [keyboardHidden, setKeyboardHidden] = useState(true);
+
+    useEffect(() => {
+        const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardHidden(false);
+        });
+        const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardHidden(true);
+        });
+
+        return () => {
+            showSubscription.remove();
+            hideSubscription.remove();
+        };
+    }, []);
+  
 
     const onChangeText = (text) => {
         setInput(text);
@@ -88,35 +104,47 @@ const EmailNotifications = ({ navigation }) => {
                                 placeholder="Email Address"
                                 input={input}
                                 onChangeText={onChangeText}
+                                onSubmitText={enableEmailNotifications}
                                 keyboardType="email"
                             />                
                         </View>                          
                     </View>
-                    <View style={styles.bottomBar}>
-                        <Pressable
-                            disabled={!enableButton}
-                            style={[styles.button, styles.buttonsLayout]}
-                            onPress={enableEmailNotifications}
-                        >
-                            <Text style={styles.accept}>Enable Email Notifications</Text>
-                        </Pressable>                
-                        <View style={styles.buttonsParent} 
-                            accessibilityLabel="Buttons Section">
-                            <Pressable
-                                style={[styles.buttonDecline, styles.buttonsLayout]}
-                                onPress={() => {
-                                    navigation.navigate("MyTab");
-                                }}
-                                accessibilityLabel="Decline Button"
-                                accessibilityRole="button"
-                                accessibilityHint="Decline Terms and Conditions"
-                            >
-                                <Text style={styles.decline}>
-                                    Skip for now
-                                </Text>
-                            </Pressable>
-                        </View>    
-                    </View>
+                    {
+                        true &&
+                        (                      
+                            <View style={styles.bottomBar}>
+                                <Pressable
+                                    disabled={!enableButton}
+                                    style={[styles.button, styles.buttonsLayout]}
+                                    onPress={enableEmailNotifications}
+                                >
+                                    <Text style={styles.accept}>Enable Email Notifications</Text>
+                                </Pressable>                
+                                <View style={styles.buttonsParent} 
+                                    accessibilityLabel="Buttons Section">
+                                    <Pressable
+                                        style={[styles.buttonDecline, styles.buttonsLayout]}
+                                        onPress={() => {
+                                            navigation.navigate("MyTab");
+                                        }}
+                                        accessibilityLabel="Decline Button"
+                                        accessibilityRole="button"
+                                        accessibilityHint="Decline Terms and Conditions"
+                                    >
+                                        <Text style={styles.decline}>
+                                            Skip for now
+                                        </Text>
+                                    </Pressable>
+                                </View>    
+                            </View>
+                        )
+                    }
+                    {
+                        !keyboardHidden &&
+                        (
+                            <View style={styles.textBottomHeight} />
+                        )
+                    }                    
                 </ScrollView>
             </TouchableWithoutFeedback>
         </View>
@@ -163,7 +191,7 @@ const styles = StyleSheet.create({
     },
     innerContent: {
         justifyContent: 'space-around',
-        flex: 1
+        //flex: 1
     },
     container: {
         flex: 1,
@@ -250,14 +278,18 @@ const styles = StyleSheet.create({
         marginTop: 10
     }, 
     subInput: {
-        marginTop: 20
+        marginTop: 20,
+        marginBottom: 20
     },    
     viewContainer: {
         flex: 1,
         width: '100%',
         alignItems: 'center',
         marginTop: 50
-    }
+    },
+    textBottomHeight: {
+        height: 200
+    },    
 });
 
 export default EmailNotifications;

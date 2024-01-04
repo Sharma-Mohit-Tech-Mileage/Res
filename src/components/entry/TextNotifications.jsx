@@ -20,6 +20,22 @@ const TextNotifications = ({ navigation }) => {
     const [nextScreen, setNextScreen] = useState('EntryEmailNotifications');
     const user = useSelector(state => state.combinedReducers.user.userData);
     const profile = useSelector(state => state.combinedReducers.profile || {});
+    const [keyboardHidden, setKeyboardHidden] = useState(true);
+
+    useEffect(() => {
+      const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+        setKeyboardHidden(false);
+      });
+      const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+        setKeyboardHidden(true);
+      });
+  
+      return () => {
+        showSubscription.remove();
+        hideSubscription.remove();
+      };
+    }, []);
+
 
     useEffect(() => {
         if (profile.paperlessStatus) {
@@ -33,7 +49,7 @@ const TextNotifications = ({ navigation }) => {
 
     const onChangeText = (text) => {
         setInput(text);
-        if (input.length > 0) {
+        if (text.length > 0) {
             setEnableButton(true);
         } else {
             setEnableButton(false);
@@ -63,8 +79,10 @@ const TextNotifications = ({ navigation }) => {
         }
         console.log('enableTextNotifications: ', data);
         //{"accountNumber": "900690538", "billingOptOutStatus": false, "optOut": false, "outageOptOut": false, "phoneNumber": ""}
-        dispatch(updateTextNotification(data, null));
-        navigation.navigate(nextScreen);
+        if (toggleCheckBox && input.length > 0) {
+            dispatch(updateTextNotification(data, null));
+            navigation.navigate(nextScreen);
+        }
     };
 
     const terms = [
@@ -118,45 +136,62 @@ const TextNotifications = ({ navigation }) => {
                                 placeholder="Phone number"
                                 input={input}
                                 onChangeText={onChangeText}
+                                onSubmitText={enableTextNotifications}
                                 keyboardType="number-pad"
                             />                
                         </View>                            
                     </View>
-                    <View style={styles.checkBoxArea}>
-                        <CheckBox
-                            disabled={false}
-                            value={toggleCheckBox}
-                            onValueChange={onCheckBox}
-                            style={styles.checkBox}
-                            boxType="square"
-                        />   
-                        <View style={styles.checkBoxAreaView}>
-                            <Text style={styles.checkBoxAreaViewText}>I agree that message and data rates may apply. Message frequency may vary.</Text>
-                        </View>             
-                    </View>
-                    <View style={styles.bottomBar}>
-                        <Pressable
-                            disabled={!enableButton}
-                            style={enableButton ? [styles.button, styles.buttonsLayout] : [styles.button, styles.buttonsLayout, styles.buttonDisabled]}
-                            onPress={enableTextNotifications}
-                        >
-                            <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]}>Enable Text Notifications</Text>
-                        </Pressable>                
-                        <View style={styles.buttonsParent} 
-                            accessibilityLabel="Buttons Section">
-                            <Pressable
-                                style={[styles.buttonDecline, styles.buttonsLayout]}
-                                onPress={() => navigation.navigate("EntryEmailNotifications")}
-                                accessibilityLabel="Decline Button"
-                                accessibilityRole="button"
-                                accessibilityHint="Decline Terms and Conditions"
-                            >
-                                <Text style={styles.decline}>
-                                    Skip for now
-                                </Text>
-                            </Pressable>
-                        </View>    
-                    </View>
+                    {
+                        true &&
+                        (
+                            <View style={styles.checkBoxArea}>
+                                <CheckBox
+                                    disabled={false}
+                                    value={toggleCheckBox}
+                                    onValueChange={onCheckBox}
+                                    style={styles.checkBox}
+                                    boxType="square"
+                                />   
+                                <View style={styles.checkBoxAreaView}>
+                                    <Text style={styles.checkBoxAreaViewText}>I agree that message and data rates may apply. Message frequency may vary.</Text>
+                                </View>             
+                            </View>                            
+                        )
+                    }
+                    {
+                        true &&
+                        (                    
+                            <View style={styles.bottomBar}>
+                                <Pressable
+                                    disabled={!enableButton}
+                                    style={enableButton ? [styles.button, styles.buttonsLayout] : [styles.button, styles.buttonsLayout, styles.buttonDisabled]}
+                                    onPress={enableTextNotifications}
+                                >
+                                    <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]}>Enable Text Notifications</Text>
+                                </Pressable>                
+                                <View style={styles.buttonsParent} 
+                                    accessibilityLabel="Buttons Section">
+                                    <Pressable
+                                        style={[styles.buttonDecline, styles.buttonsLayout]}
+                                        onPress={() => navigation.navigate("EntryEmailNotifications")}
+                                        accessibilityLabel="Decline Button"
+                                        accessibilityRole="button"
+                                        accessibilityHint="Decline Terms and Conditions"
+                                    >
+                                        <Text style={styles.decline}>
+                                            Skip for now
+                                        </Text>
+                                    </Pressable>
+                                </View>    
+                            </View>
+                        )
+                    }
+                    {
+                        !keyboardHidden &&
+                        (
+                            <View style={styles.textBottomHeight} />
+                        )
+                    }                    
                 </ScrollView>
             </TouchableWithoutFeedback>
         </View>
@@ -233,7 +268,7 @@ const styles = StyleSheet.create({
     },    
     innerContent: {
         justifyContent: 'space-around',
-        flex: 1
+        //flex: 1
     },        
     container: {
         flex: 1,
@@ -319,14 +354,18 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20
     }, 
     subInput: {
-        marginTop: 10
+        marginTop: 10,
+        marginBottom: 10
     },
     viewContainer: {
         flex: 1,
         width: '100%',
         alignItems: 'center',
         marginTop: 50,
-    }
+    },
+    textBottomHeight: {
+        height: 200
+    },
 });
 
 export default TextNotifications;

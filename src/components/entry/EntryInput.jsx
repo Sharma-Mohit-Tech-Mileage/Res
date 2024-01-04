@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../GlobalStyles';
 
-const EntryInput = ({ input, placeholder, onChangeText, iconImage, keyboardType }) => {
+const EntryInput = ({ input, placeholder, onChangeText, onSubmitText, iconImage, keyboardType }) => {
     const inputRef = useRef(null);
 
     return (
@@ -26,6 +26,7 @@ const EntryInput = ({ input, placeholder, onChangeText, iconImage, keyboardType 
                 placeholder={placeholder}
                 value={input}
                 onChangeText={onChangeText}
+                onSubmitEditing={onSubmitText}
                 placeholderTextColor={Color.gray600}
                 autoCorrect={false}
                 clearButtonMode="always"
