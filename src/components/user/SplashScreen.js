@@ -77,10 +77,6 @@ const SplashScreen = ({ navigation }) => {
 
       const data = await getFirstTime();
 
-      navigation.navigate("EntryPushNotifications");
-
-      return;
-
       if (userInfo.accountNumber === "900690538") {
         setErrorMessage(strings.nonAdminUserMsg);
         setTimeout(() => {
