@@ -111,75 +111,55 @@ const ProfileSettingsEdit = () => {
               </Text>
             </View>
             <View style={styles.frameParent}>
-              <View
-                style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}>
-                <View style={styles.textinput}>
-                  <Text style={[styles.firstTypo]}>
-                    First Name
-                  </Text>
-                  <View >
-                    <Controller
-                      control={control}
-                      name="firstName"
-                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                        <SparkLightInput
-                          placeholder="First Name"
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value}
-                          error={error?.message}
-                        />
-                      )}
+              <View style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}>
+                <Controller
+                  control={control}
+                  name="firstName"
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <SparkLightInput
+                      placeholder="First Name"
+                      label={"First Name"}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      error={error?.message}
                     />
-                  </View>
-                </View>
+                  )}
+                />
               </View>
               <View
                 style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}>
-                <View style={styles.textinput}>
-                  <Text style={[styles.firstTypo]}>
-                    Last Name
-                  </Text>
-                  <View >
-                    <Controller
-                      control={control}
-                      name="lastName"
-                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                        <SparkLightInput
-                          placeholder="First Name"
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value}
-                          error={error?.message}
-                        />
-                      )}
+                <Controller
+                  control={control}
+                  name="lastName"
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <SparkLightInput
+                      label={"Last Name"}
+                      placeholder="First Name"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      error={error?.message}
                     />
-                  </View>
-                </View>
+                  )}
+                />
               </View>
               <View style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}>
-                <View />
-                <View style={styles.textinput}>
-                  <Text style={[styles.firstTypo]}>
-                    Username
-                  </Text>
-                  <View >
-                    <Controller
-                      control={control}
-                      name="userName"
-                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                        <SparkLightInput
-                          placeholder="First Name"
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value}
-                          editable={false}
-                          error={error?.message}
-                        />
-                      )}
+                <Controller
+                  control={control}
+                  name="userName"
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <SparkLightInput
+                      label={'Username'}
+                      placeholder="First Name"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      editable={false}
+                      error={error?.message}
                     />
-                  </View>
-                </View>
+                  )}
+                />
               </View>
             </View>
             <View style={styles.rectangleWrapper}>
@@ -192,50 +172,40 @@ const ProfileSettingsEdit = () => {
                 </Text>
               </View>
               <View style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}>
-                <View style={styles.textinput}>
-                  <Text style={[styles.firstTypo]}>
-                    Email
-                  </Text>
-                  <View >
-                    <Controller
-                      control={control}
-                      name="svEmailAddress"
-                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                        <SparkLightInput
-                          placeholder="First Name"
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value}
-                          editable={!profileDetailsfromStore.multipleEmails}
-                          error={error?.message}
-                        />
-                      )}
+                <Controller
+                  control={control}
+                  name="svEmailAddress"
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <SparkLightInput
+                      label={'Email'}
+                      placeholder="First Name"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      editable={!profileDetailsfromStore.multipleEmails}
+                      error={error?.message}
                     />
-                  </View>
-                </View>
+                  )}
+                />
               </View>
               <View style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}>
-                <View style={styles.textinput}>
-                  <Text style={[styles.firstTypo]}>Mobile Phone</Text>
-                  <View >
-                    <Controller
-                      control={control}
-                      name="phoneNumber" // This should be the name used in your validation schema
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <SparkLightInput
-                          placeholder="Mobile number"
-                          onBlur={onBlur}
-                          onChangeText={(text) => {
-                            onChange(text);
-                            updateSmsPayloadPhoneNumber(text);
-                          }}
-                          value={value}
-                          error={errors.phoneNumber?.message}
-                        />
-                      )}
+                <Controller
+                  control={control}
+                  name="phoneNumber" // This should be the name used in your validation schema
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <SparkLightInput
+                      placeholder="Mobile number"
+                      onBlur={onBlur}
+                      label={'Mobile Phone'}
+                      onChangeText={(text) => {
+                        onChange(text);
+                        updateSmsPayloadPhoneNumber(text);
+                      }}
+                      value={value}
+                      error={errors.phoneNumber?.message}
                     />
-                  </View>
-                </View>
+                  )}
+                />
               </View>
             </View>
           </View>
@@ -261,13 +231,6 @@ const styles = StyleSheet.create({
   informationWrapperFlexBox: {
     flexDirection: "row",
     alignSelf: "stretch",
-  },
-  firstTypo: {
-    fontSize: FontSize.size_sm,
-    textAlign: "left",
-    color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
   },
   buttonsLayout: {
     width: '100%',
@@ -296,10 +259,6 @@ const styles = StyleSheet.create({
     paddingBottom: Padding.p_5xs,
     alignItems: "center",
     paddingHorizontal: Padding.p_5xl,
-  },
-  textinput: {
-    justifyContent: "center",
-    alignSelf: "stretch",
   },
   textinputWrapper: {
     justifyContent: "center",
