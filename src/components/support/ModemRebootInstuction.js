@@ -36,7 +36,7 @@ const ModemReboot = () => {
   return (
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
-        title="Modem Reboot Instructions"
+        title="Reboot Modem Instructions"
          onPressBack={() => navigation.goBack()}
       />
       <ScrollView showsVerticalScrollIndicator={false} >
@@ -91,7 +91,7 @@ const ModemReboot = () => {
             <Image
               style={styles.contactUs}
               resizeMode='contain'
-              source={require("../../../assets/phone-outgoing-01.png")}
+              source={require("../../../assets/phone-outgoing-02.png")}
             />
             
             

@@ -72,9 +72,8 @@ const HomeScreen = ({ route, navigation }) => {
             setAccountStatus('Disconnect')
             setIsInternetDetails(true)
           }
-          getUserAccountDetails(response)
     }, (error)=>{
-
+      
     });
   });
   }
@@ -88,6 +87,8 @@ const HomeScreen = ({ route, navigation }) => {
              setAccountStatus('Disconnect')
              setIsInternetDetails(true)
              setHasOutage(true)
+           }else{
+            getSoftDisconnectStatus();
            }
            
      }, (error)=>{
@@ -106,7 +107,7 @@ const HomeScreen = ({ route, navigation }) => {
     console.log("error", error);
   };
 
-  const getUserAccountDetails = (isDisconnect=false) => {
+  const getUserAccountDetails = () => {
     let re = getUser().then((res) => {
       const request = `account/api/account/${res.userInfo.accountNumber}`;
       GetApiRequest(request, (res)=>{
@@ -115,10 +116,7 @@ const HomeScreen = ({ route, navigation }) => {
           let dueDate = moment(res.paymentDueDate).format("ll");
           setDueDate(dueDate);
           setBillAmt(res.currentBalance);
-          if(!isDisconnect){
-            updateInternetHealth(res.currentBalance);
-          }
-          
+          updateInternetHealth(res.currentBalance);  
         }
       }, onErrorBill);
     });
@@ -143,9 +141,10 @@ const HomeScreen = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    getSoftDisconnectStatus();
-    getInternetPlanDetails();
     checkModemOutagStatus();
+    getInternetPlanDetails();
+    getUserAccountDetails()
+    
    
 
     const backAction = () => {
@@ -228,7 +227,7 @@ const HomeScreen = ({ route, navigation }) => {
                 </View>
                 <Text style={styles.internetStatusTxt}>
                   {" "}
-                  {billPaid?strings.internetStatus:strings.internetStatusIssue}
+                  {(billPaid && !hasOutage)?strings.internetStatus:strings.internetStatusIssue}
                 </Text>
               </View>
 
