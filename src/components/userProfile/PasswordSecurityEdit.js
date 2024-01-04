@@ -109,24 +109,6 @@ const PasswordSecurityEdit = () => {
               </View>
               <View style={styles.frameParent}>
                 <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
-                  <View style={styles.textinput}>
-                    <View style={styles.firstNameParent}>
-                      <Text style={[styles.firstName, styles.firstTypo]} accessibilityRole="header">
-                        New Password
-                      </Text>
-                      <Pressable onPress={() => setPasswordVisible(!passwordVisible)}>
-                        <View style={styles.eyeParent}>
-                          <Image
-                            style={styles.eyeIcon}
-                            resizeMode="stretch"
-                            source={!passwordVisible ? require("../../../assets/eye.png") : require("../../../assets/HidePassword-01.png")}
-                          />
-                          <Text style={[styles.show, styles.firstTypo]}>
-                            {passwordVisible ? 'Hide' : 'Show'}
-                          </Text>
-                        </View>
-                      </Pressable>
-                    </View>
                     <Controller
                       control={control}
                       name="newPassword"
@@ -135,9 +117,10 @@ const PasswordSecurityEdit = () => {
                           <SparkLightInput
                             placeholder="New Password"
                             onBlur={onBlur}
+                            label={'New Password'}
                             onChangeText={onChange}
                             value={value}
-                            secure={!passwordVisible}
+                            secure={true}
                             error={error?.message}
                           />
                           <View style={[styles.passwordFlexBox, { marginTop: Padding.p_base }]}>
@@ -153,7 +136,6 @@ const PasswordSecurityEdit = () => {
                         </>
                       )}
                     />
-                  </View>
                 </View>
               </View>
               <View style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}>
@@ -176,7 +158,6 @@ const PasswordSecurityEdit = () => {
                 {isCustomQuestionSelected && (
                   <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                     <View style={styles.textinput}>
-                      <Text style={[styles.firstName1, styles.firstTypo]} >Type your Question</Text>
                       <Controller
                         control={control}
                         name="securityQuestion"
@@ -184,6 +165,7 @@ const PasswordSecurityEdit = () => {
                           <>
                             <SparkLightInput
                               onBlur={onBlur}
+                              label={'Type your Question'}
                               onChangeText={onChange}
                               value={value}
                               error={error?.message}
@@ -195,10 +177,6 @@ const PasswordSecurityEdit = () => {
                   </View>
                 )}
                 <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
-                  <View style={styles.textinput}>
-                    <Text style={[styles.firstName1, styles.firstTypo]} >
-                      Password Reset Answer
-                    </Text>
                     <Controller
                       control={control}
                       name="securityAnswer"
@@ -207,13 +185,13 @@ const PasswordSecurityEdit = () => {
                           <SparkLightInput
                             onBlur={onBlur}
                             onChangeText={onChange}
+                            label={"Password Reset Answer"}
                             value={value}
                             error={error?.message}
                           />
                         </>
                       )}
                     />
-                  </View>
                 </View>
               </View>
             </View>
