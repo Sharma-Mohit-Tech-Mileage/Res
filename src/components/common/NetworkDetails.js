@@ -60,7 +60,7 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
           <View style={styles.item}>
             <View style={styles.iconBg}>
               <Billpaidicon />
-             {(accountStatus=='Disconnect')? <RedCircle/> : billPaid ? <GreenCircle /> : <OrangeCircle />}
+             { billPaid ? <GreenCircle /> : <OrangeCircle />}
             </View>
             <Text style={styles.text}> {strings.bill_paid}</Text>
           </View>
