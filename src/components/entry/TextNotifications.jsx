@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Keyboard, Pressable, KeyboardAvoidingView, TouchableWithoutFeedback, Platform } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
@@ -21,21 +21,33 @@ const TextNotifications = ({ navigation }) => {
     const user = useSelector(state => state.combinedReducers.user.userData);
     const profile = useSelector(state => state.combinedReducers.profile || {});
     const [keyboardHidden, setKeyboardHidden] = useState(true);
+    const [textInputLayout, setTextInputLayout] = useState({});
+    const scrollRef = useRef();
 
     useEffect(() => {
-      const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
-        setKeyboardHidden(false);
-      });
-      const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
-        setKeyboardHidden(true);
-      });
+        
+        const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardHidden(false);
+        });
+
+        const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardHidden(true);
+        });
   
-      return () => {
-        showSubscription.remove();
-        hideSubscription.remove();
-      };
+        return () => {
+            showSubscription.remove();
+            hideSubscription.remove();
+        };
     }, []);
 
+    useEffect(() => {
+        if (!keyboardHidden) {
+            scrollRef.current?.scrollTo({
+                y: textInputLayout.y,
+                animated: true,
+            });
+        }
+    }, [keyboardHidden]);     
 
     useEffect(() => {
         if (profile.paperlessStatus) {
@@ -106,6 +118,7 @@ const TextNotifications = ({ navigation }) => {
                 <ScrollView 
                     style={styles.inner}
                     contentContainerStyle={styles.innerContent}
+                    ref={scrollRef}
                 >
                     <ProfileSettingsHeader 
                         showIcon={false}
@@ -130,7 +143,12 @@ const TextNotifications = ({ navigation }) => {
                                 <Text style={styles.subHeaderText}>Receive text alerts related to your account, updates and more from Sparklight.</Text>
                             </View>   
                         </View>
-                        <View style={styles.subInput}>
+                        <View 
+                            style={styles.subInput}
+                            onLayout={(event) => {
+                                setTextInputLayout(event.nativeEvent.layout);
+                            }}                            
+                        >
                             <EntryInput
                                 iconImage={require('../../../assets/phone.png')}
                                 placeholder="Phone number"
@@ -141,51 +159,43 @@ const TextNotifications = ({ navigation }) => {
                             />                
                         </View>                            
                     </View>
-                    {
-                        true &&
-                        (
-                            <View style={styles.checkBoxArea}>
-                                <CheckBox
-                                    disabled={false}
-                                    value={toggleCheckBox}
-                                    onValueChange={onCheckBox}
-                                    style={styles.checkBox}
-                                    boxType="square"
-                                />   
-                                <View style={styles.checkBoxAreaView}>
-                                    <Text style={styles.checkBoxAreaViewText}>I agree that message and data rates may apply. Message frequency may vary.</Text>
-                                </View>             
-                            </View>                            
-                        )
-                    }
-                    {
-                        true &&
-                        (                    
-                            <View style={styles.bottomBar}>
-                                <Pressable
-                                    disabled={!enableButton}
-                                    style={enableButton ? [styles.button, styles.buttonsLayout] : [styles.button, styles.buttonsLayout, styles.buttonDisabled]}
-                                    onPress={enableTextNotifications}
-                                >
-                                    <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]}>Enable Text Notifications</Text>
-                                </Pressable>                
-                                <View style={styles.buttonsParent} 
-                                    accessibilityLabel="Buttons Section">
-                                    <Pressable
-                                        style={[styles.buttonDecline, styles.buttonsLayout]}
-                                        onPress={() => navigation.navigate("EntryEmailNotifications")}
-                                        accessibilityLabel="Decline Button"
-                                        accessibilityRole="button"
-                                        accessibilityHint="Decline Terms and Conditions"
-                                    >
-                                        <Text style={styles.decline}>
-                                            Skip for now
-                                        </Text>
-                                    </Pressable>
-                                </View>    
-                            </View>
-                        )
-                    }
+                    <View style={styles.bottomContainer}>
+                    </View>                         
+                    <View style={styles.checkBoxArea}>
+                        <CheckBox
+                            disabled={false}
+                            value={toggleCheckBox}
+                            onValueChange={onCheckBox}
+                            style={styles.checkBox}
+                            boxType="square"
+                        />   
+                        <View style={styles.checkBoxAreaView}>
+                            <Text style={styles.checkBoxAreaViewText}>I agree that message and data rates may apply. Message frequency may vary.</Text>
+                        </View>             
+                    </View>                                
+                    <View style={styles.bottomBar}>
+                        <Pressable
+                            disabled={!enableButton}
+                            style={enableButton ? [styles.button, styles.buttonsLayout] : [styles.button, styles.buttonsLayout, styles.buttonDisabled]}
+                            onPress={enableTextNotifications}
+                        >
+                            <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]}>Enable Text Notifications</Text>
+                        </Pressable>                
+                        <View style={styles.buttonsParent} 
+                            accessibilityLabel="Buttons Section">
+                            <Pressable
+                                style={[styles.buttonDecline, styles.buttonsLayout]}
+                                onPress={() => navigation.navigate("EntryEmailNotifications")}
+                                accessibilityLabel="Decline Button"
+                                accessibilityRole="button"
+                                accessibilityHint="Decline Terms and Conditions"
+                            >
+                                <Text style={styles.decline}>
+                                    Skip for now
+                                </Text>
+                            </Pressable>
+                        </View>    
+                    </View>
                     {
                         !keyboardHidden &&
                         (
@@ -203,6 +213,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF',
         justifyContent: 'center',
         alignItems: 'center',  
+    },
+    bottomContainer: {
+        height: 100,
     },
     buttonDecline: {
         marginBottom: 50

@@ -211,7 +211,6 @@ const SplashScreen = ({ navigation }) => {
 
   useEffect(() => {
 
-
     const fetchData = async () => {
       try {
         const user = await getUser();
@@ -268,23 +267,7 @@ const SplashScreen = ({ navigation }) => {
               }}
             >
               <Text style={styles.SSoBtn}>Login</Text>
-            </TouchableOpacity>
-            <View style={styles.buttonContainer}>
-              <Pressable
-                style={[styles.buttons, styles.buttonsLayout]}
-                onPress={loginFirstTimeFlow}
-              >
-                  <Text style={styles.buttonTextFirstTime}>First Time Flow</Text>
-              </Pressable> 
-            </View>    
-            <View style={styles.buttonContainer}>
-              <Pressable
-                style={[styles.buttons, styles.buttonsLayout]}
-                onPress={termsAndConditionsFlow}
-              >
-                  <Text style={styles.buttonTextFirstTime}>Terms And Conditions</Text>
-              </Pressable> 
-            </View>            
+            </TouchableOpacity>        
           </>
         )
       }      

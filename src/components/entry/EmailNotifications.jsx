@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Alert, TouchableWithoutFeedback, Keyboard  } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
@@ -17,6 +17,8 @@ const EmailNotifications = ({ navigation }) => {
     const user = useSelector(state => state.combinedReducers.user.userData);
     const [enableButton, setEnableButton] = useState(false);
     const [keyboardHidden, setKeyboardHidden] = useState(true);
+    const [textInputLayout, setTextInputLayout] = useState({});
+    const scrollRef = useRef();
 
     useEffect(() => {
         const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
@@ -32,6 +34,14 @@ const EmailNotifications = ({ navigation }) => {
         };
     }, []);
   
+    useEffect(() => {
+        if (!keyboardHidden) {
+            scrollRef.current?.scrollTo({
+                y: textInputLayout.y,
+                animated: true,
+            });
+        }
+    }, [keyboardHidden]); 
 
     const onChangeText = (text) => {
         setInput(text);
@@ -74,6 +84,7 @@ const EmailNotifications = ({ navigation }) => {
                 <ScrollView 
                     style={styles.inner}
                     contentContainerStyle={styles.innerContent}
+                    ref={scrollRef}
                 >          
                     <ProfileSettingsHeader 
                         showIcon={false}
@@ -98,7 +109,12 @@ const EmailNotifications = ({ navigation }) => {
                                 <Text style={styles.subHeaderText}>Receive email alerts related to your account, updates and more from Sparklight.</Text>
                             </View>   
                         </View>     
-                        <View style={styles.subInput}>
+                        <View 
+                            style={styles.subInput}
+                            onLayout={(event) => {
+                                setTextInputLayout(event.nativeEvent.layout);
+                            }}                            
+                        >
                             <EntryInput
                                 iconImage={require('../../../assets/mail.png')}
                                 placeholder="Email Address"
@@ -109,36 +125,33 @@ const EmailNotifications = ({ navigation }) => {
                             />                
                         </View>                          
                     </View>
-                    {
-                        true &&
-                        (                      
-                            <View style={styles.bottomBar}>
-                                <Pressable
-                                    disabled={!enableButton}
-                                    style={[styles.button, styles.buttonsLayout]}
-                                    onPress={enableEmailNotifications}
-                                >
-                                    <Text style={styles.accept}>Enable Email Notifications</Text>
-                                </Pressable>                
-                                <View style={styles.buttonsParent} 
-                                    accessibilityLabel="Buttons Section">
-                                    <Pressable
-                                        style={[styles.buttonDecline, styles.buttonsLayout]}
-                                        onPress={() => {
-                                            navigation.navigate("MyTab");
-                                        }}
-                                        accessibilityLabel="Decline Button"
-                                        accessibilityRole="button"
-                                        accessibilityHint="Decline Terms and Conditions"
-                                    >
-                                        <Text style={styles.decline}>
-                                            Skip for now
-                                        </Text>
-                                    </Pressable>
-                                </View>    
-                            </View>
-                        )
-                    }
+                    <View style={styles.bottomContainer}>
+                    </View>                                    
+                    <View style={styles.bottomBar}>
+                        <Pressable
+                            disabled={!enableButton}
+                            style={[styles.button, styles.buttonsLayout]}
+                            onPress={enableEmailNotifications}
+                        >
+                            <Text style={styles.accept}>Enable Email Notifications</Text>
+                        </Pressable>                
+                        <View style={styles.buttonsParent} 
+                            accessibilityLabel="Buttons Section">
+                            <Pressable
+                                style={[styles.buttonDecline, styles.buttonsLayout]}
+                                onPress={() => {
+                                    navigation.navigate("MyTab");
+                                }}
+                                accessibilityLabel="Decline Button"
+                                accessibilityRole="button"
+                                accessibilityHint="Decline Terms and Conditions"
+                            >
+                                <Text style={styles.decline}>
+                                    Skip for now
+                                </Text>
+                            </Pressable>
+                        </View>    
+                    </View>
                     {
                         !keyboardHidden &&
                         (
@@ -289,6 +302,9 @@ const styles = StyleSheet.create({
     },
     textBottomHeight: {
         height: 200
+    },
+    bottomContainer: {
+        height: 170,
     },    
 });
 
