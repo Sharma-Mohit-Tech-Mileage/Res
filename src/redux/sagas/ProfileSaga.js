@@ -5,7 +5,7 @@ import {
     postProfileInfo, postTextNotifictionInfo,
     fetchPaperLessDetails, postEmailNotification,
     postTermsAndConditions, postPushNotifications,
-    unsubscribPaperLess, fetchPushNotifications
+    unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
@@ -14,7 +14,8 @@ import {
     FETCH_EMIAL_SELECTION, FETCH_PAPERLESS,
     UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS,
     UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS,
-    FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2
+    FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
+    SAVE_USER_FEEDBACK
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
@@ -88,6 +89,15 @@ function* updateProfile(action) {
     } catch (error) {
         action.navigation.navigate('ProfileSettingsEdit', { updateFailed: true });
         console.error('API Error Response:', error, action.payload); // Log the error response
+    }
+}
+
+function* saveUserFeedBack(action) {
+    try {
+        const response = yield call(handleSubmitFeedback, action.payload);
+        action.navigation.navigate('ThumbsUp', { updateSuccess: true });
+    } catch (error) {
+        action.navigation.navigate('Feedback', { updateFailed: true });
     }
 }
 
@@ -194,5 +204,6 @@ function* ProfileSagas() {
     yield takeLatest(UPDATE_PUSH_NOTIFICATIONS, updatePushNotifications);
     yield takeLatest(UPDATE_PUSH_NOTIFICATIONS_V2, updatePushNotificationsV2);
     yield takeLatest(UNSUBSCRIBE_PAPERLESS, unsubscribPaperLessSaga);
+    yield takeLatest(SAVE_USER_FEEDBACK, saveUserFeedBack);
 }
 export default ProfileSagas;

@@ -3,8 +3,8 @@ import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-nati
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
-import { transformResponse, transformNotificationPreferences, transformToUserPreferences } from '../../components/utility/constant';
+import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper,  } from '../../redux/actions/ProfileActionSuite';
+import { transformResponse, transformNotificationPreferences } from '../../components/utility/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from "../common/customui/NotificationAlert";
 
@@ -32,13 +32,17 @@ const Notifications = () => {
   } else {
     // Handling the case where there's no email in paperLessInfo
     if (profileDetails.multipleEmails) {
+      isDisabled = true;
       notificationsTitle = "There is a problem retrieving your email address";
       infoText = "We are not able to retrieve the email address for your account. Please contact us for assistance";
-    } else {
+    } else if (profileDetails.svEmailAddress){
+      isDisabled = false;
+    }
+    else  {
+      isDisabled = true;
       notificationsTitle = "No email address on file";
       infoText = "We don’t have your email address on file. Go to Profile Settings to add your email.";
     }
-    isDisabled = true;
   }
   useEffect(() => {
     const fetchData = async () => {
@@ -160,11 +164,11 @@ const NotificationSection = ({
       <View style={[styles.textNotificationsParent, styles.parentSpaceBlock]}>
         <Text style={styles.textNotifications}>{title}</Text>
         <Pressable
-          style={[styles.buttons, styles.buttonsBg, isDisabled && styles.disabledButton]}
+          style={[styles.buttons, styles.buttonsBg, isDisabled && styles.buttonDisabled]}
           onPress={() => isDisabled ? {} : navigation.navigate(navigationTarget, { additionalData: transformedData })}
           disabled={isDisabled}
         >
-          <Text style={styles.makePayment}>Edit</Text>
+          <Text style={isDisabled?styles.makePaymentDisabled:styles.makePayment}>Edit</Text>
         </Pressable>
       </View>
       <View style={styles.frameWrapper}>
@@ -299,6 +303,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Color.sparklightWhite,
   },
+  makePaymentDisabled: {
+    fontSize: FontSize.size_xs,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+    color: Color.colorGray_200,
+  },
   textNotificationsParent: {
     alignSelf: "stretch",
   },
@@ -376,7 +386,10 @@ const styles = StyleSheet.create({
   notifications: {
     backgroundColor: Color.colorWhitesmoke_200,
   },
-
+  buttonDisabled: {
+    backgroundColor: Color.colorWhitesmoke_300,
+    color: Color.colorGray_200
+  },
 });
 
 export default Notifications;

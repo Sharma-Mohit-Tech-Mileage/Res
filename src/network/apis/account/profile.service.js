@@ -1,5 +1,6 @@
 import { _axios, _axios_cableone } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
+import axios from 'axios'; // Make sure to import axios
 
 const getProfileDetails = async () => {
     let data = await getUser();
@@ -107,7 +108,7 @@ const fetchPushNotifications = async () => {
     //https://customer.uat.cableone.net/apiWrapper/mobile/api/mobilenotificationpreferences/{UserName}/mobilepreferences
 
     // Log the request endpoint and data
-    console.log(`Making API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`);    
+    console.log(`Making API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`);
 
     try {
         const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, { ...config });
@@ -249,7 +250,7 @@ const postPushNotifications = async (data) => {
 const unsubscribPaperLess = async () => {
     let user = await getUser();
     const accountNumber = user.userInfo?.accountNumber || null;
-    
+
     const config = {
         headers: {
             Authorization: `Bearer ${user.token}`
@@ -272,6 +273,46 @@ const unsubscribPaperLess = async () => {
     }
 };
 
+const handleSubmitFeedback = async (obj) => {
+    const zendeskRequestApiUrl = 'https://cableone.zendesk.com/api/v2/requests.json';
+    let user = await getUser();
+    console.log('user info=============================================', user)
+    const email = user.userInfo?.multipleEmails ? 'user.userInfo?.email' : (user.userInfo?.svEmailAddress || '');
+    const fullName = user.userInfo?.fullName;
+    const payload = {
+        request: {
+            ticket_form_id: "360000052934",
+            requester: {
+                name: fullName,
+                email: email
+            },
+            recipient: "400018994093",
+            assignee_id: "400018994093",
+            group_id: "360000672214",
+            type: null,
+            custom_fields: [
+                { id: "360022798993", value: obj.category },
+                { id: "1900000846365", value: obj.feedbackValue },
+                { id: "36003617614", value: email }
+            ],
+            subject: "Residential MobileApp Feedback",
+            comment: {
+                body: obj.feedbackText,
+                uploads: null
+            },
+            tags: ["Feedback", "Residential", "MobileApp"],
+            via: { channel: "MobileApp" }
+        }
+    };
+    console.log('PAYLOAD====================', payload);
+    try {
+        const response = await axios.post(zendeskRequestApiUrl, payload);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
 
 
-export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications }
+
+export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback }

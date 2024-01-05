@@ -27,7 +27,7 @@ const DataUsageComponent = ({navigation}) => {
         style={{ height: 200 }}
         progress={(account==='900679010')?1.0:0.8}
         progressColor={"#8D3B90"}
-        backgroundColor={"#8D3B9050"}
+        backgroundColor={"#e1e1e1"}
         cornerRadius={5}
         strokeWidth={12}
         startAngle={-Math.PI * 0.85}
@@ -68,7 +68,7 @@ const DataUsageComponent = ({navigation}) => {
               marginTop: 5,
             }}
           >
-            <Text style={styles.dataPlanTxt}> 700 GB DATA PLAN</Text>
+            <Text style={styles.dataPlanTxt}> UNLIMITED PLAN</Text>
           </View>
         </View>
       </ProgressCircle>
@@ -83,7 +83,7 @@ const DataUsageComponent = ({navigation}) => {
         <View style={{ flexDirection: "row" }}>
           <View style={[styles.dataUsageIndicator,{backgroundColor:colors.backgound_blue,marginLeft:5}]} />
           <Text style={styles.useLbl}>Remaining</Text>
-          <Text style={styles.useDataLbl}>{(account==='900679010')?' 0GB':' 160GB'}</Text>
+          <Text style={styles.useDataLbl}>{(account==='900679010')?' Unlimited':' 160GB'}</Text>
         </View>
       </View>
       <View style={{ backgroundColor: colors.grey, height: 1, marginVertical: 10 }} />

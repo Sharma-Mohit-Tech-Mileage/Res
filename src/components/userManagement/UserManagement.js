@@ -105,14 +105,14 @@ const UserManagement = () => {
             </View>
           </View>
         </View>
-        <View style={[styles.frameWrapper2, styles.frameSpaceBlock]}>
+        {/* <View style={[styles.frameWrapper2, styles.frameSpaceBlock]}>
           <View style={styles.usernameParent}>
             <Text style={[styles.username, styles.usersFlexBox]}>
               Email
             </Text>
             <Text style={styles.melsmith}>{user.email}</Text>
           </View>
-        </View>
+        </View> */}
       </View>
     )
   };

@@ -1,37 +1,98 @@
-import React, { useState } from 'react';
-import { ScrollView, Image, StyleSheet, Text, Pressable, View, TextInput } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { feedbackSchema } from '../utility/validationSchema'; // Update the path as necessary
+import { ScrollView, Image, StyleSheet, Text, Pressable, View } from 'react-native';
 import { Color, FontFamily, FontSize, Border, Padding } from '../../../GlobalStyles';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from "@react-navigation/native";
+import SparkLightInput from '../common/customui/SparkLightInput';
+import NotificationAlert from '../common/customui/NotificationAlert';
+import { useDispatch, useSelector } from 'react-redux';
+import { saveUserFeedback } from '../../redux/actions/ProfileActionSuite';
 const feedbackOptions = [
-    { name: 'facesad', text: 'Terrible', image: require("../../../assets/facesad.png"), selectedImage: require("../../../assets/Smiley-VeryUnsatisfied-sel.png") },
-    { name: 'facefrown', text: 'Unsatisfied', image: require("../../../assets/facefrown.png"), selectedImage: require("../../../assets/Smiley-Unsatisfied-sel.png") },
-    { name: 'faceneutral', text: 'Neutral', image: require("../../../assets/faceneutral.png"), selectedImage: require("../../../assets/Smiley-Neutral-sel.png") },
-    { name: 'facesmile', text: 'Satisfied', image: require("../../../assets/facesmile.png"), selectedImage: require("../../../assets/Smiley-Satisfied-sel.png") },
-    { name: 'facehappy', text: 'Great', image: require("../../../assets/facehappy.png"), selectedImage: require("../../../assets/Smiley-VerySatisfied-sel.png") },
+    { value: 1, category: 'complaint', name: 'facesad', text: 'Terrible', image: require("../../../assets/facesad.png"), selectedImage: require("../../../assets/Smiley-VeryUnsatisfied-sel.png") },
+    { value: 2, category: 'complaint', name: 'facefrown', text: 'Unsatisfied', image: require("../../../assets/facefrown.png"), selectedImage: require("../../../assets/Smiley-Unsatisfied-sel.png") },
+    { value: 3, category: 'neutral', name: 'faceneutral', text: 'Neutral', image: require("../../../assets/faceneutral.png"), selectedImage: require("../../../assets/Smiley-Neutral-sel.png") },
+    { value: 4, category: 'compliment', name: 'facesmile', text: 'Satisfied', image: require("../../../assets/facesmile.png"), selectedImage: require("../../../assets/Smiley-Satisfied-sel.png") },
+    { value: 5, category: 'compliment', name: 'facehappy', text: 'Great', image: require("../../../assets/facehappy.png"), selectedImage: require("../../../assets/Smiley-VerySatisfied-sel.png") },
 ];
+const initialState = {
+    category: 'compliment',
+    feedbackValue: 5,
+    feedbackText: ""
+};
 const Feedback = () => {
     const navigation = useNavigation();
-    const [selectedFeedback, setSelectedFeedback] = useState("facehappy");
-    const [inputText, setInputText] = useState('');
-    const [charCount, setCharCount] = useState(0);
-    const handleTextInputChange = (text) => {
-        if (text.length <= 500) {
-            setInputText(text);
-            setCharCount(text.length);
+    const [feedbackInfo, setFeedbackInfo] = useState(initialState);
+    const [showErrorAlert, setShowErrorAlert] = useState(false);
+    const route = useRoute(); // Use the useRoute hook
+    const dispatch = useDispatch();
+    const [errormsg, setErrormsg] = useState("Please enter valid information to continue.");
+    const scrollViewRef = useRef(null);
+    const updateFeedbackInfo = (name, value) => {
+        setFeedbackInfo(feedbackInfo => ({
+            ...feedbackInfo,
+            [name]: value
+        }));
+    };
+
+    // Handler for changes from input fields
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        updateFeedbackInfo(name, value);
+    };
+
+    const handleValidationError = () => {
+        setErrormsg('failed plz try after some time')
+        setShowErrorAlert(true);
+    };
+
+    // Handler for icon press, updating category and feedbackValue
+    const handleIconPress = (category, value) => {
+        updateFeedbackInfo('category', category);
+        updateFeedbackInfo('feedbackValue', value);
+    };
+    // Your submit handler
+    const handleSave = data => {
+        dispatch(saveUserFeedback(data, navigation)); // Dispatch with formData
+    };
+
+    const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
+        resolver: yupResolver(feedbackSchema),
+        defaultValues: feedbackInfo || {}
+    });
+
+    useEffect(() => {
+        reset(feedbackInfo);
+    }, [feedbackInfo, reset]);
+
+    useEffect(() => {
+        if (route.params?.updateFailed) {
+            setErrormsg('Feedback submission failed. Please try again later or contact support')
+            setShowErrorAlert(true);
+            scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+            navigation.setParams({ updateFailed: undefined });
         }
-    };
-    const handleIconPress = (optionName) => {
-        setSelectedFeedback(optionName);
-    };
+    }, [route.params?.updateFailed, navigation, dispatch]);
+
     return (
         <View style={styles.container}>
-            <ProfileSettingsHeader
-                title="Feedback"
-                onPressBack={() => navigation.navigate('Account')}
-            />
-            <ScrollView style={{marginBottom:'20%'}}>
+            <ProfileSettingsHeader title="Feedback" onPressBack={() => navigation.navigate('Account')} />
+            <ScrollView ref={scrollViewRef}  style={{ marginBottom: '20%' }}>
                 <View style={styles.howWouldYourRateYourExperWrapper}>
+                    <NotificationAlert
+                        type="error"
+                        title="Failed"
+                        message={errormsg}
+                        showCloseIcon={true}
+                        isVisible={showErrorAlert}
+                        onClose={() => setShowErrorAlert(false)}
+                    />
+                  
+                </View>
+                <View style={styles.howWouldYourRateYourExperWrapper}>
+                    
                     <Text style={[styles.howWouldYour]}>
                         How would your rate your experience using the Sparklight app?
                     </Text>
@@ -42,12 +103,12 @@ const Feedback = () => {
                             <Pressable
                                 key={option.name}
                                 style={[styles.faceSadParent, styles.parentSpaceBlock]}
-                                onPress={() => handleIconPress(option.name)}
+                                onPress={() => handleIconPress(option.category, option.value)}
                             >
                                 <Image
                                     style={styles.iconLayout}
                                     resizeMode="cover"
-                                    source={selectedFeedback === option.name ? option.selectedImage : option.image}
+                                    source={feedbackInfo.feedbackValue === option.value ? option.selectedImage : option.image}
                                 />
                                 <Text style={[styles.terrible, styles.greatTypo]}>
                                     {option.text}
@@ -56,30 +117,40 @@ const Feedback = () => {
                         ))}
                     </View>
                 </View>
-                <View style={[styles.textinputWrapper, styles.textinputFlexBox]}>
-                    <View style={[styles.firstNameWrapper, styles.frameFlexBox]}>
-                        <Text style={[styles.firstName]}>
-                            Additional Feedback
-                        </Text>
-                    </View>
-                    <View style={[styles.text1SpaceBlock]}>
-                        <TextInput
-                            style={[styles.myExperienceHasBeenGreatParent]}
-                            onChangeText={handleTextInputChange}
-                            value={inputText}
-                            multiline={true}
-                            maxLength={500}
-                            numberOfLines={6} // Set the number of lines
-                            minHeight= {FontSize.size_base * 6 + 16}
-                        />
-                    </View>
-                    <Text style={[styles.text1, styles.text1SpaceBlock]}>
-                        {charCount}/500
+                <View>
+                    <Text style={[styles.firstName]}>
+                        Additional Feedback
                     </Text>
-
+                </View>
+                <View style={styles.textinputWrapper}>
+                    <Controller
+                        control={control}
+                        name="feedbackText"
+                        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                            <>
+                                <SparkLightInput
+                                    name="feedbackText"
+                                    onChangeText={handleInputChange}
+                                    onBlur={onBlur} // bind onBlur
+                                    value={value} // bind value
+                                    multiline={true}
+                                    maxLength={500}
+                                    numberOfLines={6}
+                                    height={130}
+                                    textAlignVertical='top'
+                                    error={error?.message} // display error message
+                                />
+                            </>
+                        )}
+                    />
+                </View>
+                <View >
+                    <Text style={[styles.footerWrapper]}>
+                        {feedbackInfo.feedbackText.length}/500
+                    </Text>
                 </View>
                 <View style={styles.buttonContainer}>
-                    <Pressable style={styles.button} onPress={() => navigation.navigate('ThumbsUp')}>
+                    <Pressable style={styles.button} onPress={handleSubmit(handleSave, handleValidationError)}>
                         <Text style={styles.buttonText}>Submit Feedback</Text>
                     </Pressable>
                 </View>
@@ -132,14 +203,6 @@ const styles = StyleSheet.create({
         fontSize: FontSize.size_xs,
         lineHeight: 18,
     },
-    textinputFlexBox: {
-        justifyContent: "center",
-        alignSelf: "stretch",
-    },
-    text1SpaceBlock: {
-        marginTop: 8,
-        alignSelf: "stretch",
-    },
     howWouldYour: {
         fontSize: 22,
         lineHeight: 28,
@@ -186,35 +249,26 @@ const styles = StyleSheet.create({
         fontSize: FontSize.size_sm,
         fontFamily: FontFamily.openSansSemiBold,
         fontWeight: "600",
-        color: Color.gray600
-    },
-    firstNameWrapper: {
-        alignItems: "center",
-        alignSelf: "stretch",
-    },
-    myExperienceHasBeenGreatParent: {
-        borderColor: Color.gray600,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderWidth: 1,
-        borderStyle: "solid",
-        textAlignVertical: 'top',
-        color: Color.colorGray_200,
-        fontWeight: '600', // Set text to bold
-        fontSize:FontSize.size_base,
-        fontFamily: FontFamily.openSansRegular, 
-    },
-    text1: {
         color: Color.gray600,
-        textAlign: "right",
-        fontSize: FontSize.size_xs,
-        lineHeight: 18,
-        fontFamily: FontFamily.openSansRegular,
+        paddingTop: Padding.p_base,
+        paddingBottom: 8,
+        paddingHorizontal: Padding.p_base
+
     },
     textinputWrapper: {
-        paddingBottom: Padding.p_base,
-        paddingTop: Padding.p_5xl,
+        paddingTop: Padding.p_5xs,
         paddingHorizontal: Padding.p_base,
-    }
+        alignSelf: "stretch",
+    },
+    footerWrapper: {
+        paddingVertical: Padding.p_base,
+        paddingHorizontal: Padding.p_base,
+        textAlign: 'right',
+        alignSelf: "stretch",
+    },
+    infoWrapper: {
+        padding: Padding.p_base,
+        alignSelf: "stretch",
+    },
 });
 export default Feedback;
