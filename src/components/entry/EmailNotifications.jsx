@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Alert, TouchableWithoutFeedback, Keyboard  } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
@@ -16,6 +16,32 @@ const EmailNotifications = ({ navigation }) => {
     const [input, setInput] = useState('');
     const user = useSelector(state => state.combinedReducers.user.userData);
     const [enableButton, setEnableButton] = useState(false);
+    const [keyboardHidden, setKeyboardHidden] = useState(true);
+    const [textInputLayout, setTextInputLayout] = useState({});
+    const scrollRef = useRef();
+
+    useEffect(() => {
+        const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+            setKeyboardHidden(false);
+        });
+        const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardHidden(true);
+        });
+
+        return () => {
+            showSubscription.remove();
+            hideSubscription.remove();
+        };
+    }, []);
+  
+    useEffect(() => {
+        if (!keyboardHidden) {
+            scrollRef.current?.scrollTo({
+                y: textInputLayout.y,
+                animated: true,
+            });
+        }
+    }, [keyboardHidden]); 
 
     const onChangeText = (text) => {
         setInput(text);
@@ -58,6 +84,7 @@ const EmailNotifications = ({ navigation }) => {
                 <ScrollView 
                     style={styles.inner}
                     contentContainerStyle={styles.innerContent}
+                    ref={scrollRef}
                 >          
                     <ProfileSettingsHeader 
                         showIcon={false}
@@ -82,16 +109,24 @@ const EmailNotifications = ({ navigation }) => {
                                 <Text style={styles.subHeaderText}>Receive email alerts related to your account, updates and more from Sparklight.</Text>
                             </View>   
                         </View>     
-                        <View style={styles.subInput}>
+                        <View 
+                            style={styles.subInput}
+                            onLayout={(event) => {
+                                setTextInputLayout(event.nativeEvent.layout);
+                            }}                            
+                        >
                             <EntryInput
                                 iconImage={require('../../../assets/mail.png')}
                                 placeholder="Email Address"
                                 input={input}
                                 onChangeText={onChangeText}
+                                onSubmitText={enableEmailNotifications}
                                 keyboardType="email"
                             />                
                         </View>                          
                     </View>
+                    <View style={styles.bottomContainer}>
+                    </View>                                    
                     <View style={styles.bottomBar}>
                         <Pressable
                             disabled={!enableButton}
@@ -117,6 +152,12 @@ const EmailNotifications = ({ navigation }) => {
                             </Pressable>
                         </View>    
                     </View>
+                    {
+                        !keyboardHidden &&
+                        (
+                            <View style={styles.textBottomHeight} />
+                        )
+                    }                    
                 </ScrollView>
             </TouchableWithoutFeedback>
         </View>
@@ -163,7 +204,7 @@ const styles = StyleSheet.create({
     },
     innerContent: {
         justifyContent: 'space-around',
-        flex: 1
+        //flex: 1
     },
     container: {
         flex: 1,
@@ -250,14 +291,21 @@ const styles = StyleSheet.create({
         marginTop: 10
     }, 
     subInput: {
-        marginTop: 20
+        marginTop: 20,
+        marginBottom: 20
     },    
     viewContainer: {
         flex: 1,
         width: '100%',
         alignItems: 'center',
         marginTop: 50
-    }
+    },
+    textBottomHeight: {
+        height: 200
+    },
+    bottomContainer: {
+        height: 170,
+    },    
 });
 
 export default EmailNotifications;

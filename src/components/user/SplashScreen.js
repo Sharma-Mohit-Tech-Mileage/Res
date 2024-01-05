@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
-import { authorize, revoke } from "react-native-app-auth";
+import { authorize, revoke, refresh } from "react-native-app-auth";
 import { useDispatch, useSelector } from "react-redux";
 import { ssoLoginAction, saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
@@ -29,6 +29,7 @@ import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import { getFirstTime, storeFirstTime } from "../../redux/utils/LocalStorage";
 import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
+import { getUser } from "../../redux/utils/LocalStorage";
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -54,7 +55,7 @@ const SplashScreen = ({ navigation }) => {
   };
   
   const onSuccess = async (res) => {
-    setLoading(false);
+    //setLoading(false);
 
     console.log('onSuccess res: ', res);
 
@@ -76,32 +77,32 @@ const SplashScreen = ({ navigation }) => {
 
       const data = await getFirstTime();
 
-        if (userInfo.accountNumber === "900690538") {
-          setErrorMessage(strings.nonAdminUserMsg);
-          setTimeout(() => {
-            setModalVisible(true);
-          }, 100);
-        } else if (userInfo.accountNumber === "902862879") {
-          setErrorMessage(strings.nonInternetUserMessage);
-          setTimeout(() => {
-            setModalVisible(true);
-          }, 100);
+      if (userInfo.accountNumber === "900690538") {
+        setErrorMessage(strings.nonAdminUserMsg);
+        setTimeout(() => {
+          setModalVisible(true);
+        }, 100);
+      } else if (userInfo.accountNumber === "902862879") {
+        setErrorMessage(strings.nonInternetUserMessage);
+        setTimeout(() => {
+          setModalVisible(true);
+        }, 100);
+      } else {
+        if (data !== null 
+          && data.accountNumber === userInfo.accountNumber) {
+            navigation.navigate("MyTab");
         } else {
-          if (data !== null 
-            && data.accountNumber === userInfo.accountNumber) {
-              navigation.navigate("MyTab");
-          } else {
-            storeFirstTime({
-              accountNumber: userInfo.accountNumber
-            });
+          storeFirstTime({
+            accountNumber: userInfo.accountNumber
+          });
 
-            if (user.userInfo.mobileTCAcceptanceFlag) {
-              navigation.navigate("EntryPushNotifications");
-            } else {
-              navigation.navigate("Terms");
-            }
+          if (user.userInfo.mobileTCAcceptanceFlag) {
+            navigation.navigate("EntryPushNotifications");
+          } else {
+            navigation.navigate("Terms");
           }
-        }         
+        }
+      }         
     }
   };
 
@@ -180,7 +181,8 @@ const SplashScreen = ({ navigation }) => {
       console.log('loginAuthResult: ', result);
 
       const data = { 
-        idToken: result.idToken,accessToken:result.accessToken,
+        idToken: result.idToken,
+        accessToken: result.accessToken,
         idTokenGuid: result.authorizeAdditionalParameters.session_state,
         refreshToken: result.refreshToken
       };
@@ -206,11 +208,37 @@ const SplashScreen = ({ navigation }) => {
     await loginAuth();
   };  
 
-  const articleWindowUtility = async () => {
-    navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name :'Upgrade Plan'});
-  };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+
+    // const fetchData = async () => {
+    //   try {
+    //     const user = await getUser();
+    //     console.log('getUser: ', user);
+  
+    //     const result = await refresh(config, {
+    //       refreshToken: user.refreshToken,
+    //     });
+
+    //     console.log('result: ', JSON.stringify(result));
+
+    //     const data = { 
+    //       idToken: result.idToken,
+    //       accessToken: result.accessToken,
+    //       idTokenGuid: result.additionalParameters.session_state,
+    //       refreshToken: result.refreshToken
+    //     };
+  
+    //     setLoading(true);
+    //     callSSOLoginApi(data);
+    //   } catch (error) {
+    //     console.error("Error fetching data", error);
+    //   }
+    // };
+
+    // fetchData();
+
+  }, []);
 
   return (
     <LinearGradient
@@ -228,15 +256,37 @@ const SplashScreen = ({ navigation }) => {
           style={styles.logo}
         />
       </View>
-
-      <TouchableOpacity
-        style={styles.SSoBtnContainer}
-        onPress={() => {
-          loginAuth();
-        }}
-      >
-        <Text style={styles.SSoBtn}>Login</Text>
-      </TouchableOpacity>
+      {
+        !loading &&
+        (
+          <>
+            <TouchableOpacity
+              style={styles.SSoBtnContainer}
+              onPress={() => {
+                loginAuth();
+              }}
+            >
+              <Text style={styles.SSoBtn}>Login</Text>
+            </TouchableOpacity>        
+          </>
+        )
+      }
+      <View style={styles.buttonContainer}>
+        <Pressable
+          style={[styles.buttons, styles.buttonsLayout]}
+          onPress={loginFirstTimeFlow}
+        >
+            <Text style={styles.buttonTextFirstTime}>First Time Flow</Text>
+        </Pressable> 
+      </View>    
+      <View style={styles.buttonContainer}>
+        <Pressable
+          style={[styles.buttons, styles.buttonsLayout]}
+          onPress={termsAndConditionsFlow}
+        >
+            <Text style={styles.buttonTextFirstTime}>Terms And Conditions</Text>
+        </Pressable> 
+      </View>               
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
