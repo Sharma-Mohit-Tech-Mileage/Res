@@ -19,6 +19,7 @@ const ManageEquipment = () => {
     const [model,setModel]=React.useState('')
     const [transmissionType,setTransmissionType]=React.useState('')
     const [leased,setLeased]=React.useState('')
+    const [plans,setPlans]=React.useState([])
 
     const getLeasedDetails=()=>{
         let re = getUser().then((res) => {
@@ -32,6 +33,17 @@ const ManageEquipment = () => {
           });
 
     }
+
+    const getInternetPlanDetails = () => {
+        let re = getUser().then((res) => {
+          const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
+          GetApiRequest(request, (res)=>{
+          setPlans(res)
+          }, (error)=>{
+                          
+          });
+        });
+      };
 
     const getModemDetails = () => {
         let re = getUser().then((res) => {
@@ -47,6 +59,7 @@ const ManageEquipment = () => {
             setModel(res.model)
             setTransmissionType(res.transmissionType)
         }
+        
       };
       const onError = (error) => {
         console.log("error", error);
@@ -55,6 +68,8 @@ const ManageEquipment = () => {
     React.useEffect(()=>{
        getModemDetails();
        getLeasedDetails();
+       getInternetPlanDetails();
+       
 
     },[])
 
@@ -167,7 +182,7 @@ const ManageEquipment = () => {
                                     resizeMode="stretch"
                                     source={require("../../../assets/refresh.png")}
                                 />
-                                <Text style={styles.modemHealthSupport}>Restart Modem</Text>
+                                <Text style={styles.modemHealthSupport}>Reboot Modem</Text>
                                 <Image
                                     resizeMode="stretch"
                                     source={require("../../../assets/chevronright.png")}
@@ -176,7 +191,7 @@ const ManageEquipment = () => {
                         </View>
                     </View>
                     <View style={[styles.frameFlexBox]}>
-                        <MyServicePlan />
+                        <MyServicePlan plans={plans} navigation={navigation}/>
                     </View>
                 </View>
             </ScrollView>

@@ -79,6 +79,7 @@ const Support = () => {
       const handlePressOpenButton = () => {
        
         Zendesk.openMessagingView();
+        Zendesk.addEventListener()
       };
     
 

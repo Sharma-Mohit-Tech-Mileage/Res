@@ -24,35 +24,47 @@ import {
 const ModemExchangeInstructions = () => {
   const navigation = useNavigation();
   const [inst1, setInst1] = React.useState(
-    "The average lifespan of a modem is approximately 2-3 years, although some high-quality modems can last up to 5-8 years. Typically, high-quality modems are replaced due to becoming outdated rather than breaking down. If you suspect that your modem is not functioning properly, please contact us or visit your nearest Sparklight office to request a modem exchange. Our team will be happy to assist you and ensure that you have the best possible internet experience."
+    `The average lifespan of a modem is approximately 2-3 years, although some high-quality modems can last up to 5-8 years. Typically, high-quality modems are replaced due to becoming outdated rather than breaking down.
+    
+If you suspect that your modem is not functioning properly, please `
+  );
+  const [inst2, setInst2] = React.useState(
+    ` or visit your nearest Sparklight office to request a modem exchange. Our team will be happy to assist you and ensure that you have the best possible internet experience.`
   );
 
   return (
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
         title="Modem Exchange Instructions"
-        onPressBack={() => navigation.goBack()}
+        onPressBack={() => {
+            console.log('On Back Press')
+            navigation.goBack()
+        }}
       />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={{ flexDirection: "column", paddingBottom: hp("15%") }}>
-          <View
+      <View
             style={[
               styles.card,
               styles.shadowProp,
-              { flexDirection: "column" },
+              { flexDirection: 'column' },
             ]}
           >
-            <Image
+             <Image
               style={styles.frameChild}
               resizeMode="cover"
-              source={require("../../../assets/modem-reboot-inst.png")}
+              source={require("../../../assets/modem-reboot-inst1.png")}
             />
-            <Text style={styles.heading}>How to do a modem exchange</Text>
+            <Text style={styles.heading}>How to exchange modem</Text>
             <View
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}
             />
-            <Text style={styles.text}>{inst1}</Text>
-          </View>
+            <Text style={styles.textContactUs}>
+            {inst1}
+            <Text style={[styles.textContactUs,{fontWeight:'600'}]} onPress={()=>{
+                navigation.navigate('support')
+            }}> contact us</Text>{inst2}
+              </Text>
+          
         </View>
       </ScrollView>
     </View>
@@ -119,7 +131,17 @@ const styles = StyleSheet.create({
     padding: 20,
     alignSelf: "center",
   },
-  
+  textContactUs: {
+    color: Color.sparklightGray1,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 16,
+    fontStyle: "normal",
+    fontWeight: "400",
+    alignSelf:'center',
+    paddingLeft: 5,
+    width: wp("70%"),
+    flexWrap: "wrap",
+  },
 });
 
 export default ModemExchangeInstructions;

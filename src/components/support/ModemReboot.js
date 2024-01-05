@@ -49,7 +49,7 @@ const ModemReboot = () => {
         <View style={styles.overlay}>
           <View style={styles.alertContainer}>
             <ActivityIndicator size="large" color={Color.colorGainsboro_200} />
-            <Text style={styles.loadingTxt}>Modem Rebooting</Text>
+            <Text style={styles.loadingTxt}>Rebooting Modem</Text>
           </View>
         </View>
       </Modal>
@@ -106,7 +106,7 @@ const ModemReboot = () => {
   return (
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
-        title="Modem Reboot"
+        title="Reboot Modem"
         onPressBack={() => navigation.goBack()}
       />
       <ScrollView>
@@ -147,7 +147,7 @@ const ModemReboot = () => {
               <View style={{ flexDirection: "row", alignContent: "center" }}>
                 <ModemInfo />
                 <Text style={styles.modemInstruction}>
-                  Modem Reboot Instructions
+                  Reboot Modem Instructions
                 </Text>
               </View>
               <RightArrow />
@@ -169,7 +169,7 @@ const ModemReboot = () => {
             >
               <View style={{ flexDirection: "row", alignContent: "center" }}>
                 <VideoIcon />
-                <Text style={styles.modemInstruction}>Modem Reboot Video</Text>
+                <Text style={styles.modemInstruction}>Reboot Modem Video</Text>
               </View>
               <RightArrow />
             </TouchableOpacity>
@@ -183,7 +183,7 @@ const ModemReboot = () => {
                 rebootModemAction();
               }}
             >
-              <Text style={styles.Btn}>Modem Reboot</Text>
+              <Text style={styles.Btn}>Reboot Modem</Text>
             </TouchableOpacity>
           </View>
 
