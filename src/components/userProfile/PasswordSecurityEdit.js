@@ -15,7 +15,6 @@ import { passwordSchema } from '../utility/validationSchema'; // Update the path
 const PasswordSecurityEdit = () => {
 
   const navigation = useNavigation();
-  const [passwordVisible, setPasswordVisible] = useState(false);
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
   const [showErrorAlert, setShowErrorAlert] = useState(false);
