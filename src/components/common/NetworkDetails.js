@@ -37,7 +37,7 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
             <Outageicon />
             {(hasOutage)?<RedCircle/>:<GreenCircle />}
           </View>
-          <Text style={styles.text}> {strings.noOutageTxt}</Text>
+          <Text style={styles.text}> {(hasOutage)?strings.noOutageDetected:strings.noOutageTxt}</Text>
         </View>
         {/* <View style={styles.item}>
         <View style ={styles.iconBg}>
