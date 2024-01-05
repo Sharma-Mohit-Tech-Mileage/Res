@@ -211,32 +211,32 @@ const SplashScreen = ({ navigation }) => {
 
   useEffect(() => {
 
-    const fetchData = async () => {
-      try {
-        const user = await getUser();
-        console.log('getUser: ', user);
+    // const fetchData = async () => {
+    //   try {
+    //     const user = await getUser();
+    //     console.log('getUser: ', user);
   
-        const result = await refresh(config, {
-          refreshToken: user.refreshToken,
-        });
+    //     const result = await refresh(config, {
+    //       refreshToken: user.refreshToken,
+    //     });
 
-        console.log('result: ', JSON.stringify(result));
+    //     console.log('result: ', JSON.stringify(result));
 
-        const data = { 
-          idToken: result.idToken,
-          accessToken: result.accessToken,
-          idTokenGuid: result.additionalParameters.session_state,
-          refreshToken: result.refreshToken
-        };
+    //     const data = { 
+    //       idToken: result.idToken,
+    //       accessToken: result.accessToken,
+    //       idTokenGuid: result.additionalParameters.session_state,
+    //       refreshToken: result.refreshToken
+    //     };
   
-        setLoading(true);
-        callSSOLoginApi(data);
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-    };
+    //     setLoading(true);
+    //     callSSOLoginApi(data);
+    //   } catch (error) {
+    //     console.error("Error fetching data", error);
+    //   }
+    // };
 
-    fetchData();
+    // fetchData();
 
   }, []);
 
@@ -270,7 +270,23 @@ const SplashScreen = ({ navigation }) => {
             </TouchableOpacity>        
           </>
         )
-      }      
+      }
+      <View style={styles.buttonContainer}>
+        <Pressable
+          style={[styles.buttons, styles.buttonsLayout]}
+          onPress={loginFirstTimeFlow}
+        >
+            <Text style={styles.buttonTextFirstTime}>First Time Flow</Text>
+        </Pressable> 
+      </View>    
+      <View style={styles.buttonContainer}>
+        <Pressable
+          style={[styles.buttons, styles.buttonsLayout]}
+          onPress={termsAndConditionsFlow}
+        >
+            <Text style={styles.buttonTextFirstTime}>Terms And Conditions</Text>
+        </Pressable> 
+      </View>               
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
