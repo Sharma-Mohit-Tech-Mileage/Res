@@ -36,8 +36,8 @@ const config = {
   redirectUrl:
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
   scopes: ["openid", "profile", "email", "phone", "address"],
-  iosPrefersEphemeralSession: false,
-  additionalParameters: { prompt: "login" },
+  iosPrefersEphemeralSession: true,
+  //additionalParameters: { prompt: "login" },
 };
 
 
@@ -207,7 +207,8 @@ const SplashScreen = ({ navigation }) => {
       console.log('loginAuthResult: ', result);
 
       const data = { 
-        idToken: result.idToken,accessToken:result.accessToken,
+        idToken: result.idToken,
+        accessToken:result.accessToken,
         idTokenGuid: result.authorizeAdditionalParameters.session_state,
         refreshToken: result.refreshToken
       };
