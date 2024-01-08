@@ -11,11 +11,12 @@ import userManagementIcon from '../../../assets/right-actionable18.png';
 import feedbackicon from '../../../assets/message-alert-circle.png';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUser } from "../../redux/utils/LocalStorage";
+import { getUser, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
-import { cleanUserData } from "../../redux/utils/LocalStorage";
 import * as Zendesk from 'react-native-zendesk-messaging';
+import { SetClearTimer } from '../user/Session';
+import { saveUserInfo } from "../../redux/actions/UserAction";
 
 const config = {
   issuer: 'https://login.uat.cableone.net/auth/realms/external-sso-realm',
@@ -34,8 +35,11 @@ const logoutConfirmationPopuo=(navigation)=>{
       {
         text: 'Logout',
         onPress: () => {
-          cleanUserData();
+          storeUser({});
+          saveUserInfo({});
+          storeSsoToken({});
           Zendesk.logout()
+          SetClearTimer();
           navigation.reset({
             index: 0,
             routes: [{ name: 'Splash' }]}) 
