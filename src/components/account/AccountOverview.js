@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, View, Pressable, StatusBar, Alert,ScrollView }
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, Padding, FontSize, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
+import { StackActions } from '@react-navigation/native';
 import chevronRightIcon from '../../../assets/chevronright.png';
 import profileSettingsIcon from '../../../assets/right-actionable15.png';
 import passwordSecurityIcon from '../../../assets/right-actionable16.png';
@@ -11,7 +12,7 @@ import userManagementIcon from '../../../assets/right-actionable18.png';
 import feedbackicon from '../../../assets/message-alert-circle.png';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUser } from "../../redux/utils/LocalStorage";
+import { getUser,getSsoToken } from "../../redux/utils/LocalStorage";
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
 import { cleanUserData } from "../../redux/utils/LocalStorage";
@@ -19,6 +20,7 @@ import * as Zendesk from 'react-native-zendesk-messaging';
 
 const config = {
   issuer: 'https://login.uat.cableone.net/auth/realms/external-sso-realm',
+  iosPrefersEphemeralSession: true,
 };
 
 const logoutConfirmationPopuo=(navigation)=>{
@@ -34,21 +36,33 @@ const logoutConfirmationPopuo=(navigation)=>{
       {
         text: 'Logout',
         onPress: () => {
-          cleanUserData();
-          Zendesk.logout()
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Splash' }]}) 
-          // let re = getSsoToken().then((res) => {
-          // let token=res.idToken;
-          // console.log('Logout',token) 
-          // });
+           
+          logoutAction(navigation)
+          
         },
       },
     ],
     { cancelable: true }
   );
   
+}
+
+const logoutAction=(navigation)=>{
+  let re = getSsoToken().then((res) => {
+    console.log('token',res)
+  let token=res.idToken;
+  logout(config,{
+    idToken: token,
+    postLogoutRedirectUrl:'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
+  }).then((result)=>{
+    console.log('Logout',result)
+    cleanUserData();
+    Zendesk.logout()
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Splash' }]}) 
+    });
+  })
 }
 
 const AccountOverview = () => {
