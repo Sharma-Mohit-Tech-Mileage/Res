@@ -12,11 +12,12 @@ import userManagementIcon from '../../../assets/right-actionable18.png';
 import feedbackicon from '../../../assets/message-alert-circle.png';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUser,getSsoToken } from "../../redux/utils/LocalStorage";
+import { getUser, getSsoToken, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
-import { cleanUserData } from "../../redux/utils/LocalStorage";
 import * as Zendesk from 'react-native-zendesk-messaging';
+import { SetClearTimer } from '../user/Session';
+import { saveUserInfo } from "../../redux/actions/UserAction";
 
 const config = {
   issuer: 'https://login.uat.cableone.net/auth/realms/external-sso-realm',
@@ -36,9 +37,7 @@ const logoutConfirmationPopuo=(navigation)=>{
       {
         text: 'Logout',
         onPress: () => {
-           
-          logoutAction(navigation)
-          
+          logoutAction(navigation);
         },
       },
     ],
@@ -50,19 +49,23 @@ const logoutConfirmationPopuo=(navigation)=>{
 const logoutAction=(navigation)=>{
   let re = getSsoToken().then((res) => {
     console.log('token',res)
-  let token=res.idToken;
-  logout(config,{
-    idToken: token,
-    postLogoutRedirectUrl:'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
-  }).then((result)=>{
-    console.log('Logout',result)
-    cleanUserData();
-    Zendesk.logout()
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Splash' }]}) 
+    let token=res.idToken;
+    logout(config,{
+      idToken: token,
+      postLogoutRedirectUrl:'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
+    }).then((result)=>{
+      console.log('Logout',result)
+      storeUser({});
+      saveUserInfo({});
+      storeSsoToken({});
+      SetClearTimer();      
+      Zendesk.logout()
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Splash' }]
+      }) 
     });
-  })
+  });
 }
 
 const AccountOverview = () => {

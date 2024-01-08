@@ -29,6 +29,8 @@ import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import { getFirstTime, storeFirstTime } from "../../redux/utils/LocalStorage";
 import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
+import { getUser } from "../../redux/utils/LocalStorage";
+import { SetRenewTokenTimer, SetClearTimer } from './Session';
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -100,6 +102,8 @@ const SplashScreen = ({ navigation }) => {
       }
 
       dispatch(saveUserInfo(user));
+
+      SetRenewTokenTimer();
 
       const data = await getFirstTime();
 
@@ -196,8 +200,6 @@ const SplashScreen = ({ navigation }) => {
 
   const handleCloseAlert = () => {
     setModalVisible(false);
-    
-    
   };
 
   const loginAuth = async () => {
@@ -234,11 +236,39 @@ const SplashScreen = ({ navigation }) => {
     await loginAuth();
   };  
 
-  const articleWindowUtility = async () => {
-    navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name :'Upgrade Plan'});
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const user = await getUser();
+        console.log('SplashScreen getUser: ', user);
+  
+        if (user !== null 
+            && user !== undefined
+            && user.refreshToken !== undefined
+            && user.refreshToken !== null) {
+          const result = await refresh(config, {
+            refreshToken: user.refreshToken,
+          });
 
-  useEffect(() => {}, []);
+          console.log('result: ', JSON.stringify(result));
+
+          const data = { 
+            idToken: result.idToken,
+            accessToken: result.accessToken,
+            idTokenGuid: result.additionalParameters.session_state,
+            refreshToken: result.refreshToken
+          };
+    
+          setLoading(true);
+          callSSOLoginApi(data);
+        }
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <LinearGradient
@@ -256,15 +286,21 @@ const SplashScreen = ({ navigation }) => {
           style={styles.logo}
         />
       </View>
-
-      <TouchableOpacity
-        style={styles.SSoBtnContainer}
-        onPress={() => {
-          loginAuth();
-        }}
-      >
-        <Text style={styles.SSoBtn}>Login</Text>
-      </TouchableOpacity>
+      {
+        !loading &&
+        (
+          <>
+            <TouchableOpacity
+              style={styles.SSoBtnContainer}
+              onPress={() => {
+                loginAuth();
+              }}
+            >
+              <Text style={styles.SSoBtn}>Login</Text>
+            </TouchableOpacity>        
+          </>
+        )
+      }            
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
