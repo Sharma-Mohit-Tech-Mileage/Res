@@ -13,11 +13,11 @@ import {
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
-import { authorize, revoke, refresh } from "react-native-app-auth";
+import { authorize, revoke } from "react-native-app-auth";
 import { useDispatch, useSelector } from "react-redux";
 import { ssoLoginAction, saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
-import { PostAuthApiRequest } from "../../network/APIClient";
+import { PostAuthApiRequest,GetApiRequest } from "../../network/APIClient";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -38,8 +38,8 @@ const config = {
   redirectUrl:
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
   scopes: ["openid", "profile", "email", "phone", "address"],
-  iosPrefersEphemeralSession: false,
-  additionalParameters: { prompt: "login" },
+  iosPrefersEphemeralSession: true,
+  //additionalParameters: { prompt: "login" },
 };
 
 
@@ -56,12 +56,10 @@ const SplashScreen = ({ navigation }) => {
   };
   
   const onSuccess = async (res) => {
-    //setLoading(false);
-
+    setLoading(false);
     console.log('onSuccess res: ', res);
 
-    if (res) {
-      let token = res.jwtToken;
+    let token = res.jwtToken;
       let userInfo = res.userInfo;
       let user = {
         userInfo: userInfo,
@@ -74,40 +72,69 @@ const SplashScreen = ({ navigation }) => {
         storeUser(user);
       }
 
+    const request = `account/api/account/${res.userInfo.accountNumber}`;
+    
+      GetApiRequest(request, (accountDetails)=>{
+        console.log("getUserAccountDetails", accountDetails);
+        if (accountDetails) {
+            handleLogin(res,accountDetails.services)
+        }
+      }, (error)=>{
+
+      });
+  
+    
+  };
+
+ const handleLogin=async(res,accountDetails)=>{
+    if (res) {
+      let token = res.jwtToken;
+      let userInfo = res.userInfo;
+      let user = {
+        userInfo: userInfo,
+        token: token,
+        tokenGuid: res.idTokenGuid,
+        refreshToken: res.refreshToken
+      };
+
+      if (token) {
+        //storeUser(user);
+      }
+
       dispatch(saveUserInfo(user));
 
       SetRenewTokenTimer();
 
       const data = await getFirstTime();
 
-      if (userInfo.accountNumber === "900690538") {
-        setErrorMessage(strings.nonAdminUserMsg);
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
-      } else if (userInfo.accountNumber === "902862879") {
-        setErrorMessage(strings.nonInternetUserMessage);
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
-      } else {
-        if (data !== null 
-          && data.accountNumber === userInfo.accountNumber) {
-            navigation.navigate("MyTab");
+        if (userInfo.accountNumber === "900690538") {
+          setErrorMessage(strings.nonAdminUserMsg);
+          setTimeout(() => {
+            setModalVisible(true);
+          }, 100);
+        } else if (accountDetails.commercialPhone==false && accountDetails.fxsCommercialPhone==false && accountDetails.digital==false && accountDetails.fiber==false && accountDetails.hsd==false && accountDetails.tv==false && accountDetails.iptv==false && accountDetails.tollFreeNumber==false && accountDetails.phone==false) {
+          setErrorMessage(strings.nonInternetUserMessage);
+          setTimeout(() => {
+            setModalVisible(true);
+          }, 100);
         } else {
-          storeFirstTime({
-            accountNumber: userInfo.accountNumber
-          });
-
-          if (user.userInfo.mobileTCAcceptanceFlag) {
-            navigation.navigate("EntryPushNotifications");
+          if (data !== null 
+            && data.accountNumber === userInfo.accountNumber) {
+              navigation.navigate("MyTab");
           } else {
-            navigation.navigate("Terms");
+            storeFirstTime({
+              accountNumber: userInfo.accountNumber
+            });
+
+            if (user.userInfo.mobileTCAcceptanceFlag) {
+              navigation.navigate("EntryPushNotifications");
+            } else {
+              navigation.navigate("Terms");
+            }
           }
-        }
-      }         
+        }         
     }
-  };
+  }
 
   const onError = (error) => {
     console.log(" callSSOLoginApi error", error);
@@ -183,7 +210,7 @@ const SplashScreen = ({ navigation }) => {
 
       const data = { 
         idToken: result.idToken,
-        accessToken: result.accessToken,
+        accessToken:result.accessToken,
         idTokenGuid: result.authorizeAdditionalParameters.session_state,
         refreshToken: result.refreshToken
       };
@@ -210,7 +237,6 @@ const SplashScreen = ({ navigation }) => {
   };  
 
   useEffect(() => {
-
     const fetchData = async () => {
       try {
         const user = await getUser();
@@ -242,7 +268,6 @@ const SplashScreen = ({ navigation }) => {
     };
 
     fetchData();
-
   }, []);
 
   return (
@@ -409,3 +434,4 @@ const styles = StyleSheet.create({
 });
 
 export default SplashScreen;
+

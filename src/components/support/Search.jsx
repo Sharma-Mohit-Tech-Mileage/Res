@@ -4,7 +4,7 @@ import { Color, FontFamily, FontSize, Padding, Border } from '../../../GlobalSty
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import SearchSuggestions from '../common/customui/SearchSuggestions';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
-import { GetApiRequest } from '../../network/APIClient';
+import { GetApiRequest,GetApiRequestSearch } from '../../network/APIClient';
 
 
 import debounce from 'lodash.debounce';
@@ -15,22 +15,21 @@ const Search = ({ navigation }) => {
     const [allSuggestions,setAllSuggestions] = useState(['Support title 1', 'Support title 2', 'Support title 3']);
 
 
-   
-
     // Function to filter suggestions
     const filterSuggestions = (query) => {
-        const request = `/support/api/Articles/search/${query}`;
-        GetApiRequest(request, (res)=>{
+        const request = `/articles/search.json?page=1&per_page=200&query=${query}&sort_by=created_at&sort_order=desc`;
+        GetApiRequestSearch(request, (res)=>{
+            console.log('filterSuggestions',res.results)
             if(res){
             if (query.trim() &&  query.length>0 ) {
-                setFilteredSuggestions(res);
+                setFilteredSuggestions(res.results);
             } else {
                 setFilteredSuggestions([]); // Set to empty array when there's no input
             }
         }
 
         }, (error)=>{
-
+            console.log('filterSuggestions error',error)
         });
 
        

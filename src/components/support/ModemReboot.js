@@ -106,7 +106,7 @@ const ModemReboot = () => {
   return (
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
-        title="Reboot Modem"
+        title="Modem Reboot"
         onPressBack={() => navigation.goBack()}
       />
       <ScrollView>
@@ -147,7 +147,7 @@ const ModemReboot = () => {
               <View style={{ flexDirection: "row", alignContent: "center" }}>
                 <ModemInfo />
                 <Text style={styles.modemInstruction}>
-                  Reboot Modem Instructions
+                  Modem Reboot Instructions
                 </Text>
               </View>
               <RightArrow />
@@ -169,7 +169,7 @@ const ModemReboot = () => {
             >
               <View style={{ flexDirection: "row", alignContent: "center" }}>
                 <VideoIcon />
-                <Text style={styles.modemInstruction}>Reboot Modem Video</Text>
+                <Text style={styles.modemInstruction}>Modem Reboot Video</Text>
               </View>
               <RightArrow />
             </TouchableOpacity>

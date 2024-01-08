@@ -36,7 +36,7 @@ const ModemReboot = () => {
   return (
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
-        title="Reboot Modem Instructions"
+        title="Modem Reboot Instructions"
          onPressBack={() => navigation.goBack()}
       />
       <ScrollView showsVerticalScrollIndicator={false} >
