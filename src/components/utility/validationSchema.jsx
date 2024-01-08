@@ -13,6 +13,9 @@ export const phoneSchema = yup.object({
         .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid US mobile phone number with optional extension'),
 });
 
+export const feedbackSchema = yup.object({
+    feedbackText: yup.string().required('Comment is required.')
+});
 
 
 export const passwordSchema = (isCustomQuestionSelected) => yup.object({
