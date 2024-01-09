@@ -49,13 +49,13 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
       </View>
 
       <View style={[styles.rowContainer]}>
-        <View style={styles.item}>
+        {/*<View style={styles.item}>
           <View style={styles.iconBg}>
             <Modemicon />
             <GreenCircle />
           </View>
           <Text style={styles.text}> {strings.no_modem_issue}</Text>
-        </View>
+      </View>*/}
         <View style={{ flexDirection: "row" }}>
           <View style={styles.item}>
             <View style={styles.iconBg}>
