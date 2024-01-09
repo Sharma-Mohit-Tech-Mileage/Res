@@ -10,6 +10,8 @@ import {
   BackHandler,
   Alert,
   Platform,
+  Dimensions,
+  Pressable,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -227,6 +229,28 @@ const HomeScreen = ({ route, navigation }) => {
       colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
       style={styles.container}
     >
+      <View style={styles.shadowFullScreen} />
+      <View style={styles.walkThroughBubble}>
+        <View>
+          <Text>Home</Text>
+        </View>
+        <View>
+          <Text>View information related to your internet health, billing, service and more.</Text>
+        </View>
+        <View>
+            <View>
+
+            </View>
+            <View>
+              <Pressable
+                  style={[styles.button, styles.buttonsLayout]}
+                  onPress={enableTextNotifications}
+              >
+                  <Text style={styles.accept}>Next</Text>
+              </Pressable>                   
+            </View>
+        </View>
+      </View>     
       <SafeAreaView style={{ flex: 1 }}>
         <View
           style={{
@@ -318,7 +342,7 @@ const HomeScreen = ({ route, navigation }) => {
 
             <MyServicePlan plans={plans} navigation={navigation} />
           </View>
-        </ScrollView>
+        </ScrollView>         
       </SafeAreaView>
     </LinearGradient>
   );
@@ -340,6 +364,26 @@ const styles = StyleSheet.create({
     shadowOffset: { width: -2, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
+  },
+  shadowFullScreen: {
+    backgroundColor: 'black',
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
+    top: 0,
+    zIndex: 5,
+    opacity: .7
+  },
+  walkThroughBubble: {
+    backgroundColor: 'white',
+    position: 'absolute',
+    bottom: 120,
+    height: 200,
+    width: Dimensions.get('window').width - 40,
+    left: 20,
+    opacity: 1,
+    zIndex: 10,
+    borderRadius: 10
   },
   internetHealth: {
     color: colors.darkest_grey,

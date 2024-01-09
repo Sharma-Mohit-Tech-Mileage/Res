@@ -53,6 +53,9 @@ const MyTabs = ({ route, navigation }) => {
   }, []);
 
   return (
+    <>
+      <View style={styles.shadowTabs}>
+      </View>      
     <Tab.Navigator
       name='MyTab'
       initialRouteName="Home"
@@ -142,13 +145,25 @@ const MyTabs = ({ route, navigation }) => {
           }          
         }}
       />
-    </Tab.Navigator>
+    </Tab.Navigator>    
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   tabItem: {
     textAlign: "center",
+  },
+  shadowTabs: {
+    backgroundColor: 'black',
+    height: 100,
+    width: '100%',
+    position: 'absolute',
+    bottom: 0,
+    zIndex: 5,
+    bottom: 0,
+    opacity: .7,
+    left: 100
   },
 });
 
