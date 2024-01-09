@@ -1,19 +1,12 @@
 import * as yup from 'yup';
 
-export const profileSchema = (isPrimaryAdmin, multipleEmails) => yup.object({
+export const profileSchema = yup.object({
     firstName: yup.string().required('First Name is required'),
     lastName: yup.string().required('Last Name is required'),
-    svEmailAddress: (isPrimaryAdmin && !multipleEmails)
-        ? yup.string().email('Invalid email address').required('Email is required')
-        : yup.string().nullable(),
-    phoneNumber: isPrimaryAdmin
-        ? yup.string()
-            .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number.')
-            .required('Phone number is required')
-        : yup.string().nullable(),
+    phoneNumber: yup.string()
+        .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number.'),
+  
 });
-
-
 export const phoneSchema = yup.object({
     phone: yup.string()
         .nullable()

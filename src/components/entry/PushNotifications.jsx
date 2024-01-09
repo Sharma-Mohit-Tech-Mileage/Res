@@ -13,48 +13,47 @@ import {
   notificationListener,
 } from '../../firebase/FirebaseUtils';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchSMSSelection, fetchBillingStatus, fetchPushNotifications, fetchBillingPaper } from '../../redux/actions/ProfileActionSuite';
+import { fetchSMSSelection, fetchBillingStatus, fetchPushNotifications } from '../../redux/actions/ProfileActionSuite';
 import moment from 'moment';
 import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
 
 const PushNotifications = ({ navigation }) => {
     const [generatedToken, setGeneratedToken] = useState();
-    const [nextScreen, setNextScreen] = useState('EntryTextNotifications');
     const dispatch = useDispatch();
     const profile = useSelector(state => state.combinedReducers.profile || {});
     const user = useSelector(state => state.combinedReducers.user.userData);
 
+    console.log('profile: ', JSON.stringify(profile));
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                dispatch(fetchBillingStatus());
-                dispatch(fetchBillingPaper());
-                dispatch(fetchSMSSelection());
-                dispatch(fetchPushNotifications());
+                await dispatch(fetchBillingStatus());
+                // await dispatch(fetchBillingPaper());
+                await dispatch(fetchSMSSelection());
+                await dispatch(fetchPushNotifications());
             } catch (error) {
                 console.error("Error fetching data", error);
             }
         };
 
         fetchData();
-    }, [dispatch]); 
-    
-    useEffect(() => {
-        if (profile.smsSubscription.length > 0) {
-            if (profile.paperLessInfo !== undefined
-                && profile.paperLessInfo.accountNumber !== undefined
-                && profile.paperLessInfo.accountNumber.length > 0) {
-                console.log('setNextScreen: MyTab');
-                setNextScreen('MyTab');                  
-            } else {
-                console.log('setNextScreen: EntryEmailNotifications');
-                setNextScreen('EntryEmailNotifications');  
-            }
-        } else {
-            console.log('setNextScreen: EntryTextNotifications');
-            setNextScreen('EntryTextNotifications');  
-        }
-    }, [profile]);        
+    }, [dispatch]);    
+
+    const terms = [
+        {
+            title: 'Title',
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
+        },
+        {
+            title: 'Second Title',
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
+        },
+        {
+            title: 'Third Title',
+            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
+        }                
+    ];
 
     const enableNotifications = async () => {
         // const fetchToken = async () => {
@@ -83,10 +82,9 @@ const PushNotifications = ({ navigation }) => {
             };
             console.log('enableNotifications: ', data);
             console.log('enableNotifications navigation: ', navigation);
-            await dispatch(updatePushNotifications(data, null));
-            navigation.navigate(nextScreen);
+            await dispatch(updatePushNotifications(data, navigation));
         } else {
-            navigation.navigate(nextScreen);
+            navigation.navigate("EntryTextNotifications");
         }
         
         //void fetchToken();
@@ -135,10 +133,10 @@ const PushNotifications = ({ navigation }) => {
                         accessibilityLabel="Buttons Section">
                         <Pressable
                             style={[styles.buttonDecline, styles.buttonsLayout]}
-                            onPress={() => navigation.navigate(nextScreen)}
+                            onPress={() => navigation.navigate("EntryTextNotifications")}
                             accessibilityLabel="Decline Button"
                             accessibilityRole="button"
-                            accessibilityHint="Decline Push Notifications"
+                            accessibilityHint="Decline Terms and Conditions"
                         >
                             <Text style={styles.decline}>
                                 Skip for now

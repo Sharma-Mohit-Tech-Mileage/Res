@@ -4,14 +4,10 @@ import { ProgressCircle } from "react-native-svg-charts";
 import colors from "../../res/Colors";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
-import { getUser } from "../../redux/utils/LocalStorage";
+
 const DataUsageComponent = ({navigation}) => {
- const [account,setAccount]=useState('')
   useEffect(() => {
     console.log("data");
-    let re = getUser().then((res) => {
-      setAccount(res.userInfo.accountNumber)
-    });
   }, []);
   return (
     <View
@@ -25,11 +21,10 @@ const DataUsageComponent = ({navigation}) => {
     >
       <ProgressCircle
         style={{ height: 200 }}
-        progress={(account==='900679010')?1.0:0.8}
+        progress={0.8}
         progressColor={"#8D3B90"}
-        backgroundColor={"#e1e1e1"}
         cornerRadius={5}
-        strokeWidth={12}
+        strokeWidth={15}
         startAngle={-Math.PI * 0.85}
         endAngle={Math.PI * 0.85}
       >
@@ -47,7 +42,7 @@ const DataUsageComponent = ({navigation}) => {
               alignItems: "center",
             }}
           >
-            <Text style={styles.dataText}>{(account==='900679010')?'700':'540'}</Text>
+            <Text style={styles.dataText}>540</Text>
             <Text style={[styles.dataText, { fontSize: 16, marginTop: 5 }]}>
               GB
             </Text>
@@ -68,7 +63,7 @@ const DataUsageComponent = ({navigation}) => {
               marginTop: 5,
             }}
           >
-            <Text style={styles.dataPlanTxt}> UNLIMITED PLAN</Text>
+            <Text style={styles.dataPlanTxt}> 700 GB DATA PLAN</Text>
           </View>
         </View>
       </ProgressCircle>
@@ -77,13 +72,13 @@ const DataUsageComponent = ({navigation}) => {
         <View style={{ flexDirection: "row" }}>
           <View style={styles.dataUsageIndicator} />
           <Text style={styles.useLbl}>Used</Text>
-          <Text style={styles.useDataLbl}>{(account==='900679010')?' 700GB':' 540GB'}</Text>
+          <Text style={styles.useDataLbl}>{" "}540GB</Text>
         </View>
 
         <View style={{ flexDirection: "row" }}>
           <View style={[styles.dataUsageIndicator,{backgroundColor:colors.backgound_blue,marginLeft:5}]} />
           <Text style={styles.useLbl}>Remaining</Text>
-          <Text style={styles.useDataLbl}>{(account==='900679010')?' Unlimited':' 160GB'}</Text>
+          <Text style={styles.useDataLbl}>{" "}160GB</Text>
         </View>
       </View>
       <View style={{ backgroundColor: colors.grey, height: 1, marginVertical: 10 }} />

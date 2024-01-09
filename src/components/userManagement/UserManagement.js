@@ -4,14 +4,14 @@ import { StyleSheet, Text, View, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
-import { ROLE_COLORS, getUserType } from '../utility/constant';
+import { ROLE_COLORS, BOX_COLORS, BORDER_COLORS, getUserType } from '../utility/constant';
 import { executeUserList } from '../../redux/actions/ProfileActionSuite'
 
 const UserManagement = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const profile = useSelector(state => state.combinedReducers.profile || {});
-  const userList = profile.userList || [];
+  const userList = profile.userList || []; // Defaulting to an empty array if userList is undefined
   const userData = useSelector(state => state.combinedReducers.user.userData);
   useEffect(() => {
     dispatch(executeUserList(0));
@@ -20,8 +20,13 @@ const UserManagement = () => {
   const renderUserCard = (user) => {
     const convertedRole = getUserType(user.memberType);
     const normalizedRole = convertedRole.replace(/\s+/g, '').toLowerCase();
+    console.log('normalizedRole======================', user?.userName === userData.userInfo.userName)
     const avatarColor = ROLE_COLORS[normalizedRole] || Color.sparklightGreen;
+    const BoxColor = BOX_COLORS[normalizedRole] || Color.colorWhitesmoke_100;
+    const BorderColor = BORDER_COLORS[normalizedRole] || Color.colorWhitesmoke_100;
+    // Check if the username matches the logged-in user's username
     const isLoggedInUser = user.userName === userData.userInfo.userName;
+    // Extracting fullName and initials
     const firstName = user?.firstName || '';
     const lastName = user?.lastName || '';
 
@@ -94,19 +99,19 @@ const UserManagement = () => {
               Member Type
             </Text>
             <View style={styles.badgeWrapper}>
-              <View style={[styles.badge, styles.badgeBorder, isLoggedInUser ? styles.login : styles.loginOut]}>
+              <View style={[styles.badge, styles.badgeBorder, { backgroundColor: BoxColor, borderColor: BorderColor }]}>
                 <Text style={[styles.text3]}>{getUserType(user.memberType)}</Text>
               </View>
             </View>
           </View>
         </View>
         {/* <View style={[styles.frameWrapper2, styles.frameSpaceBlock]}>
-          { <View style={styles.usernameParent}>
+          <View style={styles.usernameParent}>
             <Text style={[styles.username, styles.usersFlexBox]}>
               Email
             </Text>
             <Text style={styles.melsmith}>{user.email}</Text>
-          </View>}
+          </View>
         </View> */}
       </View>
     )
@@ -133,9 +138,7 @@ const UserManagement = () => {
               {userList.map((user, index) => (
                 <React.Fragment key={index}>
                   {renderUserCard(user)}
-                  {index < userList.length - 1 && <View style={styles.boxspace} />}
                 </React.Fragment>
-
               ))}
             </View>
           </View>
@@ -164,16 +167,6 @@ const styles = StyleSheet.create({
   usersFlexBox: {
     textAlign: "left",
     color: Color.sparklightGray1,
-  },
-  login:
-  {
-    backgroundColor: Color.success50,
-    borderColor: Color.colorAquamarine
-  },
-  loginOut:
-  {
-    backgroundColor: Color.colorWhitesmoke_200,
-    borderColor: Color.colorWhitesmoke_200
   },
   frameBorder: {
     borderWidth: 1,
@@ -222,11 +215,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontSize: FontSize.textXsSemibold_size,
     fontWeight: "600",
-  },
-  boxspace: {
-    paddingTop: Padding.p_base,
-    height: 1,
-    backgroundColor: Color.sparklightWhite,
   },
   frameSpaceBlock: {
     paddingTop: Padding.p_5xs,
@@ -294,6 +282,8 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   loggedIn: {
+    lineHeight: 12,
+    marginTop: 4,
     fontSize: FontSize.size_xs,
     fontFamily: FontFamily.openSansRegular,
   },
@@ -374,12 +364,12 @@ const styles = StyleSheet.create({
   },
 
   frameParent3: {
-    paddingVertical: 16,
+    marginTop: 16,
     alignSelf: "stretch",
   },
   frameContainer: {
     paddingHorizontal: Padding.p_base,
-    paddingBottom: 0,
+    paddingVertical: 0,
     alignSelf: "stretch",
   },
   frameGroup: {

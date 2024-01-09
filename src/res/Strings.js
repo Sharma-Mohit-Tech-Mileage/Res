@@ -8,7 +8,6 @@ let strings = new LocalizedStrings({
    expandTxt:'Expand Details',
    collapseTxt:'Collapse Details',
    noOutageTxt:'No Outages',
-   noOutageDetected:'Outages Detected',
    connect_wifi_txt:'Connected to Wifi',
    no_modem_issue:'No Modem Issues',
    bill_paid:'Bill Paid',

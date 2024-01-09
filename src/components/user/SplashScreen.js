@@ -17,7 +17,7 @@ import { authorize, revoke } from "react-native-app-auth";
 import { useDispatch, useSelector } from "react-redux";
 import { ssoLoginAction, saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
-import { PostAuthApiRequest,GetApiRequest } from "../../network/APIClient";
+import { PostAuthApiRequest } from "../../network/APIClient";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -29,8 +29,6 @@ import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import { getFirstTime, storeFirstTime } from "../../redux/utils/LocalStorage";
 import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
-import { getUser } from "../../redux/utils/LocalStorage";
-import { SetRenewTokenTimer, SetClearTimer } from './Session';
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -38,8 +36,8 @@ const config = {
   redirectUrl:
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
   scopes: ["openid", "profile", "email", "phone", "address"],
-  iosPrefersEphemeralSession: true,
-  //additionalParameters: { prompt: "login" },
+  iosPrefersEphemeralSession: false,
+  additionalParameters: { prompt: "login" },
 };
 
 
@@ -57,53 +55,23 @@ const SplashScreen = ({ navigation }) => {
   
   const onSuccess = async (res) => {
     setLoading(false);
+
     console.log('onSuccess res: ', res);
 
-    let token = res.jwtToken;
-      let userInfo = res.userInfo;
-      let user = {
-        userInfo: userInfo,
-        token: token,
-        tokenGuid: res.idTokenGuid,
-        refreshToken: res.refreshToken
-      };
-
-      if (token) {
-        storeUser(user);
-      }
-
-    const request = `account/api/account/${res.userInfo.accountNumber}`;
-    
-      GetApiRequest(request, (accountDetails)=>{
-        console.log("getUserAccountDetails", accountDetails);
-        if (accountDetails) {
-            handleLogin(res,accountDetails.services)
-        }
-      }, (error)=>{
-
-      });
-  
-    
-  };
-
- const handleLogin=async(res,accountDetails)=>{
     if (res) {
       let token = res.jwtToken;
       let userInfo = res.userInfo;
       let user = {
         userInfo: userInfo,
         token: token,
-        tokenGuid: res.idTokenGuid,
-        refreshToken: res.refreshToken
+        tokenGuid: res.idTokenGuid
       };
 
       if (token) {
-        //storeUser(user);
+        storeUser(user);
       }
 
       dispatch(saveUserInfo(user));
-
-      SetRenewTokenTimer();
 
       const data = await getFirstTime();
 
@@ -112,7 +80,7 @@ const SplashScreen = ({ navigation }) => {
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
-        } else if (accountDetails.commercialPhone==false && accountDetails.fxsCommercialPhone==false && accountDetails.digital==false && accountDetails.fiber==false && accountDetails.hsd==false && accountDetails.tv==false && accountDetails.iptv==false && accountDetails.tollFreeNumber==false && accountDetails.phone==false) {
+        } else if (userInfo.accountNumber === "902862879") {
           setErrorMessage(strings.nonInternetUserMessage);
           setTimeout(() => {
             setModalVisible(true);
@@ -120,11 +88,14 @@ const SplashScreen = ({ navigation }) => {
         } else {
           if (data !== null 
             && data.accountNumber === userInfo.accountNumber) {
-              navigation.navigate("MyTab");
+              navigation.navigate("MyTab", {
+                fname: userInfo.firstName,
+                lname: userInfo.lastName,
+              });
           } else {
             storeFirstTime({
               accountNumber: userInfo.accountNumber
-            });
+            });     
 
             if (user.userInfo.mobileTCAcceptanceFlag) {
               navigation.navigate("EntryPushNotifications");
@@ -134,7 +105,7 @@ const SplashScreen = ({ navigation }) => {
           }
         }         
     }
-  }
+  };
 
   const onError = (error) => {
     console.log(" callSSOLoginApi error", error);
@@ -200,19 +171,28 @@ const SplashScreen = ({ navigation }) => {
 
   const handleCloseAlert = () => {
     setModalVisible(false);
+    // let re = getSsoToken().then((res) => {
+    //   let token=res.accessToken;
+    //   console.log('revoke',token)
+    //   const result =  revoke(config, {
+    //     tokenToRevoke: token,
+    //     includeBasicAuth: true,
+    //     sendClientId: true,
+    //   }).then((result)=>{
+    //     console.log('revoke result',result)
+    //   });
+
+    //   });
+    
   };
 
   const loginAuth = async () => {
     try {
       const result = await authorize(config);
 
-      console.log('loginAuthResult: ', result);
-
       const data = { 
-        idToken: result.idToken,
-        accessToken:result.accessToken,
-        idTokenGuid: result.authorizeAdditionalParameters.session_state,
-        refreshToken: result.refreshToken
+        idToken: result.idToken,accessToken:result.accessToken,
+        idTokenGuid: result.authorizeAdditionalParameters.session_state
       };
 
       setLoading(true);
@@ -236,39 +216,7 @@ const SplashScreen = ({ navigation }) => {
     await loginAuth();
   };  
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const user = await getUser();
-        console.log('SplashScreen getUser: ', user);
-  
-        if (user !== null 
-            && user !== undefined
-            && user.refreshToken !== undefined
-            && user.refreshToken !== null) {
-          const result = await refresh(config, {
-            refreshToken: user.refreshToken,
-          });
-
-          console.log('result: ', JSON.stringify(result));
-
-          const data = { 
-            idToken: result.idToken,
-            accessToken: result.accessToken,
-            idTokenGuid: result.additionalParameters.session_state,
-            refreshToken: result.refreshToken
-          };
-    
-          setLoading(true);
-          callSSOLoginApi(data);
-        }
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <LinearGradient
@@ -286,26 +234,36 @@ const SplashScreen = ({ navigation }) => {
           style={styles.logo}
         />
       </View>
-      {
-        !loading &&
-        (
-          <>
-            <TouchableOpacity
-              style={styles.SSoBtnContainer}
-              onPress={() => {
-                loginAuth();
-              }}
-            >
-              <Text style={styles.SSoBtn}>Login</Text>
-            </TouchableOpacity>        
-          </>
-        )
-      }            
+
+      <TouchableOpacity
+        style={styles.SSoBtnContainer}
+        onPress={() => {
+          loginAuth();
+        }}
+      >
+        <Text style={styles.SSoBtn}>Login</Text>
+      </TouchableOpacity>
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
         onClose={handleCloseAlert}
-      />   
+      />    
+      <View style={styles.buttonContainer}>
+        <Pressable
+          style={[styles.buttons, styles.buttonsLayout]}
+          onPress={loginFirstTimeFlow}
+        >
+            <Text style={styles.buttonTextFirstTime}>First Time Flow</Text>
+        </Pressable> 
+      </View>    
+      <View style={styles.buttonContainer}>
+        <Pressable
+          style={[styles.buttons, styles.buttonsLayout]}
+          onPress={termsAndConditionsFlow}
+        >
+            <Text style={styles.buttonTextFirstTime}>Terms And Conditions</Text>
+        </Pressable> 
+      </View>             
     </LinearGradient>
   );
 };
@@ -434,4 +392,3 @@ const styles = StyleSheet.create({
 });
 
 export default SplashScreen;
-
