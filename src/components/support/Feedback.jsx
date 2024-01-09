@@ -9,7 +9,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import SparkLightInput from '../common/customui/SparkLightInput';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveUserFeedback } from '../../redux/actions/ProfileActionSuite';
+import { saveUserFeedback, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
 const feedbackOptions = [
     { value: 1, category: 'complaint', name: 'facesad', text: 'Terrible', image: require("../../../assets/facesad.png"), selectedImage: require("../../../assets/Smiley-VeryUnsatisfied-sel.png") },
     { value: 2, category: 'complaint', name: 'facefrown', text: 'Unsatisfied', image: require("../../../assets/facefrown.png"), selectedImage: require("../../../assets/Smiley-Unsatisfied-sel.png") },
@@ -17,17 +17,19 @@ const feedbackOptions = [
     { value: 4, category: 'compliment', name: 'facesmile', text: 'Satisfied', image: require("../../../assets/facesmile.png"), selectedImage: require("../../../assets/Smiley-Satisfied-sel.png") },
     { value: 5, category: 'compliment', name: 'facehappy', text: 'Great', image: require("../../../assets/facehappy.png"), selectedImage: require("../../../assets/Smiley-VerySatisfied-sel.png") },
 ];
-const initialState = {
-    category: 'compliment',
-    feedbackValue: 5,
-    feedbackText: ""
-};
 const Feedback = () => {
     const navigation = useNavigation();
-    const [feedbackInfo, setFeedbackInfo] = useState(initialState);
+    const [feedbackInfo, setFeedbackInfo] = useState({
+        category: 'compliment',
+        feedbackValue: 5,
+        feedbackText: "",
+        email: ''
+    });
     const [showErrorAlert, setShowErrorAlert] = useState(false);
     const route = useRoute(); // Use the useRoute hook
     const dispatch = useDispatch();
+    const profile = useSelector(state => state.combinedReducers.profile || {});
+    const profileDetails = profile.profileDetails || {};
     const [errormsg, setErrormsg] = useState("Please enter valid information to continue.");
     const scrollViewRef = useRef(null);
     const updateFeedbackInfo = (name, value) => {
@@ -44,7 +46,7 @@ const Feedback = () => {
     };
 
     const handleValidationError = () => {
-        setErrormsg('failed plz try after some time')
+        setErrormsg('Please enter valid information to continue.')
         setShowErrorAlert(true);
     };
 
@@ -64,6 +66,17 @@ const Feedback = () => {
     });
 
     useEffect(() => {
+        // Define a new state based on the fetched profileDetails
+        const newInitialState = {
+            ...feedbackInfo,
+            email: profileDetails.multipleEmails && profileDetails.svEmailAddress
+                ? profileDetails.svEmailAddress
+                : ''
+        };
+        setFeedbackInfo(newInitialState); // Update the initialState with the new value
+    }, [profileDetails.multipleEmails, profileDetails.svEmailAddress]);
+
+    useEffect(() => {
         reset(feedbackInfo);
     }, [feedbackInfo, reset]);
 
@@ -79,7 +92,7 @@ const Feedback = () => {
     return (
         <View style={styles.container}>
             <ProfileSettingsHeader title="Feedback" onPressBack={() => navigation.navigate('Account')} />
-            <ScrollView ref={scrollViewRef}  style={{ marginBottom: '20%' }}>
+            <ScrollView ref={scrollViewRef} style={{ marginBottom: '20%' }}>
                 <View style={styles.howWouldYourRateYourExperWrapper}>
                     <NotificationAlert
                         type="error"
@@ -89,10 +102,10 @@ const Feedback = () => {
                         isVisible={showErrorAlert}
                         onClose={() => setShowErrorAlert(false)}
                     />
-                  
+
                 </View>
                 <View style={styles.howWouldYourRateYourExperWrapper}>
-                    
+
                     <Text style={[styles.howWouldYour]}>
                         How would your rate your experience using the Sparklight app?
                     </Text>
@@ -116,6 +129,28 @@ const Feedback = () => {
                             </Pressable>
                         ))}
                     </View>
+                </View>
+                <View>
+                    <Text style={[styles.firstName]}>
+                        User Email
+                    </Text>
+                </View>
+                <View style={styles.textinputWrapper}>
+                    <Controller
+                        control={control}
+                        name="email"
+                        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                            <>
+                                <SparkLightInput
+                                    name="email"
+                                    onChangeText={handleInputChange}
+                                    onBlur={onBlur} // bind onBlur
+                                    value={value} // bind value
+                                    error={error?.message} // display error message
+                                />
+                            </>
+                        )}
+                    />
                 </View>
                 <View>
                     <Text style={[styles.firstName]}>
