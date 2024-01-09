@@ -187,7 +187,7 @@ const MyServicePlan = ({ plans,navigation }) => {
         <TouchableOpacity
           style={[
             tabIndex == 0 ? styles.selectedTab : styles.defaultTab,
-            { borderBottomWidth: 2, borderTopWidth: 2, borderLeftWidth: 2 },
+            { borderWidth: 1 },
           ]}
           onPress={() => setTabIndex(0)}
         >
@@ -209,7 +209,7 @@ const MyServicePlan = ({ plans,navigation }) => {
         <TouchableOpacity
           style={[
             tabIndex == 1 ? styles.selectedTab : styles.defaultTab,
-            { borderBottomWidth: 2, borderTopWidth: 2, borderRightWidth: 2 },
+            { borderWidth: 1 },
           ]}
           onPress={() => setTabIndex(1)}
         >
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   selectedTab: {
     backgroundColor: colors.sparklight_purple_blue,
     borderRadius: 0.5,
-    borderColor:'#76767680',
+    borderColor:'#767676',
     paddingVertical: 5,
     paddingHorizontal: 5,
     width: wp("40%"),
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
   defaultTab: {
     backgroundColor: "white",
     borderRadius: 0.5,
-    borderColor:'#76767680',
+    borderColor:'#767676',
     paddingVertical: 5,
     paddingHorizontal: 5,
     width: wp("40%"),
