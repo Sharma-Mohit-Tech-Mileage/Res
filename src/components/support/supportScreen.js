@@ -56,7 +56,7 @@ const Support = () => {
         },
         {
             key: 'moreOptions',
-            text: 'More ...',
+            text: 'More...',
             icon: require("../../../assets/chevronright.png"),
             iconAlignment: 'right', // Icon to the right of the text
             navigateTo: 'ArticalWindowUtility',
@@ -79,6 +79,7 @@ const Support = () => {
       const handlePressOpenButton = () => {
        
         Zendesk.openMessagingView();
+        Zendesk.addEventListener()
       };
     
 
