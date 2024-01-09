@@ -1,18 +1,32 @@
 import * as yup from 'yup';
 
-export const profileSchema = yup.object({
+export const profileSchema = (isPrimaryAdmin, multipleEmails) => yup.object({
     firstName: yup.string().required('First Name is required'),
     lastName: yup.string().required('Last Name is required'),
-    phoneNumber: yup.string()
-        .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number.'),
-  
+    svEmailAddress: (isPrimaryAdmin && !multipleEmails)
+        ? yup.string().email('Invalid email address').required('Email is required')
+        : yup.string().nullable(),
+    phoneNumber: isPrimaryAdmin
+        ? yup.string()
+            .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number.')
+            .required('Phone number is required')
+        : yup.string().nullable(),
 });
+
+
 export const phoneSchema = yup.object({
     phone: yup.string()
         .nullable()
         .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid US mobile phone number with optional extension'),
 });
 
+export const feedbackSchema = yup.object({
+    feedbackText: yup.string().required('Comment is required.'),
+    email: yup
+        .string()
+        .email('Please enter a valid email address.')
+        .required('Email is required.')
+});
 
 
 export const passwordSchema = (isCustomQuestionSelected) => yup.object({

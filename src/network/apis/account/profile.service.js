@@ -276,15 +276,13 @@ const unsubscribPaperLess = async () => {
 const handleSubmitFeedback = async (obj) => {
     const zendeskRequestApiUrl = 'https://cableone.zendesk.com/api/v2/requests.json';
     let user = await getUser();
-    console.log('user info=============================================', user)
-    const email = user.userInfo?.multipleEmails ? 'user.userInfo?.email' : (user.userInfo?.svEmailAddress || '');
     const fullName = user.userInfo?.fullName;
     const payload = {
         request: {
             ticket_form_id: "360000052934",
             requester: {
                 name: fullName,
-                email: email
+                email: obj.email
             },
             recipient: "400018994093",
             assignee_id: "400018994093",
@@ -293,7 +291,7 @@ const handleSubmitFeedback = async (obj) => {
             custom_fields: [
                 { id: "360022798993", value: obj.category },
                 { id: "1900000846365", value: obj.feedbackValue },
-                { id: "36003617614", value: email }
+                { id: "36003617614", value: obj.email }
             ],
             subject: "Residential MobileApp Feedback",
             comment: {
