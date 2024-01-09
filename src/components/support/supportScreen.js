@@ -153,6 +153,7 @@ const Support = () => {
                                         <View style={styles.headingAndIcon}>
                                             <View style={[styles.icon]}>
                                                 <Image
+                                                    style={styles.supportIcon}
                                                     resizeMode="stretch"
                                                     source={require("../../../assets/tool-02.png")}
                                                 />
@@ -218,6 +219,7 @@ const Support = () => {
                                         <View style={styles.headingAndIcon}>
                                             <View style={[styles.icon]}>
                                                 <Image
+                                                    style={styles.supportIcon}
                                                     resizeMode="stretch"
                                                     source={require("../../../assets/modem-02.png")}
                                                 />
@@ -256,8 +258,9 @@ const Support = () => {
                                         <View style={styles.headingAndIcon}>
                                             <View style={[styles.icon]}>
                                                 <Image
+                                                    style={styles.supportIcon}
                                                     resizeMode="stretch"
-                                                    source={require("../../../assets/featured-icon.png")}
+                                                    source={require("../../../assets/message-text-square-01.png")}
                                                 />
                                             </View>
                                             <View style={styles.frameParent}>
@@ -317,8 +320,9 @@ const Support = () => {
                                         <View style={styles.headingAndIcon4}>
                                             <View style={[styles.icon]}>
                                                 <Image
+                                                    style={styles.supportIcon}
                                                     resizeMode="stretch"
-                                                    source={require("../../../assets/tool-01.png")}
+                                                    source={require("../../../assets/tool-02.png")}
                                                 />
                                             </View>
                                             <View style={styles.frameParent}>
@@ -362,6 +366,7 @@ const Support = () => {
                                             <View style={styles.headingAndIcon4}>
                                                 <View style={[styles.icon]}>
                                                     <Image
+                                                        style={styles.supportIcon}
                                                         resizeMode="stretch"
                                                         source={require("../../../assets/wallet-03.png")}
                                                     /></View>
@@ -447,6 +452,10 @@ const styles = StyleSheet.create({
     lifeBuoy02IconLayout: {
         height: 32,
         width: 32,
+    },
+    supportIcon: {
+        height: 24,
+        width: 24,
     },
     integrationCardBorder: {
         borderWidth: 1,

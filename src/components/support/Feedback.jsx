@@ -134,33 +134,7 @@ const Feedback = () => {
                         ))}
                     </View>
                 </View>
-                <View>
-                    <Text style={[styles.firstName]}>
-                        User Email
-                    </Text>
-                </View>
-                <View style={styles.textinputWrapper}>
-                    <Controller
-                        control={control}
-                        name="email"
-                        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                            <>
-                                <SparkLightInput
-                                    name="email"
-                                    onChangeText={handleInputChange}
-                                    onBlur={onBlur} // bind onBlur
-                                    value={value} // bind value
-                                    error={error?.message} // display error message
-                                />
-                            </>
-                        )}
-                    />
-                </View>
-                <View>
-                    <Text style={[styles.firstName]}>
-                        Additional Feedback
-                    </Text>
-                </View>
+               
                 <View style={styles.textinputWrapper}>
                     <Controller
                         control={control}
@@ -169,12 +143,12 @@ const Feedback = () => {
                             <>
                                 <SparkLightInput
                                     name="feedbackText"
+                                    label={'Additional Feedback'}
                                     onChangeText={handleInputChange}
-                                    onBlur={onBlur} // bind onBlur
                                     value={value} // bind value
                                     multiline={true}
                                     maxLength={500}
-                                    numberOfLines={6}
+                                    numberOfLines={4}
                                     height={130}
                                     textAlignVertical='top'
                                     error={error?.message} // display error message
@@ -183,6 +157,24 @@ const Feedback = () => {
                         )}
                     />
                 </View>
+                    <View style={styles.textinputWrapper}>
+                        <Controller
+                            control={control}
+                            name="email"
+                            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                                <>
+                                    <SparkLightInput
+                                        name="email"
+                                        label={'Email'}
+                                        onChangeText={handleInputChange}
+                                        onBlur={onBlur} // bind onBlur
+                                        value={value} // bind value
+                                        error={error?.message} // display error message
+                                    />
+                                </>
+                            )}
+                        />
+                    </View>
                 <View >
                     <Text style={[styles.footerWrapper]}>
                         {feedbackInfo.feedbackText.length}/500
