@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, View, Pressable, StatusBar, Alert,ScrollView } from "react-native";
+import { Image, StyleSheet, Text, View, Pressable, StatusBar, Alert, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Color, FontFamily, Padding, FontSize, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
+import { StackActions } from '@react-navigation/native';
 import chevronRightIcon from '../../../assets/chevronright.png';
 import profileSettingsIcon from '../../../assets/right-actionable15.png';
 import passwordSecurityIcon from '../../../assets/right-actionable16.png';
@@ -11,17 +12,19 @@ import userManagementIcon from '../../../assets/right-actionable18.png';
 import feedbackicon from '../../../assets/message-alert-circle.png';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUser } from "../../redux/utils/LocalStorage";
+import { getUser, getSsoToken, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
-import { cleanUserData } from "../../redux/utils/LocalStorage";
 import * as Zendesk from 'react-native-zendesk-messaging';
-
+import { SetClearTimer } from '../user/Session';
+import { saveUserInfo } from "../../redux/actions/UserAction";
+import { isPrimaryAdmin } from '../utility/constant';
 const config = {
   issuer: 'https://login.uat.cableone.net/auth/realms/external-sso-realm',
+  iosPrefersEphemeralSession: true,
 };
 
-const logoutConfirmationPopuo=(navigation)=>{
+const logoutConfirmationPopuo = (navigation) => {
   Alert.alert(
     'Confirm Logout',
     'Are you sure you want to Logout the app?',
@@ -34,21 +37,35 @@ const logoutConfirmationPopuo=(navigation)=>{
       {
         text: 'Logout',
         onPress: () => {
-          cleanUserData();
-          Zendesk.logout()
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Splash' }]}) 
-          // let re = getSsoToken().then((res) => {
-          // let token=res.idToken;
-          // console.log('Logout',token) 
-          // });
+          logoutAction(navigation);
         },
       },
     ],
     { cancelable: true }
   );
-  
+
+}
+
+const logoutAction = (navigation) => {
+  let re = getSsoToken().then((res) => {
+    console.log('token', res)
+    let token = res.idToken;
+    logout(config, {
+      idToken: token,
+      postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
+    }).then((result) => {
+      console.log('Logout', result)
+      storeUser({});
+      saveUserInfo({});
+      storeSsoToken({});
+      SetClearTimer();
+      Zendesk.logout()
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Splash' }]
+      })
+    });
+  });
 }
 
 const AccountOverview = () => {
@@ -56,39 +73,49 @@ const AccountOverview = () => {
   const [fullName, setFullName] = useState('');
   const [initials, setInitials] = useState('');
   const dispatch = useDispatch();
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {};
+  const isPrimaryUser = isPrimaryAdmin(profileDetails.memberType);
+
   useEffect(() => {
     dispatch(fetchProfileDetails());
-  }, [dispatch]);
+  }, []);
+
   const menuItems = [
     {
       name: 'Profile Settings',
       onPress: () => navigation.navigate('ProfileSettings'),
       icon: profileSettingsIcon,
       accessibilityLabel: 'Navigate to profile settings',
+      includeInMenu: true,
     },
     {
       name: 'Password & Security',
       onPress: () => navigation.navigate('PasswordSecurity'),
       icon: passwordSecurityIcon,
       accessibilityLabel: 'Navigate to password and security settings',
+      includeInMenu: true,
     },
     {
       name: 'Notifications',
       onPress: () => navigation.navigate('Notifications'),
       icon: notificationsIcon,
       accessibilityLabel: 'Navigate to notifications settings',
+      includeInMenu: isPrimaryUser,
     },
     {
       name: 'User Management',
       onPress: () => navigation.navigate('UserManagement'),
       icon: userManagementIcon,
       accessibilityLabel: 'Navigate to user management settings',
+      includeInMenu: true,
     },
     {
       name: 'Feedback',
       onPress: () => navigation.navigate('Feedback'),
       icon: feedbackicon,
       accessibilityLabel: 'Navigate to user management settings',
+      includeInMenu: true,
     }
   ];
 
@@ -150,7 +177,7 @@ const AccountOverview = () => {
             <View style={styles.navigationBorder}>
               {/* Mapping through menu items */}
               {menuItems.map((item, index) => (
-                <React.Fragment key={item.name}>
+                item.includeInMenu && (<React.Fragment key={item.name}>
                   <Pressable
                     style={[styles.rightActionableGroup, styles.tabsFlexBox]}
                     onPress={item.onPress}
@@ -180,15 +207,15 @@ const AccountOverview = () => {
                     />
                   </Pressable>
                   {/* Divider, if not the last item */}
-                  {index < menuItems.length - 1 && <View style={styles.frameChild} />}
+                  {item.includeInMenu && index < menuItems.length - 1 && <View style={styles.frameChild} />}
                 </React.Fragment>
-              ))}
+                )))}
             </View>
 
             <Pressable
               accessible={true}
               style={[styles.buttons, styles.buttonsSpaceBlock]}
-              onPress={()=>{logoutConfirmationPopuo(navigation)}}
+              onPress={() => { logoutConfirmationPopuo(navigation) }}
             >
               <Text style={[styles.makePayment, styles.makePaymentTypo]}>
                 Logout
@@ -199,23 +226,22 @@ const AccountOverview = () => {
               onPress={() => { /* Handle press event if necessary for the entire line */ }}
             >
               <Text style={{ fontStyle: 'italic', color: Color.colorMidnightblue }}>
-                { 'View our '}
+                {'View our '}
                 <Text
                   style={{ textDecorationLine: 'underline' }}
-                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/privacy-policy', name: 'Privacy Policy' })}
+                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}
                 >
                   Privacy Policy
                 </Text>
                 {' and '}
                 <Text
                   style={{ textDecorationLine: 'underline' }}
-                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/terms-conditions', name: 'Terms & Conditions' })}
+                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}
                 >
                   Terms & Conditions
                 </Text>
               </Text>
             </Pressable>
-            {/* Logout button */}
           </View>
         </View>
       </ScrollView>

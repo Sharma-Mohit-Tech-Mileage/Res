@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateProfileRequest } from '../../redux/actions/ProfileActionSuite';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { profileSchema } from '../utility/validationSchema';
+import { isPrimaryAdmin } from '../utility/constant';
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
@@ -20,6 +21,7 @@ const ProfileSettingsEdit = () => {
   const [initialEmailAddress, setInitialEmailAddress] = useState('');
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetailsfromStore = profile.profileDetails || {};
+  const isPrimaryUser = isPrimaryAdmin(profileDetailsfromStore.memberType);
   const scrollViewRef = useRef(null);
   const [smsPayload, setSmsPayload] = useState(route.params?.smsPayload || {});
 
@@ -34,7 +36,7 @@ const ProfileSettingsEdit = () => {
   };
 
   const { control, handleSubmit, reset, formState: { errors } } = useForm({
-    resolver: yupResolver(profileSchema),
+    resolver: yupResolver(profileSchema(isPrimaryUser, profileDetailsfromStore.multipleEmails)),
     defaultValues: {
       ...profileDetailsfromStore,
       phoneNumber: smsPayload.phoneNumber
@@ -71,12 +73,11 @@ const ProfileSettingsEdit = () => {
   }, [profileDetailsfromStore]);
 
   useEffect(() => {
-    // Cleanup function to close notifications on unmount
     return () => {
       setShowErrorAlert(false);
       setShowValidationAlert(false);
     };
-  }, []); // The empty array ensures this runs on unmount only
+  }, []);
 
   return (
     <View style={styles.profileSettingsEdit}>
@@ -178,11 +179,11 @@ const ProfileSettingsEdit = () => {
                   render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                     <SparkLightInput
                       label={'Email'}
-                      placeholder="First Name"
+                      placeholder="Email"
                       onBlur={onBlur}
                       onChangeText={onChange}
-                      value={value}
-                      editable={!profileDetailsfromStore.multipleEmails}
+                      value={(!isPrimaryUser || profileDetailsfromStore.multipleEmails)?'':value}
+                      editable={!profileDetailsfromStore.multipleEmails && isPrimaryUser}
                       error={error?.message}
                     />
                   )}
@@ -201,7 +202,8 @@ const ProfileSettingsEdit = () => {
                         onChange(text);
                         updateSmsPayloadPhoneNumber(text);
                       }}
-                      value={value}
+                      value={isPrimaryUser?value:""}
+                      editable={isPrimaryUser}
                       error={errors.phoneNumber?.message}
                     />
                   )}
