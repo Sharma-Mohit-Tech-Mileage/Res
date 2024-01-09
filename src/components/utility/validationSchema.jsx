@@ -21,7 +21,11 @@ export const phoneSchema = yup.object({
 });
 
 export const feedbackSchema = yup.object({
-    feedbackText: yup.string().required('Comment is required.')
+    feedbackText: yup.string().required('Comment is required.'),
+    email: yup
+        .string()
+        .email('Please enter a valid email address.')
+        .required('Email is required.')
 });
 
 
