@@ -11,7 +11,6 @@ import TicketView from "../../components/support/TicketView";
 import ManageEquipment from "../../components/support/ManageEquipment";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import LiveSupportChat from "../../components/support/LiveSupportChat";
-import ModemStackScreen from "./ManageEquepmentStack";
 
 const SupportStack = createStackNavigator();
 
@@ -48,7 +47,7 @@ function SupportStackScreen() {
       />
       <SupportStack.Screen
         name="ManageEquipment"
-        component={ModemStackScreen}
+        component={ManageEquipment}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),

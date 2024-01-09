@@ -9,19 +9,6 @@ export const BOX_COLORS = {
     admin: Color.colorWhitesmoke_200,
     viewonly: Color.colorWhitesmoke_200,
 };
-
-export const convertToSpecialCase = (str) => {
-    // Check if the string is null, empty, or less than 2 characters
-    if (!str || typeof str !== 'string' || str.length < 2) {
-        return null; // or throw an error, depending on your requirements
-    }
-
-    return str.split(' ').map(word =>
-        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-    ).join(' ');
-}
-
-
 export const BORDER_COLORS = {
     primaryadmin: Color.colorAquamarine,
     admin: Color.colorWhitesmoke_200,
@@ -64,7 +51,7 @@ export const transformResponse = (responseArray) => {
     const defaultSubscriptionDetails = [
         { type: 'Appointments', status: 'Off' },
         { type: 'Outage', status: 'Off' },
-        { type: 'Billing', status: 'Off' },
+        { type: 'Billing', status: 'On' },
     ];
 
     // Check if the response is an array and not empty
@@ -121,20 +108,6 @@ export const getUserType = (input) => {
     // Return the corresponding value or a default message
     return mapping[inputLower] || '';
 };
-
-export const isPrimaryAdmin = (input) => {
-    // Check for null, undefined, or non-string input
-    if (!input || typeof input !== 'string' || input.trim() === '') {
-        return false;
-    }
-
-    // Convert input to lower case for case-insensitive comparison
-    const inputLower = input.toLowerCase();
-
-    // Check if the user is a primary admin
-    return inputLower === 'headofhousehold';
-};
-
 
 export const initializeSettings = (additionalData) => {
     // Default settings if additionalData or its properties are undefined

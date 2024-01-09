@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-nati
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, } from '../../redux/actions/ProfileActionSuite';
+import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper,  } from '../../redux/actions/ProfileActionSuite';
 import { transformResponse, transformNotificationPreferences } from '../../components/utility/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from "../common/customui/NotificationAlert";
@@ -19,7 +19,7 @@ const Notifications = () => {
   const smsSubscription = profile.smsSubscription || [];
   const profileDetails = profile.profileDetails || {};
   const paperLessInfo = profile.paperLessInfo || {};
-  //const transformedNotification = transformNotificationPreferences(profile.pushNotifications || {});
+  const transformedNotification = transformNotificationPreferences(profile.pushNotifications||{});
   const data = transformResponse(smsSubscription);
   const emailAddress = paperLessInfo.emailAddress || '';
   const emailStatus = paperLessInfo.emailStatus || 'Pending';
@@ -35,10 +35,10 @@ const Notifications = () => {
       isDisabled = true;
       notificationsTitle = "There is a problem retrieving your email address";
       infoText = "We are not able to retrieve the email address for your account. Please contact us for assistance";
-    } else if (profileDetails.svEmailAddress) {
+    } else if (profileDetails.svEmailAddress){
       isDisabled = false;
     }
-    else {
+    else  {
       isDisabled = true;
       notificationsTitle = "No email address on file";
       infoText = "We don’t have your email address on file. Go to Profile Settings to add your email.";
@@ -49,7 +49,7 @@ const Notifications = () => {
       try {
         await dispatch(fetchBillingPaper());
         await dispatch(fetchSMSSelection());
-       // await dispatch(fetchPushNotifications());
+        await dispatch(fetchPushNotifications());
       } catch (error) {
         console.error("Error fetching data", error);
       }
@@ -66,7 +66,7 @@ const Notifications = () => {
       setShowSuccessAlert(true);
       dispatch(fetchBillingPaper());
       dispatch(fetchSMSSelection());
-      //dispatch(fetchPushNotifications());
+      dispatch(fetchPushNotifications());
       navigation.setParams({ updateSuccess: undefined, updatedType: undefined });
     }
   }, [route.params, navigation, dispatch]);
@@ -107,7 +107,7 @@ const Notifications = () => {
             transformedData={{ status: paperLessInfo?.paperlessStatus === 'Active', email: paperLessInfo.emailAddress }}
             additionalSettings={[{ type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off' }]}
           />
-          {/* <View style={{ marginBottom: Padding.p_base }} />
+          <View style={{ marginBottom: Padding.p_base }} />
           <NotificationSection
             title="In-App Notifications"
             successMessage={successMessage}
@@ -120,7 +120,7 @@ const Notifications = () => {
             navigationTarget="InAppNotifications"
             transformedData={transformedNotification}
             additionalSettings={transformedNotification}
-          /> */}
+          />
         </View>
 
       </ScrollView>
@@ -168,7 +168,7 @@ const NotificationSection = ({
           onPress={() => isDisabled ? {} : navigation.navigate(navigationTarget, { additionalData: transformedData })}
           disabled={isDisabled}
         >
-          <Text style={isDisabled ? styles.makePaymentDisabled : styles.makePayment}>Edit</Text>
+          <Text style={isDisabled?styles.makePaymentDisabled:styles.makePayment}>Edit</Text>
         </Pressable>
       </View>
       <View style={styles.frameWrapper}>
@@ -179,29 +179,29 @@ const NotificationSection = ({
             showCloseIcon={false}
             message={infoText}
           />
-          : null}
-        {(!isDisabled && infoText) ? <View style={styles.frameView}>
-          <View style={styles.infoCircleWrapper}>
-            <Image
-              style={styles.infoCircleIcon}
-              resizeMode="stretch"
-              source={require("../../../assets/infocircle.png")}
-            />
-          </View>
-          <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
-            {infoText}
-            {number && (
-              <Text style={[styles.text]} accessibilityLabel={`Phone Number: ${number}`}>
-                {number}
-              </Text>
-            )}
-            {email && (
-              <Text style={styles.text} accessibilityLabel={`Email Address: ${email}`}>
-                {email}
-              </Text>
-            )}
-          </Text>
-        </View> : null}
+          :
+          <View style={styles.frameView}>
+            <View style={styles.infoCircleWrapper}>
+              <Image
+                style={styles.infoCircleIcon}
+                resizeMode="stretch"
+                source={require("../../../assets/infocircle.png")}
+              />
+            </View>
+            <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
+              {infoText}
+              {number && (
+                <Text style={[styles.text]} accessibilityLabel={`Phone Number: ${number}`}>
+                  {number}
+                </Text>
+              )}
+              {email && (
+                <Text style={styles.text} accessibilityLabel={`Email Address: ${email}`}>
+                  {email}
+                </Text>
+              )}
+            </Text>
+          </View>}
       </View>
       {additionalSettings.map((setting, index) => (
         <NotificationType key={index} type={setting.type} status={setting.status} />

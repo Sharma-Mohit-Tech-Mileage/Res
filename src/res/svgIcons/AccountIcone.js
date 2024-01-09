@@ -7,8 +7,12 @@ const strokeWidth = 12;
 const radius = (size - strokeWidth) / 2;
 const circunference = radius * 2 * Math.PI;
 const AccountIcon = (props) => {
-  const Fname= props.data.firstName.charAt(0);
-  const Lname= props.data.lastName.charAt(0);
+   const Fname= props.data.params.fname.charAt(0);
+   const Lname= props.data.params.lname.charAt(0);
+  
+
+    //console.log("FName",props.data.params.fname)
+    //console.log("Lname",props.data.params.lname)
   
   return (
     <Svg width={width} height={size}>

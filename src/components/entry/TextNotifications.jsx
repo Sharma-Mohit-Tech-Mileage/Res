@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Keyboard, Pressable, KeyboardAvoidingView, TouchableWithoutFeedback, Platform } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
@@ -17,43 +17,7 @@ const TextNotifications = ({ navigation }) => {
     const [input, setInput] = useState('');
     const [toggleCheckBox, setToggleCheckBox] = useState(false);
     const [enableButton, setEnableButton] = useState(false);
-    const [nextScreen, setNextScreen] = useState('EntryEmailNotifications');
     const user = useSelector(state => state.combinedReducers.user.userData);
-    const profile = useSelector(state => state.combinedReducers.profile || {});
-    const [keyboardHidden, setKeyboardHidden] = useState(true);
-    const [textInputLayout, setTextInputLayout] = useState({});
-    const scrollRef = useRef();
-
-    useEffect(() => {
-        
-        const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
-            setKeyboardHidden(false);
-        });
-
-        const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
-            setKeyboardHidden(true);
-        });
-  
-        return () => {
-            showSubscription.remove();
-            hideSubscription.remove();
-        };
-    }, []);
-
-    useEffect(() => {
-        if (!keyboardHidden) {
-            scrollRef.current?.scrollTo({
-                y: textInputLayout.y,
-                animated: true,
-            });
-        }
-    }, [keyboardHidden]);     
-
-    useEffect(() => {
-        if (profile.paperlessStatus) {
-            setNextScreen('MyTab');                      
-        }
-    }, []); 
 
     useEffect(() => {
         setInput(user.phone);
@@ -61,20 +25,12 @@ const TextNotifications = ({ navigation }) => {
 
     const onChangeText = (text) => {
         setInput(text);
-        if (toggleCheckBox && text.length > 0) {
-            setEnableButton(true);
-        } else {
-            setEnableButton(false);
-        }
     };   
 
     const onCheckBox = (value) => {
+        console.log('onCheckBox: ', value);
+        setEnableButton(value);
         setToggleCheckBox(value);
-        if (value && input.length > 0) {
-            setEnableButton(true);
-        } else {
-            setEnableButton(false);
-        }
     };  
     
     const keyboardDismiss = () => {
@@ -91,10 +47,8 @@ const TextNotifications = ({ navigation }) => {
         }
         console.log('enableTextNotifications: ', data);
         //{"accountNumber": "900690538", "billingOptOutStatus": false, "optOut": false, "outageOptOut": false, "phoneNumber": ""}
-        if (toggleCheckBox && input.length > 0) {
-            dispatch(updateTextNotification(data, null));
-            navigation.navigate(nextScreen);
-        }
+        dispatch(updateTextNotification(data, null));
+        navigation.navigate("EntryEmailNotifications");
     };
 
     const terms = [
@@ -118,7 +72,6 @@ const TextNotifications = ({ navigation }) => {
                 <ScrollView 
                     style={styles.inner}
                     contentContainerStyle={styles.innerContent}
-                    ref={scrollRef}
                 >
                     <ProfileSettingsHeader 
                         showIcon={false}
@@ -143,24 +96,16 @@ const TextNotifications = ({ navigation }) => {
                                 <Text style={styles.subHeaderText}>Receive text alerts related to your account, updates and more from Sparklight.</Text>
                             </View>   
                         </View>
-                        <View 
-                            style={styles.subInput}
-                            onLayout={(event) => {
-                                setTextInputLayout(event.nativeEvent.layout);
-                            }}                            
-                        >
+                        <View style={styles.subInput}>
                             <EntryInput
                                 iconImage={require('../../../assets/phone.png')}
                                 placeholder="Phone number"
                                 input={input}
                                 onChangeText={onChangeText}
-                                onSubmitText={enableTextNotifications}
                                 keyboardType="number-pad"
                             />                
                         </View>                            
                     </View>
-                    <View style={styles.bottomContainer}>
-                    </View>                         
                     <View style={styles.checkBoxArea}>
                         <CheckBox
                             disabled={false}
@@ -172,7 +117,7 @@ const TextNotifications = ({ navigation }) => {
                         <View style={styles.checkBoxAreaView}>
                             <Text style={styles.checkBoxAreaViewText}>I agree that message and data rates may apply. Message frequency may vary.</Text>
                         </View>             
-                    </View>                                
+                    </View>
                     <View style={styles.bottomBar}>
                         <Pressable
                             disabled={!enableButton}
@@ -196,12 +141,6 @@ const TextNotifications = ({ navigation }) => {
                             </Pressable>
                         </View>    
                     </View>
-                    {
-                        !keyboardHidden &&
-                        (
-                            <View style={styles.textBottomHeight} />
-                        )
-                    }                    
                 </ScrollView>
             </TouchableWithoutFeedback>
         </View>
@@ -213,9 +152,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF',
         justifyContent: 'center',
         alignItems: 'center',  
-    },
-    bottomContainer: {
-        height: 100,
     },
     buttonDecline: {
         marginBottom: 50
@@ -281,7 +217,7 @@ const styles = StyleSheet.create({
     },    
     innerContent: {
         justifyContent: 'space-around',
-        //flex: 1
+        flex: 1
     },        
     container: {
         flex: 1,
@@ -367,18 +303,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20
     }, 
     subInput: {
-        marginTop: 10,
-        marginBottom: 10
+        marginTop: 10
     },
     viewContainer: {
         flex: 1,
         width: '100%',
         alignItems: 'center',
         marginTop: 50,
-    },
-    textBottomHeight: {
-        height: 200
-    },
+    }
 });
 
 export default TextNotifications;

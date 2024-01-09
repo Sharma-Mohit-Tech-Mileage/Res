@@ -54,7 +54,6 @@ export const Padding = {
     p_3xs: 10,
     p_9xs: 4,
     p_13xl: 32,
-    p_48:48,
     p_37xl: 56,
     p_6xl: 25,
     p_8xs: 5,
