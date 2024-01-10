@@ -157,6 +157,10 @@ const Feedback = () => {
                         )}
                     />
                 </View>
+                    <View><Text style={[styles.footerWrapper]}>
+                        {feedbackInfo.feedbackText.length}/500
+                    </Text></View>
+                    
                     <View style={styles.textinputWrapper}>
                         <Controller
                             control={control}
@@ -176,9 +180,7 @@ const Feedback = () => {
                         />
                     </View>
                 <View >
-                    <Text style={[styles.footerWrapper]}>
-                        {feedbackInfo.feedbackText.length}/500
-                    </Text>
+                    
                 </View>
                 <View style={styles.buttonContainer}>
                     <Pressable style={styles.button} onPress={handleSubmit(handleSave, handleValidationError)}>
