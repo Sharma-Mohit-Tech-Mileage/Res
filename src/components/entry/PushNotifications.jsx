@@ -19,83 +19,14 @@ import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite'
 
 const PushNotifications = ({ navigation }) => {
     const [generatedToken, setGeneratedToken] = useState();
+    const [profileLoadCount, setProfileLoadCount] = useState(true);
     const [nextScreen, setNextScreen] = useState('EntryTextNotifications');
     const dispatch = useDispatch();
     const profile = useSelector(state => state.combinedReducers.profile || {});
     const user = useSelector(state => state.combinedReducers.user.userData);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                dispatch(fetchBillingStatus());
-                dispatch(fetchBillingPaper());
-                dispatch(fetchSMSSelection());
-                dispatch(fetchPushNotifications());
-            } catch (error) {
-                console.error("Error fetching data", error);
-            }
-        };
-
-        fetchData();
-    }, [dispatch]); 
-    
-    useEffect(() => {
-        let goToPhoneScreen = false;
-        let optOutCount = 0;
-        let stayOnPushNotificationScreen = false;
-        let optOutCountPushNotification = 0;
-        
-        if (profile.pushNotifications.length > 0) {
-            const messageTypes = profile.pushNotifications[0].pushMessageType;
-            messageTypes.forEach((messageType) => {
-                if (messageType.optOutFlag) {
-                    optOutCountPushNotification = optOutCountPushNotification + 1;
-                }
-            });
-            if (optOutCountPushNotification > 2) {
-                stayOnPushNotificationScreen = true;
-            }
-        } else {
-            stayOnPushNotificationScreen = true;
-        }
-        
-        if (profile.smsSubscription.length > 0) {
-            const firstSubscription = profile.smsSubscription[0];
-            firstSubscription.smsMessageType.forEach((messageType) => {
-                if (messageType.optOutFlag) {
-                    optOutCount = optOutCount + 1;
-                }
-            });
-            if (optOutCount > 2) {
-                goToPhoneScreen = true;
-            }
-        } else {
-            goToPhoneScreen = true;
-        }
-
-        if (goToPhoneScreen) {
-            setNextScreen('EntryTextNotifications');  
-        } else {
-            if (profile.paperLessInfo !== undefined
-                && profile.paperLessInfo.accountNumber !== undefined
-                && profile.paperLessInfo.accountNumber.length > 0) {
-                console.log('setNextScreen: MyTab');
-                setNextScreen('MyTab');                  
-            } else {
-                console.log('setNextScreen: EntryEmailNotifications');
-                setNextScreen('EntryEmailNotifications');  
-            }
-        }
-    }, [profile]);        
 
     const enableNotifications = async () => {
-        // const fetchToken = async () => {
-        //     const token = await getFcmToken();
-        //     if (token) {
-        //         setGeneratedToken(token);
-        //     }
-        // };
-
         const enabledPermission = await requestUserPermission();
 
         if (enabledPermission) {

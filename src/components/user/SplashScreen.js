@@ -119,20 +119,10 @@ const SplashScreen = ({ navigation }) => {
             setModalVisible(true);
           }, 100);
         } else {
-          // if (data !== null 
-          //   && data.accountNumber === userInfo.accountNumber) {
-          if (false) {
-              navigation.navigate("MyTab");
+          if (user.userInfo.mobileTCAcceptanceFlag) {
+            navigation.navigate("MyTab");
           } else {
-            storeFirstTime({
-              accountNumber: userInfo.accountNumber
-            });
-
-            if (user.userInfo.mobileTCAcceptanceFlag) {
-              navigation.navigate("EntryPushNotifications");
-            } else {
-              navigation.navigate("Terms");
-            }
+            navigation.navigate("Terms");
           }
         }         
     }
@@ -226,17 +216,6 @@ const SplashScreen = ({ navigation }) => {
       console.log(error);
     }
   };
-
-  const loginFirstTimeFlow = async () => {
-    storeFirstTime(null);
-    await loginAuth();
-  };
-
-  const termsAndConditionsFlow = async () => {
-    storeFirstTime(null);
-    dispatch(updateTermsAndConditions(false, null));
-    await loginAuth();
-  };  
 
   useEffect(() => {
     const fetchData = async () => {

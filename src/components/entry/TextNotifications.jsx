@@ -50,8 +50,10 @@ const TextNotifications = ({ navigation }) => {
     }, [keyboardHidden]);     
 
     useEffect(() => {
-        if (profile.paperlessStatus) {
-            setNextScreen('MyTab');                      
+        if (profile.paperLessInfo !== undefined
+            && profile.paperLessInfo.accountNumber !== undefined
+            && profile.paperLessInfo.accountNumber.length > 0) {
+                setNextScreen('MyTab');                      
         }
     }, []); 
 
