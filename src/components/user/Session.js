@@ -30,13 +30,13 @@ const renewToken = async () => {
     loop = setTimeout(async () => {
         try {
             const user = await getUser();
-            console.log('getUser: ', user);
+            //console.log('getUser: ', user);
 
             const result = await refresh(config, {
                 refreshToken: user.refreshToken,
             });
 
-            console.log('result: ', JSON.stringify(result));
+            //console.log('result: ', JSON.stringify(result));
 
             const data = { 
                 idToken: result.idToken,
@@ -55,7 +55,7 @@ const onSuccess = async (res) => {
     // const dispatch = useDispatch();
     //const dispatch = useDispatch();
 
-    console.log('onSuccess in Session res: ', res);
+    //console.log('onSuccess in Session res: ', res);
 
     if (res) {
         let token = res.jwtToken;

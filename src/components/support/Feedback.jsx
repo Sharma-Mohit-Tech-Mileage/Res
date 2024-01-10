@@ -81,7 +81,7 @@ const Feedback = () => {
 
     useEffect(() => {
         reset(feedbackInfo);
-    }, [feedbackInfo, reset]);
+    }, [feedbackInfo]);
 
     useEffect(() => {
         if (route.params?.updateFailed) {

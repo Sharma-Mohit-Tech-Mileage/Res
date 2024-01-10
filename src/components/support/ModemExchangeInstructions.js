@@ -20,6 +20,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import {DeviceEventEmitter} from "react-native"
 
 const ModemExchangeInstructions = () => {
   const navigation = useNavigation();
@@ -31,6 +32,12 @@ If you suspect that your modem is not functioning properly, please `
   const [inst2, setInst2] = React.useState(
     ` or visit your nearest Sparklight office to request a modem exchange. Our team will be happy to assist you and ensure that you have the best possible internet experience.`
   );
+
+  React.useEffect(() => {
+    return () => {
+       // DeviceEventEmitter.removeAllListeners("event.contactUsEvent")
+      };
+    }, []);
 
   return (
     <View style={styles.modemRebootContainer}>
@@ -56,13 +63,14 @@ If you suspect that your modem is not functioning properly, please `
             />
             <Text style={styles.heading}>How to exchange modem</Text>
             <View
-              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}
+              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10, marginBottom:10 }}
             />
-            <Text style={styles.textContactUs}>
+            <Text style={styles.text}>
             {inst1}
-            <Text style={[styles.textContactUs,{fontWeight:'600'}]} onPress={()=>{
+            <Text style={[styles.textContactUs,{fontWeight:"900",fontSize:16}]} onPress={()=>{
+               // DeviceEventEmitter.emit("event.contactUsEvent", {name:'Contact US'});
                 navigation.navigate('support')
-            }}> contact us</Text>{inst2}
+            }}>contact us</Text>{inst2}
               </Text>
           
         </View>
@@ -125,22 +133,19 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 16,
-    fontStyle: "normal",
-    textAlign: "left",
     fontWeight: "400",
-    padding: 20,
+    paddingHorizontal: 20,
     alignSelf: "center",
   },
   textContactUs: {
-    color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorMidnightblue,
+    fontFamily: FontFamily.openSansSemiBold,
     fontSize: 16,
     fontStyle: "normal",
     fontWeight: "400",
     alignSelf:'center',
     paddingLeft: 5,
-    width: wp("70%"),
-    flexWrap: "wrap",
+    
   },
 });
 
