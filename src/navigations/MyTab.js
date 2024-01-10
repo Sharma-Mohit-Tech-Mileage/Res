@@ -1,10 +1,9 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTabBarVisibility } from './TabBarVisibilityContext';
 import AccountStackScreen from '../navigations/stackNavigation/AccountStack';
-import HomeStackScreen from './stackNavigation/HomeStack';
-import ShopScreen from '../components/home/Shop';
-import HomeScreen from '../components/home/Home';
 import SupportStack from '../navigations/stackNavigation/SupportStack';
+import HomeStackScreen from './stackNavigation/HomeStack';
+import ShopStack from '../navigations/stackNavigation/ShopStack';
 import HomeIconSelected from '../res/svgIcons/HomeIconSelected';
 import HomeIcon from '../res/svgIcons/HomeIcon';
 import ShopIcon from '../res/svgIcons/ShopIcon';
@@ -89,14 +88,9 @@ const MyTabs = ({ route, navigation }) => {
       />
       <Tab.Screen
         name="Shop"
-        component={ShopScreen} // This will not be used, since we will override the onPress
-        listeners={({ navigation }) => ({
-          tabPress: (e) => {
-            e.preventDefault();
-            navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/115009159707-Data-Plans', name :'Shop'});
-          },
-        })}
+        component={ShopStack} // This will not be used, since we will override the onPress
         options={{
+          tabBarLabel: 'Shop',
           headerShown: false,
           tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected /> : <ShopIcon />)
         }}

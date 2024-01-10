@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     myModemParent: {
         paddingTop: Padding.p_5xl,
         paddingBottom: Padding.p_base,
-        paddingHorizontal: Padding.p_5xl,
+        paddingHorizontal: Padding.p_base,
         marginBottom: '15%'
     },
     manageEquipment: {
