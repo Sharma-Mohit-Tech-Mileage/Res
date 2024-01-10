@@ -195,10 +195,9 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "white",
-    borderRadius: 5,
+    borderRadius: 2,
     paddingVertical: 10,
-
-    width: wp("82%"),
+    width: wp("84%"),
   },
   shadowProp: {
     shadowColor: "#171717",

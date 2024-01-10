@@ -233,8 +233,9 @@ const DataSpeedComponent = ({navigation}) => {
           height: 30,
           flexDirection: "row",
           justifyContent: "space-between",
-          padding: 5,
-          marginHorizontal:20
+          padding: 4,
+          marginHorizontal:20,
+          
         }}
       >
         <Text
