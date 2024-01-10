@@ -131,7 +131,7 @@ const Support = () => {
                                             {item.iconAlignment === 'right' ? <Text style={[styles.searchChild, styles.textTypoRight]}>
                                                 {item.text}
                                             </Text>
-                                                : <Text style={[{ paddingHorizontal: Padding.p_3xs,color: Color.sparklightGray1 }]}>
+                                                : <Text style={[{ paddingHorizontal: Padding.p_3xs,color: Color.sparklightGray1,fontSize:FontSize.size_base }]}>
                                                     {item.text}
                                                 </Text>}
                                         </View>
@@ -146,12 +146,14 @@ const Support = () => {
                                     Additional Support
                                 </Text>
                             </View>
+                            {/*
                             <Pressable style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} onPress={() => { }}>
                                 <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
                                         <View style={styles.headingAndIcon}>
                                             <View style={[styles.icon]}>
                                                 <Image
+                                                    style={styles.supportIcon}
                                                     resizeMode="stretch"
                                                     source={require("../../../assets/tool-02.png")}
                                                 />
@@ -175,6 +177,7 @@ const Support = () => {
                                     </View>
                                 </View>
                             </Pressable>
+                            */}
                             <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} >
                                 <Pressable
                                     style={[styles.integrationCardMobile1, styles.integrationCardBorder,]}
@@ -216,6 +219,7 @@ const Support = () => {
                                         <View style={styles.headingAndIcon}>
                                             <View style={[styles.icon]}>
                                                 <Image
+                                                    style={styles.supportIcon}
                                                     resizeMode="stretch"
                                                     source={require("../../../assets/modem-02.png")}
                                                 />
@@ -247,15 +251,16 @@ const Support = () => {
                                     Contact Us
                                 </Text>
                             </View>
-                            <View style={styles.integrationCardMobileWrapper}>
+                            {/*<View style={styles.integrationCardMobileWrapper}>
                                 <View
                                     style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
                                         <View style={styles.headingAndIcon}>
                                             <View style={[styles.icon]}>
                                                 <Image
+                                                    style={styles.supportIcon}
                                                     resizeMode="stretch"
-                                                    source={require("../../../assets/featured-icon.png")}
+                                                    source={require("../../../assets/message-text-square-01.png")}
                                                 />
                                             </View>
                                             <View style={styles.frameParent}>
@@ -315,8 +320,9 @@ const Support = () => {
                                         <View style={styles.headingAndIcon4}>
                                             <View style={[styles.icon]}>
                                                 <Image
+                                                    style={styles.supportIcon}
                                                     resizeMode="stretch"
-                                                    source={require("../../../assets/tool-01.png")}
+                                                    source={require("../../../assets/tool-02.png")}
                                                 />
                                             </View>
                                             <View style={styles.frameParent}>
@@ -360,6 +366,7 @@ const Support = () => {
                                             <View style={styles.headingAndIcon4}>
                                                 <View style={[styles.icon]}>
                                                     <Image
+                                                        style={styles.supportIcon}
                                                         resizeMode="stretch"
                                                         source={require("../../../assets/wallet-03.png")}
                                                     /></View>
@@ -445,6 +452,10 @@ const styles = StyleSheet.create({
     lifeBuoy02IconLayout: {
         height: 32,
         width: 32,
+    },
+    supportIcon: {
+        height: 24,
+        width: 24,
     },
     integrationCardBorder: {
         borderWidth: 1,
@@ -559,8 +570,9 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: Padding.p_base,
         paddingVertical: Padding.p_base,
-        fontSize: FontSize.size_base,
+        fontSize: FontSize.size_lg,
         fontFamily: FontFamily.openSansRegular,
+        fontWeight:'400'
     },
     search: {
         justifyContent: "center",

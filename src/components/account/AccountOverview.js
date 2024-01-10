@@ -187,7 +187,7 @@ const AccountOverview = () => {
                     {/* Menu item icon */}
                     <Image
                       style={styles.rightIconLayout}
-                      resizeMode="cover"
+                      resizeMode="center"
                       source={item.icon}
                       accessible
                       accessibilityLabel={`${item.name} icon`}
@@ -278,8 +278,9 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   rightIconLayout: {
-    height: 20,
-    width: 20,
+    height: 24,
+    width: 24,
+    marginRight:5
   },
   title: {
     marginLeft: -35,

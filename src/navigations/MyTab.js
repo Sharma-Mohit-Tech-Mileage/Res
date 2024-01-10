@@ -20,6 +20,7 @@ import {
   Alert,
 } from "react-native";
 import { useSelector } from 'react-redux';
+import { FontFamily } from '../../GlobalStyles';
 
 const Tab = createBottomTabNavigator();
 
@@ -57,9 +58,10 @@ const MyTabs = ({ route, navigation }) => {
       name='MyTab'
       initialRouteName="Home"
       screenOptions={{
-        tabBarStyle: { position: 'absolute', height: (Platform.OS == 'ios') ? 90 : 60, display: tabBarVisible ? 'flex' : 'none' },
+        tabBarStyle: { paddingVertical: 5,position: 'absolute', height: (Platform.OS == 'ios') ? 90 : 60, display: tabBarVisible ? 'flex' : 'none',  },
         tabBarActiveTintColor: '#353091',
-        tabBarInactiveTintColor: '#767676'
+        tabBarInactiveTintColor: '#767676',
+        tabBarLabelStyle:{fontSize:12,fontFamily:FontFamily.openSansRegular,fontWeight:'600'},
 
       }}
     >

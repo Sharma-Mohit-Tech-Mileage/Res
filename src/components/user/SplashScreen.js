@@ -56,7 +56,7 @@ const SplashScreen = ({ navigation }) => {
   };
   
   const onSuccess = async (res) => {
-    setLoading(false);
+    
     console.log('onSuccess res: ', res);
 
     let token = res.jwtToken;
@@ -75,12 +75,13 @@ const SplashScreen = ({ navigation }) => {
     const request = `account/api/account/${res.userInfo.accountNumber}`;
     
       GetApiRequest(request, (accountDetails)=>{
+        setLoading(false);
         console.log("getUserAccountDetails", accountDetails);
         if (accountDetails) {
             handleLogin(res,accountDetails.services)
         }
       }, (error)=>{
-
+        setLoading(false);
       });
   
     

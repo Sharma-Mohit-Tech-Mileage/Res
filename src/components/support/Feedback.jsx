@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { feedbackSchema } from '../utility/validationSchema'; // Update the path as necessary
-import { ScrollView, Image, StyleSheet, Text, Pressable, View } from 'react-native';
+import { ScrollView, Image, StyleSheet, Text, Pressable, View, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Color, FontFamily, FontSize, Border, Padding } from '../../../GlobalStyles';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -25,6 +25,8 @@ const Feedback = () => {
         feedbackText: "",
         email: ''
     });
+    // Function to dismiss keyboard
+    const dismissKeyboard = () => Keyboard.dismiss();
     const [showErrorAlert, setShowErrorAlert] = useState(false);
     const route = useRoute(); // Use the useRoute hook
     const dispatch = useDispatch();
@@ -66,15 +68,16 @@ const Feedback = () => {
     });
 
     useEffect(() => {
-        // Define a new state based on the fetched profileDetails
+        if (profileDetails)
+            dispatch(fetchProfileDetails());
         const newInitialState = {
             ...feedbackInfo,
-            email: profileDetails.multipleEmails && profileDetails.svEmailAddress
-                ? profileDetails.svEmailAddress
-                : ''
+            email: profileDetails.multipleEmails
+                ? ''
+                : profileDetails.svEmailAddress
         };
         setFeedbackInfo(newInitialState); // Update the initialState with the new value
-    }, [profileDetails.multipleEmails, profileDetails.svEmailAddress]);
+    }, []);
 
     useEffect(() => {
         reset(feedbackInfo);
@@ -92,7 +95,8 @@ const Feedback = () => {
     return (
         <View style={styles.container}>
             <ProfileSettingsHeader title="Feedback" onPressBack={() => navigation.navigate('Account')} />
-            <ScrollView ref={scrollViewRef} style={{ marginBottom: '20%' }}>
+            <ScrollView ref={scrollViewRef} >
+                <KeyboardAvoidingView behavior="padding">
                 <View style={styles.howWouldYourRateYourExperWrapper}>
                     <NotificationAlert
                         type="error"
@@ -130,33 +134,7 @@ const Feedback = () => {
                         ))}
                     </View>
                 </View>
-                <View>
-                    <Text style={[styles.firstName]}>
-                        User Email
-                    </Text>
-                </View>
-                <View style={styles.textinputWrapper}>
-                    <Controller
-                        control={control}
-                        name="email"
-                        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                            <>
-                                <SparkLightInput
-                                    name="email"
-                                    onChangeText={handleInputChange}
-                                    onBlur={onBlur} // bind onBlur
-                                    value={value} // bind value
-                                    error={error?.message} // display error message
-                                />
-                            </>
-                        )}
-                    />
-                </View>
-                <View>
-                    <Text style={[styles.firstName]}>
-                        Additional Feedback
-                    </Text>
-                </View>
+               
                 <View style={styles.textinputWrapper}>
                     <Controller
                         control={control}
@@ -165,12 +143,12 @@ const Feedback = () => {
                             <>
                                 <SparkLightInput
                                     name="feedbackText"
+                                    label={'Additional Feedback'}
                                     onChangeText={handleInputChange}
-                                    onBlur={onBlur} // bind onBlur
                                     value={value} // bind value
                                     multiline={true}
                                     maxLength={500}
-                                    numberOfLines={6}
+                                    numberOfLines={4}
                                     height={130}
                                     textAlignVertical='top'
                                     error={error?.message} // display error message
@@ -179,6 +157,24 @@ const Feedback = () => {
                         )}
                     />
                 </View>
+                    <View style={styles.textinputWrapper}>
+                        <Controller
+                            control={control}
+                            name="email"
+                            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                                <>
+                                    <SparkLightInput
+                                        name="email"
+                                        label={'Email'}
+                                        onChangeText={handleInputChange}
+                                        onBlur={onBlur} // bind onBlur
+                                        value={value} // bind value
+                                        error={error?.message} // display error message
+                                    />
+                                </>
+                            )}
+                        />
+                    </View>
                 <View >
                     <Text style={[styles.footerWrapper]}>
                         {feedbackInfo.feedbackText.length}/500
@@ -194,6 +190,7 @@ const Feedback = () => {
                         <Text style={{ color: Color.colorMidnightblue }}>Cancel</Text>
                     </Pressable>
                 </View>
+                </KeyboardAvoidingView>
             </ScrollView>
         </View>
     );
