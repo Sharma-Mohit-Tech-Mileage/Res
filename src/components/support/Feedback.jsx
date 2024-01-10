@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { feedbackSchema } from '../utility/validationSchema'; // Update the path as necessary
-import { ScrollView, Image, StyleSheet, Text, Pressable, View, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { ScrollView, Image, StyleSheet, Text, Pressable, View, KeyboardAvoidingView, Keyboard } from 'react-native';
 import { Color, FontFamily, FontSize, Border, Padding } from '../../../GlobalStyles';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -182,12 +182,12 @@ const Feedback = () => {
                 </View>
                 <View style={styles.buttonContainer}>
                     <Pressable style={styles.button} onPress={handleSubmit(handleSave, handleValidationError)}>
-                        <Text style={styles.buttonText}>Submit Feedback</Text>
+                            <Text style={[styles.textStyle, { color: Color.sparklightWhite }]}>Submit Feedback</Text>
                     </Pressable>
                 </View>
                 <View style={styles.buttonContainer}>
                     <Pressable onPress={() => navigation.navigate('Account')} >
-                        <Text style={{ color: Color.colorMidnightblue }}>Cancel</Text>
+                            <Text style={[styles.textStyle, { color: Color.colorMidnightblue }]}>Cancel</Text>
                     </Pressable>
                 </View>
                 </KeyboardAvoidingView>
@@ -217,6 +217,14 @@ const styles = StyleSheet.create({
         color: Color.sparklightWhite,
         fontFamily: FontFamily.openSansRegular,
         textAlign: "center",
+    },
+    textStyle: {
+        textAlign: 'center',
+        fontFamily: FontFamily.openSansRegular, 
+        fontSize: FontSize.size_base,
+        fontStyle: 'normal',
+        fontWeight: '400',
+        lineHeight: 20, 
     },
     iconLayout: {
         height: 32,
