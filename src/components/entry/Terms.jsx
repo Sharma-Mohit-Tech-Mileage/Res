@@ -1,17 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable } from "react-native";
+import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Dimensions } from "react-native";
+import WebView from 'react-native-webview';
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useSelector, useDispatch } from 'react-redux';
-import { cleanUserData, storeFirstTime } from "../../redux/utils/LocalStorage";
+import { getSsoToken, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
+import * as Zendesk from 'react-native-zendesk-messaging';
+import { logout } from 'react-native-app-auth';
+import { SetClearTimer } from '../user/Session';
+import { saveUserInfo } from "../../redux/actions/UserAction";
+
+const config = {
+    issuer: 'https://login.uat.cableone.net/auth/realms/external-sso-realm',
+    iosPrefersEphemeralSession: true,
+};
+
+const { width, height } = Dimensions.get('window');
 
 const Terms = ({ navigation }) => {
+    const [initScript, setInitScript] = useState('');
+    const [progress, setProgress] = useState(0);
+    const [isError, setIsError] = useState(false);
     const dispatch = useDispatch();
     const stateData = useSelector(state => state);
     const combinedReducers = useSelector(state => state.combinedReducers);
     const userData = useSelector(state => state.combinedReducers.user.userData);
+    const url = 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions';
     console.log('userData: ', userData);
     console.log('combinedReducers: ', combinedReducers);
     console.log('stateData: ', JSON.stringify(stateData));
@@ -22,12 +38,24 @@ const Terms = ({ navigation }) => {
     };
 
     const termsCanceled = () => {
-        cleanUserData();
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Splash' }]}) 
-        //dispatch(updateTermsAndConditions(false, navigation));
-        //navigation.navigate("PushNotifications");
+        let re = getSsoToken().then((res) => {
+            console.log('token', res)
+            let token = res.idToken;
+            logout(config, {
+              idToken: token,
+              postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
+            }).then((result) => {
+                storeUser({});
+                saveUserInfo({});
+                storeSsoToken({});
+                SetClearTimer();
+                Zendesk.logout();
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Splash' }]
+                })
+            });
+        });
     };    
 
     const terms = [
@@ -51,31 +79,28 @@ const Terms = ({ navigation }) => {
                 showIcon={false}
                 title={'Terms'}
             />
-            <ScrollView 
-                contentContainerStyle={styles.scrollViewContentContainer}
-                style={styles.scrollViewContainer}>
-                <View>
-                    <View style={styles.sparklightImageView}>
-                        <Image 
-                            style={styles.sparklightImage}
-                            source={require("../../../assets/nn-1.png")} 
-                        />
+            {
+                progress < 1 &&
+                (
+                    <View style={{...styles.progressBar}}>
+                        <View style={{...styles.progress, width: `${progress * 100}%` }} />
                     </View>
-                    <View style={styles.termsHeader}>
-                        <Text style={styles.termsHeaderText}>Terms and Conditions</Text>
-                    </View>            
+                )
+            }            
+            <WebView
+                key={url}
+                source={{ uri: url }}
+                onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
+                onError={() => setIsError(true)}
+                //sharedCookiesEnabled={true}
+                //injectedJavaScriptBeforeContentLoaded={initScript}
+                //onNavigationStateChange={(navState) => setUrl(navState.url)}
+            />  
+            {isError && (
+                <View style={[styles.errorContainer, { marginTop: '23%' }]}>
+                    <Text style={styles.errorText}>Failed to load. Please try again later.</Text>
                 </View>
-                {terms.map((term, index) => (
-                    <View key={index}>
-                        <View style={styles.termsTitle}>
-                            <Text style={styles.termsTitleText}>{term.title}</Text>
-                        </View>
-                        <View style={styles.termsDescription}>
-                            <Text style={styles.termsDescriptionText}>{term.description}</Text>
-                        </View>                        
-                    </View>
-                ))}                
-            </ScrollView>
+            )}                           
             <View style={styles.bottomBar}>
                 <View style={styles.buttonsParent} 
                     accessibilityLabel="Buttons Section">
@@ -103,6 +128,24 @@ const Terms = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+    progressBar: {
+        height: height * 0.004, // 0.4% of screen height
+        backgroundColor: 'lightgrey',
+    },
+    progress: {
+        height: '100%',
+        backgroundColor: 'rgba(141, 59, 144, 1)',
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: width * 0.05, // 5% of screen width
+    },
+    errorText: {
+        fontSize: width * 0.04, // 4% of screen width
+        marginBottom: height * 0.02, // 2% of screen height
+    },    
     bottomBar: {
         height: 150,
         backgroundColor: '#FFF',

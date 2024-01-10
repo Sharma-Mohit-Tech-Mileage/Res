@@ -40,7 +40,42 @@ const PushNotifications = ({ navigation }) => {
     }, [dispatch]); 
     
     useEffect(() => {
+        let goToPhoneScreen = false;
+        let optOutCount = 0;
+        let stayOnPushNotificationScreen = false;
+        let optOutCountPushNotification = 0;
+        
+        if (profile.pushNotifications.length > 0) {
+            const messageTypes = profile.pushNotifications[0].pushMessageType;
+            messageTypes.forEach((messageType) => {
+                if (messageType.optOutFlag) {
+                    optOutCountPushNotification = optOutCountPushNotification + 1;
+                }
+            });
+            if (optOutCountPushNotification > 2) {
+                stayOnPushNotificationScreen = true;
+            }
+        } else {
+            stayOnPushNotificationScreen = true;
+        }
+        
         if (profile.smsSubscription.length > 0) {
+            const firstSubscription = profile.smsSubscription[0];
+            firstSubscription.smsMessageType.forEach((messageType) => {
+                if (messageType.optOutFlag) {
+                    optOutCount = optOutCount + 1;
+                }
+            });
+            if (optOutCount > 2) {
+                goToPhoneScreen = true;
+            }
+        } else {
+            goToPhoneScreen = true;
+        }
+
+        if (goToPhoneScreen) {
+            setNextScreen('EntryTextNotifications');  
+        } else {
             if (profile.paperLessInfo !== undefined
                 && profile.paperLessInfo.accountNumber !== undefined
                 && profile.paperLessInfo.accountNumber.length > 0) {
@@ -50,9 +85,6 @@ const PushNotifications = ({ navigation }) => {
                 console.log('setNextScreen: EntryEmailNotifications');
                 setNextScreen('EntryEmailNotifications');  
             }
-        } else {
-            console.log('setNextScreen: EntryTextNotifications');
-            setNextScreen('EntryTextNotifications');  
         }
     }, [profile]);        
 

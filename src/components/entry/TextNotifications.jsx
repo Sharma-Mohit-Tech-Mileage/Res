@@ -56,7 +56,14 @@ const TextNotifications = ({ navigation }) => {
     }, []); 
 
     useEffect(() => {
-        setInput(user.phone);
+        if (profile.smsSubscription.length > 0) {
+            if (profile.smsSubscription[0].phoneNum !== undefined
+                && profile.smsSubscription[0].phoneNum.length > 0) {
+                setInput(profile.smsSubscription[0].phoneNum.substring(1));
+            }
+        } else {
+            setInput(user.userInfo.phone);
+        }
     }, []);  
 
     const onChangeText = (text) => {
@@ -162,13 +169,16 @@ const TextNotifications = ({ navigation }) => {
                     <View style={styles.bottomContainer}>
                     </View>                         
                     <View style={styles.checkBoxArea}>
-                        <CheckBox
-                            disabled={false}
-                            value={toggleCheckBox}
-                            onValueChange={onCheckBox}
-                            style={styles.checkBox}
-                            boxType="square"
-                        />   
+                        <View style={styles.checkBoxView}>
+                            <CheckBox
+                                disabled={false}
+                                value={toggleCheckBox}
+                                onValueChange={onCheckBox}
+                                style={styles.checkBox}
+                                boxType="square"
+                                tintColors={{ true: Color.colorMidnightblue, false: '#D0D5DD' }}
+                            />   
+                        </View>
                         <View style={styles.checkBoxAreaView}>
                             <Text style={styles.checkBoxAreaViewText}>I agree that message and data rates may apply. Message frequency may vary.</Text>
                         </View>             
@@ -245,7 +255,15 @@ const styles = StyleSheet.create({
     },
     checkBox: {
         marginLeft: 10,
-        marginRight: 10
+        marginRight: 20,
+        width: 16,
+        height: 16,
+    },
+    checkBoxView: {
+        width: 16,
+        height: 16,
+        marginRight: Platform.OS == "ios" ? 20 : 30,
+        marginTop: 5
     },
     checkBoxArea: {
         backgroundColor: Color.colorWhitesmoke_100,
@@ -257,7 +275,7 @@ const styles = StyleSheet.create({
         width: '90%',    
     },
     checkBoxAreaView: {
-        marginRight: 20
+        marginRight: 30
     },
     checkBoxAreaViewText: {
         fontSize: 14,

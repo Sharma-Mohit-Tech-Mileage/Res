@@ -15,6 +15,7 @@ const EmailNotifications = ({ navigation }) => {
     const dispatch = useDispatch();
     const [input, setInput] = useState('');
     const user = useSelector(state => state.combinedReducers.user.userData);
+    const profile = useSelector(state => state.combinedReducers.profile || {});    
     const [enableButton, setEnableButton] = useState(false);
     const [keyboardHidden, setKeyboardHidden] = useState(true);
     const [textInputLayout, setTextInputLayout] = useState({});
@@ -33,6 +34,16 @@ const EmailNotifications = ({ navigation }) => {
             hideSubscription.remove();
         };
     }, []);
+
+    useEffect(() => {     
+        if (profile.paperLessInfo !== undefined
+            && profile.paperLessInfo.emailAddress !== undefined
+            && profile.paperLessInfo.emailAddress.length > 0) {
+            setInput(profile.paperLessInfo.emailAddress);
+        } else {
+            setInput(user.userInfo.email);
+        }
+    }, []);    
   
     useEffect(() => {
         if (!keyboardHidden) {
