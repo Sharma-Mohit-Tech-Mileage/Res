@@ -131,7 +131,7 @@ const Support = () => {
                                             {item.iconAlignment === 'right' ? <Text style={[styles.searchChild, styles.textTypoRight]}>
                                                 {item.text}
                                             </Text>
-                                                : <Text style={[{ paddingHorizontal: Padding.p_3xs,color: Color.sparklightGray1 }]}>
+                                                : <Text style={[{ paddingHorizontal: Padding.p_3xs,color: Color.sparklightGray1,fontSize:FontSize.size_base }]}>
                                                     {item.text}
                                                 </Text>}
                                         </View>
@@ -146,6 +146,7 @@ const Support = () => {
                                     Additional Support
                                 </Text>
                             </View>
+                            {/*
                             <Pressable style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} onPress={() => { }}>
                                 <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
@@ -176,6 +177,7 @@ const Support = () => {
                                     </View>
                                 </View>
                             </Pressable>
+                            */}
                             <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} >
                                 <Pressable
                                     style={[styles.integrationCardMobile1, styles.integrationCardBorder,]}
@@ -249,7 +251,7 @@ const Support = () => {
                                     Contact Us
                                 </Text>
                             </View>
-                            <View style={styles.integrationCardMobileWrapper}>
+                            {/*<View style={styles.integrationCardMobileWrapper}>
                                 <View
                                     style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
@@ -568,8 +570,9 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: Padding.p_base,
         paddingVertical: Padding.p_base,
-        fontSize: FontSize.size_base,
+        fontSize: FontSize.size_lg,
         fontFamily: FontFamily.openSansRegular,
+        fontWeight:'400'
     },
     search: {
         justifyContent: "center",

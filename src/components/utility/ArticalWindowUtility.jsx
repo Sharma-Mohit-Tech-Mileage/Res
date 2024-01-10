@@ -2,14 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
 import WebView from 'react-native-webview';
+import { useSelector } from 'react-redux';
 
 const { width, height } = Dimensions.get('window');
 const ArticalWindowUtility = ({ navigation, route }) => {
+    const [initScript, setInitScript] = useState('');
     const [progress, setProgress] = useState(0);
     const [name, setTitle] = useState(route.params?.name);
     const [isError, setIsError] = useState(false);
     const [url, setUrl] = useState(route.params?.url);
     const [modalOpen, setModalOpen] = useState(true);
+    const user = useSelector(state => state.combinedReducers.user.userData);
 
     // Reset progress and error states when URL changes or modal closes
     useEffect(() => {
@@ -25,6 +28,18 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             setTitle(route.params?.name);
         }
     }, [modalOpen]);
+
+    useEffect(() => {
+        if (user.token !== undefined) {
+            const SAVE_FROM_RN = `(function() {
+                localStorage.setItem('jwt_token', '${user.token}');
+                localStorage.setItem('upgrades_token', '${user.refreshToken}');
+                localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
+              })();`;        
+          
+            setInitScript(SAVE_FROM_RN);
+        }
+    }, []);
 
     return (
         <View style={{ flex: 1 }}>
@@ -42,6 +57,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
                     onError={() => setIsError(true)}
                     sharedCookiesEnabled={true}
+                    injectedJavaScriptBeforeContentLoaded={initScript}
                     //onNavigationStateChange={(navState) => setUrl(navState.url)}
                 />            
             )}

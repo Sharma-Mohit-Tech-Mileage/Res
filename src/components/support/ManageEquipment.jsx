@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
 import MyServicePlan from "../common/MyServicePlan";
@@ -18,6 +18,32 @@ const ManageEquipment = () => {
     const [manufacturer,setManufacturer]=React.useState('')
     const [model,setModel]=React.useState('')
     const [transmissionType,setTransmissionType]=React.useState('')
+    const [leased,setLeased]=React.useState('')
+    const [plans,setPlans]=React.useState([])
+
+    const getLeasedDetails=()=>{
+        let re = getUser().then((res) => {
+            const request = `mobile/api/Device/GetOwnershipInfo?accountnumber=${res.userInfo.accountNumber}`;
+            GetApiRequest(request, (res)=>{
+                console.log("getLeasedDetails", res);
+               setLeased(res.modemOwnership)
+            }, (error)=>{
+                console.log("getLeasedDetails Error", error);
+            });
+          });
+
+    }
+
+    const getInternetPlanDetails = () => {
+        let re = getUser().then((res) => {
+          const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
+          GetApiRequest(request, (res)=>{
+          setPlans(res)
+          }, (error)=>{
+                          
+          });
+        });
+      };
 
     const getModemDetails = () => {
         let re = getUser().then((res) => {
@@ -33,6 +59,7 @@ const ManageEquipment = () => {
             setModel(res.model)
             setTransmissionType(res.transmissionType)
         }
+        
       };
       const onError = (error) => {
         console.log("error", error);
@@ -40,6 +67,9 @@ const ManageEquipment = () => {
 
     React.useEffect(()=>{
        getModemDetails();
+       getLeasedDetails();
+       getInternetPlanDetails();
+       
 
     },[])
 
@@ -70,7 +100,7 @@ const ManageEquipment = () => {
                                             <Text style={styles.mb8600Docsis}>
                                                 {model}:{transmissionType}
                                             </Text>
-                                            <View style={styles.poorHealthParent}>
+                                            {/* <View style={styles.poorHealthParent}>
                                                 <Text style={[styles.poorHealth, styles.textTypo2]}>
                                                     Poor Health
                                                 </Text>
@@ -79,17 +109,17 @@ const ManageEquipment = () => {
                                                     resizeMode="cover"
                                                     source={require("../../../assets/Ellipse.png")}
                                                 />
-                                            </View>
+                                            </View> */}
                                             <View style={[styles.badge, styles.parentBorder]}>
                                                 <Text style={[styles.text, styles.textTypo1]}>
-                                                    LEASED
+                                                    {leased.toLocaleUpperCase()}
                                                 </Text>
                                             </View>
                                         </View>
                                     </View>
                                 </View>
                             </View>
-                            <View style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}>
+                            {/* <View style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}>
                                 <View style={[styles.notifications, styles.parentBorder]}>
                                     <Image
                                         resizeMode="cover"
@@ -113,11 +143,14 @@ const ManageEquipment = () => {
                                         </View>
                                     </View>
                                 </View>
-                            </View>
+                            </View> */}
                         </View>
                         <View style={[styles.supportAccordionParent, styles.supportParentFlexBox]} >
                             <View style={[styles.frameLayout]} />
-                            <View style={[styles.frame9defaultSpaceBlock]} >
+                            <TouchableOpacity style={[styles.frame9defaultSpaceBlock]} 
+                            onPress={()=>{
+                                navigation.navigate('ModemExchange')
+                            }}>
                                 <Image
                                     resizeMode="stretch"
                                     source={require("../../../assets/repeat-01.png")}
@@ -127,8 +160,8 @@ const ManageEquipment = () => {
                                     resizeMode="stretch"
                                     source={require("../../../assets/chevronright.png")}
                                 />
-                            </View>
-                            <View style={[styles.frameLayout]} />
+                            </TouchableOpacity>
+                            {/* <View style={[styles.frameLayout]} />
                             <View style={[styles.frame9defaultSpaceBlock]} >
                                 <Image
                                     resizeMode="stretch"
@@ -139,23 +172,26 @@ const ManageEquipment = () => {
                                     resizeMode="stretchstretch"
                                     source={require("../../../assets/chevronright.png")}
                                 />
-                            </View>
+                            </View> */}
                             <View style={[styles.frameLayout]} />
-                            <View style={[styles.frame9defaultSpaceBlock]} >
+                            <TouchableOpacity style={[styles.frame9defaultSpaceBlock]}
+                            onPress={()=>{
+                                navigation.navigate('ModemRebootScreen')
+                            }} >
                                 <Image
                                     resizeMode="stretch"
                                     source={require("../../../assets/refresh.png")}
                                 />
-                                <Text style={styles.modemHealthSupport}>Restart Modem</Text>
+                                <Text style={styles.modemHealthSupport}>Reboot Modem</Text>
                                 <Image
                                     resizeMode="stretch"
                                     source={require("../../../assets/chevronright.png")}
                                 />
-                            </View>
+                            </TouchableOpacity>
                         </View>
                     </View>
                     <View style={[styles.frameFlexBox]}>
-                        <MyServicePlan />
+                        <MyServicePlan plans={plans} navigation={navigation}/>
                     </View>
                 </View>
             </ScrollView>
