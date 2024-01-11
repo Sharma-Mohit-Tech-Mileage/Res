@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
         backgroundColor: Color.colorMidnightblue,
     },
     buttonsParent: {
-        marginTop: 16,
+       // marginTop: 16,
         alignSelf: "stretch",
     },
     textNotificationsInner: {
