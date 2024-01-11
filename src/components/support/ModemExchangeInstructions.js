@@ -35,7 +35,7 @@ If you suspect that your modem is not functioning properly, please `
 
   React.useEffect(() => {
     return () => {
-       // DeviceEventEmitter.removeAllListeners("event.contactUsEvent")
+        DeviceEventEmitter.removeAllListeners("event.contactUsEvent")
       };
     }, []);
 

@@ -196,7 +196,7 @@ const HomeScreen = ({ route, navigation }) => {
             <View style={{ flexDirection: "row" }}>
               <Image
                 style={{alignSelf:'center'}}
-                resizeMode="cover"
+                resizeMode="contain"
                 tintColor={"#F88700"}
                 source={require("../../../assets/info-circle.png")}
               />

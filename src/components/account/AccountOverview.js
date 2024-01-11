@@ -9,7 +9,7 @@ import profileSettingsIcon from '../../../assets/right-actionable15.png';
 import passwordSecurityIcon from '../../../assets/right-actionable16.png';
 import notificationsIcon from '../../../assets/right-actionable17.png';
 import userManagementIcon from '../../../assets/right-actionable18.png';
-import feedbackicon from '../../../assets/feedback.png';
+import feedbackicon from '../../../assets/message-alert-circle.png';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUser, getSsoToken, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
@@ -54,6 +54,7 @@ const logoutAction = (navigation) => {
       idToken: token,
       postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
     }).then((result) => {
+      console.log('Logout', result)
       storeUser({});
       saveUserInfo({});
       storeSsoToken({});
@@ -151,7 +152,7 @@ const AccountOverview = () => {
         iconAlignment="right"
         showIcon={false} // New prop to control icon visibility
       />
-      <ScrollView>
+      {/* <ScrollView> */}
         <View style={[styles.frameParent, styles.buttonsSpaceBlock]}>
           <LinearGradient
             style={styles.linearGradientStyle}
@@ -187,7 +188,7 @@ const AccountOverview = () => {
                     {/* Menu item icon */}
                     <Image
                       style={styles.rightIconLayout}
-                      resizeMode="contain"
+                      resizeMode='contain'
                       source={item.icon}
                       accessible
                       accessibilityLabel={`${item.name} icon`}
@@ -243,7 +244,7 @@ const AccountOverview = () => {
             </Pressable>
           </View>
         </View>
-      </ScrollView>
+      {/* </ScrollView> */}
     </View>
   );
 };
