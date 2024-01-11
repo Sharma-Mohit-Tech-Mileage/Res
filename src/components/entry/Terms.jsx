@@ -6,7 +6,7 @@ import colors from "../../res/Colors";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useSelector, useDispatch } from 'react-redux';
 import { getSsoToken, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
-import { updateTermsAndConditions, fetchSMSSelection, fetchBillingStatus, fetchPushNotifications, fetchBillingPaper  } from '../../redux/actions/ProfileActionSuite';
+import { updateTermsAndConditions, fetchSMSSelection, fetchBillingStatus, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
 import * as Zendesk from 'react-native-zendesk-messaging';
 import { logout } from 'react-native-app-auth';
 import { SetClearTimer } from '../user/Session';
@@ -24,6 +24,7 @@ const Terms = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [nextScreen, setNextScreen] = useState('EntryPushNotifications');
     const [progress, setProgress] = useState(0);
+    const [profileLoadCount, setProfileLoadCount] = useState(0);
     const [isError, setIsError] = useState(false);
     const dispatch = useDispatch();
     const stateData = useSelector(state => state);
@@ -42,6 +43,7 @@ const Terms = ({ navigation }) => {
                 dispatch(fetchBillingPaper());
                 dispatch(fetchSMSSelection());
                 dispatch(fetchPushNotifications());
+                dispatch(fetchProfileDetails());
             } catch (error) {
                 console.error("Error fetching data", error);
             }
@@ -95,7 +97,9 @@ const Terms = ({ navigation }) => {
         } else {
             if (profile.paperLessInfo !== undefined
                 && profile.paperLessInfo.accountNumber !== undefined
-                && profile.paperLessInfo.accountNumber.length > 0) {
+                && profile.paperLessInfo.accountNumber.length > 0
+                && profile.paperLessInfo.paperlessStatus !== undefined
+                && profile.paperLessInfo.paperlessStatus.toLowerCase() === 'approved') {
                 console.log('setNextScreen: MyTab');
                 setNextScreen('MyTab');                  
             } else {
@@ -103,8 +107,18 @@ const Terms = ({ navigation }) => {
                 setNextScreen('EntryEmailNotifications');  
             }
         }
-       setLoading(false);
-    }, [profile]);     
+        setProfileLoadCount(profileLoadCount + 1);
+    }, [profile]);
+    
+
+    useEffect(() => {
+        console.log('profileLoadCount: ', profileLoadCount);
+        if (profileLoadCount > 4) {
+            setLoading(false);
+            console.log('profileAfterLoad: ', JSON.stringify(profile));
+        }
+    }, [profileLoadCount]);
+    
 
     const termsAccepted = async () => {
         await dispatch(updateTermsAndConditions(true, null));
