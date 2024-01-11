@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
     borderRadius: 2,
-    width: wp("87%"),
+    width: wp("90%"),
     marginTop: wp("8%"),
     paddingTop: 20,
     paddingBottom: 20,
