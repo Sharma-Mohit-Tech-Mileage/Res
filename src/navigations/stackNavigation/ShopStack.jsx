@@ -11,7 +11,7 @@ const ShopStack = createStackNavigator();
 function ShopStackScreen() {
     const { setTabBarVisible } = useTabBarVisibility();
     return (
-        <ShopStack.Navigator initialRouteName="shopHome">
+        <ShopStack.Navigator>
             
             <ShopStack.Screen
                 name="ArticalWindowUtility"

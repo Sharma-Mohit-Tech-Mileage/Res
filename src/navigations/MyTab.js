@@ -89,6 +89,31 @@ const MyTabs = ({ route, navigation }) => {
       <Tab.Screen
         name="Shop"
         component={ShopStack} // This will not be used, since we will override the onPress
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            // Reset the stack and navigate to ArticalWindowUtility
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'Shop',
+                  state: {
+                    routes: [
+                      {
+                        name: 'ArticalWindowUtility',
+                        params: {
+                          url: 'https://support.sparklight.com/hc/en-us/articles/115009159707-Data-Plans',
+                          name: 'Shop'
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            });
+          },
+        })}
         options={{
           tabBarLabel: 'Shop',
           headerShown: false,
