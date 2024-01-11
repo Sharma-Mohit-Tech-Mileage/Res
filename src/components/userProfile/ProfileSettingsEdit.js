@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",
-    marginBottom: 200,
+    marginBottom: 250,
   },
   infoWrapper: {
     paddingHorizontal: Padding.p_5xl,
