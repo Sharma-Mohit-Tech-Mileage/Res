@@ -148,7 +148,6 @@ const Feedback = () => {
                                         value={value} // bind value
                                         multiline={true}
                                         maxLength={500}
-                                        numberOfLines={4}
                                         height={130}
                                         textAlignVertical='top'
                                         error={error?.message} // display error message

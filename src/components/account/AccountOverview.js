@@ -9,7 +9,7 @@ import profileSettingsIcon from '../../../assets/right-actionable15.png';
 import passwordSecurityIcon from '../../../assets/right-actionable16.png';
 import notificationsIcon from '../../../assets/right-actionable17.png';
 import userManagementIcon from '../../../assets/right-actionable18.png';
-import feedbackicon from '../../../assets/message-alert-circle.png';
+import feedbackicon from '../../../assets/feedback.png';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUser, getSsoToken, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
@@ -187,7 +187,7 @@ const AccountOverview = () => {
                     {/* Menu item icon */}
                     <Image
                       style={styles.rightIconLayout}
-                      resizeMode="center"
+                      resizeMode="contain"
                       source={item.icon}
                       accessible
                       accessibilityLabel={`${item.name} icon`}
