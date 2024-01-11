@@ -97,70 +97,70 @@ const Feedback = () => {
             <ProfileSettingsHeader title="Feedback" onPressBack={() => navigation.navigate('Account')} />
             <ScrollView ref={scrollViewRef} >
                 <KeyboardAvoidingView behavior="padding">
-                <View style={styles.howWouldYourRateYourExperWrapper}>
-                    <NotificationAlert
-                        type="error"
-                        title="Failed"
-                        message={errormsg}
-                        showCloseIcon={true}
-                        isVisible={showErrorAlert}
-                        onClose={() => setShowErrorAlert(false)}
-                    />
+                    <View style={styles.howWouldYourRateYourExperWrapper}>
+                        <NotificationAlert
+                            type="error"
+                            title="Error"
+                            message={errormsg}
+                            showCloseIcon={true}
+                            isVisible={showErrorAlert}
+                            onClose={() => setShowErrorAlert(false)}
+                        />
 
-                </View>
-                <View style={styles.howWouldYourRateYourExperWrapper}>
-
-                    <Text style={[styles.howWouldYour]}>
-                        How would your rate your experience using the Sparklight app?
-                    </Text>
-                </View>
-                <View style={[styles.frameContainer]}>
-                    <View style={[styles.frameGroup, styles.frameFlexBox]}>
-                        {feedbackOptions.map((option) => (
-                            <Pressable
-                                key={option.name}
-                                style={[styles.faceSadParent, styles.parentSpaceBlock]}
-                                onPress={() => handleIconPress(option.category, option.value)}
-                            >
-                                <Image
-                                    style={styles.iconLayout}
-                                    resizeMode="cover"
-                                    source={feedbackInfo.feedbackValue === option.value ? option.selectedImage : option.image}
-                                />
-                                <Text style={[styles.terrible, styles.greatTypo]}>
-                                    {option.text}
-                                </Text>
-                            </Pressable>
-                        ))}
                     </View>
-                </View>
-               
-                <View style={styles.textinputWrapper}>
-                    <Controller
-                        control={control}
-                        name="feedbackText"
-                        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                            <>
-                                <SparkLightInput
-                                    name="feedbackText"
-                                    label={'Additional Feedback'}
-                                    onChangeText={handleInputChange}
-                                    value={value} // bind value
-                                    multiline={true}
-                                    maxLength={500}
-                                    numberOfLines={4}
-                                    height={130}
-                                    textAlignVertical='top'
-                                    error={error?.message} // display error message
-                                />
-                            </>
-                        )}
-                    />
-                </View>
+                    <View style={styles.howWouldYourRateYourExperWrapper}>
+
+                        <Text style={[styles.howWouldYour]}>
+                            How would your rate your experience using the Sparklight app?
+                        </Text>
+                    </View>
+                    <View style={[styles.frameContainer]}>
+                        <View style={[styles.frameGroup, styles.frameFlexBox]}>
+                            {feedbackOptions.map((option) => (
+                                <Pressable
+                                    key={option.name}
+                                    style={[styles.faceSadParent, styles.parentSpaceBlock]}
+                                    onPress={() => handleIconPress(option.category, option.value)}
+                                >
+                                    <Image
+                                        style={styles.iconLayout}
+                                        resizeMode="cover"
+                                        source={feedbackInfo.feedbackValue === option.value ? option.selectedImage : option.image}
+                                    />
+                                    <Text style={[styles.terrible, styles.greatTypo]}>
+                                        {option.text}
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </View>
+                    </View>
+
+                    <View style={styles.textinputWrapper}>
+                        <Controller
+                            control={control}
+                            name="feedbackText"
+                            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                                <>
+                                    <SparkLightInput
+                                        name="feedbackText"
+                                        label={'Additional Feedback'}
+                                        onChangeText={handleInputChange}
+                                        value={value} // bind value
+                                        multiline={true}
+                                        maxLength={500}
+                                        numberOfLines={4}
+                                        height={130}
+                                        textAlignVertical='top'
+                                        error={error?.message} // display error message
+                                    />
+                                </>
+                            )}
+                        />
+                    </View>
                     <View><Text style={[styles.footerWrapper]}>
                         {feedbackInfo.feedbackText.length}/500
                     </Text></View>
-                    
+
                     <View style={styles.textinputWrapper}>
                         <Controller
                             control={control}
@@ -179,19 +179,19 @@ const Feedback = () => {
                             )}
                         />
                     </View>
-                <View >
-                    
-                </View>
-                <View style={styles.buttonContainer}>
-                    <Pressable style={styles.button} onPress={handleSubmit(handleSave, handleValidationError)}>
+                    <View >
+
+                    </View>
+                    <View style={styles.buttonContainer}>
+                        <Pressable style={styles.button} onPress={handleSubmit(handleSave, handleValidationError)}>
                             <Text style={[styles.textStyle, { color: Color.sparklightWhite }]}>Submit Feedback</Text>
-                    </Pressable>
-                </View>
-                <View style={styles.buttonContainer}>
-                    <Pressable onPress={() => navigation.navigate('Account')} >
+                        </Pressable>
+                    </View>
+                    <View style={styles.buttonContainer}>
+                        <Pressable onPress={() => navigation.navigate('Account')} >
                             <Text style={[styles.textStyle, { color: Color.colorMidnightblue }]}>Cancel</Text>
-                    </Pressable>
-                </View>
+                        </Pressable>
+                    </View>
                 </KeyboardAvoidingView>
             </ScrollView>
         </View>
@@ -222,11 +222,11 @@ const styles = StyleSheet.create({
     },
     textStyle: {
         textAlign: 'center',
-        fontFamily: FontFamily.openSansRegular, 
+        fontFamily: FontFamily.openSansRegular,
         fontSize: FontSize.size_base,
         fontStyle: 'normal',
         fontWeight: '400',
-        lineHeight: 20, 
+        lineHeight: 20,
     },
     iconLayout: {
         height: 32,

@@ -114,6 +114,7 @@ const MyTabs = ({ route, navigation }) => {
             });
           },
         })}
+
         options={{
           tabBarLabel: 'Shop',
           headerShown: false,
