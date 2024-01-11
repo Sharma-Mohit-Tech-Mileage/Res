@@ -72,6 +72,15 @@ const Support = () => {
            scrollViewRef.current?.scrollToEnd({animated: true})
         })
 
+        initZendesk();
+          return () => {
+            DeviceEventEmitter.removeAllListeners("event.contactUsEvent")
+          };
+
+      }, []);
+
+
+      const initZendesk=()=>{
         Zendesk.initialize({ channelKey:  Platform.OS === 'android'
         ? 'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTYxNTQwMjg1MS56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUhKSkQyQ0VZUko5RUFNRVgxR1NHQlg2MC5qc29uIn0='
         : 'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTYxNTQwMjg1MS56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUhKSkM2QVNWNFNDTkZGVFdYRVFYNjJQNC5qc29uIn0=' })
@@ -81,9 +90,7 @@ const Support = () => {
           .catch((error) =>{
     
           });
-
-
-      }, []);
+      }
     
       const handlePressOpenButton = () => {
        

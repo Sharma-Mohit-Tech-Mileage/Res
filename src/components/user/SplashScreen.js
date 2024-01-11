@@ -207,7 +207,7 @@ const SplashScreen = ({ navigation }) => {
     try {
       const result = await authorize(config);
 
-      //console.log('loginAuthResult: ', result);
+      console.log('loginAuthResult: ', result);
 
       const data = { 
         idToken: result.idToken,

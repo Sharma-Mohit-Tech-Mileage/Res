@@ -145,7 +145,7 @@ const Feedback = () => {
                                     name="feedbackText"
                                     label={'Additional Feedback'}
                                     onChangeText={handleInputChange}
-                                    value={value} // bind value
+                                    //value={value} // bind value
                                     multiline={true}
                                     maxLength={500}
                                     numberOfLines={4}

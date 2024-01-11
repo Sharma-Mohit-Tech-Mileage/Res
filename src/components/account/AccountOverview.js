@@ -152,7 +152,7 @@ const AccountOverview = () => {
         iconAlignment="right"
         showIcon={false} // New prop to control icon visibility
       />
-      <ScrollView>
+      {/* <ScrollView> */}
         <View style={[styles.frameParent, styles.buttonsSpaceBlock]}>
           <LinearGradient
             style={styles.linearGradientStyle}
@@ -188,7 +188,7 @@ const AccountOverview = () => {
                     {/* Menu item icon */}
                     <Image
                       style={styles.rightIconLayout}
-                      resizeMode="center"
+                      resizeMode='contain'
                       source={item.icon}
                       accessible
                       accessibilityLabel={`${item.name} icon`}
@@ -244,7 +244,7 @@ const AccountOverview = () => {
             </Pressable>
           </View>
         </View>
-      </ScrollView>
+      {/* </ScrollView> */}
     </View>
   );
 };
