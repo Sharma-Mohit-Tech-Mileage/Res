@@ -239,7 +239,8 @@ const HomeScreen = ({ route, navigation }) => {
         >
           <Image
             resizeMode="contain"
-            source={require("../../res/images/header_logo.png")}
+            style={{ width: 120, height: 30.324, flexShrink: 0 }}
+            source={require("../../../assets/SparklightEntryLogo.png")}
           />
           {/* <View>
             <BellIcon />

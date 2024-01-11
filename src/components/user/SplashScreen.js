@@ -263,7 +263,7 @@ const SplashScreen = ({ navigation }) => {
         {loading ? <ActivityIndicator size="large" color={"white"} /> : <></>}
         <Image
           resizeMode="contain"
-          source={require("../../res/images/Logo.png")}
+          source={require("../../../assets/SparklightEntryLogo.png")}
           style={styles.logo}
         />
       </View>
