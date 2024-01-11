@@ -82,7 +82,7 @@ const Search = ({ navigation }) => {
                         <Image
                             style={styles.buttonIcon}
                             resizeMode="cover"
-                            source={require("../../../assets/tool-03.png")}
+                            source={require("../../../assets/tool-02.png")}
                         />
                         <Text style={styles.buttonText}>Troubleshooting</Text>
                     </View>

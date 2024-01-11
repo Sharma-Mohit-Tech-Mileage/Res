@@ -7,7 +7,7 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
     const typeStyles = {
         info: { color: Color.sparklightBrightPurple, image: require('../../../../assets/info.png') },
         error: { color: Color.sparkLightRed, image: require('../../../../assets/error.png') },
-        success: { color: Color.sparklightGreen, image: require('../../../../assets/success.png') },
+        success: { color: Color.sparklightGreen, image: require('../../../../assets/checkcircle.png') },
         warning: { color: Color.sparkLightInfo, image: require('../../../../assets/warning.png') },
     };
 
@@ -55,6 +55,8 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     iconStyle: {
+        height:18,
+        width:18,
         marginTop: 2, // Adjust top margin to align with the title
     },
     closeButton: {

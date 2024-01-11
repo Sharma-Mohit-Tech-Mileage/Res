@@ -179,7 +179,7 @@ const ProfileSettingsEdit = () => {
                   render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                     <SparkLightInput
                       label={'Email'}
-                      placeholder="Email"
+                      placeholder={(!isPrimaryUser || profileDetailsfromStore.multipleEmails) ?"":"Email"}
                       onBlur={onBlur}
                       onChangeText={onChange}
                       value={(!isPrimaryUser || profileDetailsfromStore.multipleEmails)?'':value}
@@ -195,7 +195,7 @@ const ProfileSettingsEdit = () => {
                   name="phoneNumber" // This should be the name used in your validation schema
                   render={({ field: { onChange, onBlur, value } }) => (
                     <SparkLightInput
-                      placeholder="Mobile number"
+                      placeholder={isPrimaryUser?"Mobile number":""}
                       onBlur={onBlur}
                       label={'Mobile Phone'}
                       onChangeText={(text) => {

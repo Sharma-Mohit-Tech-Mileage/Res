@@ -301,7 +301,7 @@ const Support = () => {
                                             <View style={[styles.icon]}>
                                                 <Image
                                                     resizeMode="stretch"
-                                                    source={require("../../../assets/ticket-03.png")}
+                                                    source={require("../../../assets/ticket-02.png")}
                                                 /></View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
