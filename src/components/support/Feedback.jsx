@@ -95,9 +95,9 @@ const Feedback = () => {
     return (
         <View style={styles.container}>
             <ProfileSettingsHeader title="Feedback" onPressBack={() => navigation.navigate('Account')} />
-            <ScrollView ref={scrollViewRef} >
+            <ScrollView ref={scrollViewRef} style={{ marginBottom: '30%' }}>
                 <KeyboardAvoidingView behavior="padding">
-                    <View style={styles.howWouldYourRateYourExperWrapper}>
+                    {false &&<View style={styles.howWouldYourRateYourExperWrapper}>
                         <NotificationAlert
                             type="error"
                             title="Error"
@@ -107,7 +107,7 @@ const Feedback = () => {
                             onClose={() => setShowErrorAlert(false)}
                         />
 
-                    </View>
+                    </View>}
                     <View style={styles.howWouldYourRateYourExperWrapper}>
 
                         <Text style={[styles.howWouldYour]}>
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         flexDirection: "row",
-        justifyContent: "space-around",
+        justifyContent: "space-evenly",
         padding: Padding.p_base,
     },
     button: {
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
         alignSelf: "stretch",
     },
     footerWrapper: {
-        paddingVertical: Padding.p_base,
+       // paddingVertical: Padding.p_base,
         paddingHorizontal: Padding.p_base,
         textAlign: 'right',
         alignSelf: "stretch",
