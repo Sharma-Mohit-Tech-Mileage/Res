@@ -97,7 +97,7 @@ const Feedback = () => {
             <ProfileSettingsHeader title="Feedback" onPressBack={() => navigation.navigate('Account')} />
             <ScrollView ref={scrollViewRef} style={{ marginBottom: '30%' }}>
                 <KeyboardAvoidingView behavior="padding">
-                    {false &&<View style={styles.howWouldYourRateYourExperWrapper}>
+                    {showErrorAlert &&<View style={styles.howWouldYourRateYourExperWrapper}>
                         <NotificationAlert
                             type="error"
                             title="Error"
