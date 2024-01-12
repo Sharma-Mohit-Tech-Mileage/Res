@@ -67,7 +67,7 @@ If you suspect that your modem is not functioning properly, please `
             />
             <Text style={styles.text}>
             {inst1}
-            <Text style={[styles.textContactUs,{fontWeight:"900",fontSize:16}]} onPress={()=>{
+            <Text style={[styles.textContactUs,{fontWeight:"600"}]} onPress={()=>{
                // DeviceEventEmitter.emit("event.contactUsEvent", {name:'Contact US'});
                 navigation.navigate('support')
             }}>contact us</Text>{inst2}
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 2,
     width: wp("90%"),
-    marginTop: wp("8%"),
+    marginTop: wp("5%"),
     paddingTop: 20,
     paddingBottom: 20,
   },

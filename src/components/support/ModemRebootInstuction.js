@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 2,
     width: wp("90%"),
-    marginTop: wp("8%"),
+    marginTop: wp("5%"),
     paddingTop: 20,
     paddingBottom: 20,
   },
