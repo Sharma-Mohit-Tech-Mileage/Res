@@ -215,6 +215,7 @@ const ProfileSettingsEdit = () => {
             <Pressable style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]} onPress={handleSubmit(handleSave, handleValidationError)}>
               <Text style={[{ color: Color.sparklightWhite }, styles.makeTypo]}>Save</Text>
             </Pressable>
+            <View style={{ padding: 8 }}></View>
             <Pressable style={[styles.buttonsLayout]} onPress={() => navigation.navigate("ProfileSettings")}>
               <Text style={[styles.makeTypo, { color: Color.colorMidnightblue }]}>Cancel</Text>
             </Pressable>
