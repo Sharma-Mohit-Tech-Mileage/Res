@@ -3,8 +3,8 @@ import {Svg, Circle, G, Path, Line, Rect} from 'react-native-svg';
 const SupportIconSelected = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
-    width={35}
-    height={34}
+    width={33}
+    height={32}
     fill="none"
     {...props}
   >

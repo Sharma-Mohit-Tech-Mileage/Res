@@ -31,6 +31,7 @@ import { getFirstTime, storeFirstTime } from "../../redux/utils/LocalStorage";
 import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
 import { getUser } from "../../redux/utils/LocalStorage";
 import { SetRenewTokenTimer, SetClearTimer } from './Session';
+import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -307,6 +308,12 @@ const SplashScreen = ({ navigation }) => {
         message={errorMessage}
         onClose={handleCloseAlert}
       />   
+      <CustomerDisconnectPage
+      visible={false}
+      onLogin={()=>{
+
+      }}
+      />
     </LinearGradient>
   );
 };

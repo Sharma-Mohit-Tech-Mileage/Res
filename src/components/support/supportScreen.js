@@ -6,6 +6,10 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
 import * as Zendesk from 'react-native-zendesk-messaging';
 import {DeviceEventEmitter} from "react-native"
+import {
+    widthPercentageToDP as wp,
+    heightPercentageToDP as hp,
+  } from "react-native-responsive-screen";
 
 const Support = () => {
     const navigation = useNavigation();
@@ -106,7 +110,7 @@ const Support = () => {
                 iconAlignment="right"
                 showIcon={false} // New prop to control icon visibility
             />
-            <ScrollView  ref={scrollViewRef}>
+            
                 <LinearGradient
                     style={styles.linearGradientStyle}
                     locations={[0, 1]}
@@ -128,6 +132,9 @@ const Support = () => {
                                 <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                             </View>
                         </View>
+                        <ScrollView style={{width:'100%',marginBottom:hp('30%')}}>
+                        <View >
+                        
                         <View style={styles.issuesFlexBox}>
                             {items.map((item, index) => (
                                 <React.Fragment key={item.name}>
@@ -424,9 +431,11 @@ const Support = () => {
                             </View>
                         </View>
                         <View style={[styles.issuesFlexBox]} />
+                        </View>
+                        </ScrollView>
                     </View>
                 </View>
-            </ScrollView>
+            
         </View>
     );
 };
@@ -708,7 +717,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         top: 0,
-        bottom: '97%',
+        bottom: '82%',
     },
 });
 
