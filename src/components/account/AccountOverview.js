@@ -12,7 +12,7 @@ import userManagementIcon from '../../../assets/right-actionable18.png';
 import feedbackicon from '../../../assets/message-alert-circle.png';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUser, getSsoToken, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
+import { getUser, getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
 import * as Zendesk from 'react-native-zendesk-messaging';
@@ -55,8 +55,9 @@ const logoutAction = (navigation) => {
       postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
     }).then((result) => {
       storeUser({});
-      saveUserInfo({});
       storeSsoToken({});
+      saveUserInfo({});
+      cleanUserData();
       SetClearTimer();
       Zendesk.logout()
       navigation.reset({

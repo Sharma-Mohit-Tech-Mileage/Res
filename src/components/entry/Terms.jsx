@@ -5,7 +5,7 @@ import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalSty
 import colors from "../../res/Colors";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useSelector, useDispatch } from 'react-redux';
-import { getSsoToken, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
+import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { updateTermsAndConditions, fetchSMSSelection, fetchBillingStatus, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
 import * as Zendesk from 'react-native-zendesk-messaging';
 import { logout } from 'react-native-app-auth';
@@ -107,6 +107,11 @@ const Terms = ({ navigation }) => {
                 setNextScreen('EntryEmailNotifications');  
             }
         }
+
+        if (profile.profileDetails.memberType === "Admin") {
+            setNextScreen('MyTab');
+        }
+
         setProfileLoadCount(profileLoadCount + 1);
     }, [profile]);
     
@@ -135,8 +140,9 @@ const Terms = ({ navigation }) => {
               postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
             }).then((result) => {
                 storeUser({});
-                saveUserInfo({});
                 storeSsoToken({});
+                saveUserInfo({});
+                cleanUserData();
                 SetClearTimer();
                 Zendesk.logout();
                 navigation.reset({
