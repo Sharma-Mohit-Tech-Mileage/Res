@@ -19,51 +19,14 @@ import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite'
 
 const PushNotifications = ({ navigation }) => {
     const [generatedToken, setGeneratedToken] = useState();
+    const [profileLoadCount, setProfileLoadCount] = useState(true);
     const [nextScreen, setNextScreen] = useState('EntryTextNotifications');
     const dispatch = useDispatch();
     const profile = useSelector(state => state.combinedReducers.profile || {});
     const user = useSelector(state => state.combinedReducers.user.userData);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                dispatch(fetchBillingStatus());
-                dispatch(fetchBillingPaper());
-                dispatch(fetchSMSSelection());
-                dispatch(fetchPushNotifications());
-            } catch (error) {
-                console.error("Error fetching data", error);
-            }
-        };
-
-        fetchData();
-    }, [dispatch]); 
-    
-    useEffect(() => {
-        if (profile.smsSubscription.length > 0) {
-            if (profile.paperLessInfo !== undefined
-                && profile.paperLessInfo.accountNumber !== undefined
-                && profile.paperLessInfo.accountNumber.length > 0) {
-                console.log('setNextScreen: MyTab');
-                setNextScreen('MyTab');                  
-            } else {
-                console.log('setNextScreen: EntryEmailNotifications');
-                setNextScreen('EntryEmailNotifications');  
-            }
-        } else {
-            console.log('setNextScreen: EntryTextNotifications');
-            setNextScreen('EntryTextNotifications');  
-        }
-    }, [profile]);        
 
     const enableNotifications = async () => {
-        // const fetchToken = async () => {
-        //     const token = await getFcmToken();
-        //     if (token) {
-        //         setGeneratedToken(token);
-        //     }
-        // };
-
         const enabledPermission = await requestUserPermission();
 
         if (enabledPermission) {

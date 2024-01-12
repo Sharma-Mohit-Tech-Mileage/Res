@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
-import { authorize, revoke } from "react-native-app-auth";
+import { authorize, revoke, refresh } from "react-native-app-auth";
 import { useDispatch, useSelector } from "react-redux";
 import { ssoLoginAction, saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
@@ -119,19 +119,10 @@ const SplashScreen = ({ navigation }) => {
             setModalVisible(true);
           }, 100);
         } else {
-          if (data !== null 
-            && data.accountNumber === userInfo.accountNumber) {
-              navigation.navigate("MyTab");
+          if (user.userInfo.mobileTCAcceptanceFlag) {
+            navigation.navigate("MyTab");
           } else {
-            storeFirstTime({
-              accountNumber: userInfo.accountNumber
-            });
-
-            if (user.userInfo.mobileTCAcceptanceFlag) {
-              navigation.navigate("EntryPushNotifications");
-            } else {
-              navigation.navigate("Terms");
-            }
+            navigation.navigate("Terms");
           }
         }         
     }
@@ -226,17 +217,6 @@ const SplashScreen = ({ navigation }) => {
     }
   };
 
-  const loginFirstTimeFlow = async () => {
-    storeFirstTime(null);
-    await loginAuth();
-  };
-
-  const termsAndConditionsFlow = async () => {
-    storeFirstTime(null);
-    dispatch(updateTermsAndConditions(false, null));
-    await loginAuth();
-  };  
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -251,7 +231,7 @@ const SplashScreen = ({ navigation }) => {
             refreshToken: user.refreshToken,
           });
 
-          console.log('result: ', JSON.stringify(result));
+          //console.log('result: ', JSON.stringify(result));
 
           const data = { 
             idToken: result.idToken,

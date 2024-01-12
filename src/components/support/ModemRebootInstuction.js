@@ -20,6 +20,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import {DeviceEventEmitter} from "react-native"
 
 const ModemReboot = () => {
   const navigation = useNavigation();
@@ -33,6 +34,13 @@ const ModemReboot = () => {
   const [inst3, setInst3] = React.useState(
     "If neither option fixes your issue, please don't hesitate to "
   );
+
+  React.useEffect(() => {
+    return () => {
+        DeviceEventEmitter.removeAllListeners("event.contactUsEvent")
+      };
+    }, []);
+
   return (
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
@@ -55,7 +63,7 @@ const ModemReboot = () => {
             />
             <Text style={styles.heading}>How to do a soft reboot</Text>
             <View
-              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}
+              style={{ backgroundColor: "#F4F4F5", height: 1, marginVertical: 20 }}
             />
             <Text style={styles.text}>
             {'You can reboot your modem by clicking '} 
@@ -77,7 +85,7 @@ const ModemReboot = () => {
             />
             <Text style={styles.heading}>How to reboot manually</Text>
             <View
-              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}
+              style={{ backgroundColor: "#F4F4F5", height: 1, marginVertical: 20 }}
             />
             <Text style={styles.text}>{inst2}</Text>
           </View>
@@ -91,15 +99,19 @@ const ModemReboot = () => {
             <Image
               style={styles.contactUs}
               resizeMode='contain'
-              source={require("../../../assets/phone-outgoing-02.png")}
+              source={require("../../../assets/phone-outgoing-01.png")}
             />
             
             
-            <Text style={styles.textContactUs}>
+            <Text style={[styles.text,{width:wp('75%')}]}>
             {inst3}
             <Text style={[styles.textContactUs,{fontWeight:'600'}]} onPress={()=>{
-                navigation.navigate('support')
-            }}> contact us</Text>{' for further assistance.'}
+                DeviceEventEmitter.emit("event.contactUsEvent", {name:'Contact US'});
+                setTimeout(()=>{
+                  navigation.navigate('support')
+                },500)
+                
+            }}>contact us</Text>{' for further assistance.'}
               </Text>
           </View>
         </View>
@@ -135,9 +147,9 @@ const styles = StyleSheet.create({
     height: 70,
   }, contactUs: {
     alignSelf: "center",
-    width: 40,
-    height: 40,
-    marginLeft:10
+    width: 30,
+    height: 30,
+    margin:10
   },
 
   modemInstruction: {
@@ -164,16 +176,15 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     textAlign: "left",
     fontWeight: "400",
-    padding: 20,
+    paddingHorizontal: 20,
     alignSelf: "center",
   },textContactUs: {
-    color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorMidnightblue,
+    fontFamily: FontFamily.openSansSemiBold,
     fontSize: 16,
     fontStyle: "normal",
-    fontWeight: "400",
+    fontWeight: "600",
     paddingLeft:5,
-    width:wp('70%'),
     flexWrap:'wrap'
     
   },

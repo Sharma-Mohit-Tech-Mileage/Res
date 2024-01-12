@@ -196,7 +196,7 @@ const HomeScreen = ({ route, navigation }) => {
             <View style={{ flexDirection: "row" }}>
               <Image
                 style={{alignSelf:'center'}}
-                resizeMode="cover"
+                resizeMode="contain"
                 tintColor={"#F88700"}
                 source={require("../../../assets/info-circle.png")}
               />
@@ -307,7 +307,7 @@ const HomeScreen = ({ route, navigation }) => {
               )}
             </View>
             <ScrollView horizontal={true} style={{ marginStart: 20 }}>
-              <View style={{ marginHorizontal: 10 }}>
+              <View >
                 <MyInternetDetials
                   plans={plans}
                   billAmt={billAmt}
@@ -332,9 +332,9 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "white",
-    borderRadius: 5,
+    borderRadius:2,
     paddingTop: 45,
-    width: wp("87%"),
+    width: wp("92%"),
   },
   shadowProp: {
     shadowColor: "#171717",

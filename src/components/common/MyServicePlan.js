@@ -239,9 +239,9 @@ const MyServicePlan = ({ plans,navigation }) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
-    borderRadius: 5,
+    borderRadius: 2,
     paddingVertical: 15,
-    width: wp("87%"),
+    width: wp("92%"),
   },
   shadowProp: {
     shadowColor: "#171717",

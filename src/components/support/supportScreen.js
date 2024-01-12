@@ -1,13 +1,15 @@
-import React, { useState,useEffect } from "react";
+import React, { useState,useEffect,useRef } from "react";
 import { StyleSheet, View, Image, Text, Pressable, ScrollView, Linking, Platform } from "react-native";
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
 import * as Zendesk from 'react-native-zendesk-messaging';
+import {DeviceEventEmitter} from "react-native"
 
 const Support = () => {
     const navigation = useNavigation();
+    const scrollViewRef = useRef(null);
     const makeCall = (number) => {
         let phoneNumber = '';
 
@@ -65,6 +67,20 @@ const Support = () => {
     ];
 
     useEffect(() => {
+        DeviceEventEmitter.addListener("event.contactUsEvent", (eventData) => {
+           console.log('Callback',eventData)
+           scrollViewRef.current?.scrollToEnd({animated: true})
+        })
+
+        initZendesk();
+          return () => {
+            DeviceEventEmitter.removeAllListeners("event.contactUsEvent")
+          };
+
+      }, []);
+
+
+      const initZendesk=()=>{
         Zendesk.initialize({ channelKey:  Platform.OS === 'android'
         ? 'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTYxNTQwMjg1MS56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUhKSkQyQ0VZUko5RUFNRVgxR1NHQlg2MC5qc29uIn0='
         : 'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTYxNTQwMjg1MS56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUhKSkM2QVNWNFNDTkZGVFdYRVFYNjJQNC5qc29uIn0=' })
@@ -74,7 +90,7 @@ const Support = () => {
           .catch((error) =>{
     
           });
-      }, []);
+      }
     
       const handlePressOpenButton = () => {
        
@@ -90,7 +106,7 @@ const Support = () => {
                 iconAlignment="right"
                 showIcon={false} // New prop to control icon visibility
             />
-            <ScrollView >
+            <ScrollView  ref={scrollViewRef}>
                 <LinearGradient
                     style={styles.linearGradientStyle}
                     locations={[0, 1]}

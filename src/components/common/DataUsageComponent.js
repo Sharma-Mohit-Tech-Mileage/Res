@@ -68,7 +68,7 @@ const DataUsageComponent = ({navigation}) => {
               marginTop: 5,
             }}
           >
-            <Text style={styles.dataPlanTxt}> UNLIMITED PLAN</Text>
+            <Text style={styles.dataPlanTxt}> {(account==='900679010')? 'UNLIMITED PLAN' : '700GB PLAN'}</Text>
           </View>
         </View>
       </ProgressCircle>
@@ -96,7 +96,7 @@ const DataUsageComponent = ({navigation}) => {
           height: 30,
           flexDirection: "row",
           justifyContent: "space-between",
-          padding: 5,
+          padding: 4,
           marginHorizontal:20
         }}
       >

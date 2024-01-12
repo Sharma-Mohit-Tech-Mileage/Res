@@ -10,11 +10,13 @@ import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
 import EntryInput from "./EntryInput";
 import { useSelector, useDispatch } from 'react-redux';
 import { updateEmailNotification } from '../../redux/actions/ProfileActionSuite';
+import NotificationAlert from "../common/customui/NotificationAlert";
 
 const EmailNotifications = ({ navigation }) => {
     const dispatch = useDispatch();
     const [input, setInput] = useState('');
     const user = useSelector(state => state.combinedReducers.user.userData);
+    const profile = useSelector(state => state.combinedReducers.profile || {});    
     const [enableButton, setEnableButton] = useState(false);
     const [keyboardHidden, setKeyboardHidden] = useState(true);
     const [textInputLayout, setTextInputLayout] = useState({});
@@ -33,6 +35,19 @@ const EmailNotifications = ({ navigation }) => {
             hideSubscription.remove();
         };
     }, []);
+
+    useEffect(() => {     
+
+        if (profile.profileDetails !== undefined
+            && profile.profileDetails.svEmailAddress !== undefined
+            && profile.profileDetails.svEmailAddress !== null
+            && profile.profileDetails.svEmailAddress !== "Multiple Emails"
+            && profile.profileDetails.svEmailAddress.length > 0) {
+                setInput(profile.profileDetails.svEmailAddress);
+                setEnableButton(true);
+        }
+
+    }, []);    
   
     useEffect(() => {
         if (!keyboardHidden) {
@@ -45,7 +60,7 @@ const EmailNotifications = ({ navigation }) => {
 
     const onChangeText = (text) => {
         setInput(text);
-        if (input.length > 0) {
+        if (text.length > 0) {
             setEnableButton(true);
         } else {
             setEnableButton(false);
@@ -108,32 +123,53 @@ const EmailNotifications = ({ navigation }) => {
                             <View style={styles.subHeader}>
                                 <Text style={styles.subHeaderText}>Receive email alerts related to your account, updates and more from Sparklight.</Text>
                             </View>   
-                        </View>     
-                        <View 
-                            style={styles.subInput}
-                            onLayout={(event) => {
-                                setTextInputLayout(event.nativeEvent.layout);
-                            }}                            
-                        >
-                            <EntryInput
-                                iconImage={require('../../../assets/mail.png')}
-                                placeholder="Email Address"
-                                input={input}
-                                onChangeText={onChangeText}
-                                onSubmitText={enableEmailNotifications}
-                                keyboardType="email-address"
-                            />                
-                        </View>                          
+                        </View>
+                        <>
+                        {
+                            profile.profileDetails !== undefined
+                            && profile.profileDetails.multipleEmails ?
+                            (
+                                <View 
+                                    style={styles.notificationAlert}                        
+                                >
+                                    <NotificationAlert
+                                        type={"warning"}
+                                        title={"There is a problem retrieving your email address"}
+                                        showCloseIcon={false}
+                                        message={"We are not able to retrieve the email address for your account. Please contact us for assistance"}
+                                    />                                                 
+                                </View>   
+                            )
+                            :
+                            (
+                                <View 
+                                    style={styles.subInput}
+                                    onLayout={(event) => {
+                                        setTextInputLayout(event.nativeEvent.layout);
+                                    }}                            
+                                >
+                                <EntryInput
+                                    iconImage={require('../../../assets/mail.png')}
+                                    placeholder="Email Address"
+                                    input={input}
+                                    onChangeText={onChangeText}
+                                    onSubmitText={enableEmailNotifications}
+                                    keyboardType="email-address"
+                                />                
+                                </View>   
+                            )
+                        } 
+                        </>                     
                     </View>
                     <View style={styles.bottomContainer}>
                     </View>                                    
                     <View style={styles.bottomBar}>
                         <Pressable
                             disabled={!enableButton}
-                            style={[styles.button, styles.buttonsLayout]}
+                            style={enableButton ? [styles.button, styles.buttonsLayout] : [styles.button, styles.buttonsLayout, styles.buttonDisabled]}
                             onPress={enableEmailNotifications}
-                        >
-                            <Text style={styles.accept}>Enable Email Notifications</Text>
+                        >                      
+                            <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]}>Enable Email Notifications</Text>
                         </Pressable>                
                         <View style={styles.buttonsParent} 
                             accessibilityLabel="Buttons Section">
@@ -185,6 +221,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRadius: Border.br_11xs,
         height: 50,
+    },    
+    buttonDisabled: {
+        backgroundColor: Color.colorWhitesmoke_300,
+        color: Color.colorGray_200
+    },
+    buttonDisabledText: {
+        color: Color.sparklightaddGray
     },    
     buttonsParent: {
         width: '90%',
@@ -306,6 +349,11 @@ const styles = StyleSheet.create({
     bottomContainer: {
         height: 170,
     },    
+    notificationAlert: {
+        paddingTop: Padding.p_base,
+        paddingHorizontal: Padding.p_5xl,
+        alignSelf: "stretch",        
+    }
 });
 
 export default EmailNotifications;

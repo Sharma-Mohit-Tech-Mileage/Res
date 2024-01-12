@@ -33,7 +33,7 @@ import { GetApiRequest } from "../../network/APIClient";
 
 const ModemReboot = () => {
   const navigation = useNavigation();
-  const [modemStatus, setModemStatus] = useState("");
+  const [modemStatus, setModemStatus] = useState("connected");
   const [loading, setLoading] = useState(false);
 
   const LoadingOverlay = () => {
