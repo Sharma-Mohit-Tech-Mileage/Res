@@ -105,7 +105,7 @@ const ModemReboot = () => {
             
             <Text style={[styles.text,{width:wp('75%')}]}>
             {inst3}
-            <Text style={[styles.textContactUs,{fontWeight:'600'}]} onPress={()=>{
+            <Text style={[styles.textContactUs,{fontWeight:'700'}]} onPress={()=>{
                 DeviceEventEmitter.emit("event.contactUsEvent", {name:'Contact US'});
                 setTimeout(()=>{
                   navigation.navigate('support')

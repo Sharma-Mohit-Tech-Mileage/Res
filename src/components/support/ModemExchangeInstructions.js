@@ -67,7 +67,7 @@ If you suspect that your modem is not functioning properly, please `
             />
             <Text style={styles.text}>
             {inst1}
-            <Text style={[styles.textContactUs,{fontWeight:"900",fontSize:16}]} onPress={()=>{
+            <Text style={[styles.textContactUs,{fontWeight:"700"}]} onPress={()=>{
                // DeviceEventEmitter.emit("event.contactUsEvent", {name:'Contact US'});
                 navigation.navigate('support')
             }}>contact us</Text>{inst2}
