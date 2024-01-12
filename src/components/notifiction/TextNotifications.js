@@ -208,11 +208,12 @@ const TextNotifications = ({ navigation }) => {
                         >
                             <Text style={[styles.makePayment, styles.makeTypo]}>Save</Text>
                         </Pressable>
+                        <View style={{ padding: 8 }}></View>
                         <Pressable
                             style={[styles.buttonsLayout]}
                             onPress={() => navigation.navigate("Notifications")}
                         >
-                            <Text style={[styles.accountClr]}>
+                            <Text style={[styles.accountClr, styles.makeTypo]}>
                                 Cancel
                             </Text>
                         </Pressable>

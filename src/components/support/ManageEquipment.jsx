@@ -152,7 +152,7 @@ const ManageEquipment = () => {
                                 navigation.navigate('ModemExchange')
                             }}>
                                 <Image
-                                style={{ width: 30, height: 30, flexShrink: 0 }}
+                                style={{ width: 20, height: 20, flexShrink: 0 }}
                                     resizeMode='contain'
                                     source={require("../../../assets/repeat-01.png")}
                                 />
@@ -180,7 +180,7 @@ const ManageEquipment = () => {
                                 navigation.navigate('ModemRebootScreen')
                             }} >
                                 <Image
-                                style={{ width: 30, height: 30, flexShrink: 0 }}
+                                style={{ width: 20, height: 20, flexShrink: 0 }}
                                     resizeMode='contain'
                                     source={require("../../../assets/refresh.png")}
                                 />
