@@ -40,9 +40,11 @@ const EmailNotifications = ({ navigation }) => {
 
         if (profile.profileDetails !== undefined
             && profile.profileDetails.svEmailAddress !== undefined
+            && profile.profileDetails.svEmailAddress !== null
             && profile.profileDetails.svEmailAddress !== "Multiple Emails"
             && profile.profileDetails.svEmailAddress.length > 0) {
                 setInput(profile.profileDetails.svEmailAddress);
+                setEnableButton(true);
         }
 
     }, []);    
@@ -58,7 +60,7 @@ const EmailNotifications = ({ navigation }) => {
 
     const onChangeText = (text) => {
         setInput(text);
-        if (input.length > 0) {
+        if (text.length > 0) {
             setEnableButton(true);
         } else {
             setEnableButton(false);
