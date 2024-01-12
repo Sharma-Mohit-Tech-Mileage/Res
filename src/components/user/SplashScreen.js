@@ -31,6 +31,10 @@ import { getFirstTime, storeFirstTime } from "../../redux/utils/LocalStorage";
 import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
 import { getUser } from "../../redux/utils/LocalStorage";
 import { SetRenewTokenTimer, SetClearTimer } from './Session';
+import messaging from '@react-native-firebase/messaging';
+import {
+  requestUserPermission,
+} from '../../firebase/FirebaseUtils';
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -250,6 +254,44 @@ const SplashScreen = ({ navigation }) => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const onLoadMethod = async () => {
+      const enabledPermission = await requestUserPermission();
+      if (enabledPermission){
+        // return fcm token for the device
+        await messaging().registerDeviceForRemoteMessages();
+        messaging().getToken().then(token => {
+          console.log("LoadToken: ", token);
+        });
+      }
+      else {
+        console.log("Failed Token Status", authStatus);
+      }
+
+      // Register background handler
+      messaging().setBackgroundMessageHandler(async remoteMessage => {
+        console.log('Message handled in the background!', remoteMessage);
+      });
+
+      messaging().onNotificationOpenedApp(remoteMessage => {
+        console.log(
+          'Notification caused app to open from background state:',
+          remoteMessage.notification,
+        );
+      });
+
+    };
+
+    onLoadMethod();
+
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log('Push Notification Message: ', JSON.stringify(remoteMessage))
+      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+    });
+
+    return unsubscribe;  
+  }, []);  
 
   return (
     <LinearGradient
