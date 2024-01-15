@@ -11,6 +11,8 @@ import colors from "../../res/Colors";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import warningIcon from '../../../assets/alert-triangle.png';
 
+import logo from '../../../assets/sparklightlogo-01.png';
+
 const CustomerDisconnectPage = ({ visible, onLogin }) => {
   const [msg1, setMsg1] = useState(
     "Sign in to pay your bill online, submit support tickets and much more."
@@ -29,26 +31,25 @@ const CustomerDisconnectPage = ({ visible, onLogin }) => {
       <View style={styles.overlay}>
         <View style={styles.alertContainer}>
           <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
+            style={{ flexDirection: 'column', }}
           >
-            <View style={{ flexDirection: "row", alignSelf: "flex-start" }}>
+            <Image source={logo} style={{width:200,height:50, alignSelf:'center'}} resizeMode='contain' />
               
-              <Text style={styles.alertTitle}> Customer Login</Text>
-            </View>
+             
+            
           </View>
-          <View
-            style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
-          />
-          <Text style={styles.message}>{msg1}</Text>
-           <View style={{flexDirection:'row'}}>
+          <Text style={styles.alertTitle}>Customer Login</Text>
+          
+          <Text style={[styles.message,{fontSize:16}]}>{msg1}</Text>
+           <View style={{flexDirection:'row',marginTop:10}}>
            <Image source={warningIcon} style={{width:24,height:24}} />
-                    <Text>We're sorry!</Text>
+                    <Text style={{textAlign:'center', marginLeft:5, alignSelf:'center', fontWeight:'600',fontFamily:FontFamily.openSansSemiBold}}>We're sorry!</Text>
            </View>
           <Text style={styles.message}>{msg2}</Text>
           <TouchableOpacity
             style={styles.openBtn}
             onPress={() => {
-              
+              onLogin()
             }}
           >
             <Text style={styles.openPortaltxt}>Sign in</Text>
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     fontWeight: "400",
-    lineHeight: 28,
+    lineHeight: 24,
     marginTop: 10,
   },
   buttonContainer: {
@@ -115,11 +116,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   alertTitle: {
-    color: colors.sparklight_grey,
+    color: colors.sparklight_purple_blue,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 22,
-    fontWeight: "400",
-    marginLeft: 5,
+    fontWeight: "600",
+    marginTop:20
   },
   openBtn: {
     backgroundColor: colors.sparklight_yellow,
