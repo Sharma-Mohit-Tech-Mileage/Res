@@ -47,6 +47,7 @@ const config = {
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [disconnected, setDisconnected] = useState(false);
   const [data, setData] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -57,7 +58,7 @@ const SplashScreen = ({ navigation }) => {
   };
   
   const onSuccess = async (res) => {
-    
+    setLoading(false);
     console.log('onSuccess res: ', res);
 
     let token = res.jwtToken;
@@ -73,22 +74,12 @@ const SplashScreen = ({ navigation }) => {
         storeUser(user);
       }
 
-    const request = `account/api/account/${res.userInfo.accountNumber}`;
-    
-      GetApiRequest(request, (accountDetails)=>{
-        setLoading(false);
-        console.log("getUserAccountDetails", accountDetails);
-        if (accountDetails) {
-            handleLogin(res,accountDetails.services)
-        }
-      }, (error)=>{
-        setLoading(false);
-      });
-  
+      
+      handleLogin(res)
     
   };
 
- const handleLogin=async(res,accountDetails)=>{
+ const handleLogin=async(res)=>{
     if (res) {
       let token = res.jwtToken;
       let userInfo = res.userInfo;
@@ -99,27 +90,27 @@ const SplashScreen = ({ navigation }) => {
         refreshToken: res.refreshToken
       };
 
-      if (token) {
-        //storeUser(user);
-      }
+      
 
-      dispatch(saveUserInfo(user));
-
-      SetRenewTokenTimer();
-
-      const data = await getFirstTime();
-
-        if (userInfo.accountNumber === "900690538") {
+      
+      if(res.userInfo.acctStatus==='Disconnect'){
+        setDisconnected(true)
+       }else if (userInfo.authLevel==='Limited') {
           setErrorMessage(strings.nonAdminUserMsg);
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
-        } else if (accountDetails.commercialPhone==false && accountDetails.fxsCommercialPhone==false && accountDetails.digital==false && accountDetails.fiber==false && accountDetails.hsd==false && accountDetails.tv==false && accountDetails.iptv==false && accountDetails.tollFreeNumber==false && accountDetails.phone==false) {
+        } else if (res.custServices.internet==false) {
           setErrorMessage(strings.nonInternetUserMessage);
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
-        } else {
+        }else {
+
+          dispatch(saveUserInfo(user));
+          SetRenewTokenTimer();
+          const data = await getFirstTime();
+
           if (data !== null 
             && data.accountNumber === userInfo.accountNumber) {
               navigation.navigate("MyTab");
@@ -140,6 +131,7 @@ const SplashScreen = ({ navigation }) => {
 
   const onError = (error) => {
     console.log(" callSSOLoginApi error", error);
+    setLoading(false);
   };
 
   const CustomAlertModal = ({ visible, message, onClose }) => {
@@ -309,9 +301,10 @@ const SplashScreen = ({ navigation }) => {
         onClose={handleCloseAlert}
       />   
       <CustomerDisconnectPage
-      visible={false}
+      visible={disconnected}
       onLogin={()=>{
-
+        setDisconnected(false)
+        loginAuth();
       }}
       />
     </LinearGradient>
