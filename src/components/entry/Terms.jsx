@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: Border.br_11xs,
-        height: 50,
+        minHeight: 50,
         width: '45%',
     },    
     buttonsParent: {
@@ -276,6 +276,8 @@ const styles = StyleSheet.create({
         color: Color.sparklightWhite,
     },
     decline: {
+        fontSize: FontSize.size_base,
+        fontFamily: FontFamily.openSansRegular,        
         color: Color.colorMidnightblue,
         textAlign: "center",
     },    

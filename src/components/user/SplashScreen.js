@@ -61,17 +61,17 @@ const SplashScreen = ({ navigation }) => {
     console.log('onSuccess res: ', res);
 
     let token = res.jwtToken;
-      let userInfo = res.userInfo;
-      let user = {
-        userInfo: userInfo,
-        token: token,
-        tokenGuid: res.idTokenGuid,
-        refreshToken: res.refreshToken
-      };
+    let userInfo = res.userInfo;
+    let user = {
+      userInfo: userInfo,
+      token: token,
+      tokenGuid: res.idTokenGuid,
+      refreshToken: res.refreshToken
+    };
 
-      if (token) {
-        storeUser(user);
-      }
+    if (token) {
+      storeUser(user);
+    }
 
     const request = `account/api/account/${res.userInfo.accountNumber}`;
     
