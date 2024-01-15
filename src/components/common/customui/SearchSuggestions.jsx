@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../../GlobalStyles';
 import { widthPercentageToDP as wp,heightPercentageToDP as hp} from 'react-native-responsive-screen';
-const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,navigation }) => {
+const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,navigation, onEndReached,Footer }) => {
     const inputRef = useRef(null);
     const [input, setInput] = useState('');
 
@@ -62,8 +62,11 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
         <View style={{height:hp('70%')}}>
         <FlatList
             data={suggestions}
-            keyExtractor={(item, index) => item.id.toString()}
+            keyExtractor={(item, index) =>index.toString()}
             renderItem={renderSuggestion}
+            onEndReached={onEndReached}
+            onEndReachedThreshold={0.1}
+            //ListFooterComponent={Footer}
         />
         </View>
         </View>
