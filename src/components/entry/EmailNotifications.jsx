@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: Border.br_11xs,
-        height: 50,
+        minHeight: 50,
     },    
     buttonDisabled: {
         backgroundColor: Color.colorWhitesmoke_300,

@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
-import { authorize, revoke, refresh } from "react-native-app-auth";
+import { authorize, revoke } from "react-native-app-auth";
 import { useDispatch, useSelector } from "react-redux";
 import { ssoLoginAction, saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
@@ -31,6 +31,7 @@ import { getFirstTime, storeFirstTime } from "../../redux/utils/LocalStorage";
 import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
 import { getUser } from "../../redux/utils/LocalStorage";
 import { SetRenewTokenTimer, SetClearTimer } from './Session';
+import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 
 const config = {
   issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
@@ -46,6 +47,7 @@ const config = {
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [disconnected, setDisconnected] = useState(false);
   const [data, setData] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -56,38 +58,28 @@ const SplashScreen = ({ navigation }) => {
   };
   
   const onSuccess = async (res) => {
-    
+    setLoading(false);
     console.log('onSuccess res: ', res);
 
     let token = res.jwtToken;
-      let userInfo = res.userInfo;
-      let user = {
-        userInfo: userInfo,
-        token: token,
-        tokenGuid: res.idTokenGuid,
-        refreshToken: res.refreshToken
-      };
+    let userInfo = res.userInfo;
+    let user = {
+      userInfo: userInfo,
+      token: token,
+      tokenGuid: res.idTokenGuid,
+      refreshToken: res.refreshToken
+    };
 
-      if (token) {
-        storeUser(user);
-      }
+    if (token) {
+      storeUser(user);
+    }
 
-    const request = `account/api/account/${res.userInfo.accountNumber}`;
-    
-      GetApiRequest(request, (accountDetails)=>{
-        setLoading(false);
-        console.log("getUserAccountDetails", accountDetails);
-        if (accountDetails) {
-            handleLogin(res,accountDetails.services)
-        }
-      }, (error)=>{
-        setLoading(false);
-      });
-  
+      
+      handleLogin(res)
     
   };
 
- const handleLogin=async(res,accountDetails)=>{
+ const handleLogin=async(res)=>{
     if (res) {
       let token = res.jwtToken;
       let userInfo = res.userInfo;
@@ -98,31 +90,40 @@ const SplashScreen = ({ navigation }) => {
         refreshToken: res.refreshToken
       };
 
-      if (token) {
-        //storeUser(user);
-      }
+      
 
-      dispatch(saveUserInfo(user));
-
-      SetRenewTokenTimer();
-
-      const data = await getFirstTime();
-
-        if (userInfo.accountNumber === "900690538") {
+      
+      if(res.userInfo.acctStatus==='Disconnect'){
+        setDisconnected(true)
+       }else if (userInfo.authLevel==='Limited') {
           setErrorMessage(strings.nonAdminUserMsg);
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
-        } else if (accountDetails.commercialPhone==false && accountDetails.fxsCommercialPhone==false && accountDetails.digital==false && accountDetails.fiber==false && accountDetails.hsd==false && accountDetails.tv==false && accountDetails.iptv==false && accountDetails.tollFreeNumber==false && accountDetails.phone==false) {
+        } else if (res.custServices.internet==false) {
           setErrorMessage(strings.nonInternetUserMessage);
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
-        } else {
-          if (user.userInfo.mobileTCAcceptanceFlag) {
-            navigation.navigate("MyTab");
+        }else {
+
+          dispatch(saveUserInfo(user));
+          SetRenewTokenTimer();
+          const data = await getFirstTime();
+
+          if (data !== null 
+            && data.accountNumber === userInfo.accountNumber) {
+              navigation.navigate("MyTab");
           } else {
-            navigation.navigate("Terms");
+            storeFirstTime({
+              accountNumber: userInfo.accountNumber
+            });
+
+            if (user.userInfo.mobileTCAcceptanceFlag) {
+              navigation.navigate("EntryPushNotifications");
+            } else {
+              navigation.navigate("Terms");
+            }
           }
         }         
     }
@@ -130,6 +131,7 @@ const SplashScreen = ({ navigation }) => {
 
   const onError = (error) => {
     console.log(" callSSOLoginApi error", error);
+    setLoading(false);
   };
 
   const CustomAlertModal = ({ visible, message, onClose }) => {
@@ -217,6 +219,17 @@ const SplashScreen = ({ navigation }) => {
     }
   };
 
+  const loginFirstTimeFlow = async () => {
+    storeFirstTime(null);
+    await loginAuth();
+  };
+
+  const termsAndConditionsFlow = async () => {
+    storeFirstTime(null);
+    dispatch(updateTermsAndConditions(false, null));
+    await loginAuth();
+  };  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -263,7 +276,7 @@ const SplashScreen = ({ navigation }) => {
         {loading ? <ActivityIndicator size="large" color={"white"} /> : <></>}
         <Image
           resizeMode="contain"
-          source={require("../../../assets/SparklightEntryLogo.png")}
+          source={require("../../res/images/Logo.png")}
           style={styles.logo}
         />
       </View>
@@ -287,6 +300,13 @@ const SplashScreen = ({ navigation }) => {
         message={errorMessage}
         onClose={handleCloseAlert}
       />   
+      <CustomerDisconnectPage
+      visible={disconnected}
+      onLogin={()=>{
+        setDisconnected(false)
+        loginAuth();
+      }}
+      />
     </LinearGradient>
   );
 };

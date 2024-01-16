@@ -65,20 +65,7 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
-  const getSoftDisconnectStatus=()=>{
-   let re = getUser().then((res) => {
-    const request = `/SeasonalReconnect/api/SeasonalReconnect/${res.userInfo.accountNumber}/CheckEligibility`;
-    GetApiRequest(request, (response)=>{
-     console.log('getSoftDisconnectStatus',response)
-          if(response===true){
-            setAccountStatus('Disconnect')
-            setIsInternetDetails(true)
-          }
-    }, (error)=>{
-      
-    });
-  });
-  }
+
 
   const checkModemOutagStatus=()=>{
     let re = getUser().then((res) => {
@@ -93,8 +80,6 @@ const HomeScreen = ({ route, navigation }) => {
              setHasOutage(true)
              setIsOutageAlert(true)
 
-           }else{
-            getSoftDisconnectStatus();
            }
            
      }, (error)=>{
@@ -119,10 +104,16 @@ const HomeScreen = ({ route, navigation }) => {
       GetApiRequest(request, (res)=>{
         console.log("getUserAccountDetails", res);
         if (res) {
+          if(res.currentCollectionStep=='Soft Disconnect'){
+            setAccountStatus('Disconnect')
+            setIsInternetDetails(true)
+            return;
+          }
           let dueDate = moment(res.paymentDueDate).format("ll");
           setDueDate(dueDate);
           setBillAmt(res.currentBalance);
-          updateInternetHealth(res.currentBalance);  
+          updateInternetHealth(res.currentBalance);
+
         }
       }, onErrorBill);
     });
@@ -329,6 +320,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.splash_bg,
+    marginBottom: 30
   },
   card: {
     backgroundColor: "white",

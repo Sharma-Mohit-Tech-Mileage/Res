@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     bottomBar: {
         backgroundColor: '#FFF',
         justifyContent: 'center',
-        alignItems: 'center',  
+        alignItems: 'center',
     },
     bottomContainer: {
         height: 100,
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: Border.br_11xs,
-        height: 50,
+        minHeight: 50
     },    
     buttonsParent: {
         width: '90%',
@@ -293,6 +293,8 @@ const styles = StyleSheet.create({
         color: Color.sparklightWhite,
     },
     decline: {
+        fontSize: FontSize.size_sm,
+        fontFamily: FontFamily.openSansRegular,        
         color: Color.colorMidnightblue,
         textAlign: "center",
     },    

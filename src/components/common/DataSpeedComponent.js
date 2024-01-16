@@ -230,7 +230,7 @@ const DataSpeedComponent = ({navigation}) => {
           // );
         }}
         style={{
-          height: 30,
+          minHeight: 30,
           flexDirection: "row",
           justifyContent: "space-between",
           padding: 4,

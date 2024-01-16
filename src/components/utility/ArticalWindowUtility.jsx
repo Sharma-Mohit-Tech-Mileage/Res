@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -33,7 +33,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         if (user.token !== undefined) {
             const SAVE_FROM_RN = `(function() {
                 localStorage.setItem('jwt_token', '${user.token}');
-                localStorage.setItem('upgrades_token', '${user.refreshToken}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
               })();`;        
           
@@ -42,7 +41,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }, []);
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />
             {progress < 1 ? (
                 <View style={{ ...styles.progressBar}}>

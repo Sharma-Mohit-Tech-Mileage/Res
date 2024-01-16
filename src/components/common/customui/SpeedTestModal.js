@@ -96,6 +96,7 @@ const SpeedTestModal = ({ url, onClose }) => {
           injectedJavaScript={INJECTED_JAVASCRIPT}
         />
         </View>  
+        <Text style={{marginHorizontal:20,fontSize:12,color:Color.sparklightaddGray,textAlign:'center'}}>All trademarks of Ookla, LLC, including Speedtest®, are used under license.</Text>
         </View>
       </SafeAreaView>
     </Modal>
