@@ -72,9 +72,13 @@ const EmailNotifications = ({ navigation }) => {
     };
 
     const enableEmailNotifications = () => {
-        console.log('enableEmailNotifications');
-        dispatch(updateEmailNotification(input, null));
-        navigation.navigate("MyTab");
+        const data = {
+            profile: profile.profileDetails,
+            email: input
+        };
+        console.log('enableEmailNotifications: ', data);
+        dispatch(updateEntryEmailNotification(data, null));
+        //navigation.navigate("MyTab");
     };
     
     return  (

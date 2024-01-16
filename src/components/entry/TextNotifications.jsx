@@ -182,7 +182,7 @@ const TextNotifications = ({ navigation }) => {
                             accessibilityLabel="Buttons Section">
                             <Pressable
                                 style={[styles.buttonDecline, styles.buttonsLayout]}
-                                onPress={() => navigation.navigate("EntryEmailNotifications")}
+                                onPress={() => navigation.navigate(nextScreen)}
                                 accessibilityLabel="Decline Button"
                                 accessibilityRole="button"
                                 accessibilityHint="Decline Terms and Conditions"

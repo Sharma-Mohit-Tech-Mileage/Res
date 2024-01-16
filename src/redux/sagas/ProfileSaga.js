@@ -196,25 +196,17 @@ function* updateEntryEmailNotification(action) {
         const profile = action.payload.profile;
         const updateEmail = action.payload.email;
         const oldEmail = action.payload.profile.svEmailAddress;
-        action.payload.profile.svEmailAddress = updateEmail;
-        action.payload.profile.email = oldEmail;
-        // {
-        //     profile: action.payload.profile,
-        //     email: action.payload.email
-        // }
-
-
-        const emailChanged = newData.svEmailAddress !== initialEmailAddress;
-        if (emailChanged) {
-          newData.email = initialEmailAddress;
+        
+        if (updateEmail !== oldEmail) {
+            profile.svEmailAddress = updateEmail;
+            profile.email = oldEmail;
+            yield call(postProfileInfo, profile);
         }
 
-        console.log('updateEntryEmailNotification', action.payload)
-        const response = yield call(postProfileInfo, action.payload);
-        const emailNotifiction = yield call(postEmailNotification, action.payload.email);
-        action.navigation.navigate('ProfileSettings', { updateSuccess: true });
+        yield call(postEmailNotification, updateEmail);
+        action.navigation.navigate('MyTab');
     } catch (error) {
-        action.navigation.navigate('ProfileSettingsEdit', { updateFailed: true });
+        action.navigation.navigate('EntryEmailNotifications', { updateFailed: true });
         console.error('API Error Response:', error, action.payload); // Log the error response
     }
 }
