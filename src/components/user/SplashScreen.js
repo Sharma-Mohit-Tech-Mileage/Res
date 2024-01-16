@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
-import { authorize, revoke } from "react-native-app-auth";
+import { authorize, revoke, refresh } from "react-native-app-auth";
 import { useDispatch, useSelector } from "react-redux";
 import { ssoLoginAction, saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
@@ -27,8 +27,6 @@ import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
-import { getFirstTime, storeFirstTime } from "../../redux/utils/LocalStorage";
-import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
 import { getUser } from "../../redux/utils/LocalStorage";
 import { SetRenewTokenTimer, SetClearTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
@@ -90,12 +88,9 @@ const SplashScreen = ({ navigation }) => {
         refreshToken: res.refreshToken
       };
 
-      
-
-      
-      if(res.userInfo.acctStatus==='Disconnect'){
+      if (res.userInfo.acctStatus==='Disconnect'){
         setDisconnected(true)
-       }else if (userInfo.authLevel==='Limited') {
+       } else if (userInfo.authLevel==='Limited') {
           setErrorMessage(strings.nonAdminUserMsg);
           setTimeout(() => {
             setModalVisible(true);
@@ -105,25 +100,15 @@ const SplashScreen = ({ navigation }) => {
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
-        }else {
+        } else {
 
           dispatch(saveUserInfo(user));
           SetRenewTokenTimer();
-          const data = await getFirstTime();
 
-          if (data !== null 
-            && data.accountNumber === userInfo.accountNumber) {
-              navigation.navigate("MyTab");
+          if (user.userInfo.mobileTCAcceptanceFlag) {
+            navigation.navigate("MyTab");
           } else {
-            storeFirstTime({
-              accountNumber: userInfo.accountNumber
-            });
-
-            if (user.userInfo.mobileTCAcceptanceFlag) {
-              navigation.navigate("EntryPushNotifications");
-            } else {
-              navigation.navigate("Terms");
-            }
+            navigation.navigate("Terms");
           }
         }         
     }
@@ -218,17 +203,6 @@ const SplashScreen = ({ navigation }) => {
       console.log(error);
     }
   };
-
-  const loginFirstTimeFlow = async () => {
-    storeFirstTime(null);
-    await loginAuth();
-  };
-
-  const termsAndConditionsFlow = async () => {
-    storeFirstTime(null);
-    dispatch(updateTermsAndConditions(false, null));
-    await loginAuth();
-  };  
 
   useEffect(() => {
     const fetchData = async () => {
