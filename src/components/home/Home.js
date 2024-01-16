@@ -107,12 +107,14 @@ const HomeScreen = ({ route, navigation }) => {
           if(res.currentCollectionStep=='Soft Disconnect'){
             setAccountStatus('Disconnect')
             setIsInternetDetails(true)
-            return;
+          
+          }else{
+            updateInternetHealth(res.currentBalance);
           }
           let dueDate = moment(res.paymentDueDate).format("ll");
           setDueDate(dueDate);
           setBillAmt(res.currentBalance);
-          updateInternetHealth(res.currentBalance);
+          
 
         }
       }, onErrorBill);
