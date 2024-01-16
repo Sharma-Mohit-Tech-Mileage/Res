@@ -103,7 +103,7 @@ const MyTabs = ({ route, navigation }) => {
                       {
                         name: 'ArticalWindowUtility',
                         params: {
-                          url: 'https://support.sparklight.com/hc/en-us/articles/115009159707-Data-Plans',
+                          url: 'https://customer.uat.sparklight.com/residential/services/upgrade',
                           name: 'Shop'
                         },
                       },
