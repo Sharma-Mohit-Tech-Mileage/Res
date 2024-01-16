@@ -232,7 +232,8 @@ const HomeScreen = ({ route, navigation }) => {
         >
           <Image
             resizeMode="contain"
-            source={require("../../res/images/header_logo.png")}
+            style={{ width: 120, height: 30.324, flexShrink: 0 }}
+            source={require("../../../assets/SparklightEntryLogo.png")}
           />
           {/* <View>
             <BellIcon />
@@ -321,6 +322,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.splash_bg,
+    marginBottom: 30
   },
   card: {
     backgroundColor: "white",

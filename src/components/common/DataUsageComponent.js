@@ -93,7 +93,7 @@ const DataUsageComponent = ({navigation}) => {
           //Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
         }}
         style={{
-          height: 30,
+          minHeight: 30,
           flexDirection: "row",
           justifyContent: "space-between",
           padding: 4,

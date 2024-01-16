@@ -105,7 +105,7 @@ const ModemReboot = () => {
             
             <Text style={[styles.text,{width:wp('75%')}]}>
             {inst3}
-            <Text style={[styles.textContactUs,{fontWeight:'600'}]} onPress={()=>{
+            <Text style={[styles.textContactUs,{fontWeight:'700'}]} onPress={()=>{
                 DeviceEventEmitter.emit("event.contactUsEvent", {name:'Contact US'});
                 setTimeout(()=>{
                   navigation.navigate('support')
@@ -130,8 +130,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
     borderRadius: 2,
-    width: wp("90%"),
-    marginTop: wp("5%"),
+    width: wp("92%"),
+    marginTop: wp("8%"),
     paddingTop: 20,
     paddingBottom: 20,
   },

@@ -30,11 +30,13 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
         <TouchableOpacity onPress={() => handleSuggestionClick(item)} style={styles.suggestionItem}>
             <Image
                 source={require('../../../../assets/file-05.png')}
-                style={{ marginRight: 8 }}
+                style={{
+                    marginRight: 18, width: 13.333,
+                    height: 16.667 }}
             />
             <Text style={styles.suggestionText}>{item.title}</Text>
             <Image
-                source={require('../../../../assets/share-04.png')}
+                source={require('../../../../assets/right-actionable10.png')}
             />
         </TouchableOpacity>
     );

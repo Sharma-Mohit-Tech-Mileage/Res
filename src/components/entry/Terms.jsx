@@ -1,49 +1,157 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable } from "react-native";
+import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Dimensions } from "react-native";
+import WebView from 'react-native-webview';
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useSelector, useDispatch } from 'react-redux';
-import { cleanUserData, storeFirstTime } from "../../redux/utils/LocalStorage";
-import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
+import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
+import { updateTermsAndConditions, fetchSMSSelection, fetchBillingStatus, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
+import * as Zendesk from 'react-native-zendesk-messaging';
+import { logout } from 'react-native-app-auth';
+import { SetClearTimer } from '../user/Session';
+import { saveUserInfo } from "../../redux/actions/UserAction";
+
+const config = {
+    issuer: 'https://login.uat.cableone.net/auth/realms/external-sso-realm',
+    iosPrefersEphemeralSession: true,
+};
+
+const { width, height } = Dimensions.get('window');
 
 const Terms = ({ navigation }) => {
+    const [initScript, setInitScript] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [nextScreen, setNextScreen] = useState('EntryPushNotifications');
+    const [progress, setProgress] = useState(0);
+    const [profileLoadCount, setProfileLoadCount] = useState(0);
+    const [isError, setIsError] = useState(false);
     const dispatch = useDispatch();
     const stateData = useSelector(state => state);
     const combinedReducers = useSelector(state => state.combinedReducers);
     const userData = useSelector(state => state.combinedReducers.user.userData);
+    const profile = useSelector(state => state.combinedReducers.profile || {});
+    const url = 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions';
     console.log('userData: ', userData);
     console.log('combinedReducers: ', combinedReducers);
     console.log('stateData: ', JSON.stringify(stateData));
 
-    const termsAccepted = () => {
-        console.log('termsAccepted');
-        dispatch(updateTermsAndConditions(true, navigation));
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                dispatch(fetchBillingStatus());
+                dispatch(fetchBillingPaper());
+                dispatch(fetchSMSSelection());
+                dispatch(fetchPushNotifications());
+                dispatch(fetchProfileDetails());
+            } catch (error) {
+                console.error("Error fetching data", error);
+            }
+        };
+
+        fetchData();
+    }, [dispatch]); 
+
+    useEffect(() => {
+        let goToPhoneScreen = false;
+        let optOutCount = 0;
+        let goToPushNotificationScreen = false;
+        let optOutCountPushNotification = 0;
+
+        
+        if (profile.pushNotifications.length > 0) {
+            const messageTypes = profile.pushNotifications[0].pushMessageType;
+            messageTypes.forEach((messageType) => {
+                if (messageType.optOutFlag) {
+                    goToPushNotificationScreen = optOutCountPushNotification + 1;
+                }
+            });
+            if (optOutCountPushNotification > 2) {
+                goToPushNotificationScreen = true;
+            }
+        } else {
+            goToPushNotificationScreen = true;
+        }
+        
+        if (profile.smsSubscription.length > 0) {
+            const firstSubscription = profile.smsSubscription[0];
+            firstSubscription.smsMessageType.forEach((messageType) => {
+                console.log('messageType.optOutFlag: ', messageType.optOutFlag);
+                console.log('optOutCount: ', optOutCount);
+                if (messageType.optOutFlag) {
+                    optOutCount = optOutCount + 1;
+                }
+            });
+            console.log('optOutCountAfterLoop: ', optOutCount);
+            if (optOutCount > 2) {
+                goToPhoneScreen = true;
+            }
+        } else {
+            goToPhoneScreen = true;
+        }
+
+        if (goToPushNotificationScreen) {
+            setNextScreen('EntryPushNotifications'); 
+        } else if (goToPhoneScreen) {
+            setNextScreen('EntryTextNotifications');  
+        } else {
+            if (profile.paperLessInfo !== undefined
+                && profile.paperLessInfo.accountNumber !== undefined
+                && profile.paperLessInfo.accountNumber.length > 0
+                && profile.paperLessInfo.paperlessStatus !== undefined
+                && profile.paperLessInfo.paperlessStatus.toLowerCase() === 'approved') {
+                console.log('setNextScreen: MyTab');
+                setNextScreen('MyTab');                  
+            } else {
+                console.log('setNextScreen: EntryEmailNotifications');
+                setNextScreen('EntryEmailNotifications');  
+            }
+        }
+
+        if (profile.profileDetails.memberType === "Admin") {
+            setNextScreen('MyTab');
+        }
+
+        setProfileLoadCount(profileLoadCount + 1);
+    }, [profile]);
+    
+
+    useEffect(() => {
+        console.log('profileLoadCount: ', profileLoadCount);
+        if (profileLoadCount > 4) {
+            setLoading(false);
+            console.log('profileAfterLoad: ', JSON.stringify(profile));
+        }
+    }, [profileLoadCount]);
+    
+
+    const termsAccepted = async () => {
+        await dispatch(updateTermsAndConditions(true, null));
+        console.log('termsAccepted: ', nextScreen);
+        navigation.navigate(nextScreen);
     };
 
     const termsCanceled = () => {
-        cleanUserData();
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Splash' }]}) 
-        //dispatch(updateTermsAndConditions(false, navigation));
-        //navigation.navigate("PushNotifications");
+        let re = getSsoToken().then((res) => {
+            console.log('token', res)
+            let token = res.idToken;
+            logout(config, {
+              idToken: token,
+              postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
+            }).then((result) => {
+                storeUser({});
+                storeSsoToken({});
+                saveUserInfo({});
+                cleanUserData();
+                SetClearTimer();
+                Zendesk.logout();
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Splash' }]
+                })
+            });
+        });
     };    
-
-    const terms = [
-        {
-            title: 'Title',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
-        },
-        {
-            title: 'Second Title',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
-        },
-        {
-            title: 'Third Title',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
-        }                
-    ];
 
     return  (
         <View style={styles.container}>
@@ -51,31 +159,28 @@ const Terms = ({ navigation }) => {
                 showIcon={false}
                 title={'Terms'}
             />
-            <ScrollView 
-                contentContainerStyle={styles.scrollViewContentContainer}
-                style={styles.scrollViewContainer}>
-                <View>
-                    <View style={styles.sparklightImageView}>
-                        <Image 
-                            style={styles.sparklightImage}
-                            source={require("../../../assets/nn-1.png")} 
-                        />
+            {
+                progress < 1 &&
+                (
+                    <View style={{...styles.progressBar}}>
+                        <View style={{...styles.progress, width: `${progress * 100}%` }} />
                     </View>
-                    <View style={styles.termsHeader}>
-                        <Text style={styles.termsHeaderText}>Terms and Conditions</Text>
-                    </View>            
+                )
+            }            
+            <WebView
+                key={url}
+                source={{ uri: url }}
+                onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
+                onError={() => setIsError(true)}
+                //sharedCookiesEnabled={true}
+                //injectedJavaScriptBeforeContentLoaded={initScript}
+                //onNavigationStateChange={(navState) => setUrl(navState.url)}
+            />  
+            {isError && (
+                <View style={[styles.errorContainer, { marginTop: '23%' }]}>
+                    <Text style={styles.errorText}>Failed to load. Please try again later.</Text>
                 </View>
-                {terms.map((term, index) => (
-                    <View key={index}>
-                        <View style={styles.termsTitle}>
-                            <Text style={styles.termsTitleText}>{term.title}</Text>
-                        </View>
-                        <View style={styles.termsDescription}>
-                            <Text style={styles.termsDescriptionText}>{term.description}</Text>
-                        </View>                        
-                    </View>
-                ))}                
-            </ScrollView>
+            )}                           
             <View style={styles.bottomBar}>
                 <View style={styles.buttonsParent} 
                     accessibilityLabel="Buttons Section">
@@ -89,13 +194,24 @@ const Terms = ({ navigation }) => {
                         <Text style={styles.decline}>
                             Decline
                         </Text>
-                    </Pressable>                
-                    <Pressable
-                        style={[styles.buttons, styles.buttonsLayout]}
-                        onPress={termsAccepted}
-                    >
-                        <Text style={styles.accept}>Accept</Text>
                     </Pressable>
+                    {
+                        loading ?
+                        (
+                            <View style={[styles.buttons, styles.buttonsLayout]}>
+                                <ActivityIndicator size="small" color={"white"} /> 
+                            </View>  
+                        )                      
+                        :
+                        (
+                            <Pressable
+                                style={[styles.buttons, styles.buttonsLayout]}
+                                onPress={termsAccepted}
+                            >
+                                <Text style={styles.accept}>Accept</Text>
+                            </Pressable>
+                        )
+                    }                
                 </View>    
             </View>
         </View>
@@ -103,6 +219,24 @@ const Terms = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+    progressBar: {
+        height: height * 0.004, // 0.4% of screen height
+        backgroundColor: 'lightgrey',
+    },
+    progress: {
+        height: '100%',
+        backgroundColor: 'rgba(141, 59, 144, 1)',
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: width * 0.05, // 5% of screen width
+    },
+    errorText: {
+        fontSize: width * 0.04, // 4% of screen width
+        marginBottom: height * 0.02, // 2% of screen height
+    },    
     bottomBar: {
         height: 150,
         backgroundColor: '#FFF',
@@ -127,7 +261,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: Border.br_11xs,
-        height: 50,
+        minHeight: 50,
         width: '45%',
     },    
     buttonsParent: {
@@ -142,6 +276,8 @@ const styles = StyleSheet.create({
         color: Color.sparklightWhite,
     },
     decline: {
+        fontSize: FontSize.size_base,
+        fontFamily: FontFamily.openSansRegular,        
         color: Color.colorMidnightblue,
         textAlign: "center",
     },    
