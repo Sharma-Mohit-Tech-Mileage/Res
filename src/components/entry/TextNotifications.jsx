@@ -52,7 +52,11 @@ const TextNotifications = ({ navigation }) => {
     useEffect(() => {
         if (profile.paperLessInfo !== undefined
             && profile.paperLessInfo.accountNumber !== undefined
-            && profile.paperLessInfo.accountNumber.length > 0) {
+            && profile.paperLessInfo.accountNumber.length > 0
+            && profile.paperLessInfo.paperlessStatus !== undefined
+            && (profile.paperLessInfo.paperlessStatus.toLowerCase() === 'approved'
+                || profile.paperLessInfo.paperlessStatus.toLowerCase() === 'active')
+            ) {
                 setNextScreen('MyTab');                      
         }
     }, []); 

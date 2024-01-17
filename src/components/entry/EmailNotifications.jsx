@@ -9,7 +9,7 @@ import BellIcon from "../../res/svgIcons/bellIcon";
 import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
 import EntryInput from "./EntryInput";
 import { useSelector, useDispatch } from 'react-redux';
-import { updateEmailNotification } from '../../redux/actions/ProfileActionSuite';
+import { updateEntryEmailNotification } from '../../redux/actions/ProfileActionSuite';
 import NotificationAlert from "../common/customui/NotificationAlert";
 
 const EmailNotifications = ({ navigation }) => {
@@ -77,7 +77,7 @@ const EmailNotifications = ({ navigation }) => {
             email: input
         };
         console.log('enableEmailNotifications: ', data);
-        dispatch(updateEntryEmailNotification(data, null));
+        dispatch(updateEntryEmailNotification(data, navigation));
         //navigation.navigate("MyTab");
     };
     

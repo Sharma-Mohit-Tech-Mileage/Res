@@ -46,18 +46,18 @@ export const cleanUserData = async () => {
 }
 };
 
-export const storeFirstTime = async (value) => {
+export const storePushNotificationStatus = async (value) => {
   try {
-    await AsyncStorage.setItem("firsTime", JSON.stringify(value));
+    await AsyncStorage.setItem("pushNotificationStatus", JSON.stringify(value));
   } catch (error) {
     console.log(error);
   }
 };
 
 // getting data
-export const getFirstTime = async () => {
+export const getPushNotificationStatus = async () => {
   try {
-    const userData = JSON.parse(await AsyncStorage.getItem("firsTime"))
+    const userData = JSON.parse(await AsyncStorage.getItem("pushNotificationStatus"))
     return userData;
   } catch (error) {
    console.log(error); 
