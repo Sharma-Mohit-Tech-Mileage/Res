@@ -4,7 +4,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, } from '../../redux/actions/ProfileActionSuite';
-import { transformResponse, transformNotificationPreferences } from '../../components/utility/constant';
+import { transformResponse, transformNotificationPreferences, isPrimaryAdmin } from '../../components/utility/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from "../common/customui/NotificationAlert";
 
@@ -19,18 +19,18 @@ const Notifications = () => {
   const smsSubscription = profile.smsSubscription || [];
   const profileDetails = profile.profileDetails || {};
   const paperLessInfo = profile.paperLessInfo || {};
-  //const transformedNotification = transformNotificationPreferences(profile.pushNotifications || {});
+  const transformedNotification = transformNotificationPreferences(profile.pushNotifications || {});
   const data = transformResponse(smsSubscription);
   const emailAddress = paperLessInfo.emailAddress || '';
   const emailStatus = paperLessInfo.emailStatus || 'Pending';
   const isEmailVerified = emailStatus === 'Verified';
+  const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   let notificationsTitle, infoText, isDisabled;
   if (emailAddress) {
     notificationsTitle = isEmailVerified ? "" : "Email verification pending";
     infoText = isEmailVerified ? `Emails are sent to ` : `Email ${emailAddress} is being verified. Please verify your email address to continue.`;
-    isDisabled = !isEmailVerified; // Disable if not verified
+    isDisabled = !isEmailVerified;
   } else {
-    // Handling the case where there's no email in paperLessInfo
     if (profileDetails.multipleEmails) {
       isDisabled = true;
       notificationsTitle = "There is a problem retrieving your email address";
@@ -49,7 +49,7 @@ const Notifications = () => {
       try {
         await dispatch(fetchBillingPaper());
         await dispatch(fetchSMSSelection());
-       // await dispatch(fetchPushNotifications());
+        await dispatch(fetchPushNotifications());
       } catch (error) {
         console.error("Error fetching data", error);
       }
@@ -66,7 +66,7 @@ const Notifications = () => {
       setShowSuccessAlert(true);
       dispatch(fetchBillingPaper());
       dispatch(fetchSMSSelection());
-      //dispatch(fetchPushNotifications());
+      dispatch(fetchPushNotifications());
       navigation.setParams({ updateSuccess: undefined, updatedType: undefined });
     }
   }, [route.params, navigation, dispatch]);
@@ -91,6 +91,7 @@ const Notifications = () => {
             transformedData={data}
             navigationTarget="TextNotifications"
             additionalSettings={data.subscriptionDetails}
+            isAdmin={!isPrimary}
           />
           <View style={{ marginBottom: Padding.p_base }} />
           <NotificationSection
@@ -106,8 +107,9 @@ const Notifications = () => {
             navigationTarget="EmailNotifications"
             transformedData={{ status: paperLessInfo?.paperlessStatus === 'Active', email: paperLessInfo.emailAddress }}
             additionalSettings={[{ type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off' }]}
+            isAdmin={!isPrimary}
           />
-          {/* <View style={{ marginBottom: Padding.p_base }} />
+          <View style={{ marginBottom: Padding.p_base }} />
           <NotificationSection
             title="In-App Notifications"
             successMessage={successMessage}
@@ -120,7 +122,8 @@ const Notifications = () => {
             navigationTarget="InAppNotifications"
             transformedData={transformedNotification}
             additionalSettings={transformedNotification}
-          /> */}
+            isAdmin={false}
+          />
         </View>
 
       </ScrollView>
@@ -142,6 +145,7 @@ const NotificationSection = ({
   email,
   navigationTarget,
   additionalSettings = [],
+  isAdmin
 }) => {
 
   const navigation = useNavigation();
@@ -163,16 +167,16 @@ const NotificationSection = ({
       )}
       <View style={[styles.textNotificationsParent, styles.parentSpaceBlock]}>
         <Text style={styles.textNotifications}>{title}</Text>
-        <Pressable
+        {!isAdmin && <Pressable
           style={[styles.buttons, styles.buttonsBg, isDisabled && styles.buttonDisabled]}
           onPress={() => isDisabled ? {} : navigation.navigate(navigationTarget, { additionalData: transformedData })}
           disabled={isDisabled}
         >
           <Text style={isDisabled ? styles.makePaymentDisabled : styles.makePayment}>Edit</Text>
-        </Pressable>
+        </Pressable>}
       </View>
       <View style={styles.frameWrapper}>
-        {isDisabled ?
+        {!isAdmin && isDisabled ?
           <NotificationAlert
             type="warning"
             title={notificationsTitle}
@@ -180,11 +184,20 @@ const NotificationSection = ({
             message={infoText}
           />
           : null}
+        {isAdmin ?
+          <NotificationAlert
+            type="warning"
+            title={""}
+            showCloseIcon={false}
+            message={"Only Primary Admin can make changes"}
+          />
+          : null}
+        {isAdmin ? <View style={{ marginVertical: 8 }} /> : null}
         {(!isDisabled && infoText) ? <View style={styles.frameView}>
           <View style={styles.infoCircleWrapper}>
             <Image
               style={styles.infoCircleIcon}
-              resizeMode="stretch"
+              resizeMode="contain"
               source={require("../../../assets/infocircle.png")}
             />
           </View>
@@ -313,9 +326,9 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   infoCircleIcon: {
-    width: 16,
-    height: 16,
-    overflow: "hidden",
+    width: 18,
+    height: 18,
+    marginTop: -5
   },
   infoCircleWrapper: {
     paddingHorizontal: 0,
