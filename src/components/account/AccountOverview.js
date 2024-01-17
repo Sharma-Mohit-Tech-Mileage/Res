@@ -17,7 +17,6 @@ import { logout } from 'react-native-app-auth';
 import * as Zendesk from 'react-native-zendesk-messaging';
 import { SetClearTimer } from '../user/Session';
 import { saveUserInfo } from "../../redux/actions/UserAction";
-import { isPrimaryAdmin } from '../utility/constant';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -77,10 +76,6 @@ const AccountOverview = () => {
   const [fullName, setFullName] = useState('');
   const [initials, setInitials] = useState('');
   const dispatch = useDispatch();
-  const profile = useSelector(state => state.combinedReducers.profile || {});
-  const profileDetails = profile.profileDetails || {};
-  const isPrimaryUser = isPrimaryAdmin(profileDetails.memberType);
-
   useEffect(() => {
     dispatch(fetchProfileDetails());
   }, []);
@@ -105,7 +100,7 @@ const AccountOverview = () => {
       onPress: () => navigation.navigate('Notifications'),
       icon: notificationsIcon,
       accessibilityLabel: 'Navigate to notifications settings',
-      includeInMenu: isPrimaryUser,
+      includeInMenu: true,
     },
     {
       name: 'User Management',
