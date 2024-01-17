@@ -133,7 +133,7 @@ const Support = () => {
                                 <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                             </View>
                         </View>
-                        <ScrollView style={{width:'100%',marginBottom:hp('30%')}}>
+                        <ScrollView style={{width:'100%',marginBottom:hp('40%')}}>
                         <View >
                         
                         <View style={styles.issuesFlexBox}>

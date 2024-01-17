@@ -20,7 +20,7 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
     }, [input, onChangeInput]);
 
     const handleSuggestionClick = (suggestion) => {
-        setInput(suggestion.title);
+        //setInput(suggestion.title);
         // Optionally close the keyboard
         navigation.navigate('ArticalWindowUtility', { url: suggestion.html_url, name: 'Search Result' }) 
     };

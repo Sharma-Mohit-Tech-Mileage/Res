@@ -56,7 +56,16 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
           </View>
           <Text style={styles.text}> {strings.no_modem_issue}</Text>
       </View>*/}
-        <View style={{ flexDirection: "row" }}>
+        <TouchableOpacity style={{ flexDirection: "row" }}
+        onPress={() => {
+          if(!billPaid){
+          navigation.navigate("ArticalWindowUtility", {
+            url: "https://customer.uat.sparklight.com/residential/billing",
+            name: "Billing Details",
+          });
+        }
+        }}
+        >
           <View style={styles.item}>
             <View style={styles.iconBg}>
               <Billpaidicon />
@@ -65,26 +74,21 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
             <Text style={styles.text}> {strings.bill_paid}</Text>
           </View>
           {!billPaid ? (
-            <TouchableOpacity
+            <View
               style={{
                 justifyContent: "center",
                 right: 20,
                 top: 26,
                 position: "absolute",
               }}
-              onPress={() => {
-                navigation.navigate("ArticalWindowUtility", {
-                  url: "https://customer.uat.sparklight.com/residential/billing",
-                  name: "Billing Details",
-                });
-              }}
+              
             >
               <RightArrow />
-            </TouchableOpacity>
+            </View>
           ) : (
             <></>
           )}
-        </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
