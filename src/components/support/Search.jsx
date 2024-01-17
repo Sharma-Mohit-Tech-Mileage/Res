@@ -42,6 +42,7 @@ const Search = ({ navigation }) => {
             if (query.trim() && query.length > 0) {
               setTotalPage(res.page_count)
               const data = filteredSuggestions.concat(res.results);
+              
               setFilteredSuggestions(data);
             } else {
               setFilteredSuggestions([]); // Set to empty array when there's no input
