@@ -5,7 +5,7 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
 import * as Zendesk from 'react-native-zendesk-messaging';
-import {DeviceEventEmitter} from "react-native"
+import PubSub from 'pubsub-js'
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
@@ -70,15 +70,18 @@ const Support = () => {
         }
     ];
 
-    useEffect(() => {
-        DeviceEventEmitter.addListener("event.contactUsEvent", (eventData) => {
-           console.log('Callback',eventData)
-           scrollViewRef.current?.scrollToEnd({animated: true})
-        })
+    var mySubscriber = function (msg, data) {
+        console.log( msg, data );
+        scrollViewRef.current?.scrollToEnd({animated: true})
+    };
+    
 
+    useEffect(() => {
+        var token = PubSub.subscribe('event.contactUsEvent', mySubscriber);
+    
         initZendesk();
           return () => {
-            DeviceEventEmitter.removeAllListeners("event.contactUsEvent")
+            PubSub.unsubscribe(token);
           };
 
       }, []);
@@ -132,7 +135,9 @@ const Support = () => {
                                 <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                             </View>
                         </View>
-                        <ScrollView style={{width:'100%',marginBottom:hp('40%')}}>
+                        <ScrollView style={{width:'100%',marginBottom:hp('36%'),padding: Padding.p_base}}
+                         ref={scrollViewRef}
+                        >
                         <View >
                         
                         <View style={styles.issuesFlexBox}>
@@ -702,7 +707,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     mainContainer: {
-        padding: Padding.p_base,
         alignItems: "center",
         alignSelf: 'stretch',
         marginBottom: '20%',
