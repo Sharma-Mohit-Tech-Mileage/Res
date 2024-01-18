@@ -25,6 +25,15 @@ const Notifications = () => {
   const emailStatus = paperLessInfo.emailStatus || 'Pending';
   const isEmailVerified = emailStatus === 'Verified';
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
+  const checkStatus = (paperlessStatus) => {
+    if (paperlessStatus == null) {
+      return true;
+    }
+
+    const lowerCaseStatus = paperlessStatus.toLowerCase();
+    return lowerCaseStatus !== "processing" && lowerCaseStatus !== "active";
+  };
+  const notRegistered = checkStatus(paperLessInfo?.paperlessStatus);
   let notificationsTitle, infoText, isDisabled;
   if (emailAddress) {
     notificationsTitle = isEmailVerified ? "" : "Email verification pending";
@@ -106,7 +115,7 @@ const Notifications = () => {
             email={paperLessInfo.emailAddress}
             navigationTarget="EmailNotifications"
             transformedData={{ status: paperLessInfo?.paperlessStatus === 'Active', email: paperLessInfo.emailAddress }}
-            additionalSettings={[{ type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off' }]}
+            additionalSettings={[{ type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off', isNew: notRegistered}]}
             isAdmin={!isPrimary}
           />
           <View style={{ marginBottom: Padding.p_base }} />
