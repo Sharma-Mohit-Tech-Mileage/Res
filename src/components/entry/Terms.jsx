@@ -99,17 +99,21 @@ const Terms = ({ navigation }) => {
                 && profile.paperLessInfo.accountNumber !== undefined
                 && profile.paperLessInfo.accountNumber.length > 0
                 && profile.paperLessInfo.paperlessStatus !== undefined
-                && profile.paperLessInfo.paperlessStatus.toLowerCase() === 'approved') {
-                console.log('setNextScreen: MyTab');
+                && (profile.paperLessInfo.paperlessStatus.toLowerCase() === 'approved'
+                    || profile.paperLessInfo.paperlessStatus.toLowerCase() === 'active')
+                ) {
                 setNextScreen('MyTab');                  
             } else {
-                console.log('setNextScreen: EntryEmailNotifications');
                 setNextScreen('EntryEmailNotifications');  
             }
         }
 
         if (profile.profileDetails.memberType === "Admin") {
-            setNextScreen('MyTab');
+            if (goToPushNotificationScreen) {
+                setNextScreen('EntryPushNotifications'); 
+            } else {
+                setNextScreen('MyTab');
+            }
         }
 
         setProfileLoadCount(profileLoadCount + 1);
@@ -118,7 +122,7 @@ const Terms = ({ navigation }) => {
 
     useEffect(() => {
         console.log('profileLoadCount: ', profileLoadCount);
-        if (profileLoadCount > 4) {
+        if (profileLoadCount > 5) {
             setLoading(false);
             console.log('profileAfterLoad: ', JSON.stringify(profile));
         }

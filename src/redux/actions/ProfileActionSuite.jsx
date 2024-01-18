@@ -9,7 +9,8 @@ import {
     UPDATE_TERMS_AND_CONDITIONS, UNSUBSCRIBE_PAPERLESS,
     UPDATE_PUSH_NOTIFICATIONS, FETCH_PUSH_NOTIFICATIONS,
     SAVE_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
-    SAVE_USER_FEEDBACK
+    SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
+    UPDATE_EXISTING_EMAIL_NOTIFICATION
 } from '../constants';
 export const fetchProfileSuccess = (response) => {
     return {
@@ -122,6 +123,12 @@ export const updateEmailNotification = (data, navigation) => ({
     navigation,
 });
 
+export const updateExistingEmailNotification = (data, navigation) => ({
+    type: UPDATE_EXISTING_EMAIL_NOTIFICATION,
+    payload: data,
+    navigation,
+});
+
 export const updateTermsAndConditions = (data, navigation) => ({
     type: UPDATE_TERMS_AND_CONDITIONS,
     payload: data,
@@ -133,14 +140,21 @@ export const updatePushNotifications = (data, navigation) => ({
     payload: data,
     navigation,
 });
+
 export const updatePushNotificationsv2 = (data, navigation) => ({
     type: UPDATE_PUSH_NOTIFICATIONS_V2,
     payload: data,
     navigation,
 });
+
 export const saveUserFeedback = (data, navigation) => ({
     type: SAVE_USER_FEEDBACK,
     payload: data,
     navigation,
 });
 
+export const updateEntryEmailNotification = (data, navigation) => ({
+    type: UPDATE_ENTRY_EMAIL_NOTIFICATION,
+    payload: data,
+    navigation,
+});

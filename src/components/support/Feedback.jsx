@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { feedbackSchema } from '../utility/validationSchema'; // Update the path as necessary
-import { ScrollView, Image, StyleSheet, Text, Pressable, View, KeyboardAvoidingView, Keyboard } from 'react-native';
+import { ScrollView, Image, StyleSheet, Pressable, View, KeyboardAvoidingView, Keyboard } from 'react-native';
 import { Color, FontFamily, FontSize, Border, Padding } from '../../../GlobalStyles';
+import Text from '../common/customui/CustomText';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import SparkLightInput from '../common/customui/SparkLightInput';
@@ -119,21 +120,25 @@ const Feedback = () => {
                             {feedbackOptions.map((option) => (
                                 <Pressable
                                     key={option.name}
-                                    style={[styles.faceSadParent, styles.parentSpaceBlock]}
+                                    style={[styles.faceSadParent, { flex: 1 }]} // make sure this style allows for the text to overflow and not just push the boundaries
                                     onPress={() => handleIconPress(option.category, option.value)}
                                 >
                                     <Image
                                         style={styles.iconLayout}
-                                        resizeMode="cover"
+                                        resizeMode="contain"
                                         source={feedbackInfo.feedbackValue === option.value ? option.selectedImage : option.image}
                                     />
-                                    <Text style={[styles.terrible, styles.greatTypo]}>
+                                    <Text
+                                        allowFontScaling={false}
+                                        style={[styles.terrible, styles.greatTypo]}
+                                    >
                                         {option.text}
                                     </Text>
                                 </Pressable>
                             ))}
                         </View>
                     </View>
+
 
                     <View style={styles.textinputWrapper}>
                         <Controller
@@ -261,7 +266,8 @@ const styles = StyleSheet.create({
         marginTop: 16,
         color: Color.colorGray_100,
         fontFamily: FontFamily.openSansRegular,
-        textAlign: "center",
+        textAlign: 'center',
+        width: '90%', // Adjust this width as needed for your layout
     },
     faceSadParent: {
         borderRightWidth: 1,
@@ -269,7 +275,9 @@ const styles = StyleSheet.create({
         borderColor: Color.sparklightGray,
         borderStyle: "solid",
         paddingVertical: Padding.p_base,
-        paddingHorizontal: 0,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     frameGroup: {
         borderRadius: 8,
@@ -277,7 +285,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderStyle: "solid",
         borderColor: Color.colorGainsboro_200,
-        flex: 1,
     },
     frameContainer: {
         alignItems: "center",

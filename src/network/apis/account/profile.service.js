@@ -164,6 +164,31 @@ const postTextNotifictionInfo = async (data) => {
     }
 };
 
+const putEmailNotification = async (email) => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+
+    // Log the request endpoint and data
+    console.log(`Making API putEmailNotification Call to /account/api/account/${accountNumber}/paperless with email:`, email);
+
+    try {
+        const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
+
+        // Log the successful response
+        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless, Response:`, response);
+        return response;
+    } catch (error) {
+        // Log the error with a descriptive message
+        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless:`, error);
+        throw error;
+    }
+};
+
 const postEmailNotification = async (email) => {
     let user = await getUser();
     const accountNumber = user.userInfo?.accountNumber || null;
@@ -174,10 +199,10 @@ const postEmailNotification = async (email) => {
     };
 
     // Log the request endpoint and data
-    console.log(`Making API Call to /account/api/account/${accountNumber}/paperless with email:`, email);
+    console.log(`Making API  postEmailNotification Call to /account/api/account/${accountNumber}/paperless with email:`, email);
 
     try {
-        const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
+        const response = await _axios.post(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
 
         // Log the successful response
         console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless, Response:`, response);
@@ -312,5 +337,4 @@ const handleSubmitFeedback = async (obj) => {
 };
 
 
-
-export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback }
+export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback }

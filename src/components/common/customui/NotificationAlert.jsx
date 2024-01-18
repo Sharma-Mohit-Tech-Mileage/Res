@@ -17,13 +17,20 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
     };
     return (
         <View style={[styles.notificationContainer, { borderLeftColor: currentTypeStyle.color }]}>
-            <Image source={currentTypeStyle.image} style={styles.iconStyle} />
+            <Image
+                source={currentTypeStyle.image}
+                resizeMode="contain"
+                style={[
+                    styles.iconStyle,
+                    { marginTop: !title ?  1: 1 }
+                ]}
+            />
             <View style={[
                 styles.textContentContainer,
-                showCloseIcon ? { marginRight: 30 } : { marginRight: 10 } // Apply marginRight only if showCloseIcon is true
+                showCloseIcon ? { marginRight: 30 } : { marginRight: 10 } 
             ]}>
-                <Text style={[styles.title, { color: currentTypeStyle.color }]}>{title}</Text>
-                <Text style={styles.message}>{message}</Text>
+                {title &&<Text style={[styles.title, { color: currentTypeStyle.color }]}>{title}</Text>}
+                <Text style={!title ? styles.messageOnEmpty :styles.message}>{message}</Text>
             </View>
             {showCloseIcon && (
                 <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
@@ -57,7 +64,6 @@ const styles = StyleSheet.create({
     iconStyle: {
         height:18,
         width:18,
-        marginTop: 2, // Adjust top margin to align with the title
     },
     closeButton: {
         position: 'absolute', // Position the button absolutely
@@ -73,6 +79,12 @@ const styles = StyleSheet.create({
     },
     message: {
         paddingTop:8,
+        fontSize: FontSize.size_sm,
+        fontFamily: FontFamily.openSansRegular,
+        fontWeight: '400',
+        color: Color.colorGray_200,
+    },
+    messageOnEmpty: {
         fontSize: FontSize.size_sm,
         fontFamily: FontFamily.openSansRegular,
         fontWeight: '400',

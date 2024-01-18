@@ -72,10 +72,8 @@ const SplashScreen = ({ navigation }) => {
     if (token) {
       storeUser(user);
     }
-
       
-      handleLogin(res)
-    
+    handleLogin(res)
   };
 
  const handleLogin=async(res)=>{

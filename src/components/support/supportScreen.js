@@ -1,7 +1,8 @@
 import React, { useState,useEffect,useRef } from "react";
-import { StyleSheet, View, Image, Text, Pressable, ScrollView, Linking, Platform } from "react-native";
+import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform } from "react-native";
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import Text from '../common/customui/CustomText';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
 import * as Zendesk from 'react-native-zendesk-messaging';
@@ -582,15 +583,16 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     wereHereTo: {
-        fontSize: 22,
-        lineHeight: 28,
+        fontSize: FontSize.size_3xl,
         width: 210,
-        textAlign: "center",
-        color: Color.colorGray_100,
         fontFamily: FontFamily.openSansRegular,
+        color: Color.colorGray_200,
+        lineHeight: 28,
+        textAlign: "center",
     },
     wereHereToHelpWrapper: {
         justifyContent: "center",
+        overflow: 'hidden',
     },
     header: {
         alignSelf: "stretch",
@@ -721,7 +723,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         top: 0,
-        bottom: '82%',
+        height: hp('18%'),
     },
 });
 
