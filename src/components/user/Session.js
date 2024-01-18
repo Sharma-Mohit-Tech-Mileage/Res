@@ -28,21 +28,7 @@ let timer = 0;
 
 const renewToken = async () => {
     loop = setTimeout(async () => {
-        try {
-            const user = await getUser();
-            const result = await refresh(config, {
-                refreshToken: user.refreshToken,
-            });
-            const data = { 
-                idToken: result.idToken,
-                accessToken: result.accessToken,
-                idTokenGuid: result.additionalParameters.session_state,
-                refreshToken: result.refreshToken
-            };
-            PostAuthApiRequest("/mobile/api/gettoken", data, onSuccess, onError);
-        } catch (error) {
-            console.error("Error fetching data", error);
-        }
+        await RefreshToken();
     }, 900000);
 }
 
@@ -85,4 +71,21 @@ export const SetClearTimer = () => {
     clearTimeout(loop);
 }
 
+export const RefreshToken = async () => {
+    try {
+        const user = await getUser();
+        const result = await refresh(config, {
+            refreshToken: user.refreshToken,
+        });
+        const data = { 
+            idToken: result.idToken,
+            accessToken: result.accessToken,
+            idTokenGuid: result.additionalParameters.session_state,
+            refreshToken: result.refreshToken
+        };
+        PostAuthApiRequest("/mobile/api/gettoken", data, onSuccess, onError);
+    } catch (error) {
+        console.error("Error fetching data", error);
+    }
+}
     
