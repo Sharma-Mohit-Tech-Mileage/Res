@@ -2,8 +2,9 @@ import * as React from "react";
 import { View, Text } from "react-native";
 
 const AccountIcon = (props) => {
-  const Fname = props.data.firstName.charAt(0);
-  const Lname = props.data.lastName.charAt(0);
+  const Fname = props.data.firstName && props.data.firstName.length > 0 ? props.data.firstName.charAt(0) : '';
+  const Lname = props.data.lastName && props.data.lastName.length > 0 ? props.data.lastName.charAt(0) : '';
+
 
   return (
     <View
@@ -18,7 +19,7 @@ const AccountIcon = (props) => {
         justifyContent: "center",
       }}
     >
-      <Text style={{color:'white',fontWeight:'600'}}>
+      <Text allowFontScaling={false} style={{color:'white',fontWeight:'600'}}>
         {Fname}{Lname}
       </Text>
     </View>

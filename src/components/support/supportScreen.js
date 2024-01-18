@@ -583,15 +583,16 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     wereHereTo: {
-        fontSize: 22,
-        lineHeight: 28,
+        fontSize: FontSize.size_3xl,
         width: 210,
-        textAlign: "center",
-        color: Color.colorGray_100,
         fontFamily: FontFamily.openSansRegular,
+        color: Color.colorGray_200,
+        lineHeight: 28,
+        textAlign: "center",
     },
     wereHereToHelpWrapper: {
         justifyContent: "center",
+        overflow: 'hidden',
     },
     header: {
         alignSelf: "stretch",

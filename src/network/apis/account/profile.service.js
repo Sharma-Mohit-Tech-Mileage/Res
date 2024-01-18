@@ -174,7 +174,7 @@ const putEmailNotification = async (email) => {
     };
 
     // Log the request endpoint and data
-    console.log(`Making API Call to /account/api/account/${accountNumber}/paperless with email:`, email);
+    console.log(`Making API putEmailNotification Call to /account/api/account/${accountNumber}/paperless with email:`, email);
 
     try {
         const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
@@ -199,7 +199,7 @@ const postEmailNotification = async (email) => {
     };
 
     // Log the request endpoint and data
-    console.log(`Making API Call to /account/api/account/${accountNumber}/paperless with email:`, email);
+    console.log(`Making API  postEmailNotification Call to /account/api/account/${accountNumber}/paperless with email:`, email);
 
     try {
         const response = await _axios.post(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
