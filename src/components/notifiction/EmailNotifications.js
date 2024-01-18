@@ -6,7 +6,7 @@ import Toggle from '../common/Toggle';
 import { useDispatch } from 'react-redux';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { updateEmailNotification,updateExistingEmailNotification, unsubscribePaperless } from '../../redux/actions/ProfileActionSuite'
+import { updateEmailNotification, unsubscribePaperless } from '../../redux/actions/ProfileActionSuite'
 const EmailNotifications = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [initialize, setInitializeSettings] = useState({});
@@ -41,12 +41,10 @@ const EmailNotifications = () => {
 
   const handleSave = () => {
     if (initialize.status) {
-      if (initialize.isNew)
-        dispatch(updateEmailNotification(initialize.email, navigation));
-      else {
-        dispatch(updateExistingEmailNotification(initialize.email, navigation));
-      }
+      // If toggle is true/on, call updateEmailNotification
+      dispatch(updateEmailNotification(initialize.email, navigation));
     } else {
+      // If toggle is false/off, call unsubscribePaperless
       dispatch(unsubscribePaperless(navigation));
     }
   };
