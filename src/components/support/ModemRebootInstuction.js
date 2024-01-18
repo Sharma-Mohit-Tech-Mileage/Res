@@ -20,7 +20,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import {DeviceEventEmitter} from "react-native"
+import PubSub from 'pubsub-js'
 
 const ModemReboot = () => {
   const navigation = useNavigation();
@@ -37,7 +37,7 @@ const ModemReboot = () => {
 
   React.useEffect(() => {
     return () => {
-        DeviceEventEmitter.removeAllListeners("event.contactUsEvent")
+        
       };
     }, []);
 
@@ -45,7 +45,8 @@ const ModemReboot = () => {
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
         title="Modem Reboot Instructions"
-         onPressBack={() => navigation.goBack()}
+         onPressBack={() => navigation.goBack()
+        }
       />
       <ScrollView showsVerticalScrollIndicator={false} >
         <View style={{ flexDirection: "column",paddingBottom:hp('15%') }}>
@@ -106,7 +107,8 @@ const ModemReboot = () => {
             <Text style={[styles.text,{width:wp('75%')}]}>
             {inst3}
             <Text style={[styles.textContactUs,{fontWeight:'700'}]} onPress={()=>{
-                DeviceEventEmitter.emit("event.contactUsEvent", {name:'Contact US'});
+          
+                PubSub.publish('event.contactUsEvent', {});
                 setTimeout(()=>{
                   navigation.navigate('support')
                 },500)

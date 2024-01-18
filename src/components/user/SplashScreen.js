@@ -45,6 +45,7 @@ const config = {
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [loginEnable, setLoginEnable] = useState(true);
   const [disconnected, setDisconnected] = useState(false);
   const [data, setData] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
@@ -115,6 +116,7 @@ const SplashScreen = ({ navigation }) => {
   const onError = (error) => {
     console.log(" callSSOLoginApi error", error);
     setLoading(false);
+    setDisconnected(true)
   };
 
   const CustomAlertModal = ({ visible, message, onClose }) => {
@@ -191,7 +193,7 @@ const SplashScreen = ({ navigation }) => {
         idTokenGuid: result.authorizeAdditionalParameters.session_state,
         refreshToken: result.refreshToken
       };
-
+      
       setLoading(true);
       //dispatch(ssoLoginAction(data))
       callSSOLoginApi(data);
@@ -259,7 +261,13 @@ const SplashScreen = ({ navigation }) => {
             <TouchableOpacity
               style={styles.SSoBtnContainer}
               onPress={() => {
-                loginAuth();
+                if(loginEnable){
+                  setLoginEnable(false)
+                   loginAuth();
+                   setTimeout(()=>{
+                    setLoginEnable(true)
+                   },1500)
+                }
               }}
             >
               <Text style={styles.SSoBtn}>Login</Text>
@@ -277,6 +285,9 @@ const SplashScreen = ({ navigation }) => {
       onLogin={()=>{
         setDisconnected(false)
         loginAuth();
+      }}
+      onClose={()=>{
+        setDisconnected(false)
       }}
       />
     </LinearGradient>
