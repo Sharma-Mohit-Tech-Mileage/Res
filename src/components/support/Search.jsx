@@ -24,7 +24,7 @@ import debounce from "lodash.debounce";
 const Search = ({ navigation }) => {
   const [input, setInput] = useState("");
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
-  const [noData, setNoData] = useState([{id:'1234',title:'No results Displayed.',html_url:''}]);
+  const [noData, setNoData] = useState([{id:'1234',title:'No results found.',html_url:''}]);
   const [isFirstPageReceived, setIsFirstPageReceived] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [pageNo, setPageNo] = useState(1);
