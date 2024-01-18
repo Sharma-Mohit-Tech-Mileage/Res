@@ -22,7 +22,9 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
     const handleSuggestionClick = (suggestion) => {
         //setInput(suggestion.title);
         // Optionally close the keyboard
-        navigation.navigate('ArticalWindowUtility', { url: suggestion.html_url, name: 'Search Result' }) 
+        if(suggestion.html_url!=''){
+          navigation.navigate('ArticalWindowUtility', { url: suggestion.html_url, name: 'Search Result' }) 
+        }
     };
 
 
@@ -35,9 +37,11 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
                     height: 16.667 }}
             />
             <Text style={styles.suggestionText}>{item.title}</Text>
+            {(item.html_url!='') ?
             <Image
                 source={require('../../../../assets/right-actionable10.png')}
             />
+                : <></>}
         </TouchableOpacity>
     );
 
