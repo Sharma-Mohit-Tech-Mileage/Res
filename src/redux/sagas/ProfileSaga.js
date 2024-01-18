@@ -5,8 +5,7 @@ import {
     postProfileInfo, postTextNotifictionInfo,
     fetchPaperLessDetails, postEmailNotification,
     postTermsAndConditions, postPushNotifications,
-    unsubscribPaperLess, fetchPushNotifications, 
-    handleSubmitFeedback, putEmailNotification
+    unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
@@ -16,7 +15,7 @@ import {
     UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS,
     UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS,
     FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
-    SAVE_USER_FEEDBACK, UPDATE_EXISTING_EMAIL_NOTIFICATION
+    SAVE_USER_FEEDBACK
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
@@ -139,18 +138,6 @@ function* updateEmailNotification(action) {
         }
     }
 }
-function* updateExistingEmailNotification(action) {
-    try {
-        const response = yield call(putEmailNotification, action.payload);
-        if (action.navigation !== null) {
-            action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Email' });
-        }
-    } catch (error) {
-        if (action.navigation !== null) {
-            action.navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Email' });
-        }
-    }
-}
 
 function* updateTermsAndConditions(action) {
     console.log('updateTermsAndConditions: ', action);
@@ -213,7 +200,6 @@ function* ProfileSagas() {
     yield takeLatest(UPDATE_PROFILE_SECURITY, updateProfileSecurity);
     yield takeLatest(UPDATE_TEXT_NOTIFICATION, updateTextNotification);
     yield takeLatest(UPDATE_EMAIL_NOTIFICATION, updateEmailNotification);
-    yield takeLatest(UPDATE_EXISTING_EMAIL_NOTIFICATION, updateExistingEmailNotification);
     yield takeLatest(UPDATE_TERMS_AND_CONDITIONS, updateTermsAndConditions);
     yield takeLatest(UPDATE_PUSH_NOTIFICATIONS, updatePushNotifications);
     yield takeLatest(UPDATE_PUSH_NOTIFICATIONS_V2, updatePushNotificationsV2);

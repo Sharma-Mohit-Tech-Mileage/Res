@@ -129,7 +129,8 @@ const Feedback = () => {
                                         source={feedbackInfo.feedbackValue === option.value ? option.selectedImage : option.image}
                                     />
                                     <Text
-                                        allowFontScaling={false}
+                                        numberOfLines={1} // Limit the text to one line
+                                        ellipsizeMode='tail' // Add an ellipsis at the end if the text is too long
                                         style={[styles.terrible, styles.greatTypo]}
                                     >
                                         {option.text}
