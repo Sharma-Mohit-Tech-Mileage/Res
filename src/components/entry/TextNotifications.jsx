@@ -52,7 +52,11 @@ const TextNotifications = ({ navigation }) => {
     useEffect(() => {
         if (profile.paperLessInfo !== undefined
             && profile.paperLessInfo.accountNumber !== undefined
-            && profile.paperLessInfo.accountNumber.length > 0) {
+            && profile.paperLessInfo.accountNumber.length > 0
+            && profile.paperLessInfo.paperlessStatus !== undefined
+            && (profile.paperLessInfo.paperlessStatus.toLowerCase() === 'approved'
+                || profile.paperLessInfo.paperlessStatus.toLowerCase() === 'active')
+            ) {
                 setNextScreen('MyTab');                      
         }
     }, []); 
@@ -105,21 +109,6 @@ const TextNotifications = ({ navigation }) => {
             navigation.navigate(nextScreen);
         }
     };
-
-    const terms = [
-        {
-            title: 'Title',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
-        },
-        {
-            title: 'Second Title',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
-        },
-        {
-            title: 'Third Title',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
-        }                
-    ];
 
     return  (
         <View style={styles.container}>
@@ -197,7 +186,7 @@ const TextNotifications = ({ navigation }) => {
                             accessibilityLabel="Buttons Section">
                             <Pressable
                                 style={[styles.buttonDecline, styles.buttonsLayout]}
-                                onPress={() => navigation.navigate("EntryEmailNotifications")}
+                                onPress={() => navigation.navigate(nextScreen)}
                                 accessibilityLabel="Decline Button"
                                 accessibilityRole="button"
                                 accessibilityHint="Decline Terms and Conditions"

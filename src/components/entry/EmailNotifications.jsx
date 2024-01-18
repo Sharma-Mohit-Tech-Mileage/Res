@@ -9,7 +9,7 @@ import BellIcon from "../../res/svgIcons/bellIcon";
 import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
 import EntryInput from "./EntryInput";
 import { useSelector, useDispatch } from 'react-redux';
-import { updateEmailNotification } from '../../redux/actions/ProfileActionSuite';
+import { updateEntryEmailNotification } from '../../redux/actions/ProfileActionSuite';
 import NotificationAlert from "../common/customui/NotificationAlert";
 
 const EmailNotifications = ({ navigation }) => {
@@ -72,27 +72,15 @@ const EmailNotifications = ({ navigation }) => {
     };
 
     const enableEmailNotifications = () => {
-        console.log('enableEmailNotifications');
-        dispatch(updateEmailNotification(input, null));
-        navigation.navigate("MyTab");
+        const data = {
+            profile: profile.profileDetails,
+            email: input
+        };
+        console.log('enableEmailNotifications: ', data);
+        dispatch(updateEntryEmailNotification(data, navigation));
+        //navigation.navigate("MyTab");
     };
-        
     
-    const terms = [
-        {
-            title: 'Title',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
-        },
-        {
-            title: 'Second Title',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
-        },
-        {
-            title: 'Third Title',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
-        }                
-    ];
-
     return  (
         <View style={styles.container}>
             <TouchableWithoutFeedback onPress={keyboardDismiss}>
