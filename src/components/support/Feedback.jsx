@@ -96,8 +96,8 @@ const Feedback = () => {
     return (
         <View style={styles.container}>
             <ProfileSettingsHeader title="Feedback" onPressBack={() => navigation.navigate('Account')} />
-            <ScrollView ref={scrollViewRef} style={{ marginBottom: '30%' }}>
-                <KeyboardAvoidingView behavior="padding">
+            <ScrollView ref={scrollViewRef}>
+                <View style={{marginBottom:'25%'}}>
                     {showErrorAlert &&<View style={styles.howWouldYourRateYourExperWrapper}>
                         <NotificationAlert
                             type="error"
@@ -161,9 +161,11 @@ const Feedback = () => {
                             )}
                         />
                     </View>
-                    <View><Text style={[styles.footerWrapper]}>
+                    <View>
+                    <Text style={styles.footerWrapper}>
                         {feedbackInfo.feedbackText.length}/500
-                    </Text></View>
+                    </Text>
+                    </View>
 
                     <View style={styles.textinputWrapper}>
                         <Controller
@@ -196,7 +198,7 @@ const Feedback = () => {
                             <Text style={[styles.textStyle, { color: Color.colorMidnightblue }]}>Cancel</Text>
                         </Pressable>
                     </View>
-                </KeyboardAvoidingView>
+                </View>
             </ScrollView>
         </View>
     );
