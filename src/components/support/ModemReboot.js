@@ -30,11 +30,14 @@ import VideoIcon from "../../res/svgIcons/VideoIcon";
 
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
+import CustomerErrorPage from "../utility/SystemErrorPopup";
 
 const ModemReboot = () => {
   const navigation = useNavigation();
   const [modemStatus, setModemStatus] = useState("connected");
   const [loading, setLoading] = useState(false);
+  const [isRebootError, setIsRebootError] = useState(false);
+  const [rebootErrorMsg,SetRebootErrorMsg]=useState('Oops, we have encountered an error. Please retry or refer to the Modem Reboot Instructions.')
 
   const LoadingOverlay = () => {
     return (
@@ -65,11 +68,15 @@ const ModemReboot = () => {
         (res) => {
           console.log("rebootModemAction", res);
           setModemStatus(res.status);
-          setLoading(false);
+          setTimeout(()=>{
+           setLoading(false)
+          },500)
+          
         },
         (error) => {
           console.log("rebootModemAction Error", error);
           setLoading(false);
+          setIsRebootError(true)
         }
       );
     });
@@ -85,7 +92,7 @@ const ModemReboot = () => {
           <View style={{ flexDirection: "column", padding: 10 }}>
             <View style={{ flexDirection: "row" }}>
               <Image
-                style={{alignSelf:'center'}}
+                style={{ alignSelf: "center" }}
                 resizeMode="cover"
                 tintColor={"#F88700"}
                 source={require("../../../assets/info-circle.png")}
@@ -122,15 +129,21 @@ const ModemReboot = () => {
             <Image
               style={styles.frameChild}
               resizeMode="cover"
-              source={(modemStatus === "") ?require("../../../assets/modemReboot.png"):require("../../../assets/modem-connected.png")}
+              source={
+                modemStatus === ""
+                  ? require("../../../assets/modemReboot.png")
+                  : require("../../../assets/modem-connected.png")
+              }
             />
 
             {modemStatus === "" ? (
               <RenderErrorBox />
             ) : (
-              <Text style={{ alignSelf: "center", marginVertical:10 }}>Modem is connected</Text>
+              <Text style={{ alignSelf: "center", marginVertical: 10 }}>
+                Modem is connected
+              </Text>
             )}
-             <View style={styles.borderSec} />
+            <View style={styles.borderSec} />
 
             <TouchableOpacity
               style={{
@@ -173,8 +186,6 @@ const ModemReboot = () => {
               </View>
               <RightArrow />
             </TouchableOpacity>
-
-        
           </View>
           <View style={{ marginTop: 20 }}>
             <TouchableOpacity
@@ -202,6 +213,19 @@ const ModemReboot = () => {
             </TouchableOpacity>
           </View>
           <LoadingOverlay />
+          <CustomerErrorPage
+            visible={isRebootError}
+            message={rebootErrorMsg}
+            title={'Modem Reboot Failed'}
+            onActionTxt={'Retry Modem Reboot'}
+            onAction={() => {
+              setIsRebootError(false);
+               rebootModemAction();
+            }}
+            onClose={() => {
+              setIsRebootError(false);
+            }}
+          />
         </View>
       </ScrollView>
     </View>
@@ -231,8 +255,8 @@ const styles = StyleSheet.create({
   },
   frameChild: {
     alignSelf: "center",
-    width:70,
-    height:70
+    width: 70,
+    height: 70,
   },
   rebootModemTxt: {
     color: colors.sparklight_grey,
@@ -308,11 +332,12 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontStyle: "normal",
     fontWeight: "400",
-  },borderSec: {
-    width: '100%',
+  },
+  borderSec: {
+    width: "100%",
     height: 1,
     backgroundColor: Color.sparklightGray,
-},
+  },
 });
 
 export default ModemReboot;
