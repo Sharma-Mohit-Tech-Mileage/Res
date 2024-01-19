@@ -132,8 +132,8 @@ const Support = () => {
                                 <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                             </View>
                         </View>
-                        <ScrollView style={{width:'100%',marginBottom:hp('40%')}}>
-                        <View >
+                        <ScrollView style={{width:'100%'}}>
+                        <View style={{ paddingBottom: 450 }}>
                         <View style={styles.issuesFlexBox}>
                             {items.map((item, index) => (
                                 <React.Fragment key={item.name}>
@@ -432,7 +432,7 @@ const Support = () => {
                         <View style={[styles.issuesFlexBox]} />
                         </View>
                         </ScrollView>
-                    </View>
+                        </View>
                 </View>
             
         </View>
@@ -705,7 +705,6 @@ const styles = StyleSheet.create({
         padding: Padding.p_base,
         alignItems: "center",
         alignSelf: 'stretch',
-        marginBottom: '20%',
     },
     support: {
         flex: 1,
