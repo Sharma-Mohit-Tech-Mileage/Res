@@ -123,7 +123,7 @@ export const updateEmailNotification = (data, navigation) => ({
     navigation,
 });
 
-export const updateExistingEmailNotification = (data, navigation) => ({
+export const updateFreshEmail = (data, navigation) => ({
     type: UPDATE_EXISTING_EMAIL_NOTIFICATION,
     payload: data,
     navigation,

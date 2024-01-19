@@ -1,8 +1,7 @@
 import React, { useState,useEffect,useRef } from "react";
-import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform } from "react-native";
+import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text } from "react-native";
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import Text from '../common/customui/CustomText';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
 import * as Zendesk from 'react-native-zendesk-messaging';
@@ -135,7 +134,6 @@ const Support = () => {
                         </View>
                         <ScrollView style={{width:'100%',marginBottom:hp('40%')}}>
                         <View >
-                        
                         <View style={styles.issuesFlexBox}>
                             {items.map((item, index) => (
                                 <React.Fragment key={item.name}>
