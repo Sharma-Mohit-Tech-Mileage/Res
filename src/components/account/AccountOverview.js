@@ -21,6 +21,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import VersionCheck from 'react-native-version-check';
 const config = {
   issuer: 'https://login.uat.cableone.net/auth/realms/external-sso-realm',
   iosPrefersEphemeralSession: true,
@@ -142,6 +143,7 @@ const AccountOverview = () => {
       }
     };
     fetchUserData();
+    console.log('Build Number',VersionCheck.getCurrentVersion()); 
   }, []);
 
   return (
@@ -240,7 +242,9 @@ const AccountOverview = () => {
                   </Text>
                 </Text>
               </Pressable>
+
             </View>
+            <Text style={{color: Color.colorMidnightblue,alignSelf:'center', marginTop:20}}>Version:{VersionCheck.getCurrentVersion()}</Text>
           </View>
         </ScrollView>
       </View>

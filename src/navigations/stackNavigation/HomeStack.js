@@ -18,7 +18,7 @@ function HomeStackScreen() {
             <HomeStack.Screen
                 name="Dashboard"
                 component={HomeScreen}
-                options={{ headerShown: false }}
+                options={{ headerShown: false,gestureEnabled: false}}
             />
             <HomeStack.Screen
                 name="OklaSpeedTest"
