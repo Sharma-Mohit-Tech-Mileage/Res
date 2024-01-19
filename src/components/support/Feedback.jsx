@@ -2,9 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { feedbackSchema } from '../utility/validationSchema'; // Update the path as necessary
-import { ScrollView, Image, StyleSheet, Pressable, View, KeyboardAvoidingView, Keyboard } from 'react-native';
+import { ScrollView, Image, StyleSheet, Pressable, View, Text, Keyboard } from 'react-native';
 import { Color, FontFamily, FontSize, Border, Padding } from '../../../GlobalStyles';
-import Text from '../common/customui/CustomText';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import SparkLightInput from '../common/customui/SparkLightInput';
@@ -25,9 +24,7 @@ const Feedback = () => {
         feedbackValue: 5,
         feedbackText: "",
         email: ''
-    });
-    // Function to dismiss keyboard
-    const dismissKeyboard = () => Keyboard.dismiss();
+    });;
     const [showErrorAlert, setShowErrorAlert] = useState(false);
     const route = useRoute(); // Use the useRoute hook
     const dispatch = useDispatch();
@@ -96,8 +93,9 @@ const Feedback = () => {
     return (
         <View style={styles.container}>
             <ProfileSettingsHeader title="Feedback" onPressBack={() => navigation.navigate('Account')} />
+            <View style={{ marginBottom: '40%' }}>
             <ScrollView ref={scrollViewRef}>
-                <View style={{marginBottom:'25%'}}>
+                
                     {showErrorAlert &&<View style={styles.howWouldYourRateYourExperWrapper}>
                         <NotificationAlert
                             type="error"
@@ -198,8 +196,8 @@ const Feedback = () => {
                             <Text style={[styles.textStyle, { color: Color.colorMidnightblue }]}>Cancel</Text>
                         </Pressable>
                     </View>
-                </View>
             </ScrollView>
+            </View>
         </View>
     );
 };
