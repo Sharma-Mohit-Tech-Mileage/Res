@@ -5,7 +5,7 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
 import * as Zendesk from 'react-native-zendesk-messaging';
-import {DeviceEventEmitter} from "react-native"
+import PubSub from 'pubsub-js'
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
@@ -70,15 +70,18 @@ const Support = () => {
         }
     ];
 
-    useEffect(() => {
-        DeviceEventEmitter.addListener("event.contactUsEvent", (eventData) => {
-           console.log('Callback',eventData)
-           scrollViewRef.current?.scrollToEnd({animated: true})
-        })
+    var mySubscriber = function (msg, data) {
+        console.log( msg, data );
+        scrollViewRef.current?.scrollToEnd({animated: true})
+    };
+    
 
+    useEffect(() => {
+        var token = PubSub.subscribe('event.contactUsEvent', mySubscriber);
+    
         initZendesk();
           return () => {
-            DeviceEventEmitter.removeAllListeners("event.contactUsEvent")
+            PubSub.unsubscribe(token);
           };
 
       }, []);
