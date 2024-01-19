@@ -2,9 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { feedbackSchema } from '../utility/validationSchema'; // Update the path as necessary
-import { ScrollView, Image, StyleSheet, Pressable, View, KeyboardAvoidingView, Keyboard } from 'react-native';
+import { ScrollView, Image, StyleSheet, Pressable, View, Text, Keyboard } from 'react-native';
 import { Color, FontFamily, FontSize, Border, Padding } from '../../../GlobalStyles';
-import Text from '../common/customui/CustomText';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import SparkLightInput from '../common/customui/SparkLightInput';
@@ -25,9 +24,7 @@ const Feedback = () => {
         feedbackValue: 5,
         feedbackText: "",
         email: ''
-    });
-    // Function to dismiss keyboard
-    const dismissKeyboard = () => Keyboard.dismiss();
+    });;
     const [showErrorAlert, setShowErrorAlert] = useState(false);
     const route = useRoute(); // Use the useRoute hook
     const dispatch = useDispatch();
@@ -96,8 +93,10 @@ const Feedback = () => {
     return (
         <View style={styles.container}>
             <ProfileSettingsHeader title="Feedback" onPressBack={() => navigation.navigate('Account')} />
-            <ScrollView ref={scrollViewRef} style={{ marginBottom: '30%' }}>
-                <KeyboardAvoidingView behavior="padding">
+           
+            <ScrollView ref={scrollViewRef}>
+                <View style={{ marginBottom: 300 }}>
+                
                     {showErrorAlert &&<View style={styles.howWouldYourRateYourExperWrapper}>
                         <NotificationAlert
                             type="error"
@@ -129,8 +128,7 @@ const Feedback = () => {
                                         source={feedbackInfo.feedbackValue === option.value ? option.selectedImage : option.image}
                                     />
                                     <Text
-                                        numberOfLines={1} // Limit the text to one line
-                                        ellipsizeMode='tail' // Add an ellipsis at the end if the text is too long
+                                        allowFontScaling={false}
                                         style={[styles.terrible, styles.greatTypo]}
                                     >
                                         {option.text}
@@ -162,9 +160,11 @@ const Feedback = () => {
                             )}
                         />
                     </View>
-                    <View><Text style={[styles.footerWrapper]}>
+                    <View>
+                    <Text style={styles.footerWrapper}>
                         {feedbackInfo.feedbackText.length}/500
-                    </Text></View>
+                    </Text>
+                    </View>
 
                     <View style={styles.textinputWrapper}>
                         <Controller
@@ -197,9 +197,10 @@ const Feedback = () => {
                             <Text style={[styles.textStyle, { color: Color.colorMidnightblue }]}>Cancel</Text>
                         </Pressable>
                     </View>
-                </KeyboardAvoidingView>
+                </View>
             </ScrollView>
-        </View>
+            </View>
+      
     );
 };
 

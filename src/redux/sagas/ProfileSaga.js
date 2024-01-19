@@ -16,7 +16,8 @@ import {
     UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS,
     UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS,
     FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
-    SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION
+    SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
+    UPDATE_EXISTING_EMAIL_NOTIFICATION
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
@@ -78,6 +79,19 @@ function* getPushNotifications(action) {
     } catch (error) {
         console.error('Fetch Paperless Details API Error:', error);
         // Optionally, dispatch an action to handle this error state
+    }
+}
+
+function* updateNewEmail(action) {
+    try {
+        const response = yield call(postEmailNotification, action.payload);
+        if (action.navigation !== null) {
+            action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Email' });
+        }
+    } catch (error) {
+        if (action.navigation !== null) {
+            action.navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Email' });
+        }
     }
 }
 
@@ -178,7 +192,6 @@ function* updatePushNotifications(action) {
     }
 }
 function* updatePushNotificationsV2(action) {
-    console.log('updatePushNotification v2 paayload==========================================: ', action.payload);
     try {
         yield call(postPushNotifications, action.payload);
         if (action.navigation !== null) {
@@ -228,5 +241,6 @@ function* ProfileSagas() {
     yield takeLatest(UNSUBSCRIBE_PAPERLESS, unsubscribPaperLessSaga);
     yield takeLatest(SAVE_USER_FEEDBACK, saveUserFeedBack);
     yield takeLatest(UPDATE_ENTRY_EMAIL_NOTIFICATION, updateEntryEmailNotification);
+    yield takeLatest(UPDATE_EXISTING_EMAIL_NOTIFICATION, updateNewEmail);
 }
 export default ProfileSagas;

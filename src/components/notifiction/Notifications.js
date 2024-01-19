@@ -21,10 +21,19 @@ const Notifications = () => {
   const paperLessInfo = profile.paperLessInfo || {};
   const transformedNotification = transformNotificationPreferences(profile.pushNotifications || {});
   const data = transformResponse(smsSubscription);
-  const emailAddress = paperLessInfo.emailAddress || '';
+  const emailAddress = paperLessInfo.emailAddress;
   const emailStatus = paperLessInfo.emailStatus || 'Pending';
   const isEmailVerified = emailStatus === 'Verified';
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
+  const isFreshEntry = (entry) => {
+    
+    return !(
+      entry.emailAddress !== "" &&
+      entry.paperlessStatus === "InActive" &&
+      entry.emailStatus === "Verified"
+    );
+  };
+  const notRegistered = isFreshEntry(paperLessInfo);
   let notificationsTitle, infoText, isDisabled;
   if (emailAddress) {
     notificationsTitle = isEmailVerified ? "" : "Email verification pending";
@@ -105,8 +114,8 @@ const Notifications = () => {
             infoText={infoText}
             email={paperLessInfo.emailAddress}
             navigationTarget="EmailNotifications"
-            transformedData={{ status: paperLessInfo?.paperlessStatus === 'Active', email: paperLessInfo.emailAddress }}
-            additionalSettings={[{ type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off' }]}
+            transformedData={{ status: paperLessInfo?.paperlessStatus === 'Active', email: profileDetails.svEmailAddress, isNew: isFreshEntry(paperLessInfo) }}
+            additionalSettings={[{ type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off'}]}
             isAdmin={!isPrimary}
           />
           <View style={{ marginBottom: Padding.p_base }} />

@@ -1,30 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { Text } from "react-native"; // Import Text from react-native
-import { Alert } from "react-native";
+import { Text } from "react-native";
 import UserNavigations from "./src/navigations/UserNavigations";
 import { Provider } from "react-redux";
 import store from "./src/redux/configureStore.js";
 import { TabBarVisibilityProvider } from './src/navigations/TabBarVisibilityContext';
 import { NativeBaseProvider } from 'native-base';
 import { CopilotProvider } from "react-native-copilot";
-
+import { AnalyticsContext } from './src/components/utility/AnalyticsContext';
+import analytics from '@react-native-firebase/analytics';
 // Set the maxFontSizeMultiplier for Text globally
 Text.defaultProps = {
   ...Text.defaultProps,
-  maxFontSizeMultiplier: 1.5,
+  maxFontSizeMultiplier: 1.25,
 };
 
 const App = () => {
-  const [generatedToken, setGeneratedToken] = useState();
-
-  // Rest of your component code
-
   return (
     <Provider store={store}>
       <NativeBaseProvider>
         <TabBarVisibilityProvider>
           <CopilotProvider stopOnOutsideClick androidStatusBarVisible>
-            <UserNavigations />
+            {/* Wrap UserNavigations with AnalyticsContext.Provider */}
+            <AnalyticsContext.Provider value={{ logEvent: (eventName, eventData) => analytics().logEvent(eventName, eventData) }}>
+              <UserNavigations />
+            </AnalyticsContext.Provider>
           </CopilotProvider>
         </TabBarVisibilityProvider>
       </NativeBaseProvider>

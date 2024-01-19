@@ -1,8 +1,7 @@
 import React, { useState,useEffect,useRef } from "react";
-import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform } from "react-native";
+import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text } from "react-native";
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import Text from '../common/customui/CustomText';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
 import * as Zendesk from 'react-native-zendesk-messaging';
@@ -136,11 +135,8 @@ const Support = () => {
                                 <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                             </View>
                         </View>
-                        <ScrollView style={{width:'100%',marginBottom:hp('36%'),padding: Padding.p_base}}
-                         ref={scrollViewRef}
-                        >
-                        <View >
-                        
+                        <ScrollView style={{width:'100%'}}>
+                        <View style={{ paddingBottom: 450 }}>
                         <View style={styles.issuesFlexBox}>
                             {items.map((item, index) => (
                                 <React.Fragment key={item.name}>
@@ -439,7 +435,7 @@ const Support = () => {
                         <View style={[styles.issuesFlexBox]} />
                         </View>
                         </ScrollView>
-                    </View>
+                        </View>
                 </View>
             
         </View>
@@ -583,15 +579,16 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     wereHereTo: {
-        fontSize: 22,
-        lineHeight: 28,
+        fontSize: FontSize.size_3xl,
         width: 210,
-        textAlign: "center",
-        color: Color.colorGray_100,
         fontFamily: FontFamily.openSansRegular,
+        color: Color.colorGray_200,
+        lineHeight: 28,
+        textAlign: "center",
     },
     wereHereToHelpWrapper: {
         justifyContent: "center",
+        overflow: 'hidden',
     },
     header: {
         alignSelf: "stretch",
@@ -708,9 +705,9 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     mainContainer: {
+        padding: Padding.p_base,
         alignItems: "center",
         alignSelf: 'stretch',
-        marginBottom: '20%',
     },
     support: {
         flex: 1,
