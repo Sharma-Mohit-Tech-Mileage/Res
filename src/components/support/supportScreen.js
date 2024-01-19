@@ -5,7 +5,7 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
 import * as Zendesk from 'react-native-zendesk-messaging';
-import PubSub from 'pubsub-js'
+import {DeviceEventEmitter} from "react-native"
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
@@ -70,18 +70,15 @@ const Support = () => {
         }
     ];
 
-    var mySubscriber = function (msg, data) {
-        console.log( msg, data );
-        scrollViewRef.current?.scrollToEnd({animated: true})
-    };
-    
-
     useEffect(() => {
-        var token = PubSub.subscribe('event.contactUsEvent', mySubscriber);
-    
+        DeviceEventEmitter.addListener("event.contactUsEvent", (eventData) => {
+           console.log('Callback',eventData)
+           scrollViewRef.current?.scrollToEnd({animated: true})
+        })
+
         initZendesk();
           return () => {
-            PubSub.unsubscribe(token);
+            DeviceEventEmitter.removeAllListeners("event.contactUsEvent")
           };
 
       }, []);
@@ -135,10 +132,8 @@ const Support = () => {
                                 <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                             </View>
                         </View>
-                        <ScrollView style={{width:'100%',marginBottom:hp('36%'),padding: Padding.p_base}}
-                         ref={scrollViewRef}
-                        >
-                        <View >
+                        <ScrollView style={{width:'100%'}}>
+                        <View style={{ paddingBottom: 450 }}>
                         <View style={styles.issuesFlexBox}>
                             {items.map((item, index) => (
                                 <React.Fragment key={item.name}>
@@ -437,7 +432,7 @@ const Support = () => {
                         <View style={[styles.issuesFlexBox]} />
                         </View>
                         </ScrollView>
-                    </View>
+                        </View>
                 </View>
             
         </View>
@@ -707,9 +702,9 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     mainContainer: {
+        padding: Padding.p_base,
         alignItems: "center",
         alignSelf: 'stretch',
-        marginBottom: '20%',
     },
     support: {
         flex: 1,
