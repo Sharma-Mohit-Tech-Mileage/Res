@@ -57,26 +57,11 @@ const SplashScreen = ({ navigation }) => {
   };
   
   const onSuccess = async (res) => {
-    setLoading(false);
-    console.log('onSuccess res: ', res);
-
-    let token = res.jwtToken;
-    let userInfo = res.userInfo;
-    let user = {
-      userInfo: userInfo,
-      token: token,
-      tokenGuid: res.idTokenGuid,
-      refreshToken: res.refreshToken
-    };
-
-    if (token) {
-      storeUser(user);
-    }
-      
+    setLoading(false);   
     handleLogin(res)
   };
 
- const handleLogin=async(res)=>{
+ const handleLogin = async (res) => {
     if (res) {
       let token = res.jwtToken;
       let userInfo = res.userInfo;
@@ -100,7 +85,7 @@ const SplashScreen = ({ navigation }) => {
             setModalVisible(true);
           }, 100);
         } else {
-
+          storeUser(user);
           dispatch(saveUserInfo(user));
           SetRenewTokenTimer();
 

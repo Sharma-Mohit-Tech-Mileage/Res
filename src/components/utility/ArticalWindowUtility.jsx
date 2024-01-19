@@ -20,10 +20,12 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const navigationChange = (navState) => {
         //https://customer.uat.sparklight.com/SecureLoginSSO/token/postlogout
         console.log('navigationChange: ', JSON.stringify(navState));
-        if (navState.url.includes('/postlogout')) {
-            RefreshToken();
-            userUpdate();
-            webViewRef.current.reload();
+        //https://login.uat.cableone.net/auth/realms/external-sso-realm
+        if (navState.url.includes('/postlogout')
+            || navState.url.includes('login.uat.cableone.net')) {
+                RefreshToken();
+                userUpdate();
+                webViewRef.current.reload();
         }
     }
 
