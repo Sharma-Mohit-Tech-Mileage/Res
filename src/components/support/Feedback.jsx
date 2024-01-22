@@ -176,9 +176,10 @@ const Feedback = () => {
                                         name="email"
                                         label={'Email'}
                                         onChangeText={handleInputChange}
-                                        onBlur={onBlur} // bind onBlur
                                         value={value} // bind value
                                         error={error?.message} // display error message
+                                        autoCorrect={false}  // Turn off auto-correction
+                                        autoComplete="off"  // Turn off auto-completion
                                     />
                                 </>
                             )}
