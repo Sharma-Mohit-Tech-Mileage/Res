@@ -205,25 +205,54 @@ const HomeScreen = ({ route, navigation }) => {
     checkNotifications();
    
 
+    // const backAction = () => {
+    //   Alert.alert(
+    //     "Confirm Exit",
+    //     "Are you sure you want to exit the app kapil?",
+    //     [
+    //       {
+    //         text: "Cancel",
+    //         onPress: () => null,
+    //         style: "cancel",
+    //       },
+    //       {
+    //         text: "Exit",
+    //         onPress: () => BackHandler.exitApp(),
+    //       },
+    //     ],
+    //     { cancelable: false }
+    //   );
+    //   return true;
+    // };
+
     const backAction = () => {
+      // Check if there's a screen to go back to
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+        return true; // Prevents the default back action (closing the app)
+      }
+
+      // No more screens to go back to, so show an exit confirmation dialog
       Alert.alert(
-        "Confirm Exit",
-        "Are you sure you want to exit the app?",
+        "Exit App", // Alert Title
+        "Do you want to exit the app?", // Alert Message
         [
           {
             text: "Cancel",
-            onPress: () => null,
-            style: "cancel",
+            onPress: () => null, // Does nothing, just closes the alert
+            style: "cancel"
           },
           {
-            text: "Exit",
-            onPress: () => BackHandler.exitApp(),
-          },
+            text: "Yes",
+            onPress: () => BackHandler.exitApp() // Exits the app
+          }
         ],
-        { cancelable: false }
+        { cancelable: false } // Prevents the alert from being dismissed by tapping outside of it
       );
-      return true;
+
+      return true; // Prevents the default back action (since we're handling it)
     };
+
 
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
