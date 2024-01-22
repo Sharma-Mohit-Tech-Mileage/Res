@@ -30,9 +30,10 @@ import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { SetRenewTokenTimer, SetClearTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
+import { Env } from "../../network/apis/account/Constants";
 
 const config = {
-  issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
+  issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
   redirectUrl:
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
@@ -50,6 +51,7 @@ const SplashScreen = ({ navigation }) => {
   const [data, setData] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage1, setErrorMessage1] = useState("");
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -91,11 +93,13 @@ const SplashScreen = ({ navigation }) => {
         setDisconnected(true)
        } else if (userInfo.authLevel==='Limited') {
           setErrorMessage(strings.nonAdminUserMsg);
+          setErrorMessage1(' to view information.')
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
         } else if (res.custServices.internet==false) {
           setErrorMessage(strings.nonInternetUserMessage);
+          setErrorMessage1(' to manage your service.')
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
@@ -119,7 +123,7 @@ const SplashScreen = ({ navigation }) => {
     setDisconnected(true)
   };
 
-  const CustomAlertModal = ({ visible, message, onClose }) => {
+  const CustomAlertModal = ({ visible, message,message2, onClose }) => {
     return (
       <Modal
         visible={visible}
@@ -146,8 +150,11 @@ const SplashScreen = ({ navigation }) => {
             <View
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
             />
-            <Text style={styles.message}>{message}</Text>
-            <TouchableOpacity
+            <Text style={styles.message}>{message}
+            <Text style={[styles.message,{fontWeight:600,color:colors.sparklight_purple_blue}]}>Please login to your online account</Text>
+            {message2}
+            </Text>
+            {/* <TouchableOpacity
               style={styles.openBtn}
               onPress={() => {
                 Linking.openURL("https://customer.uat.sparklight.com/SecureLogin/login.aspx");
@@ -159,7 +166,7 @@ const SplashScreen = ({ navigation }) => {
               >
                 Open Portal
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity
               style={styles.closeBtn}
@@ -278,6 +285,7 @@ const SplashScreen = ({ navigation }) => {
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
+        message2={errorMessage1}
         onClose={handleCloseAlert}
       />   
       <CustomerDisconnectPage

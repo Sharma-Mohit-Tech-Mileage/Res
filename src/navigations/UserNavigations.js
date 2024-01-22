@@ -13,12 +13,12 @@ const Stack = createNativeStackNavigator();
 
 const UserNavigations = (props) => {
   return (
-    <NavigationContainer>
+    <NavigationContainer >
       <Stack.Navigator>
         <Stack.Screen
           name="Splash"
           component={SplashScreen}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, gestureEnabled: false}}
         />
         <Stack.Screen
           name="EntryEmailNotifications"
