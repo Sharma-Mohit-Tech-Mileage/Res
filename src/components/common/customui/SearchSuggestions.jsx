@@ -34,7 +34,7 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
                     marginRight: 18, width: 13.333,
                     height: 16.667 }}
             />
-            <Text style={styles.suggestionText}>{item.title}</Text>
+            <Text maxFontSizeMultiplier={1.25} style={styles.suggestionText}>{item.title}</Text>
             <Image
                 source={require('../../../../assets/right-actionable10.png')}
             />
@@ -49,6 +49,7 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
                 style={[styles.searchIcon, styles.leftIcon]}
             />
             <TextInput
+                    maxFontSizeMultiplier={1.25}
                     ref={inputRef}
                     style={styles.searchInput}
                     placeholder={placeholder}
