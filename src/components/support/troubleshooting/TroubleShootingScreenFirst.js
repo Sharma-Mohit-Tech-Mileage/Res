@@ -19,6 +19,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import colors from "../../../res/Colors";
+import SystemIcon from "../../../res/svgIcons/troubleshooting/SystemIcon";
 
 
 const TroubleshootingFirst = () => {
@@ -38,6 +39,7 @@ const TroubleshootingFirst = () => {
       />
       <ScrollView>
         <View style={[styles.card, { flexDirection: "column" }]}>
+            <SystemIcon/>
           <Text style={styles.questions}>{msg1}</Text>
 
           <Text style={[styles.questions, { fontWeight: "400" }]}>{msg2}</Text>

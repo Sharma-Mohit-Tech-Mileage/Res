@@ -6,14 +6,15 @@ import {
   TouchableOpacity,
   Image,
   Modal,
+  Linking
 } from "react-native";
 import colors from "../../res/Colors";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
-import warningIcon from '../../../assets/alert-triangle.png';
+import warningIcon from "../../../assets/alert-triangle.png";
 
-import logo from '../../../assets/sparklightlogo-01.png';
+import logo from "../../../assets/sparklightlogo-01.png";
 
-const CustomerDisconnectPage = ({ visible, onLogin }) => {
+const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
   const [msg1, setMsg1] = useState(
     "Sign in to pay your bill online, submit support tickets and much more."
   );
@@ -30,32 +31,45 @@ const CustomerDisconnectPage = ({ visible, onLogin }) => {
     >
       <View style={styles.overlay}>
         <View style={styles.alertContainer}>
-          <View
-            style={{ flexDirection: 'column', }}
-          >
-            <Image source={logo} style={{width:200,height:50, alignSelf:'center'}} resizeMode='contain' />
-              
-             
-            
+          <View style={{ flexDirection: "column" }}>
+            <Image
+              source={logo}
+              style={{ width: 200, height: 50, alignSelf: "center" }}
+              resizeMode="contain"
+            />
           </View>
           <Text style={styles.alertTitle}>Customer Login</Text>
-          
-          <Text style={[styles.message,{fontSize:16}]}>{msg1}</Text>
-           <View style={{flexDirection:'row',marginTop:10}}>
-           <Image source={warningIcon} style={{width:24,height:24}} />
-                    <Text style={{textAlign:'center', marginLeft:5, alignSelf:'center', fontWeight:'600',fontFamily:FontFamily.openSansSemiBold}}>We're sorry!</Text>
-           </View>
+
+          <Text style={[styles.message, { fontSize: 16 }]}>{msg1}</Text>
+          <View style={{ flexDirection: "row", marginTop: 10 }}>
+            <Image source={warningIcon} style={{ width: 24, height: 24 }} />
+            <Text
+              style={{
+                textAlign: "center",
+                marginLeft: 5,
+                alignSelf: "center",
+                fontWeight: "600",
+                fontFamily: FontFamily.openSansSemiBold,
+              }}
+            >
+              We're sorry!
+            </Text>
+          </View>
           <Text style={styles.message}>{msg2}</Text>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.openBtn}
             onPress={() => {
-              onLogin()
+              Linking.openURL(
+                "https://customer.uat.sparklight.com/SecureLogin/login.aspx"
+              );
             }}
           >
-            <Text style={styles.openPortaltxt}>Sign in</Text>
-          </TouchableOpacity>
+            <Text style={styles.openPortaltxt}>Open Portal</Text>
+          </TouchableOpacity> */}
 
-          
+          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+            <Text style={styles.closeAlertTxt}>Close</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -120,10 +134,10 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontSize: 22,
     fontWeight: "600",
-    marginTop:20
+    marginTop: 20,
   },
   openBtn: {
-    backgroundColor: colors.sparklight_yellow,
+    backgroundColor: colors.sparklight_purple_blue,
     justifyContent: "center",
     width: "100%",
     marginTop: 20,
@@ -135,7 +149,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   openPortaltxt: {
-    color: colors.darkest_grey,
+    color: colors.snow_white,
     textAlign: "center",
     padding: 8,
     fontSize: 16,

@@ -24,7 +24,7 @@ import debounce from "lodash.debounce";
 const Search = ({ navigation }) => {
   const [input, setInput] = useState("");
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
-  const [allSearchList, setAllSearchList] = useState([]);
+  const [noData, setNoData] = useState([{id:'1234',title:'No results found.',html_url:''}]);
   const [isFirstPageReceived, setIsFirstPageReceived] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [pageNo, setPageNo] = useState(1);
@@ -39,9 +39,15 @@ const Search = ({ navigation }) => {
         try {
           if (res) {
             console.log(`Search page no ${res.page} and total page ${res.page_count}`)
+            
             if (query.trim() && query.length > 0) {
               setTotalPage(res.page_count)
-              const data = filteredSuggestions.concat(res.results);
+              var data = filteredSuggestions.concat(res.results);
+             // console.log('Data',data)
+              if(data.length===0){
+                data=[...noData]
+                
+              }
               
               setFilteredSuggestions(data);
             } else {
@@ -50,6 +56,8 @@ const Search = ({ navigation }) => {
 
             //setIsLoading(false)
             //setPageNo(pageNo+1)
+          }else{
+            console.log('No Data')
           }
         } catch (e) {}
       },

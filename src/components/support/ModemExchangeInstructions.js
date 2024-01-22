@@ -20,7 +20,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import {DeviceEventEmitter} from "react-native"
+import PubSub from 'pubsub-js'
 
 const ModemExchangeInstructions = () => {
   const navigation = useNavigation();
@@ -35,7 +35,7 @@ If you suspect that your modem is not functioning properly, please `
 
   React.useEffect(() => {
     return () => {
-        DeviceEventEmitter.removeAllListeners("event.contactUsEvent")
+       
       };
     }, []);
 
@@ -68,8 +68,10 @@ If you suspect that your modem is not functioning properly, please `
             <Text style={styles.text}>
             {inst1}
             <Text style={[styles.textContactUs,{fontWeight:"700"}]} onPress={()=>{
-               // DeviceEventEmitter.emit("event.contactUsEvent", {name:'Contact US'});
-                navigation.navigate('support')
+                PubSub.publish('event.contactUsEvent', {});
+                setTimeout(()=>{
+                    navigation.navigate('support')
+                  },500)
             }}>contact us</Text>{inst2}
               </Text>
           

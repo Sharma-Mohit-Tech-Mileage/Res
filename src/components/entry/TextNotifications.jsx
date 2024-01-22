@@ -83,7 +83,7 @@ const TextNotifications = ({ navigation }) => {
 
     const onCheckBox = (value) => {
         setToggleCheckBox(value);
-        if (value && input.length > 0) {
+        if (value && input !== undefined && input.length > 0) {
             setEnableButton(true);
         } else {
             setEnableButton(false);

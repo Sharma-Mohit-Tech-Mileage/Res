@@ -30,9 +30,10 @@ import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { SetRenewTokenTimer, SetClearTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
+import { Env } from "../../network/apis/account/Constants";
 
 const config = {
-  issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
+  issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
   redirectUrl:
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
@@ -45,10 +46,12 @@ const config = {
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [loginEnable, setLoginEnable] = useState(true);
   const [disconnected, setDisconnected] = useState(false);
   const [data, setData] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage1, setErrorMessage1] = useState("");
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -56,26 +59,11 @@ const SplashScreen = ({ navigation }) => {
   };
   
   const onSuccess = async (res) => {
-    setLoading(false);
-    console.log('onSuccess res: ', res);
-
-    let token = res.jwtToken;
-    let userInfo = res.userInfo;
-    let user = {
-      userInfo: userInfo,
-      token: token,
-      tokenGuid: res.idTokenGuid,
-      refreshToken: res.refreshToken
-    };
-
-    if (token) {
-      storeUser(user);
-    }
-      
+    setLoading(false);   
     handleLogin(res)
   };
 
- const handleLogin=async(res)=>{
+ const handleLogin = async (res) => {
     if (res) {
       let token = res.jwtToken;
       let userInfo = res.userInfo;
@@ -90,16 +78,18 @@ const SplashScreen = ({ navigation }) => {
         setDisconnected(true)
        } else if (userInfo.authLevel==='Limited') {
           setErrorMessage(strings.nonAdminUserMsg);
+          setErrorMessage1(' to view information.')
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
         } else if (res.custServices.internet==false) {
           setErrorMessage(strings.nonInternetUserMessage);
+          setErrorMessage1(' to manage your service.')
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
         } else {
-
+          storeUser(user);
           dispatch(saveUserInfo(user));
           SetRenewTokenTimer();
 
@@ -115,9 +105,10 @@ const SplashScreen = ({ navigation }) => {
   const onError = (error) => {
     console.log(" callSSOLoginApi error", error);
     setLoading(false);
+    setDisconnected(true)
   };
 
-  const CustomAlertModal = ({ visible, message, onClose }) => {
+  const CustomAlertModal = ({ visible, message,message2, onClose }) => {
     return (
       <Modal
         visible={visible}
@@ -144,8 +135,11 @@ const SplashScreen = ({ navigation }) => {
             <View
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
             />
-            <Text style={styles.message}>{message}</Text>
-            <TouchableOpacity
+            <Text style={styles.message}>{message}
+            <Text style={[styles.message,{fontWeight:600,color:colors.sparklight_purple_blue}]}>Please login to your online account</Text>
+            {message2}
+            </Text>
+            {/* <TouchableOpacity
               style={styles.openBtn}
               onPress={() => {
                 Linking.openURL("https://customer.uat.sparklight.com/SecureLogin/login.aspx");
@@ -157,7 +151,7 @@ const SplashScreen = ({ navigation }) => {
               >
                 Open Portal
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity
               style={styles.closeBtn}
@@ -191,7 +185,7 @@ const SplashScreen = ({ navigation }) => {
         idTokenGuid: result.authorizeAdditionalParameters.session_state,
         refreshToken: result.refreshToken
       };
-
+      
       setLoading(true);
       //dispatch(ssoLoginAction(data))
       callSSOLoginApi(data);
@@ -259,7 +253,13 @@ const SplashScreen = ({ navigation }) => {
             <TouchableOpacity
               style={styles.SSoBtnContainer}
               onPress={() => {
-                loginAuth();
+                if(loginEnable){
+                  setLoginEnable(false)
+                   loginAuth();
+                   setTimeout(()=>{
+                    setLoginEnable(true)
+                   },1500)
+                }
               }}
             >
               <Text style={styles.SSoBtn}>Login</Text>
@@ -270,6 +270,7 @@ const SplashScreen = ({ navigation }) => {
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
+        message2={errorMessage1}
         onClose={handleCloseAlert}
       />   
       <CustomerDisconnectPage
@@ -277,6 +278,9 @@ const SplashScreen = ({ navigation }) => {
       onLogin={()=>{
         setDisconnected(false)
         loginAuth();
+      }}
+      onClose={()=>{
+        setDisconnected(false)
       }}
       />
     </LinearGradient>
