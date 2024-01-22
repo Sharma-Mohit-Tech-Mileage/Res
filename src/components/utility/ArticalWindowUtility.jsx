@@ -5,6 +5,7 @@ import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
 import { getUser } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
+import { isUserAuthorized } from "../../network/APIClient";
 
 const { width, height } = Dimensions.get('window');
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -13,38 +14,62 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [name, setTitle] = useState(route.params?.name);
     const [isError, setIsError] = useState(false);
     const [url, setUrl] = useState(route.params?.url);
+    const [localUser, setLocalUser] = useState({});
     const [modalOpen, setModalOpen] = useState(true);
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
+    
 
-    const navigationChange = (navState) => {
+    const navigationChange = async (navState) => {
         //https://customer.uat.sparklight.com/SecureLoginSSO/token/postlogout
         console.log('navigationChange: ', JSON.stringify(navState));
         //https://login.uat.cableone.net/auth/realms/external-sso-realm
         if (navState.url.includes('/postlogout')
             || navState.url.includes('login.uat.cableone.net')) {
-                RefreshToken();
-                userUpdate();
-                webViewRef.current.reload();
+                //isUserAuthorized(false);
+                await RefreshToken();
+                // let userLocal = await getUser();
+                // console.log('GetUserNavigationChange: ', userLocal.token);
+                await userUpdate();
+                
         }
     }
 
-    const userUpdate = () => {
-        if (user.token !== undefined) {
+    const userUpdate = async () => {
+        const userLocal = await getUser();
+        setLocalUser(userLocal);
+        console.log('userLocal.token: ', userLocal.token);
+        if (userLocal.token !== undefined) {
+            console.log('UserUpdate: ', userLocal.token);
             const SAVE_FROM_RN = `(function() {
-                localStorage.setItem('jwt_token', '${user.token}');
-                localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
+                localStorage.setItem('jwt_token', '${userLocal.token}');
+                localStorage.setItem('user_info', '${JSON.stringify(userLocal.userInfo)}');
               })();`;        
           
             setInitScript(SAVE_FROM_RN);
+            webViewRef.current.reload();
         }
     }
+
+    useEffect(() => {
+        console.log('LocalUserToken:', localUser.token);
+    }, [localUser]);     
 
     // Reset progress and error states when URL changes or modal closes
     useEffect(() => {
         setProgress(0);
         setIsError(false);
     }, [url, name, modalOpen]);
+
+    // useEffect(() => {
+    //     webViewRef.current.reload();
+    // }, [initScript]);    
+
+    // useEffect(()=>{
+    //     console.log('home.user.token: ', user.token);
+    //     userUpdate();
+    //     webViewRef.current.reload();        
+    // }, [user.token])  
 
     // Optionally, if you want to reset state when the modal is re-opened
     useEffect(() => {

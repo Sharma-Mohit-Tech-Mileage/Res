@@ -27,7 +27,7 @@ import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
 import { getUser, getPushNotificationStatus, storePushNotificationStatus } from "../../redux/utils/LocalStorage";
-import { GetApiRequest } from "../../network/APIClient";
+import { GetApiRequest, UserAuthorized } from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
@@ -37,6 +37,7 @@ import {
 } from '../../firebase/FirebaseUtils';
 import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
 import { useSelector, useDispatch } from 'react-redux';
+import { RefreshToken } from '../user/Session';
 
 const HomeScreen = ({ route, navigation }) => {
   // const { email, name } = {
@@ -238,6 +239,19 @@ const HomeScreen = ({ route, navigation }) => {
     setCurrentHealth('Offline')
    }
   },[accountStatus])
+
+  useEffect(() => {
+    console.log('HomeUserAuthorized: ', UserAuthorized);
+    if (!UserAuthorized) {
+      RefreshToken()
+      console.log('UserAuthorizedRefreshToken');
+      console.log('User')
+    }
+  }, [UserAuthorized]);
+
+  // useEffect(()=>{
+  //   console.log('home.user.token: ', user.token);
+  // }, [user.token])  
 
   const OutageAlert=({estimatedTime})=>{
     return(

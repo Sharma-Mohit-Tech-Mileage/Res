@@ -5,6 +5,12 @@ const BASE_URL = 'https://customer.uat.sparklight.com/apiWrapper/'
 //const BASE_URL_AUTH="https://customer.uat.cableone.net/apiWrapper/"
 const SUPPORT_URL="https://support.sparklight.com/api/v2/help_center/"
 
+export let UserAuthorized = false;
+
+export const isUserAuthorized = (authorize) => {
+    UserAuthorized = authorize;
+}
+
 export const PostAuthApiRequest=(endpoint, body, onSuccess, onError)=>{
     const idTokenGuid = body.idTokenGuid;
     const refreshToken = body.refreshToken;
@@ -63,27 +69,26 @@ fetch(`${BASE_URL}/${endpoint}`, {
 
 }
 
-
-
-
 export const GetApiRequest= async(endpoint, onSuccess,onError)=>{
  const user= await getUser()
 fetch(`${BASE_URL}/${endpoint}`, {
-    method: 'GET',
-    headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${user.token}` // Not always needed with a GET request
-    }
-})
-    .then(response => Promise.all([response, response.json()]))
-    .then(([response, json]) => {
-        //console.log('response', response);
-        if (!response.ok) { // We should get a 200 (OK) status code if everything is fine/working
-            throw Error(`Respsonse status ${response.status} (${response.statusText}): ${json.message}`);
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.token}` // Not always needed with a GET request
         }
-        //console.log("Response",json);
-        onSuccess(json)
-        // Whatever you want to do next after fetching - maybe dispatch something?
+    })
+    .then(response => {
+        if (response.status === 401) {
+            isUserAuthorized(false);
+            throw Error(`Response status ${response.status} (${response.statusText})`);
+        } else {
+            return response.json();
+        }     
+    })
+    .then(([response, json]) => {
+        isUserAuthorized(true);
+        onSuccess(json);
     })
     .catch(exception => {
         onError(exception.message)

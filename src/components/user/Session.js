@@ -33,6 +33,7 @@ const renewToken = async () => {
 }
 
 const onSuccess = async (res) => {
+    console.log('onSuccess: ', res);
     if (res) {
         let token = res.jwtToken;
         let userInfo = res.userInfo;
@@ -72,6 +73,7 @@ export const SetClearTimer = () => {
 }
 
 export const RefreshToken = async () => {
+    console.log('RefreshToken');
     try {
         const user = await getUser();
         const result = await refresh(config, {
