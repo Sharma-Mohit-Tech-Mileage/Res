@@ -26,7 +26,7 @@ const Notifications = () => {
   const isEmailVerified = emailStatus === 'Verified';
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   const isFreshEntry = (entry) => {
-    
+
     return !(
       entry.emailAddress !== "" &&
       entry.paperlessStatus === "InActive" &&
@@ -50,7 +50,14 @@ const Notifications = () => {
     else {
       isDisabled = true;
       notificationsTitle = "No email address on file";
-      infoText = "We don’t have your email address on file. Go to Profile Settings to add your email.";
+      infoText = (
+        <Text>
+          We don’t have your email address on file. Go to
+          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('ProfileSettings') }}>
+            {' Profile Settings '}
+          </Text>
+          to add your email.
+        </Text>)
     }
   }
   useEffect(() => {
@@ -95,7 +102,13 @@ const Notifications = () => {
             setShowSuccessAlert={() => setShowSuccessAlert(false)}
             isDisabled={!data.phoneNum}
             notificationsTitle="No mobile phone number on file"
-            infoText={data.phoneNum ? `Text alerts are sent to ` : 'We don’t have your mobile phone number on file. Go to Profile Settings to add your phone number.'}
+            infoText={data.phoneNum ? `Text alerts are sent to ` : (<Text>
+              We don’t have your mobile phone number on file. Go to
+              <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('ProfileSettings') }}>
+                {' Profile Settings '}
+              </Text>
+              to add your phone number.
+            </Text>)}
             number={data.phoneNum}
             transformedData={data}
             navigationTarget="TextNotifications"
@@ -115,7 +128,7 @@ const Notifications = () => {
             email={paperLessInfo.emailAddress}
             navigationTarget="EmailNotifications"
             transformedData={{ status: paperLessInfo?.paperlessStatus === 'Active', email: profileDetails.svEmailAddress, isNew: isFreshEntry(paperLessInfo) }}
-            additionalSettings={[{ type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off'}]}
+            additionalSettings={[{ type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off' }]}
             isAdmin={!isPrimary}
           />
           <View style={{ marginBottom: Padding.p_base }} />
