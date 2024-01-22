@@ -43,7 +43,16 @@ const Notifications = () => {
     if (profileDetails.multipleEmails) {
       isDisabled = true;
       notificationsTitle = "There is a problem retrieving your email address";
-      infoText = "We are not able to retrieve the email address for your account. Please contact us for assistance";
+      infoText = 
+      (
+        <Text>
+          We are not able to retrieve the email address for your account. Please
+          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('support') }}>
+            {' contect us '}
+          </Text>
+          for assistance.
+        </Text>)
+
     } else if (profileDetails.svEmailAddress) {
       isDisabled = false;
     }
