@@ -15,6 +15,7 @@ import {
 import Wallet2icon from "../../res/svgIcons/Wallet2icon";
 import Myplanicon from "../../res/svgIcons/Myplanicon";
 import { FontFamily } from "../../../GlobalStyles";
+import { Env } from "../../network/apis/account/Constants";
 
 const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
   //const [billAmt,setBillAmt]=useState(0)
@@ -155,7 +156,7 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
-              url: "https://customer.uat.sparklight.com/residential/services/upgrade",
+              url: `${Env.URL}/residential/services/upgrade`,
               name: "Upgrade Plan",
             });
             //Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')

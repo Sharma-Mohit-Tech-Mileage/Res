@@ -1,8 +1,8 @@
 import React from "react";
 import { getUser } from "../redux/utils/LocalStorage";
+import { Env } from "./apis/account/Constants";
 
-const BASE_URL = 'https://customer.uat.sparklight.com/apiWrapper/' 
-//const BASE_URL_AUTH="https://customer.uat.cableone.net/apiWrapper/"
+const BASE_URL = Env.API_BASEURL
 const SUPPORT_URL="https://support.sparklight.com/api/v2/help_center/"
 
 export const PostAuthApiRequest=(endpoint, body, onSuccess, onError)=>{
@@ -11,7 +11,7 @@ export const PostAuthApiRequest=(endpoint, body, onSuccess, onError)=>{
     
     delete body.idTokenGuid;
     delete body.refreshToken;
-
+    console.log('API URL',BASE_URL)
     fetch(`${BASE_URL}/${endpoint}`, {
         method: 'POST',
         headers: {
@@ -37,6 +37,7 @@ export const PostAuthApiRequest=(endpoint, body, onSuccess, onError)=>{
 
 export const PostApiRequest=(endpoint,body, onSuccess,onError)=>{
 // Example POST request
+console.log('API URL',BASE_URL)
 fetch(`${BASE_URL}/${endpoint}`, {
     method: 'GET',
     headers: {
@@ -68,6 +69,7 @@ fetch(`${BASE_URL}/${endpoint}`, {
 
 export const GetApiRequest= async(endpoint, onSuccess,onError)=>{
  const user= await getUser()
+ console.log('API URL',BASE_URL)
 fetch(`${BASE_URL}/${endpoint}`, {
     method: 'GET',
     headers: {

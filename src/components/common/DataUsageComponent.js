@@ -5,6 +5,7 @@ import colors from "../../res/Colors";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
 import { getUser } from "../../redux/utils/LocalStorage";
+import { Env } from "../../network/apis/account/Constants";
 const DataUsageComponent = ({navigation}) => {
  const [account,setAccount]=useState('')
   useEffect(() => {
@@ -89,7 +90,7 @@ const DataUsageComponent = ({navigation}) => {
       <View style={{ backgroundColor: colors.grey, height: 1, marginVertical: 10 }} />
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name: 'Upgrade Plan' })
+          navigation.navigate('ArticalWindowUtility', { url: `${Env.URL}/residential/services/upgrade`, name: 'Upgrade Plan' })
           //Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
         }}
         style={{
