@@ -270,17 +270,10 @@ const HomeScreen = ({ route, navigation }) => {
   },[accountStatus])
 
   useEffect(() => {
-    console.log('HomeUserAuthorized: ', UserAuthorized);
     if (!UserAuthorized) {
-      RefreshToken()
-      console.log('UserAuthorizedRefreshToken');
-      console.log('User')
+      RefreshToken();
     }
   }, [UserAuthorized]);
-
-  // useEffect(()=>{
-  //   console.log('home.user.token: ', user.token);
-  // }, [user.token])  
 
   const OutageAlert=({estimatedTime})=>{
     return(
