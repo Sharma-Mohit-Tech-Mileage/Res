@@ -76,7 +76,7 @@ const ManageEquipment = () => {
     return (
         <View style={styles.manageEquipment}>
             <ProfileSettingsHeader
-                title="Manage Equipment "
+                title="Manage Equipment"
                 onPressBack={() => navigation.navigate('support')}
             />
             <ScrollView>
@@ -148,7 +148,7 @@ const ManageEquipment = () => {
                             <View style={[styles.frameLayout]} />
                             <TouchableOpacity style={[styles.frame9defaultSpaceBlock]} 
                             onPress={()=>{
-                                navigation.navigate('ModemExchange')
+                                navigation.navigate("ModemExchange")
                             }}>
                                 <Image
                                 style={{ width: 20, height: 20, flexShrink: 0 }}
@@ -176,7 +176,7 @@ const ManageEquipment = () => {
                             <View style={[styles.frameLayout]} />
                             <TouchableOpacity style={[styles.frame9defaultSpaceBlock]}
                             onPress={()=>{
-                                navigation.navigate('ModemRebootScreen')
+                                navigation.navigate("ModemRebootScreen")
                             }} >
                                 <Image
                                 style={{ width: 20, height: 20, flexShrink: 0 }}
