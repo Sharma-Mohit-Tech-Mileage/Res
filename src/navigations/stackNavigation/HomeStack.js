@@ -15,9 +15,7 @@ function HomeStackScreen() {
     
     return (
         <HomeStack.Navigator initialRouteName="Dashboard" 
-        defaultNavigationOptions= {{
-            gestureEnabled: false
-          }}
+        
         >
             <HomeStack.Screen
                 name="Dashboard"

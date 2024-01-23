@@ -23,7 +23,7 @@ import {
 } from "react-native-responsive-screen";
 import VersionCheck from 'react-native-version-check';
 const config = {
-  issuer: 'https://login.uat.cableone.net/auth/realms/external-sso-realm',
+  issuer: 'https://login.cableone.net/auth/realms/external-sso-realm',
   iosPrefersEphemeralSession: true,
 };
 
