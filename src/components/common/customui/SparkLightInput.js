@@ -52,6 +52,7 @@ const SparkLightInput = ({
                     !isFocused && !error && { borderColor: Color.sparklightDarkGray }
                 ]}
                 accessibilityLabel={accessibilityLabel || placeholder}
+                maxFontSizeMultiplier={1.25}
                 {...props}
             />
             {error && (

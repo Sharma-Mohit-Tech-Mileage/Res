@@ -82,7 +82,7 @@ function* getPushNotifications(action) {
     }
 }
 
-function* updateExistingEmailNotification(action) {
+function* updateNewEmail(action) {
     try {
         const response = yield call(postEmailNotification, action.payload);
         if (action.navigation !== null) {
@@ -192,7 +192,6 @@ function* updatePushNotifications(action) {
     }
 }
 function* updatePushNotificationsV2(action) {
-    console.log('updatePushNotification v2 paayload==========================================: ', action.payload);
     try {
         yield call(postPushNotifications, action.payload);
         if (action.navigation !== null) {
@@ -242,6 +241,6 @@ function* ProfileSagas() {
     yield takeLatest(UNSUBSCRIBE_PAPERLESS, unsubscribPaperLessSaga);
     yield takeLatest(SAVE_USER_FEEDBACK, saveUserFeedBack);
     yield takeLatest(UPDATE_ENTRY_EMAIL_NOTIFICATION, updateEntryEmailNotification);
-    yield takeLatest(UPDATE_EXISTING_EMAIL_NOTIFICATION, updateExistingEmailNotification);
+    yield takeLatest(UPDATE_EXISTING_EMAIL_NOTIFICATION, updateNewEmail);
 }
 export default ProfileSagas;

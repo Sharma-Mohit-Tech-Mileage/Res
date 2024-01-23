@@ -298,25 +298,63 @@ const unsubscribPaperLess = async () => {
     }
 };
 
+// const handleSubmitFeedback = async (obj) => {
+//     const zendeskRequestApiUrl = 'https://cableone.zendesk.com/api/v2/requests.json';
+//     let user = await getUser();
+//     const fullName = user.userInfo?.fullName;
+//     const payload = {
+//         request: {
+//             ticket_form_id: "360000052934",
+//             requester: {
+//                 name: fullName,
+//                 email: obj.email
+//             },
+//             recipient: "400018994093",
+//             assignee_id: "400018994093",
+//             group_id: "360000672214",
+//             type: null,
+//             custom_fields: [
+//                 { id: "360022798993", value: obj.category },
+//                 { id: "1900000846365", value: obj.feedbackValue },
+//                 { id: "36003617614", value: obj.email }
+//             ],
+//             subject: "Residential MobileApp Feedback",
+//             comment: {
+//                 body: obj.feedbackText,
+//                 uploads: null
+//             },
+//             tags: ["Feedback", "Residential", "MobileApp"],
+//             via: { channel: "MobileApp" }
+//         }
+//     };
+//     console.log('PAYLOAD====================', payload);
+//     try {
+//         const response = await axios.post(zendeskRequestApiUrl, payload);
+//         return response;
+//     } catch (error) {
+//         throw error;
+//     }
+// };
+
 const handleSubmitFeedback = async (obj) => {
-    const zendeskRequestApiUrl = 'https://cableone.zendesk.com/api/v2/requests.json';
+    const zendeskRequestApiUrl = 'https://cableone1615402851.zendesk.com/api/v2/requests.json';
     let user = await getUser();
     const fullName = user.userInfo?.fullName;
     const payload = {
         request: {
-            ticket_form_id: "360000052934",
+            ticket_form_id: "1500000315922",
             requester: {
                 name: fullName,
                 email: obj.email
             },
-            recipient: "400018994093",
-            assignee_id: "400018994093",
-            group_id: "360000672214",
+            recipient: "1503384311321",
+            assignee_id: "1503384311321",
+            group_id: "360017953054",
             type: null,
             custom_fields: [
-                { id: "360022798993", value: obj.category },
-                { id: "1900000846365", value: obj.feedbackValue },
-                { id: "36003617614", value: obj.email }
+                { id: "1500002176201", value: obj.category },
+                { id: "18708581262999", value: obj.feedbackValue },
+                { id: "1500002222302", value: obj.email }
             ],
             subject: "Residential MobileApp Feedback",
             comment: {
