@@ -22,8 +22,10 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import VersionCheck from 'react-native-version-check';
+import { Env } from "../../network/apis/account/Constants";
+
 const config = {
-  issuer: 'https://login.cableone.net/auth/realms/external-sso-realm',
+  issuer: Env.SSO_LOGIN,
   iosPrefersEphemeralSession: true,
 };
 
