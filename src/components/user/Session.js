@@ -28,35 +28,11 @@ let timer = 0;
 
 const renewToken = async () => {
     loop = setTimeout(async () => {
-        try {
-            const user = await getUser();
-            console.log('getUser: ', user);
-
-            const result = await refresh(config, {
-                refreshToken: user.refreshToken,
-            });
-
-            console.log('result: ', JSON.stringify(result));
-
-            const data = { 
-                idToken: result.idToken,
-                accessToken: result.accessToken,
-                idTokenGuid: result.additionalParameters.session_state,
-                refreshToken: result.refreshToken
-            };
-            PostAuthApiRequest("/mobile/api/gettoken", data, onSuccess, onError);
-        } catch (error) {
-            console.error("Error fetching data", error);
-        }
-    }, 10000);
+        await RefreshToken();
+    }, 900000);
 }
 
 const onSuccess = async (res) => {
-    // const dispatch = useDispatch();
-    //const dispatch = useDispatch();
-
-    console.log('onSuccess in Session res: ', res);
-
     if (res) {
         let token = res.jwtToken;
         let userInfo = res.userInfo;
@@ -74,7 +50,7 @@ const onSuccess = async (res) => {
         saveUserInfo(user);
 
         console.log('setTimeout: ', timer);
-        timer = timer + 10000;
+        timer = timer + 900000;
         if (loopContinue) {
             renewToken();
         }        
@@ -95,4 +71,21 @@ export const SetClearTimer = () => {
     clearTimeout(loop);
 }
 
+export const RefreshToken = async () => {
+    try {
+        const user = await getUser();
+        const result = await refresh(config, {
+            refreshToken: user.refreshToken,
+        });
+        const data = { 
+            idToken: result.idToken,
+            accessToken: result.accessToken,
+            idTokenGuid: result.additionalParameters.session_state,
+            refreshToken: result.refreshToken
+        };
+        PostAuthApiRequest("/mobile/api/gettoken", data, onSuccess, onError);
+    } catch (error) {
+        console.error("Error fetching data", error);
+    }
+}
     

@@ -50,13 +50,26 @@ const TextNotifications = ({ navigation }) => {
     }, [keyboardHidden]);     
 
     useEffect(() => {
-        if (profile.paperlessStatus) {
-            setNextScreen('MyTab');                      
+        if (profile.paperLessInfo !== undefined
+            && profile.paperLessInfo.accountNumber !== undefined
+            && profile.paperLessInfo.accountNumber.length > 0
+            && profile.paperLessInfo.paperlessStatus !== undefined
+            && (profile.paperLessInfo.paperlessStatus.toLowerCase() === 'approved'
+                || profile.paperLessInfo.paperlessStatus.toLowerCase() === 'active')
+            ) {
+                setNextScreen('MyTab');                      
         }
     }, []); 
 
     useEffect(() => {
-        setInput(user.phone);
+        if (profile.smsSubscription.length > 0) {
+            if (profile.smsSubscription[0].phoneNum !== undefined
+                && profile.smsSubscription[0].phoneNum.length > 0) {
+                setInput(profile.smsSubscription[0].phoneNum.substring(1));
+            }
+        } else {
+            setInput(user.userInfo.phone);
+        }
     }, []);  
 
     const onChangeText = (text) => {
@@ -96,21 +109,6 @@ const TextNotifications = ({ navigation }) => {
             navigation.navigate(nextScreen);
         }
     };
-
-    const terms = [
-        {
-            title: 'Title',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
-        },
-        {
-            title: 'Second Title',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
-        },
-        {
-            title: 'Third Title',
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sollicitudin erat ipsum, quis feugiat mi tempor ac. In fermentum vehicula molestie. Mauris dignissim arcu nec commodo gravida. Donec quis efficitur ex. Nulla pharetra nunc justo, in mollis neque accumsan in. Phasellus gravida nisl id erat tempus, sit amet rutrum metus cursus. Curabitur iaculis sollicitudin massa, quis bibendum ante congue vel. Vestibulum et sem a felis aliquet vestibulum nec et odio. Vivamus laoreet mi quis diam dictum rhoncus. Nunc feugiat commodo turpis, ut mattis magna lacinia non. Aliquam nec justo ultrices, rhoncus dui vitae, condimentum urna. Sed sed ipsum tortor. Morbi euismod ipsum eu nisi maximus posuere. Donec sodales et mauris eu vestibulum. Fusce sed massa facilisis, ullamcorper dui sit amet, varius tortor.'
-        }                
-    ];
 
     return  (
         <View style={styles.container}>
@@ -162,13 +160,16 @@ const TextNotifications = ({ navigation }) => {
                     <View style={styles.bottomContainer}>
                     </View>                         
                     <View style={styles.checkBoxArea}>
-                        <CheckBox
-                            disabled={false}
-                            value={toggleCheckBox}
-                            onValueChange={onCheckBox}
-                            style={styles.checkBox}
-                            boxType="square"
-                        />   
+                        <View style={styles.checkBoxView}>
+                            <CheckBox
+                                disabled={false}
+                                value={toggleCheckBox}
+                                onValueChange={onCheckBox}
+                                style={styles.checkBox}
+                                boxType="square"
+                                tintColors={{ true: Color.colorMidnightblue, false: '#D0D5DD' }}
+                            />   
+                        </View>
                         <View style={styles.checkBoxAreaView}>
                             <Text style={styles.checkBoxAreaViewText}>I agree that message and data rates may apply. Message frequency may vary.</Text>
                         </View>             
@@ -185,7 +186,7 @@ const TextNotifications = ({ navigation }) => {
                             accessibilityLabel="Buttons Section">
                             <Pressable
                                 style={[styles.buttonDecline, styles.buttonsLayout]}
-                                onPress={() => navigation.navigate("EntryEmailNotifications")}
+                                onPress={() => navigation.navigate(nextScreen)}
                                 accessibilityLabel="Decline Button"
                                 accessibilityRole="button"
                                 accessibilityHint="Decline Terms and Conditions"
@@ -212,7 +213,7 @@ const styles = StyleSheet.create({
     bottomBar: {
         backgroundColor: '#FFF',
         justifyContent: 'center',
-        alignItems: 'center',  
+        alignItems: 'center',
     },
     bottomContainer: {
         height: 100,
@@ -238,14 +239,22 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: Border.br_11xs,
-        height: 50,
+        minHeight: 50
     },    
     buttonsParent: {
         width: '90%',
     },
     checkBox: {
         marginLeft: 10,
-        marginRight: 10
+        marginRight: 20,
+        width: 16,
+        height: 16,
+    },
+    checkBoxView: {
+        width: 16,
+        height: 16,
+        marginRight: Platform.OS == "ios" ? 20 : 30,
+        marginTop: 5
     },
     checkBoxArea: {
         backgroundColor: Color.colorWhitesmoke_100,
@@ -257,7 +266,7 @@ const styles = StyleSheet.create({
         width: '90%',    
     },
     checkBoxAreaView: {
-        marginRight: 20
+        marginRight: 30
     },
     checkBoxAreaViewText: {
         fontSize: 14,
@@ -273,6 +282,8 @@ const styles = StyleSheet.create({
         color: Color.sparklightWhite,
     },
     decline: {
+        fontSize: FontSize.size_sm,
+        fontFamily: FontFamily.openSansRegular,        
         color: Color.colorMidnightblue,
         textAlign: "center",
     },    

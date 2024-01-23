@@ -5,6 +5,7 @@ import colors from "../../res/Colors";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
 import { getUser } from "../../redux/utils/LocalStorage";
+import { Env } from "../../network/apis/account/Constants";
 const DataUsageComponent = ({navigation}) => {
  const [account,setAccount]=useState('')
   useEffect(() => {
@@ -68,7 +69,7 @@ const DataUsageComponent = ({navigation}) => {
               marginTop: 5,
             }}
           >
-            <Text style={styles.dataPlanTxt}> UNLIMITED PLAN</Text>
+            <Text style={styles.dataPlanTxt}> {(account==='900679010')? 'UNLIMITED PLAN' : '700GB PLAN'}</Text>
           </View>
         </View>
       </ProgressCircle>
@@ -89,14 +90,14 @@ const DataUsageComponent = ({navigation}) => {
       <View style={{ backgroundColor: colors.grey, height: 1, marginVertical: 10 }} />
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name: 'Upgrade Plan' })
+          navigation.navigate('ArticalWindowUtility', { url: `${Env.URL}/residential/services/upgrade`, name: 'Upgrade Plan' })
           //Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
         }}
         style={{
-          height: 30,
+          minHeight: 30,
           flexDirection: "row",
           justifyContent: "space-between",
-          padding: 5,
+          padding: 4,
           marginHorizontal:20
         }}
       >

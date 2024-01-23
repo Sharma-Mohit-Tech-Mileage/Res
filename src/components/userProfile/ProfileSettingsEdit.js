@@ -179,7 +179,7 @@ const ProfileSettingsEdit = () => {
                   render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                     <SparkLightInput
                       label={'Email'}
-                      placeholder="Email"
+                      placeholder={(!isPrimaryUser || profileDetailsfromStore.multipleEmails) ?"":"Email"}
                       onBlur={onBlur}
                       onChangeText={onChange}
                       value={(!isPrimaryUser || profileDetailsfromStore.multipleEmails)?'':value}
@@ -195,7 +195,7 @@ const ProfileSettingsEdit = () => {
                   name="phoneNumber" // This should be the name used in your validation schema
                   render={({ field: { onChange, onBlur, value } }) => (
                     <SparkLightInput
-                      placeholder="Mobile number"
+                      placeholder={isPrimaryUser?"Mobile number":""}
                       onBlur={onBlur}
                       label={'Mobile Phone'}
                       onChangeText={(text) => {
@@ -215,6 +215,7 @@ const ProfileSettingsEdit = () => {
             <Pressable style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]} onPress={handleSubmit(handleSave, handleValidationError)}>
               <Text style={[{ color: Color.sparklightWhite }, styles.makeTypo]}>Save</Text>
             </Pressable>
+            <View style={{ padding: 8 }}></View>
             <Pressable style={[styles.buttonsLayout]} onPress={() => navigation.navigate("ProfileSettings")}>
               <Text style={[styles.makeTypo, { color: Color.colorMidnightblue }]}>Cancel</Text>
             </Pressable>
@@ -300,7 +301,7 @@ const styles = StyleSheet.create({
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",
-    marginBottom: 200,
+    marginBottom: 250,
   },
   infoWrapper: {
     paddingHorizontal: Padding.p_5xl,

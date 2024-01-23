@@ -26,11 +26,17 @@ import NetworkDetails from "../common/NetworkDetails";
 import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
-import { getUser } from "../../redux/utils/LocalStorage";
+import { getUser, getPushNotificationStatus, storePushNotificationStatus } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
+import {
+  getFcmToken,
+  requestUserPermission,
+} from '../../firebase/FirebaseUtils';
+import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
+import { useSelector, useDispatch } from 'react-redux';
 
 const HomeScreen = ({ route, navigation }) => {
   // const { email, name } = {
@@ -38,7 +44,8 @@ const HomeScreen = ({ route, navigation }) => {
   //   name: route.params.data.params.name,
   // };
   const [isInternetDetails, setIsInternetDetails] = useState(false);
-
+  const user = useSelector(state => state.combinedReducers.user.userData);
+  const dispatch = useDispatch();
   const [plans, setPlans] = useState([]);
   const [billAmt, setBillAmt] = useState(0);
   const [dueDate, setDueDate] = useState("");
@@ -65,20 +72,7 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
-  const getSoftDisconnectStatus=()=>{
-   let re = getUser().then((res) => {
-    const request = `/SeasonalReconnect/api/SeasonalReconnect/${res.userInfo.accountNumber}/CheckEligibility`;
-    GetApiRequest(request, (response)=>{
-     console.log('getSoftDisconnectStatus',response)
-          if(response===true){
-            setAccountStatus('Disconnect')
-            setIsInternetDetails(true)
-          }
-    }, (error)=>{
-      
-    });
-  });
-  }
+
 
   const checkModemOutagStatus=()=>{
     let re = getUser().then((res) => {
@@ -93,8 +87,6 @@ const HomeScreen = ({ route, navigation }) => {
              setHasOutage(true)
              setIsOutageAlert(true)
 
-           }else{
-            getSoftDisconnectStatus();
            }
            
      }, (error)=>{
@@ -119,10 +111,18 @@ const HomeScreen = ({ route, navigation }) => {
       GetApiRequest(request, (res)=>{
         console.log("getUserAccountDetails", res);
         if (res) {
+          if(res.currentCollectionStep=='Soft Disconnect'){
+            setAccountStatus('Disconnect')
+            setIsInternetDetails(true)
+          
+          }else{
+            updateInternetHealth(res.currentBalance);
+          }
           let dueDate = moment(res.paymentDueDate).format("ll");
           setDueDate(dueDate);
           setBillAmt(res.currentBalance);
-          updateInternetHealth(res.currentBalance);  
+          
+
         }
       }, onErrorBill);
     });
@@ -140,17 +140,69 @@ const HomeScreen = ({ route, navigation }) => {
    
   };
 
-  
-
   const onErrorBill = (error) => {
     console.log("error", error);
+  };
+
+  const checkNotifications = async () => {
+    const pushNotification = await getPushNotificationStatus();
+    let askNotification = false;
+    if (pushNotification === null) {
+      askNotification = true;
+    } else {
+      if (pushNotification.permanentSkip) {
+        askNotification = false;
+      } else {
+        if (pushNotification.status === 'skip') {
+          const now = moment();
+          const days = now.diff(pushNotification.date, "days");
+
+          if (days > 15) {
+            askNotification = true;
+          } else {
+            askNotification = false;
+          }
+        }
+      }
+    }
+
+    if (askNotification) {
+      const enabledPermission = await requestUserPermission();
+
+      if (enabledPermission) {
+          const token = await getFcmToken();
+          const data = {
+              accountNumber: user.userInfo.accountNumber,
+              deviceToken: token,
+              deviceTokenTimestamp: moment().format(),
+              optOut: false,
+              outageOptOut: false,
+              billingOptOutStatus: false,
+              userName: user.userInfo.userName,
+              isAndroid: Platform.OS == "android",
+          };
+          const localData = {
+              status: 'accepted',
+              date: new Date()
+          };            
+          storePushNotificationStatus(localData);
+          await dispatch(updatePushNotifications(data, null));
+      } else {
+        const localData = {
+          status: 'skip',
+          date: new Date(),
+          permanentSkip: true
+        };            
+        storePushNotificationStatus(localData);        
+      }
+    }
   };
 
   useEffect(() => {
     checkModemOutagStatus();
     getInternetPlanDetails();
-    getUserAccountDetails()
-    
+    getUserAccountDetails();
+    checkNotifications();
    
 
     const backAction = () => {
@@ -196,7 +248,7 @@ const HomeScreen = ({ route, navigation }) => {
             <View style={{ flexDirection: "row" }}>
               <Image
                 style={{alignSelf:'center'}}
-                resizeMode="cover"
+                resizeMode="contain"
                 tintColor={"#F88700"}
                 source={require("../../../assets/info-circle.png")}
               />
@@ -239,7 +291,8 @@ const HomeScreen = ({ route, navigation }) => {
         >
           <Image
             resizeMode="contain"
-            source={require("../../res/images/header_logo.png")}
+            style={{ width: 120, height: 30.324, flexShrink: 0 }}
+            source={require("../../../assets/SparklightEntryLogo.png")}
           />
           {/* <View>
             <BellIcon />
@@ -306,7 +359,7 @@ const HomeScreen = ({ route, navigation }) => {
               )}
             </View>
             <ScrollView horizontal={true} style={{ marginStart: 20 }}>
-              <View style={{ marginHorizontal: 10 }}>
+              <View >
                 <MyInternetDetials
                   plans={plans}
                   billAmt={billAmt}
@@ -328,12 +381,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.splash_bg,
+    marginBottom: 30
   },
   card: {
     backgroundColor: "white",
-    borderRadius: 5,
+    borderRadius:2,
     paddingTop: 45,
-    width: wp("87%"),
+    width: wp("92%"),
   },
   shadowProp: {
     shadowColor: "#171717",

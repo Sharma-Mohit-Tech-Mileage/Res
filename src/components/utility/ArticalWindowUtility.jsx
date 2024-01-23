@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
+import { getUser } from "../../redux/utils/LocalStorage";
+import { RefreshToken } from '../user/Session';
 
 const { width, height } = Dimensions.get('window');
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -13,6 +15,28 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [url, setUrl] = useState(route.params?.url);
     const [modalOpen, setModalOpen] = useState(true);
     const user = useSelector(state => state.combinedReducers.user.userData);
+    const webViewRef = useRef();
+
+    const navigationChange = (navState) => {
+        //https://customer.uat.sparklight.com/SecureLoginSSO/token/postlogout
+        console.log('navigationChange: ', JSON.stringify(navState));
+        if (navState.url.includes('/postlogout')) {
+            RefreshToken();
+            userUpdate();
+            webViewRef.current.reload();
+        }
+    }
+
+    const userUpdate = () => {
+        if (user.token !== undefined) {
+            const SAVE_FROM_RN = `(function() {
+                localStorage.setItem('jwt_token', '${user.token}');
+                localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
+              })();`;        
+          
+            setInitScript(SAVE_FROM_RN);
+        }
+    }
 
     // Reset progress and error states when URL changes or modal closes
     useEffect(() => {
@@ -30,19 +54,11 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }, [modalOpen]);
 
     useEffect(() => {
-        if (user.token !== undefined) {
-            const SAVE_FROM_RN = `(function() {
-                localStorage.setItem('jwt_token', '${user.token}');
-                localStorage.setItem('upgrades_token', '${user.refreshToken}');
-                localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
-              })();`;        
-          
-            setInitScript(SAVE_FROM_RN);
-        }
+        userUpdate();
     }, []);
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />
             {progress < 1 ? (
                 <View style={{ ...styles.progressBar}}>
@@ -50,15 +66,15 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 </View>) : (<View >
                 </View>)}
             {modalOpen && (
-
                 <WebView
+                    ref={webViewRef}
                     key={url}
                     source={{ uri: url }}
                     onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
                     onError={() => setIsError(true)}
                     sharedCookiesEnabled={true}
                     injectedJavaScriptBeforeContentLoaded={initScript}
-                    //onNavigationStateChange={(navState) => setUrl(navState.url)}
+                    onNavigationStateChange={navigationChange}
                 />            
             )}
             {isError ? (

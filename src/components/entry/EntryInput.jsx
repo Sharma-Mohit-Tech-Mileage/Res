@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     },
    
     leftIcon: {
-        marginRight: 8, // Space between the icon and the text input
+        marginRight: 0, // Space between the icon and the text input
         backgroundColor: '#FFF', // Hex color from the design
         // Set the size if needed, e.g. width: 20, height: 20
     },

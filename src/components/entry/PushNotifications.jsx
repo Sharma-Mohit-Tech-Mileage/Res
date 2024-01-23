@@ -10,67 +10,63 @@ import BellRingingIcon from "../../res/svgIcons/BellRingingIcon";
 import {
   getFcmToken,
   requestUserPermission,
-  notificationListener,
 } from '../../firebase/FirebaseUtils';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchSMSSelection, fetchBillingStatus, fetchPushNotifications, fetchBillingPaper } from '../../redux/actions/ProfileActionSuite';
 import moment from 'moment';
 import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
+import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
 
 const PushNotifications = ({ navigation }) => {
-    const [generatedToken, setGeneratedToken] = useState();
     const [nextScreen, setNextScreen] = useState('EntryTextNotifications');
     const dispatch = useDispatch();
     const profile = useSelector(state => state.combinedReducers.profile || {});
     const user = useSelector(state => state.combinedReducers.user.userData);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                dispatch(fetchBillingStatus());
-                dispatch(fetchBillingPaper());
-                dispatch(fetchSMSSelection());
-                dispatch(fetchPushNotifications());
-            } catch (error) {
-                console.error("Error fetching data", error);
-            }
-        };
-
-        fetchData();
-    }, [dispatch]); 
-    
-    useEffect(() => {
+        let goToPhoneScreen = false;
+        let optOutCount = 0;
+  
         if (profile.smsSubscription.length > 0) {
-            if (profile.paperLessInfo !== undefined
-                && profile.paperLessInfo.accountNumber !== undefined
-                && profile.paperLessInfo.accountNumber.length > 0) {
-                console.log('setNextScreen: MyTab');
-                setNextScreen('MyTab');                  
-            } else {
-                console.log('setNextScreen: EntryEmailNotifications');
-                setNextScreen('EntryEmailNotifications');  
+            const firstSubscription = profile.smsSubscription[0];
+            firstSubscription.smsMessageType.forEach((messageType) => {
+                if (messageType.optOutFlag) {
+                    optOutCount = optOutCount + 1;
+                }
+            });
+            console.log('optOutCountAfterLoop: ', optOutCount);
+            if (optOutCount > 2) {
+                goToPhoneScreen = true;
             }
         } else {
-            console.log('setNextScreen: EntryTextNotifications');
-            setNextScreen('EntryTextNotifications');  
+            goToPhoneScreen = true;
         }
-    }, [profile]);        
 
+        if (goToPhoneScreen) {
+            setNextScreen('EntryTextNotifications');  
+        } else {
+            if (profile.paperLessInfo !== undefined
+                && profile.paperLessInfo.accountNumber !== undefined
+                && profile.paperLessInfo.accountNumber.length > 0
+                && profile.paperLessInfo.paperlessStatus !== undefined
+                && (profile.paperLessInfo.paperlessStatus.toLowerCase() === 'approved'
+                    || profile.paperLessInfo.paperlessStatus.toLowerCase() === 'active')
+                ) {
+                setNextScreen('MyTab');                  
+            } else {
+                setNextScreen('EntryEmailNotifications');  
+            }
+        }
+
+        if (profile.profileDetails.memberType === "Admin") {
+            setNextScreen('MyTab');
+        }
+    }, []);
+    
     const enableNotifications = async () => {
-        // const fetchToken = async () => {
-        //     const token = await getFcmToken();
-        //     if (token) {
-        //         setGeneratedToken(token);
-        //     }
-        // };
-
         const enabledPermission = await requestUserPermission();
 
         if (enabledPermission) {
             const token = await getFcmToken();
-            if (token) {
-                setGeneratedToken(token);
-            }
             const data = {
                 accountNumber: user.userInfo.accountNumber,
                 deviceToken: token,
@@ -83,16 +79,33 @@ const PushNotifications = ({ navigation }) => {
             };
             console.log('enableNotifications: ', data);
             console.log('enableNotifications navigation: ', navigation);
+            const localData = {
+                status: 'accepted',
+                date: new Date()
+            };            
+            storePushNotificationStatus(localData);
             await dispatch(updatePushNotifications(data, null));
             navigation.navigate(nextScreen);
         } else {
+            const localData = {
+                status: 'skip',
+                date: new Date(),
+                permanentSkip: true
+            };            
+            storePushNotificationStatus(localData);
             navigation.navigate(nextScreen);
         }
-        
-        //void fetchToken();
-        //void requestUserPermission();
-        //void notificationListener();
     };
+
+    const skipNotifications = async () => {
+        const data = {
+            status: 'skip',
+            date: new Date(),
+            permanentSkip: false
+        };
+        storePushNotificationStatus(data);
+        navigation.navigate(nextScreen);
+    };    
 
     return  (
         <View style={styles.container}>
@@ -135,7 +148,7 @@ const PushNotifications = ({ navigation }) => {
                         accessibilityLabel="Buttons Section">
                         <Pressable
                             style={[styles.buttonDecline, styles.buttonsLayout]}
-                            onPress={() => navigation.navigate(nextScreen)}
+                            onPress={skipNotifications}
                             accessibilityLabel="Decline Button"
                             accessibilityRole="button"
                             accessibilityHint="Decline Push Notifications"
@@ -171,7 +184,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: Border.br_11xs,
-        height: 50,
+        minHeight: 50,
     },    
     buttonsParent: {
         width: '90%',

@@ -1,35 +1,28 @@
 import * as React from "react";
-import { Svg, Circle, G, Path, Line, Rect, Text } from "react-native-svg";
-const width = 50;
-const height = 50;
-const size = width < height ? width - 16 : height - 8;
-const strokeWidth = 12;
-const radius = (size - strokeWidth) / 2;
-const circunference = radius * 2 * Math.PI;
+import { View, Text } from "react-native";
+
 const AccountIcon = (props) => {
-  const Fname= props.data.firstName.charAt(0);
-  const Lname= props.data.lastName.charAt(0);
-  
+  const Fname = props.data.firstName && props.data.firstName.length > 0 ? props.data.firstName.charAt(0) : '';
+  const Lname = props.data.lastName && props.data.lastName.length > 0 ? props.data.lastName.charAt(0) : '';
+
+
   return (
-    <Svg width={width} height={size}>
-      <Circle
-        stroke="#767676"
-        fill={props.focused ? "#353091" : "#767676"}
-        cx={size / 2 + 5}
-        cy={size / 2}
-        r={radius}
-        strokeDasharray={`${circunference} ${circunference}`}
-      />
-      <Text
-        stroke="white"
-        fontSize="14"
-        x={size / 2}
-        y={size / 2 + 5}
-        textAnchor="middle"
-      >
+    <View
+      style={{
+        backgroundColor: props.focused ? "#353091" : "#767676",
+        padding: 5,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        alignContent: "center",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Text allowFontScaling={false} style={{color:'white',fontWeight:'600'}}>
         {Fname}{Lname}
       </Text>
-    </Svg>
+    </View>
   );
 };
 export default AccountIcon;
