@@ -224,7 +224,10 @@ const DataSpeedComponent = ({navigation}) => {
       />
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name: 'Upgrade Plan' })
+          navigation.navigate('ArticalWindowUtility', { 
+            //url: 'https://customer.uat.sparklight.com/residential/services/upgrade',
+              url: 'https://customer.sparklight.com/residential/services/upgrade',
+             name: 'Upgrade Plan' })
           // Linking.openURL(
           //   "https://customer.uat.sparklight.com/residential/services/upgrade"
           // );

@@ -79,7 +79,8 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
-              url: "https://customer.uat.sparklight.com/residential/billing",
+              //url: "https://customer.uat.sparklight.com/residential/billing",
+                url: "https://customer.sparklight.com/residential/billing",
               name: "Billing Details",
             });
             //Linking.openURL('https://customer.uat.sparklight.com/residential/billing')
