@@ -14,11 +14,15 @@ function HomeStackScreen() {
     const { setTabBarVisible } = useTabBarVisibility();
     
     return (
-        <HomeStack.Navigator initialRouteName="Dashboard">
+        <HomeStack.Navigator initialRouteName="Dashboard" 
+        defaultNavigationOptions= {{
+            gestureEnabled: false
+          }}
+        >
             <HomeStack.Screen
                 name="Dashboard"
                 component={HomeScreen}
-                options={{ headerShown: false }}
+                options={{ headerShown: false}}
             />
             <HomeStack.Screen
                 name="OklaSpeedTest"

@@ -56,7 +56,7 @@ const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
             </Text>
           </View>
           <Text style={styles.message}>{msg2}</Text>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.openBtn}
             onPress={() => {
               Linking.openURL(
@@ -65,7 +65,7 @@ const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
             }}
           >
             <Text style={styles.openPortaltxt}>Open Portal</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
             <Text style={styles.closeAlertTxt}>Close</Text>

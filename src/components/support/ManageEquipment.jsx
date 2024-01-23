@@ -1,9 +1,8 @@
 import * as React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
+import { FontFamily, Padding, Color, FontSize, Border,ScrollView } from "../../../GlobalStyles";
 import MyServicePlan from "../common/MyServicePlan";
-import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
@@ -400,13 +399,14 @@ const styles = StyleSheet.create({
         paddingTop: Padding.p_5xl,
         paddingBottom: Padding.p_base,
         paddingHorizontal: Padding.p_base,
-        marginBottom: '15%'
+        marginBottom: '20%'
     },
     manageEquipment: {
         width: "100%",
         flex: 1,
         backgroundColor: Color.colorWhitesmoke_200,
-    },iconBg: {
+    },
+    iconBg: {
         backgroundColor: "#F4F4F5",
         padding: 5,
         width: wp("20%"),

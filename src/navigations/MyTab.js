@@ -70,6 +70,7 @@ const MyTabs = ({ route, navigation }) => {
         initialParams={{ data: route }}
         options={{
           headerShown: false,
+          swipeEnabled: false,
           tabBarLabel: 'Home',
           tabBarIcon: ({ focused }) => {
             return (
