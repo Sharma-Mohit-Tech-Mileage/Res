@@ -88,7 +88,7 @@ fetch(`${BASE_URL}/${endpoint}`, {
             return response.json();
         }     
     })
-    .then(([response, json]) => {
+    .then((json) => {
         isUserAuthorized(true);
         onSuccess(json);
     })
