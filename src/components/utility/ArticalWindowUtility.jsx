@@ -5,6 +5,7 @@ import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
 import { getUser } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
+import { isUserAuthorized } from "../../network/APIClient";
 
 const { width, height } = Dimensions.get('window');
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -13,30 +14,58 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [name, setTitle] = useState(route.params?.name);
     const [isError, setIsError] = useState(false);
     const [url, setUrl] = useState(route.params?.url);
+    const [currentUser, setCurrentUser] = useState({});
     const [modalOpen, setModalOpen] = useState(true);
+    const [navStateReloading, setNavStateReloading] = useState(false);
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
+    
 
-    const navigationChange = (navState) => {
+    const navigationChange = async (navState) => {
         //https://customer.uat.sparklight.com/SecureLoginSSO/token/postlogout
-        console.log('navigationChange: ', JSON.stringify(navState));
         //https://login.uat.cableone.net/auth/realms/external-sso-realm
+        console.log('navigationChange: ', JSON.stringify(navState));
         if (navState.url.includes('/postlogout')
             || navState.url.includes('login.uat.cableone.net')) {
-                RefreshToken();
-                userUpdate();
-                webViewRef.current.reload();
+                
+            if (!navStateReloading) {
+                setModalOpen(false);   
+                setProgress(1);                        
+                setNavStateReloading(true);
+                await RefreshToken();
+                setTimeout(async () => {
+                    await userUpdate();
+                }, 1000);                
+            }
         }
     }
 
-    const userUpdate = () => {
+    const userUpdate = async () => {
+        const userLocal = await getUser();
+
+        if (userLocal.token === currentUser.token) {
+            console.log('tokens equal each other');
+            setTimeout(async () => {
+                await userUpdate();
+            }, 1000);
+        } else {
+            setNavStateReloading(false);
+            userUpdateScript(userLocal);
+            setUrl(route.params?.url);
+            setModalOpen(true);   
+            setProgress(0); 
+            setCurrentUser(userLocal);        
+        }
+    }
+
+    const userUpdateScript = async (user) => {
         if (user.token !== undefined) {
             const SAVE_FROM_RN = `(function() {
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
               })();`;        
-          
-            setInitScript(SAVE_FROM_RN);
+
+            setInitScript(SAVE_FROM_RN);         
         }
     }
 
@@ -56,7 +85,8 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }, [modalOpen]);
 
     useEffect(() => {
-        userUpdate();
+        setCurrentUser(user);
+        userUpdateScript(user);
     }, []);
 
     return (
