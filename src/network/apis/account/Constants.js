@@ -15,5 +15,5 @@ export const config={
 
 }
 
-//export const Env=config.PRODUCTION
-export const Env=config.UAT
+export const Env=config.PRODUCTION
+//export const Env=config.UAT
