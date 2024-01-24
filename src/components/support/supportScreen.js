@@ -135,8 +135,10 @@ const Support = () => {
                                 <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                             </View>
                         </View>
-                    <ScrollView style={{ width: '100%' }}>
-                        <View style={{ paddingBottom: 400 ,paddingHorizontal:Padding.p_base}}>
+                        <ScrollView style={{width:'100%',marginBottom:hp('40%'),padding: Padding.p_base}}
+                         ref={scrollViewRef}
+                        >
+                        <View >
                         <View style={styles.issuesFlexBox}>
                             {items.map((item, index) => (
                                 <React.Fragment key={item.name}>
