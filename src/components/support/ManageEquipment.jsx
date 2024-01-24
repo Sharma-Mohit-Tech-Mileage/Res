@@ -8,7 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
-import { ScrollView } from "react-native-gesture-handler";
+
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,

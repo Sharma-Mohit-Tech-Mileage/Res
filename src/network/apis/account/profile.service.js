@@ -354,8 +354,8 @@ const handleSubmitFeedback = async (obj) => {
             type: null,
             custom_fields: [
                 { id:Env.ZENDESK_FEEDBACK.category_id , value: obj.category },
-                { id: "18708581262999", value: obj.feedbackValue },
-                { id: "1500002222302", value: obj.email }
+                { id:Env.ZENDESK_FEEDBACK.feedbackValue_id, value: obj.feedbackValue },
+                { id:Env.ZENDESK_FEEDBACK.email_id, value: obj.email }
             ],
             subject: "Residential MobileApp Feedback",
             comment: {
