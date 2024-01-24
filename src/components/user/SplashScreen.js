@@ -151,7 +151,9 @@ const SplashScreen = ({ navigation }) => {
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
             />
             <Text style={styles.message}>{message}
-            <Text style={[styles.message,{fontWeight:600,color:colors.sparklight_purple_blue}]}>Please login to your online account</Text>
+            <Text style={[styles.message,{fontWeight:600,color:colors.sparklight_purple_blue}]} onPress={()=>{
+              Linking.openURL(Env.URL);
+            }}> login to your online account</Text>
             {message2}
             </Text>
             {/* <TouchableOpacity
@@ -282,7 +284,7 @@ const SplashScreen = ({ navigation }) => {
           </>
         )
       }  
-      <Text style={{color: 'white',alignSelf:'center', marginTop:20, fontSize:16}}>Version:{VersionCheck.getCurrentVersion()}</Text>          
+      <Text style={{color: 'white',alignSelf:'center', marginTop:45, fontSize:16}}>Version:{VersionCheck.getCurrentVersion()}</Text>          
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}

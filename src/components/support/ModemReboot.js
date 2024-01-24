@@ -35,9 +35,12 @@ import CustomerErrorPage from "../utility/SystemErrorPopup";
 const ModemReboot = () => {
   const navigation = useNavigation();
   const [modemStatus, setModemStatus] = useState("connected");
+  const [accountNumber, setAccountNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [isRebootError, setIsRebootError] = useState(false);
-  const [rebootErrorMsg,SetRebootErrorMsg]=useState('Oops, we have encountered an error. Please retry or refer to the Modem Reboot Instructions.')
+  const [rebootErrorMsg, SetRebootErrorMsg] = useState(
+    "Oops, we have encountered an error. Please retry or refer to the Modem Reboot Instructions."
+  );
 
   const LoadingOverlay = () => {
     return (
@@ -60,32 +63,36 @@ const ModemReboot = () => {
   };
 
   const rebootModemAction = () => {
-    setLoading(true);
-    let re = getUser().then((res) => {
-      const request = `mobile/api/Device/RebootModem?accountnumber=${res.userInfo.accountNumber}`;
+    console.log(accountNumber)
+    if (accountNumber) {
+      setLoading(true);
+      const request = `mobile/api/Device/RebootModem?accountnumber=${accountNumber}`;
       GetApiRequest(
         request,
         (res) => {
           console.log("rebootModemAction", res);
           setModemStatus(res.status);
-          setTimeout(()=>{
-           setLoading(false)
-           if(res.status=='Bad'){
-            setIsRebootError(true)
-           }
-          },500)
-          
+          setLoading(false);
+          if (res.status == "Bad") {
+            setIsRebootError(true);
+          }
         },
         (error) => {
           console.log("rebootModemAction Error", error);
           setLoading(false);
-          setIsRebootError(true)
+          setIsRebootError(true);
         }
       );
-    });
+    }
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    let re = getUser().then((res) => {
+      setAccountNumber(res.userInfo.accountNumber);
+    });
+  }, []);
+
+  useEffect(() => {}, [accountNumber]);
 
   const RenderErrorBox = () => {
     return (
@@ -219,11 +226,11 @@ const ModemReboot = () => {
           <CustomerErrorPage
             visible={isRebootError}
             message={rebootErrorMsg}
-            title={'Modem Reboot Failed'}
-            onActionTxt={'Retry Modem Reboot'}
+            title={"Modem Reboot Failed"}
+            onActionTxt={"Retry Modem Reboot"}
             onAction={() => {
               setIsRebootError(false);
-               rebootModemAction();
+              rebootModemAction();
             }}
             onClose={() => {
               setIsRebootError(false);

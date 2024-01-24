@@ -11,6 +11,7 @@ export const config={
       recipient: "400018994093",
       assignee_id: "400018994093",
       group_id: "360000672214",
+      category_id: "360022798993",
    }
 
  },

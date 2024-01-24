@@ -48,6 +48,7 @@ const HomeScreen = ({ route, navigation }) => {
   const user = useSelector(state => state.combinedReducers.user.userData);
   const dispatch = useDispatch();
   const [plans, setPlans] = useState([]);
+  const [data, setData] = useState({});
   const [billAmt, setBillAmt] = useState(0);
   const [dueDate, setDueDate] = useState("");
   const [currentHealth, setCurrentHealth] = useState("Poor");
@@ -64,6 +65,19 @@ const HomeScreen = ({ route, navigation }) => {
       default: 80,
     };
     return currentHealth[type] || currentHealth["default"];
+  };
+
+  const getDataUsage = () => {
+    let re = getUser().then((res) => {
+      const request = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
+      GetApiRequest(request, (res)=>{
+            if(res){
+              setData(res)
+            }
+      }, (error)=>{
+  
+      });
+    });
   };
 
   const getInternetPlanDetails = () => {
@@ -204,7 +218,7 @@ const HomeScreen = ({ route, navigation }) => {
     getInternetPlanDetails();
     getUserAccountDetails();
     checkNotifications();
-   
+    getDataUsage()
 
     // const backAction = () => {
     //   Alert.alert(
@@ -405,7 +419,7 @@ const HomeScreen = ({ route, navigation }) => {
               </View>
             </ScrollView>
 
-            <MyServicePlan plans={plans} navigation={navigation} />
+            <MyServicePlan plans={plans} useData={data} navigation={navigation} />
           </View>
         </ScrollView>
       </SafeAreaView>
