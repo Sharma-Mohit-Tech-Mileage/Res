@@ -26,7 +26,7 @@ import NetworkDetails from "../common/NetworkDetails";
 import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
-import { getUser, getPushNotificationStatus, storePushNotificationStatus } from "../../redux/utils/LocalStorage";
+import { getUser, getPushNotificationStatus, storePushNotificationStatus, storeUpgradeToken } from "../../redux/utils/LocalStorage";
 import { GetApiRequest, UserAuthorized } from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily } from "../../../GlobalStyles";
@@ -73,7 +73,31 @@ const HomeScreen = ({ route, navigation }) => {
     });
   };
 
+  const getUpgradeToken = async () => {
+    const url = 'https://publicservices.sparklight.com/ShoppingCart/api/UpgradeOrder/token';
 
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          'grant_type': 'password',
+          'username': 'upgr4d3s0rd3rus3r',
+          'password': 'upgr4d3s0rd3rp4ssw0rd'
+        }).toString()
+    });
+
+    let json = {};
+
+    if (response !== undefined) {
+      json = response.json();
+    }
+
+    console.log('getUpgradeToken:', json);
+
+    return json;
+  };
 
   const checkModemOutagStatus=()=>{
     let re = getUser().then((res) => {
@@ -274,6 +298,16 @@ const HomeScreen = ({ route, navigation }) => {
       RefreshToken();
     }
   }, [UserAuthorized]);
+
+  useEffect(async () => {
+    try {
+      const result = await getUpgradeToken();
+      console.log('getUpgradeTokenResult: ', JSON.stringify(result));
+      storeUpgradeToken(result);
+    } catch (error) {
+      console.error("Error fetching data", error);
+    }
+  }, []);  
 
   const OutageAlert=({estimatedTime})=>{
     return(
