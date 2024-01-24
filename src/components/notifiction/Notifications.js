@@ -43,14 +43,16 @@ const Notifications = () => {
       isDisabled = true;
       notificationsTitle = "There is a problem retrieving your email address";
       infoText =
-        (
-          <Text>
-            We are not able to retrieve the email address for your account. Please
-            <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('support') }}>
-            {' contact us '}
+        (<Text>
+          We are not able to retrieve the email address for your account. Please
+          <Pressable onPress={() => { navigation.navigate('support') }}>
+            <Text style={[styles.text, { color: Color.colorMidnightblue }]}>
+              {' contact us '}
             </Text>
-            for assistance.
-          </Text>)
+          </Pressable>
+          for assistance.
+        </Text>
+)
 
     } else if (profileDetails.svEmailAddress) {
       isDisabled = false;
@@ -58,14 +60,16 @@ const Notifications = () => {
     else {
       isDisabled = true;
       notificationsTitle = "No email address on file";
-      infoText = (
-        <Text>
-          We don’t have your email address on file. Go to
-          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('ProfileSettings') }}>
+      infoText = (<Text>
+        We don’t have your email address on file. Go to
+        <Pressable onPress={() => { navigation.navigate('ProfileSettings') }}>
+          <Text style={[styles.text, { color: Color.colorMidnightblue }]}>
             {' Profile Settings '}
           </Text>
-          to add your email.
-        </Text>)
+        </Pressable>
+        to add your email.
+      </Text>
+)
     }
   }
   useEffect(() => {
