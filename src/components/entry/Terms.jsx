@@ -11,9 +11,10 @@ import * as Zendesk from 'react-native-zendesk-messaging';
 import { logout } from 'react-native-app-auth';
 import { SetClearTimer } from '../user/Session';
 import { saveUserInfo } from "../../redux/actions/UserAction";
+import { Env } from "../../network/apis/account/Constants";
 
 const config = {
-    issuer: 'https://login.uat.cableone.net/auth/realms/external-sso-realm',
+    issuer: Env.SSO_LOGIN,
     iosPrefersEphemeralSession: true,
 };
 

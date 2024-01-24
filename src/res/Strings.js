@@ -17,8 +17,8 @@ let strings = new LocalizedStrings({
    test_speed_info:'Wi-Fi speeds on mobile devices are \n typically lower than wired speeds.',
    learn_more:'Learn More',
    test_with_eero:'Test with Eero',
-   nonAdminUserMsg:'Currently, only the Primary Admin or an Admin of a Sparklight account can use the MySparklight mobile app for account management.',
-   nonInternetUserMessage:'Currently, only a Sparklight account with Internet service can use the MySparklight mobile app for service management.'
+   nonAdminUserMsg:'Currently, only the Primary Admin or an Admin of a Sparklight account can use the MySparklight mobile app for account management.Please',
+   nonInternetUserMessage:'Currently, only a Sparklight account with Internet service can use the MySparklight mobile app for service management.Please'
  },
  
 });

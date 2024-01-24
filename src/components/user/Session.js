@@ -5,14 +5,14 @@ import { refresh } from "react-native-app-auth";
 import { storeUser } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { saveUserInfo } from "../../redux/actions/UserAction";
-
+import { Env } from "../../network/apis/account/Constants";
 
 // import { getUser } from "../redux/utils/LocalStorage";
 
 //const [refresh, setRefresh] = useState();
 
 const config = {
-    issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
+    issuer: Env.SSO_LOGIN,
     clientId: "sparklight-customer-mobile-app",
     redirectUrl:
         "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",

@@ -27,7 +27,7 @@ import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
 import { getUser, getPushNotificationStatus, storePushNotificationStatus } from "../../redux/utils/LocalStorage";
-import { GetApiRequest } from "../../network/APIClient";
+import { GetApiRequest, UserAuthorized } from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
@@ -37,6 +37,7 @@ import {
 } from '../../firebase/FirebaseUtils';
 import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
 import { useSelector, useDispatch } from 'react-redux';
+import { RefreshToken } from '../user/Session';
 
 const HomeScreen = ({ route, navigation }) => {
   // const { email, name } = {
@@ -47,6 +48,7 @@ const HomeScreen = ({ route, navigation }) => {
   const user = useSelector(state => state.combinedReducers.user.userData);
   const dispatch = useDispatch();
   const [plans, setPlans] = useState([]);
+  const [data, setData] = useState({});
   const [billAmt, setBillAmt] = useState(0);
   const [dueDate, setDueDate] = useState("");
   const [currentHealth, setCurrentHealth] = useState("Poor");
@@ -63,6 +65,19 @@ const HomeScreen = ({ route, navigation }) => {
       default: 80,
     };
     return currentHealth[type] || currentHealth["default"];
+  };
+
+  const getDataUsage = () => {
+    let re = getUser().then((res) => {
+      const request = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
+      GetApiRequest(request, (res)=>{
+            if(res){
+              setData(res)
+            }
+      }, (error)=>{
+  
+      });
+    });
   };
 
   const getInternetPlanDetails = () => {
@@ -203,42 +218,43 @@ const HomeScreen = ({ route, navigation }) => {
     getInternetPlanDetails();
     getUserAccountDetails();
     checkNotifications();
+     getDataUsage()
+  
+    const backAction = () => {
+      // Check if there's a screen to go back to
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+        return true; // Prevents the default back action (closing the app)
+      }
 
-    // const backAction = () => {
-    //   // Check if there's a screen to go back to
-    //   if (navigation.canGoBack()) {
-    //     navigation.goBack();
-    //     return true; // Prevents the default back action (closing the app)
-    //   }
+      // No more screens to go back to, so show an exit confirmation dialog
+      Alert.alert(
+        "Exit App", // Alert Title
+        "Do you want to exit the app?", // Alert Message
+        [
+          {
+            text: "Cancel",
+            onPress: () => null, // Does nothing, just closes the alert
+            style: "cancel"
+          },
+          {
+            text: "Yes",
+            onPress: () => BackHandler.exitApp() // Exits the app
+          }
+        ],
+        { cancelable: false } // Prevents the alert from being dismissed by tapping outside of it
+      );
 
-    //   // No more screens to go back to, so show an exit confirmation dialog
-    //   Alert.alert(
-    //     "Exit App", // Alert Title
-    //     "Do you want to exit the app?", // Alert Message
-    //     [
-    //       {
-    //         text: "Cancel",
-    //         onPress: () => null, // Does nothing, just closes the alert
-    //         style: "cancel"
-    //       },
-    //       {
-    //         text: "Yes",
-    //         onPress: () => BackHandler.exitApp() // Exits the app
-    //       }
-    //     ],
-    //     { cancelable: false } // Prevents the alert from being dismissed by tapping outside of it
-    //   );
-
-    //   return true; // Prevents the default back action (since we're handling it)
-    // };
+      return true; // Prevents the default back action (since we're handling it)
+    };
 
 
-    // const backHandler = BackHandler.addEventListener(
-    //   "hardwareBackPress",
-    //   backAction
-    // );
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
 
-    // return () => backHandler.remove();
+    return () => backHandler.remove();
   }, []);
 
   useEffect(()=>{
@@ -246,6 +262,12 @@ const HomeScreen = ({ route, navigation }) => {
     setCurrentHealth('Offline')
    }
   },[accountStatus])
+
+  useEffect(() => {
+    if (!UserAuthorized) {
+      RefreshToken();
+    }
+  }, [UserAuthorized]);
 
   const OutageAlert=({estimatedTime})=>{
     return(
@@ -377,7 +399,7 @@ const HomeScreen = ({ route, navigation }) => {
               </View>
             </ScrollView>
 
-            <MyServicePlan plans={plans} navigation={navigation} />
+            <MyServicePlan plans={plans} useData={data} navigation={navigation} />
           </View>
         </ScrollView>
       </SafeAreaView>

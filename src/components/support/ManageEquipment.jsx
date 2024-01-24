@@ -3,11 +3,12 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
 import MyServicePlan from "../common/MyServicePlan";
+import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
-import { ScrollView } from "react-native-gesture-handler";
+
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
@@ -112,7 +113,7 @@ const ManageEquipment = () => {
                                             </View> */}
                                             <View style={[styles.badge, styles.parentBorder]}>
                                                 <Text style={[styles.text, styles.textTypo1]}>
-                                                    {leased.toLocaleUpperCase()}
+                                                    {'leased'.toLocaleUpperCase()}
                                                 </Text>
                                             </View>
                                         </View>
@@ -152,7 +153,7 @@ const ManageEquipment = () => {
                                 navigation.navigate('ModemExchange')
                             }}>
                                 <Image
-                                style={{ width: 20, height: 20, flexShrink: 0 }}
+                                style={{ width: 30, height: 30, flexShrink: 0 }}
                                     resizeMode='contain'
                                     source={require("../../../assets/repeat-01.png")}
                                 />
@@ -180,7 +181,7 @@ const ManageEquipment = () => {
                                 navigation.navigate('ModemRebootScreen')
                             }} >
                                 <Image
-                                style={{ width: 20, height: 20, flexShrink: 0 }}
+                                style={{ width: 30, height: 30, flexShrink: 0 }}
                                     resizeMode='contain'
                                     source={require("../../../assets/refresh.png")}
                                 />
@@ -400,14 +401,13 @@ const styles = StyleSheet.create({
         paddingTop: Padding.p_5xl,
         paddingBottom: Padding.p_base,
         paddingHorizontal: Padding.p_base,
-        marginBottom: '20%'
+        marginBottom: '15%'
     },
     manageEquipment: {
         width: "100%",
         flex: 1,
         backgroundColor: Color.colorWhitesmoke_200,
-    },
-    iconBg: {
+    },iconBg: {
         backgroundColor: "#F4F4F5",
         padding: 5,
         width: wp("20%"),
