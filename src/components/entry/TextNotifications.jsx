@@ -83,7 +83,7 @@ const TextNotifications = ({ navigation }) => {
 
     const onCheckBox = (value) => {
         setToggleCheckBox(value);
-        if (value && input !== undefined && input.length > 0) {
+        if (value && input !== undefined && input !== null && input.length > 0) {
             setEnableButton(true);
         } else {
             setEnableButton(false);
@@ -106,7 +106,15 @@ const TextNotifications = ({ navigation }) => {
         //{"accountNumber": "900690538", "billingOptOutStatus": false, "optOut": false, "outageOptOut": false, "phoneNumber": ""}
         if (toggleCheckBox && input.length > 0) {
             dispatch(updateTextNotification(data, null));
-            navigation.navigate(nextScreen);
+            if (nextScreen === 'MyTab') {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'MyTab' }],
+                });
+            } else {
+                navigation.navigate(nextScreen);
+            }
+
         }
     };
 
@@ -186,7 +194,16 @@ const TextNotifications = ({ navigation }) => {
                             accessibilityLabel="Buttons Section">
                             <Pressable
                                 style={[styles.buttonDecline, styles.buttonsLayout]}
-                                onPress={() => navigation.navigate(nextScreen)}
+                                onPress={() => {
+                                    if (nextScreen === 'MyTab') {
+                                        navigation.reset({
+                                            index: 0,
+                                            routes: [{ name: 'MyTab' }],
+                                        });
+                                    } else {
+                                        navigation.navigate(nextScreen);
+                                    }
+                                }}
                                 accessibilityLabel="Decline Button"
                                 accessibilityRole="button"
                                 accessibilityHint="Decline Terms and Conditions"

@@ -93,11 +93,11 @@ const Feedback = () => {
     return (
         <View style={styles.container}>
             <ProfileSettingsHeader title="Feedback" onPressBack={() => navigation.navigate('Account')} />
-           
+
             <ScrollView ref={scrollViewRef}>
                 <View style={{ marginBottom: 300 }}>
-                
-                    {showErrorAlert &&<View style={styles.howWouldYourRateYourExperWrapper}>
+
+                    {showErrorAlert && <View style={styles.howWouldYourRateYourExperWrapper}>
                         <NotificationAlert
                             type="error"
                             title="Error"
@@ -161,9 +161,9 @@ const Feedback = () => {
                         />
                     </View>
                     <View>
-                    <Text style={styles.footerWrapper}>
-                        {feedbackInfo.feedbackText.length}/500
-                    </Text>
+                        <Text style={styles.footerWrapper}>
+                            {feedbackInfo.feedbackText.length}/500
+                        </Text>
                     </View>
 
                     <View style={styles.textinputWrapper}>
@@ -178,8 +178,6 @@ const Feedback = () => {
                                         onChangeText={handleInputChange}
                                         value={value} // bind value
                                         error={error?.message} // display error message
-                                        autoCorrect={false}  // Turn off auto-correction
-                                        autoComplete="off"  // Turn off auto-completion
                                     />
                                 </>
                             )}
@@ -200,8 +198,8 @@ const Feedback = () => {
                     </View>
                 </View>
             </ScrollView>
-            </View>
-      
+        </View>
+
     );
 };
 
@@ -312,7 +310,7 @@ const styles = StyleSheet.create({
         alignSelf: "stretch",
     },
     footerWrapper: {
-       // paddingVertical: Padding.p_base,
+        // paddingVertical: Padding.p_base,
         paddingHorizontal: Padding.p_base,
         textAlign: 'right',
         alignSelf: "stretch",

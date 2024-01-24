@@ -48,7 +48,7 @@ If you suspect that your modem is not functioning properly, please `
             navigation.goBack()
         }}
       />
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} >
       <View
             style={[
               styles.card,
@@ -93,8 +93,8 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     width: wp("92%"),
     marginTop: wp("8%"),
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingVertical: 20,
+    marginBottom:"20%"
   },
   shadowProp: {
     shadowColor: "#171717",

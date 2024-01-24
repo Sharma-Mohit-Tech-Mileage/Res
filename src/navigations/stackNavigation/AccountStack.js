@@ -15,11 +15,12 @@ import Feedback from '../../components/support/Feedback';
 import ThumbsUp from '../../components/support/ThumbsUp';
 import ArticalWindowUtility from '../../components/utility/ArticalWindowUtility';
 import { useTabBarVisibility } from '../TabBarVisibilityContext';
+import supportScreen from "../../components/support/supportScreen";
 const AccountStack = createStackNavigator();
 function AccountStackScreen() {
     const { setTabBarVisible } = useTabBarVisibility();
     return (
-        <AccountStack.Navigator initialRouteName="Account">
+        <AccountStack.Navigator initialRouteName="Account" defaultNavigationOptions={{ gestureEnabled: true }}>
             <AccountStack.Screen
                 name="Account"
                 component={AccountScreen}
@@ -27,6 +28,15 @@ function AccountStackScreen() {
                 listeners={{
                     focus: () => setTabBarVisible(true),
                     blur: () => setTabBarVisible(true)
+                }}
+            />
+            <AccountStack.Screen
+                name="support"
+                component={supportScreen}
+                options={{ headerShown: false }}
+                listeners={{
+                    focus: () => setTabBarVisible(true),
+                    blur: () => setTabBarVisible(true),
                 }}
             />
             <AccountStack.Screen
