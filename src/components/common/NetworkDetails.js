@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
-import WifiIcon from "../../res/svgIcons/WifiIcon";
-import Modemicon from "../../res/svgIcons/Modemicon";
 import Billpaidicon from "../../res/svgIcons/Billpaidicon";
 import Outageicon from "../../res/svgIcons/Outageicon";
 import colors from "../../res/Colors";
@@ -13,6 +11,7 @@ import {
 } from "react-native-responsive-screen";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
+import { Env } from "../../network/apis/account/Constants";
 const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
   useEffect(() => {
     //console.log("data");
@@ -60,7 +59,7 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
         onPress={() => {
           if(!billPaid){
           navigation.navigate("ArticalWindowUtility", {
-            url: "https://customer.uat.sparklight.com/residential/billing",
+            url: Env.URL+"/residential/billing",
             name: "Billing Details",
           });
         }

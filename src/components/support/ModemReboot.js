@@ -70,6 +70,9 @@ const ModemReboot = () => {
           setModemStatus(res.status);
           setTimeout(()=>{
            setLoading(false)
+           if(res.status=='Bad'){
+            setIsRebootError(true)
+           }
           },500)
           
         },

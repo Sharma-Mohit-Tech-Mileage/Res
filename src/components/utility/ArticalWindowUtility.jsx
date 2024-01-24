@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { getUser } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
 import { isUserAuthorized } from "../../network/APIClient";
+import { Env } from '../../network/apis/account/Constants';
 
 const { width, height } = Dimensions.get('window');
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -26,7 +27,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         //https://login.uat.cableone.net/auth/realms/external-sso-realm
         console.log('navigationChange: ', JSON.stringify(navState));
         if (navState.url.includes('/postlogout')
-            || navState.url.includes('login.uat.cableone.net')) {
+            || navState.url.includes(Env.SSO_LOGIN)) {
                 
             if (!navStateReloading) {
                 setModalOpen(false);   
