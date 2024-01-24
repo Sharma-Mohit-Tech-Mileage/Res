@@ -1,6 +1,7 @@
 import { _axios, _axios_cableone } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import axios from 'axios'; // Make sure to import axios
+import { Env } from "./Constants";
 
 const getProfileDetails = async () => {
     let data = await getUser();
@@ -337,19 +338,19 @@ const unsubscribPaperLess = async () => {
 // };
 
 const handleSubmitFeedback = async (obj) => {
-    const zendeskRequestApiUrl = 'https://cableone1615402851.zendesk.com/api/v2/requests.json';
+    const zendeskRequestApiUrl = Env.ZENDESK_FEEDBACK.Url
     let user = await getUser();
     const fullName = user.userInfo?.fullName;
     const payload = {
         request: {
-            ticket_form_id: "1500000315922",
+            ticket_form_id:Env.ZENDESK_FEEDBACK.ticket_form_id ,
             requester: {
                 name: fullName,
                 email: obj.email
             },
-            recipient: "1503384311321",
-            assignee_id: "1503384311321",
-            group_id: "360017953054",
+            recipient: Env.ZENDESK_FEEDBACK.recipient,
+            assignee_id:Env.ZENDESK_FEEDBACK.assignee_id,
+            group_id: Env.ZENDESK_FEEDBACK.group_id,
             type: null,
             custom_fields: [
                 { id: "1500002176201", value: obj.category },

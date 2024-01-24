@@ -152,7 +152,7 @@ const TextNotifications = ({ navigation }) => {
                                 placeholder="Phone number"
                                 input={input}
                                 onChangeText={onChangeText}
-                                onSubmitText={enableTextNotifications}
+                                onSubmitText={keyboardDismiss}
                                 keyboardType="number-pad"
                             />                
                         </View>                            

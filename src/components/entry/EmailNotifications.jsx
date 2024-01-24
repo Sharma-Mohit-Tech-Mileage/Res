@@ -141,7 +141,7 @@ const EmailNotifications = ({ navigation }) => {
                                     placeholder="Email Address"
                                     input={input}
                                     onChangeText={onChangeText}
-                                    onSubmitText={enableEmailNotifications}
+                                    onSubmitText={keyboardDismiss}
                                     keyboardType="email-address"
                                 />                
                                 </View>   

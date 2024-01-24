@@ -22,6 +22,7 @@ import SpeedTestModal from "./customui/SpeedTestModal";
 import moment from "moment";
 import { GetApiRequest } from "../../network/APIClient";
 import { FontFamily } from "../../../GlobalStyles";
+import { Env } from "../../network/apis/account/Constants";
 
 
 const DataSpeedComponent = ({navigation}) => {
@@ -224,7 +225,10 @@ const DataSpeedComponent = ({navigation}) => {
       />
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name: 'Upgrade Plan' })
+          navigation.navigate('ArticalWindowUtility', { 
+            url: Env.URL+'/residential/services/upgrade',
+             // url: 'https://customer.sparklight.com/residential/services/upgrade',
+             name: 'Upgrade Plan' })
           // Linking.openURL(
           //   "https://customer.uat.sparklight.com/residential/services/upgrade"
           // );
