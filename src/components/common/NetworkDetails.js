@@ -6,6 +6,7 @@ import Billpaidicon from "../../res/svgIcons/Billpaidicon";
 import Outageicon from "../../res/svgIcons/Outageicon";
 import colors from "../../res/Colors";
 import strings from "../../res/Strings";
+import { Env } from "../../network/apis/account/Constants";
 
 import {
   widthPercentageToDP as wp,
@@ -60,7 +61,7 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
         onPress={() => {
           if(!billPaid){
           navigation.navigate("ArticalWindowUtility", {
-            url: "https://customer.uat.sparklight.com/residential/billing",
+            url: `${Env.URL}/residential/billing`,
             name: "Billing Details",
           });
         }

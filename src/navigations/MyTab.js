@@ -20,6 +20,7 @@ import {
 } from "react-native";
 import { useSelector } from 'react-redux';
 import { FontFamily } from '../../GlobalStyles';
+import { Env } from "../network/apis/account/Constants";
 
 const Tab = createBottomTabNavigator();
 
@@ -104,7 +105,7 @@ const MyTabs = ({ route, navigation }) => {
                       {
                         name: 'ArticalWindowUtility',
                         params: {
-                          url: 'https://customer.uat.sparklight.com/residential/services/upgrade',
+                          url: `${Env.URL}/residential/services/upgrade`,
                           name: 'Shop'
                         },
                       },
