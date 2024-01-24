@@ -156,20 +156,6 @@ const SplashScreen = ({ navigation }) => {
             }}> login to your online account</Text>
             {message2}
             </Text>
-            {/* <TouchableOpacity
-              style={styles.openBtn}
-              onPress={() => {
-                Linking.openURL("https://customer.uat.sparklight.com/SecureLogin/login.aspx");
-
-              }}
-            >
-              <Text
-                style={styles.openPortaltxt}
-              >
-                Open Portal
-              </Text>
-            </TouchableOpacity> */}
-
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={onClose}

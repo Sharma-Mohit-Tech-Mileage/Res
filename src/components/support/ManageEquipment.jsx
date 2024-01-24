@@ -8,6 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
+import { ScrollView } from "react-native-gesture-handler";
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
@@ -26,7 +27,7 @@ const ManageEquipment = () => {
             const request = `mobile/api/Device/GetOwnershipInfo?accountnumber=${res.userInfo.accountNumber}`;
             GetApiRequest(request, (res)=>{
                 console.log("getLeasedDetails", res);
-               setLeased(res.modemOwnership)
+                setLeased(res?.modemOwnership ?? '');
             }, (error)=>{
                 console.log("getLeasedDetails Error", error);
             });

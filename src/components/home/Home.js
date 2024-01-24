@@ -218,28 +218,8 @@ const HomeScreen = ({ route, navigation }) => {
     getInternetPlanDetails();
     getUserAccountDetails();
     checkNotifications();
-    getDataUsage()
-
-    // const backAction = () => {
-    //   Alert.alert(
-    //     "Confirm Exit",
-    //     "Are you sure you want to exit the app kapil?",
-    //     [
-    //       {
-    //         text: "Cancel",
-    //         onPress: () => null,
-    //         style: "cancel",
-    //       },
-    //       {
-    //         text: "Exit",
-    //         onPress: () => BackHandler.exitApp(),
-    //       },
-    //     ],
-    //     { cancelable: false }
-    //   );
-    //   return true;
-    // };
-
+     getDataUsage()
+  
     const backAction = () => {
       // Check if there's a screen to go back to
       if (navigation.canGoBack()) {

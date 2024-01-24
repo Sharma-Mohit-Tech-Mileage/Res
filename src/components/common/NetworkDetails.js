@@ -4,7 +4,6 @@ import Billpaidicon from "../../res/svgIcons/Billpaidicon";
 import Outageicon from "../../res/svgIcons/Outageicon";
 import colors from "../../res/Colors";
 import strings from "../../res/Strings";
-
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -59,7 +58,7 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
         onPress={() => {
           if(!billPaid){
           navigation.navigate("ArticalWindowUtility", {
-            url: Env.URL+"/residential/billing",
+            url: `${Env.URL}/residential/billing`,
             name: "Billing Details",
           });
         }

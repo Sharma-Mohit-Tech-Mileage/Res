@@ -79,11 +79,9 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
-              
-                url: Env.URL+"/residential/billing",
+              url: `${Env.URL}/residential/billing`,
               name: "Billing Details",
             });
-            //Linking.openURL('https://customer.uat.sparklight.com/residential/billing')
           }}
           style={{
             paddingBottom: 5,
@@ -160,7 +158,6 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
               url: `${Env.URL}/residential/services/upgrade`,
               name: "Upgrade Plan",
             });
-            //Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
           }}
           style={{
             paddingBottom: 5,
