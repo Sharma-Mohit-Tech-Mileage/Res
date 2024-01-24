@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
-import { authorize, revoke, refresh, logout } from "react-native-app-auth";
+import { authorize, revoke, refresh } from "react-native-app-auth";
 import { useDispatch, useSelector } from "react-redux";
 import { ssoLoginAction, saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
@@ -31,7 +31,6 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { SetRenewTokenTimer, SetClearTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env } from "../../network/apis/account/Constants";
-import VersionCheck from 'react-native-version-check';
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -49,6 +48,7 @@ const SplashScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [loginEnable, setLoginEnable] = useState(true);
   const [disconnected, setDisconnected] = useState(false);
+  const [data, setData] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessage1, setErrorMessage1] = useState("");
@@ -74,49 +74,36 @@ const SplashScreen = ({ navigation }) => {
         refreshToken: res.refreshToken
       };
 
-      if (res.userInfo.acctStatus === 'Disconnect'){
-        setDisconnected(true);
-      } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
-        setErrorMessage(strings.nonAdminUserMsg);
-        setErrorMessage1(' to view information.')
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
-      } else if (res.custServices.internet == false) {
-        setErrorMessage(strings.nonInternetUserMessage);
-        setErrorMessage1(' to manage your service.')
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
-      } else {
-        storeUser(user);
-        dispatch(saveUserInfo(user));
-        SetRenewTokenTimer();
-
-        if (user.userInfo.mobileTCAcceptanceFlag) {
-          navigation.navigate("MyTab");
+      if (res.userInfo.acctStatus==='Disconnect'){
+        setDisconnected(true)
+       } else if (userInfo.authLevel==='Limited') {
+          setErrorMessage(strings.nonAdminUserMsg);
+          setErrorMessage1(' to view information.')
+          setTimeout(() => {
+            setModalVisible(true);
+          }, 100);
+        } else if (res.custServices.internet==false) {
+          setErrorMessage(strings.nonInternetUserMessage);
+          setErrorMessage1(' to manage your service.')
+          setTimeout(() => {
+            setModalVisible(true);
+          }, 100);
         } else {
-          navigation.navigate("Terms");
-        }
-      }         
+          storeUser(user);
+          dispatch(saveUserInfo(user));
+          SetRenewTokenTimer();
+          if (user.userInfo.mobileTCAcceptanceFlag) {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'MyTab' }], // Navigate to 'MyTab' after reset
+            });
+          } else {
+            navigation.navigate("Terms");
+          }
+        }         
     }
   }
 
-  const logoutAction = () => {
-    getSsoToken().then((res) => {
-      console.log('token', res)
-      let token = res.idToken;
-      logout(config, {
-        idToken: token,
-        postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
-      }).then((result) => {
-        storeUser({});
-        storeSsoToken({});
-        saveUserInfo({});
-        cleanUserData();
-      });
-    });
-  }
   const onError = (error) => {
     console.log(" callSSOLoginApi error", error);
     setLoading(false);
@@ -151,11 +138,23 @@ const SplashScreen = ({ navigation }) => {
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
             />
             <Text style={styles.message}>{message}
-            <Text style={[styles.message,{fontWeight:600,color:colors.sparklight_purple_blue}]} onPress={()=>{
-              Linking.openURL(Env.URL);
-            }}> login to your online account</Text>
+            <Text style={[styles.message,{fontWeight:600,color:colors.sparklight_purple_blue}]}>Please login to your online account</Text>
             {message2}
             </Text>
+            {/* <TouchableOpacity
+              style={styles.openBtn}
+              onPress={() => {
+                Linking.openURL("https://customer.uat.sparklight.com/SecureLogin/login.aspx");
+
+              }}
+            >
+              <Text
+                style={styles.openPortaltxt}
+              >
+                Open Portal
+              </Text>
+            </TouchableOpacity> */}
+
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={onClose}
@@ -174,7 +173,6 @@ const SplashScreen = ({ navigation }) => {
 
   const handleCloseAlert = () => {
     setModalVisible(false);
-    logoutAction();
   };
 
   const loginAuth = async () => {
@@ -185,14 +183,16 @@ const SplashScreen = ({ navigation }) => {
 
       const data = { 
         idToken: result.idToken,
-        accessToken: result.accessToken,
+        accessToken:result.accessToken,
         idTokenGuid: result.authorizeAdditionalParameters.session_state,
         refreshToken: result.refreshToken
       };
       
       setLoading(true);
-      storeSsoToken(data);
+      //dispatch(ssoLoginAction(data))
       callSSOLoginApi(data);
+      storeSsoToken(data);
+      setData(result)
     } catch (error) {
       console.log(error);
     }
@@ -222,7 +222,6 @@ const SplashScreen = ({ navigation }) => {
           };
     
           setLoading(true);
-          storeSsoToken(data);          
           callSSOLoginApi(data);
         }
       } catch (error) {
@@ -269,8 +268,7 @@ const SplashScreen = ({ navigation }) => {
             </TouchableOpacity>        
           </>
         )
-      }  
-      <Text style={{color: 'white',alignSelf:'center', marginTop:45, fontSize:16}}>Version:{VersionCheck.getCurrentVersion()}</Text>          
+      }            
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
@@ -285,7 +283,6 @@ const SplashScreen = ({ navigation }) => {
       }}
       onClose={()=>{
         setDisconnected(false)
-        logoutAction();
       }}
       />
     </LinearGradient>

@@ -140,7 +140,15 @@ const Terms = ({ navigation }) => {
     const termsAccepted = async () => {
         await dispatch(updateTermsAndConditions(true, null));
         console.log('termsAccepted: ', nextScreen);
-        navigation.navigate(nextScreen);
+        if (nextScreen === 'MyTab') {
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'MyTab' }],
+            });
+        } else {
+            navigation.navigate(nextScreen);
+        }
+
     };
 
     const termsCanceled = () => {

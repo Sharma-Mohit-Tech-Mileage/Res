@@ -93,7 +93,15 @@ const PushNotifications = ({ navigation }) => {
                 permanentSkip: true
             };            
             storePushNotificationStatus(localData);
-            navigation.navigate(nextScreen);
+            if (nextScreen === 'MyTab') {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'MyTab' }],
+                });
+            } else {
+                navigation.navigate(nextScreen);
+            }
+
         }
     };
 
