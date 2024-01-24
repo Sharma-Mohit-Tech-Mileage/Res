@@ -20,7 +20,7 @@ import {
 } from "react-native";
 import { useSelector } from 'react-redux';
 import { FontFamily } from '../../GlobalStyles';
-import { Env } from "../network/apis/account/Constants";
+import { Env } from '../network/apis/account/Constants';
 
 const Tab = createBottomTabNavigator();
 

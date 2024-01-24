@@ -31,6 +31,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { SetRenewTokenTimer, SetClearTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env } from "../../network/apis/account/Constants";
+import VersionCheck from 'react-native-version-check';
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -75,7 +76,7 @@ const SplashScreen = ({ navigation }) => {
 
       if (res.userInfo.acctStatus === 'Disconnect'){
         setDisconnected(true);
-      } else if (userInfo.authLevel === 'Limited') {
+      } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
         setErrorMessage(strings.nonAdminUserMsg);
         setErrorMessage1(' to view information.')
         setTimeout(() => {
@@ -266,7 +267,8 @@ const SplashScreen = ({ navigation }) => {
             </TouchableOpacity>        
           </>
         )
-      }            
+      }  
+      <Text style={{color: 'white',alignSelf:'center', marginTop:20, fontSize:16}}>Version:{VersionCheck.getCurrentVersion()}</Text>          
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
