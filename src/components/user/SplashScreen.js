@@ -1,3 +1,6 @@
+SplashScreen
+
+
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -94,7 +97,10 @@ const SplashScreen = ({ navigation }) => {
         SetRenewTokenTimer();
 
         if (user.userInfo.mobileTCAcceptanceFlag) {
-          navigation.navigate("MyTab");
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'MyTab' }], // Navigate to 'MyTab' after reset
+          });
         } else {
           navigation.navigate("Terms");
         }
@@ -151,9 +157,25 @@ const SplashScreen = ({ navigation }) => {
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
             />
             <Text style={styles.message}>{message}
-            <Text style={[styles.message,{fontWeight:600,color:colors.sparklight_purple_blue}]}>Please login to your online account</Text>
+            <Text style={[styles.message,{fontWeight:600,color:colors.sparklight_purple_blue}]} onPress={()=>{
+              Linking.openURL(Env.URL);
+            }}> login to your online account</Text>
             {message2}
             </Text>
+            {/* <TouchableOpacity
+              style={styles.openBtn}
+              onPress={() => {
+                Linking.openURL("https://customer.uat.sparklight.com/SecureLogin/login.aspx");
+
+              }}
+            >
+              <Text
+                style={styles.openPortaltxt}
+              >
+                Open Portal
+              </Text>
+            </TouchableOpacity> */}
+
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={onClose}
@@ -268,7 +290,7 @@ const SplashScreen = ({ navigation }) => {
           </>
         )
       }  
-      <Text style={{color: 'white',alignSelf:'center', marginTop:20, fontSize:16}}>Version:{VersionCheck.getCurrentVersion()}</Text>          
+      <Text style={{color: 'white',alignSelf:'center', marginTop:45, fontSize:16}}>Version:{VersionCheck.getCurrentVersion()}</Text>          
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
@@ -414,4 +436,5 @@ const styles = StyleSheet.create({
 });
 
 export default SplashScreen;
+
 

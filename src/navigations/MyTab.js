@@ -13,6 +13,7 @@ import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
 import { CopilotStep, walkthroughable, useCopilot } from "react-native-copilot";
 import React, { useEffect, useState } from "react";
+import { BackHandler } from 'react-native';
 import {
   View,
   StyleSheet,
@@ -43,15 +44,32 @@ const MyTabs = ({ route, navigation }) => {
     copilotEvents.on("stop", () => {
       setLastEvent(`stop`);
     });
-  }, [copilotEvents]);  
-  
+  }, [copilotEvents]); 
+
   useEffect(() => {
-    // Alert.alert(('hello'));
-    // setTimeout(() => {
-    // start();
-    //   Alert.alert(('timeout'));
-    // }, 10000);
-  }, []);
+    const backAction = () => {
+      // Check if there's a screen to go back to in the navigation stack
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+        return true; // Prevents the default back action, navigates back
+      }
+      // If no previous screen is available, do nothing and let the default action proceed
+      return false; // Allows the default back action to proceed
+    };
+
+    // Add the back button listener
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    // Clean up the listener on component unmount
+    return () => backHandler.remove();
+  }, [navigation]);
+
+
+
+
 
   return (
     <Tab.Navigator

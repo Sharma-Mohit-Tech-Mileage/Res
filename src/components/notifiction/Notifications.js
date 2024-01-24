@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-nati
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, } from '../../redux/actions/ProfileActionSuite';
+import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper,fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
 import { transformResponse, transformNotificationPreferences, isPrimaryAdmin } from '../../components/utility/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from "../common/customui/NotificationAlert";
@@ -26,14 +26,13 @@ const Notifications = () => {
   const isEmailVerified = emailStatus === 'Verified';
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   const isFreshEntry = (entry) => {
-
     return !(
       entry.emailAddress !== "" &&
       entry.paperlessStatus === "InActive" &&
       entry.emailStatus === "Verified"
     );
   };
-  const notRegistered = isFreshEntry(paperLessInfo);
+
   let notificationsTitle, infoText, isDisabled;
   if (emailAddress) {
     notificationsTitle = isEmailVerified ? "" : "Email verification pending";
@@ -43,15 +42,17 @@ const Notifications = () => {
     if (profileDetails.multipleEmails) {
       isDisabled = true;
       notificationsTitle = "There is a problem retrieving your email address";
-      infoText = 
-      (
-        <Text>
+      infoText =
+        (<Text>
           We are not able to retrieve the email address for your account. Please
-          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('support') }}>
-            {' contect us '}
-          </Text>
+          <Pressable onPress={() => { navigation.navigate('support') }}>
+            <Text style={[styles.text, { color: Color.colorMidnightblue }]}>
+              {' contact us '}
+            </Text>
+          </Pressable>
           for assistance.
-        </Text>)
+        </Text>
+)
 
     } else if (profileDetails.svEmailAddress) {
       isDisabled = false;
@@ -59,14 +60,16 @@ const Notifications = () => {
     else {
       isDisabled = true;
       notificationsTitle = "No email address on file";
-      infoText = (
-        <Text>
-          We don’t have your email address on file. Go to
-          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('ProfileSettings') }}>
+      infoText = (<Text>
+        We don’t have your email address on file. Go to
+        <Pressable onPress={() => { navigation.navigate('ProfileSettings') }}>
+          <Text style={[styles.text, { color: Color.colorMidnightblue }]}>
             {' Profile Settings '}
           </Text>
-          to add your email.
-        </Text>)
+        </Pressable>
+        to add your email.
+      </Text>
+)
     }
   }
   useEffect(() => {
@@ -75,6 +78,7 @@ const Notifications = () => {
         await dispatch(fetchBillingPaper());
         await dispatch(fetchSMSSelection());
         await dispatch(fetchPushNotifications());
+        await dispatch(fetchProfileDetails());
       } catch (error) {
         console.error("Error fetching data", error);
       }
