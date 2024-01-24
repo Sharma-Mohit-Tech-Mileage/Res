@@ -164,7 +164,10 @@ const EmailNotifications = ({ navigation }) => {
                             <Pressable
                                 style={[styles.buttonDecline, styles.buttonsLayout]}
                                 onPress={() => {
-                                    navigation.navigate("MyTab");
+                                    navigation.reset({
+                                        index: 0,
+                                        routes: [{ name: 'MyTab' }], // Navigate to 'MyTab' after reset
+                                    });
                                 }}
                                 accessibilityLabel="Decline Button"
                                 accessibilityRole="button"

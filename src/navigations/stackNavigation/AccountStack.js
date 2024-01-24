@@ -20,7 +20,7 @@ const AccountStack = createStackNavigator();
 function AccountStackScreen() {
     const { setTabBarVisible } = useTabBarVisibility();
     return (
-        <AccountStack.Navigator initialRouteName="Account">
+        <AccountStack.Navigator initialRouteName="Account" defaultNavigationOptions={{ gestureEnabled: true }}>
             <AccountStack.Screen
                 name="Account"
                 component={AccountScreen}

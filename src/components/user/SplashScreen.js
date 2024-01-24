@@ -92,9 +92,11 @@ const SplashScreen = ({ navigation }) => {
           storeUser(user);
           dispatch(saveUserInfo(user));
           SetRenewTokenTimer();
-
           if (user.userInfo.mobileTCAcceptanceFlag) {
-            navigation.navigate("MyTab");
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'MyTab' }], // Navigate to 'MyTab' after reset
+            });
           } else {
             navigation.navigate("Terms");
           }
