@@ -21,7 +21,19 @@ const ManageEquipment = () => {
     const [transmissionType,setTransmissionType]=React.useState('')
     const [leased,setLeased]=React.useState('')
     const [plans,setPlans]=React.useState([])
+    const [data, setData] = useState({});
+    const getDataUsage = () => {
+        let re = getUser().then((res) => {
+            const request = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
+            GetApiRequest(request, (res) => {
+                if (res) {
+                    setData(res)
+                }
+            }, (error) => {
 
+            });
+        });
+    };
     const getLeasedDetails=()=>{
         let re = getUser().then((res) => {
             const request = `mobile/api/Device/GetOwnershipInfo?accountnumber=${res.userInfo.accountNumber}`;
@@ -70,8 +82,7 @@ const ManageEquipment = () => {
        getModemDetails();
        getLeasedDetails();
        getInternetPlanDetails();
-       
-
+       getDataUsage();
     },[])
 
 
@@ -194,7 +205,7 @@ const ManageEquipment = () => {
                         </View>
                     </View>
                     <View style={[styles.frameFlexBox]}>
-                        <MyServicePlan plans={plans} navigation={navigation}/>
+                        <MyServicePlan plans={plans} useData={data}  navigation={navigation}/>
                     </View>
                 </View>
             </ScrollView>
