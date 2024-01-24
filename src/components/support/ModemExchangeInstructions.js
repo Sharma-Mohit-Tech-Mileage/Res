@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     width: wp("92%"),
     marginTop: wp("8%"),
-    paddingTop: 20,
+    paddingVertical: 20,
     marginBottom:"20%"
   },
   shadowProp: {
