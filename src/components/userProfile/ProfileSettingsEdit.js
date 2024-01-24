@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateProfileRequest } from '../../redux/actions/ProfileActionSuite';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { profileSchema } from '../utility/validationSchema';
+import { isPrimaryAdmin } from '../utility/constant';
 
 const ProfileSettingsEdit = () => {
   const navigation = useNavigation();
@@ -20,6 +21,7 @@ const ProfileSettingsEdit = () => {
   const [initialEmailAddress, setInitialEmailAddress] = useState('');
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetailsfromStore = profile.profileDetails || {};
+  const isPrimaryUser = isPrimaryAdmin(profileDetailsfromStore.memberType);
   const scrollViewRef = useRef(null);
   const [smsPayload, setSmsPayload] = useState(route.params?.smsPayload || {});
 
@@ -34,7 +36,7 @@ const ProfileSettingsEdit = () => {
   };
 
   const { control, handleSubmit, reset, formState: { errors } } = useForm({
-    resolver: yupResolver(profileSchema),
+    resolver: yupResolver(profileSchema(isPrimaryUser, profileDetailsfromStore.multipleEmails)),
     defaultValues: {
       ...profileDetailsfromStore,
       phoneNumber: smsPayload.phoneNumber
@@ -71,12 +73,11 @@ const ProfileSettingsEdit = () => {
   }, [profileDetailsfromStore]);
 
   useEffect(() => {
-    // Cleanup function to close notifications on unmount
     return () => {
       setShowErrorAlert(false);
       setShowValidationAlert(false);
     };
-  }, []); // The empty array ensures this runs on unmount only
+  }, []);
 
   return (
     <View style={styles.profileSettingsEdit}>
@@ -178,11 +179,11 @@ const ProfileSettingsEdit = () => {
                   render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                     <SparkLightInput
                       label={'Email'}
-                      placeholder="First Name"
+                      placeholder={(!isPrimaryUser || profileDetailsfromStore.multipleEmails) ?"":"Email"}
                       onBlur={onBlur}
                       onChangeText={onChange}
-                      value={value}
-                      editable={!profileDetailsfromStore.multipleEmails}
+                      value={(!isPrimaryUser || profileDetailsfromStore.multipleEmails)?'':value}
+                      editable={!profileDetailsfromStore.multipleEmails && isPrimaryUser}
                       error={error?.message}
                     />
                   )}
@@ -194,14 +195,15 @@ const ProfileSettingsEdit = () => {
                   name="phoneNumber" // This should be the name used in your validation schema
                   render={({ field: { onChange, onBlur, value } }) => (
                     <SparkLightInput
-                      placeholder="Mobile number"
+                      placeholder={isPrimaryUser?"Mobile number":""}
                       onBlur={onBlur}
                       label={'Mobile Phone'}
                       onChangeText={(text) => {
                         onChange(text);
                         updateSmsPayloadPhoneNumber(text);
                       }}
-                      value={value}
+                      value={isPrimaryUser?value:""}
+                      editable={isPrimaryUser}
                       error={errors.phoneNumber?.message}
                     />
                   )}
@@ -213,6 +215,7 @@ const ProfileSettingsEdit = () => {
             <Pressable style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]} onPress={handleSubmit(handleSave, handleValidationError)}>
               <Text style={[{ color: Color.sparklightWhite }, styles.makeTypo]}>Save</Text>
             </Pressable>
+            <View style={{ padding: 8 }}></View>
             <Pressable style={[styles.buttonsLayout]} onPress={() => navigation.navigate("ProfileSettings")}>
               <Text style={[styles.makeTypo, { color: Color.colorMidnightblue }]}>Cancel</Text>
             </Pressable>
@@ -298,7 +301,7 @@ const styles = StyleSheet.create({
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",
-    marginBottom: 200,
+    marginBottom: 300,
   },
   infoWrapper: {
     paddingHorizontal: Padding.p_5xl,

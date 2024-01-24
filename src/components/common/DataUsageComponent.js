@@ -5,13 +5,36 @@ import colors from "../../res/Colors";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
 import { getUser } from "../../redux/utils/LocalStorage";
+import { Env } from "../../network/apis/account/Constants";
+import { GetApiRequest } from "../../network/APIClient";
 const DataUsageComponent = ({navigation}) => {
  const [account,setAccount]=useState('')
+ const [data,setData]=useState({})
+ const [progress,setProgress]=useState(0.0)
+
+ const getDataUsage = () => {
+  let re = getUser().then((res) => {
+    const request = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
+    GetApiRequest(request, (res)=>{
+          if(res){
+            setData(res)
+            let totalUsedGB=Math.round(data.totalUsedGB)
+            let planData=Math.round(data.dataPlanGB)
+            var progress = Math.round(((totalUsedGB/planData)*100) * 10) / 10
+            setProgress(progress)
+          }
+    }, (error)=>{
+
+    });
+  });
+};
+
   useEffect(() => {
-    console.log("data");
+    
     let re = getUser().then((res) => {
       setAccount(res.userInfo.accountNumber)
     });
+    getDataUsage();
   }, []);
   return (
     <View
@@ -25,7 +48,7 @@ const DataUsageComponent = ({navigation}) => {
     >
       <ProgressCircle
         style={{ height: 200 }}
-        progress={(account==='900679010')?1.0:0.8}
+        progress={progress}
         progressColor={"#8D3B90"}
         backgroundColor={"#e1e1e1"}
         cornerRadius={5}
@@ -47,7 +70,7 @@ const DataUsageComponent = ({navigation}) => {
               alignItems: "center",
             }}
           >
-            <Text style={styles.dataText}>{(account==='900679010')?'700':'540'}</Text>
+            <Text style={styles.dataText}>{Math.round(data.totalUsedGB)}</Text>
             <Text style={[styles.dataText, { fontSize: 16, marginTop: 5 }]}>
               GB
             </Text>
@@ -68,7 +91,7 @@ const DataUsageComponent = ({navigation}) => {
               marginTop: 5,
             }}
           >
-            <Text style={styles.dataPlanTxt}> UNLIMITED PLAN</Text>
+            <Text style={styles.dataPlanTxt}> {Math.floor(data.dataPlanGB)}{" GB"}</Text>
           </View>
         </View>
       </ProgressCircle>
@@ -77,26 +100,26 @@ const DataUsageComponent = ({navigation}) => {
         <View style={{ flexDirection: "row" }}>
           <View style={styles.dataUsageIndicator} />
           <Text style={styles.useLbl}>Used</Text>
-          <Text style={styles.useDataLbl}>{(account==='900679010')?' 700GB':' 540GB'}</Text>
+          <Text style={styles.useDataLbl}>{" "}{Math.floor(data.uploadUsedGB+data.downloadUsedGB)}</Text>
         </View>
 
         <View style={{ flexDirection: "row" }}>
           <View style={[styles.dataUsageIndicator,{backgroundColor:colors.backgound_blue,marginLeft:5}]} />
           <Text style={styles.useLbl}>Remaining</Text>
-          <Text style={styles.useDataLbl}>{(account==='900679010')?' Unlimited':' 160GB'}</Text>
+          <Text style={styles.useDataLbl}>{" "}{Math.floor(data.remainingGB)}</Text>
         </View>
       </View>
       <View style={{ backgroundColor: colors.grey, height: 1, marginVertical: 10 }} />
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name: 'Upgrade Plan' })
+          navigation.navigate('ArticalWindowUtility', { url: Env.URL+"/residential/services/upgrade", name: 'Upgrade Plan' })
           //Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
         }}
         style={{
-          height: 30,
+          minHeight: 30,
           flexDirection: "row",
           justifyContent: "space-between",
-          padding: 5,
+          padding: 4,
           marginHorizontal:20
         }}
       >

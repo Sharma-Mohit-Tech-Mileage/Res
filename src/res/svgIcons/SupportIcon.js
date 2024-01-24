@@ -3,8 +3,8 @@ import {Svg, Circle, G, Path, Line, Rect} from 'react-native-svg';
 const SupportIcon = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
-    width={30}
-    height={30}
+    width={32}
+    height={32}
     fill="none"
     {...props}
   >

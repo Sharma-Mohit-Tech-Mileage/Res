@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../../GlobalStyles";
-import warningIcon from '../../../../assets/alertTriangle.png';
+import warningIcon from '../../../../assets/alert-triangle.png';
 import eyeIcon from '../../../../assets/eye.png';
 import eyeSlashIcon from '../../../../assets/HidePassword-01.png'
 
@@ -52,6 +52,7 @@ const SparkLightInput = ({
                     !isFocused && !error && { borderColor: Color.sparklightDarkGray }
                 ]}
                 accessibilityLabel={accessibilityLabel || placeholder}
+                maxFontSizeMultiplier={1.25}
                 {...props}
             />
             {error && (

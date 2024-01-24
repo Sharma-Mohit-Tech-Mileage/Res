@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
-import WifiIcon from "../../res/svgIcons/WifiIcon";
-import Modemicon from "../../res/svgIcons/Modemicon";
 import Billpaidicon from "../../res/svgIcons/Billpaidicon";
 import Outageicon from "../../res/svgIcons/Outageicon";
 import colors from "../../res/Colors";
 import strings from "../../res/Strings";
-
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
+import { Env } from "../../network/apis/account/Constants";
 const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
   useEffect(() => {
     //console.log("data");
@@ -49,14 +47,23 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
       </View>
 
       <View style={[styles.rowContainer]}>
-        <View style={styles.item}>
+        {/*<View style={styles.item}>
           <View style={styles.iconBg}>
             <Modemicon />
             <GreenCircle />
           </View>
           <Text style={styles.text}> {strings.no_modem_issue}</Text>
-        </View>
-        <View style={{ flexDirection: "row" }}>
+      </View>*/}
+        <TouchableOpacity style={{ flexDirection: "row" }}
+        onPress={() => {
+          if(!billPaid){
+          navigation.navigate("ArticalWindowUtility", {
+            url: `${Env.URL}/residential/billing`,
+            name: "Billing Details",
+          });
+        }
+        }}
+        >
           <View style={styles.item}>
             <View style={styles.iconBg}>
               <Billpaidicon />
@@ -65,26 +72,21 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
             <Text style={styles.text}> {strings.bill_paid}</Text>
           </View>
           {!billPaid ? (
-            <TouchableOpacity
+            <View
               style={{
                 justifyContent: "center",
                 right: 20,
                 top: 26,
                 position: "absolute",
               }}
-              onPress={() => {
-                navigation.navigate("ArticalWindowUtility", {
-                  url: "https://customer.uat.sparklight.com/residential/billing",
-                  name: "Billing Details",
-                });
-              }}
+              
             >
               <RightArrow />
-            </TouchableOpacity>
+            </View>
           ) : (
             <></>
           )}
-        </View>
+        </TouchableOpacity>
       </View>
     </View>
   );

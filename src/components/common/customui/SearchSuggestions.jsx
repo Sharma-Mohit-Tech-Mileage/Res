@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../../GlobalStyles';
 import { widthPercentageToDP as wp,heightPercentageToDP as hp} from 'react-native-responsive-screen';
-const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,navigation }) => {
+const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,navigation, onEndReached,Footer }) => {
     const inputRef = useRef(null);
     const [input, setInput] = useState('');
 
@@ -20,9 +20,11 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
     }, [input, onChangeInput]);
 
     const handleSuggestionClick = (suggestion) => {
-        setInput(suggestion.title);
+        //setInput(suggestion.title);
         // Optionally close the keyboard
-        navigation.navigate('ArticalWindowUtility', { url: suggestion.html_url, name: 'Search Result' }) 
+        if(suggestion.html_url!=''){
+          navigation.navigate('ArticalWindowUtility', { url: suggestion.html_url, name: 'Search Result' }) 
+        }
     };
 
 
@@ -30,12 +32,16 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
         <TouchableOpacity onPress={() => handleSuggestionClick(item)} style={styles.suggestionItem}>
             <Image
                 source={require('../../../../assets/file-05.png')}
-                style={{ marginRight: 8 }}
+                style={{
+                    marginRight: 18, width: 13.333,
+                    height: 16.667 }}
             />
-            <Text style={styles.suggestionText}>{item.title}</Text>
+            <Text maxFontSizeMultiplier={1.25} style={styles.suggestionText}>{item.title}</Text>
+            {(item.html_url!='') ?
             <Image
-                source={require('../../../../assets/share-04.png')}
+                source={require('../../../../assets/right-actionable10.png')}
             />
+                : <></>}
         </TouchableOpacity>
     );
 
@@ -47,6 +53,7 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
                 style={[styles.searchIcon, styles.leftIcon]}
             />
             <TextInput
+                    maxFontSizeMultiplier={1.25}
                     ref={inputRef}
                     style={styles.searchInput}
                     placeholder={placeholder}
@@ -60,8 +67,11 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
         <View style={{height:hp('70%')}}>
         <FlatList
             data={suggestions}
-            keyExtractor={(item, index) => item.id.toString()}
+            keyExtractor={(item, index) =>index.toString()}
             renderItem={renderSuggestion}
+            onEndReached={onEndReached}
+            onEndReachedThreshold={0.1}
+            //ListFooterComponent={Footer}
         />
         </View>
         </View>

@@ -8,7 +8,6 @@ import CreateTicket from "../../components/support/CreateTicket";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import TicketSupport from "../../components/support/TicketSupport";
 import TicketView from "../../components/support/TicketView";
-import ManageEquipment from "../../components/support/ManageEquipment";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import LiveSupportChat from "../../components/support/LiveSupportChat";
 import ModemStackScreen from "./ManageEquepmentStack";

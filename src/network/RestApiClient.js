@@ -1,9 +1,10 @@
 import axios from 'axios';
-const BASE_URL_CABLEONE="https://customer.uat.cableone.net/apiWrapper/"
-const BASE_URL="https://customer.uat.sparklight.com/apiWrapper/"
+import { Env } from "./apis/account/Constants";
+//const BASE_URL_CABLEONE="https://customer.uat.cableone.net/apiWrapper/"
+const BASE_URL=Env.API_BASEURL
 
 const _axios_auth = axios.create({
-    baseURL: BASE_URL_CABLEONE,
+    baseURL: BASE_URL,
     timeout: 15000,
     headers: {
         'Content-Type': 'application/json',
@@ -24,7 +25,7 @@ const _axios = axios.create({
 });
 
 const _axios_cableone = axios.create({
-    baseURL: BASE_URL_CABLEONE,
+    baseURL: BASE_URL,
     withCredentials: false,
     crossDomain: true,
     timeout: 10000,
@@ -103,3 +104,4 @@ const _axios_cableone = axios.create({
 
 
 export  {_axios, _axios_auth, _axios_cableone};
+

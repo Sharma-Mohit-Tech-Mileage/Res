@@ -13,6 +13,7 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style }) => {
                 minWidth="200"
                 accessibilityLabel="Choose Service"
                 placeholder="Select an option"
+                maxFontSizeMultiplier={1.25}
                 _selectedItem={{
                     bg: Color.Gray300,
                     endIcon: <CheckIcon size="5" />,

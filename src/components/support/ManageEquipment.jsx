@@ -100,7 +100,7 @@ const ManageEquipment = () => {
                                             <Text style={styles.mb8600Docsis}>
                                                 {model}:{transmissionType}
                                             </Text>
-                                            <View style={styles.poorHealthParent}>
+                                            {/* <View style={styles.poorHealthParent}>
                                                 <Text style={[styles.poorHealth, styles.textTypo2]}>
                                                     Poor Health
                                                 </Text>
@@ -109,17 +109,17 @@ const ManageEquipment = () => {
                                                     resizeMode="cover"
                                                     source={require("../../../assets/Ellipse.png")}
                                                 />
-                                            </View>
+                                            </View> */}
                                             <View style={[styles.badge, styles.parentBorder]}>
                                                 <Text style={[styles.text, styles.textTypo1]}>
-                                                    {leased.toLocaleUpperCase()}
+                                                    {'leased'.toLocaleUpperCase()}
                                                 </Text>
                                             </View>
                                         </View>
                                     </View>
                                 </View>
                             </View>
-                            <View style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}>
+                            {/* <View style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}>
                                 <View style={[styles.notifications, styles.parentBorder]}>
                                     <Image
                                         resizeMode="cover"
@@ -143,7 +143,7 @@ const ManageEquipment = () => {
                                         </View>
                                     </View>
                                 </View>
-                            </View>
+                            </View> */}
                         </View>
                         <View style={[styles.supportAccordionParent, styles.supportParentFlexBox]} >
                             <View style={[styles.frameLayout]} />
@@ -152,7 +152,8 @@ const ManageEquipment = () => {
                                 navigation.navigate('ModemExchange')
                             }}>
                                 <Image
-                                    resizeMode="stretch"
+                                style={{ width: 30, height: 30, flexShrink: 0 }}
+                                    resizeMode='contain'
                                     source={require("../../../assets/repeat-01.png")}
                                 />
                                 <Text style={styles.modemHealthSupport}>Exchange Modem</Text>
@@ -179,7 +180,8 @@ const ManageEquipment = () => {
                                 navigation.navigate('ModemRebootScreen')
                             }} >
                                 <Image
-                                    resizeMode="stretch"
+                                style={{ width: 30, height: 30, flexShrink: 0 }}
+                                    resizeMode='contain'
                                     source={require("../../../assets/refresh.png")}
                                 />
                                 <Text style={styles.modemHealthSupport}>Reboot Modem</Text>
@@ -397,7 +399,7 @@ const styles = StyleSheet.create({
     myModemParent: {
         paddingTop: Padding.p_5xl,
         paddingBottom: Padding.p_base,
-        paddingHorizontal: Padding.p_5xl,
+        paddingHorizontal: Padding.p_base,
         marginBottom: '15%'
     },
     manageEquipment: {

@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
-import { authorize, revoke } from "react-native-app-auth";
+import { authorize, revoke, refresh, logout } from "react-native-app-auth";
 import { useDispatch, useSelector } from "react-redux";
 import { ssoLoginAction, saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
@@ -27,13 +27,14 @@ import AlertIcon from "../../res/svgIcons/AlertIcon";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
-import { getFirstTime, storeFirstTime } from "../../redux/utils/LocalStorage";
-import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
 import { getUser } from "../../redux/utils/LocalStorage";
 import { SetRenewTokenTimer, SetClearTimer } from './Session';
+import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
+import { Env } from "../../network/apis/account/Constants";
+import VersionCheck from 'react-native-version-check';
 
 const config = {
-  issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
+  issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
   redirectUrl:
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
@@ -46,9 +47,11 @@ const config = {
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({});
+  const [loginEnable, setLoginEnable] = useState(true);
+  const [disconnected, setDisconnected] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage1, setErrorMessage1] = useState("");
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -56,37 +59,11 @@ const SplashScreen = ({ navigation }) => {
   };
   
   const onSuccess = async (res) => {
-    setLoading(false);
-    console.log('onSuccess res: ', res);
-
-    let token = res.jwtToken;
-      let userInfo = res.userInfo;
-      let user = {
-        userInfo: userInfo,
-        token: token,
-        tokenGuid: res.idTokenGuid,
-        refreshToken: res.refreshToken
-      };
-
-      if (token) {
-        storeUser(user);
-      }
-
-    const request = `account/api/account/${res.userInfo.accountNumber}`;
-    
-      GetApiRequest(request, (accountDetails)=>{
-        console.log("getUserAccountDetails", accountDetails);
-        if (accountDetails) {
-            handleLogin(res,accountDetails.services)
-        }
-      }, (error)=>{
-
-      });
-  
-    
+    setLoading(false);   
+    handleLogin(res)
   };
 
- const handleLogin=async(res,accountDetails)=>{
+ const handleLogin = async (res) => {
     if (res) {
       let token = res.jwtToken;
       let userInfo = res.userInfo;
@@ -97,50 +74,56 @@ const SplashScreen = ({ navigation }) => {
         refreshToken: res.refreshToken
       };
 
-      if (token) {
-        //storeUser(user);
-      }
+      if (res.userInfo.acctStatus === 'Disconnect'){
+        setDisconnected(true);
+      } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
+        setErrorMessage(strings.nonAdminUserMsg);
+        setErrorMessage1(' to view information.')
+        setTimeout(() => {
+          setModalVisible(true);
+        }, 100);
+      } else if (res.custServices.internet == false) {
+        setErrorMessage(strings.nonInternetUserMessage);
+        setErrorMessage1(' to manage your service.')
+        setTimeout(() => {
+          setModalVisible(true);
+        }, 100);
+      } else {
+        storeUser(user);
+        dispatch(saveUserInfo(user));
+        SetRenewTokenTimer();
 
-      dispatch(saveUserInfo(user));
-
-      SetRenewTokenTimer();
-
-      const data = await getFirstTime();
-
-        if (userInfo.accountNumber === "900690538") {
-          setErrorMessage(strings.nonAdminUserMsg);
-          setTimeout(() => {
-            setModalVisible(true);
-          }, 100);
-        } else if (accountDetails.commercialPhone==false && accountDetails.fxsCommercialPhone==false && accountDetails.digital==false && accountDetails.fiber==false && accountDetails.hsd==false && accountDetails.tv==false && accountDetails.iptv==false && accountDetails.tollFreeNumber==false && accountDetails.phone==false) {
-          setErrorMessage(strings.nonInternetUserMessage);
-          setTimeout(() => {
-            setModalVisible(true);
-          }, 100);
+        if (user.userInfo.mobileTCAcceptanceFlag) {
+          navigation.navigate("MyTab");
         } else {
-          if (data !== null 
-            && data.accountNumber === userInfo.accountNumber) {
-              navigation.navigate("MyTab");
-          } else {
-            storeFirstTime({
-              accountNumber: userInfo.accountNumber
-            });
-
-            if (user.userInfo.mobileTCAcceptanceFlag) {
-              navigation.navigate("EntryPushNotifications");
-            } else {
-              navigation.navigate("Terms");
-            }
-          }
-        }         
+          navigation.navigate("Terms");
+        }
+      }         
     }
   }
 
+  const logoutAction = () => {
+    getSsoToken().then((res) => {
+      console.log('token', res)
+      let token = res.idToken;
+      logout(config, {
+        idToken: token,
+        postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
+      }).then((result) => {
+        storeUser({});
+        storeSsoToken({});
+        saveUserInfo({});
+        cleanUserData();
+      });
+    });
+  }
   const onError = (error) => {
     console.log(" callSSOLoginApi error", error);
+    setLoading(false);
+    setDisconnected(true)
   };
 
-  const CustomAlertModal = ({ visible, message, onClose }) => {
+  const CustomAlertModal = ({ visible, message,message2, onClose }) => {
     return (
       <Modal
         visible={visible}
@@ -167,21 +150,10 @@ const SplashScreen = ({ navigation }) => {
             <View
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
             />
-            <Text style={styles.message}>{message}</Text>
-            <TouchableOpacity
-              style={styles.openBtn}
-              onPress={() => {
-                Linking.openURL("https://customer.uat.sparklight.com/SecureLogin/login.aspx");
-
-              }}
-            >
-              <Text
-                style={styles.openPortaltxt}
-              >
-                Open Portal
-              </Text>
-            </TouchableOpacity>
-
+            <Text style={styles.message}>{message}
+            <Text style={[styles.message,{fontWeight:600,color:colors.sparklight_purple_blue}]}>Please login to your online account</Text>
+            {message2}
+            </Text>
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={onClose}
@@ -200,6 +172,7 @@ const SplashScreen = ({ navigation }) => {
 
   const handleCloseAlert = () => {
     setModalVisible(false);
+    logoutAction();
   };
 
   const loginAuth = async () => {
@@ -210,31 +183,18 @@ const SplashScreen = ({ navigation }) => {
 
       const data = { 
         idToken: result.idToken,
-        accessToken:result.accessToken,
+        accessToken: result.accessToken,
         idTokenGuid: result.authorizeAdditionalParameters.session_state,
         refreshToken: result.refreshToken
       };
-
+      
       setLoading(true);
-      //dispatch(ssoLoginAction(data))
-      callSSOLoginApi(data);
       storeSsoToken(data);
-      setData(result)
+      callSSOLoginApi(data);
     } catch (error) {
       console.log(error);
     }
   };
-
-  const loginFirstTimeFlow = async () => {
-    storeFirstTime(null);
-    await loginAuth();
-  };
-
-  const termsAndConditionsFlow = async () => {
-    storeFirstTime(null);
-    dispatch(updateTermsAndConditions(false, null));
-    await loginAuth();
-  };  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -250,7 +210,7 @@ const SplashScreen = ({ navigation }) => {
             refreshToken: user.refreshToken,
           });
 
-          console.log('result: ', JSON.stringify(result));
+          //console.log('result: ', JSON.stringify(result));
 
           const data = { 
             idToken: result.idToken,
@@ -260,6 +220,7 @@ const SplashScreen = ({ navigation }) => {
           };
     
           setLoading(true);
+          storeSsoToken(data);          
           callSSOLoginApi(data);
         }
       } catch (error) {
@@ -293,19 +254,38 @@ const SplashScreen = ({ navigation }) => {
             <TouchableOpacity
               style={styles.SSoBtnContainer}
               onPress={() => {
-                loginAuth();
+                if(loginEnable){
+                  setLoginEnable(false)
+                   loginAuth();
+                   setTimeout(()=>{
+                    setLoginEnable(true)
+                   },1500)
+                }
               }}
             >
               <Text style={styles.SSoBtn}>Login</Text>
             </TouchableOpacity>        
           </>
         )
-      }            
+      }  
+      <Text style={{color: 'white',alignSelf:'center', marginTop:20, fontSize:16}}>Version:{VersionCheck.getCurrentVersion()}</Text>          
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
+        message2={errorMessage1}
         onClose={handleCloseAlert}
       />   
+      <CustomerDisconnectPage
+      visible={disconnected}
+      onLogin={()=>{
+        setDisconnected(false)
+        loginAuth();
+      }}
+      onClose={()=>{
+        setDisconnected(false)
+        logoutAction();
+      }}
+      />
     </LinearGradient>
   );
 };

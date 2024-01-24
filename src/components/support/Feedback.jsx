@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { feedbackSchema } from '../utility/validationSchema'; // Update the path as necessary
-import { ScrollView, Image, StyleSheet, Text, Pressable, View } from 'react-native';
+import { ScrollView, Image, StyleSheet, Pressable, View, Text, Keyboard } from 'react-native';
 import { Color, FontFamily, FontSize, Border, Padding } from '../../../GlobalStyles';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import SparkLightInput from '../common/customui/SparkLightInput';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveUserFeedback } from '../../redux/actions/ProfileActionSuite';
+import { saveUserFeedback, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
 const feedbackOptions = [
     { value: 1, category: 'complaint', name: 'facesad', text: 'Terrible', image: require("../../../assets/facesad.png"), selectedImage: require("../../../assets/Smiley-VeryUnsatisfied-sel.png") },
     { value: 2, category: 'complaint', name: 'facefrown', text: 'Unsatisfied', image: require("../../../assets/facefrown.png"), selectedImage: require("../../../assets/Smiley-Unsatisfied-sel.png") },
@@ -17,17 +17,19 @@ const feedbackOptions = [
     { value: 4, category: 'compliment', name: 'facesmile', text: 'Satisfied', image: require("../../../assets/facesmile.png"), selectedImage: require("../../../assets/Smiley-Satisfied-sel.png") },
     { value: 5, category: 'compliment', name: 'facehappy', text: 'Great', image: require("../../../assets/facehappy.png"), selectedImage: require("../../../assets/Smiley-VerySatisfied-sel.png") },
 ];
-const initialState = {
-    category: 'compliment',
-    feedbackValue: 5,
-    feedbackText: ""
-};
 const Feedback = () => {
     const navigation = useNavigation();
-    const [feedbackInfo, setFeedbackInfo] = useState(initialState);
+    const [feedbackInfo, setFeedbackInfo] = useState({
+        category: 'compliment',
+        feedbackValue: 5,
+        feedbackText: "",
+        email: ''
+    });;
     const [showErrorAlert, setShowErrorAlert] = useState(false);
     const route = useRoute(); // Use the useRoute hook
     const dispatch = useDispatch();
+    const profile = useSelector(state => state.combinedReducers.profile || {});
+    const profileDetails = profile.profileDetails || {};
     const [errormsg, setErrormsg] = useState("Please enter valid information to continue.");
     const scrollViewRef = useRef(null);
     const updateFeedbackInfo = (name, value) => {
@@ -44,7 +46,7 @@ const Feedback = () => {
     };
 
     const handleValidationError = () => {
-        setErrormsg('failed plz try after some time')
+        setErrormsg('Please enter valid information to continue.')
         setShowErrorAlert(true);
     };
 
@@ -64,8 +66,20 @@ const Feedback = () => {
     });
 
     useEffect(() => {
+        if (profileDetails)
+            dispatch(fetchProfileDetails());
+        const newInitialState = {
+            ...feedbackInfo,
+            email: profileDetails.multipleEmails
+                ? ''
+                : profileDetails.svEmailAddress
+        };
+        setFeedbackInfo(newInitialState); // Update the initialState with the new value
+    }, []);
+
+    useEffect(() => {
         reset(feedbackInfo);
-    }, [feedbackInfo, reset]);
+    }, [feedbackInfo]);
 
     useEffect(() => {
         if (route.params?.updateFailed) {
@@ -79,88 +93,115 @@ const Feedback = () => {
     return (
         <View style={styles.container}>
             <ProfileSettingsHeader title="Feedback" onPressBack={() => navigation.navigate('Account')} />
-            <ScrollView ref={scrollViewRef}  style={{ marginBottom: '20%' }}>
-                <View style={styles.howWouldYourRateYourExperWrapper}>
-                    <NotificationAlert
-                        type="error"
-                        title="Failed"
-                        message={errormsg}
-                        showCloseIcon={true}
-                        isVisible={showErrorAlert}
-                        onClose={() => setShowErrorAlert(false)}
-                    />
-                  
-                </View>
-                <View style={styles.howWouldYourRateYourExperWrapper}>
-                    
-                    <Text style={[styles.howWouldYour]}>
-                        How would your rate your experience using the Sparklight app?
-                    </Text>
-                </View>
-                <View style={[styles.frameContainer]}>
-                    <View style={[styles.frameGroup, styles.frameFlexBox]}>
-                        {feedbackOptions.map((option) => (
-                            <Pressable
-                                key={option.name}
-                                style={[styles.faceSadParent, styles.parentSpaceBlock]}
-                                onPress={() => handleIconPress(option.category, option.value)}
-                            >
-                                <Image
-                                    style={styles.iconLayout}
-                                    resizeMode="cover"
-                                    source={feedbackInfo.feedbackValue === option.value ? option.selectedImage : option.image}
-                                />
-                                <Text style={[styles.terrible, styles.greatTypo]}>
-                                    {option.text}
-                                </Text>
-                            </Pressable>
-                        ))}
+           
+            <ScrollView ref={scrollViewRef}>
+                <View style={{ marginBottom: 300 }}>
+                
+                    {showErrorAlert &&<View style={styles.howWouldYourRateYourExperWrapper}>
+                        <NotificationAlert
+                            type="error"
+                            title="Error"
+                            message={errormsg}
+                            showCloseIcon={true}
+                            isVisible={showErrorAlert}
+                            onClose={() => setShowErrorAlert(false)}
+                        />
+
+                    </View>}
+                    <View style={styles.howWouldYourRateYourExperWrapper}>
+
+                        <Text style={[styles.howWouldYour]}>
+                            How would your rate your experience using the Sparklight app?
+                        </Text>
                     </View>
-                </View>
-                <View>
-                    <Text style={[styles.firstName]}>
-                        Additional Feedback
-                    </Text>
-                </View>
-                <View style={styles.textinputWrapper}>
-                    <Controller
-                        control={control}
-                        name="feedbackText"
-                        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                            <>
-                                <SparkLightInput
-                                    name="feedbackText"
-                                    onChangeText={handleInputChange}
-                                    onBlur={onBlur} // bind onBlur
-                                    value={value} // bind value
-                                    multiline={true}
-                                    maxLength={500}
-                                    numberOfLines={6}
-                                    height={130}
-                                    textAlignVertical='top'
-                                    error={error?.message} // display error message
-                                />
-                            </>
-                        )}
-                    />
-                </View>
-                <View >
-                    <Text style={[styles.footerWrapper]}>
+                    <View style={[styles.frameContainer]}>
+                        <View style={[styles.frameGroup, styles.frameFlexBox]}>
+                            {feedbackOptions.map((option) => (
+                                <Pressable
+                                    key={option.name}
+                                    style={[styles.faceSadParent, { flex: 1 }]} // make sure this style allows for the text to overflow and not just push the boundaries
+                                    onPress={() => handleIconPress(option.category, option.value)}
+                                >
+                                    <Image
+                                        style={styles.iconLayout}
+                                        resizeMode="contain"
+                                        source={feedbackInfo.feedbackValue === option.value ? option.selectedImage : option.image}
+                                    />
+                                    <Text
+                                        allowFontScaling={false}
+                                        style={[styles.terrible, styles.greatTypo]}
+                                    >
+                                        {option.text}
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </View>
+                    </View>
+
+
+                    <View style={styles.textinputWrapper}>
+                        <Controller
+                            control={control}
+                            name="feedbackText"
+                            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                                <>
+                                    <SparkLightInput
+                                        name="feedbackText"
+                                        label={'Additional Feedback'}
+                                        onChangeText={handleInputChange}
+                                        //value={value} // bind value
+                                        multiline={true}
+                                        maxLength={500}
+                                        height={130}
+                                        textAlignVertical='top'
+                                        error={error?.message} // display error message
+                                    />
+                                </>
+                            )}
+                        />
+                    </View>
+                    <View>
+                    <Text style={styles.footerWrapper}>
                         {feedbackInfo.feedbackText.length}/500
                     </Text>
-                </View>
-                <View style={styles.buttonContainer}>
-                    <Pressable style={styles.button} onPress={handleSubmit(handleSave, handleValidationError)}>
-                        <Text style={styles.buttonText}>Submit Feedback</Text>
-                    </Pressable>
-                </View>
-                <View style={styles.buttonContainer}>
-                    <Pressable onPress={() => navigation.navigate('Account')} >
-                        <Text style={{ color: Color.colorMidnightblue }}>Cancel</Text>
-                    </Pressable>
+                    </View>
+
+                    <View style={styles.textinputWrapper}>
+                        <Controller
+                            control={control}
+                            name="email"
+                            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                                <>
+                                    <SparkLightInput
+                                        name="email"
+                                        label={'Email'}
+                                        onChangeText={handleInputChange}
+                                        value={value} // bind value
+                                        error={error?.message} // display error message
+                                        autoCorrect={false}  // Turn off auto-correction
+                                        autoComplete="off"  // Turn off auto-completion
+                                    />
+                                </>
+                            )}
+                        />
+                    </View>
+                    <View >
+
+                    </View>
+                    <View style={styles.buttonContainer}>
+                        <Pressable style={styles.button} onPress={handleSubmit(handleSave, handleValidationError)}>
+                            <Text style={[styles.textStyle, { color: Color.sparklightWhite }]}>Submit Feedback</Text>
+                        </Pressable>
+                    </View>
+                    <View style={styles.buttonContainer}>
+                        <Pressable onPress={() => navigation.navigate('Account')} >
+                            <Text style={[styles.textStyle, { color: Color.colorMidnightblue }]}>Cancel</Text>
+                        </Pressable>
+                    </View>
                 </View>
             </ScrollView>
-        </View>
+            </View>
+      
     );
 };
 
@@ -171,7 +212,7 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         flexDirection: "row",
-        justifyContent: "space-around",
+        justifyContent: "space-evenly",
         padding: Padding.p_base,
     },
     button: {
@@ -185,6 +226,14 @@ const styles = StyleSheet.create({
         color: Color.sparklightWhite,
         fontFamily: FontFamily.openSansRegular,
         textAlign: "center",
+    },
+    textStyle: {
+        textAlign: 'center',
+        fontFamily: FontFamily.openSansRegular,
+        fontSize: FontSize.size_base,
+        fontStyle: 'normal',
+        fontWeight: '400',
+        lineHeight: 20,
     },
     iconLayout: {
         height: 32,
@@ -220,7 +269,8 @@ const styles = StyleSheet.create({
         marginTop: 16,
         color: Color.colorGray_100,
         fontFamily: FontFamily.openSansRegular,
-        textAlign: "center",
+        textAlign: 'center',
+        width: '90%', // Adjust this width as needed for your layout
     },
     faceSadParent: {
         borderRightWidth: 1,
@@ -228,7 +278,9 @@ const styles = StyleSheet.create({
         borderColor: Color.sparklightGray,
         borderStyle: "solid",
         paddingVertical: Padding.p_base,
-        paddingHorizontal: 0,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     frameGroup: {
         borderRadius: 8,
@@ -236,7 +288,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderStyle: "solid",
         borderColor: Color.colorGainsboro_200,
-        flex: 1,
     },
     frameContainer: {
         alignItems: "center",
@@ -261,7 +312,7 @@ const styles = StyleSheet.create({
         alignSelf: "stretch",
     },
     footerWrapper: {
-        paddingVertical: Padding.p_base,
+       // paddingVertical: Padding.p_base,
         paddingHorizontal: Padding.p_base,
         textAlign: 'right',
         alignSelf: "stretch",

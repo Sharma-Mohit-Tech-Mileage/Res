@@ -25,10 +25,10 @@ const PasswordSecurityEdit = () => {
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const scrollViewRef = useRef(null);
+
   // Handler for when the security question dropdown value changes
   const handleSecurityQuestionChange = (itemValue) => {
-    console.log("securityQuestion", itemValue)
-    setLocalProfile({ ...profileDetails, securityQuestion: itemValue });
+    setLocalProfile({ ...profileDetails, securityQuestion: itemValue === "Add your own question" ? '' : itemValue });
     setCustomSecurityQuestion(itemValue);
     setIsCustomQuestionSelected(itemValue === "Add your own question");
   };
@@ -126,7 +126,10 @@ const PasswordSecurityEdit = () => {
                             {validatePassword(value, profileDetails.userName).map((isValid, index) => (
                               <View key={`point-${index}`} style={styles.bulletPointContainer}>
                                 <View style={{ marginTop: 7 }}>
-                                  <Text style={[styles.bullet, { backgroundColor: isValid ? Color.sparklightGreen : Color.colorGray_200 }]} />
+                                  <View style={[
+                                    styles.bullet,
+                                    { backgroundColor: isValid ? Color.sparklightGreen : Color.colorGray_200 }
+                                  ]} />
                                 </View>
                                 <Text style={styles.bulletPoiint}>{passwordTerms[index]}</Text>
                               </View>
@@ -371,7 +374,7 @@ const styles = StyleSheet.create({
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",
-    marginBottom: 200
+    marginBottom: 300
   },
   passwordSecurityEdit: {
     flex: 1,

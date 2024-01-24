@@ -4,7 +4,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserType, BOX_COLORS, transformResponse, initializeSettings, getRoleBasedMessage } from '../utility/constant';
+import { getUserType, isPrimaryAdmin, convertToSpecialCase, transformResponse, initializeSettings, getRoleBasedMessage } from '../utility/constant';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { fetchProfileDetails, fetchSMSSelection } from '../../redux/actions/ProfileActionSuite'
 const ProfileSettings = () => {
@@ -17,16 +17,16 @@ const ProfileSettings = () => {
   const smsSubscription = profile.smsSubscription || [];
   const data = transformResponse(smsSubscription);
   const smsPayload = initializeSettings(data);
+  const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   const convertedRole = getUserType(profileDetails.memberType || '');
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || '');
-  const normalizedRole = convertedRole?.replace(/\s+/g, '').toLowerCase() || '';
-  const boxBackground = BOX_COLORS[normalizedRole] || Color.colorWhitesmoke_200;
   const emailAlertNeeded = !profileDetails.svEmailAddress || profileDetails.multipleEmails;
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
       dispatch(fetchProfileDetails());
-      dispatch(fetchSMSSelection());
+      if (isPrimary)
+        dispatch(fetchSMSSelection());
       navigation.setParams({ updateSuccess: undefined });
     }
   }, [route.params?.updateSuccess, navigation, dispatch]);
@@ -35,14 +35,9 @@ const ProfileSettings = () => {
     if (profileDetails) {
       dispatch(fetchProfileDetails());
     }
-    dispatch(fetchSMSSelection());
+    if (smsPayload && isPrimary)
+      dispatch(fetchSMSSelection());
   }, [dispatch]);
-
-  useEffect(() => {
-    return () => {
-      setShowSuccessAlert(false);
-    };
-  }, []); // The empty array ensures this runs on unmount only
 
   return (
     <View style={{ zIndex: 1 }}>
@@ -90,7 +85,7 @@ const ProfileSettings = () => {
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Member Type</Text>
                 <View style={styles.badgeWrapper}>
-                  <View style={[styles.badge, styles.badgeBorder, { backgroundColor: boxBackground }]}>
+                  <View style={[styles.badge, styles.badgeBorder]}>
                     <Text style={[styles.text, styles.textTypo]}>
                       {convertedRole}
                     </Text>
@@ -100,7 +95,7 @@ const ProfileSettings = () => {
               <View style={styles.notificationsWrapper}>
                 <NotificationAlert
                   type="info" // "info", "success", "warning"
-                  title={convertedRole}
+                  title={convertToSpecialCase(convertedRole)}
                   showCloseIcon={false}
                   message={roleBasedInfo}
                 />
@@ -115,7 +110,7 @@ const ProfileSettings = () => {
                   Contact Information
                 </Text>
               </View>
-              {emailAlertNeeded && (
+              {emailAlertNeeded && isPrimary && (
                 <View style={styles.notificationsWrapper}>
                   <NotificationAlert
                     type={"warning"}
@@ -131,10 +126,10 @@ const ProfileSettings = () => {
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Email</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {profileDetails.svEmailAddress}
+                  {profileDetails.multipleEmails ? '' : profileDetails.svEmailAddress}
                 </Text>
               </View>
-              {!smsPayload.phoneNumber && (
+              {!smsPayload.phoneNumber && isPrimary && (
                 <View style={styles.notificationsWrapper}>
                   <NotificationAlert
                     type={"warning"}
@@ -236,6 +231,7 @@ const styles = StyleSheet.create({
   },
   badge: {
     borderColor: Color.colorAquamarine,
+    backgroundColor: Color.success50,
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,
     alignItems: "center",
