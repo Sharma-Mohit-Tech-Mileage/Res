@@ -44,13 +44,11 @@ const Notifications = () => {
       notificationsTitle = "There is a problem retrieving your email address";
       infoText =
         (<Text>
-          We are not able to retrieve the email address for your account. Please
-          <Pressable onPress={() => { navigation.navigate('support') }}>
-            <Text style={[styles.text, { color: Color.colorMidnightblue }]}>
-              {' contact us '}
+          {'We are not able to retrieve the email address for your account. Please '}
+          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('support') }}>
+              contact us
             </Text>
-          </Pressable>
-          for assistance.
+          {' for assistance.'}
         </Text>
 )
 
@@ -61,13 +59,11 @@ const Notifications = () => {
       isDisabled = true;
       notificationsTitle = "No email address on file";
       infoText = (<Text>
-        We don’t have your email address on file. Go to
-        <Pressable onPress={() => { navigation.navigate('ProfileSettings') }}>
-          <Text style={[styles.text, { color: Color.colorMidnightblue }]}>
-            {' Profile Settings '}
+        {'We don’t have your email address on file. Go to '}
+          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('ProfileSettings') }}>
+            Profile Settings
           </Text>
-        </Pressable>
-        to add your email.
+       {' to add your email.'}
       </Text>
 )
     }
