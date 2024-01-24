@@ -268,7 +268,9 @@ const SplashScreen = ({ navigation }) => {
             </TouchableOpacity>        
           </>
         )
-      }            
+      }  
+      <Text style={{color: 'white',alignSelf:'center', marginTop:45, fontSize:16}}>Version:{VersionCheck.getCurrentVersion()}
+      </Text>  
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
