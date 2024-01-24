@@ -21,7 +21,7 @@ const ManageEquipment = () => {
     const [transmissionType,setTransmissionType]=React.useState('')
     const [leased,setLeased]=React.useState('')
     const [plans,setPlans]=React.useState([])
-    const [data, setData] = useState({});
+    const [data, setData] =React.useState({});
     const getDataUsage = () => {
         let re = getUser().then((res) => {
             const request = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
