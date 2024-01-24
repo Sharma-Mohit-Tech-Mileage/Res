@@ -19,7 +19,7 @@ const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
     "Sign in to pay your bill online, submit support tickets and much more."
   );
   const [msg2, setMsg2] = useState(
-    "We apologize, but due to technical issues, we are unable to log you in at this time.Please call 1-877-692-2253 for further assistance."
+    "We apologize, but due to technical issues, we are unable to log you in at this time. Please call 1-877-692-2253 for further assistance."
   );
 
   return (
