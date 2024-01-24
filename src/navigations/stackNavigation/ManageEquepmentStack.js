@@ -12,7 +12,7 @@ const ModemStack = createStackNavigator();
 function ModemStackScreen() {
   const { setTabBarVisible } = useTabBarVisibility();
   return (
-    <ModemStack.Navigator initialRouteName="ManageEquipmentScreen">
+    <ModemStack.Navigator initialRouteName="ManageEquipmentScreen" defaultNavigationOptions={{ gestureEnabled: true }}>
       <ModemStack.Screen
         name="ManageEquipmentScreen"
         component={ManageEquipment}

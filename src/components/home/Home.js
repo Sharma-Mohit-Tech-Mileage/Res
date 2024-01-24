@@ -220,41 +220,8 @@ const HomeScreen = ({ route, navigation }) => {
     checkNotifications();
      getDataUsage()
   
-    const backAction = () => {
-      // Check if there's a screen to go back to
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-        return true; // Prevents the default back action (closing the app)
-      }
+   
 
-      // No more screens to go back to, so show an exit confirmation dialog
-      Alert.alert(
-        "Exit App", // Alert Title
-        "Do you want to exit the app?", // Alert Message
-        [
-          {
-            text: "Cancel",
-            onPress: () => null, // Does nothing, just closes the alert
-            style: "cancel"
-          },
-          {
-            text: "Yes",
-            onPress: () => BackHandler.exitApp() // Exits the app
-          }
-        ],
-        { cancelable: false } // Prevents the alert from being dismissed by tapping outside of it
-      );
-
-      return true; // Prevents the default back action (since we're handling it)
-    };
-
-
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-
-    return () => backHandler.remove();
   }, []);
 
   useEffect(()=>{
