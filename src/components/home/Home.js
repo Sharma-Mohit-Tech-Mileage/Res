@@ -332,7 +332,7 @@ const HomeScreen = ({ route, navigation }) => {
             <View>
               <Pressable
                   style={[styles.button, styles.buttonsLayout]}
-                  onPress={enableTextNotifications}
+                  //onPress={enableTextNotifications}
               >
                   <Text style={styles.accept}>Next</Text>
               </Pressable>                   
