@@ -1,12 +1,13 @@
 import * as React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { FontFamily, Padding, Color, FontSize, Border,ScrollView } from "../../../GlobalStyles";
+import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
 import MyServicePlan from "../common/MyServicePlan";
 import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
+import { ScrollView } from "react-native-gesture-handler";
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
@@ -25,7 +26,7 @@ const ManageEquipment = () => {
             const request = `mobile/api/Device/GetOwnershipInfo?accountnumber=${res.userInfo.accountNumber}`;
             GetApiRequest(request, (res)=>{
                 console.log("getLeasedDetails", res);
-               setLeased(res.modemOwnership)
+                setLeased(res?.modemOwnership ?? '');
             }, (error)=>{
                 console.log("getLeasedDetails Error", error);
             });
