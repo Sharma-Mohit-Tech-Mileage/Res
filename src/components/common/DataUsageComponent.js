@@ -7,10 +7,12 @@ import { FontFamily } from "../../../GlobalStyles";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { Env } from "../../network/apis/account/Constants";
 import { GetApiRequest } from "../../network/APIClient";
-const DataUsageComponent = ({navigation}) => {
+const DataUsageComponent = ({navigation,useData}) => {
  const [account,setAccount]=useState('')
  const [data,setData]=useState({})
  const [progress,setProgress]=useState(0.0)
+ const [totalUsed,setTotalUsed]=useState(0)
+ 
 
  const getDataUsage = () => {
   let re = getUser().then((res) => {
@@ -19,9 +21,12 @@ const DataUsageComponent = ({navigation}) => {
           if(res){
             setData(res)
             let totalUsedGB=Math.round(data.totalUsedGB)
+            setTotalUsed(totalUsedGB)
             let planData=Math.round(data.dataPlanGB)
             var progress = Math.round(((totalUsedGB/planData)*100) * 10) / 10
-            setProgress(progress)
+            let pBar=progress/100
+            console.log('Progress',pBar)
+            setProgress(pBar)
           }
     }, (error)=>{
 
@@ -31,10 +36,18 @@ const DataUsageComponent = ({navigation}) => {
 
   useEffect(() => {
     
-    let re = getUser().then((res) => {
-      setAccount(res.userInfo.accountNumber)
-    });
-    getDataUsage();
+    // let re = getUser().then((res) => {
+    //   setAccount(res.userInfo.accountNumber)
+    // });
+    // getDataUsage();
+           setData(useData)
+           let totalUsedGB=Math.round(useData.totalUsedGB)
+            setTotalUsed(totalUsedGB)
+            let planData=Math.round(useData.dataPlanGB)
+            var progress = Math.round(((totalUsedGB/planData)*100) * 10) / 10
+            let pBar=progress/100
+            console.log('Progress',pBar)
+            setProgress(pBar)
   }, []);
   return (
     <View
@@ -70,7 +83,7 @@ const DataUsageComponent = ({navigation}) => {
               alignItems: "center",
             }}
           >
-            <Text style={styles.dataText}>{Math.round(data.totalUsedGB)}</Text>
+            <Text style={styles.dataText}>{totalUsed}</Text>
             <Text style={[styles.dataText, { fontSize: 16, marginTop: 5 }]}>
               GB
             </Text>
@@ -100,7 +113,7 @@ const DataUsageComponent = ({navigation}) => {
         <View style={{ flexDirection: "row" }}>
           <View style={styles.dataUsageIndicator} />
           <Text style={styles.useLbl}>Used</Text>
-          <Text style={styles.useDataLbl}>{" "}{Math.floor(data.uploadUsedGB+data.downloadUsedGB)}</Text>
+          <Text style={styles.useDataLbl}>{" "}{totalUsed}</Text>
         </View>
 
         <View style={{ flexDirection: "row" }}>

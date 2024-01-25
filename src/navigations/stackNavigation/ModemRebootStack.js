@@ -14,7 +14,7 @@ const ModemRebootStack1 = createStackNavigator();
 function ModemRebootStack() {
   const { setTabBarVisible } = useTabBarVisibility();
   return (
-    <ModemRebootStack1.Navigator initialRouteName="ModemReboot">
+    <ModemRebootStack1.Navigator initialRouteName="ModemReboot" defaultNavigationOptions={{ gestureEnabled: true }}>
       <ModemRebootStack1.Screen
         name="ModemReboot"
         component={ModemReboot}

@@ -17,7 +17,7 @@ const SupportStack = createStackNavigator();
 function SupportStackScreen() {
   const { setTabBarVisible } = useTabBarVisibility();
   return (
-    <SupportStack.Navigator initialRouteName="supportScreen">
+    <SupportStack.Navigator initialRouteName="supportScreen" defaultNavigationOptions={{ gestureEnabled: true }}>
       <SupportStack.Screen
         name="support"
         component={supportScreen}

@@ -46,7 +46,7 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
             />
             <Text style={styles.message}>{message}</Text>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.openBtn}
               onPress={onAction}
             >
@@ -55,7 +55,7 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
               >
                {onActionTxt}
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity
               style={styles.closeBtn}

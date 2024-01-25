@@ -22,7 +22,7 @@ import InternetIcon from "../../res/svgIcons/InternetIcon";
 import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import TickIcon from "../../res/svgIcons/TickIcon";
 
-const MyServicePlan = ({ plans, navigation }) => {
+const MyServicePlan = ({ plans, navigation,useData }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [ShowComment, setModelComment] = useState(false);
   const [animateModal, setanimateModal] = useState(false);
@@ -255,7 +255,7 @@ const MyServicePlan = ({ plans, navigation }) => {
       {tabIndex == 0 ? (
         <DataSpeedComponent navigation={navigation} />
       ) : (
-        <DataUsageComponent navigation={navigation} />
+        <DataUsageComponent navigation={navigation} useData={useData} />
       )}
       <MyPlanDetails />
     </View>
