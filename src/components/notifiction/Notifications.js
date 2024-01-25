@@ -45,7 +45,7 @@ const Notifications = () => {
       infoText =
         (<Text>
           {'We are not able to retrieve the email address for your account. Please '}
-          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('support') }}>
+          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('Support') }}>
               contact us
             </Text>
           {' for assistance.'}
