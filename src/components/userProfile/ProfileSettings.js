@@ -116,10 +116,7 @@ const ProfileSettings = () => {
                     type={"warning"}
                     title={profileDetails.multipleEmails ? "There is a problem retrieving your email address" : "No email address on file"}
                     showCloseIcon={false}
-                    message={
-                      profileDetails.multipleEmails ? "We are not able to retrieve the email address for your account. Please contact us for assistance"
-                        : "We don't have your email address on file. Please add your email."
-                    }
+                    message={profileDetails.multipleEmails ? <Text>{'We are not able to retrieve the email address for your account. Please '}<Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('Support') }}> contact us</Text> {' for assistance.'}</Text>: "We don't have your email address on file. Please add your email."}
                   /></View>
               )}
 
