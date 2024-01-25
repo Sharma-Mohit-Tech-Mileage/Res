@@ -1,5 +1,5 @@
 import * as React from "react"
-import {Svg, Circle, G, Path, Line, Stop,Defs,LinearGradient} from 'react-native-svg';
+import {Svg, Path,Defs,LinearGradient} from 'react-native-svg';
 const SvgComponent = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
