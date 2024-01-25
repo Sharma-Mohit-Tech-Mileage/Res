@@ -21,11 +21,27 @@ import SwipeUpDownModal from "react-native-swipe-modal-up-down";
 import InternetIcon from "../../res/svgIcons/InternetIcon";
 import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import TickIcon from "../../res/svgIcons/TickIcon";
+import { getUser } from "../../redux/utils/LocalStorage";
+import { GetApiRequest } from "../../network/APIClient";
 
-const MyServicePlan = ({ plans, navigation,useData }) => {
+const MyServicePlan = ({ plans, navigation }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [ShowComment, setModelComment] = useState(false);
   const [animateModal, setanimateModal] = useState(false);
+  const [data, setData] = useState({});
+
+  const getDataUsage = () => {
+    let re = getUser().then((res) => {
+      const request = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
+      GetApiRequest(request, (res)=>{
+            if(res){
+              setData(res)
+            }
+      }, (error)=>{
+  
+      });
+    });
+  };
 
   const MyPlanDetails = () => {
     useEffect(() => {}, []);
@@ -178,6 +194,7 @@ const MyServicePlan = ({ plans, navigation,useData }) => {
 
   useEffect(() => {
     //console.log("data");
+    getDataUsage();
   }, []);
   return (
     <View
@@ -255,7 +272,7 @@ const MyServicePlan = ({ plans, navigation,useData }) => {
       {tabIndex == 0 ? (
         <DataSpeedComponent navigation={navigation} />
       ) : (
-        <DataUsageComponent navigation={navigation} useData={useData} />
+        <DataUsageComponent navigation={navigation} useData={data} />
       )}
       <MyPlanDetails />
     </View>

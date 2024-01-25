@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUserType, isPrimaryAdmin, convertToSpecialCase, transformResponse, initializeSettings, getRoleBasedMessage } from '../utility/constant';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { fetchProfileDetails, fetchSMSSelection } from '../../redux/actions/ProfileActionSuite'
+import PubSub from 'pubsub-js'
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -116,7 +117,10 @@ const ProfileSettings = () => {
                     type={"warning"}
                     title={profileDetails.multipleEmails ? "There is a problem retrieving your email address" : "No email address on file"}
                     showCloseIcon={false}
-                    message={profileDetails.multipleEmails ? <Text>{'We are not able to retrieve the email address for your account. Please '}<Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('Support') }}> contact us</Text> {' for assistance.'}</Text>: "We don't have your email address on file. Please add your email."}
+                    message={profileDetails.multipleEmails ? <Text>{'We are not able to retrieve the email address for your account. Please '}<Text style={[styles.text, { color: Color.colorMidnightblue,fontWeight:'700' }]} onPress={() => {
+                      PubSub.publish('event.contactUsEvent', {});
+                      navigation.navigate('Support')
+                       }}> contact us</Text> {' for assistance.'}</Text>: "We don't have your email address on file. Please add your email."}
                   /></View>
               )}
 

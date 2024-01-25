@@ -11,7 +11,6 @@ import TicketView from "../../components/support/TicketView";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import LiveSupportChat from "../../components/support/LiveSupportChat";
 import ModemStackScreen from "./ManageEquepmentStack";
-
 const SupportStack = createStackNavigator();
 
 function SupportStackScreen() {
