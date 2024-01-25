@@ -3,10 +3,11 @@ import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
-import { getUser } from "../../redux/utils/LocalStorage";
+import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
 import { isUserAuthorized } from "../../network/APIClient";
 import { Env } from '../../network/apis/account/Constants';
+
 
 const { width, height } = Dimensions.get('window');
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -60,10 +61,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }
 
     const userUpdateScript = async (user) => {
+        const upgradeToken = await getUpgradeToken();
+        console.log('userUpdateScript: ', user);
+        console.log('upgradeToken.access_token: ', upgradeToken.access_token);
         if (user.token !== undefined) {
             const SAVE_FROM_RN = `(function() {
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
+                localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
               })();`;        
 
             setInitScript(SAVE_FROM_RN);         
