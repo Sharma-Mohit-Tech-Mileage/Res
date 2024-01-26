@@ -299,44 +299,6 @@ const unsubscribPaperLess = async () => {
     }
 };
 
-// const handleSubmitFeedback = async (obj) => {
-//     const zendeskRequestApiUrl = 'https://cableone.zendesk.com/api/v2/requests.json';
-//     let user = await getUser();
-//     const fullName = user.userInfo?.fullName;
-//     const payload = {
-//         request: {
-//             ticket_form_id: "360000052934",
-//             requester: {
-//                 name: fullName,
-//                 email: obj.email
-//             },
-//             recipient: "400018994093",
-//             assignee_id: "400018994093",
-//             group_id: "360000672214",
-//             type: null,
-//             custom_fields: [
-//                 { id: "360022798993", value: obj.category },
-//                 { id: "1900000846365", value: obj.feedbackValue },
-//                 { id: "36003617614", value: obj.email }
-//             ],
-//             subject: "Residential MobileApp Feedback",
-//             comment: {
-//                 body: obj.feedbackText,
-//                 uploads: null
-//             },
-//             tags: ["Feedback", "Residential", "MobileApp"],
-//             via: { channel: "MobileApp" }
-//         }
-//     };
-//     console.log('PAYLOAD====================', payload);
-//     try {
-//         const response = await axios.post(zendeskRequestApiUrl, payload);
-//         return response;
-//     } catch (error) {
-//         throw error;
-//     }
-// };
-
 const handleSubmitFeedback = async (obj) => {
     const zendeskRequestApiUrl = Env.ZENDESK_FEEDBACK.Url
     let user = await getUser();
@@ -346,7 +308,7 @@ const handleSubmitFeedback = async (obj) => {
             ticket_form_id:Env.ZENDESK_FEEDBACK.ticket_form_id ,
             requester: {
                 name: fullName,
-                email: obj.email
+                email: obj.feedbackEmail
             },
             recipient: Env.ZENDESK_FEEDBACK.recipient,
             assignee_id:Env.ZENDESK_FEEDBACK.assignee_id,
@@ -355,7 +317,7 @@ const handleSubmitFeedback = async (obj) => {
             custom_fields: [
                 { id:Env.ZENDESK_FEEDBACK.category_id , value: obj.category },
                 { id:Env.ZENDESK_FEEDBACK.feedbackValue_id, value: obj.feedbackValue },
-                { id:Env.ZENDESK_FEEDBACK.email_id, value: obj.email }
+                { id: Env.ZENDESK_FEEDBACK.email_id, value: obj.feedbackEmail }
             ],
             subject: "Residential MobileApp Feedback",
             comment: {
