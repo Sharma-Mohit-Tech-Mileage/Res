@@ -1,5 +1,3 @@
-SplashScreen
-
 
 import React, { useEffect, useState } from "react";
 import {
@@ -9,29 +7,27 @@ import {
   Text,
   ActivityIndicator,
   Linking,
-  Alert,
   TouchableOpacity,
   Modal,
-  Pressable,
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
-import { authorize, revoke, refresh, logout } from "react-native-app-auth";
-import { useDispatch, useSelector } from "react-redux";
-import { ssoLoginAction, saveUserInfo } from "../../redux/actions/UserAction";
+import { authorize, refresh, logout } from "react-native-app-auth";
+import { useDispatch } from "react-redux";
+import {  saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
-import { PostAuthApiRequest,GetApiRequest } from "../../network/APIClient";
+import { PostAuthApiRequest } from "../../network/APIClient";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import RNExitApp from "react-native-exit-app"
+
 import AlertIcon from "../../res/svgIcons/AlertIcon";
-import CloseIcon from "../../res/svgIcons/CloseIcon";
+
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
-import { getUser } from "../../redux/utils/LocalStorage";
-import { SetRenewTokenTimer, SetClearTimer } from './Session';
+import { getUser,cleanUserData } from "../../redux/utils/LocalStorage";
+import { SetRenewTokenTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env } from "../../network/apis/account/Constants";
 import VersionCheck from 'react-native-version-check';

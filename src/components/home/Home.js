@@ -2,13 +2,10 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   Image,
   TouchableOpacity,
   ScrollView,
-  BackHandler,
-  Alert,
   Platform,
 } from "react-native";
 import {
@@ -39,7 +36,7 @@ import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite'
 import { useSelector, useDispatch } from 'react-redux';
 import { RefreshToken } from '../user/Session';
 
-const HomeScreen = ({ route, navigation }) => {
+const HomeScreen = ({ navigation }) => {
   // const { email, name } = {
   //   email: route.params.data.params.email,
   //   name: route.params.data.params.name,
@@ -69,7 +66,7 @@ const HomeScreen = ({ route, navigation }) => {
   
 
   const getInternetPlanDetails = () => {
-    let re = getUser().then((res) => {
+     getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
       GetApiRequest(request, onSuccessPlan, onError);
     });
@@ -102,7 +99,7 @@ const HomeScreen = ({ route, navigation }) => {
   };
 
   const checkModemOutagStatus=()=>{
-    let re = getUser().then((res) => {
+     getUser().then((res) => {
      const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${res.userInfo.accountNumber}`;
      GetApiRequest(request, (response)=>{
       console.log('checkModemOutagStatus',response)
@@ -117,7 +114,7 @@ const HomeScreen = ({ route, navigation }) => {
            }
            
      }, (error)=>{
- 
+         console.log(error)   
      });
    });
    }
@@ -133,7 +130,7 @@ const HomeScreen = ({ route, navigation }) => {
   };
 
   const getUserAccountDetails = () => {
-    let re = getUser().then((res) => {
+     getUser().then((res) => {
       const request = `account/api/account/${res.userInfo.accountNumber}`;
       GetApiRequest(request, (res)=>{
         console.log("getUserAccountDetails", res);

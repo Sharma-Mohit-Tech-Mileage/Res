@@ -44,7 +44,9 @@ const MyServicePlan = ({ plans, navigation }) => {
   };
 
   const MyPlanDetails = () => {
-    useEffect(() => {}, []);
+    useEffect(() => {
+      console.log('Plan data',plans)
+    }, []);
 
     const PlanDetailsItem = ({ item, index }) => {
       return (
@@ -178,9 +180,9 @@ const MyServicePlan = ({ plans, navigation }) => {
                 />
               </TouchableOpacity>
             </View>
-            {plans?.map((item, index) => {
+            {(plans.length>0) ? plans.map((item, index) => {
               return <PlanDetailsItem item={item} index={index} key={index} />;
-            })}
+            }):<></>}
           </View>
         }
         ContentModalStyle={styles.Modal}
