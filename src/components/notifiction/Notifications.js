@@ -7,6 +7,7 @@ import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper,fetchProfi
 import { transformResponse, transformNotificationPreferences, isPrimaryAdmin } from '../../components/utility/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from "../common/customui/NotificationAlert";
+import PubSub from 'pubsub-js'
 
 const Notifications = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -45,7 +46,10 @@ const Notifications = () => {
       infoText =
         (<Text>
           {'We are not able to retrieve the email address for your account. Please '}
-          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('support') }}>
+          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { 
+              PubSub.publish('event.contactUsEvent', {});
+            navigation.navigate('Support')
+             }}>
               contact us
             </Text>
           {' for assistance.'}
