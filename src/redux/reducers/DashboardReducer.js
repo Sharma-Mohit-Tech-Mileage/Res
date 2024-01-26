@@ -3,14 +3,16 @@ import {
   POST_INTERNET_SPEED, 
   UPDATE_INTERNET_SPEED, 
   GET_ACCOUNT_INFO, 
-  UPDATE_ACCOUNT_INFO
+  UPDATE_ACCOUNT_INFO,
+  UPDATE_WALK_THROUGH_STEP
 } from '../constants/index';
 
 const initialState ={
-  isLoading:false,
-  speed:{},
-  accountInfo:{},
-  erro: ""
+  isLoading: false,
+  speed: {},
+  accountInfo: {},
+  erro: "",
+  walkThroughStep: null
 }
 
 const dashboardReducer = (state = initialState, action) => {
@@ -36,12 +38,17 @@ const dashboardReducer = (state = initialState, action) => {
         isLoading: true
       }
     case UPDATE_ACCOUNT_INFO:
-        return {
-          isLoading: false,
-          accountInfo: action.payload,
-          
-        }
-    
+      return {
+        isLoading: false,
+        accountInfo: action.payload,
+        
+      }
+    case UPDATE_WALK_THROUGH_STEP:
+      return{
+        ...state,
+        walkThroughStep: action.payload
+      }
+      
     default:
       return state;
   }

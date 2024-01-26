@@ -3,7 +3,7 @@ import {
    POST_INTERNET_SPEED,
    UPDATE_INTERNET_SPEED,
    GET_ACCOUNT_INFO,
-   UPDATE_ACCOUNT_INFO 
+   UPDATE_WALK_THROUGH_STEP 
 } from '../constants';
 
 export const getCurrentSpeed = (accountId) => {
@@ -38,5 +38,12 @@ export const updateAccountInfo = (result) => {
    return {
       type: UPDATE_ACCOUNT_INFO,
       payload:result
+   };
+};
+
+export const updateWalkThroughStep = (result) => {
+   return {
+      type: UPDATE_WALK_THROUGH_STEP,
+      payload: result
    };
 };

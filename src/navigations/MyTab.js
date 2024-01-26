@@ -11,7 +11,6 @@ import ShopIconSelected from '../res/svgIcons/ShopIconSelected';
 import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
-import { CopilotStep, walkthroughable, useCopilot } from "react-native-copilot";
 import React, { useEffect, useState } from "react";
 import { BackHandler } from 'react-native';
 import {
@@ -25,26 +24,14 @@ import { Env } from '../network/apis/account/Constants';
 
 const Tab = createBottomTabNavigator();
 
-const WalkthroughableView = walkthroughable(View);
-
 const MyTabs = ({ route, navigation }) => {
-  const { start, copilotEvents } = useCopilot();
   const [secondStepActive, setSecondStepActive] = useState(true);
   const [lastEvent, setLastEvent] = useState(null);
+  const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
+  const [shadowStyle, setShadowStyle] = useState(styles.shadowTabs);
   const { tabBarVisible } = useTabBarVisibility();
   const user = useSelector(state => state.combinedReducers.user.userData);
-
-  useEffect(() => {
-    copilotEvents.on("stepChange", (step) => {
-      setLastEvent(`stepChange: ${step.name}`);
-    });
-    copilotEvents.on("start", () => {
-      setLastEvent(`start`);
-    });
-    copilotEvents.on("stop", () => {
-      setLastEvent(`stop`);
-    });
-  }, [copilotEvents]); 
+  const home = useSelector(state => state.combinedReducers.home);
 
   useEffect(() => {
     const backAction = () => {
@@ -68,13 +55,26 @@ const MyTabs = ({ route, navigation }) => {
   }, [navigation]);
 
 
-
-
+  useEffect(() => {
+    console.log('MyTabHome: ', home);
+    if (home.walkThroughStep === 0) {
+      setShadowStyle(styles.shadowTabs);
+      setShadowStyleLeft(styles.shadowTabsLeft);
+    } else if (home.walkThroughStep === 1) {
+      setShadowStyle([styles.shadowTabs, styles.shadowTabsStep2]);
+      setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep2Left]);
+    } else if (home.walkThroughStep === 2) {
+      setShadowStyle([styles.shadowTabs, styles.shadowTabsStep3]);
+      setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left]);
+    }
+  }, [home]);
 
   return (
     <>
-      <View style={styles.shadowTabs}>
-      </View>      
+    <View style={shadowStyleLeft}>
+    </View>       
+    <View style={shadowStyle}>
+    </View>      
     <Tab.Navigator
       name='MyTab'
       initialRouteName="Home"
@@ -96,15 +96,9 @@ const MyTabs = ({ route, navigation }) => {
           tabBarLabel: 'Home',
           tabBarIcon: ({ focused }) => {
             return (
-              <CopilotStep
-                text="View information related to your internet health, billing, service and more."
-                order={1}
-                name="first"
-              >
-                <WalkthroughableView style={styles.tabItem}>
-                  {focused ? <HomeIconSelected /> : <HomeIcon />}
-                </WalkthroughableView>
-              </CopilotStep>   
+              <View style={styles.tabItem}>
+                {focused ? <HomeIconSelected /> : <HomeIcon />}
+              </View>
             );
           }
         }}
@@ -153,15 +147,9 @@ const MyTabs = ({ route, navigation }) => {
           tabBarLabel: 'Support',
           tabBarIcon: ({ focused }) => {
             return (
-              <CopilotStep
-                text="View information related to your internet health, billing, service and more."
-                order={2}
-                name="second"
-              >
-                <WalkthroughableView style={styles.tabItem}>
-                  {focused ? <SupportIconSelected /> : <SupportIcon />}
-                </WalkthroughableView>
-              </CopilotStep>   
+              <View style={styles.tabItem}>
+                {focused ? <SupportIconSelected /> : <SupportIcon />}
+              </View>
             );
           }
         }}
@@ -174,15 +162,9 @@ const MyTabs = ({ route, navigation }) => {
           tabBarLabel: 'Account',
           tabBarIcon: ({ focused }) => {
             return (
-              <CopilotStep
-                text="Manage your profile settings, notifications, users and more."
-                order={3}
-                name="third"
-              >
-                <WalkthroughableView style={styles.tabItem}>
-                  <AccountIcon focused={focused} data={user.userInfo} />
-                </WalkthroughableView>
-              </CopilotStep>   
+              <View style={styles.tabItem}>
+                <AccountIcon focused={focused} data={user.userInfo} />
+              </View>
             );
           }          
         }}
@@ -198,7 +180,7 @@ const styles = StyleSheet.create({
   },
   shadowTabs: {
     backgroundColor: 'black',
-    height: 100,
+    height: 90,
     width: '100%',
     position: 'absolute',
     bottom: 0,
@@ -207,6 +189,23 @@ const styles = StyleSheet.create({
     opacity: .7,
     left: 100
   },
+  shadowTabsStep2: {
+    left: 280,
+  },
+  shadowTabsStep3: {
+    left: 380,
+  },
+  shadowTabsLeft: {
+
+  },
+  shadowTabsStep2Left: {
+    width: 190,
+    left: 0
+  },
+  shadowTabsStep3Left: {
+    width: 280,
+    left: 0
+  },  
 });
 
 export default MyTabs;

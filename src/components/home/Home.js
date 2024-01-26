@@ -31,7 +31,7 @@ import MyServicePlan from "../common/MyServicePlan";
 import { getUser, getPushNotificationStatus, storePushNotificationStatus, storeUpgradeToken } from "../../redux/utils/LocalStorage";
 import { GetApiRequest, UserAuthorized } from "../../network/APIClient";
 import moment from "moment";
-import { Border, Color, FontFamily } from "../../../GlobalStyles";
+import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import {
   getFcmToken,
@@ -40,6 +40,7 @@ import {
 import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
 import { useSelector, useDispatch } from 'react-redux';
 import { RefreshToken } from '../user/Session';
+import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 
 const HomeScreen = ({ route, navigation }) => {
   // const { email, name } = {
@@ -48,6 +49,7 @@ const HomeScreen = ({ route, navigation }) => {
   // };
   const [isInternetDetails, setIsInternetDetails] = useState(false);
   const user = useSelector(state => state.combinedReducers.user.userData);
+  const home = useSelector(state => state.combinedReducers.home);
   const dispatch = useDispatch();
   const [plans, setPlans] = useState([]);
   const [data, setData] = useState({});
@@ -58,7 +60,10 @@ const HomeScreen = ({ route, navigation }) => {
   const [accountStatus,setAccountStatus]=useState('Active')
   const [hasOutage,setHasOutage]=useState(false)
   const [isOutageAlert,setIsOutageAlert]=useState(false)
-  const [estimatedRestoreTime,setEstimatedRestoreTime]=useState('')
+  const [estimatedRestoreTime, setEstimatedRestoreTime]=useState('')
+  const [walkThroughStep, setWalkThroughStep] = useState(0);
+  const [showWalkThrough, setShowWalkThrough] = useState(true);
+
   const getInternetHealth = (type) => {
     var currentHealth = {
       Offline: 20,
@@ -239,38 +244,106 @@ const HomeScreen = ({ route, navigation }) => {
     }
   };
 
-  useEffect(() => {
-    checkModemOutagStatus();
-    getInternetPlanDetails();
-    getUserAccountDetails();
-    checkNotifications();
-     getDataUsage()
-  
-   
+  // useEffect(() => {
+  //   checkModemOutagStatus();
+  //   getInternetPlanDetails();
+  //   getUserAccountDetails();
+  //   checkNotifications();
+  //   getDataUsage();
+  // }, []);
 
-  }, []);
+  // useEffect(()=>{
+  //  if(accountStatus==='Disconnect'){
+  //   setCurrentHealth('Offline')
+  //  }
+  // },[accountStatus])
 
-  useEffect(()=>{
-   if(accountStatus==='Disconnect'){
-    setCurrentHealth('Offline')
-   }
-  },[accountStatus])
+  // useEffect(async () => {
+  //   try {
+  //     const result = await getUpgradeToken();
+  //     console.log('getUpgradeTokenResult: ', JSON.stringify(result));
+  //     storeUpgradeToken(result);
+  //   } catch (error) {
+  //     console.error("Error fetching data", error);
+  //   }
+  // }, []);  
 
-  useEffect(() => {
-    if (!UserAuthorized) {
-      RefreshToken();
+  const changeWalkThroughStep = (step) => {
+    console.log("walkThroughStep: ", step);
+    if (step > 2) {
+
+    } else {
+      dispatch(updateWalkThroughStep(step));
+      setWalkThroughStep(step);
     }
-  }, [UserAuthorized]);
+  };
 
-  useEffect(async () => {
-    try {
-      const result = await getUpgradeToken();
-      console.log('getUpgradeTokenResult: ', JSON.stringify(result));
-      storeUpgradeToken(result);
-    } catch (error) {
-      console.error("Error fetching data", error);
-    }
-  }, []);  
+  const walkthroughModal = () => {
+
+    const walkThroughScreens = [
+      {
+        title: 'Home',
+        description: 'View information related to your internet health, billing, service and more.',
+        buttonText: 'Next'
+      },
+      {
+        title: 'Support',
+        description: 'View our FAQ, check in on your modem or troubleshoot your issues.',
+        buttonText: 'Next'
+      },
+      {
+        title: 'Account',
+        description: 'Manage your profile settings, notifications, users and more.',
+        buttonText: 'Let\'s Go!'
+      },            
+    ];
+
+    const walkThrough = walkThroughScreens[walkThroughStep];
+
+    return (
+      <>
+        <View style={styles.walkThroughBubble}>
+          <View>
+            <View style={styles.title}>
+              <Text style={styles.titleText}>{walkThrough.title}</Text>
+            </View>
+            <View style={styles.description}>
+              <Text style={styles.descriptionText}>{walkThrough.description}</Text>
+            </View>
+          </View>
+          <View style={styles.walkThroughBottomArea}>
+              <View style={styles.circlePaging}>
+                <View style={styles.circle}></View>
+                <View style={walkThroughStep < 1 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
+                <View style={walkThroughStep < 2 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
+              </View>
+              <View style={styles.walkThroughButtons}>
+                <View style={styles.walkThroughSubButtons}>
+                  {
+                    walkThroughStep > 0 &&
+                    (
+                      <Pressable
+                          style={[styles.button, styles.buttonsLayout, styles.buttonPrevious]}
+                          onPress={() => changeWalkThroughStep(walkThroughStep - 1)}
+                      >
+                          <Text style={styles.decline}>Previous</Text>
+                      </Pressable> 
+                    )
+                  }                    
+                  <Pressable
+                      style={[styles.button, styles.buttonsLayout, styles.buttonNext]}
+                      onPress={() => changeWalkThroughStep(walkThroughStep + 1)}
+                  >
+                      <Text style={styles.accept}>{walkThrough.buttonText}</Text>
+                  </Pressable>   
+                </View>                
+              </View>
+          </View>
+        </View>         
+      </>
+
+    )
+  }
 
   const OutageAlert=({estimatedTime})=>{
     return(
@@ -312,28 +385,8 @@ const HomeScreen = ({ route, navigation }) => {
       colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
       style={styles.container}
     >
-      <View style={styles.shadowFullScreen} />
-      <View style={styles.walkThroughBubble}>
-        <View>
-          <Text>Home</Text>
-        </View>
-        <View>
-          <Text>View information related to your internet health, billing, service and more.</Text>
-        </View>
-        <View>
-            <View>
-
-            </View>
-            <View>
-              <Pressable
-                  style={[styles.button, styles.buttonsLayout]}
-                  //onPress={enableTextNotifications}
-              >
-                  <Text style={styles.accept}>Next</Text>
-              </Pressable>                   
-            </View>
-        </View>
-      </View>     
+      {showWalkThrough && (<View style={styles.shadowFullScreen} />)}
+      {showWalkThrough && walkthroughModal()}
       <SafeAreaView style={{ flex: 1 }}>
         <View
           style={{
@@ -433,6 +486,92 @@ const HomeScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  accept: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+    color: Color.sparklightWhite,
+  },
+  circle: {
+    width: 8,
+    height: 8,
+    backgroundColor: Color.colorMidnightblue,
+    borderRadius: 8,
+    marginLeft: 10
+  },
+  circleUnselected: {
+    backgroundColor: '#D9D9D9'
+  },
+  circlePaging: {
+    width: 100,
+    //backgroundColor: 'green',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginBottom: 16
+  },
+  walkThroughBottomArea: {
+    flexDirection: 'row',
+    flex: 1
+  },
+  walkThroughButtons: {
+    justifyContent: 'space-between',
+    //backgroundColor: 'orange',
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  walkThroughSubButtons: {
+    width: 195,
+    flexDirection: 'row',
+    justifyContent: 'flex-end'
+  },
+  title: {
+    marginBottom: 5
+  },
+  titleText: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansSemiBold,        
+  },  
+  description: {
+
+  },
+  descriptionText: {
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.openSansRegular,    
+    lineHeight: 24,    
+  },
+  decline: {
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.openSansRegular,        
+    color: Color.colorMidnightblue,
+    textAlign: "center",
+  },  
+  button: {
+    backgroundColor: Color.colorMidnightblue,
+  },
+  buttonDisabled: {
+    backgroundColor: Color.colorWhitesmoke_300,
+    color: Color.colorGray_200
+  },
+  buttonDisabledText: {
+    color: Color.sparklightaddGray
+  },    
+  buttonNext: {
+    justifyContent: 'flex-end',
+    marginLeft: 10
+  },
+  buttonPrevious: {
+    backgroundColor: Color.colorWhitesmoke_200,
+  },
+  buttonsLayout: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: Border.br_11xs,
+    minHeight: 32,
+    textAlign: 'center'
+  },  
   container: {
     flex: 1,
     backgroundColor: colors.splash_bg,
@@ -463,12 +602,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     position: 'absolute',
     bottom: 120,
-    height: 200,
+    height: 180,
     width: Dimensions.get('window').width - 40,
     left: 20,
     opacity: 1,
     zIndex: 10,
-    borderRadius: 10
+    borderRadius: 10,
+    justifyContent: 'space-between',
+    padding: 20
   },
   internetHealth: {
     color: colors.darkest_grey,

@@ -8115,15 +8115,6 @@ react-native-config@^1.5.1:
   resolved "https://registry.yarnpkg.com/react-native-config/-/react-native-config-1.5.1.tgz#73c94f511493e9b7ff9350cdf351d203a1b05acc"
   integrity sha512-g1xNgt1tV95FCX+iWz6YJonxXkQX0GdD3fB8xQtR1GUBEqweB9zMROW77gi2TygmYmUkBI7LU4pES+zcTyK4HA==
 
-react-native-copilot@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/react-native-copilot/-/react-native-copilot-3.2.1.tgz#f7700ee6a881bf9e708e1c5497e6cbba67004ad2"
-  integrity sha512-mqCxMKLYYTHqVtp361y6I+mq+t6qcff453K49YYmGSuw355wiTHBtppF+U1nTHbCWQt4RlKmkP06YvXX0d6RQg==
-  dependencies:
-    "@changesets/changelog-github" "^0.4.8"
-    "@changesets/cli" "^2.26.0"
-    mitt "^3.0.0"
-
 react-native-exit-app@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/react-native-exit-app/-/react-native-exit-app-2.0.0.tgz"
