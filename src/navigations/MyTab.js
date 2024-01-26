@@ -17,7 +17,7 @@ import { BackHandler } from 'react-native';
 import {
   View,
   StyleSheet,
-  Alert,
+  Platform
 } from "react-native";
 import { useSelector } from 'react-redux';
 import { FontFamily } from '../../GlobalStyles';
@@ -28,9 +28,8 @@ const Tab = createBottomTabNavigator();
 const WalkthroughableView = walkthroughable(View);
 
 const MyTabs = ({ route, navigation }) => {
-  const { start, copilotEvents } = useCopilot();
-  const [secondStepActive, setSecondStepActive] = useState(true);
-  const [lastEvent, setLastEvent] = useState(null);
+  const { copilotEvents } = useCopilot();
+  const [ setLastEvent] = useState(null);
   const { tabBarVisible } = useTabBarVisibility();
   const user = useSelector(state => state.combinedReducers.user.userData);
 

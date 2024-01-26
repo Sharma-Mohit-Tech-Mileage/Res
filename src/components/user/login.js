@@ -1,11 +1,11 @@
 import React, { useState,useEffect } from 'react';
-import { View, Text, Button, StyleSheet,Alert } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { authorize } from "react-native-app-auth";
-import MyTabs from '../../navigations/MyTab';
+
 
 
 const LoginScreen = ({navigation}) => {
-  const [data, setData] = useState(undefined);
+  const [setData] = useState(undefined);
  
 
   useEffect(() => {
