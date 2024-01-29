@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
+import React, {  useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Billpaidicon from "../../res/svgIcons/Billpaidicon";
 import Outageicon from "../../res/svgIcons/Outageicon";
 import colors from "../../res/Colors";

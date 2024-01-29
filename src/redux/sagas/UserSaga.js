@@ -1,5 +1,4 @@
-import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
-import {delay} from 'redux-saga';
+import { call, put, takeLatest} from "redux-saga/effects";
 import {ssoLoginApi} from "../../network/apis/account/LoginService";
 import { SSO_LOGIN_REQUEST } from "../constants";
  import { saveUserInfo } from "../actions/UserAction";

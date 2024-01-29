@@ -14,9 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import {
   FontFamily,
-  Padding,
   Color,
-  FontSize,
   Border,
 } from "../../../GlobalStyles";
 import {
@@ -38,7 +36,7 @@ const ModemReboot = () => {
   const [accountNumber, setAccountNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [isRebootError, setIsRebootError] = useState(false);
-  const [rebootErrorMsg, SetRebootErrorMsg] = useState(
+  const [rebootErrorMsg] = useState(
     "Oops, we have encountered an error. Please retry or refer to the Modem Reboot Instructions."
   );
 
