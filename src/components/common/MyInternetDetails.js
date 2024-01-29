@@ -10,7 +10,6 @@ import LinearGradient from "react-native-linear-gradient";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import Wallet2icon from "../../res/svgIcons/Wallet2icon";
 import Myplanicon from "../../res/svgIcons/Myplanicon";

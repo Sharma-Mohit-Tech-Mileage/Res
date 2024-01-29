@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { StyleSheet, Text, Pressable, View } from "react-native";
-import { useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import Toggle from '../common/Toggle';
 import { useDispatch } from 'react-redux';

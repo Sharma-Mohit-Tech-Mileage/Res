@@ -1,6 +1,6 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, { useState,useEffect } from 'react';
-import { View, Text, Pressable } from 'react-native';
+
+import React, { useState,useEffect} from 'react';
+import { View, Text, Pressable,StyleSheet } from 'react-native';
 import { SegmentedArc } from '../common/arcchart/SegmentedArc';
 import moment from 'moment';
 import colors from '../../res/Colors';
@@ -75,23 +75,32 @@ const InternetHealthChart= ({currentValue}) => {
           <Pressable onPress={_handlePress} style={{ alignItems: 'center' }}>
             <Text
               allowFontScaling={false}
-              style={
-                { 
-                  fontSize: 24, 
-                  paddingTop: 20,
-                  fontWeight:"600",
-                  color:colors.darkest_grey,
-                  fontFamily:FontFamily.openSansRegular 
-              }
-            }>{metaData.lastFilledSegment.data.label}</Text>
+              style={styles.Title}>{metaData.lastFilledSegment.data.label}</Text>
             <Text
               allowFontScaling={false}
-              style={{ marginTop:10, fontSize: 11.7,color:'#767676',textAlign:'center',fontFamily:FontFamily.openSansRegular }}>Updated {todayDate}</Text>
+              style={styles.SubText}>Updated {todayDate}</Text>
           </Pressable>
         )}
       </SegmentedArc>
     </View>
   );
 };
+const styles = StyleSheet.create({
+  SubTiltle: {
+     marginTop:10,
+     fontSize: 11.7,
+     color:'#767676',
+     textAlign:'center',
+     fontFamily:FontFamily.openSansRegular 
+  },Title:{
+    
+      fontSize: 24, 
+      paddingTop: 20,
+      fontWeight:"600",
+      color:colors.darkest_grey,
+      fontFamily:FontFamily.openSansRegular 
+  
+  }
+});
 
 export default InternetHealthChart;

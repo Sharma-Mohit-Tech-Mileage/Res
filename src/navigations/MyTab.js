@@ -11,14 +11,14 @@ import ShopIconSelected from '../res/svgIcons/ShopIconSelected';
 import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
-import { CopilotStep, walkthroughable, useCopilot } from "react-native-copilot";
-import React, { useEffect, useState } from "react";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { CopilotStep, walkthroughable } from "react-native-copilot";
+import React, { useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { BackHandler } from 'react-native';
 import {
   View,
   StyleSheet,
-  Alert,
+  Platform
 } from "react-native";
 import { useSelector } from 'react-redux';
 import { FontFamily } from '../../GlobalStyles';

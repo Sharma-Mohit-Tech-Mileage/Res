@@ -19,7 +19,6 @@ import {
 } from "../../../GlobalStyles";
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import colors from "../../res/Colors";
 import ModemInfo from "../../res/svgIcons/ModemInfo";
@@ -85,7 +84,7 @@ const ModemReboot = () => {
   };
 
   useEffect(() => {
-    let re = getUser().then((res) => {
+     getUser().then((res) => {
       setAccountNumber(res.userInfo.accountNumber);
     });
   }, []);

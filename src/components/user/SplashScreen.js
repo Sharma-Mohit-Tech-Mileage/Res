@@ -116,6 +116,7 @@ const SplashScreen = ({ navigation }) => {
         storeSsoToken({});
         saveUserInfo({});
         cleanUserData();
+        console.log(result)
       });
     });
   }

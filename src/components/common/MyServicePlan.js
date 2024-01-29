@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   TouchableOpacity,
   Image,
@@ -19,7 +18,7 @@ import {
 } from "react-native-responsive-screen";
 import SwipeUpDownModal from "react-native-swipe-modal-up-down";
 import InternetIcon from "../../res/svgIcons/InternetIcon";
-import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
+import { FontFamily, FontSize } from "../../../GlobalStyles";
 import TickIcon from "../../res/svgIcons/TickIcon";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
@@ -31,14 +30,14 @@ const MyServicePlan = ({ plans, navigation }) => {
   const [data, setData] = useState({});
 
   const getDataUsage = () => {
-    let re = getUser().then((res) => {
+     getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
       GetApiRequest(request, (res)=>{
             if(res){
               setData(res)
             }
       }, (error)=>{
-  
+           console.log(error)
       });
     });
   };
@@ -149,7 +148,6 @@ const MyServicePlan = ({ plans, navigation }) => {
           <View style={{ marginVertical: 10, borderRadius: 10 }}>
             <View
               style={{
-                flexDirection: "row",
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",

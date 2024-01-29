@@ -6,12 +6,11 @@ import colors from "../../res/Colors";
 import strings from "../../res/Strings";
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
 import { Env } from "../../network/apis/account/Constants";
-const NetworkDetails = ({ navigation, billPaid,hasOutage, accountStatus }) => {
+const NetworkDetails = ({ navigation, billPaid,hasOutage }) => {
   useEffect(() => {
     //console.log("data");
   }, []);

@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   TouchableOpacity,
-  Linking,
 } from "react-native";
 import { ProgressCircle } from "react-native-svg-charts";
 import colors from "../../res/Colors";
@@ -15,20 +13,20 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { Env } from "../../network/apis/account/Constants";
 import { GetApiRequest } from "../../network/APIClient";
 const DataUsageComponent = ({ navigation, useData }) => {
-  const [account, setAccount] = useState("");
+
   const [data, setData] = useState(useData);
   const [progress, setProgress] = useState(0.0);
   const [totalUsed, setTotalUsed] = useState(0);
 
   const getDataUsage = () => {
-    let re = getUser().then((res) => {
+   getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
       GetApiRequest(request, (res)=>{
             if(res){
               setData(res)
             }
       }, (error)=>{
-  
+         console.log(error)
       });
     });
   };
