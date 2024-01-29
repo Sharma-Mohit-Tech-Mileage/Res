@@ -9,27 +9,29 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import SparkLightInput from '../common/customui/SparkLightInput';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveUserFeedback, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
+import { saveUserFeedback } from '../../redux/actions/ProfileActionSuite';
 const feedbackOptions = [
     { value: 1, category: 'complaint', name: 'facesad', text: 'Terrible', image: require("../../../assets/facesad.png"), selectedImage: require("../../../assets/Smiley-VeryUnsatisfied-sel.png") },
-    { value: 2, category: 'complaint', name: 'facefrown', text: 'Poor', image: require("../../../assets/facefrown.png"), selectedImage: require("../../../assets/Smiley-Unsatisfied-sel.png") },
+    { value: 2, category: 'complaint', name: 'facefrown', text: 'Unsatisfied', image: require("../../../assets/facefrown.png"), selectedImage: require("../../../assets/Smiley-Unsatisfied-sel.png") },
     { value: 3, category: 'neutral', name: 'faceneutral', text: 'Neutral', image: require("../../../assets/faceneutral.png"), selectedImage: require("../../../assets/Smiley-Neutral-sel.png") },
     { value: 4, category: 'compliment', name: 'facesmile', text: 'Satisfied', image: require("../../../assets/facesmile.png"), selectedImage: require("../../../assets/Smiley-Satisfied-sel.png") },
     { value: 5, category: 'compliment', name: 'facehappy', text: 'Great', image: require("../../../assets/facehappy.png"), selectedImage: require("../../../assets/Smiley-VerySatisfied-sel.png") },
 ];
 const Feedback = () => {
     const navigation = useNavigation();
-    const [feedbackInfo, setFeedbackInfo] = useState({
-        category: 'compliment',
-        feedbackValue: 5,
-        feedbackText: "",
-        email: ''
-    });;
     const [showErrorAlert, setShowErrorAlert] = useState(false);
     const route = useRoute(); // Use the useRoute hook
     const dispatch = useDispatch();
     const profile = useSelector(state => state.combinedReducers.profile || {});
     const profileDetails = profile.profileDetails || {};
+    const [feedbackInfo, setFeedbackInfo] = useState({
+        category: 'compliment',
+        feedbackValue: 5,
+        feedbackText: "",
+        feedbackEmail: profileDetails.multipleEmails
+            ? ''
+            : profileDetails.svEmailAddress
+    });
     const [errormsg, setErrormsg] = useState("Please enter valid information to continue.");
     const scrollViewRef = useRef(null);
     const updateFeedbackInfo = (name, value) => {
@@ -64,18 +66,6 @@ const Feedback = () => {
         resolver: yupResolver(feedbackSchema),
         defaultValues: feedbackInfo || {}
     });
-
-    useEffect(() => {
-        if (profileDetails)
-            dispatch(fetchProfileDetails());
-        const newInitialState = {
-            ...feedbackInfo,
-            email: profileDetails.multipleEmails
-                ? ''
-                : profileDetails.svEmailAddress
-        };
-        setFeedbackInfo(newInitialState); // Update the initialState with the new value
-    }, []);
 
     useEffect(() => {
         reset(feedbackInfo);
@@ -169,11 +159,11 @@ const Feedback = () => {
                     <View style={styles.textinputWrapper}>
                         <Controller
                             control={control}
-                            name="email"
+                            name="feedbackEmail"
                             render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                                 <>
                                     <SparkLightInput
-                                        name="email"
+                                        name="feedbackEmail"
                                         label={'Email'}
                                         onChangeText={handleInputChange}
                                         value={value} // bind value
