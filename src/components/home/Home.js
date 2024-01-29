@@ -38,6 +38,7 @@ import {
 import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
 import { useSelector, useDispatch } from 'react-redux';
 import { RefreshToken } from '../user/Session';
+import { Env } from '../../network/apis/account/Constants';
 
 const HomeScreen = ({ route, navigation }) => {
   // const { email, name } = {
@@ -76,7 +77,7 @@ const HomeScreen = ({ route, navigation }) => {
   };
 
   const getUpgradeToken = async () => {
-    const url = 'https://publicservices.sparklight.com/ShoppingCart/api/UpgradeOrder/token';
+    const url = Env.API_SHOPPING_CART_BASEURL + '/api/UpgradeOrder/token';
 
     const response = await fetch(url, {
         method: 'POST',
