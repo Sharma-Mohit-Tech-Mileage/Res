@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { feedbackSchema } from '../utility/validationSchema'; // Update the path as necessary
-import { ScrollView, Image, StyleSheet, Pressable, View, Text, Keyboard } from 'react-native';
+import { feedbackSchema } from '../utility/validationSchema';
+import { ScrollView, Image, StyleSheet, Pressable, View, Text } from 'react-native';
 import { Color, FontFamily, FontSize, Border, Padding } from '../../../GlobalStyles';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -18,58 +18,43 @@ const feedbackOptions = [
     { value: 5, category: 'compliment', name: 'facehappy', text: 'Great', image: require("../../../assets/facehappy.png"), selectedImage: require("../../../assets/Smiley-VerySatisfied-sel.png") },
 ];
 const Feedback = () => {
+    
     const navigation = useNavigation();
     const [showErrorAlert, setShowErrorAlert] = useState(false);
-    const route = useRoute(); // Use the useRoute hook
+    const route = useRoute();
     const dispatch = useDispatch();
     const profile = useSelector(state => state.combinedReducers.profile || {});
     const profileDetails = profile.profileDetails || {};
-    const [feedbackInfo, setFeedbackInfo] = useState({
-        category: 'compliment',
-        feedbackValue: 5,
-        feedbackText: "",
-        feedbackEmail: profileDetails.multipleEmails
-            ? ''
-            : profileDetails.svEmailAddress
-    });
+
+    const [selectedFeedback, setSelectedFeedback] = useState('facehappy'); // State to track selected feedback
+
     const [errormsg, setErrormsg] = useState("Please enter valid information to continue.");
     const scrollViewRef = useRef(null);
-    const updateFeedbackInfo = (name, value) => {
-        setFeedbackInfo(feedbackInfo => ({
-            ...feedbackInfo,
-            [name]: value
-        }));
-    };
-
-    // Handler for changes from input fields
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        updateFeedbackInfo(name, value);
-    };
 
     const handleValidationError = () => {
         setErrormsg('Please enter valid information to continue.')
         setShowErrorAlert(true);
     };
 
-    // Handler for icon press, updating category and feedbackValue
-    const handleIconPress = (category, value) => {
-        updateFeedbackInfo('category', category);
-        updateFeedbackInfo('feedbackValue', value);
-    };
-    // Your submit handler
-    const handleSave = data => {
-        dispatch(saveUserFeedback(data, navigation)); // Dispatch with formData
+    const handleIconPress = (option) => {
+        setSelectedFeedback(option.name); // Update the selected feedback
+        setValue('category', option.category);
+        setValue('feedbackValue', option.value);
     };
 
-    const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
+    const onSubmit = data => {
+        dispatch(saveUserFeedback(data, navigation));
+    };
+
+    const { control, handleSubmit, setValue, formState: { errors } } = useForm({
         resolver: yupResolver(feedbackSchema),
-        defaultValues: feedbackInfo || {}
+        defaultValues: {
+            category: 'compliment',
+            feedbackValue: 5,
+            feedbackText: "",
+            feedbackEmail: profileDetails.multipleEmails ? '' : profileDetails.svEmailAddress
+        }
     });
-
-    useEffect(() => {
-        reset(feedbackInfo);
-    }, [feedbackInfo]);
 
     useEffect(() => {
         if (route.params?.updateFailed) {
@@ -82,11 +67,9 @@ const Feedback = () => {
 
     return (
         <View style={styles.container}>
-            <ProfileSettingsHeader title="Feedback" onPressBack={() => navigation.navigate('Account')} />
-
+            <ProfileSettingsHeader title="Feedback" onPressBack={() => navigation.goBack()} />
             <ScrollView ref={scrollViewRef}>
                 <View style={{ marginBottom: 300 }}>
-
                     {showErrorAlert && <View style={styles.howWouldYourRateYourExperWrapper}>
                         <NotificationAlert
                             type="error"
@@ -99,7 +82,6 @@ const Feedback = () => {
 
                     </View>}
                     <View style={styles.howWouldYourRateYourExperWrapper}>
-
                         <Text style={[styles.howWouldYour]}>
                             How would your rate your experience using the Sparklight app?
                         </Text>
@@ -110,12 +92,12 @@ const Feedback = () => {
                                 <Pressable
                                     key={option.name}
                                     style={[styles.faceSadParent, { flex: 1 }]} // make sure this style allows for the text to overflow and not just push the boundaries
-                                    onPress={() => handleIconPress(option.category, option.value)}
+                                    onPress={() => handleIconPress(option)}
                                 >
                                     <Image
                                         style={styles.iconLayout}
                                         resizeMode="contain"
-                                        source={feedbackInfo.feedbackValue === option.value ? option.selectedImage : option.image}
+                                        source={selectedFeedback === option.name ? option.selectedImage : option.image}
                                     />
                                     <Text
                                         allowFontScaling={false}
@@ -133,43 +115,40 @@ const Feedback = () => {
                         <Controller
                             control={control}
                             name="feedbackText"
-                            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                            render={({ field: { onChange, onBlur, value } }) => (
                                 <>
                                     <SparkLightInput
-                                        name="feedbackText"
-                                        label={'Additional Feedback'}
-                                        onChangeText={handleInputChange}
-                                        //value={value} // bind value
+                                        label="Additional Feedback"
+                                        textAlignVertical='top'
+                                        onChangeText={onChange}
+                                        onBlur={onBlur}
+                                        value={value}
                                         multiline={true}
                                         maxLength={500}
                                         height={130}
-                                        textAlignVertical='top'
-                                        error={error?.message} // display error message
+                                        error={errors.feedbackText?.message}
                                     />
+                                    {/* Move the Text component inside the render function */}
+                                    <Text style={styles.footerWrapper}>
+                                        {`${value.length}/500`}
+                                    </Text>
                                 </>
                             )}
                         />
-                    </View>
-                    <View>
-                        <Text style={styles.footerWrapper}>
-                            {feedbackInfo.feedbackText.length}/500
-                        </Text>
                     </View>
 
                     <View style={styles.textinputWrapper}>
                         <Controller
                             control={control}
                             name="feedbackEmail"
-                            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                                <>
-                                    <SparkLightInput
-                                        name="feedbackEmail"
-                                        label={'Email'}
-                                        onChangeText={handleInputChange}
-                                        value={value} // bind value
-                                        error={error?.message} // display error message
-                                    />
-                                </>
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <SparkLightInput
+                                    label="Email"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.feedbackEmail?.message}
+                                />
                             )}
                         />
                     </View>
@@ -177,7 +156,7 @@ const Feedback = () => {
 
                     </View>
                     <View style={styles.buttonContainer}>
-                        <Pressable style={styles.button} onPress={handleSubmit(handleSave, handleValidationError)}>
+                        <Pressable style={styles.button} onPress={handleSubmit(onSubmit, handleValidationError)}>
                             <Text style={[styles.textStyle, { color: Color.sparklightWhite }]}>Submit Feedback</Text>
                         </Pressable>
                     </View>
@@ -300,13 +279,7 @@ const styles = StyleSheet.create({
         alignSelf: "stretch",
     },
     footerWrapper: {
-        // paddingVertical: Padding.p_base,
-        paddingHorizontal: Padding.p_base,
         textAlign: 'right',
-        alignSelf: "stretch",
-    },
-    infoWrapper: {
-        padding: Padding.p_base,
         alignSelf: "stretch",
     },
 });
