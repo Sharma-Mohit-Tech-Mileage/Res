@@ -189,11 +189,6 @@ const styles = StyleSheet.create({
         marginTop: Padding.p_base,
         flex: 1, // makes each button expand
     },
-    buttonText: {
-        color: Color.sparklightWhite,
-        fontFamily: FontFamily.openSansRegular,
-        textAlign: "center",
-    },
     textStyle: {
         textAlign: 'center',
         fontFamily: FontFamily.openSansRegular,
@@ -206,10 +201,6 @@ const styles = StyleSheet.create({
         height: 32,
         width: 32,
         overflow: "hidden",
-    },
-    parentSpaceBlock: {
-        paddingVertical: Padding.p_base,
-        flex: 1,
     },
     frameFlexBox: {
         flexDirection: "row",
@@ -262,16 +253,6 @@ const styles = StyleSheet.create({
         alignSelf: "stretch",
         paddingTop: Padding.p_5xl,
         paddingHorizontal: Padding.p_base,
-    },
-    firstName: {
-        fontSize: FontSize.size_sm,
-        fontFamily: FontFamily.openSansSemiBold,
-        fontWeight: "600",
-        color: Color.gray600,
-        paddingTop: Padding.p_base,
-        paddingBottom: 8,
-        paddingHorizontal: Padding.p_base
-
     },
     textinputWrapper: {
         paddingTop: Padding.p_5xs,
