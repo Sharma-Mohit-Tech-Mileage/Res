@@ -98,7 +98,8 @@ const ManageEquipment = () => {
                                                 {manufacturer}
                                             </Text>
                                             <Text style={styles.mb8600Docsis}>
-                                                {model}:{transmissionType}
+                                                {model}
+                                                {/* {transmissionType} */}
                                             </Text>
                                             {/* <View style={styles.poorHealthParent}>
                                                 <Text style={[styles.poorHealth, styles.textTypo2]}>

@@ -325,7 +325,7 @@ const HomeScreen = ({ route, navigation }) => {
           >
              {(isOutageAlert)?<OutageAlert estimatedTime={estimatedRestoreTime}/>:<></>}
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
-              <Text style={styles.internetHealth}>Internet Health</Text>
+              <Text style={styles.internetHealth}>Service Health</Text>
               <InternetHealthChart
                 currentValue={getInternetHealth(currentHealth)}
                  key={currentHealth}
