@@ -33,12 +33,10 @@ const ProfileSettings = () => {
   }, [route.params?.updateSuccess, navigation, dispatch]);
 
   useEffect(() => {
-    if (profileDetails) {
-      dispatch(fetchProfileDetails());
-    }
-    if (smsPayload && isPrimary)
+    dispatch(fetchProfileDetails());
+    if (isPrimary)
       dispatch(fetchSMSSelection());
-  }, [dispatch]);
+  }, []);
 
   return (
     <View style={{ zIndex: 1 }}>
