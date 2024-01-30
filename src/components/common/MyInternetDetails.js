@@ -23,7 +23,7 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
   //const [dueDate,setDueDate]=useState('')
 
   useEffect(() => {
-    if (plans.length != 0) {
+    if (plans.length > 0) {
       setPlanSpeed(plans[0].downloadSpeed);
     }
   });

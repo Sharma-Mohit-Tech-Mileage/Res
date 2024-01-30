@@ -358,11 +358,12 @@ const styles = StyleSheet.create({
   },
   frameGroup: {
     marginTop: Padding.p_5xl,
+    paddingHorizontal:Padding.p_base,
     alignSelf: "stretch",
   },
   frameParent: {
     flex: 1,
-    padding: Padding.p_base,
+    paddingVertical: Padding.p_base,
     alignSelf: 'stretch',
     marginBottom: '20%',
   },
