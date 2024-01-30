@@ -34,7 +34,7 @@ const DataSpeedComponent = ({navigation}) => {
   const [upload, setUpload] = useState(0);
   const [downloadFrac, setDownloadFrac] = useState(0);
   const [uploadFrac, setUploadFrac] = useState(0);
-  const [ setSpeed] = useState(false);
+  const [ speed ,setSpeed] = useState(false);
   const [testDate, setTestDate] = useState(0);
 
   const getCurrentSpeed = () => {

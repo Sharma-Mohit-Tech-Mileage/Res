@@ -122,11 +122,58 @@ const HomeScreen = ({ navigation }) => {
     console.log("getInternetPlanDetails", res);
     if (res) {
       setPlans(res);
+      if(res.length>0){
+      let macAddress=res[0].macAddress
+      checkModemDetails(macAddress)
+      }
     }
   };
   const onError = (error) => {
     console.log("error", error);
   };
+
+  /**
+   * get modem details
+   */
+
+  const checkModemDetails=(macAddress)=>{
+    const request = `mobile/api/modem/getmodemdetails?macId=${macAddress}`;
+    GetApiRequest(request, (res)=>{
+      console.log("checkModemDetails", res);
+      let temt=[];
+      if(res.equipmentType==='DOCSIS'){
+        temt.push(res.uTxP_State)
+        temt.push(res.uRxL_State)
+        temt.push(res.usnR_State)
+        temt.push(res.dsnR_State)
+        temt.push(res.dRxL_State)
+      }
+
+      const allGreen =  temt.every(v => v === 'Green');
+      console.log('allg',allGreen)
+      if(!allGreen){
+        const checkYellow=temt.includes('Yellow')
+        const checkRed=temt.includes('Red')
+        if(checkYellow){
+            setAccountStatus('Poor')
+            setIsInternetDetails(true)
+        }
+        if(checkRed){
+          setAccountStatus('Disconnect')
+          setIsInternetDetails(true)
+        }
+      }else{
+         if(currentHealth!='Optimal'){
+          setAccountStatus('Optimal')
+          setIsInternetDetails(false)
+         }
+      }
+      
+    }, (error)=>{
+        console.log('Modem details',error)   
+    });
+  
+  }
 
   const getUserAccountDetails = () => {
      getUser().then((res) => {

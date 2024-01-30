@@ -1,6 +1,7 @@
 
 
 export const config={
+
  PRODUCTION:{
     URL:'https://customer.sparklight.com',
     SSO_LOGIN:'https://login.cableone.net/auth/realms/external-sso-realm',
@@ -35,5 +36,6 @@ export const config={
 
 }
 
-//export const Env=config.PRODUCTION
-export const Env=config.UAT
+export const ISUAT=true
+
+export const Env=(ISUAT)? config.UAT : config.PRODUCTION

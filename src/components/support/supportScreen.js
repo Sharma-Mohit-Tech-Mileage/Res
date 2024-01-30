@@ -133,7 +133,7 @@ const Support = () => {
                                 <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                             </View>
                         </View>
-                        <ScrollView style={{width:'100%',marginBottom:hp('45%'),padding: Padding.p_base}}
+                        <ScrollView style={{width:'100%',marginBottom:hp('42%'),padding: Padding.p_base}}
                          ref={scrollViewRef}
                         >
                         <View >

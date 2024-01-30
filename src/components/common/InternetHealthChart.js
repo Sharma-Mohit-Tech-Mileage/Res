@@ -86,9 +86,9 @@ const InternetHealthChart= ({currentValue}) => {
   );
 };
 const styles = StyleSheet.create({
-  SubTiltle: {
+  SubText: {
      marginTop:10,
-     fontSize: 11.7,
+     fontSize: 12,
      color:'#767676',
      textAlign:'center',
      fontFamily:FontFamily.openSansRegular 
