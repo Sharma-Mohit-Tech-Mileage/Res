@@ -140,7 +140,7 @@ const Terms = ({ navigation }) => {
 
     const termsAccepted = async () => {
         await dispatch(updateTermsAndConditions(true, null));
-        await dispatch(updateWalkThroughStep(0));
+        //await dispatch(updateWalkThroughStep(0));
         console.log('termsAccepted: ', nextScreen);
         if (nextScreen === 'MyTab') {
             navigation.reset({
