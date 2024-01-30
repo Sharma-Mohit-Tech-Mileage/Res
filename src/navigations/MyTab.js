@@ -12,13 +12,9 @@ import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
 import { CopilotStep, walkthroughable, useCopilot } from "react-native-copilot";
-import React, { useEffect, useState } from "react";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { BackHandler } from 'react-native';
 import {
   View,
-  StyleSheet,
-  Alert,
+  StyleSheet
 } from "react-native";
 import { useSelector } from 'react-redux';
 import { FontFamily } from '../../GlobalStyles';
@@ -29,62 +25,8 @@ const Tab = createBottomTabNavigator();
 const WalkthroughableView = walkthroughable(View);
 
 const MyTabs = ({ route }) => {
-  // const { start, copilotEvents } = useCopilot();
-  // const [secondStepActive, setSecondStepActive] = useState(true);
-  // const [lastEvent, setLastEvent] = useState(null);
   const { tabBarVisible } = useTabBarVisibility();
-  const navigation = useNavigation();
   const user = useSelector(state => state.combinedReducers.user.userData);
-
-  // useEffect(() => {
-  //   copilotEvents.on("stepChange", (step) => {
-  //     setLastEvent(`stepChange: ${step.name}`);
-  //   });
-  //   copilotEvents.on("start", () => {
-  //     setLastEvent(`start`);
-  //   });
-  //   copilotEvents.on("stop", () => {
-  //     setLastEvent(`stop`);
-  //   });
-  // }, [copilotEvents]); 
-
-  useEffect(() => {
-    const backAction = () => {
-      // Log the current state of the entire navigation
-      const currentRoute = navigation.getState();
-      console.log("Current Navigation State:", currentRoute);
-
-      // Check if there's a screen to go back to in the current tab's stack
-      const currentTab = currentRoute.routes[currentRoute.index];
-      console.log("Current Tab State:", currentTab.state);
-
-      if (currentTab.state && currentTab.state.index > 0) {
-        console.log("Going back within the current tab's stack");
-       // navigation.goBack();
-        return false;
-      } else if (navigation.canGoBack()) {
-        console.log("Going back in the outer stack");
-       // navigation.goBack();
-        return false;
-      }
-
-      console.log("No screen to go back to, default action proceeds");
-      return true;
-    };
-
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-
-    // Clean up the event listener when the component unmounts
-    return () => {
-      console.log("Removing back button listener");
-      backHandler.remove();
-    };
-  }, [navigation]);
-
-
 
   return (
     <Tab.Navigator

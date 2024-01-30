@@ -111,7 +111,10 @@ const PushNotifications = ({ navigation }) => {
             permanentSkip: false
         };
         storePushNotificationStatus(data);
-        navigation.navigate(nextScreen);
+        navigation.reset({
+            index: 0,
+            routes: [{ name: nextScreen }],
+        });
     };    
 
     return  (
