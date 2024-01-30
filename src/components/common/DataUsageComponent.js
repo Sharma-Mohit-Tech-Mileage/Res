@@ -63,7 +63,7 @@ const DataUsageComponent = ({ navigation, useData }) => {
       }}
     >
       <ProgressCircle
-        style={{ height: 200 }}
+        style={{ height: 220 }}
         progress={progress}
         progressColor={"#8D3B90"}
         backgroundColor={"#e1e1e1"}
