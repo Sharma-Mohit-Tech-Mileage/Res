@@ -1,5 +1,5 @@
 import * as React from "react"
-import {Svg, Circle, G, Path, Line, Rect} from 'react-native-svg';
+import {Svg,Path} from 'react-native-svg';
 const DownArrow = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"

@@ -18,7 +18,7 @@ const AccountIcon = (props) => {
         justifyContent: "center",
       }}
     >
-      <Text allowFontScaling={false} style={{color:'white',fontWeight:'600'}}>
+      <Text allowFontScaling={false} style={{color:'white',fontWeight:'600',fontSize:12}}>
         {Fname}{Lname}
       </Text>
     </View>

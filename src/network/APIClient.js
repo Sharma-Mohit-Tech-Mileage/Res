@@ -1,4 +1,3 @@
-import React from "react";
 import { getUser } from "../redux/utils/LocalStorage";
 import { Env } from "./apis/account/Constants";
 
@@ -29,6 +28,7 @@ export const PostAuthApiRequest=(endpoint, body, onSuccess, onError)=>{
         .then(response => Promise.all([response, response.json()]))
         .then(([response, json]) => {
             //Add Token Guid
+            console.log(response)
             json.idTokenGuid = idTokenGuid;
             json.refreshToken = refreshToken;
             onSuccess(json)
@@ -41,14 +41,15 @@ export const PostAuthApiRequest=(endpoint, body, onSuccess, onError)=>{
     }
     
 
-export const PostApiRequest=(endpoint,body, onSuccess,onError)=>{
+export const PostApiRequest=async(endpoint,body, onSuccess,onError)=>{
 // Example POST request
+const user= await getUser()
 console.log('API URL',BASE_URL)
 fetch(`${BASE_URL}/${endpoint}`, {
     method: 'GET',
     headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${JWT}`
+        'Authorization': `Bearer ${user.token}`
     },
     body: JSON.stringify({
         body
@@ -72,7 +73,7 @@ fetch(`${BASE_URL}/${endpoint}`, {
 
 export const GetApiRequest= async(endpoint, onSuccess,onError)=>{
  const user= await getUser()
- console.log('API URL',BASE_URL)
+ console.log(`API URL ${BASE_URL}/${endpoint}`);
 fetch(`${BASE_URL}/${endpoint}`, {
         method: 'GET',
         headers: {

@@ -2,9 +2,6 @@
 
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import supportScreen from "../../components/support/supportScreen";
-import Search from "../../components/support/Search";
-import ManageEquipment from "../../components/support/ManageEquipment";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemReboot from "../../components/support/ModemReboot";
 import ModemRebootInstructions from "../../components/support/ModemRebootInstuction";

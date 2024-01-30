@@ -5,16 +5,12 @@ import {
   Text,
   View,
   ScrollView,
-  TouchableOpacity,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import {
   FontFamily,
-  Padding,
   Color,
-  FontSize,
-  Border,
 } from "../../../GlobalStyles";
 import {
   widthPercentageToDP as wp,
@@ -24,12 +20,12 @@ import PubSub from 'pubsub-js'
 
 const ModemExchangeInstructions = () => {
   const navigation = useNavigation();
-  const [inst1, setInst1] = React.useState(
+  const [inst1] = React.useState(
     `The average lifespan of a modem is approximately 2-3 years, although some high-quality modems can last up to 5-8 years. Typically, high-quality modems are replaced due to becoming outdated rather than breaking down.
     
 If you suspect that your modem is not functioning properly, please `
   );
-  const [inst2, setInst2] = React.useState(
+  const [inst2] = React.useState(
     ` or visit your nearest Sparklight office to request a modem exchange. Our team will be happy to assist you and ensure that you have the best possible internet experience.`
   );
 

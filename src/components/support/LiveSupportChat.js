@@ -1,22 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
-  Modal,
   View,
-  StyleSheet,
   TouchableOpacity,
   Text,
   SafeAreaView,
-  Pressable,
 } from "react-native";
-import WebView from "react-native-webview";
+
 import * as Zendesk from 'react-native-zendesk-messaging';
  
-
-
-
-
 const LiveSupportChat = () => {
-    const [title,setTitle]=useState('Customer A')
+    
     var zendesk_chat_key='939402da-c188-4f5e-a869-46922a124b52'
     const userAgent = "YourApp";
   const customHTML = `

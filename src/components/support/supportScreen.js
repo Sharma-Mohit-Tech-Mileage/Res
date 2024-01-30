@@ -1,4 +1,4 @@
-import React, { useState,useEffect,useRef } from "react";
+import React, { useEffect,useRef } from "react";
 import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text } from "react-native";
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
@@ -7,7 +7,6 @@ import { useNavigation } from "@react-navigation/native";
 import * as Zendesk from 'react-native-zendesk-messaging';
 import PubSub from 'pubsub-js'
 import {
-    widthPercentageToDP as wp,
     heightPercentageToDP as hp,
   } from "react-native-responsive-screen";
 
@@ -135,7 +134,7 @@ const Support = () => {
                                 <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                             </View>
                         </View>
-                        <ScrollView style={{width:'100%',marginBottom:hp('40%'),padding: Padding.p_base}}
+                        <ScrollView style={{width:'100%',marginBottom:hp('45%'),padding: Padding.p_base}}
                          ref={scrollViewRef}
                         >
                         <View >

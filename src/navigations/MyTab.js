@@ -12,6 +12,7 @@ import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
 import React, { useEffect, useState } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { BackHandler } from 'react-native';
 import {
   View,
@@ -30,28 +31,44 @@ const MyTabs = ({ route, navigation }) => {
   const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
   const [shadowStyle, setShadowStyle] = useState(styles.shadowTabs);
   const { tabBarVisible } = useTabBarVisibility();
+  const navigation = useNavigation();
   const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector(state => state.combinedReducers.home);
 
   useEffect(() => {
     const backAction = () => {
-      // Check if there's a screen to go back to in the navigation stack
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-        return true; // Prevents the default back action, navigates back
+      // Log the current state of the entire navigation
+      const currentRoute = navigation.getState();
+      console.log("Current Navigation State:", currentRoute);
+
+      // Check if there's a screen to go back to in the current tab's stack
+      const currentTab = currentRoute.routes[currentRoute.index];
+      console.log("Current Tab State:", currentTab.state);
+
+      if (currentTab.state && currentTab.state.index > 0) {
+        console.log("Going back within the current tab's stack");
+       // navigation.goBack();
+        return false;
+      } else if (navigation.canGoBack()) {
+        console.log("Going back in the outer stack");
+       // navigation.goBack();
+        return false;
       }
-      // If no previous screen is available, do nothing and let the default action proceed
-      return false; // Allows the default back action to proceed
+
+      console.log("No screen to go back to, default action proceeds");
+      return true;
     };
 
-    // Add the back button listener
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       backAction
     );
 
-    // Clean up the listener on component unmount
-    return () => backHandler.remove();
+    // Clean up the event listener when the component unmounts
+    return () => {
+      console.log("Removing back button listener");
+      backHandler.remove();
+    };
   }, [navigation]);
 
 
