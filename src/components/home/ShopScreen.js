@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text } from 'react-native';
 
-const ShopScreen = ({ navigation }) => {
+const ShopScreen = () => {
   // useEffect(() => {
   //   // Navigate to 'ArticalWindowUtility' as soon as the screen loads
   //   navigation.navigate('ArticalWindowUtility', {

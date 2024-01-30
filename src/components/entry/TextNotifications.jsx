@@ -106,15 +106,10 @@ const TextNotifications = ({ navigation }) => {
         //{"accountNumber": "900690538", "billingOptOutStatus": false, "optOut": false, "outageOptOut": false, "phoneNumber": ""}
         if (toggleCheckBox && input.length > 0) {
             dispatch(updateTextNotification(data, null));
-            if (nextScreen === 'MyTab') {
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: 'MyTab' }],
-                });
-            } else {
-                navigation.navigate(nextScreen);
-            }
-
+            navigation.reset({
+                index: 0,
+                routes: [{ name: nextScreen }],
+            });
         }
     };
 
@@ -195,14 +190,10 @@ const TextNotifications = ({ navigation }) => {
                             <Pressable
                                 style={[styles.buttonDecline, styles.buttonsLayout]}
                                 onPress={() => {
-                                    if (nextScreen === 'MyTab') {
-                                        navigation.reset({
-                                            index: 0,
-                                            routes: [{ name: 'MyTab' }],
-                                        });
-                                    } else {
-                                        navigation.navigate(nextScreen);
-                                    }
+                                    navigation.reset({
+                                        index: 0,
+                                        routes: [{ name: nextScreen }],
+                                    });
                                 }}
                                 accessibilityLabel="Decline Button"
                                 accessibilityRole="button"

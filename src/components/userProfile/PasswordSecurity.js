@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, Pressable, View } from "react-native";
+import { StyleSheet, Text, Pressable, View } from "react-native";
 import { useNavigation , useRoute} from "@react-navigation/native";
 import { Color, Padding, FontSize, FontFamily, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from '../common/customui/NotificationAlert';
-import { fetchProfileDetails, fetchSMSSelection } from '../../redux/actions/ProfileActionSuite'
+import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 const PasswordSecurity = () => {
   const navigation = useNavigation();
   const route = useRoute(); // Use the useRoute hook
@@ -24,7 +24,7 @@ const PasswordSecurity = () => {
     if (profileDetails) {
       dispatch(fetchProfileDetails());
     }
-  }, [dispatch]);
+  }, []);
 
   return (
     <View style={styles.passwordSecurity}>

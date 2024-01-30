@@ -29,7 +29,7 @@ import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import { getUser,cleanUserData } from "../../redux/utils/LocalStorage";
 import { SetRenewTokenTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
-import { Env } from "../../network/apis/account/Constants";
+import { Env,  ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from 'react-native-version-check';
 
 const config = {
@@ -98,7 +98,10 @@ const SplashScreen = ({ navigation }) => {
             routes: [{ name: 'MyTab' }], // Navigate to 'MyTab' after reset
           });
         } else {
-          navigation.navigate("Terms");
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Terms' }], // Navigate to 'MyTab' after reset
+          });
         }
       }         
     }
@@ -116,6 +119,7 @@ const SplashScreen = ({ navigation }) => {
         storeSsoToken({});
         saveUserInfo({});
         cleanUserData();
+        console.log(result)
       });
     });
   }
@@ -286,7 +290,7 @@ const SplashScreen = ({ navigation }) => {
           </>
         )
       }  
-      <Text style={{color: 'white',alignSelf:'center', marginTop:45, fontSize:16}}>Version:{VersionCheck.getCurrentVersion()}</Text>          
+      <Text style={{color: 'white',alignSelf:'center', marginTop:45, fontSize:16}}> {(ISUAT)? 'UAT':''} Version:{VersionCheck.getCurrentVersion()}</Text>          
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}

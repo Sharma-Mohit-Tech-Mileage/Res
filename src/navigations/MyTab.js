@@ -12,12 +12,10 @@ import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
 import React, { useEffect, useState } from "react";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import { BackHandler } from 'react-native';
 import {
   View,
   StyleSheet,
-  Alert,
   Dimensions,
 } from "react-native";
 import { useSelector } from 'react-redux';

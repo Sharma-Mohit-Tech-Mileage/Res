@@ -142,14 +142,10 @@ const Terms = ({ navigation }) => {
         await dispatch(updateTermsAndConditions(true, null));
         await dispatch(updateWalkThroughStep(0));
         console.log('termsAccepted: ', nextScreen);
-        if (nextScreen === 'MyTab') {
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'MyTab' }],
-            });
-        } else {
-            navigation.navigate(nextScreen);
-        }
+        navigation.reset({
+            index: 0,
+            routes: [{ name: nextScreen }],
+        });
 
     };
 

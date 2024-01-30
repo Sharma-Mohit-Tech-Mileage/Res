@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
@@ -57,10 +56,10 @@ const HomeScreen = ({ navigation }) => {
   const [accountStatus,setAccountStatus]=useState('Active')
   const [hasOutage,setHasOutage]=useState(false)
   const [isOutageAlert,setIsOutageAlert]=useState(false)
-  const [estimatedRestoreTime, setEstimatedRestoreTime]=useState('')
+  const [isModemIssue,setIsModemIssue]=useState(false)
+  const [estimatedRestoreTime,setEstimatedRestoreTime]=useState('')
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
-
   const getInternetHealth = (type) => {
     var currentHealth = {
       Offline: 20,
@@ -100,9 +99,6 @@ const HomeScreen = ({ navigation }) => {
     if (response !== undefined) {
       json = response.json();
     }
-
-    console.log('getUpgradeToken:', json);
-
     return json;
   };
 
@@ -131,11 +127,58 @@ const HomeScreen = ({ navigation }) => {
     console.log("getInternetPlanDetails", res);
     if (res) {
       setPlans(res);
+      if(res.length>0){
+      let macAddress=res[0].macAddress
+      checkModemDetails(macAddress)
+      }
     }
   };
   const onError = (error) => {
     console.log("error", error);
   };
+
+  /**
+   * get modem details
+   */
+
+  const checkModemDetails=(macAddress)=>{
+    const request = `mobile/api/modem/getmodemdetails?macId=${macAddress}`;
+    GetApiRequest(request, (res)=>{
+      console.log("checkModemDetails", res);
+      let temt=[];
+      if(res.equipmentType==='DOCSIS'){
+        temt.push(res.uTxP_State)
+        temt.push(res.uRxL_State)
+        temt.push(res.usnR_State)
+        temt.push(res.dsnR_State)
+        temt.push(res.dRxL_State)
+      }
+
+      const allGreen =  temt.every(v => v === 'Green');
+      console.log('allg',allGreen)
+      if(!allGreen){
+        const checkYellow=temt.includes('Yellow')
+        const checkRed=temt.includes('Red')
+        if(checkYellow){
+            setAccountStatus('Poor')
+            setIsInternetDetails(true)
+        }
+        if(checkRed){
+          setAccountStatus('Disconnect')
+          setIsInternetDetails(true)
+        }
+      }else{
+         if(currentHealth!='Optimal'){
+          setAccountStatus('Optimal')
+          setIsInternetDetails(false)
+         }
+      }
+      
+    }, (error)=>{
+        console.log('Modem details',error)   
+    });
+  
+  }
 
   const getUserAccountDetails = () => {
      getUser().then((res) => {

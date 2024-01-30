@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View } from 'react-native';
-import supportScreen from './supportScreen';
+import SupportScreen from './supportScreen';
 import Article from './ArticleModal';
 
 const WebView = () => {
@@ -13,7 +13,7 @@ const WebView = () => {
 
     return (
         <View style={{ flex: 1 }}>
-            {showWebView ? <Article /> : <supportScreen onPress1={handlePress} />}
+            {showWebView ? <Article /> : <SupportScreen onPress1={handlePress} />}
         </View>
     );
 };
