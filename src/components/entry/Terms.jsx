@@ -12,6 +12,7 @@ import { logout } from 'react-native-app-auth';
 import { SetClearTimer } from '../user/Session';
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { Env } from "../../network/apis/account/Constants";
+import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 
 const config = {
     issuer: Env.SSO_LOGIN,
@@ -139,6 +140,7 @@ const Terms = ({ navigation }) => {
 
     const termsAccepted = async () => {
         await dispatch(updateTermsAndConditions(true, null));
+        await dispatch(updateWalkThroughStep(0));
         console.log('termsAccepted: ', nextScreen);
         if (nextScreen === 'MyTab') {
             navigation.reset({

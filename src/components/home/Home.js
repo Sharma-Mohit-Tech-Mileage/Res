@@ -59,7 +59,7 @@ const HomeScreen = ({ navigation }) => {
   const [isOutageAlert,setIsOutageAlert]=useState(false)
   const [estimatedRestoreTime, setEstimatedRestoreTime]=useState('')
   const [walkThroughStep, setWalkThroughStep] = useState(0);
-  const [showWalkThrough, setShowWalkThrough] = useState(true);
+  const [showWalkThrough, setShowWalkThrough] = useState(false);
 
   const getInternetHealth = (type) => {
     var currentHealth = {
@@ -230,14 +230,6 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // useEffect(() => {
-  //   checkModemOutagStatus();
-  //   getInternetPlanDetails();
-  //   getUserAccountDetails();
-  //   checkNotifications();
-  //   getDataUsage();
-  // }, []);
-
   // useEffect(()=>{
   //  if(accountStatus==='Disconnect'){
   //   setCurrentHealth('Offline')
@@ -262,10 +254,17 @@ const HomeScreen = ({ navigation }) => {
   //   }
   // }, []);  
 
+  useEffect(async () => {
+    if (home.walkThroughStep !== null) {
+      setShowWalkThrough(true);
+    }
+  }, []);    
+
   const changeWalkThroughStep = (step) => {
     console.log("walkThroughStep: ", step);
     if (step > 2) {
-
+      dispatch(updateWalkThroughStep(null));
+      setShowWalkThrough(false);
     } else {
       dispatch(updateWalkThroughStep(step));
       setWalkThroughStep(step);
@@ -498,7 +497,6 @@ const styles = StyleSheet.create({
   },
   circlePaging: {
     width: 100,
-    //backgroundColor: 'green',
     flexDirection: 'row',
     alignItems: 'flex-end',
     marginBottom: 16
@@ -509,7 +507,6 @@ const styles = StyleSheet.create({
   },
   walkThroughButtons: {
     justifyContent: 'space-between',
-    //backgroundColor: 'orange',
     flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-end',

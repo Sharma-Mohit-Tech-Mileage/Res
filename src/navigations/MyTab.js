@@ -18,10 +18,13 @@ import {
   View,
   StyleSheet,
   Alert,
+  Dimensions,
 } from "react-native";
 import { useSelector } from 'react-redux';
 import { FontFamily } from '../../GlobalStyles';
 import { Env } from '../network/apis/account/Constants';
+const { width } = Dimensions.get('window');
+const tabWidth = Number(width/4);
 
 const Tab = createBottomTabNavigator();
 
@@ -31,7 +34,6 @@ const MyTabs = ({ route, navigation }) => {
   const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
   const [shadowStyle, setShadowStyle] = useState(styles.shadowTabs);
   const { tabBarVisible } = useTabBarVisibility();
-  const navigation = useNavigation();
   const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector(state => state.combinedReducers.home);
 
@@ -88,10 +90,16 @@ const MyTabs = ({ route, navigation }) => {
 
   return (
     <>
-    <View style={shadowStyleLeft}>
-    </View>       
-    <View style={shadowStyle}>
-    </View>      
+    { home.walkThroughStep !== null &&
+      (
+        <>
+          <View style={shadowStyleLeft}>
+          </View>       
+          <View style={shadowStyle}>
+          </View>     
+        </>
+      )
+    } 
     <Tab.Navigator
       name='MyTab'
       initialRouteName="Home"
@@ -197,7 +205,7 @@ const styles = StyleSheet.create({
   },
   shadowTabs: {
     backgroundColor: 'black',
-    height: 90,
+    height: (Platform.OS == 'ios') ? 90 : 60,
     width: '100%',
     position: 'absolute',
     bottom: 0,
@@ -207,20 +215,20 @@ const styles = StyleSheet.create({
     left: 100
   },
   shadowTabsStep2: {
-    left: 280,
+    left: tabWidth * 3,
   },
   shadowTabsStep3: {
-    left: 380,
+    left: tabWidth * 4,
   },
   shadowTabsLeft: {
 
   },
   shadowTabsStep2Left: {
-    width: 190,
+    width: tabWidth * 2,
     left: 0
   },
   shadowTabsStep3Left: {
-    width: 280,
+    width: tabWidth * 3,
     left: 0
   },  
 });
