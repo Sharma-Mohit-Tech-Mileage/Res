@@ -19,7 +19,7 @@ export const config={
 
  },
  UAT:{
-    URL:'https://customer.uat.sparklight.com/residential',
+    URL:'https://customer.uat.sparklight.com',
     SSO_LOGIN:'https://login.uat.cableone.net/auth/realms/external-sso-realm',
     API_BASEURL:'https://customer.uat.sparklight.com/apiWrapper/',
     ZENDESK_FEEDBACK:{
@@ -36,6 +36,6 @@ export const config={
 
 }
 
-export const ISUAT=false
+export const ISUAT = true
 
 export const Env=(ISUAT)? config.UAT : config.PRODUCTION
