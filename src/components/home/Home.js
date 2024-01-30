@@ -563,6 +563,7 @@ const styles = StyleSheet.create({
     marginBottom: 5
   },
   titleText: {
+    color: Color.sparklightGray1,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansSemiBold,        
   },  
@@ -570,6 +571,7 @@ const styles = StyleSheet.create({
 
   },
   descriptionText: {
+    color: Color.sparklightGray1,
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,    
     lineHeight: 24,    
@@ -682,7 +684,8 @@ const styles = StyleSheet.create({
     color: colors.sparklight_purple_blue,
     lineHeight: 20,
     fontWeight: "600",
-  },modemError1: {
+  },
+  modemError1: {
     color: Color.sparkLightInfo,
     FontFamily: FontFamily.textXsSemibold,
     fontSize: 15,
