@@ -52,6 +52,7 @@ const HomeScreen = ({ navigation }) => {
   const [accountStatus,setAccountStatus]=useState('Active')
   const [hasOutage,setHasOutage]=useState(false)
   const [isOutageAlert,setIsOutageAlert]=useState(false)
+  const [isModemIssue,setIsModemIssue]=useState(false)
   const [estimatedRestoreTime,setEstimatedRestoreTime]=useState('')
   const getInternetHealth = (type) => {
     var currentHealth = {
@@ -92,9 +93,6 @@ const HomeScreen = ({ navigation }) => {
     if (response !== undefined) {
       json = response.json();
     }
-
-    console.log('getUpgradeToken:', json);
-
     return json;
   };
 

@@ -2,6 +2,7 @@ import React, {  useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Billpaidicon from "../../res/svgIcons/Billpaidicon";
 import Outageicon from "../../res/svgIcons/Outageicon";
+import Modemicon from "../../res/svgIcons/Modemicon";
 import colors from "../../res/Colors";
 import strings from "../../res/Strings";
 import {
@@ -46,13 +47,13 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage }) => {
       </View>
 
       <View style={[styles.rowContainer]}>
-        {/*<View style={styles.item}>
+        <View style={styles.item}>
           <View style={styles.iconBg}>
             <Modemicon />
             <GreenCircle />
           </View>
           <Text style={styles.text}> {strings.no_modem_issue}</Text>
-      </View>*/}
+      </View>
         <TouchableOpacity style={{ flexDirection: "row" }}
         onPress={() => {
           if(!billPaid){
