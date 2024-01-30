@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   TouchableOpacity,
-  Linking,
 } from "react-native";
 import { ProgressCircle } from "react-native-svg-charts";
 import colors from "../../res/Colors";
@@ -15,20 +13,21 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { Env } from "../../network/apis/account/Constants";
 import { GetApiRequest } from "../../network/APIClient";
 const DataUsageComponent = ({ navigation, useData }) => {
-  const [account, setAccount] = useState("");
+
   const [data, setData] = useState(useData);
   const [progress, setProgress] = useState(0.0);
   const [totalUsed, setTotalUsed] = useState(0);
+  const [isUnlimtedPlan, setIsUnlimtedPlan] = useState(false);
 
   const getDataUsage = () => {
-    let re = getUser().then((res) => {
+   getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
       GetApiRequest(request, (res)=>{
             if(res){
               setData(res)
             }
       }, (error)=>{
-  
+         console.log(error)
       });
     });
   };
@@ -39,9 +38,14 @@ const DataUsageComponent = ({ navigation, useData }) => {
     let totalUsedGB = Math.round(data.totalUsedGB);
     setTotalUsed(totalUsedGB);
     let planData = Math.round(data.dataPlanGB);
+    if(planData===15000){
+      setIsUnlimtedPlan(true)
+    }else{
+      setIsUnlimtedPlan(false)
+    }
     var progress = Math.round((totalUsedGB / planData) * 100 * 10) / 10;
     let pBar = progress / 100;
-    console.log("Progress", pBar);
+    console.log("Progress", planData);
     setProgress(pBar);
   }else{
     getDataUsage();
@@ -57,7 +61,7 @@ const DataUsageComponent = ({ navigation, useData }) => {
       }}
     >
       <ProgressCircle
-        style={{ height: 200 }}
+        style={{ height: 220 }}
         progress={progress}
         progressColor={"#8D3B90"}
         backgroundColor={"#e1e1e1"}
@@ -103,8 +107,8 @@ const DataUsageComponent = ({ navigation, useData }) => {
           >
             <Text style={styles.dataPlanTxt}>
               {" "}
-              {Math.floor(data.dataPlanGB)}
-              {" GB"}
+              {(isUnlimtedPlan)?'UNLIMITED DATA PLAN':Math.floor(data.dataPlanGB)}
+              {(isUnlimtedPlan)? "" :" GB"}
             </Text>
           </View>
         </View>
@@ -132,7 +136,7 @@ const DataUsageComponent = ({ navigation, useData }) => {
             ]}
           />
           <Text style={styles.useLbl}>Remaining</Text>
-          <Text style={styles.useDataLbl}> {Math.floor(data.remainingGB)}</Text>
+          <Text style={styles.useDataLbl}> {(isUnlimtedPlan)?'Unlimited':Math.floor(data.remainingGB)}</Text>
         </View>
       </View>
       <View

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import { StyleSheet, Text, Pressable, View, ScrollView ,Platform} from "react-native";
 import { Color, FontSize, FontFamily, Padding, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useRoute, useIsFocused } from "@react-navigation/native";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { transformToUserPreferences } from '../utility/constant';
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { updatePushNotificationsv2 } from '../../redux/actions/ProfileActionSuite';
@@ -13,7 +13,7 @@ import { getFcmToken, requestUserPermission } from '../../firebase/FirebaseUtils
 const InAppNotifications = ({ navigation }) => {
   const [initialize, setInitializeSettings] = useState({});
   const [showErrorAlert, setShowErrorAlert] = useState(false);
-  const [generatedToken, setGeneratedToken] = useState();
+  const [ setGeneratedToken] = useState();
   const route = useRoute(); // Use the useRoute hook
   const additionalData = route.params?.additionalData;
   const dispatch = useDispatch();

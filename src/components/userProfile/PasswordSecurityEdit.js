@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import { StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
 import { validatePassword, securityQuestions, passwordTerms } from "../utility/constant";
