@@ -1,5 +1,4 @@
-import React, { useRef } from 'react';
-import { useDispatch, useSelector } from "react-redux";
+
 import { getUser } from "../../redux/utils/LocalStorage";
 import { refresh } from "react-native-app-auth";
 import { storeUser } from "../../redux/utils/LocalStorage";

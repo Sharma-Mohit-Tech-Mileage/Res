@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Image,
   Modal,
-  Linking
 } from "react-native";
 import colors from "../../res/Colors";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
@@ -15,10 +14,10 @@ import warningIcon from "../../../assets/alert-triangle.png";
 import logo from "../../../assets/sparklightlogo-01.png";
 
 const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
-  const [msg1, setMsg1] = useState(
+  const [msg1] = useState(
     "Sign in to pay your bill online, submit support tickets and much more."
   );
-  const [msg2, setMsg2] = useState(
+  const [msg2] = useState(
     "We apologize, but due to technical issues, we are unable to log you in at this time . Please call 1-877-692-2253 for further assistance."
   );
 
