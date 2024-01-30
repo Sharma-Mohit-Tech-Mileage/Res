@@ -34,6 +34,7 @@ import {
 import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
 import { useSelector, useDispatch } from 'react-redux';
 import { RefreshToken } from '../user/Session';
+import { Env } from '../../network/apis/account/Constants';
 
 const HomeScreen = ({ navigation }) => {
   // const { email, name } = {
@@ -72,7 +73,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const getUpgradeToken = async () => {
-    const url = 'https://publicservices.sparklight.com/ShoppingCart/api/UpgradeOrder/token';
+    const url = Env.API_SHOPPING_CART_BASEURL + '/api/UpgradeOrder/token';
 
     const response = await fetch(url, {
         method: 'POST',
@@ -368,7 +369,7 @@ const HomeScreen = ({ navigation }) => {
           >
              {(isOutageAlert)?<OutageAlert estimatedTime={estimatedRestoreTime}/>:<></>}
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
-              <Text style={styles.internetHealth}>Internet Health</Text>
+              <Text style={styles.internetHealth}>Service Health</Text>
               <InternetHealthChart
                 currentValue={getInternetHealth(currentHealth)}
                  key={currentHealth}

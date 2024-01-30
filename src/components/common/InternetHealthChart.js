@@ -20,7 +20,7 @@ const InternetHealthChart= ({currentValue}) => {
       scale: 0.33,
       filledColor: '#FBB231',
       emptyColor: '#FBB231',
-      data: { label: 'Poor' }
+      data: { label: 'Issue' }
     },
     {
       scale: 0.33,
