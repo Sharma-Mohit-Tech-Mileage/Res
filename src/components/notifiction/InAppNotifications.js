@@ -66,7 +66,7 @@ const InAppNotifications = ({ navigation }) => {
       initialize.deviceTokenTimestamp = moment().format();  // Assuming 'moment' is imported and available
       initialize.isAndroid = Platform.OS === "android"
       await dispatch(updatePushNotificationsv2(initialize, navigation));
-    };
+    }
 
   }
     return (

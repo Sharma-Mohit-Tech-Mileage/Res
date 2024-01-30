@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Animated, TouchableWithoutFeedback, View, StyleSheet, Easing } from 'react-native';
-import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
+import { Color } from "../../../GlobalStyles";
 
 const Toggle = ({ name, onToggle, initialValue = false }) => {
     const [isActive, setIsActive] = useState(initialValue);

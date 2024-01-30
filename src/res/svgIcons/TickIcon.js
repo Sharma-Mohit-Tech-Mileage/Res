@@ -1,5 +1,5 @@
 import * as React from "react"
-import {Svg, Circle, G, Path, ClipPath, Defs} from 'react-native-svg';
+import {Svg, G, Path, ClipPath, Defs} from 'react-native-svg';
 const TickIcon = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
