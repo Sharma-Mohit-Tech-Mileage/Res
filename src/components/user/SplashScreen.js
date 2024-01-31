@@ -98,7 +98,10 @@ const SplashScreen = ({ navigation }) => {
             routes: [{ name: 'MyTab' }], // Navigate to 'MyTab' after reset
           });
         } else {
-          navigation.navigate("Terms");
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Terms' }], // Navigate to 'MyTab' after reset
+          });
         }
       }         
     }
