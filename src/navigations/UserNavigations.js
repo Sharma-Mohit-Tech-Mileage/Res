@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect, useRef } from "react";
+import { BackHandler } from "react-native"; // Import BackHandler
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import analytics from '@react-native-firebase/analytics';
@@ -42,6 +43,28 @@ const UserNavigations = (props) => {
     }
   };
 
+  const handleBackButton = () => {
+    // Log the current state of the entire navigation
+    const currentRoute = navigationRef.current.getRootState();
+    console.log("Current Navigation State:", currentRoute);
+
+    // Check if there's a screen to go back to in the current tab's stack
+    const currentTab = currentRoute.routes[currentRoute.index];
+    console.log("Current Tab State:", currentTab.state);
+
+    if (currentTab.state && currentTab.state.index > 0) {
+      console.log("Going back within the current tab's stack");
+      // navigation.goBack();
+      return false;
+    } else if (navigationRef.current.canGoBack()) {
+      console.log("Going back in the outer stack");
+      // navigation.goBack();
+      return false;
+    }
+
+    console.log("No screen to go back to, default action proceeds");
+    return true;
+  };
 
   useEffect(() => {
     // Call onReady manually for the first load
@@ -50,12 +73,18 @@ const UserNavigations = (props) => {
     // Attach the listener
     const unsubscribe = navigationRef.current.addListener('state', onStateChange);
 
-    // Clean up the listener when the component unmounts
-    return () => unsubscribe();
+    // Add a listener for the hardware back button press
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+
+    // Clean up the listeners when the component unmounts
+    return () => {
+      unsubscribe();
+      backHandler.remove();
+    };
   }, []);
   return (
     <NavigationContainer ref={navigationRef} onReady={onReady} onStateChange={onStateChange}>
-      <Stack.Navigator>
+      <Stack.Navigator >
         <Stack.Screen
           name="Splash"
           component={SplashScreen}

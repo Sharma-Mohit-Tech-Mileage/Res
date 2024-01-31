@@ -24,7 +24,7 @@ const PasswordSecurity = () => {
     if (profileDetails) {
       dispatch(fetchProfileDetails());
     }
-  }, [dispatch]);
+  }, []);
 
   return (
     <View style={styles.passwordSecurity}>

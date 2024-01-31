@@ -85,7 +85,10 @@ const PushNotifications = ({ navigation }) => {
             };            
             storePushNotificationStatus(localData);
             await dispatch(updatePushNotifications(data, null));
-            navigation.navigate(nextScreen);
+            navigation.reset({
+                index: 0,
+                routes: [{ name: nextScreen }],
+            });
         } else {
             const localData = {
                 status: 'skip',
@@ -93,14 +96,10 @@ const PushNotifications = ({ navigation }) => {
                 permanentSkip: true
             };            
             storePushNotificationStatus(localData);
-            if (nextScreen === 'MyTab') {
                 navigation.reset({
                     index: 0,
-                    routes: [{ name: 'MyTab' }],
+                    routes: [{ name: nextScreen }],
                 });
-            } else {
-                navigation.navigate(nextScreen);
-            }
 
         }
     };
@@ -112,7 +111,10 @@ const PushNotifications = ({ navigation }) => {
             permanentSkip: false
         };
         storePushNotificationStatus(data);
-        navigation.navigate(nextScreen);
+        navigation.reset({
+            index: 0,
+            routes: [{ name: nextScreen }],
+        });
     };    
 
     return  (
