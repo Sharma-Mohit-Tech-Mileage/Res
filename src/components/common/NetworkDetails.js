@@ -11,7 +11,7 @@ import {
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
 import { Env } from "../../network/apis/account/Constants";
-const NetworkDetails = ({ navigation, billPaid,hasOutage }) => {
+const NetworkDetails = ({ navigation, billPaid,hasOutage,isModemIssue }) => {
   useEffect(() => {
     //console.log("data");
   }, []);
@@ -50,7 +50,7 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage }) => {
         <View style={styles.item}>
           <View style={styles.iconBg}>
             <Modemicon />
-            <GreenCircle />
+            { (isModemIssue)?<RedCircle/> : <GreenCircle />}
           </View>
           <Text style={styles.text}> {strings.no_modem_issue}</Text>
       </View>
