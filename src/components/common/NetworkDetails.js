@@ -13,7 +13,7 @@ import { FontFamily } from "../../../GlobalStyles";
 import { Env } from "../../network/apis/account/Constants";
 const NetworkDetails = ({ navigation, billPaid,hasOutage,isModemIssue }) => {
   useEffect(() => {
-    //console.log("data");
+    console.log("data",isModemIssue);
   }, []);
 
   const GreenCircle = () => {
@@ -52,7 +52,22 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage,isModemIssue }) => {
             <Modemicon />
             { (isModemIssue)?<RedCircle/> : <GreenCircle />}
           </View>
-          <Text style={styles.text}> {strings.no_modem_issue}</Text>
+          <Text style={styles.text}> {(isModemIssue)?strings.modem_issue_detected:strings.no_modem_issue}</Text>
+          {isModemIssue ? (
+            <View
+              style={{
+                justifyContent: "center",
+                right: 20,
+                top: 26,
+                position: "absolute",
+              }}
+              
+            >
+              <RightArrow />
+            </View>
+          ) : (
+            <></>
+          )}
       </View>
         <TouchableOpacity style={{ flexDirection: "row" }}
         onPress={() => {
