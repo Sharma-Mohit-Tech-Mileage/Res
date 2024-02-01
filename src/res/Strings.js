@@ -11,6 +11,7 @@ let strings = new LocalizedStrings({
    noOutageDetected:'Outages Detected',
    connect_wifi_txt:'Connected to Wifi',
    no_modem_issue:'No Modem Issues',
+   modem_issue_detected:'Modem Issues Detected',
    bill_paid:'Bill Paid',
    my_service_txt:'My Service',
    my_plan_details_txt:'Plan Details',
