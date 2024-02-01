@@ -109,7 +109,7 @@ const HomeScreen = ({ navigation }) => {
       console.log('checkModemOutagStatus',response)
            if(response.hasOutage===true){
             let time=moment(response.estimatedTimeOfResolution).format('LT'); 
-            setEstimatedRestoreTime(time)
+             setEstimatedRestoreTime(time)
              setAccountStatus('Disconnect')
              setIsInternetDetails(true)
              setHasOutage(true)
@@ -179,11 +179,9 @@ const HomeScreen = ({ navigation }) => {
       const checkYellow = temt.includes("Yellow");
       const checkRed = temt.includes("Red");
       if (checkRed) {
-        
         setCurrentHealth('Offline');
         setIsInternetDetails(true);
       } else if (checkYellow) {
-       
         setCurrentHealth('Poor');
         setIsInternetDetails(true);
       }
@@ -481,7 +479,7 @@ const HomeScreen = ({ navigation }) => {
                 </View>
                 <Text style={styles.internetStatusTxt}>
                   {" "}
-                  {(billPaid && !hasOutage)?strings.internetStatus:strings.internetStatusIssue}
+                  {(currentHealth!='Optimal')?strings.internetStatusIssue:strings.internetStatus}
                 </Text>
               </View>
 
@@ -514,7 +512,7 @@ const HomeScreen = ({ navigation }) => {
                 </View>
               </TouchableOpacity>
               {isInternetDetails ? (
-                <NetworkDetails billPaid={billPaid} hasOutage={hasOutage} isModemIssue={isModemIssue} navigation={navigation} accountStatus={accountStatus} />
+                <NetworkDetails billPaid={billPaid} hasOutage={hasOutage} currentHealth={currentHealth} navigation={navigation} accountStatus={accountStatus} />
               ) : (
                 <></>
               )}

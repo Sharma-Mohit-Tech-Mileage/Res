@@ -1,21 +1,16 @@
-import React, {  useEffect } from "react";
+import React, { useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Billpaidicon from "../../res/svgIcons/Billpaidicon";
 import Outageicon from "../../res/svgIcons/Outageicon";
 import Modemicon from "../../res/svgIcons/Modemicon";
 import colors from "../../res/Colors";
 import strings from "../../res/Strings";
-import {
-  widthPercentageToDP as wp,
-} from "react-native-responsive-screen";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
 import { Env } from "../../network/apis/account/Constants";
-const NetworkDetails = ({ navigation, billPaid,hasOutage,isModemIssue }) => {
-  useEffect(() => {
-    console.log("data",isModemIssue);
-  }, []);
-
+import PubSub from "pubsub-js";
+const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
   const GreenCircle = () => {
     return <View style={styles.greenTick}></View>;
   };
@@ -33,9 +28,12 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage,isModemIssue }) => {
         <View style={styles.item}>
           <View style={styles.iconBg}>
             <Outageicon />
-            {(hasOutage)?<RedCircle/>:<GreenCircle />}
+            {hasOutage ? <RedCircle /> : <GreenCircle />}
           </View>
-          <Text style={styles.text}> {(hasOutage)?strings.noOutageDetected:strings.noOutageTxt}</Text>
+          <Text style={styles.text}>
+            {" "}
+            {hasOutage ? strings.noOutageDetected : strings.noOutageTxt}
+          </Text>
         </View>
         {/* <View style={styles.item}>
         <View style ={styles.iconBg}>
@@ -47,42 +45,60 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage,isModemIssue }) => {
       </View>
 
       <View style={[styles.rowContainer]}>
-        <View style={styles.item}>
-          <View style={styles.iconBg}>
-            <Modemicon />
-            { (isModemIssue)?<RedCircle/> : <GreenCircle />}
-          </View>
-          <Text style={styles.text}> {(isModemIssue)?strings.modem_issue_detected:strings.no_modem_issue}</Text>
-          {isModemIssue ? (
-            <View
-              style={{
-                justifyContent: "center",
-                right: 20,
-                top: 26,
-                position: "absolute",
-              }}
-              
-            >
-              <RightArrow />
+        <TouchableOpacity
+          style={{ flexDirection: "row" }}
+          onPress={() => {
+            navigation.push('ManageEquipment');
+          }}
+        >
+          <View style={styles.item}>
+            <View style={styles.iconBg}>
+              <Modemicon />
+              {currentHealth === "Offline" ? (
+                <RedCircle />
+              ) : currentHealth === "Poor" ? (
+                <OrangeCircle />
+              ) : (
+                <GreenCircle />
+              )}
             </View>
-          ) : (
-            <></>
-          )}
-      </View>
-        <TouchableOpacity style={{ flexDirection: "row" }}
-        onPress={() => {
-          if(!billPaid){
-          navigation.navigate("ArticalWindowUtility", {
-            url: `${Env.URL}/residential/billing`,
-            name: "Billing Details",
-          });
-        }
-        }}
+            <Text style={styles.text}>
+              {" "}
+              {currentHealth != "Optimal"
+                ? strings.modem_issue_detected
+                : strings.no_modem_issue}
+            </Text>
+            {currentHealth != "Optimal" ? (
+              <View
+                style={{
+                  justifyContent: "center",
+                  right: 20,
+                  top: 26,
+                  position: "absolute",
+                }}
+              >
+                <RightArrow />
+              </View>
+            ) : (
+              <></>
+            )}
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ flexDirection: "row" }}
+          onPress={() => {
+            if (!billPaid) {
+              navigation.navigate("ArticalWindowUtility", {
+                url: `${Env.URL}/residential/billing`,
+                name: "Billing Details",
+              });
+            }
+          }}
         >
           <View style={styles.item}>
             <View style={styles.iconBg}>
               <Billpaidicon />
-             { billPaid ? <GreenCircle /> : <OrangeCircle />}
+              {billPaid ? <GreenCircle /> : <OrangeCircle />}
             </View>
             <Text style={styles.text}> {strings.bill_paid}</Text>
           </View>
@@ -94,7 +110,6 @@ const NetworkDetails = ({ navigation, billPaid,hasOutage,isModemIssue }) => {
                 top: 26,
                 position: "absolute",
               }}
-              
             >
               <RightArrow />
             </View>
@@ -140,7 +155,7 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: 5,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
     marginLeft: 10,
     color: colors.darkest_grey,
@@ -167,7 +182,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.sparklight_red,
     borderWidth: 2,
     borderColor: "white",
-  },orangeTick: {
+  },
+  orangeTick: {
     width: 14,
     height: 14,
     borderRadius: 7,
