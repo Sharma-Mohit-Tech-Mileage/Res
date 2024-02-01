@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>LSApplicationCategoryType</key>
-	<false/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -37,6 +35,17 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FirebaseAutomaticScreenReportingEnabled</key>
+	<false/>
+	<key>LSApplicationCategoryType</key>
+	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>data</string>
+		<string>data:application/octet-stream</string>
+		<string>data:</string>
+		<string>application/octet-stream</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -52,6 +61,14 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>InterSemi-Bold.ttf</string>
+		<string>Inter-Bold.ttf</string>
+		<string>OpenSans-Bold.ttf</string>
+		<string>OpenSans-Regular.ttf</string>
+		<string>OpenSans-SemiBold.ttf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -77,15 +94,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>FirebaseAutomaticScreenReportingEnabled</key>
-	<false/>
-	<key>UIAppFonts</key>
-	<array>
-		<string>InterSemi-Bold.ttf</string>
-		<string>Inter-Bold.ttf</string>
-		<string>OpenSans-Bold.ttf</string>
-		<string>OpenSans-Regular.ttf</string>
-		<string>OpenSans-SemiBold.ttf</string>
-	</array>
 </dict>
 </plist>

@@ -284,24 +284,25 @@ const HomeScreen = ({ navigation }) => {
     getInternetPlanDetails();
     getUserAccountDetails();
     checkNotifications();
+
+    const fetchData = async () => {
+      console.log('FetchData: ');
+      try {
+        const result = await getUpgradeToken();
+        console.log('getUpgradeTokenResult: ', JSON.stringify(result));
+        storeUpgradeToken(result);
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+
+      if (home.walkThroughStep !== null) {
+        setShowWalkThrough(true);
+      }
+    };
+
+    fetchData();    
     
   }, []);
-
-  // useEffect(async () => {
-  //   try {
-  //     const result = await getUpgradeToken();
-  //     console.log('getUpgradeTokenResult: ', JSON.stringify(result));
-  //     storeUpgradeToken(result);
-  //   } catch (error) {
-  //     console.error("Error fetching data", error);
-  //   }
-  // }, []);  
-
-  useEffect(async () => {
-    if (home.walkThroughStep !== null) {
-      setShowWalkThrough(true);
-    }
-  }, []);    
 
   const changeWalkThroughStep = (step) => {
     console.log("walkThroughStep: ", step);
