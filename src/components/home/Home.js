@@ -109,7 +109,7 @@ const HomeScreen = ({ navigation }) => {
       console.log('checkModemOutagStatus',response)
            if(response.hasOutage===true){
             let time=moment(response.estimatedTimeOfResolution).format('LT'); 
-            setEstimatedRestoreTime(time)
+             setEstimatedRestoreTime(time)
              setAccountStatus('Disconnect')
              setIsInternetDetails(true)
              setHasOutage(true)
@@ -129,7 +129,7 @@ const HomeScreen = ({ navigation }) => {
       setPlans(res);
       if(res.length>0){
       let macAddress=res[0].macAddress
-      checkModemDetails(macAddress)
+      checkModemDetails("00:40:36:7b:29:5a")
       }
     }
   };
@@ -141,44 +141,59 @@ const HomeScreen = ({ navigation }) => {
    * get modem details
    */
 
-  const checkModemDetails=(macAddress)=>{
+  const checkModemDetails = (macAddress) => {
     const request = `mobile/api/modem/getmodemdetails?macId=${macAddress}`;
-    GetApiRequest(request, (res)=>{
-      console.log("checkModemDetails", res);
-      let temt=[];
-      if(res.equipmentType==='DOCSIS'){
-        temt.push(res.uTxP_State)
-        temt.push(res.uRxL_State)
-        temt.push(res.usnR_State)
-        temt.push(res.dsnR_State)
-        temt.push(res.dRxL_State)
+    GetApiRequest(
+      request,
+      (res) => {
+        console.log("checkModemDetails", res);
+        if (res) {
+          let temt = [];
+          if (res.equipmentType === "DOCSIS") {
+            temt.push(res.uTxP_State);
+            temt.push(res.uRxL_State);
+            temt.push(res.usnR_State);
+            temt.push(res.dsnR_State);
+            temt.push(res.dRxL_State);
+            updateModemStatus(temt);
+          }else if(res.equipmentType === "ONU"){
+            temt.push(res.onutP_State);
+            temt.push(res.oltrP_State);
+            temt.push(res.onurP_State);
+            updateModemStatus(temt)
+          }
+          
+        }
+      },
+      (error) => {
+        console.log("Modem details", error);
       }
+    );
+  };
 
-      const allGreen =  temt.every(v => v === 'Green');
-      console.log('allg',allGreen)
-      if(!allGreen){
-        const checkYellow=temt.includes('Yellow')
-        const checkRed=temt.includes('Red')
-        if(checkYellow){
-            setAccountStatus('Poor')
-            setIsInternetDetails(true)
-        }
-        if(checkRed){
-          setAccountStatus('Disconnect')
-          setIsInternetDetails(true)
-        }
-      }else{
-         if(currentHealth!='Optimal'){
-          setAccountStatus('Optimal')
-          setIsInternetDetails(false)
-         }
+  const updateModemStatus = (temt) => {
+    const allGreen = temt.every((v) => v === "Green");
+    console.log('modem status',allGreen)
+    if (!allGreen) {
+      setIsModemIssue(true);
+      const checkYellow = temt.includes("Yellow");
+      const checkRed = temt.includes("Red");
+      if (checkRed) {
+        setCurrentHealth('Offline');
+        setIsInternetDetails(true);
+      } else if (checkYellow) {
+        setCurrentHealth('Poor');
+        setIsInternetDetails(true);
       }
-      
-    }, (error)=>{
-        console.log('Modem details',error)   
-    });
-  
-  }
+    } else {
+      if (currentHealth != 'Optimal') {
+        setCurrentHealth('Optimal');
+        setIsInternetDetails(false);
+        setIsModemIssue(false);
+      }
+    }
+    
+  };
 
   const getUserAccountDetails = () => {
      getUser().then((res) => {
@@ -192,12 +207,13 @@ const HomeScreen = ({ navigation }) => {
           
           }else{
             updateInternetHealth(res.currentBalance);
+
           }
           let dueDate = moment(res.paymentDueDate).format("ll");
           setDueDate(dueDate);
           setBillAmt(res.currentBalance);
           
-
+           getInternetPlanDetails();
         }
       }, onErrorBill);
     });
@@ -281,7 +297,6 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     checkModemOutagStatus();
-    getInternetPlanDetails();
     getUserAccountDetails();
     checkNotifications();
 
@@ -465,7 +480,7 @@ const HomeScreen = ({ navigation }) => {
                 </View>
                 <Text style={styles.internetStatusTxt}>
                   {" "}
-                  {(billPaid && !hasOutage)?strings.internetStatus:strings.internetStatusIssue}
+                  {(currentHealth!='Optimal')?strings.internetStatusIssue:strings.internetStatus}
                 </Text>
               </View>
 
@@ -498,7 +513,7 @@ const HomeScreen = ({ navigation }) => {
                 </View>
               </TouchableOpacity>
               {isInternetDetails ? (
-                <NetworkDetails billPaid={billPaid} hasOutage={hasOutage} navigation={navigation} accountStatus={accountStatus} />
+                <NetworkDetails billPaid={billPaid} hasOutage={hasOutage} currentHealth={currentHealth} navigation={navigation} accountStatus={accountStatus} />
               ) : (
                 <></>
               )}
