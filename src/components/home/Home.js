@@ -133,7 +133,7 @@ const HomeScreen = ({ navigation }) => {
       let macAddress=res[0].macAddress
       var mac=macAddress;
       if(user.userInfo.accountNumber==='128387263'){
-        mac="00:40:36:7b:29:5a"
+        mac="ac:db:48:21:f2:21"
       }else if(user.userInfo.accountNumber==='133370775'){
         mac="04:bc:9f:17:02:b8"
       }
