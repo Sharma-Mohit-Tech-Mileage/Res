@@ -31,6 +31,7 @@ import { SetRenewTokenTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env,  ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from 'react-native-version-check';
+import * as Zendesk from 'react-native-zendesk-messaging';
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -72,6 +73,8 @@ const SplashScreen = ({ navigation }) => {
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken
       };
+
+      Zendesk.login(token)
 
       if (res.userInfo.acctStatus === 'Disconnect'){
         setDisconnected(true);

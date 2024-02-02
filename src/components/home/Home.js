@@ -9,6 +9,7 @@ import {
   Platform,
   Dimensions,
   Pressable,
+  ActivityIndicator
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -56,7 +57,7 @@ const HomeScreen = ({ navigation }) => {
   const [accountStatus,setAccountStatus]=useState('Active')
   const [hasOutage,setHasOutage]=useState(false)
   const [isOutageAlert,setIsOutageAlert]=useState(false)
-  const [isModemIssue,setIsModemIssue]=useState(false)
+  const [checkModemStatus,setCheckModemStatus]=useState(false)
   const [estimatedRestoreTime,setEstimatedRestoreTime]=useState('')
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
@@ -137,6 +138,8 @@ const HomeScreen = ({ navigation }) => {
         mac="04:bc:9f:17:02:b8"
       }
       checkModemDetails(mac)
+      }else{
+        setCheckModemStatus(true)
       }
     }
   };
@@ -153,6 +156,7 @@ const HomeScreen = ({ navigation }) => {
     GetApiRequest(
       request,
       (res) => {
+        setCheckModemStatus(true)
         console.log("checkModemDetails", res);
         if (res) {
           let temt = [];
@@ -173,6 +177,7 @@ const HomeScreen = ({ navigation }) => {
         }
       },
       (error) => {
+        setCheckModemStatus(true)
         console.log("Modem details", error);
       }
     );
@@ -182,7 +187,6 @@ const HomeScreen = ({ navigation }) => {
     const allGreen = temt.every((v) => v === "Green");
     console.log('modem status',allGreen)
     if (!allGreen) {
-      setIsModemIssue(true);
       const checkYellow = temt.includes("Yellow");
       const checkRed = temt.includes("Red");
       if (checkRed) {
@@ -196,7 +200,6 @@ const HomeScreen = ({ navigation }) => {
       if (currentHealth != 'Optimal') {
         setCurrentHealth('Optimal');
         setIsInternetDetails(false);
-        setIsModemIssue(false);
       }
     }
     
@@ -476,10 +479,16 @@ const HomeScreen = ({ navigation }) => {
              {(isOutageAlert)?<OutageAlert estimatedTime={estimatedRestoreTime}/>:<></>}
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <Text style={styles.internetHealth}>Service Health</Text>
+              { (checkModemStatus) ?
               <InternetHealthChart
                 currentValue={getInternetHealth(currentHealth)}
                  key={currentHealth}
               />
+              : <ActivityIndicator
+              size="large"
+              color={Color.colorGainsboro_200}
+              
+            />}
               <View style={styles.internetStatusSection}>
                 <View style={{ marginTop: 5 }}>
                   <InfoIcon />

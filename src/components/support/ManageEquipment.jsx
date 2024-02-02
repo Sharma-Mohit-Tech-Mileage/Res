@@ -1,5 +1,12 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import {
   FontFamily,
@@ -20,17 +27,15 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-const ManageEquipment = (route) => {
-  // console.log("PROPS" + JSON.stringify(route));
+const ManageEquipment = () => {
   const navigation = useNavigation();
-  const [manufacturer, setManufacturer] = React.useState("");
+  const [manufacturer, setManufacturer] = React.useState('');
   const [model, setModel] = React.useState("");
   const [transmissionType, setTransmissionType] = React.useState("");
   const [leased, setLeased] = React.useState("");
   const [plans, setPlans] = React.useState([]);
   const [loadingHealth, setLoadingHealth] = React.useState(false);
   const [currentHealth, setCurrentHealth] = React.useState("Optimal");
-
 
   const getLeasedDetails = () => {
     let re = getUser().then((res) => {
@@ -53,21 +58,21 @@ const ManageEquipment = (route) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
       GetApiRequest(
         request,
-        (res) => {
-          setPlans(res);
-          if (res.length > 0) {
-            let macAddress = res[0].macAddress;
-            var mac=macAddress;
-            if(res.userInfo.accountNumber==='128387263'){
-              mac="00:40:36:7b:29:5a"
-            }else if(res.userInfo.accountNumber==='133370775'){
-              mac="04:bc:9f:17:02:b8"
+        (response) => {
+          setPlans(response);
+          if (response.length > 0) {
+            let macAddress = response[0].macAddress;
+            var mac = macAddress;
+            if (res.userInfo.accountNumber === "128387263") {
+              mac = "00:40:36:7b:29:5a";
+            } else if (res.userInfo.accountNumber === "133370775") {
+              mac = "04:bc:9f:17:02:b8";
             }
             checkModemDetails(mac);
           }
         },
         (error) => {
-            setLoadingHealth(false)
+          setLoadingHealth(false);
         }
       );
     });
@@ -82,7 +87,7 @@ const ManageEquipment = (route) => {
     GetApiRequest(
       request,
       (res) => {
-        setLoadingHealth(true)
+        setLoadingHealth(true);
         console.log("checkModemDetails", res);
         if (res) {
           let temt = [];
@@ -102,7 +107,7 @@ const ManageEquipment = (route) => {
         }
       },
       (error) => {
-        setLoadingHealth(false)
+        setLoadingHealth(false);
         console.log("Modem details", error);
       }
     );
@@ -148,8 +153,6 @@ const ManageEquipment = (route) => {
     getInternetPlanDetails();
   }, []);
 
-  
-
   return (
     <View style={styles.manageEquipment}>
       <ProfileSettingsHeader
@@ -182,20 +185,35 @@ const ManageEquipment = (route) => {
                         {/* {transmissionType} */}
                       </Text>
 
-                      { loadingHealth && <View style={styles.poorHealthParent}>
-                        <Text style={[styles.poorHealth, styles.textTypo2]}>
-                          {currentHealth === "Poor"
-                            ? "Issue Health"
-                            : (currentHealth=="Offline")?"Poor Health" :'Good Health'}
-                        </Text>
-                        <Image
-                          style={styles.frameChild}
-                          tintColor={(currentHealth==='Optimal'?colors.sparklight_green :(currentHealth==='Offline')?colors.sparklight_red : colors.sparklight_yellow)}
-                          resizeMode="cover"
-                          source={require("../../../assets/Ellipse.png")}
+                      {loadingHealth ? (
+                        <View style={styles.poorHealthParent}>
+                          <Text style={[styles.poorHealth, styles.textTypo2]}>
+                            {currentHealth === "Poor"
+                              ? "Issue Health"
+                              : currentHealth == "Offline"
+                              ? "Poor Health"
+                              : "Good Health"}
+                          </Text>
+                          <Image
+                            style={styles.frameChild}
+                            tintColor={
+                              currentHealth === "Optimal"
+                                ? colors.sparklight_green
+                                : currentHealth === "Offline"
+                                ? colors.sparklight_red
+                                : colors.sparklight_yellow
+                            }
+                            resizeMode="cover"
+                            source={require("../../../assets/Ellipse.png")}
+                          />
+                        </View>
+                      ) : (
+                        <ActivityIndicator
+                          size="small"
+                          color={Color.colorGainsboro_200}
+                          style={{ width: 40 }}
                         />
-                      </View>
-                       }
+                      )}
                       <View style={[styles.badge, styles.parentBorder]}>
                         <Text style={[styles.text, styles.textTypo1]}>
                           {"leased".toLocaleUpperCase()}
@@ -205,31 +223,42 @@ const ManageEquipment = (route) => {
                   </View>
                 </View>
               </View>
-              {/* <View style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}>
-                                <View style={[styles.notifications, styles.parentBorder]}>
-                                    <Image
-                                        resizeMode="cover"
-                                        source={require("../../../assets/rectangle-529.png")}
-                                    />
-                                    <View style={styles.bannerWarning}>
-                                        <View style={styles.rightActionableParent}>
-                                            <Image
-                                                style={{ height: '100%' }} // Set both width and height to '100%'
-                                                resizeMode="stretch" // Change resizeMode to stretch
-                                                source={require("../../../assets/alertred.png")}
-                                            />
-                                            <View style={styles.creditCardWillExpireSoonParent}>
-                                                <Text style={styles.creditCardWill}>
-                                                    Modem has poor health
-                                                </Text>
-                                                <Text style={[styles.yourSavedCard, styles.yourSavedCardSpaceBlock,]} >
-                                                    Try one of the options below to resolve.
-                                                </Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View> */}
+
+                { ( currentHealth!='Optimal' && loadingHealth) &&
+              <View
+                style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}
+              >
+                <View style={[styles.notifications, styles.parentBorder]}>
+                  <Image
+                    resizeMode="cover"
+                    source={require("../../../assets/rectangle-529.png")}
+                  />
+                  <View style={styles.bannerWarning}>
+                    <View style={styles.rightActionableParent}>
+                      <Image
+                        style={{ height: "100%" }} // Set both width and height to '100%'
+                        resizeMode="stretch" // Change resizeMode to stretch
+                        source={require("../../../assets/alertred.png")}
+                      />
+                      <View style={styles.creditCardWillExpireSoonParent}>
+                        <Text style={styles.creditCardWill}>
+                          Modem has poor health
+                        </Text>
+                        <Text
+                          style={[
+                            styles.yourSavedCard,
+                            styles.yourSavedCardSpaceBlock,
+                          ]}
+                        >
+                          Try one of the options below to resolve.
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+                 }
+
             </View>
             <View
               style={[
@@ -268,6 +297,7 @@ const ManageEquipment = (route) => {
                                 />
                             </View> */}
               <View style={[styles.frameLayout]} />
+              { (manufacturer!='Calix') &&
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
@@ -285,6 +315,7 @@ const ManageEquipment = (route) => {
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
+             }
             </View>
           </View>
           <View style={[styles.frameFlexBox]}>
