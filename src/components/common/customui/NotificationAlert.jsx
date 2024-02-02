@@ -30,7 +30,7 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                 showCloseIcon ? { marginRight: 30 } : { marginRight: 10 } 
             ]}>
                 {title &&<Text style={[styles.title, { color: currentTypeStyle.color }]}>{title}</Text>}
-                <Text style={!title ? styles.messageOnEmpty :styles.message}>{message}</Text>
+                {message ?<Text style={!title ? styles.messageOnEmpty :styles.message}>{message}</Text>:null}
             </View>
             {showCloseIcon && (
                 <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
