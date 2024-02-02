@@ -18,20 +18,17 @@ import { Padding, Color, FontFamily, Border, FontSize } from '../../../GlobalSty
 const PDFViewModal = ({ url, onClose }) => {
   const [modalVisible, setModalVisible] = useState(true);
   const [iconPressed, setIconPressed] = useState(false);
-  const convertUrl = url.replace('application/octet-stream', 'application/pdf');
+  const convertUrl = 'data:application/pdf;base64,' + url;
 
-  //console.log('PDFViewModal URL: ', url);
-  
   const closeModal = () => {
     setModalVisible(false);
     onClose();
   };
 
   const loadAndSharePDF = async () => {
-    const showError = await sharePDF(convertUrl, 'billinghistory.pdf');
+    const showError = await sharePDF(url, 'billinghistory.pdf');
     if (showError !== undefined) {
       console.log(showError);
-      // Do something with the error
     }
   };  
 
@@ -42,6 +39,13 @@ const PDFViewModal = ({ url, onClose }) => {
       visible={modalVisible}
       onRequestClose={closeModal}
     >
+      <LinearGradient
+          style={[styles.profileSettingsChild, { paddingTop: 40 }]}
+          locations={[0, 1]}
+          colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+          useAngle={true}
+          angle={90}
+      ></LinearGradient>      
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>
             <StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />
@@ -71,24 +75,30 @@ const PDFViewModal = ({ url, onClose }) => {
                           accessible={false}
                       />
                     </Pressable>
-                    <Text style={styles.title}>Billing History</Text>                
+                    <Text style={styles.title}>Billing History</Text>
+                    <Pressable
+                        style={[styles.navIcon, styles.chevronLayout]}
+                        onPress={loadAndSharePDF}
+                        accessibilityLabel="Share"
+                        accessibilityHint="Share your Billing History"
+                        accessibilityRole="button"
+                        accessible={true}
+                        hitSlop={20}
+                        onPressIn={() => setIconPressed(true)}
+                        onPressOut={() => setIconPressed(false)}
+                    >
+                        <Image
+                            style={[styles.icon, iconPressed ? styles.iconPressed : null]}
+                            resizeMode="cover"
+                            source={require("../../../assets/share.png")}
+                            accessible={false}
+                        />
+                    </Pressable>                 
                 </View>
           </LinearGradient>      
           <View style={{width:'100%',height:'100%',}}>
             <Pdf
                 source={{uri: convertUrl}}
-                onLoadComplete={(numberOfPages,filePath) => {
-                    console.log(`Number of pages: ${numberOfPages}`);
-                }}
-                onPageChanged={(page,numberOfPages) => {
-                    console.log(`Current page: ${page}`);
-                }}
-                onError={(error) => {
-                    console.log(error);
-                }}
-                onPressLink={(uri) => {
-                    console.log(`Link pressed: ${uri}`);
-                }}
                 style={styles.pdf}/>
           </View>
         </View>
@@ -102,7 +112,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: 20
   },
   closeButton: {
     alignSelf:'flex-end',
