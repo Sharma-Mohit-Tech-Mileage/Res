@@ -60,6 +60,7 @@ const HomeScreen = ({ navigation }) => {
   const [estimatedRestoreTime,setEstimatedRestoreTime]=useState('')
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
+
   const getInternetHealth = (type) => {
     var currentHealth = {
       Offline: 20,
@@ -129,7 +130,13 @@ const HomeScreen = ({ navigation }) => {
       setPlans(res);
       if(res.length>0){
       let macAddress=res[0].macAddress
-      checkModemDetails("00:40:36:7b:29:5a")
+      var mac=macAddress;
+      if(user.userInfo.accountNumber==='128387263'){
+        mac="00:40:36:7b:29:5a"
+      }else if(user.userInfo.accountNumber==='133370775'){
+        mac="04:bc:9f:17:02:b8"
+      }
+      checkModemDetails(mac)
       }
     }
   };

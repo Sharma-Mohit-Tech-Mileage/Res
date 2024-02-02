@@ -28,8 +28,9 @@ const ManageEquipment = (route) => {
   const [transmissionType, setTransmissionType] = React.useState("");
   const [leased, setLeased] = React.useState("");
   const [plans, setPlans] = React.useState([]);
-  const [data, setData] = React.useState({});
+  const [loadingHealth, setLoadingHealth] = React.useState(false);
   const [currentHealth, setCurrentHealth] = React.useState("Optimal");
+
 
   const getLeasedDetails = () => {
     let re = getUser().then((res) => {
@@ -56,10 +57,18 @@ const ManageEquipment = (route) => {
           setPlans(res);
           if (res.length > 0) {
             let macAddress = res[0].macAddress;
-            checkModemDetails("00:40:36:7b:29:5a");
+            var mac=macAddress;
+            if(res.userInfo.accountNumber==='128387263'){
+              mac="00:40:36:7b:29:5a"
+            }else if(res.userInfo.accountNumber==='133370775'){
+              mac="04:bc:9f:17:02:b8"
+            }
+            checkModemDetails(mac);
           }
         },
-        (error) => {}
+        (error) => {
+            setLoadingHealth(false)
+        }
       );
     });
   };
@@ -73,6 +82,7 @@ const ManageEquipment = (route) => {
     GetApiRequest(
       request,
       (res) => {
+        setLoadingHealth(true)
         console.log("checkModemDetails", res);
         if (res) {
           let temt = [];
@@ -92,6 +102,7 @@ const ManageEquipment = (route) => {
         }
       },
       (error) => {
+        setLoadingHealth(false)
         console.log("Modem details", error);
       }
     );
@@ -137,16 +148,7 @@ const ManageEquipment = (route) => {
     getInternetPlanDetails();
   }, []);
 
-  const GreenCircle = () => {
-    return <View style={styles.greenTick}></View>;
-  };
-
-  const RedCircle = () => {
-    return <View style={styles.redTick}></View>;
-  };
-  const OrangeCircle = () => {
-    return <View style={styles.orangeTick}></View>;
-  };
+  
 
   return (
     <View style={styles.manageEquipment}>
@@ -179,7 +181,8 @@ const ManageEquipment = (route) => {
                         {model}
                         {/* {transmissionType} */}
                       </Text>
-                      <View style={styles.poorHealthParent}>
+
+                      { loadingHealth && <View style={styles.poorHealthParent}>
                         <Text style={[styles.poorHealth, styles.textTypo2]}>
                           {currentHealth === "Poor"
                             ? "Issue Health"
@@ -192,6 +195,7 @@ const ManageEquipment = (route) => {
                           source={require("../../../assets/Ellipse.png")}
                         />
                       </View>
+                       }
                       <View style={[styles.badge, styles.parentBorder]}>
                         <Text style={[styles.text, styles.textTypo1]}>
                           {"leased".toLocaleUpperCase()}
@@ -506,39 +510,6 @@ const styles = StyleSheet.create({
     alignContent: "center",
     alignItems: "center",
     justifyContent: "center",
-  },
-  greenTick: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    position: "absolute",
-    bottom: 0,
-    right: -3,
-    backgroundColor: colors.sparklight_green,
-    borderWidth: 2,
-    borderColor: "white",
-  },
-  redTick: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    position: "absolute",
-    bottom: 0,
-    right: -3,
-    backgroundColor: colors.sparklight_red,
-    borderWidth: 2,
-    borderColor: "white",
-  },
-  orangeTick: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    position: "absolute",
-    bottom: 0,
-    right: -3,
-    backgroundColor: colors.sparklight_yellow,
-    borderWidth: 2,
-    borderColor: "white",
   },
 });
 
