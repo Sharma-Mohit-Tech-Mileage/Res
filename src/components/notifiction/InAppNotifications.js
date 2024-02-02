@@ -59,9 +59,6 @@ const InAppNotifications = ({ navigation }) => {
     const enabledPermission = await requestUserPermission();
     if (enabledPermission) {
       const token = await getFcmToken();
-      if (token) {
-        setGeneratedToken(token);
-      }
       initialize.deviceToken = token;  // Replace 'token' with your actual token variable
       initialize.deviceTokenTimestamp = moment().format();  // Assuming 'moment' is imported and available
       initialize.isAndroid = Platform.OS === "android"
