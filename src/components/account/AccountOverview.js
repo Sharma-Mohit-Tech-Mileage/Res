@@ -222,23 +222,13 @@ const AccountOverview = () => {
                   Logout
                 </Text>
               </Pressable>
-              <Pressable
-                style={[styles.buttons, styles.buttonsSpaceBlock1]}
-                onPress={() => { /* Handle press event if necessary for the entire line */ }}
-              >
-                <Text style={{ fontStyle: 'italic', color: Color.colorMidnightblue }}>
-                  {'View our '}
-                  <Text
-                    style={{ textDecorationLine: 'underline' }}
-                    onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}
-                  >
+              <Pressable style={[styles.buttons, styles.buttonsSpaceBlock]}>
+                <Text>
+                  <Text style={styles.linkStyle} onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}>
                     Privacy Policy
                   </Text>
-                  {' and '}
-                  <Text
-                    style={{ textDecorationLine: 'underline' }}
-                    onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}
-                  >
+                  <Text style={styles.linkStyle}> | </Text>
+                  <Text style={styles.linkStyle} onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}>
                     Terms & Conditions
                   </Text>
                 </Text>
@@ -265,9 +255,6 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_base,
     alignItems: "center",
   },
-  buttonsSpaceBlock1: {
-    alignItems: "center",
-  },
   navigationBorder: {
     borderColor: Color.sparklightGray,
     backgroundColor: Color.sparklightWhite,
@@ -277,6 +264,11 @@ const styles = StyleSheet.create({
   tabsFlexBox: {
     flexDirection: "row",
     alignSelf: "stretch",
+  },
+  linkStyle :{
+    color: Color.colorMidnightblue, 
+    alignSelf: 'center',
+    fontWeight:'600'
   },
   makePaymentTypo: {
     fontSize: FontSize.size_base,
