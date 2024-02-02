@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Platform, Pressable } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -7,6 +7,7 @@ import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
 import { isUserAuthorized } from "../../network/APIClient";
 import { Env } from '../../network/apis/account/Constants';
+import PDFViewModal from './PDFViewModal';
 
 
 const { width, height } = Dimensions.get('window');
@@ -19,9 +20,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [currentUser, setCurrentUser] = useState({});
     const [modalOpen, setModalOpen] = useState(true);
     const [navStateReloading, setNavStateReloading] = useState(false);
+    const [showPDFModal, setShowPDFModal] = useState(false);
+    const [showPDFUrl, setShowPDFUrl] = useState('');
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
     
+    const toggleModal = () => {
+        setShowPDFModal(!showPDFModal);
+    };
 
     const navigationChange = async (navState) => {
         //https://customer.uat.sparklight.com/SecureLoginSSO/token/postlogout
@@ -39,6 +45,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 }, 1000);                
             }
         }
+    }
+
+    const onShouldStartLoadWithRequest = (request) => {
+        if (request.mainDocumentURL.includes('data:application/octet-stream')) {
+            setShowPDFUrl(request.mainDocumentURL);
+            setShowPDFModal(true);
+        }
+        return true;
     }
 
     const userUpdate = async () => {
@@ -108,10 +122,11 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     key={url}
                     source={{ uri: url }}
                     onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
-                    onError={() => setIsError(true)}
                     sharedCookiesEnabled={true}
                     injectedJavaScriptBeforeContentLoaded={initScript}
                     onNavigationStateChange={navigationChange}
+                    onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+                    originWhitelist={['http://*', 'https://*', 'data:*']}
                 />            
             )}
             {isError ? (
@@ -119,7 +134,12 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     <Text style={styles.errorText}>Failed to load. Please try again later.</Text>
                 </View>
             ) : null}
-            
+            {showPDFModal && (
+                <PDFViewModal
+                    url={showPDFUrl}
+                    onClose={()=>toggleModal()}
+                />
+            )}            
         </View>
     );
 };

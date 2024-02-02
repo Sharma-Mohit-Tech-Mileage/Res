@@ -6,6 +6,7 @@ export const config={
     URL:'https://customer.sparklight.com',
     SSO_LOGIN:'https://login.cableone.net/auth/realms/external-sso-realm',
     API_BASEURL:'https://publicservices.sparklight.com/portalservices/',
+    API_SHOPPING_CART_BASEURL:'https://publicservices.sparklight.com/ShoppingCart',
     ZENDESK_FEEDBACK:{
       Url:'https://cableone.zendesk.com/api/v2/requests.json',
       ticket_form_id: "360000052934",
@@ -16,12 +17,12 @@ export const config={
       feedbackValue_id: "1900000846365",
       email_id: "36003617614",
    }
-
  },
  UAT:{
     URL:'https://customer.uat.sparklight.com',
     SSO_LOGIN:'https://login.uat.cableone.net/auth/realms/external-sso-realm',
     API_BASEURL:'https://customer.uat.sparklight.com/apiWrapper/',
+    API_SHOPPING_CART_BASEURL:'https://secure.uat.cableone.net/ShoppingCartBackBoneAPIWrapperDemo',
     ZENDESK_FEEDBACK:{
       Url:'https://cableone1615402851.zendesk.com/api/v2/requests.json',
       ticket_form_id: "1500000315922",
@@ -36,6 +37,6 @@ export const config={
 
 }
 
-export const ISUAT = true
+export const ISUAT = false
 
 export const Env=(ISUAT)? config.UAT : config.PRODUCTION
