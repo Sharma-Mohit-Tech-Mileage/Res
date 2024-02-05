@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../../components/home/Home';
 import ArticalWindowUtility from '../../components/utility/ArticalWindowUtility';
 import { useTabBarVisibility } from '../TabBarVisibilityContext';
+import ModemStackScreen from "./ManageEquepmentStack";
 
 const HomeStack = createStackNavigator();
 
@@ -32,6 +33,15 @@ function HomeStackScreen() {
                     blur: () => setTabBarVisible(true)
                 }}
             />
+            <HomeStack.Screen
+        name="ManageEquipment"
+        component={ModemStackScreen}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
 
         </HomeStack.Navigator>
     );
