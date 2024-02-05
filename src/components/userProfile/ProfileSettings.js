@@ -33,10 +33,16 @@ const ProfileSettings = () => {
   }, [route.params?.updateSuccess, navigation, dispatch]);
 
   useEffect(() => {
+    // Always fetch profile details on component mount
     dispatch(fetchProfileDetails());
-    if (isPrimary)
+  }, [dispatch]);
+
+  useEffect(() => {
+    // This useEffect is dedicated to responding to changes in the isPrimary flag
+    if (isPrimary) {
       dispatch(fetchSMSSelection());
-  }, []);
+    }
+  }, [isPrimary, dispatch]); // This useEffect depends on isPrimary and will re-run when isPrimary changes
 
   return (
     <View style={{ zIndex: 1 }}>
