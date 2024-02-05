@@ -12,12 +12,7 @@ import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
 import React, { useEffect, useState } from "react";
-import { BackHandler } from 'react-native';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
+import { View, StyleSheet, Dimensions} from "react-native";
 import { useSelector } from 'react-redux';
 import { FontFamily } from '../../GlobalStyles';
 import { Env } from '../network/apis/account/Constants';
@@ -27,50 +22,11 @@ const tabWidth = Number(width/4);
 const Tab = createBottomTabNavigator();
 
 const MyTabs = ({ route, navigation }) => {
-  const [secondStepActive, setSecondStepActive] = useState(true);
-  const [lastEvent, setLastEvent] = useState(null);
   const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
   const [shadowStyle, setShadowStyle] = useState(styles.shadowTabs);
   const { tabBarVisible } = useTabBarVisibility();
   const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector(state => state.combinedReducers.home);
-
-  useEffect(() => {
-    const backAction = () => {
-      // Log the current state of the entire navigation
-      const currentRoute = navigation.getState();
-      console.log("Current Navigation State:", currentRoute);
-
-      // Check if there's a screen to go back to in the current tab's stack
-      const currentTab = currentRoute.routes[currentRoute.index];
-      console.log("Current Tab State:", currentTab.state);
-
-      if (currentTab.state && currentTab.state.index > 0) {
-        console.log("Going back within the current tab's stack");
-       // navigation.goBack();
-        return false;
-      } else if (navigation.canGoBack()) {
-        console.log("Going back in the outer stack");
-       // navigation.goBack();
-        return false;
-      }
-
-      console.log("No screen to go back to, default action proceeds");
-      return true;
-    };
-
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-
-    // Clean up the event listener when the component unmounts
-    return () => {
-      console.log("Removing back button listener");
-      backHandler.remove();
-    };
-  }, [navigation]);
-
 
   useEffect(() => {
     console.log('MyTabHome: ', home);
@@ -128,11 +84,10 @@ const MyTabs = ({ route, navigation }) => {
       />
       <Tab.Screen
         name="Shop"
-        component={ShopStack} // This will not be used, since we will override the onPress
+        component={ShopStack} 
         listeners={({ navigation }) => ({
           tabPress: (e) => {
             e.preventDefault();
-            // Reset the stack and navigate to ArticalWindowUtility
             navigation.reset({
               index: 0,
               routes: [
