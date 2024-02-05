@@ -39,6 +39,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RefreshToken } from '../user/Session';
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from '../../network/apis/account/Constants';
+const tabWidth = Number(Dimensions.get('window').width/4);
 
 const HomeScreen = ({ navigation }) => {
   // const { email, name } = {
@@ -309,24 +310,25 @@ const HomeScreen = ({ navigation }) => {
     checkModemOutagStatus();
     getUserAccountDetails();
     checkNotifications();
+
+    const fetchData = async () => {
+      console.log('FetchData: ');
+      try {
+        const result = await getUpgradeToken();
+        console.log('getUpgradeTokenResult: ', JSON.stringify(result));
+        storeUpgradeToken(result);
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
+
+      if (home.walkThroughStep !== null) {
+        setShowWalkThrough(true);
+      }
+    };
+
+    fetchData();    
     
   }, []);
-
-  // useEffect(async () => {
-  //   try {
-  //     const result = await getUpgradeToken();
-  //     console.log('getUpgradeTokenResult: ', JSON.stringify(result));
-  //     storeUpgradeToken(result);
-  //   } catch (error) {
-  //     console.error("Error fetching data", error);
-  //   }
-  // }, []);  
-
-  useEffect(async () => {
-    if (home.walkThroughStep !== null) {
-      setShowWalkThrough(true);
-    }
-  }, []);    
 
   const changeWalkThroughStep = (step) => {
     console.log("walkThroughStep: ", step);
@@ -360,6 +362,13 @@ const HomeScreen = ({ navigation }) => {
     ];
 
     const walkThrough = walkThroughScreens[walkThroughStep];
+    const bottomCarotStyles = [styles.bottomCarot];
+
+    if (walkThroughStep === 1) {
+      bottomCarotStyles.push(styles.bottomCarotStep2);
+    } else if (walkThroughStep === 2) {
+      bottomCarotStyles.push(styles.bottomCarotStep3);
+    }
 
     return (
       <>
@@ -399,6 +408,13 @@ const HomeScreen = ({ navigation }) => {
                   </Pressable>   
                 </View>                
               </View>
+          </View>
+          <View>
+            <Image
+              style={bottomCarotStyles}
+              tintColor={"#FFF"}
+              source={require("../../../assets/polygon.png")}
+            />
           </View>
         </View>         
       </>
@@ -559,6 +575,18 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Color.sparklightWhite,
   },
+  bottomCarot: {
+    width: 18,
+    height: 13,
+    position: 'absolute',
+    top: 20
+  },
+  bottomCarotStep2: {
+    left: tabWidth * 2
+  },
+  bottomCarotStep3: {
+    left: tabWidth * 3
+  },
   circle: {
     width: 8,
     height: 8,
@@ -595,7 +623,7 @@ const styles = StyleSheet.create({
   },
   titleText: {
     color: Color.sparklightGray1,
-    fontSize: FontSize.size_base,
+    fontSize: FontSize.size_lg,
     fontFamily: FontFamily.openSansSemiBold,        
   },  
   description: {
@@ -668,7 +696,7 @@ const styles = StyleSheet.create({
   walkThroughBubble: {
     backgroundColor: 'white',
     position: 'absolute',
-    bottom: 120,
+    bottom: 90,
     height: 180,
     width: Dimensions.get('window').width - 40,
     left: 20,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Platform } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Platform, Pressable } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -7,6 +7,7 @@ import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
 import { isUserAuthorized } from "../../network/APIClient";
 import { Env } from '../../network/apis/account/Constants';
+import PDFViewModal from './PDFViewModal';
 
 
 const { width, height } = Dimensions.get('window');
@@ -19,14 +20,16 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [currentUser, setCurrentUser] = useState({});
     const [modalOpen, setModalOpen] = useState(true);
     const [navStateReloading, setNavStateReloading] = useState(false);
+    const [showPDFModal, setShowPDFModal] = useState(false);
+    const [showPDFUrl, setShowPDFUrl] = useState('');
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
     
+    const toggleModal = () => {
+        setShowPDFModal(!showPDFModal);
+    };
 
     const navigationChange = async (navState) => {
-        //https://customer.uat.sparklight.com/SecureLoginSSO/token/postlogout
-        //https://login.uat.cableone.net/auth/realms/external-sso-realm
-        console.log('navigationChange: ', JSON.stringify(navState));
         if (navState.url.includes('/postlogout')
             || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
@@ -40,6 +43,20 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             }
         }
     }
+
+    const onMessage = (event) => {
+        try {
+            const data = JSON.parse(event.nativeEvent.data);
+
+            if (data !== undefined && data.responseURL !== undefined && data.responseURL.includes('/statements/')) {
+                const responseData = JSON.parse(data.response);
+                setShowPDFUrl(responseData.fileBinary);
+                setShowPDFModal(true);
+            }
+        } catch (error) {
+            console.log('onMessageError: ', error);
+        }    
+    }    
 
     const userUpdate = async () => {
         const userLocal = await getUser();
@@ -68,6 +85,16 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
                 localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
+                var open = XMLHttpRequest.prototype.open;
+                XMLHttpRequest.prototype.open = function() {
+                    this.addEventListener("load", function(event) {
+                        if (this.responseURL.match('/account/.*/statements/') !== null) {
+                            var message = {"status" : this.status, "responseURL" : this.responseURL, "response" : this.response}
+                            window.ReactNativeWebView.postMessage(JSON.stringify(message));
+                        }
+                    }); 
+                    open.apply(this, arguments);
+                };                
               })();`;        
 
             setInitScript(SAVE_FROM_RN);         
@@ -108,10 +135,13 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     key={url}
                     source={{ uri: url }}
                     onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
-                    onError={() => setIsError(true)}
                     sharedCookiesEnabled={true}
                     injectedJavaScriptBeforeContentLoaded={initScript}
                     onNavigationStateChange={navigationChange}
+                    //onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+                    originWhitelist={['http://*', 'https://*', 'data:*']}
+                    //setSupportMultipleWindows={false}
+                    onMessage={onMessage}
                 />            
             )}
             {isError ? (
@@ -119,7 +149,12 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     <Text style={styles.errorText}>Failed to load. Please try again later.</Text>
                 </View>
             ) : null}
-            
+            {showPDFModal && (
+                <PDFViewModal
+                    url={showPDFUrl}
+                    onClose={()=>toggleModal()}
+                />
+            )}            
         </View>
     );
 };
