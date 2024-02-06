@@ -189,9 +189,9 @@ const ManageEquipment = () => {
                         <View style={styles.poorHealthParent}>
                           <Text style={[styles.poorHealth, styles.textTypo2]}>
                             {currentHealth === "Poor"
-                              ? "Issue Health"
+                              ? "Issue Detected"
                               : currentHealth == "Offline"
-                              ? "Poor Health"
+                              ? "Issue Detected"
                               : "Good Health"}
                           </Text>
                           <Image
@@ -242,7 +242,7 @@ const ManageEquipment = () => {
                       />
                       <View style={styles.creditCardWillExpireSoonParent}>
                         <Text style={styles.creditCardWill}>
-                          Modem has poor health
+                        An issue has been detected
                         </Text>
                         <Text
                           style={[

@@ -62,6 +62,7 @@ const HomeScreen = ({ navigation }) => {
   const [estimatedRestoreTime,setEstimatedRestoreTime]=useState('')
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
+  var internetHealths =[]
 
   const getInternetHealth = (type) => {
     var currentHealth = {
@@ -117,6 +118,7 @@ const HomeScreen = ({ navigation }) => {
              setIsInternetDetails(true)
              setHasOutage(true)
              setIsOutageAlert(true)
+             internetHealths.push('Red')
 
            }
            
@@ -178,6 +180,7 @@ const HomeScreen = ({ navigation }) => {
         }
       },
       (error) => {
+        refreshInternetHealth()
         setCheckModemStatus(true)
         console.log("Modem details", error);
       }
@@ -193,18 +196,42 @@ const HomeScreen = ({ navigation }) => {
       if (checkRed) {
         setCurrentHealth('Offline');
         setIsInternetDetails(true);
+        internetHealths.push('Red')
       } else if (checkYellow) {
         setCurrentHealth('Poor');
         setIsInternetDetails(true);
+        internetHealths.push('Yellow')
       }
     } else {
       if (currentHealth != 'Optimal') {
         setCurrentHealth('Optimal');
         setIsInternetDetails(false);
       }
+      internetHealths.push('Green')
     }
-    
+    refreshInternetHealth()
   };
+
+  const refreshInternetHealth=()=>{
+   
+    const checkYellow = internetHealths.includes('Yellow');
+    const checkRed = internetHealths.includes('Red');
+    const checkGreen = internetHealths.includes('Green');
+    if(checkRed){
+      console.log('Internet Health is Red')
+      setCurrentHealth('Offline');
+      setIsInternetDetails(true);
+    }else if(checkYellow){
+      console.log('Internet Health is yellow')
+      setCurrentHealth('Poor');
+      setIsInternetDetails(true);
+    }else{
+      console.log('Internet Health is Green')
+      setCurrentHealth('Optimal');
+      setIsInternetDetails(false);
+    }
+
+  }
 
   const getUserAccountDetails = () => {
      getUser().then((res) => {
@@ -225,6 +252,7 @@ const HomeScreen = ({ navigation }) => {
           setBillAmt(res.currentBalance);
           
            getInternetPlanDetails();
+           refreshInternetHealth()
         }
       }, onErrorBill);
     });
@@ -235,9 +263,11 @@ const HomeScreen = ({ navigation }) => {
      setCurrentHealth('Optimal')
      setIsInternetDetails(false)
      setBillPaid(true)
+     internetHealths.push('Green')
     }else{
       setCurrentHealth('Poor')
       setIsInternetDetails(true)
+      internetHealths.push('Yellow')
     }
    
   };

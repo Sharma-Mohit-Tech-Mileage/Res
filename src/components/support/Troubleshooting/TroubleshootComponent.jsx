@@ -10,22 +10,20 @@ const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
 const TroubleshootComponent = ({
-    step, title, description, success, pageCount
+    step, title, description, success, pageCount,loading,resultMsg
 }) => {
     let IconComponent;
     switch (step) {
-        case 1: IconComponent = <TroubleshootIcon />; break;
-        case 2: IconComponent = <OutageAreaIcon />; break;
-        case 3: IconComponent = <OutageAreaIcon />; break;
-        case 4: IconComponent = <WalletIcon />; break;
-        case 5: IconComponent = <WalletIcon />; break;
-        case 6: IconComponent = <ServiceIcon />; break;
+        case 0: IconComponent = <TroubleshootIcon />; break;
+        case 1: IconComponent = <OutageAreaIcon />; break;
+        case 2: IconComponent = <WalletIcon />; break;
+        case 3: IconComponent = <ServiceIcon />; break;
         default: IconComponent = <TroubleshootIcon />;
     }
-
+   
     return (
         <View style={styles.container}>
-            {pageCount ? <Text style={styles.topLeftText}>{pageCount} of 3</Text> : null}
+            {pageCount>0 ? <Text style={styles.topLeftText}>{pageCount} of 3</Text> : null}
             <View style={styles.content}>
                 <View style={styles.circle}>
                     {IconComponent}
@@ -36,11 +34,12 @@ const TroubleshootComponent = ({
                     </View>
                 )}
                 <View style={styles.spinnerContainer}>
-                    <Text style={styles.title}>{title}</Text>
+                    <Text style={styles.title}>{(loading)?title :resultMsg}</Text>
                     {description && <Text style={styles.description}>{description}</Text>}
                 </View>
                 <View style={styles.spinnerContainer}>
-                    <ActivityIndicator size="large" color="#8D3B90" style={styles.activityIndicator} />
+
+                    { loading ? <ActivityIndicator size="large" color="#8D3B90" style={styles.activityIndicator} /> :<></>}
                 </View>
             </View>
         </View>
