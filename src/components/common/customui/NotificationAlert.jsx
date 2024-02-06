@@ -22,21 +22,31 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                 resizeMode="contain"
                 style={[
                     styles.iconStyle,
-                    { marginTop: !title ?  1: 1 }
+                    { marginTop: !title ? 1 : 1 }
                 ]}
             />
             <View style={[
                 styles.textContentContainer,
-                showCloseIcon ? { marginRight: 30 } : { marginRight: 10 } 
+                showCloseIcon ? { marginRight: 30 } : { marginRight: 10 }
             ]}>
-                {title &&<Text style={[styles.title, { color: currentTypeStyle.color }]}>{title}</Text>}
-                {message ?<Text style={!title ? styles.messageOnEmpty :styles.message}>{message}</Text>:null}
+                {title && <Text style={[styles.title, { color: currentTypeStyle.color }]}>{title}</Text>}
+                {message ? <Text style={!title ? styles.messageOnEmpty : styles.message}>{message}</Text> : null}
             </View>
             {showCloseIcon && (
-                <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-                    <Image source={require('../../../../assets/right-actionable7.png')} />
+                <TouchableOpacity
+                    onPress={handleClose}
+                    style={styles.closeButton}
+                    accessibilityLabel="Close"
+                    accessibilityRole="button"
+                    accessibilityHint="Closes the Notifiction window"
+                >
+                    <Image
+                        source={require('../../../../assets/right-actionable7.png')}
+                        accessibilityLabel="Close icon"
+                    />
                 </TouchableOpacity>
             )}
+
         </View>
     );
 };
@@ -48,11 +58,11 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start', // Align items to the start of the container
         borderLeftWidth: 4,
         borderRadius: 2,
-        borderTopWidth:1,
-        borderBottomWidth:1,
-        borderRightWidth:1,
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderRightWidth: 1,
         paddingLeft: 10,
-        paddingVertical:10,
+        paddingVertical: 10,
         borderBottomColor: '#E1E1E1',
         borderEndColor: '#E1E1E1',
         borderTopColor: '#E1E1E1'
@@ -62,15 +72,15 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     iconStyle: {
-        height:18,
-        width:18,
+        height: 18,
+        width: 18,
     },
     closeButton: {
         position: 'absolute', // Position the button absolutely
         top: '50%',           // Position halfway down the container
         justifyContent: 'center',
         alignItems: 'center',
-        right:10,
+        right: 10,
     },
     title: {
         fontSize: FontSize.size_base,
@@ -78,7 +88,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     message: {
-        paddingTop:8,
+        paddingTop: 8,
         fontSize: FontSize.size_sm,
         fontFamily: FontFamily.openSansRegular,
         fontWeight: '400',

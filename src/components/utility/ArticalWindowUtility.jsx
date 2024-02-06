@@ -8,13 +8,14 @@ import { RefreshToken } from '../user/Session';
 import { isUserAuthorized } from "../../network/APIClient";
 import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
-
+import LinearGradient from "react-native-linear-gradient";
 
 const { width, height } = Dimensions.get('window');
 const ArticalWindowUtility = ({ navigation, route }) => {
     const [initScript, setInitScript] = useState('');
     const [progress, setProgress] = useState(0);
     const [name, setTitle] = useState(route.params?.name);
+    const [isExpandable, setIsExpandable] = useState(route.params?.isExpandable ?? false);
     const [isError, setIsError] = useState(false);
     const [url, setUrl] = useState(route.params?.url);
     const [currentUser, setCurrentUser] = useState({});
@@ -24,7 +25,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [showPDFUrl, setShowPDFUrl] = useState('');
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
-    
+
     const toggleModal = () => {
         setShowPDFModal(!showPDFModal);
     };
@@ -33,13 +34,13 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         if (navState.url.includes('/postlogout')
             || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
-                setModalOpen(false);   
-                setProgress(1);                        
+                setModalOpen(false);
+                setProgress(1);
                 setNavStateReloading(true);
                 await RefreshToken();
                 setTimeout(async () => {
                     await userUpdate();
-                }, 1000);                
+                }, 1000);
             }
         }
     }
@@ -55,8 +56,8 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             }
         } catch (error) {
             console.log('onMessageError: ', error);
-        }    
-    }    
+        }
+    }
 
     const userUpdate = async () => {
         const userLocal = await getUser();
@@ -70,9 +71,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             setNavStateReloading(false);
             userUpdateScript(userLocal);
             setUrl(route.params?.url);
-            setModalOpen(true);   
-            setProgress(0); 
-            setCurrentUser(userLocal);        
+            setModalOpen(true);
+            setProgress(0);
+            setCurrentUser(userLocal);
         }
     }
 
@@ -95,9 +96,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     }); 
                     open.apply(this, arguments);
                 };                
-              })();`;        
+              })();`;
 
-            setInitScript(SAVE_FROM_RN);         
+            setInitScript(SAVE_FROM_RN);
         }
     }
 
@@ -107,12 +108,11 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         setIsError(false);
     }, [url, name, modalOpen]);
 
-    // Optionally, if you want to reset state when the modal is re-opened
     useEffect(() => {
         if (modalOpen) {
-            // The modal has been opened again, reset the URL if needed
             setUrl(route.params?.url);
             setTitle(route.params?.name);
+            setIsExpandable(route.params?.isExpandable);
         }
     }, [modalOpen]);
 
@@ -123,9 +123,18 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
-            <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />
+
+            {isExpandable ? <LinearGradient
+                style={styles.linearGradientStyle}
+                locations={[0, 1]}
+                colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+                useAngle={true}
+                angle={90}
+            >
+                <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />
+            </LinearGradient> : <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />}
             {progress < 1 ? (
-                <View style={{ ...styles.progressBar}}>
+                <View style={{ ...styles.progressBar }}>
                     <View style={{ ...styles.progress, width: `${progress * 100}%` }} />
                 </View>) : (<View >
                 </View>)}
@@ -142,7 +151,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     originWhitelist={['http://*', 'https://*', 'data:*']}
                     //setSupportMultipleWindows={false}
                     onMessage={onMessage}
-                />            
+                />
             )}
             {isError ? (
                 <View style={[styles.errorContainer, { marginTop: '23%' }]}>
@@ -152,9 +161,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             {showPDFModal && (
                 <PDFViewModal
                     url={showPDFUrl}
-                    onClose={()=>toggleModal()}
+                    onClose={() => toggleModal()}
                 />
-            )}            
+            )}
         </View>
     );
 };
@@ -189,6 +198,12 @@ const styles = StyleSheet.create({
     closeButtonText: {
         color: 'white',
         fontSize: width * 0.04, // 4% of screen width
+    },
+    linearGradientStyle: {
+        left: 0,
+        right: 0,
+        top: 0,
+        height: 150,
     },
     header: {
         height: 100, // Adjust as needed
