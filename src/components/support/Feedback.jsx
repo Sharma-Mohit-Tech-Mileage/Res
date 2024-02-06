@@ -91,7 +91,7 @@ const Feedback = () => {
                             {feedbackOptions.map((option) => (
                                 <Pressable
                                     key={option.name}
-                                    style={[styles.faceSadParent, { flex: 1 }]} // make sure this style allows for the text to overflow and not just push the boundaries
+                                    style={[styles.faceSadParent, { flex: 1 }]} 
                                     onPress={() => handleIconPress(option)}
                                 >
                                     <Image
@@ -128,7 +128,6 @@ const Feedback = () => {
                                         height={130}
                                         error={errors.feedbackText?.message}
                                     />
-                                    {/* Move the Text component inside the render function */}
                                     <Text style={styles.footerWrapper}>
                                         {`${value.length}/500`}
                                     </Text>

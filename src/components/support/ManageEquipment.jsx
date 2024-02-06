@@ -15,13 +15,12 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
 import colors from "../../res/Colors";
-
+import NotificationAlert from '../common/customui/NotificationAlert';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 const ManageEquipment = (route) => {
-  // console.log("PROPS" + JSON.stringify(route));
   const navigation = useNavigation();
   const [manufacturer, setManufacturer] = React.useState("");
   const [model, setModel] = React.useState("");
@@ -30,7 +29,15 @@ const ManageEquipment = (route) => {
   const [plans, setPlans] = React.useState([]);
   const [data, setData] = React.useState({});
   const [currentHealth, setCurrentHealth] = React.useState("Optimal");
-
+  const healthStatus = {
+    Poor: "Issue Detected",
+    Offline: "Offline",
+  };
+  const healthColors = {
+    Optimal: colors.sparklight_green,
+    Offline: Color.sparklightaddGray,
+  };
+  const shouldShowAlert = ["Poor", "Offline"].includes(currentHealth);
   const getLeasedDetails = () => {
     let re = getUser().then((res) => {
       const request = `mobile/api/Device/GetOwnershipInfo?accountnumber=${res.userInfo.accountNumber}`;
@@ -59,7 +66,7 @@ const ManageEquipment = (route) => {
             checkModemDetails("00:40:36:7b:29:5a");
           }
         },
-        (error) => {}
+        (error) => { }
       );
     });
   };
@@ -177,17 +184,14 @@ const ManageEquipment = (route) => {
                       </Text>
                       <Text style={styles.mb8600Docsis}>
                         {model}
-                        {/* {transmissionType} */}
                       </Text>
                       <View style={styles.poorHealthParent}>
                         <Text style={[styles.poorHealth, styles.textTypo2]}>
-                          {currentHealth === "Poor"
-                            ? "Issue Health"
-                            : (currentHealth=="Offline")?"Poor Health" :'Good Health'}
+                          {healthStatus[currentHealth] || "Good Health"}
                         </Text>
                         <Image
                           style={styles.frameChild}
-                          tintColor={(currentHealth==='Optimal'?colors.sparklight_green :(currentHealth==='Offline')?colors.sparklight_red : colors.sparklight_yellow)}
+                          tintColor={healthColors[currentHealth] || colors.sparklight_yellow}
                           resizeMode="cover"
                           source={require("../../../assets/Ellipse.png")}
                         />
@@ -201,38 +205,20 @@ const ManageEquipment = (route) => {
                   </View>
                 </View>
               </View>
-              {/* <View style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}>
-                                <View style={[styles.notifications, styles.parentBorder]}>
-                                    <Image
-                                        resizeMode="cover"
-                                        source={require("../../../assets/rectangle-529.png")}
-                                    />
-                                    <View style={styles.bannerWarning}>
-                                        <View style={styles.rightActionableParent}>
-                                            <Image
-                                                style={{ height: '100%' }} // Set both width and height to '100%'
-                                                resizeMode="stretch" // Change resizeMode to stretch
-                                                source={require("../../../assets/alertred.png")}
-                                            />
-                                            <View style={styles.creditCardWillExpireSoonParent}>
-                                                <Text style={styles.creditCardWill}>
-                                                    Modem has poor health
-                                                </Text>
-                                                <Text style={[styles.yourSavedCard, styles.yourSavedCardSpaceBlock,]} >
-                                                    Try one of the options below to resolve.
-                                                </Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View> */}
             </View>
+            {shouldShowAlert && (
+              <View style={{ paddingHorizontal: Padding.p_base, paddingBottom: Padding.p_5xl }}>
+                <NotificationAlert
+                  type="error"
+                  title="An issue has been detected"
+                  message="Try one of the options below to resolve."
+                  showCloseIcon={false}
+                  onClose={() => setShowErrorAlert(false)}
+                />
+              </View>
+            )}
             <View
-              style={[
-                styles.supportAccordionParent,
-                styles.supportParentFlexBox,
-              ]}
-            >
+              style={[styles.supportAccordionParent, styles.supportParentFlexBox,]}>
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
@@ -251,18 +237,6 @@ const ManageEquipment = (route) => {
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
-              {/* <View style={[styles.frameLayout]} />
-                            <View style={[styles.frame9defaultSpaceBlock]} >
-                                <Image
-                                    resizeMode="stretch"
-                                    source={require("../../../assets/key-02.png")}
-                                />
-                                <Text style={styles.modemHealthSupport}>Update Password</Text>
-                                <Image
-                                    resizeMode="stretchstretch"
-                                    source={require("../../../assets/chevronright.png")}
-                                />
-                            </View> */}
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
@@ -276,6 +250,24 @@ const ManageEquipment = (route) => {
                   source={require("../../../assets/refresh.png")}
                 />
                 <Text style={styles.modemHealthSupport}>Reboot Modem</Text>
+                <Image
+                  resizeMode="stretch"
+                  source={require("../../../assets/chevronright.png")}
+                />
+              </TouchableOpacity>
+              <View style={[styles.frameLayout]} />
+              <TouchableOpacity
+                style={[styles.frame9defaultSpaceBlock]}
+                onPress={() => {
+                  navigation.navigate("ModemConnectivityGuide");
+                }}
+              >
+                <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
+                  resizeMode="contain"
+                  source={require("../../../assets/tool-02.png")}
+                />
+                <Text style={styles.modemHealthSupport}>Check Connection</Text>
                 <Image
                   resizeMode="stretch"
                   source={require("../../../assets/chevronright.png")}
