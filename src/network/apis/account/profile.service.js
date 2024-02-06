@@ -1,6 +1,7 @@
 import { _axios, _axios_cableone } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import axios from 'axios'; // Make sure to import axios
+import { Env } from "./Constants";
 
 const getProfileDetails = async () => {
     let data = await getUser();
@@ -164,6 +165,31 @@ const postTextNotifictionInfo = async (data) => {
     }
 };
 
+const putEmailNotification = async (email) => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+
+    // Log the request endpoint and data
+    console.log(`Making API putEmailNotification Call to /account/api/account/${accountNumber}/paperless with email:`, email);
+
+    try {
+        const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
+
+        // Log the successful response
+        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless, Response:`, response);
+        return response;
+    } catch (error) {
+        // Log the error with a descriptive message
+        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless:`, error);
+        throw error;
+    }
+};
+
 const postEmailNotification = async (email) => {
     let user = await getUser();
     const accountNumber = user.userInfo?.accountNumber || null;
@@ -174,10 +200,10 @@ const postEmailNotification = async (email) => {
     };
 
     // Log the request endpoint and data
-    console.log(`Making API Call to /account/api/account/${accountNumber}/paperless with email:`, email);
+    console.log(`Making API  postEmailNotification Call to /account/api/account/${accountNumber}/paperless with email:`, email);
 
     try {
-        const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
+        const response = await _axios.post(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
 
         // Log the successful response
         console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless, Response:`, response);
@@ -274,24 +300,24 @@ const unsubscribPaperLess = async () => {
 };
 
 const handleSubmitFeedback = async (obj) => {
-    const zendeskRequestApiUrl = 'https://cableone.zendesk.com/api/v2/requests.json';
+    const zendeskRequestApiUrl = Env.ZENDESK_FEEDBACK.Url
     let user = await getUser();
     const fullName = user.userInfo?.fullName;
     const payload = {
         request: {
-            ticket_form_id: "360000052934",
+            ticket_form_id:Env.ZENDESK_FEEDBACK.ticket_form_id ,
             requester: {
                 name: fullName,
-                email: obj.email
+                email: obj.feedbackEmail
             },
-            recipient: "400018994093",
-            assignee_id: "400018994093",
-            group_id: "360000672214",
+            recipient: Env.ZENDESK_FEEDBACK.recipient,
+            assignee_id:Env.ZENDESK_FEEDBACK.assignee_id,
+            group_id: Env.ZENDESK_FEEDBACK.group_id,
             type: null,
             custom_fields: [
-                { id: "360022798993", value: obj.category },
-                { id: "1900000846365", value: obj.feedbackValue },
-                { id: "36003617614", value: obj.email }
+                { id:Env.ZENDESK_FEEDBACK.category_id , value: obj.category },
+                { id:Env.ZENDESK_FEEDBACK.feedbackValue_id, value: obj.feedbackValue },
+                { id: Env.ZENDESK_FEEDBACK.email_id, value: obj.feedbackEmail }
             ],
             subject: "Residential MobileApp Feedback",
             comment: {
@@ -312,5 +338,4 @@ const handleSubmitFeedback = async (obj) => {
 };
 
 
-
-export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback }
+export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback }

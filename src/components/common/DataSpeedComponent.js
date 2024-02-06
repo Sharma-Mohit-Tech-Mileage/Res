@@ -5,8 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  Linking,
-  
 } from "react-native";
 
 import colors from "../../res/Colors";
@@ -15,17 +13,16 @@ import InfoIcon from "../../res/svgIcons/InfoIcon";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import TimerInfo from "../../res/svgIcons/TimerInfo";
 import strings from "../../res/Strings";
-import { getCurrentSpeed } from "../../redux/actions/DashboardAction";
-import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "../../redux/utils/LocalStorage"
 import SpeedTestModal from "./customui/SpeedTestModal";
 import moment from "moment";
 import { GetApiRequest } from "../../network/APIClient";
 import { FontFamily } from "../../../GlobalStyles";
+import { Env } from "../../network/apis/account/Constants";
 
 
 const DataSpeedComponent = ({navigation}) => {
-  const dispatch = useDispatch();
+  
   const [showModal, setShowModal] = useState(false);
 
   const toggleModal = () => {
@@ -37,11 +34,11 @@ const DataSpeedComponent = ({navigation}) => {
   const [upload, setUpload] = useState(0);
   const [downloadFrac, setDownloadFrac] = useState(0);
   const [uploadFrac, setUploadFrac] = useState(0);
-  const [speed, setSpeed] = useState(false);
+  const [ speed ,setSpeed] = useState(false);
   const [testDate, setTestDate] = useState(0);
 
   const getCurrentSpeed = () => {
-    let re = getUser().then((res) => {
+    getUser().then((res) => {
       const request = `/Internet/api/internet/${res.userInfo.accountNumber}/speedTest/Get`;
       GetApiRequest(request, onSuccess, onError);
     });
@@ -224,13 +221,13 @@ const DataSpeedComponent = ({navigation}) => {
       />
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name: 'Upgrade Plan' })
-          // Linking.openURL(
-          //   "https://customer.uat.sparklight.com/residential/services/upgrade"
-          // );
+          navigation.navigate('ArticalWindowUtility', { 
+            url: `${Env.URL}/residential/services/upgrade`,
+            name: 'Upgrade Plan' 
+          })
         }}
         style={{
-          height: 30,
+          minHeight: 30,
           flexDirection: "row",
           justifyContent: "space-between",
           padding: 4,

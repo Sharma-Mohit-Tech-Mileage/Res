@@ -1,18 +1,56 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet,TouchableOpacity, Linking } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { ProgressCircle } from "react-native-svg-charts";
 import colors from "../../res/Colors";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
 import { getUser } from "../../redux/utils/LocalStorage";
-const DataUsageComponent = ({navigation}) => {
- const [account,setAccount]=useState('')
-  useEffect(() => {
-    console.log("data");
-    let re = getUser().then((res) => {
-      setAccount(res.userInfo.accountNumber)
+import { Env } from "../../network/apis/account/Constants";
+import { GetApiRequest } from "../../network/APIClient";
+const DataUsageComponent = ({ navigation, useData }) => {
+
+  const [data, setData] = useState(useData);
+  const [progress, setProgress] = useState(0.0);
+  const [totalUsed, setTotalUsed] = useState(0);
+  const [isUnlimtedPlan, setIsUnlimtedPlan] = useState(false);
+
+  const getDataUsage = () => {
+   getUser().then((res) => {
+      const request = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
+      GetApiRequest(request, (res)=>{
+            if(res){
+              setData(res)
+            }
+      }, (error)=>{
+         console.log(error)
+      });
     });
-  }, []);
+  };
+
+  useEffect(() => {
+    console.log('usage')
+    if(Object.entries(data).length>0){
+    let totalUsedGB = Math.round(data.totalUsedGB);
+    setTotalUsed(totalUsedGB);
+    let planData = Math.round(data.dataPlanGB);
+    if(planData===15000){
+      setIsUnlimtedPlan(true)
+    }else{
+      setIsUnlimtedPlan(false)
+    }
+    var progress = Math.round((totalUsedGB / planData) * 100 * 10) / 10;
+    let pBar = progress / 100;
+    console.log("Progress", planData);
+    setProgress(pBar);
+  }else{
+    getDataUsage();
+  }
+  }, [data]);
   return (
     <View
       style={{
@@ -20,12 +58,11 @@ const DataUsageComponent = ({navigation}) => {
         flexDirection: "column",
         justifyContent: "center",
         marginTop: 20,
-      
       }}
     >
       <ProgressCircle
-        style={{ height: 200 }}
-        progress={(account==='900679010')?1.0:0.8}
+        style={{ height: 220 }}
+        progress={progress}
         progressColor={"#8D3B90"}
         backgroundColor={"#e1e1e1"}
         cornerRadius={5}
@@ -47,7 +84,7 @@ const DataUsageComponent = ({navigation}) => {
               alignItems: "center",
             }}
           >
-            <Text style={styles.dataText}>{(account==='900679010')?'700':'540'}</Text>
+            <Text style={styles.dataText}>{totalUsed}</Text>
             <Text style={[styles.dataText, { fontSize: 16, marginTop: 5 }]}>
               GB
             </Text>
@@ -68,44 +105,65 @@ const DataUsageComponent = ({navigation}) => {
               marginTop: 5,
             }}
           >
-            <Text style={styles.dataPlanTxt}> {(account==='900679010')? 'UNLIMITED PLAN' : '700GB PLAN'}</Text>
+            <Text style={styles.dataPlanTxt}>
+              {" "}
+              {(isUnlimtedPlan)?'UNLIMITED DATA PLAN':Math.floor(data.dataPlanGB)}
+              {(isUnlimtedPlan)? "" :" GB"}
+            </Text>
           </View>
         </View>
       </ProgressCircle>
 
-      <View style={{ flexDirection: "row", justifyContent: "space-between" ,marginTop:20, marginHorizontal:20}}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: 20,
+          marginHorizontal: 20,
+        }}
+      >
         <View style={{ flexDirection: "row" }}>
           <View style={styles.dataUsageIndicator} />
           <Text style={styles.useLbl}>Used</Text>
-          <Text style={styles.useDataLbl}>{(account==='900679010')?' 700GB':' 540GB'}</Text>
+          <Text style={styles.useDataLbl}> {totalUsed}</Text>
         </View>
 
         <View style={{ flexDirection: "row" }}>
-          <View style={[styles.dataUsageIndicator,{backgroundColor:colors.backgound_blue,marginLeft:5}]} />
+          <View
+            style={[
+              styles.dataUsageIndicator,
+              { backgroundColor: colors.backgound_blue, marginLeft: 5 },
+            ]}
+          />
           <Text style={styles.useLbl}>Remaining</Text>
-          <Text style={styles.useDataLbl}>{(account==='900679010')?' Unlimited':' 160GB'}</Text>
+          <Text style={styles.useDataLbl}> {(isUnlimtedPlan)?'Unlimited':Math.floor(data.remainingGB)}</Text>
         </View>
       </View>
-      <View style={{ backgroundColor: colors.grey, height: 1, marginVertical: 10 }} />
+      <View
+        style={{ backgroundColor: colors.grey, height: 1, marginVertical: 10 }}
+      />
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('ArticalWindowUtility', { url: 'https://customer.uat.sparklight.com/residential/services/upgrade', name: 'Upgrade Plan' })
+          navigation.navigate("ArticalWindowUtility", {
+            url: Env.URL + "/residential/services/upgrade",
+            name: "Upgrade Plan",
+          });
           //Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
         }}
         style={{
-          height: 30,
+          minHeight: 30,
           flexDirection: "row",
           justifyContent: "space-between",
           padding: 4,
-          marginHorizontal:20
+          marginHorizontal: 20,
         }}
       >
         <Text
           style={{
             fontSize: 16,
             fontWeight: "600",
-            color:colors.sparklight_purple_blue,
-            fontFamily:FontFamily.openSansRegular,
+            color: colors.sparklight_purple_blue,
+            fontFamily: FontFamily.openSansRegular,
           }}
         >
           Upgrade Plan
@@ -121,7 +179,7 @@ const DataUsageComponent = ({navigation}) => {
 const styles = StyleSheet.create({
   dataText: {
     color: colors.darkest_grey,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
     fontSize: 24,
     fontStyle: "normal",
@@ -129,7 +187,7 @@ const styles = StyleSheet.create({
   },
   dataPlanTxt: {
     color: colors.sparklight_bright_purple,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
     fontSize: 12,
     fontStyle: "normal",
@@ -143,20 +201,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.sparklight_bright_purple,
     borderWidth: 2,
     borderColor: "white",
-    marginLeft:5
+    marginLeft: 5,
   },
   useLbl: {
     color: colors.dark_grey,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     fontStyle: "normal",
     fontWeight: "400",
     lineHeight: 20,
-    marginLeft:5
+    marginLeft: 5,
   },
   useDataLbl: {
     color: colors.sparklight_black,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     fontStyle: "normal",
     fontWeight: "600",

@@ -11,53 +11,54 @@ import ShopIconSelected from '../res/svgIcons/ShopIconSelected';
 import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
-import { CopilotStep, walkthroughable, useCopilot } from "react-native-copilot";
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Alert,
-} from "react-native";
+import { View, StyleSheet, Dimensions} from "react-native";
 import { useSelector } from 'react-redux';
 import { FontFamily } from '../../GlobalStyles';
+import { Env } from '../network/apis/account/Constants';
+const { width } = Dimensions.get('window');
+const tabWidth = Number(width/4);
 
 const Tab = createBottomTabNavigator();
 
-const WalkthroughableView = walkthroughable(View);
-
 const MyTabs = ({ route, navigation }) => {
-  const { start, copilotEvents } = useCopilot();
-  const [secondStepActive, setSecondStepActive] = useState(true);
-  const [lastEvent, setLastEvent] = useState(null);
+  const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
+  const [shadowStyle, setShadowStyle] = useState(styles.shadowTabs);
   const { tabBarVisible } = useTabBarVisibility();
   const user = useSelector(state => state.combinedReducers.user.userData);
+  const home = useSelector(state => state.combinedReducers.home);
 
   useEffect(() => {
-    copilotEvents.on("stepChange", (step) => {
-      setLastEvent(`stepChange: ${step.name}`);
-    });
-    copilotEvents.on("start", () => {
-      setLastEvent(`start`);
-    });
-    copilotEvents.on("stop", () => {
-      setLastEvent(`stop`);
-    });
-  }, [copilotEvents]);  
-  
-  useEffect(() => {
-    // Alert.alert(('hello'));
-    // setTimeout(() => {
-    // start();
-    //   Alert.alert(('timeout'));
-    // }, 10000);
-  }, []);
+    console.log('MyTabHome: ', home);
+    if (home.walkThroughStep === 0) {
+      setShadowStyle(styles.shadowTabs);
+      setShadowStyleLeft(styles.shadowTabsLeft);
+    } else if (home.walkThroughStep === 1) {
+      setShadowStyle([styles.shadowTabs, styles.shadowTabsStep2]);
+      setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep2Left]);
+    } else if (home.walkThroughStep === 2) {
+      setShadowStyle([styles.shadowTabs, styles.shadowTabsStep3]);
+      setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left]);
+    }
+  }, [home]);
 
   return (
+    <>
+    { home.walkThroughStep !== null &&
+      (
+        <>
+          <View style={shadowStyleLeft}>
+          </View>       
+          <View style={shadowStyle}>
+          </View>     
+        </>
+      )
+    } 
     <Tab.Navigator
       name='MyTab'
       initialRouteName="Home"
       screenOptions={{
-        tabBarStyle: { paddingVertical: 5,position: 'absolute', height: (Platform.OS == 'ios') ? 90 : 60, display: tabBarVisible ? 'flex' : 'none',  },
+        tabBarStyle: { paddingVertical: 5, position: 'absolute', height: (Platform.OS == 'ios') ? 90 : 60, display: tabBarVisible ? 'flex' : 'none',  },
         tabBarActiveTintColor: '#353091',
         tabBarInactiveTintColor: '#767676',
         tabBarLabelStyle:{fontSize:12,fontFamily:FontFamily.openSansRegular,fontWeight:'600'},
@@ -70,25 +71,45 @@ const MyTabs = ({ route, navigation }) => {
         initialParams={{ data: route }}
         options={{
           headerShown: false,
+          swipeEnabled: false,
           tabBarLabel: 'Home',
           tabBarIcon: ({ focused }) => {
             return (
-              <CopilotStep
-                text="View information related to your internet health, billing, service and more."
-                order={1}
-                name="first"
-              >
-                <WalkthroughableView style={styles.tabItem}>
-                  {focused ? <HomeIconSelected /> : <HomeIcon />}
-                </WalkthroughableView>
-              </CopilotStep>   
+              <View style={styles.tabItem}>
+                {focused ? <HomeIconSelected /> : <HomeIcon />}
+              </View>
             );
           }
         }}
       />
       <Tab.Screen
         name="Shop"
-        component={ShopStack} // This will not be used, since we will override the onPress
+        component={ShopStack} 
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'Shop',
+                  state: {
+                    routes: [
+                      {
+                        name: 'ArticalWindowUtility',
+                        params: {
+                          url: `${Env.URL}/residential/services/upgrade`,
+                          name: 'Shop'
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            });
+          },
+        })}
+
         options={{
           tabBarLabel: 'Shop',
           headerShown: false,
@@ -104,15 +125,9 @@ const MyTabs = ({ route, navigation }) => {
           tabBarLabel: 'Support',
           tabBarIcon: ({ focused }) => {
             return (
-              <CopilotStep
-                text="View information related to your internet health, billing, service and more."
-                order={2}
-                name="second"
-              >
-                <WalkthroughableView style={styles.tabItem}>
-                  {focused ? <SupportIconSelected /> : <SupportIcon />}
-                </WalkthroughableView>
-              </CopilotStep>   
+              <View style={styles.tabItem}>
+                {focused ? <SupportIconSelected /> : <SupportIcon />}
+              </View>
             );
           }
         }}
@@ -125,20 +140,15 @@ const MyTabs = ({ route, navigation }) => {
           tabBarLabel: 'Account',
           tabBarIcon: ({ focused }) => {
             return (
-              <CopilotStep
-                text="Manage your profile settings, notifications, users and more."
-                order={3}
-                name="third"
-              >
-                <WalkthroughableView style={styles.tabItem}>
-                  <AccountIcon focused={focused} data={user.userInfo} />
-                </WalkthroughableView>
-              </CopilotStep>   
+              <View style={styles.tabItem}>
+                <AccountIcon focused={focused} data={user.userInfo} />
+              </View>
             );
           }          
         }}
       />
-    </Tab.Navigator>
+    </Tab.Navigator>    
+    </>
   );
 }
 
@@ -146,6 +156,34 @@ const styles = StyleSheet.create({
   tabItem: {
     textAlign: "center",
   },
+  shadowTabs: {
+    backgroundColor: 'black',
+    height: (Platform.OS == 'ios') ? 90 : 60,
+    width: '100%',
+    position: 'absolute',
+    bottom: 0,
+    zIndex: 5,
+    bottom: 0,
+    opacity: .7,
+    left: 100
+  },
+  shadowTabsStep2: {
+    left: tabWidth * 3,
+  },
+  shadowTabsStep3: {
+    left: tabWidth * 4,
+  },
+  shadowTabsLeft: {
+
+  },
+  shadowTabsStep2Left: {
+    width: tabWidth * 2,
+    left: 0
+  },
+  shadowTabsStep3Left: {
+    width: tabWidth * 3,
+    left: 0
+  },  
 });
 
 export default MyTabs;

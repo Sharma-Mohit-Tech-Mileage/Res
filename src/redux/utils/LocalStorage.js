@@ -18,7 +18,6 @@ export const getUser = async () => {
   }
 };
 
-
 export const storeSsoToken = async (value) => {
   try {
     await AsyncStorage.setItem("idToken", JSON.stringify(value));
@@ -36,6 +35,7 @@ export const getSsoToken = async () => {
    console.log(error); 
   }
 };
+
 // getting data
 export const cleanUserData = async () => {
   try {
@@ -46,19 +46,37 @@ export const cleanUserData = async () => {
 }
 };
 
-export const storeFirstTime = async (value) => {
+export const storePushNotificationStatus = async (value) => {
   try {
-    await AsyncStorage.setItem("firsTime", JSON.stringify(value));
+    await AsyncStorage.setItem("pushNotificationStatus", JSON.stringify(value));
   } catch (error) {
     console.log(error);
   }
 };
 
 // getting data
-export const getFirstTime = async () => {
+export const getPushNotificationStatus = async () => {
   try {
-    const userData = JSON.parse(await AsyncStorage.getItem("firsTime"))
+    const userData = JSON.parse(await AsyncStorage.getItem("pushNotificationStatus"))
     return userData;
+  } catch (error) {
+   console.log(error); 
+  }
+};
+
+export const storeUpgradeToken = async (value) => {
+  try {
+    await AsyncStorage.setItem("upgradeToken", JSON.stringify(value));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// getting data
+export const getUpgradeToken = async () => {
+  try {
+    const upgradeData = JSON.parse(await AsyncStorage.getItem("upgradeToken"));
+    return upgradeData;
   } catch (error) {
    console.log(error); 
   }

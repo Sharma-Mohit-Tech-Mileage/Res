@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   TouchableOpacity,
   Image,
@@ -19,19 +18,36 @@ import {
 } from "react-native-responsive-screen";
 import SwipeUpDownModal from "react-native-swipe-modal-up-down";
 import InternetIcon from "../../res/svgIcons/InternetIcon";
-import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
+import { FontFamily, FontSize } from "../../../GlobalStyles";
 import TickIcon from "../../res/svgIcons/TickIcon";
+import { getUser } from "../../redux/utils/LocalStorage";
+import { GetApiRequest } from "../../network/APIClient";
 
-const MyServicePlan = ({ plans,navigation }) => {
+const MyServicePlan = ({ plans, navigation }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [ShowComment, setModelComment] = useState(false);
   const [animateModal, setanimateModal] = useState(false);
+  const [data, setData] = useState({});
+
+  const getDataUsage = () => {
+     getUser().then((res) => {
+      const request = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
+      GetApiRequest(request, (res)=>{
+            if(res){
+              setData(res)
+            }
+      }, (error)=>{
+           console.log(error)
+      });
+    });
+  };
 
   const MyPlanDetails = () => {
-    useEffect(() => {}, []);
+    useEffect(() => {
+      console.log('Plan data',plans)
+    }, []);
 
     const PlanDetailsItem = ({ item, index }) => {
-     
       return (
         <View key={index}>
           <View
@@ -51,6 +67,7 @@ const MyServicePlan = ({ plans,navigation }) => {
                 borderRadius: 10,
                 justifyContent: "center",
                 alignItems: "center",
+                alignSelf: "center",
               }}
             >
               <InternetIcon />
@@ -61,7 +78,10 @@ const MyServicePlan = ({ plans,navigation }) => {
           </View>
 
           <View style={[styles.planDetailsRow]}>
-            <TickIcon />
+            <View style={{ alignSelf: "center" }}>
+              <TickIcon />
+            </View>
+
             <Text style={styles.planDetailsTxt}>
               Download Speed Up To {item.downloadSpeed} Mbps
             </Text>
@@ -71,7 +91,9 @@ const MyServicePlan = ({ plans,navigation }) => {
             style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }}
           />
           <View style={[styles.planDetailsRow]}>
-            <TickIcon />
+            <View style={{ alignSelf: "center" }}>
+              <TickIcon />
+            </View>
             <Text style={styles.planDetailsTxt}>
               Upload Speed Up To {item.uploadSpeed} Mbps
             </Text>
@@ -87,9 +109,11 @@ const MyServicePlan = ({ plans,navigation }) => {
             }}
           >
             <View style={{ flexDirection: "row" }}>
-              <TickIcon />
+              <View style={{ alignSelf: "center" }}>
+                <TickIcon />
+              </View>
               <Text style={styles.planDetailsTxt}>
-                Data Plan {item.dataQuotaGB}GB*
+                Data Plan {(item.dataQuotaGB=='15000')?'UNLIMITED':item.dataQuotaGB+' GB*'}
               </Text>
             </View>
             {/* <Text
@@ -123,26 +147,40 @@ const MyServicePlan = ({ plans,navigation }) => {
         ContentModal={
           <View style={{ marginVertical: 10, borderRadius: 10 }}>
             <View
-              style={{ flexDirection: "row", flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            marginHorizontal:20,
-          marginVertical:10}}
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginHorizontal: 20,
+                marginVertical: 10,
+              }}
             >
-              <Text style={{textAlign:'center',fontSize:FontSize.size_3xl,color:colors.sparklight_grey,fontWeight:'400', fontFamily:FontFamily.openSansRegular}}>Plan Details</Text>
-              <TouchableOpacity onPress={()=>{
-                setModelComment(false)
-              }}>
-              <Image 
-                style={{ height: 32, width: 32, overflow: "hidden" }}
-                resizeMode="cover"
-                source={require("../../../assets/right-actionable7.png")}
-              />
+              <Text
+                style={{
+                  textAlign: "center",
+                  fontSize: FontSize.size_3xl,
+                  color: colors.sparklight_grey,
+                  fontWeight: "400",
+                  fontFamily: FontFamily.openSansRegular,
+                }}
+              >
+                Plan Details
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setModelComment(false);
+                }}
+              >
+                <Image
+                  style={{ height: 32, width: 32, overflow: "hidden" }}
+                  resizeMode="cover"
+                  source={require("../../../assets/right-actionable7.png")}
+                />
               </TouchableOpacity>
             </View>
-            {plans?.map((item, index) => {
+            {(plans.length>0) ? plans.map((item, index) => {
               return <PlanDetailsItem item={item} index={index} key={index} />;
-            })}
+            }):<></>}
           </View>
         }
         ContentModalStyle={styles.Modal}
@@ -156,6 +194,7 @@ const MyServicePlan = ({ plans,navigation }) => {
 
   useEffect(() => {
     //console.log("data");
+    getDataUsage();
   }, []);
   return (
     <View
@@ -165,7 +204,7 @@ const MyServicePlan = ({ plans,navigation }) => {
         { flexDirection: "column", marginBottom: hp("10%") },
       ]}
     >
-      <View style={[styles.subSec,{marginHorizontal:20}]}>
+      <View style={[styles.subSec, { marginHorizontal: 20 }]}>
         <Text style={styles.subTitle}>{strings.my_service_txt}</Text>
         <TouchableOpacity
           style={{ flexDirection: "row", alignItems: "center" }}
@@ -180,7 +219,7 @@ const MyServicePlan = ({ plans,navigation }) => {
         style={{
           flexDirection: "row",
           justifyContent: "center",
-          alignItems:'center',
+          alignItems: "center",
           marginTop: wp("5%"),
         }}
       >
@@ -197,9 +236,9 @@ const MyServicePlan = ({ plans,navigation }) => {
               fontSize: 16,
               fontStyle: "normal",
               fontWeight: "400",
-              textAlign:'center',
-              textAlignVertical:'center',
-              fontFamily:FontFamily.openSansRegular,
+              textAlign: "center",
+              textAlignVertical: "center",
+              fontFamily: FontFamily.openSansRegular,
             }}
           >
             {" "}
@@ -219,9 +258,9 @@ const MyServicePlan = ({ plans,navigation }) => {
               fontSize: 16,
               fontStyle: "normal",
               textAlign: "center",
-              fontFamily:FontFamily.openSansRegular,
+              fontFamily: FontFamily.openSansRegular,
               textAlignVertical: "center",
-              fontWeight:'400',
+              fontWeight: "400",
             }}
           >
             {" "}
@@ -230,7 +269,11 @@ const MyServicePlan = ({ plans,navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {tabIndex == 0 ? <DataSpeedComponent navigation={navigation}/> : <DataUsageComponent navigation={navigation} />}
+      {tabIndex == 0 ? (
+        <DataSpeedComponent navigation={navigation} />
+      ) : (
+        <DataUsageComponent navigation={navigation} useData={data} />
+      )}
       <MyPlanDetails />
     </View>
   );
@@ -262,14 +305,14 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontStyle: "normal",
     fontWeight: "400",
-    fontFamily:FontFamily.openSansRegular
+    fontFamily: FontFamily.openSansRegular,
   },
   date: {
     fontSize: 14,
     color: colors.sparklight_purple_blue,
     textAlignVertical: "center",
     marginLeft: 5,
-    fontWeight:'600'
+    fontWeight: "600",
   },
   subSec: {
     flexDirection: "row",
@@ -279,7 +322,7 @@ const styles = StyleSheet.create({
   selectedTab: {
     backgroundColor: colors.sparklight_purple_blue,
     borderRadius: 0.5,
-    borderColor:'#767676',
+    borderColor: "#767676",
     paddingVertical: 5,
     paddingHorizontal: 5,
     width: wp("40%"),
@@ -287,7 +330,7 @@ const styles = StyleSheet.create({
   defaultTab: {
     backgroundColor: "white",
     borderRadius: 0.5,
-    borderColor:'#767676',
+    borderColor: "#767676",
     paddingVertical: 5,
     paddingHorizontal: 5,
     width: wp("40%"),
@@ -307,8 +350,8 @@ const styles = StyleSheet.create({
   Modal: {
     backgroundColor: "#fff",
     marginTop: hp("40%"),
-    borderTopLeftRadius:16,
-    borderTopRightRadius:16
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
   },
   planDetailsRow: {
     padding: wp("4%"),
@@ -319,13 +362,14 @@ const styles = StyleSheet.create({
     color: colors.darkest_grey,
     fontSize: FontSize.size_3xl,
     marginLeft: 10,
+    width: "90%",
     alignSelf: "center",
-    fontFamily:FontFamily.openSansRegular
+    fontFamily: FontFamily.openSansRegular,
   },
   planDetailsTxt: {
     color: colors.darkest_grey,
     fontSize: FontSize.size_base,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     marginLeft: 10,
     fontWeight: "400",
   },

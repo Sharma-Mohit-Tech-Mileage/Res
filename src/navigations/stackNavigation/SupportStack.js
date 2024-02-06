@@ -8,17 +8,16 @@ import CreateTicket from "../../components/support/CreateTicket";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import TicketSupport from "../../components/support/TicketSupport";
 import TicketView from "../../components/support/TicketView";
-import ManageEquipment from "../../components/support/ManageEquipment";
+import TroubleShootStack from "./TroubleShootStack";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import LiveSupportChat from "../../components/support/LiveSupportChat";
 import ModemStackScreen from "./ManageEquepmentStack";
-
 const SupportStack = createStackNavigator();
 
 function SupportStackScreen() {
   const { setTabBarVisible } = useTabBarVisibility();
   return (
-    <SupportStack.Navigator initialRouteName="supportScreen">
+    <SupportStack.Navigator initialRouteName="supportScreen" defaultNavigationOptions={{ gestureEnabled: true }}>
       <SupportStack.Screen
         name="support"
         component={supportScreen}
@@ -89,6 +88,15 @@ function SupportStackScreen() {
       <SupportStack.Screen
         name="LiveChatTicketSupport"
         component={LiveSupportChat}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+      <SupportStack.Screen
+        name="DiagnosticFlow"
+        component={TroubleShootStack}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),

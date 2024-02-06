@@ -1,18 +1,17 @@
-import React, { useRef } from 'react';
-import { useDispatch, useSelector } from "react-redux";
+
 import { getUser } from "../../redux/utils/LocalStorage";
 import { refresh } from "react-native-app-auth";
 import { storeUser } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { saveUserInfo } from "../../redux/actions/UserAction";
-
+import { Env } from "../../network/apis/account/Constants";
 
 // import { getUser } from "../redux/utils/LocalStorage";
 
 //const [refresh, setRefresh] = useState();
 
 const config = {
-    issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
+    issuer: Env.SSO_LOGIN,
     clientId: "sparklight-customer-mobile-app",
     redirectUrl:
         "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
@@ -28,21 +27,7 @@ let timer = 0;
 
 const renewToken = async () => {
     loop = setTimeout(async () => {
-        try {
-            const user = await getUser();
-            const result = await refresh(config, {
-                refreshToken: user.refreshToken,
-            });
-            const data = { 
-                idToken: result.idToken,
-                accessToken: result.accessToken,
-                idTokenGuid: result.additionalParameters.session_state,
-                refreshToken: result.refreshToken
-            };
-            PostAuthApiRequest("/mobile/api/gettoken", data, onSuccess, onError);
-        } catch (error) {
-            console.error("Error fetching data", error);
-        }
+        await RefreshToken();
     }, 900000);
 }
 
@@ -85,4 +70,21 @@ export const SetClearTimer = () => {
     clearTimeout(loop);
 }
 
+export const RefreshToken = async () => {
+    try {
+        const user = await getUser();
+        const result = await refresh(config, {
+            refreshToken: user.refreshToken,
+        });
+        const data = { 
+            idToken: result.idToken,
+            accessToken: result.accessToken,
+            idTokenGuid: result.additionalParameters.session_state,
+            refreshToken: result.refreshToken
+        };
+        PostAuthApiRequest("/mobile/api/gettoken", data, onSuccess, onError);
+    } catch (error) {
+        console.error("Error fetching data", error);
+    }
+}
     

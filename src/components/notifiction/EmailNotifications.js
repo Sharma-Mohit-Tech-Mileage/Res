@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { StyleSheet, Text, Pressable, View } from "react-native";
-import { useNavigation, useRoute, useIsFocused } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import Toggle from '../common/Toggle';
 import { useDispatch } from 'react-redux';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { updateEmailNotification, unsubscribePaperless } from '../../redux/actions/ProfileActionSuite'
+import { useAnalytics } from '../utility/AnalyticsContext';
+import { updateEmailNotification, updateFreshEmail, unsubscribePaperless } from '../../redux/actions/ProfileActionSuite'
 const EmailNotifications = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [initialize, setInitializeSettings] = useState({});
@@ -15,6 +16,7 @@ const EmailNotifications = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const scrollViewRef = useRef(null);
+  const { logEvent } = useAnalytics();
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
     console.log('paperlessdata',e)
@@ -40,13 +42,19 @@ const EmailNotifications = () => {
   }, [route.params?.updateFailed, navigation, dispatch]);
 
   const handleSave = () => {
-    if (initialize.status) {
-      // If toggle is true/on, call updateEmailNotification
-      dispatch(updateEmailNotification(initialize.email, navigation));
+    const status = initialize.status;
+    if (status) {
+      if (initialize.isNew)
+        dispatch(updateFreshEmail(initialize.email, navigation));
+      else {
+        dispatch(updateEmailNotification(initialize.email, navigation));
+      }
     } else {
-      // If toggle is false/off, call unsubscribePaperless
       dispatch(unsubscribePaperless(navigation));
     }
+
+    // Updated event name
+    logEvent('paperless_status_update', { status });
   };
 
 

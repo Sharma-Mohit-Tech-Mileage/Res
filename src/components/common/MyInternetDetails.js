@@ -10,11 +10,11 @@ import LinearGradient from "react-native-linear-gradient";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import Wallet2icon from "../../res/svgIcons/Wallet2icon";
 import Myplanicon from "../../res/svgIcons/Myplanicon";
 import { FontFamily } from "../../../GlobalStyles";
+import { Env } from "../../network/apis/account/Constants";
 
 const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
   //const [billAmt,setBillAmt]=useState(0)
@@ -22,7 +22,7 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
   //const [dueDate,setDueDate]=useState('')
 
   useEffect(() => {
-    if (plans.length != 0) {
+    if (plans.length > 0) {
       setPlanSpeed(plans[0].downloadSpeed);
     }
   });
@@ -78,10 +78,9 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
-              url: "https://customer.uat.sparklight.com/residential/billing",
+              url: `${Env.URL}/residential/billing`,
               name: "Billing Details",
             });
-            //Linking.openURL('https://customer.uat.sparklight.com/residential/billing')
           }}
           style={{
             paddingBottom: 5,
@@ -155,10 +154,9 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
-              url: "https://customer.uat.sparklight.com/residential/services/upgrade",
+              url: `${Env.URL}/residential/services/upgrade`,
               name: "Upgrade Plan",
             });
-            //Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')
           }}
           style={{
             paddingBottom: 5,

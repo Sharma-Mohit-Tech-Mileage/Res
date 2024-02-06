@@ -11,9 +11,11 @@ import * as Zendesk from 'react-native-zendesk-messaging';
 import { logout } from 'react-native-app-auth';
 import { SetClearTimer } from '../user/Session';
 import { saveUserInfo } from "../../redux/actions/UserAction";
+import { Env } from "../../network/apis/account/Constants";
+import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 
 const config = {
-    issuer: 'https://login.uat.cableone.net/auth/realms/external-sso-realm',
+    issuer: Env.SSO_LOGIN,
     iosPrefersEphemeralSession: true,
 };
 
@@ -35,6 +37,13 @@ const Terms = ({ navigation }) => {
     console.log('userData: ', userData);
     console.log('combinedReducers: ', combinedReducers);
     console.log('stateData: ', JSON.stringify(stateData));
+
+    useEffect(() => {
+        //Add incase the api call fails
+        setTimeout(() => {
+            setLoading(false);
+        }, 10000);
+    }, []); 
 
     useEffect(() => {
         const fetchData = async () => {
@@ -99,17 +108,21 @@ const Terms = ({ navigation }) => {
                 && profile.paperLessInfo.accountNumber !== undefined
                 && profile.paperLessInfo.accountNumber.length > 0
                 && profile.paperLessInfo.paperlessStatus !== undefined
-                && profile.paperLessInfo.paperlessStatus.toLowerCase() === 'approved') {
-                console.log('setNextScreen: MyTab');
+                && (profile.paperLessInfo.paperlessStatus.toLowerCase() === 'approved'
+                    || profile.paperLessInfo.paperlessStatus.toLowerCase() === 'active')
+                ) {
                 setNextScreen('MyTab');                  
             } else {
-                console.log('setNextScreen: EntryEmailNotifications');
                 setNextScreen('EntryEmailNotifications');  
             }
         }
 
         if (profile.profileDetails.memberType === "Admin") {
-            setNextScreen('MyTab');
+            if (goToPushNotificationScreen) {
+                setNextScreen('EntryPushNotifications'); 
+            } else {
+                setNextScreen('MyTab');
+            }
         }
 
         setProfileLoadCount(profileLoadCount + 1);
@@ -118,7 +131,7 @@ const Terms = ({ navigation }) => {
 
     useEffect(() => {
         console.log('profileLoadCount: ', profileLoadCount);
-        if (profileLoadCount > 4) {
+        if (profileLoadCount > 5) {
             setLoading(false);
             console.log('profileAfterLoad: ', JSON.stringify(profile));
         }
@@ -127,8 +140,13 @@ const Terms = ({ navigation }) => {
 
     const termsAccepted = async () => {
         await dispatch(updateTermsAndConditions(true, null));
+        await dispatch(updateWalkThroughStep(0));
         console.log('termsAccepted: ', nextScreen);
-        navigation.navigate(nextScreen);
+        navigation.reset({
+            index: 0,
+            routes: [{ name: nextScreen }],
+        });
+
     };
 
     const termsCanceled = () => {
@@ -261,7 +279,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         borderRadius: Border.br_11xs,
-        height: 50,
+        minHeight: 50,
         width: '45%',
     },    
     buttonsParent: {
@@ -276,6 +294,8 @@ const styles = StyleSheet.create({
         color: Color.sparklightWhite,
     },
     decline: {
+        fontSize: FontSize.size_base,
+        fontFamily: FontFamily.openSansRegular,        
         color: Color.colorMidnightblue,
         textAlign: "center",
     },    

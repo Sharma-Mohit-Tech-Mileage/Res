@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUserType, isPrimaryAdmin, convertToSpecialCase, transformResponse, initializeSettings, getRoleBasedMessage } from '../utility/constant';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { fetchProfileDetails, fetchSMSSelection } from '../../redux/actions/ProfileActionSuite'
+import PubSub from 'pubsub-js'
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -32,12 +33,16 @@ const ProfileSettings = () => {
   }, [route.params?.updateSuccess, navigation, dispatch]);
 
   useEffect(() => {
-    if (profileDetails) {
-      dispatch(fetchProfileDetails());
-    }
-    if (smsPayload && isPrimary)
-      dispatch(fetchSMSSelection());
+    // Always fetch profile details on component mount
+    dispatch(fetchProfileDetails());
   }, [dispatch]);
+
+  useEffect(() => {
+    // This useEffect is dedicated to responding to changes in the isPrimary flag
+    if (isPrimary) {
+      dispatch(fetchSMSSelection());
+    }
+  }, [isPrimary, dispatch]); // This useEffect depends on isPrimary and will re-run when isPrimary changes
 
   return (
     <View style={{ zIndex: 1 }}>
@@ -116,10 +121,10 @@ const ProfileSettings = () => {
                     type={"warning"}
                     title={profileDetails.multipleEmails ? "There is a problem retrieving your email address" : "No email address on file"}
                     showCloseIcon={false}
-                    message={
-                      profileDetails.multipleEmails ? "We are not able to retrieve the email address for your account. Please contact us for assistance"
-                        : "We don't have your email address on file. Please add your email."
-                    }
+                    message={profileDetails.multipleEmails ? <Text>{'We are not able to retrieve the email address for your account. Please '}<Text style={[styles.text, { color: Color.colorMidnightblue,fontWeight:'700' }]} onPress={() => {
+                      PubSub.publish('event.contactUsEvent', {});
+                      navigation.navigate('Support')
+                       }}> contact us</Text> {' for assistance.'}</Text>: "We don't have your email address on file. Please add your email."}
                   /></View>
               )}
 

@@ -1,11 +1,14 @@
-import React, { useState,useEffect,useRef } from "react";
-import { StyleSheet, View, Image, Text, Pressable, ScrollView, Linking, Platform } from "react-native";
+import React, { useEffect,useRef } from "react";
+import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text } from "react-native";
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
 import * as Zendesk from 'react-native-zendesk-messaging';
-import {DeviceEventEmitter} from "react-native"
+import PubSub from 'pubsub-js'
+import {
+    heightPercentageToDP as hp,
+  } from "react-native-responsive-screen";
 
 const Support = () => {
     const navigation = useNavigation();
@@ -66,12 +69,24 @@ const Support = () => {
         }
     ];
 
-    useEffect(() => {
-        DeviceEventEmitter.addListener("event.contactUsEvent", (eventData) => {
-           console.log('Callback',eventData)
-           scrollViewRef.current?.scrollToEnd({animated: true})
-        })
+    var mySubscriber = function (msg, data) {
+        console.log( msg, data );
+        scrollViewRef.current?.scrollToEnd({animated: true})
+    };
+    
 
+    useEffect(() => {
+        var token = PubSub.subscribe('event.contactUsEvent', mySubscriber);
+    
+        initZendesk();
+          return () => {
+            PubSub.unsubscribe(token);
+          };
+
+      }, []);
+
+
+      const initZendesk=()=>{
         Zendesk.initialize({ channelKey:  Platform.OS === 'android'
         ? 'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTYxNTQwMjg1MS56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUhKSkQyQ0VZUko5RUFNRVgxR1NHQlg2MC5qc29uIn0='
         : 'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTYxNTQwMjg1MS56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUhKSkM2QVNWNFNDTkZGVFdYRVFYNjJQNC5qc29uIn0=' })
@@ -79,17 +94,14 @@ const Support = () => {
             
           })
           .catch((error) =>{
-    
+            console.log(error)
           });
-
-
-      }, []);
+      }
     
-      const handlePressOpenButton = () => {
-       
-        Zendesk.openMessagingView();
-        Zendesk.addEventListener()
-      };
+    //   const handlePressOpenButton = () => {
+    //     Zendesk.openMessagingView();
+    //     Zendesk.addEventListener()
+    //   };
     
 
     return (
@@ -99,7 +111,7 @@ const Support = () => {
                 iconAlignment="right"
                 showIcon={false} // New prop to control icon visibility
             />
-            <ScrollView  ref={scrollViewRef}>
+            
                 <LinearGradient
                     style={styles.linearGradientStyle}
                     locations={[0, 1]}
@@ -121,6 +133,10 @@ const Support = () => {
                                 <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                             </View>
                         </View>
+                        <ScrollView style={{width:'100%',marginBottom:hp('42%'),padding: Padding.p_base}}
+                         ref={scrollViewRef}
+                        >
+                        <View >
                         <View style={styles.issuesFlexBox}>
                             {items.map((item, index) => (
                                 <React.Fragment key={item.name}>
@@ -301,7 +317,7 @@ const Support = () => {
                                             <View style={[styles.icon]}>
                                                 <Image
                                                     resizeMode="stretch"
-                                                    source={require("../../../assets/ticket-03.png")}
+                                                    source={require("../../../assets/ticket-02.png")}
                                                 /></View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
@@ -417,9 +433,11 @@ const Support = () => {
                             </View>
                         </View>
                         <View style={[styles.issuesFlexBox]} />
-                    </View>
+                        </View>
+                        </ScrollView>
+                        </View>
                 </View>
-            </ScrollView>
+            
         </View>
     );
 };
@@ -561,15 +579,16 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     wereHereTo: {
-        fontSize: 22,
-        lineHeight: 28,
+        fontSize: FontSize.size_3xl,
         width: 210,
-        textAlign: "center",
-        color: Color.colorGray_100,
         fontFamily: FontFamily.openSansRegular,
+        color: Color.colorGray_200,
+        lineHeight: 28,
+        textAlign: "center",
     },
     wereHereToHelpWrapper: {
         justifyContent: "center",
+        overflow: 'hidden',
     },
     header: {
         alignSelf: "stretch",
@@ -686,10 +705,9 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     mainContainer: {
-        padding: Padding.p_base,
+        paddingVertical: Padding.p_base,
         alignItems: "center",
         alignSelf: 'stretch',
-        marginBottom: '20%',
     },
     support: {
         flex: 1,
@@ -701,7 +719,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         top: 0,
-        bottom: '97%',
+        height: hp('18%'),
     },
 });
 

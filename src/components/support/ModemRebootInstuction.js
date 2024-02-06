@@ -5,39 +5,35 @@ import {
   Text,
   View,
   ScrollView,
-  TouchableOpacity,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import {
   FontFamily,
-  Padding,
   Color,
-  FontSize,
-  Border,
 } from "../../../GlobalStyles";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import {DeviceEventEmitter} from "react-native"
+import PubSub from 'pubsub-js'
 
 const ModemReboot = () => {
   const navigation = useNavigation();
-  const [inst1, setInst1] = React.useState(
+  const [inst1] = React.useState(
     " button through the app. During the reboot, your internet service will be temporarily unavailable, and the lights on the front of the modem will start flashing. Your modem is ready once the status symbol light on the front of the modem is solid. This can take up to 10 minutes."
   );
 
-  const [inst2, setInst2] = React.useState(
+  const [inst2] = React.useState(
     "If you're still having issues, try a hard reboot of the modem by unplugging it from power, waiting 30 seconds, and then plugging it back in. Wait up to 10 minutes for your modem to come back online."
   );
-  const [inst3, setInst3] = React.useState(
+  const [inst3] = React.useState(
     "If neither option fixes your issue, please don't hesitate to "
   );
 
   React.useEffect(() => {
     return () => {
-        DeviceEventEmitter.removeAllListeners("event.contactUsEvent")
+        
       };
     }, []);
 
@@ -45,7 +41,8 @@ const ModemReboot = () => {
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
         title="Modem Reboot Instructions"
-         onPressBack={() => navigation.goBack()}
+         onPressBack={() => navigation.goBack()
+        }
       />
       <ScrollView showsVerticalScrollIndicator={false} >
         <View style={{ flexDirection: "column",paddingBottom:hp('15%') }}>
@@ -105,8 +102,9 @@ const ModemReboot = () => {
             
             <Text style={[styles.text,{width:wp('75%')}]}>
             {inst3}
-            <Text style={[styles.textContactUs,{fontWeight:'600'}]} onPress={()=>{
-                DeviceEventEmitter.emit("event.contactUsEvent", {name:'Contact US'});
+            <Text style={[styles.textContactUs,{fontWeight:'700'}]} onPress={()=>{
+          
+                PubSub.publish('event.contactUsEvent', {});
                 setTimeout(()=>{
                   navigation.navigate('support')
                 },500)
@@ -130,7 +128,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
     borderRadius: 2,
-    width: wp("87%"),
+    width: wp("92%"),
     marginTop: wp("8%"),
     paddingTop: 20,
     paddingBottom: 20,

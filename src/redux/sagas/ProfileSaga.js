@@ -1,11 +1,12 @@
-import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
+import { call, put, takeLatest} from "redux-saga/effects";
 import {
     getProfileDetails, fetchUserList,
     fetchSmsSubscription, fetchBillingStatus,
     postProfileInfo, postTextNotifictionInfo,
     fetchPaperLessDetails, postEmailNotification,
-    postTermsAndConditions, postPushNotifications,
-    unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback
+    putEmailNotification, postTermsAndConditions, 
+    postPushNotifications, unsubscribPaperLess, 
+    fetchPushNotifications, handleSubmitFeedback
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
@@ -15,7 +16,8 @@ import {
     UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS,
     UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS,
     FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
-    SAVE_USER_FEEDBACK
+    SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
+    UPDATE_EXISTING_EMAIL_NOTIFICATION
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
@@ -80,8 +82,22 @@ function* getPushNotifications(action) {
     }
 }
 
+function* updateNewEmail(action) {
+    try {
+        const response = yield call(postEmailNotification, action.payload);
+        if (action.navigation !== null) {
+            action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Email' });
+        }
+    } catch (error) {
+        if (action.navigation !== null) {
+            action.navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Email' });
+        }
+    }
+}
+
 function* updateProfile(action) {
     try {
+        console.log('updateProfile: ', JSON.stringify(action.payload));
         const response = yield call(postProfileInfo, action.payload);
         console.log('action.smsPayload', action.smsPayload)
         const textNotifiction = yield call(postTextNotifictionInfo, action.smsPayload);
@@ -128,7 +144,7 @@ function* updateTextNotification(action) {
 
 function* updateEmailNotification(action) {
     try {
-        const response = yield call(postEmailNotification, action.payload);
+        const response = yield call(putEmailNotification, action.payload);
         if (action.navigation !== null) {
             action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Email' });
         }
@@ -176,7 +192,6 @@ function* updatePushNotifications(action) {
     }
 }
 function* updatePushNotificationsV2(action) {
-    console.log('updatePushNotification v2 paayload==========================================: ', action.payload);
     try {
         yield call(postPushNotifications, action.payload);
         if (action.navigation !== null) {
@@ -186,6 +201,26 @@ function* updatePushNotificationsV2(action) {
         if (action.navigation !== null) {
             action.navigation.navigate('InAppNotifications', { updateFailed: true, updatedType: 'App' });
         }
+    }
+}
+
+function* updateEntryEmailNotification(action) {
+    try {
+        const profile = action.payload.profile;
+        const updateEmail = action.payload.email;
+        const oldEmail = action.payload.profile.svEmailAddress;
+        
+        if (updateEmail !== oldEmail) {
+            profile.svEmailAddress = updateEmail;
+            profile.email = oldEmail;
+            yield call(postProfileInfo, profile);
+        }
+
+        yield call(postEmailNotification, updateEmail);
+        action.navigation.navigate('MyTab');
+    } catch (error) {
+        action.navigation.navigate('EntryEmailNotifications', { updateFailed: true });
+        console.error('API Error Response:', error, action.payload); // Log the error response
     }
 }
 
@@ -205,5 +240,7 @@ function* ProfileSagas() {
     yield takeLatest(UPDATE_PUSH_NOTIFICATIONS_V2, updatePushNotificationsV2);
     yield takeLatest(UNSUBSCRIBE_PAPERLESS, unsubscribPaperLessSaga);
     yield takeLatest(SAVE_USER_FEEDBACK, saveUserFeedBack);
+    yield takeLatest(UPDATE_ENTRY_EMAIL_NOTIFICATION, updateEntryEmailNotification);
+    yield takeLatest(UPDATE_EXISTING_EMAIL_NOTIFICATION, updateNewEmail);
 }
 export default ProfileSagas;

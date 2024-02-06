@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -6,38 +7,38 @@ import {
   Text,
   ActivityIndicator,
   Linking,
-  Alert,
   TouchableOpacity,
   Modal,
-  Pressable,
+  Alert,
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
-import { authorize, revoke, refresh } from "react-native-app-auth";
-import { useDispatch, useSelector } from "react-redux";
-import { ssoLoginAction, saveUserInfo } from "../../redux/actions/UserAction";
+import { authorize, refresh, logout } from "react-native-app-auth";
+import { useDispatch } from "react-redux";
+import {  saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
-import { PostAuthApiRequest,GetApiRequest } from "../../network/APIClient";
+import { PostAuthApiRequest } from "../../network/APIClient";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import RNExitApp from "react-native-exit-app"
+
 import AlertIcon from "../../res/svgIcons/AlertIcon";
-import CloseIcon from "../../res/svgIcons/CloseIcon";
+
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
-import { getFirstTime, storeFirstTime } from "../../redux/utils/LocalStorage";
-import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
-import { getUser } from "../../redux/utils/LocalStorage";
-import { SetRenewTokenTimer, SetClearTimer } from './Session';
+import { getUser,cleanUserData } from "../../redux/utils/LocalStorage";
+import { SetRenewTokenTimer } from './Session';
+import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
+import { Env,  ISUAT } from "../../network/apis/account/Constants";
+import VersionCheck from 'react-native-version-check';
 import messaging from '@react-native-firebase/messaging';
 import {
   requestUserPermission,
 } from '../../firebase/FirebaseUtils';
 
 const config = {
-  issuer: "https://login.uat.cableone.net/auth/realms/external-sso-realm",
+  issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
   redirectUrl:
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
@@ -50,9 +51,11 @@ const config = {
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({});
+  const [loginEnable, setLoginEnable] = useState(true);
+  const [disconnected, setDisconnected] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage1, setErrorMessage1] = useState("");
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -60,38 +63,11 @@ const SplashScreen = ({ navigation }) => {
   };
   
   const onSuccess = async (res) => {
-    
-    console.log('onSuccess res: ', res);
-
-    let token = res.jwtToken;
-      let userInfo = res.userInfo;
-      let user = {
-        userInfo: userInfo,
-        token: token,
-        tokenGuid: res.idTokenGuid,
-        refreshToken: res.refreshToken
-      };
-
-      if (token) {
-        storeUser(user);
-      }
-
-    const request = `account/api/account/${res.userInfo.accountNumber}`;
-    
-      GetApiRequest(request, (accountDetails)=>{
-        setLoading(false);
-        console.log("getUserAccountDetails", accountDetails);
-        if (accountDetails) {
-            handleLogin(res,accountDetails.services)
-        }
-      }, (error)=>{
-        setLoading(false);
-      });
-  
-    
+    setLoading(false);   
+    handleLogin(res)
   };
 
- const handleLogin=async(res,accountDetails)=>{
+ const handleLogin = async (res) => {
     if (res) {
       let token = res.jwtToken;
       let userInfo = res.userInfo;
@@ -102,41 +78,63 @@ const SplashScreen = ({ navigation }) => {
         refreshToken: res.refreshToken
       };
 
-      if (token) {
-        //storeUser(user);
-      }
+      if (res.userInfo.acctStatus === 'Disconnect'){
+        setDisconnected(true);
+      } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
+        setErrorMessage(strings.nonAdminUserMsg);
+        setErrorMessage1(' to view information.')
+        setTimeout(() => {
+          setModalVisible(true);
+        }, 100);
+      } else if (res.custServices.internet == false) {
+        setErrorMessage(strings.nonInternetUserMessage);
+        setErrorMessage1(' to manage your service.')
+        setTimeout(() => {
+          setModalVisible(true);
+        }, 100);
+      } else {
+        storeUser(user);
+        dispatch(saveUserInfo(user));
+        SetRenewTokenTimer();
 
-      dispatch(saveUserInfo(user));
-
-      SetRenewTokenTimer();
-
-      const data = await getFirstTime();
-
-        if (userInfo.accountNumber === "900690538") {
-          setErrorMessage(strings.nonAdminUserMsg);
-          setTimeout(() => {
-            setModalVisible(true);
-          }, 100);
-        } else if (accountDetails.commercialPhone==false && accountDetails.fxsCommercialPhone==false && accountDetails.digital==false && accountDetails.fiber==false && accountDetails.hsd==false && accountDetails.tv==false && accountDetails.iptv==false && accountDetails.tollFreeNumber==false && accountDetails.phone==false) {
-          setErrorMessage(strings.nonInternetUserMessage);
-          setTimeout(() => {
-            setModalVisible(true);
-          }, 100);
+        if (user.userInfo.mobileTCAcceptanceFlag) {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'MyTab' }], // Navigate to 'MyTab' after reset
+          });
         } else {
-          if (user.userInfo.mobileTCAcceptanceFlag) {
-            navigation.navigate("MyTab");
-          } else {
-            navigation.navigate("Terms");
-          }
-        }         
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Terms' }], // Navigate to 'MyTab' after reset
+          });
+        }
+      }         
     }
   }
 
+  const logoutAction = () => {
+    getSsoToken().then((res) => {
+      console.log('token', res)
+      let token = res.idToken;
+      logout(config, {
+        idToken: token,
+        postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
+      }).then((result) => {
+        storeUser({});
+        storeSsoToken({});
+        saveUserInfo({});
+        cleanUserData();
+        console.log(result)
+      });
+    });
+  }
   const onError = (error) => {
     console.log(" callSSOLoginApi error", error);
+    setLoading(false);
+    setDisconnected(true)
   };
 
-  const CustomAlertModal = ({ visible, message, onClose }) => {
+  const CustomAlertModal = ({ visible, message,message2, onClose }) => {
     return (
       <Modal
         visible={visible}
@@ -163,8 +161,13 @@ const SplashScreen = ({ navigation }) => {
             <View
               style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
             />
-            <Text style={styles.message}>{message}</Text>
-            <TouchableOpacity
+            <Text style={styles.message}>{message}
+            <Text style={[styles.message,{fontWeight:600,color:colors.sparklight_purple_blue}]} onPress={()=>{
+              Linking.openURL(Env.URL);
+            }}> login to your online account</Text>
+            {message2}
+            </Text>
+            {/* <TouchableOpacity
               style={styles.openBtn}
               onPress={() => {
                 Linking.openURL("https://customer.uat.sparklight.com/SecureLogin/login.aspx");
@@ -176,7 +179,7 @@ const SplashScreen = ({ navigation }) => {
               >
                 Open Portal
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity
               style={styles.closeBtn}
@@ -196,26 +199,25 @@ const SplashScreen = ({ navigation }) => {
 
   const handleCloseAlert = () => {
     setModalVisible(false);
+    logoutAction();
   };
 
   const loginAuth = async () => {
     try {
       const result = await authorize(config);
 
-      //console.log('loginAuthResult: ', result);
+      console.log('loginAuthResult: ', result);
 
       const data = { 
         idToken: result.idToken,
-        accessToken:result.accessToken,
+        accessToken: result.accessToken,
         idTokenGuid: result.authorizeAdditionalParameters.session_state,
         refreshToken: result.refreshToken
       };
-
+      
       setLoading(true);
-      //dispatch(ssoLoginAction(data))
-      callSSOLoginApi(data);
       storeSsoToken(data);
-      setData(result)
+      callSSOLoginApi(data);
     } catch (error) {
       console.log(error);
     }
@@ -245,6 +247,7 @@ const SplashScreen = ({ navigation }) => {
           };
     
           setLoading(true);
+          storeSsoToken(data);          
           callSSOLoginApi(data);
         }
       } catch (error) {
@@ -281,6 +284,18 @@ const SplashScreen = ({ navigation }) => {
         );
       });
 
+      messaging()
+      .getInitialNotification()
+      .then(remoteMessage => {
+        if (remoteMessage) {
+          console.log(
+            'Notification caused app to open from quit state:',
+            remoteMessage.notification,
+          );
+        }
+      });
+
+
     };
 
     onLoadMethod();
@@ -292,6 +307,8 @@ const SplashScreen = ({ navigation }) => {
 
     return unsubscribe;  
   }, []);  
+
+  
 
   return (
     <LinearGradient
@@ -316,19 +333,38 @@ const SplashScreen = ({ navigation }) => {
             <TouchableOpacity
               style={styles.SSoBtnContainer}
               onPress={() => {
-                loginAuth();
+                if(loginEnable){
+                  setLoginEnable(false)
+                   loginAuth();
+                   setTimeout(()=>{
+                    setLoginEnable(true)
+                   },1500)
+                }
               }}
             >
               <Text style={styles.SSoBtn}>Login</Text>
             </TouchableOpacity>        
           </>
         )
-      }            
+      }  
+      <Text style={{color: 'white',alignSelf:'center', marginTop:45, fontSize:16}}> {(ISUAT)? 'UAT':''} Version:{VersionCheck.getCurrentVersion()}</Text>          
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
+        message2={errorMessage1}
         onClose={handleCloseAlert}
       />   
+      <CustomerDisconnectPage
+      visible={disconnected}
+      onLogin={()=>{
+        setDisconnected(false)
+        loginAuth();
+      }}
+      onClose={()=>{
+        setDisconnected(false)
+        logoutAction();
+      }}
+      />
     </LinearGradient>
   );
 };
@@ -457,4 +493,5 @@ const styles = StyleSheet.create({
 });
 
 export default SplashScreen;
+
 

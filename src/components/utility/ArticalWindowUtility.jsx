@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Dimensions, Platform, Pressable } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
+import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
+import { RefreshToken } from '../user/Session';
+import { isUserAuthorized } from "../../network/APIClient";
+import { Env } from '../../network/apis/account/Constants';
+import PDFViewModal from './PDFViewModal';
+
 
 const { width, height } = Dimensions.get('window');
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -11,8 +17,89 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [name, setTitle] = useState(route.params?.name);
     const [isError, setIsError] = useState(false);
     const [url, setUrl] = useState(route.params?.url);
+    const [currentUser, setCurrentUser] = useState({});
     const [modalOpen, setModalOpen] = useState(true);
+    const [navStateReloading, setNavStateReloading] = useState(false);
+    const [showPDFModal, setShowPDFModal] = useState(false);
+    const [showPDFUrl, setShowPDFUrl] = useState('');
     const user = useSelector(state => state.combinedReducers.user.userData);
+    const webViewRef = useRef();
+    
+    const toggleModal = () => {
+        setShowPDFModal(!showPDFModal);
+    };
+
+    const navigationChange = async (navState) => {
+        if (navState.url.includes('/postlogout')
+            || navState.url.includes(Env.SSO_LOGIN)) {
+            if (!navStateReloading) {
+                setModalOpen(false);   
+                setProgress(1);                        
+                setNavStateReloading(true);
+                await RefreshToken();
+                setTimeout(async () => {
+                    await userUpdate();
+                }, 1000);                
+            }
+        }
+    }
+
+    const onMessage = (event) => {
+        try {
+            const data = JSON.parse(event.nativeEvent.data);
+
+            if (data !== undefined && data.responseURL !== undefined && data.responseURL.includes('/statements/')) {
+                const responseData = JSON.parse(data.response);
+                setShowPDFUrl(responseData.fileBinary);
+                setShowPDFModal(true);
+            }
+        } catch (error) {
+            console.log('onMessageError: ', error);
+        }    
+    }    
+
+    const userUpdate = async () => {
+        const userLocal = await getUser();
+
+        if (userLocal.token === currentUser.token) {
+            console.log('tokens equal each other');
+            setTimeout(async () => {
+                await userUpdate();
+            }, 1000);
+        } else {
+            setNavStateReloading(false);
+            userUpdateScript(userLocal);
+            setUrl(route.params?.url);
+            setModalOpen(true);   
+            setProgress(0); 
+            setCurrentUser(userLocal);        
+        }
+    }
+
+    const userUpdateScript = async (user) => {
+        const upgradeToken = await getUpgradeToken();
+        console.log('userUpdateScript: ', user);
+        console.log('upgradeToken.access_token: ', upgradeToken.access_token);
+        if (user.token !== undefined) {
+            const SAVE_FROM_RN = `(function() {
+                localStorage.setItem('jwt_token', '${user.token}');
+                localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
+                localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
+                var open = XMLHttpRequest.prototype.open;
+                XMLHttpRequest.prototype.open = function() {
+                    this.addEventListener("load", function(event) {
+                        if (this.responseURL.match('/account/.*/statements/') !== null) {
+                            var message = {"status" : this.status, "responseURL" : this.responseURL, "response" : this.response}
+                            window.ReactNativeWebView.postMessage(JSON.stringify(message));
+                        }
+                    }); 
+                    open.apply(this, arguments);
+                };                
+              })();`;        
+
+            setInitScript(SAVE_FROM_RN);         
+        }
+    }
 
     // Reset progress and error states when URL changes or modal closes
     useEffect(() => {
@@ -30,19 +117,12 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }, [modalOpen]);
 
     useEffect(() => {
-        if (user.token !== undefined) {
-            const SAVE_FROM_RN = `(function() {
-                localStorage.setItem('jwt_token', '${user.token}');
-                localStorage.setItem('upgrades_token', '${user.refreshToken}');
-                localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
-              })();`;        
-          
-            setInitScript(SAVE_FROM_RN);
-        }
+        setCurrentUser(user);
+        userUpdateScript(user);
     }, []);
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />
             {progress < 1 ? (
                 <View style={{ ...styles.progressBar}}>
@@ -50,15 +130,18 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 </View>) : (<View >
                 </View>)}
             {modalOpen && (
-
                 <WebView
+                    ref={webViewRef}
                     key={url}
                     source={{ uri: url }}
                     onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
-                    onError={() => setIsError(true)}
                     sharedCookiesEnabled={true}
                     injectedJavaScriptBeforeContentLoaded={initScript}
-                    //onNavigationStateChange={(navState) => setUrl(navState.url)}
+                    onNavigationStateChange={navigationChange}
+                    //onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+                    originWhitelist={['http://*', 'https://*', 'data:*']}
+                    //setSupportMultipleWindows={false}
+                    onMessage={onMessage}
                 />            
             )}
             {isError ? (
@@ -66,7 +149,12 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     <Text style={styles.errorText}>Failed to load. Please try again later.</Text>
                 </View>
             ) : null}
-            
+            {showPDFModal && (
+                <PDFViewModal
+                    url={showPDFUrl}
+                    onClose={()=>toggleModal()}
+                />
+            )}            
         </View>
     );
 };
