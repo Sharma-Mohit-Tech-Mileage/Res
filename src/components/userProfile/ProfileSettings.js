@@ -33,16 +33,14 @@ const ProfileSettings = () => {
   }, [route.params?.updateSuccess, navigation, dispatch]);
 
   useEffect(() => {
-    // Always fetch profile details on component mount
     dispatch(fetchProfileDetails());
   }, [dispatch]);
 
   useEffect(() => {
-    // This useEffect is dedicated to responding to changes in the isPrimary flag
     if (isPrimary) {
       dispatch(fetchSMSSelection());
     }
-  }, [isPrimary, dispatch]); // This useEffect depends on isPrimary and will re-run when isPrimary changes
+  }, [isPrimary, dispatch]);
 
   return (
     <View style={{ zIndex: 1 }}>
@@ -122,8 +120,10 @@ const ProfileSettings = () => {
                     title={profileDetails.multipleEmails ? "There is a problem retrieving your email address" : "No email address on file"}
                     showCloseIcon={false}
                     message={profileDetails.multipleEmails ? <Text>{'We are not able to retrieve the email address for your account. Please '}<Text style={[styles.text, { color: Color.colorMidnightblue,fontWeight:'700' }]} onPress={() => {
-                      PubSub.publish('event.contactUsEvent', {});
-                      navigation.navigate('Support')
+                      navigation.navigate('Support');
+                      setTimeout(() => {
+                        PubSub.publish('event.contactUsEvent', {});
+                      }, 500); // Adjust delay as needed
                        }}> contact us</Text> {' for assistance.'}</Text>: "We don't have your email address on file. Please add your email."}
                   /></View>
               )}

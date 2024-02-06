@@ -144,7 +144,7 @@ const AccountOverview = () => {
       }
     };
     fetchUserData();
-    console.log('Build Number',VersionCheck.getCurrentVersion()); 
+    console.log('Build Number', VersionCheck.getCurrentVersion());
   }, []);
 
   return (
@@ -215,6 +215,8 @@ const AccountOverview = () => {
               </View>
               <Pressable
                 accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Logout"
                 style={[styles.buttons, styles.buttonsSpaceBlock]}
                 onPress={() => { logoutConfirmationPopuo(navigation) }}
               >
@@ -222,20 +224,23 @@ const AccountOverview = () => {
                   Logout
                 </Text>
               </Pressable>
-              <Pressable style={[styles.buttons, styles.buttonsSpaceBlock]}>
+              <Pressable style={[styles.buttons, styles.buttonsSpaceBlock]}
+                accessible={true}
+                accessibilityRole="link">
                 <Text>
-                  <Text style={styles.linkStyle} onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}>
+                  <Text
+                    accessibilityLabel=" Privacy Policy" style={styles.linkStyle} onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}>
                     Privacy Policy
                   </Text>
                   <Text style={styles.linkStyle}> | </Text>
-                  <Text style={styles.linkStyle} onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}>
+                  <Text accessibilityLabel="Terms & Conditions" style={styles.linkStyle} onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}>
                     Terms & Conditions
                   </Text>
                 </Text>
               </Pressable>
 
             </View>
-            <Text style={{color: Color.colorMidnightblue,alignSelf:'center', marginTop:20}}>Version:{VersionCheck.getCurrentVersion()}</Text>
+            <Text style={{ color: Color.colorMidnightblue, alignSelf: 'center', marginTop: 20 }}>Version:{VersionCheck.getCurrentVersion()}</Text>
           </View>
         </ScrollView>
       </View>
@@ -249,7 +254,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0,
-    height: hp('18%'),
+    height: 150,
   },
   buttonsSpaceBlock: {
     paddingVertical: Padding.p_base,
@@ -265,10 +270,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignSelf: "stretch",
   },
-  linkStyle :{
-    color: Color.colorMidnightblue, 
+  linkStyle: {
+    color: Color.colorMidnightblue,
     alignSelf: 'center',
-    fontWeight:'600'
+    fontWeight: '600'
   },
   makePaymentTypo: {
     fontSize: FontSize.size_base,
@@ -349,7 +354,7 @@ const styles = StyleSheet.create({
   },
   frameGroup: {
     marginTop: Padding.p_5xl,
-    paddingHorizontal:Padding.p_base,
+    paddingHorizontal: Padding.p_base,
     alignSelf: "stretch",
   },
   frameParent: {

@@ -159,9 +159,9 @@ const PushNotifications = ({ navigation }) => {
                         <Pressable
                             style={[styles.buttonDecline, styles.buttonsLayout]}
                             onPress={skipNotifications}
-                            accessibilityLabel="Decline Button"
+                            accessibilityLabel="Skip Button"
                             accessibilityRole="button"
-                            accessibilityHint="Decline Push Notifications"
+                            accessibilityHint="Skip Push Notifications"
                         >
                             <Text style={styles.decline}>
                                 Skip for now
