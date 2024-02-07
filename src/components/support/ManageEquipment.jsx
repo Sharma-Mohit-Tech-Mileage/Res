@@ -22,21 +22,29 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
 import colors from "../../res/Colors";
-
+import NotificationAlert from '../common/customui/NotificationAlert';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 const ManageEquipment = () => {
   const navigation = useNavigation();
-  const [manufacturer, setManufacturer] = React.useState('');
+  const [manufacturer, setManufacturer] = React.useState("");
   const [model, setModel] = React.useState("");
   const [transmissionType, setTransmissionType] = React.useState("");
   const [leased, setLeased] = React.useState("");
   const [plans, setPlans] = React.useState([]);
   const [loadingHealth, setLoadingHealth] = React.useState(false);
   const [currentHealth, setCurrentHealth] = React.useState("Optimal");
-
+  const healthStatus = {
+    Poor: "Issue Detected",
+    Offline: "Offline",
+  };
+  const healthColors = {
+    Optimal: colors.sparklight_green,
+    Offline: Color.sparklightaddGray,
+  };
+  const shouldShowAlert = ["Poor", "Offline"].includes(currentHealth);
   const getLeasedDetails = () => {
     let re = getUser().then((res) => {
       const request = `mobile/api/Device/GetOwnershipInfo?accountnumber=${res.userInfo.accountNumber}`;
@@ -58,22 +66,14 @@ const ManageEquipment = () => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
       GetApiRequest(
         request,
-        (response) => {
-          setPlans(response);
-          if (response.length > 0) {
-            let macAddress = response[0].macAddress;
-            var mac = macAddress;
-            if (res.userInfo.accountNumber === "128387263") {
-              mac = "00:40:36:7b:29:5a";
-            } else if (res.userInfo.accountNumber === "133370775") {
-              mac = "04:bc:9f:17:02:b8";
-            }
-            checkModemDetails(mac);
+        (res) => {
+          setPlans(res);
+          if (res.length > 0) {
+            let macAddress = res[0].macAddress;
+            checkModemDetails("00:40:36:7b:29:5a");
           }
         },
-        (error) => {
-          setLoadingHealth(false);
-        }
+        (error) => { }
       );
     });
   };
@@ -87,8 +87,7 @@ const ManageEquipment = () => {
     GetApiRequest(
       request,
       (res) => {
-        setLoadingHealth(true);
-        console.log("checkModemDetails", res);
+        console.log("checkModemDetails================================", res);
         if (res) {
           let temt = [];
           if (res.equipmentType === "DOCSIS") {
@@ -107,13 +106,13 @@ const ManageEquipment = () => {
         }
       },
       (error) => {
-        setLoadingHealth(false);
-        console.log("Modem details", error);
+        console.log("Modem details====================================", error);
       }
     );
   };
 
   const updateModemStatus = (temt) => {
+    console.log('Print the modem health status')
     const allGreen = temt.every((v) => v === "Green");
     if (!allGreen) {
       const checkYellow = temt.includes("Yellow");
@@ -153,6 +152,17 @@ const ManageEquipment = () => {
     getInternetPlanDetails();
   }, []);
 
+  const GreenCircle = () => {
+    return <View style={styles.greenTick}></View>;
+  };
+
+  const RedCircle = () => {
+    return <View style={styles.redTick}></View>;
+  };
+  const OrangeCircle = () => {
+    return <View style={styles.orangeTick}></View>;
+  };
+
   return (
     <View style={styles.manageEquipment}>
       <ProfileSettingsHeader
@@ -182,32 +192,18 @@ const ManageEquipment = () => {
                       </Text>
                       <Text style={styles.mb8600Docsis}>
                         {model}
-                        {/* {transmissionType} */}
                       </Text>
-
-                      {loadingHealth ? (
-                        <View style={styles.poorHealthParent}>
-                          <Text style={[styles.poorHealth, styles.textTypo2]}>
-                            {currentHealth === "Poor"
-                              ? "Issue Detected"
-                              : currentHealth == "Offline"
-                              ? "Issue Detected"
-                              : "Good Health"}
-                          </Text>
-                          <Image
-                            style={styles.frameChild}
-                            tintColor={
-                              currentHealth === "Optimal"
-                                ? colors.sparklight_green
-                                : currentHealth === "Offline"
-                                ? colors.sparklight_red
-                                : colors.sparklight_yellow
-                            }
-                            resizeMode="cover"
-                            source={require("../../../assets/Ellipse.png")}
-                          />
-                        </View>
-                      ) : (
+                      {loadingHealth ? <View style={styles.poorHealthParent}>
+                        <Text style={[styles.poorHealth, styles.textTypo2]}>
+                          {healthStatus[currentHealth] || "Good Health"}
+                        </Text>
+                        <Image
+                          style={styles.frameChild}
+                          tintColor={healthColors[currentHealth] || colors.sparklight_yellow}
+                          resizeMode="cover"
+                          source={require("../../../assets/Ellipse.png")}
+                        />
+                      </View> : (
                         <ActivityIndicator
                           size="small"
                           color={Color.colorGainsboro_200}
@@ -223,49 +219,20 @@ const ManageEquipment = () => {
                   </View>
                 </View>
               </View>
-
-                { ( currentHealth!='Optimal' && loadingHealth) &&
-              <View
-                style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}
-              >
-                <View style={[styles.notifications, styles.parentBorder]}>
-                  <Image
-                    resizeMode="cover"
-                    source={require("../../../assets/rectangle-529.png")}
-                  />
-                  <View style={styles.bannerWarning}>
-                    <View style={styles.rightActionableParent}>
-                      <Image
-                        style={{ height: "100%" }} // Set both width and height to '100%'
-                        resizeMode="stretch" // Change resizeMode to stretch
-                        source={require("../../../assets/alertred.png")}
-                      />
-                      <View style={styles.creditCardWillExpireSoonParent}>
-                        <Text style={styles.creditCardWill}>
-                        An issue has been detected
-                        </Text>
-                        <Text
-                          style={[
-                            styles.yourSavedCard,
-                            styles.yourSavedCardSpaceBlock,
-                          ]}
-                        >
-                          Try one of the options below to resolve.
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </View>
-                 }
-
             </View>
+            {shouldShowAlert && (
+              <View style={{ paddingHorizontal: Padding.p_base, paddingBottom: Padding.p_5xl }}>
+                <NotificationAlert
+                  type="error"
+                  title="An issue has been detected"
+                  message="Try one of the options below to resolve."
+                  showCloseIcon={false}
+                  onClose={() => setShowErrorAlert(false)}
+                />
+              </View>
+            )}
             <View
-              style={[
-                styles.supportAccordionParent,
-                styles.supportParentFlexBox,
-              ]}
-            >
+              style={[styles.supportAccordionParent, styles.supportParentFlexBox,]}>
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
@@ -284,20 +251,7 @@ const ManageEquipment = () => {
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
-              {/* <View style={[styles.frameLayout]} />
-                            <View style={[styles.frame9defaultSpaceBlock]} >
-                                <Image
-                                    resizeMode="stretch"
-                                    source={require("../../../assets/key-02.png")}
-                                />
-                                <Text style={styles.modemHealthSupport}>Update Password</Text>
-                                <Image
-                                    resizeMode="stretchstretch"
-                                    source={require("../../../assets/chevronright.png")}
-                                />
-                            </View> */}
               <View style={[styles.frameLayout]} />
-              { (manufacturer!='Calix') &&
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
@@ -315,7 +269,24 @@ const ManageEquipment = () => {
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
-             }
+              <View style={[styles.frameLayout]} />
+              <TouchableOpacity
+                style={[styles.frame9defaultSpaceBlock]}
+                onPress={() => {
+                  navigation.navigate("ModemConnectivityGuide");
+                }}
+              >
+                <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
+                  resizeMode="contain"
+                  source={require("../../../assets/tool-02.png")}
+                />
+                <Text style={styles.modemHealthSupport}>Check Connection</Text>
+                <Image
+                  resizeMode="stretch"
+                  source={require("../../../assets/chevronright.png")}
+                />
+              </TouchableOpacity>
             </View>
           </View>
           <View style={[styles.frameFlexBox]}>
