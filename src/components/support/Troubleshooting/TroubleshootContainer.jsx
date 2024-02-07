@@ -16,6 +16,7 @@ import {
 import { getUser } from "../../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../../network/APIClient";
 import { useSelector } from 'react-redux';
+import moment from "moment";
 const stepsData = [
   {
     title: "Let's resolve your issues.",
@@ -53,6 +54,11 @@ const TroubleshootContainer = () => {
   const user = useSelector(state => state.combinedReducers.user.userData);
   const [currentStep, setCurrentStep] = useState(0);
   const [networkStatus, setNetworkStatus] = useState([false,false,false,false]);
+  const [outageIssueDetected,setOutageIssueDetected]=useState(false)
+  const [billIssueDetected,setBillIssueDetected]=useState(false)
+  const [modemssueDetected,setModemIssueDetected]=useState(false)
+  const [issueDetected,setIssueDetected]=useState(false)
+  const [estimatedRestoreTime,setEstimatedRestoreTime]=useState('')
 
   const [loading, setLoading] = useState(true);
   const [key, setKey] = useState(1);
@@ -69,15 +75,19 @@ const TroubleshootContainer = () => {
         (response) => {
           console.log("checkModemOutagStatus", response);
           if (response.hasOutage === true) {
-            networkStatus[currentStep]=false
+            let time=moment(response.estimatedTimeOfResolution).format('LT'); 
+            setEstimatedRestoreTime(time)
+            setOutageIssueDetected(true)
+            setIssueDetected(true)
           } else {
             networkStatus[currentStep]=true
             setKey(2)
+            setTimeout(() => {
+                setCurrentStep(2);
+              }, 2000);
           }
           setLoading(false);
-          setTimeout(() => {
-            setCurrentStep(2);
-          }, 2000);
+          
         },
         (error) => {
           console.log(error);
@@ -103,21 +113,22 @@ const TroubleshootContainer = () => {
             //   }
             if(res.currentBalance<=0){
                 // Bill paide
-                console.log("checkBillPaid", "res");
                 networkStatus[currentStep]=true
+                setTimeout(() => {
+                    setCurrentStep(3);
+                     checkModemHealth("ac:db:48:21:f2:21");
+                   }, 2000);
+                
                 setKey(3)
                }else{
                  // Bill Pending
-                 networkStatus[currentStep]=false
+                 setIssueDetected(true)
+                 setBillIssueDetected(true)
                }
 
         }
         setLoading(false);
         
-        setTimeout(() => {
-         setCurrentStep(3);
-          checkModemHealth("ac:db:48:21:f2:21");
-        }, 2000);
       },
       (Error) => {}
     );
@@ -216,7 +227,8 @@ const TroubleshootContainer = () => {
           marginBottom: "15%",
         }}
       >
-        <TroubleshootComponent
+       <>
+       { !issueDetected && (<TroubleshootComponent
           key={key} 
           step={currentStep}
           title={step.title}
@@ -226,16 +238,29 @@ const TroubleshootContainer = () => {
           pageCount={step.pageCount}
           loading={loading}
         />
-      </SafeAreaView>
-      {/* <ScrollView contentContainerStyle={{ flex: 1 }} style={{ marginBottom: "15%", paddingHorizontal: Padding.p_base, paddingTop: Padding.p_5xl }}>
-                <ModemHealthy
+       )}
+      
+       { outageIssueDetected && (
+                <OutagesAlert
                     step={currentStep}
                     title={'No service issues were detected.'}
-                    description={null}
+                    description={estimatedRestoreTime}
                     success={true}
                     pageCount={3}
                 />
-            </ScrollView> */}
+       )}
+
+{ billIssueDetected && (
+                <AccountOutages
+                    step={currentStep}
+                    title={'No service issues were detected.'}
+                    description={estimatedRestoreTime}
+                    success={true}
+                    pageCount={3}
+                />
+       )}
+        </>
+        </SafeAreaView>
     </View>
   );
 };

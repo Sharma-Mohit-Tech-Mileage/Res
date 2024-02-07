@@ -62,7 +62,7 @@ const HomeScreen = ({ navigation }) => {
   const [estimatedRestoreTime,setEstimatedRestoreTime]=useState('')
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
-  var internetHealths =[]
+  const [internetHealths,setInternetHealths]= useState([])
 
   const getInternetHealth = (type) => {
     var currentHealth = {
@@ -118,8 +118,10 @@ const HomeScreen = ({ navigation }) => {
              setIsInternetDetails(true)
              setHasOutage(true)
              setIsOutageAlert(true)
-             internetHealths.push('Red')
+             setInternetHealths(oldArray => [...oldArray,'Red'] );
 
+           }else{
+            setInternetHealths(oldArray => [...oldArray,'Green'] );
            }
            
      }, (error)=>{
@@ -180,8 +182,8 @@ const HomeScreen = ({ navigation }) => {
         }
       },
       (error) => {
-        refreshInternetHealth()
         setCheckModemStatus(true)
+        setInternetHealths(oldArray => [...oldArray,'Green'] );
         console.log("Modem details", error);
       }
     );
@@ -194,22 +196,14 @@ const HomeScreen = ({ navigation }) => {
       const checkYellow = temt.includes("Yellow");
       const checkRed = temt.includes("Red");
       if (checkRed) {
-        setCurrentHealth('Offline');
-        setIsInternetDetails(true);
-        internetHealths.push('Red')
+        setInternetHealths(oldArray => [...oldArray,'Red'] );
       } else if (checkYellow) {
-        setCurrentHealth('Poor');
-        setIsInternetDetails(true);
-        internetHealths.push('Yellow')
+        setInternetHealths(oldArray => [...oldArray,'Yellow'] );
       }
     } else {
-      if (currentHealth != 'Optimal') {
-        setCurrentHealth('Optimal');
-        setIsInternetDetails(false);
-      }
-      internetHealths.push('Green')
+      setInternetHealths(oldArray => [...oldArray,'Green'] );
     }
-    refreshInternetHealth()
+    
   };
 
   const refreshInternetHealth=()=>{
@@ -242,7 +236,7 @@ const HomeScreen = ({ navigation }) => {
           if(res.currentCollectionStep=='Soft Disconnect'){
             setAccountStatus('Disconnect')
             setIsInternetDetails(true)
-          
+            setInternetHealths(oldArray => [...oldArray,'Red'] );
           }else{
             updateInternetHealth(res.currentBalance);
 
@@ -252,7 +246,7 @@ const HomeScreen = ({ navigation }) => {
           setBillAmt(res.currentBalance);
           
            getInternetPlanDetails();
-           refreshInternetHealth()
+           
         }
       }, onErrorBill);
     });
@@ -260,14 +254,10 @@ const HomeScreen = ({ navigation }) => {
 
   const updateInternetHealth = (dueAmount) => {
     if(dueAmount<=0){
-     setCurrentHealth('Optimal')
-     setIsInternetDetails(false)
      setBillPaid(true)
-     internetHealths.push('Green')
+     setInternetHealths(oldArray => [...oldArray,'Green'] );
     }else{
-      setCurrentHealth('Poor')
-      setIsInternetDetails(true)
-      internetHealths.push('Yellow')
+      setInternetHealths(oldArray => [...oldArray,'Yellow'] );
     }
    
   };
@@ -330,11 +320,14 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // useEffect(()=>{
-  //  if(accountStatus==='Disconnect'){
-  //   setCurrentHealth('Offline')
-  //  }
-  // },[accountStatus]);
+  useEffect(()=>{
+
+    console.log('Health',internetHealths.length)
+    if(internetHealths.length>=3){
+      refreshInternetHealth()
+    }
+   
+  },[internetHealths]);
 
   useEffect(() => {
     checkModemOutagStatus();
