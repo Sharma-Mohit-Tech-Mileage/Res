@@ -330,10 +330,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 18,
   },
-  yourSavedCardSpaceBlock: {
-    marginTop: 8,
-    alignSelf: "stretch",
-  },
   supportParentFlexBox: {
     alignItems: "flex-end",
     justifyContent: "center",
@@ -353,10 +349,6 @@ const styles = StyleSheet.create({
     padding: Padding.p_5xl,
     justifyContent: "center",
     alignItems: "center",
-  },
-  textTypo: {
-    fontFamily: FontFamily.textXsSemibold,
-    fontWeight: "600",
   },
   myModem1: {
     textAlign: "left",
@@ -429,45 +421,6 @@ const styles = StyleSheet.create({
   frameWrapper: {
     paddingHorizontal: Padding.p_base,
     paddingVertical: 0,
-  },
-  creditCardWill: {
-    fontWeight: "700",
-    fontFamily: FontFamily.interBold,
-    color: Color.sparkLightRed,
-    fontSize: FontSize.textXsSemibold_size,
-    textAlign: "left",
-  },
-  yourSavedCard: {
-    color: Color.colorGray_100,
-    fontSize: FontSize.textXsSemibold_size,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-  },
-  creditCardWillExpireSoonParent: {
-    marginLeft: 10,
-    flex: 1,
-  },
-  rightActionableParent: {
-    flexDirection: "row",
-    flex: 1,
-  },
-  bannerWarning: {
-    alignItems: "center",
-    flexDirection: "row",
-    backgroundColor: Color.sparklightWhite,
-    alignSelf: "stretch",
-    flex: 1,
-  },
-  notifications: {
-    flexDirection: "row",
-    borderColor: Color.sparklightGray,
-    borderRadius: Border.br_11xs,
-    alignSelf: "stretch",
-  },
-  notificationsWrapper: {
-    marginTop: 24,
-    justifyContent: "center",
-    paddingHorizontal: Padding.p_5xl,
   },
   modemHealthSupport: {
     marginLeft: 10,
