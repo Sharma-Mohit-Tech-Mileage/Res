@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
+  Button,
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
@@ -36,6 +37,7 @@ import messaging from '@react-native-firebase/messaging';
 import {
   requestUserPermission,
 } from '../../firebase/FirebaseUtils';
+import notifee from '@notifee/react-native';
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -273,8 +275,31 @@ const SplashScreen = ({ navigation }) => {
       }
 
       // Register background handler
-      messaging().setBackgroundMessageHandler(async remoteMessage => {
-        console.log('Message handled in the background!', remoteMessage);
+      messaging().setBackgroundMessageHandler(async remoteMessage => {     
+        console.log('Message handled in the background Again!', remoteMessage);
+        try {
+            // Create a channel (required for Android)
+            const channelId = await notifee.createChannel({
+              id: 'default',
+              name: 'Default Channel',
+            });
+
+            // Display a notification
+            await notifee.displayNotification({
+              title: remoteMessage.notification.title,
+              body: remoteMessage.notification.body,
+              android: {
+                channelId,
+                //smallIcon: remoteMessage.notification.android.imageUrl, // optional, defaults to 'ic_launcher'.
+                // pressAction is needed if you want the notification to open the app when pressed
+                pressAction: {
+                  id: 'default',
+                },
+              },
+            });
+        } catch (error) {
+          console.log('Error when setting background message: ', error);
+        }
       });
 
       messaging().onNotificationOpenedApp(remoteMessage => {
@@ -301,8 +326,30 @@ const SplashScreen = ({ navigation }) => {
     onLoadMethod();
 
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('Push Notification Message: ', JSON.stringify(remoteMessage))
-      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      console.log('Push Notification Message: ', remoteMessage);
+      try {
+          // Create a channel (required for Android)
+          const channelId = await notifee.createChannel({
+            id: 'default',
+            name: 'Default Channel',
+          });
+
+          // Display a notification
+          await notifee.displayNotification({
+            title: remoteMessage.notification.title,
+            body: remoteMessage.notification.body,
+            android: {
+              channelId,
+              //smallIcon: remoteMessage.notification.android.imageUrl, // optional, defaults to 'ic_launcher'.
+              // pressAction is needed if you want the notification to open the app when pressed
+              pressAction: {
+                id: 'default',
+              },
+            },
+          });
+      } catch (error) {
+        console.log('Error when setting background message: ', error);
+      }
     });
 
     return unsubscribe;  
@@ -346,7 +393,7 @@ const SplashScreen = ({ navigation }) => {
             </TouchableOpacity>        
           </>
         )
-      }  
+      }   
       <Text style={{color: 'white',alignSelf:'center', marginTop:45, fontSize:16}}> {(ISUAT)? 'UAT':''} Version:{VersionCheck.getCurrentVersion()}</Text>          
       <CustomAlertModal
         visible={modalVisible}
