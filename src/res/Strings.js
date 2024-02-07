@@ -19,7 +19,7 @@ let strings = new LocalizedStrings({
    learn_more:'Learn More',
    test_with_eero:'Test with Eero',
    nonAdminUserMsg:'Currently, only the Primary Admin or an Admin of a Sparklight account can use the MySparklight mobile app for account management. Please',
-   BusinessUserMsg:'Currently, only the Residential of a Sparklight account can use the MySparklight mobile app for account management. Please',
+   BusinessUserMsg:'Only customers with Sparklight home internet services can use the MySparklight mobile app for account management. Please',
    nonAdminUserMsg:'Only customers with Sparklight home internet services can use the MySparklight mobile app for account management. Please',
    nonInternetUserMessage:'Currently, only a Sparklight account with Internet service can use the MySparklight mobile app for service management. Please'
  },
