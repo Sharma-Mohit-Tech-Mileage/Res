@@ -66,14 +66,22 @@ const ManageEquipment = () => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
       GetApiRequest(
         request,
-        (res) => {
-          setPlans(res);
-          if (res.length > 0) {
-            let macAddress = res[0].macAddress;
-            checkModemDetails("00:40:36:7b:29:5a");
+        (response) => {
+          setPlans(response);
+          if (response.length > 0) {
+            let macAddress = response[0].macAddress;
+            var mac = macAddress;
+            if (res.userInfo.accountNumber === "128387263") {
+              mac = "00:40:36:7b:29:5a";
+            } else if (res.userInfo.accountNumber === "133370775") {
+              mac = "04:bc:9f:17:02:b8";
+            }
+            checkModemDetails(mac);
           }
         },
-        (error) => { }
+        (error) => {
+          setLoadingHealth(false);
+        }
       );
     });
   };
@@ -87,7 +95,8 @@ const ManageEquipment = () => {
     GetApiRequest(
       request,
       (res) => {
-        console.log("checkModemDetails================================", res);
+        setLoadingHealth(true);
+        console.log("checkModemDetails", res);
         if (res) {
           let temt = [];
           if (res.equipmentType === "DOCSIS") {
@@ -106,13 +115,13 @@ const ManageEquipment = () => {
         }
       },
       (error) => {
-        console.log("Modem details====================================", error);
+        setLoadingHealth(false);
+        console.log("Modem details", error);
       }
     );
   };
 
   const updateModemStatus = (temt) => {
-    console.log('Print the modem health status')
     const allGreen = temt.every((v) => v === "Green");
     if (!allGreen) {
       const checkYellow = temt.includes("Yellow");

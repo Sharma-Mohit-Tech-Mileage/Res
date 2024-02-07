@@ -133,7 +133,7 @@ const Support = () => {
                                 <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                             </View>
                         </View>
-                        <ScrollView style={{width:'100%',marginBottom:hp('42%'),padding: Padding.p_base}}
+                        <ScrollView style={{width:'100%',marginBottom:hp('50%'),padding: Padding.p_base}}
                          ref={scrollViewRef}
                         >
                         <View >
@@ -341,68 +341,27 @@ const Support = () => {
                                 </Pressable>
                             </View>
                             */}
-                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
-                                <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
-                                    <View style={[styles.content, styles.contentSpaceBlock]}>
-                                        <View style={styles.headingAndIcon4}>
-                                            <View style={[styles.icon]}>
-                                                <Image
-                                                    style={styles.supportIcon}
-                                                    resizeMode="stretch"
-                                                    source={require("../../../assets/tool-02.png")}
-                                                />
-                                            </View>
-                                            <View style={styles.frameParent}>
-                                                <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.headingTypo]}>
-                                                        Tech Support
-                                                    </Text>
-                                                    <Pressable onPress={() => makeCall('877-692-2253')}>
-                                                        <Image
-                                                            style={styles.chevronIconLayout}
-                                                            resizeMode="stretch"
-                                                            source={require("../../../assets/phone-outgoing-01.png")}
-                                                        />
-                                                    </Pressable>
-                                                </View>
-                                                <Pressable onPress={() => makeCall('877-692-2253')}>
-                                                    <View style={styles.supportingTextWrapper}>
-                                                        <Text style={[styles.supportingText4, styles.support1Typo,]}>
-                                                            877-692-2253
-                                                        </Text>
-                                                    </View>
-                                                </Pressable>
-                                                <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
-                                                    Need a little help with your Sparklight® service? We're here 24 hours a day, seven days a week to support you.
-                                                </Text>
-                                                <Text style={[styles.supportingText6, styles.supportingTypo,]}>
-                                                    {`Call Center Hours: `}
-                                                </Text>
-                                                <Text style={[styles.supportingText7, styles.supportingTypo,]}>
-                                                    24h/7 days a week
-                                                </Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
-                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}>
-                                <View style={[styles.integrationCardMobile1, styles.integrationCardBorder,]} >
-                                    <View style={[styles.content, styles.contentSpaceBlock]}>
-                                        <View style={styles.headingAndToggle}>
+                                <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
+                                    <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
+                                        <View style={[styles.content, styles.contentSpaceBlock]}>
                                             <View style={styles.headingAndIcon4}>
                                                 <View style={[styles.icon]}>
                                                     <Image
                                                         style={styles.supportIcon}
                                                         resizeMode="stretch"
-                                                        source={require("../../../assets/wallet-03.png")}
-                                                    /></View>
+                                                        source={require("../../../assets/tool-02.png")}
+                                                    />
+                                                </View>
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
                                                         <Text style={[styles.headingTypo]}>
-                                                            Billing Support
+                                                            Tech Support
                                                         </Text>
-                                                        <Pressable onPress={() => makeCall('877-692-2253')}>
+                                                        <Pressable
+                                                            onPress={() => makeCall('877-692-2253')}
+                                                            accessibilityLabel="Call Tech Support"
+                                                            accessibilityRole="button"
+                                                            accessibilityHint="Dials the tech support number on your phone">
                                                             <Image
                                                                 style={styles.chevronIconLayout}
                                                                 resizeMode="stretch"
@@ -418,23 +377,73 @@ const Support = () => {
                                                         </View>
                                                     </Pressable>
                                                     <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
-                                                        Want to upgrade your service, make a change, or have a
-                                                        billing question? Give us a call for assistance.
+                                                        Need a little help with your Sparklight® service? We're here 24 hours a day, seven days a week to support you.
                                                     </Text>
                                                     <Text style={[styles.supportingText6, styles.supportingTypo,]}>
                                                         {`Call Center Hours: `}
                                                     </Text>
-                                                    <Text style={[styles.supportingText7, styles.supportingTypo,]} >
-                                                        M-F 8:00 AM-5:00 PM MST
+                                                    <Text style={[styles.supportingText7, styles.supportingTypo,]}>
+                                                        24h/7 days a week
                                                     </Text>
                                                 </View>
                                             </View>
                                         </View>
                                     </View>
                                 </View>
+                                <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}>
+                                    <View style={[styles.integrationCardMobile1, styles.integrationCardBorder,]} >
+                                        <View style={[styles.content, styles.contentSpaceBlock]}>
+                                            <View style={styles.headingAndToggle}>
+                                                <View style={styles.headingAndIcon4}>
+                                                    <View style={[styles.icon]}>
+                                                        <Image
+                                                            style={styles.supportIcon}
+                                                            resizeMode="stretch"
+                                                            source={require("../../../assets/wallet-03.png")}
+                                                        /></View>
+                                                    <View style={styles.frameParent}>
+                                                        <View style={styles.headingAndToggle}>
+                                                            <Text style={[styles.headingTypo]}>
+                                                                Billing Support
+                                                            </Text>
+                                                            <Pressable
+                                                                onPress={() => makeCall('877-692-2253')}
+                                                                accessibilityLabel="Call Billing Support"
+                                                                accessibilityRole="button"
+                                                                accessibilityHint="Dials the billing support number on your phone">
+                                                                <Image
+                                                                    style={styles.chevronIconLayout}
+                                                                    resizeMode="stretch"
+                                                                    source={require("../../../assets/phone-outgoing-01.png")}
+                                                                />
+                                                            </Pressable>
+
+                                                        </View>
+                                                        <Pressable onPress={() => makeCall('877-692-2253')}>
+                                                            <View style={styles.supportingTextWrapper}>
+                                                                <Text style={[styles.supportingText4, styles.support1Typo,]}>
+                                                                    877-692-2253
+                                                                </Text>
+                                                            </View>
+                                                        </Pressable>
+                                                        <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
+                                                            Want to upgrade your service, make a change, or have a
+                                                            billing question? Give us a call for assistance.
+                                                        </Text>
+                                                        <Text style={[styles.supportingText6, styles.supportingTypo,]}>
+                                                            {`Call Center Hours: `}
+                                                        </Text>
+                                                        <Text style={[styles.supportingText7, styles.supportingTypo,]} >
+                                                            M-F 8:00 AM-5:00 PM MST
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
                             </View>
-                        </View>
-                        <View style={[styles.issuesFlexBox]} />
+                            <View style={[styles.issuesFlexBox]} />
                         </View>
                         </ScrollView>
                         </View>
@@ -721,7 +730,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         top: 0,
-        height: hp('18%'),
+        height: 150,
     },
 });
 
