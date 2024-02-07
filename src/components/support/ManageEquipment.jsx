@@ -215,7 +215,7 @@ const ManageEquipment = () => {
                       </View> : (
                         <ActivityIndicator
                           size="small"
-                          color={Color.colorGainsboro_200}
+                          color="#8D3B90"
                           style={{ width: 40 }}
                         />
                       )}
