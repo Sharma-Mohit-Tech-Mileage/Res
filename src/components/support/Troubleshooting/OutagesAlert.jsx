@@ -22,7 +22,7 @@ const TroubleshootComponent = ({
                         type="warning"
                         title={(<Text style={styles.textStyle}>Uh oh. You may be experiencing an outage in your area.</Text>)}
                         showCloseIcon={false}
-                        message={(<Text >{'Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. '}<Text style={styles.textStyle}> Estimated Time to Restore: 10:50PM.</Text></Text>)}
+                        message={(<Text >{'Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. '}<Text style={styles.textStyle}> Estimated Time to Restore: {description}</Text></Text>)}
                     />
                 </View>
                 

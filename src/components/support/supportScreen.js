@@ -137,137 +137,139 @@ const Support = () => {
                          ref={scrollViewRef}
                         >
                         <View >
-                            <View style={styles.issuesFlexBox}>
-                                {items.map((item, index) => (
-                                    <React.Fragment key={item.name}>
-                                        <Pressable key={item.key} style={[styles.search, styles.navigationBorder]}
-                                            onPress={() => {
-                                                if (item.iconAlignment === 'left') {
-                                                    navigation.navigate(item.navigateTo)
-                                                } else {
-                                                    navigation.navigate(item.navigateTo, { url: item.url, name: item.text })
-                                                }
-                                            }}>
-                                            <View style={[styles.pressableContent, item.iconAlignment === 'right' && { flexDirection: 'row-reverse' }]}>
-                                                <Image
-                                                    source={item.icon}
-                                                    style={[styles.iconStyle, item.iconAlignment === 'right' ? styles.iconRight : styles.iconLeft]}
-                                                />
-                                                {item.iconAlignment === 'right' ? <Text style={[styles.searchChild, styles.textTypoRight]}>
+                        <View style={styles.issuesFlexBox}>
+                            {items.map((item, index) => (
+                                <React.Fragment key={item.name}>
+                                    <Pressable key={item.key} style={[styles.search, styles.navigationBorder]}
+                                        onPress={() => {
+                                            if (item.iconAlignment === 'left') {
+                                                navigation.navigate(item.navigateTo)
+                                            } else {
+                                                navigation.navigate(item.navigateTo, { url: item.url, name: item.text })
+                                            }
+                                        }}>
+                                        <View style={[styles.pressableContent, item.iconAlignment === 'right' && { flexDirection: 'row-reverse' }]}>
+                                            <Image
+                                                source={item.icon}
+                                                style={[styles.iconStyle, item.iconAlignment === 'right' ? styles.iconRight : styles.iconLeft]}
+                                            />
+                                            {item.iconAlignment === 'right' ? <Text style={[styles.searchChild, styles.textTypoRight]}>
+                                                {item.text}
+                                            </Text>
+                                                : <Text style={[{ paddingHorizontal: Padding.p_3xs,color: Color.sparklightGray1,fontSize:FontSize.size_base }]}>
                                                     {item.text}
-                                                </Text>
-                                                    : <Text style={[{ paddingHorizontal: Padding.p_3xs, color: Color.sparklightGray1, fontSize: FontSize.size_base }]}>
-                                                        {item.text}
-                                                    </Text>}
-                                            </View>
-                                        </Pressable>
-                                        {index < items.length - 1 && <View style={styles.frameChild} />}
-                                    </React.Fragment>
-                                ))}
+                                                </Text>}
+                                        </View>
+                                    </Pressable>
+                                    {index < items.length - 1 && <View style={styles.frameChild} />}
+                                </React.Fragment>
+                            ))}
+                        </View>
+                        <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
+                            <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
+                                <Text style={[styles.heading, styles.headingTypo]}>
+                                    Additional Support
+                                </Text>
                             </View>
-                            <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
-                                <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
-                                    <Text style={[styles.heading, styles.headingTypo]}>
-                                        Additional Support
-                                    </Text>
-                                </View>
-
-                                <Pressable style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} onPress={() => { navigation.navigate('DiagnosticFlow') }}>
-                                    <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
-                                        <View style={[styles.content, styles.contentSpaceBlock]}>
-                                            <View style={styles.headingAndIcon}>
-                                                <View style={[styles.icon]}>
+                            
+                            <Pressable style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} onPress={() => {
+                               navigation.navigate('DiagnosticFlow') 
+                             }}>
+                                <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
+                                    <View style={[styles.content, styles.contentSpaceBlock]}>
+                                        <View style={styles.headingAndIcon}>
+                                            <View style={[styles.icon]}>
+                                                <Image
+                                                    style={styles.supportIcon}
+                                                    resizeMode="stretch"
+                                                    source={require("../../../assets/tool-02.png")}
+                                                />
+                                            </View>
+                                            <View style={styles.frameParent}>
+                                                <View style={styles.headingAndToggle}>
+                                                    <Text style={[styles.headingTypo]}>
+                                                        Troubleshooting
+                                                    </Text>
                                                     <Image
-                                                        style={styles.supportIcon}
+                                                        style={styles.chevronIconLayout}
                                                         resizeMode="stretch"
-                                                        source={require("../../../assets/tool-02.png")}
+                                                        source={require("../../../assets/chevronright.png")}
                                                     />
                                                 </View>
-                                                <View style={styles.frameParent}>
-                                                    <View style={styles.headingAndToggle}>
-                                                        <Text style={[styles.headingTypo]}>
-                                                            Troubleshooting
-                                                        </Text>
-                                                        <Image
-                                                            style={styles.chevronIconLayout}
-                                                            resizeMode="stretch"
-                                                            source={require("../../../assets/chevronright.png")}
-                                                        />
-                                                    </View>
-                                                    <Text style={[styles.supportingText, styles.supportingTypo1,]} >
-                                                        Explore instant solutions to issues.
+                                                <Text style={[styles.supportingText, styles.supportingTypo1,]} >
+                                                    Explore instant solutions to issues.
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+                            </Pressable>
+                            
+                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} >
+                                <Pressable
+                                    style={[styles.integrationCardMobile1, styles.integrationCardBorder,]}
+                                    onPress={() => { navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/18929657224855', name: 'FAQ' }) }}
+                                >
+                                    <View style={[styles.content, styles.contentSpaceBlock]}>
+                                        <View style={styles.headingAndIcon}>
+                                            <View style={[]}>
+                                                <Image
+                                                    style={styles.icon}
+                                                    resizeMode="stretch"
+                                                    source={require("../../../assets/icon-faq.png")}
+                                                /></View>
+                                            <View style={styles.frameParent}>
+                                                <View style={styles.headingAndToggle}>
+                                                    <Text style={[styles.headingTypo]}>
+                                                        FAQ
                                                     </Text>
+                                                    <Image
+                                                        style={styles.chevronIconLayout}
+                                                        resizeMode="stretch"
+                                                        source={require("../../../assets/chevronright.png")}
+                                                    />
                                                 </View>
+                                                <Text style={[styles.supportingText, styles.supportingTypo1]}>
+                                                    Review common questions.
+                                                </Text>
                                             </View>
                                         </View>
                                     </View>
                                 </Pressable>
-
-                                <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} >
-                                    <Pressable
-                                        style={[styles.integrationCardMobile1, styles.integrationCardBorder,]}
-                                        onPress={() => { navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/18929657224855', name: 'FAQ' }) }}
-                                    >
-                                        <View style={[styles.content, styles.contentSpaceBlock]}>
-                                            <View style={styles.headingAndIcon}>
-                                                <View style={[]}>
-                                                    <Image
-                                                        style={styles.icon}
-                                                        resizeMode="stretch"
-                                                        source={require("../../../assets/icon-faq.png")}
-                                                    /></View>
-                                                <View style={styles.frameParent}>
-                                                    <View style={styles.headingAndToggle}>
-                                                        <Text style={[styles.headingTypo]}>
-                                                            FAQ
-                                                        </Text>
-                                                        <Image
-                                                            style={styles.chevronIconLayout}
-                                                            resizeMode="stretch"
-                                                            source={require("../../../assets/chevronright.png")}
-                                                        />
-                                                    </View>
-                                                    <Text style={[styles.supportingText, styles.supportingTypo1]}>
-                                                        Review common questions.
-                                                    </Text>
-                                                </View>
+                            </View>
+                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
+                                <Pressable
+                                    style={[styles.integrationCardMobile1, styles.integrationCardBorder]}
+                                    onPress={() => { navigation.navigate('ManageEquipment') }}
+                                >
+                                    <View style={[styles.content, styles.contentSpaceBlock]}>
+                                        <View style={styles.headingAndIcon}>
+                                            <View style={[styles.icon]}>
+                                                <Image
+                                                    style={styles.supportIcon}
+                                                    resizeMode="stretch"
+                                                    source={require("../../../assets/modem-02.png")}
+                                                />
                                             </View>
-                                        </View>
-                                    </Pressable>
-                                </View>
-                                <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
-                                    <Pressable
-                                        style={[styles.integrationCardMobile1, styles.integrationCardBorder]}
-                                        onPress={() => { navigation.navigate('ManageEquipment') }}
-                                    >
-                                        <View style={[styles.content, styles.contentSpaceBlock]}>
-                                            <View style={styles.headingAndIcon}>
-                                                <View style={[styles.icon]}>
+                                            <View style={styles.frameParent}>
+                                                <View style={styles.headingAndToggle}>
+                                                    <Text style={[styles.headingTypo]}>
+                                                        Equipment Management
+                                                    </Text>
                                                     <Image
-                                                        style={styles.supportIcon}
+                                                        style={styles.chevronIconLayout}
                                                         resizeMode="stretch"
-                                                        source={require("../../../assets/modem-02.png")}
+                                                        source={require("../../../assets/chevronright.png")}
                                                     />
                                                 </View>
-                                                <View style={styles.frameParent}>
-                                                    <View style={styles.headingAndToggle}>
-                                                        <Text style={[styles.headingTypo]}>
-                                                            Equipment Management
-                                                        </Text>
-                                                        <Image
-                                                            style={styles.chevronIconLayout}
-                                                            resizeMode="stretch"
-                                                            source={require("../../../assets/chevronright.png")}
-                                                        />
-                                                    </View>
-                                                    <Text style={[styles.supportingText, styles.supportingTypo1,]}>
-                                                        View and manage equipment.
-                                                    </Text>
-                                                </View>
+                                                <Text style={[styles.supportingText, styles.supportingTypo1,]}>
+                                                    View and manage equipment.
+                                                </Text>
                                             </View>
                                         </View>
-                                    </Pressable>
-                                </View>
+                                    </View>
+                                </Pressable>
+                            </View>
 
                         </View>
                         <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
@@ -339,27 +341,68 @@ const Support = () => {
                                 </Pressable>
                             </View>
                             */}
-                                <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
-                                    <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
-                                        <View style={[styles.content, styles.contentSpaceBlock]}>
+                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
+                                <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
+                                    <View style={[styles.content, styles.contentSpaceBlock]}>
+                                        <View style={styles.headingAndIcon4}>
+                                            <View style={[styles.icon]}>
+                                                <Image
+                                                    style={styles.supportIcon}
+                                                    resizeMode="stretch"
+                                                    source={require("../../../assets/tool-02.png")}
+                                                />
+                                            </View>
+                                            <View style={styles.frameParent}>
+                                                <View style={styles.headingAndToggle}>
+                                                    <Text style={[styles.headingTypo]}>
+                                                        Tech Support
+                                                    </Text>
+                                                    <Pressable onPress={() => makeCall('877-692-2253')}>
+                                                        <Image
+                                                            style={styles.chevronIconLayout}
+                                                            resizeMode="stretch"
+                                                            source={require("../../../assets/phone-outgoing-01.png")}
+                                                        />
+                                                    </Pressable>
+                                                </View>
+                                                <Pressable onPress={() => makeCall('877-692-2253')}>
+                                                    <View style={styles.supportingTextWrapper}>
+                                                        <Text style={[styles.supportingText4, styles.support1Typo,]}>
+                                                            877-692-2253
+                                                        </Text>
+                                                    </View>
+                                                </Pressable>
+                                                <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
+                                                    Need a little help with your Sparklight® service? We're here 24 hours a day, seven days a week to support you.
+                                                </Text>
+                                                <Text style={[styles.supportingText6, styles.supportingTypo,]}>
+                                                    {`Call Center Hours: `}
+                                                </Text>
+                                                <Text style={[styles.supportingText7, styles.supportingTypo,]}>
+                                                    24h/7 days a week
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
+                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}>
+                                <View style={[styles.integrationCardMobile1, styles.integrationCardBorder,]} >
+                                    <View style={[styles.content, styles.contentSpaceBlock]}>
+                                        <View style={styles.headingAndToggle}>
                                             <View style={styles.headingAndIcon4}>
                                                 <View style={[styles.icon]}>
                                                     <Image
                                                         style={styles.supportIcon}
                                                         resizeMode="stretch"
-                                                        source={require("../../../assets/tool-02.png")}
-                                                    />
-                                                </View>
+                                                        source={require("../../../assets/wallet-03.png")}
+                                                    /></View>
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
                                                         <Text style={[styles.headingTypo]}>
-                                                            Tech Support
+                                                            Billing Support
                                                         </Text>
-                                                        <Pressable
-                                                            onPress={() => makeCall('877-692-2253')}
-                                                            accessibilityLabel="Call Tech Support"
-                                                            accessibilityRole="button"
-                                                            accessibilityHint="Dials the tech support number on your phone">
+                                                        <Pressable onPress={() => makeCall('877-692-2253')}>
                                                             <Image
                                                                 style={styles.chevronIconLayout}
                                                                 resizeMode="stretch"
@@ -375,73 +418,23 @@ const Support = () => {
                                                         </View>
                                                     </Pressable>
                                                     <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
-                                                        Need a little help with your Sparklight® service? We're here 24 hours a day, seven days a week to support you.
+                                                        Want to upgrade your service, make a change, or have a
+                                                        billing question? Give us a call for assistance.
                                                     </Text>
                                                     <Text style={[styles.supportingText6, styles.supportingTypo,]}>
                                                         {`Call Center Hours: `}
                                                     </Text>
-                                                    <Text style={[styles.supportingText7, styles.supportingTypo,]}>
-                                                        24h/7 days a week
+                                                    <Text style={[styles.supportingText7, styles.supportingTypo,]} >
+                                                        M-F 8:00 AM-5:00 PM MST
                                                     </Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                                <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}>
-                                    <View style={[styles.integrationCardMobile1, styles.integrationCardBorder,]} >
-                                        <View style={[styles.content, styles.contentSpaceBlock]}>
-                                            <View style={styles.headingAndToggle}>
-                                                <View style={styles.headingAndIcon4}>
-                                                    <View style={[styles.icon]}>
-                                                        <Image
-                                                            style={styles.supportIcon}
-                                                            resizeMode="stretch"
-                                                            source={require("../../../assets/wallet-03.png")}
-                                                        /></View>
-                                                    <View style={styles.frameParent}>
-                                                        <View style={styles.headingAndToggle}>
-                                                            <Text style={[styles.headingTypo]}>
-                                                                Billing Support
-                                                            </Text>
-                                                            <Pressable
-                                                                onPress={() => makeCall('877-692-2253')}
-                                                                accessibilityLabel="Call Billing Support"
-                                                                accessibilityRole="button"
-                                                                accessibilityHint="Dials the billing support number on your phone">
-                                                                <Image
-                                                                    style={styles.chevronIconLayout}
-                                                                    resizeMode="stretch"
-                                                                    source={require("../../../assets/phone-outgoing-01.png")}
-                                                                />
-                                                            </Pressable>
-
-                                                        </View>
-                                                        <Pressable onPress={() => makeCall('877-692-2253')}>
-                                                            <View style={styles.supportingTextWrapper}>
-                                                                <Text style={[styles.supportingText4, styles.support1Typo,]}>
-                                                                    877-692-2253
-                                                                </Text>
-                                                            </View>
-                                                        </Pressable>
-                                                        <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
-                                                            Want to upgrade your service, make a change, or have a
-                                                            billing question? Give us a call for assistance.
-                                                        </Text>
-                                                        <Text style={[styles.supportingText6, styles.supportingTypo,]}>
-                                                            {`Call Center Hours: `}
-                                                        </Text>
-                                                        <Text style={[styles.supportingText7, styles.supportingTypo,]} >
-                                                            M-F 8:00 AM-5:00 PM MST
-                                                        </Text>
-                                                    </View>
                                                 </View>
                                             </View>
                                         </View>
                                     </View>
                                 </View>
                             </View>
-                            <View style={[styles.issuesFlexBox]} />
+                        </View>
+                        <View style={[styles.issuesFlexBox]} />
                         </View>
                         </ScrollView>
                         </View>
@@ -728,7 +721,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         top: 0,
-        height: 150,
+        height: hp('18%'),
     },
 });
 

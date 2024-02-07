@@ -12,7 +12,7 @@ const TroubleshootComponent = ({
 
     return (
         <View style={styles.container}>
-            {pageCount ? <Text style={styles.topLeftText}>3 of 3</Text> : null}
+            {pageCount ? <Text style={styles.topLeftText}>2 of 3</Text> : null}
             <View style={styles.content}>
                 <View style={styles.circle}>
                     <WalletIcon />
