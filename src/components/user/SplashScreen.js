@@ -78,10 +78,12 @@ const SplashScreen = ({ navigation }) => {
 
       if (res.userInfo.acctStatus === 'Disconnect'){
         setDisconnected(true);
-      } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted' || userInfo.customerType === 'Business' ) {
+      } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
         setErrorMessage(strings.nonAdminUserMsg);
         setErrorMessage(strings.BusinessUserMsg);
         setErrorMessage1(' to view information.')
+        setErrorMessage(strings.nonAdminUserMsg);
+        setErrorMessage1(' to manage your Sparklight Business services account.')
         setTimeout(() => {
           setModalVisible(true);
         }, 100);
