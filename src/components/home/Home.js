@@ -125,7 +125,7 @@ const HomeScreen = ({ navigation }) => {
            }
            
      }, (error)=>{
-         console.log(error)   
+         console.log("checkModemOutagStatus erro",error)   
      });
    });
    }
