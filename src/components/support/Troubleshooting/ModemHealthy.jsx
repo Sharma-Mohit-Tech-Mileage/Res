@@ -12,24 +12,22 @@ import SettingsIcon from "../../../res/svgIcons/SettingsIcon"
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
-const ModemHealthy = ({
-    step, title, description, success, pageCount
-}) => {
+const ModemHealthy = () => {
     const navigation = useNavigation();
     return (
         <View style={styles.container}>
-            {pageCount ? <Text style={styles.topLeftText}>{pageCount} of 3</Text> : null}
+             <Text style={styles.topLeftText}>3 of 3</Text>
             <View style={styles.content}>
                 <View style={styles.circle}>
                     <ServiceIcon />
                 </View>
-                {success && (
+                
                     <View style={{ justifyContent: 'center', paddingVertical:8}}>
                         <SuccessIcon />
                     </View>
-                )}
+                
                 <View style={{justifyContent:'center',paddingVertical:8}}>
-                    <Text style={styles.title}>{title}</Text>
+                    <Text style={styles.title}>{'No service issues were detected.'}</Text>
                 </View>
                 <View style={{ flexDirection: "column", flex: 1 }}>
                     <View style={styles.card}>
