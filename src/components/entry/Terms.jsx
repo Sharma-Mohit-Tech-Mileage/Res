@@ -38,12 +38,12 @@ const Terms = ({ navigation }) => {
     console.log('combinedReducers: ', combinedReducers);
     console.log('stateData: ', JSON.stringify(stateData));
 
-    useEffect(() => {
-        //Add incase the api call fails
-        setTimeout(() => {
-            setLoading(false);
-        }, 10000);
-    }, []); 
+    // useEffect(() => {
+    //     //Add incase the api call fails
+    //     setTimeout(() => {
+    //         setLoading(false);
+    //     }, 10000);
+    // }, []); 
 
     useEffect(() => {
         const fetchData = async () => {

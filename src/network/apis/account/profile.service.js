@@ -3,7 +3,9 @@ import { getUser } from "../../../redux/utils/LocalStorage";
 import axios from 'axios'; // Make sure to import axios
 import { Env } from "./Constants";
 
+let getProfileDetailsCount = 0;
 const getProfileDetails = async () => {
+    getProfileDetailsCount = getProfileDetailsCount + 1;
     let data = await getUser();
     const accountNumber = data.userInfo?.accountNumber || null;
     const config = {
@@ -12,7 +14,17 @@ const getProfileDetails = async () => {
         }
     };
 
-    return _axios.get(`/users/api/profile/${accountNumber}`, { ...config }).then(res => res.data).catch(error => { throw error })
+    return _axios.get(`/users/api/profile/${accountNumber}`, { ...config })
+        .then(res => res.data)
+        .catch(error => {
+            console.error(`Error fetching /users/api/profile/${accountNumber}`, error);            
+            if (error.includes('[AxiosError: timeout of') && getProfileDetailsCount < 2) {
+                getProfileDetails();
+            } else {
+                getProfileDetailsCount = 0;
+                throw error;
+            }
+        });
 };
 
 const fetchUserList = async () => {
@@ -37,7 +49,9 @@ const fetchUserList = async () => {
         });
 };
 
+let fetchSmsSubscriptionCount = 0;
 const fetchSmsSubscription = async () => {
+    fetchSmsSubscriptionCount = fetchSmsSubscriptionCount + 1;
     let data = await getUser();
     const accountNumber = data.userInfo?.accountNumber || null;
     const config = {
@@ -53,11 +67,20 @@ const fetchSmsSubscription = async () => {
         })
         .catch(error => {
             console.error('Error fetching SMS subscription list:', error);
+            if (error.includes('[AxiosError: timeout of') && fetchSmsSubscriptionCount < 2) {
+                fetchSmsSubscription();
+            } else {
+                fetchSmsSubscriptionCount = 0;
+                throw error;                
+            }            
             throw error;
         });
 };
 
+
+let fetchBillingStatusCount = 0;
 const fetchBillingStatus = async () => {
+    fetchBillingStatusCount = fetchBillingStatusCount + 1;
     let data = await getUser();
     const accountNumber = data.userInfo?.accountNumber || null;
     const config = {
@@ -72,12 +95,20 @@ const fetchBillingStatus = async () => {
             return res.data;  // Return the actual data, not the stringified version
         })
         .catch(error => {
-            console.error('Error fetching /account/api/account/`${accountNumber}`/paperless/status', error);
-            throw error;
+            //ERROR  Error fetching fetchPaperLessDetails /account/api/account/`${accountNumber}`/paperless [AxiosError: timeout of 10000ms exceeded]
+            console.error('Error fetching /account/api/account/`${accountNumber}`/paperless/status', error);            
+            if (error.includes('[AxiosError: timeout of') && fetchBillingStatusCount < 2) {
+                fetchBillingStatus();
+            } else {
+                fetchBillingStatusCount = 0;
+                throw error;                
+            }
         });
 };
 
+let fetchPaperLessDetailsCount = 0;
 const fetchPaperLessDetails = async () => {
+    fetchPaperLessDetailsCount = fetchPaperLessDetailsCount + 1;
     let data = await getUser();
     const accountNumber = data.userInfo?.accountNumber || null;
     const config = {
@@ -93,11 +124,18 @@ const fetchPaperLessDetails = async () => {
         })
         .catch(error => {
             console.error('Error fetching fetchPaperLessDetails /account/api/account/`${accountNumber}`/paperless', error);
-            throw error;
+            if (error.includes('[AxiosError: timeout of') && fetchPaperLessDetailsCount < 2) {
+                fetchPaperLessDetails();
+            } else {
+                fetchPaperLessDetailsCount = 0
+                throw error;
+            }
         });
 };
 
+let fetchPushNotificationsCount = 0;
 const fetchPushNotifications = async () => {
+    fetchPushNotificationsCount = fetchPushNotificationsCount + 1;
     let user = await getUser();
     const userName = user.userInfo?.userName || null;
     const config = {
@@ -120,7 +158,12 @@ const fetchPushNotifications = async () => {
     } catch (error) {
         // Log the error with a descriptive message
         console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, error);
-        throw error;
+        if (error.includes('[AxiosError: timeout of') && fetchPushNotificationsCount < 2) {
+            fetchPushNotifications();
+        } else {
+            fetchPushNotificationsCount = 0;
+            throw error;                
+        }
     }
 };
 
