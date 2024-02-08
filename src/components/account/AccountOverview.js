@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View, Pressable, Alert, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Color, FontFamily, Padding, FontSize,Border } from "../../../GlobalStyles";
+import { Color, FontFamily,FontSize, Padding, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
 import chevronRightIcon from '../../../assets/chevronright.png';
 import profileSettingsIcon from '../../../assets/right-actionable15.png';
@@ -171,7 +171,7 @@ const AccountOverview = () => {
           </Text>
         </View>
         <ScrollView style={{ flex: 1 }}>
-          <View >
+          <View style={{marginBottom: '30%'}}>
             <View style={styles.frameGroup}>
               <View style={styles.navigationBorder}>
                 {/* Mapping through menu items */}
@@ -198,7 +198,7 @@ const AccountOverview = () => {
                       </Text>
                       {/* Chevron/Arrow icon */}
                       <Image
-                        style={[{ marginLeft: 10}, styles.rightIconLayout]}
+                        style={[{ marginLeft: 10 }, styles.rightIconLayout]}
                         resizeMode="cover"
                         source={chevronRightIcon}
                         accessible
@@ -240,7 +240,7 @@ const AccountOverview = () => {
               </Pressable>
 
             </View>
-            <Text style={{ color: Color.colorMidnightblue, alignSelf: 'center'}}>Version:{VersionCheck.getCurrentVersion()}</Text>
+            <Text style={{ color: Color.colorMidnightblue, alignSelf: 'center' }}>Version:{VersionCheck.getCurrentVersion()}</Text>
           </View>
         </ScrollView>
       </View>
@@ -383,7 +383,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: Padding.p_base,
     alignSelf: 'stretch',
-    marginBottom: '20%',
   },
   account: {
     flex: 1,
