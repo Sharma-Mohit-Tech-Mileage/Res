@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   useDataLbl: {
-    color: colors.sparklight_black,
+    color: '#001321',
     fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     fontStyle: "normal",
