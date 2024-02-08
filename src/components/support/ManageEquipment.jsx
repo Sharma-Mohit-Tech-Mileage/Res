@@ -202,7 +202,7 @@ const ManageEquipment = () => {
                       <Text style={styles.mb8600Docsis}>
                         {model}
                       </Text>
-                      {loadingHealth ? <View style={styles.poorHealthParent}>
+                      {/* {loadingHealth ? <View style={styles.poorHealthParent}>
                         <Text style={[styles.poorHealth, styles.textTypo2]}>
                           {healthStatus[currentHealth] || "Good Health"}
                         </Text>
@@ -218,7 +218,7 @@ const ManageEquipment = () => {
                           color="#8D3B90"
                           style={{ width: 40 }}
                         />
-                      )}
+                      )} */}
                       <View style={[styles.badge, styles.parentBorder]}>
                         <Text style={[styles.text, styles.textTypo1]}>
                           {"leased".toLocaleUpperCase()}

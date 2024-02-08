@@ -170,7 +170,7 @@ const Support = () => {
                                     </Text>
                                 </View>
 
-                                <Pressable style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} onPress={() => { navigation.navigate('DiagnosticFlow') }}>
+                                {/* <Pressable style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} onPress={() => { navigation.navigate('DiagnosticFlow') }}>
                                     <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                         <View style={[styles.content, styles.contentSpaceBlock]}>
                                             <View style={styles.headingAndIcon}>
@@ -199,7 +199,7 @@ const Support = () => {
                                             </View>
                                         </View>
                                     </View>
-                                </Pressable>
+                                </Pressable> */}
 
                                 <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} >
                                     <Pressable
