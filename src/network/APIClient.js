@@ -85,6 +85,8 @@ fetch(`${BASE_URL}/${endpoint}`, {
         if (response.status === 401) {
             isUserAuthorized(false);
             throw Error(`Response status ${response.status} (${response.statusText})`);
+        } else if(response.status===204){
+            onError(response.status)
         } else {
             return response.json();
         }     

@@ -23,12 +23,14 @@ const stepsData = [
     title: "Let's resolve your issues.",
     description: "Performing a system check...",
     resultMsg: "",
+    errorMsg:'Uh oh. Looks like there is a server error.',
     success: false,
     pageCount: 0,
   },
   {
     title: "Checking for outages in your area...",
     resultMsg: "No outages were detected in your area...",
+    errorMsg:'Uh oh. Looks like there is a server error.',
     description: null,
     success: false,
     pageCount: 1,
@@ -36,6 +38,7 @@ const stepsData = [
   {
     title: "Checking for account issues...",
     resultMsg: "No account issues were detected.",
+    errorMsg:'Uh oh. Looks like there is a server error.',
     description: null,
     success: false,
     pageCount: 2,
@@ -43,6 +46,7 @@ const stepsData = [
   {
     title: "Checking for service issues...",
     resultMsg: "No service issues were detected.",
+    errorMsg:'Uh oh. Looks like there is a server error.',
     description: null,
     success: false,
     pageCount: 3,
@@ -60,10 +64,16 @@ const TroubleshootContainer = () => {
     false,
     false,
   ]);
+
+  const [networkError, setNetworkError] = useState([
+    false,
+    false,
+    false,
+    false,
+  ]);
   const [outageIssueDetected, setOutageIssueDetected] = useState(false);
   const [billIssueDetected, setBillIssueDetected] = useState(false);
   const [modemsIsueDetected, setModemIssueDetected] = useState(false);
-  const [isModemOnline, setIsModemOnline] = useState(false);
   const [issueDetected, setIssueDetected] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
 
@@ -80,6 +90,7 @@ const TroubleshootContainer = () => {
       GetApiRequest(
         request,
         (response) => {
+          if(response){
           console.log("checkModemOutagStatus", response);
           if (response.hasOutage === true) {
             let time = moment(response.estimatedTimeOfResolution).format("LT");
@@ -94,9 +105,20 @@ const TroubleshootContainer = () => {
             }, 2000);
           }
           setLoading(false);
+        }
         },
         (error) => {
           console.log(error);
+          if(error===204){
+            networkStatus[currentStep] = true;
+          }else{
+            networkError[currentStep] = true;
+          }
+            setKey(2);
+            setTimeout(() => {
+              setCurrentStep(2);
+            }, 2000);
+            setLoading(false);
         }
       );
     });
@@ -133,7 +155,15 @@ const TroubleshootContainer = () => {
         }
         setLoading(false);
       },
-      (Error) => {}
+      (Error) => {
+        console.log("checkBillPaid error",Error)
+        networkError[currentStep] = true;
+            setKey(3);
+            setTimeout(() => {
+              setCurrentStep(3);
+            }, 2000);
+            setLoading(false);
+      }
     );
   };
 
@@ -155,9 +185,8 @@ const TroubleshootContainer = () => {
             temt.push(res.dRxL_State);
             if (res.modem_State === "Online") {
               updateModemStatus(temt);
-              setIsModemOnline(true);
             } else {
-              setIsModemOnline(false);
+              navigation.navigate("ModemConnectivityGuide");
             }
           } else if (res.equipmentType === "ONU") {
             temt.push(res.onutP_State);
@@ -165,9 +194,9 @@ const TroubleshootContainer = () => {
             temt.push(res.onurP_State);
             if (res.onU_State === "Online") {
               updateModemStatus(temt);
-              setIsModemOnline(true);
             } else {
-              setIsModemOnline(false);
+              navigation.navigate("ModemConnectivityGuide");
+
             }
           }
           setLoading(false);
@@ -175,6 +204,10 @@ const TroubleshootContainer = () => {
       },
       (error) => {
         console.log("Modem details", error);
+        networkError[currentStep] = true;
+        setKey(3);
+        setLoading(false)
+        
       }
     );
   };
@@ -196,6 +229,8 @@ const TroubleshootContainer = () => {
       setIssueDetected(true);
       networkStatus[currentStep] = true;
       setKey(5);
+      navigation.navigate("ModemHealthy");
+      
     }
   };
 
@@ -227,7 +262,7 @@ const TroubleshootContainer = () => {
   }, []);
 
   const step = stepsData[currentStep];
-  console.log("Success", networkStatus);
+
 
   return (
     <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
@@ -251,12 +286,11 @@ const TroubleshootContainer = () => {
             <TroubleshootComponent
               key={key}
               step={currentStep}
-              title={step.title}
-              description={step.description}
-              resultMsg={step.resultMsg}
+              item={step}
               success={networkStatus[currentStep]}
               pageCount={step.pageCount}
               loading={loading}
+              isError={networkError[currentStep]}
             />
           )}
 
@@ -279,13 +313,10 @@ const TroubleshootContainer = () => {
               pageCount={step.pageCount}
             />
           )}
-          {/* { (step.pageCount===3 && !isModemOnline) ? <ModemConnectivityGuide /> : !modemsIsueDetected && (
-            <ModemHealthy step={currentStep}
-            title={"No service issues were detected."}
-            description={''}
-            success={true}
-            pageCount={step.pageCount} />
-          ) } */}
+          {
+
+          }
+          
         </>
       </SafeAreaView>
     </View>
