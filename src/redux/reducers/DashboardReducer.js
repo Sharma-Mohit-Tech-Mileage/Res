@@ -24,11 +24,13 @@ const dashboardReducer = (state = initialState, action) => {
       }
     case POST_INTERNET_SPEED:
       return {
+        ...state,
         isLoading: false,
         speed: action.payload,
       }      
     case UPDATE_INTERNET_SPEED:
       return {
+        ...state,
         isLoading: false,
         speed: action.payload,
       }
@@ -39,16 +41,15 @@ const dashboardReducer = (state = initialState, action) => {
       }
     case UPDATE_ACCOUNT_INFO:
       return {
+        ...state,
         isLoading: false,
         accountInfo: action.payload,
-        
       }
     case UPDATE_WALK_THROUGH_STEP:
       return{
         ...state,
         walkThroughStep: action.payload
       }
-      
     default:
       return state;
   }

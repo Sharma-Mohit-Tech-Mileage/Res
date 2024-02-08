@@ -124,8 +124,12 @@ const HomeScreen = ({ navigation }) => {
             setInternetHealths(oldArray => [...oldArray,'Green'] );
            }
            
-     }, (error)=>{
-         console.log("checkModemOutagStatus erro",error)   
+     }, (errorCode)=>{
+         console.log("checkModemOutagStatus erro",errorCode) 
+         if(errorCode===204) {
+          setInternetHealths(oldArray => [...oldArray,'Green'] ); 
+         }
+         
      });
    });
    }
@@ -183,7 +187,7 @@ const HomeScreen = ({ navigation }) => {
       },
       (error) => {
         setCheckModemStatus(true)
-        setInternetHealths(oldArray => [...oldArray,'Green'] );
+        setInternetHealths(oldArray => [...oldArray,'yellow'] );
         console.log("Modem details", error);
       }
     );
@@ -518,6 +522,10 @@ const HomeScreen = ({ navigation }) => {
              {(isOutageAlert)?<OutageAlert estimatedTime={estimatedRestoreTime}/>:<></>}
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <Text style={styles.internetHealth}>Service Health</Text>
+              {/* <InternetHealthChart
+                currentValue={getInternetHealth(currentHealth)}
+                 key={currentHealth}
+              /> */}
               { (checkModemStatus) ?
               <InternetHealthChart
                 currentValue={getInternetHealth(currentHealth)}

@@ -10,7 +10,7 @@ const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
 const TroubleshootComponent = ({
-    step, title, description, success, pageCount,loading,resultMsg
+    step, success, pageCount,loading,isError,item
 }) => {
     let IconComponent;
     switch (step) {
@@ -34,8 +34,8 @@ const TroubleshootComponent = ({
                     </View>
                 )}
                 <View style={styles.spinnerContainer}>
-                    <Text style={styles.title}>{(loading)?title :resultMsg}</Text>
-                    {description && <Text style={styles.description}>{description}</Text>}
+                    <Text style={styles.title}>{(loading)?item.title :(isError)? item.errorMsg:item.resultMsg}</Text>
+                    {item.description && <Text style={styles.description}>{item.description}</Text>}
                 </View>
                 <View style={styles.spinnerContainer}>
 
