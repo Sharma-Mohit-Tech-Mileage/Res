@@ -123,25 +123,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
-            {isExpandable ? <View style={styles.container}>
-                <LinearGradient
-                    style={styles.linearGradientStyle}
-                    locations={[0, 1]}
-                    colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
-                    useAngle={true}
-                    angle={90}
-                >
-                    <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} showIcon={false} />
-                </LinearGradient>
-                <View style={styles.circle}>
-                    <Image
-                        source={require('../../../assets/shop.png')} // Replace 'your-image-url-here' with your actual image URL
-                        style={styles.circleImage}
-                    />
-                </View>
-
-                {/* Other components */}
-            </View> : <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />}
+            <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />
             {progress < 1 ? (
                 <View style={{ ...styles.progressBar }}>
                     <View style={{ ...styles.progress, width: `${progress * 100}%` }} />

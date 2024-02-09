@@ -53,7 +53,7 @@ const HomeScreen = ({ navigation }) => {
   const [plans, setPlans] = useState([]);
   const [billAmt, setBillAmt] = useState(0);
   const [dueDate, setDueDate] = useState("");
-  const [currentHealth, setCurrentHealth] = useState("Poor");
+  const [currentHealth, setCurrentHealth] = useState("Optimal");
   const [billPaid, setBillPaid] = useState(false);
   const [accountStatus,setAccountStatus]=useState('Active')
   const [hasOutage,setHasOutage]=useState(false)
@@ -531,11 +531,11 @@ const HomeScreen = ({ navigation }) => {
                 currentValue={getInternetHealth(currentHealth)}
                  key={currentHealth}
               />
-              : <ActivityIndicator
-              size="large"
-              color={Color.colorGainsboro_200}
-              
-            />}
+                : <ActivityIndicator
+                  size="large"
+                  color='#8D3B90'
+
+                />}
               <View style={styles.internetStatusSection}>
                 <View style={{ marginTop: 5 }}>
                   <InfoIcon />

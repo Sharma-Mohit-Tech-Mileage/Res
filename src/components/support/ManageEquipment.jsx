@@ -279,7 +279,7 @@ const ManageEquipment = () => {
                 />
               </TouchableOpacity>
               <View style={[styles.frameLayout]} />
-              <TouchableOpacity
+              {/*<TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
                   navigation.navigate("ModemConnectivityGuide");
@@ -295,7 +295,7 @@ const ManageEquipment = () => {
                   resizeMode="stretch"
                   source={require("../../../assets/chevronright.png")}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity>*/}
             </View>
           </View>
           <View style={[styles.frameFlexBox]}>
