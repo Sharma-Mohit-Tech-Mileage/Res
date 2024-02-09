@@ -19,7 +19,7 @@ import MyServicePlan from "../common/MyServicePlan";
 import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
-import { GetApiRequest } from "../../network/APIClient";
+import { GetApiRequest,GetModemStatusApiRequest } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
 import colors from "../../res/Colors";
 
@@ -64,7 +64,7 @@ const ManageEquipment = () => {
             let macAddress = response[0].macAddress;
             var mac = macAddress;
             if (res.userInfo.accountNumber === "128387263") {
-              mac = "00:40:36:7b:29:5a";
+              mac = "00:1d:d0:68:1c:e2";
             } else if (res.userInfo.accountNumber === "133370775") {
               mac = "04:bc:9f:17:02:b8";
             }
@@ -83,36 +83,35 @@ const ManageEquipment = () => {
    */
 
   const checkModemDetails = (macAddress) => {
-    const request = `mobile/api/modem/getmodemdetails?macId=${macAddress}`;
-    GetApiRequest(
+    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
+    GetModemStatusApiRequest(
       request,
       (res) => {
-        setLoadingHealth(true);
         console.log("checkModemDetails", res);
         if (res) {
           let temt = [];
-          if (res.equipmentType === "DOCSIS") {
-            temt.push(res.uTxP_State);
-            temt.push(res.uRxL_State);
-            temt.push(res.usnR_State);
-            temt.push(res.dsnR_State);
-            temt.push(res.dRxL_State);
+          if (res.EquipmentType === "DOCSIS") {
+            temt.push(res.UTxP_State);
+            temt.push(res.URxL_State);
+            temt.push(res.UsnR_State);
+            temt.push(res.DsnR_State);
+            temt.push(res.DRxL_State);
             updateModemStatus(temt);
-          } else if (res.equipmentType === "ONU") {
-            temt.push(res.onutP_State);
-            temt.push(res.oltrP_State);
-            temt.push(res.onurP_State);
-            updateModemStatus(temt);
+          }else if(res.EquipmentType === "ONU"){
+            temt.push(res.OnutP_State);
+            temt.push(res.OltrP_State);
+            temt.push(res.OnurP_State);
+            updateModemStatus(temt)
           }
+          setLoadingHealth(true);
         }
       },
       (error) => {
-        setLoadingHealth(false);
         console.log("Modem details", error);
       }
     );
   };
-
+  
   const updateModemStatus = (temt) => {
     const allGreen = temt.every((v) => v === "Green");
     if (!allGreen) {

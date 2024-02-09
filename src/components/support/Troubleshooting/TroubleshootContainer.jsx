@@ -14,7 +14,7 @@ import {
   FontFamily,
 } from "../../../../GlobalStyles";
 import { getUser } from "../../../redux/utils/LocalStorage";
-import { GetApiRequest } from "../../../network/APIClient";
+import { GetApiRequest,GetModemStatusApiRequest } from "../../../network/APIClient";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import ModemConnectivityGuide from "./ModemConnectivityGuide";
@@ -169,30 +169,32 @@ const TroubleshootContainer = () => {
 
   const checkModemHealth = (macAddress) => {
     setLoading(true);
-    const request = `mobile/api/modem/getmodemdetails?macId=${macAddress}`;
-    GetApiRequest(
+    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
+    GetModemStatusApiRequest(
       request,
       (res) => {
         console.log("checkModemHealth", res);
         if (res) {
           let temt = [];
-
-          if (res.equipmentType === "DOCSIS") {
-            temt.push(res.uTxP_State);
-            temt.push(res.uRxL_State);
-            temt.push(res.usnR_State);
-            temt.push(res.dsnR_State);
-            temt.push(res.dRxL_State);
-            if (res.modem_State === "Online") {
+          console.log("checkModemHealth", res.EquipmentType);
+          if (res.EquipmentType === "DOCSIS") {
+            temt.push(res.UTxP_State);
+            temt.push(res.URxL_State);
+            temt.push(res.UsnR_State);
+            temt.push(res.DsnR_State);
+            temt.push(res.DRxL_State);
+           
+            if (res.Modem_State === "Online") {
+              console.log("checkModemHealth online", temt);
               updateModemStatus(temt);
             } else {
               navigation.navigate("ModemConnectivityGuide");
             }
-          } else if (res.equipmentType === "ONU") {
-            temt.push(res.onutP_State);
-            temt.push(res.oltrP_State);
-            temt.push(res.onurP_State);
-            if (res.onU_State === "Online") {
+          } else if (res.EquipmentType === "ONU") {
+            temt.push(res.OnutP_State);
+            temt.push(res.OltrP_State);
+            temt.push(res.OnurP_State);
+            if (res.OnU_State === "Online") {
               updateModemStatus(temt);
             } else {
               navigation.navigate("ModemConnectivityGuide");
@@ -213,6 +215,7 @@ const TroubleshootContainer = () => {
   };
 
   const updateModemStatus = (temt) => {
+    console.log("checkModemHealth", temt);
     const allGreen = temt.every((v) => v === "Green");
     console.log("modem status", allGreen);
     if (!allGreen) {
@@ -249,7 +252,8 @@ const TroubleshootContainer = () => {
     }
 
     if (currentStep === 3) {
-      checkModemHealth("ac:db:48:21:f2:21");
+
+      checkModemHealth("00:1d:d0:68:1c:e2");
     }
   }, [currentStep]);
   useEffect(() => {

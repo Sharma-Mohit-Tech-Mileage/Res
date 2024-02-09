@@ -3,6 +3,7 @@ import { Env } from "./apis/account/Constants";
 
 const BASE_URL = Env.API_BASEURL
 const SUPPORT_URL="https://support.sparklight.com/api/v2/help_center/"
+const MODEM_BASE_URL="https://mule-gateway.cableone.net/customer-api"
 
 export let UserAuthorized = false;
 
@@ -128,63 +129,35 @@ export const GetApiRequestSearch= async(endpoint, onSuccess,onError)=>{
    
    }
 
-// // Example GET request with id
-// fetch(`${BASE_URL}/whatever-endpoint/${encodeURIComponent(userId)}`, {
-//     method: 'GET',
-//     headers: {
-//         'Content-Type': 'application/json',
-//         'Authorization': `Bearer ${JWT}` // Not always needed with a GET request
-//     }
-// })
-//     .then(response => Promise.all([response, response.json()]))
-//     .then(([response, json]) => {
-//         // console.log('response', response);
-//         if (!response.ok) { // We should get a 200 (OK) status code if everything is fine/working
-//             throw Error(`Respsonse status ${response.status} (${response.statusText}): ${json.message}`);
-//         }
-//         // console.log(json);
-//         // Whatever you want to do next after fetching - maybe dispatch something?
-//     })
-//     .catch(exception => {
-//         console.log(new Map([
-//             [TypeError, "There was a problem fetching the response."],
-//             [SyntaxError, "There was a problem parsing the response."],
-//             [Error, exception.message]
-//         ]).get(exception.constructor()));
-//     });
 
-
-
-
-// // // Example PUT resquest - with token and encodeURIComponent
-// // fetch(`${baseUrl}/whatever-endpoint/${encodeURIComponent(userId)}`, {
-// //     method: 'PUT',
-// //     headers: {
-// //         'Content-Type': 'application/json',
-// //         'Authorization': `Bearer ${JWT}`
-// //     },
-// //     body: JSON.stringify({
-// //         sendSomething,
-// //         sendSomething2,
-// //         sendSomething3
-// //     })
-// // })
-// //     .then(response => Promise.all([response, response.json()]))
-// //     .then(([response, json]) => {
-// //         // console.log('response', response);
-// //         if (!response.ok || !response.status === 204) { // We should get a 200 (OK) or 204 (No Content) status code if everything is fine/working
-//             throw Error(`Respsonse status ${response.status} (${response.statusText}): ${json.message}`);
-//         }
-//         // console.log(json);
-//         // Whatever you want to do next after the PUT request - maybe dispatch something?
-//     })
-//     .catch(exception => {
-//         console.log(new Map([
-//             [TypeError, "There was a problem fetching the response."],
-//             [SyntaxError, "There was a problem parsing the response."],
-//             [Error, exception.message]
-//         ]).get(exception.constructor()));
-//     });
+export const GetModemStatusApiRequest= async(endpoint, onSuccess,onError)=>{
+   fetch(`${MODEM_BASE_URL}/${endpoint}`, {
+           method: 'GET',
+           headers: {
+               'Content-Type': 'application/json',
+               'client_id': '0224e1c5310a45f4a02a244a54e50350',
+                'client_secret':'1237E83e1676480B90BfEdB0aa73c91b'
+           }
+       })
+       .then(response => {
+           if (response.status === 401) {
+               throw Error(`Response status ${response.status} (${response.statusText})`);
+           } else if(response.status===204){
+               onError(response.status)
+           } else {
+               return response.json();
+           }     
+       })
+       .then((json) => {
+           onSuccess(json);
+       })
+       .catch(exception => {
+           onError(exception.message)
+           
+       });
+   
+   }
+   
 
 
 
