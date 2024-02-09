@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Platform, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Platform,Image, Pressable } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -8,13 +8,14 @@ import { RefreshToken } from '../user/Session';
 import { isUserAuthorized } from "../../network/APIClient";
 import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
-
-
+import LinearGradient from "react-native-linear-gradient";
+import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 const { width, height } = Dimensions.get('window');
 const ArticalWindowUtility = ({ navigation, route }) => {
     const [initScript, setInitScript] = useState('');
     const [progress, setProgress] = useState(0);
     const [name, setTitle] = useState(route.params?.name);
+    const [isExpandable, setIsExpandable] = useState(route.params?.isExpandable ?? false);
     const [isError, setIsError] = useState(false);
     const [url, setUrl] = useState(route.params?.url);
     const [currentUser, setCurrentUser] = useState({});
@@ -24,7 +25,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [showPDFUrl, setShowPDFUrl] = useState('');
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
-    
+
     const toggleModal = () => {
         setShowPDFModal(!showPDFModal);
     };
@@ -33,13 +34,13 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         if (navState.url.includes('/postlogout')
             || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
-                setModalOpen(false);   
-                setProgress(1);                        
+                setModalOpen(false);
+                setProgress(1);
                 setNavStateReloading(true);
                 await RefreshToken();
                 setTimeout(async () => {
                     await userUpdate();
-                }, 1000);                
+                }, 1000);
             }
         }
     }
@@ -55,8 +56,8 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             }
         } catch (error) {
             console.log('onMessageError: ', error);
-        }    
-    }    
+        }
+    }
 
     const userUpdate = async () => {
         const userLocal = await getUser();
@@ -70,9 +71,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             setNavStateReloading(false);
             userUpdateScript(userLocal);
             setUrl(route.params?.url);
-            setModalOpen(true);   
-            setProgress(0); 
-            setCurrentUser(userLocal);        
+            setModalOpen(true);
+            setProgress(0);
+            setCurrentUser(userLocal);
         }
     }
 
@@ -95,9 +96,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     }); 
                     open.apply(this, arguments);
                 };                
-              })();`;        
+              })();`;
 
-            setInitScript(SAVE_FROM_RN);         
+            setInitScript(SAVE_FROM_RN);
         }
     }
 
@@ -107,12 +108,11 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         setIsError(false);
     }, [url, name, modalOpen]);
 
-    // Optionally, if you want to reset state when the modal is re-opened
     useEffect(() => {
         if (modalOpen) {
-            // The modal has been opened again, reset the URL if needed
             setUrl(route.params?.url);
             setTitle(route.params?.name);
+            setIsExpandable(route.params?.isExpandable);
         }
     }, [modalOpen]);
 
@@ -125,10 +125,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />
             {progress < 1 ? (
-                <View style={{ ...styles.progressBar}}>
+                <View style={{ ...styles.progressBar }}>
                     <View style={{ ...styles.progress, width: `${progress * 100}%` }} />
-                </View>) : (<View >
-                </View>)}
+                </View>) : (<View />)}
             {modalOpen && (
                 <WebView
                     ref={webViewRef}
@@ -142,7 +141,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     originWhitelist={['http://*', 'https://*', 'data:*']}
                     //setSupportMultipleWindows={false}
                     onMessage={onMessage}
-                />            
+                />
             )}
             {isError ? (
                 <View style={[styles.errorContainer, { marginTop: '23%' }]}>
@@ -152,9 +151,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             {showPDFModal && (
                 <PDFViewModal
                     url={showPDFUrl}
-                    onClose={()=>toggleModal()}
+                    onClose={() => toggleModal()}
                 />
-            )}            
+            )}
         </View>
     );
 };
@@ -174,6 +173,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: width * 0.05, // 5% of screen width
     },
+    circleImage: {
+        width: 32, 
+        height: 32, 
+    },
     errorText: {
         fontSize: width * 0.04, // 4% of screen width
         marginBottom: height * 0.02, // 2% of screen height
@@ -189,6 +192,28 @@ const styles = StyleSheet.create({
     closeButtonText: {
         color: 'white',
         fontSize: width * 0.04, // 4% of screen width
+    },
+    container: {
+        //flex: 1,
+      //  marginBottom: (Platform.OS == 'ios') ? 90 : 60,
+        alignItems: 'center', // Center children horizontally
+    },
+    linearGradientStyle: {
+        width: '100%',
+        height: 150, // Adjust the height as needed
+    },
+    circle: {
+        position: 'absolute',
+        top: 150 - 36, // Half of the circle's height (72 / 2)
+        width: 72,
+        height: 72,
+        borderRadius: 36,
+        backgroundColor: Color.colorMidnightblue,
+        borderColor: Color.colorWhitesmoke_200,
+        borderWidth: 4,
+        zIndex:9,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     header: {
         height: 100, // Adjust as needed

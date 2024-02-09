@@ -7,7 +7,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-nat
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import SettingsIcon from "../../../res/svgIcons/SettingsIcon"
 const PeriodicProblems = () => {
-    const navigation = useNavigation();
+    //const navigation = useNavigation();
 
     const instructions1 = [
         "Intermittent dropouts can be caused by various factors.Check for damaged cables or outdated firmware on your modem.",

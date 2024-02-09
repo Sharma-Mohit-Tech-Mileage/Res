@@ -169,9 +169,9 @@ const EmailNotifications = ({ navigation }) => {
                                         routes: [{ name: 'MyTab' }], // Navigate to 'MyTab' after reset
                                     });
                                 }}
-                                accessibilityLabel="Decline Button"
+                                accessibilityLabel="Skip for now"
                                 accessibilityRole="button"
-                                accessibilityHint="Decline Terms and Conditions"
+                                accessibilityHint="Skip Terms and Conditions"
                             >
                                 <Text style={styles.decline}>
                                     Skip for now

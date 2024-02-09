@@ -9,6 +9,7 @@ import {
   Platform,
   Dimensions,
   Pressable,
+  ActivityIndicator
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -52,15 +53,17 @@ const HomeScreen = ({ navigation }) => {
   const [plans, setPlans] = useState([]);
   const [billAmt, setBillAmt] = useState(0);
   const [dueDate, setDueDate] = useState("");
-  const [currentHealth, setCurrentHealth] = useState("Poor");
+  const [currentHealth, setCurrentHealth] = useState("Optimal");
   const [billPaid, setBillPaid] = useState(false);
   const [accountStatus,setAccountStatus]=useState('Active')
   const [hasOutage,setHasOutage]=useState(false)
   const [isOutageAlert,setIsOutageAlert]=useState(false)
-  const [isModemIssue,setIsModemIssue]=useState(false)
+  const [checkModemStatus,setCheckModemStatus]=useState(false)
   const [estimatedRestoreTime,setEstimatedRestoreTime]=useState('')
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
+  const [internetHealths,setInternetHealths]= useState([])
+
   const getInternetHealth = (type) => {
     var currentHealth = {
       Offline: 20,
@@ -115,11 +118,18 @@ const HomeScreen = ({ navigation }) => {
              setIsInternetDetails(true)
              setHasOutage(true)
              setIsOutageAlert(true)
+             setInternetHealths(oldArray => [...oldArray,'Red'] );
 
+           }else{
+            setInternetHealths(oldArray => [...oldArray,'Green'] );
            }
            
-     }, (error)=>{
-         console.log(error)   
+     }, (errorCode)=>{
+         console.log("checkModemOutagStatus erro",errorCode) 
+         if(errorCode===204) {
+          setInternetHealths(oldArray => [...oldArray,'Green'] ); 
+         }
+         
      });
    });
    }
@@ -130,7 +140,15 @@ const HomeScreen = ({ navigation }) => {
       setPlans(res);
       if(res.length>0){
       let macAddress=res[0].macAddress
-      checkModemDetails("00:40:36:7b:29:5a")
+      var mac=macAddress;
+      if(user.userInfo.accountNumber==='128387263'){
+        mac="ac:db:48:21:f2:21"
+      }else if(user.userInfo.accountNumber==='133370775'){
+        mac="04:bc:9f:17:02:b8"
+      }
+      checkModemDetails(mac)
+      }else{
+        setCheckModemStatus(true)
       }
     }
   };
@@ -147,6 +165,7 @@ const HomeScreen = ({ navigation }) => {
     GetApiRequest(
       request,
       (res) => {
+        setCheckModemStatus(true)
         console.log("checkModemDetails", res);
         if (res) {
           let temt = [];
@@ -167,6 +186,8 @@ const HomeScreen = ({ navigation }) => {
         }
       },
       (error) => {
+        setCheckModemStatus(true)
+        setInternetHealths(oldArray => [...oldArray,'yellow'] );
         console.log("Modem details", error);
       }
     );
@@ -176,25 +197,39 @@ const HomeScreen = ({ navigation }) => {
     const allGreen = temt.every((v) => v === "Green");
     console.log('modem status',allGreen)
     if (!allGreen) {
-      setIsModemIssue(true);
       const checkYellow = temt.includes("Yellow");
       const checkRed = temt.includes("Red");
       if (checkRed) {
-        setCurrentHealth('Offline');
-        setIsInternetDetails(true);
+        setInternetHealths(oldArray => [...oldArray,'Red'] );
       } else if (checkYellow) {
-        setCurrentHealth('Poor');
-        setIsInternetDetails(true);
+        setInternetHealths(oldArray => [...oldArray,'Yellow'] );
       }
     } else {
-      if (currentHealth != 'Optimal') {
-        setCurrentHealth('Optimal');
-        setIsInternetDetails(false);
-        setIsModemIssue(false);
-      }
+      setInternetHealths(oldArray => [...oldArray,'Green'] );
     }
     
   };
+
+  const refreshInternetHealth=()=>{
+   
+    const checkYellow = internetHealths.includes('Yellow');
+    const checkRed = internetHealths.includes('Red');
+    const checkGreen = internetHealths.includes('Green');
+    if(checkRed){
+      console.log('Internet Health is Red')
+      setCurrentHealth('Offline');
+      setIsInternetDetails(true);
+    }else if(checkYellow){
+      console.log('Internet Health is yellow')
+      setCurrentHealth('Poor');
+      setIsInternetDetails(true);
+    }else{
+      console.log('Internet Health is Green')
+      setCurrentHealth('Optimal');
+      setIsInternetDetails(false);
+    }
+
+  }
 
   const getUserAccountDetails = () => {
      getUser().then((res) => {
@@ -205,7 +240,7 @@ const HomeScreen = ({ navigation }) => {
           if(res.currentCollectionStep=='Soft Disconnect'){
             setAccountStatus('Disconnect')
             setIsInternetDetails(true)
-          
+            setInternetHealths(oldArray => [...oldArray,'Red'] );
           }else{
             updateInternetHealth(res.currentBalance);
 
@@ -215,6 +250,7 @@ const HomeScreen = ({ navigation }) => {
           setBillAmt(res.currentBalance);
           
            getInternetPlanDetails();
+           
         }
       }, onErrorBill);
     });
@@ -222,12 +258,10 @@ const HomeScreen = ({ navigation }) => {
 
   const updateInternetHealth = (dueAmount) => {
     if(dueAmount<=0){
-     setCurrentHealth('Optimal')
-     setIsInternetDetails(false)
      setBillPaid(true)
+     setInternetHealths(oldArray => [...oldArray,'Green'] );
     }else{
-      setCurrentHealth('Poor')
-      setIsInternetDetails(true)
+      setInternetHealths(oldArray => [...oldArray,'Yellow'] );
     }
    
   };
@@ -290,11 +324,14 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // useEffect(()=>{
-  //  if(accountStatus==='Disconnect'){
-  //   setCurrentHealth('Offline')
-  //  }
-  // },[accountStatus]);
+  useEffect(()=>{
+
+    console.log('Health',internetHealths.length)
+    if(internetHealths.length>=3){
+      refreshInternetHealth()
+    }
+   
+  },[internetHealths]);
 
   useEffect(() => {
     checkModemOutagStatus();
@@ -485,10 +522,20 @@ const HomeScreen = ({ navigation }) => {
              {(isOutageAlert)?<OutageAlert estimatedTime={estimatedRestoreTime}/>:<></>}
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <Text style={styles.internetHealth}>Service Health</Text>
+              {/* <InternetHealthChart
+                currentValue={getInternetHealth(currentHealth)}
+                 key={currentHealth}
+              /> */}
+              { (checkModemStatus) ?
               <InternetHealthChart
                 currentValue={getInternetHealth(currentHealth)}
                  key={currentHealth}
               />
+                : <ActivityIndicator
+                  size="large"
+                  color='#8D3B90'
+
+                />}
               <View style={styles.internetStatusSection}>
                 <View style={{ marginTop: 5 }}>
                   <InfoIcon />

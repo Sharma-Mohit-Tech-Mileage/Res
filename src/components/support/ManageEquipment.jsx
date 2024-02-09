@@ -1,5 +1,12 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import {
   FontFamily,
@@ -15,22 +22,29 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
 import colors from "../../res/Colors";
-
+import NotificationAlert from '../common/customui/NotificationAlert';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-const ManageEquipment = (route) => {
-  // console.log("PROPS" + JSON.stringify(route));
+const ManageEquipment = () => {
   const navigation = useNavigation();
   const [manufacturer, setManufacturer] = React.useState("");
   const [model, setModel] = React.useState("");
   const [transmissionType, setTransmissionType] = React.useState("");
   const [leased, setLeased] = React.useState("");
   const [plans, setPlans] = React.useState([]);
-  const [data, setData] = React.useState({});
+  const [loadingHealth, setLoadingHealth] = React.useState(false);
   const [currentHealth, setCurrentHealth] = React.useState("Optimal");
-
+  const healthStatus = {
+    Poor: "Issue Detected",
+    Offline: "Offline",
+  };
+  const healthColors = {
+    Optimal: colors.sparklight_green,
+    Offline: Color.sparklightaddGray,
+  };
+  const shouldShowAlert = ["Poor", "Offline"].includes(currentHealth);
   const getLeasedDetails = () => {
     let re = getUser().then((res) => {
       const request = `mobile/api/Device/GetOwnershipInfo?accountnumber=${res.userInfo.accountNumber}`;
@@ -52,14 +66,22 @@ const ManageEquipment = (route) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
       GetApiRequest(
         request,
-        (res) => {
-          setPlans(res);
-          if (res.length > 0) {
-            let macAddress = res[0].macAddress;
-            checkModemDetails("00:40:36:7b:29:5a");
+        (response) => {
+          setPlans(response);
+          if (response.length > 0) {
+            let macAddress = response[0].macAddress;
+            var mac = macAddress;
+            if (res.userInfo.accountNumber === "128387263") {
+              mac = "00:40:36:7b:29:5a";
+            } else if (res.userInfo.accountNumber === "133370775") {
+              mac = "04:bc:9f:17:02:b8";
+            }
+            checkModemDetails(mac);
           }
         },
-        (error) => {}
+        (error) => {
+          setLoadingHealth(false);
+        }
       );
     });
   };
@@ -73,6 +95,7 @@ const ManageEquipment = (route) => {
     GetApiRequest(
       request,
       (res) => {
+        setLoadingHealth(true);
         console.log("checkModemDetails", res);
         if (res) {
           let temt = [];
@@ -92,6 +115,7 @@ const ManageEquipment = (route) => {
         }
       },
       (error) => {
+        setLoadingHealth(false);
         console.log("Modem details", error);
       }
     );
@@ -177,21 +201,24 @@ const ManageEquipment = (route) => {
                       </Text>
                       <Text style={styles.mb8600Docsis}>
                         {model}
-                        {/* {transmissionType} */}
                       </Text>
-                      <View style={styles.poorHealthParent}>
+                      {/* {loadingHealth ? <View style={styles.poorHealthParent}>
                         <Text style={[styles.poorHealth, styles.textTypo2]}>
-                          {currentHealth === "Poor"
-                            ? "Issue Health"
-                            : (currentHealth=="Offline")?"Poor Health" :'Good Health'}
+                          {healthStatus[currentHealth] || "Good Health"}
                         </Text>
                         <Image
                           style={styles.frameChild}
-                          tintColor={(currentHealth==='Optimal'?colors.sparklight_green :(currentHealth==='Offline')?colors.sparklight_red : colors.sparklight_yellow)}
+                          tintColor={healthColors[currentHealth] || colors.sparklight_yellow}
                           resizeMode="cover"
                           source={require("../../../assets/Ellipse.png")}
                         />
-                      </View>
+                      </View> : (
+                        <ActivityIndicator
+                          size="small"
+                          color="#8D3B90"
+                          style={{ width: 40 }}
+                        />
+                      )} */}
                       <View style={[styles.badge, styles.parentBorder]}>
                         <Text style={[styles.text, styles.textTypo1]}>
                           {"leased".toLocaleUpperCase()}
@@ -201,38 +228,20 @@ const ManageEquipment = (route) => {
                   </View>
                 </View>
               </View>
-              {/* <View style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}>
-                                <View style={[styles.notifications, styles.parentBorder]}>
-                                    <Image
-                                        resizeMode="cover"
-                                        source={require("../../../assets/rectangle-529.png")}
-                                    />
-                                    <View style={styles.bannerWarning}>
-                                        <View style={styles.rightActionableParent}>
-                                            <Image
-                                                style={{ height: '100%' }} // Set both width and height to '100%'
-                                                resizeMode="stretch" // Change resizeMode to stretch
-                                                source={require("../../../assets/alertred.png")}
-                                            />
-                                            <View style={styles.creditCardWillExpireSoonParent}>
-                                                <Text style={styles.creditCardWill}>
-                                                    Modem has poor health
-                                                </Text>
-                                                <Text style={[styles.yourSavedCard, styles.yourSavedCardSpaceBlock,]} >
-                                                    Try one of the options below to resolve.
-                                                </Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View> */}
             </View>
+            {shouldShowAlert && (
+              <View style={{ paddingHorizontal: Padding.p_base, paddingBottom: Padding.p_5xl }}>
+                <NotificationAlert
+                  type="error"
+                  title="An issue has been detected"
+                  message="Try one of the options below to resolve."
+                  showCloseIcon={false}
+                  onClose={() => setShowErrorAlert(false)}
+                />
+              </View>
+            )}
             <View
-              style={[
-                styles.supportAccordionParent,
-                styles.supportParentFlexBox,
-              ]}
-            >
+              style={[styles.supportAccordionParent, styles.supportParentFlexBox,]}>
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
@@ -251,18 +260,6 @@ const ManageEquipment = (route) => {
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
-              {/* <View style={[styles.frameLayout]} />
-                            <View style={[styles.frame9defaultSpaceBlock]} >
-                                <Image
-                                    resizeMode="stretch"
-                                    source={require("../../../assets/key-02.png")}
-                                />
-                                <Text style={styles.modemHealthSupport}>Update Password</Text>
-                                <Image
-                                    resizeMode="stretchstretch"
-                                    source={require("../../../assets/chevronright.png")}
-                                />
-                            </View> */}
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
@@ -281,6 +278,24 @@ const ManageEquipment = (route) => {
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
+              <View style={[styles.frameLayout]} />
+              {/*<TouchableOpacity
+                style={[styles.frame9defaultSpaceBlock]}
+                onPress={() => {
+                  navigation.navigate("ModemConnectivityGuide");
+                }}
+              >
+                <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
+                  resizeMode="contain"
+                  source={require("../../../assets/tool-02.png")}
+                />
+                <Text style={styles.modemHealthSupport}>Check Connection</Text>
+                <Image
+                  resizeMode="stretch"
+                  source={require("../../../assets/chevronright.png")}
+                />
+              </TouchableOpacity>*/}
             </View>
           </View>
           <View style={[styles.frameFlexBox]}>
@@ -324,10 +339,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 18,
   },
-  yourSavedCardSpaceBlock: {
-    marginTop: 8,
-    alignSelf: "stretch",
-  },
   supportParentFlexBox: {
     alignItems: "flex-end",
     justifyContent: "center",
@@ -347,10 +358,6 @@ const styles = StyleSheet.create({
     padding: Padding.p_5xl,
     justifyContent: "center",
     alignItems: "center",
-  },
-  textTypo: {
-    fontFamily: FontFamily.textXsSemibold,
-    fontWeight: "600",
   },
   myModem1: {
     textAlign: "left",
@@ -424,45 +431,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
     paddingVertical: 0,
   },
-  creditCardWill: {
-    fontWeight: "700",
-    fontFamily: FontFamily.interBold,
-    color: Color.sparkLightRed,
-    fontSize: FontSize.textXsSemibold_size,
-    textAlign: "left",
-  },
-  yourSavedCard: {
-    color: Color.colorGray_100,
-    fontSize: FontSize.textXsSemibold_size,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-  },
-  creditCardWillExpireSoonParent: {
-    marginLeft: 10,
-    flex: 1,
-  },
-  rightActionableParent: {
-    flexDirection: "row",
-    flex: 1,
-  },
-  bannerWarning: {
-    alignItems: "center",
-    flexDirection: "row",
-    backgroundColor: Color.sparklightWhite,
-    alignSelf: "stretch",
-    flex: 1,
-  },
-  notifications: {
-    flexDirection: "row",
-    borderColor: Color.sparklightGray,
-    borderRadius: Border.br_11xs,
-    alignSelf: "stretch",
-  },
-  notificationsWrapper: {
-    marginTop: 24,
-    justifyContent: "center",
-    paddingHorizontal: Padding.p_5xl,
-  },
   modemHealthSupport: {
     marginLeft: 10,
     color: Color.colorGray_100,
@@ -506,39 +474,6 @@ const styles = StyleSheet.create({
     alignContent: "center",
     alignItems: "center",
     justifyContent: "center",
-  },
-  greenTick: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    position: "absolute",
-    bottom: 0,
-    right: -3,
-    backgroundColor: colors.sparklight_green,
-    borderWidth: 2,
-    borderColor: "white",
-  },
-  redTick: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    position: "absolute",
-    bottom: 0,
-    right: -3,
-    backgroundColor: colors.sparklight_red,
-    borderWidth: 2,
-    borderColor: "white",
-  },
-  orangeTick: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    position: "absolute",
-    bottom: 0,
-    right: -3,
-    backgroundColor: colors.sparklight_yellow,
-    borderWidth: 2,
-    borderColor: "white",
   },
 });
 

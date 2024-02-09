@@ -228,18 +228,22 @@ const MyServicePlan = ({ plans, navigation }) => {
             tabIndex == 0 ? styles.selectedTab : styles.defaultTab,
             { borderWidth: 1 },
           ]}
-          onPress={() => setTabIndex(0)}
+          onPress={
+            () =>setTabIndex(0)}
         >
           <Text
+          
             style={{
               color: tabIndex == 0 ? "white" : "#000",
               fontSize: 16,
               fontStyle: "normal",
-              fontWeight: "400",
               textAlign: "center",
-              textAlignVertical: "center",
               fontFamily: FontFamily.openSansRegular,
+              textAlignVertical: "center",
+              fontWeight: "400",
+             
             }}
+            
           >
             {" "}
             Data Speed

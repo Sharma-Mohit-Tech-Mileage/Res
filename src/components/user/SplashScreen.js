@@ -38,6 +38,7 @@ import {
   requestUserPermission,
 } from '../../firebase/FirebaseUtils';
 import notifee from '@notifee/react-native';
+import * as Zendesk from 'react-native-zendesk-messaging';
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -80,6 +81,8 @@ const SplashScreen = ({ navigation }) => {
         refreshToken: res.refreshToken
       };
 
+      Zendesk.login(token)
+
       if (res.userInfo.acctStatus === 'Disconnect'){
         setDisconnected(true);
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
@@ -88,7 +91,13 @@ const SplashScreen = ({ navigation }) => {
         setTimeout(() => {
           setModalVisible(true);
         }, 100);
-      } else if (res.custServices.internet == false) {
+      } else if(userInfo.customerType === 'Business'){
+        setErrorMessage(strings.BusinessUserMsg);
+        setErrorMessage1(' to view information.')
+        setTimeout(() => {
+          setModalVisible(true);
+        }, 100);
+      }else if (res.custServices.internet == false) {
         setErrorMessage(strings.nonInternetUserMessage);
         setErrorMessage1(' to manage your service.')
         setTimeout(() => {

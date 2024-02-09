@@ -555,7 +555,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_TEAM = W486HD85BD;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = W486HD85BD;
 				ENABLE_BITCODE = NO;
@@ -566,7 +566,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.11.2;
+				MARKETING_VERSION = 1.11.3;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -596,7 +596,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 23;
 				DEVELOPMENT_TEAM = W486HD85BD;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = W486HD85BD;
 				INFOPLIST_FILE = Sparklight/Info.plist;
@@ -606,7 +606,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.11.2;
+				MARKETING_VERSION = 1.11.3;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

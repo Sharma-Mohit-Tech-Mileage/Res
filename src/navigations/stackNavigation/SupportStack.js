@@ -12,6 +12,7 @@ import TroubleShootStack from "./TroubleShootStack";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import LiveSupportChat from "../../components/support/LiveSupportChat";
 import ModemStackScreen from "./ManageEquepmentStack";
+import ModemConnectivityGuide from '../../components/support/Troubleshooting/ModemConnectivityGuide';
 const SupportStack = createStackNavigator();
 
 function SupportStackScreen() {
@@ -102,6 +103,15 @@ function SupportStackScreen() {
           focus: () => setTabBarVisible(true),
           blur: () => setTabBarVisible(true),
         }}
+      />
+      <SupportStack.Screen
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+        name="ModemConnectivityGuide"
+        component={ModemConnectivityGuide}
       />
     </SupportStack.Navigator>
   );
