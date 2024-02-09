@@ -57,7 +57,8 @@ const PushNotifications = ({ navigation }) => {
             }
         }
 
-        if (profile.profileDetails.memberType === "Admin") {
+        if (profile.profileDetails !== undefined
+            && profile.profileDetails.memberType === "Admin") {
             setNextScreen('MyTab');
         }
     }, []);

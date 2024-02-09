@@ -18,7 +18,7 @@ const getProfileDetails = async () => {
         .then(res => res.data)
         .catch(error => {
             console.error(`Error fetching /users/api/profile/${accountNumber}`, error);            
-            if (error.toString().includes('[AxiosError: timeout of') && getProfileDetailsCount < 2) {
+            if (error.toString().includes('AxiosError: timeout of') && getProfileDetailsCount < 2) {
                 getProfileDetails();
             } else {
                 getProfileDetailsCount = 0;
@@ -67,7 +67,7 @@ const fetchSmsSubscription = async () => {
         })
         .catch(error => {
             console.error('Error fetching SMS subscription list:', error);
-            if (error.toString().includes('[AxiosError: timeout of') && fetchSmsSubscriptionCount < 2) {
+            if (error.toString().includes('AxiosError: timeout of') && fetchSmsSubscriptionCount < 2) {
                 fetchSmsSubscription();
             } else {
                 fetchSmsSubscriptionCount = 0;
@@ -81,6 +81,7 @@ const fetchSmsSubscription = async () => {
 let fetchBillingStatusCount = 0;
 const fetchBillingStatus = async () => {
     fetchBillingStatusCount = fetchBillingStatusCount + 1;
+    console.log('fetchBillingStatusCount: ', fetchBillingStatusCount);
     let data = await getUser();
     const accountNumber = data.userInfo?.accountNumber || null;
     const config = {
@@ -95,9 +96,9 @@ const fetchBillingStatus = async () => {
             return res.data;  // Return the actual data, not the stringified version
         })
         .catch(error => {
-            //ERROR  Error fetching fetchPaperLessDetails /account/api/account/`${accountNumber}`/paperless [AxiosError: timeout of 10000ms exceeded]
-            console.error('Error fetching /account/api/account/`${accountNumber}`/paperless/status', error);            
-            if (error.toString().includes('[AxiosError: timeout of') && fetchBillingStatusCount < 2) {
+            console.error('Error fetching /account/api/account/`${accountNumber}`/paperless/status', error);
+            if (error.toString().includes('AxiosError: timeout of') && fetchBillingStatusCount < 2) {
+                console.log('Inside Billing Status');
                 fetchBillingStatus();
             } else {
                 fetchBillingStatusCount = 0;
@@ -124,7 +125,7 @@ const fetchPaperLessDetails = async () => {
         })
         .catch(error => {
             console.error('Error fetching fetchPaperLessDetails /account/api/account/`${accountNumber}`/paperless', error);
-            if (error.toString().includes('[AxiosError: timeout of') && fetchPaperLessDetailsCount < 2) {
+            if (error.toString().includes('AxiosError: timeout of') && fetchPaperLessDetailsCount < 2) {
                 fetchPaperLessDetails();
             } else {
                 fetchPaperLessDetailsCount = 0
@@ -158,7 +159,7 @@ const fetchPushNotifications = async () => {
     } catch (error) {
         // Log the error with a descriptive message
         console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, error);
-        if (error.toString().includes('[AxiosError: timeout of') && fetchPushNotificationsCount < 2) {
+        if (error.toString().includes('AxiosError: timeout of') && fetchPushNotificationsCount < 2) {
             fetchPushNotifications();
         } else {
             fetchPushNotificationsCount = 0;

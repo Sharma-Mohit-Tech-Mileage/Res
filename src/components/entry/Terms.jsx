@@ -117,7 +117,9 @@ const Terms = ({ navigation }) => {
             }
         }
 
-        if (profile.profileDetails.memberType === "Admin") {
+        
+        if (profile.profileDetails !== undefined
+            && profile.profileDetails.memberType === "Admin") {
             if (goToPushNotificationScreen) {
                 setNextScreen('EntryPushNotifications'); 
             } else {
@@ -131,7 +133,7 @@ const Terms = ({ navigation }) => {
 
     useEffect(() => {
         console.log('profileLoadCount: ', profileLoadCount);
-        if (profileLoadCount > 5) {
+        if (profileLoadCount > 4) {
             setLoading(false);
             console.log('profileAfterLoad: ', JSON.stringify(profile));
         }
