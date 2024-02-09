@@ -125,7 +125,7 @@ const DataUsageComponent = ({ navigation, useData }) => {
         <View style={{ flexDirection: "row" }}>
           <View style={styles.dataUsageIndicator} />
           <Text style={styles.useLbl}>Used</Text>
-          <Text style={styles.useDataLbl}> {totalUsed}</Text>
+          <Text style={styles.useDataLbl}> {totalUsed+" GB"}</Text>
         </View>
 
         <View style={{ flexDirection: "row" }}>
@@ -136,7 +136,7 @@ const DataUsageComponent = ({ navigation, useData }) => {
             ]}
           />
           <Text style={styles.useLbl}>Remaining</Text>
-          <Text style={styles.useDataLbl}> {(isUnlimtedPlan)?'Unlimited':Math.floor(data.remainingGB)}</Text>
+          <Text style={styles.useDataLbl}> {(isUnlimtedPlan)?'Unlimited': Math.floor(data.remainingGB)+" GB"}</Text>
         </View>
       </View>
       <View
