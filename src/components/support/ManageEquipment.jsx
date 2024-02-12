@@ -64,7 +64,7 @@ const ManageEquipment = () => {
             let macAddress = response[0].macAddress;
             var mac = macAddress;
             if (res.userInfo.accountNumber === "128387263") {
-              mac = "00:1d:d0:68:1c:e2";
+              mac = "90:aa:c3:b0:45:60";
             } else if (res.userInfo.accountNumber === "133370775") {
               mac = "04:bc:9f:17:02:b8";
             }
@@ -93,8 +93,8 @@ const ManageEquipment = () => {
           if (res.EquipmentType === "DOCSIS") {
             temt.push(res.UTxP_State);
             temt.push(res.URxL_State);
-            temt.push(res.UsnR_State);
-            temt.push(res.DsnR_State);
+            temt.push(res.USNR_State);
+            temt.push(res.DSNR_State);
             temt.push(res.DRxL_State);
             updateModemStatus(temt);
           }else if(res.EquipmentType === "ONU"){
@@ -121,6 +121,8 @@ const ManageEquipment = () => {
         setCurrentHealth("Offline");
       } else if (checkYellow) {
         setCurrentHealth("Poor");
+      }else{
+        setCurrentHealth("Offline");
       }
     } else {
       setCurrentHealth("Optimal");
@@ -156,7 +158,7 @@ const ManageEquipment = () => {
     <View style={styles.manageEquipment}>
       <ProfileSettingsHeader
         title="Manage Equipment "
-        onPressBack={() => navigation.goBack()}
+        onPressBack={() => navigation.navigate("SupportStack")}
       />
       <ScrollView>
         <View style={styles.myModemParent}>
@@ -544,3 +546,4 @@ const styles = StyleSheet.create({
 });
 
 export default ManageEquipment;
+

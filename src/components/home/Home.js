@@ -144,7 +144,7 @@ const HomeScreen = ({ navigation }) => {
       let macAddress=res[0].macAddress
       var mac=macAddress;
       if(user.userInfo.accountNumber==='128387263'){
-        mac="00:1d:d0:68:1c:e2"
+        mac="90:aa:c3:b0:45:60"
       }else if(user.userInfo.accountNumber==='133370775'){
         mac="04:bc:9f:17:02:b8"
       }
@@ -174,8 +174,8 @@ const HomeScreen = ({ navigation }) => {
           if (res.EquipmentType === "DOCSIS") {
             temt.push(res.UTxP_State);
             temt.push(res.URxL_State);
-            temt.push(res.UsnR_State);
-            temt.push(res.DsnR_State);
+            temt.push(res.USNR_State);
+            temt.push(res.DSNR_State);
             temt.push(res.DRxL_State);
             updateModemStatus(temt);
           }else if(res.EquipmentType === "ONU"){
@@ -205,6 +205,8 @@ const HomeScreen = ({ navigation }) => {
         setInternetHealths(oldArray => [...oldArray,'Red'] );
       } else if (checkYellow) {
         setInternetHealths(oldArray => [...oldArray,'Yellow'] );
+      }else{
+        setInternetHealths(oldArray => [...oldArray,'Red'] );
       }
     } else {
       setInternetHealths(oldArray => [...oldArray,'Green'] );
@@ -806,3 +808,4 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+
