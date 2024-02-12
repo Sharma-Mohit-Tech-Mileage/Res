@@ -26,7 +26,7 @@ import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
 import { getUser, getPushNotificationStatus, storePushNotificationStatus, storeUpgradeToken } from "../../redux/utils/LocalStorage";
-import { GetApiRequest, UserAuthorized } from "../../network/APIClient";
+import { GetApiRequest, UserAuthorized ,GetModemStatusApiRequest } from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
@@ -111,6 +111,7 @@ const HomeScreen = ({ navigation }) => {
      const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${res.userInfo.accountNumber}`;
      GetApiRequest(request, (response)=>{
       console.log('checkModemOutagStatus',response)
+      if(response){
            if(response.hasOutage===true){
             let time=moment(response.estimatedTimeOfResolution).format('LT'); 
              setEstimatedRestoreTime(time)
@@ -123,6 +124,7 @@ const HomeScreen = ({ navigation }) => {
            }else{
             setInternetHealths(oldArray => [...oldArray,'Green'] );
            }
+        }
            
      }, (errorCode)=>{
          console.log("checkModemOutagStatus erro",errorCode) 
@@ -142,7 +144,7 @@ const HomeScreen = ({ navigation }) => {
       let macAddress=res[0].macAddress
       var mac=macAddress;
       if(user.userInfo.accountNumber==='128387263'){
-        mac="ac:db:48:21:f2:21"
+        mac="90:aa:c3:b0:45:60"
       }else if(user.userInfo.accountNumber==='133370775'){
         mac="04:bc:9f:17:02:b8"
       }
@@ -161,25 +163,25 @@ const HomeScreen = ({ navigation }) => {
    */
 
   const checkModemDetails = (macAddress) => {
-    const request = `mobile/api/modem/getmodemdetails?macId=${macAddress}`;
-    GetApiRequest(
+    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
+    GetModemStatusApiRequest(
       request,
       (res) => {
         setCheckModemStatus(true)
         console.log("checkModemDetails", res);
         if (res) {
           let temt = [];
-          if (res.equipmentType === "DOCSIS") {
-            temt.push(res.uTxP_State);
-            temt.push(res.uRxL_State);
-            temt.push(res.usnR_State);
-            temt.push(res.dsnR_State);
-            temt.push(res.dRxL_State);
+          if (res.EquipmentType === "DOCSIS") {
+            temt.push(res.UTxP_State);
+            temt.push(res.URxL_State);
+            temt.push(res.USNR_State);
+            temt.push(res.DSNR_State);
+            temt.push(res.DRxL_State);
             updateModemStatus(temt);
-          }else if(res.equipmentType === "ONU"){
-            temt.push(res.onutP_State);
-            temt.push(res.oltrP_State);
-            temt.push(res.onurP_State);
+          }else if(res.EquipmentType === "ONU"){
+            temt.push(res.OnutP_State);
+            temt.push(res.OltrP_State);
+            temt.push(res.OnurP_State);
             updateModemStatus(temt)
           }
           
@@ -203,6 +205,8 @@ const HomeScreen = ({ navigation }) => {
         setInternetHealths(oldArray => [...oldArray,'Red'] );
       } else if (checkYellow) {
         setInternetHealths(oldArray => [...oldArray,'Yellow'] );
+      }else{
+        setInternetHealths(oldArray => [...oldArray,'Red'] );
       }
     } else {
       setInternetHealths(oldArray => [...oldArray,'Green'] );
@@ -327,7 +331,7 @@ const HomeScreen = ({ navigation }) => {
   useEffect(()=>{
 
     console.log('Health',internetHealths.length)
-    if(internetHealths.length>=3){
+    if(internetHealths.length>=2){
       refreshInternetHealth()
     }
    
@@ -808,3 +812,4 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+
