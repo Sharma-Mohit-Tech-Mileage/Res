@@ -38,12 +38,12 @@ const Terms = ({ navigation }) => {
     console.log('combinedReducers: ', combinedReducers);
     console.log('stateData: ', JSON.stringify(stateData));
 
-    useEffect(() => {
-        //Add incase the api call fails
-        setTimeout(() => {
-            setLoading(false);
-        }, 10000);
-    }, []); 
+    // useEffect(() => {
+    //     //Add incase the api call fails
+    //     setTimeout(() => {
+    //         setLoading(false);
+    //     }, 10000);
+    // }, []); 
 
     useEffect(() => {
         const fetchData = async () => {
@@ -117,7 +117,9 @@ const Terms = ({ navigation }) => {
             }
         }
 
-        if (profile.profileDetails.memberType === "Admin") {
+        
+        if (profile.profileDetails !== undefined
+            && profile.profileDetails.memberType === "Admin") {
             if (goToPushNotificationScreen) {
                 setNextScreen('EntryPushNotifications'); 
             } else {
@@ -131,7 +133,7 @@ const Terms = ({ navigation }) => {
 
     useEffect(() => {
         console.log('profileLoadCount: ', profileLoadCount);
-        if (profileLoadCount > 5) {
+        if (profileLoadCount > 4) {
             setLoading(false);
             console.log('profileAfterLoad: ', JSON.stringify(profile));
         }

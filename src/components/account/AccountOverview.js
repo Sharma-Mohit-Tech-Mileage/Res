@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View, Pressable, Alert, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Color, FontFamily, Padding, FontSize } from "../../../GlobalStyles";
+import { Color, FontFamily,FontSize, Padding, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
 import chevronRightIcon from '../../../assets/chevronright.png';
 import profileSettingsIcon from '../../../assets/right-actionable15.png';
@@ -17,9 +17,6 @@ import { logout } from 'react-native-app-auth';
 import * as Zendesk from 'react-native-zendesk-messaging';
 import { SetClearTimer } from '../user/Session';
 import { saveUserInfo } from "../../redux/actions/UserAction";
-import {
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
 import VersionCheck from 'react-native-version-check';
 import { Env } from "../../network/apis/account/Constants";
 
@@ -144,7 +141,7 @@ const AccountOverview = () => {
       }
     };
     fetchUserData();
-    console.log('Build Number',VersionCheck.getCurrentVersion()); 
+    console.log('Build Number', VersionCheck.getCurrentVersion());
   }, []);
 
   return (
@@ -174,7 +171,7 @@ const AccountOverview = () => {
           </Text>
         </View>
         <ScrollView style={{ flex: 1 }}>
-          <View >
+          <View style={{marginBottom: '30%'}}>
             <View style={styles.frameGroup}>
               <View style={styles.navigationBorder}>
                 {/* Mapping through menu items */}
@@ -201,7 +198,7 @@ const AccountOverview = () => {
                       </Text>
                       {/* Chevron/Arrow icon */}
                       <Image
-                        style={[styles.rightActionableIcon1, styles.rightIconLayout]}
+                        style={[{ marginLeft: 10 }, styles.rightIconLayout]}
                         resizeMode="cover"
                         source={chevronRightIcon}
                         accessible
@@ -213,29 +210,37 @@ const AccountOverview = () => {
                   </React.Fragment>
                   )))}
               </View>
-              <Pressable
+              <View style={styles.buttonContainer}>
+                <Pressable
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Logout"
+                  style={[styles.button, styles.buttonsLayout]}
+                  onPress={() => { logoutConfirmationPopuo(navigation) }}
+                >
+                  <Text style={[styles.accept]}>
+                    Logout
+                  </Text>
+                </Pressable>
+              </View>
+
+              <Pressable style={[styles.buttons, styles.buttonsSpaceBlock]}
                 accessible={true}
-                style={[styles.buttons, styles.buttonsSpaceBlock]}
-                onPress={() => { logoutConfirmationPopuo(navigation) }}
-              >
-                <Text style={[styles.makePayment, styles.makePaymentTypo]}>
-                  Logout
-                </Text>
-              </Pressable>
-              <Pressable style={[styles.buttons, styles.buttonsSpaceBlock]}>
+                accessibilityRole="link">
                 <Text>
-                  <Text style={styles.linkStyle} onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}>
+                  <Text
+                    accessibilityLabel=" Privacy Policy" style={styles.linkStyle} onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}>
                     Privacy Policy
                   </Text>
                   <Text style={styles.linkStyle}> | </Text>
-                  <Text style={styles.linkStyle} onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}>
+                  <Text accessibilityLabel="Terms & Conditions" style={styles.linkStyle} onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}>
                     Terms & Conditions
                   </Text>
                 </Text>
               </Pressable>
 
             </View>
-            <Text style={{color: Color.colorMidnightblue,alignSelf:'center', marginTop:20}}>Version:{VersionCheck.getCurrentVersion()}</Text>
+            <Text style={{ color: Color.colorMidnightblue, alignSelf: 'center' }}>Version:{VersionCheck.getCurrentVersion()}</Text>
           </View>
         </ScrollView>
       </View>
@@ -249,7 +254,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0,
-    height: hp('18%'),
+    height: 150,
   },
   buttonsSpaceBlock: {
     paddingVertical: Padding.p_base,
@@ -261,19 +266,32 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     justifyContent: "center",
   },
+  accept: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+    color: Color.sparklightWhite,
+  },
   tabsFlexBox: {
     flexDirection: "row",
     alignSelf: "stretch",
   },
-  linkStyle :{
-    color: Color.colorMidnightblue, 
+  linkStyle: {
+    color: Color.colorMidnightblue,
     alignSelf: 'center',
-    fontWeight:'600'
+    fontWeight: '600'
   },
   makePaymentTypo: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%', // Ensure the container takes up the full width
+    paddingTop: Padding.p_5xl, // Adjust padding as needed
+  },
+
   rightIconLayout: {
     height: 24,
     width: 24,
@@ -282,6 +300,18 @@ const styles = StyleSheet.create({
   title: {
     marginLeft: -35,
     fontSize: FontSize.size_lg,
+  },
+  button: {
+    backgroundColor: Color.colorMidnightblue,
+    width: '100%',
+  },
+  buttonsLayout: {
+    paddingVertical: Padding.p_base,
+    paddingHorizontal: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: Border.br_11xs,
+    minHeight: 50
   },
   rightActionable: {
     borderColor: Color.colorWhitesmoke_200,
@@ -323,9 +353,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     flex: 1,
   },
-  rightActionableIcon1: {
-    marginLeft: 10,
-  },
   rightActionableGroup: {
     paddingVertical: Padding.p_base,
     alignItems: "center",
@@ -349,14 +376,13 @@ const styles = StyleSheet.create({
   },
   frameGroup: {
     marginTop: Padding.p_5xl,
-    paddingHorizontal:Padding.p_base,
+    paddingHorizontal: Padding.p_base,
     alignSelf: "stretch",
   },
   frameParent: {
     flex: 1,
     paddingVertical: Padding.p_base,
     alignSelf: 'stretch',
-    marginBottom: '20%',
   },
   account: {
     flex: 1,

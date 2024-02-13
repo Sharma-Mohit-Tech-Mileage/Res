@@ -3,19 +3,18 @@ import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-nati
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper,fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
+import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
 import { transformResponse, transformNotificationPreferences, isPrimaryAdmin } from '../../components/utility/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PubSub from 'pubsub-js'
-
 const Notifications = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [updatedSection, setUpdatedSection] = useState('');
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const route = useRoute(); // Use the useRoute hook
+  const route = useRoute(); 
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const smsSubscription = profile.smsSubscription || [];
   const profileDetails = profile.profileDetails || {};
@@ -46,15 +45,17 @@ const Notifications = () => {
       infoText =
         (<Text>
           {'We are not able to retrieve the email address for your account. Please '}
-          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { 
-              PubSub.publish('event.contactUsEvent', {});
+          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => {
             navigation.navigate('Support')
-             }}>
-              contact us
-            </Text>
+            setTimeout(() => {
+              PubSub.publish('event.contactUsEvent', {});
+            }, 500);
+          }}>
+            contact us
+          </Text>
           {' for assistance.'}
         </Text>
-)
+        )
 
     } else if (profileDetails.svEmailAddress) {
       isDisabled = false;
@@ -64,12 +65,12 @@ const Notifications = () => {
       notificationsTitle = "No email address on file";
       infoText = (<Text>
         {'We don’t have your email address on file. Go to '}
-          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('ProfileSettings') }}>
-            Profile Settings
-          </Text>
-       {' to add your email.'}
+        <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('ProfileSettings') }}>
+          Profile Settings
+        </Text>
+        {' to add your email.'}
       </Text>
-)
+      )
     }
   }
   useEffect(() => {

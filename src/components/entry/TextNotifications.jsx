@@ -195,9 +195,9 @@ const TextNotifications = ({ navigation }) => {
                                         routes: [{ name: nextScreen }],
                                     });
                                 }}
-                                accessibilityLabel="Decline Button"
+                                accessibilityLabel="Skip Button"
                                 accessibilityRole="button"
-                                accessibilityHint="Decline Terms and Conditions"
+                                accessibilityHint="Skip Terms and Conditions"
                             >
                                 <Text style={styles.decline}>
                                     Skip for now
