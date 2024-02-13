@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-nati
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
+import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails, saveSMSSelection } from '../../redux/actions/ProfileActionSuite';
 import { transformResponse, transformNotificationPreferences, isPrimaryAdmin } from '../../components/utility/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from "../common/customui/NotificationAlert";
@@ -74,19 +74,20 @@ const Notifications = () => {
     }
   }
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await dispatch(fetchBillingPaper());
-        await dispatch(fetchSMSSelection());
-        await dispatch(fetchPushNotifications());
-        await dispatch(fetchProfileDetails());
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-    };
-    fetchData();
+    dispatch(fetchBillingPaper());
+    dispatch(fetchSMSSelection());
+    dispatch(fetchPushNotifications());
+    dispatch(fetchProfileDetails());
   }, [dispatch]);
 
+  useEffect(() => {
+    return () => {
+      if (!isPrimary){
+        dispatch(saveSMSSelection([]))
+      }
+      console.log('Notifications component will unmount====================================');
+    };
+  }, []);
 
   useEffect(() => {
     if (route.params?.updateSuccess) {
