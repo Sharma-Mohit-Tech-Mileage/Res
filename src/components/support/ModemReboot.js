@@ -29,9 +29,10 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 
-const ModemReboot = () => {
+const ModemReboot = ({route}) => {
+  console.log('Error reboot',JSON.stringify(route))
   const navigation = useNavigation();
-  const [modemStatus, setModemStatus] = useState("connected");
+  const [modemStatus, setModemStatus] = useState(route.params?.isError?"":'connected');
   const [accountNumber, setAccountNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [isRebootError, setIsRebootError] = useState(false);
@@ -121,7 +122,15 @@ const ModemReboot = () => {
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
         title="Modem Reboot"
-        onPressBack={() => navigation.goBack()}
+        onPressBack={() => {
+          if(route.params?.isError){
+            navigation.navigate("Support")
+          }else{
+            navigation.goBack()
+          }
+        }
+          
+        }
       />
       <ScrollView>
         <View style={{ flexDirection: "column" }}>
