@@ -30,7 +30,7 @@ const ModemHealthy = () => {
     <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
       <ProfileSettingsHeader
         title="Troubleshooting"
-        onPressBack={() => navigation.goBack()}
+        onPressBack={() => navigation.navigate('Support')}
         accessibilityLabel="Back to Support"
         accessibilityHint="Navigates back to the Support screen"
       />
@@ -65,7 +65,7 @@ const ModemHealthy = () => {
                 <TouchableOpacity
                   style={styles.pressableStyle}
                   onPress={() => {
-                    navigation.navigate('ArticalWindowUtility',{url:'https://support.sparklight.com/hc/en-us/categories/115001419607-WiFi',name:'Wi-Fi Issues'})
+                    navigation.navigate('ArticalWindowUtility',{url:'https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues',name:'Wi-Fi Issues'})
                   }}
                 >
                   <View style={styles.menuWrap}>
@@ -79,7 +79,7 @@ const ModemHealthy = () => {
                 <TouchableOpacity
                   style={styles.pressableStyle}
                   onPress={() => {
-                    navigation.navigate('ArticalWindowUtility',{url:'https://support.sparklight.com/hc/en-us/categories/115001419607-WiFi',name:'Surfing Issues'})
+                    navigation.navigate('ArticalWindowUtility',{url:'https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email',name:'Surfing Issues'})
                   }}
                 >
                   <View style={styles.menuWrap}>
@@ -105,7 +105,7 @@ const ModemHealthy = () => {
                 <TouchableOpacity
                   style={styles.pressableStyle}
                   onPress={() => {
-                    navigation.navigate('ArticalWindowUtility',{url:'https://support.sparklight.com/hc/en-us/categories/115001419607-WiFi',name:'No Connection'})
+                    navigation.navigate('ModemConnectivityGuide')
                   }}
                 >
                   <View style={styles.menuWrap}>
@@ -114,7 +114,7 @@ const ModemHealthy = () => {
                   </View>
                   <RightArrow />
                 </TouchableOpacity>
-                <View style={styles.borderSec} />
+                
               </View>
             </View>
           </View>
@@ -130,18 +130,20 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingTop: windowHeight * 0.05,
     backgroundColor: Color.sparklightWhite,
+    
   },
   content: {
     flexGrow: 1, // This allows the content to expand
     alignItems: "center",
     justifyContent: "center",
+    
   },
   pressableStyle: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginHorizontal: 20,
     alignItems: "center",
-    paddingVertical: 15,
+    paddingVertical: 20,
   },
   circle: {
     width: windowWidth * 0.5,

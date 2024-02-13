@@ -111,7 +111,7 @@ const HomeScreen = ({ navigation }) => {
      const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${res.userInfo.accountNumber}`;
      GetApiRequest(request, (response)=>{
       console.log('checkModemOutagStatus',response)
-      if(response){
+      if(response!=undefined){
            if(response.hasOutage===true){
             let time=moment(response.estimatedTimeOfResolution).format('LT'); 
              setEstimatedRestoreTime(time)
@@ -128,7 +128,7 @@ const HomeScreen = ({ navigation }) => {
            
      }, (errorCode)=>{
          console.log("checkModemOutagStatus erro",errorCode) 
-         if(errorCode===204) {
+         if(errorCode==204) {
           setInternetHealths(oldArray => [...oldArray,'Green'] ); 
          }
          
@@ -144,7 +144,7 @@ const HomeScreen = ({ navigation }) => {
       let macAddress=res[0].macAddress
       var mac=macAddress;
       if(user.userInfo.accountNumber==='128387263'){
-        mac="0c:f8:93:09:2c:85"
+        mac="1c:ab:c0:18:a8:79"
       }else if(user.userInfo.accountNumber==='133370775'){
         mac="04:bc:9f:17:02:b8"
       }
@@ -171,14 +171,14 @@ const HomeScreen = ({ navigation }) => {
         console.log("checkModemDetails", res);
         if (res) {
           let temt = [];
-          if (res.EquipmentType === "DOCSIS") {
+          if (res.equipmentType === "DOCSIS") {
             temt.push(res.uTxP_State);
             temt.push(res.uRxL_State);
-            temt.push(res.uSNR_State);
-            temt.push(res.dSNR_State);
+            temt.push(res.usnR_State);
+            temt.push(res.dsnR_State);
             temt.push(res.dRxL_State);
             updateModemStatus(temt);
-          }else if(res.EquipmentType === "ONU"){
+          }else if(res.equipmentType === "ONU"){
             temt.push(res.OnutP_State);
             temt.push(res.OltrP_State);
             temt.push(res.OnurP_State);
@@ -202,8 +202,10 @@ const HomeScreen = ({ navigation }) => {
       const checkYellow = temt.includes("Yellow");
       const checkRed = temt.includes("Red");
       if (checkRed) {
+        console.log('modem status','Red')
         setInternetHealths(oldArray => [...oldArray,'Red'] );
       } else if (checkYellow) {
+        console.log('modem status','Yellow')
         setInternetHealths(oldArray => [...oldArray,'Yellow'] );
       }else{
         setInternetHealths(oldArray => [...oldArray,'Red'] );
@@ -329,9 +331,8 @@ const HomeScreen = ({ navigation }) => {
   };
 
   useEffect(()=>{
-
-    console.log('Health',internetHealths.length)
-    if(internetHealths.length>=2){
+    console.log('Health count',internetHealths)
+    if(internetHealths.length>=3){
       refreshInternetHealth()
     }
    
@@ -526,20 +527,16 @@ const HomeScreen = ({ navigation }) => {
              {(isOutageAlert)?<OutageAlert estimatedTime={estimatedRestoreTime}/>:<></>}
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <Text style={styles.internetHealth}>Service Health</Text>
-              {/* <InternetHealthChart
-                currentValue={getInternetHealth(currentHealth)}
-                 key={currentHealth}
-              /> */}
               { (checkModemStatus) ?
               <InternetHealthChart
                 currentValue={getInternetHealth(currentHealth)}
                  key={currentHealth}
               />
-                : <ActivityIndicator
-                  size="large"
-                  color='#8D3B90'
-
-                />}
+              : <ActivityIndicator
+              size="large"
+              color={Color.colorGainsboro_200}
+              
+            />}
               <View style={styles.internetStatusSection}>
                 <View style={{ marginTop: 5 }}>
                   <InfoIcon />
