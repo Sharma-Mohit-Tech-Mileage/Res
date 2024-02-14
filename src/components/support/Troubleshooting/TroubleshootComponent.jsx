@@ -25,7 +25,7 @@ const TroubleshootComponent = ({
         <View style={styles.container}>
             {pageCount>0 ? <Text style={styles.topLeftText}>{pageCount} of 3</Text> : null}
             <View style={styles.content}>
-                <View style={styles.circle}>
+                <View style={[styles.circle,{overflow:(step==1)?'hidden':'visible'}]}>
                     {IconComponent}
                 </View>
                 {success && (
@@ -66,16 +66,15 @@ const styles = StyleSheet.create({
         width: windowWidth * 0.5,
         height: windowWidth * 0.5,
         borderRadius: (windowWidth * 0.5) / 2,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#F8F8F8',
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 5,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
+        shadowOffset: { width: -2, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
         marginBottom: 20,
-        overflow: 'hidden',
     },
     title: {
         fontSize: 22,

@@ -93,14 +93,14 @@ const ManageEquipment = () => {
         console.log("checkModemDetails", res);
         if (res) {
           let temt = [];
-          if (res.equipmentType === "DOCSIS") {
-            temt.push(res.uTxP_State);
-            temt.push(res.uRxL_State);
-            temt.push(res.usnR_State);
-            temt.push(res.dsnR_State);
-            temt.push(res.dRxL_State);
+          if (res.EquipmentType === "DOCSIS") {
+            temt.push(res.UTxP_State);
+            temt.push(res.URxL_State);
+            temt.push(res.USNR_State);
+            temt.push(res.DSNR_State);
+            temt.push(res.DRxL_State);
             updateModemStatus(temt);
-          }else if(res.equipmentType === "ONU"){
+          }else if(res.EquipmentType === "ONU"){
             temt.push(res.OnutP_State);
             temt.push(res.OltrP_State);
             temt.push(res.OnurP_State);

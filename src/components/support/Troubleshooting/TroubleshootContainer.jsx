@@ -184,14 +184,13 @@ const TroubleshootContainer = () => {
           }
           let temt = [];
           console.log("checkModemHealth", res.EquipmentType);
-          if (res.equipmentType === "DOCSIS") {
-            temt.push(res.uTxP_State);
-            temt.push(res.uRxL_State);
-            temt.push(res.usnR_State);
-            temt.push(res.dsnR_State);
-            temt.push(res.dRxL_State);
-
-            if (res.modem_State === "Online") {
+          if (res.EquipmentType === "DOCSIS") {
+            temt.push(res.UTxP_State);
+            temt.push(res.URxL_State);
+            temt.push(res.USNR_State);
+            temt.push(res.DSNR_State);
+            temt.push(res.DRxL_State);
+            if (res.Modem_State === "Online") {
               console.log("checkModemHealth online", temt);
               updateModemStatus(temt);
             } else {
