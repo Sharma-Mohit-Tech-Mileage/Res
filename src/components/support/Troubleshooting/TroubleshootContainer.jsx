@@ -14,7 +14,10 @@ import {
   FontFamily,
 } from "../../../../GlobalStyles";
 import { getUser } from "../../../redux/utils/LocalStorage";
-import { GetApiRequest } from "../../../network/APIClient";
+import {
+  GetApiRequest,
+  GetModemStatusApiRequest,
+} from "../../../network/APIClient";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import ModemConnectivityGuide from "./ModemConnectivityGuide";
@@ -23,14 +26,14 @@ const stepsData = [
     title: "Let's resolve your issues.",
     description: "Performing a system check...",
     resultMsg: "",
-    errorMsg:'Uh oh. Looks like there is a server error.',
+    errorMsg: "Uh oh. Looks like there is a server error.",
     success: false,
     pageCount: 0,
   },
   {
     title: "Checking for outages in your area...",
     resultMsg: "No outages were detected in your area...",
-    errorMsg:'Uh oh. Looks like there is a server error.',
+    errorMsg: "Uh oh. Looks like there is a server error.",
     description: null,
     success: false,
     pageCount: 1,
@@ -38,7 +41,7 @@ const stepsData = [
   {
     title: "Checking for account issues...",
     resultMsg: "No account issues were detected.",
-    errorMsg:'Uh oh. Looks like there is a server error.',
+    errorMsg: "Uh oh. Looks like there is a server error.",
     description: null,
     success: false,
     pageCount: 2,
@@ -46,7 +49,7 @@ const stepsData = [
   {
     title: "Checking for service issues...",
     resultMsg: "No service issues were detected.",
-    errorMsg:'Uh oh. Looks like there is a server error.',
+    errorMsg: "Uh oh. Looks like there is a server error.",
     description: null,
     success: false,
     pageCount: 3,
@@ -79,18 +82,18 @@ const TroubleshootContainer = () => {
 
   const [loading, setLoading] = useState(true);
   const [key, setKey] = useState(1);
+  const [macAddress, setMacAddress] = useState("");
 
   /**
    * check Modem Outage status
    */
   const checkModemOutagStatus = () => {
-    getUser().then((res) => {
-      setLoading(true);
-      const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${res.userInfo.accountNumber}`;
-      GetApiRequest(
-        request,
-        (response) => {
-          if(response){
+    setLoading(true);
+    const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${user.userInfo.accountNumber}`;
+    GetApiRequest(
+      request,
+      (response) => {
+        if (response) {
           console.log("checkModemOutagStatus", response);
           if (response.hasOutage === true) {
             let time = moment(response.estimatedTimeOfResolution).format("LT");
@@ -106,22 +109,21 @@ const TroubleshootContainer = () => {
           }
           setLoading(false);
         }
-        },
-        (error) => {
-          console.log(error);
-          if(error===204){
-            networkStatus[currentStep] = true;
-          }else{
-            networkError[currentStep] = true;
-          }
-            setKey(2);
-            setTimeout(() => {
-              setCurrentStep(2);
-            }, 2000);
-            setLoading(false);
+      },
+      (error) => {
+        console.log(error);
+        if (error === 204) {
+          networkStatus[currentStep] = true;
+        } else {
+          networkError[currentStep] = true;
         }
-      );
-    });
+        setKey(2);
+        setTimeout(() => {
+          setCurrentStep(2);
+        }, 2000);
+        setLoading(false);
+      }
+    );
   };
 
   /**
@@ -156,73 +158,88 @@ const TroubleshootContainer = () => {
         setLoading(false);
       },
       (Error) => {
-        console.log("checkBillPaid error",Error)
+        console.log("checkBillPaid error", Error);
         networkError[currentStep] = true;
-            setKey(3);
-            setTimeout(() => {
-              setCurrentStep(3);
-            }, 2000);
-            setLoading(false);
+        setKey(3);
+        setTimeout(() => {
+          setCurrentStep(3);
+        }, 2000);
+        setLoading(false);
       }
     );
   };
 
   const checkModemHealth = (macAddress) => {
     setLoading(true);
-    const request = `mobile/api/modem/getmodemdetails?macId=${macAddress}`;
-    GetApiRequest(
+    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
+    GetModemStatusApiRequest(
       request,
       (res) => {
         console.log("checkModemHealth", res);
         if (res) {
-          let temt = [];
 
+          if(res.status===408){
+            navigation.navigate("ModemConnectivityGuide");
+            return;
+          }
+          let temt = [];
+          console.log("checkModemHealth", res.EquipmentType);
           if (res.equipmentType === "DOCSIS") {
             temt.push(res.uTxP_State);
             temt.push(res.uRxL_State);
             temt.push(res.usnR_State);
             temt.push(res.dsnR_State);
             temt.push(res.dRxL_State);
+
             if (res.modem_State === "Online") {
+              console.log("checkModemHealth online", temt);
               updateModemStatus(temt);
             } else {
               navigation.navigate("ModemConnectivityGuide");
             }
           } else if (res.equipmentType === "ONU") {
-            temt.push(res.onutP_State);
-            temt.push(res.oltrP_State);
-            temt.push(res.onurP_State);
+            temt.push(res.OnutP_State);
+            temt.push(res.OltrP_State);
+            temt.push(res.OnurP_State);
             if (res.onU_State === "Online") {
               updateModemStatus(temt);
             } else {
               navigation.navigate("ModemConnectivityGuide");
-
             }
           }
           setLoading(false);
+        }else{
+          navigation.navigate("ModemConnectivityGuide");
         }
       },
       (error) => {
+        navigation.navigate("ModemConnectivityGuide");
         console.log("Modem details", error);
-        networkError[currentStep] = true;
+        //networkError[currentStep] = true;
         setKey(3);
-        setLoading(false)
+        setLoading(false);
         
       }
     );
   };
 
   const updateModemStatus = (temt) => {
+    console.log("checkModemHealth", temt);
     const allGreen = temt.every((v) => v === "Green");
     console.log("modem status", allGreen);
     if (!allGreen) {
       const checkYellow = temt.includes("Yellow");
       const checkRed = temt.includes("Red");
       if (checkRed || checkYellow) {
-        stepsData[currentStep].success = false;
-        setModemIssueDetected(true);
+        // stepsData[currentStep].success = false;
+        //setModemIssueDetected(true);
         setIssueDetected(true);
-        navigation.navigate("ManageEquipment");
+        navigation.navigate("ModemRebootScreen",{isError:true});;
+      } else {
+        //stepsData[currentStep].success = false;
+        //setModemIssueDetected(true);
+        setIssueDetected(true);
+        navigation.navigate("ModemRebootScreen",{isError:true});
       }
     } else {
       // modem health is good
@@ -230,8 +247,39 @@ const TroubleshootContainer = () => {
       networkStatus[currentStep] = true;
       setKey(5);
       navigation.navigate("ModemHealthy");
-      
     }
+  };
+
+  /**
+   * check plan details
+   */
+  const getInternetPlanDetails = () => {
+    setLoading(true)
+    const request = `internet/api/internet/${user.userInfo.accountNumber}/plan`;
+    GetApiRequest(
+      request,
+      (response) => {
+        if (response.length > 0) {
+          let macAddress = response[0].macAddress;
+          var mac = macAddress;
+          if (user.userInfo.accountNumber === "128387263") {
+            mac = "00:1d:d0:d4:f8:02";
+          } else if (user.userInfo.accountNumber === "133370775") {
+            mac = "0c:f8:93:09:2c:85";
+          }
+          else if(user.userInfo.accountNumber==='133437285'){
+            mac="1c:ab:c0:18:a8:79"
+          }
+          checkModemHealth(mac);
+        }
+      },
+      (error) => {
+        console.log("error", error);
+        networkError[currentStep] = true;
+        setKey(3);
+        setLoading(false);
+      }
+    );
   };
 
   const startTroubleShooting = () => {
@@ -249,7 +297,7 @@ const TroubleshootContainer = () => {
     }
 
     if (currentStep === 3) {
-      checkModemHealth("ac:db:48:21:f2:21");
+      getInternetPlanDetails();
     }
   }, [currentStep]);
   useEffect(() => {
@@ -262,7 +310,6 @@ const TroubleshootContainer = () => {
   }, []);
 
   const step = stepsData[currentStep];
-
 
   return (
     <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
@@ -313,10 +360,6 @@ const TroubleshootContainer = () => {
               pageCount={step.pageCount}
             />
           )}
-          {
-
-          }
-          
         </>
       </SafeAreaView>
     </View>

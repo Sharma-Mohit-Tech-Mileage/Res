@@ -1,3 +1,4 @@
+export const LOGOUT = 'LOGOUT';
 export const FETCH_DATA = 'FETCH_DATA';
 export const LIST_FETCHED = 'LIST_FETCHED';
 export const SSO_LOGIN_REQUEST = 'SSO_LOGIN_REQUEST';

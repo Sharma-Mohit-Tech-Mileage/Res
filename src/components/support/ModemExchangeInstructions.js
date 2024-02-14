@@ -5,71 +5,64 @@ import {
   Text,
   View,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import {
-  FontFamily,
-  Color,
-} from "../../../GlobalStyles";
-import {
-  widthPercentageToDP as wp,
-} from "react-native-responsive-screen";
-import PubSub from 'pubsub-js'
+import { FontFamily, Color } from "../../../GlobalStyles";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import PubSub from 'pubsub-js';
 
 const ModemExchangeInstructions = () => {
   const navigation = useNavigation();
-  const [inst1] = React.useState(
-    `The average lifespan of a modem is approximately 2-3 years, although some high-quality modems can last up to 5-8 years. Typically, high-quality modems are replaced due to becoming outdated rather than breaking down.
-    
-If you suspect that your modem is not functioning properly, please `
-  );
-  const [inst2] = React.useState(
-    ` or visit your nearest Sparklight office to request a modem exchange. Our team will be happy to assist you and ensure that you have the best possible internet experience.`
-  );
 
-  React.useEffect(() => {
-    return () => {
-       
-      };
-    }, []);
+  // Define your instructions here
+  const instructions = [
+    `The average lifespan of a modem is approximately 2-3 years, although some high-quality modems can last up to 5-8 years.`,
+    `Typically, high-quality modems are replaced due to becoming outdated rather than breaking down.`,
+    `If you suspect that your modem is not functioning properly, please contact us or visit your nearest Sparklight office to request a modem exchange.`,
+    `Our team will be happy to assist you and ensure that you have the best possible internet experience.`,
+  ];
 
   return (
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
         title="Modem Exchange Instructions"
         onPressBack={() => {
-            console.log('On Back Press')
-            navigation.goBack()
+          console.log('On Back Press');
+          navigation.goBack();
         }}
       />
-      <ScrollView showsVerticalScrollIndicator={false} >
-      <View
-            style={[
-              styles.card,
-              styles.shadowProp,
-              { flexDirection: 'column' },
-            ]}
-          >
-             <Image
-              style={styles.frameChild}
-              resizeMode="cover"
-              source={require("../../../assets/modem-reboot-inst1.png")}
-            />
-            <Text style={styles.heading}>How to exchange modem</Text>
-            <View
-              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10, marginBottom:10 }}
-            />
-            <Text style={styles.text}>
-            {inst1}
-            <Text style={[styles.textContactUs,{fontWeight:"700"}]} onPress={()=>{
-                PubSub.publish('event.contactUsEvent', {});
-                setTimeout(()=>{
-                    navigation.navigate('support')
-                  },500)
-            }}>contact us</Text>{inst2}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={[styles.card, styles.shadowProp]}>
+          <Image
+            style={styles.frameChild}
+            resizeMode="cover"
+            source={require("../../../assets/modem-reboot-inst1.png")}
+          />
+          <Text style={styles.heading}>How to exchange modem</Text>
+          <View style={styles.separator} />
+          {instructions.map((instruction, index) => (
+            <View key={index} style={styles.instructionContainer}>
+              <Text style={styles.bulletPoint}>•</Text>
+              <Text style={styles.instructionText}>
+                {instruction.includes('contact us') ? (
+                  <>
+                    {instruction.split('contact us')[0]}
+                    <Text style={styles.linkText} onPress={() => {
+                      PubSub.publish('event.contactUsEvent', {});
+                      setTimeout(() => navigation.navigate('support'), 500);
+                    }}>
+                      contact us
+                    </Text>
+                    {instruction.split('contact us')[1]}
+                  </>
+                ) : (
+                  instruction
+                )}
               </Text>
-          
+            </View>
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -89,7 +82,8 @@ const styles = StyleSheet.create({
     width: wp("92%"),
     marginTop: wp("8%"),
     paddingVertical: 20,
-    marginBottom:"20%"
+    paddingHorizontal: 20,
+    marginBottom: "20%",
   },
   shadowProp: {
     shadowColor: "#171717",
@@ -102,47 +96,42 @@ const styles = StyleSheet.create({
     width: 71,
     height: 70,
   },
-  contactUs: {
-    alignSelf: "center",
-    width: 40,
-    height: 40,
-    marginLeft: 10,
-  },
-
-  modemInstruction: {
-    color: Color.colorGray_200,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: 16,
-    fontStyle: "normal",
-    fontWeight: "400",
-    marginLeft: 10,
-  },
   heading: {
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 16,
-    fontStyle: "normal",
     fontWeight: "700",
     alignSelf: "center",
     marginTop: 10,
   },
-  text: {
+  separator: {
+    backgroundColor: "#F4F4F5",
+    height: 1,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  instructionContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+  },
+  bulletPoint: {
+    fontSize: 16,
+    lineHeight: 24, // Adjust line height to match your text if needed
+    color: Color.sparklightGray1,
+  },
+  instructionText: {
+    flex: 1,
+    paddingLeft: 10,
+    paddingRight:6,
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 16,
     fontWeight: "400",
-    paddingHorizontal: 20,
-    alignSelf: "center",
   },
-  textContactUs: {
+  linkText: {
     color: Color.colorMidnightblue,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: 16,
-    fontStyle: "normal",
-    fontWeight: "400",
-    alignSelf:'center',
-    paddingLeft: 5,
-    
+    fontWeight: "700",
   },
 });
 

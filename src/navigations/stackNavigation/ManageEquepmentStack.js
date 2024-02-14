@@ -6,6 +6,7 @@ import ManageEquipment from "../../components/support/ManageEquipment";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemRebootStack from "./ModemRebootStack";
 import ModemExchangeInstructions from "../../components/support/ModemExchangeInstructions";
+import SupportStackScreen from "./SupportStack";
 
 const ModemStack = createStackNavigator();
 
@@ -40,10 +41,19 @@ function ModemStackScreen() {
           blur: () => setTabBarVisible(true),
         }}
       />
-     
+     <ModemStack.Screen
+        name="SupportStack"
+        component={SupportStackScreen}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
       
     </ModemStack.Navigator>
   );
 }
 
 export default ModemStackScreen;
+

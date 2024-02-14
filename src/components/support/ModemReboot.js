@@ -29,9 +29,9 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 
-const ModemReboot = () => {
+const ModemReboot = ({route}) => {
   const navigation = useNavigation();
-  const [modemStatus, setModemStatus] = useState("connected");
+  const [modemStatus, setModemStatus] = useState(route.params?.isError?"":'connected');
   const [accountNumber, setAccountNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [isRebootError, setIsRebootError] = useState(false);
@@ -70,14 +70,20 @@ const ModemReboot = () => {
           console.log("rebootModemAction", res);
           setModemStatus(res.status);
           setLoading(false);
-          if (res.status == "Bad") {
-            setIsRebootError(true);
-          }
+          setTimeout(()=>{
+            if (res.status == "Bad") {
+              setIsRebootError(true);
+            }
+          },1000)
+          
         },
         (error) => {
           console.log("rebootModemAction Error", error);
           setLoading(false);
-          setIsRebootError(true);
+          setTimeout(()=>{
+            setIsRebootError(true);
+          })
+          
         }
       );
     }
@@ -89,7 +95,9 @@ const ModemReboot = () => {
     });
   }, []);
 
-  useEffect(() => {}, [accountNumber]);
+  useEffect(() => {
+
+  }, [accountNumber]);
 
   const RenderErrorBox = () => {
     return (
@@ -121,7 +129,15 @@ const ModemReboot = () => {
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
         title="Modem Reboot"
-        onPressBack={() => navigation.goBack()}
+        onPressBack={() => {
+          if(route.params?.isError){
+            navigation.navigate("Support")
+          }else{
+            navigation.goBack()
+          }
+        }
+          
+        }
       />
       <ScrollView>
         <View style={{ flexDirection: "column" }}>
@@ -209,7 +225,11 @@ const ModemReboot = () => {
             <TouchableOpacity
               style={[styles.BtnContainer, { backgroundColor: "#00000000" }]}
               onPress={() => {
-                navigation.goBack();
+                if(route.params?.isError){
+                  navigation.navigate("Support")
+                }else{
+                  navigation.goBack()
+                }
               }}
             >
               <Text

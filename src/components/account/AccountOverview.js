@@ -16,7 +16,7 @@ import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
 import * as Zendesk from 'react-native-zendesk-messaging';
 import { SetClearTimer } from '../user/Session';
-import { saveUserInfo } from "../../redux/actions/UserAction";
+import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
 import { Env } from "../../network/apis/account/Constants";
 
@@ -59,6 +59,7 @@ const logoutAction = (navigation) => {
       storeUser({});
       storeSsoToken({});
       saveUserInfo({});
+      logoutApp();
       cleanUserData();
       SetClearTimer();
       Zendesk.logout()

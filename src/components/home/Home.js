@@ -26,7 +26,7 @@ import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
 import { getUser, getPushNotificationStatus, storePushNotificationStatus, storeUpgradeToken } from "../../redux/utils/LocalStorage";
-import { GetApiRequest, UserAuthorized } from "../../network/APIClient";
+import { GetApiRequest, UserAuthorized ,GetModemStatusApiRequest } from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
@@ -111,6 +111,7 @@ const HomeScreen = ({ navigation }) => {
      const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${res.userInfo.accountNumber}`;
      GetApiRequest(request, (response)=>{
       console.log('checkModemOutagStatus',response)
+      if(response!=undefined){
            if(response.hasOutage===true){
             let time=moment(response.estimatedTimeOfResolution).format('LT'); 
              setEstimatedRestoreTime(time)
@@ -123,10 +124,11 @@ const HomeScreen = ({ navigation }) => {
            }else{
             setInternetHealths(oldArray => [...oldArray,'Green'] );
            }
+        }
            
      }, (errorCode)=>{
          console.log("checkModemOutagStatus erro",errorCode) 
-         if(errorCode===204) {
+         if(errorCode==204) {
           setInternetHealths(oldArray => [...oldArray,'Green'] ); 
          }
          
@@ -142,9 +144,11 @@ const HomeScreen = ({ navigation }) => {
       let macAddress=res[0].macAddress
       var mac=macAddress;
       if(user.userInfo.accountNumber==='128387263'){
-        mac="ac:db:48:21:f2:21"
+        mac="00:1d:d0:d4:f8:02"
       }else if(user.userInfo.accountNumber==='133370775'){
-        mac="04:bc:9f:17:02:b8"
+        mac="0c:f8:93:09:2c:85"
+      }else if(user.userInfo.accountNumber==='133437285'){
+        mac="1c:ab:c0:18:a8:79"
       }
       checkModemDetails(mac)
       }else{
@@ -161,8 +165,8 @@ const HomeScreen = ({ navigation }) => {
    */
 
   const checkModemDetails = (macAddress) => {
-    const request = `mobile/api/modem/getmodemdetails?macId=${macAddress}`;
-    GetApiRequest(
+    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
+    GetModemStatusApiRequest(
       request,
       (res) => {
         setCheckModemStatus(true)
@@ -177,9 +181,9 @@ const HomeScreen = ({ navigation }) => {
             temt.push(res.dRxL_State);
             updateModemStatus(temt);
           }else if(res.equipmentType === "ONU"){
-            temt.push(res.onutP_State);
-            temt.push(res.oltrP_State);
-            temt.push(res.onurP_State);
+            temt.push(res.OnutP_State);
+            temt.push(res.OltrP_State);
+            temt.push(res.OnurP_State);
             updateModemStatus(temt)
           }
           
@@ -200,9 +204,13 @@ const HomeScreen = ({ navigation }) => {
       const checkYellow = temt.includes("Yellow");
       const checkRed = temt.includes("Red");
       if (checkRed) {
+        console.log('modem status','Red')
         setInternetHealths(oldArray => [...oldArray,'Red'] );
       } else if (checkYellow) {
+        console.log('modem status','Yellow')
         setInternetHealths(oldArray => [...oldArray,'Yellow'] );
+      }else{
+        setInternetHealths(oldArray => [...oldArray,'Red'] );
       }
     } else {
       setInternetHealths(oldArray => [...oldArray,'Green'] );
@@ -325,8 +333,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   useEffect(()=>{
-
-    console.log('Health',internetHealths.length)
+    console.log('Health count',internetHealths)
     if(internetHealths.length>=3){
       refreshInternetHealth()
     }
@@ -522,20 +529,16 @@ const HomeScreen = ({ navigation }) => {
              {(isOutageAlert)?<OutageAlert estimatedTime={estimatedRestoreTime}/>:<></>}
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <Text style={styles.internetHealth}>Service Health</Text>
-              {/* <InternetHealthChart
-                currentValue={getInternetHealth(currentHealth)}
-                 key={currentHealth}
-              /> */}
               { (checkModemStatus) ?
               <InternetHealthChart
                 currentValue={getInternetHealth(currentHealth)}
                  key={currentHealth}
               />
-                : <ActivityIndicator
-                  size="large"
-                  color='#8D3B90'
-
-                />}
+              : <ActivityIndicator
+              size="large"
+              color={Color.colorGainsboro_200}
+              
+            />}
               <View style={styles.internetStatusSection}>
                 <View style={{ marginTop: 5 }}>
                   <InfoIcon />
@@ -808,3 +811,4 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+

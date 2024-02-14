@@ -29,7 +29,7 @@ const ModemConnectivityGuide = () => {
         <View style={styles.modemRebootContainer}>
             <ProfileSettingsHeader
                 title="Troubleshooting"
-                onPressBack={() => navigation.goBack()}
+                onPressBack={() => navigation.navigate('Support')}
             />
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={{ flexDirection: "column", paddingBottom: hp('15%') }}>
