@@ -54,7 +54,9 @@ const ProfileReducer = (state = initialState, action) => {
                 pushNotifications: action.payload,
             };
         case LOGOUT:
-            return initialState;  // Reset state on logout                    
+            return {
+                initialState
+            }                    
         default:
             return state;
     }
