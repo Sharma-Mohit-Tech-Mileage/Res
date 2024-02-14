@@ -354,8 +354,7 @@ const HomeScreen = ({ navigation }) => {
       } catch (error) {
         console.error("Error fetching data", error);
       }
-
-      if (home.walkThroughStep !== null) {
+      if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
         setShowWalkThrough(true);
       }
     };
