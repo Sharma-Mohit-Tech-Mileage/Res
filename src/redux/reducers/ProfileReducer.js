@@ -1,6 +1,7 @@
-import { 
-    USER_PROFILE_DETAILS, SAVE_USER_LIST, 
-    SAVE_SMS_SELECTION, SAVE_EMAIL_SELECTION, 
+import {
+    LOGOUT,
+    USER_PROFILE_DETAILS, SAVE_USER_LIST,
+    SAVE_SMS_SELECTION, SAVE_EMAIL_SELECTION,
     SAVE_PAPERLESS_DETAILS, SAVE_PUSH_NOTIFICATIONS
 } from '../constants/index';
 
@@ -51,7 +52,9 @@ const ProfileReducer = (state = initialState, action) => {
             return {
                 ...state,
                 pushNotifications: action.payload,
-            };                    
+            };
+        case LOGOUT:
+            return initialState;  // Reset state on logout                    
         default:
             return state;
     }
