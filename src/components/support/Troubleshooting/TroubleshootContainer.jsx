@@ -267,8 +267,8 @@ const TroubleshootContainer = () => {
           } else if (user.userInfo.accountNumber === "133370775") {
             mac = "0c:f8:93:09:2c:85";
           }
-          else if(user.userInfo.accountNumber==='133370775'){
-            mac="0c:f8:93:09:2c:85"
+          else if(user.userInfo.accountNumber==='133437285'){
+            mac="1c:ab:c0:18:a8:79"
           }
           checkModemHealth(mac);
         }

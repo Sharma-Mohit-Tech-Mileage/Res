@@ -225,7 +225,11 @@ const ModemReboot = ({route}) => {
             <TouchableOpacity
               style={[styles.BtnContainer, { backgroundColor: "#00000000" }]}
               onPress={() => {
-                navigation.goBack();
+                if(route.params?.isError){
+                  navigation.navigate("Support")
+                }else{
+                  navigation.goBack()
+                }
               }}
             >
               <Text
