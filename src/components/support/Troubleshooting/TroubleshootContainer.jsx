@@ -177,6 +177,11 @@ const TroubleshootContainer = () => {
       (res) => {
         console.log("checkModemHealth", res);
         if (res) {
+
+          if(res.status===408){
+            navigation.navigate("ModemConnectivityGuide");
+            return;
+          }
           let temt = [];
           console.log("checkModemHealth", res.EquipmentType);
           if (res.equipmentType === "DOCSIS") {
@@ -203,13 +208,17 @@ const TroubleshootContainer = () => {
             }
           }
           setLoading(false);
+        }else{
+          navigation.navigate("ModemConnectivityGuide");
         }
       },
       (error) => {
+        navigation.navigate("ModemConnectivityGuide");
         console.log("Modem details", error);
-        networkError[currentStep] = true;
+        //networkError[currentStep] = true;
         setKey(3);
         setLoading(false);
+        
       }
     );
   };
@@ -257,6 +266,9 @@ const TroubleshootContainer = () => {
             mac = "00:1d:d0:d4:f8:02";
           } else if (user.userInfo.accountNumber === "133370775") {
             mac = "0c:f8:93:09:2c:85";
+          }
+          else if(user.userInfo.accountNumber==='133370775'){
+            mac="0c:f8:93:09:2c:85"
           }
           checkModemHealth(mac);
         }

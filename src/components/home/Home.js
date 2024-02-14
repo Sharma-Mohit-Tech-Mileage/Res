@@ -147,6 +147,8 @@ const HomeScreen = ({ navigation }) => {
         mac="00:1d:d0:d4:f8:02"
       }else if(user.userInfo.accountNumber==='133370775'){
         mac="0c:f8:93:09:2c:85"
+      }else if(user.userInfo.accountNumber==='133370775'){
+        mac="0c:f8:93:09:2c:85"
       }
       checkModemDetails(mac)
       }else{

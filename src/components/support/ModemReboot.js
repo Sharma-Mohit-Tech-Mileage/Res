@@ -30,7 +30,6 @@ import { GetApiRequest } from "../../network/APIClient";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 
 const ModemReboot = ({route}) => {
-  console.log('Error reboot',JSON.stringify(route))
   const navigation = useNavigation();
   const [modemStatus, setModemStatus] = useState(route.params?.isError?"":'connected');
   const [accountNumber, setAccountNumber] = useState("");
@@ -71,14 +70,20 @@ const ModemReboot = ({route}) => {
           console.log("rebootModemAction", res);
           setModemStatus(res.status);
           setLoading(false);
-          if (res.status == "Bad") {
-            setIsRebootError(true);
-          }
+          setTimeout(()=>{
+            if (res.status == "Bad") {
+              setIsRebootError(true);
+            }
+          },1000)
+          
         },
         (error) => {
           console.log("rebootModemAction Error", error);
           setLoading(false);
-          setIsRebootError(true);
+          setTimeout(()=>{
+            setIsRebootError(true);
+          })
+          
         }
       );
     }
@@ -90,7 +95,9 @@ const ModemReboot = ({route}) => {
     });
   }, []);
 
-  useEffect(() => {}, [accountNumber]);
+  useEffect(() => {
+
+  }, [accountNumber]);
 
   const RenderErrorBox = () => {
     return (
