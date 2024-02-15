@@ -43,9 +43,7 @@ const MyServicePlan = ({ plans, navigation }) => {
   };
 
   const MyPlanDetails = () => {
-    useEffect(() => {
-      console.log('Plan data',plans)
-    }, []);
+    
 
     const PlanDetailsItem = ({ item, index }) => {
       return (
