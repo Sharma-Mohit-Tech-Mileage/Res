@@ -14,7 +14,7 @@ const Notifications = () => {
   const [updatedSection, setUpdatedSection] = useState('');
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const route = useRoute(); 
+  const route = useRoute();
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const smsSubscription = profile.smsSubscription || [];
   const profileDetails = profile.profileDetails || {};
@@ -43,19 +43,13 @@ const Notifications = () => {
       isDisabled = true;
       notificationsTitle = "There is a problem retrieving your email address";
       infoText =
-        (<Text>
-          {'We are not able to retrieve the email address for your account. Please '}
-          <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => {
-            navigation.navigate('Support')
-            setTimeout(() => {
-              PubSub.publish('event.contactUsEvent', {});
-            }, 500);
-          }}>
-            contact us
-          </Text>
-          {' for assistance.'}
-        </Text>
-        )
+        (<Text style={styles.messageText}>
+          {'We are not able to retrieve the email address for your account. Please'}
+          <Text style={styles.contactUsText} onPress={() => {navigation.navigate('Support');
+              setTimeout(() => {PubSub.publish('event.contactUsEvent', {});}, 500);}}
+          >
+            {' contact us '}
+          </Text>{'for assistance.'}</Text>)
 
     } else if (profileDetails.svEmailAddress) {
       isDisabled = false;
@@ -64,10 +58,8 @@ const Notifications = () => {
       isDisabled = true;
       notificationsTitle = "No email address on file";
       infoText = (<Text>
-        {'We don’t have your email address on file. Go to '}
-        <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('ProfileSettings') }}>
-          Profile Settings
-        </Text>
+        {'We don’t have your email address on file. Go to '} <Text style={[styles.contactUsText]} onPress={() => { navigation.navigate('ProfileSettings') }}>
+          Profile Settings </Text>
         {' to add your email.'}
       </Text>
       )
@@ -82,10 +74,9 @@ const Notifications = () => {
 
   useEffect(() => {
     return () => {
-      if (!isPrimary){
+      if (!isPrimary) {
         dispatch(saveSMSSelection([]))
       }
-      console.log('Notifications component will unmount====================================');
     };
   }, []);
 
@@ -119,7 +110,7 @@ const Notifications = () => {
             notificationsTitle="No mobile phone number on file"
             infoText={data.phoneNum ? `Text alerts are sent to ` : (<Text>
               We don’t have your mobile phone number on file. Go to
-              <Text style={[styles.text, { color: Color.colorMidnightblue }]} onPress={() => { navigation.navigate('ProfileSettings') }}>
+              <Text style={[styles.contactUsText]} onPress={() => { navigation.navigate('ProfileSettings') }}>
                 {' Profile Settings '}
               </Text>
               to add your phone number.
@@ -297,6 +288,15 @@ const NotificationType = ({ type, status }) => {
 };
 
 const styles = StyleSheet.create({
+  contactUsText: {
+    color: Color.colorMidnightblue,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: 16,
+    fontStyle: "normal",
+    fontWeight: "700",
+    paddingLeft: 5,
+    flexWrap: 'wrap'
+  },
   frameBorder: {
     borderWidth: 1,
     justifyContent: "center",

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Pressable, ScrollView } from "react-native";
+import { StyleSheet, Text, View, Pressable, ScrollView, TouchableOpacity } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -120,12 +120,21 @@ const ProfileSettings = () => {
                     type={"warning"}
                     title={profileDetails.multipleEmails ? "There is a problem retrieving your email address" : "No email address on file"}
                     showCloseIcon={false}
-                    message={profileDetails.multipleEmails ? <Text>{'We are not able to retrieve the email address for your account. Please '}<Text style={[styles.text, { color: Color.colorMidnightblue,fontWeight:'700' }]} onPress={() => {
-                      navigation.navigate('Support');
-                      setTimeout(() => {
-                        PubSub.publish('event.contactUsEvent', {});
-                      }, 500);
-                       }}> contact us</Text> {' for assistance.'}</Text>: "We don't have your email address on file. Please add your email."}
+                    message={profileDetails.multipleEmails ? <Text style={styles.messageText}>
+                      {'We are not able to retrieve the email address for your account. Please'}
+                      <Text
+                        style={styles.contactUsText}
+                        onPress={() => {
+                          navigation.navigate('Support');
+                          setTimeout(() => {
+                            PubSub.publish('event.contactUsEvent', {});
+                          }, 500);
+                        }}
+                      >
+                        {' contact us '}
+                      </Text>
+                      {'for assistance.'}
+                    </Text> : "We don't have your email address on file. Please add your email."}
                   /></View>
               )}
 
@@ -201,6 +210,15 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
+  },
+  contactUsText: {
+    color: Color.colorMidnightblue,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: 16,
+    fontStyle: "normal",
+    fontWeight: "700",
+    paddingLeft: 5,
+    flexWrap: 'wrap'
   },
   buttons: {
     marginLeft: Padding.p_3xs,
