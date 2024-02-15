@@ -99,8 +99,8 @@ function* updateProfile(action) {
     try {
         console.log('updateProfile: ', JSON.stringify(action.payload));
         const response = yield call(postProfileInfo, action.payload);
-        console.log('action.smsPayload', action.smsPayload)
-        const textNotifiction = yield call(postTextNotifictionInfo, action.smsPayload);
+        //console.log('action.smsPayload', action.smsPayload)
+       // const textNotifiction = yield call(postTextNotifictionInfo, action.smsPayload);
         action.navigation.navigate('ProfileSettings', { updateSuccess: true });
     } catch (error) {
         action.navigation.navigate('ProfileSettingsEdit', { updateFailed: true });

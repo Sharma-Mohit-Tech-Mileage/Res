@@ -15,9 +15,9 @@ const ProfileSettings = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
-  const smsSubscription = profile.smsSubscription || [];
-  const data = transformResponse(smsSubscription);
-  const smsPayload = initializeSettings(data);
+  //const smsSubscription = profile.smsSubscription || [];
+  //const data = transformResponse(smsSubscription);
+  //const smsPayload = initializeSettings(data);
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   const convertedRole = getUserType(profileDetails.memberType || '');
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || '');
@@ -26,8 +26,8 @@ const ProfileSettings = () => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
       dispatch(fetchProfileDetails());
-      if (isPrimary)
-        dispatch(fetchSMSSelection());
+      // if (isPrimary)
+      //   dispatch(fetchSMSSelection());
       navigation.setParams({ updateSuccess: undefined });
     }
   }, [route.params?.updateSuccess, navigation, dispatch]);
@@ -36,11 +36,11 @@ const ProfileSettings = () => {
     dispatch(fetchProfileDetails());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (isPrimary) {
-      dispatch(fetchSMSSelection());
-    }
-  }, [isPrimary, dispatch]);
+  // useEffect(() => {
+  //   if (isPrimary) {
+  //     dispatch(fetchSMSSelection());
+  //   }
+  // }, [isPrimary, dispatch]);
 
   return (
     <View style={{ zIndex: 1 }}>
@@ -64,7 +64,8 @@ const ProfileSettings = () => {
               </Text>
               <Pressable
                 style={[styles.buttons, styles.buttonsLayout]}
-                onPress={() => navigation.navigate("ProfileSettingsEdit", { smsPayload: smsPayload })}>
+                // onPress={() => navigation.navigate("ProfileSettingsEdit", { smsPayload: smsPayload })}>
+                onPress={() => navigation.navigate("ProfileSettingsEdit")}>
                 <Text style={[styles.makePayment, styles.text1Clr]}>Edit</Text>
               </Pressable>
             </View>
@@ -123,7 +124,7 @@ const ProfileSettings = () => {
                       navigation.navigate('Support');
                       setTimeout(() => {
                         PubSub.publish('event.contactUsEvent', {});
-                      }, 500); // Adjust delay as needed
+                      }, 500);
                        }}> contact us</Text> {' for assistance.'}</Text>: "We don't have your email address on file. Please add your email."}
                   /></View>
               )}
@@ -134,7 +135,7 @@ const ProfileSettings = () => {
                   {profileDetails.multipleEmails ? '' : profileDetails.svEmailAddress}
                 </Text>
               </View>
-              {!smsPayload.phoneNumber && isPrimary && (
+              {/* {!smsPayload.phoneNumber && isPrimary && (
                 <View style={styles.notificationsWrapper}>
                   <NotificationAlert
                     type={"warning"}
@@ -148,7 +149,7 @@ const ProfileSettings = () => {
                 <Text style={[styles.melissa, styles.melissaTypo]}>
                   {smsPayload.phoneNumber || ''}
                 </Text>
-              </View>
+              </View> */}
             </View>
           </View>
         </View>
