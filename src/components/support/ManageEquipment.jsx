@@ -59,6 +59,7 @@ const ManageEquipment = () => {
       GetApiRequest(
         request,
         (response) => {
+          console.log('getInternetPlanDetails',response.length)
           setPlans(response);
           if (response.length > 0) {
             let macAddress = response[0].macAddress;
@@ -66,11 +67,15 @@ const ManageEquipment = () => {
             if (res.userInfo.accountNumber === "128387263") {
               mac = "00:1d:d0:d4:f8:02";
             } else if (res.userInfo.accountNumber === "133370775") {
-              mac = "0c:f8:93:09:2c:85";
+              mac = "90:aa:c3:fb:42:50";
             }
-            else if(user.userInfo.accountNumber==='133437285'){
+            else if(res.userInfo.accountNumber==='133437285'){
               mac="1c:ab:c0:18:a8:79"
             }
+            else if(res.userInfo.accountNumber==='131684698'){
+              mac="ac:20:2e:6d:82:f1"
+            }
+        
             checkModemDetails(mac);
           }
         },
@@ -92,6 +97,11 @@ const ManageEquipment = () => {
       (res) => {
         console.log("checkModemDetails", res);
         if (res) {
+          if(res.status===408 || res.status===404){
+            setCurrentHealth("Offline");
+            setLoadingHealth(false);
+            return;
+          }
           let temt = [];
           if (res.EquipmentType === "DOCSIS") {
             temt.push(res.UTxP_State);
@@ -110,6 +120,8 @@ const ManageEquipment = () => {
         }
       },
       (error) => {
+        setLoadingHealth(true);
+        setCurrentHealth("Offline");
         console.log("Modem details", error);
       }
     );
@@ -305,7 +317,9 @@ const ManageEquipment = () => {
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
-                  navigation.navigate("ModemRebootScreen");
+                  if(loadingHealth){
+                    navigation.navigate("ModemRebootScreen",{isError:(currentHealth!='Optimal')?true:false,isFromT:true})
+                  }
                 }}
               >
                 <Image

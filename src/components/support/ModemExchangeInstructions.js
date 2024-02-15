@@ -44,7 +44,7 @@ const ModemExchangeInstructions = () => {
           <View style={styles.separator} />
           {instructions.map((instruction, index) => (
             <View key={index} style={styles.instructionContainer}>
-              <Text style={styles.bulletPoint}>•</Text>
+              <Text style={styles.bulletPoint}>ï¿½</Text>
               <Text style={styles.instructionText}>
                 {instruction.includes('contact us') ? (
                   <>

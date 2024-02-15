@@ -9,6 +9,7 @@ import PeriodicProblems from "../../components/support/Troubleshooting/PeriodicP
 import SupportStackScreen from "./SupportStack";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import ModemRebootStack from "./ModemRebootStack";
+import ModemExchangeInstructions from "../../components/support/ModemExchangeInstructions";
 
 
 const TroubleStack = createStackNavigator();
@@ -43,6 +44,7 @@ function TroubleShootStack() {
 
       <TroubleStack.Screen name="ArticalWindowUtility" component={ArticalWindowUtility} />
       <TroubleStack.Screen name="ModemRebootScreen" component={ModemRebootStack} />
+      <TroubleStack.Screen name="ModemExchange" component={ModemExchangeInstructions} />
       
     </TroubleStack.Navigator>
   );

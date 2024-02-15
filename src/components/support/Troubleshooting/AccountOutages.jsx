@@ -1,15 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView } from 'react-native';
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../../GlobalStyles";
+import { useNavigation } from "@react-navigation/native";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import WalletIcon from '../../../res/svgIcons/troubleshooting/WalletIcon';
+import { Env } from '../../../network/apis/account/Constants';
+import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
 const TroubleshootComponent = ({
     step, title, description, success, pageCount
 }) => {
-
+    const navigation = useNavigation();
     return (
         <View style={styles.container}>
             {pageCount ? <Text style={styles.topLeftText}>2 of 3</Text> : null}
@@ -25,7 +28,13 @@ const TroubleshootComponent = ({
                     />
                 </View>
                 <View style={styles.btnContainer}>
-                    <Pressable style={[styles.button]}>
+                    <Pressable onPress={()=>{
+                        navigation.navigate("ArticalWindowUtility", {
+                            url: `${Env.URL}/residential/billing`,
+                            name: "Billing Details",
+                          });
+                    }}
+                    style={[styles.button]}>
                         <Text style={styles.accept}>Pay Bill</Text>
                     </Pressable>  
                 </View>
@@ -88,8 +97,8 @@ const styles = StyleSheet.create({
     },
     button: {
         backgroundColor: Color.colorMidnightblue,
-        marginBottom: 20,
-        paddingVertical: Padding.p_base,
+        marginBottom: hp('15%'),
+        paddingVertical: Padding.p_3xs,
     },
     
     accept: {

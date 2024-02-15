@@ -35,9 +35,11 @@ const PeriodicProblems = () => {
                         <Text style={styles.heading}>Intermittent Issues </Text>
                         <View style={{ backgroundColor: "#F4F4F5", height: 1, marginVertical: 20 }} />
                         {instructions1.map(renderInstruction)}
-                        <View style={{ paddingTop: 32,flex:1 }}>
+                        <View style={{ paddingTop: 32 }}>
                             <View style={styles.borderSec} />
-                            <TouchableOpacity style={styles.pressableStyle} onPress={() => { }}>
+                            <TouchableOpacity style={styles.pressableStyle} onPress={() => {
+                                navigation.navigate("ModemRebootScreen",{isError:false,isFromT:true})
+                             }}>
                                 <View style={styles.menuWrap}>
                                     <SettingsIcon />
                                     <Text style={styles.menuText}>
@@ -48,7 +50,9 @@ const PeriodicProblems = () => {
                             </TouchableOpacity>
                             <View style={styles.borderSec} />
 
-                            <TouchableOpacity style={styles.pressableStyle} onPress={() => { }}>
+                            <TouchableOpacity style={styles.pressableStyle} onPress={() => {
+                                 navigation.navigate("ModemExchange");
+                             }}>
                                 <View style={styles.menuWrap}>
                                     <SettingsIcon />
                                     <Text style={styles.menuText}>Exchange Modem</Text>
@@ -56,7 +60,9 @@ const PeriodicProblems = () => {
                                 <RightArrow />
                             </TouchableOpacity>
                             <View style={styles.borderSec} />
-                            <TouchableOpacity style={styles.pressableStyle} onPress={() => { }}>
+                            <TouchableOpacity style={styles.pressableStyle} onPress={() => {
+                                navigation.navigate('ArticalWindowUtility',{url:'https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues',name:'Wi-Fi Issues'})
+                             }}>
                                 <View style={styles.menuWrap}>
                                     <SettingsIcon />
                                     <Text style={styles.menuText}>Wi-Fi Issues</Text>
@@ -84,7 +90,6 @@ const styles = StyleSheet.create({
         borderRadius: 2,
         width: wp("92%"),
         marginTop: Padding.p_5xl,
-        padding: 20,
         flex: 1,
     },
     shadowProp: {
@@ -96,9 +101,9 @@ const styles = StyleSheet.create({
     pressableStyle: {
         flexDirection: "row",
         justifyContent: "space-between",
-        marginHorizontal: 20,
         alignItems: "center",
         paddingVertical: 15,
+        marginHorizontal:20
     },
     frameChild: {
         alignSelf: "center",
@@ -118,6 +123,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'flex-start', // Align items to the start of the cross axis
         marginBottom: 10,
+        paddingHorizontal:20
     },
     bulletPoint: {
         width: 6,

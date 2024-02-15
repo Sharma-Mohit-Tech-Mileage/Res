@@ -178,7 +178,7 @@ const TroubleshootContainer = () => {
         console.log("checkModemHealth", res);
         if (res) {
 
-          if(res.status===408){
+          if(res.status===408 || res.status===404){
             navigation.navigate("ModemConnectivityGuide");
             return;
           }
@@ -264,10 +264,13 @@ const TroubleshootContainer = () => {
           if (user.userInfo.accountNumber === "128387263") {
             mac = "00:1d:d0:d4:f8:02";
           } else if (user.userInfo.accountNumber === "133370775") {
-            mac = "0c:f8:93:09:2c:85";
+            mac = "90:aa:c3:fb:42:50";
           }
           else if(user.userInfo.accountNumber==='133437285'){
             mac="1c:ab:c0:18:a8:79"
+          }
+          else if(user.userInfo.accountNumber==='131684698'){
+            mac="ac:20:2e:6d:82:f1"
           }
           checkModemHealth(mac);
         }

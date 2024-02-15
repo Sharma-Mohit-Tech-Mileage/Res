@@ -30,6 +30,7 @@ import { GetApiRequest } from "../../network/APIClient";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 
 const ModemReboot = ({route}) => {
+  console.log('Route',JSON.stringify(route))
   const navigation = useNavigation();
   const [modemStatus, setModemStatus] = useState(route.params?.isError?"":'connected');
   const [accountNumber, setAccountNumber] = useState("");
@@ -99,6 +100,17 @@ const ModemReboot = ({route}) => {
 
   }, [accountNumber]);
 
+  const goBackAction=()=>{
+    if(route.params?.isFromT){
+      navigation.goBack()
+    }else if(route.params?.isError){
+      navigation.navigate("Support")
+    }else{
+      navigation.goBack()
+    }
+  }
+
+
   const RenderErrorBox = () => {
     return (
       <View style={styles.errorBox}>
@@ -130,11 +142,7 @@ const ModemReboot = ({route}) => {
       <ProfileSettingsHeader
         title="Modem Reboot"
         onPressBack={() => {
-          if(route.params?.isError){
-            navigation.navigate("Support")
-          }else{
-            navigation.goBack()
-          }
+          goBackAction()
         }
           
         }
@@ -225,11 +233,7 @@ const ModemReboot = ({route}) => {
             <TouchableOpacity
               style={[styles.BtnContainer, { backgroundColor: "#00000000" }]}
               onPress={() => {
-                if(route.params?.isError){
-                  navigation.navigate("Support")
-                }else{
-                  navigation.goBack()
-                }
+                goBackAction();
               }}
             >
               <Text
