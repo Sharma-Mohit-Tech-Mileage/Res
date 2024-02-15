@@ -141,6 +141,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     originWhitelist={['http://*', 'https://*', 'data:*']}
                     //setSupportMultipleWindows={false}
                     onMessage={onMessage}
+                    incognito={true}
                 />
             )}
             {isError ? (
