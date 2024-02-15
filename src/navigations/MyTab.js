@@ -44,7 +44,7 @@ const MyTabs = ({ route, navigation }) => {
 
   return (
     <>
-    { home.walkThroughStep !== null &&
+    { home.walkThroughStep !== null && home.walkThroughStep !== undefined &&
       (
         <>
           <View style={shadowStyleLeft}>
