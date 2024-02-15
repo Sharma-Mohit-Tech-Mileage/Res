@@ -20,7 +20,9 @@ const userReducer = (state = initialState, action) => {
 
       }
     case LOGOUT:
-      return initialState;  // Reset state on logout
+      return {
+        initialState
+      }; 
     default:
       return state;
   }
