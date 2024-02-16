@@ -100,6 +100,11 @@ const ManageEquipment = () => {
       (res) => {
         console.log("checkModemDetails", res.status);
         if (res) {
+          if(res.status===408){
+            setCurrentHealth("Poor");
+            setLoadingHealth(false)
+            return;
+          }
           let temt = [];
           if (res.EquipmentType === "DOCSIS") {
             temt.push(res.UTxP_State);
