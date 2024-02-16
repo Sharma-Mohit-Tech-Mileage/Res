@@ -5,7 +5,8 @@ import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { FontFamily, Color } from "../../../../GlobalStyles";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
-const ModemConnectivityGuide = () => {
+const ModemConnectivityGuide = ({route}) => {
+    console.log('No Connection',JSON.stringify(route))
     const navigation = useNavigation();
 
     const instructions1 = [
@@ -29,7 +30,14 @@ const ModemConnectivityGuide = () => {
         <View style={styles.modemRebootContainer}>
             <ProfileSettingsHeader
                 title="Troubleshooting"
-                onPressBack={() => navigation.navigate('Support')}
+                onPressBack={() => {
+                    if(route.params?.isSuccess){
+                        navigation.goBack()
+                    }else{
+                    navigation.navigate('Support')
+                    }
+                }
+                }
             />
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={{ flexDirection: "column", paddingBottom: hp('15%') }}>

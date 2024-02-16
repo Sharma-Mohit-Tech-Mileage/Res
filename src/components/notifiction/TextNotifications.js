@@ -1,65 +1,62 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
-import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import Toggle from '../common/Toggle';
-import { useRoute, useIsFocused } from "@react-navigation/native";
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useRoute } from "@react-navigation/native";
 import { useDispatch } from 'react-redux';
-import { initializeSettings } from '../utility/constant';
+import { updateTextNotification } from '../../redux/actions/ProfileActionSuite';
+import SparkLightInput from "../common/customui/SparkLightInput";
+import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
-import {updateTextNotification} from '../../redux/actions/ProfileActionSuite';
+import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
+import { initializeSettings } from '../utility/constant';
+import Toggle from '../common/Toggle';
 
+// Define your validation schema
+const validationSchema = yup.object().shape({
+    phoneNumber : yup.string()
+            .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number.')
+            .required('Phone number is required'),
+    optOut: yup.boolean(),
+    outageOptOut: yup.boolean(),
+    billingOptOutStatus: yup.boolean(),
+});
 const TextNotifications = ({ navigation }) => {
-    const [initialize, setInitializeSettings] = useState({});
-    const [showErrorAlert, setShowErrorAlert] = useState(false);
-    const route = useRoute(); // Use the useRoute hook
-    const additionalData = route.params?.additionalData;
-    const dispatch = useDispatch();
     const scrollViewRef = useRef(null);
-    const isFocused = useIsFocused(); // Hook to determine if the screen is focused
-
-    useEffect(() => {
-        // Check if the screen is focused
-        if (isFocused) {
-            // Initialize settings based on additionalData
-            const initializedSettings = initializeSettings(additionalData);
-            setInitializeSettings(initializedSettings);
+    const route = useRoute();
+    const dispatch = useDispatch();
+    const [showErrorAlert, setShowErrorAlert] = useState(false);
+    const [errorText, setErrorText] = useState(false);
+    const formatedData = initializeSettings(route.params?.additionalData);
+    const { control, handleSubmit, setValue, getValues, formState: { errors } } = useForm({
+        resolver: yupResolver(validationSchema),
+        defaultValues: {
+            phoneNumber: formatedData?.phoneNumber || '',
+            optOut: formatedData?.optOut || false,
+            outageOptOut: formatedData?.outageOptOut || false,
+            billingOptOutStatus: formatedData?.billingOptOutStatus || false,
+            accountNumber:''
         }
-
-        // Cleanup function
-        return () => {
-            if (isFocused) {
-                setInitializeSettings({}); // Reset state when leaving the screen
-            }
-        };
-    }, [isFocused, additionalData]); // Depend on isFocused and additionalData
-    const handleToggleChange = (e) => {
-        const { name, value } = e.target;
-
-        // Log the name and value for debugging
-        console.log(`Name: ${name}, Value: ${value}`);
-
-        setInitializeSettings(initialize => {
-            const updatedSettings = {
-                ...initialize,
-                [name]: !value
-            };
-            return updatedSettings;
-        });
-    };
-
+    });
 
     useEffect(() => {
         if (route.params?.updateFailed) {
+            setErrorText('Notifications updated failed.')
             setShowErrorAlert(true);
             scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-            // Reset the parameter so subsequent navigations are detected
             navigation.setParams({ updateFailed: undefined });
         }
     }, [route.params?.updateFailed, navigation, dispatch]);
 
-    const handleSave = () => {
-        dispatch(updateTextNotification(initialize, navigation));
+    const handleValidationError = () => {
+        scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+        setErrorText('Please enter valid information to continue.')
+        setShowErrorAlert(true);
+    };
+
+    const onSubmit = data => {
+        dispatch(updateTextNotification(data, navigation));
     };
 
     return (
@@ -77,7 +74,7 @@ const TextNotifications = ({ navigation }) => {
                             <NotificationAlert
                                 type="error"
                                 title="Failed"
-                                message="Notifications updated failed."
+                                message={errorText ? errorText:"Notifications updated failed."}
                                 showCloseIcon={true}
                                 isVisible={showErrorAlert}
                                 onClose={() => setShowErrorAlert(false)}
@@ -103,11 +100,23 @@ const TextNotifications = ({ navigation }) => {
                         </View>
                         <View style={styles.frameChild} />
                         <View style={styles.frameGroup}>
-                            <View style={styles.frameParent3}>
+                            <View style={[styles.frameParent3,{paddingVertical:4}]}>
                                 <Text style={styles.mobilePhoneTypo}>
                                     Mobile Phone
                                 </Text>
-                                <Text style={styles.text}>{initialize.phoneNumber}</Text>
+                                <Controller
+                                    control={control}
+                                    name="phoneNumber"
+                                    render={({ field: { onChange, onBlur, value } }) => (
+                                        <SparkLightInput
+                                            placeholder="Mobile Number"
+                                            onBlur={onBlur}
+                                            onChangeText={onChange}
+                                            value={value}
+                                            error={errors.phoneNumber?.message}
+                                        />
+                                    )}
+                                />
                                 <Text style={[styles.receiveTextNotifications1, styles.containerTypo,]}>
                                     Message and data rates may apply. Message frequency may vary. Text STOP to opt out or HELP
                                     for help.
@@ -123,10 +132,16 @@ const TextNotifications = ({ navigation }) => {
                                             Appointments
                                         </Text>
                                         <View >
-                                            <Toggle
+                                            <Controller
+                                                control={control}
                                                 name="optOut"
-                                                initialValue={!initialize.optOut}
-                                                onToggle={handleToggleChange}
+                                                render={({ field: { onChange, value } }) => (
+                                                    <Toggle
+                                                        label="Appointments"
+                                                        onToggle={() => onChange(!value)}
+                                                        initialValue={!value}
+                                                    />
+                                                )}
                                             />
                                         </View>
                                     </View>
@@ -145,10 +160,16 @@ const TextNotifications = ({ navigation }) => {
                                             Outage Alerts
                                         </Text>
                                         <View >
-                                            <Toggle
+                                            <Controller
+                                                control={control}
                                                 name="outageOptOut"
-                                                initialValue={!initialize.outageOptOut}
-                                                onToggle={handleToggleChange}
+                                                render={({ field: { onChange, value } }) => (
+                                                    <Toggle
+                                                        label="Outage Alerts"
+                                                        onToggle={() => onChange(!value)}
+                                                        initialValue={!value}
+                                                    />
+                                                )}
                                             />
                                         </View>
                                     </View>
@@ -167,10 +188,17 @@ const TextNotifications = ({ navigation }) => {
                                             Billing
                                         </Text>
                                         <View >
-                                            <Toggle
+                                            <Controller
+                                                control={control}
                                                 name="billingOptOutStatus"
-                                                initialValue={!initialize.billingOptOutStatus}
-                                                onToggle={handleToggleChange} />
+                                                render={({ field: { onChange, value } }) => (
+                                                    <Toggle
+                                                        label="Billing"
+                                                        onToggle={() => onChange(!value)}
+                                                        initialValue={!value}
+                                                    />
+                                                )}
+                                            />
                                         </View>
                                     </View>
                                     <Text style={[styles.receiveTextNotifications1, styles.containerTypo,]}>
@@ -204,7 +232,7 @@ const TextNotifications = ({ navigation }) => {
                     <View style={styles.buttonsParent} accessibilityLabel="Buttons Section">
                         <Pressable
                             style={[styles.buttons, styles.buttonsLayout]}
-                            onPress={handleSave}
+                            onPress={handleSubmit(onSubmit, handleValidationError)}
                         >
                             <Text style={[styles.makePayment, styles.makeTypo]}>Save</Text>
                         </Pressable>

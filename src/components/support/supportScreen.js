@@ -98,10 +98,10 @@ const Support = () => {
           });
       }
     
-    //   const handlePressOpenButton = () => {
-    //     Zendesk.openMessagingView();
-    //     Zendesk.addEventListener()
-    //   };
+      const handlePressOpenButton = () => {
+        Zendesk.openMessagingView();
+        //Zendesk.addEventListener()
+      };
     
 
     return (

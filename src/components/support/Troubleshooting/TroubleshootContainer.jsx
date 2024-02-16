@@ -177,21 +177,22 @@ const TroubleshootContainer = () => {
       (res) => {
         console.log("checkModemHealth", res);
         if (res) {
-
-          if(res.status===408){
-            navigation.navigate("ModemConnectivityGuide");
-            return;
+          if(res?.status){
+            if(res.status===408){
+              setIssueDetected(true);
+              navigation.navigate("ModemRebootScreen",{isError:true})
+              return
+            }
           }
           let temt = [];
           console.log("checkModemHealth", res.EquipmentType);
-          if (res.equipmentType === "DOCSIS") {
-            temt.push(res.uTxP_State);
-            temt.push(res.uRxL_State);
-            temt.push(res.usnR_State);
-            temt.push(res.dsnR_State);
-            temt.push(res.dRxL_State);
-
-            if (res.modem_State === "Online") {
+          if (res.EquipmentType === "DOCSIS") {
+            temt.push(res.UTxP_State);
+            temt.push(res.URxL_State);
+            temt.push(res.USNR_State);
+            temt.push(res.DSNR_State);
+            temt.push(res.DRxL_State);
+            if (res.Modem_State === "Online") {
               console.log("checkModemHealth online", temt);
               updateModemStatus(temt);
             } else {
@@ -265,10 +266,13 @@ const TroubleshootContainer = () => {
           if (user.userInfo.accountNumber === "128387263") {
             mac = "00:1d:d0:d4:f8:02";
           } else if (user.userInfo.accountNumber === "133370775") {
-            mac = "0c:f8:93:09:2c:85";
+            mac = "90:aa:c3:fb:42:50";
           }
           else if(user.userInfo.accountNumber==='133437285'){
             mac="1c:ab:c0:18:a8:79"
+          }
+          else if(user.userInfo.accountNumber==='131684698'){
+            mac="ac:20:2e:6d:82:f1"
           }
           checkModemHealth(mac);
         }
