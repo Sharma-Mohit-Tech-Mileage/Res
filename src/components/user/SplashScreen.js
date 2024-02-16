@@ -269,103 +269,6 @@ const SplashScreen = ({ navigation }) => {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const onLoadMethod = async () => {
-      const enabledPermission = await requestUserPermission();
-      if (enabledPermission){
-        // return fcm token for the device
-        await messaging().registerDeviceForRemoteMessages();
-        messaging().getToken().then(token => {
-          console.log("LoadToken: ", token);
-        });
-      }
-      else {
-        console.log("Failed Token Status", authStatus);
-      }
-
-      // Register background handler
-      messaging().setBackgroundMessageHandler(async remoteMessage => {     
-        console.log('Message handled in the background Again!', remoteMessage);
-        try {
-            // Create a channel (required for Android)
-            const channelId = await notifee.createChannel({
-              id: 'default',
-              name: 'Default Channel',
-            });
-
-            // Display a notification
-            await notifee.displayNotification({
-              title: remoteMessage.notification.title,
-              body: remoteMessage.notification.body,
-              android: {
-                channelId,
-                //smallIcon: remoteMessage.notification.android.imageUrl, // optional, defaults to 'ic_launcher'.
-                // pressAction is needed if you want the notification to open the app when pressed
-                pressAction: {
-                  id: 'default',
-                },
-              },
-            });
-        } catch (error) {
-          console.log('Error when setting background message: ', error);
-        }
-      });
-
-      messaging().onNotificationOpenedApp(remoteMessage => {
-        console.log(
-          'Notification caused app to open from background state:',
-          remoteMessage.notification,
-        );
-      });
-
-      messaging()
-      .getInitialNotification()
-      .then(remoteMessage => {
-        if (remoteMessage) {
-          console.log(
-            'Notification caused app to open from quit state:',
-            remoteMessage.notification,
-          );
-        }
-      });
-
-
-    };
-
-    onLoadMethod();
-
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('Push Notification Message: ', remoteMessage);
-      try {
-          // Create a channel (required for Android)
-          const channelId = await notifee.createChannel({
-            id: 'default',
-            name: 'Default Channel',
-          });
-
-          // Display a notification
-          await notifee.displayNotification({
-            title: remoteMessage.notification.title,
-            body: remoteMessage.notification.body,
-            android: {
-              channelId,
-              //smallIcon: remoteMessage.notification.android.imageUrl, // optional, defaults to 'ic_launcher'.
-              // pressAction is needed if you want the notification to open the app when pressed
-              pressAction: {
-                id: 'default',
-              },
-            },
-          });
-      } catch (error) {
-        console.log('Error when setting background message: ', error);
-      }
-    });
-
-    return unsubscribe;  
-  }, []);  
-
-  
-
   return (
     <LinearGradient
       start={{ x: 0, y: 0 }}
@@ -402,8 +305,8 @@ const SplashScreen = ({ navigation }) => {
             </TouchableOpacity>        
           </>
         )
-      }   
-      <Text style={{color: 'white',alignSelf:'center', marginTop:45, fontSize:16}}> {(ISUAT)? 'UAT':''} Version:{VersionCheck.getCurrentVersion()}</Text>          
+      }
+      <Text style={{color: 'white',alignSelf:'center', marginTop:45, fontSize:16}}> {(ISUAT)? 'UAT':''} Version:{VersionCheck.getCurrentVersion()}</Text>
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
