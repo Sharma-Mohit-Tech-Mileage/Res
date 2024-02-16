@@ -27,6 +27,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import CheckConnection from "../../res/svgIcons/CheckConnection";
 const ManageEquipment = () => {
   const navigation = useNavigation();
   const [manufacturer, setManufacturer] = React.useState('');
@@ -36,6 +37,7 @@ const ManageEquipment = () => {
   const [plans, setPlans] = React.useState([]);
   const [loadingHealth, setLoadingHealth] = React.useState(false);
   const [currentHealth, setCurrentHealth] = React.useState("Optimal");
+  const [isOffline, setIsOffline] = React.useState(false);
 
   const getLeasedDetails = () => {
     let re = getUser().then((res) => {
@@ -54,6 +56,7 @@ const ManageEquipment = () => {
   };
 
   const getInternetPlanDetails = () => {
+    setLoadingHealth(true)
     let re = getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
       GetApiRequest(
@@ -95,13 +98,8 @@ const ManageEquipment = () => {
     GetModemStatusApiRequest(
       request,
       (res) => {
-        console.log("checkModemDetails", res);
+        console.log("checkModemDetails", res.status);
         if (res) {
-          if(res.status===408 || res.status===404){
-            setCurrentHealth("Offline");
-            setLoadingHealth(false);
-            return;
-          }
           let temt = [];
           if (res.EquipmentType === "DOCSIS") {
             temt.push(res.UTxP_State);
@@ -116,13 +114,21 @@ const ManageEquipment = () => {
             temt.push(res.OnurP_State);
             updateModemStatus(temt)
           }
-          setLoadingHealth(true);
+          setLoadingHealth(false);
         }
       },
-      (error) => {
-        setLoadingHealth(true);
-        setCurrentHealth("Offline");
-        console.log("Modem details", error);
+      (errorCode) => {
+        setLoadingHealth(false);
+        console.log("Modem details", errorCode);
+        if(errorCode===408){
+          setCurrentHealth("Offline");
+          return;
+        }else if(errorCode===404){
+          setIsOffline(true)
+          return;
+        }else{
+          setCurrentHealth("Offline");
+        }
       }
     );
   };
@@ -201,10 +207,10 @@ const ManageEquipment = () => {
                         {/* {transmissionType} */}
                       </Text>
 
-                      {loadingHealth ? (
+                      {!loadingHealth ? (
                         <View style={styles.poorHealthParent}>
                           <Text style={[styles.poorHealth, styles.textTypo2]}>
-                            {currentHealth === "Poor"
+                            {(isOffline)? "Offline": currentHealth === "Poor"
                               ? "Issue Detected"
                               : currentHealth == "Offline"
                               ? "Issue Detected"
@@ -213,7 +219,7 @@ const ManageEquipment = () => {
                           <Image
                             style={styles.frameChild}
                             tintColor={
-                              currentHealth === "Optimal"
+                              (isOffline)?colors.dark_grey :currentHealth === "Optimal"
                                 ? colors.sparklight_green
                                 : currentHealth === "Offline"
                                 ? colors.sparklight_red
@@ -240,7 +246,7 @@ const ManageEquipment = () => {
                 </View>
               </View>
 
-                { ( currentHealth!='Optimal' && loadingHealth) &&
+                { ( currentHealth!='Optimal' && !loadingHealth) &&
               <View
                 style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}
               >
@@ -258,7 +264,7 @@ const ManageEquipment = () => {
                       />
                       <View style={styles.creditCardWillExpireSoonParent}>
                         <Text style={styles.creditCardWill}>
-                        An issue has been detected
+                        {(isOffline)?'Modem is Offline' :'An issue has been detected'}
                         </Text>
                         <Text
                           style={[
@@ -282,6 +288,26 @@ const ManageEquipment = () => {
                 styles.supportParentFlexBox,
               ]}
             >
+              { (isOffline) &&(
+                <>
+                 <View style={[styles.frameLayout]} />
+                 <TouchableOpacity
+                   style={[styles.frame9defaultSpaceBlock]}
+                   onPress={() => {
+                     navigation.navigate("ModemConnectivityGuide",{isSuccess:true});
+                   }}
+                 >
+                   <CheckConnection/>
+                   <Text style={styles.modemHealthSupport}>Check connection</Text>
+                   <Image
+                     resizeMode="stretch"
+                     source={require("../../../assets/chevronright.png")}
+                   />
+                 </TouchableOpacity>
+                 </>
+              )
+
+              }
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}

@@ -144,6 +144,8 @@ export const GetModemStatusApiRequest= async(endpoint, onSuccess,onError)=>{
                throw Error(`Response status ${response.status} (${response.statusText})`);
            } else if(response.status===204){
                onError(response.status)
+           }else if(response.status===404){
+            onError(response.status)
            } else {
                return response.json();
            }     
