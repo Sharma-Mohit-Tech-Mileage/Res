@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     btnContainer: {
         flex: 1,
         justifyContent: 'center',
-        width: '50%',
+        width: '90%',
     },
     circle: {
         width: windowWidth * 0.5,

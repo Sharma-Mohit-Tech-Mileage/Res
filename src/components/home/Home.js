@@ -153,8 +153,6 @@ const HomeScreen = ({ navigation }) => {
         mac="ac:20:2e:6d:82:f1"
       }
       checkModemDetails(mac)
-      }else{
-        setCheckModemStatus(true)
       }
     }
   };
@@ -171,14 +169,9 @@ const HomeScreen = ({ navigation }) => {
     GetModemStatusApiRequest(
       request,
       (res) => {
-        setCheckModemStatus(true)
         console.log("checkModemDetails", res);
         if (res) {
 
-          if(res.status===408 || res.status===404){
-            setInternetHealths(oldArray => [...oldArray,'Red'] );
-            return;
-          }
           let temt = [];
           if (res.EquipmentType === "DOCSIS") {
             temt.push(res.UTxP_State);
@@ -196,10 +189,13 @@ const HomeScreen = ({ navigation }) => {
           
         }
       },
-      (error) => {
-        setCheckModemStatus(true)
-        setInternetHealths(oldArray => [...oldArray,'yellow'] );
-        console.log("Modem details", error);
+      (errorCode) => {
+        console.log("Modem details on Error", errorCode);
+        if(errorCode===404){
+          setInternetHealths(oldArray => [...oldArray,'Red'] );
+        }else{
+          setInternetHealths(oldArray => [...oldArray,'yellow'] );
+        }
       }
     );
   };
@@ -342,6 +338,7 @@ const HomeScreen = ({ navigation }) => {
   useEffect(()=>{
     console.log('Health count',internetHealths)
     if(internetHealths.length>=3){
+      setCheckModemStatus(true)
       refreshInternetHealth()
     }
    

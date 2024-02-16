@@ -177,11 +177,6 @@ const TroubleshootContainer = () => {
       (res) => {
         console.log("checkModemHealth", res);
         if (res) {
-
-          if(res.status===408 || res.status===404){
-            navigation.navigate("ModemConnectivityGuide");
-            return;
-          }
           let temt = [];
           console.log("checkModemHealth", res.EquipmentType);
           if (res.EquipmentType === "DOCSIS") {

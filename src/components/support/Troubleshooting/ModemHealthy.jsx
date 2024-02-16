@@ -105,7 +105,7 @@ const ModemHealthy = () => {
                 <TouchableOpacity
                   style={styles.pressableStyle}
                   onPress={() => {
-                    navigation.navigate('ModemConnectivityGuide')
+                    navigation.navigate('ModemConnectivityGuide',{isSuccess:true})
                   }}
                 >
                   <View style={styles.menuWrap}>

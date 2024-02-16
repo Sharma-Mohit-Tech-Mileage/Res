@@ -74,7 +74,7 @@ const SplashScreen = ({ navigation }) => {
         refreshToken: res.refreshToken
       };
 
-      Zendesk.login(token)
+      //Zendesk.login(token)
 
       if (res.userInfo.acctStatus === 'Disconnect'){
         setDisconnected(true);
