@@ -28,6 +28,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import CheckConnection from "../../res/svgIcons/CheckConnection";
+import RefreshIcon from "../../res/svgIcons/RefreshIcon";
 const ManageEquipment = () => {
   const navigation = useNavigation();
   const [manufacturer, setManufacturer] = React.useState('');
@@ -101,7 +102,8 @@ const ManageEquipment = () => {
         console.log("checkModemDetails", res.status);
         if (res) {
           if(res.status===408){
-            setCurrentHealth("Poor");
+            //setCurrentHealth("Offline");
+            setIsOffline(true)
             setLoadingHealth(false)
             return;
           }
@@ -126,7 +128,8 @@ const ManageEquipment = () => {
         setLoadingHealth(false);
         console.log("Modem details", errorCode);
         if(errorCode===408){
-          setCurrentHealth("Offline");
+          //setCurrentHealth("Offline");
+          setIsOffline(true)
           return;
         }else if(errorCode===404){
           setIsOffline(true)
@@ -293,11 +296,11 @@ const ManageEquipment = () => {
                 styles.supportParentFlexBox,
               ]}
             >
-              { (isOffline) &&(
+              { (isOffline || currentHealth==='Poor') &&(
                 <>
                  <View style={[styles.frameLayout]} />
                  <TouchableOpacity
-                   style={[styles.frame9defaultSpaceBlock]}
+                   style={[styles.frame9defaultSpaceBlock,{backgroundColor:currentHealth!='Optimal'?'#EF4E3E10':'white'}]}
                    onPress={() => {
                      navigation.navigate("ModemConnectivityGuide",{isSuccess:true});
                    }}
@@ -313,24 +316,7 @@ const ManageEquipment = () => {
               )
 
               }
-              <View style={[styles.frameLayout]} />
-              <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock]}
-                onPress={() => {
-                  navigation.navigate("ModemExchange");
-                }}
-              >
-                <Image
-                  style={{ width: 20, height: 20, flexShrink: 0 }}
-                  resizeMode="contain"
-                  source={require("../../../assets/repeat-01.png")}
-                />
-                <Text style={styles.modemHealthSupport}>Exchange Modem</Text>
-                <Image
-                  resizeMode="stretch"
-                  source={require("../../../assets/chevronright.png")}
-                />
-              </TouchableOpacity>
+              
               {/* <View style={[styles.frameLayout]} />
                             <View style={[styles.frame9defaultSpaceBlock]} >
                                 <Image
@@ -346,18 +332,19 @@ const ManageEquipment = () => {
               <View style={[styles.frameLayout]} />
               { (manufacturer!='Calix') &&
               <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock]}
+                style={[styles.frame9defaultSpaceBlock,{backgroundColor:currentHealth!='Optimal'?'#EF4E3E10':'white'}]}
                 onPress={() => {
-                  if(loadingHealth){
+                  if(!loadingHealth){
                     navigation.navigate("ModemRebootScreen",{isError:(currentHealth!='Optimal')?true:false,isFromT:true})
                   }
                 }}
               >
-                <Image
+                {/* <Image
                   style={{ width: 20, height: 20, flexShrink: 0 }}
                   resizeMode="contain"
                   source={require("../../../assets/refresh.png")}
-                />
+                /> */}
+                <RefreshIcon/>
                 <Text style={styles.modemHealthSupport}>Reboot Modem</Text>
                 <Image
                   resizeMode="stretch"
@@ -365,6 +352,30 @@ const ManageEquipment = () => {
                 />
               </TouchableOpacity>
              }
+             {(currentHealth!='Poor') && (
+                <>
+              <View style={[styles.frameLayout]} />
+
+              <TouchableOpacity
+                style={[styles.frame9defaultSpaceBlock,{backgroundColor:currentHealth!='Optimal'?'#EF4E3E10':'white'}]}
+                onPress={() => {
+                  navigation.navigate("ModemExchange");
+                }}
+              >
+                <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
+                  resizeMode="contain"
+                  source={require("../../../assets/repeat-01.png")}
+                />
+                <Text style={styles.modemHealthSupport}>Exchange Modem</Text>
+                <Image
+                  resizeMode="stretch"
+                  source={require("../../../assets/chevronright.png")}
+                />
+              </TouchableOpacity>
+              </>
+                  
+          )}
             </View>
           </View>
           <View style={[styles.frameFlexBox]}>
