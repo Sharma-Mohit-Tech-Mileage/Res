@@ -6,11 +6,11 @@ export const profileSchema = (isPrimaryAdmin, multipleEmails) => yup.object({
     svEmailAddress: (isPrimaryAdmin && !multipleEmails)
         ? yup.string().email('Invalid email address').required('Email is required')
         : yup.string().nullable(),
-    phoneNumber: isPrimaryAdmin
-        ? yup.string()
-            .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number.')
-            .required('Phone number is required')
-        : yup.string().nullable(),
+    // phoneNumber: isPrimaryAdmin
+    //     ? yup.string()
+    //         .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number.')
+    //         .required('Phone number is required')
+    //     : yup.string().nullable(),
 });
 
 

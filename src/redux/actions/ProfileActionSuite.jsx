@@ -97,10 +97,10 @@ export const savePaperlessDetails = (data) => {
 };
 
 // Action creator
-export const updateProfileRequest = (data, smsPayload, navigation) => ({
+export const updateProfileRequest = (data, navigation) => ({
     type: UPDATE_PROFILE_REQUEST,
     payload: data,
-    smsPayload: smsPayload,
+   // smsPayload: smsPayload,
     navigation,
 });
 

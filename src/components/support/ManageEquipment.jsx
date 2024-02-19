@@ -100,6 +100,11 @@ const ManageEquipment = () => {
       (res) => {
         console.log("checkModemDetails", res.status);
         if (res) {
+          if(res.status===408){
+            setCurrentHealth("Poor");
+            setLoadingHealth(false)
+            return;
+          }
           let temt = [];
           if (res.EquipmentType === "DOCSIS") {
             temt.push(res.UTxP_State);
@@ -343,7 +348,7 @@ const ManageEquipment = () => {
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
-                  if(loadingHealth){
+                  if(!loadingHealth){
                     navigation.navigate("ModemRebootScreen",{isError:(currentHealth!='Optimal')?true:false,isFromT:true})
                   }
                 }}

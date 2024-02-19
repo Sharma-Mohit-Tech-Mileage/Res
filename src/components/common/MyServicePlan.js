@@ -47,13 +47,15 @@ const MyServicePlan = ({ plans, navigation }) => {
 
     const PlanDetailsItem = ({ item, index }) => {
       return (
-        <View key={index}>
+        <View key={index} accessible accessibilityLabel={`Plan Details for Internet ${item.planName}`}>
           <View
             style={{
               flexDirection: "row",
               backgroundColor: colors.backgound_blue,
               padding: wp("3%"),
             }}
+            accessible
+            accessibilityLabel={`Internet Plan ${item.planName}`}
           >
             <LinearGradient
               start={{ x: 0, y: 0 }}
@@ -68,9 +70,9 @@ const MyServicePlan = ({ plans, navigation }) => {
                 alignSelf: "center",
               }}
             >
-              <InternetIcon />
+              <InternetIcon accessible accessibilityLabel="Internet Icon" />
             </LinearGradient>
-            <Text style={styles.planDetailsRowHeader}>
+            <Text style={styles.planDetailsRowHeader} accessibilityLabel={`Internet ${item.planName}`}>
               Internet {item.planName}
             </Text>
           </View>
@@ -161,6 +163,9 @@ const MyServicePlan = ({ plans, navigation }) => {
                   fontWeight: "400",
                   fontFamily: FontFamily.openSansRegular,
                 }}
+                accessible={true}
+                accessibilityLabel="Plan Details"
+                accessibilityRole="header"
               >
                 Plan Details
               </Text>
@@ -168,11 +173,16 @@ const MyServicePlan = ({ plans, navigation }) => {
                 onPress={() => {
                   setModelComment(false);
                 }}
+                accessible={true}
+                accessibilityLabel="Close Plan Details"
+                accessibilityHint="Closes the plan details modal"
               >
                 <Image
                   style={{ height: 32, width: 32, overflow: "hidden" }}
                   resizeMode="cover"
                   source={require("../../../assets/right-actionable7.png")}
+                  accessible={true}
+                  accessibilityLabel="Close icon"
                 />
               </TouchableOpacity>
             </View>
@@ -216,9 +226,9 @@ const MyServicePlan = ({ plans, navigation }) => {
       <View
         style={{
           flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          marginTop: wp("5%"),
+           justifyContent: "center",
+          // alignItems: "center",
+          padding: wp("5%"),
         }}
       >
         <TouchableOpacity
@@ -226,9 +236,7 @@ const MyServicePlan = ({ plans, navigation }) => {
             tabIndex == 0 ? styles.selectedTab : styles.defaultTab,
             { borderWidth: 1 },
           ]}
-          onPress={
-            () =>setTabIndex(0)}
-        >
+          onPress={() => setTabIndex(0)}>
           <Text
           
             style={{
@@ -242,8 +250,7 @@ const MyServicePlan = ({ plans, navigation }) => {
              
             }}
             
-          >
-            {" "}
+          >{" "}
             Data Speed
           </Text>
         </TouchableOpacity>

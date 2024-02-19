@@ -52,7 +52,9 @@ const dashboardReducer = (state = initialState, action) => {
         walkThroughStep: action.payload
       }
     case LOGOUT:
-      return initialState;  // Reset state on logout
+      return {
+        initialState
+      };  // Reset state on logout
     default:
       return state;
   }

@@ -44,7 +44,7 @@ const ModemExchangeInstructions = () => {
           <View style={styles.separator} />
           {instructions.map((instruction, index) => (
             <View key={index} style={styles.instructionContainer}>
-              <Text style={styles.bulletPoint}>�</Text>
+              <View style={styles.bulletPoint}></View>
               <Text style={styles.instructionText}>
                 {instruction.includes('contact us') ? (
                   <>
@@ -132,6 +132,14 @@ const styles = StyleSheet.create({
   linkText: {
     color: Color.colorMidnightblue,
     fontWeight: "700",
+  },
+  bulletPoint: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Color.sparklightGray1,
+    marginTop: 8,
+    marginRight: 8,
   },
 });
 

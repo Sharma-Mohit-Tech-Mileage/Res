@@ -23,33 +23,33 @@ const ProfileSettingsEdit = () => {
   const profileDetailsfromStore = profile.profileDetails || {};
   const isPrimaryUser = isPrimaryAdmin(profileDetailsfromStore.memberType);
   const scrollViewRef = useRef(null);
-  const [smsPayload, setSmsPayload] = useState(route.params?.smsPayload || {});
-
+  //const [smsPayload, setSmsPayload] = useState(route.params?.smsPayload || {});
+  console.log('profile Info-----------------------------------------------------------------------------',JSON.stringify(profileDetailsfromStore))
   const handleSave = async (data) => {
     const newData = { ...data };
-    delete newData.phoneNumber; // Safe operation even if phoneNumber does not exist
+    //delete newData.phoneNumber; // Safe operation even if phoneNumber does not exist
     const emailChanged = newData.svEmailAddress !== initialEmailAddress;
     if (emailChanged) {
       newData.email = initialEmailAddress;
     }
-    dispatch(updateProfileRequest(newData, smsPayload, navigation));
+    dispatch(updateProfileRequest(newData, navigation));
   };
 
   const { control, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: yupResolver(profileSchema(isPrimaryUser, profileDetailsfromStore.multipleEmails)),
     defaultValues: {
       ...profileDetailsfromStore,
-      phoneNumber: smsPayload.phoneNumber
+     // phoneNumber: smsPayload.phoneNumber
     }
   });
 
-  const updateSmsPayloadPhoneNumber = (e) => {
-    const { value } = e.target;
-    setSmsPayload(smsPayload => ({
-      ...smsPayload,
-      'phoneNumber': value
-    }));
-  };
+  // const updateSmsPayloadPhoneNumber = (e) => {
+  //   const { value } = e.target;
+  //   setSmsPayload(smsPayload => ({
+  //     ...smsPayload,
+  //     'phoneNumber': value
+  //   }));
+  // };
 
   const handleValidationError = () => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
@@ -189,7 +189,7 @@ const ProfileSettingsEdit = () => {
                   )}
                 />
               </View>
-              <View style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}>
+              {/* <View style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}>
                 <Controller
                   control={control}
                   name="phoneNumber" // This should be the name used in your validation schema
@@ -208,7 +208,7 @@ const ProfileSettingsEdit = () => {
                     />
                   )}
                 />
-              </View>
+              </View> */}
             </View>
           </View>
           <View style={{ marginTop: Padding.p_base }}>

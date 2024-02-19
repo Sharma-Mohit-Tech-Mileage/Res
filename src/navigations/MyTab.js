@@ -44,7 +44,7 @@ const MyTabs = ({ route, navigation }) => {
 
   return (
     <>
-    { home.walkThroughStep !== null &&
+    { home.walkThroughStep !== null && home.walkThroughStep !== undefined &&
       (
         <>
           <View style={shadowStyleLeft}>
@@ -142,7 +142,7 @@ const MyTabs = ({ route, navigation }) => {
           tabBarIcon: ({ focused }) => {
             return (
               <View style={styles.tabItem}>
-                <AccountIcon focused={focused} data={user.userInfo} />
+                <AccountIcon focused={focused} data={user?.userInfo} />
               </View>
             );
           }          

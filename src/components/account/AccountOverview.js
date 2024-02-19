@@ -25,7 +25,7 @@ const config = {
   iosPrefersEphemeralSession: true,
 };
 
-const logoutConfirmationPopuo = (navigation) => {
+const logoutConfirmationPopup = (dispatch, navigation) => {
   Alert.alert(
     'Confirm Logout',
     'Are you sure you want to Logout the app?',
@@ -38,38 +38,39 @@ const logoutConfirmationPopuo = (navigation) => {
       {
         text: 'Logout',
         onPress: () => {
-          logoutAction(navigation);
+          logoutAction(dispatch, navigation);
         },
       },
     ],
     { cancelable: true }
   );
+};
 
-}
 
-const logoutAction = (navigation) => {
-  let re = getSsoToken().then((res) => {
-    console.log('token', res)
+const logoutAction = (dispatch, navigation) => {
+  getSsoToken().then((res) => {
+    console.log('token', res);
     let token = res.idToken;
     logout(config, {
       idToken: token,
       postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
     }).then((result) => {
-      console.log('Logout', result)
+      console.log('Logout', result);
       storeUser({});
       storeSsoToken({});
-      saveUserInfo({});
-      logoutApp();
+      dispatch(saveUserInfo({}));
+      dispatch(logoutApp());
       cleanUserData();
       SetClearTimer();
-      Zendesk.logout()
+      Zendesk.logout();
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Splash' }]
-      })
+        routes: [{ name: 'Splash' }],
+      });
     });
   });
-}
+};
+
 
 const AccountOverview = () => {
   const navigation = useNavigation();
@@ -217,7 +218,7 @@ const AccountOverview = () => {
                   accessibilityRole="button"
                   accessibilityLabel="Logout"
                   style={[styles.button, styles.buttonsLayout]}
-                  onPress={() => { logoutConfirmationPopuo(navigation) }}
+                  onPress={() => { logoutConfirmationPopup(dispatch, navigation) }}
                 >
                   <Text style={[styles.accept]}>
                     Logout

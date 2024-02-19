@@ -177,6 +177,13 @@ const TroubleshootContainer = () => {
       (res) => {
         console.log("checkModemHealth", res);
         if (res) {
+          if(res?.status){
+            if(res.status===408){
+              setIssueDetected(true);
+              navigation.navigate("ModemRebootScreen",{isError:true})
+              return
+            }
+          }
           let temt = [];
           console.log("checkModemHealth", res.EquipmentType);
           if (res.EquipmentType === "DOCSIS") {

@@ -172,6 +172,13 @@ const HomeScreen = ({ navigation }) => {
         console.log("checkModemDetails", res);
         if (res) {
 
+          if(res?.status){
+            if(res.status===408){
+              setInternetHealths(oldArray => [...oldArray,'Yellow'] );
+              return
+            }
+          }
+
           let temt = [];
           if (res.EquipmentType === "DOCSIS") {
             temt.push(res.UTxP_State);
@@ -194,7 +201,7 @@ const HomeScreen = ({ navigation }) => {
         if(errorCode===404){
           setInternetHealths(oldArray => [...oldArray,'Red'] );
         }else{
-          setInternetHealths(oldArray => [...oldArray,'yellow'] );
+          setInternetHealths(oldArray => [...oldArray,'Yellow'] );
         }
       }
     );
@@ -231,7 +238,7 @@ const HomeScreen = ({ navigation }) => {
       setCurrentHealth('Offline');
       setIsInternetDetails(true);
     }else if(checkYellow){
-      console.log('Internet Health is yellow')
+      console.log('Internet Health is Yellow')
       setCurrentHealth('Poor');
       setIsInternetDetails(true);
     }else{
@@ -358,8 +365,7 @@ const HomeScreen = ({ navigation }) => {
       } catch (error) {
         console.error("Error fetching data", error);
       }
-
-      if (home.walkThroughStep !== null) {
+      if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
         setShowWalkThrough(true);
       }
     };
