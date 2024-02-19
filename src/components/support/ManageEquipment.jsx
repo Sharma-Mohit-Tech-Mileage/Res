@@ -348,7 +348,7 @@ const ManageEquipment = () => {
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
-                  if(loadingHealth){
+                  if(!loadingHealth){
                     navigation.navigate("ModemRebootScreen",{isError:(currentHealth!='Optimal')?true:false,isFromT:true})
                   }
                 }}
