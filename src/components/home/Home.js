@@ -174,7 +174,7 @@ const HomeScreen = ({ navigation }) => {
 
           if(res?.status){
             if(res.status===408){
-              setInternetHealths(oldArray => [...oldArray,'Yellow'] );
+              setInternetHealths(oldArray => [...oldArray,'Red'] );
               return
             }
           }

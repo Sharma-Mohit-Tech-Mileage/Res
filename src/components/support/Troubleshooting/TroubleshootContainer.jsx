@@ -180,7 +180,7 @@ const TroubleshootContainer = () => {
           if(res?.status){
             if(res.status===408){
               setIssueDetected(true);
-              navigation.navigate("ModemRebootScreen",{isError:true})
+              navigation.navigate("ManageEquipment",{isError:true})
               return
             }
           }
@@ -235,12 +235,12 @@ const TroubleshootContainer = () => {
         // stepsData[currentStep].success = false;
         //setModemIssueDetected(true);
         setIssueDetected(true);
-        navigation.navigate("ModemRebootScreen",{isError:true});;
+        navigation.navigate("ManageEquipment",{isError:true});;
       } else {
         //stepsData[currentStep].success = false;
         //setModemIssueDetected(true);
         setIssueDetected(true);
-        navigation.navigate("ModemRebootScreen",{isError:true});
+        navigation.navigate("ManageEquipment",{isError:true});
       }
     } else {
       // modem health is good
