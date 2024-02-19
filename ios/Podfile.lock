@@ -635,11 +635,25 @@ PODS:
     - React-RCTImage
   - RNSVG (13.14.0):
     - React-Core
+  - RNZendeskChat (0.4.1):
+    - React-Core
+    - ZendeskChatSDK (~> 2.9)
   - SocketRocket (0.6.1)
   - Yoga (1.14.0)
   - Zendesk (1.13.0):
     - ZendeskSDKConversationKit (~> 1.10.0)
     - ZendeskSDKCoreUtilities (~> 1.4.0)
+  - ZendeskChatProvidersSDK (2.12.0)
+  - ZendeskChatSDK (2.12.0):
+    - ZendeskChatProvidersSDK (= 2.12.0)
+    - ZendeskMessagingSDK (= 3.8.5)
+  - ZendeskCommonUISDK (6.1.4)
+  - ZendeskMessagingAPISDK (3.8.5):
+    - ZendeskSDKConfigurationsSDK (= 1.1.11)
+  - ZendeskMessagingSDK (3.8.5):
+    - ZendeskCommonUISDK (= 6.1.4)
+    - ZendeskMessagingAPISDK (= 3.8.5)
+  - ZendeskSDKConfigurationsSDK (1.1.11)
   - ZendeskSDKConversationKit (1.10.0):
     - ZendeskSDKCoreUtilities (~> 1.4.0)
     - ZendeskSDKFayeClient (~> 1.5.0)
@@ -731,6 +745,7 @@ DEPENDENCIES:
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - RNZendeskChat (from `../node_modules/react-native-zendesk-chat`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -756,6 +771,12 @@ SPEC REPOS:
     - PromisesSwift
     - SocketRocket
     - Zendesk
+    - ZendeskChatProvidersSDK
+    - ZendeskChatSDK
+    - ZendeskCommonUISDK
+    - ZendeskMessagingAPISDK
+    - ZendeskMessagingSDK
+    - ZendeskSDKConfigurationsSDK
     - ZendeskSDKConversationKit
     - ZendeskSDKCoreUtilities
     - ZendeskSDKFayeClient
@@ -890,6 +911,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-screens"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  RNZendeskChat:
+    :path: "../node_modules/react-native-zendesk-chat"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -974,9 +997,16 @@ SPEC CHECKSUMS:
   RNReanimated: 8ace147c4bcfeccba91eb97cde784c773c91850e
   RNScreens: 85d3880b52d34db7b8eeebe2f1a0e807c05e69fa
   RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
+  RNZendeskChat: c3835f664be1746b121b69736d5c95e236cae382
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 3efc43e0d48686ce2e8c60f99d4e6bd349aff981
   Zendesk: 5e382df2c0034a0df4e43174ecbd7e9bed54b929
+  ZendeskChatProvidersSDK: b3f5a914ed9d518770c994f0f04683952087b00a
+  ZendeskChatSDK: 12fbe34d67b73895882786736329236e7e092b67
+  ZendeskCommonUISDK: ba160fe413b491af9e7bfcb9808afcd494dc83a5
+  ZendeskMessagingAPISDK: 410f9bcf07c79fe98d6f251da102368d6b356c54
+  ZendeskMessagingSDK: 95d396c981dacfab83cc7b9736e8561d51a3052b
+  ZendeskSDKConfigurationsSDK: ebced171fd1f4eb57760e8537d8cfa6a450122be
   ZendeskSDKConversationKit: a93d5826c299240fb7ef4fa88956bd99e6762cf4
   ZendeskSDKCoreUtilities: b44c8d51dd90ece3ef140efffe3ff5f154cfaadf
   ZendeskSDKFayeClient: a06c403c1c38adb9ae5a341a4d54632c78275a3e

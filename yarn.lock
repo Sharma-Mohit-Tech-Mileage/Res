@@ -8120,6 +8120,11 @@ react-native-webview@^13.6.3:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"
 
+react-native-zendesk-chat@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/react-native-zendesk-chat/-/react-native-zendesk-chat-0.4.1.tgz#e054d93a63504a46626894054fb4a4f4ab448e36"
+  integrity sha512-7ZwzEUYOGC3XzTvdofOwla67K3aS0yirXkUHXa6q3xgyBIP2Dao8jerrdSNzXwt7ZzGCG77cKwDxXG5uV82bow==
+
 react-native-zendesk-messaging@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/react-native-zendesk-messaging/-/react-native-zendesk-messaging-0.2.1.tgz#5edf91313b5f05936df22132da56d0cc80bcf87c"

@@ -274,7 +274,7 @@ const Support = () => {
                                     Contact Us
                                 </Text>
                             </View>
-                            {/*<View style={styles.integrationCardMobileWrapper}>
+                            <View style={styles.integrationCardMobileWrapper}>
                                 <View
                                     style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
@@ -289,8 +289,8 @@ const Support = () => {
                                             <View style={styles.frameParent}>
                                                 <Pressable style={styles.headingAndToggle}
                                                 onPress={()=>{
-                                                   // navigation.navigate('LiveChatTicketSupport') 
-                                                   handlePressOpenButton()
+                                                   navigation.navigate('LiveChatTicketSupport') 
+                                                   //handlePressOpenButton()
                                                 }}
                                                 >
                                                     <Text style={[styles.supportingText, styles.headingTypo1]}>
