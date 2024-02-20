@@ -33,6 +33,7 @@ import { SetRenewTokenTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env,  ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from 'react-native-version-check';
+import ZendeskChat from "react-native-zendesk-chat";
 import messaging from '@react-native-firebase/messaging';
 import {
   requestUserPermission,
@@ -49,6 +50,11 @@ const config = {
   iosPrefersEphemeralSession: true,
   //additionalParameters: { prompt: "login" },
 };
+
+// Once in your application:
+//4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC
+//84AFF64rwYVgQS35EsTakO03d98WTdJb
+ZendeskChat.init("4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC");
 
 
 const SplashScreen = ({ navigation }) => {
