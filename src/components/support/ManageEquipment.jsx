@@ -71,10 +71,10 @@ const ManageEquipment = () => {
             if (res.userInfo.accountNumber === "128387263") {
               mac = "00:1d:d0:d4:f8:02";
             } else if (res.userInfo.accountNumber === "133370775") {
-              mac = "90:aa:c3:fb:42:50";
+              mac = "60:19:71:d5:10:72";
             }
             else if(res.userInfo.accountNumber==='133437285'){
-              mac="1c:ab:c0:18:a8:79"
+              mac="00:40:36:7b:29:5a"
             }
             else if(res.userInfo.accountNumber==='131684698'){
               mac="ac:20:2e:6d:82:f1"
@@ -99,9 +99,9 @@ const ManageEquipment = () => {
     GetModemStatusApiRequest(
       request,
       (res) => {
-        console.log("checkModemDetails", res.status);
+        console.log("checkModemDetails", res);
         if (res) {
-          if(res.status===408){
+          if(res.status && res.status===408){
             //setCurrentHealth("Offline");
             setIsOffline(true)
             setLoadingHealth(false)
@@ -296,11 +296,11 @@ const ManageEquipment = () => {
                 styles.supportParentFlexBox,
               ]}
             >
-              { (isOffline || currentHealth==='Poor') &&(
+              { (isOffline || currentHealth==='Offline' ||currentHealth==='Poor') &&(
                 <>
                  <View style={[styles.frameLayout]} />
                  <TouchableOpacity
-                   style={[styles.frame9defaultSpaceBlock,{backgroundColor:currentHealth!='Optimal'?'#EF4E3E10':'white'}]}
+                   style={[styles.frame9defaultSpaceBlock,{backgroundColor:(currentHealth==='Offline'||currentHealth==='Poor'|| isOffline)?'#EF4E3E10':'white'}]}
                    onPress={() => {
                      navigation.navigate("ModemConnectivityGuide",{isSuccess:true});
                    }}
@@ -332,7 +332,7 @@ const ManageEquipment = () => {
               <View style={[styles.frameLayout]} />
               { (manufacturer!='Calix') &&
               <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock,{backgroundColor:currentHealth!='Optimal'?'#EF4E3E10':'white'}]}
+                style={[styles.frame9defaultSpaceBlock,{backgroundColor:(currentHealth==='Offline'||currentHealth==='Poor')?'#EF4E3E10':'white'}]}
                 onPress={() => {
                   if(!loadingHealth){
                     navigation.navigate("ModemRebootScreen",{isError:(currentHealth!='Optimal')?true:false,isFromT:true})
@@ -352,12 +352,10 @@ const ManageEquipment = () => {
                 />
               </TouchableOpacity>
              }
-             {(currentHealth!='Poor') && (
-                <>
+             
               <View style={[styles.frameLayout]} />
-
               <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock,{backgroundColor:currentHealth!='Optimal'?'#EF4E3E10':'white'}]}
+                style={[styles.frame9defaultSpaceBlock,{backgroundColor:currentHealth==='Offline'?'#EF4E3E10':'white'}]}
                 onPress={() => {
                   navigation.navigate("ModemExchange");
                 }}
@@ -373,9 +371,7 @@ const ManageEquipment = () => {
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
-              </>
-                  
-          )}
+              
             </View>
           </View>
           <View style={[styles.frameFlexBox]}>
