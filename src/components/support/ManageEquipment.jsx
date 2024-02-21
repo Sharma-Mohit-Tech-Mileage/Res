@@ -384,7 +384,7 @@ const ManageEquipment = () => {
                   style={{ width: 20, height: 20, flexShrink: 0 }}
                   resizeMode="contain"
                   tintColor={Color.sparklightBrightPurple}
-                  source={require("../../../assets/phone-outgoing-01.png")}
+                  source={require("../../../assets/phone-outgoing-04.png")}
                 />
                 <Text style={styles.modemHealthSupport}>Contact Us</Text>
                 <Image

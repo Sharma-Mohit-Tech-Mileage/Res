@@ -196,7 +196,7 @@ const TroubleshootContainer = () => {
               console.log("checkModemHealth online", temt);
               updateModemStatus(temt);
             } else {
-              navigation.navigate("ModemConnectivityGuide");
+              navigation.navigate("ManageEquipment");
             }
           } else if (res.equipmentType === "ONU") {
             temt.push(res.OnutP_State);
@@ -205,15 +205,16 @@ const TroubleshootContainer = () => {
             if (res.onU_State === "Online") {
               updateModemStatus(temt);
             } else {
-              navigation.navigate("ModemConnectivityGuide");
+              navigation.navigate("ManageEquipment");
             }
           }
           setLoading(false);
         }else{
-          navigation.navigate("ModemConnectivityGuide");
+          navigation.navigate("ManageEquipment");
         }
       },
       (error) => {
+        console.log("Modem details Error1", error);
         console.log("Modem details Error", error);
         setIssueDetected(true);
         navigation.navigate("ManageEquipment",{isError:true});;
