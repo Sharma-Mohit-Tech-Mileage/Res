@@ -174,7 +174,7 @@ const HomeScreen = ({ navigation }) => {
 
           if(res?.status){
             if(res.status===408){
-              setInternetHealths(oldArray => [...oldArray,'Red'] );
+              setInternetHealths(oldArray => [...oldArray,'Yellow'] );
               return
             }
           }
@@ -199,6 +199,8 @@ const HomeScreen = ({ navigation }) => {
       (errorCode) => {
         console.log("Modem details on Error", errorCode);
         if(errorCode===404){
+          setInternetHealths(oldArray => [...oldArray,'Red'] );
+        }else if(errorCode===400 ||errorCode===500 |errorCode===504){
           setInternetHealths(oldArray => [...oldArray,'Red'] );
         }else{
           setInternetHealths(oldArray => [...oldArray,'Yellow'] );

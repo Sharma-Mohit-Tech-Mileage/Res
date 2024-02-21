@@ -214,8 +214,10 @@ const TroubleshootContainer = () => {
         }
       },
       (error) => {
-        navigation.navigate("ModemConnectivityGuide");
-        console.log("Modem details", error);
+        console.log("Modem details Error", error);
+        setIssueDetected(true);
+        navigation.navigate("ManageEquipment",{isError:true});;
+        
         //networkError[currentStep] = true;
         setKey(3);
         setLoading(false);
