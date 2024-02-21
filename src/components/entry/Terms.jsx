@@ -7,7 +7,6 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useSelector, useDispatch } from 'react-redux';
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { updateTermsAndConditions, fetchSMSSelection, fetchBillingStatus, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
-import * as Zendesk from 'react-native-zendesk-messaging';
 import { logout } from 'react-native-app-auth';
 import { SetClearTimer } from '../user/Session';
 import { saveUserInfo } from "../../redux/actions/UserAction";
@@ -164,7 +163,6 @@ const Terms = ({ navigation }) => {
                 saveUserInfo({});
                 cleanUserData();
                 SetClearTimer();
-                Zendesk.logout();
                 navigation.reset({
                     index: 0,
                     routes: [{ name: 'Splash' }]

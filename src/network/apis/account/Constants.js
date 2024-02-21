@@ -16,7 +16,8 @@ export const config={
       category_id: "360022798993",
       feedbackValue_id: "1900000846365",
       email_id: "36003617614",
-   }
+   },
+   ZENDESK_CHAT_KEY: '4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC'   
  },
  UAT:{
     URL:'https://customer.uat.sparklight.com',
@@ -32,7 +33,8 @@ export const config={
       category_id: "1500002176201",
       feedbackValue_id: "18708581262999",
       email_id: "1500002222302",
-   }
+   },
+   ZENDESK_CHAT_KEY: '84AFF64rwYVgQS35EsTakO03d98WTdJb'
  }
 
 }

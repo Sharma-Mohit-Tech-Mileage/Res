@@ -10,7 +10,6 @@ import TicketSupport from "../../components/support/TicketSupport";
 import TicketView from "../../components/support/TicketView";
 import TroubleShootStack from "./TroubleShootStack";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
-import LiveSupportChat from "../../components/support/LiveSupportChat";
 import ModemStackScreen from "./ManageEquepmentStack";
 import ModemConnectivityGuide from '../../components/support/Troubleshooting/ModemConnectivityGuide';
 const SupportStack = createStackNavigator();
@@ -79,16 +78,6 @@ function SupportStackScreen() {
       <SupportStack.Screen
         name="TicketSupport"
         component={TicketSupport}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
-
-      <SupportStack.Screen
-        name="LiveChatTicketSupport"
-        component={LiveSupportChat}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),

@@ -94,9 +94,6 @@ const Support = () => {
 
     
     const handlePressOpenButton = () => {
-        console.log('handlePressOpenButton');
-        console.log('onZenDeskChat');
-
         const user = {
             full_name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
             email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
@@ -111,13 +108,13 @@ const Support = () => {
             // The behaviorFlags are optional, and each default to 'true' if omitted
             behaviorFlags: {
                 showAgentAvailability: true,
-                showChatTranscriptPrompt: true,
+                showChatTranscriptPrompt: false,
                 showPreChatForm: true,
                 showOfflineForm: true,
             },
             // The preChatFormOptions are optional & each defaults to "optional" if omitted
             preChatFormOptions: {
-                name: !user.full_name ? "required" : "optional",
+                name: "optional",
                 email: "optional",
                 phone: "optional",
                 department: "required",
