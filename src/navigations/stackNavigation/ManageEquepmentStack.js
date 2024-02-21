@@ -51,7 +51,6 @@ function ModemStackScreen() {
           blur: () => setTabBarVisible(true),
         }}
       />
-
        <ModemStack.Screen
         name="ModemConnectivityGuide"
         component={ModemConnectivityGuide}
@@ -61,7 +60,6 @@ function ModemStackScreen() {
           blur: () => setTabBarVisible(true),
         }}
       />
-      
     </ModemStack.Navigator>
   );
 }

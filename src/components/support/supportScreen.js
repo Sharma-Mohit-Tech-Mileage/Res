@@ -10,7 +10,8 @@ import {
     heightPercentageToDP as hp,
   } from "react-native-responsive-screen";
 
-const Support = () => {
+const Support = ({route}) => {
+    console.log('Back to Support',JSON.stringify(route))
     const navigation = useNavigation();
     const scrollViewRef = useRef(null);
     const makeCall = (number) => {
@@ -76,8 +77,15 @@ const Support = () => {
     
 
     useEffect(() => {
+       if(route.params?.isContactUs){
+        console.log('scrollToEnd')
+        setTimeout(()=>{
+            scrollViewRef.current?.scrollToEnd({animated: true})
+        },1000)
+        
+       }
+
         var token = PubSub.subscribe('event.contactUsEvent', mySubscriber);
-    
         initZendesk();
           return () => {
             PubSub.unsubscribe(token);

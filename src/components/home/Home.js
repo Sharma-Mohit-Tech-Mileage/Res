@@ -146,9 +146,9 @@ const HomeScreen = ({ navigation }) => {
       if(user.userInfo.accountNumber==='128387263'){
         mac="00:1d:d0:d4:f8:02"
       }else if(user.userInfo.accountNumber==='133370775'){
-        mac="90:aa:c3:fb:42:50"
+        mac="60:19:71:d5:10:72"
       }else if(user.userInfo.accountNumber==='133437285'){
-        mac="1c:ab:c0:18:a8:79"
+        mac="00:40:36:7b:29:5a"
       }else if(user.userInfo.accountNumber==='131684698'){
         mac="ac:20:2e:6d:82:f1"
       }
@@ -174,7 +174,7 @@ const HomeScreen = ({ navigation }) => {
 
           if(res?.status){
             if(res.status===408){
-              setInternetHealths(oldArray => [...oldArray,'Red'] );
+              setInternetHealths(oldArray => [...oldArray,'Yellow'] );
               return
             }
           }
@@ -199,6 +199,8 @@ const HomeScreen = ({ navigation }) => {
       (errorCode) => {
         console.log("Modem details on Error", errorCode);
         if(errorCode===404){
+          setInternetHealths(oldArray => [...oldArray,'Red'] );
+        }else if(errorCode===400 ||errorCode===500 |errorCode===504){
           setInternetHealths(oldArray => [...oldArray,'Red'] );
         }else{
           setInternetHealths(oldArray => [...oldArray,'Yellow'] );
