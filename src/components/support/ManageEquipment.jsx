@@ -29,6 +29,8 @@ import {
 } from "react-native-responsive-screen";
 import CheckConnection from "../../res/svgIcons/CheckConnection";
 import RefreshIcon from "../../res/svgIcons/RefreshIcon";
+import PubSub from 'pubsub-js';
+
 const ManageEquipment = () => {
   const navigation = useNavigation();
   const [manufacturer, setManufacturer] = React.useState('');
@@ -39,6 +41,7 @@ const ManageEquipment = () => {
   const [loadingHealth, setLoadingHealth] = React.useState(false);
   const [currentHealth, setCurrentHealth] = React.useState("Optimal");
   const [isOffline, setIsOffline] = React.useState(false);
+  const [isContactUs, setIsContactUs] = React.useState(false);
 
   const getLeasedDetails = () => {
     let re = getUser().then((res) => {
@@ -71,10 +74,10 @@ const ManageEquipment = () => {
             if (res.userInfo.accountNumber === "128387263") {
               mac = "00:1d:d0:d4:f8:02";
             } else if (res.userInfo.accountNumber === "133370775") {
-              mac = "90:aa:c3:fb:42:50";
+              mac = "60:19:71:d5:10:72";
             }
             else if(res.userInfo.accountNumber==='133437285'){
-              mac="1c:ab:c0:18:a8:79"
+              mac="00:40:36:7b:29:5a"
             }
             else if(res.userInfo.accountNumber==='131684698'){
               mac="ac:20:2e:6d:82:f1"
@@ -99,12 +102,12 @@ const ManageEquipment = () => {
     GetModemStatusApiRequest(
       request,
       (res) => {
-        console.log("checkModemDetails", res.status);
+
         if (res) {
-          if(res.status===408){
-            //setCurrentHealth("Offline");
-            setIsOffline(true)
+          console.log("checkModemDetails", res);
+          if(res.status && res.status===408){
             setLoadingHealth(false)
+            setCurrentHealth("Poor");
             return;
           }
           let temt = [];
@@ -127,15 +130,12 @@ const ManageEquipment = () => {
       (errorCode) => {
         setLoadingHealth(false);
         console.log("Modem details", errorCode);
-        if(errorCode===408){
-          //setCurrentHealth("Offline");
+         if(errorCode===404){
           setIsOffline(true)
           return;
-        }else if(errorCode===404){
-          setIsOffline(true)
-          return;
-        }else{
+        }else if(errorCode===400 ||errorCode===500 |errorCode===504){
           setCurrentHealth("Offline");
+          setIsContactUs(true)
         }
       }
     );
@@ -183,6 +183,10 @@ const ManageEquipment = () => {
     getInternetPlanDetails();
   }, []);
 
+  React.useEffect(() => {
+    console.log('Current Health',currentHealth)
+  }, [currentHealth]);
+
   return (
     <View style={styles.manageEquipment}>
       <ProfileSettingsHeader
@@ -227,7 +231,7 @@ const ManageEquipment = () => {
                           <Image
                             style={styles.frameChild}
                             tintColor={
-                              (isOffline)?colors.dark_grey :currentHealth === "Optimal"
+                              (isOffline)?colors.sparklight_red :currentHealth === "Optimal"
                                 ? colors.sparklight_green
                                 : currentHealth === "Offline"
                                 ? colors.sparklight_red
@@ -254,7 +258,7 @@ const ManageEquipment = () => {
                 </View>
               </View>
 
-                { ( currentHealth!='Optimal' && !loadingHealth) &&
+                { ( (currentHealth!="Optimal" ||isOffline) && !loadingHealth) &&
               <View
                 style={[styles.notificationsWrapper, styles.myModemSpaceBlock]}
               >
@@ -272,7 +276,7 @@ const ManageEquipment = () => {
                       />
                       <View style={styles.creditCardWillExpireSoonParent}>
                         <Text style={styles.creditCardWill}>
-                        {(isOffline)?'Modem is Offline' :'An issue has been detected'}
+                        {(isOffline)?'Modem is Offline' :(isContactUs)?'!Please again later':'An issue has been detected'}
                         </Text>
                         <Text
                           style={[
@@ -280,7 +284,7 @@ const ManageEquipment = () => {
                             styles.yourSavedCardSpaceBlock,
                           ]}
                         >
-                          Try one of the options below to resolve.
+                          {(isContactUs)?`Sorry, we're having trouble completing the modem system check right now. This seems to be an issue on our end. Please try again later. If the problem persists, please contact our support team for assistance.`:'Try one of the highlighted options below to resolve'}
                         </Text>
                       </View>
                     </View>
@@ -296,11 +300,10 @@ const ManageEquipment = () => {
                 styles.supportParentFlexBox,
               ]}
             >
-              { (isOffline || currentHealth==='Poor') &&(
-                <>
+              
                  <View style={[styles.frameLayout]} />
                  <TouchableOpacity
-                   style={[styles.frame9defaultSpaceBlock,{backgroundColor:currentHealth!='Optimal'?'#EF4E3E10':'white'}]}
+                   style={[styles.frame9defaultSpaceBlock,{backgroundColor:(currentHealth==='Offline'||isOffline || currentHealth==='Poor')?'#EF4E3E10':'white'}]}
                    onPress={() => {
                      navigation.navigate("ModemConnectivityGuide",{isSuccess:true});
                    }}
@@ -312,10 +315,7 @@ const ManageEquipment = () => {
                      source={require("../../../assets/chevronright.png")}
                    />
                  </TouchableOpacity>
-                 </>
-              )
-
-              }
+                 
               
               {/* <View style={[styles.frameLayout]} />
                             <View style={[styles.frame9defaultSpaceBlock]} >
@@ -332,7 +332,7 @@ const ManageEquipment = () => {
               <View style={[styles.frameLayout]} />
               { (manufacturer!='Calix') &&
               <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock,{backgroundColor:currentHealth!='Optimal'?'#EF4E3E10':'white'}]}
+                style={[styles.frame9defaultSpaceBlock,{backgroundColor:(currentHealth==='Offline'||currentHealth==='Poor')?'#EF4E3E10':'white'}]}
                 onPress={() => {
                   if(!loadingHealth){
                     navigation.navigate("ModemRebootScreen",{isError:(currentHealth!='Optimal')?true:false,isFromT:true})
@@ -352,12 +352,10 @@ const ManageEquipment = () => {
                 />
               </TouchableOpacity>
              }
-             {(currentHealth!='Poor') && (
-                <>
+             
               <View style={[styles.frameLayout]} />
-
               <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock,{backgroundColor:currentHealth!='Optimal'?'#EF4E3E10':'white'}]}
+                style={[styles.frame9defaultSpaceBlock,{backgroundColor:currentHealth==='Offline'?'#EF4E3E10':'white'}]}
                 onPress={() => {
                   navigation.navigate("ModemExchange");
                 }}
@@ -373,9 +371,29 @@ const ManageEquipment = () => {
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
-              </>
-                  
-          )}
+
+              <View style={[styles.frameLayout]} />
+              <TouchableOpacity
+                style={[styles.frame9defaultSpaceBlock,{backgroundColor:(currentHealth==='Offline' || isContactUs)?'#EF4E3E10':'white'}]}
+                onPress={() => {
+                  PubSub.publish('event.contactUsEvent', {});
+                  setTimeout(() => navigation.navigate('SupportStack',{'isContactUs':true}), 500);
+                }}
+              >
+                <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
+                  resizeMode="contain"
+                  tintColor={Color.sparklightBrightPurple}
+                  source={require("../../../assets/phone-outgoing-04.png")}
+                />
+                <Text style={styles.modemHealthSupport}>Contact Us</Text>
+                <Image
+                  resizeMode="stretch"
+                  source={require("../../../assets/chevronright.png")}
+                />
+              </TouchableOpacity>
+              
+              
             </View>
           </View>
           <View style={[styles.frameFlexBox]}>

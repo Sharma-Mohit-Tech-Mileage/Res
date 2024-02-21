@@ -48,7 +48,7 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
         { <TouchableOpacity
           style={{ flexDirection: "row" }}
           onPress={() => {
-            navigation.push('ManageEquipment');
+            navigation.push('ManageEquipment',{isManagementEquipment:true});
           }}
         >
           <View style={styles.item}>

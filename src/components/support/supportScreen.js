@@ -11,7 +11,8 @@ import {
     heightPercentageToDP as hp,
   } from "react-native-responsive-screen";
 
-const Support = () => {
+const Support = ({route}) => {
+    console.log('Back to Support',JSON.stringify(route))
     const navigation = useNavigation();
     const [zenDeskSupportAvailable, setZenDeskSupportAvailable] = useState(false);
     const userData = useSelector(state => state.combinedReducers.user.userData);
@@ -79,8 +80,15 @@ const Support = () => {
     
 
     useEffect(() => {
-        var token = PubSub.subscribe('event.contactUsEvent', mySubscriber);
+       if(route.params?.isContactUs){
+        console.log('scrollToEnd')
+        setTimeout(()=>{
+            scrollViewRef.current?.scrollToEnd({animated: true})
+        },1000)
+        
+       }
 
+        var token = PubSub.subscribe('event.contactUsEvent', mySubscriber);
         return () => {
             PubSub.unsubscribe(token);
         };     

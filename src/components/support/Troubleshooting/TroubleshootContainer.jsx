@@ -196,7 +196,7 @@ const TroubleshootContainer = () => {
               console.log("checkModemHealth online", temt);
               updateModemStatus(temt);
             } else {
-              navigation.navigate("ModemConnectivityGuide");
+              navigation.navigate("ManageEquipment");
             }
           } else if (res.equipmentType === "ONU") {
             temt.push(res.OnutP_State);
@@ -205,17 +205,20 @@ const TroubleshootContainer = () => {
             if (res.onU_State === "Online") {
               updateModemStatus(temt);
             } else {
-              navigation.navigate("ModemConnectivityGuide");
+              navigation.navigate("ManageEquipment");
             }
           }
           setLoading(false);
         }else{
-          navigation.navigate("ModemConnectivityGuide");
+          navigation.navigate("ManageEquipment");
         }
       },
       (error) => {
-        navigation.navigate("ModemConnectivityGuide");
-        console.log("Modem details", error);
+        console.log("Modem details Error1", error);
+        console.log("Modem details Error", error);
+        setIssueDetected(true);
+        navigation.navigate("ManageEquipment",{isError:true});;
+        
         //networkError[currentStep] = true;
         setKey(3);
         setLoading(false);
@@ -266,10 +269,10 @@ const TroubleshootContainer = () => {
           if (user.userInfo.accountNumber === "128387263") {
             mac = "00:1d:d0:d4:f8:02";
           } else if (user.userInfo.accountNumber === "133370775") {
-            mac = "90:aa:c3:fb:42:50";
+            mac = "60:19:71:d5:10:72";
           }
           else if(user.userInfo.accountNumber==='133437285'){
-            mac="1c:ab:c0:18:a8:79"
+            mac="00:40:36:7b:29:5a"
           }
           else if(user.userInfo.accountNumber==='131684698'){
             mac="ac:20:2e:6d:82:f1"

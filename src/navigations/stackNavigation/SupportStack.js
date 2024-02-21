@@ -14,13 +14,14 @@ import ModemStackScreen from "./ManageEquepmentStack";
 import ModemConnectivityGuide from '../../components/support/Troubleshooting/ModemConnectivityGuide';
 const SupportStack = createStackNavigator();
 
-function SupportStackScreen() {
+function SupportStackScreen({route}) {
   const { setTabBarVisible } = useTabBarVisibility();
   return (
-    <SupportStack.Navigator initialRouteName="supportScreen" defaultNavigationOptions={{ gestureEnabled: true }}>
+    <SupportStack.Navigator initialRouteName="support" defaultNavigationOptions={{ gestureEnabled: true }}>
       <SupportStack.Screen
         name="support"
         component={supportScreen}
+        initialParams={route.params}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),

@@ -3,7 +3,7 @@
 export const config={
 
  PRODUCTION:{
-    URL:'https://customer.sparklight.com',
+    URL:'https://customer.sparklight.com/residential',
     SSO_LOGIN:'https://login.cableone.net/auth/realms/external-sso-realm',
     API_BASEURL:'https://publicservices.sparklight.com/portalservices/',
     API_SHOPPING_CART_BASEURL:'https://publicservices.sparklight.com/ShoppingCart',
@@ -20,7 +20,7 @@ export const config={
    ZENDESK_CHAT_KEY: '4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC'   
  },
  UAT:{
-    URL:'https://customer.uat.sparklight.com',
+    URL:'https://customer.uat.sparklight.com/residential',
     SSO_LOGIN:'https://login.uat.cableone.net/auth/realms/external-sso-realm',
     API_BASEURL:'https://customer.uat.sparklight.com/apiWrapper/',
     API_SHOPPING_CART_BASEURL:'https://secure.uat.cableone.net/ShoppingCartBackBoneAPIWrapperDemo',
