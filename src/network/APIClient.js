@@ -3,7 +3,7 @@ import { Env } from "./apis/account/Constants";
 
 const BASE_URL = Env.API_BASEURL
 const SUPPORT_URL="https://support.sparklight.com/api/v2/help_center/"
-const MODEM_BASE_URL="https://mule-gateway.cableone.net/customer-api"
+const MODEM_BASE_URL=Env.MODEM_BASE_URL
 
 export let UserAuthorized = false;
 
