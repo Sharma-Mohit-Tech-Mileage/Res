@@ -45,13 +45,22 @@ const Notifications = () => {
     notificationsTitle = "There is a problem retrieving your email address";
     infoText = (
       <Text style={styles.messageText}>
-        {'We are not able to retrieve the email address for your account. Please'} <Text style={styles.contactUsText} onPress={() => {
-          navigation.navigate('Support');
-          setTimeout(() => { PubSub.publish('event.contactUsEvent', {}); }, 500);
-        }
-        }> {' contact us '}</Text>{'for assistance.'}
+        {'We are not able to retrieve the email address for your account. Please '}
+        <Text
+          accessible={true}
+          accessibilityRole="link"
+          accessibilityLabel="Contact us for assistance"
+          onPress={() => {
+            navigation.navigate('Support');
+            setTimeout(() => { PubSub.publish('event.contactUsEvent', {}); }, 500);
+          }}
+          style={styles.contactUsText}>
+          {' contact us '}
+        </Text>
+        {'for assistance.'}
       </Text>
     );
+
   } else if (emailAddress) {
     notificationsTitle = isEmailVerified ? '' : 'Email verification pending';
     infoText = (isEmailVerified || !isPrimary) ? (

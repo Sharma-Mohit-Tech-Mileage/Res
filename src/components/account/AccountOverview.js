@@ -226,7 +226,7 @@ const AccountOverview = () => {
                 </Pressable>
               </View>
 
-              <Pressable style={[styles.buttons, styles.buttonsSpaceBlock]}
+              {/* <Pressable style={[styles.buttons, styles.buttonsSpaceBlock]}
                 accessible={true}
                 accessibilityRole="link">
                 <Text>
@@ -239,7 +239,30 @@ const AccountOverview = () => {
                     Terms & Conditions
                   </Text>
                 </Text>
-              </Pressable>
+              </Pressable> */}
+              <View style={{ flexDirection: 'row', ...styles.buttonsSpaceBlock, ...styles.buttons, ...styles.buttonsSpaceBlock }}>
+                <Pressable
+                  accessible={true}
+                  accessibilityRole="link"
+                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}
+                >
+                  <Text accessibilityLabel="Privacy Policy" style={styles.linkStyle}>
+                    Privacy Policy
+                  </Text>
+                </Pressable>
+
+                <Text style={styles.linkStyle}> | </Text>
+
+                <Pressable
+                  accessible={true}
+                  accessibilityRole="link"
+                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}
+                >
+                  <Text accessibilityLabel="Terms & Conditions" style={styles.linkStyle}>
+                    Terms & Conditions
+                  </Text>
+                </Pressable>
+              </View>
 
             </View>
             <Text style={{ color: Color.colorMidnightblue, alignSelf: 'center' }}>Version:{VersionCheck.getCurrentVersion()}</Text>
