@@ -16,9 +16,10 @@ import ModemConnectivityGuide from '../../components/support/Troubleshooting/Mod
 const SupportStack = createStackNavigator();
 
 function SupportStackScreen({route}) {
+  console.log('Support',JSON.stringify(route))
   const { setTabBarVisible } = useTabBarVisibility();
   return (
-    <SupportStack.Navigator initialRouteName="support" defaultNavigationOptions={{ gestureEnabled: true }}>
+    <SupportStack.Navigator initialRouteName={(route.params?.isManagementEquipment)?"ManageEquipment":"support"} defaultNavigationOptions={{ gestureEnabled: true }}>
       <SupportStack.Screen
         name="support"
         component={supportScreen}

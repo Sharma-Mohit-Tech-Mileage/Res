@@ -77,7 +77,9 @@ const SplashScreen = ({ navigation }) => {
       //Zendesk.login(token)
 
       if (res.userInfo.acctStatus === 'Disconnect'){
-        setDisconnected(true);
+        setTimeout(()=>{
+          setDisconnected(true)
+        },500)
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
         setErrorMessage(strings.nonAdminUserMsg);
         setErrorMessage1(' to view information.')
@@ -135,7 +137,10 @@ const SplashScreen = ({ navigation }) => {
   const onError = (error) => {
     console.log(" callSSOLoginApi error", error);
     setLoading(false);
-    setDisconnected(true)
+    setTimeout(()=>{
+      setDisconnected(true)
+    },500)
+   
   };
 
   const CustomAlertModal = ({ visible, message,message2, onClose }) => {

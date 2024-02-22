@@ -51,7 +51,10 @@ const ModemExchangeInstructions = () => {
                     {instruction.split('contact us')[0]}
                     <Text style={styles.linkText} onPress={() => {
                       PubSub.publish('event.contactUsEvent', {});
-                      setTimeout(() => navigation.navigate('support'), 500);
+                      //setTimeout(() => navigation.navigate('support'), 500);
+                      navigation.navigate("SupportStack", {
+                        isContactUs: true,
+                      })
                     }}>
                       contact us
                     </Text>
