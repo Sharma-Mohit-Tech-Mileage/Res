@@ -32,8 +32,8 @@ export const convertToSpecialCase = (str) => {
 
 export const isFreshEntry = (entry) => {
     const hasNoEmail = !entry.emailAddress; // true if emailAddress is empty, null, or undefined
-    const isPreviouslySubscribed = entry.paperlessStatus === "Active"; // true if paperlessStatus indicates a previous subscription
-    const isEmailBeingProcessed = entry.emailStatus === "Verified" || entry.emailStatus === "InProgress"; // true if email is either verified or in progress
+    const isPreviouslySubscribed = entry.paperlessStatus === "Active" || entry.paperlessStatus ==='Processing'; // true if paperlessStatus indicates a previous subscription
+    const isEmailBeingProcessed = entry.emailStatus === "Verified" || entry.emailStatus === "Pending"; // true if email is either verified or in progress
 
     // An entry is fresh if it has no email OR it is not previously subscribed OR the email is being processed
     return hasNoEmail && !isPreviouslySubscribed && !isEmailBeingProcessed;
