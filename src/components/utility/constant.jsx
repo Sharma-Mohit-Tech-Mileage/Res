@@ -11,7 +11,6 @@ export const BOX_COLORS = {
 };
 export const extractAcknowledgementEmail = logObj => {
     try {
-        // Directly access the 'acknowledgement' property from the object
         const acknowledgementText = logObj.acknowledgement || '';
         const emailMatch = acknowledgementText.match(/[\w.-]+@[\w.-]+\.\w+/);
         return emailMatch ? emailMatch[0] : null;
@@ -20,9 +19,8 @@ export const extractAcknowledgementEmail = logObj => {
     }
 };
 export const convertToSpecialCase = (str) => {
-    // Check if the string is null, empty, or less than 2 characters
     if (!str || typeof str !== 'string' || str.length < 2) {
-        return null; // or throw an error, depending on your requirements
+        return null; 
     }
 
     return str.split(' ').map(word =>
@@ -31,11 +29,11 @@ export const convertToSpecialCase = (str) => {
 }
 
 export const isFreshEntry = (entry) => {
-    const hasNoEmail = !entry.emailAddress; // true if emailAddress is empty, null, or undefined
-    const isPreviouslySubscribed = entry.paperlessStatus === "Active" || entry.paperlessStatus ==='Processing'; // true if paperlessStatus indicates a previous subscription
-    const isEmailBeingProcessed = entry.emailStatus === "Verified" || entry.emailStatus === "Pending"; // true if email is either verified or in progress
+    const acknowledgementEmail = extractAcknowledgementEmail(entry);
+    const hasNoEmail = !entry.emailAddress || !acknowledgementEmail; 
+    const isPreviouslySubscribed = entry.paperlessStatus === "Active" || entry.paperlessStatus ==='Processing'; 
+    const isEmailBeingProcessed = entry.emailStatus === "Verified" || entry.emailStatus === "Pending"; 
 
-    // An entry is fresh if it has no email OR it is not previously subscribed OR the email is being processed
     return hasNoEmail && !isPreviouslySubscribed && !isEmailBeingProcessed;
 };
 
