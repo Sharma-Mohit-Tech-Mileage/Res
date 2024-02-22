@@ -9,7 +9,16 @@ export const BOX_COLORS = {
     admin: Color.colorWhitesmoke_200,
     viewonly: Color.colorWhitesmoke_200,
 };
-
+export const extractAcknowledgementEmail = logObj => {
+    try {
+        // Directly access the 'acknowledgement' property from the object
+        const acknowledgementText = logObj.acknowledgement || '';
+        const emailMatch = acknowledgementText.match(/[\w.-]+@[\w.-]+\.\w+/);
+        return emailMatch ? emailMatch[0] : null;
+    } catch (e) {
+        return null;
+    }
+};
 export const convertToSpecialCase = (str) => {
     // Check if the string is null, empty, or less than 2 characters
     if (!str || typeof str !== 'string' || str.length < 2) {
@@ -21,6 +30,14 @@ export const convertToSpecialCase = (str) => {
     ).join(' ');
 }
 
+export const isFreshEntry = (entry) => {
+    const hasNoEmail = !entry.emailAddress; // true if emailAddress is empty, null, or undefined
+    const isPreviouslySubscribed = entry.paperlessStatus === "Active"; // true if paperlessStatus indicates a previous subscription
+    const isEmailBeingProcessed = entry.emailStatus === "Verified" || entry.emailStatus === "InProgress"; // true if email is either verified or in progress
+
+    // An entry is fresh if it has no email OR it is not previously subscribed OR the email is being processed
+    return hasNoEmail && !isPreviouslySubscribed && !isEmailBeingProcessed;
+};
 
 export const BORDER_COLORS = {
     primaryadmin: Color.colorAquamarine,

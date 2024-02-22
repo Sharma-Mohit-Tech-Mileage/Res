@@ -42,9 +42,169 @@ const MyServicePlan = ({ plans, navigation }) => {
     });
   };
 
+  // const MyPlanDetails = () => {
+  //   useEffect(() => {
+  //     console.log('Plan data',plans)
+  //   }, []);
+
+  //   const PlanDetailsItem = ({ item, index }) => {
+  //     return (
+  //       <View key={index} accessible accessibilityLabel={`Plan Details for Internet ${item.planName}`}>
+  //         <View
+  //           style={{
+  //             flexDirection: "row",
+  //             backgroundColor: colors.backgound_blue,
+  //             padding: wp("3%"),
+  //           }}
+  //           accessible
+  //           accessibilityLabel={`Internet Plan ${item.planName}`}
+  //         >
+  //           <LinearGradient
+  //             start={{ x: 0, y: 0 }}
+  //             end={{ x: 1, y: 0 }}
+  //             colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+  //             style={{
+  //               width: wp("10%"),
+  //               height: wp("10%"),
+  //               borderRadius: 10,
+  //               justifyContent: "center",
+  //               alignItems: "center",
+  //               alignSelf: "center",
+  //             }}
+  //           >
+  //             <InternetIcon accessible accessibilityLabel="Internet Icon" />
+  //           </LinearGradient>
+  //           <Text style={styles.planDetailsRowHeader} accessibilityLabel={`Internet ${item.planName}`}>
+  //             Internet {item.planName}
+  //           </Text>
+  //         </View>
+
+  //         <View style={[styles.planDetailsRow]}>
+  //           <View style={{ alignSelf: "center" }}>
+  //             <TickIcon />
+  //           </View>
+
+  //           <Text style={styles.planDetailsTxt}>
+  //             Download Speed Up To {item.downloadSpeed} Mbps
+  //           </Text>
+  //         </View>
+
+  //         <View
+  //           style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }}
+  //         />
+  //         <View style={[styles.planDetailsRow]}>
+  //           <View style={{ alignSelf: "center" }}>
+  //             <TickIcon />
+  //           </View>
+  //           <Text style={styles.planDetailsTxt}>
+  //             Upload Speed Up To {item.uploadSpeed} Mbps
+  //           </Text>
+  //         </View>
+  //         <View
+  //           style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }}
+  //         />
+  //         <View
+  //           style={{
+  //             flexDirection: "column",
+  //             padding: wp("4%"),
+  //             marginLeft: 10,
+  //           }}
+  //         >
+  //           <View style={{ flexDirection: "row" }}>
+  //             <View style={{ alignSelf: "center" }}>
+  //               <TickIcon />
+  //             </View>
+  //             <Text style={styles.planDetailsTxt}>
+  //               Data Plan {(item.dataQuotaGB=='15000')?'UNLIMITED':item.dataQuotaGB+' GB*'}
+  //             </Text>
+  //           </View>
+  //           {/* <Text
+  //             style={{
+  //               fontSize: FontSize.size_xs,
+  //               color: colors.sparklight_grey,
+  //               fontWeight: "400",
+  //               marginLeft: 10,
+  //               marginTop: 5,
+  //             }}
+  //           >
+  //             * $10 charge for each add'l 100GB; Up to $40/mo.
+  //           </Text> */}
+  //         </View>
+  //         <View
+  //           style={{
+  //             backgroundColor: colors.grey,
+  //             height: 1,
+  //             width: "100%",
+  //             marginTop: 5,
+  //           }}
+  //         />
+  //       </View>
+  //     );
+  //   };
+
+  //   return (
+  //     <SwipeUpDownModal
+  //       modalVisible={ShowComment}
+  //       PressToanimate={animateModal}
+  //       ContentModal={
+  //         <View style={{ marginVertical: 10, borderRadius: 10 }}>
+  //           <View
+  //             style={{
+  //               flexDirection: "row",
+  //               justifyContent: "space-between",
+  //               alignItems: "center",
+  //               marginHorizontal: 20,
+  //               marginVertical: 10,
+  //             }}
+  //           >
+  //             <Text
+  //               style={{
+  //                 textAlign: "center",
+  //                 fontSize: FontSize.size_3xl,
+  //                 color: colors.sparklight_grey,
+  //                 fontWeight: "400",
+  //                 fontFamily: FontFamily.openSansRegular,
+  //               }}
+  //               accessible={true}
+  //               accessibilityLabel="Plan Details"
+  //               accessibilityRole="header"
+  //             >
+  //               Plan Details
+  //             </Text>
+  //             <TouchableOpacity
+  //               onPress={() => {
+  //                 setModelComment(false);
+  //               }}
+  //               accessible={true}
+  //               accessibilityLabel="Close Plan Details"
+  //               accessibilityHint="Closes the plan details modal"
+  //             >
+  //               <Image
+  //                 style={{ height: 32, width: 32, overflow: "hidden" }}
+  //                 resizeMode="cover"
+  //                 source={require("../../../assets/right-actionable7.png")}
+  //                 accessible={true}
+  //                 accessibilityLabel="Close icon"
+  //               />
+  //             </TouchableOpacity>
+  //           </View>
+  //           {(plans.length>0) ? plans.map((item, index) => {
+  //             return <PlanDetailsItem item={item} index={index} key={index} />;
+  //           }):<></>}
+  //         </View>
+  //       }
+  //       ContentModalStyle={styles.Modal}
+  //       onClose={() => {
+  //         setModelComment(false);
+  //         setanimateModal(false);
+  //       }}
+  //     />
+  //   );
+  // };
+  
   const MyPlanDetails = () => {
     useEffect(() => {
-      console.log('Plan data',plans)
+      console.log('Plan data', plans);
     }, []);
 
     const PlanDetailsItem = ({ item, index }) => {
@@ -53,11 +213,12 @@ const MyServicePlan = ({ plans, navigation }) => {
           <View
             style={{
               flexDirection: "row",
-              backgroundColor: colors.backgound_blue,
+              backgroundColor: colors.background_blue,
               padding: wp("3%"),
             }}
             accessible
             accessibilityLabel={`Internet Plan ${item.planName}`}
+            accessibilityRole="header"
           >
             <LinearGradient
               start={{ x: 0, y: 0 }}
@@ -72,37 +233,36 @@ const MyServicePlan = ({ plans, navigation }) => {
                 alignSelf: "center",
               }}
             >
-              <InternetIcon accessible accessibilityLabel="Internet Icon" />
+              <InternetIcon accessible accessibilityLabel="Internet Icon" accessibilityRole="image" />
             </LinearGradient>
-            <Text style={styles.planDetailsRowHeader} accessibilityLabel={`Internet ${item.planName}`}>
+            <Text style={styles.planDetailsRowHeader} accessibilityLabel={`Internet ${item.planName}`} accessibilityRole="header">
               Internet {item.planName}
             </Text>
           </View>
 
           <View style={[styles.planDetailsRow]}>
             <View style={{ alignSelf: "center" }}>
-              <TickIcon />
+              <TickIcon accessible accessibilityLabel="Tick Icon" accessibilityRole="image" />
             </View>
 
-            <Text style={styles.planDetailsTxt}>
+            <Text style={styles.planDetailsTxt} accessibilityRole="header">
               Download Speed Up To {item.downloadSpeed} Mbps
             </Text>
           </View>
 
-          <View
-            style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }}
-          />
+          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} accessible accessibilityRole="text" />
+
           <View style={[styles.planDetailsRow]}>
             <View style={{ alignSelf: "center" }}>
-              <TickIcon />
+              <TickIcon accessible accessibilityLabel="Tick Icon" accessibilityRole="image" />
             </View>
-            <Text style={styles.planDetailsTxt}>
+            <Text style={styles.planDetailsTxt} accessibilityRole="text">
               Upload Speed Up To {item.uploadSpeed} Mbps
             </Text>
           </View>
-          <View
-            style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }}
-          />
+
+          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} accessible accessibilityRole="none" />
+
           <View
             style={{
               flexDirection: "column",
@@ -112,32 +272,15 @@ const MyServicePlan = ({ plans, navigation }) => {
           >
             <View style={{ flexDirection: "row" }}>
               <View style={{ alignSelf: "center" }}>
-                <TickIcon />
+                <TickIcon accessible accessibilityLabel="Tick Icon" accessibilityRole="image" />
               </View>
-              <Text style={styles.planDetailsTxt}>
-                Data Plan {(item.dataQuotaGB=='15000')?'UNLIMITED':item.dataQuotaGB+' GB*'}
+              <Text style={styles.planDetailsTxt} accessibilityRole="text">
+                Data Plan {(item.dataQuotaGB == '15000') ? 'UNLIMITED' : `${item.dataQuotaGB} GB*`}
               </Text>
             </View>
-            {/* <Text
-              style={{
-                fontSize: FontSize.size_xs,
-                color: colors.sparklight_grey,
-                fontWeight: "400",
-                marginLeft: 10,
-                marginTop: 5,
-              }}
-            >
-              * $10 charge for each add'l 100GB; Up to $40/mo.
-            </Text> */}
           </View>
-          <View
-            style={{
-              backgroundColor: colors.grey,
-              height: 1,
-              width: "100%",
-              marginTop: 5,
-            }}
-          />
+
+          <View style={{ backgroundColor: colors.grey, height: 1, width: "100%", marginTop: 5 }} accessible accessibilityRole="none" />
         </View>
       );
     };
@@ -156,6 +299,8 @@ const MyServicePlan = ({ plans, navigation }) => {
                 marginHorizontal: 20,
                 marginVertical: 10,
               }}
+              accessible
+              accessibilityRole="header"
             >
               <Text
                 style={{
@@ -178,6 +323,7 @@ const MyServicePlan = ({ plans, navigation }) => {
                 accessible={true}
                 accessibilityLabel="Close Plan Details"
                 accessibilityHint="Closes the plan details modal"
+                accessibilityRole="button"
               >
                 <Image
                   style={{ height: 32, width: 32, overflow: "hidden" }}
@@ -185,12 +331,13 @@ const MyServicePlan = ({ plans, navigation }) => {
                   source={require("../../../assets/right-actionable7.png")}
                   accessible={true}
                   accessibilityLabel="Close icon"
+                  accessibilityRole="image"
                 />
               </TouchableOpacity>
             </View>
-            {(plans.length>0) ? plans.map((item, index) => {
+            {(plans?.length > 0) ? plans.map((item, index) => {
               return <PlanDetailsItem item={item} index={index} key={index} />;
-            }):<></>}
+            }) : <></>}
           </View>
         }
         ContentModalStyle={styles.Modal}

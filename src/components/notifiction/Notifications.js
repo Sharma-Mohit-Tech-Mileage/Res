@@ -3,11 +3,23 @@ import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-nati
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails, saveSMSSelection } from '../../redux/actions/ProfileActionSuite';
-import { transformResponse, transformNotificationPreferences, isPrimaryAdmin } from '../../components/utility/constant';
+import {
+  fetchSMSSelection,
+  fetchPushNotifications,
+  fetchBillingPaper,
+  fetchProfileDetails,
+  saveSMSSelection, resentEmailVerifiction
+} from '../../redux/actions/ProfileActionSuite';
+import {
+  transformResponse,
+  transformNotificationPreferences,
+  isPrimaryAdmin,
+  isFreshEntry,
+  extractAcknowledgementEmail
+} from '../../components/utility/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from "../common/customui/NotificationAlert";
-import PubSub from 'pubsub-js'
+import PubSub from 'pubsub-js';
 const Notifications = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -21,50 +33,60 @@ const Notifications = () => {
   const paperLessInfo = profile.paperLessInfo || {};
   const transformedNotification = transformNotificationPreferences(profile.pushNotifications || {});
   const data = transformResponse(smsSubscription);
+
   const emailAddress = paperLessInfo.emailAddress;
-  const emailStatus = paperLessInfo.emailStatus || 'Pending';
-  const isEmailVerified = emailStatus === 'Verified';
+  const isEmailVerified = paperLessInfo.emailStatus === 'Verified';
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
-  const isFreshEntry = (entry) => {
-    return !(
-      entry.emailAddress !== "" &&
-      entry.paperlessStatus === "InActive" &&
-      entry.emailStatus === "Verified"
-    );
-  };
+  const acknowledgement = extractAcknowledgementEmail(paperLessInfo);
 
-  let notificationsTitle, infoText, isDisabled;
-  if (emailAddress) {
-    notificationsTitle = isEmailVerified ? "" : "Email verification pending";
-    infoText = isEmailVerified ? `Emails are sent to ` : `Email ${emailAddress} is being verified. Please verify your email address to continue.`;
-    isDisabled = !isEmailVerified;
-  } else {
-    if (profileDetails.multipleEmails) {
-      isDisabled = true;
-      notificationsTitle = "There is a problem retrieving your email address";
-      infoText =
-        (<Text style={styles.messageText}>
-          {'We are not able to retrieve the email address for your account. Please'}
-          <Text style={styles.contactUsText} onPress={() => {navigation.navigate('Support');
-              setTimeout(() => {PubSub.publish('event.contactUsEvent', {});}, 500);}}
-          >
-            {' contact us '}
-          </Text>{'for assistance.'}</Text>)
-
-    } else if (profileDetails.svEmailAddress) {
-      isDisabled = false;
-    }
-    else {
-      isDisabled = true;
-      notificationsTitle = "No email address on file";
-      infoText = (<Text>
-        {'We don’t have your email address on file. Go to '} <Text style={[styles.contactUsText]} onPress={() => { navigation.navigate('ProfileSettings') }}>
-          Profile Settings </Text>
-        {' to add your email.'}
+  let notificationsTitle = '', infoText = '', isDisabled = false
+  if (profileDetails.multipleEmails) {
+    isDisabled = true
+    notificationsTitle = "There is a problem retrieving your email address";
+    infoText = (
+      <Text style={styles.messageText}>
+        {'We are not able to retrieve the email address for your account. Please'} <Text style={styles.contactUsText} onPress={() => {
+          navigation.navigate('Support');
+          setTimeout(() => { PubSub.publish('event.contactUsEvent', {}); }, 500);
+        }
+        }> {' contact us '}</Text>{'for assistance.'}
       </Text>
-      )
-    }
+    );
+  } else if (emailAddress) {
+    notificationsTitle = isEmailVerified ? '' : 'Email verification pending';
+    infoText = (isEmailVerified || !isPrimary) ? (
+      <Text>
+        Emails are sent to <Text style={styles.text}>{emailAddress}</Text>
+      </Text>
+    ) : (
+      <Text>
+        Email <Text style={styles.contactUsText}>{acknowledgement}</Text> not confirmed yet.{' '}
+        <Text style={styles.contactUsText} onPress={() => dispatch(resentEmailVerifiction(navigation))}>
+          Click here
+        </Text>
+        {' to resend.'}
+      </Text>
+
+    );
   }
+  else if (acknowledgement && isPrimary) {
+    notificationsTitle = 'Email verification pending';
+    infoText = (
+      <Text>
+        Email <Text style={styles.contactUsText}>{acknowledgement}</Text> not confirmed yet.{' '}
+        <Text style={styles.contactUsText} onPress={() => dispatch(resentEmailVerifiction(navigation))}>
+          Click here
+        </Text>
+        {' to resend.'}
+      </Text>
+
+    );
+  } else {
+    isDisabled = true
+  }
+
+
+
   useEffect(() => {
     dispatch(fetchBillingPaper());
     dispatch(fetchSMSSelection());
@@ -83,13 +105,40 @@ const Notifications = () => {
   useEffect(() => {
     if (route.params?.updateSuccess) {
       const updatedType = route.params.updatedType || 'Notification';
+      switch (updatedType) {
+        case 'Email':
+          dispatch(fetchBillingPaper());
+          dispatch(fetchProfileDetails());
+          break;
+        case 'Text':
+          dispatch(fetchSMSSelection());
+          break;
+        case 'App':
+          dispatch(fetchPushNotifications());
+          break;
+        case 'ProfileDetails':
+          dispatch(fetchProfileDetails());
+          break;
+        default:
+          dispatch(fetchBillingPaper());
+          dispatch(fetchProfileDetails());
+          dispatch(fetchPushNotifications());
+          dispatch(fetchProfileDetails());
+      }
       setUpdatedSection(updatedType);
       setSuccessMessage(`${updatedType} settings have been updated successfully.`);
       setShowSuccessAlert(true);
-      dispatch(fetchBillingPaper());
-      dispatch(fetchSMSSelection());
-      dispatch(fetchPushNotifications());
       navigation.setParams({ updateSuccess: undefined, updatedType: undefined });
+    }
+  }, [route.params, navigation, dispatch]);
+
+  useEffect(() => {
+    if (route.params?.resentNotification) {
+      const updatedType = route.params.updatedType;
+      setUpdatedSection('Email');
+      setSuccessMessage(updatedType ? 'Verification email resent' : 'Resend failed. Try again');
+      setShowSuccessAlert(true);
+      navigation.setParams({ resentNotification: undefined, updatedType: undefined });
     }
   }, [route.params, navigation, dispatch]);
 
@@ -108,13 +157,14 @@ const Notifications = () => {
             setShowSuccessAlert={() => setShowSuccessAlert(false)}
             isDisabled={!data.phoneNum}
             notificationsTitle="No mobile phone number on file"
-            infoText={data.phoneNum ? `Text alerts are sent to ` : (<Text>
-              We don’t have your mobile phone number on file. Go to
-              <Text style={[styles.contactUsText]} onPress={() => { navigation.navigate('ProfileSettings') }}>
-                {' Profile Settings '}
-              </Text>
-              to add your phone number.
-            </Text>)}
+            infoText={data.phoneNum ? `Text alerts are sent to ` : ''}
+            // (<Text>
+            //   We don’t have your mobile phone number on file. Go to
+            //   <Text style={[styles.contactUsText]} onPress={() => { navigation.navigate('ProfileSettings') }}>
+            //     {' Profile Settings '}
+            //   </Text>
+            //   to add your phone number.
+            // </Text>)}
             number={data.phoneNum}
             transformedData={data}
             navigationTarget="TextNotifications"
@@ -133,7 +183,11 @@ const Notifications = () => {
             infoText={infoText}
             email={paperLessInfo.emailAddress}
             navigationTarget="EmailNotifications"
-            transformedData={{ status: paperLessInfo?.paperlessStatus === 'Active', email: profileDetails.svEmailAddress, isNew: isFreshEntry(paperLessInfo) }}
+            transformedData={{
+              status: paperLessInfo?.paperlessStatus === 'Active',
+              email: paperLessInfo.emailAddress || profileDetails.svEmailAddress,
+              isNew: isFreshEntry(paperLessInfo)
+            }}
             additionalSettings={[{ type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off' }]}
             isAdmin={!isPrimary}
           />
@@ -185,7 +239,7 @@ const NotificationSection = ({
         <View style={styles.infoWrapper}>
           <NotificationAlert
             type="success"
-            title="Update Successful"
+            title="Successful"
             message={successMessage}
             showCloseIcon={true}
             isVisible={showSuccessAlert}
@@ -236,11 +290,11 @@ const NotificationSection = ({
                 {number}
               </Text>
             )}
-            {email && (
+            {/* {email && (
               <Text style={styles.text} accessibilityLabel={`Email Address: ${email}`}>
                 {email}
               </Text>
-            )}
+            )} */}
           </Text>
         </View> : null}
       </View>
@@ -365,7 +419,7 @@ const styles = StyleSheet.create({
   infoCircleIcon: {
     width: 18,
     height: 18,
-    marginTop: -5
+    marginTop: -3
   },
   infoCircleWrapper: {
     paddingHorizontal: 0,
@@ -375,7 +429,8 @@ const styles = StyleSheet.create({
   text: {
     color: Color.colorGray_100,
     fontWeight: "600",
-    fontSize: 14
+    fontSize: 14,
+    flex: 1, // Allows the text to shrink and expand as needed
   },
   infoWrapper: {
     paddingHorizontal: Padding.p_5xl,

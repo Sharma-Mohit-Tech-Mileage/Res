@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUserType, isPrimaryAdmin, convertToSpecialCase, transformResponse, initializeSettings, getRoleBasedMessage } from '../utility/constant';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { fetchProfileDetails, fetchSMSSelection } from '../../redux/actions/ProfileActionSuite'
-import PubSub from 'pubsub-js'
+//import PubSub from 'pubsub-js'
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -21,7 +21,7 @@ const ProfileSettings = () => {
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   const convertedRole = getUserType(profileDetails.memberType || '');
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || '');
-  const emailAlertNeeded = !profileDetails.svEmailAddress || profileDetails.multipleEmails;
+ // const emailAlertNeeded = !profileDetails.svEmailAddress || profileDetails.multipleEmails;
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
@@ -62,12 +62,12 @@ const ProfileSettings = () => {
               <Text style={[styles.generalInformation, styles.melissaTypo]}>
                 General Information
               </Text>
-              <Pressable
+              {!isPrimary && <Pressable
                 style={[styles.buttons, styles.buttonsLayout]}
                 // onPress={() => navigation.navigate("ProfileSettingsEdit", { smsPayload: smsPayload })}>
                 onPress={() => navigation.navigate("ProfileSettingsEdit")}>
                 <Text style={[styles.makePayment, styles.text1Clr]}>Edit</Text>
-              </Pressable>
+              </Pressable>}
             </View>
             <View style={styles.frameContainer}>
               <View style={styles.firstNameParent} accessible={true} >
@@ -108,7 +108,7 @@ const ProfileSettings = () => {
             <View style={[{ paddingHorizontal: Padding.p_5xl }, styles.frameParentSpaceBlock]}>
               <View style={styles.frameChild} />
             </View>
-            <View style={styles.frameParentSpaceBlock}>
+            {/* <View style={styles.frameParentSpaceBlock}>
               <View style={styles.contactInformationWrapper}>
                 <Text style={[styles.generalInformation, styles.melissaTypo]}>
                   Contact Information
@@ -144,7 +144,7 @@ const ProfileSettings = () => {
                   {profileDetails.multipleEmails ? '' : profileDetails.svEmailAddress}
                 </Text>
               </View>
-              {/* {!smsPayload.phoneNumber && isPrimary && (
+              {!smsPayload.phoneNumber && isPrimary && (
                 <View style={styles.notificationsWrapper}>
                   <NotificationAlert
                     type={"warning"}
@@ -158,8 +158,8 @@ const ProfileSettings = () => {
                 <Text style={[styles.melissa, styles.melissaTypo]}>
                   {smsPayload.phoneNumber || ''}
                 </Text>
-              </View> */}
-            </View>
+              </View>
+            </View> */}
           </View>
         </View>
       </ScrollView>

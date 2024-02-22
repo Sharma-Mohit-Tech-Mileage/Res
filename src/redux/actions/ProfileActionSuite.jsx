@@ -10,7 +10,7 @@ import {
     UPDATE_PUSH_NOTIFICATIONS, FETCH_PUSH_NOTIFICATIONS,
     SAVE_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
     SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
-    UPDATE_EXISTING_EMAIL_NOTIFICATION
+    UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION
 } from '../constants';
 export const fetchProfileSuccess = (response) => {
     return {
@@ -117,15 +117,19 @@ export const updateTextNotification = (data, navigation) => ({
     navigation,
 });
 
-export const updateEmailNotification = (data, navigation) => ({
+export const updateEmailNotification = (data, isEmailChanged, ProfilePayLoad, navigation) => ({
     type: UPDATE_EMAIL_NOTIFICATION,
     payload: data,
+    isEmailChanged: isEmailChanged,
+    ProfilePayLoad: ProfilePayLoad,
     navigation,
 });
 
-export const updateFreshEmail = (data, navigation) => ({
+export const updateFreshEmail = (data, isEmailChanged, ProfilePayLoad, navigation) => ({
     type: UPDATE_EXISTING_EMAIL_NOTIFICATION,
     payload: data,
+    isEmailChanged: isEmailChanged,
+    ProfilePayLoad: ProfilePayLoad,
     navigation,
 });
 
@@ -158,3 +162,8 @@ export const updateEntryEmailNotification = (data, navigation) => ({
     payload: data,
     navigation,
 });
+
+export const resentEmailVerifiction = (navigation) => ({
+    type: RESEND_EMAIL_VERIFICTION,
+    navigation
+})
