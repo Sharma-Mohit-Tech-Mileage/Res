@@ -92,7 +92,7 @@ const Notifications = () => {
     dispatch(fetchSMSSelection());
     dispatch(fetchPushNotifications());
     dispatch(fetchProfileDetails());
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     return () => {

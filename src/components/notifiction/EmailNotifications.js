@@ -49,11 +49,10 @@ const EmailNotifications = () => {
     console.log('handleSave called with data:', data); // Log the initial data received by the function
 
     const { email, paperlessBilling } = data;
+    const updatedProfileDetails = { ...profileDetailsfromStore };
     const emailChanged = email !== updatedProfileDetails.svEmailAddress;
     console.log('Email changed:', emailChanged); // Log if the email has changed
-
-    const updatedProfileDetails = { ...profileDetailsfromStore };
-    console.log('Initial profile details:', updatedProfileDetails); // Log the initial profile details
+    console.log('Initial profile details:==============================', updatedProfileDetails); // Log the initial profile details
 
     if (emailChanged) {
       updatedProfileDetails.email = updatedProfileDetails.svEmailAddress;
@@ -173,7 +172,7 @@ const EmailNotifications = () => {
                       name="paperlessBilling"
                       render={({ field: { onChange, value } }) => (
                         <Toggle
-                          onToggle={newValue => onChange(!newValue)}
+                          onToggle={newValue => onChange(newValue)}
                           initialValue={value}
                         />
                       )}
