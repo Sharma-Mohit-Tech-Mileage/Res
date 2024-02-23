@@ -234,6 +234,27 @@ const putEmailNotification = async (email) => {
     }
 };
 
+const resendEmailVerification = async () => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+
+    try {
+        const response = await _axios.post(`/account/api/account/${accountNumber}/paperless/resend`, {}, config);
+
+        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless/resend, Response:`, response);
+        return response;
+    } catch (error) {
+        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless/resend:`, error);
+        throw error;
+    }
+};
+
+
 const postEmailNotification = async (email) => {
     let user = await getUser();
     const accountNumber = user.userInfo?.accountNumber || null;
@@ -382,4 +403,4 @@ const handleSubmitFeedback = async (obj) => {
 };
 
 
-export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback }
+export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification }

@@ -9,6 +9,8 @@ import {
   Linking,
   TouchableOpacity,
   Modal,
+  Alert,
+  Button,
 } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
@@ -31,7 +33,12 @@ import { SetRenewTokenTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env,  ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from 'react-native-version-check';
-import * as Zendesk from 'react-native-zendesk-messaging';
+import ZendeskChat from "react-native-zendesk-chat";
+import messaging from '@react-native-firebase/messaging';
+import {
+  requestUserPermission,
+} from '../../firebase/FirebaseUtils';
+import notifee from '@notifee/react-native';
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -42,6 +49,11 @@ const config = {
   iosPrefersEphemeralSession: true,
   //additionalParameters: { prompt: "login" },
 };
+
+// Once in your application:
+//4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC
+//84AFF64rwYVgQS35EsTakO03d98WTdJb
+ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
 
 const SplashScreen = ({ navigation }) => {
@@ -73,8 +85,6 @@ const SplashScreen = ({ navigation }) => {
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken
       };
-
-      //Zendesk.login(token)
 
       if (res.userInfo.acctStatus === 'Disconnect'){
         setTimeout(()=>{
@@ -303,8 +313,8 @@ const SplashScreen = ({ navigation }) => {
             </TouchableOpacity>        
           </>
         )
-      }  
-      <Text style={{color: 'white',alignSelf:'center', marginTop:45, fontSize:16}}> {(ISUAT)? 'UAT':''} Version:{VersionCheck.getCurrentVersion()}</Text>          
+      }
+      <Text style={{color: 'white',alignSelf:'center', marginTop:45, fontSize:16}}> {(ISUAT)? 'UAT':''} Version:{VersionCheck.getCurrentVersion()}</Text>
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}

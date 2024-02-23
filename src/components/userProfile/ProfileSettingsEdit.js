@@ -163,7 +163,7 @@ const ProfileSettingsEdit = () => {
                 />
               </View>
             </View>
-            <View style={styles.rectangleWrapper}>
+            {/* <View style={styles.rectangleWrapper}>
               <View style={styles.frameItem} />
             </View>
             <View style={{ marginTop: Padding.p_base }}>
@@ -189,7 +189,7 @@ const ProfileSettingsEdit = () => {
                   )}
                 />
               </View>
-              {/* <View style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}>
+              <View style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}>
                 <Controller
                   control={control}
                   name="phoneNumber" // This should be the name used in your validation schema
@@ -208,10 +208,10 @@ const ProfileSettingsEdit = () => {
                     />
                   )}
                 />
-              </View> */}
-            </View>
+              </View>
+            </View> */}
           </View>
-          <View style={{ marginTop: Padding.p_base }}>
+          <View style={{ marginTop: Padding.p_5xl }}>
             <Pressable style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]} onPress={handleSubmit(handleSave, handleValidationError)}>
               <Text style={[{ color: Color.sparklightWhite }, styles.makeTypo]}>Save</Text>
             </Pressable>

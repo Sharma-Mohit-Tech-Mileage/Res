@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View, Pressable, Alert, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Color, FontFamily,FontSize, Padding, Border } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
 import chevronRightIcon from '../../../assets/chevronright.png';
 import profileSettingsIcon from '../../../assets/right-actionable15.png';
@@ -14,7 +14,6 @@ import { useDispatch } from 'react-redux';
 import { getUser, getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
-import * as Zendesk from 'react-native-zendesk-messaging';
 import { SetClearTimer } from '../user/Session';
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
@@ -62,7 +61,6 @@ const logoutAction = (dispatch, navigation) => {
       dispatch(logoutApp());
       cleanUserData();
       SetClearTimer();
-      Zendesk.logout();
       navigation.reset({
         index: 0,
         routes: [{ name: 'Splash' }],
@@ -79,7 +77,7 @@ const AccountOverview = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchProfileDetails());
-  }, []);
+  }, [dispatch]);
 
   const menuItems = [
     {
@@ -143,7 +141,6 @@ const AccountOverview = () => {
       }
     };
     fetchUserData();
-    console.log('Build Number', VersionCheck.getCurrentVersion());
   }, []);
 
   return (
@@ -173,7 +170,7 @@ const AccountOverview = () => {
           </Text>
         </View>
         <ScrollView style={{ flex: 1 }}>
-          <View style={{marginBottom: '30%'}}>
+          <View style={{ marginBottom: '30%' }}>
             <View style={styles.frameGroup}>
               <View style={styles.navigationBorder}>
                 {/* Mapping through menu items */}
@@ -226,7 +223,7 @@ const AccountOverview = () => {
                 </Pressable>
               </View>
 
-              <Pressable style={[styles.buttons, styles.buttonsSpaceBlock]}
+              {/* <Pressable style={[styles.buttons, styles.buttonsSpaceBlock]}
                 accessible={true}
                 accessibilityRole="link">
                 <Text>
@@ -239,7 +236,30 @@ const AccountOverview = () => {
                     Terms & Conditions
                   </Text>
                 </Text>
-              </Pressable>
+              </Pressable> */}
+              <View style={{ flexDirection: 'row', ...styles.buttonsSpaceBlock, ...styles.buttons, ...styles.buttonsSpaceBlock }}>
+                <Pressable
+                  accessible={true}
+                  accessibilityRole="link"
+                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}
+                >
+                  <Text accessibilityLabel="Privacy Policy" style={styles.linkStyle}>
+                    Privacy Policy
+                  </Text>
+                </Pressable>
+
+                <Text style={styles.linkStyle}> | </Text>
+
+                <Pressable
+                  accessible={true}
+                  accessibilityRole="link"
+                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}
+                >
+                  <Text accessibilityLabel="Terms & Conditions" style={styles.linkStyle}>
+                    Terms & Conditions
+                  </Text>
+                </Pressable>
+              </View>
 
             </View>
             <Text style={{ color: Color.colorMidnightblue, alignSelf: 'center' }}>Version:{VersionCheck.getCurrentVersion()}</Text>

@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Pressable, ScrollView } from "react-native";
+import { StyleSheet, Text, View, Pressable, ScrollView, TouchableOpacity } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from 'react-redux';
+import { getUser } from "../../redux/utils/LocalStorage";
 import { getUserType, isPrimaryAdmin, convertToSpecialCase, transformResponse, initializeSettings, getRoleBasedMessage } from '../utility/constant';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { fetchProfileDetails, fetchSMSSelection } from '../../redux/actions/ProfileActionSuite'
-import PubSub from 'pubsub-js'
+//import PubSub from 'pubsub-js'
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [accountObj, setAccountObj] = useState({});
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
   //const smsSubscription = profile.smsSubscription || [];
@@ -21,7 +23,7 @@ const ProfileSettings = () => {
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   const convertedRole = getUserType(profileDetails.memberType || '');
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || '');
-  const emailAlertNeeded = !profileDetails.svEmailAddress || profileDetails.multipleEmails;
+  // const emailAlertNeeded = !profileDetails.svEmailAddress || profileDetails.multipleEmails;
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
@@ -41,7 +43,13 @@ const ProfileSettings = () => {
   //     dispatch(fetchSMSSelection());
   //   }
   // }, [isPrimary, dispatch]);
-
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const data = await getUser();
+      if (data) { setAccountObj(data?.userInfo) }
+    };
+    fetchUserData();
+  }, []);
   return (
     <View style={{ zIndex: 1 }}>
       <ProfileSettingsHeader title="Profile Settings" onPressBack={() => navigation.navigate('Account')} />
@@ -62,23 +70,23 @@ const ProfileSettings = () => {
               <Text style={[styles.generalInformation, styles.melissaTypo]}>
                 General Information
               </Text>
-              <Pressable
+              {!isPrimary && <Pressable
                 style={[styles.buttons, styles.buttonsLayout]}
                 // onPress={() => navigation.navigate("ProfileSettingsEdit", { smsPayload: smsPayload })}>
                 onPress={() => navigation.navigate("ProfileSettingsEdit")}>
                 <Text style={[styles.makePayment, styles.text1Clr]}>Edit</Text>
-              </Pressable>
+              </Pressable>}
             </View>
             <View style={styles.frameContainer}>
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>First Name</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {profileDetails.firstName}
+                  {isPrimary ? accountObj.firstName : profileDetails.firstName}
                 </Text>
               </View>
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Last Name</Text>
-                <Text style={[styles.melissa, styles.melissaTypo]}>{profileDetails.lastName}</Text>
+                <Text style={[styles.melissa, styles.melissaTypo]}>{isPrimary ? accountObj.lastName : profileDetails.lastName}</Text>
               </View>
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Username</Text>
@@ -108,7 +116,7 @@ const ProfileSettings = () => {
             <View style={[{ paddingHorizontal: Padding.p_5xl }, styles.frameParentSpaceBlock]}>
               <View style={styles.frameChild} />
             </View>
-            <View style={styles.frameParentSpaceBlock}>
+            {/* <View style={styles.frameParentSpaceBlock}>
               <View style={styles.contactInformationWrapper}>
                 <Text style={[styles.generalInformation, styles.melissaTypo]}>
                   Contact Information
@@ -120,12 +128,21 @@ const ProfileSettings = () => {
                     type={"warning"}
                     title={profileDetails.multipleEmails ? "There is a problem retrieving your email address" : "No email address on file"}
                     showCloseIcon={false}
-                    message={profileDetails.multipleEmails ? <Text>{'We are not able to retrieve the email address for your account. Please '}<Text style={[styles.text, { color: Color.colorMidnightblue,fontWeight:'700' }]} onPress={() => {
-                      navigation.navigate('Support');
-                      setTimeout(() => {
-                        PubSub.publish('event.contactUsEvent', {});
-                      }, 500);
-                       }}> contact us</Text> {' for assistance.'}</Text>: "We don't have your email address on file. Please add your email."}
+                    message={profileDetails.multipleEmails ? <Text style={styles.messageText}>
+                      {'We are not able to retrieve the email address for your account. Please'}
+                      <Text
+                        style={styles.contactUsText}
+                        onPress={() => {
+                          navigation.navigate('Support');
+                          setTimeout(() => {
+                            PubSub.publish('event.contactUsEvent', {});
+                          }, 500);
+                        }}
+                      >
+                        {' contact us '}
+                      </Text>
+                      {'for assistance.'}
+                    </Text> : "We don't have your email address on file. Please add your email."}
                   /></View>
               )}
 
@@ -135,7 +152,7 @@ const ProfileSettings = () => {
                   {profileDetails.multipleEmails ? '' : profileDetails.svEmailAddress}
                 </Text>
               </View>
-              {/* {!smsPayload.phoneNumber && isPrimary && (
+              {!smsPayload.phoneNumber && isPrimary && (
                 <View style={styles.notificationsWrapper}>
                   <NotificationAlert
                     type={"warning"}
@@ -149,8 +166,8 @@ const ProfileSettings = () => {
                 <Text style={[styles.melissa, styles.melissaTypo]}>
                   {smsPayload.phoneNumber || ''}
                 </Text>
-              </View> */}
-            </View>
+              </View>
+            </View> */}
           </View>
         </View>
       </ScrollView>
@@ -201,6 +218,15 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
+  },
+  contactUsText: {
+    color: Color.colorMidnightblue,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: 16,
+    fontStyle: "normal",
+    fontWeight: "700",
+    paddingLeft: 5,
+    flexWrap: 'wrap'
   },
   buttons: {
     marginLeft: Padding.p_3xs,

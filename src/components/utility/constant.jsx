@@ -9,11 +9,18 @@ export const BOX_COLORS = {
     admin: Color.colorWhitesmoke_200,
     viewonly: Color.colorWhitesmoke_200,
 };
-
+export const extractAcknowledgementEmail = logObj => {
+    try {
+        const acknowledgementText = logObj.acknowledgement || '';
+        const emailMatch = acknowledgementText.match(/[\w.-]+@[\w.-]+\.\w+/);
+        return emailMatch ? emailMatch[0] : null;
+    } catch (e) {
+        return null;
+    }
+};
 export const convertToSpecialCase = (str) => {
-    // Check if the string is null, empty, or less than 2 characters
     if (!str || typeof str !== 'string' || str.length < 2) {
-        return null; // or throw an error, depending on your requirements
+        return null; 
     }
 
     return str.split(' ').map(word =>
@@ -21,6 +28,14 @@ export const convertToSpecialCase = (str) => {
     ).join(' ');
 }
 
+export const isFreshEntry = (entry) => {
+    const acknowledgementEmail = extractAcknowledgementEmail(entry);
+    const hasNoEmail = !entry.emailAddress || !acknowledgementEmail; 
+    const isPreviouslySubscribed = entry.paperlessStatus === "Active" || entry.paperlessStatus ==='Processing'; 
+    const isEmailBeingProcessed = entry.emailStatus === "Verified" || entry.emailStatus === "Pending"; 
+
+    return hasNoEmail && !isPreviouslySubscribed && !isEmailBeingProcessed;
+};
 
 export const BORDER_COLORS = {
     primaryadmin: Color.colorAquamarine,

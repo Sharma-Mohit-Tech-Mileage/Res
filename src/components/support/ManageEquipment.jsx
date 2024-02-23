@@ -85,6 +85,8 @@ const ManageEquipment = () => {
               mac = "00:40:36:59:62:d0";
             } else if (res.userInfo.accountNumber === "131684698") {
               mac = "ac:20:2e:6d:82:f1";
+            } else if (res.userInfo.accountNumber === "136885142") {
+              mac = "00:40:36:59:00:00";
             }
 
             checkModemDetails(mac);
@@ -275,11 +277,8 @@ const ManageEquipment = () => {
                     styles.myModemSpaceBlock,
                   ]}
                 >
-                  <View style={[styles.notifications, styles.parentBorder]}>
-                    <Image
-                      resizeMode="cover"
-                      source={require("../../../assets/rectangle-529.png")}
-                    />
+                  <View style={[styles.notifications, styles.parentBorder1]}>
+                   
                     <View style={styles.bannerWarning}>
                       <View style={styles.rightActionableParent}>
                         <Image
@@ -563,6 +562,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: "solid",
   },
+  parentBorder1: {
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderLeftWidth:5,
+    borderLeftColor:colors.sparklight_yellow
+  },
   textTypo1: {
     fontSize: FontSize.textXsSemibold_size,
     textAlign: "center",
@@ -701,6 +706,7 @@ const styles = StyleSheet.create({
     borderColor: Color.sparklightGray,
     borderRadius: Border.br_11xs,
     alignSelf: "stretch",
+    padding:5
   },
   notificationsWrapper: {
     marginTop: 24,

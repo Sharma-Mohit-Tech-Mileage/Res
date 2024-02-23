@@ -151,6 +151,8 @@ const HomeScreen = ({ navigation }) => {
         mac="00:40:36:59:62:d0"
       }else if(user.userInfo.accountNumber==='131684698'){
         mac="ac:20:2e:6d:82:f1"
+      }else if(user.userInfo.accountNumber==='136885142'){
+        mac="00:40:36:59:00:00"
       }
       checkModemDetails(mac)
       }
@@ -198,9 +200,9 @@ const HomeScreen = ({ navigation }) => {
       },
       (errorCode) => {
         console.log("Modem details on Error", errorCode);
-        if(errorCode===404){
+        if(errorCode===404 ){
           setInternetHealths(oldArray => [...oldArray,'Red'] );
-        }else if(errorCode===400 ||errorCode===500 |errorCode===504){
+        }else if(errorCode===400 ||errorCode===500 ||errorCode===504){
           setInternetHealths(oldArray => [...oldArray,'Red'] );
         }else{
           setInternetHealths(oldArray => [...oldArray,'Yellow'] );
