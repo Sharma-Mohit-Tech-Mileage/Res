@@ -57,7 +57,7 @@ PODS:
     - GoogleUtilities/Logger (~> 7.12)
   - FirebaseCoreExtension (10.18.0):
     - FirebaseCore (~> 10.0)
-  - FirebaseCoreInternal (10.19.0):
+  - FirebaseCoreInternal (10.21.0):
     - "GoogleUtilities/NSData+zlib (~> 7.8)"
   - FirebaseCrashlytics (10.18.0):
     - FirebaseCore (~> 10.5)
@@ -67,7 +67,7 @@ PODS:
     - GoogleUtilities/Environment (~> 7.8)
     - nanopb (< 2.30910.0, >= 2.30908.0)
     - PromisesObjC (~> 2.1)
-  - FirebaseInstallations (10.19.0):
+  - FirebaseInstallations (10.21.0):
     - FirebaseCore (~> 10.0)
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/UserDefaults (~> 7.8)
@@ -81,7 +81,7 @@ PODS:
     - GoogleUtilities/Reachability (~> 7.8)
     - GoogleUtilities/UserDefaults (~> 7.8)
     - nanopb (< 2.30910.0, >= 2.30908.0)
-  - FirebaseSessions (10.19.0):
+  - FirebaseSessions (10.21.0):
     - FirebaseCore (~> 10.5)
     - FirebaseCoreExtension (~> 10.0)
     - FirebaseInstallations (~> 10.0)
@@ -477,9 +477,6 @@ PODS:
     - React-Core
   - react-native-webview (13.6.3):
     - React-Core
-  - react-native-zendesk-messaging (0.2.1):
-    - React-Core
-    - ZendeskSDKMessaging (= 2.13.0)
   - React-NativeModulesApple (0.72.4):
     - hermes-engine
     - React-callinvoker
@@ -621,6 +618,11 @@ PODS:
     - React-Core
   - RNKeychain (8.1.2):
     - React-Core
+  - RNNotifee (7.8.2):
+    - React-Core
+    - RNNotifee/NotifeeCore (= 7.8.2)
+  - RNNotifee/NotifeeCore (7.8.2):
+    - React-Core
   - RNReanimated (3.6.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
@@ -630,33 +632,22 @@ PODS:
     - React-RCTImage
   - RNSVG (13.14.0):
     - React-Core
+  - RNZendeskChat (0.4.1):
+    - React-Core
+    - ZendeskChatSDK (~> 2.9)
   - SocketRocket (0.6.1)
   - Yoga (1.14.0)
-  - Zendesk (1.13.0):
-    - ZendeskSDKConversationKit (~> 1.10.0)
-    - ZendeskSDKCoreUtilities (~> 1.4.0)
-  - ZendeskSDKConversationKit (1.10.0):
-    - ZendeskSDKCoreUtilities (~> 1.4.0)
-    - ZendeskSDKFayeClient (~> 1.5.0)
-    - ZendeskSDKHTTPClient (~> 0.13.0)
-    - ZendeskSDKStorage (~> 0.8.0)
-  - ZendeskSDKCoreUtilities (1.4.0)
-  - ZendeskSDKFayeClient (1.5.0):
-    - ZendeskSDKLogger (~> 0.8.0)
-    - ZendeskSDKSocketClient (~> 1.5.0)
-  - ZendeskSDKHTTPClient (0.13.0):
-    - ZendeskSDKLogger (~> 0.8.0)
-  - ZendeskSDKLogger (0.8.0)
-  - ZendeskSDKMessaging (2.13.0):
-    - Zendesk (~> 1.13.0)
-    - ZendeskSDKConversationKit (~> 1.10.0)
-    - ZendeskSDKCoreUtilities (~> 1.4.0)
-    - ZendeskSDKUIComponents (~> 2.8.0)
-  - ZendeskSDKSocketClient (1.5.0):
-    - ZendeskSDKLogger (~> 0.8.0)
-  - ZendeskSDKStorage (0.8.0):
-    - ZendeskSDKLogger (~> 0.8.0)
-  - ZendeskSDKUIComponents (2.8.0)
+  - ZendeskChatProvidersSDK (2.12.0)
+  - ZendeskChatSDK (2.12.0):
+    - ZendeskChatProvidersSDK (= 2.12.0)
+    - ZendeskMessagingSDK (= 3.8.5)
+  - ZendeskCommonUISDK (6.1.4)
+  - ZendeskMessagingAPISDK (3.8.5):
+    - ZendeskSDKConfigurationsSDK (= 1.1.11)
+  - ZendeskMessagingSDK (3.8.5):
+    - ZendeskCommonUISDK (= 6.1.4)
+    - ZendeskMessagingAPISDK (= 3.8.5)
+  - ZendeskSDKConfigurationsSDK (1.1.11)
 
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
@@ -694,7 +685,6 @@ DEPENDENCIES:
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-version-check (from `../node_modules/react-native-version-check`)
   - react-native-webview (from `../node_modules/react-native-webview`)
-  - react-native-zendesk-messaging (from `../node_modules/react-native-zendesk-messaging`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -722,9 +712,11 @@ DEPENDENCIES:
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
+  - "RNNotifee (from `../node_modules/@notifee/react-native`)"
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - RNZendeskChat (from `../node_modules/react-native-zendesk-chat`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -749,16 +741,12 @@ SPEC REPOS:
     - PromisesObjC
     - PromisesSwift
     - SocketRocket
-    - Zendesk
-    - ZendeskSDKConversationKit
-    - ZendeskSDKCoreUtilities
-    - ZendeskSDKFayeClient
-    - ZendeskSDKHTTPClient
-    - ZendeskSDKLogger
-    - ZendeskSDKMessaging
-    - ZendeskSDKSocketClient
-    - ZendeskSDKStorage
-    - ZendeskSDKUIComponents
+    - ZendeskChatProvidersSDK
+    - ZendeskChatSDK
+    - ZendeskCommonUISDK
+    - ZendeskMessagingAPISDK
+    - ZendeskMessagingSDK
+    - ZendeskSDKConfigurationsSDK
 
 EXTERNAL SOURCES:
   boost:
@@ -820,8 +808,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-version-check"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
-  react-native-zendesk-messaging:
-    :path: "../node_modules/react-native-zendesk-messaging"
   React-NativeModulesApple:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios"
   React-perflogger:
@@ -876,12 +862,16 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNKeychain:
     :path: "../node_modules/react-native-keychain"
+  RNNotifee:
+    :path: "../node_modules/@notifee/react-native"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  RNZendeskChat:
+    :path: "../node_modules/react-native-zendesk-chat"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -897,11 +887,11 @@ SPEC CHECKSUMS:
   FirebaseAnalytics: 4d310b35c48eaa4a058ddc04bdca6bdb5dc0fe80
   FirebaseCore: 2322423314d92f946219c8791674d2f3345b598f
   FirebaseCoreExtension: 62b201498aa10535801cdf3448c7f4db5e24ed80
-  FirebaseCoreInternal: b444828ea7cfd594fca83046b95db98a2be4f290
+  FirebaseCoreInternal: 43c1788eaeee9d1b97caaa751af567ce11010d00
   FirebaseCrashlytics: 86d5bce01f42fa1db265f87ff1d591f04db610ec
-  FirebaseInstallations: 033d199474164db20c8350736842a94fe717b960
+  FirebaseInstallations: 390ea1d10a4d02b20c965cbfd527ee9b3b412acb
   FirebaseMessaging: 9bc34a98d2e0237e1b121915120d4d48ddcf301e
-  FirebaseSessions: e5f4caa188dc8bc6142abc974355be75b042215e
+  FirebaseSessions: 80c2bbdd28166267b3d132debe5f7531efdb00bc
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   GoogleAppMeasurement: 70ce9aa438cff1cfb31ea3e660bcc67734cb716e
@@ -921,7 +911,7 @@ SPEC CHECKSUMS:
   React-Core: 34da8c952844e21f5a69bf46438fb6bf063900d0
   React-CoreModules: 621243df8863055ff30f3bb2ff71573ffa7b16c8
   React-cxxreact: 4ad1cc861e32fb533dad6ff7a4ea25680fa1c994
-  React-debug: be2197b422ad86e62320eab092f12f7113b632c1
+  React-debug: 9e44938a864fd790888bb7199ebecaeabd81a952
   React-hermes: 37377d0a56aa0cf55c65248271866ce3268cde3f
   React-jsi: 6de8b0ccc6b765b58e4eee9ee38049dbeaf5c221
   React-jsiexecutor: c7f826e40fa9cab5d37cab6130b1af237332b594
@@ -934,8 +924,7 @@ SPEC CHECKSUMS:
   react-native-safe-area-context: 7aa8e6d9d0f3100a820efb1a98af68aa747f9284
   react-native-version-check: 6cd36aad4e30b8e3216747e3b4ddeb09e0647af8
   react-native-webview: 88293a0f23eca8465c0433c023ec632930e644d0
-  react-native-zendesk-messaging: e4418f96cb02c6741cce7059972f01312eac8e0f
-  React-NativeModulesApple: 51966425078cea9d1894b96863cbc705f89bd264
+  React-NativeModulesApple: 7e1b89ea0c9dcc8f41c07a1052d3c075b7145056
   React-perflogger: 496a1a3dc6737f964107cb3ddae7f9e265ddda58
   React-RCTActionSheet: 02904b932b50e680f4e26e7a686b33ebf7ef3c00
   React-RCTAnimation: e44fe5053708c5be762943087c78dc5a6a3c645c
@@ -949,9 +938,9 @@ SPEC CHECKSUMS:
   React-RCTVibration: 35eec7201c8ffdaccdd908a5ec874b7055f975f3
   React-rncore: 46133d523155fc84572338bd6a7c461c1d873efc
   React-runtimeexecutor: d465ba0c47ef3ed8281143f59605cacc2244d5c7
-  React-runtimescheduler: 35ffb0c4b94e39654aa6c5e0feb75bcec6c8bedc
-  React-utils: b2b33a29ff204f6a421c261e29d81dd9f82d69bc
-  ReactCommon: b3ae12ca7ee4e3c2b488ee2815ede90ff4f87550
+  React-runtimescheduler: d1f4d971cccc48296d1f4e74a213c6d5c9a9ad1a
+  React-utils: bbb98d9798b62570ea2699f5be26e6fb4de4790c
+  ReactCommon: 02765a8f559a0f727e9615dd16f3608dafdf4b5d
   ReactNativeLocalization: fb171138cdc80d5d0d4f20243d2fc82c2b3cc48f
   RNCAsyncStorage: 687bb9e85dd3d45b966662440dcfc0cd962347e6
   RNCCheckbox: 75255b03e604bbcc26411eb31c4cbe3e3865f538
@@ -962,21 +951,19 @@ SPEC CHECKSUMS:
   RNFBMessaging: ad43f856329b726580e8f3898335a2382e5294e1
   RNGestureHandler: a5039da2ac028b073ae801289476060b34d559b1
   RNKeychain: a65256b6ca6ba6976132cc4124b238a5b13b3d9c
+  RNNotifee: 8e2d3df3f0e9ce8f5d1fe4c967431138190b6175
   RNReanimated: 8ace147c4bcfeccba91eb97cde784c773c91850e
   RNScreens: 85d3880b52d34db7b8eeebe2f1a0e807c05e69fa
   RNSVG: d00c8f91c3cbf6d476451313a18f04d220d4f396
+  RNZendeskChat: c3835f664be1746b121b69736d5c95e236cae382
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 3efc43e0d48686ce2e8c60f99d4e6bd349aff981
-  Zendesk: 5e382df2c0034a0df4e43174ecbd7e9bed54b929
-  ZendeskSDKConversationKit: a93d5826c299240fb7ef4fa88956bd99e6762cf4
-  ZendeskSDKCoreUtilities: b44c8d51dd90ece3ef140efffe3ff5f154cfaadf
-  ZendeskSDKFayeClient: a06c403c1c38adb9ae5a341a4d54632c78275a3e
-  ZendeskSDKHTTPClient: 79dfe6b5e75beccb435003051a081c71e7361770
-  ZendeskSDKLogger: e59c678c74a88838a0844423996cb15dd88825d5
-  ZendeskSDKMessaging: 62e057ac0e68fabeb88a84409fb8b57d2a11b7de
-  ZendeskSDKSocketClient: 33c0eb83b065409723559c798738bbc504b0a967
-  ZendeskSDKStorage: 00d6f78a39a42b71c3730b1c39cc0a5c12690685
-  ZendeskSDKUIComponents: 59fab9ac52f3ac5ef3136188da8dc38b06d100f7
+  ZendeskChatProvidersSDK: b3f5a914ed9d518770c994f0f04683952087b00a
+  ZendeskChatSDK: 12fbe34d67b73895882786736329236e7e092b67
+  ZendeskCommonUISDK: ba160fe413b491af9e7bfcb9808afcd494dc83a5
+  ZendeskMessagingAPISDK: 410f9bcf07c79fe98d6f251da102368d6b356c54
+  ZendeskMessagingSDK: 95d396c981dacfab83cc7b9736e8561d51a3052b
+  ZendeskSDKConfigurationsSDK: ebced171fd1f4eb57760e8537d8cfa6a450122be
 
 PODFILE CHECKSUM: 77effbc93c5890de68313949e7e10cd2c21b57d7
 

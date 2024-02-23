@@ -163,14 +163,14 @@ const TextNotifications = ({ navigation }) => {
                     <View style={styles.bottomContainer}>
                     </View>                         
                     <View style={styles.checkBoxArea}>
-                        <View style={styles.checkBoxView}>
+                        <View style={Platform.OS == "ios" ? styles.checkBoxView : styles.checkBoxViewAndroid }>
                             <CheckBox
                                 disabled={false}
                                 value={toggleCheckBox}
                                 onValueChange={onCheckBox}
-                                style={styles.checkBox}
+                                style={Platform.OS == "ios" ? styles.checkBox : styles.checkBoxAndroid} 
                                 boxType="square"
-                                tintColors={{ true: Color.colorMidnightblue, false: '#D0D5DD' }}
+                                tintColors={{ true: Color.colorMidnightblue, false: Platform.OS == "ios" ? Color.colorWhitesmoke_300 : '#D0D5DD' }}
                             />   
                         </View>
                         <View style={styles.checkBoxAreaView}>
@@ -255,31 +255,51 @@ const styles = StyleSheet.create({
     checkBox: {
         marginLeft: 10,
         marginRight: 20,
-        width: 16,
-        height: 16,
+        width: 12,
+        height: 12,
+        backgroundColor: Color.colorWhitesmoke_100
     },
     checkBoxView: {
-        width: 16,
-        height: 16,
+        width: 12,
+        height: 12,
         marginRight: Platform.OS == "ios" ? 20 : 30,
-        marginTop: 5
+        marginTop: 10,
+        backgroundColor: Color.colorWhitesmoke_100
+    },    
+    checkBoxAndroid: {
+        //marginLeft: 10,
+        //marginRight: 20,
+        //width: 12,
+        //height: 12,
+        //backgroundColor: Color.colorWhitesmoke_100
+    },
+    checkBoxViewAndroid: {
+        //width: 20,
+        //height: 20,
+        //margin: 10,
+        //backgroundColor: '#000',
+        marginRight: 10,
+        marginLeft: 10,
+        // marginTop: 10,
+        //backgroundColor: Color.colorWhitesmoke_100
     },
     checkBoxArea: {
         backgroundColor: Color.colorWhitesmoke_100,
         flexDirection: 'row',
         marginBottom: 20,
-        paddingVertical: 20,
+        paddingVertical: 10,
         marginLeft: 20,
         marginRight: 20,
         width: '90%',    
     },
     checkBoxAreaView: {
-        marginRight: 30
+        marginRight: 30,
+        //marginLeft: 30,
     },
     checkBoxAreaViewText: {
         fontSize: 14,
         fontFamily: FontFamily.openSansRegular,   
-        lineHeight: 20,    
+        lineHeight: 30,    
         marginRight: 20,
         color: Color.colorGray_200
     },

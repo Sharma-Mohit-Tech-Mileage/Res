@@ -49,15 +49,13 @@ const ModemExchangeInstructions = () => {
                 {instruction.includes('contact us') ? (
                   <>
                     {instruction.split('contact us')[0]}
-                    <Text
-                      accessible={true}
-                      accessibilityRole="link"
-                      accessibilityLabel="Contact us for more information"
-                      onPress={() => {
-                        PubSub.publish('event.contactUsEvent', {});
-                        setTimeout(() => navigation.navigate('support'), 500);
-                      }}
-                      style={styles.linkText}>
+                    <Text style={styles.linkText} onPress={() => {
+                      PubSub.publish('event.contactUsEvent', {});
+                      //setTimeout(() => navigation.navigate('support'), 500);
+                      navigation.navigate("SupportStack", {
+                        isContactUs: true,
+                      })
+                    }}>
                       contact us
                     </Text>
                     {instruction.split('contact us')[1]}
@@ -66,7 +64,6 @@ const ModemExchangeInstructions = () => {
                   instruction
                 )}
               </Text>
-
             </View>
           ))}
         </View>

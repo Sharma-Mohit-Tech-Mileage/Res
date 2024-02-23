@@ -10,18 +10,19 @@ import TicketSupport from "../../components/support/TicketSupport";
 import TicketView from "../../components/support/TicketView";
 import TroubleShootStack from "./TroubleShootStack";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
-import LiveSupportChat from "../../components/support/LiveSupportChat";
 import ModemStackScreen from "./ManageEquepmentStack";
 import ModemConnectivityGuide from '../../components/support/Troubleshooting/ModemConnectivityGuide';
 const SupportStack = createStackNavigator();
 
-function SupportStackScreen() {
+function SupportStackScreen({route}) {
+  console.log('Support',JSON.stringify(route))
   const { setTabBarVisible } = useTabBarVisibility();
   return (
-    <SupportStack.Navigator initialRouteName="supportScreen" defaultNavigationOptions={{ gestureEnabled: true }}>
+    <SupportStack.Navigator initialRouteName={(route.params?.isManagementEquipment)?"ManageEquipment":"support"} defaultNavigationOptions={{ gestureEnabled: true }}>
       <SupportStack.Screen
         name="support"
         component={supportScreen}
+        initialParams={route.params}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),
@@ -79,16 +80,6 @@ function SupportStackScreen() {
       <SupportStack.Screen
         name="TicketSupport"
         component={TicketSupport}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
-
-      <SupportStack.Screen
-        name="LiveChatTicketSupport"
-        component={LiveSupportChat}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),

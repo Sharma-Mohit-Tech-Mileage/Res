@@ -146,13 +146,13 @@ const HomeScreen = ({ navigation }) => {
       if(user.userInfo.accountNumber==='128387263'){
         mac="00:1d:d0:d4:f8:02"
       }else if(user.userInfo.accountNumber==='133370775'){
-        mac="0c:f8:93:09:2c:85"
+        mac="60:19:71:d5:10:72"
       }else if(user.userInfo.accountNumber==='133437285'){
-        mac="1c:ab:c0:18:a8:79"
+        mac="00:40:36:59:62:d0"
+      }else if(user.userInfo.accountNumber==='131684698'){
+        mac="ac:20:2e:6d:82:f1"
       }
       checkModemDetails(mac)
-      }else{
-        setCheckModemStatus(true)
       }
     }
   };
@@ -169,18 +169,25 @@ const HomeScreen = ({ navigation }) => {
     GetModemStatusApiRequest(
       request,
       (res) => {
-        setCheckModemStatus(true)
         console.log("checkModemDetails", res);
         if (res) {
+
+          if(res?.status){
+            if(res.status===408){
+              setInternetHealths(oldArray => [...oldArray,'Yellow'] );
+              return
+            }
+          }
+
           let temt = [];
-          if (res.equipmentType === "DOCSIS") {
-            temt.push(res.uTxP_State);
-            temt.push(res.uRxL_State);
-            temt.push(res.usnR_State);
-            temt.push(res.dsnR_State);
-            temt.push(res.dRxL_State);
+          if (res.EquipmentType === "DOCSIS") {
+            temt.push(res.UTxP_State);
+            temt.push(res.URxL_State);
+            temt.push(res.USNR_State);
+            temt.push(res.DSNR_State);
+            temt.push(res.DRxL_State);
             updateModemStatus(temt);
-          }else if(res.equipmentType === "ONU"){
+          }else if(res.EquipmentType === "ONU"){
             temt.push(res.OnutP_State);
             temt.push(res.OltrP_State);
             temt.push(res.OnurP_State);
@@ -189,10 +196,15 @@ const HomeScreen = ({ navigation }) => {
           
         }
       },
-      (error) => {
-        setCheckModemStatus(true)
-        setInternetHealths(oldArray => [...oldArray,'yellow'] );
-        console.log("Modem details", error);
+      (errorCode) => {
+        console.log("Modem details on Error", errorCode);
+        if(errorCode===404){
+          setInternetHealths(oldArray => [...oldArray,'Red'] );
+        }else if(errorCode===400 ||errorCode===500 |errorCode===504){
+          setInternetHealths(oldArray => [...oldArray,'Red'] );
+        }else{
+          setInternetHealths(oldArray => [...oldArray,'Yellow'] );
+        }
       }
     );
   };
@@ -228,7 +240,7 @@ const HomeScreen = ({ navigation }) => {
       setCurrentHealth('Offline');
       setIsInternetDetails(true);
     }else if(checkYellow){
-      console.log('Internet Health is yellow')
+      console.log('Internet Health is Yellow')
       setCurrentHealth('Poor');
       setIsInternetDetails(true);
     }else{
@@ -335,6 +347,7 @@ const HomeScreen = ({ navigation }) => {
   useEffect(()=>{
     console.log('Health count',internetHealths)
     if(internetHealths.length>=3){
+      setCheckModemStatus(true)
       refreshInternetHealth()
     }
    

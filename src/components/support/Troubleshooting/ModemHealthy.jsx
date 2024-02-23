@@ -19,8 +19,11 @@ import ServiceIcon from "../../../res/svgIcons/troubleshooting/ServiceIcon";
 import SuccessIcon from "../../../res/svgIcons/troubleshooting/SuccessIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import RightArrow from "../../../res/svgIcons/RightArrow";
-import SettingsIcon from "../../../res/svgIcons/SettingsIcon";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
+import WifiIssueIcon from "../../../res/svgIcons/WifiIssueIcon";
+import Surfingissue from "../../../res/svgIcons/surfingissue";
+import IntermittentIssues from "../../../res/svgIcons/IntermittentIssues";
+import Noconnection from "../../../res/svgIcons/Noconnection";
 const windowHeight = Dimensions.get("window").height;
 const windowWidth = Dimensions.get("window").width;
 
@@ -69,7 +72,7 @@ const ModemHealthy = () => {
                   }}
                 >
                   <View style={styles.menuWrap}>
-                    <SettingsIcon />
+                    <WifiIssueIcon />
                     <Text style={styles.menuText}>Wi-Fi Issues</Text>
                   </View>
                   <RightArrow />
@@ -83,7 +86,7 @@ const ModemHealthy = () => {
                   }}
                 >
                   <View style={styles.menuWrap}>
-                    <SettingsIcon />
+                    <Surfingissue />
                     <Text style={styles.menuText}>Surfing Issues</Text>
                   </View>
                   <RightArrow />
@@ -96,7 +99,7 @@ const ModemHealthy = () => {
                   }}
                 >
                   <View style={styles.menuWrap}>
-                    <SettingsIcon />
+                    <IntermittentIssues />
                     <Text style={styles.menuText}>Intermittent Issues</Text>
                   </View>
                   <RightArrow />
@@ -105,11 +108,11 @@ const ModemHealthy = () => {
                 <TouchableOpacity
                   style={styles.pressableStyle}
                   onPress={() => {
-                    navigation.navigate('ModemConnectivityGuide')
+                    navigation.navigate('ModemConnectivityGuide',{isSuccess:true})
                   }}
                 >
                   <View style={styles.menuWrap}>
-                    <SettingsIcon />
+                    <Noconnection />
                     <Text style={styles.menuText}>No Connection</Text>
                   </View>
                   <RightArrow />

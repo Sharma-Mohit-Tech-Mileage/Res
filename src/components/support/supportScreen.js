@@ -1,17 +1,21 @@
-import React, { useEffect,useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text } from "react-native";
+import { useSelector } from 'react-redux';
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
-import * as Zendesk from 'react-native-zendesk-messaging';
+import ZendeskChat from "react-native-zendesk-chat";
 import PubSub from 'pubsub-js'
 import {
     heightPercentageToDP as hp,
   } from "react-native-responsive-screen";
 
-const Support = () => {
+const Support = ({route}) => {
+    console.log('Back to Support',JSON.stringify(route))
     const navigation = useNavigation();
+    const [zenDeskSupportAvailable, setZenDeskSupportAvailable] = useState(false);
+    const userData = useSelector(state => state.combinedReducers.user.userData);
     const scrollViewRef = useRef(null);
     const makeCall = (number) => {
         let phoneNumber = '';
@@ -76,32 +80,59 @@ const Support = () => {
     
 
     useEffect(() => {
+       if(route.params?.isContactUs){
+        console.log('scrollToEnd')
+        setTimeout(()=>{
+            scrollViewRef.current?.scrollToEnd({animated: true})
+        },1000)
+        
+       }
+
         var token = PubSub.subscribe('event.contactUsEvent', mySubscriber);
-    
-        initZendesk();
-          return () => {
+        return () => {
             PubSub.unsubscribe(token);
-          };
+        };     
+    }, []);
 
-      }, []);
+    useEffect(async () => {
+        const online = await ZendeskChat.areAgentsOnline();
+        console.log('setZenDeskSupportAvailable: ', online);
+        setZenDeskSupportAvailable(online);
+    }, []);      
 
-
-      const initZendesk=()=>{
-        Zendesk.initialize({ channelKey:  Platform.OS === 'android'
-        ? 'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTYxNTQwMjg1MS56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUhKSkQyQ0VZUko5RUFNRVgxR1NHQlg2MC5qc29uIn0='
-        : 'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTYxNTQwMjg1MS56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUhKSkM2QVNWNFNDTkZGVFdYRVFYNjJQNC5qc29uIn0=' })
-          .then(() => {
-            
-          })
-          .catch((error) =>{
-            console.log(error)
-          });
-      }
     
-    //   const handlePressOpenButton = () => {
-    //     Zendesk.openMessagingView();
-    //     Zendesk.addEventListener()
-    //   };
+    const handlePressOpenButton = () => {
+        const user = {
+            full_name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
+            email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
+            phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
+        };
+
+        // On button press, when you want to show chat:
+        ZendeskChat.startChat({
+            name: user.full_name,
+            email: user.email,
+            phone: user.phone,
+            // The behaviorFlags are optional, and each default to 'true' if omitted
+            behaviorFlags: {
+                showAgentAvailability: true,
+                showChatTranscriptPrompt: false,
+                showPreChatForm: true,
+                showOfflineForm: true,
+            },
+            // The preChatFormOptions are optional & each defaults to "optional" if omitted
+            preChatFormOptions: {
+                name: "optional",
+                email: "optional",
+                phone: "optional",
+                department: "required",
+            },
+            messagingOptions: {
+                botName: 'Sparklight',
+            },
+            localizedDismissButtonTitle: "Dismiss",
+        });
+    };
     
 
     return (
@@ -274,38 +305,70 @@ const Support = () => {
                                     Contact Us
                                 </Text>
                             </View>
-                            {/*<View style={styles.integrationCardMobileWrapper}>
-                                <View
-                                    style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
-                                    <View style={[styles.content, styles.contentSpaceBlock]}>
-                                        <View style={styles.headingAndIcon}>
-                                            <View style={[styles.icon]}>
-                                                <Image
-                                                    style={styles.supportIcon}
-                                                    resizeMode="stretch"
-                                                    source={require("../../../assets/message-text-square-01.png")}
-                                                />
-                                            </View>
-                                            <View style={styles.frameParent}>
-                                                <Pressable style={styles.headingAndToggle}
-                                                onPress={()=>{
-                                                   // navigation.navigate('LiveChatTicketSupport') 
-                                                   handlePressOpenButton()
-                                                }}
-                                                >
-                                                    <Text style={[styles.supportingText, styles.headingTypo1]}>
-                                                        Live Support
-                                                    </Text>
-                                                </Pressable>
-                                                <Text style={[styles.supportingText, styles.supportingTypo1]} >
-                                                    No agents available right now. Agents are typically
-                                                    available from 5:00am- 9:00pm PST
-                                                </Text>
+                            {
+                                zenDeskSupportAvailable ?
+                                    <View style={styles.integrationCardMobileWrapper}>
+                                        <View
+                                            style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
+                                            <View style={[styles.content, styles.contentSpaceBlock]}>
+                                                <View style={styles.headingAndIcon}>
+                                                    <View style={[styles.icon]}>
+                                                        <Image
+                                                            style={styles.supportIcon}
+                                                            resizeMode="stretch"
+                                                            source={require("../../../assets/message-text-square-01-purple.png")}
+                                                        />
+                                                    </View>
+                                                    <View style={styles.frameParent}>
+                                                        <Pressable style={styles.headingAndToggle}
+                                                            onPress={()=>{
+                                                                //navigation.navigate('LiveChatTicketSupport') 
+                                                                handlePressOpenButton()
+                                                            }}
+                                                        >
+                                                            <Text style={[styles.supportingText, styles.supportActiveText]}>
+                                                                Live Support
+                                                            </Text>
+                                                        </Pressable>
+                                                    </View>
+                                                </View>
                                             </View>
                                         </View>
-                                    </View>
-                                </View>
-                            </View>
+                                    </View>                                     
+                                :
+                                    <View style={styles.integrationCardMobileWrapper}>
+                                        <View
+                                            style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
+                                            <View style={[styles.content, styles.contentSpaceBlock]}>
+                                                <View style={styles.headingAndIcon}>
+                                                    <View style={[styles.icon]}>
+                                                        <Image
+                                                            style={styles.supportIcon}
+                                                            resizeMode="stretch"
+                                                            source={require("../../../assets/message-text-square-01.png")}
+                                                        />
+                                                    </View>
+                                                    <View style={styles.frameParent}>
+                                                        <Pressable style={styles.headingAndToggle}
+                                                        onPress={()=>{
+                                                        navigation.navigate('LiveChatTicketSupport') 
+                                                        //handlePressOpenButton()
+                                                        }}
+                                                        >
+                                                            <Text style={[styles.supportingText, styles.headingTypo1]}>
+                                                                Live Support
+                                                            </Text>
+                                                        </Pressable>
+                                                        <Text style={[styles.supportingText, styles.supportingTypo1]} >
+                                                            No agents available right now. Agents are typically
+                                                            available from 5:00am- 9:00pm PST
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </View>                                
+                            }
                             {/* <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}> 
                                 <Pressable
                                     style={[styles.integrationCardMobile1, styles.integrationCardBorder,]}
@@ -540,6 +603,14 @@ const styles = StyleSheet.create({
         height: 20,
         width: 20,
         overflow: "hidden",
+    },
+    supportActiveText: {
+        color: Color.colorMidnightblue,
+        textAlign: "auto",
+        lineHeight: 18,
+        fontSize: FontSize.size_lg,
+        fontFamily: FontFamily.openSansRegular,
+        flex: 1,        
     },
     supportingTypo1: {
         lineHeight: 20,
