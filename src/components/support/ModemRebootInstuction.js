@@ -102,15 +102,18 @@ const ModemReboot = () => {
             
             <Text style={[styles.text,{width:wp('75%')}]}>
             {inst3}
-            <Text style={[styles.textContactUs,{fontWeight:'700'}]} onPress={()=>{
-          
-                PubSub.publish('event.contactUsEvent', {});
-                setTimeout(()=>{
-                  navigation.navigate('support')
-                },500)
-                
-            }}>contact us</Text>{' for further assistance.'}
-              </Text>
+              <Text style={[styles.textContactUs, { fontWeight: '700' }]}
+                accessible={true}
+                accessibilityRole="link"
+                accessibilityLabel="Contact us for further assistance"
+                onPress={() => {
+                  PubSub.publish('event.contactUsEvent', {});
+                  setTimeout(() => {
+                    navigation.navigate('support')
+                  }, 500)
+
+                }}>contact us</Text>{' for further assistance.'}
+            </Text>
           </View>
         </View>
       </ScrollView>

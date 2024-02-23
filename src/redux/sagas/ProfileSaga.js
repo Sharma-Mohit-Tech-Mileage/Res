@@ -6,7 +6,7 @@ import {
     fetchPaperLessDetails, postEmailNotification,
     putEmailNotification, postTermsAndConditions, 
     postPushNotifications, unsubscribPaperLess, 
-    fetchPushNotifications, handleSubmitFeedback
+    fetchPushNotifications, handleSubmitFeedback,resendEmailVerification
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
@@ -17,7 +17,7 @@ import {
     UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS,
     FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
     SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
-    UPDATE_EXISTING_EMAIL_NOTIFICATION
+    UPDATE_EXISTING_EMAIL_NOTIFICATION,RESEND_EMAIL_VERIFICTION
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
@@ -85,6 +85,9 @@ function* getPushNotifications(action) {
 function* updateNewEmail(action) {
     try {
         const response = yield call(postEmailNotification, action.payload);
+        if (action.isEmailChanged === true) {
+            yield call(postProfileInfo, action.ProfilePayLoad);
+        }
         if (action.navigation !== null) {
             action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Email' });
         }
@@ -145,6 +148,9 @@ function* updateTextNotification(action) {
 function* updateEmailNotification(action) {
     try {
         const response = yield call(putEmailNotification, action.payload);
+        if (action.isEmailChanged === true) {
+            yield call(postProfileInfo, action.ProfilePayLoad);
+        }
         if (action.navigation !== null) {
             action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Email' });
         }
@@ -204,6 +210,19 @@ function* updatePushNotificationsV2(action) {
     }
 }
 
+function* resentVerifiction(action) {
+    try {
+        yield call(resendEmailVerification);
+        if (action.navigation !== null) {
+            action.navigation.navigate('Notifications', { resentNotification: true, updatedType: true });
+        }
+    } catch (error) {
+        if (action.navigation !== null) {
+            action.navigation.navigate('Notifications', { resentNotification: true, updatedType: false });
+        }
+    }
+}
+
 function* updateEntryEmailNotification(action) {
     try {
         const profile = action.payload.profile;
@@ -242,5 +261,6 @@ function* ProfileSagas() {
     yield takeLatest(SAVE_USER_FEEDBACK, saveUserFeedBack);
     yield takeLatest(UPDATE_ENTRY_EMAIL_NOTIFICATION, updateEntryEmailNotification);
     yield takeLatest(UPDATE_EXISTING_EMAIL_NOTIFICATION, updateNewEmail);
+    yield takeLatest(RESEND_EMAIL_VERIFICTION, resentVerifiction);
 }
 export default ProfileSagas;

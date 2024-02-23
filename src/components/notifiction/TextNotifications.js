@@ -100,10 +100,11 @@ const TextNotifications = ({ navigation }) => {
                         </View>
                         <View style={styles.frameChild} />
                         <View style={styles.frameGroup}>
-                            <View style={[styles.frameParent3,{paddingVertical:4}]}>
+                            <View style={[styles.frameParent3]}>
                                 <Text style={styles.mobilePhoneTypo}>
                                     Mobile Phone
                                 </Text>
+                                <View style={{paddingVertical:4}}>
                                 <Controller
                                     control={control}
                                     name="phoneNumber"
@@ -116,7 +117,7 @@ const TextNotifications = ({ navigation }) => {
                                             error={errors.phoneNumber?.message}
                                         />
                                     )}
-                                />
+                                    /></View>
                                 <Text style={[styles.receiveTextNotifications1, styles.containerTypo,]}>
                                     Message and data rates may apply. Message frequency may vary. Text STOP to opt out or HELP
                                     for help.
