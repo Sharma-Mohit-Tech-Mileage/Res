@@ -4,6 +4,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from 'react-redux';
+import { getUser } from "../../redux/utils/LocalStorage";
 import { getUserType, isPrimaryAdmin, convertToSpecialCase, transformResponse, initializeSettings, getRoleBasedMessage } from '../utility/constant';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { fetchProfileDetails, fetchSMSSelection } from '../../redux/actions/ProfileActionSuite'
@@ -13,6 +14,7 @@ const ProfileSettings = () => {
   const route = useRoute();
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [accountObj, setAccountObj] = useState({});
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
   //const smsSubscription = profile.smsSubscription || [];
@@ -21,7 +23,7 @@ const ProfileSettings = () => {
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   const convertedRole = getUserType(profileDetails.memberType || '');
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || '');
- // const emailAlertNeeded = !profileDetails.svEmailAddress || profileDetails.multipleEmails;
+  // const emailAlertNeeded = !profileDetails.svEmailAddress || profileDetails.multipleEmails;
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
@@ -41,7 +43,13 @@ const ProfileSettings = () => {
   //     dispatch(fetchSMSSelection());
   //   }
   // }, [isPrimary, dispatch]);
-
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const data = await getUser();
+      if (data) { setAccountObj(data?.userInfo) }
+    };
+    fetchUserData();
+  }, []);
   return (
     <View style={{ zIndex: 1 }}>
       <ProfileSettingsHeader title="Profile Settings" onPressBack={() => navigation.navigate('Account')} />
@@ -73,12 +81,12 @@ const ProfileSettings = () => {
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>First Name</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {profileDetails.firstName}
+                  {isPrimary ? accountObj.firstName : profileDetails.firstName}
                 </Text>
               </View>
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Last Name</Text>
-                <Text style={[styles.melissa, styles.melissaTypo]}>{profileDetails.lastName}</Text>
+                <Text style={[styles.melissa, styles.melissaTypo]}>{isPrimary ? accountObj.lastName : profileDetails.lastName}</Text>
               </View>
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Username</Text>

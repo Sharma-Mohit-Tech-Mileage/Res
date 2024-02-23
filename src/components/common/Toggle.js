@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Animated, TouchableWithoutFeedback, View, StyleSheet, Easing } from 'react-native';
 import { Color } from "../../../GlobalStyles";
 
-const Toggle = ({ name, onToggle, initialValue = false }) => {
+const Toggle = ({ name, onToggle, initialValue = false, disabled = false }) => {
     const [isActive, setIsActive] = useState(initialValue);
     const translateX = useRef(new Animated.Value(isActive ? 8 : -8)).current;
 
@@ -17,6 +17,7 @@ const Toggle = ({ name, onToggle, initialValue = false }) => {
     }, [initialValue, translateX]);
 
     const handleToggle = () => {
+        if (disabled) return; // Prevent toggle if disabled
         const nextState = !isActive;
         setIsActive(nextState);
 

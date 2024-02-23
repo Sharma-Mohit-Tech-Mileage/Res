@@ -26,7 +26,6 @@ const EmailNotifications = () => {
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetailsfromStore = profile.profileDetails || {};
   const paperlessdata = route.params?.additionalData;
-  const [initialEmail, setInitialEmail] = useState('');
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const { logEvent } = useAnalytics();
@@ -36,46 +35,31 @@ const EmailNotifications = () => {
     defaultValues: {
       email: paperlessdata?.email || '',
       paperlessBilling: paperlessdata?.status || false,
+      critNotif: paperlessdata?.critNotif||false
     },
   });
 
-  // Set the initial email when the component mounts or the paperlessdata updates....
-  useEffect(() => {
-    setInitialEmail(paperlessdata?.email || '');
-  }, [paperlessdata?.email]);
-
-
   const handleSave = data => {
-    console.log('handleSave called with data:', data); // Log the initial data received by the function
-
     const { email, paperlessBilling } = data;
     const updatedProfileDetails = { ...profileDetailsfromStore };
     const emailChanged = email !== updatedProfileDetails.svEmailAddress;
-    console.log('Email changed:', emailChanged); // Log if the email has changed
-    console.log('Initial profile details:==============================', updatedProfileDetails); // Log the initial profile details
-
     if (emailChanged) {
       updatedProfileDetails.email = updatedProfileDetails.svEmailAddress;
       updatedProfileDetails.svEmailAddress = email;
-      console.log('Updated profile details after email change:', updatedProfileDetails); // Log the updated profile details after email change
     }
 
     if (paperlessBilling) {
-      console.log('Paperless billing is enabled'); // Log if paperless billing is enabled
       if (paperlessdata?.isNew) {
-        console.log('Dispatching updateFreshEmail'); // Log the dispatch of updateFreshEmail
         dispatch(updateFreshEmail(email, emailChanged, updatedProfileDetails, navigation));
       } else {
-        console.log('Dispatching updateEmailNotification'); // Log the dispatch of updateEmailNotification
         dispatch(updateEmailNotification(email, emailChanged, updatedProfileDetails, navigation));
       }
     } else {
-      console.log('Unsubscribing from paperless billing'); // Log the unsubscribe action
       dispatch(unsubscribePaperless(navigation));
     }
 
     logEvent('email_notification_update', { email, paperlessBilling, emailChanged });
-    console.log('Event logged: email_notification_update', { email, paperlessBilling, emailChanged }); // Log the event being logged
+    console.log('Event logged: email_notification_update', { email, paperlessBilling, emailChanged });
   };
 
 
@@ -129,11 +113,10 @@ const EmailNotifications = () => {
                       <Text style={[styles.youAreSubscribedContainer, styles.containerTypo,]} >
                         <Text
                           style={styles.youAreSubscribed}
-                        >{`You are subscribed to text message alerts. `}</Text>
-                        <Text style={styles.replyStopTo}>
-                          Reply STOP to cancel at any time. Call 1-800-123-0456 for
-                          support. Message and data rates may apply.
-                        </Text>
+                        >{`Please enter your email address below to opt into email notifications and stay connected with us. `}</Text>
+                        {/* <Text style={styles.replyStopTo}>
+                          Please enter your email address below to opt into email notifications and stay connected with us.
+                        </Text> */}
                       </Text>
                     </View>
                   </View>
@@ -160,6 +143,28 @@ const EmailNotifications = () => {
                       )}
                     />
                   </View>
+                  <View style={{ paddingVertical: Padding.p_base }}>
+                    <View style={styles.frameChild} />
+                  </View>
+                  <View style={[styles.paperlessBillingParent, styles.frameFlexBox,]}>
+                    <Text style={styles.paperlessBilling}>
+                      Critical notifications, Account Changes and Service Updates
+                    </Text>
+                    <Controller
+                      control={control}
+                      name="critNotif"
+                      render={({ field: { onChange, value } }) => (
+                        <Toggle
+                          onToggle={newValue => onChange(newValue)}
+                          initialValue={value}
+                          disabled={true}
+                        />
+                      )}
+                    />
+                  </View>
+                  <Text style={[styles.receiveBillingStatements, styles.receiveTypo]}>
+                    We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications only.
+                  </Text>
                   <View style={{ paddingVertical: Padding.p_base }}>
                     <View style={styles.frameChild} />
                   </View>

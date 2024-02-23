@@ -83,10 +83,12 @@ const Notifications = () => {
     infoText = (
       <Text>
         Email <Text style={styles.contactUsText}>{acknowledgement}</Text> not confirmed yet.{' '}
-        <Text style={styles.contactUsText} onPress={() => dispatch(resentEmailVerifiction(navigation))}>
+        <Text accessible={true}
+          accessibilityRole="link"
+          accessibilityLabel="resend email verification"  style={styles.contactUsText} onPress={() => dispatch(resentEmailVerifiction(navigation))}>
           Click here
         </Text>
-        {' to resend.'}
+        {' to resend email verification.'}
       </Text>
 
     );
@@ -195,9 +197,13 @@ const Notifications = () => {
             transformedData={{
               status: paperLessInfo?.paperlessStatus === 'Active',
               email: paperLessInfo.emailAddress || profileDetails.svEmailAddress,
-              isNew: isFreshEntry(paperLessInfo)
+              isNew: isFreshEntry(paperLessInfo),
+              critNotif: !!profileDetails.svEmailAddress
             }}
-            additionalSettings={[{ type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off' }]}
+            additionalSettings={[
+              { type: 'Critical notifications', status: !!profileDetails.svEmailAddress ? 'On' : 'Off' },
+              { type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off' }
+              ]}
             isAdmin={!isPrimary}
           />
           <View style={{ marginBottom: Padding.p_base }} />

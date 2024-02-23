@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View, Pressable, Alert, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Color, FontFamily,FontSize, Padding, Border } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
 import chevronRightIcon from '../../../assets/chevronright.png';
 import profileSettingsIcon from '../../../assets/right-actionable15.png';
@@ -79,7 +79,7 @@ const AccountOverview = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchProfileDetails());
-  }, []);
+  }, [dispatch]);
 
   const menuItems = [
     {
@@ -143,7 +143,6 @@ const AccountOverview = () => {
       }
     };
     fetchUserData();
-    console.log('Build Number', VersionCheck.getCurrentVersion());
   }, []);
 
   return (
@@ -173,7 +172,7 @@ const AccountOverview = () => {
           </Text>
         </View>
         <ScrollView style={{ flex: 1 }}>
-          <View style={{marginBottom: '30%'}}>
+          <View style={{ marginBottom: '30%' }}>
             <View style={styles.frameGroup}>
               <View style={styles.navigationBorder}>
                 {/* Mapping through menu items */}
