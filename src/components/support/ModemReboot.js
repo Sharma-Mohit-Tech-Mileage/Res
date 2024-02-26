@@ -119,10 +119,10 @@ const ModemReboot = ({route}) => {
           <View style={{ flexDirection: "column", padding: 10 }}>
             <View style={{ flexDirection: "row" }}>
               <Image
-                style={{ alignSelf: "center" }}
+                style={{ alignSelf: "center", width:24,height:24 }}
                 resizeMode="cover"
                 tintColor={"#F88700"}
-                source={require("../../../assets/info-circle.png")}
+                source={require("../../../assets/alert-triangle.png")}
               />
               <Text style={styles.modemError1}>
                 Uh-oh, experiencing internet issues?
