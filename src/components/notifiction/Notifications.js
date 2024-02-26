@@ -3,23 +3,10 @@ import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-nati
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import {
-  fetchSMSSelection,
-  fetchPushNotifications,
-  fetchBillingPaper,
-  fetchProfileDetails,
-  saveSMSSelection, resentEmailVerifiction
-} from '../../redux/actions/ProfileActionSuite';
-import {
-  transformResponse,
-  transformNotificationPreferences,
-  isPrimaryAdmin,
-  isFreshEntry,
-  extractAcknowledgementEmail
-} from '../../components/utility/constant';
+import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails, saveSMSSelection, resentEmailVerifiction } from '../../redux/actions/ProfileActionSuite';
+import { transformResponse, transformNotificationPreferences, isPrimaryAdmin, isFreshEntry, extractAcknowledgementEmail } from '../../components/utility/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from "../common/customui/NotificationAlert";
-import PubSub from 'pubsub-js';
 const Notifications = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -42,75 +29,26 @@ const Notifications = () => {
   let notificationsTitle = '', infoText = '', isDisabled = false
   if (profileDetails.multipleEmails) {
     isDisabled = true
-    notificationsTitle = "There is a problem retrieving your email address";
-    infoText = (
-      <Text style={styles.messageText}>
-        {'We are not able to retrieve the email address for your account. Please '}
-        <Text
-          accessible={true}
-          accessibilityRole="link"
-          accessibilityLabel="Contact us for assistance"
-          onPress={() => {
-            navigation.navigate('Support');
-            setTimeout(() => { PubSub.publish('event.contactUsEvent', {}); }, 500);
-          }}
-          style={styles.contactUsText}>
-          {' contact us '}
-        </Text>
-        {'for assistance.'}
-      </Text>
-    );
-
-  } else if (emailAddress) {
+    notificationsTitle = "Unable to retrieve email address.";
+    infoText = 'We are not able to retrieve the email address for your account. Please contact us for assistance.'
+  } 
+  else if (emailAddress || acknowledgement) 
+  {
     notificationsTitle = isEmailVerified ? '' : 'Email verification pending';
-    infoText = (isEmailVerified || !isPrimary) ? (
-      <Text>
-        Emails are sent to <Text style={styles.text}>{emailAddress}</Text>
-      </Text>
-    ) : (
-      <Text>
-        Email <Text style={styles.contactUsText}>{acknowledgement}</Text> not confirmed yet.{' '}
-        <Text style={styles.contactUsText} onPress={() => dispatch(resentEmailVerifiction(navigation))}>
-          Click here
-        </Text>
-        {' to resend.'}
-      </Text>
-
-    );
+    infoText = isEmailVerified ? (<Text>Emails are sent to <Text style={styles.text}>{emailAddress}</Text></Text>) 
+    : 
+    (<Text>
+        <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation. Check your inbox for our verification link.{' '}
+        <Text style={styles.contactUsText} onPress={() => dispatch(resentEmailVerifiction(navigation))}> Resend Confirmation Email</Text>
+     </Text>
+     );
   }
-  else if (acknowledgement && isPrimary) {
-    notificationsTitle = 'Email verification pending';
-    infoText = (
-      <Text>
-        Email <Text style={styles.contactUsText}>{acknowledgement}</Text> not confirmed yet.{' '}
-        <Text accessible={true}
-          accessibilityRole="link"
-          accessibilityLabel="resend email verification"  style={styles.contactUsText} onPress={() => dispatch(resentEmailVerifiction(navigation))}>
-          Click here
-        </Text>
-        {' to resend email verification.'}
-      </Text>
-
-    );
-  } else {
-    isDisabled = true
-  }
-
-
 
   useEffect(() => {
+    dispatch(fetchProfileDetails());
     dispatch(fetchBillingPaper());
     dispatch(fetchSMSSelection());
     dispatch(fetchPushNotifications());
-    dispatch(fetchProfileDetails());
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (!isPrimary) {
-        dispatch(saveSMSSelection([]))
-      }
-    };
   }, []);
 
   useEffect(() => {
@@ -127,14 +65,11 @@ const Notifications = () => {
         case 'App':
           dispatch(fetchPushNotifications());
           break;
-        case 'ProfileDetails':
-          dispatch(fetchProfileDetails());
-          break;
         default:
+          dispatch(fetchProfileDetails());
           dispatch(fetchBillingPaper());
           dispatch(fetchProfileDetails());
           dispatch(fetchPushNotifications());
-          dispatch(fetchProfileDetails());
       }
       setUpdatedSection(updatedType);
       setSuccessMessage(`${updatedType} settings have been updated successfully.`);
@@ -166,16 +101,9 @@ const Notifications = () => {
             showNotification={updatedSection === 'Text'}
             showSuccessAlert={showSuccessAlert}
             setShowSuccessAlert={() => setShowSuccessAlert(false)}
-            isDisabled={!data.phoneNum}
+            isDisabled={false}
             notificationsTitle="No mobile phone number on file"
             infoText={data.phoneNum ? `Text alerts are sent to ` : ''}
-            // (<Text>
-            //   We don’t have your mobile phone number on file. Go to
-            //   <Text style={[styles.contactUsText]} onPress={() => { navigation.navigate('ProfileSettings') }}>
-            //     {' Profile Settings '}
-            //   </Text>
-            //   to add your phone number.
-            // </Text>)}
             number={data.phoneNum}
             transformedData={data}
             navigationTarget="TextNotifications"
@@ -203,7 +131,7 @@ const Notifications = () => {
             additionalSettings={[
               { type: 'Critical notifications', status: !!profileDetails.svEmailAddress ? 'On' : 'Off' },
               { type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off' }
-              ]}
+            ]}
             isAdmin={!isPrimary}
           />
           <View style={{ marginBottom: Padding.p_base }} />
@@ -249,7 +177,7 @@ const NotificationSection = ({
   const handleClose = () => { setShowSuccessAlert(false); };
 
   return (
-    <View style={[styles.frameParent2, styles.frameBorder]}>
+    <View style={{ ...styles.frameBorder, alignItems: "center"}}>
       {showNotification && (
         <View style={styles.infoWrapper}>
           <NotificationAlert
@@ -262,7 +190,7 @@ const NotificationSection = ({
           />
         </View>
       )}
-      <View style={[styles.textNotificationsParent, styles.parentSpaceBlock]}>
+      <View style={{ ...styles.parentSpaceBlock, alignSelf: "stretch"}}>
         <Text style={styles.textNotifications}>{title}</Text>
         {!isAdmin && <Pressable
           style={[styles.buttons, styles.buttonsBg, isDisabled && styles.buttonDisabled]}
@@ -273,24 +201,22 @@ const NotificationSection = ({
         </Pressable>}
       </View>
       <View style={styles.frameWrapper}>
-        {!isAdmin && isDisabled ?
+        {!isAdmin && isDisabled &&
           <NotificationAlert
             type="warning"
             title={notificationsTitle}
             showCloseIcon={false}
             message={infoText}
-          />
-          : null}
-        {isAdmin ?
+          />}
+        {isAdmin &&
           <NotificationAlert
             type="warning"
             title={""}
             showCloseIcon={false}
             message={"Only Primary Admin can make changes"}
-          />
-          : null}
-        {isAdmin ? <View style={{ marginVertical: 8 }} /> : null}
-        {(!isDisabled && infoText) ? <View style={styles.frameView}>
+          />}
+        {isAdmin && <View style={{ marginVertical: 8 }} />}
+        {(!isDisabled && infoText) && <View style={styles.frameView}>
           <View style={styles.infoCircleWrapper}>
             <Image
               style={styles.infoCircleIcon}
@@ -300,18 +226,13 @@ const NotificationSection = ({
           </View>
           <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
             {infoText}
-            {number && (
+            { number && (
               <Text style={[styles.text]} accessibilityLabel={`Phone Number: ${number}`}>
                 {number}
               </Text>
             )}
-            {/* {email && (
-              <Text style={styles.text} accessibilityLabel={`Email Address: ${email}`}>
-                {email}
-              </Text>
-            )} */}
           </Text>
-        </View> : null}
+        </View>}
       </View>
       {additionalSettings.map((setting, index) => (
         <NotificationType key={index} type={setting.type} status={setting.status} />
@@ -342,14 +263,14 @@ const NotificationType = ({ type, status }) => {
   return (
     <View style={styles.frameWrapperBorder}>
       <View style={[styles.parentSpaceBlock]}>
-        <Text style={[styles.appointments, styles.subscribedTypo]}>{type}</Text>
+        <Text style={{...styles.subscribedTypo,flex:1}}>{type}</Text>
         <View style={[styles.checkCircleParent]}>
           <Image
             style={styles.infoCircleIcon}
             resizeMode="cover"
             source={imageSource}
           />
-          <Text style={[styles.subscribed, styles.subscribedTypo]}>{displayStatus}</Text>
+          <Text style={{ ...styles.subscribedTypo, marginLeft: 10, }}>{displayStatus}</Text>
         </View>
       </View>
     </View>
@@ -428,9 +349,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: Color.colorGray_200,
   },
-  textNotificationsParent: {
-    alignSelf: "stretch",
-  },
   infoCircleIcon: {
     width: 18,
     height: 18,
@@ -445,7 +363,7 @@ const styles = StyleSheet.create({
     color: Color.colorGray_100,
     fontWeight: "600",
     fontSize: 14,
-    flex: 1, // Allows the text to shrink and expand as needed
+    flex: 1, 
   },
   infoWrapper: {
     paddingHorizontal: Padding.p_5xl,
@@ -468,24 +386,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: Color.sparklightGray,
   },
-  appointments: {
-    flex: 1,
-  },
-  subscribed: {
-    marginLeft: 10,
-  },
   checkCircleParent: {
     alignItems: "center",
     flexDirection: "row",
-  },
-  frameParent2: {
-    alignItems: "center",
   },
   notificationsSentFrom: {
     marginLeft: 8,
     color: Color.colorGray_100,
     fontWeight: '400',
-
   },
   notificationsInner: {
     paddingVertical: Padding.p_5xl,
