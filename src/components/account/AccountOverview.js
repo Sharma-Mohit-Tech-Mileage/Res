@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 import { getUser, getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
+import * as Zendesk from 'react-native-zendesk-messaging';
 import { SetClearTimer } from '../user/Session';
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
@@ -61,6 +62,7 @@ const logoutAction = (dispatch, navigation) => {
       dispatch(logoutApp());
       cleanUserData();
       SetClearTimer();
+      Zendesk.logout();
       navigation.reset({
         index: 0,
         routes: [{ name: 'Splash' }],
@@ -77,7 +79,7 @@ const AccountOverview = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchProfileDetails());
-  }, [dispatch]);
+  }, []);
 
   const menuItems = [
     {
