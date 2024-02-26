@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Color, FontSize, FontFamily, Padding } from '../../../../GlobalStyles';
-
+import PubSub from 'pubsub-js';
+import { useNavigation, useRoute } from "@react-navigation/native";
 const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true, isVisible = true }) => {
     if (!isVisible) return null;
     const typeStyles = {
@@ -12,6 +13,7 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
     };
 
     const currentTypeStyle = typeStyles[type] || typeStyles.info;
+    const navigation = useNavigation();
     const handleClose = () => {
         onClose && onClose(); // Call the onClose prop function if it exists
     };
@@ -30,7 +32,20 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                 showCloseIcon ? { marginRight: 30 } : { marginRight: 10 }
             ]}>
                 {title && <Text style={[styles.title, { color: currentTypeStyle.color }]}>{title}</Text>}
-                {message ? <Text style={!title ? styles.messageOnEmpty : styles.message}>{message}</Text> : null}
+                {message ? (
+                    <Text style={!title ? styles.messageOnEmpty : styles.message}>
+                        {message.split("contact us").map((part, index, arr) => index < arr.length - 1 ? (
+                            <React.Fragment key={index}>
+                                {part}
+                                <Text style={styles.contactUsText} onPress={() => {
+                                    navigation.navigate('Support');
+                                    setTimeout(() => { PubSub.publish('event.contactUsEvent', {}); }, 500);
+                                }}>contact us</Text>
+                            </React.Fragment>
+                        ) : part)}
+                    </Text>
+                ) : null}
+
             </View>
             {showCloseIcon && (
                 <TouchableOpacity
@@ -99,6 +114,15 @@ const styles = StyleSheet.create({
         fontFamily: FontFamily.openSansRegular,
         fontWeight: '400',
         color: Color.colorGray_200,
+    },
+    contactUsText: {
+        color: Color.colorMidnightblue,
+        fontFamily: FontFamily.openSansSemiBold,
+        fontSize: 16,
+        fontStyle: "normal",
+        fontWeight: "700",
+        paddingLeft: 5,
+        flexWrap: 'wrap'
     },
 });
 
