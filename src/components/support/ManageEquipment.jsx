@@ -85,6 +85,8 @@ const ManageEquipment = () => {
               mac = "00:40:36:59:62:d0";
             } else if (res.userInfo.accountNumber === "131684698") {
               mac = "ac:20:2e:6d:82:f1";
+            } else if (res.userInfo.accountNumber === "136885142") {
+              mac = "00:40:36:59:00:00";
             }
 
             checkModemDetails(mac);
@@ -234,7 +236,7 @@ const ManageEquipment = () => {
                               ? "Issue Detected"
                               : currentHealth == "Offline"
                               ? "Issue Detected"
-                              : "Good Health"}
+                              : "Optimal Health"}
                           </Text>
                           <Image
                             style={styles.frameChild}
@@ -275,26 +277,36 @@ const ManageEquipment = () => {
                     styles.myModemSpaceBlock,
                   ]}
                 >
-                  <View style={[styles.notifications, styles.parentBorder]}>
-                    <Image
-                      resizeMode="cover"
-                      source={require("../../../assets/rectangle-529.png")}
-                    />
+                  <View style={[styles.notifications, styles.parentBorder1,{borderLeftColor: isOffline
+                                ? colors.sparklight_red
+                                : currentHealth === "Offline"
+                                ? colors.sparklight_red
+                                : colors.sparklight_yellow }]}>
                     <View style={styles.bannerWarning}>
                       <View style={styles.rightActionableParent}>
-                        <Image
-                          style={{ height: "100%" }} // Set both width and height to '100%'
-                          resizeMode="stretch" // Change resizeMode to stretch
-                          source={require("../../../assets/alertred.png")}
-                        />
+                        
                         <View style={styles.creditCardWillExpireSoonParent}>
-                          <Text style={styles.creditCardWill}>
+                          <View style={{flexDirection:'row'}}>
+                          <Image
+                          style={{ alignSelf: "center", width: 24, height: 24 }}
+                          resizeMode="cover"
+                          tintColor={isOffline
+                            ? colors.sparklight_red
+                            : currentHealth === "Optimal"
+                            ? colors.sparklight_green
+                            : currentHealth === "Offline"
+                            ? colors.sparklight_red
+                            : colors.sparklight_yellow}
+                          source={require("../../../assets/alert-triangle.png")}
+                        />
+                          <Text style={[styles.creditCardWill,{marginLeft:5,marginTop:5}]}>
                             {isOffline
                               ? "Modem is Offline"
                               : isContactUs
-                              ? "!Please again later"
+                              ? "Please try again later"
                               : "An issue has been detected"}
                           </Text>
+                            </View>
                           <Text
                             style={[
                               styles.yourSavedCard,
@@ -323,12 +335,13 @@ const ManageEquipment = () => {
                 style={[
                   styles.frame9defaultSpaceBlock,
                   {
-                    backgroundColor:
-                      currentHealth === "Offline" ||
-                      isOffline ||
-                      currentHealth === "Poor"
-                        ? "#EF4E3E10"
-                        : "white",
+                    backgroundColor: isContactUs
+                      ? "white"
+                      : currentHealth === "Offline" ||
+                        isOffline ||
+                        currentHealth === "Poor"
+                      ? "#EF4E3E10"
+                      : "white",
                   },
                 ]}
                 onPress={() => {
@@ -363,16 +376,21 @@ const ManageEquipment = () => {
                   style={[
                     styles.frame9defaultSpaceBlock,
                     {
-                      backgroundColor:
-                        currentHealth === "Offline" || currentHealth === "Poor"
-                          ? "#EF4E3E10"
-                          : "white",
+                      backgroundColor: isContactUs
+                        ? "white"
+                        : currentHealth === "Offline" ||
+                          currentHealth === "Poor"
+                        ? "#EF4E3E10"
+                        : "white",
                     },
                   ]}
                   onPress={() => {
                     if (!loadingHealth) {
                       navigation.navigate("ModemRebootScreen", {
-                        isError: (currentHealth != "Optimal" ||isOffline) ? true : false,
+                        isError:
+                          currentHealth != "Optimal" || isOffline
+                            ? true
+                            : false,
                         isFromT: true,
                       });
                     }
@@ -397,8 +415,11 @@ const ManageEquipment = () => {
                 style={[
                   styles.frame9defaultSpaceBlock,
                   {
-                    backgroundColor:
-                      currentHealth === "Offline" ? "#EF4E3E10" : "white",
+                    backgroundColor: isContactUs
+                      ? "white"
+                      : currentHealth === "Offline"
+                      ? "#EF4E3E10"
+                      : "white",
                   },
                 ]}
                 onPress={() => {
@@ -477,30 +498,35 @@ const ManageEquipment = () => {
               ]}
             >
               <View style={[styles.frameLayout]} />
-            
-                <TouchableOpacity
-                  style={[styles.frame9defaultSpaceBlock]}
-                  onPress={() => {
-                    navigation.navigate('ArticalWindowUtility',{url:'https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email',name:'Surfing Issues'})
-                  }}
-                >
-                  <WifiIssueIcon />
-                  <Text style={styles.modemHealthSupport}>Wifi Issues</Text>
-                  <Image
-                    resizeMode="stretch"
-                    source={require("../../../assets/chevronright.png")}
-                  />
-                </TouchableOpacity>
-              
+
+              <TouchableOpacity
+                style={[styles.frame9defaultSpaceBlock]}
+                onPress={() => {
+                  navigation.navigate("ArticalWindowUtility", {
+                    url: "https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email",
+                    name: "Surfing Issues",
+                  });
+                }}
+              >
+                <WifiIssueIcon />
+                <Text style={styles.modemHealthSupport}>Wifi Issues</Text>
+                <Image
+                  resizeMode="stretch"
+                  source={require("../../../assets/chevronright.png")}
+                />
+              </TouchableOpacity>
 
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
-                  navigation.navigate('ArticalWindowUtility',{url:'https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email',name:'Surfing Issues'})
+                  navigation.navigate("ArticalWindowUtility", {
+                    url: "https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email",
+                    name: "Surfing Issues",
+                  });
                 }}
               >
-                <Surfingissue/>
+                <Surfingissue />
                 <Text style={styles.modemHealthSupport}>Surfing Issues</Text>
                 <Image
                   resizeMode="stretch"
@@ -512,10 +538,10 @@ const ManageEquipment = () => {
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
-                  navigation.navigate('PeriodicProblems')
+                  navigation.navigate("PeriodicProblems");
                 }}
               >
-                <IntermittentIssues/>
+                <IntermittentIssues />
                 <Text style={styles.modemHealthSupport}>
                   Intermittent Issues
                 </Text>
@@ -562,6 +588,12 @@ const styles = StyleSheet.create({
   parentBorder: {
     borderWidth: 1,
     borderStyle: "solid",
+  },
+  parentBorder1: {
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderLeftWidth: 5,
+    borderLeftColor: colors.sparklight_yellow,
   },
   textTypo1: {
     fontSize: FontSize.textXsSemibold_size,
@@ -701,6 +733,7 @@ const styles = StyleSheet.create({
     borderColor: Color.sparklightGray,
     borderRadius: Border.br_11xs,
     alignSelf: "stretch",
+    padding: 5,
   },
   notificationsWrapper: {
     marginTop: 24,

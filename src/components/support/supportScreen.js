@@ -29,6 +29,20 @@ const Support = ({route}) => {
         Linking.openURL(phoneNumber);
     };
 
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+          // The screen is focused
+          // Call any action
+          setTimeout(()=>{
+            scrollViewRef.current?.scrollTo({y:0,x:0,animated: true})
+        },500)
+          
+           
+        });
+    
+        // Return the function to unsubscribe from the event so it gets removed on unmount
+        return unsubscribe;
+      }, [navigation]);
 
 
     const items = [
@@ -81,13 +95,12 @@ const Support = ({route}) => {
 
     useEffect(() => {
        if(route.params?.isContactUs){
-        console.log('scrollToEnd')
         setTimeout(()=>{
             scrollViewRef.current?.scrollToEnd({animated: true})
         },1000)
         
        }
-
+       
         var token = PubSub.subscribe('event.contactUsEvent', mySubscriber);
         return () => {
             PubSub.unsubscribe(token);

@@ -277,6 +277,9 @@ const TroubleshootContainer = () => {
           else if(user.userInfo.accountNumber==='131684698'){
             mac="ac:20:2e:6d:82:f1"
           }
+          else if(user.userInfo.accountNumber==='136885142'){
+            mac="00:40:36:59:00:00"
+          }
           checkModemHealth(mac);
         }
       },
