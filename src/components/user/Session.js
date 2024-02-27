@@ -2,6 +2,7 @@
 import { getUser } from "../../redux/utils/LocalStorage";
 import { refresh } from "react-native-app-auth";
 import { storeUser } from "../../redux/utils/LocalStorage";
+import  store  from '../../redux/configureStore';
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { Env } from "../../network/apis/account/Constants";

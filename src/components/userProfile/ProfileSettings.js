@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Pressable, ScrollView, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Pressable, ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from 'react-redux';
 import { getUser } from "../../redux/utils/LocalStorage";
-import { getUserType, isPrimaryAdmin, convertToSpecialCase, transformResponse, initializeSettings, getRoleBasedMessage } from '../utility/constant';
+import { getUserType, isPrimaryAdmin, convertToSpecialCase, getRoleBasedMessage } from '../utility/constant';
 import NotificationAlert from '../common/customui/NotificationAlert';
-import { fetchProfileDetails, fetchSMSSelection } from '../../redux/actions/ProfileActionSuite'
-//import PubSub from 'pubsub-js'
+import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
+import { RefreshToken } from '../user/Session';
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -17,19 +17,14 @@ const ProfileSettings = () => {
   const [accountObj, setAccountObj] = useState({});
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
-  //const smsSubscription = profile.smsSubscription || [];
-  //const data = transformResponse(smsSubscription);
-  //const smsPayload = initializeSettings(data);
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   const convertedRole = getUserType(profileDetails.memberType || '');
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || '');
-  // const emailAlertNeeded = !profileDetails.svEmailAddress || profileDetails.multipleEmails;
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
+      RefreshToken();
       dispatch(fetchProfileDetails());
-      // if (isPrimary)
-      //   dispatch(fetchSMSSelection());
       navigation.setParams({ updateSuccess: undefined });
     }
   }, [route.params?.updateSuccess, navigation, dispatch]);
@@ -38,11 +33,6 @@ const ProfileSettings = () => {
     dispatch(fetchProfileDetails());
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   if (isPrimary) {
-  //     dispatch(fetchSMSSelection());
-  //   }
-  // }, [isPrimary, dispatch]);
   useEffect(() => {
     const fetchUserData = async () => {
       const data = await getUser();
@@ -72,7 +62,6 @@ const ProfileSettings = () => {
               </Text>
               {!isPrimary && <Pressable
                 style={[styles.buttons, styles.buttonsLayout]}
-                // onPress={() => navigation.navigate("ProfileSettingsEdit", { smsPayload: smsPayload })}>
                 onPress={() => navigation.navigate("ProfileSettingsEdit")}>
                 <Text style={[styles.makePayment, styles.text1Clr]}>Edit</Text>
               </Pressable>}
@@ -106,7 +95,7 @@ const ProfileSettings = () => {
               </View>
               <View style={styles.notificationsWrapper}>
                 <NotificationAlert
-                  type="info" // "info", "success", "warning"
+                  type="info"
                   title={convertToSpecialCase(convertedRole)}
                   showCloseIcon={false}
                   message={roleBasedInfo}
@@ -116,58 +105,6 @@ const ProfileSettings = () => {
             <View style={[{ paddingHorizontal: Padding.p_5xl }, styles.frameParentSpaceBlock]}>
               <View style={styles.frameChild} />
             </View>
-            {/* <View style={styles.frameParentSpaceBlock}>
-              <View style={styles.contactInformationWrapper}>
-                <Text style={[styles.generalInformation, styles.melissaTypo]}>
-                  Contact Information
-                </Text>
-              </View>
-              {emailAlertNeeded && isPrimary && (
-                <View style={styles.notificationsWrapper}>
-                  <NotificationAlert
-                    type={"warning"}
-                    title={profileDetails.multipleEmails ? "There is a problem retrieving your email address" : "No email address on file"}
-                    showCloseIcon={false}
-                    message={profileDetails.multipleEmails ? <Text style={styles.messageText}>
-                      {'We are not able to retrieve the email address for your account. Please'}
-                      <Text
-                        style={styles.contactUsText}
-                        onPress={() => {
-                          navigation.navigate('Support');
-                          setTimeout(() => {
-                            PubSub.publish('event.contactUsEvent', {});
-                          }, 500);
-                        }}
-                      >
-                        {' contact us '}
-                      </Text>
-                      {'for assistance.'}
-                    </Text> : "We don't have your email address on file. Please add your email."}
-                  /></View>
-              )}
-
-              <View style={styles.firstNameParent} accessible={true} >
-                <Text style={styles.firstName}>Email</Text>
-                <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {profileDetails.multipleEmails ? '' : profileDetails.svEmailAddress}
-                </Text>
-              </View>
-              {!smsPayload.phoneNumber && isPrimary && (
-                <View style={styles.notificationsWrapper}>
-                  <NotificationAlert
-                    type={"warning"}
-                    title={"No mobile phone number on file"}
-                    showCloseIcon={false}
-                    message={"We don't have your phone number on file. Please add your phone number"}
-                  /></View>
-              )}
-              <View style={styles.firstNameParent} accessible={true} >
-                <Text style={styles.firstName}>Mobile Phone</Text>
-                <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {smsPayload.phoneNumber || ''}
-                </Text>
-              </View>
-            </View> */}
           </View>
         </View>
       </ScrollView>
@@ -218,15 +155,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
-  },
-  contactUsText: {
-    color: Color.colorMidnightblue,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: 16,
-    fontStyle: "normal",
-    fontWeight: "700",
-    paddingLeft: 5,
-    flexWrap: 'wrap'
   },
   buttons: {
     marginLeft: Padding.p_3xs,
@@ -292,13 +220,6 @@ const styles = StyleSheet.create({
   frameChild: {
     height: 1,
     backgroundColor: Color.sparklightGray,
-    alignSelf: "stretch",
-  },
-  contactInformationWrapper: {
-    paddingBottom: Padding.p_base,
-    paddingHorizontal: Padding.p_5xl,
-    alignItems: "center",
-    flexDirection: "row",
     alignSelf: "stretch",
   },
   frameGroup: {

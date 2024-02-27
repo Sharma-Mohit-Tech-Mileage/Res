@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   },
   emailNotificationsInner: {
     marginTop: Padding.p_5xl,
-    paddingBottom: Padding.p_base,
+    paddingBottom: '20%',
     paddingHorizontal: Padding.p_base,
     width: '100%',
     overflow: "hidden",

@@ -19,7 +19,7 @@ const AccountIcon = (props) => {
       }}
     >
       <Text allowFontScaling={false} style={{color:'white',fontWeight:'600',fontSize:12}}>
-        {Fname}{Lname}
+        {(Fname ?? '').toUpperCase()}{(Lname ?? '').toUpperCase()}
       </Text>
     </View>
   );

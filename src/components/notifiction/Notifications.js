@@ -4,7 +4,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails, saveSMSSelection, resentEmailVerifiction } from '../../redux/actions/ProfileActionSuite';
-import { transformResponse, transformNotificationPreferences, isPrimaryAdmin, isFreshEntry, extractAcknowledgementEmail } from '../../components/utility/constant';
+import { transformResponse, transformNotificationPreferences, isPrimaryAdmin, isAdminRole, isFreshEntry, extractAcknowledgementEmail } from '../../components/utility/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from "../common/customui/NotificationAlert";
 const Notifications = () => {
@@ -24,6 +24,7 @@ const Notifications = () => {
   const emailAddress = paperLessInfo.emailAddress;
   const isEmailVerified = paperLessInfo.emailStatus === 'Verified';
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
+  const isAdmin = isAdminRole(profileDetails.memberType);
   const acknowledgement = extractAcknowledgementEmail(paperLessInfo);
 
   let notificationsTitle = '', infoText = '', isDisabled = false
@@ -38,8 +39,8 @@ const Notifications = () => {
     infoText = isEmailVerified ? (<Text>Emails are sent to <Text style={styles.text}>{emailAddress}</Text></Text>) 
     : 
     (<Text>
-        <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation. Check your inbox for our verification link.{' '}
-        <Text style={styles.contactUsText} onPress={() => dispatch(resentEmailVerifiction(navigation))}> Resend Confirmation Email</Text>
+        <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation. {isPrimary?' Check your inbox for our verification link. ':''}
+        {isPrimary ?<Text style={styles.contactUsText} onPress={() => dispatch(resentEmailVerifiction(navigation))}> Resend Confirmation Email</Text>:''}
      </Text>
      );
   }
@@ -108,7 +109,7 @@ const Notifications = () => {
             transformedData={data}
             navigationTarget="TextNotifications"
             additionalSettings={data.subscriptionDetails}
-            isAdmin={!isPrimary}
+            isAdmin={isAdmin}
           />
           <View style={{ marginBottom: Padding.p_base }} />
           <NotificationSection
@@ -132,7 +133,7 @@ const Notifications = () => {
               { type: 'Critical notifications', status: !!profileDetails.svEmailAddress ? 'On' : 'Off' },
               { type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off' }
             ]}
-            isAdmin={!isPrimary}
+            isAdmin={isAdmin}
           />
           <View style={{ marginBottom: Padding.p_base }} />
           <NotificationSection
