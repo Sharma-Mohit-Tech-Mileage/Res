@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Color, FontSize, FontFamily, Padding } from '../../../../GlobalStyles';
 import PubSub from 'pubsub-js';
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, CommonActions } from "@react-navigation/native";
 const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true, isVisible = true }) => {
     if (!isVisible) return null;
     const typeStyles = {
@@ -38,8 +38,10 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                             <React.Fragment key={index}>
                                 {part}
                                 <Text style={styles.contactUsText} onPress={() => {
-                                    navigation.navigate('Support');
-                                    setTimeout(() => { PubSub.publish('event.contactUsEvent', {}); }, 500);
+                                    navigation.navigate('Support', {
+                                        screen: 'support',
+                                        params: { triggerEvent: true }, 
+                                    });
                                 }}>contact us</Text>
                             </React.Fragment>
                         ) : part)}
