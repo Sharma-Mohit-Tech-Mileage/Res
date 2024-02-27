@@ -28,6 +28,7 @@ const Notifications = () => {
   const acknowledgement = extractAcknowledgementEmail(paperLessInfo);
 
   let notificationsTitle = '', infoText = '', isDisabled = false
+  if (profileDetails){
   if (profileDetails.multipleEmails) {
     isDisabled = true
     notificationsTitle = "Unable to retrieve email address.";
@@ -43,7 +44,7 @@ const Notifications = () => {
         {isPrimary ?<Text style={styles.contactUsText} onPress={() => dispatch(resentEmailVerifiction(navigation))}> Resend Confirmation Email</Text>:''}
      </Text>
      );
-  }
+  }}
 
   useEffect(() => {
     dispatch(fetchProfileDetails());
