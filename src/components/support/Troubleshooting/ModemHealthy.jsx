@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Dimensions,
   SafeAreaView,
+  ScrollView
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -24,6 +25,7 @@ import WifiIssueIcon from "../../../res/svgIcons/WifiIssueIcon";
 import Surfingissue from "../../../res/svgIcons/surfingissue";
 import IntermittentIssues from "../../../res/svgIcons/IntermittentIssues";
 import Noconnection from "../../../res/svgIcons/Noconnection";
+import Modemicon from "../../../res/svgIcons/Modemicon";
 const windowHeight = Dimensions.get("window").height;
 const windowWidth = Dimensions.get("window").width;
 
@@ -62,8 +64,23 @@ const ModemHealthy = () => {
                 {"No service issues were detected."}
               </Text>
             </View>
+           <ScrollView style={{marginBottom:80}}>
             <View style={{ flexDirection: "column", flex: 1 }}>
               <View style={styles.card}>
+
+              <TouchableOpacity
+                  style={styles.pressableStyle}
+                  onPress={() => {
+                    navigation.navigate('ManageEquipment')
+                  }}
+                >
+                  <View style={styles.menuWrap}>
+                    <Modemicon />
+                    <Text style={styles.menuText}>Manage Equipment</Text>
+                  </View>
+                  <RightArrow />
+                </TouchableOpacity>
+               
                 <View style={styles.borderSec} />
                 <TouchableOpacity
                   style={styles.pressableStyle}
@@ -120,6 +137,7 @@ const ModemHealthy = () => {
                 
               </View>
             </View>
+            </ScrollView>
           </View>
         </View>
       </SafeAreaView>

@@ -121,6 +121,19 @@ const MyTabs = ({ route, navigation }) => {
       <Tab.Screen
         name="Support"
         component={SupportStack}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'Support',
+                },
+              ],
+            });
+          },
+        })}
         options={{
           headerShown: false,
           tabBarLabel: 'Support',

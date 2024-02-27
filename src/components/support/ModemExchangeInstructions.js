@@ -53,7 +53,7 @@ const ModemExchangeInstructions = () => {
                       accessibilityRole="link"
                       accessibilityLabel="Contact us for more information"
                     style={styles.linkText} onPress={() => {
-                      PubSub.publish('event.contactUsEvent', {});
+                      //PubSub.publish('event.contactUsEvent', {});
                       //setTimeout(() => navigation.navigate('support'), 500);
                       navigation.navigate("SupportStack", {
                         isContactUs: true,

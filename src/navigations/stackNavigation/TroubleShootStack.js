@@ -40,7 +40,7 @@ function TroubleShootStack() {
         name="PeriodicProblems"
         component={PeriodicProblems}
       />
-      <TroubleStack.Screen name="Support" component={SupportStackScreen} />
+      <TroubleStack.Screen name="SupportStack" component={SupportStackScreen} />
 
       <TroubleStack.Screen name="ArticalWindowUtility" component={ArticalWindowUtility} />
       <TroubleStack.Screen name="ModemRebootScreen" component={ModemRebootStack} />

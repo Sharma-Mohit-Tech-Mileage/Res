@@ -297,9 +297,9 @@ const ManageEquipment = () => {
                             : currentHealth === "Offline"
                             ? colors.sparklight_red
                             : colors.sparklight_yellow}
-                          source={require("../../../assets/alert-triangle.png")}
+                          source={require("../../../assets/infocircle.png")}
                         />
-                          <Text style={[styles.creditCardWill,{marginLeft:5,marginTop:5}]}>
+                          <Text style={[styles.creditCardWill,{marginLeft:5,color:(currentHealth === "Poor")? '#000': Color.sparkLightRed }]}>
                             {isOffline
                               ? "Modem is Offline"
                               : isContactUs
@@ -503,8 +503,8 @@ const ManageEquipment = () => {
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
                   navigation.navigate("ArticalWindowUtility", {
-                    url: "https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email",
-                    name: "Surfing Issues",
+                    url: "https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues",
+                    name: "Wifi Issues",
                   });
                 }}
               >
@@ -706,6 +706,7 @@ const styles = StyleSheet.create({
     color: Color.sparkLightRed,
     fontSize: FontSize.textXsSemibold_size,
     textAlign: "left",
+    alignSelf:'center'
   },
   yourSavedCard: {
     color: Color.colorGray_100,

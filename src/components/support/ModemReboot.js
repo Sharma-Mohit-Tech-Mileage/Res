@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   modemError1: {
-    color: Color.sparkLightInfo,
+    color: "#000000",
     FontFamily: FontFamily.textXsSemibold,
     fontSize: 15,
     fontStyle: "normal",
