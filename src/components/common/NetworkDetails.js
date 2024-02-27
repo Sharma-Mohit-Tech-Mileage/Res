@@ -10,6 +10,7 @@ import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
 import { Env } from "../../network/apis/account/Constants";
 import PubSub from "pubsub-js";
+import { CommonActions } from '@react-navigation/native';
 const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
   const GreenCircle = () => {
     return <View style={styles.greenTick}></View>;
@@ -48,7 +49,13 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
         { <TouchableOpacity
           style={{ flexDirection: "row" }}
           onPress={() => {
-            navigation.navigate('Support',{isManagementEquipment:true});
+            if(currentHealth!='Optimal'){
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Support',params: { isManagementEquipment:true }, }],
+          });
+        }
+           // navigation.navigate('Support',{isManagementEquipment:true});
           }}
         >
           <View style={styles.item}>

@@ -13,6 +13,7 @@ import PeriodicProblems from "../../components/support/Troubleshooting/PeriodicP
 const ModemStack = createStackNavigator();
 
 function ModemStackScreen() {
+  console.log('Manage equipment')
   const { setTabBarVisible } = useTabBarVisibility();
   return (
     <ModemStack.Navigator

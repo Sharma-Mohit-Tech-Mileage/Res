@@ -120,11 +120,11 @@ const Support = ({route}) => {
         };     
     }, []);
 
-    useEffect(async () => {
-        const online = await ZendeskChat.areAgentsOnline();
-        console.log('setZenDeskSupportAvailable: ', online);
-        setZenDeskSupportAvailable(online);
-    }, []);      
+    // useEffect(async () => {
+    //     const online = await ZendeskChat.areAgentsOnline();
+    //     console.log('setZenDeskSupportAvailable: ', online);
+    //     setZenDeskSupportAvailable(online);
+    // }, []);      
 
     
     const handlePressOpenButton = () => {
@@ -331,7 +331,7 @@ const Support = ({route}) => {
                                     Contact Us
                                 </Text>
                             </View>
-                            {
+                            {/* {
                                 zenDeskSupportAvailable ?
                                     <View style={styles.integrationCardMobileWrapper}>
                                         <View
@@ -394,7 +394,7 @@ const Support = ({route}) => {
                                             </View>
                                         </View>
                                     </View>                                
-                            }
+                            } */}
                             {/* <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}> 
                                 <Pressable
                                     style={[styles.integrationCardMobile1, styles.integrationCardBorder,]}

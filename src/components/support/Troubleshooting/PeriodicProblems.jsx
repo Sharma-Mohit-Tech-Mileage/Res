@@ -46,7 +46,7 @@ const PeriodicProblems = () => {
         title="Troubleshooting"
         onPressBack={() => navigation.goBack()}
       />
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom:80}}>
         <View style={{ flexDirection: "column", flex: 1 }}>
           <View style={[styles.card, styles.shadowProp]}>
             <Image
