@@ -46,8 +46,7 @@ const onSuccess = async (res) => {
         if (token) {
             storeUser(user);
         }
-
-        saveUserInfo(user);
+        store.dispatch(saveUserInfo(user));
 
         console.log('setTimeout: ', timer);
         timer = timer + 900000;
