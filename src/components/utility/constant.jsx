@@ -150,6 +150,17 @@ export const isPrimaryAdmin = (input) => {
     return inputLower === 'headofhousehold';
 };
 
+export const isAdminRole = (input) => {
+    if (!input || typeof input !== 'string' || input.trim() === '') {
+        return false;
+    }
+
+    const inputLower = input.toLowerCase();
+    const adminRoles = ['admin']; 
+    return adminRoles.includes(inputLower);
+};
+
+
 
 export const initializeSettings = (additionalData) => {
     // Default settings if additionalData or its properties are undefined

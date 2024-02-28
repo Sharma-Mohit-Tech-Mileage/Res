@@ -102,6 +102,7 @@ const SplashScreen = ({ navigation }) => {
         setTimeout(() => {
           setModalVisible(true);
         }, 100);
+
       }else if (res.custServices.internet == false) {
         setErrorMessage(strings.nonInternetUserMessage);
         setErrorMessage1(' to manage your service.')

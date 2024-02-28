@@ -21,6 +21,7 @@ import {
 import { useSelector } from "react-redux";
 import moment from "moment";
 import ModemConnectivityGuide from "./ModemConnectivityGuide";
+import { useIsFocused } from '@react-navigation/native';
 const stepsData = [
   {
     title: "Let's resolve your issues.",
@@ -58,7 +59,7 @@ const stepsData = [
 
 const TroubleshootContainer = () => {
   const navigation = useNavigation();
-
+  const isFocused = useIsFocused();
   const user = useSelector((state) => state.combinedReducers.user.userData);
   const [currentStep, setCurrentStep] = useState(0);
   const [networkStatus, setNetworkStatus] = useState([
@@ -180,7 +181,9 @@ const TroubleshootContainer = () => {
           if(res?.status){
             if(res.status===408){
               setIssueDetected(true);
+              if(isFocused){
               navigation.navigate("ManageEquipment",{isError:true})
+              }
               return
             }
           }
@@ -196,7 +199,9 @@ const TroubleshootContainer = () => {
               console.log("checkModemHealth online", temt);
               updateModemStatus(temt);
             } else {
+              if(isFocused){
               navigation.navigate("ManageEquipment");
+              }
             }
           } else if (res.equipmentType === "ONU") {
             temt.push(res.OnutP_State);
@@ -205,19 +210,25 @@ const TroubleshootContainer = () => {
             if (res.onU_State === "Online") {
               updateModemStatus(temt);
             } else {
+              if(isFocused){
               navigation.navigate("ManageEquipment");
+              }
             }
           }
           setLoading(false);
         }else{
+          if(isFocused){
           navigation.navigate("ManageEquipment");
+          }
         }
       },
       (error) => {
         console.log("Modem details Error1", error);
         console.log("Modem details Error", error);
         setIssueDetected(true);
+        if(isFocused){
         navigation.navigate("ManageEquipment",{isError:true});;
+        }
         
         //networkError[currentStep] = true;
         setKey(3);
@@ -238,19 +249,25 @@ const TroubleshootContainer = () => {
         // stepsData[currentStep].success = false;
         //setModemIssueDetected(true);
         setIssueDetected(true);
+        if(isFocused){
         navigation.navigate("ManageEquipment",{isError:true});;
+        }
       } else {
         //stepsData[currentStep].success = false;
         //setModemIssueDetected(true);
         setIssueDetected(true);
+        if(isFocused){
         navigation.navigate("ManageEquipment",{isError:true});
+        }
       }
     } else {
       // modem health is good
       setIssueDetected(true);
       networkStatus[currentStep] = true;
       setKey(5);
+      if(isFocused){
       navigation.navigate("ModemHealthy");
+      }
     }
   };
 

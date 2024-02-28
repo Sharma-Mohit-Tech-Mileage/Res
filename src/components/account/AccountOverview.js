@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Image, StyleSheet, Text, View, Pressable, Alert, ScrollView } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
 import chevronRightIcon from '../../../assets/chevronright.png';
@@ -10,10 +10,11 @@ import notificationsIcon from '../../../assets/right-actionable17.png';
 import userManagementIcon from '../../../assets/right-actionable18.png';
 import feedbackicon from '../../../assets/message-alert-circle.png';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { useDispatch } from 'react-redux';
-import { getUser, getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
+import { useDispatch, useSelector } from 'react-redux';
+import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
+ //import * as Zendesk from 'react-native-zendesk-messaging';
 import { SetClearTimer } from '../user/Session';
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
@@ -61,6 +62,7 @@ const logoutAction = (dispatch, navigation) => {
       dispatch(logoutApp());
       cleanUserData();
       SetClearTimer();
+      // Zendesk.logout();
       navigation.reset({
         index: 0,
         routes: [{ name: 'Splash' }],
@@ -69,15 +71,15 @@ const logoutAction = (dispatch, navigation) => {
   });
 };
 
-
 const AccountOverview = () => {
   const navigation = useNavigation();
   const [fullName, setFullName] = useState('');
   const [initials, setInitials] = useState('');
   const dispatch = useDispatch();
+  const user = useSelector(state => state.combinedReducers.user.userData);
   useEffect(() => {
     dispatch(fetchProfileDetails());
-  }, [dispatch]);
+  }, []);
 
   const menuItems = [
     {
@@ -117,38 +119,36 @@ const AccountOverview = () => {
     }
   ];
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const data = await getUser();
-      if (data) {
-        // Extracting fullName and initials
-        const firstName = data.userInfo?.firstName || '';
-        const lastName = data.userInfo?.lastName || '';
+  useFocusEffect(
+    useCallback(() => {
+      const firstName = user.userInfo?.firstName || '';
+      const lastName = user.userInfo?.lastName || '';
 
-        let initials = '';
-        if (firstName.length > 0) {
-          initials += firstName.charAt(0).toUpperCase();
-        }
-        if (lastName.length > 0) {
-          initials += lastName.charAt(0).toUpperCase();
-        }
-        // Camel Case Full Name
-        const fullNameCamelCase = [firstName, lastName]
-          .map(name => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase())
-          .join(' ');
-        setFullName(fullNameCamelCase);
-        setInitials(initials);
+      let initials = '';
+      if (firstName.length > 0) {
+        initials += firstName.charAt(0).toUpperCase();
       }
-    };
-    fetchUserData();
-  }, []);
+      if (lastName.length > 0) {
+        initials += lastName.charAt(0).toUpperCase();
+      }
+
+      const fullNameCamelCase = [firstName, lastName]
+        .map(name => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase())
+        .join(' ');
+
+      setFullName(fullNameCamelCase);
+      setInitials(initials);
+      return () => {
+      };
+    }, [user?.userInfo]) 
+  );
 
   return (
     <View style={styles.account} accessibilityLabel="Account screen">
       <ProfileSettingsHeader
         title="Account"
         iconAlignment="right"
-        showIcon={false} // New prop to control icon visibility
+        showIcon={false} 
       />
       <LinearGradient
         style={styles.linearGradientStyle}
@@ -223,20 +223,6 @@ const AccountOverview = () => {
                 </Pressable>
               </View>
 
-              {/* <Pressable style={[styles.buttons, styles.buttonsSpaceBlock]}
-                accessible={true}
-                accessibilityRole="link">
-                <Text>
-                  <Text
-                    accessibilityLabel=" Privacy Policy" style={styles.linkStyle} onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}>
-                    Privacy Policy
-                  </Text>
-                  <Text style={styles.linkStyle}> | </Text>
-                  <Text accessibilityLabel="Terms & Conditions" style={styles.linkStyle} onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}>
-                    Terms & Conditions
-                  </Text>
-                </Text>
-              </Pressable> */}
               <View style={{ flexDirection: 'row', ...styles.buttonsSpaceBlock, ...styles.buttons, ...styles.buttonsSpaceBlock }}>
                 <Pressable
                   accessible={true}
@@ -310,8 +296,8 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    width: '100%', // Ensure the container takes up the full width
-    paddingTop: Padding.p_5xl, // Adjust padding as needed
+    width: '100%', 
+    paddingTop: Padding.p_5xl,
   },
 
   rightIconLayout: {
