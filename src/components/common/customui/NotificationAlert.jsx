@@ -38,16 +38,24 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                             <React.Fragment key={index}>
                                 {part}
                                 {'\n'}{/* Newline character to ensure "contact us" starts on a new line */}
-                                <Text style={styles.contactUsText} onPress={() => {
-                                    navigation.navigate('Support', {
-                                        screen: 'support',
-                                        params: { triggerEvent: true },
-                                    });
-                                }}>
+                                <Text
+                                    style={styles.contactUsText}
+                                    onPress={() => {
+                                        navigation.navigate('Support', {
+                                            screen: 'support',
+                                            params: { triggerEvent: true },
+                                        });
+                                    }}
+                                    accessible={true}
+                                    accessibilityLabel="Contact us"
+                                    accessibilityRole="button"
+                                    accessibilityHint="Navigates to the support screen"
+                                >
                                     contact us
                                 </Text>
                             </React.Fragment>
                         ) : part)}
+
                     </Text>
                 ) : null}
 

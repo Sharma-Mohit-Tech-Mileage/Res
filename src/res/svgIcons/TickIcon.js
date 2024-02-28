@@ -7,6 +7,9 @@ const TickIcon = (props) => (
     height={16}
     fill="none"
     {...props}
+    accessible={true}
+    accessibilityRole="image"
+    accessibilityLabel={'Selected'}
   >
     <G clipPath="url(#a)">
       <Path

@@ -6,6 +6,9 @@ const InternetIcon = (props) => (
     width={24}
     height={24}
     fill="none"
+    accessible={true}
+    accessibilityRole="image"
+    accessibilityLabel={'Internet'}
     {...props}
   >
     <Path
