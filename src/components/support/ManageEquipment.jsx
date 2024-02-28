@@ -37,7 +37,8 @@ import WifiIssueIcon from "../../res/svgIcons/WifiIssueIcon";
 import IntermittentIssues from "../../res/svgIcons/IntermittentIssues";
 import Surfingissue from "../../res/svgIcons/surfingissue";
 
-const ManageEquipment = () => {
+const ManageEquipment = ({route}) => {
+  console.log(JSON.stringify(route))
   const navigation = useNavigation();
   const [manufacturer, setManufacturer] = React.useState("");
   const [model, setModel] = React.useState("");
@@ -199,7 +200,14 @@ const ManageEquipment = () => {
     <View style={styles.manageEquipment}>
       <ProfileSettingsHeader
         title="Manage Equipment "
-        onPressBack={() => navigation.navigate("SupportStack")}
+        onPressBack={() => {
+          if(route.params?.isFromTroubleshooting){
+            navigation.goBack();
+          }else{
+          navigation.navigate("SupportStack")
+          }
+        }
+        }
       />
       <ScrollView>
         <View style={styles.myModemParent}>

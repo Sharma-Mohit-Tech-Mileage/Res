@@ -38,10 +38,13 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                             <React.Fragment key={index}>
                                 {part}
                                 <Text style={styles.contactUsText} onPress={() => {
-                                    navigation.navigate('Support', {
-                                        screen: 'support',
-                                        params: { triggerEvent: true }, 
-                                    });
+                                    // navigation.navigate('Support', {
+                                    //     screen: 'support',
+                                    //     params: { triggerEvent: true }, 
+                                    // });
+                                    navigation.navigate("Support", {
+                                        isContactUs: true,
+                                      })
                                 }}>contact us</Text>
                             </React.Fragment>
                         ) : part)}
