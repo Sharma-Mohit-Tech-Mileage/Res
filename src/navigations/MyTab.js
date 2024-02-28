@@ -118,7 +118,7 @@ const MyTabs = ({ route, navigation }) => {
         }}
       />
 
-      {/* <Tab.Screen
+       <Tab.Screen
         name="Support"
         component={SupportStack}
         listeners={({ navigation }) => ({
@@ -129,6 +129,7 @@ const MyTabs = ({ route, navigation }) => {
               routes: [
                 {
                   name: 'Support',
+                  //params: { triggerEvent: true }
                 },
               ],
             });
@@ -145,8 +146,8 @@ const MyTabs = ({ route, navigation }) => {
             );
           }
         }}
-      /> */}
-        <Tab.Screen
+      /> 
+        {/* <Tab.Screen
           name="Support"
           component={SupportStack}
           options={{
@@ -169,7 +170,7 @@ const MyTabs = ({ route, navigation }) => {
               }
             },
           })}
-        />
+        /> */}
 
       <Tab.Screen
         name="Account"

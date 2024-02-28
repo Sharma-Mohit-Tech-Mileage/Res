@@ -35,7 +35,7 @@ const ModemHealthy = () => {
     <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
       <ProfileSettingsHeader
         title="Troubleshooting"
-        onPressBack={() => navigation.navigate('Support')}
+        onPressBack={() => navigation.navigate('SupportStack')}
         accessibilityLabel="Back to Support"
         accessibilityHint="Navigates back to the Support screen"
       />
