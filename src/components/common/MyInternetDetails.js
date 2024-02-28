@@ -78,7 +78,7 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
-              url: `${Env.URL}/residential/billing`,
+              url: `${Env.URL}/billing`,
               name: "Billing Details",
             });
           }}
@@ -154,7 +154,7 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
-              url: `${Env.URL}/residential/services/upgrade`,
+              url: `${Env.URL}/services/upgrade`,
               name: "Upgrade Plan",
             });
           }}

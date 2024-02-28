@@ -96,7 +96,7 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
           onPress={() => {
             if (!billPaid) {
               navigation.navigate("ArticalWindowUtility", {
-                url: `${Env.URL}/residential/billing`,
+                url: `${Env.URL}/billing`,
                 name: "Billing Details",
               });
             }
