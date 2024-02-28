@@ -1,56 +1,53 @@
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails, saveSMSSelection, resentEmailVerifiction } from '../../redux/actions/ProfileActionSuite';
-import { transformResponse, transformNotificationPreferences, isPrimaryAdmin, isAdminRole, isFreshEntry, extractAcknowledgementEmail } from '../../components/utility/constant';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigation, useRoute } from "@react-navigation/native";
+import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
+import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
+import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails, resentEmailVerifiction } from '../../redux/actions/ProfileActionSuite';
+import { transformResponse, transformNotificationPreferences, isPrimaryAdmin, isAdminRole, isFreshEntry, extractAcknowledgementEmail } from '../../components/utility/constant';
 const Notifications = () => {
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [updatedSection, setUpdatedSection] = useState('');
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const route = useRoute();
+  const [successMessage, setSuccessMessage] = useState('');
+  const [updatedSection, setUpdatedSection] = useState('');
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const smsSubscription = profile.smsSubscription || [];
   const profileDetails = profile.profileDetails || {};
   const paperLessInfo = profile.paperLessInfo || {};
   const transformedNotification = transformNotificationPreferences(profile.pushNotifications || {});
   const data = transformResponse(smsSubscription);
-
-  const emailAddress = paperLessInfo.emailAddress;
+  const emailAddress = paperLessInfo.emailAddress||'';
   const isEmailVerified = paperLessInfo.emailStatus === 'Verified';
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   const isAdmin = isAdminRole(profileDetails.memberType);
   const acknowledgement = extractAcknowledgementEmail(paperLessInfo);
 
-  let notificationsTitle = '', infoText = '', isDisabled = false
-  if (profileDetails){
-  if (profileDetails.multipleEmails) {
+  let notificationsTitle = '', infoText = '', isDisabled = false;
+  if (profileDetails.multipleEmails===true) {
     isDisabled = true
     notificationsTitle = "Unable to retrieve email address.";
-    infoText = 'We are not able to retrieve the email address for your account. Please contact us for assistance.'
-  } 
-  else if (emailAddress || acknowledgement) 
-  {
-    notificationsTitle = isEmailVerified ? '' : 'Email verification pending';
-    infoText = isEmailVerified ? (<Text>Emails are sent to <Text style={styles.text}>{emailAddress}</Text></Text>) 
-    : 
-    (<Text>
-        <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation. {isPrimary?' Check your inbox for our verification link. ':''}
-        {isPrimary ?<Text style={styles.contactUsText} onPress={() => dispatch(resentEmailVerifiction(navigation))}> Resend Confirmation Email</Text>:''}
-     </Text>
-     );
-  }}
+    infoText = "Unable to retrieve your account's email address. Please contact us for assistance."
+  }
+  else if (profileDetails.multipleEmails === false) {
+    if (emailAddress || acknowledgement) {
+      notificationsTitle = isEmailVerified ? '' : 'Email verification pending';
+      infoText = isEmailVerified ? (<Text>Emails are sent to <Text style={styles.text}>{emailAddress}</Text></Text>) :
+        (<Text>
+          <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation. {isPrimary ? ' Check your inbox for our verification link. ' : ''}<Text>{"\n"}</Text>
+          {isPrimary ? <Text style={styles.contactUsText} onPress={() => dispatch(resentEmailVerifiction(navigation))}> Resend Confirmation Email</Text> : ''}
+        </Text>);
+    }
+  }
 
   useEffect(() => {
     dispatch(fetchProfileDetails());
-    dispatch(fetchBillingPaper());
     dispatch(fetchSMSSelection());
     dispatch(fetchPushNotifications());
+    dispatch(fetchBillingPaper());
   }, []);
 
   useEffect(() => {
@@ -179,7 +176,7 @@ const NotificationSection = ({
   const handleClose = () => { setShowSuccessAlert(false); };
 
   return (
-    <View style={{ ...styles.frameBorder, alignItems: "center"}}>
+    <View style={{ ...styles.frameBorder, alignItems: "center" }}>
       {showNotification && (
         <View style={styles.infoWrapper}>
           <NotificationAlert
@@ -192,13 +189,12 @@ const NotificationSection = ({
           />
         </View>
       )}
-      <View style={{ ...styles.parentSpaceBlock, alignSelf: "stretch"}}>
+      <View style={{ ...styles.parentSpaceBlock, alignSelf: "stretch" }}>
         <Text style={styles.textNotifications}>{title}</Text>
         {!isAdmin && <Pressable
           style={[styles.buttons, styles.buttonsBg, isDisabled && styles.buttonDisabled]}
           onPress={() => isDisabled ? {} : navigation.navigate(navigationTarget, { additionalData: transformedData })}
-          disabled={isDisabled}
-        >
+          disabled={isDisabled}>
           <Text style={isDisabled ? styles.makePaymentDisabled : styles.makePayment}>Edit</Text>
         </Pressable>}
       </View>
@@ -208,15 +204,13 @@ const NotificationSection = ({
             type="warning"
             title={notificationsTitle}
             showCloseIcon={false}
-            message={infoText}
-          />}
+            message={infoText} />}
         {isAdmin &&
           <NotificationAlert
             type="warning"
             title={""}
             showCloseIcon={false}
-            message={"Only Primary Admin can make changes"}
-          />}
+            message={"Only Primary Admin can make changes"} />}
         {isAdmin && <View style={{ marginVertical: 8 }} />}
         {(!isDisabled && infoText) && <View style={styles.frameView}>
           <View style={styles.infoCircleWrapper}>
@@ -228,7 +222,7 @@ const NotificationSection = ({
           </View>
           <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
             {infoText}
-            { number && (
+            {number && (
               <Text style={[styles.text]} accessibilityLabel={`Phone Number: ${number}`}>
                 {number}
               </Text>
@@ -265,7 +259,7 @@ const NotificationType = ({ type, status }) => {
   return (
     <View style={styles.frameWrapperBorder}>
       <View style={[styles.parentSpaceBlock]}>
-        <Text style={{...styles.subscribedTypo,flex:1}}>{type}</Text>
+        <Text style={{ ...styles.subscribedTypo, flex: 1 }}>{type}</Text>
         <View style={[styles.checkCircleParent]}>
           <Image
             style={styles.infoCircleIcon}
@@ -365,7 +359,7 @@ const styles = StyleSheet.create({
     color: Color.colorGray_100,
     fontWeight: "600",
     fontSize: 14,
-    flex: 1, 
+    flex: 1,
   },
   infoWrapper: {
     paddingHorizontal: Padding.p_5xl,
