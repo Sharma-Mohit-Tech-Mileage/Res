@@ -27,18 +27,33 @@ const Notifications = () => {
   const acknowledgement = extractAcknowledgementEmail(paperLessInfo);
 
   let notificationsTitle = '', infoText = '', isDisabled = false;
-  if (profileDetails.multipleEmails===true) {
+  if (profileDetails.multipleEmails) {
     isDisabled = true
     notificationsTitle = "Unable to retrieve email address.";
-    infoText = "Unable to retrieve your account's email address. Please contact us for assistance."
+    infoText = "We are not able to retrieve the email address for your account. Please contact us for assistance."
   }
   else if (profileDetails.multipleEmails === false) {
     if (emailAddress || acknowledgement) {
       notificationsTitle = isEmailVerified ? '' : 'Email verification pending';
       infoText = isEmailVerified ? (<Text>Emails are sent to <Text style={styles.text}>{emailAddress}</Text></Text>) :
         (<Text>
-          <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation. {isPrimary ? ' Check your inbox for our verification link. ' : ''}<Text>{"\n"}</Text>
-          {isPrimary ? <Text style={styles.contactUsText} onPress={() => dispatch(resentEmailVerifiction(navigation))}> Resend Confirmation Email</Text> : ''}
+          <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation.
+          {isPrimary && (
+            <>
+              {' Check your inbox for our verification link.'}
+              <Text> {"\n"}</Text> 
+              <Text
+                accessible={true}
+                accessibilityRole="link"
+                accessibilityLabel="Resend Confirmation Email"
+                accessibilityHint="Activates the email verification process again"
+                style={styles.contactUsText}
+                onPress={() => dispatch(resentEmailVerifiction(navigation))}
+              >
+                Resend Confirmation Email
+              </Text>
+            </>
+          )}
         </Text>);
     }
   }
