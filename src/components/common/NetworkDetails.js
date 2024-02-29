@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: "row",
     backgroundColor: "white",
-    width: wp("85%"),
+    width: wp("92%"),
     margin: 1,
     alignContent: "center",
     alignItems: "center",

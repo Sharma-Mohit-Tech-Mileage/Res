@@ -24,7 +24,8 @@ import RightArrow from "../../../res/svgIcons/RightArrow";
 import SettingsIcon from "../../../res/svgIcons/SettingsIcon";
 import WifiIssueIcon from "../../../res/svgIcons/WifiIssueIcon";
 import RefreshIcon from "../../../res/svgIcons/RefreshIcon";
-const PeriodicProblems = () => {
+const PeriodicProblems = ({route}) => {
+  console.log('Intermi',JSON.stringify(route))
   const navigation = useNavigation();
 
   const instructions1 = [
@@ -69,7 +70,7 @@ const PeriodicProblems = () => {
                 style={styles.pressableStyle}
                 onPress={() => {
                   navigation.navigate("ModemRebootScreen", {
-                    isError: false,
+                    isError: (route.params?.health!='Optimal')?true:false,
                     isFromT: true,
                   });
                 }}

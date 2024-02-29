@@ -96,7 +96,8 @@ const ModemReboot = () => {
             <Image
               style={styles.contactUs}
               resizeMode='contain'
-              source={require("../../../assets/phone-outgoing-01.png")}
+              tintColor={Color.sparklightBrightPurple}
+              source={require("../../../assets/phone-outgoing-04.png")}
             />
             
             

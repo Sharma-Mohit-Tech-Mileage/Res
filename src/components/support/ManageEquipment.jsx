@@ -137,13 +137,15 @@ const ManageEquipment = () => {
         console.log("Modem details", errorCode);
         if (errorCode === 404) {
           setIsOffline(true);
-          return;
         } else if (
           errorCode === 400 ||
           (errorCode === 500) | (errorCode === 504)
         ) {
           setCurrentHealth("Offline");
           setIsContactUs(true);
+        }else {
+          setCurrentHealth("Offline");
+          
         }
       }
     );
@@ -538,7 +540,7 @@ const ManageEquipment = () => {
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
-                  navigation.navigate("PeriodicProblems");
+                  navigation.navigate("PeriodicProblems",{health:currentHealth});
                 }}
               >
                 <IntermittentIssues />

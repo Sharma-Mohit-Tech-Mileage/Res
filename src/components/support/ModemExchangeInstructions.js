@@ -49,7 +49,7 @@ const ModemExchangeInstructions = () => {
                 {instruction.includes('contact us') ? (
                   <>
                     {instruction.split('contact us')[0]}
-                    <Text   accessible={true}
+                    <Text accessible={true}
                       accessibilityRole="link"
                       accessibilityLabel="Contact us for more information"
                     style={styles.linkText} onPress={() => {

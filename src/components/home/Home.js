@@ -205,7 +205,7 @@ const HomeScreen = ({ navigation }) => {
         }else if(errorCode===400 ||errorCode===500 ||errorCode===504){
           setInternetHealths(oldArray => [...oldArray,'Red'] );
         }else{
-          setInternetHealths(oldArray => [...oldArray,'Yellow'] );
+          setInternetHealths(oldArray => [...oldArray,'Red'] );
         }
       }
     );
