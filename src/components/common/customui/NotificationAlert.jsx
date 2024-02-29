@@ -37,28 +37,19 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                         {message.split("contact us").map((part, index, arr) => index < arr.length - 1 ? (
                             <React.Fragment key={index}>
                                 {part}
-                                {'\n'}{/* Newline character to ensure "contact us" starts on a new line */}
-                                <Text
-                                    style={styles.contactUsText}
-                                    onPress={() => {
-                                        navigation.navigate('Support', {
-                                            screen: 'support',
-                                            params: { triggerEvent: true },
-                                        });
-                                    }}
-                                    accessible={true}
-                                    accessibilityLabel="Contact us"
-                                    accessibilityRole="button"
-                                    accessibilityHint="Navigates to the support screen"
-                                >
-                                    contact us
-                                </Text>
+                                <Text style={styles.contactUsText} onPress={() => {
+                                    // navigation.navigate('Support', {
+                                    //     screen: 'support',
+                                    //     params: { triggerEvent: true }, 
+                                    // });
+                                    navigation.navigate("Support", {
+                                        isContactUs: true,
+                                      })
+                                }}>contact us</Text>
                             </React.Fragment>
                         ) : part)}
-
                     </Text>
                 ) : null}
-
 
             </View>
             {showCloseIcon && (

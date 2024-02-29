@@ -48,6 +48,7 @@ const ModemHealthy = () => {
           marginBottom: "15%",
         }}
       >
+         <ScrollView style={{marginBottom:20}}>
         <View style={styles.container}>
           <Text style={styles.topLeftText}>3 of 3</Text>
           <View style={styles.content}>
@@ -64,14 +65,14 @@ const ModemHealthy = () => {
                 {"No service issues were detected."}
               </Text>
             </View>
-           <ScrollView style={{marginBottom:80}}>
+          
             <View style={{ flexDirection: "column", flex: 1 }}>
               <View style={styles.card}>
-
+              <View style={styles.borderSec} />
               <TouchableOpacity
                   style={styles.pressableStyle}
                   onPress={() => {
-                    navigation.navigate('ManageEquipment')
+                    navigation.navigate('ManageEquipment',{isFromTroubleshooting:true})
                   }}
                 >
                   <View style={styles.menuWrap}>
@@ -137,9 +138,9 @@ const ModemHealthy = () => {
                 
               </View>
             </View>
-            </ScrollView>
           </View>
         </View>
+        </ScrollView>
       </SafeAreaView>
     </View>
   );

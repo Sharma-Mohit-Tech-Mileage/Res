@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     textAlign: "left",
     fontWeight: "400",
-    paddingHorizontal: 20,
+    paddingHorizontal: 8,
     alignSelf: "center",
   },textContactUs: {
     color: Color.colorMidnightblue,

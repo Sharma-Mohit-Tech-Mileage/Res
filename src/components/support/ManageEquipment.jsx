@@ -37,7 +37,8 @@ import WifiIssueIcon from "../../res/svgIcons/WifiIssueIcon";
 import IntermittentIssues from "../../res/svgIcons/IntermittentIssues";
 import Surfingissue from "../../res/svgIcons/surfingissue";
 
-const ManageEquipment = () => {
+const ManageEquipment = ({route}) => {
+  console.log(JSON.stringify(route))
   const navigation = useNavigation();
   const [manufacturer, setManufacturer] = React.useState("");
   const [model, setModel] = React.useState("");
@@ -201,7 +202,14 @@ const ManageEquipment = () => {
     <View style={styles.manageEquipment}>
       <ProfileSettingsHeader
         title="Manage Equipment "
-        onPressBack={() => navigation.navigate("SupportStack")}
+        onPressBack={() => {
+          if(route.params?.isFromTroubleshooting){
+            navigation.goBack();
+          }else{
+          navigation.navigate("SupportStack")
+          }
+        }
+        }
       />
       <ScrollView>
         <View style={styles.myModemParent}>
@@ -279,11 +287,13 @@ const ManageEquipment = () => {
                     styles.myModemSpaceBlock,
                   ]}
                 >
-                  <View style={[styles.notifications, styles.parentBorder1,{borderLeftColor: isOffline
+                  <View style={[styles.notifications, styles.parentBorder1]}>
+
+          <View style={{ backgroundColor: isOffline
                                 ? colors.sparklight_red
                                 : currentHealth === "Offline"
                                 ? colors.sparklight_red
-                                : colors.sparklight_yellow }]}>
+                                : colors.sparklight_yellow , width: 4 }} />
                     <View style={styles.bannerWarning}>
                       <View style={styles.rightActionableParent}>
                         
@@ -322,6 +332,8 @@ const ManageEquipment = () => {
                         </View>
                       </View>
                     </View>
+
+
                   </View>
                 </View>
               )}
@@ -594,8 +606,7 @@ const styles = StyleSheet.create({
   parentBorder1: {
     borderWidth: 1,
     borderStyle: "solid",
-    borderLeftWidth: 5,
-    borderLeftColor: colors.sparklight_yellow,
+    
   },
   textTypo1: {
     fontSize: FontSize.textXsSemibold_size,
@@ -730,13 +741,13 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightWhite,
     alignSelf: "stretch",
     flex: 1,
+    padding:5
   },
   notifications: {
     flexDirection: "row",
     borderColor: Color.sparklightGray,
     borderRadius: Border.br_11xs,
     alignSelf: "stretch",
-    padding: 5,
   },
   notificationsWrapper: {
     marginTop: 24,

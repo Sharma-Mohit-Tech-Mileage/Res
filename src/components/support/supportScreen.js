@@ -29,18 +29,18 @@ const Support = ({route}) => {
         Linking.openURL(phoneNumber);
     };
     
-     useEffect(() => {
-        // Check if the triggerEvent parameter is present
-        if (route.params?.triggerEvent) {
-            // If present, perform the desired action after a delay
-            setTimeout(() => {
-                PubSub.publish('event.contactUsEvent', {});
-            }, 500);
+    //  useEffect(() => {
+    //     // Check if the triggerEvent parameter is present
+    //     if (route.params?.triggerEvent) {
+    //         // If present, perform the desired action after a delay
+    //         setTimeout(() => {
+    //             PubSub.publish('event.contactUsEvent', {});
+    //         }, 500);
 
-            // Reset the parameter to avoid repeated actions if the screen is revisited
-            navigation.setParams({ triggerEvent: undefined });
-        }
-    }, [route.params, navigation]);
+    //         // Reset the parameter to avoid repeated actions if the screen is revisited
+    //         navigation.setParams({ triggerEvent: undefined });
+    //     }
+    // }, [route.params, navigation]);
 
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
