@@ -34,28 +34,32 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                 {title && <Text style={[styles.title, { color: currentTypeStyle.color }]}>{title}</Text>}
                 {message ? (
                     <Text style={!title ? styles.messageOnEmpty : styles.message}>
-                        {message.split("contact us").map((part, index, arr) => index < arr.length - 1 ? (
+                        {message.split("Please contact us").map((part, index, arr) => index < arr.length - 1 ? (
                             <React.Fragment key={index}>
                                 {part}
-                                {'\n'}{/* Newline character to ensure "contact us" starts on a new line */}
-                                <Text
-                                    style={styles.contactUsText}
-                                    onPress={() => {
-                                        navigation.navigate('Support', {
-                                            screen: 'support',
-                                            params: { triggerEvent: true },
-                                        });
-                                    }}
-                                    accessible={true}
-                                    accessibilityLabel="Contact us"
-                                    accessibilityRole="button"
-                                    accessibilityHint="Navigates to the support screen"
-                                >
-                                    contact us
+                                {'\n'}
+                                <Text>
+                                    Please{' '}
+                                    <Text
+                                        style={styles.contactUsText}
+                                        onPress={() => {
+                                            navigation.navigate('Support', {
+                                                screen: 'support',
+                                                params: { triggerEvent: true },
+                                            });
+                                        }}
+                                        accessible={true}
+                                        accessibilityLabel="Contact us"
+                                        accessibilityRole="button"
+                                        accessibilityHint="Navigates to the support screen"
+                                    >
+                                        contact us
+                                    </Text>
                                 </Text>
                             </React.Fragment>
-                        ) : part)}
-
+                        ) : (
+                            <Text key={index}>{part}</Text>
+                        ))}
                     </Text>
                 ) : null}
 

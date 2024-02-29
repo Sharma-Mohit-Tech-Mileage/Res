@@ -218,21 +218,32 @@ const MyServicePlan = ({ plans, navigation }) => {
             accessibilityLabel={`Internet Plan ${item.planName}`}
             accessibilityRole="header"
           >
-            <LinearGradient
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+            <View
+              accessible={true}
+              accessibilityLabel="Internet Icon"
+              accessibilityRole="image" // Change the role as needed
               style={{
                 width: wp("10%"),
                 height: wp("10%"),
                 borderRadius: 10,
-                justifyContent: "center",
-                alignItems: "center",
-                alignSelf: "center",
               }}
             >
-              <InternetIcon accessible accessibilityLabel="Internet Icon" accessibilityRole="image" />
-            </LinearGradient>
+              <LinearGradient
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+                style={{
+                  width: wp("10%"),
+                  height: wp("10%"),
+                  borderRadius: 10,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  alignSelf: "center",
+                }}
+              >
+                <InternetIcon />
+              </LinearGradient>
+            </View>
             <Text style={styles.planDetailsRowHeader} accessibilityLabel={`Internet ${item.planName}`} accessibilityRole="header">
               Internet {item.planName}
             </Text>
