@@ -240,26 +240,26 @@ const MyServicePlan = ({ plans, navigation }) => {
 
           <View style={[styles.planDetailsRow]}>
             <View style={{ alignSelf: "center" }}>
-              <TickIcon accessible accessibilityLabel="Tick Icon" accessibilityRole="image" />
+              <TickIcon accessible={true} accessibilityLabel="Tick Icon" accessibilityRole="image" />
             </View>
 
-            <Text style={styles.planDetailsTxt} accessibilityRole="header">
+            <Text style={styles.planDetailsTxt} accessible={true} accessibilityRole="header">
               Download Speed Up To {item.downloadSpeed} Mbps
             </Text>
           </View>
 
-          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} accessible accessibilityRole="text" />
+          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} accessible={true} accessibilityRole="text" />
 
           <View style={[styles.planDetailsRow]}>
             <View style={{ alignSelf: "center" }}>
-              <TickIcon accessible accessibilityLabel="Tick Icon" accessibilityRole="image" />
+              <TickIcon accessible={true} accessibilityLabel="Tick Icon" accessibilityRole="image" />
             </View>
-            <Text style={styles.planDetailsTxt} accessibilityRole="text">
+            <Text style={styles.planDetailsTxt} accessible={true} accessibilityRole="text">
               Upload Speed Up To {item.uploadSpeed} Mbps
             </Text>
           </View>
 
-          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} accessible accessibilityRole="none" />
+          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} accessible={true} accessibilityRole="none" />
 
           <View
             style={{
@@ -270,9 +270,11 @@ const MyServicePlan = ({ plans, navigation }) => {
           >
             <View style={{ flexDirection: "row" }}>
               <View style={{ alignSelf: "center" }}>
-                <TickIcon accessible accessibilityLabel="Tick Icon" accessibilityRole="image" />
+                <TickIcon  accessibilityRole="image" />
               </View>
-              <Text style={styles.planDetailsTxt} accessible accessibilityRole="text">
+              <Text style={styles.planDetailsTxt} accessible
+                accessibilityRole="text"
+                accessibilityLabel={`Data Plan ${item.dataQuotaGB === '15000' ? 'UNLIMITED' : item.dataQuotaGB + ' gigabytes'}`}>
                 Data Plan {(item.dataQuotaGB=='15000')?'UNLIMITED':item.dataQuotaGB+' GB*'}
               </Text>
             </View>
@@ -339,7 +341,7 @@ const MyServicePlan = ({ plans, navigation }) => {
                   resizeMode="cover"
                   source={require("../../../assets/right-actionable7.png")}
                   accessible={true}
-                  accessibilityLabel="Close icon"
+                  accessibilityLabel="Close Plan window"
                   accessibilityRole="image"
                 />
               </TouchableOpacity>

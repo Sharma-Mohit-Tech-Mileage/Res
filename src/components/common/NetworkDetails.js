@@ -96,7 +96,7 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
           onPress={() => {
             if (!billPaid) {
               navigation.navigate("ArticalWindowUtility", {
-                url: `${Env.URL}/residential/billing`,
+                url: `${Env.URL}/billing`,
                 name: "Billing Details",
               });
             }
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: "row",
     backgroundColor: "white",
-    width: wp("85%"),
+    width: wp("92%"),
     margin: 1,
     alignContent: "center",
     alignItems: "center",

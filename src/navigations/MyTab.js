@@ -98,7 +98,7 @@ const MyTabs = ({ route, navigation }) => {
                       {
                         name: 'ArticalWindowUtility',
                         params: {
-                          url: `${Env.URL}/residential/services/upgrade`,
+                          url: `${Env.URL}/services/upgrade`,
                           name: 'Shop',
                           isExpandable:true
                         },

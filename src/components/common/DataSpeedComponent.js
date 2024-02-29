@@ -222,7 +222,7 @@ const DataSpeedComponent = ({navigation}) => {
       <TouchableOpacity
         onPress={() => {
           navigation.navigate('ArticalWindowUtility', { 
-            url: `${Env.URL}/residential/services/upgrade`,
+            url: `${Env.URL}/services/upgrade`,
             name: 'Upgrade Plan' 
           })
         }}
