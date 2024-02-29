@@ -33,39 +33,36 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
             ]}>
                 {title && <Text style={[styles.title, { color: currentTypeStyle.color }]}>{title}</Text>}
                 {message ? (
-                    <Text style={!title ? styles.messageOnEmpty : styles.message}>
-                        {message.split("Please contact us").map((part, index, arr) => index < arr.length - 1 ? (
-                            <React.Fragment key={index}>
-                                {part}
-                                {'\n'}
-                                <Text
-                                    accessible={true}
-                                    accessibilityLabel="Contact us"
-                                    accessibilityRole="button"
-                                    accessibilityHint="Navigates to the support screen"
-                                >
-                                    Please{' '}
-                                    <Text
-                                        style={styles.contactUsText}
-                                        onPress={() => {
-                                            navigation.navigate("Support", {
-                                                isContactUs: true,
-                                            })
-                                        }}
-                                        accessible={true}
-                                        accessibilityLabel="Contact us"
-                                        accessibilityRole="button"
-                                        accessibilityHint="Navigates to the support screen"
-                                    >
-                                        contact us
+                    <View style={!title ? styles.messageOnEmpty : styles.message}>
+                        {message.split("Please contact us").map((part, index, arr) =>
+                            index < arr.length - 1 ? (
+                                <React.Fragment key={index}>
+                                    <Text>{part}</Text>
+                                    <Text>
+                                        {'\nPlease '}
+                                        <Text
+                                            style={styles.contactUsText}
+                                            onPress={() => {
+                                                navigation.navigate("Support", {
+                                                    isContactUs: true,
+                                                });
+                                            }}
+                                            accessible={true}
+                                            accessibilityLabel="Contact us"
+                                            accessibilityRole="button"
+                                            accessibilityHint="Navigates to the support screen"
+                                        >
+                                            contact us
+                                        </Text>
                                     </Text>
-                                </Text>
-                            </React.Fragment>
-                        ) : (
-                            <Text key={index}>{part}</Text>
-                        ))}
-                    </Text>
+                                </React.Fragment>
+                            ) : (
+                                <Text key={index}>{part}</Text>
+                            )
+                        )}
+                    </View>
                 ) : null}
+
 
 
             </View>
