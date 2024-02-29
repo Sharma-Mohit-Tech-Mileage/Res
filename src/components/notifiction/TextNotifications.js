@@ -92,8 +92,7 @@ const TextNotifications = ({ navigation }) => {
                                         style={styles.youAreSubscribed}
                                     >{`You are subscribed to text message alerts. `}</Text>
                                     <Text style={styles.replyStopTo}>
-                                        Reply STOP to cancel at any time. Call 1-800-123-0456 for
-                                        support. Message and data rates may apply.
+                                        Reply STOP to cancel at any time. Message and data rates may apply.
                                     </Text>
                                 </Text>
                             </View>

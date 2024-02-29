@@ -33,12 +33,8 @@ const Terms = ({ navigation }) => {
     const userData = useSelector(state => state.combinedReducers.user.userData);
     const profile = useSelector(state => state.combinedReducers.profile || {});
     const url = 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions';
-    console.log('userData: ', userData);
-    console.log('combinedReducers: ', combinedReducers);
-    console.log('stateData: ', JSON.stringify(stateData));
 
     useEffect(() => {
-        //Add incase the api call fails
         setTimeout(() => {
             setLoading(false);
         }, 10000);
@@ -67,11 +63,11 @@ const Terms = ({ navigation }) => {
         let optOutCountPushNotification = 0;
 
         
-        if (profile.pushNotifications.length > 0) {
+        if (profile?.pushNotifications?.length > 0) {
             const messageTypes = profile.pushNotifications[0].pushMessageType;
             messageTypes.forEach((messageType) => {
                 if (messageType.optOutFlag) {
-                    goToPushNotificationScreen = optOutCountPushNotification + 1;
+                    optOutCountPushNotification += 1;
                 }
             });
             if (optOutCountPushNotification > 2) {
@@ -81,16 +77,13 @@ const Terms = ({ navigation }) => {
             goToPushNotificationScreen = true;
         }
         
-        if (profile.smsSubscription.length > 0) {
+        if (profile?.smsSubscription?.length > 0) {
             const firstSubscription = profile.smsSubscription[0];
             firstSubscription.smsMessageType.forEach((messageType) => {
-                console.log('messageType.optOutFlag: ', messageType.optOutFlag);
-                console.log('optOutCount: ', optOutCount);
                 if (messageType.optOutFlag) {
                     optOutCount = optOutCount + 1;
                 }
             });
-            console.log('optOutCountAfterLoop: ', optOutCount);
             if (optOutCount > 2) {
                 goToPhoneScreen = true;
             }
@@ -103,22 +96,17 @@ const Terms = ({ navigation }) => {
         } else if (goToPhoneScreen) {
             setNextScreen('EntryTextNotifications');  
         } else {
-            if (profile.paperLessInfo !== undefined
-                && profile.paperLessInfo.accountNumber !== undefined
-                && profile.paperLessInfo.accountNumber.length > 0
-                && profile.paperLessInfo.paperlessStatus !== undefined
-                && (profile.paperLessInfo.paperlessStatus.toLowerCase() === 'approved'
-                    || profile.paperLessInfo.paperlessStatus.toLowerCase() === 'active')
-                ) {
-                setNextScreen('MyTab');                  
+            const paperlessStatus = profile?.paperLessInfo?.paperlessStatus?.toLowerCase() ?? '';
+            if (profile?.paperLessInfo?.accountNumber?.length > 0
+                && ['approved', 'active'].includes(paperlessStatus)) {
+                setNextScreen('MyTab');
             } else {
-                setNextScreen('EntryEmailNotifications');  
+                setNextScreen('EntryEmailNotifications');
             }
         }
 
         
-        if (profile.profileDetails !== undefined
-            && profile.profileDetails.memberType === "Admin") {
+        if (profile?.profileDetails?.memberType === "Admin") {
             if (goToPushNotificationScreen) {
                 setNextScreen('EntryPushNotifications'); 
             } else {
