@@ -38,7 +38,12 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                             <React.Fragment key={index}>
                                 {part}
                                 {'\n'}
-                                <Text>
+                                <Text
+                                    accessible={true}
+                                    accessibilityLabel="Contact us"
+                                    accessibilityRole="button"
+                                    accessibilityHint="Navigates to the support screen"
+                                >
                                     Please{' '}
                                     <Text
                                         style={styles.contactUsText}
