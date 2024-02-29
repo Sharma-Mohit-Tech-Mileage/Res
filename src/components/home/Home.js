@@ -9,7 +9,8 @@ import {
   Platform,
   Dimensions,
   Pressable,
-  ActivityIndicator
+  ActivityIndicator,
+  Linking
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -39,6 +40,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RefreshToken } from '../user/Session';
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from '../../network/apis/account/Constants';
+import VersionCheck from 'react-native-version-check';
 const tabWidth = Number(Dimensions.get('window').width/4);
 
 const HomeScreen = ({ navigation }) => {
@@ -63,6 +65,7 @@ const HomeScreen = ({ navigation }) => {
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths,setInternetHealths]= useState([])
+  const [isAppNewUpdate,setIsAppNewUpdate]=useState(false)
 
   const getInternetHealth = (type) => {
     var currentHealth = {
@@ -375,6 +378,7 @@ const HomeScreen = ({ navigation }) => {
     };
 
     fetchData();    
+    checkAppUpdate();
     
   }, []);
 
@@ -388,6 +392,17 @@ const HomeScreen = ({ navigation }) => {
       setWalkThroughStep(step);
     }
   };
+
+  const checkAppUpdate=()=>{
+    VersionCheck.needUpdate()
+  .then(async res => {
+    console.log('AppUpdate',res.isNeeded);    // true
+    if (res.isNeeded) {
+      setIsAppNewUpdate(true)
+      Linking.openURL(res.storeUrl);  // open store if update is needed.
+    }
+  });
+  }
 
   const walkthroughModal = () => {
 
@@ -503,6 +518,45 @@ const HomeScreen = ({ navigation }) => {
     )
   }
 
+  /**
+   * New app update alert 
+   */
+
+
+  const AppUpdateAlert=()=>{
+    return(
+      <View style={styles.errorBox}>
+        <View style={{ flexDirection: "row",width:'90%' }}>
+          <View style={{ backgroundColor: Color.sparklightGreen, width: 4 }} />
+          <View style={{ flexDirection: "column", padding: 10 }}>
+            <View style={{ flexDirection: "row" }}>
+              <Image
+                style={{alignSelf:'center'}}
+                resizeMode="contain"
+                tintColor={Color.sparklightGreen}
+                source={require("../../../assets/info-circle.png")}
+              />
+              <Text style={[styles.modemError1,{color:Color.sparklightGreen}]}>
+                What's New
+              </Text>
+            </View>
+            <Text style={styles.modemError2}>
+            Enhance your app experience with the latest version. Update Now and keep your app running smoothly.
+              {/* <Text style={[styles.modemError2,{fontWeight:'700'}]}>Estimated Time to Restore: {estimatedTime}</Text> */}
+            </Text>
+          </View>
+          
+          <TouchableOpacity style={{marginTop:10}} onPress={()=>{
+            setIsAppNewUpdate(false)
+          }}>
+          <CloseIcon/>
+          </TouchableOpacity>
+        </View>
+      </View>
+    )
+  }
+  /************* End App Update Alert Section ******* */
+
   return (
     <LinearGradient
       start={{ x: 0, y: 0 }}
@@ -540,7 +594,8 @@ const HomeScreen = ({ navigation }) => {
               marginTop: 50,
             }}
           >
-             {(isOutageAlert)?<OutageAlert estimatedTime={estimatedRestoreTime}/>:<></>}
+          {(isAppNewUpdate)?<AppUpdateAlert/>:<></>}
+         {(isOutageAlert)?<OutageAlert estimatedTime={estimatedRestoreTime}/>:<></>}
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <Text style={styles.internetHealth}>Service Health</Text>
               { (checkModemStatus) ?
