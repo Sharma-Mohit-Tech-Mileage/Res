@@ -287,11 +287,13 @@ const ManageEquipment = ({route}) => {
                     styles.myModemSpaceBlock,
                   ]}
                 >
-                  <View style={[styles.notifications, styles.parentBorder1,{borderLeftColor: isOffline
+                  <View style={[styles.notifications, styles.parentBorder1]}>
+
+          <View style={{ backgroundColor: isOffline
                                 ? colors.sparklight_red
                                 : currentHealth === "Offline"
                                 ? colors.sparklight_red
-                                : colors.sparklight_yellow }]}>
+                                : colors.sparklight_yellow , width: 4 }} />
                     <View style={styles.bannerWarning}>
                       <View style={styles.rightActionableParent}>
                         
@@ -330,6 +332,8 @@ const ManageEquipment = ({route}) => {
                         </View>
                       </View>
                     </View>
+
+
                   </View>
                 </View>
               )}
@@ -602,8 +606,7 @@ const styles = StyleSheet.create({
   parentBorder1: {
     borderWidth: 1,
     borderStyle: "solid",
-    borderLeftWidth: 5,
-    borderLeftColor: colors.sparklight_yellow,
+    
   },
   textTypo1: {
     fontSize: FontSize.textXsSemibold_size,
@@ -738,13 +741,13 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightWhite,
     alignSelf: "stretch",
     flex: 1,
+    padding:5
   },
   notifications: {
     flexDirection: "row",
     borderColor: Color.sparklightGray,
     borderRadius: Border.br_11xs,
     alignSelf: "stretch",
-    padding: 5,
   },
   notificationsWrapper: {
     marginTop: 24,
