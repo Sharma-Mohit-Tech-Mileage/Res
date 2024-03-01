@@ -30,7 +30,7 @@ const TroubleshootComponent = ({
                 <View style={styles.btnContainer}>
                     <Pressable onPress={()=>{
                         navigation.navigate("ArticalWindowUtility", {
-                            url: `${Env.URL}/residential/billing`,
+                            url: `${Env.URL}/billing`,
                             name: "Billing Details",
                           });
                     }}

@@ -96,7 +96,8 @@ const ModemReboot = () => {
             <Image
               style={styles.contactUs}
               resizeMode='contain'
-              source={require("../../../assets/phone-outgoing-01.png")}
+              tintColor={Color.sparklightBrightPurple}
+              source={require("../../../assets/phone-outgoing-04.png")}
             />
             
             
@@ -109,7 +110,9 @@ const ModemReboot = () => {
                 onPress={() => {
                   PubSub.publish('event.contactUsEvent', {});
                   setTimeout(() => {
-                    navigation.navigate('support')
+                    navigation.navigate("SupportStack", {
+                      isContactUs: true,
+                    })
                   }, 500)
 
                 }}>contact us</Text>{' for further assistance.'}
@@ -177,7 +180,7 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     textAlign: "left",
     fontWeight: "400",
-    paddingHorizontal: 20,
+    paddingHorizontal: 8,
     alignSelf: "center",
   },textContactUs: {
     color: Color.colorMidnightblue,

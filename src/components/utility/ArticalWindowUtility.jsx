@@ -48,7 +48,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const onMessage = (event) => {
         try {
             const data = JSON.parse(event.nativeEvent.data);
-
             if (data !== undefined && data.responseURL !== undefined && data.responseURL.includes('/statements/')) {
                 const responseData = JSON.parse(data.response);
                 setShowPDFUrl(responseData.fileBinary);

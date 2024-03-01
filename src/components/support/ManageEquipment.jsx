@@ -37,7 +37,8 @@ import WifiIssueIcon from "../../res/svgIcons/WifiIssueIcon";
 import IntermittentIssues from "../../res/svgIcons/IntermittentIssues";
 import Surfingissue from "../../res/svgIcons/surfingissue";
 
-const ManageEquipment = () => {
+const ManageEquipment = ({route}) => {
+  console.log(JSON.stringify(route))
   const navigation = useNavigation();
   const [manufacturer, setManufacturer] = React.useState("");
   const [model, setModel] = React.useState("");
@@ -137,13 +138,15 @@ const ManageEquipment = () => {
         console.log("Modem details", errorCode);
         if (errorCode === 404) {
           setIsOffline(true);
-          return;
         } else if (
           errorCode === 400 ||
           (errorCode === 500) | (errorCode === 504)
         ) {
           setCurrentHealth("Offline");
           setIsContactUs(true);
+        }else {
+          setCurrentHealth("Offline");
+          
         }
       }
     );
@@ -199,7 +202,14 @@ const ManageEquipment = () => {
     <View style={styles.manageEquipment}>
       <ProfileSettingsHeader
         title="Manage Equipment "
-        onPressBack={() => navigation.navigate("SupportStack")}
+        onPressBack={() => {
+          if(route.params?.isFromTroubleshooting){
+            navigation.goBack();
+          }else{
+          navigation.navigate("SupportStack")
+          }
+        }
+        }
       />
       <ScrollView>
         <View style={styles.myModemParent}>
@@ -277,11 +287,13 @@ const ManageEquipment = () => {
                     styles.myModemSpaceBlock,
                   ]}
                 >
-                  <View style={[styles.notifications, styles.parentBorder1,{borderLeftColor: isOffline
+                  <View style={[styles.notifications, styles.parentBorder1]}>
+
+          <View style={{ backgroundColor: isOffline
                                 ? colors.sparklight_red
                                 : currentHealth === "Offline"
                                 ? colors.sparklight_red
-                                : colors.sparklight_yellow }]}>
+                                : colors.sparklight_yellow , width: 4 }} />
                     <View style={styles.bannerWarning}>
                       <View style={styles.rightActionableParent}>
                         
@@ -297,9 +309,9 @@ const ManageEquipment = () => {
                             : currentHealth === "Offline"
                             ? colors.sparklight_red
                             : colors.sparklight_yellow}
-                          source={require("../../../assets/alert-triangle.png")}
+                          source={require("../../../assets/infocircle.png")}
                         />
-                          <Text style={[styles.creditCardWill,{marginLeft:5,marginTop:5}]}>
+                          <Text style={[styles.creditCardWill,{marginLeft:5,color:(currentHealth === "Poor")? '#000': Color.sparkLightRed }]}>
                             {isOffline
                               ? "Modem is Offline"
                               : isContactUs
@@ -320,6 +332,8 @@ const ManageEquipment = () => {
                         </View>
                       </View>
                     </View>
+
+
                   </View>
                 </View>
               )}
@@ -503,8 +517,8 @@ const ManageEquipment = () => {
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
                   navigation.navigate("ArticalWindowUtility", {
-                    url: "https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email",
-                    name: "Surfing Issues",
+                    url: "https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues",
+                    name: "Wifi Issues",
                   });
                 }}
               >
@@ -538,7 +552,9 @@ const ManageEquipment = () => {
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
-                  navigation.navigate("PeriodicProblems");
+                  if(!loadingHealth){
+                  navigation.navigate("PeriodicProblems",{isError:(currentHealth !='Optimal' || isOffline)});
+                  }
                 }}
               >
                 <IntermittentIssues />
@@ -592,8 +608,7 @@ const styles = StyleSheet.create({
   parentBorder1: {
     borderWidth: 1,
     borderStyle: "solid",
-    borderLeftWidth: 5,
-    borderLeftColor: colors.sparklight_yellow,
+    
   },
   textTypo1: {
     fontSize: FontSize.textXsSemibold_size,
@@ -706,6 +721,7 @@ const styles = StyleSheet.create({
     color: Color.sparkLightRed,
     fontSize: FontSize.textXsSemibold_size,
     textAlign: "left",
+    alignSelf:'center'
   },
   yourSavedCard: {
     color: Color.colorGray_100,
@@ -727,13 +743,13 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightWhite,
     alignSelf: "stretch",
     flex: 1,
+    padding:5
   },
   notifications: {
     flexDirection: "row",
     borderColor: Color.sparklightGray,
     borderRadius: Border.br_11xs,
     alignSelf: "stretch",
-    padding: 5,
   },
   notificationsWrapper: {
     marginTop: 24,

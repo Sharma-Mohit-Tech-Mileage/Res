@@ -145,7 +145,7 @@ const DataUsageComponent = ({ navigation, useData }) => {
       <TouchableOpacity
         onPress={() => {
           navigation.navigate("ArticalWindowUtility", {
-            url: Env.URL + "/residential/services/upgrade",
+            url: Env.URL + "/services/upgrade",
             name: "Upgrade Plan",
           });
           //Linking.openURL('https://customer.uat.sparklight.com/residential/services/upgrade')

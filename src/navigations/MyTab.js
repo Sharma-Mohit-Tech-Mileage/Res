@@ -98,7 +98,7 @@ const MyTabs = ({ route, navigation }) => {
                       {
                         name: 'ArticalWindowUtility',
                         params: {
-                          url: `${Env.URL}/residential/services/upgrade`,
+                          url: `${Env.URL}/services/upgrade`,
                           name: 'Shop',
                           isExpandable:true
                         },
@@ -118,9 +118,23 @@ const MyTabs = ({ route, navigation }) => {
         }}
       />
 
-      {/* <Tab.Screen
+       <Tab.Screen
         name="Support"
         component={SupportStack}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'Support',
+                  //params: { triggerEvent: true }
+                },
+              ],
+            });
+          },
+        })}
         options={{
           headerShown: false,
           tabBarLabel: 'Support',
@@ -132,8 +146,8 @@ const MyTabs = ({ route, navigation }) => {
             );
           }
         }}
-      /> */}
-        <Tab.Screen
+      /> 
+        {/* <Tab.Screen
           name="Support"
           component={SupportStack}
           options={{
@@ -156,7 +170,7 @@ const MyTabs = ({ route, navigation }) => {
               }
             },
           })}
-        />
+        /> */}
 
       <Tab.Screen
         name="Account"

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Dimensions,
   SafeAreaView,
+  ScrollView
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -24,6 +25,7 @@ import WifiIssueIcon from "../../../res/svgIcons/WifiIssueIcon";
 import Surfingissue from "../../../res/svgIcons/surfingissue";
 import IntermittentIssues from "../../../res/svgIcons/IntermittentIssues";
 import Noconnection from "../../../res/svgIcons/Noconnection";
+import Modemicon from "../../../res/svgIcons/Modemicon";
 const windowHeight = Dimensions.get("window").height;
 const windowWidth = Dimensions.get("window").width;
 
@@ -33,7 +35,7 @@ const ModemHealthy = () => {
     <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
       <ProfileSettingsHeader
         title="Troubleshooting"
-        onPressBack={() => navigation.navigate('Support')}
+        onPressBack={() => navigation.navigate('SupportStack')}
         accessibilityLabel="Back to Support"
         accessibilityHint="Navigates back to the Support screen"
       />
@@ -46,6 +48,7 @@ const ModemHealthy = () => {
           marginBottom: "15%",
         }}
       >
+         <ScrollView style={{marginBottom:20}}>
         <View style={styles.container}>
           <Text style={styles.topLeftText}>3 of 3</Text>
           <View style={styles.content}>
@@ -62,8 +65,23 @@ const ModemHealthy = () => {
                 {"No service issues were detected."}
               </Text>
             </View>
+          
             <View style={{ flexDirection: "column", flex: 1 }}>
               <View style={styles.card}>
+              <View style={styles.borderSec} />
+              <TouchableOpacity
+                  style={styles.pressableStyle}
+                  onPress={() => {
+                    navigation.navigate('ManageEquipment',{isFromTroubleshooting:true})
+                  }}
+                >
+                  <View style={styles.menuWrap}>
+                    <Modemicon />
+                    <Text style={styles.menuText}>Manage Equipment</Text>
+                  </View>
+                  <RightArrow />
+                </TouchableOpacity>
+               
                 <View style={styles.borderSec} />
                 <TouchableOpacity
                   style={styles.pressableStyle}
@@ -122,6 +140,7 @@ const ModemHealthy = () => {
             </View>
           </View>
         </View>
+        </ScrollView>
       </SafeAreaView>
     </View>
   );

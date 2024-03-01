@@ -10,6 +10,7 @@ import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
 import { Env } from "../../network/apis/account/Constants";
 import PubSub from "pubsub-js";
+import { CommonActions } from '@react-navigation/native';
 const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
   const GreenCircle = () => {
     return <View style={styles.greenTick}></View>;
@@ -48,7 +49,13 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
         { <TouchableOpacity
           style={{ flexDirection: "row" }}
           onPress={() => {
-            navigation.navigate('Support',{isManagementEquipment:true});
+            if(currentHealth!='Optimal'){
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Support',params: { isManagementEquipment:true }, }],
+          });
+        }
+           // navigation.navigate('Support',{isManagementEquipment:true});
           }}
         >
           <View style={styles.item}>
@@ -89,7 +96,7 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
           onPress={() => {
             if (!billPaid) {
               navigation.navigate("ArticalWindowUtility", {
-                url: `${Env.URL}/residential/billing`,
+                url: `${Env.URL}/billing`,
                 name: "Billing Details",
               });
             }
@@ -134,7 +141,7 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: "row",
     backgroundColor: "white",
-    width: wp("85%"),
+    width: wp("92%"),
     margin: 1,
     alignContent: "center",
     alignItems: "center",

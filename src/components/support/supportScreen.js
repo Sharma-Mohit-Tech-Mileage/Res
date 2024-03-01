@@ -29,25 +29,28 @@ const Support = ({route}) => {
         Linking.openURL(phoneNumber);
     };
     
-     useEffect(() => {
-        // Check if the triggerEvent parameter is present
-        if (route.params?.triggerEvent) {
-            // If present, perform the desired action after a delay
-            setTimeout(() => {
-                PubSub.publish('event.contactUsEvent', {});
-            }, 500);
+    //  useEffect(() => {
+    //     // Check if the triggerEvent parameter is present
+    //     if (route.params?.triggerEvent) {
+    //         // If present, perform the desired action after a delay
+    //         setTimeout(() => {
+    //             PubSub.publish('event.contactUsEvent', {});
+    //         }, 500);
 
-            // Reset the parameter to avoid repeated actions if the screen is revisited
-            navigation.setParams({ triggerEvent: undefined });
-        }
-    }, [route.params, navigation]);
+    //         // Reset the parameter to avoid repeated actions if the screen is revisited
+    //         navigation.setParams({ triggerEvent: undefined });
+    //     }
+    // }, [route.params, navigation]);
 
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
           // The screen is focused
           // Call any action
           setTimeout(()=>{
+            if(!route.params?.isContactUs){
             scrollViewRef.current?.scrollTo({y:0,x:0,animated: true})
+            }
+
         },500)
           
            
@@ -107,10 +110,12 @@ const Support = ({route}) => {
     
 
     useEffect(() => {
+        console.log('Focus to contact',route.params?.isContactUs)
        if(route.params?.isContactUs){
+        console.log('Focus to contact')
         setTimeout(()=>{
             scrollViewRef.current?.scrollToEnd({animated: true})
-        },1000)
+        },500)
         
        }
        
@@ -120,11 +125,11 @@ const Support = ({route}) => {
         };     
     }, []);
 
-    useEffect(async () => {
-        const online = await ZendeskChat.areAgentsOnline();
-        console.log('setZenDeskSupportAvailable: ', online);
-        setZenDeskSupportAvailable(online);
-    }, []);      
+    // useEffect(async () => {
+    //     const online = await ZendeskChat.areAgentsOnline();
+    //     console.log('setZenDeskSupportAvailable: ', online);
+    //     setZenDeskSupportAvailable(online);
+    // }, []);      
 
     
     const handlePressOpenButton = () => {
@@ -331,7 +336,7 @@ const Support = ({route}) => {
                                     Contact Us
                                 </Text>
                             </View>
-                            {
+                            {/* {
                                 zenDeskSupportAvailable ?
                                     <View style={styles.integrationCardMobileWrapper}>
                                         <View
@@ -394,7 +399,7 @@ const Support = ({route}) => {
                                             </View>
                                         </View>
                                     </View>                                
-                            }
+                            } */}
                             {/* <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}> 
                                 <Pressable
                                     style={[styles.integrationCardMobile1, styles.integrationCardBorder,]}

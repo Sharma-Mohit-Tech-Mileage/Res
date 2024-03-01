@@ -49,11 +49,11 @@ const ModemExchangeInstructions = () => {
                 {instruction.includes('contact us') ? (
                   <>
                     {instruction.split('contact us')[0]}
-                    <Text   accessible={true}
+                    <Text accessible={true}
                       accessibilityRole="link"
                       accessibilityLabel="Contact us for more information"
                     style={styles.linkText} onPress={() => {
-                      PubSub.publish('event.contactUsEvent', {});
+                      //PubSub.publish('event.contactUsEvent', {});
                       //setTimeout(() => navigation.navigate('support'), 500);
                       navigation.navigate("SupportStack", {
                         isContactUs: true,

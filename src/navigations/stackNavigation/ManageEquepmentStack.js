@@ -12,7 +12,8 @@ import PeriodicProblems from "../../components/support/Troubleshooting/PeriodicP
 
 const ModemStack = createStackNavigator();
 
-function ModemStackScreen() {
+function ModemStackScreen({route}) {
+  console.log('Manage equipment')
   const { setTabBarVisible } = useTabBarVisibility();
   return (
     <ModemStack.Navigator
@@ -23,6 +24,7 @@ function ModemStackScreen() {
         name="ManageEquipmentScreen"
         component={ManageEquipment}
         options={{ headerShown: false }}
+        initialParams={route.params}
         listeners={{
           focus: () => setTabBarVisible(true),
           blur: () => setTabBarVisible(true),
