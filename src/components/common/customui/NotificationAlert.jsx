@@ -33,41 +33,41 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
             ]}>
                 {title && <Text style={[styles.title, { color: currentTypeStyle.color }]}>{title}</Text>}
                 {message ? (
-                    <View style={!title ? styles.messageOnEmpty : styles.message}>
-                        {message.split("Please contact us").map((part, index, arr) =>
-                            index < arr.length - 1 ? (
-                                <React.Fragment key={index}>
-                                    <Text>{part}</Text>
-                                    <Text style={!title ? styles.messageOnEmpty : styles.message}>
-                                        {'\nPlease '}
-                                        <Text
-                                            style={styles.contactUsText}
-                                            onPress={() => {
-                                                navigation.reset({
-                                                    index: 0,
-                                                    routes: [
-                                                        {
-                                                            name: 'Support',
-                                                            params: { isContactUs: true }
-                                                        },
-                                                    ],
-                                                });
-                                            }}
-                                            accessible={true}
-                                            accessibilityLabel="Contact us"
-                                            accessibilityRole="button"
-                                            accessibilityHint="Navigates to the support screen"
-                                        >
-                                            contact us
-                                        </Text>
+                    <Text style={!title ? styles.messageOnEmpty : styles.message}>
+                        {message.split("Please contact us").map((part, index, arr) => index < arr.length - 1 ? (
+                            <React.Fragment key={index}>
+                                <Text style={!title ? styles.messageOnEmpty : styles.message}>{part}</Text>
+                                <Text style={!title ? styles.messageOnEmpty : styles.message}>
+                                    {'\nPlease '}
+                                    <Text 
+                                        accessible={true}
+                                        accessibilityLabel="Contact us"
+                                        accessibilityRole="button"
+                                        accessibilityHint="Navigates to the support screen"
+                                        style={styles.contactUsText}
+                                        onPress={() => {
+                                            navigation.reset({
+                                                index: 0,
+                                                routes: [
+                                                    {
+                                                        name: 'Support',
+                                                        params: { isContactUs: true }
+                                                    },
+                                                ],
+                                            });
+                                        }}
+                                    >
+                                        contact us
                                     </Text>
-                                </React.Fragment>
-                            ) : (
-                                    <Text style={!title ? styles.messageOnEmpty : styles.message} key={index}>{part}</Text>
-                            )
-                        )}
-                    </View>
+                                </Text>
+                            </React.Fragment>
+                        ) : (
+                                <Text style={!title ? styles.messageOnEmpty : styles.message} key={index}>{part}</Text>
+                        ))}
+                    </Text>
                 ) : null}
+
+
             </View>
             {showCloseIcon && (
                 <TouchableOpacity
