@@ -47,7 +47,10 @@ const Support = ({route}) => {
           // The screen is focused
           // Call any action
           setTimeout(()=>{
+            if(!route.params?.isContactUs){
             scrollViewRef.current?.scrollTo({y:0,x:0,animated: true})
+            }
+
         },500)
           
            
@@ -107,10 +110,12 @@ const Support = ({route}) => {
     
 
     useEffect(() => {
+        console.log('Focus to contact',route.params?.isContactUs)
        if(route.params?.isContactUs){
+        console.log('Focus to contact')
         setTimeout(()=>{
             scrollViewRef.current?.scrollToEnd({animated: true})
-        },1000)
+        },500)
         
        }
        
