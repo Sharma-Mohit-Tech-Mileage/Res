@@ -43,8 +43,14 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                                         <Text
                                             style={styles.contactUsText}
                                             onPress={() => {
-                                                navigation.navigate("Support", {
-                                                    isContactUs: true,
+                                                navigation.reset({
+                                                    index: 0,
+                                                    routes: [
+                                                        {
+                                                            name: 'Support',
+                                                            params: { isContactUs: true }
+                                                        },
+                                                    ],
                                                 });
                                             }}
                                             accessible={true}
