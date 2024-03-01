@@ -66,6 +66,7 @@ const HomeScreen = ({ navigation }) => {
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths,setInternetHealths]= useState([])
   const [isAppNewUpdate,setIsAppNewUpdate]=useState(false)
+  const [storeUrl,setStoreUrl]=useState('')
 
   const getInternetHealth = (type) => {
     var currentHealth = {
@@ -397,20 +398,20 @@ const HomeScreen = ({ navigation }) => {
  let currentVersion=VersionCheck.getCurrentVersion();
     VersionCheck.getLatestVersion()    // Automatically choose profer provider using `Platform.select` by device platform.
   .then(latestVersion => {
-    console.log('Latest version',latestVersion);  
-      // 0.1.2
-      if(latestVersion!=currentVersion){
-        setIsAppNewUpdate(true)
-      }
+    console.log('Latest version',latestVersion);
+    console.log('Current version',currentVersion);   
+    VersionCheck.needUpdate({
+      // depth: 1,
+      // currentVersion: currentVersion,
+      // latestVersion: latestVersion,
+    }).then(res => {
+      console.log(res.isNeeded);  // false
+      setIsAppNewUpdate(res.isNeeded)
+      setStoreUrl(res.storeUrl)
+      console.log('App Url',JSON.stringify(res))
+    });
   });
-  //   VersionCheck.needUpdate()
-  // .then(async res => {
-  //   console.log('AppUpdate',res.isNeeded);    // true
-  //   if (res.isNeeded) {
-  //     setIsAppNewUpdate(true)
-  //    // Linking.openURL(res.storeUrl);  // open store if update is needed.
-  //   }
-  // });
+  
   }
 
   const walkthroughModal = () => {
@@ -550,8 +551,16 @@ const HomeScreen = ({ navigation }) => {
               </Text>
             </View>
             <Text style={styles.modemError2}>
-            Enhance your app experience with the latest version. Update Now and keep your app running smoothly.
-              {/* <Text style={[styles.modemError2,{fontWeight:'700'}]}>Estimated Time to Restore: {estimatedTime}</Text> */}
+            Enhance your app experience with the latest version.  
+              <Text style={[styles.modemError2,{fontWeight:'700'}]} onPress={()=>{
+                  if(Platform.OS==='android'){
+                    Linking.openURL('https://play.google.com/store/apps/details?id=com.sparklight');
+                  }else{
+                   Linking.openURL('https://apps.apple.com/us/app/mysparklight/id6469003880');
+                  }
+                
+              }}> Update Now </Text> 
+              and keep your app running smoothly.
             </Text>
           </View>
           
