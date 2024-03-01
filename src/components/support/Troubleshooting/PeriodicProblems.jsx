@@ -70,7 +70,7 @@ const PeriodicProblems = ({route}) => {
                 style={styles.pressableStyle}
                 onPress={() => {
                   navigation.navigate("ModemRebootScreen", {
-                    isError: (route.params?.health!='Optimal')?true:false,
+                    isError: (route.params?.isError)?true:false,
                     isFromT: true,
                   });
                 }}

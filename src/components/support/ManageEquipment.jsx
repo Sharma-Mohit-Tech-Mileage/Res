@@ -552,7 +552,9 @@ const ManageEquipment = ({route}) => {
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
-                  navigation.navigate("PeriodicProblems",{health:currentHealth});
+                  if(!loadingHealth){
+                  navigation.navigate("PeriodicProblems",{isError:(currentHealth !='Optimal' || isOffline)});
+                  }
                 }}
               >
                 <IntermittentIssues />
