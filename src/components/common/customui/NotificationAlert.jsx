@@ -38,20 +38,14 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                             index < arr.length - 1 ? (
                                 <React.Fragment key={index}>
                                     <Text>{part}</Text>
-                                    <Text>
+                                    <Text style={!title ? styles.messageOnEmpty : styles.message}>
                                         {'\nPlease '}
                                         <Text
                                             style={styles.contactUsText}
                                             onPress={() => {
-                                                navigation.reset({
-                                                    index: 0,
-                                                    routes: [
-                                                      {
-                                                        name: 'Support',
-                                                        params: { isContactUs: true }
-                                                      },
-                                                    ],
-                                                  });
+                                                navigation.navigate("Support", {
+                                                    isContactUs: true,
+                                                });
                                             }}
                                             accessible={true}
                                             accessibilityLabel="Contact us"
@@ -63,14 +57,11 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                                     </Text>
                                 </React.Fragment>
                             ) : (
-                                <Text key={index}>{part}</Text>
+                                    <Text style={!title ? styles.messageOnEmpty : styles.message} key={index}>{part}</Text>
                             )
                         )}
                     </View>
                 ) : null}
-
-
-
             </View>
             {showCloseIcon && (
                 <TouchableOpacity
