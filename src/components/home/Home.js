@@ -394,14 +394,23 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const checkAppUpdate=()=>{
-    VersionCheck.needUpdate()
-  .then(async res => {
-    console.log('AppUpdate',res.isNeeded);    // true
-    if (res.isNeeded) {
-      setIsAppNewUpdate(true)
-      Linking.openURL(res.storeUrl);  // open store if update is needed.
-    }
+ let currentVersion=VersionCheck.getCurrentVersion();
+    VersionCheck.getLatestVersion()    // Automatically choose profer provider using `Platform.select` by device platform.
+  .then(latestVersion => {
+    console.log('Latest version',latestVersion);  
+      // 0.1.2
+      if(latestVersion!=currentVersion){
+        setIsAppNewUpdate(true)
+      }
   });
+  //   VersionCheck.needUpdate()
+  // .then(async res => {
+  //   console.log('AppUpdate',res.isNeeded);    // true
+  //   if (res.isNeeded) {
+  //     setIsAppNewUpdate(true)
+  //    // Linking.openURL(res.storeUrl);  // open store if update is needed.
+  //   }
+  // });
   }
 
   const walkthroughModal = () => {
