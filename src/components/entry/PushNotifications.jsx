@@ -65,7 +65,9 @@ const PushNotifications = ({ navigation }) => {
     
     const enableNotifications = async () => {
         const enabledPermission = await requestUserPermission();
-
+        if (Platform.OS === 'android') {
+            await notifee.requestPermission();
+        }
         if (enabledPermission) {
             const token = await getFcmToken();
             const data = {
