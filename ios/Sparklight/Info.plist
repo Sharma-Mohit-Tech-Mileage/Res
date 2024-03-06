@@ -45,7 +45,6 @@
 		<string>data:application/octet-stream</string>
 		<string>data:</string>
 		<string>application/octet-stream</string>
-    <string>itms-apps</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

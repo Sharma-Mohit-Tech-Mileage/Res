@@ -43,16 +43,6 @@ import { Env } from '../../network/apis/account/Constants';
 import VersionCheck from 'react-native-version-check';
 const tabWidth = Number(Dimensions.get('window').width/4);
 
-import SpInAppUpdates, {
-  NeedsUpdateResponse,
-  IAUUpdateKind,
-  StartUpdateOptions,
-} from 'sp-react-native-in-app-updates';
-
-const inAppUpdates = new SpInAppUpdates(
-  true // isDebug
-);
-
 const HomeScreen = ({ navigation }) => {
   // const { email, name } = {
   //   email: route.params.data.params.email,
@@ -406,30 +396,25 @@ const HomeScreen = ({ navigation }) => {
 
   const checkAppUpdate=()=>{
 
-
-    inAppUpdates.checkNeedsUpdate({ country: 'us' }).then(result => {
-       console.log('IsAppUpdate=>',result.shouldUpdate)
-      if (result.shouldUpdate) {
-        setIsAppNewUpdate(result.shouldUpdate)
-        //inAppUpdates.startUpdate(updateOptions);
-      }
+ let currentVersion=VersionCheck.getCurrentVersion();
+    VersionCheck.getLatestVersion()    // Automatically choose profer provider using `Platform.select` by device platform.
+  .then(latestVersion => {
+    console.log('Latest version',latestVersion);
+    console.log('Current version',currentVersion); 
+    if(Platform.OS==='android')  {
+      VersionCheck.needUpdate().then(res => {
+        setIsAppNewUpdate(res.isNeeded)
+      });
+    }else{
+    VersionCheck.needUpdate({
+       currentVersion: currentVersion,
+       latestVersion: latestVersion,
+    }).then(res => {
+      setIsAppNewUpdate(res.isNeeded)
     });
-//  let currentVersion=VersionCheck.getCurrentVersion();
-//     VersionCheck.getLatestVersion()    // Automatically choose profer provider using `Platform.select` by device platform.
-//   .then(latestVersion => {
-//     console.log('Latest version',latestVersion);
-//     console.log('Current version',currentVersion);   
+   }
+  });
 
-//     VersionCheck.needUpdate({
-//       // currentVersion: currentVersion,
-//       // latestVersion: latestVersion,
-//     }).then(res => {
-//       console.log(res.isNeeded);  // false
-//       setIsAppNewUpdate(res.isNeeded)
-//       setStoreUrl(res.storeUrl)
-//       console.log('App Url',JSON.stringify(res))
-//     });
-//   });
   
   }
 
