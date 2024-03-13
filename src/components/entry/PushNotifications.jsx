@@ -15,6 +15,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
+import notifee from '@notifee/react-native';
 
 const PushNotifications = ({ navigation }) => {
     const [nextScreen, setNextScreen] = useState('EntryTextNotifications');

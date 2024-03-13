@@ -39,6 +39,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RefreshToken } from '../user/Session';
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from '../../network/apis/account/Constants';
+import notifee from '@notifee/react-native';
 const tabWidth = Number(Dimensions.get('window').width/4);
 
 const HomeScreen = ({ navigation }) => {
@@ -295,6 +296,7 @@ const HomeScreen = ({ navigation }) => {
   const checkNotifications = async () => {
     const pushNotification = await getPushNotificationStatus();
     let askNotification = false;
+    console.log('checkNotifications: ', pushNotification);
     if (pushNotification === null) {
       askNotification = true;
     } else {
@@ -313,6 +315,8 @@ const HomeScreen = ({ navigation }) => {
         }
       }
     }
+
+    console.log('askNotification: ', askNotification);
 
     if (askNotification) {
       const enabledPermission = await requestUserPermission();
@@ -333,6 +337,7 @@ const HomeScreen = ({ navigation }) => {
               status: 'accepted',
               date: new Date()
           };            
+          await notifee.requestPermission();
           storePushNotificationStatus(localData);
           await dispatch(updatePushNotifications(data, null));
       } else {
