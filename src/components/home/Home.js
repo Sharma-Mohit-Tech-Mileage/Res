@@ -556,7 +556,7 @@ const HomeScreen = ({ navigation }) => {
             </View>
             <Text style={styles.modemError2}>
             Enhance your app experience with the latest version.  
-              <Text style={[styles.modemError2,{fontWeight:'700'}]} onPress={()=>{
+              <Text style={styles.updateNow} onPress={()=>{
                   if(Platform.OS==='android'){
                     Linking.openURL('https://play.google.com/store/apps/details?id=com.sparklight');
                   }else{
@@ -884,6 +884,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontStyle: "normal",
     fontWeight: "400",
+    marginLeft: 20,
+    marginTop: 7,
+    marginRight: 5,
+  },updateNow:{
+    color: Color.colorMidnightblue,
+    FontFamily: FontFamily.openSansRegular,
+    fontSize: 14,
+    fontStyle: "normal",
+    fontWeight: "700",
     marginLeft: 20,
     marginTop: 7,
     marginRight: 5,
