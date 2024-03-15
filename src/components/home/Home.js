@@ -34,7 +34,7 @@ import {
   getFcmToken,
   requestUserPermission,
 } from '../../firebase/FirebaseUtils';
-import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
+import { updatePushNotifications, fetchPushNotifications } from '../../redux/actions/ProfileActionSuite';
 import { useSelector, useDispatch } from 'react-redux';
 import { RefreshToken } from '../user/Session';
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
@@ -50,6 +50,7 @@ const HomeScreen = ({ navigation }) => {
   const [isInternetDetails, setIsInternetDetails] = useState(false);
   const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector(state => state.combinedReducers.home);
+  const profile = useSelector(state => state.combinedReducers.profile || {});
   const dispatch = useDispatch();
   const [plans, setPlans] = useState([]);
   const [billAmt, setBillAmt] = useState(0);
@@ -315,6 +316,19 @@ const HomeScreen = ({ navigation }) => {
         }
       }
     }
+    //Add logic to check if notifications are turned off
+
+    if (profile?.pushNotifications?.length > 0) {
+        const messageTypes = profile.pushNotifications[0].pushMessageType;
+        messageTypes.forEach((messageType) => {
+            if (messageType.optOutFlag) {
+                optOutCountPushNotification += 1;
+            }
+        });
+        if (optOutCountPushNotification > 2) {
+          askNotification = false;
+        }
+    }
 
     console.log('askNotification: ', askNotification);
 
@@ -363,7 +377,6 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     checkModemOutagStatus();
     getUserAccountDetails();
-    checkNotifications();
 
     const fetchData = async () => {
       console.log('FetchData: ');
@@ -382,6 +395,23 @@ const HomeScreen = ({ navigation }) => {
     fetchData();    
     
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            dispatch(fetchPushNotifications());
+        } catch (error) {
+            console.error("Error fetching data", error);
+        }
+    };
+
+    fetchData();
+}, [dispatch]);   
+
+  useEffect(() => {
+    console.log('profile: ', profile);
+    checkNotifications();
+  }, [profile]);
 
   const changeWalkThroughStep = (step) => {
     console.log("walkThroughStep: ", step);

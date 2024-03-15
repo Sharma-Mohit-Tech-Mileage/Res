@@ -53,7 +53,7 @@ const config = {
 // Once in your application:
 //4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC
 //84AFF64rwYVgQS35EsTakO03d98WTdJb
-//ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
+ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
 
 const SplashScreen = ({ navigation }) => {
