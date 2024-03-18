@@ -60,11 +60,11 @@ const ProfileSettings = () => {
               <Text style={[styles.generalInformation, styles.melissaTypo]}>
                 General Information
               </Text>
-              {!isPrimary && <Pressable
+              {/* {!isPrimary && <Pressable
                 style={[styles.buttons, styles.buttonsLayout]}
                 onPress={() => navigation.navigate("ProfileSettingsEdit")}>
                 <Text style={[styles.makePayment, styles.text1Clr]}>Edit</Text>
-              </Pressable>}
+              </Pressable>} */}
             </View>
             <View style={styles.frameContainer}>
               <View style={styles.firstNameParent} accessible={true} >

@@ -162,18 +162,18 @@ const ModemReboot = ({route}) => {
               resizeMode="cover"
               source={
                 modemStatus === ""
-                  ? require("../../../assets/modemReboot.png")
-                  : require("../../../assets/modem-connected.png")
+                  ? require("../../../assets/reboot_modem.png")
+                  : require("../../../assets/reboot_modem.png")
               }
             />
 
-            {modemStatus === "" ? (
-              <RenderErrorBox />
+            {/* {modemStatus === "" ? (
+               <RenderErrorBox />
             ) : (
               <Text style={{ alignSelf: "center", marginVertical: 10 }}>
                 Modem is connected
               </Text>
-            )}
+            )} */}
             <View style={styles.borderSec} />
 
             <TouchableOpacity
@@ -286,8 +286,9 @@ const styles = StyleSheet.create({
   },
   frameChild: {
     alignSelf: "center",
-    width: 70,
-    height: 70,
+    marginBottom:20,
+    width: 100,
+    height: 100,
   },
   rebootModemTxt: {
     color: colors.sparklight_grey,
