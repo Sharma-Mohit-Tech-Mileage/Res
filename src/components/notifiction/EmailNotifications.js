@@ -28,7 +28,7 @@ const EmailNotifications = () => {
   const paperlessdata = route.params?.additionalData;
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const { logEvent } = useAnalytics();
+  //const { logEvent } = useAnalytics();
 
   const { control, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(validationSchema),
@@ -58,7 +58,7 @@ const EmailNotifications = () => {
       dispatch(unsubscribePaperless(navigation));
     }
 
-    logEvent('email_notification_update', { email, paperlessBilling, emailChanged });
+    //logEvent('email_notification_update', { email, paperlessBilling, emailChanged });
     console.log('Event logged: email_notification_update', { email, paperlessBilling, emailChanged });
   };
 

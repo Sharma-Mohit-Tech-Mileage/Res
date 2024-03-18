@@ -35,9 +35,9 @@ const DataUsageComponent = ({ navigation, useData }) => {
   useEffect(() => {
     console.log('usage')
     if(Object.entries(data).length>0){
-    let totalUsedGB = Math.round(data.totalUsedGB);
+      const totalUsedGB = typeof data.totalUsedGB === 'number' ? Math.round(data.totalUsedGB) : 0;
+      const planData = typeof data.dataPlanGB === 'number' ? Math.round(data.dataPlanGB) : 0;
     setTotalUsed(totalUsedGB);
-    let planData = Math.round(data.dataPlanGB);
     if(planData===15000){
       setIsUnlimtedPlan(true)
     }else{
@@ -107,7 +107,7 @@ const DataUsageComponent = ({ navigation, useData }) => {
           >
             <Text style={styles.dataPlanTxt}>
               {" "}
-              {(isUnlimtedPlan)?'UNLIMITED DATA PLAN':Math.floor(data.dataPlanGB)}
+              {(isUnlimtedPlan)?'UNLIMITED DATA PLAN':typeof data.dataPlanGB === 'number' ? Math.round(data.dataPlanGB) : 0}
               {(isUnlimtedPlan)? "" :" GB"}
             </Text>
           </View>
@@ -136,7 +136,7 @@ const DataUsageComponent = ({ navigation, useData }) => {
             ]}
           />
           <Text style={styles.useLbl}>Remaining</Text>
-          <Text style={styles.useDataLbl}> {(isUnlimtedPlan)?'Unlimited': Math.floor(data.remainingGB)+" GB"}</Text>
+          <Text style={styles.useDataLbl}> {(isUnlimtedPlan)?'Unlimited': typeof data.remainingGB === 'number' ? Math.round(data.remainingGB) : 0+" GB"}</Text>
         </View>
       </View>
       <View
