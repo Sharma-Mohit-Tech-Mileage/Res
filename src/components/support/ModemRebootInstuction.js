@@ -110,7 +110,9 @@ const ModemReboot = () => {
                 onPress={() => {
                   PubSub.publish('event.contactUsEvent', {});
                   setTimeout(() => {
-                    navigation.navigate('support')
+                    navigation.navigate("SupportStack", {
+                      isContactUs: true,
+                    })
                   }, 500)
 
                 }}>contact us</Text>{' for further assistance.'}

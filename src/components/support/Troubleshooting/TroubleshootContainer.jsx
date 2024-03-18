@@ -289,7 +289,7 @@ const TroubleshootContainer = () => {
             mac = "60:19:71:d5:10:72";
           }
           else if(user.userInfo.accountNumber==='133437285'){
-            mac="00:40:36:59:62:d0"
+            mac="60:19:71:1b:b7:62"
           }
           else if(user.userInfo.accountNumber==='131684698'){
             mac="ac:20:2e:6d:82:f1"

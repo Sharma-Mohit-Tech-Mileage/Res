@@ -300,6 +300,7 @@ const HomeScreen = ({ navigation }) => {
   const checkNotifications = async () => {
     const pushNotification = await getPushNotificationStatus();
     let askNotification = false;
+    console.log('checkNotifications: ', pushNotification);
     if (pushNotification === null) {
       askNotification = true;
     } else {
@@ -379,7 +380,6 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     checkModemOutagStatus();
     getUserAccountDetails();
-    checkNotifications();
 
     const fetchData = async () => {
       console.log('FetchData: ');
