@@ -15,6 +15,7 @@ import {
 import {
   widthPercentageToDP as wp,
 } from "react-native-responsive-screen";
+import VersionCheck from 'react-native-version-check';
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -40,8 +41,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RefreshToken } from '../user/Session';
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from '../../network/apis/account/Constants';
-import notifee from '@notifee/react-native';
+import notifee from '@notifee/react-native'
 const tabWidth = Number(Dimensions.get('window').width/4);
+
 
 const HomeScreen = ({ navigation }) => {
   // const { email, name } = {
@@ -650,6 +652,7 @@ const HomeScreen = ({ navigation }) => {
               marginTop: 50,
             }}
           >
+            {(isAppNewUpdate)?<AppUpdateAlert/>:<></>}
              {(isOutageAlert)?<OutageAlert estimatedTime={estimatedRestoreTime}/>:<></>}
              <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <Text style={styles.internetHealth}>Service Health</Text>
