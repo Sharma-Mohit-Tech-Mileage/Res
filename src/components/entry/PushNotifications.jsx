@@ -15,6 +15,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
+import notifee from '@notifee/react-native';
 
 const PushNotifications = ({ navigation }) => {
     const [nextScreen, setNextScreen] = useState('EntryTextNotifications');
@@ -65,7 +66,9 @@ const PushNotifications = ({ navigation }) => {
     
     const enableNotifications = async () => {
         const enabledPermission = await requestUserPermission();
-
+        if (Platform.OS === 'android') {
+            await notifee.requestPermission();
+        }
         if (enabledPermission) {
             const token = await getFcmToken();
             const data = {
