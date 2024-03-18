@@ -20,12 +20,11 @@ const Notifications = () => {
   const paperLessInfo = profile.paperLessInfo || {};
   const transformedNotification = transformNotificationPreferences(profile.pushNotifications || {});
   const data = transformResponse(smsSubscription);
-  const emailAddress = paperLessInfo.emailAddress||'';
+  const emailAddress = paperLessInfo.emailAddress || '';
   const isEmailVerified = paperLessInfo.emailStatus === 'Verified';
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   const isAdmin = isAdminRole(profileDetails.memberType);
   const acknowledgement = extractAcknowledgementEmail(paperLessInfo);
-
   let notificationsTitle = '', infoText = '', isDisabled = false;
   if (profileDetails.multipleEmails) {
     isDisabled = true
@@ -41,7 +40,7 @@ const Notifications = () => {
           {isPrimary && (
             <>
               {' Check your inbox for our verification link.'}
-              <Text> {"\n"}</Text> 
+              <Text> {"\n"}</Text>
               <Text
                 accessible={true}
                 accessibilityRole="link"
@@ -55,6 +54,9 @@ const Notifications = () => {
             </>
           )}
         </Text>);
+    }
+    else if (profileDetails.svEmailAddress) {
+      infoText = (<Text>Emails are sent to <Text style={styles.text}>{profileDetails.svEmailAddress}</Text></Text>);
     }
   }
 
