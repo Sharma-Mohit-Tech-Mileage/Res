@@ -1,3 +1,4 @@
+import { Alert, Linking, Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 
   const requestUserPermission = async () => {
@@ -10,6 +11,44 @@ import messaging from '@react-native-firebase/messaging';
 
     return enabled;  
   };
+
+  const notifyPermission = async () => {
+    let authStatus = await messaging().hasPermission();
+  
+    if (authStatus === messaging.AuthorizationStatus.NOT_DETERMINED) {
+      authStatus = await messaging().requestPermission();
+    }
+  
+    const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  
+    if (authStatus === messaging.AuthorizationStatus.DENIED) {
+      Alert.alert(
+        'Sparklight Would Like to Send You Notifications',
+        'Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Go to Settings',
+            onPress: () => {
+              if (Platform.OS === 'ios') {
+                Linking.openURL('app-settings:');
+              } else {
+                Linking.openSettings();
+              }
+            },
+          },
+        ],
+      );
+    }
+  
+    return enabled;
+  };
+  
 
   const getFcmToken = async () => {
     try {
