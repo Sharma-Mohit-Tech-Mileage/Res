@@ -93,4 +93,5 @@ import messaging from '@react-native-firebase/messaging';
     getFcmToken,
     requestUserPermission,
     notificationListener,
+    notifyPermission
   };
