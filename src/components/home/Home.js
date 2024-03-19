@@ -293,9 +293,9 @@ const HomeScreen = ({ navigation }) => {
       } else {
         if (pushNotification.status === 'skip') {
           const now = moment();
-          const days = now.diff(pushNotification.date, "days");
+          const days = now.diff(pushNotification.date, "minutes");
 
-          if (days => 0) {
+          if (days => 5) {
             askNotification = true;
           } else {
             askNotification = false;
