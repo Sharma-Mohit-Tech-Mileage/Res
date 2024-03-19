@@ -1,20 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Platform,
-  Dimensions,
-  Pressable,
-  ActivityIndicator,
-  Linking
-} from "react-native";
-import {
-  widthPercentageToDP as wp,
-} from "react-native-responsive-screen";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Pressable, ActivityIndicator, Linking } from "react-native";
+import { widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import VersionCheck from 'react-native-version-check';
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
@@ -32,10 +18,7 @@ import { GetApiRequest, UserAuthorized ,GetModemStatusApiRequest } from "../../n
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
-import {
-  getFcmToken,
-  requestUserPermission,
-} from '../../firebase/FirebaseUtils';
+import { getFcmToken, requestUserPermission, notifyPermission } from '../../firebase/FirebaseUtils';
 import { updatePushNotifications, fetchPushNotifications } from '../../redux/actions/ProfileActionSuite';
 import { useSelector, useDispatch } from 'react-redux';
 import { RefreshToken } from '../user/Session';
@@ -302,7 +285,6 @@ const HomeScreen = ({ navigation }) => {
   const checkNotifications = async () => {
     const pushNotification = await getPushNotificationStatus();
     let askNotification = false;
-    console.log('checkNotifications: ', pushNotification);
     if (pushNotification === null) {
       askNotification = true;
     } else {
@@ -313,7 +295,7 @@ const HomeScreen = ({ navigation }) => {
           const now = moment();
           const days = now.diff(pushNotification.date, "days");
 
-          if (days > 15) {
+          if (days => 0) {
             askNotification = true;
           } else {
             askNotification = false;
@@ -321,8 +303,7 @@ const HomeScreen = ({ navigation }) => {
         }
       }
     }
-    //Add logic to check if notifications are turned off
-
+    let optOutCountPushNotification=0;
     if (profile?.pushNotifications?.length > 0) {
         const messageTypes = profile.pushNotifications[0].pushMessageType;
         messageTypes.forEach((messageType) => {
@@ -334,24 +315,34 @@ const HomeScreen = ({ navigation }) => {
           askNotification = false;
         }
     }
-
-    console.log('askNotification: ', askNotification);
-
     if (askNotification) {
       const enabledPermission = await requestUserPermission();
-
       if (enabledPermission) {
           const token = await getFcmToken();
           const data = {
-              accountNumber: user.userInfo.accountNumber,
-              deviceToken: token,
-              deviceTokenTimestamp: moment().format(),
-              optOut: false,
-              outageOptOut: false,
-              billingOptOutStatus: false,
-              userName: user.userInfo.userName,
-              isAndroid: Platform.OS == "android",
-          };
+            accountNumber: user.userInfo.accountNumber,
+            deviceToken: token,
+            deviceTokenTimestamp: moment().format(),
+            optOut: false,
+            outageOptOut: false,
+            billingOptOutStatus: false,
+            userName: user.userInfo.userName,
+            isAndroid: Platform.OS == "android",
+        };
+        if (profile?.pushNotifications?.length > 0) {
+          const messageTypes = profile.pushNotifications[0].pushMessageType;
+          messageTypes.forEach((messageType) => {
+              if (messageType.optOutFlag) {
+                  if (messageType.messageType === 'Appointment') {
+                    data.optOut = messageType.optOutFlag;
+                  } else if (messageType.messageType === 'Outage') {
+                    data.outageOptOut = messageType.optOutFlag;
+                  } else if (messageType.messageType === 'Billing') {
+                    data.billingOptOutStatus = messageType.optOutFlag;
+                  }
+              }
+          });
+      }
           const localData = {
               status: 'accepted',
               date: new Date()

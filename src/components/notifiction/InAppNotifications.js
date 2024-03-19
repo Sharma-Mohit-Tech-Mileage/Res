@@ -9,11 +9,10 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import { updatePushNotificationsv2 } from '../../redux/actions/ProfileActionSuite';
 import moment from 'moment';
 import Toggle from '../common/Toggle';
-import { getFcmToken, requestUserPermission } from '../../firebase/FirebaseUtils';
+import { getFcmToken, notifyPermission } from '../../firebase/FirebaseUtils';
 const InAppNotifications = ({ navigation }) => {
   const [initialize, setInitializeSettings] = useState({});
   const [showErrorAlert, setShowErrorAlert] = useState(false);
-  const [ setGeneratedToken] = useState();
   const route = useRoute(); // Use the useRoute hook
   const additionalData = route.params?.additionalData;
   const dispatch = useDispatch();
@@ -36,7 +35,6 @@ const InAppNotifications = ({ navigation }) => {
   }, [isFocused, additionalData]); // Depend on isFocused and additionalData
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Name: ${name}, Value: ${value}`);
     setInitializeSettings(initialize => {
       const updatedSettings = {
         ...initialize,
@@ -56,14 +54,12 @@ const InAppNotifications = ({ navigation }) => {
   }, [route.params?.updateFailed, navigation, dispatch]);
 
   const handleSave = async () => {  // Mark the function as async
-    const enabledPermission = await requestUserPermission();
-    if (enabledPermission) {
+    const enabledPermission = await notifyPermission();
       const token = await getFcmToken();
       initialize.deviceToken = token;  // Replace 'token' with your actual token variable
       initialize.deviceTokenTimestamp = moment().format();  // Assuming 'moment' is imported and available
       initialize.isAndroid = Platform.OS === "android"
       await dispatch(updatePushNotificationsv2(initialize, navigation));
-    }
 
   }
     return (
@@ -171,7 +167,7 @@ const InAppNotifications = ({ navigation }) => {
     },
     buttonsLayout: {
       paddingHorizontal: 0,
-      width: '100',
+      width: '100%',
       paddingVertical: Padding.p_base,
       justifyContent: "center",
       alignItems: "center",
