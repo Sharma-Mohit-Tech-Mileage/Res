@@ -79,7 +79,7 @@ const PasswordSecurityEdit = () => {
         title="Edit Password & Security"
         onPressBack={() => navigation.navigate('PasswordSecurity')}
       />
-      <ScrollView ref={scrollViewRef}>
+      <ScrollView ref={scrollViewRef} >
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
             <View style={[styles.frameGroup, styles.wrapperSpaceBlock1]}>

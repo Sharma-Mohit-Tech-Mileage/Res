@@ -328,21 +328,23 @@ const HomeScreen = ({ navigation }) => {
             billingOptOutStatus: false,
             userName: user.userInfo.userName,
             isAndroid: Platform.OS == "android",
-        };
-        if (profile?.pushNotifications?.length > 0) {
-          const messageTypes = profile.pushNotifications[0].pushMessageType;
-          messageTypes.forEach((messageType) => {
-              if (messageType.optOutFlag) {
-                  if (messageType.messageType === 'Appointment') {
-                    data.optOut = messageType.optOutFlag;
-                  } else if (messageType.messageType === 'Outage') {
-                    data.outageOptOut = messageType.optOutFlag;
-                  } else if (messageType.messageType === 'Billing') {
-                    data.billingOptOutStatus = messageType.optOutFlag;
-                  }
-              }
-          });
-      }
+          };
+
+          if (profile?.pushNotifications?.length > 0) {
+            const messageTypes = profile.pushNotifications[0].pushMessageType;
+            messageTypes.forEach((messageType) => {
+                if (messageType.optOutFlag) {
+                    if (messageType.messageType === 'Appointment') {
+                      data.optOut = messageType.optOutFlag;
+                    } else if (messageType.messageType === 'Outage') {
+                      data.outageOptOut = messageType.optOutFlag;
+                    } else if (messageType.messageType === 'Billing') {
+                      data.billingOptOutStatus = messageType.optOutFlag;
+                    }
+                }
+            });
+          }
+
           const localData = {
               status: 'accepted',
               date: new Date()
@@ -408,7 +410,7 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     console.log('profile: ', profile);
     checkNotifications();
-  }, [profile]);
+  }, [profile?.pushNotifications?.length>0]);
 
   const changeWalkThroughStep = (step) => {
     console.log("walkThroughStep: ", step);

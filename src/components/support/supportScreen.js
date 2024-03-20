@@ -118,9 +118,7 @@ const Support = ({route}) => {
     
 
     useEffect(() => {
-        console.log('Focus to contact',route.params?.isContactUs)
        if(route.params?.isContactUs){
-        console.log('Focus to contact')
         setTimeout(()=>{
             scrollViewRef.current?.scrollToEnd({animated: true})
         },500)
@@ -216,8 +214,9 @@ const Support = ({route}) => {
                                 </View>
                                 <View style={styles.frameChild}/>
                                 {items.map((item, index) => (
-                                    <React.Fragment key={item.name}>
-                                        <Pressable key={item.key} style={[styles.search, styles.navigationBorder]}
+                                    <React.Fragment key={index}>
+                                        
+                                        <Pressable key={index} style={[styles.search, styles.navigationBorder]}
                                             onPress={() => {
                                                 if (item.iconAlignment === 'left') {
                                                     navigation.navigate(item.navigateTo)

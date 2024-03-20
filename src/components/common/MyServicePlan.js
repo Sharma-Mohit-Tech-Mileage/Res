@@ -200,7 +200,9 @@ const MyServicePlan = ({ plans, navigation }) => {
             <FlatList
               data={plans||[]}
               renderItem={({ item, index }) => (
+                <View key={index}>
                 <PlanDetailsItem item={item} index={index} key={index} />
+                </View>
               )}
               keyExtractor={item => item.id}
               accessible={true}

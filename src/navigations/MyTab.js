@@ -173,7 +173,7 @@ const MyTabs = ({ route, navigation }) => {
         /> */}
 
       <Tab.Screen
-        name="Account"
+        name="account"
         component={AccountStackScreen}
         options={{
           headerShown: false,
