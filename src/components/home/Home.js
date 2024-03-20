@@ -333,7 +333,6 @@ const HomeScreen = ({ navigation }) => {
           if (profile?.pushNotifications?.length > 0) {
             const messageTypes = profile.pushNotifications[0].pushMessageType;
             messageTypes.forEach((messageType) => {
-                if (messageType.optOutFlag) {
                     if (messageType.messageType === 'Appointment') {
                       data.optOut = messageType.optOutFlag;
                     } else if (messageType.messageType === 'Outage') {
@@ -341,7 +340,6 @@ const HomeScreen = ({ navigation }) => {
                     } else if (messageType.messageType === 'Billing') {
                       data.billingOptOutStatus = messageType.optOutFlag;
                     }
-                }
             });
           }
 
@@ -407,10 +405,15 @@ const HomeScreen = ({ navigation }) => {
     fetchData();
 }, [dispatch]);   
 
-  useEffect(() => {
-    console.log('profile: ', profile);
-    checkNotifications();
-  }, [profile?.pushNotifications?.length>0]);
+useEffect(() => {
+  // Check if profile.pushNotifications[0].pushMessageType is not undefined
+  if (profile?.pushNotifications?.[0]?.pushMessageType !== undefined) {
+      console.log('[checkNotificationsEffect] pushMessageType is defined. Executing checkNotifications.');
+      checkNotifications();
+  } else {
+      console.log('[checkNotificationsEffect] pushMessageType is undefined. Skipping checkNotifications.');
+  }
+}, [profile, checkNotifications]); 
 
   const changeWalkThroughStep = (step) => {
     console.log("walkThroughStep: ", step);
