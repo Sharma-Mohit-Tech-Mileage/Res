@@ -293,9 +293,9 @@ const HomeScreen = ({ navigation }) => {
       } else {
         if (pushNotification.status === 'skip') {
           const now = moment();
-          const days = now.diff(pushNotification.date, "minutes");
+          const days = now.diff(pushNotification.date, "days");
 
-          if (days => 5) {
+          if (days => 15) {
             askNotification = true;
           } else {
             askNotification = false;
@@ -903,7 +903,7 @@ const styles = StyleSheet.create({
   },
   modemError1: {
     color: '#000',
-    FontFamily: FontFamily.textXsSemibold,
+    fontFamily: FontFamily.textXsSemibold,
     fontSize: 15,
     fontStyle: "normal",
     fontWeight: "700",
@@ -912,7 +912,7 @@ const styles = StyleSheet.create({
   },
   modemError2: {
     color: Color.colorGray_200,
-    FontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     fontStyle: "normal",
     fontWeight: "400",
@@ -921,7 +921,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },updateNow:{
     color: Color.colorMidnightblue,
-    FontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     fontStyle: "normal",
     fontWeight: "700",
