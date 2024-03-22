@@ -56,6 +56,9 @@ const Notifications = () => {
           )}
         </Text>);
     }
+    else if (profileDetails.svEmailAddress) {
+      infoText = (<Text>Emails are sent to <Text style={styles.text}>{profileDetails.svEmailAddress}</Text></Text>);
+    }
   }
 
   useEffect(() => {

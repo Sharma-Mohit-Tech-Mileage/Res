@@ -74,6 +74,14 @@ const Support = ({route}) => {
             navigateTo: 'searchArticals',
         },
         {
+            key: 'Faqs',
+            text: 'FAQs',
+            icon: require("../../../assets/chevronright.png"),
+            iconAlignment: 'right', // Icon to the left of the text
+            navigateTo: 'ArticalWindowUtility',
+            url: 'https://support.sparklight.com/hc/en-us/articles/18929657224855'
+        },
+        {
             key: 'moreOptions',
             text: 'Billing & Payments',
             icon: require("../../../assets/chevronright.png"),
@@ -114,9 +122,7 @@ const Support = ({route}) => {
     
 
     useEffect(() => {
-        console.log('Focus to contact',route.params?.isContactUs)
        if(route.params?.isContactUs){
-        console.log('Focus to contact')
         setTimeout(()=>{
             scrollViewRef.current?.scrollToEnd({animated: true})
         },500)
@@ -205,9 +211,16 @@ const Support = ({route}) => {
                     <ScrollView style={{ width: '100%', padding: Padding.p_base }} ref={scrollViewRef}>
                         <View style={{ marginBottom: hp('50%') }}>
                             <View style={styles.issuesFlexBox}>
+                            <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
+                                    <Text style={[styles.heading, styles.headingTypo]}>
+                                       Knowledgebase
+                                    </Text>
+                                </View>
+                                <View style={styles.frameChild}/>
                                 {items.map((item, index) => (
-                                    <React.Fragment key={item.name}>
-                                        <Pressable key={item.key} style={[styles.search, styles.navigationBorder]}
+                                    <React.Fragment key={index}>
+                                        
+                                        <Pressable key={index} style={[styles.search, styles.navigationBorder]}
                                             onPress={() => {
                                                 if (item.iconAlignment === 'left') {
                                                     navigation.navigate(item.navigateTo)
@@ -253,7 +266,7 @@ const Support = ({route}) => {
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
                                                         <Text style={[styles.headingTypo]}>
-                                                            Troubleshooting
+                                                        Sparklight Smart Check
                                                         </Text>
                                                         <Image
                                                             style={styles.chevronIconLayout}
@@ -262,7 +275,7 @@ const Support = ({route}) => {
                                                         />
                                                     </View>
                                                     <Text style={[styles.supportingText, styles.supportingTypo1,]} >
-                                                        Explore instant solutions to issues.
+                                                    Automated troubleshooting scan.
                                                     </Text>
                                                 </View>
                                             </View>
@@ -270,7 +283,7 @@ const Support = ({route}) => {
                                     </View>
                                 </Pressable> }
 
-                                <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} >
+                                {/* <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} >
                                     <Pressable
                                         style={[styles.integrationCardMobile1, styles.integrationCardBorder,]}
                                         onPress={() => { navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/18929657224855', name: 'FAQ' }) }}
@@ -302,6 +315,8 @@ const Support = ({route}) => {
                                         </View>
                                     </Pressable>
                                 </View>
+
+                                */}
                                 <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
                                     <Pressable
                                         style={[styles.integrationCardMobile1, styles.integrationCardBorder]}
@@ -371,13 +386,13 @@ const Support = ({route}) => {
                                                         />
                                                     </Pressable>                                                        
                                                 </View>
-                                                <Pressable
+                                                {/* <Pressable
                                                     onPress={() => handlePressOpenButton("1500003304301", ['Residential', 'Sales', 'ContactUs'])}
                                                     accessibilityLabel="Chat Support"
                                                     accessibilityRole="button"
                                                     accessibilityHint="Chat with Tech Support">
                                                     <Text>Chat With Us</Text>
-                                                </Pressable>                                                 
+                                                </Pressable>                                                  */}
                                                 <Pressable onPress={() => makeCall('877-692-2253')}>
                                                     <View style={styles.supportingTextWrapper}>
                                                         <Text style={[styles.supportingText4, styles.support1Typo,]}>
@@ -427,7 +442,7 @@ const Support = ({route}) => {
                                                             />
                                                         </Pressable>
                                                     </View>
-                                                    <Pressable
+                                                    {/* <Pressable
                                                         onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
                                                         accessibilityLabel="Chat Support"
                                                         accessibilityRole="button"
@@ -435,7 +450,7 @@ const Support = ({route}) => {
                                                         <View style={styles.supportChatText}>
                                                             <Text style={[styles.supportingText4]}>Chat With Us</Text>                                                            
                                                         </View>                                                     
-                                                    </Pressable>                                                    
+                                                    </Pressable>                                                     */}
                                                     <Pressable onPress={() => makeCall('877-692-2253')}>
                                                         <View style={styles.supportingTextWrapper}>
                                                             <Text style={[styles.supportingText4, styles.support1Typo,]}>

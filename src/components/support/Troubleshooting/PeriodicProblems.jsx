@@ -24,16 +24,39 @@ import RightArrow from "../../../res/svgIcons/RightArrow";
 import SettingsIcon from "../../../res/svgIcons/SettingsIcon";
 import WifiIssueIcon from "../../../res/svgIcons/WifiIssueIcon";
 import RefreshIcon from "../../../res/svgIcons/RefreshIcon";
+import { GetApiRequest } from "../../../network/APIClient";
+import { getUser } from "../../../redux/utils/LocalStorage";
 const PeriodicProblems = ({route}) => {
   console.log('Intermi',JSON.stringify(route))
   const navigation = useNavigation();
-
+  const [manufacturer, setManufacturer] = React.useState("");
   const instructions1 = [
     "Intermittent dropouts can be caused by various factors.Check for damaged cables or outdated firmware on your modem.",
     "Sometimes a device itself may be experiencing problems.Verify if it is a specific device or if all devices have issues.",
     "Proximity to other wireless networks, such as in apartments, can also cause intermittent issues.",
   ];
 
+  React.useEffect(()=>{
+    getModemDetails();
+  },[])
+
+  const getModemDetails = () => {
+    let re = getUser().then((res) => {
+      const request = `internet/api/internet/${res.userInfo.accountNumber}/modem`;
+      GetApiRequest(request, onSuccess, onError);
+    });
+  };
+
+  const onSuccess = (res) => {
+    console.log("getModemDetails", res);
+    if (res) {
+      setManufacturer(res.manufacturer);
+     
+    }
+  };
+  const onError = (error) => {
+    console.log("error", error);
+  };
   const renderInstruction = (instruction, index) => (
     <View key={index} style={styles.instructionContainer}>
       <View style={styles.bulletPoint} />
@@ -66,6 +89,7 @@ const PeriodicProblems = ({route}) => {
             {instructions1.map(renderInstruction)}
             <View style={{ paddingTop: 32 }}>
               <View style={styles.borderSec} />
+              {manufacturer != "Calix" && (
               <TouchableOpacity
                 style={styles.pressableStyle}
                 onPress={() => {
@@ -81,7 +105,9 @@ const PeriodicProblems = ({route}) => {
                 </View>
                 <RightArrow />
               </TouchableOpacity>
+              )}
               <View style={styles.borderSec} />
+              
 
               <TouchableOpacity
                 style={styles.pressableStyle}

@@ -270,11 +270,13 @@ const ManageEquipment = ({route}) => {
                           style={{ width: 40 }}
                         />
                       )}
+                      {leased.length>0 && (
                       <View style={[styles.badge, styles.parentBorder]}>
                         <Text style={[styles.text, styles.textTypo1]}>
-                          {"leased".toLocaleUpperCase()}
+                          {leased.toLocaleUpperCase()}
                         </Text>
                       </View>
+                         )}
                     </View>
                   </View>
                 </View>
