@@ -316,51 +316,70 @@ const HomeScreen = ({ navigation }) => {
         }
       }
     }
-    //Add logic to check if notifications are turned off
 
-    if (profile?.pushNotifications?.length > 0) {
-        const messageTypes = profile.pushNotifications[0].pushMessageType;
-        messageTypes.forEach((messageType) => {
+    if (askNotification) {
+      let optOut = false;
+      let outageOptOut = false;
+      let billingOptOutStatus = false;
+
+      let enabledNotification = false;
+
+      if (profile?.pushNotifications?.length > 0) {
+          let optOutCountPushNotification = 0;
+          enabledNotification = true;
+          const messageTypes = profile.pushNotifications[0].pushMessageType;
+          messageTypes.forEach((messageType) => {
+            switch(messageType.messageTyp) {
+              case 'Appointment':
+                optOut = messageType.optOutFlag;
+                break;
+              case 'Outage':
+                outageOptOut = messageType.optOutFlag;
+                break;
+              case 'Billing':
+                billingOptOutStatus = messageType.optOutFlag;
+                break;
+            }
             if (messageType.optOutFlag) {
                 optOutCountPushNotification += 1;
             }
-        });
-        if (optOutCountPushNotification > 2) {
-          askNotification = false;
-        }
-    }
+          });
 
-    console.log('askNotification: ', askNotification);
+          if (optOutCountPushNotification > 2) {
+            enabledNotification = false;
+          }
+      }
 
-    if (askNotification) {
-      const enabledPermission = await requestUserPermission();
+      if (enabledNotification) {                                                          
+        const enabledPermission = await requestUserPermission();
 
-      if (enabledPermission) {
-          const token = await getFcmToken();
-          const data = {
-              accountNumber: user.userInfo.accountNumber,
-              deviceToken: token,
-              deviceTokenTimestamp: moment().format(),
-              optOut: false,
-              outageOptOut: false,
-              billingOptOutStatus: false,
-              userName: user.userInfo.userName,
-              isAndroid: Platform.OS == "android",
-          };
+        if (enabledPermission) {
+            const token = await getFcmToken();
+            const data = {
+                accountNumber: user.userInfo.accountNumber,
+                deviceToken: token,
+                deviceTokenTimestamp: moment().format(),
+                optOut: optOut,
+                outageOptOut: outageOptOut,
+                billingOptOutStatus: billingOptOutStatus,
+                userName: user.userInfo.userName,
+                isAndroid: Platform.OS == "android",
+            };
+            const localData = {
+                status: 'accepted',
+                date: new Date()
+            };            
+            await notifee.requestPermission();
+            storePushNotificationStatus(localData);
+            await dispatch(updatePushNotifications(data, null));
+        } else {
           const localData = {
-              status: 'accepted',
-              date: new Date()
+            status: 'skip',
+            date: new Date(),
+            permanentSkip: true
           };            
-          await notifee.requestPermission();
-          storePushNotificationStatus(localData);
-          await dispatch(updatePushNotifications(data, null));
-      } else {
-        const localData = {
-          status: 'skip',
-          date: new Date(),
-          permanentSkip: true
-        };            
-        storePushNotificationStatus(localData);        
+          storePushNotificationStatus(localData);        
+        }
       }
     }
   };

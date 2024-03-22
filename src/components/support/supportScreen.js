@@ -11,6 +11,10 @@ import {
     heightPercentageToDP as hp,
   } from "react-native-responsive-screen";
 
+import { Env } from "../../network/apis/account/Constants";
+
+ZendeskChat.init(Env.ZENDESK_CHAT_KEY);  
+
 const Support = ({route}) => {
     console.log('Back to Support',JSON.stringify(route))
     const navigation = useNavigation();
@@ -139,6 +143,8 @@ const Support = ({route}) => {
             phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
         };
 
+        tags.push('pid:_' + userData.userInfo.accountNumber);
+
         // On button press, when you want to show chat:
         ZendeskChat.startChat({
             name: user.full_name,
@@ -157,8 +163,6 @@ const Support = ({route}) => {
             preChatFormOptions: {
                 name: "optional",
                 email: "optional",
-                phone: "optional",
-                department: "required",
             },
             messagingOptions: {
                 botName: 'Sparklight',
