@@ -14,14 +14,13 @@ import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
 import { getUser, getPushNotificationStatus, storePushNotificationStatus, storeUpgradeToken } from "../../redux/utils/LocalStorage";
-import { GetApiRequest, UserAuthorized ,GetModemStatusApiRequest } from "../../network/APIClient";
+import { GetApiRequest ,GetModemStatusApiRequest } from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import { getFcmToken, requestUserPermission, notifyPermission } from '../../firebase/FirebaseUtils';
 import { updatePushNotifications, fetchPushNotifications } from '../../redux/actions/ProfileActionSuite';
 import { useSelector, useDispatch } from 'react-redux';
-import { RefreshToken } from '../user/Session';
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from '../../network/apis/account/Constants';
 import notifee from '@notifee/react-native'
@@ -29,10 +28,6 @@ const tabWidth = Number(Dimensions.get('window').width/4);
 
 
 const HomeScreen = ({ navigation }) => {
-  // const { email, name } = {
-  //   email: route.params.data.params.email,
-  //   name: route.params.data.params.name,
-  // };
   const [isInternetDetails, setIsInternetDetails] = useState(false);
   const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector(state => state.combinedReducers.home);
@@ -51,20 +46,12 @@ const HomeScreen = ({ navigation }) => {
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths,setInternetHealths]= useState([])
-  const [isAppNewUpdate,setIsAppNewUpdate]=useState(false)
-  const [storeUrl,setStoreUrl]=useState('')
+  const [isAppNewUpdate,setIsAppNewUpdate]=useState(false);
 
   const getInternetHealth = (type) => {
-    var currentHealth = {
-      Offline: 20,
-      Poor: 50,
-      Optimal: 80,
-      default: 80,
-    };
+    var currentHealth = { Offline: 20,Poor: 50, Optimal: 80, default: 80};
     return currentHealth[type] || currentHealth["default"];
   };
-
-  
 
   const getInternetPlanDetails = () => {
      getUser().then((res) => {
@@ -151,10 +138,6 @@ const HomeScreen = ({ navigation }) => {
   const onError = (error) => {
     console.log("error", error);
   };
-
-  /**
-   * get modem details
-   */
 
   const checkModemDetails = (macAddress) => {
     const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
@@ -295,7 +278,7 @@ const HomeScreen = ({ navigation }) => {
           const now = moment();
           const days = now.diff(pushNotification.date, "days");
 
-          if (days => 15) {
+          if (days >= 15) {
             askNotification = true;
           } else {
             askNotification = false;
@@ -372,7 +355,6 @@ const HomeScreen = ({ navigation }) => {
   };
 
   useEffect(()=>{
-    console.log('Health count',internetHealths)
     if(internetHealths.length>=3){
       setCheckModemStatus(true)
       refreshInternetHealth()
@@ -385,7 +367,6 @@ const HomeScreen = ({ navigation }) => {
     getUserAccountDetails();
 
     const fetchData = async () => {
-      console.log('FetchData: ');
       try {
         const result = await getUpgradeToken();
         console.log('getUpgradeTokenResult: ', JSON.stringify(result));
@@ -397,26 +378,22 @@ const HomeScreen = ({ navigation }) => {
         setShowWalkThrough(true);
       }
     };
-
     fetchData();    
-    checkAppUpdate();
-    
+    checkAppUpdate(); 
   }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-        try {
-            dispatch(fetchPushNotifications());
-        } catch (error) {
-            console.error("Error fetching data", error);
-        }
+      try {
+        dispatch(fetchPushNotifications());
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
     };
-
     fetchData();
 }, [dispatch]);   
 
 useEffect(() => {
-  // Check if profile.pushNotifications[0].pushMessageType is not undefined
   if (profile?.pushNotifications?.[0]?.pushMessageType !== undefined) {
       console.log('[checkNotificationsEffect] pushMessageType is defined. Executing checkNotifications.');
       checkNotifications();
@@ -426,7 +403,6 @@ useEffect(() => {
 }, [profile, checkNotifications]); 
 
   const changeWalkThroughStep = (step) => {
-    console.log("walkThroughStep: ", step);
     if (step > 2) {
       dispatch(updateWalkThroughStep(null));
       setShowWalkThrough(false);
@@ -437,12 +413,9 @@ useEffect(() => {
   };
 
   const checkAppUpdate=()=>{
-
  let currentVersion=VersionCheck.getCurrentVersion();
-    VersionCheck.getLatestVersion()    // Automatically choose profer provider using `Platform.select` by device platform.
+    VersionCheck.getLatestVersion() 
   .then(latestVersion => {
-    console.log('Latest version',latestVersion);
-    console.log('Current version',currentVersion); 
     if(Platform.OS==='android')  {
       VersionCheck.needUpdate().then(res => {
         setIsAppNewUpdate(res.isNeeded)
