@@ -1,60 +1,31 @@
 
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Image,
-  StyleSheet,
-  Text,
-  ActivityIndicator,
-  Linking,
-  TouchableOpacity,
-  Modal,
-  Alert,
-  Button,
-} from "react-native";
+import {View,Image,StyleSheet,Text,ActivityIndicator,Linking,TouchableOpacity,Modal} from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
-import {  saveUserInfo } from "../../redux/actions/UserAction";
+import { saveUserInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
-
+import {widthPercentageToDP as wp,heightPercentageToDP as hp,} from "react-native-responsive-screen";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
-
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
-import { getUser,cleanUserData } from "../../redux/utils/LocalStorage";
+import { getUser, cleanUserData } from "../../redux/utils/LocalStorage";
 import { SetRenewTokenTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
-import { Env,  ISUAT } from "../../network/apis/account/Constants";
+import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from 'react-native-version-check';
 import ZendeskChat from "react-native-zendesk-chat";
-import messaging from '@react-native-firebase/messaging';
-import {
-  requestUserPermission,
-} from '../../firebase/FirebaseUtils';
-import notifee from '@notifee/react-native';
-
 const config = {
   issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
-  redirectUrl:
-    "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
+  redirectUrl: "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
   scopes: ["openid", "profile", "email", "phone", "address"],
   iosPrefersEphemeralSession: true,
-  //additionalParameters: { prompt: "login" },
 };
-
-// Once in your application:
-//4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC
-//84AFF64rwYVgQS35EsTakO03d98WTdJb
-ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
-
+//ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -69,13 +40,10 @@ const SplashScreen = ({ navigation }) => {
     setLoading(true);
     PostAuthApiRequest("/mobile/api/gettoken", request, onSuccess, onError);
   };
-  
-  const onSuccess = async (res) => {
-    setLoading(false);   
-    handleLogin(res)
-  };
 
- const handleLogin = async (res) => {
+  const onSuccess = async (res) => {setLoading(false);handleLogin(res)};
+
+  const handleLogin = async (res) => {
     if (res) {
       let token = res.jwtToken;
       let userInfo = res.userInfo;
@@ -85,122 +53,111 @@ const SplashScreen = ({ navigation }) => {
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken
       };
-
-      if (res.userInfo.acctStatus === 'Disconnect'){
-        setTimeout(()=>{
-          setDisconnected(true)
-        },500)
+      if (res.userInfo.acctStatus === 'Disconnect') {
+        setTimeout(() => {setDisconnected(true)}, 500)
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
         setErrorMessage(strings.nonAdminUserMsg);
         setErrorMessage1(' to view information.')
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
-      } else if(userInfo.customerType === 'Business'){
+        setTimeout(() => {setModalVisible(true)}, 100);
+      } else if (userInfo.customerType === 'Business') {
         setErrorMessage(strings.BusinessUserMsg);
         setErrorMessage1(' to view information.')
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
-
-      }else if (res.custServices.internet == false) {
+        setTimeout(() => {setModalVisible(true);}, 100);
+      } else if (res.custServices.internet == false) {
         setErrorMessage(strings.nonInternetUserMessage);
         setErrorMessage1(' to manage your service.')
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
+        setTimeout(() => {setModalVisible(true);}, 100);
       } else {
         storeUser(user);
         dispatch(saveUserInfo(user));
         SetRenewTokenTimer();
-
         if (user.userInfo.mobileTCAcceptanceFlag) {
           navigation.reset({
             index: 0,
-            routes: [{ name: 'MyTab' }], // Navigate to 'MyTab' after reset
+            routes: [{ name: 'MyTab' }], 
           });
         } else {
           navigation.reset({
             index: 0,
-            routes: [{ name: 'Terms' }], // Navigate to 'MyTab' after reset
+            routes: [{ name: 'Terms' }],
           });
         }
-      }         
+      }
     }
   }
-
-  const logoutAction = () => {
+  const logoutAction = (postLogoutCallback) => {
     getSsoToken().then((res) => {
-      console.log('token', res)
-      let token = res.idToken;
+      const token = res.idToken;
       logout(config, {
         idToken: token,
-        postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
-      }).then((result) => {
+        postLogoutRedirectUrl: config.redirectUrl,
+      }).then(() => {
         storeUser({});
         storeSsoToken({});
         saveUserInfo({});
         cleanUserData();
-        console.log(result)
+        if (postLogoutCallback) {
+          postLogoutCallback(); // Execute the callback after logout
+        }
+      }).catch((error) => {
+        console.error("Logout error:", error);
+        if (postLogoutCallback) {
+          postLogoutCallback(); // Even on error, execute the callback
+        }
       });
+    }).catch((error) => {
+      console.error("Error getting SSO token:", error);
+      if (postLogoutCallback) {
+        postLogoutCallback(); // Even on error, execute the callback
+      }
     });
-  }
+  };
+  
+  // const logoutAction = () => {
+  //   getSsoToken().then((res) => {
+  //     console.log('token', res)
+  //     let token = res.idToken;
+  //     logout(config, {
+  //       idToken: token,
+  //       postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
+  //     }).then((result) => {
+  //       storeUser({});
+  //       storeSsoToken({});
+  //       saveUserInfo({});
+  //       cleanUserData();
+  //       console.log(result)
+  //     });
+  //   });
+  // }
   const onError = (error) => {
-    console.log(" callSSOLoginApi error", error);
     setLoading(false);
-    setTimeout(()=>{
-      setDisconnected(true)
-    },500)
-   
+    setTimeout(() => { setDisconnected(true)}, 500)
   };
 
-  const CustomAlertModal = ({ visible, message,message2, onClose }) => {
+  const CustomAlertModal = ({ visible, message, message2, onClose }) => {
     return (
       <Modal
         visible={visible}
         transparent
         animationType="fade"
-        onRequestClose={onClose}
-      >
+        onRequestClose={onClose}>
         <View style={styles.overlay}>
           <View style={styles.alertContainer}>
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
               <View style={{ flexDirection: "row", alignSelf: "flex-start" }}>
                 <AlertIcon />
-                <Text
-                  style={styles.alertTitle}
-                >
-                  {" "}
-                  Access Denied
+                <Text style={styles.alertTitle}>
+                  {" Access Denied"}
                 </Text>
               </View>
-              
             </View>
-            <View
-              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
-            />
+            <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}/>
             <Text style={styles.message}>{message}
-            <Text style={[styles.message,{fontWeight:600,color:colors.sparklight_purple_blue}]} onPress={()=>{
-              Linking.openURL(Env.URL);
-            }}> login to your online account</Text>
-            {message2}
-            </Text>
-            {/* <TouchableOpacity
-              style={styles.openBtn}
-              onPress={() => {
-                Linking.openURL("https://customer.uat.sparklight.com/SecureLogin/login.aspx");
-
-              }}
-            >
-              <Text
-                style={styles.openPortaltxt}
-              >
-                Open Portal
+              <Text style={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue }]} onPress={onClose}>
+                login to your online account
               </Text>
-            </TouchableOpacity> */}
-
+              {message2}
+            </Text>
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={onClose}
@@ -216,25 +173,70 @@ const SplashScreen = ({ navigation }) => {
       </Modal>
     );
   };
-
+  
   const handleCloseAlert = () => {
     setModalVisible(false);
-    logoutAction();
+    logoutAction(() => {
+      Linking.openURL(Env.URL); // Open the login web portal after logging out.
+    });
   };
+  
+
+  // const CustomAlertModal = ({ visible, message, message2, onClose }) => {
+  //   return (
+  //     <Modal
+  //       visible={visible}
+  //       transparent
+  //       animationType="fade"
+  //       onRequestClose={onClose}>
+  //       <View style={styles.overlay}>
+  //         <View style={styles.alertContainer}>
+  //           <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+  //             <View style={{ flexDirection: "row", alignSelf: "flex-start" }}>
+  //               <AlertIcon />
+  //               <Text style={styles.alertTitle}>
+  //                 {" Access Denied"}
+  //               </Text>
+  //             </View>
+  //           </View>
+  //           <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}/>
+  //           <Text style={styles.message}>{message}
+  //             <Text style={[styles.message, { fontWeight: 600, color: colors.sparklight_purple_blue }]} onPress={() => {
+  //               Linking.openURL(Env.URL);
+  //             }}> login to your online account</Text>
+  //             {message2}
+  //           </Text>
+  //           <TouchableOpacity
+  //             style={styles.closeBtn}
+  //             onPress={onClose}
+  //           >
+  //             <Text
+  //               style={styles.closeAlertTxt}
+  //             >
+  //               Close
+  //             </Text>
+  //           </TouchableOpacity>
+  //         </View>
+  //       </View>
+  //     </Modal>
+  //   );
+  // };
+
+  // const handleCloseAlert = () => {
+  //   setModalVisible(false);
+  //   logoutAction();
+  // };
 
   const loginAuth = async () => {
     try {
       const result = await authorize(config);
-
-      console.log('loginAuthResult: ', result);
-
-      const data = { 
+      const data = {
         idToken: result.idToken,
         accessToken: result.accessToken,
         idTokenGuid: result.authorizeAdditionalParameters.session_state,
         refreshToken: result.refreshToken
       };
-      
+
       setLoading(true);
       storeSsoToken(data);
       callSSOLoginApi(data);
@@ -247,27 +249,19 @@ const SplashScreen = ({ navigation }) => {
     const fetchData = async () => {
       try {
         const user = await getUser();
-        console.log('SplashScreen getUser: ', user);
-  
-        if (user !== null 
-            && user !== undefined
-            && user.refreshToken !== undefined
-            && user.refreshToken !== null) {
+        if (user?.refreshToken != null) {
           const result = await refresh(config, {
             refreshToken: user.refreshToken,
           });
-
-          //console.log('result: ', JSON.stringify(result));
-
-          const data = { 
+          const data = {
             idToken: result.idToken,
             accessToken: result.accessToken,
             idTokenGuid: result.additionalParameters.session_state,
             refreshToken: result.refreshToken
           };
-    
+
           setLoading(true);
-          storeSsoToken(data);          
+          storeSsoToken(data);
           callSSOLoginApi(data);
         }
       } catch (error) {
@@ -286,7 +280,6 @@ const SplashScreen = ({ navigation }) => {
       style={styles.container}
     >
       <View style={styles.splashContainer}>
-        {/* Your centered logo */}
         {loading ? <ActivityIndicator size="large" color={"white"} /> : <></>}
         <Image
           resizeMode="contain"
@@ -301,37 +294,37 @@ const SplashScreen = ({ navigation }) => {
             <TouchableOpacity
               style={styles.SSoBtnContainer}
               onPress={() => {
-                if(loginEnable){
+                if (loginEnable) {
                   setLoginEnable(false)
-                   loginAuth();
-                   setTimeout(()=>{
+                  loginAuth();
+                  setTimeout(() => {
                     setLoginEnable(true)
-                   },1500)
+                  }, 1500)
                 }
               }}
             >
               <Text style={styles.SSoBtn}>Login</Text>
-            </TouchableOpacity>        
+            </TouchableOpacity>
           </>
         )
       }
-      <Text style={{color: 'white',alignSelf:'center', marginTop:45, fontSize:16}}> {(ISUAT)? 'UAT':''} Version:{VersionCheck.getCurrentVersion()}</Text>
+      <Text style={{ color: 'white', alignSelf: 'center', marginTop: 45, fontSize: 16 }}> {(ISUAT) ? 'UAT' : ''} Version:{VersionCheck.getCurrentVersion()}</Text>
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
         message2={errorMessage1}
         onClose={handleCloseAlert}
-      />   
+      />
       <CustomerDisconnectPage
-      visible={disconnected}
-      onLogin={()=>{
-        setDisconnected(false)
-        loginAuth();
-      }}
-      onClose={()=>{
-        setDisconnected(false)
-        logoutAction();
-      }}
+        visible={disconnected}
+        onLogin={() => {
+          setDisconnected(false)
+          loginAuth();
+        }}
+        onClose={() => {
+          setDisconnected(false)
+          logoutAction();
+        }}
       />
     </LinearGradient>
   );
@@ -347,12 +340,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     color: Color.colorGray_100,
-  },  
+  },
   splashContainer: {
     marginTop: hp('20%'),
     justifyContent: "center",
     alignItems: "center",
-    // Customize your splash screen background color
   },
   logo: {
     width: 320,
@@ -372,7 +364,7 @@ const styles = StyleSheet.create({
   },
   SSoBtn: {
     color: colors.darkest_grey,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
     padding: 16,
     fontSize: 16,
@@ -399,11 +391,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "black",
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
   },
   message: {
     color: colors.darkest_grey,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 28,
@@ -424,39 +416,39 @@ const styles = StyleSheet.create({
     height: 50,
     width: "45%",
     marginTop: 20,
-  },alertTitle:
+  }, alertTitle:
   {
     color: colors.sparklight_grey,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontSize: 22,
     fontWeight: "400",
     marginLeft: 5,
-  },openBtn:
+  }, openBtn:
   {
     backgroundColor: colors.sparklight_purple_blue,
     justifyContent: "center",
     width: "100%",
     marginTop: 20,
-  },closeBtn:
+  }, closeBtn:
   {
     backgroundColor: colors.backgound_blue,
     justifyContent: "center",
     width: "100%",
     marginTop: 15,
-  },openPortaltxt:
+  }, openPortaltxt:
   {
     color: colors.snow_white,
     textAlign: "center",
     padding: 8,
     fontSize: 16,
-    fontFamily:FontFamily.openSansRegular,
-  },closeAlertTxt:
+    fontFamily: FontFamily.openSansRegular,
+  }, closeAlertTxt:
   {
     color: colors.sparklight_purple_blue,
     textAlign: "center",
     padding: 8,
     fontSize: 16,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
   }
 });
 

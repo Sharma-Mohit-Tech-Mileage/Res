@@ -11,6 +11,10 @@ import {
     heightPercentageToDP as hp,
   } from "react-native-responsive-screen";
 
+import { Env } from "../../network/apis/account/Constants";
+
+ZendeskChat.init(Env.ZENDESK_CHAT_KEY);  
+
 const Support = ({route}) => {
     console.log('Back to Support',JSON.stringify(route))
     const navigation = useNavigation();
@@ -118,9 +122,7 @@ const Support = ({route}) => {
     
 
     useEffect(() => {
-        console.log('Focus to contact',route.params?.isContactUs)
        if(route.params?.isContactUs){
-        console.log('Focus to contact')
         setTimeout(()=>{
             scrollViewRef.current?.scrollToEnd({animated: true})
         },500)
@@ -147,6 +149,8 @@ const Support = ({route}) => {
             phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
         };
 
+        tags.push('pid:_' + userData.userInfo.accountNumber);
+
         // On button press, when you want to show chat:
         ZendeskChat.startChat({
             name: user.full_name,
@@ -165,8 +169,6 @@ const Support = ({route}) => {
             preChatFormOptions: {
                 name: "optional",
                 email: "optional",
-                phone: "optional",
-                department: "required",
             },
             messagingOptions: {
                 botName: 'Sparklight',
@@ -216,8 +218,9 @@ const Support = ({route}) => {
                                 </View>
                                 <View style={styles.frameChild}/>
                                 {items.map((item, index) => (
-                                    <React.Fragment key={item.name}>
-                                        <Pressable key={item.key} style={[styles.search, styles.navigationBorder]}
+                                    <React.Fragment key={index}>
+                                        
+                                        <Pressable key={index} style={[styles.search, styles.navigationBorder]}
                                             onPress={() => {
                                                 if (item.iconAlignment === 'left') {
                                                     navigation.navigate(item.navigateTo)
@@ -383,13 +386,15 @@ const Support = ({route}) => {
                                                         />
                                                     </Pressable>                                                        
                                                 </View>
-                                                {/* <Pressable
+                                                <Pressable
                                                     onPress={() => handlePressOpenButton("1500003304301", ['Residential', 'Sales', 'ContactUs'])}
                                                     accessibilityLabel="Chat Support"
                                                     accessibilityRole="button"
                                                     accessibilityHint="Chat with Tech Support">
-                                                    <Text>Chat With Us</Text>
-                                                </Pressable>                                                  */}
+                                                    <View style={styles.supportChatText}>
+                                                        <Text style={[styles.supportingText4]}>Chat With Us</Text>                                                            
+                                                    </View>    
+                                                </Pressable>
                                                 <Pressable onPress={() => makeCall('877-692-2253')}>
                                                     <View style={styles.supportingTextWrapper}>
                                                         <Text style={[styles.supportingText4, styles.support1Typo,]}>
@@ -439,7 +444,7 @@ const Support = ({route}) => {
                                                             />
                                                         </Pressable>
                                                     </View>
-                                                    {/* <Pressable
+                                                    <Pressable
                                                         onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
                                                         accessibilityLabel="Chat Support"
                                                         accessibilityRole="button"
@@ -447,7 +452,7 @@ const Support = ({route}) => {
                                                         <View style={styles.supportChatText}>
                                                             <Text style={[styles.supportingText4]}>Chat With Us</Text>                                                            
                                                         </View>                                                     
-                                                    </Pressable>                                                     */}
+                                                    </Pressable>
                                                     <Pressable onPress={() => makeCall('877-692-2253')}>
                                                         <View style={styles.supportingTextWrapper}>
                                                             <Text style={[styles.supportingText4, styles.support1Typo,]}>
@@ -722,6 +727,10 @@ const styles = StyleSheet.create({
         marginTop: 24,
         alignSelf: "stretch",
         alignItems: "center",
+    },
+    supportChatText: {
+        paddingTop: 5,
+        paddingBottom: 5,
     },
     supportingText4: {
         lineHeight: 20,

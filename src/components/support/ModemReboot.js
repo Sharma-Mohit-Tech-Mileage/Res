@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   },
   modemError1: {
     color: "#000000",
-    FontFamily: FontFamily.textXsSemibold,
+    fontFamily: FontFamily.textXsSemibold,
     fontSize: 15,
     fontStyle: "normal",
     fontWeight: "700",
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   },
   modemError2: {
     color: Color.colorGray_200,
-    FontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     fontStyle: "normal",
     fontWeight: "400",

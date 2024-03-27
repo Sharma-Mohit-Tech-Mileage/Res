@@ -1,20 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Platform,
-  Dimensions,
-  Pressable,
-  ActivityIndicator,
-  Linking
-} from "react-native";
-import {
-  widthPercentageToDP as wp,
-} from "react-native-responsive-screen";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Pressable, ActivityIndicator, Linking } from "react-native";
+import { widthPercentageToDP as wp, } from "react-native-responsive-screen";
 import VersionCheck from 'react-native-version-check';
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
@@ -28,17 +14,13 @@ import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
 import { getUser, getPushNotificationStatus, storePushNotificationStatus, storeUpgradeToken } from "../../redux/utils/LocalStorage";
-import { GetApiRequest, UserAuthorized ,GetModemStatusApiRequest } from "../../network/APIClient";
+import { GetApiRequest ,GetModemStatusApiRequest } from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
-import {
-  getFcmToken,
-  requestUserPermission,
-} from '../../firebase/FirebaseUtils';
+import { getFcmToken, requestUserPermission, notifyPermission } from '../../firebase/FirebaseUtils';
 import { updatePushNotifications, fetchPushNotifications } from '../../redux/actions/ProfileActionSuite';
 import { useSelector, useDispatch } from 'react-redux';
-import { RefreshToken } from '../user/Session';
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from '../../network/apis/account/Constants';
 import notifee from '@notifee/react-native'
@@ -46,10 +28,6 @@ const tabWidth = Number(Dimensions.get('window').width/4);
 
 
 const HomeScreen = ({ navigation }) => {
-  // const { email, name } = {
-  //   email: route.params.data.params.email,
-  //   name: route.params.data.params.name,
-  // };
   const [isInternetDetails, setIsInternetDetails] = useState(false);
   const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector(state => state.combinedReducers.home);
@@ -68,20 +46,12 @@ const HomeScreen = ({ navigation }) => {
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths,setInternetHealths]= useState([])
-  const [isAppNewUpdate,setIsAppNewUpdate]=useState(false)
-  const [storeUrl,setStoreUrl]=useState('')
+  const [isAppNewUpdate,setIsAppNewUpdate]=useState(false);
 
   const getInternetHealth = (type) => {
-    var currentHealth = {
-      Offline: 20,
-      Poor: 50,
-      Optimal: 80,
-      default: 80,
-    };
+    var currentHealth = { Offline: 20,Poor: 50, Optimal: 80, default: 80};
     return currentHealth[type] || currentHealth["default"];
   };
-
-  
 
   const getInternetPlanDetails = () => {
      getUser().then((res) => {
@@ -168,10 +138,6 @@ const HomeScreen = ({ navigation }) => {
   const onError = (error) => {
     console.log("error", error);
   };
-
-  /**
-   * get modem details
-   */
 
   const checkModemDetails = (macAddress) => {
     const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
@@ -302,7 +268,6 @@ const HomeScreen = ({ navigation }) => {
   const checkNotifications = async () => {
     const pushNotification = await getPushNotificationStatus();
     let askNotification = false;
-    console.log('checkNotifications: ', pushNotification);
     if (pushNotification === null) {
       askNotification = true;
     } else {
@@ -313,7 +278,7 @@ const HomeScreen = ({ navigation }) => {
           const now = moment();
           const days = now.diff(pushNotification.date, "days");
 
-          if (days > 15) {
+          if (days >= 15) {
             askNotification = true;
           } else {
             askNotification = false;
@@ -321,57 +286,75 @@ const HomeScreen = ({ navigation }) => {
         }
       }
     }
-    //Add logic to check if notifications are turned off
 
-    if (profile?.pushNotifications?.length > 0) {
-        const messageTypes = profile.pushNotifications[0].pushMessageType;
-        messageTypes.forEach((messageType) => {
+    if (askNotification) {
+      let optOut = false;
+      let outageOptOut = false;
+      let billingOptOutStatus = false;
+
+      let enabledNotification = false;
+
+      if (profile?.pushNotifications?.length > 0) {
+          let optOutCountPushNotification = 0;
+          enabledNotification = true;
+          const messageTypes = profile.pushNotifications[0].pushMessageType;
+          messageTypes.forEach((messageType) => {
+            switch(messageType.messageTyp) {
+              case 'Appointment':
+                optOut = messageType.optOutFlag;
+                break;
+              case 'Outage':
+                outageOptOut = messageType.optOutFlag;
+                break;
+              case 'Billing':
+                billingOptOutStatus = messageType.optOutFlag;
+                break;
+            }
             if (messageType.optOutFlag) {
                 optOutCountPushNotification += 1;
             }
-        });
-        if (optOutCountPushNotification > 2) {
-          askNotification = false;
-        }
-    }
+          });
 
-    console.log('askNotification: ', askNotification);
+          if (optOutCountPushNotification > 2) {
+            enabledNotification = false;
+          }
+      }
 
-    if (askNotification) {
-      const enabledPermission = await requestUserPermission();
+      if (enabledNotification) {                                                          
+        const enabledPermission = await requestUserPermission();
 
-      if (enabledPermission) {
-          const token = await getFcmToken();
-          const data = {
-              accountNumber: user.userInfo.accountNumber,
-              deviceToken: token,
-              deviceTokenTimestamp: moment().format(),
-              optOut: false,
-              outageOptOut: false,
-              billingOptOutStatus: false,
-              userName: user.userInfo.userName,
-              isAndroid: Platform.OS == "android",
-          };
+        if (enabledPermission) {
+            const token = await getFcmToken();
+            const data = {
+                accountNumber: user.userInfo.accountNumber,
+                deviceToken: token,
+                deviceTokenTimestamp: moment().format(),
+                optOut: optOut,
+                outageOptOut: outageOptOut,
+                billingOptOutStatus: billingOptOutStatus,
+                userName: user.userInfo.userName,
+                isAndroid: Platform.OS == "android",
+            };
+            const localData = {
+                status: 'accepted',
+                date: new Date()
+            };            
+            await notifee.requestPermission();
+            storePushNotificationStatus(localData);
+            await dispatch(updatePushNotifications(data, null));
+        } else {
           const localData = {
-              status: 'accepted',
-              date: new Date()
+            status: 'skip',
+            date: new Date(),
+            permanentSkip: true
           };            
-          await notifee.requestPermission();
-          storePushNotificationStatus(localData);
-          await dispatch(updatePushNotifications(data, null));
-      } else {
-        const localData = {
-          status: 'skip',
-          date: new Date(),
-          permanentSkip: true
-        };            
-        storePushNotificationStatus(localData);        
+          storePushNotificationStatus(localData);        
+        }
       }
     }
   };
 
   useEffect(()=>{
-    console.log('Health count',internetHealths)
     if(internetHealths.length>=3){
       setCheckModemStatus(true)
       refreshInternetHealth()
@@ -384,7 +367,6 @@ const HomeScreen = ({ navigation }) => {
     getUserAccountDetails();
 
     const fetchData = async () => {
-      console.log('FetchData: ');
       try {
         const result = await getUpgradeToken();
         console.log('getUpgradeTokenResult: ', JSON.stringify(result));
@@ -396,31 +378,31 @@ const HomeScreen = ({ navigation }) => {
         setShowWalkThrough(true);
       }
     };
-
     fetchData();    
-    checkAppUpdate();
-    
+    checkAppUpdate(); 
   }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-        try {
-            dispatch(fetchPushNotifications());
-        } catch (error) {
-            console.error("Error fetching data", error);
-        }
+      try {
+        dispatch(fetchPushNotifications());
+      } catch (error) {
+        console.error("Error fetching data", error);
+      }
     };
-
     fetchData();
 }, [dispatch]);   
 
-  useEffect(() => {
-    console.log('profile: ', profile);
-    checkNotifications();
-  }, [profile]);
+useEffect(() => {
+  if (profile?.pushNotifications?.[0]?.pushMessageType !== undefined) {
+      console.log('[checkNotificationsEffect] pushMessageType is defined. Executing checkNotifications.');
+      checkNotifications();
+  } else {
+      console.log('[checkNotificationsEffect] pushMessageType is undefined. Skipping checkNotifications.');
+  }
+}, [profile, checkNotifications]); 
 
   const changeWalkThroughStep = (step) => {
-    console.log("walkThroughStep: ", step);
     if (step > 2) {
       dispatch(updateWalkThroughStep(null));
       setShowWalkThrough(false);
@@ -431,12 +413,9 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const checkAppUpdate=()=>{
-
  let currentVersion=VersionCheck.getCurrentVersion();
-    VersionCheck.getLatestVersion()    // Automatically choose profer provider using `Platform.select` by device platform.
+    VersionCheck.getLatestVersion() 
   .then(latestVersion => {
-    console.log('Latest version',latestVersion);
-    console.log('Current version',currentVersion); 
     if(Platform.OS==='android')  {
       VersionCheck.needUpdate().then(res => {
         setIsAppNewUpdate(res.isNeeded)
@@ -907,7 +886,7 @@ const styles = StyleSheet.create({
   },
   modemError1: {
     color: '#000',
-    FontFamily: FontFamily.textXsSemibold,
+    fontFamily: FontFamily.textXsSemibold,
     fontSize: 15,
     fontStyle: "normal",
     fontWeight: "700",
@@ -916,7 +895,7 @@ const styles = StyleSheet.create({
   },
   modemError2: {
     color: Color.colorGray_200,
-    FontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     fontStyle: "normal",
     fontWeight: "400",
@@ -925,7 +904,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },updateNow:{
     color: Color.colorMidnightblue,
-    FontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     fontStyle: "normal",
     fontWeight: "700",

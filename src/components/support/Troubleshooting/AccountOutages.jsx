@@ -27,7 +27,7 @@ const TroubleshootComponent = ({
                         showCloseIcon={false}
                     />
                 </View>
-                <View style={styles.btnContainer}>
+                <View style={{width: '90%',}}>
                     <Pressable onPress={()=>{
                         navigation.navigate("ArticalWindowUtility", {
                             url: `${Env.URL}/billing`,
@@ -62,9 +62,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: Padding.p_base
     },
     btnContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        width: '90%',
+        // flex: 1,
+        // justifyContent: 'center',
+        // paddingHorizontal: Padding.p_base,
+        // width: '90%',
     },
     circle: {
         width: windowWidth * 0.5,
