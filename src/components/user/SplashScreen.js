@@ -35,6 +35,7 @@ const SplashScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessage1, setErrorMessage1] = useState("");
+  const [isAppNewUpdate,setIsAppNewUpdate]=useState(false)
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -134,6 +135,40 @@ const SplashScreen = ({ navigation }) => {
     setTimeout(() => { setDisconnected(true)}, 500)
   };
 
+  const AppUpdateMsg=()=>{
+    return(
+      <View
+          style={{ alignItems:'center', flexDirection:'column' }}
+        >
+          <Text
+            style={{
+              color: "white",
+              fontSize: 20,
+              fontFamily:FontFamily.openSansSemiBold,
+              alignItems: "center",
+              marginTop:20
+            }}
+          >
+            New version available
+          </Text>
+          <Text
+            style={{
+              color: "white",
+              fontSize: 16,
+              fontFamily:FontFamily.openSansRegular,
+              alignItems: "center",
+              marginTop: 20,
+              textAlign:'center',
+              marginHorizontal: 22,
+            }}
+          >
+            Looks like you have an older version of the app. To get latest
+            features and best experience you'll need to update now
+          </Text>
+          </View>
+    )
+  }
+
   const CustomAlertModal = ({ visible, message, message2, onClose }) => {
     return (
       <Modal
@@ -227,6 +262,28 @@ const SplashScreen = ({ navigation }) => {
   //   logoutAction();
   // };
 
+
+  const checkAppUpdate = () => {
+    let currentVersion = VersionCheck.getCurrentVersion();
+    VersionCheck.getLatestVersion()  
+      .then(latestVersion => {
+        if (Platform.OS === 'android') {
+          VersionCheck.needUpdate().then(res => {
+            setIsAppNewUpdate(res?.isNeeded)
+          });
+        } else {
+          VersionCheck.needUpdate({
+            currentVersion: currentVersion,
+            latestVersion: latestVersion,
+          }).then(res => {
+            setIsAppNewUpdate(res?.isNeeded)
+          });
+        }
+      });
+
+
+  }
+
   const loginAuth = async () => {
     try {
       const result = await authorize(config);
@@ -270,6 +327,7 @@ const SplashScreen = ({ navigation }) => {
     };
 
     fetchData();
+    checkAppUpdate();
   }, []);
 
   return (
@@ -286,15 +344,26 @@ const SplashScreen = ({ navigation }) => {
           source={require("../../res/images/Logo.png")}
           style={styles.logo}
         />
+{isAppNewUpdate && (
+  <AppUpdateMsg/>
+)}
+
       </View>
       {
         !loading &&
         (
           <>
             <TouchableOpacity
-              style={styles.SSoBtnContainer}
+              style={[styles.SSoBtnContainer,{marginTop:isAppNewUpdate?hp("15%"):hp("35%")}]}
               onPress={() => {
-                if (loginEnable) {
+                if(isAppNewUpdate){
+                  if (Platform.OS === 'android') {
+                    Linking.openURL('https://play.google.com/store/apps/details?id=com.sparklight');
+                  } else {
+                    Linking.openURL('https://apps.apple.com/us/app/mysparklight/id6469003880');
+                  }
+                }else
+               if (loginEnable ) {
                   setLoginEnable(false)
                   loginAuth();
                   setTimeout(() => {
@@ -303,7 +372,7 @@ const SplashScreen = ({ navigation }) => {
                 }
               }}
             >
-              <Text style={styles.SSoBtn}>Login</Text>
+              <Text style={styles.SSoBtn}>{isAppNewUpdate?'Update' :'Login'}</Text>
             </TouchableOpacity>
           </>
         )
