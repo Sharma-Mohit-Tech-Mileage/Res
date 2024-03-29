@@ -151,8 +151,8 @@ const fetchPushNotifications = async () => {
     console.log(`Making API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`);
 
     try {
-        const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, { ...config });
-
+        //const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, { ...config });
+        const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences/${accountNumber}`, { ...config });
         // Log the successful response
         console.log(`API Call Successful to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:;;;;;;;;;;;;;;;;;`, JSON.stringify(response.data));
         return response.data;
@@ -328,11 +328,9 @@ const postPushNotifications = async (data) => {
     try {
         const response = await _axios_cableone.post(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, data, config);
 
-        // Log the successful response
         console.log(`API Call Successful to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:`, response);
         return response;
     } catch (error) {
-        // Log the error with a descriptive message
         console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, error);
         throw error;
     }
