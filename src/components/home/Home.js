@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Pressable, ActivityIndicator, Linking } from "react-native";
-import { widthPercentageToDP as wp, } from "react-native-responsive-screen";
-import VersionCheck from 'react-native-version-check';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Platform,
+  Dimensions,
+  Pressable,
+  ActivityIndicator,
+  Linking,
+} from "react-native";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import VersionCheck from "react-native-version-check";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,66 +25,93 @@ import NetworkDetails from "../common/NetworkDetails";
 import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
-import { getUser, getPushNotificationStatus, storePushNotificationStatus, storeUpgradeToken } from "../../redux/utils/LocalStorage";
-import { GetApiRequest ,GetModemStatusApiRequest } from "../../network/APIClient";
+import {
+  getUser,
+  getPushNotificationStatus,
+  storePushNotificationStatus,
+  storeUpgradeToken,
+} from "../../redux/utils/LocalStorage";
+import {
+  GetApiRequest,
+  GetModemStatusApiRequest,
+} from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
-import { getFcmToken, requestUserPermission, notifyPermission } from '../../firebase/FirebaseUtils';
-import { updatePushNotifications, fetchPushNotifications } from '../../redux/actions/ProfileActionSuite';
-import { useSelector, useDispatch } from 'react-redux';
+import {
+  getFcmToken,
+  requestUserPermission,
+  notifyPermission,
+} from "../../firebase/FirebaseUtils";
+import {
+  updatePushNotifications,
+  fetchPushNotifications,
+} from "../../redux/actions/ProfileActionSuite";
+import { useSelector, useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
-import { Env } from '../../network/apis/account/Constants';
-import notifee from '@notifee/react-native'
-const tabWidth = Number(Dimensions.get('window').width/4);
-
+import { Env } from "../../network/apis/account/Constants";
+import notifee from "@notifee/react-native";
+import AppUpdate from "../utility/AppUpdateAlert";
+const tabWidth = Number(Dimensions.get("window").width / 4);
 
 const HomeScreen = ({ navigation }) => {
   const [isInternetDetails, setIsInternetDetails] = useState(false);
-  const user = useSelector(state => state.combinedReducers.user.userData);
-  const home = useSelector(state => state.combinedReducers.home);
-  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const user = useSelector((state) => state.combinedReducers.user.userData);
+  const home = useSelector((state) => state.combinedReducers.home);
+  const profile = useSelector((state) => state.combinedReducers.profile || {});
   const dispatch = useDispatch();
   const [plans, setPlans] = useState([]);
   const [billAmt, setBillAmt] = useState(0);
   const [dueDate, setDueDate] = useState("");
   const [currentHealth, setCurrentHealth] = useState("Optimal");
   const [billPaid, setBillPaid] = useState(false);
-  const [accountStatus,setAccountStatus]=useState('Active')
-  const [hasOutage,setHasOutage]=useState(false)
-  const [isOutageAlert,setIsOutageAlert]=useState(false)
-  const [checkModemStatus,setCheckModemStatus]=useState(false)
-  const [estimatedRestoreTime,setEstimatedRestoreTime]=useState('')
+  const [accountStatus, setAccountStatus] = useState("Active");
+  const [hasOutage, setHasOutage] = useState(false);
+  const [isOutageAlert, setIsOutageAlert] = useState(false);
+  const [checkModemStatus, setCheckModemStatus] = useState(false);
+  const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
-  const [internetHealths,setInternetHealths]= useState([])
-  const [isAppNewUpdate,setIsAppNewUpdate]=useState(false);
+  const [internetHealths, setInternetHealths] = useState([]);
+  const [isAppNewUpdate, setIsAppNewUpdate] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      // The screen is focused
+      // Call any action
+
+      console.log("On Focus Home");
+    });
+
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
 
   const getInternetHealth = (type) => {
-    var currentHealth = { Offline: 20,Poor: 50, Optimal: 80, default: 80};
+    var currentHealth = { Offline: 20, Poor: 50, Optimal: 80, default: 80 };
     return currentHealth[type] || currentHealth["default"];
   };
 
   const getInternetPlanDetails = () => {
-     getUser().then((res) => {
+    getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
       GetApiRequest(request, onSuccessPlan, onError);
     });
   };
 
   const getUpgradeToken = async () => {
-    const url = Env.API_SHOPPING_CART_BASEURL + '/api/UpgradeOrder/token';
+    const url = Env.API_SHOPPING_CART_BASEURL + "/api/UpgradeOrder/token";
 
     const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({
-          'grant_type': 'password',
-          'username': 'upgr4d3s0rd3rus3r',
-          'password': 'upgr4d3s0rd3rp4ssw0rd'
-        }).toString()
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        grant_type: "password",
+        username: "upgr4d3s0rd3rus3r",
+        password: "upgr4d3s0rd3rp4ssw0rd",
+      }).toString(),
     });
 
     let json = {};
@@ -83,55 +122,58 @@ const HomeScreen = ({ navigation }) => {
     return json;
   };
 
-  const checkModemOutagStatus=()=>{
-     getUser().then((res) => {
-     const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${res.userInfo.accountNumber}`;
-     GetApiRequest(request, (response)=>{
-      console.log('checkModemOutagStatus',response)
-      if(response!=undefined){
-           if(response.hasOutage===true){
-            let time=moment(response.estimatedTimeOfResolution).format('LT'); 
-             setEstimatedRestoreTime(time)
-             setAccountStatus('Disconnect')
-             setIsInternetDetails(true)
-             setHasOutage(true)
-             setIsOutageAlert(true)
-             setInternetHealths(oldArray => [...oldArray,'Red'] );
-
-           }else{
-            setInternetHealths(oldArray => [...oldArray,'Green'] );
-           }
+  const checkModemOutagStatus = () => {
+    getUser().then((res) => {
+      const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${res.userInfo.accountNumber}`;
+      GetApiRequest(
+        request,
+        (response) => {
+          console.log("checkModemOutagStatus", response);
+          if (response != undefined) {
+            if (response.hasOutage === true) {
+              let time = moment(response.estimatedTimeOfResolution).format(
+                "LT"
+              );
+              setEstimatedRestoreTime(time);
+              setAccountStatus("Disconnect");
+              setIsInternetDetails(true);
+              setHasOutage(true);
+              setIsOutageAlert(true);
+              setInternetHealths((oldArray) => [...oldArray, "Red"]);
+            } else {
+              setInternetHealths((oldArray) => [...oldArray, "Green"]);
+            }
+          }
+        },
+        (errorCode) => {
+          console.log("checkModemOutagStatus erro", errorCode);
+          if (errorCode == 204) {
+            setInternetHealths((oldArray) => [...oldArray, "Green"]);
+          }
         }
-           
-     }, (errorCode)=>{
-         console.log("checkModemOutagStatus erro",errorCode) 
-         if(errorCode==204) {
-          setInternetHealths(oldArray => [...oldArray,'Green'] ); 
-         }
-         
-     });
-   });
-   }
+      );
+    });
+  };
 
   const onSuccessPlan = (res) => {
     console.log("getInternetPlanDetails", res);
     if (res) {
       setPlans(res);
-      if(res.length>0){
-      let macAddress=res[0].macAddress
-      var mac=macAddress;
-      if(user.userInfo.accountNumber==='128387263'){
-        mac="00:1d:d0:d4:f8:02"
-      }else if(user.userInfo.accountNumber==='133370775'){
-        mac="60:19:71:d5:10:72"
-      }else if(user.userInfo.accountNumber==='133437285'){
-        mac="60:19:71:1b:b7:62"
-      }else if(user.userInfo.accountNumber==='131684698'){
-        mac="ac:20:2e:6d:82:f1"
-      }else if(user.userInfo.accountNumber==='136885142'){
-        mac="00:40:36:59:00:00"
-      }
-      checkModemDetails(mac)
+      if (res.length > 0) {
+        let macAddress = res[0].macAddress;
+        var mac = macAddress;
+        if (user.userInfo.accountNumber === "128387263") {
+          mac = "00:1d:d0:d4:f8:02";
+        } else if (user.userInfo.accountNumber === "133370775") {
+          mac = "60:19:71:d5:10:72";
+        } else if (user.userInfo.accountNumber === "133437285") {
+          mac = "60:19:71:1b:b7:62";
+        } else if (user.userInfo.accountNumber === "131684698") {
+          mac = "ac:20:2e:6d:82:f1";
+        } else if (user.userInfo.accountNumber === "136885142") {
+          mac = "00:40:36:59:00:00";
+        }
+        checkModemDetails(mac);
       }
     }
   };
@@ -146,11 +188,10 @@ const HomeScreen = ({ navigation }) => {
       (res) => {
         console.log("checkModemDetails", res);
         if (res) {
-
-          if(res?.status){
-            if(res.status===408){
-              setInternetHealths(oldArray => [...oldArray,'Yellow'] );
-              return
+          if (res?.status) {
+            if (res.status === 408) {
+              setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
+              return;
             }
           }
 
@@ -162,23 +203,26 @@ const HomeScreen = ({ navigation }) => {
             temt.push(res.DSNR_State);
             temt.push(res.DRxL_State);
             updateModemStatus(temt);
-          }else if(res.EquipmentType === "ONU"){
+          } else if (res.EquipmentType === "ONU") {
             temt.push(res.OnutP_State);
             temt.push(res.OltrP_State);
             temt.push(res.OnurP_State);
-            updateModemStatus(temt)
+            updateModemStatus(temt);
           }
-          
         }
       },
       (errorCode) => {
         console.log("Modem details on Error", errorCode);
-        if(errorCode===404 ){
-          setInternetHealths(oldArray => [...oldArray,'Red'] );
-        }else if(errorCode===400 ||errorCode===500 ||errorCode===504){
-          setInternetHealths(oldArray => [...oldArray,'Red'] );
-        }else{
-          setInternetHealths(oldArray => [...oldArray,'Red'] );
+        if (errorCode === 404) {
+          setInternetHealths((oldArray) => [...oldArray, "Red"]);
+        } else if (
+          errorCode === 400 ||
+          errorCode === 500 ||
+          errorCode === 504
+        ) {
+          setInternetHealths((oldArray) => [...oldArray, "Red"]);
+        } else {
+          setInternetHealths((oldArray) => [...oldArray, "Red"]);
         }
       }
     );
@@ -186,79 +230,77 @@ const HomeScreen = ({ navigation }) => {
 
   const updateModemStatus = (temt) => {
     const allGreen = temt.every((v) => v === "Green");
-    console.log('modem status',allGreen)
+    console.log("modem status", allGreen);
     if (!allGreen) {
       const checkYellow = temt.includes("Yellow");
       const checkRed = temt.includes("Red");
       if (checkRed) {
-        console.log('modem status','Red')
-        setInternetHealths(oldArray => [...oldArray,'Red'] );
+        console.log("modem status", "Red");
+        setInternetHealths((oldArray) => [...oldArray, "Red"]);
       } else if (checkYellow) {
-        console.log('modem status','Yellow')
-        setInternetHealths(oldArray => [...oldArray,'Yellow'] );
-      }else{
-        setInternetHealths(oldArray => [...oldArray,'Red'] );
+        console.log("modem status", "Yellow");
+        setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
+      } else {
+        setInternetHealths((oldArray) => [...oldArray, "Red"]);
       }
     } else {
-      setInternetHealths(oldArray => [...oldArray,'Green'] );
+      setInternetHealths((oldArray) => [...oldArray, "Green"]);
     }
-    
   };
 
-  const refreshInternetHealth=()=>{
-   
-    const checkYellow = internetHealths.includes('Yellow');
-    const checkRed = internetHealths.includes('Red');
-    const checkGreen = internetHealths.includes('Green');
-    if(checkRed){
-      console.log('Internet Health is Red')
-      setCurrentHealth('Offline');
+  const refreshInternetHealth = () => {
+    const checkYellow = internetHealths.includes("Yellow");
+    const checkRed = internetHealths.includes("Red");
+    const checkGreen = internetHealths.includes("Green");
+    if (checkRed) {
+      console.log("Internet Health is Red");
+      setCurrentHealth("Offline");
       setIsInternetDetails(true);
-    }else if(checkYellow){
-      console.log('Internet Health is Yellow')
-      setCurrentHealth('Poor');
+    } else if (checkYellow) {
+      console.log("Internet Health is Yellow");
+      setCurrentHealth("Poor");
       setIsInternetDetails(true);
-    }else{
-      console.log('Internet Health is Green')
-      setCurrentHealth('Optimal');
+    } else {
+      console.log("Internet Health is Green");
+      setCurrentHealth("Optimal");
       setIsInternetDetails(false);
     }
-
-  }
+  };
 
   const getUserAccountDetails = () => {
-     getUser().then((res) => {
+    getUser().then((res) => {
       const request = `account/api/account/${res.userInfo.accountNumber}`;
-      GetApiRequest(request, (res)=>{
-        console.log("getUserAccountDetails", res);
-        if (res) {
-          if(res.currentCollectionStep=='Soft Disconnect'){
-            setAccountStatus('Disconnect')
-            setIsInternetDetails(true)
-            setInternetHealths(oldArray => [...oldArray,'Red'] );
-          }else{
-            updateInternetHealth(res.currentBalance);
+      GetApiRequest(
+        request,
+        (res) => {
+          console.log("getUserAccountDetails", res);
+          if (res) {
+            if (res.currentCollectionStep == "Soft Disconnect") {
+              setAccountStatus("Disconnect");
+              setIsInternetDetails(true);
+              setInternetHealths((oldArray) => [...oldArray, "Red"]);
+            } else {
+              updateInternetHealth(res.currentBalance);
+            }
+            let dueDate = moment(res.paymentDueDate).format("ll");
+            setDueDate(dueDate);
+            setBillAmt(res.currentBalance);
 
+            getInternetPlanDetails();
           }
-          let dueDate = moment(res.paymentDueDate).format("ll");
-          setDueDate(dueDate);
-          setBillAmt(res.currentBalance);
-          
-           getInternetPlanDetails();
-           
-        }
-      }, onErrorBill);
+        },
+        onErrorBill
+      );
     });
   };
 
   const updateInternetHealth = (dueAmount) => {
-    if(dueAmount<=0){
-     setBillPaid(true)
-     setInternetHealths(oldArray => [...oldArray,'Green'] );
-    }else{
-      setInternetHealths(oldArray => [...oldArray,'Yellow'] );
+    if (dueAmount <= 0) {
+      setBillPaid(true);
+      setInternetHealths((oldArray) => [...oldArray, "Green"]);
+    } else {
+      setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
     }
-   
   };
 
   const onErrorBill = (error) => {
@@ -274,7 +316,7 @@ const HomeScreen = ({ navigation }) => {
       if (pushNotification.permanentSkip) {
         askNotification = false;
       } else {
-        if (pushNotification.status === 'skip') {
+        if (pushNotification.status === "skip") {
           const now = moment();
           const days = now.diff(pushNotification.date, "days");
 
@@ -295,72 +337,71 @@ const HomeScreen = ({ navigation }) => {
       let enabledNotification = false;
 
       if (profile?.pushNotifications?.length > 0) {
-          let optOutCountPushNotification = 0;
-          enabledNotification = true;
-          const messageTypes = profile.pushNotifications[0].pushMessageType;
-          messageTypes.forEach((messageType) => {
-            switch(messageType.messageTyp) {
-              case 'Appointment':
-                optOut = messageType.optOutFlag;
-                break;
-              case 'Outage':
-                outageOptOut = messageType.optOutFlag;
-                break;
-              case 'Billing':
-                billingOptOutStatus = messageType.optOutFlag;
-                break;
-            }
-            if (messageType.optOutFlag) {
-                optOutCountPushNotification += 1;
-            }
-          });
-
-          if (optOutCountPushNotification > 2) {
-            enabledNotification = false;
+        let optOutCountPushNotification = 0;
+        enabledNotification = true;
+        const messageTypes = profile.pushNotifications[0].pushMessageType;
+        messageTypes.forEach((messageType) => {
+          switch (messageType.messageTyp) {
+            case "Appointment":
+              optOut = messageType.optOutFlag;
+              break;
+            case "Outage":
+              outageOptOut = messageType.optOutFlag;
+              break;
+            case "Billing":
+              billingOptOutStatus = messageType.optOutFlag;
+              break;
           }
+          if (messageType.optOutFlag) {
+            optOutCountPushNotification += 1;
+          }
+        });
+
+        if (optOutCountPushNotification > 2) {
+          enabledNotification = false;
+        }
       }
 
-      if (enabledNotification) {                                                          
+      if (enabledNotification) {
         const enabledPermission = await requestUserPermission();
 
         if (enabledPermission) {
-            const token = await getFcmToken();
-            const data = {
-                accountNumber: user.userInfo.accountNumber,
-                deviceToken: token,
-                deviceTokenTimestamp: moment().format(),
-                optOut: optOut,
-                outageOptOut: outageOptOut,
-                billingOptOutStatus: billingOptOutStatus,
-                userName: user.userInfo.userName,
-                isAndroid: Platform.OS == "android",
-            };
-            const localData = {
-                status: 'accepted',
-                date: new Date()
-            };            
-            await notifee.requestPermission();
-            storePushNotificationStatus(localData);
-            await dispatch(updatePushNotifications(data, null));
+          const token = await getFcmToken();
+          const data = {
+            accountNumber: user.userInfo.accountNumber,
+            deviceToken: token,
+            deviceTokenTimestamp: moment().format(),
+            optOut: optOut,
+            outageOptOut: outageOptOut,
+            billingOptOutStatus: billingOptOutStatus,
+            userName: user.userInfo.userName,
+            isAndroid: Platform.OS == "android",
+          };
+          const localData = {
+            status: "accepted",
+            date: new Date(),
+          };
+          await notifee.requestPermission();
+          storePushNotificationStatus(localData);
+          await dispatch(updatePushNotifications(data, null));
         } else {
           const localData = {
-            status: 'skip',
+            status: "skip",
             date: new Date(),
-            permanentSkip: true
-          };            
-          storePushNotificationStatus(localData);        
+            permanentSkip: true,
+          };
+          storePushNotificationStatus(localData);
         }
       }
     }
   };
 
-  useEffect(()=>{
-    if(internetHealths.length>=3){
-      setCheckModemStatus(true)
-      refreshInternetHealth()
+  useEffect(() => {
+    if (internetHealths.length >= 3) {
+      setCheckModemStatus(true);
+      refreshInternetHealth();
     }
-   
-  },[internetHealths]);
+  }, [internetHealths]);
 
   useEffect(() => {
     checkModemOutagStatus();
@@ -369,7 +410,7 @@ const HomeScreen = ({ navigation }) => {
     const fetchData = async () => {
       try {
         const result = await getUpgradeToken();
-        console.log('getUpgradeTokenResult: ', JSON.stringify(result));
+        console.log("getUpgradeTokenResult: ", JSON.stringify(result));
         storeUpgradeToken(result);
       } catch (error) {
         console.error("Error fetching data", error);
@@ -378,8 +419,8 @@ const HomeScreen = ({ navigation }) => {
         setShowWalkThrough(true);
       }
     };
-    fetchData();    
-    checkAppUpdate(); 
+    fetchData();
+    checkAppUpdate();
   }, []);
 
   useEffect(() => {
@@ -391,16 +432,20 @@ const HomeScreen = ({ navigation }) => {
       }
     };
     fetchData();
-}, [dispatch]);   
+  }, [dispatch]);
 
-useEffect(() => {
-  if (profile?.pushNotifications?.[0]?.pushMessageType !== undefined) {
-      console.log('[checkNotificationsEffect] pushMessageType is defined. Executing checkNotifications.');
+  useEffect(() => {
+    if (profile?.pushNotifications?.[0]?.pushMessageType !== undefined) {
+      console.log(
+        "[checkNotificationsEffect] pushMessageType is defined. Executing checkNotifications."
+      );
       checkNotifications();
-  } else {
-      console.log('[checkNotificationsEffect] pushMessageType is undefined. Skipping checkNotifications.');
-  }
-}, [profile, checkNotifications]); 
+    } else {
+      console.log(
+        "[checkNotificationsEffect] pushMessageType is undefined. Skipping checkNotifications."
+      );
+    }
+  }, [profile, checkNotifications]);
 
   const changeWalkThroughStep = (step) => {
     if (step > 2) {
@@ -412,45 +457,45 @@ useEffect(() => {
     }
   };
 
-  const checkAppUpdate=()=>{
- let currentVersion=VersionCheck.getCurrentVersion();
-    VersionCheck.getLatestVersion() 
-  .then(latestVersion => {
-    if(Platform.OS==='android')  {
-      VersionCheck.needUpdate().then(res => {
-        setIsAppNewUpdate(res.isNeeded)
-      });
-    }else{
-    VersionCheck.needUpdate({
-       currentVersion: currentVersion,
-       latestVersion: latestVersion,
-    }).then(res => {
-      setIsAppNewUpdate(res.isNeeded)
+  const checkAppUpdate = () => {
+    console.log("Check app update");
+    let currentVersion = VersionCheck.getCurrentVersion();
+    VersionCheck.getLatestVersion().then((latestVersion) => {
+      if (Platform.OS === "android") {
+        VersionCheck.needUpdate().then((res) => {
+          setIsAppNewUpdate(res.isNeeded);
+        });
+      } else {
+        VersionCheck.needUpdate({
+          currentVersion: currentVersion,
+          latestVersion: latestVersion,
+        }).then((res) => {
+          setIsAppNewUpdate(res.isNeeded);
+        });
+      }
     });
-   }
-  });
-
-  
-  }
+  };
 
   const walkthroughModal = () => {
-
     const walkThroughScreens = [
       {
-        title: 'Home',
-        description: 'View information related to your internet health, billing, service and more.',
-        buttonText: 'Next'
+        title: "Home",
+        description:
+          "View information related to your internet health, billing, service and more.",
+        buttonText: "Next",
       },
       {
-        title: 'Support',
-        description: 'View our FAQ, check in on your modem or troubleshoot your issues.',
-        buttonText: 'Next'
+        title: "Support",
+        description:
+          "View our FAQ, check in on your modem or troubleshoot your issues.",
+        buttonText: "Next",
       },
       {
-        title: 'Account',
-        description: 'Manage your profile settings, notifications, users and more.',
-        buttonText: 'Let\'s Go!'
-      },            
+        title: "Account",
+        description:
+          "Manage your profile settings, notifications, users and more.",
+        buttonText: "Let's Go!",
+      },
     ];
 
     const walkThrough = walkThroughScreens[walkThroughStep];
@@ -470,36 +515,55 @@ useEffect(() => {
               <Text style={styles.titleText}>{walkThrough.title}</Text>
             </View>
             <View style={styles.description}>
-              <Text style={styles.descriptionText}>{walkThrough.description}</Text>
+              <Text style={styles.descriptionText}>
+                {walkThrough.description}
+              </Text>
             </View>
           </View>
           <View style={styles.walkThroughBottomArea}>
-              <View style={styles.circlePaging}>
-                <View style={styles.circle}></View>
-                <View style={walkThroughStep < 1 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
-                <View style={walkThroughStep < 2 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
-              </View>
-              <View style={styles.walkThroughButtons}>
-                <View style={styles.walkThroughSubButtons}>
-                  {
-                    walkThroughStep > 0 &&
-                    (
-                      <Pressable
-                          style={[styles.button, styles.buttonsLayout, styles.buttonPrevious]}
-                          onPress={() => changeWalkThroughStep(walkThroughStep - 1)}
-                      >
-                          <Text style={styles.decline}>Previous</Text>
-                      </Pressable> 
-                    )
-                  }                    
+            <View style={styles.circlePaging}>
+              <View style={styles.circle}></View>
+              <View
+                style={
+                  walkThroughStep < 1
+                    ? [styles.circle, styles.circleUnselected]
+                    : styles.circle
+                }
+              ></View>
+              <View
+                style={
+                  walkThroughStep < 2
+                    ? [styles.circle, styles.circleUnselected]
+                    : styles.circle
+                }
+              ></View>
+            </View>
+            <View style={styles.walkThroughButtons}>
+              <View style={styles.walkThroughSubButtons}>
+                {walkThroughStep > 0 && (
                   <Pressable
-                      style={[styles.button, styles.buttonsLayout, styles.buttonNext]}
-                      onPress={() => changeWalkThroughStep(walkThroughStep + 1)}
+                    style={[
+                      styles.button,
+                      styles.buttonsLayout,
+                      styles.buttonPrevious,
+                    ]}
+                    onPress={() => changeWalkThroughStep(walkThroughStep - 1)}
                   >
-                      <Text style={styles.accept}>{walkThrough.buttonText}</Text>
-                  </Pressable>   
-                </View>                
+                    <Text style={styles.decline}>Previous</Text>
+                  </Pressable>
+                )}
+                <Pressable
+                  style={[
+                    styles.button,
+                    styles.buttonsLayout,
+                    styles.buttonNext,
+                  ]}
+                  onPress={() => changeWalkThroughStep(walkThroughStep + 1)}
+                >
+                  <Text style={styles.accept}>{walkThrough.buttonText}</Text>
+                </Pressable>
               </View>
+            </View>
           </View>
           <View>
             <Image
@@ -508,90 +572,107 @@ useEffect(() => {
               source={require("../../../assets/polygon.png")}
             />
           </View>
-        </View>         
+        </View>
       </>
+    );
+  };
 
-    )
-  }
-
-  const OutageAlert=({estimatedTime})=>{
-    return(
+  const OutageAlert = ({ estimatedTime }) => {
+    return (
       <View style={styles.errorBox}>
-        <View style={{ flexDirection: "row",width:'90%' }}>
+        <View style={{ flexDirection: "row", width: "90%" }}>
           <View style={{ backgroundColor: "#F88700", width: 4 }} />
           <View style={{ flexDirection: "column", padding: 10 }}>
             <View style={{ flexDirection: "row" }}>
               <Image
-                style={{alignSelf:'center'}}
+                style={{ alignSelf: "center" }}
                 resizeMode="contain"
                 tintColor={"#F88700"}
                 source={require("../../../assets/info-circle.png")}
               />
-              <Text style={styles.modemError1}>
-                Outage Alert
-              </Text>
+              <Text style={styles.modemError1}>Outage Alert</Text>
             </View>
             <Text style={styles.modemError2}>
-              Our systems show that you may be experiencing an outage related to your Internet service. We are working to restore service as soon as possible.
-              <Text style={[styles.modemError2,{fontWeight:'700'}]}>Estimated Time to Restore: {estimatedTime}</Text>
+              Our systems show that you may be experiencing an outage related to
+              your Internet service. We are working to restore service as soon
+              as possible.
+              <Text style={[styles.modemError2, { fontWeight: "700" }]}>
+                Estimated Time to Restore: {estimatedTime}
+              </Text>
             </Text>
           </View>
-          
-          <TouchableOpacity style={{marginTop:10}} onPress={()=>{
-            setIsOutageAlert(false)
-          }}>
-          <CloseIcon/>
+
+          <TouchableOpacity
+            style={{ marginTop: 10 }}
+            onPress={() => {
+              setIsOutageAlert(false);
+            }}
+          >
+            <CloseIcon />
           </TouchableOpacity>
         </View>
       </View>
-    )
-  }
+    );
+  };
 
   /**
-   * New app update alert 
+   * New app update alert
    */
 
-
-  const AppUpdateAlert=()=>{
-    return(
+  const AppUpdateAlert = () => {
+    return (
       <View style={styles.errorBox}>
-        <View style={{ flexDirection: "row",width:'90%' }}>
+        <View style={{ flexDirection: "row", width: "90%" }}>
           <View style={{ backgroundColor: Color.sparklightGreen, width: 4 }} />
           <View style={{ flexDirection: "column", padding: 10 }}>
             <View style={{ flexDirection: "row" }}>
               <Image
-                style={{alignSelf:'center'}}
+                style={{ alignSelf: "center" }}
                 resizeMode="contain"
                 tintColor={Color.sparklightGreen}
                 source={require("../../../assets/info-circle.png")}
               />
-              <Text style={[styles.modemError1,{color:Color.sparklightGreen}]}>
+              <Text
+                style={[styles.modemError1, { color: Color.sparklightGreen }]}
+              >
                 What's New
               </Text>
             </View>
             <Text style={styles.modemError2}>
-            Enhance your app experience with the latest version.  
-              <Text style={styles.updateNow} onPress={()=>{
-                  if(Platform.OS==='android'){
-                    Linking.openURL('https://play.google.com/store/apps/details?id=com.sparklight');
-                  }else{
-                   Linking.openURL('https://apps.apple.com/us/app/mysparklight/id6469003880');
+              Enhance your app experience with the latest version.
+              <Text
+                style={styles.updateNow}
+                onPress={() => {
+                  if (Platform.OS === "android") {
+                    Linking.openURL(
+                      "https://play.google.com/store/apps/details?id=com.sparklight"
+                    );
+                  } else {
+                    Linking.openURL(
+                      "https://apps.apple.com/us/app/mysparklight/id6469003880"
+                    );
                   }
-                
-              }}> Update Now </Text> 
+                }}
+              >
+                {" "}
+                Update Now{" "}
+              </Text>
               and keep your app running smoothly.
             </Text>
           </View>
-          
-          <TouchableOpacity style={{marginTop:10}} onPress={()=>{
-            setIsAppNewUpdate(false)
-          }}>
-          <CloseIcon/>
+
+          <TouchableOpacity
+            style={{ marginTop: 10 }}
+            onPress={() => {
+              setIsAppNewUpdate(false);
+            }}
+          >
+            <CloseIcon />
           </TouchableOpacity>
         </View>
       </View>
-    )
-  }
+    );
+  };
   /************* End App Update Alert Section ******* */
 
   return (
@@ -601,8 +682,9 @@ useEffect(() => {
       colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
       style={styles.container}
     >
-      {showWalkThrough && (<View style={styles.shadowFullScreen} />)}
+      {showWalkThrough && <View style={styles.shadowFullScreen} />}
       {showWalkThrough && walkthroughModal()}
+
       <SafeAreaView style={{ flex: 1 }}>
         <View
           style={{
@@ -631,27 +713,41 @@ useEffect(() => {
               marginTop: 50,
             }}
           >
-            {(isAppNewUpdate)?<AppUpdateAlert/>:<></>}
-             {(isOutageAlert)?<OutageAlert estimatedTime={estimatedRestoreTime}/>:<></>}
-             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
+            {isAppNewUpdate ? <AppUpdateAlert /> : <></>}
+            <AppUpdate
+              visible={isAppNewUpdate}
+              onClose={() => {
+                console.log("On closw update");
+                setIsAppNewUpdate(false)
+              }}
+            />
+            {isOutageAlert ? (
+              <OutageAlert estimatedTime={estimatedRestoreTime} />
+            ) : (
+              <></>
+            )}
+            <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <Text style={styles.internetHealth}>Service Health</Text>
-              { (checkModemStatus) ?
-              <InternetHealthChart
-                currentValue={getInternetHealth(currentHealth)}
-                 key={currentHealth}
-              />
-              : <ActivityIndicator
-              size="large"
-              color={Color.colorGainsboro_200}
-              
-            />}
+              {checkModemStatus ? (
+                <InternetHealthChart
+                  currentValue={getInternetHealth(currentHealth)}
+                  key={currentHealth}
+                />
+              ) : (
+                <ActivityIndicator
+                  size="large"
+                  color={Color.colorGainsboro_200}
+                />
+              )}
               <View style={styles.internetStatusSection}>
                 <View style={{ marginTop: 5 }}>
                   <InfoIcon />
                 </View>
                 <Text style={styles.internetStatusTxt}>
                   {" "}
-                  {(currentHealth!='Optimal')?strings.internetStatusIssue:strings.internetStatus}
+                  {currentHealth != "Optimal"
+                    ? strings.internetStatusIssue
+                    : strings.internetStatus}
                 </Text>
               </View>
 
@@ -684,13 +780,19 @@ useEffect(() => {
                 </View>
               </TouchableOpacity>
               {isInternetDetails ? (
-                <NetworkDetails billPaid={billPaid} hasOutage={hasOutage} currentHealth={currentHealth} navigation={navigation} accountStatus={accountStatus} />
+                <NetworkDetails
+                  billPaid={billPaid}
+                  hasOutage={hasOutage}
+                  currentHealth={currentHealth}
+                  navigation={navigation}
+                  accountStatus={accountStatus}
+                />
               ) : (
                 <></>
               )}
             </View>
             <ScrollView horizontal={true} style={{ marginStart: 20 }}>
-              <View >
+              <View>
                 <MyInternetDetials
                   plans={plans}
                   billAmt={billAmt}
@@ -702,7 +804,7 @@ useEffect(() => {
 
             <MyServicePlan plans={plans} navigation={navigation} />
           </View>
-        </ScrollView>         
+        </ScrollView>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -718,82 +820,80 @@ const styles = StyleSheet.create({
   bottomCarot: {
     width: 18,
     height: 13,
-    position: 'absolute',
-    top: 20
+    position: "absolute",
+    top: 20,
   },
   bottomCarotStep2: {
-    left: tabWidth * 2
+    left: tabWidth * 2,
   },
   bottomCarotStep3: {
-    left: tabWidth * 3
+    left: tabWidth * 3,
   },
   circle: {
     width: 8,
     height: 8,
     backgroundColor: Color.colorMidnightblue,
     borderRadius: 8,
-    marginLeft: 10
+    marginLeft: 10,
   },
   circleUnselected: {
-    backgroundColor: '#D9D9D9'
+    backgroundColor: "#D9D9D9",
   },
   circlePaging: {
     width: 100,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    marginBottom: 16
+    flexDirection: "row",
+    alignItems: "flex-end",
+    marginBottom: 16,
   },
   walkThroughBottomArea: {
-    flexDirection: 'row',
-    flex: 1
+    flexDirection: "row",
+    flex: 1,
   },
   walkThroughButtons: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    alignItems: "flex-end",
   },
   walkThroughSubButtons: {
     width: 195,
-    flexDirection: 'row',
-    justifyContent: 'flex-end'
+    flexDirection: "row",
+    justifyContent: "flex-end",
   },
   title: {
-    marginBottom: 5
+    marginBottom: 5,
   },
   titleText: {
     color: Color.sparklightGray1,
     fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.openSansSemiBold,        
-  },  
-  description: {
-
+    fontFamily: FontFamily.openSansSemiBold,
   },
+  description: {},
   descriptionText: {
     color: Color.sparklightGray1,
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,    
-    lineHeight: 24,    
+    fontFamily: FontFamily.openSansRegular,
+    lineHeight: 24,
   },
   decline: {
     fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,        
+    fontFamily: FontFamily.openSansRegular,
     color: Color.colorMidnightblue,
     textAlign: "center",
-  },  
+  },
   button: {
     backgroundColor: Color.colorMidnightblue,
   },
   buttonDisabled: {
     backgroundColor: Color.colorWhitesmoke_300,
-    color: Color.colorGray_200
+    color: Color.colorGray_200,
   },
   buttonDisabledText: {
-    color: Color.sparklightaddGray
-  },    
+    color: Color.sparklightaddGray,
+  },
   buttonNext: {
-    justifyContent: 'flex-end',
-    marginLeft: 10
+    justifyContent: "flex-end",
+    marginLeft: 10,
   },
   buttonPrevious: {
     backgroundColor: Color.colorWhitesmoke_200,
@@ -805,16 +905,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: Border.br_11xs,
     minHeight: 32,
-    textAlign: 'center'
-  },  
+    textAlign: "center",
+  },
   container: {
     flex: 1,
     backgroundColor: colors.splash_bg,
-    marginBottom: 30
+    marginBottom: 30,
   },
   card: {
     backgroundColor: "white",
-    borderRadius:2,
+    borderRadius: 2,
     paddingTop: 45,
     width: wp("92%"),
   },
@@ -825,32 +925,32 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   shadowFullScreen: {
-    backgroundColor: 'black',
-    height: '100%',
-    width: '100%',
-    position: 'absolute',
+    backgroundColor: "black",
+    height: "100%",
+    width: "100%",
+    position: "absolute",
     top: 0,
     zIndex: 5,
-    opacity: .7
+    opacity: 0.7,
   },
   walkThroughBubble: {
-    backgroundColor: 'white',
-    position: 'absolute',
+    backgroundColor: "white",
+    position: "absolute",
     bottom: 90,
     height: 180,
-    width: Dimensions.get('window').width - 40,
+    width: Dimensions.get("window").width - 40,
     left: 20,
     opacity: 1,
     zIndex: 10,
     borderRadius: 10,
-    justifyContent: 'space-between',
-    padding: 20
+    justifyContent: "space-between",
+    padding: 20,
   },
   internetHealth: {
     color: colors.darkest_grey,
     fontSize: 22,
     marginTop: -20,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     paddingHorizontal: 25,
     fontStyle: "normal",
     fontWeight: "400",
@@ -862,12 +962,12 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 15,
     flexDirection: "row",
-    justifyContent:'center',
+    justifyContent: "center",
     marginHorizontal: 25,
   },
   internetStatusTxt: {
     color: colors.darkest_grey,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
     alignSelf: "center",
     fontSize: 14,
@@ -877,7 +977,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   hideShowDetails: {
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontSize: 16,
     marginVertical: 5,
     color: colors.sparklight_purple_blue,
@@ -885,7 +985,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   modemError1: {
-    color: '#000',
+    color: "#000",
     fontFamily: FontFamily.textXsSemibold,
     fontSize: 15,
     fontStyle: "normal",
@@ -902,7 +1002,8 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginTop: 7,
     marginRight: 5,
-  },updateNow:{
+  },
+  updateNow: {
     color: Color.colorMidnightblue,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
@@ -917,13 +1018,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginVertical: 20,
     borderColor: Color.sparklightGray,
-    backgroundColor:Color.sparklightWhite,
+    backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_11xs,
     borderWidth: 1,
-    marginBottom:wp('15%'),
-    marginTop:wp('-10%'),
+    marginBottom: wp("15%"),
+    marginTop: wp("-10%"),
   },
 });
 
 export default HomeScreen;
-
