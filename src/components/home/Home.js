@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Pressable,
   ActivityIndicator,
   Linking,
+  AppState
 } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import VersionCheck from "react-native-version-check";
@@ -52,6 +53,7 @@ import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
 import notifee from "@notifee/react-native";
 import AppUpdate from "../utility/AppUpdateAlert";
+
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
 const HomeScreen = ({ navigation }) => {
@@ -74,18 +76,16 @@ const HomeScreen = ({ navigation }) => {
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
   const [isAppNewUpdate, setIsAppNewUpdate] = useState(false);
+  const timer = useRef(Date.now())
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      // The screen is focused
-      // Call any action
+  AppState.addEventListener('change', (nextAppState) => {
+    if(nextAppState === "active" && (Date.now() - timer.current > 2000)){
+      checkAppUpdate();
+    }
+    
+});
 
-      console.log("On Focus Home");
-    });
 
-    // Return the function to unsubscribe from the event so it gets removed on unmount
-    return unsubscribe;
-  }, [navigation]);
 
   const getInternetHealth = (type) => {
     var currentHealth = { Offline: 20, Poor: 50, Optimal: 80, default: 80 };
@@ -713,7 +713,7 @@ const HomeScreen = ({ navigation }) => {
               marginTop: 50,
             }}
           >
-            {isAppNewUpdate ? <AppUpdateAlert /> : <></>}
+            {/* {isAppNewUpdate ? <AppUpdateAlert /> : <></>} */}
             <AppUpdate
               visible={isAppNewUpdate}
               onClose={() => {

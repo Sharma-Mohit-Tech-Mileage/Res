@@ -85,7 +85,7 @@ android {
                                  appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
         ]
         versionCode 64
-        versionName "1.11.7"
+        versionName "1.11.4"
     }
 
     

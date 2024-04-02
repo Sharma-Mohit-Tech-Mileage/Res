@@ -121,13 +121,13 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   closeBtn: {
-    backgroundColor: colors.backgound_blue,
+    backgroundColor: colors.sparklight_purple_blue,
     justifyContent: "center",
     width: "100%",
     marginTop: 15,
   },
   closeAlertTxt: {
-    color: colors.sparklight_purple_blue,
+    color: colors.snow_white,
     textAlign: "center",
     padding: 8,
     fontSize: 16,
