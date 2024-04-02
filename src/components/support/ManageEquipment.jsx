@@ -211,8 +211,8 @@ const ManageEquipment = ({route}) => {
         }
         }
       />
-      <ScrollView>
-        <View style={styles.myModemParent}>
+      <ScrollView accessible={false}>
+        <View accessible={true} style={styles.myModemParent}>
           <View style={[styles.myModem, styles.myModemSpaceBlock]}>
             <View
               style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
@@ -482,7 +482,9 @@ const ManageEquipment = ({route}) => {
                   tintColor={Color.sparklightBrightPurple}
                   source={require("../../../assets/phone-outgoing-04.png")}
                 />
-                <Text style={styles.modemHealthSupport}>Contact Us</Text>
+                <Text style={styles.modemHealthSupport} accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Contact us for more information">Contact Us</Text>
                 <Image
                   resizeMode="stretch"
                   source={require("../../../assets/chevronright.png")}

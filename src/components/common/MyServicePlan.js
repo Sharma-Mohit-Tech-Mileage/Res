@@ -1,21 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image, FlatList
-} from "react-native";
+import {View,Text,StyleSheet,TouchableOpacity,Image, FlatList,AccessibilityInfo, findNodeHandle, Platform} from "react-native";
 import colors from "../../res/Colors";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import DataSpeedComponent from "./DataSpeedComponent";
 import DataUsageComponent from "./DataUsageComponent";
 import strings from "../../res/Strings";
 import LinearGradient from "react-native-linear-gradient";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import {widthPercentageToDP as wp,heightPercentageToDP as hp,} from "react-native-responsive-screen";
 import SwipeUpDownModal from "react-native-swipe-modal-up-down";
 import InternetIcon from "../../res/svgIcons/InternetIcon";
 import { FontFamily, FontSize } from "../../../GlobalStyles";
@@ -28,7 +19,11 @@ const MyServicePlan = ({ plans, navigation }) => {
   const [ShowComment, setModelComment] = useState(false);
   const [animateModal, setanimateModal] = useState(false);
   const [data, setData] = useState({});
-
+  const planDetailsRef = React.useRef(null);
+  const setFocusToPlanDetails = () => {
+    const reactTag = findNodeHandle(planDetailsRef.current);
+    AccessibilityInfo.setAccessibilityFocus(reactTag);
+  };
   const getDataUsage = () => {
      getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
@@ -47,21 +42,16 @@ const MyServicePlan = ({ plans, navigation }) => {
 
     const PlanDetailsItem = ({ item, index }) => {
       return (
-        <View key={index} accessible accessibilityLabel={`Plan Details for Internet ${item.planName}`}>
+        <View key={index} >
           <View
             style={{
               flexDirection: "row",
               backgroundColor: colors.backgound_blue,
               padding: wp("3%"),
             }}
-            accessible
-            accessibilityLabel={`Internet Plan ${item.planName}`}
-            accessibilityRole="header"
+           
           >
             <View
-              accessible={true}
-              accessibilityLabel="Internet Icon"
-              accessibilityRole="image" // Change the role as needed
               style={{
                 width: wp("10%"),
                 height: wp("10%"),
@@ -91,26 +81,26 @@ const MyServicePlan = ({ plans, navigation }) => {
 
           <View style={[styles.planDetailsRow]}>
             <View style={{ alignSelf: "center" }}>
-              <TickIcon accessible={true} accessibilityLabel="Tick Icon" accessibilityRole="image" />
+              <TickIcon  />
             </View>
 
-            <Text style={styles.planDetailsTxt} accessible={true} accessibilityRole="header">
+            <Text style={styles.planDetailsTxt} accessible={true} >
               Download Speed Up To {item.downloadSpeed} Mbps
             </Text>
           </View>
 
-          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} accessible={true} accessibilityRole="text" />
+          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} />
 
           <View style={[styles.planDetailsRow]}>
             <View style={{ alignSelf: "center" }}>
-              <TickIcon accessible={true} accessibilityLabel="Tick Icon" accessibilityRole="image" />
+              <TickIcon />
             </View>
             <Text style={styles.planDetailsTxt} accessible={true} accessibilityRole="text">
               Upload Speed Up To {item.uploadSpeed} Mbps
             </Text>
           </View>
 
-          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} accessible={true} accessibilityRole="none" />
+          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} />
 
           <View
             style={{
@@ -121,7 +111,7 @@ const MyServicePlan = ({ plans, navigation }) => {
           >
             <View style={{ flexDirection: "row" }}>
               <View style={{ alignSelf: "center" }}>
-                <TickIcon  accessibilityRole="image" />
+                <TickIcon />
               </View>
               <Text style={styles.planDetailsTxt} accessible
                 accessibilityRole="text"
@@ -129,20 +119,9 @@ const MyServicePlan = ({ plans, navigation }) => {
                 Data Plan {(item.dataQuotaGB=='15000')?'UNLIMITED':item.dataQuotaGB+' GB*'}
               </Text>
             </View>
-            {/* <Text
-              style={{
-                fontSize: FontSize.size_xs,
-                color: colors.sparklight_grey,
-                fontWeight: "400",
-                marginLeft: 10,
-                marginTop: 5,
-              }}
-            >
-              * $10 charge for each add'l 100GB; Up to $40/mo.
-            </Text> */}
           </View>
 
-          <View style={{ backgroundColor: colors.grey, height: 1, width: "100%", marginTop: 5 }} accessible accessibilityRole="none" />
+          <View style={{ backgroundColor: colors.grey, height: 1, width: "100%", marginTop: 5 }}  />
         </View>
       );
     };
@@ -152,7 +131,9 @@ const MyServicePlan = ({ plans, navigation }) => {
         modalVisible={ShowComment}
         PressToanimate={animateModal}
         ContentModal={
-          <View style={{ marginVertical: 10, borderRadius: 10 }}>
+          <View style={{ marginVertical: 10, borderRadius: 10 }}
+            ref={planDetailsRef}
+            onLayout={setFocusToPlanDetails} >
             <View
               style={{
                 flexDirection: "row",
@@ -161,8 +142,6 @@ const MyServicePlan = ({ plans, navigation }) => {
                 marginHorizontal: 20,
                 marginVertical: 10,
               }}
-              accessible
-              accessibilityRole="header"
             >
               <Text
                 style={{
@@ -191,9 +170,6 @@ const MyServicePlan = ({ plans, navigation }) => {
                   style={{ height: 32, width: 32, overflow: "hidden" }}
                   resizeMode="cover"
                   source={require("../../../assets/right-actionable7.png")}
-                  accessible={true}
-                  accessibilityLabel="Close Plan window"
-                  accessibilityRole="image"
                 />
               </TouchableOpacity>
             </View>
@@ -204,13 +180,8 @@ const MyServicePlan = ({ plans, navigation }) => {
                 <PlanDetailsItem item={item} index={index} key={index} />
                 </View>
               )}
-              keyExtractor={item => item.id}
-              accessible={true}
-              accessibilityRole="list"
+              keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
             />
-            {/* {(plans?.length > 0) ? plans.map((item, index) => {
-              return <PlanDetailsItem item={item} index={index} key={index} />;
-            }) : <></>} */}
           </View>
         }
         ContentModalStyle={styles.Modal}

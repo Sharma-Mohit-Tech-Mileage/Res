@@ -5,11 +5,12 @@ import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
-import { saveUserInfo } from "../../redux/actions/UserAction";
+import { saveUserInfo,logError,logInfo} from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import {widthPercentageToDP as wp,heightPercentageToDP as hp,} from "react-native-responsive-screen";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
+import DeviceInfo from 'react-native-device-info';
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import { getUser, cleanUserData } from "../../redux/utils/LocalStorage";
@@ -42,7 +43,19 @@ const SplashScreen = ({ navigation }) => {
     PostAuthApiRequest("/mobile/api/gettoken", request, onSuccess, onError);
   };
 
-  const onSuccess = async (res) => {setLoading(false);handleLogin(res)};
+  const onSuccess = async (res) => {
+    setLoading(false);
+    handleLogin(res);
+    dispatch(logInfo({
+      host: DeviceInfo.getBrand(), 
+      application: 'Sparklight Residential Mobile App',
+      className: 'AuthenticationService',
+      methodName: 'callSSOLoginApi',
+      messageDate: new Date().toISOString().split('T')[0],
+      errorCode: 0,
+      message: 'Successful SSO Login',
+    }));
+  };
 
   const handleLogin = async (res) => {
     if (res) {
@@ -114,25 +127,18 @@ const SplashScreen = ({ navigation }) => {
     });
   };
   
-  // const logoutAction = () => {
-  //   getSsoToken().then((res) => {
-  //     console.log('token', res)
-  //     let token = res.idToken;
-  //     logout(config, {
-  //       idToken: token,
-  //       postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
-  //     }).then((result) => {
-  //       storeUser({});
-  //       storeSsoToken({});
-  //       saveUserInfo({});
-  //       cleanUserData();
-  //       console.log(result)
-  //     });
-  //   });
-  // }
   const onError = (error) => {
     setLoading(false);
-    setTimeout(() => { setDisconnected(true)}, 500)
+    setDisconnected(true)
+    dispatch(logError({
+      host: DeviceInfo.getBrand(),
+      application: 'Sparklight Residential Mobile App',
+      className: 'AuthenticationService',
+      methodName: 'callSSOLoginApi',
+      errorDate: new Date().toISOString().split('T')[0],
+      errorData: error.message,
+      errorCode: 30800,
+    }));
   };
 
   const AppUpdateMsg=()=>{
@@ -216,51 +222,6 @@ const SplashScreen = ({ navigation }) => {
     });
   };
   
-
-  // const CustomAlertModal = ({ visible, message, message2, onClose }) => {
-  //   return (
-  //     <Modal
-  //       visible={visible}
-  //       transparent
-  //       animationType="fade"
-  //       onRequestClose={onClose}>
-  //       <View style={styles.overlay}>
-  //         <View style={styles.alertContainer}>
-  //           <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-  //             <View style={{ flexDirection: "row", alignSelf: "flex-start" }}>
-  //               <AlertIcon />
-  //               <Text style={styles.alertTitle}>
-  //                 {" Access Denied"}
-  //               </Text>
-  //             </View>
-  //           </View>
-  //           <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}/>
-  //           <Text style={styles.message}>{message}
-  //             <Text style={[styles.message, { fontWeight: 600, color: colors.sparklight_purple_blue }]} onPress={() => {
-  //               Linking.openURL(Env.URL);
-  //             }}> login to your online account</Text>
-  //             {message2}
-  //           </Text>
-  //           <TouchableOpacity
-  //             style={styles.closeBtn}
-  //             onPress={onClose}
-  //           >
-  //             <Text
-  //               style={styles.closeAlertTxt}
-  //             >
-  //               Close
-  //             </Text>
-  //           </TouchableOpacity>
-  //         </View>
-  //       </View>
-  //     </Modal>
-  //   );
-  // };
-
-  // const handleCloseAlert = () => {
-  //   setModalVisible(false);
-  //   logoutAction();
-  // };
 
 
   const checkAppUpdate = () => {

@@ -180,6 +180,11 @@ const TextNotifications = ({ navigation }) => {
                     <View style={styles.bottomBar}>
                         <Pressable
                             disabled={!enableButton}
+                            accessible={true}
+                            accessibilityRole="button"
+                            accessibilityState={{ disabled: !enableButton }}
+                            accessibilityLabel="Enable Text Notifications"
+                            accessibilityHint="Activates text message notifications for your account."
                             style={enableButton ? [styles.button, styles.buttonsLayout] : [styles.button, styles.buttonsLayout, styles.buttonDisabled]}
                             onPress={enableTextNotifications}
                         >

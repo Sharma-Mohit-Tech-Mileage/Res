@@ -139,6 +139,7 @@ const fetchPushNotifications = async () => {
     fetchPushNotificationsCount = fetchPushNotificationsCount + 1;
     let user = await getUser();
     const userName = user.userInfo?.userName || null;
+    const accountNumber = user.userInfo?.accountNumber || null;
     const config = {
         headers: {
             Authorization: "Bearer " + user.token
@@ -400,5 +401,37 @@ const handleSubmitFeedback = async (obj) => {
     }
 };
 
+const logError = async (errorData) => {
+    let user = await getUser();
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+    console.log('error logged Payload^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^',JSON.stringify(errorData));
+    try {
+        await _axios.post('/logging/api/log/error', errorData);
+        console.log('Error logged successfully');
+    } catch (logErr) {
+        console.error('Failed to log error:', logErr);
+    }
+};
 
-export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification }
+const logInfo = async (infoData) => {
+    let user = await getUser();
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+    console.log('Info logged Payload^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^',JSON.stringify(infoData));
+    try {
+       const response = await _axios.post('/logging/api/log/info', infoData);
+       console.log('==================================================================================',response)
+        console.log('Info logged successfully');
+    } catch (logErr) {
+        console.error('Failed to log info:', logErr);
+    }
+};
+
+export { logError,logInfo,fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification }

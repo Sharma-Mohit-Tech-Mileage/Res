@@ -42,7 +42,7 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                                     <Text 
                                         accessible={true}
                                         accessibilityLabel="Contact us"
-                                        accessibilityRole="link"
+                                        accessibilityRole="button"
                                         accessibilityHint="Navigates to the support screen"
                                         style={styles.contactUsText}
                                         onPress={() => {
