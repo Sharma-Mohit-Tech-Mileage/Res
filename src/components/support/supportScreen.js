@@ -181,7 +181,7 @@ const Support = ({route}) => {
                             <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                         </View>
                     </View>
-                    <ScrollView style={{ width: '100%', padding: Padding.p_base }} ref={scrollViewRef} accessible={false}>
+                    <ScrollView style={{ width: '100%', padding: Padding.p_base }} ref={scrollViewRef} >
                         <View accessible={true} style={{ marginBottom: hp('50%') }}>
                             <View style={styles.issuesFlexBox}>
                             <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
