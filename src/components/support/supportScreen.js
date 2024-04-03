@@ -7,13 +7,20 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
 import ZendeskChat from "react-native-zendesk-chat";
 import PubSub from 'pubsub-js'
-import {heightPercentageToDP as hp,} from "react-native-responsive-screen";
+import {
+    heightPercentageToDP as hp,
+  } from "react-native-responsive-screen";
+
 import { Env } from "../../network/apis/account/Constants";
+import ChatSupportModal from "./ChatSupportModal";
 
 ZendeskChat.init(Env.ZENDESK_CHAT_KEY);  
 
 const Support = ({route}) => {
+    console.log('Back to Support',JSON.stringify(route))
     const navigation = useNavigation();
+    const [showModal, setShowModal] = useState(false);
+    const [department, setDepartment] = useState('');
     const [zenDeskSupportAvailable, setZenDeskSupportAvailable] = useState(false);
     const userData = useSelector(state => state.combinedReducers.user.userData);
     const scrollViewRef = useRef(null);
@@ -29,8 +36,28 @@ const Support = ({route}) => {
         Linking.openURL(phoneNumber);
     };
 
+    const toggleModal = () => {
+        setDepartment();
+        setShowModal(!showModal);
+    };    
+    
+    //  useEffect(() => {
+    //     // Check if the triggerEvent parameter is present
+    //     if (route.params?.triggerEvent) {
+    //         // If present, perform the desired action after a delay
+    //         setTimeout(() => {
+    //             PubSub.publish('event.contactUsEvent', {});
+    //         }, 500);
+
+    //         // Reset the parameter to avoid repeated actions if the screen is revisited
+    //         navigation.setParams({ triggerEvent: undefined });
+    //     }
+    // }, [route.params, navigation]);
+
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
+          // The screen is focused
+          // Call any action
           setTimeout(()=>{
             if(!route.params?.isContactUs){
             scrollViewRef.current?.scrollTo({y:0,x:0,animated: true})
@@ -41,6 +68,7 @@ const Support = ({route}) => {
            
         });
     
+        // Return the function to unsubscribe from the event so it gets removed on unmount
         return unsubscribe;
       }, [navigation]);
 
@@ -113,7 +141,13 @@ const Support = ({route}) => {
         return () => {
             PubSub.unsubscribe(token);
         };     
-    }, []); 
+    }, []);
+
+    // useEffect(async () => {
+    //     const online = await ZendeskChat.areAgentsOnline();
+    //     console.log('setZenDeskSupportAvailable: ', online);
+    //     setZenDeskSupportAvailable(online);
+    // }, []);      
 
     
     const handlePressOpenButton = (department, tags) => {
@@ -125,6 +159,7 @@ const Support = ({route}) => {
 
         tags.push('pid:_' + userData.userInfo.accountNumber);
 
+        // On button press, when you want to show chat:
         ZendeskChat.startChat({
             name: user.full_name,
             email: user.email,
@@ -181,8 +216,8 @@ const Support = ({route}) => {
                             <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                         </View>
                     </View>
-                    <ScrollView style={{ width: '100%', padding: Padding.p_base }} ref={scrollViewRef} >
-                        <View accessible={true} style={{ marginBottom: hp('50%') }}>
+                    <ScrollView style={{ width: '100%', padding: Padding.p_base }} ref={scrollViewRef}>
+                        <View style={{ marginBottom: hp('50%') }}>
                             <View style={styles.issuesFlexBox}>
                             <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
                                     <Text style={[styles.heading, styles.headingTypo]}>
@@ -256,6 +291,40 @@ const Support = ({route}) => {
                                     </View>
                                 </Pressable> }
 
+                                {/* <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} >
+                                    <Pressable
+                                        style={[styles.integrationCardMobile1, styles.integrationCardBorder,]}
+                                        onPress={() => { navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/18929657224855', name: 'FAQ' }) }}
+                                    >
+                                        <View style={[styles.content, styles.contentSpaceBlock]}>
+                                            <View style={styles.headingAndIcon}>
+                                                <View style={[]}>
+                                                    <Image
+                                                        style={styles.icon}
+                                                        resizeMode="stretch"
+                                                        source={require("../../../assets/icon-faq.png")}
+                                                    /></View>
+                                                <View style={styles.frameParent}>
+                                                    <View style={styles.headingAndToggle}>
+                                                        <Text style={[styles.headingTypo]}>
+                                                            FAQ
+                                                        </Text>
+                                                        <Image
+                                                            style={styles.chevronIconLayout}
+                                                            resizeMode="stretch"
+                                                            source={require("../../../assets/chevronright.png")}
+                                                        />
+                                                    </View>
+                                                    <Text style={[styles.supportingText, styles.supportingTypo1]}>
+                                                        Review common questions.
+                                                    </Text>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </Pressable>
+                                </View>
+
+                                */}
                                 <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
                                     <Pressable
                                         style={[styles.integrationCardMobile1, styles.integrationCardBorder]}
@@ -326,8 +395,11 @@ const Support = ({route}) => {
                                                     </Pressable>                                                        
                                                 </View>
                                                 <Pressable
-                                                    onPress={() => handlePressOpenButton("1500003304301", ['Residential', 'Sales', 'ContactUs'])}
-                                                    accessibilityLabel="Chat Support"
+                                                   // onPress={() => handlePressOpenButton("1500003304301", ['Residential', 'Sales', 'ContactUs'])}
+                                                   onPress={() => {
+                                                        toggleModal("1500003304301");
+                                                   }}
+                                                   accessibilityLabel="Chat Support"
                                                     accessibilityRole="button"
                                                     accessibilityHint="Chat with Tech Support">
                                                     <View style={styles.supportChatText}>
@@ -384,7 +456,10 @@ const Support = ({route}) => {
                                                         </Pressable>
                                                     </View>
                                                     <Pressable
-                                                        onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
+                                                        //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
+                                                        onPress={() => {
+                                                            toggleModal("1500003312402");
+                                                        }}
                                                         accessibilityLabel="Chat Support"
                                                         accessibilityRole="button"
                                                         accessibilityHint="Chat with Billing Support">    
@@ -418,6 +493,12 @@ const Support = ({route}) => {
                         </View>
                         <View style={[styles.issuesFlexBox]} />
                         </View>
+                        {showModal && (
+                            <ChatSupportModal
+                                department={department}
+                                onClose={()=>toggleModal()}
+                            />
+                        )}                        
                         </ScrollView>
                         </View>
                 </View>
