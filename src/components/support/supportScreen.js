@@ -12,12 +12,15 @@ import {
   } from "react-native-responsive-screen";
 
 import { Env } from "../../network/apis/account/Constants";
+import ChatSupportModal from "./ChatSupportModal";
 
 ZendeskChat.init(Env.ZENDESK_CHAT_KEY);  
 
 const Support = ({route}) => {
     console.log('Back to Support',JSON.stringify(route))
     const navigation = useNavigation();
+    const [showModal, setShowModal] = useState(false);
+    const [department, setDepartment] = useState('');
     const [zenDeskSupportAvailable, setZenDeskSupportAvailable] = useState(false);
     const userData = useSelector(state => state.combinedReducers.user.userData);
     const scrollViewRef = useRef(null);
@@ -32,6 +35,11 @@ const Support = ({route}) => {
 
         Linking.openURL(phoneNumber);
     };
+
+    const toggleModal = () => {
+        setDepartment();
+        setShowModal(!showModal);
+    };    
     
     //  useEffect(() => {
     //     // Check if the triggerEvent parameter is present
@@ -387,8 +395,11 @@ const Support = ({route}) => {
                                                     </Pressable>                                                        
                                                 </View>
                                                 <Pressable
-                                                    onPress={() => handlePressOpenButton("1500003304301", ['Residential', 'Sales', 'ContactUs'])}
-                                                    accessibilityLabel="Chat Support"
+                                                   // onPress={() => handlePressOpenButton("1500003304301", ['Residential', 'Sales', 'ContactUs'])}
+                                                   onPress={() => {
+                                                        toggleModal("1500003304301");
+                                                   }}
+                                                   accessibilityLabel="Chat Support"
                                                     accessibilityRole="button"
                                                     accessibilityHint="Chat with Tech Support">
                                                     <View style={styles.supportChatText}>
@@ -445,7 +456,10 @@ const Support = ({route}) => {
                                                         </Pressable>
                                                     </View>
                                                     <Pressable
-                                                        onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
+                                                        //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
+                                                        onPress={() => {
+                                                            toggleModal("1500003312402");
+                                                        }}
                                                         accessibilityLabel="Chat Support"
                                                         accessibilityRole="button"
                                                         accessibilityHint="Chat with Billing Support">    
@@ -479,6 +493,12 @@ const Support = ({route}) => {
                         </View>
                         <View style={[styles.issuesFlexBox]} />
                         </View>
+                        {showModal && (
+                            <ChatSupportModal
+                                department={department}
+                                onClose={()=>toggleModal()}
+                            />
+                        )}                        
                         </ScrollView>
                         </View>
                 </View>
