@@ -35,8 +35,8 @@ const ProfileSettingsHeader = ({
                         <Pressable
                             style={[iconStyle, styles.chevronLayout]}
                             onPress={onPressBack}
-                            accessibilityLabel="Back"
-                            accessibilityHint="Go back to the previous screen"
+                            accessibilityLabel="Back Button"
+                            accessibilityHint="Returns to the previous screen"
                             accessibilityRole="button"
                             accessible={true}
                             hitSlop={20}
@@ -51,7 +51,10 @@ const ProfileSettingsHeader = ({
                             />
                         </Pressable>
                     )}
-                    <Text style={styles.title}>{title}</Text>
+                    <Text style={styles.title} 
+                    accessible={true}
+                    accessibilityRole="header" // Indicates this is a header/title
+                    accessibilityLabel={title} >{title}</Text>
                 </View>
             </LinearGradient>
         </>

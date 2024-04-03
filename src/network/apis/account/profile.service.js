@@ -139,6 +139,7 @@ const fetchPushNotifications = async () => {
     fetchPushNotificationsCount = fetchPushNotificationsCount + 1;
     let user = await getUser();
     const userName = user.userInfo?.userName || null;
+    const accountNumber = user.userInfo?.accountNumber || null;
     const config = {
         headers: {
             Authorization: "Bearer " + user.token
@@ -151,8 +152,8 @@ const fetchPushNotifications = async () => {
     console.log(`Making API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`);
 
     try {
-        const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, { ...config });
-
+        //const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, { ...config });
+        const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences/${accountNumber}`, { ...config });
         // Log the successful response
         console.log(`API Call Successful to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:;;;;;;;;;;;;;;;;;`, JSON.stringify(response.data));
         return response.data;
@@ -328,11 +329,9 @@ const postPushNotifications = async (data) => {
     try {
         const response = await _axios_cableone.post(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, data, config);
 
-        // Log the successful response
         console.log(`API Call Successful to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:`, response);
         return response;
     } catch (error) {
-        // Log the error with a descriptive message
         console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, error);
         throw error;
     }
@@ -402,5 +401,37 @@ const handleSubmitFeedback = async (obj) => {
     }
 };
 
+const logError = async (errorData) => {
+    let user = await getUser();
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+    console.log('error logged Payload^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^',JSON.stringify(errorData));
+    try {
+        await _axios.post('/logging/api/log/error', errorData);
+        console.log('Error logged successfully');
+    } catch (logErr) {
+        console.error('Failed to log error:', logErr);
+    }
+};
 
-export { fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification }
+const logInfo = async (infoData) => {
+    let user = await getUser();
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+    console.log('Info logged Payload^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^',JSON.stringify(infoData));
+    try {
+       const response = await _axios.post('/logging/api/log/info', infoData);
+       console.log('==================================================================================',response)
+        console.log('Info logged successfully');
+    } catch (logErr) {
+        console.error('Failed to log info:', logErr);
+    }
+};
+
+export { logError,logInfo,fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification }

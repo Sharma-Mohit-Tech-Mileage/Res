@@ -50,7 +50,7 @@ const ModemExchangeInstructions = () => {
                   <>
                     {instruction.split('contact us')[0]}
                     <Text accessible={true}
-                      accessibilityRole="link"
+                      accessibilityRole="button"
                       accessibilityLabel="Contact us for more information"
                     style={styles.linkText} onPress={() => {
                       //PubSub.publish('event.contactUsEvent', {});

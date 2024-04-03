@@ -105,7 +105,7 @@ const ModemReboot = () => {
             {inst3}
               <Text style={[styles.textContactUs, { fontWeight: '700' }]}
                 accessible={true}
-                accessibilityRole="link"
+                accessibilityRole="button"
                 accessibilityLabel="Contact us for further assistance"
                 onPress={() => {
                   PubSub.publish('event.contactUsEvent', {});

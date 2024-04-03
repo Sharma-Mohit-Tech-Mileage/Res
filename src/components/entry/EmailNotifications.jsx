@@ -1,11 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Alert, TouchableWithoutFeedback, Keyboard  } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
-import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import InfoIcon from "../../res/svgIcons/InfoIcon";
-import BellIcon from "../../res/svgIcons/bellIcon";
 import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
 import EntryInput from "./EntryInput";
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,7 +11,6 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 const EmailNotifications = ({ navigation }) => {
     const dispatch = useDispatch();
     const [input, setInput] = useState('');
-    const user = useSelector(state => state.combinedReducers.user.userData);
     const profile = useSelector(state => state.combinedReducers.profile || {});    
     const [enableButton, setEnableButton] = useState(false);
     const [keyboardHidden, setKeyboardHidden] = useState(true);
@@ -78,7 +73,6 @@ const EmailNotifications = ({ navigation }) => {
         };
         console.log('enableEmailNotifications: ', data);
         dispatch(updateEntryEmailNotification(data, navigation));
-        //navigation.navigate("MyTab");
     };
     
     return  (
@@ -154,6 +148,11 @@ const EmailNotifications = ({ navigation }) => {
                     <View style={styles.bottomBar}>
                         <Pressable
                             disabled={!enableButton}
+                            accessible={true}
+                            accessibilityRole="button"
+                            accessibilityState={{ disabled: !enableButton }}
+                            accessibilityLabel="Enable Email Notifications"
+                            accessibilityHint="Taps to enable email notifications for your account."
                             style={enableButton ? [styles.button, styles.buttonsLayout] : [styles.button, styles.buttonsLayout, styles.buttonDisabled]}
                             onPress={enableEmailNotifications}
                         >                      

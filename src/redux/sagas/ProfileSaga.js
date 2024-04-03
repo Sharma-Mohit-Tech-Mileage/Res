@@ -4,9 +4,9 @@ import {
     fetchSmsSubscription, fetchBillingStatus,
     postProfileInfo, postTextNotifictionInfo,
     fetchPaperLessDetails, postEmailNotification,
-    putEmailNotification, postTermsAndConditions, 
-    postPushNotifications, unsubscribPaperLess, 
-    fetchPushNotifications, handleSubmitFeedback,resendEmailVerification
+    putEmailNotification, postTermsAndConditions,
+    postPushNotifications, unsubscribPaperLess,
+    fetchPushNotifications, handleSubmitFeedback, resendEmailVerification, logError, logInfo
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
@@ -17,7 +17,7 @@ import {
     UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS,
     FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
     SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
-    UPDATE_EXISTING_EMAIL_NOTIFICATION,RESEND_EMAIL_VERIFICTION
+    UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION, LOG_ERROR, LOG_INFO
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
@@ -243,6 +243,23 @@ function* updateEntryEmailNotification(action) {
     }
 }
 
+function* logErrorSaga(action) {
+    try {
+        const response = yield call(logError, action.payload)
+    } catch (error) {
+        console.error('API Error Response:', error);
+    }
+}
+
+function* logInfoSaga(action) {
+    try {
+        const response = yield call(logInfo, action.payload);
+        
+    } catch (error) {
+        console.error('API Error Response:', error);
+    }
+}
+
 function* ProfileSagas() {
     yield takeLatest(FETCH_PROFILE_DETAILS, fetchProfileDetails);
     yield takeLatest(FETCH_USER_LIST, getProfileUsers);
@@ -262,5 +279,7 @@ function* ProfileSagas() {
     yield takeLatest(UPDATE_ENTRY_EMAIL_NOTIFICATION, updateEntryEmailNotification);
     yield takeLatest(UPDATE_EXISTING_EMAIL_NOTIFICATION, updateNewEmail);
     yield takeLatest(RESEND_EMAIL_VERIFICTION, resentVerifiction);
+    yield takeLatest(LOG_ERROR, logErrorSaga);
+    yield takeLatest(LOG_INFO, logInfoSaga);
 }
 export default ProfileSagas;
