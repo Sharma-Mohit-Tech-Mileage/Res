@@ -19,6 +19,7 @@ const MyServicePlan = ({ plans, navigation }) => {
   const [ShowComment, setModelComment] = useState(false);
   const [animateModal, setanimateModal] = useState(false);
   const [data, setData] = useState({});
+  const [bundle, setBundle] = useState({});
   const planDetailsRef = React.useRef(null);
   const setFocusToPlanDetails = () => {
     const reactTag = findNodeHandle(planDetailsRef.current);
@@ -36,6 +37,23 @@ const MyServicePlan = ({ plans, navigation }) => {
       });
     });
   };
+
+  // get plan bundles
+  const getPlanBundle = () => {
+    getUser().then((res) => {
+     const request = `account/api/account/${res.userInfo.accountNumber}/bundle`;
+     GetApiRequest(request, (res)=>{
+      console.log('getPlanBundle',JSON.stringify(res))
+           if(res){
+            setBundle(res[0])
+           }
+     }, (error)=>{
+      console.log('getPlanBundle error',error)
+          console.log(error)
+     });
+   });
+ };
+
 
   const MyPlanDetails = () => {
     
@@ -74,24 +92,29 @@ const MyServicePlan = ({ plans, navigation }) => {
                 <InternetIcon />
               </LinearGradient>
             </View>
-            <Text style={styles.planDetailsRowHeader} accessibilityLabel={`Internet ${item.planName}`} accessibilityRole="header">
-              Internet {item.planName}
+            <Text style={styles.planDetailsRowHeader} accessibilityLabel={`Internet ${item.packageName}`} accessibilityRole="header">
+               {item.packageName}
             </Text>
           </View>
-
+            { item.features.map((item)=>{
+              return(
+                <>
           <View style={[styles.planDetailsRow]}>
             <View style={{ alignSelf: "center" }}>
               <TickIcon  />
             </View>
-
+      
             <Text style={styles.planDetailsTxt} accessible={true} >
-              Download Speed Up To {item.downloadSpeed} Mbps
+              {item}
             </Text>
           </View>
 
-          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} />
-
-          <View style={[styles.planDetailsRow]}>
+          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 2 }} />
+          </>
+              )
+            })}
+       
+          {/* <View style={[styles.planDetailsRow]}>
             <View style={{ alignSelf: "center" }}>
               <TickIcon />
             </View>
@@ -109,7 +132,7 @@ const MyServicePlan = ({ plans, navigation }) => {
               marginLeft: 10,
             }}
           >
-            <View style={{ flexDirection: "row" }}>
+             <View style={{ flexDirection: "row" }}>
               <View style={{ alignSelf: "center" }}>
                 <TickIcon />
               </View>
@@ -118,8 +141,8 @@ const MyServicePlan = ({ plans, navigation }) => {
                 accessibilityLabel={`Data Plan ${item.dataQuotaGB === '15000' ? 'UNLIMITED' : item.dataQuotaGB + ' gigabytes'}`}>
                 Data Plan {(item.dataQuotaGB=='15000')?'UNLIMITED':item.dataQuotaGB+' GB*'}
               </Text>
-            </View>
-          </View>
+            </View> 
+          </View> */}
 
           <View style={{ backgroundColor: colors.grey, height: 1, width: "100%", marginTop: 5 }}  />
         </View>
@@ -174,13 +197,13 @@ const MyServicePlan = ({ plans, navigation }) => {
               </TouchableOpacity>
             </View>
             <FlatList
-              data={plans||[]}
+              data={bundle.packages||[]}
               renderItem={({ item, index }) => (
                 <View key={index}>
                 <PlanDetailsItem item={item} index={index} key={index} />
                 </View>
               )}
-              keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
+              keyExtractor={(item, index) =>index.toString()}
             />
           </View>
         }
@@ -196,6 +219,7 @@ const MyServicePlan = ({ plans, navigation }) => {
   useEffect(() => {
     //console.log("data");
     getDataUsage();
+    getPlanBundle();
   }, []);
   return (
     <View
@@ -359,7 +383,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 16,
   },
   planDetailsRow: {
-    padding: wp("4%"),
+    padding: wp("2%"),
     flexDirection: "row",
     marginLeft: 10,
   },
