@@ -28,15 +28,16 @@ const AppUpdateAlert = ({ visible, onClose }) => {
           >
             <View style={{ flexDirection: "row", alignSelf: "flex-start" ,alignItems:'center'}}>
               <AlertIcon />
-              <Text style={styles.alertTitle}>{"App Update"}</Text>
+              <Text style={styles.alertTitle}>{"New Update Required"}</Text>
             </View>
           </View>
           <View
             style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
           />
           <Text style={styles.message}>
-            Looks like you have an older version of the app. To get latest
-            features and best experience you'll need to update now
+           To continue using the MySparklight app, please
+           download the latest version. Enjoy new features,
+           improved performance, and enhanced security.
           </Text>
           <TouchableOpacity
             style={styles.closeBtn}
