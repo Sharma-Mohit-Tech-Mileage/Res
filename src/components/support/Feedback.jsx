@@ -25,6 +25,8 @@ const Feedback = () => {
     const dispatch = useDispatch();
     const profile = useSelector(state => state.combinedReducers.profile || {});
     const profileDetails = profile.profileDetails || {};
+    const isSubmittingRef = useRef(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [selectedFeedback, setSelectedFeedback] = useState('facehappy'); // State to track selected feedback
 
@@ -37,12 +39,17 @@ const Feedback = () => {
     };
 
     const handleIconPress = (option) => {
+        if (isSubmittingRef.current) return;
         setSelectedFeedback(option.name); // Update the selected feedback
         setValue('category', option.category);
         setValue('feedbackValue', option.value);
     };
 
     const onSubmit = data => {
+        if (isSubmittingRef.current) return;
+        isSubmittingRef.current = true;
+        setIsSubmitting(true); // Also update the state for UI feedback
+
         dispatch(saveUserFeedback(data, navigation));
     };
 
@@ -155,9 +162,16 @@ const Feedback = () => {
 
                     </View>
                     <View style={styles.buttonContainer}>
-                        <Pressable style={styles.button} onPress={handleSubmit(onSubmit, handleValidationError)}>
-                            <Text style={[styles.textStyle, { color: Color.sparklightWhite }]}>Submit Feedback</Text>
-                        </Pressable>
+                    <Pressable
+    style={[styles.button]}
+    onPress={handleSubmit(onSubmit, handleValidationError)}
+    disabled={isSubmitting} // Use state for UI updates
+>
+    <Text style={[styles.textStyle,{color:Color.sparklightWhite}]}>
+        {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
+    </Text>
+</Pressable>
+
                     </View>
                     <View style={styles.buttonContainer}>
                         <Pressable onPress={() => navigation.navigate('Account')} >
