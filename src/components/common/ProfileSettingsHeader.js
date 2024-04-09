@@ -39,7 +39,7 @@ const ProfileSettingsHeader = ({
                             accessibilityHint="Returns to the previous screen"
                             accessibilityRole="button"
                             accessible={true}
-                            hitSlop={20}
+                            hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }} 
                             onPressIn={() => setIconPressed(true)}
                             onPressOut={() => setIconPressed(false)}
                         >
@@ -47,7 +47,6 @@ const ProfileSettingsHeader = ({
                                 style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                                 resizeMode="cover"
                                 source={iconSource}
-                                accessible={false}
                             />
                         </Pressable>
                     )}

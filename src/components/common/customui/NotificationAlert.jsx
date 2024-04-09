@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Color, FontSize, FontFamily, Padding } from '../../../../GlobalStyles';
-import PubSub from 'pubsub-js';
-import { useNavigation, CommonActions } from "@react-navigation/native";
+import { View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import { Color, FontSize, FontFamily } from '../../../../GlobalStyles';
+import { useNavigation } from "@react-navigation/native";
 const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true, isVisible = true }) => {
     if (!isVisible) return null;
     const typeStyles = {
