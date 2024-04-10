@@ -1,18 +1,5 @@
 import React, { useState, useEffect,useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Platform,
-  Dimensions,
-  Pressable,
-  ActivityIndicator,
-  Linking,
-  AppState
-} from "react-native";
+import {View,Text,StyleSheet,Image,TouchableOpacity,ScrollView,Platform,Dimensions,Pressable,ActivityIndicator,Linking,AppState} from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import VersionCheck from "react-native-version-check";
 import LinearGradient from "react-native-linear-gradient";
@@ -26,28 +13,13 @@ import NetworkDetails from "../common/NetworkDetails";
 import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
-import {
-  getUser,
-  getPushNotificationStatus,
-  storePushNotificationStatus,
-  storeUpgradeToken,
-} from "../../redux/utils/LocalStorage";
-import {
-  GetApiRequest,
-  GetModemStatusApiRequest,
-} from "../../network/APIClient";
+import {getUser,getPushNotificationStatus,storePushNotificationStatus,storeUpgradeToken,} from "../../redux/utils/LocalStorage";
+import {GetApiRequest,GetModemStatusApiRequest,} from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
-import {
-  getFcmToken,
-  requestUserPermission,
-  notifyPermission,
-} from "../../firebase/FirebaseUtils";
-import {
-  updatePushNotifications,
-  fetchPushNotifications,
-} from "../../redux/actions/ProfileActionSuite";
+import {getFcmToken,requestUserPermission,} from "../../firebase/FirebaseUtils";
+import {updatePushNotifications,fetchPushNotifications,} from "../../redux/actions/ProfileActionSuite";
 import { useSelector, useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
@@ -84,7 +56,6 @@ const HomeScreen = ({ navigation }) => {
     }
     
 });
-
 
 
   const getInternetHealth = (type) => {
@@ -509,8 +480,8 @@ const HomeScreen = ({ navigation }) => {
 
     return (
       <>
-        <View style={styles.walkThroughBubble}>
-          <View>
+        <View style={styles.walkThroughBubble} >
+          <View accessible accessibilityLabel={`${walkThrough.title}. ${walkThrough.description}`}>
             <View style={styles.title}>
               <Text style={styles.titleText}>{walkThrough.title}</Text>
             </View>
@@ -520,8 +491,8 @@ const HomeScreen = ({ navigation }) => {
               </Text>
             </View>
           </View>
-          <View style={styles.walkThroughBottomArea}>
-            <View style={styles.circlePaging}>
+          <View style={styles.walkThroughBottomArea} accessible accessibilityLabel="Navigation Buttons">
+            <View style={styles.circlePaging} accessible>
               <View style={styles.circle}></View>
               <View
                 style={
@@ -542,23 +513,19 @@ const HomeScreen = ({ navigation }) => {
               <View style={styles.walkThroughSubButtons}>
                 {walkThroughStep > 0 && (
                   <Pressable
-                    style={[
-                      styles.button,
-                      styles.buttonsLayout,
-                      styles.buttonPrevious,
-                    ]}
+                    style={[styles.button,styles.buttonsLayout, styles.buttonPrevious,]}
                     onPress={() => changeWalkThroughStep(walkThroughStep - 1)}
+                    accessibilityLabel="Previous Step"
+                    accessibilityRole="button"
                   >
                     <Text style={styles.decline}>Previous</Text>
                   </Pressable>
                 )}
                 <Pressable
-                  style={[
-                    styles.button,
-                    styles.buttonsLayout,
-                    styles.buttonNext,
-                  ]}
+                  style={[styles.button,styles.buttonsLayout,styles.buttonNext,]}
                   onPress={() => changeWalkThroughStep(walkThroughStep + 1)}
+                  accessibilityLabel={walkThroughStep < walkThroughScreens.length - 1 ? "Next Step" : "Finish Walkthrough"}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.accept}>{walkThrough.buttonText}</Text>
                 </Pressable>
@@ -570,6 +537,9 @@ const HomeScreen = ({ navigation }) => {
               style={bottomCarotStyles}
               tintColor={"#FFF"}
               source={require("../../../assets/polygon.png")}
+              accessible
+              accessibilityLabel="Decoration"
+              accessibilityRole="image"
             />
           </View>
         </View>
