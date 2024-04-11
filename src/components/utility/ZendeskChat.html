@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Contact Us</title>
+    <!-- Start of Zendesk Widget script -->
+  <script id="ze-snippet"
+  src="https://static.zdassets.com/ekr/snippet.js?key=5b6f4fab-f7a4-4a5a-a133-04bc0cb80009"> </script>
+<!-- End of Zendesk Widget script -->
+</head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<body>
+    <!-- Start of Zendesk Widget script -->
+    <script>
+        document.addEventListener( 'DOMContentLoaded', function( event ) {
+          // zE('webWidget', 'prefill', {
+          //   name: { value: "${user.name}", readOnly: true },
+          //   email: { value: "${user.email}", readOnly: true },
+          //   phone: { value: "${user.phone}", readOnly: true }
+          // });
+          // zE('webWidget', 'identify', { name: "${user.name}", email: "${user.email}" });
+          zE('webWidget', 'open');
+          zE('webWidget:on', 'close', () => window.ReactNativeWebView.postMessage("close"));
+        });
+        </script>
+    
+    <!-- End of Zendesk Widget script -->
+</body>
+
+</html>

@@ -60,7 +60,28 @@ const ChatSupportModal = ({ department, onClose }) => {
   //       open.apply(this, arguments);
   //   };})();`;
 
-  const INJECTED_JAVASCRIPT = `(function () {     var script = document.createElement('script');     script.src = 'https://static.zdassets.com/ekr/snippet.js?key=key=ad791f41-3c05-490b-8bb3-55afe1751f92'; // Replace YOUR_ZENDESK_KEY with your Zendesk key    script.setAttribute('id', 'ze-snippet');     document.getElementsByTagName('head')[0].appendChild(script);     script.onload = function () {         // Initialize Zendesk Web Widgetwindow.zESettings = {             webWidget: {                 chat: {                     tags: ['tag1', 'tag2'], // Add any necessary tagsdepartment: 'Your Department' // Set the department for the chat                }             }         };         // Open Zendesk chatwindow.zE('webWidget', 'show');     }; })();`;
+  //const INJECTED_JAVASCRIPT = `(function () {     var script = document.createElement('script');     script.src = 'https://static.zdassets.com/ekr/snippet.js?key=key=ad791f41-3c05-490b-8bb3-55afe1751f92'; // Replace YOUR_ZENDESK_KEY with your Zendesk key    script.setAttribute('id', 'ze-snippet');     document.getElementsByTagName('head')[0].appendChild(script);     script.onload = function () {         // Initialize Zendesk Web Widgetwindow.zESettings = {             webWidget: {                 chat: {                     tags: ['tag1', 'tag2'], // Add any necessary tagsdepartment: 'Your Department' // Set the department for the chat                }             }         };         // Open Zendesk chatwindow.zE('webWidget', 'show');     }; })();`;
+
+  const chatHTML=()=> {
+    
+    return `<!DOCTYPE html>
+    <html lang="en">
+    
+    <head>
+        <title>Hello, World!</title>
+    </head>
+    
+    <body>
+        <p>Hello, World!</p>
+    
+        <!-- Start of Zendesk Widget script -->
+        <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=5b6f4fab-f7a4-4a5a-a133-04bc0cb80009">
+        </script>
+        <!-- End of Zendesk Widget script -->
+    </body>
+    
+    </html>`;
+  }
 
   return (
     <Modal
@@ -69,17 +90,17 @@ const ChatSupportModal = ({ department, onClose }) => {
       visible={modalVisible}
       onRequestClose={closeModal}
     >
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1,backgroundColor:'#c8c8c8' }}>
         <ProfileSettingsHeader onPressBack={closeModal} title="Chat With Us" />
-        <View style={{ width: "100%", height: "80%" }}>
+        <View style={{ width: "100%", height: "90%" }}>
           <WebView
-            source={{ uri: "https://www.sparklight.com/contactus" }}
+            source={require("../utility/ZendeskChat.html")}
             style={styles.webview}
             javaScriptEnabled={true}
             domStorageEnabled={true}
             onNavigationStateChange={navigationChange}
             onMessage={onMessage}
-            injectedJavaScript={INJECTED_JAVASCRIPT}
+            //injectedJavaScript={INJECTED_JAVASCRIPT}
           />
         </View>
       </View>

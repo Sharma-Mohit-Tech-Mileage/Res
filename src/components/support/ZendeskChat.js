@@ -1,6 +1,7 @@
-import React, { Component, useState,useEffect } from "react";
+import React, {  useState,useEffect } from "react";
 import { WebView } from "react-native-webview";
-import { Button, Modal, View } from "react-native";
+import { Button, Modal, View,SafeAreaView } from "react-native";
+//import ChatHtml from '../utility/index.html'
 
 // Author:    Hetmann Wilhelm Iohan
 // Email:     contact@react-ui-kit.com
@@ -62,65 +63,64 @@ const ZendeskChat =()=>  {
 
   const chatHTML=()=> {
     
-    return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Chat | </title>
-  <!-- Start of Zendesk Widget script -->
-  <script src="https://static.zdassets.com/ekr/snippet.js?key=ad791f41-3c05-490b-8bb3-55afe1751f92"></script>
-  
-  <!-- End of Zendesk Widget script -->
-  <style type="text/css">html { background: #FFF; }</style>
-</head>
-<body>
-
-<script>
-
-alert('Reached chat')
-
-
-</script>
-</body>
-</html>
-`;
+    return `<!DOCTYPE html>
+    <html lang="en">
+    
+    <head>
+        <title>Hello, World!</title>
+    </head>
+    
+    <body>
+        <p>Hello, World!</p>
+    
+        <!-- Start of Zendesk Widget script -->
+        <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=5b6f4fab-f7a4-4a5a-a133-04bc0cb80009">
+        </script>
+        <!-- End of Zendesk Widget script -->
+        
+    </body>
+    
+    </html>`;
   }
 
-  const renderChat=()=> {
+  const RenderChat=()=> {
     
     const userAgent = "YourApp";
 
     return (
       <Modal {...this.props} visible={showChat}>
+        <View style={{ width: "100%", height: "100%",marginTop:20 }}>
         <WebView
           useWebKit
           style={{ flex: 1 }}
           hideKeyboardAccessoryView
-          source={{ html: chatHTML() }}
+          source={require("../utility/ZendeskChat.html")}
           showsVerticalScrollIndicator={false}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
           applicationNameForUserAgent={userAgent}
           onMessage={({ nativeEvent }) => {
-            nativeEvent.data === "close" && this.setState({ showChat: false });
+            nativeEvent.data === "close" && setShowChat(false);
           }}
-          originWhitelist={["about:blank"]}
+          originWhitelist={['*']}
           // shouldStartLoadWithRequestHandler={({ url }) => url.startsWith("about:blank")}
         />
+        </View>
       </Modal>
     );
   }
   
     return (
-      <View style={{ flex: 1, justifyContent: "center" }}>
+      <SafeAreaView style={{ flex: 1,justifyContent:'center' }}>
+        <View>
         <Button
           title="Chat with us"
           color="black"
           onPress={() => setShowChat(true)}
         />
-        {renderChat()}
-      </View>
+        <RenderChat/>
+        </View>
+      </SafeAreaView>
     );
   
 }
