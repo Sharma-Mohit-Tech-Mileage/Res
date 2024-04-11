@@ -93,7 +93,8 @@ const MyServicePlan = ({ plans, navigation }) => {
               </LinearGradient>
             </View>
             <Text style={styles.planDetailsRowHeader} accessibilityLabel={`Internet ${item.packageName}`} accessibilityRole="header">
-               {item.packageName}
+            {/* {item.packageType} {item.packageName} */}
+            {item.packageType==='Phone'? "Phone ".concat(item.packageName): item.packageName } 
             </Text>
           </View>
             { item.features.map((item)=>{
@@ -109,7 +110,10 @@ const MyServicePlan = ({ plans, navigation }) => {
             </Text>
           </View>
 
-          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 2 }} />
+          <View style={{ backgroundColor: colors.grey, height: 1.5, marginTop: 5 }}
+
+          
+          />
           </>
               )
             })}
@@ -379,11 +383,12 @@ const styles = StyleSheet.create({
   Modal: {
     backgroundColor: "#fff",
     marginTop: hp("40%"),
+    paddingBottom: 90,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
   planDetailsRow: {
-    padding: wp("2%"),
+    padding: wp("4%"),
     flexDirection: "row",
     marginLeft: 10,
   },
@@ -397,10 +402,11 @@ const styles = StyleSheet.create({
   },
   planDetailsTxt: {
     color: colors.darkest_grey,
-    fontSize: FontSize.size_base,
+    fontSize: FontSize.size_lg,
     fontFamily: FontFamily.openSansRegular,
     marginLeft: 10,
     fontWeight: "400",
+    
   },
 });
 

@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import colors from "../../res/Colors";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
-import { Color,Padding,FontFamily,Border } from "../../../GlobalStyles";
+import { Color, Padding, FontFamily, Border } from "../../../GlobalStyles";
 
 const AppUpdateAlert = ({ visible, onClose }) => {
   return (
@@ -24,9 +24,9 @@ const AppUpdateAlert = ({ visible, onClose }) => {
       <View style={styles.overlay}>
         <View style={styles.alertContainer}>
           <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
+            style={{ flexDirection: "row", justifyContent: "center" }}
           >
-            <View style={{ flexDirection: "row", alignSelf: "flex-start" ,alignItems:'center'}}>
+            <View style={{ flexDirection: "row", alignItems: 'center' }}>
               <AlertIcon />
               <Text style={styles.alertTitle}>{"New Update Required"}</Text>
             </View>
@@ -34,13 +34,13 @@ const AppUpdateAlert = ({ visible, onClose }) => {
           <View
             style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
           />
-          <Text style={styles.message}>
-           To continue using the MySparklight app, please
-           download the latest version. Enjoy new features,
-           improved performance, and enhanced security.
+          <Text style={{ ...styles.message, textAlign: 'center' }}>
+            To continue using the MySparklight app, please download the latest version. Enjoy new features, improved performance, and enhanced security.
           </Text>
           <TouchableOpacity
             style={styles.closeBtn}
+            accessibilityLabel="Update the app now"
+            accessibilityHint="Opens the app store to update the app"
             onPress={() => {
               if (Platform.OS === "android") {
                 Linking.openURL(
@@ -76,19 +76,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
     borderRadius: 5,
-    width: "85%",
-  },
-  closeButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    padding: 5,
-  },
-  closeText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "black",
-    fontFamily: FontFamily.openSansRegular,
+    alignItems: 'center',
+    width: '90%',
+    alignSelf: 'center',
   },
   message: {
     color: colors.darkest_grey,
@@ -97,6 +87,19 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     lineHeight: 28,
     marginTop: 10,
+    textAlign: 'center',
+  },
+  closeBtn: {
+    backgroundColor: colors.sparklight_purple_blue,
+    width: '100%',
+    marginTop: 15,
+    paddingVertical: 8,
+  },
+  closeAlertTxt: {
+    color: colors.snow_white,
+    fontSize: 16,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: 'center',
   },
   buttonContainer: {
     alignItems: "center",
@@ -118,22 +121,10 @@ const styles = StyleSheet.create({
     color: colors.sparklight_grey,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 22,
-    fontWeight: "400",
+    fontWeight: "600",
     marginLeft: 10,
   },
-  closeBtn: {
-    backgroundColor: colors.sparklight_purple_blue,
-    justifyContent: "center",
-    width: "100%",
-    marginTop: 15,
-  },
-  closeAlertTxt: {
-    color: colors.snow_white,
-    textAlign: "center",
-    padding: 8,
-    fontSize: 16,
-    fontFamily: FontFamily.openSansRegular,
-  },
+
 });
 
 export default AppUpdateAlert;

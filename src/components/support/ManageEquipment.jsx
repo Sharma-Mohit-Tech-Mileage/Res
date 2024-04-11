@@ -1,44 +1,22 @@
 import * as React from "react";
-import {
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-} from "react-native";
+import { Image,StyleSheet,Text,TouchableOpacity,View, ActivityIndicator,} from "react-native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import {
-  FontFamily,
-  Padding,
-  Color,
-  FontSize,
-  Border,
-} from "../../../GlobalStyles";
+import {FontFamily,Padding,Color,FontSize,Border,} from "../../../GlobalStyles";
 import MyServicePlan from "../common/MyServicePlan";
 import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
-import {
-  GetApiRequest,
-  GetModemStatusApiRequest,
-} from "../../network/APIClient";
+import {GetApiRequest,GetModemStatusApiRequest} from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
 import colors from "../../res/Colors";
-
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import {widthPercentageToDP as wp,heightPercentageToDP as hp,} from "react-native-responsive-screen";
 import CheckConnection from "../../res/svgIcons/CheckConnection";
 import RefreshIcon from "../../res/svgIcons/RefreshIcon";
 import PubSub from "pubsub-js";
 import WifiIssueIcon from "../../res/svgIcons/WifiIssueIcon";
 import IntermittentIssues from "../../res/svgIcons/IntermittentIssues";
 import Surfingissue from "../../res/svgIcons/surfingissue";
-
 const ManageEquipment = ({route}) => {
-  console.log(JSON.stringify(route))
   const navigation = useNavigation();
   const [manufacturer, setManufacturer] = React.useState("");
   const [model, setModel] = React.useState("");
@@ -99,10 +77,6 @@ const ManageEquipment = ({route}) => {
       );
     });
   };
-
-  /**
-   * get modem details
-   */
 
   const checkModemDetails = (macAddress) => {
     const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
@@ -234,7 +208,6 @@ const ManageEquipment = ({route}) => {
                       </Text>
                       <Text style={styles.mb8600Docsis}>
                         {model}
-                        {/* {transmissionType} */}
                       </Text>
 
                       {!loadingHealth ? (
@@ -373,19 +346,6 @@ const ManageEquipment = ({route}) => {
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
-
-              {/* <View style={[styles.frameLayout]} />
-                            <View style={[styles.frame9defaultSpaceBlock]} >
-                                <Image
-                                    resizeMode="stretch"
-                                    source={require("../../../assets/key-02.png")}
-                                />
-                                <Text style={styles.modemHealthSupport}>Update Password</Text>
-                                <Image
-                                    resizeMode="stretchstretch"
-                                    source={require("../../../assets/chevronright.png")}
-                                />
-                            </View> */}
               <View style={[styles.frameLayout]} />
               {manufacturer != "Calix" && (
                 <TouchableOpacity

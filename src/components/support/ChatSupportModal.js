@@ -5,54 +5,62 @@ import {
   StyleSheet,
   Text,
   SafeAreaView,
-  Pressable
+  Pressable,
 } from "react-native";
 import WebView from "react-native-webview";
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
+import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import {
+  Padding,
+  Color,
+  FontFamily,
+  Border,
+  FontSize,
+} from "../../../GlobalStyles";
 
 const ChatSupportModal = ({ department, onClose }) => {
   const [modalVisible, setModalVisible] = useState(true);
   const [speedTestState, setSpeedTestState] = useState({});
   const [host, setHost] = useState("");
-  
+
   const closeModal = () => {
     setModalVisible(false);
     onClose();
   };
 
   const navigationChange = (navState) => {
-    console.log('navigationChange: ', navState);
-  }
+    console.log("navigationChange: ", navState);
+  };
 
   const onMessage = (event) => {
-    console.log('onMessageEvent: ', event);
-  }  
+    console.log("onMessageEvent: ", event);
+  };
 
-  const INJECTED_JAVASCRIPT = `(function() {
-    var open = XMLHttpRequest.prototype.open;
-    XMLHttpRequest.prototype.open = function() {
-        this.addEventListener("load", function(event) {
-            //alert('hello');
-            document.getElementsByTagName("header")[0].style.display = 'none';
-            document.getElementsByTagName("main")[0].style.display = 'none';
-            document.getElementsByTagName("footer")[0].style.display = 'none';
-            document.getElementById("ada-entry").style.display = 'none';
-            chatProLink(1500003304301);
-            window.ReactNativeWebView.postMessage("EventResponse: " + JSON.stringify(this));
-            //var message = {"status" : this.status, "responseURL" : this.responseURL, "response" : this.response}
-            //window.ReactNativeWebView.postMessage("WEBViewResponse: " + JSON.stringify(message));
-            // var speedTest = {
-            //   "ping": Number(document.getElementsByClassName("result-tile-ping")[0].getElementsByClassName("number")[0].innerText),
-            //   "jitter": Number(document.getElementsByClassName("result-tile-jitter")[0].getElementsByClassName("number")[0].innerText),
-            //   "download": Number(document.getElementsByClassName("result-tile-download")[0].getElementsByClassName("number")[0].innerText),
-            //   "upload": Number(document.getElementsByClassName("result-tile-upload")[0].getElementsByClassName("number")[0].innerText),
-            //   "responseURL": this.responseURL,
-            // }
-            // window.ReactNativeWebView.postMessage(JSON.stringify(speedTest));
-        }); 
-        open.apply(this, arguments);
-    };})();`;
+  // const INJECTED_JAVASCRIPT = `(function() {
+  //   var open = XMLHttpRequest.prototype.open;
+  //   XMLHttpRequest.prototype.open = function() {
+  //       this.addEventListener("load", function(event) {
+  //           //alert('hello');
+  //           document.getElementsByTagName("header")[0].style.display = 'none';
+  //           document.getElementsByTagName("main")[0].style.display = 'none';
+  //           document.getElementsByTagName("footer")[0].style.display = 'none';
+  //           document.getElementById("ada-entry").style.display = 'none';
+  //           chatProLink(1500003304301);
+  //           window.ReactNativeWebView.postMessage("EventResponse: " + JSON.stringify(this));
+  //           //var message = {"status" : this.status, "responseURL" : this.responseURL, "response" : this.response}
+  //           //window.ReactNativeWebView.postMessage("WEBViewResponse: " + JSON.stringify(message));
+  //           // var speedTest = {
+  //           //   "ping": Number(document.getElementsByClassName("result-tile-ping")[0].getElementsByClassName("number")[0].innerText),
+  //           //   "jitter": Number(document.getElementsByClassName("result-tile-jitter")[0].getElementsByClassName("number")[0].innerText),
+  //           //   "download": Number(document.getElementsByClassName("result-tile-download")[0].getElementsByClassName("number")[0].innerText),
+  //           //   "upload": Number(document.getElementsByClassName("result-tile-upload")[0].getElementsByClassName("number")[0].innerText),
+  //           //   "responseURL": this.responseURL,
+  //           // }
+  //           // window.ReactNativeWebView.postMessage(JSON.stringify(speedTest));
+  //       });
+  //       open.apply(this, arguments);
+  //   };})();`;
+
+  const INJECTED_JAVASCRIPT = `(function () {     var script = document.createElement('script');     script.src = 'https://static.zdassets.com/ekr/snippet.js?key=key=ad791f41-3c05-490b-8bb3-55afe1751f92'; // Replace YOUR_ZENDESK_KEY with your Zendesk key    script.setAttribute('id', 'ze-snippet');     document.getElementsByTagName('head')[0].appendChild(script);     script.onload = function () {         // Initialize Zendesk Web Widgetwindow.zESettings = {             webWidget: {                 chat: {                     tags: ['tag1', 'tag2'], // Add any necessary tagsdepartment: 'Your Department' // Set the department for the chat                }             }         };         // Open Zendesk chatwindow.zE('webWidget', 'show');     }; })();`;
 
   return (
     <Modal
@@ -61,20 +69,20 @@ const ChatSupportModal = ({ department, onClose }) => {
       visible={modalVisible}
       onRequestClose={closeModal}
     >
-        <View style={{flex:1}}>
-          <ProfileSettingsHeader onPressBack={closeModal} title='Chat With Us' />            
-          <View style={{width:'100%',height:'80%',}}>
-              <WebView
-                source={{ uri: 'https://www.sparklight.com/contactus' }}
-                style={styles.webview}
-                javaScriptEnabled={true}
-                domStorageEnabled={true}
-                onNavigationStateChange={navigationChange}
-                onMessage={onMessage}
-                injectedJavaScript={INJECTED_JAVASCRIPT}
-              />
-          </View>
+      <View style={{ flex: 1 }}>
+        <ProfileSettingsHeader onPressBack={closeModal} title="Chat With Us" />
+        <View style={{ width: "100%", height: "80%" }}>
+          <WebView
+            source={{ uri: "https://www.sparklight.com/contactus" }}
+            style={styles.webview}
+            javaScriptEnabled={true}
+            domStorageEnabled={true}
+            onNavigationStateChange={navigationChange}
+            onMessage={onMessage}
+            injectedJavaScript={INJECTED_JAVASCRIPT}
+          />
         </View>
+      </View>
     </Modal>
   );
 };
@@ -93,7 +101,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   closeButton: {
-    alignSelf:'flex-end',
+    alignSelf: "flex-end",
     color: "white",
     fontSize: 16,
     backgroundColor: Color.colorMidnightblue,
@@ -101,7 +109,8 @@ const styles = StyleSheet.create({
   webview: {
     flex: 1,
     width: "100%",
-  },closeBtn: {
+  },
+  closeBtn: {
     textAlign: "center",
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
@@ -109,7 +118,8 @@ const styles = StyleSheet.create({
   buttons: {
     marginLeft: 10,
     backgroundColor: Color.colorMidnightblue,
-  }, buttonsLayout: {
+  },
+  buttonsLayout: {
     paddingHorizontal: Padding.p_base,
     height: 32,
     justifyContent: "center",

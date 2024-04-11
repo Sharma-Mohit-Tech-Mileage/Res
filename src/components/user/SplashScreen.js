@@ -175,7 +175,7 @@ const SplashScreen = ({ navigation }) => {
     )
   }
 
-  const CustomAlertModal = ({ visible, message, message2, onClose }) => {
+  const CustomAlertModal = ({ visible, message, message2, onClose ,closeModal}) => {
     return (
       <Modal
         visible={visible}
@@ -185,7 +185,7 @@ const SplashScreen = ({ navigation }) => {
         <View style={styles.overlay}>
           <View style={styles.alertContainer}>
             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-              <View style={{ flexDirection: "row", alignSelf: "flex-start" }}>
+              <View style={{ flexDirection: "row", alignItems: 'center' }}>
                 <AlertIcon />
                 <Text style={styles.alertTitle}>
                   {" Access Denied"}
@@ -193,15 +193,15 @@ const SplashScreen = ({ navigation }) => {
               </View>
             </View>
             <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}/>
-            <Text style={styles.message}>{message}
-              <Text style={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue }]} onPress={onClose}>
-                login to your online account
+            <Text style={styles.message}>{message}{" "}
+              <Text style={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue,textDecorationLine: 'underline',}]} onPress={onClose}>
+                {"login to your online account"}
               </Text>
               {message2}
             </Text>
             <TouchableOpacity
               style={styles.closeBtn}
-              onPress={onClose}
+              onPress={closeModal}
             >
               <Text
                 style={styles.closeAlertTxt}
@@ -244,6 +244,12 @@ const SplashScreen = ({ navigation }) => {
 
 
   }
+
+  const closeModal = () => {
+    setModalVisible(false);
+    logoutAction();
+  };
+  
 
   const loginAuth = async () => {
     try {
@@ -344,6 +350,7 @@ const SplashScreen = ({ navigation }) => {
         message={errorMessage}
         message2={errorMessage1}
         onClose={handleCloseAlert}
+        closeModal={closeModal}
       />
       <CustomerDisconnectPage
         visible={disconnected}
@@ -451,7 +458,7 @@ const styles = StyleSheet.create({
     color: colors.sparklight_grey,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 22,
-    fontWeight: "400",
+    fontWeight: "700",
     marginLeft: 5,
   }, openBtn:
   {
