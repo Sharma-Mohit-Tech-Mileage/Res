@@ -56,7 +56,7 @@
 		918501712B30B78E0048F5A3 /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Bold.ttf"; path = "../assets/fonts/OpenSans-Bold.ttf"; sourceTree = "<group>"; };
 		918501732B30B8A60048F5A3 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Bold.ttf"; path = "../assets/fonts/Inter-Bold.ttf"; sourceTree = "<group>"; };
 		918501752B30B8C70048F5A3 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-SemiBold.ttf"; path = "../assets/fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
-		91EEC2BB2B1254E10002EE57 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		91EEC2BB2B1254E10002EE57 /* GoogleService-Info[26].plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info[26].plist"; path = "../../../../Downloads/GoogleService-Info[26].plist"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FB42F54EA0B6919212802C08 /* Pods_Sparklight_SparklightTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Sparklight_SparklightTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -102,7 +102,7 @@
 			isa = PBXGroup;
 			children = (
 				918501732B30B8A60048F5A3 /* Inter-Bold.ttf */,
-				91EEC2BB2B1254E10002EE57 /* GoogleService-Info.plist */,
+				91EEC2BB2B1254E10002EE57 /* GoogleService-Info[26].plist */,
 				918501752B30B8C70048F5A3 /* Inter-SemiBold.ttf */,
 				918501712B30B78E0048F5A3 /* OpenSans-Bold.ttf */,
 				910951722B01E11E003F4BF8 /* Sparklight.entitlements */,
