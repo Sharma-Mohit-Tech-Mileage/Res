@@ -184,7 +184,7 @@ const SplashScreen = ({ navigation }) => {
         onRequestClose={onClose}>
         <View style={styles.overlay}>
           <View style={styles.alertContainer}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", justifyContent: "center" }}>
               <View style={{ flexDirection: "row", alignItems: 'center' }}>
                 <AlertIcon />
                 <Text style={styles.alertTitle}>
@@ -416,7 +416,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
     borderRadius: 5,
-    width: "85%",
+    alignItems: 'center',
+    width: '90%',
+    alignSelf: 'center',
   },
   closeButton: {
     position: "absolute",
