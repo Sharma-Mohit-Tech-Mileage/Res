@@ -36,9 +36,12 @@ const Support = ({route}) => {
         Linking.openURL(phoneNumber);
     };
 
-    const toggleModal = () => {
-        setDepartment();
-        setShowModal(!showModal);
+    const toggleModal = (department) => {
+        setDepartment(department);
+        setTimeout(()=>{
+            setShowModal(!showModal);
+        },1000)
+        
     };    
     
     //  useEffect(() => {
@@ -397,7 +400,7 @@ const Support = ({route}) => {
                                                 <Pressable
                                                    // onPress={() => handlePressOpenButton("1500003304301", ['Residential', 'Sales', 'ContactUs'])}
                                                    onPress={() => {
-                                                        toggleModal("1500003304301");
+                                                        toggleModal("tech");
                                                    }}
                                                    accessibilityLabel="Chat Support"
                                                     accessibilityRole="button"

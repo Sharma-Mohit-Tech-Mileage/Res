@@ -6,12 +6,27 @@
     <!-- Start of Zendesk Widget script -->
   <script id="ze-snippet"
   src="https://static.zdassets.com/ekr/snippet.js?key=5b6f4fab-f7a4-4a5a-a133-04bc0cb80009"> </script>
+  <script type="text/javascript">
+    window.zESettings = {
+      webWidget: {
+        chat: {
+          departments: {
+          //  enabled: []
+            enabled: ['Resi Bill Support'],
+
+            select: ['Resi Bill Support'],
+          }
+        }
+      }
+    };
+  </script>
 <!-- End of Zendesk Widget script -->
 </head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <body>
     <!-- Start of Zendesk Widget script -->
     <script>
+        
         document.addEventListener( 'DOMContentLoaded', function( event ) {
           // zE('webWidget', 'prefill', {
           //   name: { value: "${user.name}", readOnly: true },
