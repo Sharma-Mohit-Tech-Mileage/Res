@@ -100,6 +100,7 @@ const ChatSupportModal = ({ department, onClose }) => {
             domStorageEnabled={true}
             onNavigationStateChange={navigationChange}
             onMessage={onMessage}
+            originWhitelist={['*']}
             //injectedJavaScript={INJECTED_JAVASCRIPT}
           />
         </View>
