@@ -94,7 +94,7 @@ const ChatSupportModal = ({ department, onClose }) => {
         <ProfileSettingsHeader onPressBack={closeModal} title="Chat With Us" />
         <View style={{ width: "100%", height: "90%" }}>
           <WebView
-            source={require("../utility/ZendeskChat.html")}
+            source={(department==='tech')?require("../utility/ZendeskTechSupport.html"): require("../utility/ZendeskChat.html")}
             style={styles.webview}
             javaScriptEnabled={true}
             domStorageEnabled={true}
