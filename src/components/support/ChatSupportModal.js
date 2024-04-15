@@ -6,6 +6,7 @@ import {
   Text,
   SafeAreaView,
   Pressable,
+  Platform,
 } from "react-native";
 import WebView from "react-native-webview";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -16,6 +17,8 @@ import {
   Border,
   FontSize,
 } from "../../../GlobalStyles";
+import techSupport from "../utility/ZendeskTechSupport.html"
+import billSupport from "../utility/ZendeskChat.html"
 
 const ChatSupportModal = ({ department, onClose }) => {
   const [modalVisible, setModalVisible] = useState(true);
@@ -94,13 +97,21 @@ const ChatSupportModal = ({ department, onClose }) => {
         <ProfileSettingsHeader onPressBack={closeModal} title="Chat With Us" />
         <View style={{ width: "100%", height: "90%" }}>
           <WebView
-            source={(department==='tech')?require("../utility/ZendeskTechSupport.html"): require("../utility/ZendeskChat.html")}
+           originWhitelist={["*"]}
+           allowFileAccess={true}
+            source={ Platform.OS==='android'?
+              {uri: (department==='tech')?"file:///android_asset/ZendeskTechSupport.html":"file:///android_asset/ZendeskChat.html"}
+              : (department==='tech')?techSupport:billSupport
+            }
             style={styles.webview}
             javaScriptEnabled={true}
             domStorageEnabled={true}
+            allowUniversalAccessFromFileURLs={true}
+            allowFileAccessFromFileURLs={true}
+            mixedContentMode="always"
             onNavigationStateChange={navigationChange}
             onMessage={onMessage}
-            originWhitelist={['*']}
+            
             //injectedJavaScript={INJECTED_JAVASCRIPT}
           />
         </View>
