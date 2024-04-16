@@ -77,8 +77,7 @@ function* getPushNotifications(action) {
         const response = yield call(fetchPushNotifications, action.payload);
         yield put(savePushNotifications(response));
     } catch (error) {
-        console.error('Fetch Paperless Details API Error:', error);
-        // Optionally, dispatch an action to handle this error state
+       
     }
 }
 

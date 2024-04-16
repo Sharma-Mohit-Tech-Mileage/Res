@@ -38,9 +38,8 @@ const fetchUserList = async () => {
 
     return _axios.get(`/users/api/account/${accountNumber}/users`, { ...config })
         .then(res => {
-            // Log the stringified data for debugging
-            console.log(JSON.stringify(res.data, null, 2)); // null and 2 are for formatting
-            return res.data;  // Return the actual data, not the stringified version
+            console.log(JSON.stringify(res.data, null, 2)); 
+            return res.data;  
         })
         .catch(error => {
             // Log and throw the error
@@ -93,7 +92,7 @@ const fetchBillingStatus = async () => {
     return _axios.get(`/account/api/account/${accountNumber}/paperless/status`, { ...config })
         .then(res => {
             console.log('fetching fetching /account/api/account/`${accountNumber}`/paperless/status', JSON.stringify(res.data, null, 2));
-            return res.data;  // Return the actual data, not the stringified version
+            return res.data;  
         })
         .catch(error => {
             console.error('Error fetching /account/api/account/`${accountNumber}`/paperless/status', error);
@@ -145,26 +144,17 @@ const fetchPushNotifications = async () => {
             Authorization: "Bearer " + user.token
         }
     };
-
-    //https://customer.uat.cableone.net/apiWrapper/mobile/api/mobilenotificationpreferences/{UserName}/mobilepreferences
-
-    // Log the request endpoint and data
-    console.log(`Making API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`);
-
+    console.log(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`);
     try {
-        //const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, { ...config });
-        const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences/${accountNumber}`, { ...config });
-        // Log the successful response
-        console.log(`API Call Successful to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:;;;;;;;;;;;;;;;;;`, JSON.stringify(response.data));
+        const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`, { ...config });
         return response.data;
     } catch (error) {
-        // Log the error with a descriptive message
         console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, error);
         if (error.toString().includes('AxiosError: timeout of') && fetchPushNotificationsCount < 2) {
             fetchPushNotifications();
         } else {
             fetchPushNotificationsCount = 0;
-            throw error;                
+            throw error;
         }
     }
 };
@@ -219,17 +209,12 @@ const putEmailNotification = async (email) => {
         }
     };
 
-    // Log the request endpoint and data
-    console.log(`Making API putEmailNotification Call to /account/api/account/${accountNumber}/paperless with email:`, email);
-
     try {
         const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
 
-        // Log the successful response
         console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless, Response:`, response);
         return response;
     } catch (error) {
-        // Log the error with a descriptive message
         console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless:`, error);
         throw error;
     }

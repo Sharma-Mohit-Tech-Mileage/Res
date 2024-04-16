@@ -1,3 +1,5 @@
+import DeviceInfo from 'react-native-device-info';
+import VersionCheck from 'react-native-version-check';
 import { Color } from '../../../GlobalStyles'
 export const ROLE_COLORS = {
     primaryadmin: Color.colorMidnightblue,
@@ -20,7 +22,7 @@ export const extractAcknowledgementEmail = logObj => {
 };
 export const convertToSpecialCase = (str) => {
     if (!str || typeof str !== 'string' || str.length < 2) {
-        return null; 
+        return null;
     }
 
     return str.split(' ').map(word =>
@@ -254,7 +256,6 @@ export const transformNotificationPreferences = (response) => {
 
 
 export const transformToUserPreferences = (data) => {
-    console.log('Data is undefined or not an array, returning default transformToUserPreferences=======================', data);
     if (!Array.isArray(data)) {
        
         return {
@@ -295,14 +296,37 @@ export const transformToUserPreferences = (data) => {
                 transformedData.billingOptOutStatus = itemStatus === 'off';
                 break;
             default:
-                // Handle unexpected type or ignore
                 break;
         }
     });
-    console.log('final Update values based on the data array-------------------------', transformedData)
     return transformedData;
 };
+export const checkForMinorUpdate = async () => {
+    const currentVersion = DeviceInfo.getVersion();
+    const latestVersion = await VersionCheck.getLatestVersion();
 
+    const currentParts = currentVersion.split('.');
+    const latestParts = latestVersion.split('.');
+
+    const currentMajor = parseInt(currentParts[0], 10);
+    const latestMajor = parseInt(latestParts[0], 10);
+    const currentMinor = parseInt(currentParts[1], 10);
+    const latestMinor = parseInt(latestParts[1], 10);
+
+    if (latestMajor === currentMajor && latestMinor > currentMinor) {
+        return {
+            isMinorUpdateAvailable: true,
+            currentVersion: currentVersion,
+            latestVersion: latestVersion
+        };
+    }
+
+    return {
+        isMinorUpdateAvailable: false,
+        currentVersion: currentVersion,
+        latestVersion: null
+    };
+};
 
 
 

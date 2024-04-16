@@ -1,7 +1,6 @@
-import React, { useState, useEffect,useRef } from "react";
-import {View,Text,StyleSheet,Image,TouchableOpacity,ScrollView,Platform,Dimensions,Pressable,ActivityIndicator,Linking,AppState} from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Pressable, ActivityIndicator, Linking } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import VersionCheck from "react-native-version-check";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,16 +12,17 @@ import NetworkDetails from "../common/NetworkDetails";
 import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
-import {getUser,getPushNotificationStatus,storePushNotificationStatus,storeUpgradeToken,} from "../../redux/utils/LocalStorage";
-import {GetApiRequest,GetModemStatusApiRequest,} from "../../network/APIClient";
+import { getUser, getPushNotificationStatus, storePushNotificationStatus, storeUpgradeToken, } from "../../redux/utils/LocalStorage";
+import { GetApiRequest, GetModemStatusApiRequest, } from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
-import {getFcmToken,requestUserPermission,} from "../../firebase/FirebaseUtils";
-import {updatePushNotifications,fetchPushNotifications,} from "../../redux/actions/ProfileActionSuite";
+import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
+import { updatePushNotifications, fetchPushNotifications, } from "../../redux/actions/ProfileActionSuite";
 import { useSelector, useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
+import { checkForMinorUpdate } from "../utility/constant"
 import notifee from "@notifee/react-native";
 import AppUpdate from "../utility/AppUpdateAlert";
 
@@ -48,14 +48,7 @@ const HomeScreen = ({ navigation }) => {
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
   const [isAppNewUpdate, setIsAppNewUpdate] = useState(false);
-  const timer = useRef(Date.now())
-
-  AppState.addEventListener('change', (nextAppState) => {
-    if(nextAppState === "active" && (Date.now() - timer.current > 2000)){
-      checkAppUpdate();
-    }
-    
-});
+  const [updateStatus, setUpdateStatus] = useState({isMinorUpdateAvailable: false,currentVersion: '',latestVersion: ''});
 
 
   const getInternetHealth = (type) => {
@@ -368,6 +361,15 @@ const HomeScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
+    const fetchUpdateStatus = async () => {
+      const status = await checkForMinorUpdate();
+      setUpdateStatus(status);
+    };
+
+    fetchUpdateStatus();
+  }, []);
+
+  useEffect(() => {
     if (internetHealths.length >= 3) {
       setCheckModemStatus(true);
       refreshInternetHealth();
@@ -391,7 +393,6 @@ const HomeScreen = ({ navigation }) => {
       }
     };
     fetchData();
-    checkAppUpdate();
   }, []);
 
   useEffect(() => {
@@ -428,24 +429,6 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  const checkAppUpdate = () => {
-    console.log("Check app update");
-    let currentVersion = VersionCheck.getCurrentVersion();
-    VersionCheck.getLatestVersion().then((latestVersion) => {
-      if (Platform.OS === "android") {
-        VersionCheck.needUpdate().then((res) => {
-          setIsAppNewUpdate(res.isNeeded);
-        });
-      } else {
-        VersionCheck.needUpdate({
-          currentVersion: currentVersion,
-          latestVersion: latestVersion,
-        }).then((res) => {
-          setIsAppNewUpdate(res.isNeeded);
-        });
-      }
-    });
-  };
 
   const walkthroughModal = () => {
     const walkThroughScreens = [
@@ -513,7 +496,7 @@ const HomeScreen = ({ navigation }) => {
               <View style={styles.walkThroughSubButtons}>
                 {walkThroughStep > 0 && (
                   <Pressable
-                    style={[styles.button,styles.buttonsLayout, styles.buttonPrevious,]}
+                    style={[styles.button, styles.buttonsLayout, styles.buttonPrevious,]}
                     onPress={() => changeWalkThroughStep(walkThroughStep - 1)}
                     accessibilityLabel="Previous Step"
                     accessibilityRole="button"
@@ -522,7 +505,7 @@ const HomeScreen = ({ navigation }) => {
                   </Pressable>
                 )}
                 <Pressable
-                  style={[styles.button,styles.buttonsLayout,styles.buttonNext,]}
+                  style={[styles.button, styles.buttonsLayout, styles.buttonNext,]}
                   onPress={() => changeWalkThroughStep(walkThroughStep + 1)}
                   accessibilityLabel={walkThroughStep < walkThroughScreens.length - 1 ? "Next Step" : "Finish Walkthrough"}
                   accessibilityRole="button"
@@ -546,6 +529,7 @@ const HomeScreen = ({ navigation }) => {
       </>
     );
   };
+
 
   const OutageAlert = ({ estimatedTime }) => {
     return (
@@ -619,7 +603,7 @@ const HomeScreen = ({ navigation }) => {
                     );
                   } else {
                     Linking.openURL(
-                      "https://apps.apple.com/us/app/mysparklight/id6469003880"
+                      "https://apps.apple.com/us/app/mysparklight/6469003880"
                     );
                   }
                 }}
@@ -634,7 +618,11 @@ const HomeScreen = ({ navigation }) => {
           <TouchableOpacity
             style={{ marginTop: 10 }}
             onPress={() => {
-              setIsAppNewUpdate(false);
+              setUpdateStatus({
+                isMinorUpdateAvailable: false,
+                currentVersion: '',
+                latestVersion: ''
+              });
             }}
           >
             <CloseIcon />
@@ -683,7 +671,7 @@ const HomeScreen = ({ navigation }) => {
               marginTop: 50,
             }}
           >
-            {/* {isAppNewUpdate ? <AppUpdateAlert /> : <></>} */}
+            {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert />:null}
             <AppUpdate
               visible={isAppNewUpdate}
               onClose={() => {
