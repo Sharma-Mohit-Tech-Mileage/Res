@@ -13,6 +13,8 @@ import { FontFamily, FontSize } from "../../../GlobalStyles";
 import TickIcon from "../../res/svgIcons/TickIcon";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
+import TVIcon from "../../res/svgIcons/TVIcon";
+import Phone from "../../res/svgIcons/Phone";
 
 const MyServicePlan = ({ plans, navigation }) => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -59,6 +61,9 @@ const MyServicePlan = ({ plans, navigation }) => {
     
 
     const PlanDetailsItem = ({ item, index }) => {
+     let planIcon= (item.packageType==='High Speed Data')?<InternetIcon/> :(item.packageType==='Video')? <TVIcon/> : (item.packageType==='Phone')?<Phone/> :<InternetIcon/>
+     
+
       return (
         <View key={index} >
           <View
@@ -89,12 +94,12 @@ const MyServicePlan = ({ plans, navigation }) => {
                   alignSelf: "center",
                 }}
               >
-                <InternetIcon />
+                {planIcon}
               </LinearGradient>
             </View>
             <Text style={styles.planDetailsRowHeader} accessibilityLabel={`Internet ${item.packageName}`} accessibilityRole="header">
             {/* {item.packageType} {item.packageName} */}
-            {item.packageType==='Phone'? "Phone ".concat(item.packageName): item.packageName } 
+            {item.packageType==='Phone'? "Phone ".concat(item.packageName):(item.packageType=='High Speed Data')? `Intenet ${item.packageName}`: item.packageName } 
             </Text>
           </View>
             { item.features.map((item)=>{
