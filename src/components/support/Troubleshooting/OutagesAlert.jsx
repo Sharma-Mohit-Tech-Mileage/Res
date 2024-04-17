@@ -18,11 +18,11 @@ const TroubleshootComponent = ({
                     <OutageAreaIcon />
                 </View>
                 <View style={styles.spinnerContainer}>
-                <NotificationAlert
+                    <NotificationAlert
                         type="warning"
-                        title={(<View style={{flexDirection:'column'}}><Text style={styles.textStyle}>Uh oh. You may be experiencing an outage in your area.</Text>
-                        <Text >{'Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. '}<Text style={styles.textStyle}> Estimated Time to Restore: {description}</Text></Text>
-                        </View>)}
+                        title={(<Text style={{flexDirection:'column'}}><Text style={styles.textStyle}>Uh oh. You may be experiencing an outage in your area.</Text>
+                        <Text style={styles.textStyle1} >{'Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. '}<Text style={styles.textStyle}> Estimated Time to Restore: {description}</Text></Text>
+                        </Text>)}
                         showCloseIcon={false}
                         //message={(<Text >{'Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. '}<Text style={styles.textStyle}> Estimated Time to Restore: {description}</Text></Text>)}
                     />
@@ -103,8 +103,14 @@ const styles = StyleSheet.create({
         fontFamily: FontFamily.interBold, // Make sure 'Inter' font is linked in your project
         fontSize: 15,
         fontStyle: 'normal',
-        fontWeight: 'bold', // '700' is equivalent to 'bold' in React Native
-        lineHeight: 18, // React Native requires a numeric value for lineHeight
+        fontWeight: 'bold', 
+    },
+    textStyle1: {
+        color: '#292929',
+        fontFamily: FontFamily.openSansRegular, // Make sure 'Inter' font is linked in your project
+        fontSize: 15,
+        fontStyle: 'normal',
+        fontWeight: 'normal', 
     },
     topLeftText: {
         position: 'absolute',
