@@ -9,6 +9,15 @@
   <script type="text/javascript">
     window.zESettings = {
       webWidget: {
+        color: { 
+        theme: '#FF69B4',
+        launcher: '#CC3A83', // This will also update the badge
+        launcherText: '#E589B7',
+        button: '#8A0648',
+        resultLists: '#691840',
+        header: '#FF4500',
+        articleLinks: '#FF4500'
+       },
         chat: {
           departments: {
           //  enabled: []
@@ -26,6 +35,7 @@
 <body>
     <!-- Start of Zendesk Widget script -->
     <script>
+      
         
         document.addEventListener( 'DOMContentLoaded', function( event ) {
           // zE('webWidget', 'prefill', {
@@ -34,6 +44,7 @@
           //   phone: { value: "${user.phone}", readOnly: true }
           // });
            //zE('webWidget', 'identify', { name: "TEST", email: "test@gmail.com" });
+           
            zE('webWidget', 'chat:removeTags', 'afterhours','afterhours'); 
            zE('webWidget', 'chat:addTags', ['residential', 'test']);
           zE('webWidget', 'open');
