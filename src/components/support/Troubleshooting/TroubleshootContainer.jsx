@@ -3,24 +3,12 @@ import AccountOutages from "./AccountOutages";
 import OutagesAlert from "./OutagesAlert";
 import TroubleshootComponent from "./TroubleshootComponent";
 import { useNavigation } from "@react-navigation/native";
-import ModemHealthy from "./ModemHealthy";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { View, SafeAreaView, StyleSheet, ScrollView } from "react-native";
-import {
-  Color,
-  Padding,
-  Border,
-  FontSize,
-  FontFamily,
-} from "../../../../GlobalStyles";
-import { getUser } from "../../../redux/utils/LocalStorage";
-import {
-  GetApiRequest,
-  GetModemStatusApiRequest,
-} from "../../../network/APIClient";
+import {Color, Padding} from "../../../../GlobalStyles";
+import {GetApiRequest,GetModemStatusApiRequest,} from "../../../network/APIClient";
 import { useSelector } from "react-redux";
 import moment from "moment";
-import ModemConnectivityGuide from "./ModemConnectivityGuide";
 import { useIsFocused } from '@react-navigation/native';
 const stepsData = [
   {
