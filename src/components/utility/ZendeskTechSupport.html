@@ -33,7 +33,9 @@
           //   email: { value: "${user.email}", readOnly: true },
           //   phone: { value: "${user.phone}", readOnly: true }
           // });
-          // zE('webWidget', 'identify', { name: "${user.name}", email: "${user.email}" });
+           //zE('webWidget', 'identify', { name: "TEST", email: "test@gmail.com" });
+           zE('webWidget', 'chat:removeTags', 'afterhours','afterhours'); 
+           zE('webWidget', 'chat:addTags', ['residential', 'test']);
           zE('webWidget', 'open');
           zE('webWidget:on', 'close', () => window.ReactNativeWebView.postMessage("close"));
         });
