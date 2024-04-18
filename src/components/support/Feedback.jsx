@@ -18,7 +18,7 @@ const feedbackOptions = [
     { value: 5, category: 'compliment', name: 'facehappy', text: 'Great', image: require("../../../assets/facehappy.png"), selectedImage: require("../../../assets/Smiley-VerySatisfied-sel.png") },
 ];
 const Feedback = () => {
-    
+
     const navigation = useNavigation();
     const [showErrorAlert, setShowErrorAlert] = useState(false);
     const route = useRoute();
@@ -48,7 +48,7 @@ const Feedback = () => {
     const onSubmit = data => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
-        setIsSubmitting(true); // Also update the state for UI feedback
+        setIsSubmitting(true); 
 
         dispatch(saveUserFeedback(data, navigation));
     };
@@ -98,7 +98,7 @@ const Feedback = () => {
                             {feedbackOptions.map((option) => (
                                 <Pressable
                                     key={option.name}
-                                    style={[styles.faceSadParent, { flex: 1 }]} 
+                                    style={[styles.faceSadParent, { flex: 1 }]}
                                     onPress={() => handleIconPress(option)}
                                 >
                                     <Image
@@ -162,15 +162,15 @@ const Feedback = () => {
 
                     </View>
                     <View style={styles.buttonContainer}>
-                    <Pressable
-    style={[styles.button]}
-    onPress={handleSubmit(onSubmit, handleValidationError)}
-    disabled={isSubmitting} // Use state for UI updates
->
-    <Text style={[styles.textStyle,{color:Color.sparklightWhite}]}>
-        {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
-    </Text>
-</Pressable>
+                        <Pressable
+                            style={[styles.button]}
+                            onPress={handleSubmit(onSubmit, handleValidationError)}
+                            disabled={isSubmitting} // Use state for UI updates
+                        >
+                            <Text style={[styles.textStyle, { color: Color.sparklightWhite }]}>
+                                {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
+                            </Text>
+                        </Pressable>
 
                     </View>
                     <View style={styles.buttonContainer}>

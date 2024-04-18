@@ -31,12 +31,12 @@ export const convertToSpecialCase = (str) => {
 }
 
 export const isFreshEntry = (entry) => {
-    const acknowledgementEmail = extractAcknowledgementEmail(entry);
-    const hasNoEmail = !entry.emailAddress || !acknowledgementEmail; 
-    const isPreviouslySubscribed = entry.paperlessStatus === "Active" || entry.paperlessStatus ==='Processing'; 
-    const isEmailBeingProcessed = entry.emailStatus === "Verified" || entry.emailStatus === "Pending"; 
+    //const acknowledgementEmail = extractAcknowledgementEmail(entry);
+    const hasNoEmail = !entry.emailAddress
+    // const isPreviouslySubscribed = entry.paperlessStatus === "Active" || entry.paperlessStatus ==='Processing'; 
+    // const isEmailBeingProcessed = entry.emailStatus === "Verified" || entry.emailStatus === "Pending"; 
 
-    return hasNoEmail && !isPreviouslySubscribed && !isEmailBeingProcessed;
+    return hasNoEmail
 };
 
 export const BORDER_COLORS = {
@@ -158,7 +158,7 @@ export const isAdminRole = (input) => {
     }
 
     const inputLower = input.toLowerCase();
-    const adminRoles = ['admin']; 
+    const adminRoles = ['admin'];
     return adminRoles.includes(inputLower);
 };
 
@@ -222,7 +222,7 @@ export const getRoleBasedMessage = (input) => {
 };
 
 export const transformNotificationPreferences = (response) => {
-   // console.log('Default structure for when data is missing or in an unexpected format', JSON.stringify(response));
+    // console.log('Default structure for when data is missing or in an unexpected format', JSON.stringify(response));
     const defaultStructure = [
         { type: 'Appointments', status: 'Off' },
         { type: 'Outage', status: 'Off' },
@@ -257,7 +257,7 @@ export const transformNotificationPreferences = (response) => {
 
 export const transformToUserPreferences = (data) => {
     if (!Array.isArray(data)) {
-       
+
         return {
             accountNumber: '',
             deviceToken: '',

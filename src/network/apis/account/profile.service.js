@@ -212,10 +212,10 @@ const putEmailNotification = async (email) => {
     try {
         const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
 
-        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless, Response:`, response);
+        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless/${email}, Response:`, response);
         return response;
     } catch (error) {
-        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless:`, error);
+        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless/${email}:`, error);
         throw error;
     }
 };
@@ -250,13 +250,9 @@ const postEmailNotification = async (email) => {
         }
     };
 
-    // Log the request endpoint and data
-    console.log(`Making API  postEmailNotification Call to /account/api/account/${accountNumber}/paperless with email:`, email);
-
     try {
         const response = await _axios.post(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
 
-        // Log the successful response
         console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless, Response:`, response);
         return response;
     } catch (error) {
@@ -331,18 +327,10 @@ const unsubscribPaperLess = async () => {
             Authorization: `Bearer ${user.token}`
         }
     };
-
-    // Log the request endpoint and data
-    console.log(`Making API Call to /account/api/account/${accountNumber}/paperless/ with accountNumber:`, accountNumber);
-
     try {
         const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/unsubscribe`, {}, config);
-
-        // Log the successful response
-        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless/unsubscribe, Response:`, response);
         return response;
     } catch (error) {
-        // Log the error with a descriptive message
         console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless/unsubscribe:`, error);
         throw error;
     }

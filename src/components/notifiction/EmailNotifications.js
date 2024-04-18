@@ -10,7 +10,6 @@ import SparkLightInput from "../common/customui/SparkLightInput";
 import { useDispatch, useSelector } from 'react-redux';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { useAnalytics } from '../utility/AnalyticsContext';
 import { updateEmailNotification, updateFreshEmail, unsubscribePaperless } from '../../redux/actions/ProfileActionSuite';
 
 const validationSchema = yup.object().shape({
@@ -20,6 +19,8 @@ const validationSchema = yup.object().shape({
 
 const EmailNotifications = () => {
   const scrollViewRef = useRef(null);
+  const isSubmittingRef = useRef(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const route = useRoute();
@@ -28,26 +29,27 @@ const EmailNotifications = () => {
   const paperlessdata = route.params?.additionalData;
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  //const { logEvent } = useAnalytics();
 
   const { control, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
       email: paperlessdata?.email || '',
       paperlessBilling: paperlessdata?.status || false,
-      critNotif: paperlessdata?.critNotif||false
+      critNotif: paperlessdata?.critNotif || false
     },
   });
 
   const handleSave = data => {
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
     const { email, paperlessBilling } = data;
     const updatedProfileDetails = { ...profileDetailsfromStore };
-    const emailChanged = email !== updatedProfileDetails.svEmailAddress;
+    const emailChanged = email?.toLowerCase() !== updatedProfileDetails.svEmailAddress?.toLowerCase();
     if (emailChanged) {
       updatedProfileDetails.email = updatedProfileDetails.svEmailAddress;
       updatedProfileDetails.svEmailAddress = email;
     }
-
     if (paperlessBilling) {
       if (paperlessdata?.isNew) {
         dispatch(updateFreshEmail(email, emailChanged, updatedProfileDetails, navigation));
@@ -57,9 +59,6 @@ const EmailNotifications = () => {
     } else {
       dispatch(unsubscribePaperless(navigation));
     }
-
-    //logEvent('email_notification_update', { email, paperlessBilling, emailChanged });
-    console.log('Event logged: email_notification_update', { email, paperlessBilling, emailChanged });
   };
 
 
@@ -69,6 +68,8 @@ const EmailNotifications = () => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setErrorMsg('Please enter valid information to continue.')
     setShowErrorAlert(true);
+    isSubmittingRef.current = false;
+    setIsSubmitting(false);
   };
 
   useEffect(() => {
@@ -76,6 +77,8 @@ const EmailNotifications = () => {
       scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
       setShowErrorAlert(true);
       setErrorMsg('Notifications updated failed')
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
     }
   }, [route.params?.updateFailed]);
 
@@ -199,7 +202,8 @@ const EmailNotifications = () => {
               accessibilityRole="button"
               accessibilityLabel="Save"
             >
-              <Text style={[styles.makePayment, styles.makeTypo]}>Save</Text>
+
+              <Text style={[styles.makePayment, styles.makeTypo]}>{isSubmitting ? 'Submitting...' : 'Save'}</Text>
             </Pressable>
             <Pressable
               style={[styles.buttons1, styles.buttonsLayout]}

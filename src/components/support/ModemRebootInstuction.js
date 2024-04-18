@@ -103,7 +103,7 @@ const ModemReboot = () => {
             
             <Text style={[styles.text,{width:wp('75%')}]}>
             {inst3}
-              <Text style={[styles.textContactUs, { fontWeight: '700' }]}
+              <Text style={[styles.textContactUs]}
                 accessible={true}
                 accessibilityRole="button"
                 accessibilityLabel="Contact us for further assistance"
@@ -187,10 +187,9 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansSemiBold,
     fontSize: 16,
     fontStyle: "normal",
-    fontWeight: "600",
+    fontWeight: "700",
     paddingLeft:5,
     flexWrap:'wrap'
-    
   },
 });
 

@@ -133,7 +133,12 @@ const styles = StyleSheet.create({
   },
   linkText: {
     color: Color.colorMidnightblue,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: 16,
+    fontStyle: "normal",
     fontWeight: "700",
+    paddingLeft:5,
+    flexWrap:'wrap'
   },
   bulletPoint: {
     width: 6,
