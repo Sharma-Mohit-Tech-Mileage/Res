@@ -107,6 +107,7 @@ const ModemReboot = () => {
                 accessible={true}
                 accessibilityRole="button"
                 accessibilityLabel="Contact us for further assistance"
+                hitSlop={{ top: 20, bottom:20, left: 20, right: 20 }}
                 onPress={() => {
                   PubSub.publish('event.contactUsEvent', {});
                   setTimeout(() => {

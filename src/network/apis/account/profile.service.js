@@ -149,7 +149,7 @@ const fetchPushNotifications = async () => {
         const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`, { ...config });
         return response.data;
     } catch (error) {
-        console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, error);
+        console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`, error);
         if (error.toString().includes('AxiosError: timeout of') && fetchPushNotificationsCount < 2) {
             fetchPushNotifications();
         } else {
@@ -272,17 +272,11 @@ const postTermsAndConditions = async (flag) => {
         }
     };
 
-    // Log the request endpoint and data
-    console.log(`Making API Call to /mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}:`);
-
     try {
         const response = await _axios_cableone.put(`/mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}`, {}, config);
 
-        // Log the successful response
-        console.log(`API Call Successful to /mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}, Response:`, response);
         return response;
     } catch (error) {
-        // Log the error with a descriptive message
         console.error(`Error in API Call to /mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}:`, error);
         throw error;
     }
@@ -292,7 +286,6 @@ const postPushNotifications = async (data) => {
     let user = await getUser();
     const accountNumber = user.userInfo?.accountNumber || null;
     const userName = user.userInfo?.userName || null;
-    // Update data object with accountNumber and userName
     data.accountNumber = accountNumber;
     data.userName = userName;
 
@@ -301,11 +294,6 @@ const postPushNotifications = async (data) => {
             Authorization: `Bearer ${user.token}`
         }
     };
-
-    //https://customer.uat.cableone.net/apiWrapper/mobile/api/mobilenotificationpreferences/{UserName}/mobilepreferences
-
-    // Log the request endpoint and data
-    console.log(`Making API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences with payload`, data);
 
     try {
         const response = await _axios_cableone.post(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, data, config);

@@ -48,6 +48,7 @@ const Notifications = () => {
                 accessibilityLabel="Resend Confirmation Email"
                 accessibilityHint="Activates the email verification process again"
                 style={styles.contactUsText}
+                hitSlop={{ top: 20, bottom:20, left: 20, right: 20 }}
                 onPress={() => dispatch(resentEmailVerifiction(navigation))}
               >
                 Resend Confirmation Email

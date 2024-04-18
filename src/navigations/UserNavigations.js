@@ -26,17 +26,13 @@ const UserNavigations = (props) => {
     const previousRouteName = routeNameRef.current;
     const currentRouteName = navigationRef.current.getCurrentRoute().name;
 
-    if (previousRouteName !== currentRouteName) {
+    if (previousRouteName !== currentRouteName && currentRouteName && currentRouteName.trim() !== "") {
       try {
         await analytics().logEvent('screen_view', {
           screen_name: currentRouteName,
           screen_class: currentRouteName
         });
-        // The event was successfully queued for sending
-        console.log(`Screen view event queued for: ${currentRouteName}`);
       } catch (error) {
-        // Handle any errors that occurred during logging
-        console.error('Error logging screen view event:', error);
       }
 
       routeNameRef.current = currentRouteName;

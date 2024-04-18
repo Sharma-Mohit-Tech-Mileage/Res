@@ -49,7 +49,10 @@ const ModemExchangeInstructions = () => {
                 {instruction.includes('contact us') ? (
                   <>
                     {instruction.split('contact us')[0]}
-                    <Text 
+                    <Text accessible={true}
+                      accessibilityRole="link"
+                      accessibilityLabel="Contact us for more information"
+                      hitSlop={{ top: 20, bottom:20, left: 20, right: 20 }}
                     style={styles.linkText} onPress={() => {
                       navigation.navigate("SupportStack", {
                         isContactUs: true,
