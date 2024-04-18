@@ -41,6 +41,7 @@ const App = () => {
 
     const currentMajor = parseInt(currentParts[0], 10);
     const latestMajor = parseInt(latestParts[0], 10);
+    console.log("Checking for updates...",currentMajor,latestMajor);
     if (latestMajor > currentMajor) {
       console.log("Major update available.");
       setMajorUpdateVisible(true);

@@ -294,7 +294,7 @@ const SplashScreen = ({ navigation }) => {
     };
 
     fetchData();
-    checkAppUpdate();
+    //checkAppUpdate();
   }, []);
 
   return (
