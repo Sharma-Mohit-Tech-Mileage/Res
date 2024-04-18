@@ -22,9 +22,7 @@ import { updatePushNotifications, fetchPushNotifications, } from "../../redux/ac
 import { useSelector, useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
-import { checkForMinorUpdate } from "../utility/constant"
-import notifee from "@notifee/react-native";
-import AppUpdate from "../utility/AppUpdateAlert";
+import { checkForMinorUpdate } from "../utility/constant";
 
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
@@ -47,7 +45,6 @@ const HomeScreen = ({ navigation }) => {
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
-  const [isAppNewUpdate, setIsAppNewUpdate] = useState(false);
   const [updateStatus, setUpdateStatus] = useState({isMinorUpdateAvailable: false,currentVersion: '',latestVersion: ''});
 
 
@@ -685,13 +682,6 @@ const HomeScreen = ({ navigation }) => {
             }}
           >
             {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert />:null}
-            <AppUpdate
-              visible={isAppNewUpdate}
-              onClose={() => {
-                console.log("On closw update");
-                setIsAppNewUpdate(false)
-              }}
-            />
             {isOutageAlert ? (
               <OutageAlert estimatedTime={estimatedRestoreTime} />
             ) : (
