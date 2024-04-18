@@ -305,14 +305,14 @@ const HomeScreen = ({ navigation }) => {
         enabledNotification = true;
         const messageTypes = profile.pushNotifications[0].pushMessageType;
         messageTypes.forEach((messageType) => {
-          switch (messageType.messageTyp) {
-            case "Appointment":
+          switch (messageType.messageType) {
+            case 'Appointment':
               optOut = messageType.optOutFlag;
               break;
-            case "Outage":
+            case 'Outage':
               outageOptOut = messageType.optOutFlag;
               break;
-            case "Billing":
+            case 'Billing':
               billingOptOutStatus = messageType.optOutFlag;
               break;
           }
@@ -321,9 +321,9 @@ const HomeScreen = ({ navigation }) => {
           }
         });
 
-        if (optOutCountPushNotification > 2) {
-          enabledNotification = false;
-        }
+        // if (optOutCountPushNotification > 2) {
+        //   enabledNotification = false;
+        // }
       }
 
       if (enabledNotification) {
@@ -331,6 +331,7 @@ const HomeScreen = ({ navigation }) => {
 
         if (enabledPermission) {
           const token = await getFcmToken();
+          console.log('FCM HOME WITH PERMISSION',token)
           const data = {
             accountNumber: user.userInfo.accountNumber,
             deviceToken: token,
@@ -342,18 +343,30 @@ const HomeScreen = ({ navigation }) => {
             isAndroid: Platform.OS == "android",
           };
           const localData = {
-            status: "accepted",
-            date: new Date(),
+            status: 'accepted',
+            date: new Date()
           };
-          await notifee.requestPermission();
           storePushNotificationStatus(localData);
           await dispatch(updatePushNotifications(data, null));
         } else {
-          const localData = {
-            status: "skip",
-            date: new Date(),
-            permanentSkip: true,
+          const token = await getFcmToken();
+          console.log('FCM HOME WITHOUT PERMISSION',token)
+          const data = {
+            accountNumber: user.userInfo.accountNumber,
+            deviceToken: token,
+            deviceTokenTimestamp: moment().format(),
+            optOut: optOut,
+            outageOptOut: outageOptOut,
+            billingOptOutStatus: billingOptOutStatus,
+            userName: user.userInfo.userName,
+            isAndroid: Platform.OS == "android",
           };
+          const localData = {
+            status: 'skip',
+            date: new Date(),
+            permanentSkip: true
+          };
+          await dispatch(updatePushNotifications(data, null));
           storePushNotificationStatus(localData);
         }
       }

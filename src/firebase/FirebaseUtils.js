@@ -1,16 +1,39 @@
-import { Alert, Linking, Platform } from 'react-native';
+import { Alert, Linking, PermissionsAndroid, Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 
-  const requestUserPermission = async () => {
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+const requestUserPermission = async () => {
+  let granted;
+  let logMessage = '';
 
-    console.log('Authorization status:', authStatus);
+  if (Platform.OS === 'android' && Platform.Version >= 33) {
+    const alreadyGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+    if (alreadyGranted) {
+      granted = true;
+      logMessage = `Android API ${Platform.Version} POST_NOTIFICATIONS Permission: already granted`;
+    } else {
+      const status = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS);
+      granted = (status === PermissionsAndroid.RESULTS.GRANTED);
+      logMessage = `Android API ${Platform.Version} POST_NOTIFICATIONS Permission: ${status}`;
+    }
+  } else {
+    const authStatus = await messaging().hasPermission();
+    if (authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL) {
+      granted = true;
+      logMessage = 'FCM Authorization Status: Already authorized/provisional';
+    } else {
+      const requestStatus = await messaging().requestPermission();
+      granted =
+        requestStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        requestStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      logMessage = `FCM Authorization Status: ${granted ? 'authorized/provisional' : 'denied/undetermined'}`;
+    }
+  }
 
-    return enabled;  
-  };
+  console.log(logMessage);
+
+  return granted;
+};
 
   const notifyPermission = async () => {
     let authStatus = await messaging().hasPermission();
