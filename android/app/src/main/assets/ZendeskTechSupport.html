@@ -9,6 +9,15 @@
   <script type="text/javascript">
     window.zESettings = {
       webWidget: {
+        color: { 
+        theme: '#8D3B90',
+        launcher: '#8D3B90', // This will also update the badge
+        launcherText: '#EBEEF1',
+        button: '#8D3B90',
+        resultLists: '#691840',
+        header: '#8D3B90',
+        articleLinks: '#8D3B90'
+      },
         chat: {
           departments: {
           //  enabled: []
@@ -34,6 +43,9 @@
           //   phone: { value: "${user.phone}", readOnly: true }
           // });
           // zE('webWidget', 'identify', { name: "${user.name}", email: "${user.email}" });
+
+           zE('webWidget', 'chat:removeTags', 'afterhours','afterhours','spk-test'); 
+           zE('webWidget', 'chat:addTags', ['residential', 'test','Busuiness']);
           zE('webWidget', 'open');
           zE('webWidget:on', 'close', () => window.ReactNativeWebView.postMessage("close"));
         });

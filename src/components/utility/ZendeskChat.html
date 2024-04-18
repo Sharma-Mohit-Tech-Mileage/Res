@@ -10,13 +10,13 @@
     window.zESettings = {
       webWidget: {
         color: { 
-        theme: '#FF69B4',
-        launcher: '#CC3A83', // This will also update the badge
-        launcherText: '#E589B7',
-        button: '#8A0648',
+        theme: '#8D3B90',
+        launcher: '#8D3B90', // This will also update the badge
+        launcherText: '#EBEEF1',
+        button: '#8D3B90',
         resultLists: '#691840',
-        header: '#FF4500',
-        articleLinks: '#FF4500'
+        header: '#8D3B90',
+        articleLinks: '#8D3B90'
        },
         chat: {
           departments: {
@@ -35,6 +35,7 @@
 <body>
     <!-- Start of Zendesk Widget script -->
     <script>
+
         
         document.addEventListener( 'DOMContentLoaded', function( event ) {
           // zE('webWidget', 'prefill', {
@@ -43,6 +44,9 @@
           //   phone: { value: "${user.phone}", readOnly: true }
           // });
           // zE('webWidget', 'identify', { name: "${user.name}", email: "${user.email}" });
+
+           zE('webWidget', 'chat:removeTags', 'afterhours','afterhours','spk-test'); 
+           zE('webWidget', 'chat:addTags', ['residential', 'test']);
           zE('webWidget', 'open');
           zE('webWidget:on', 'close', () => window.ReactNativeWebView.postMessage("close"));
         });

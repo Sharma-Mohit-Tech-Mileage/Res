@@ -10,13 +10,13 @@
     window.zESettings = {
       webWidget: {
         color: { 
-        theme: '#FF69B4',
-        launcher: '#CC3A83', // This will also update the badge
-        launcherText: '#E589B7',
-        button: '#8A0648',
+        theme: '#8D3B90',
+        launcher: '#8D3B90', // This will also update the badge
+        launcherText: '#EBEEF1',
+        button: '#8D3B90',
         resultLists: '#691840',
-        header: '#FF4500',
-        articleLinks: '#FF4500'
+        header: '#353091',
+        articleLinks: '#8D3B90'
        },
         chat: {
           departments: {
@@ -45,8 +45,8 @@
           // });
            //zE('webWidget', 'identify', { name: "TEST", email: "test@gmail.com" });
            
-           zE('webWidget', 'chat:removeTags', 'afterhours','afterhours'); 
-           zE('webWidget', 'chat:addTags', ['residential', 'test']);
+           zE('webWidget', 'chat:removeTags', 'afterhours','afterhours','spk-test'); 
+           zE('webWidget', 'chat:addTags', ['residential', 'test','Busuiness']);
           zE('webWidget', 'open');
           zE('webWidget:on', 'close', () => window.ReactNativeWebView.postMessage("close"));
         });
