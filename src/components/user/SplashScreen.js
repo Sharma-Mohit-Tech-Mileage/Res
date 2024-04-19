@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, Linking, TouchableOpacity, Modal } from "react-native";
+import { View, Image, StyleSheet, Text, ActivityIndicator, Linking, TouchableOpacity, Modal,Platform } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
@@ -28,6 +28,7 @@ const config = {
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [bussinessApp,setIsBusiness]  =useState(false);
   const [loginEnable, setLoginEnable] = useState(true);
   const [disconnected, setDisconnected] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -70,8 +71,9 @@ const SplashScreen = ({ navigation }) => {
         setErrorMessage1(' to view information.')
         setTimeout(() => { setModalVisible(true) }, 100);
       } else if (userInfo.customerType === 'Business') {
+        setIsBusiness(true);
         setErrorMessage(strings.BusinessUserMsg);
-        setErrorMessage1(' to view information.')
+        setErrorMessage1(' to manage your Sparklight Business services account');
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (res.custServices.internet == false) {
         setErrorMessage(strings.nonInternetUserMessage);
@@ -157,7 +159,7 @@ const SplashScreen = ({ navigation }) => {
             <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
             <Text style={styles.message}>{message}{" "}
               <Text style={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: 'underline', }]} onPress={onClose}>
-                {"login to your online account"}
+                {bussinessApp?"download the MySparklight Business mobile app":"login to your online account"}
               </Text>
               {message2}
             </Text>
@@ -180,7 +182,16 @@ const SplashScreen = ({ navigation }) => {
   const handleCloseAlert = () => {
     setModalVisible(false);
     logoutAction(() => {
-      Linking.openURL(Env.URL); // Open the login web portal after logging out.
+      if(bussinessApp){
+        if(Platform.OS==='android'){
+          Linking.openURL('https://play.google.com/store/apps/details?id=com.sparklight');
+        }else{
+         Linking.openURL('https://apps.apple.com/us/app/mysparklight/id6469003880');
+        }
+      }else{
+        Linking.openURL(Env.URL);
+      }
+      
     });
   };
 
