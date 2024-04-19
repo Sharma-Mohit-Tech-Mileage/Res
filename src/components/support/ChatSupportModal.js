@@ -100,9 +100,9 @@ const ChatSupportModal = ({ department, onClose }) => {
       visible={modalVisible}
       onRequestClose={closeModal}
     >
-      <View style={{ flex: 1,backgroundColor:'#c8c8c8' }}>
+      <View style={{ flex: 1,backgroundColor:'#fff' }}>
         <ProfileSettingsHeader onPressBack={closeModal} title="Chat With Us" />
-        <View style={{ width: "100%", height: "90%" }}>
+        <View style={{ width: "100%", height: "78%" }}>
           <WebView
            originWhitelist={["*"]}
            allowFileAccess={true}
@@ -134,7 +134,7 @@ const ChatSupportModal = ({ department, onClose }) => {
         <ActivityIndicator
           style={{ position: "absolute", top: hp('50%'), left: wp('48%') }}
           size="large"
-          color={colors.primary_color}
+          color={colors.sparklight_bright_purple}
         />
       )}
       </View>
