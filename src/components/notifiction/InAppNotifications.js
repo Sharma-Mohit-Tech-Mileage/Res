@@ -53,10 +53,11 @@ const InAppNotifications = ({ navigation }) => {
   }, [route.params?.updateFailed, navigation, dispatch]);
 
   const handleSave = async () => { 
-      await requestUserPermission();
       const pushNotification = await getPushNotificationStatus();
       if(pushNotification?.permanentSkip){
         await notifyPermission()
+      }else{
+        await requestUserPermission();
       }
       const token = await getFcmToken();
       console.log('FCM IN NOTIFICATION  >>>>>>><<<<<<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^',token)

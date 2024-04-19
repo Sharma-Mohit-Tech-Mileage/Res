@@ -58,11 +58,10 @@ const logoutAction = (dispatch, navigation) => {
       console.log('Logout', result);
       storeUser({});
       storeSsoToken({});
-      dispatch(saveUserInfo({}));
-      dispatch(logoutApp());
+       dispatch(saveUserInfo({}));
+       dispatch(logoutApp());
       cleanUserData();
       SetClearTimer();
-      // Zendesk.logout();
       navigation.reset({
         index: 0,
         routes: [{ name: 'Splash' }],

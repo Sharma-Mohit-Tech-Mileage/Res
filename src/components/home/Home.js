@@ -318,9 +318,6 @@ const HomeScreen = ({ navigation }) => {
           }
         });
 
-        // if (optOutCountPushNotification > 2) {
-        //   enabledNotification = false;
-        // }
       }
 
       if (enabledNotification) {
@@ -417,7 +414,7 @@ const HomeScreen = ({ navigation }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (profile?.pushNotifications?.[0]?.pushMessageType !== undefined) {
+    if (profile?.pushNotifications?.[0]?.pushMessageType !== undefined && user.userInfo !== undefined) {
       console.log(
         "[checkNotificationsEffect] pushMessageType is defined. Executing checkNotifications."
       );
@@ -427,7 +424,7 @@ const HomeScreen = ({ navigation }) => {
         "[checkNotificationsEffect] pushMessageType is undefined. Skipping checkNotifications."
       );
     }
-  }, [profile, checkNotifications]);
+  }, [profile,user, checkNotifications]);
 
   const changeWalkThroughStep = (step) => {
     if (step > 2) {
@@ -579,10 +576,6 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
-  /**
-   * New app update alert
-   */
-
   const AppUpdateAlert = () => {
     return (
       <View style={styles.errorBox}>
@@ -641,7 +634,6 @@ const HomeScreen = ({ navigation }) => {
       </View>
     );
   };
-  /************* End App Update Alert Section ******* */
 
   return (
     <LinearGradient

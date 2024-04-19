@@ -39,7 +39,6 @@ export const getSsoToken = async () => {
 export const cleanUserData = async () => {
   try {
     const keys = await AsyncStorage.getAllKeys();
-    // Modify the filter condition to check if the key contains "pushNotificationStatus"
     const keysToRemove = keys.filter(key => !key.includes("pushNotificationStatus"));
 
     await AsyncStorage.multiRemove(keysToRemove);
