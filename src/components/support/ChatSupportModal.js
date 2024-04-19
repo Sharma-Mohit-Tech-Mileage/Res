@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   Pressable,
   Platform,
+  ActivityIndicator
 } from "react-native";
 import WebView from "react-native-webview";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -19,11 +20,17 @@ import {
 } from "../../../GlobalStyles";
 import techSupport from "../utility/ZendeskTechSupport.html"
 import billSupport from "../utility/ZendeskChat.html"
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import colors from "../../res/Colors";
 
 const ChatSupportModal = ({ department, onClose }) => {
   const [modalVisible, setModalVisible] = useState(true);
   const [speedTestState, setSpeedTestState] = useState({});
   const [host, setHost] = useState("");
+  const [loading,setLoading]=useState(false)
 
   const closeModal = () => {
     setModalVisible(false);
@@ -93,9 +100,9 @@ const ChatSupportModal = ({ department, onClose }) => {
       visible={modalVisible}
       onRequestClose={closeModal}
     >
-      <View style={{ flex: 1,backgroundColor:'#c8c8c8' }}>
+      <View style={{ flex: 1,backgroundColor:'#fff' }}>
         <ProfileSettingsHeader onPressBack={closeModal} title="Chat With Us" />
-        <View style={{ width: "100%", height: "90%" }}>
+        <View style={{ width: "100%", height: "78%" }}>
           <WebView
            originWhitelist={["*"]}
            allowFileAccess={true}
@@ -111,10 +118,25 @@ const ChatSupportModal = ({ department, onClose }) => {
             mixedContentMode="always"
             onNavigationStateChange={navigationChange}
             onMessage={onMessage}
+            onLoadStart={()=>{
+              setLoading(true)
+            }}
+            onLoadEnd={()=>{
+              setTimeout(()=>{
+                setLoading(false)
+              },1000)
+            }}
             
             //injectedJavaScript={INJECTED_JAVASCRIPT}
           />
         </View>
+        {loading && (
+        <ActivityIndicator
+          style={{ position: "absolute", top: hp('50%'), left: wp('48%') }}
+          size="large"
+          color={colors.sparklight_bright_purple}
+        />
+      )}
       </View>
     </Modal>
   );
