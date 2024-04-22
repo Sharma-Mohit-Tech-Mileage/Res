@@ -166,7 +166,7 @@ const ChatSupportModal = ({ department, onClose }) => {
               },1000)
             }}
             
-            injectedJavaScript={injectedJavaScript}
+            //injectedJavaScript={injectedJavaScript}
           />
         </View>
         {loading && (
