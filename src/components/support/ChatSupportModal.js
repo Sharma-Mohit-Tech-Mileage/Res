@@ -56,13 +56,10 @@ const ChatSupportModal = ({ department, onClose }) => {
         chat: {
           departments: {
             //  enabled: []
-              enabled: [${department==='tech'}?'Resi Tech Support':'Resi Tech Support'],
+              enabled: [${department==='tech'}?'Resi Tech Support':'Resi Bill Support'],
   
-              select: [${department==='tech'}?'Resi Tech Support':'Resi Tech Support'],
+              select: [${department==='tech'}?'Resi Tech Support':'Resi Bill Support'],
 
-              enabled: [${department===' Bill'}?'Resi Bill Support':'Resi Bill Support'],
-  
-              select: [${department==='Bill'}?'Resi Bill Support':'Resi Bill Support'],
             },
           tags: ${tagsString},
         
