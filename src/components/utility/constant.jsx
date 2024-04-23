@@ -1,3 +1,5 @@
+import DeviceInfo from 'react-native-device-info';
+import VersionCheck from 'react-native-version-check';
 import { Color } from '../../../GlobalStyles'
 export const ROLE_COLORS = {
     primaryadmin: Color.colorMidnightblue,
@@ -20,7 +22,7 @@ export const extractAcknowledgementEmail = logObj => {
 };
 export const convertToSpecialCase = (str) => {
     if (!str || typeof str !== 'string' || str.length < 2) {
-        return null; 
+        return null;
     }
 
     return str.split(' ').map(word =>
@@ -29,12 +31,12 @@ export const convertToSpecialCase = (str) => {
 }
 
 export const isFreshEntry = (entry) => {
-    const acknowledgementEmail = extractAcknowledgementEmail(entry);
-    const hasNoEmail = !entry.emailAddress || !acknowledgementEmail; 
-    const isPreviouslySubscribed = entry.paperlessStatus === "Active" || entry.paperlessStatus ==='Processing'; 
-    const isEmailBeingProcessed = entry.emailStatus === "Verified" || entry.emailStatus === "Pending"; 
+    //const acknowledgementEmail = extractAcknowledgementEmail(entry);
+    const hasNoEmail = !entry.emailAddress
+    // const isPreviouslySubscribed = entry.paperlessStatus === "Active" || entry.paperlessStatus ==='Processing'; 
+    // const isEmailBeingProcessed = entry.emailStatus === "Verified" || entry.emailStatus === "Pending"; 
 
-    return hasNoEmail && !isPreviouslySubscribed && !isEmailBeingProcessed;
+    return hasNoEmail
 };
 
 export const BORDER_COLORS = {
@@ -156,7 +158,7 @@ export const isAdminRole = (input) => {
     }
 
     const inputLower = input.toLowerCase();
-    const adminRoles = ['admin']; 
+    const adminRoles = ['admin'];
     return adminRoles.includes(inputLower);
 };
 
@@ -220,7 +222,7 @@ export const getRoleBasedMessage = (input) => {
 };
 
 export const transformNotificationPreferences = (response) => {
-   // console.log('Default structure for when data is missing or in an unexpected format', JSON.stringify(response));
+    // console.log('Default structure for when data is missing or in an unexpected format', JSON.stringify(response));
     const defaultStructure = [
         { type: 'Appointments', status: 'Off' },
         { type: 'Outage', status: 'Off' },
@@ -254,9 +256,8 @@ export const transformNotificationPreferences = (response) => {
 
 
 export const transformToUserPreferences = (data) => {
-    console.log('Data is undefined or not an array, returning default transformToUserPreferences=======================', data);
     if (!Array.isArray(data)) {
-       
+
         return {
             accountNumber: '',
             deviceToken: '',
@@ -295,14 +296,37 @@ export const transformToUserPreferences = (data) => {
                 transformedData.billingOptOutStatus = itemStatus === 'off';
                 break;
             default:
-                // Handle unexpected type or ignore
                 break;
         }
     });
-    console.log('final Update values based on the data array-------------------------', transformedData)
     return transformedData;
 };
+export const checkForMinorUpdate = async () => {
+    const currentVersion = DeviceInfo.getVersion();
+    const latestVersion = await VersionCheck.getLatestVersion();
 
+    const currentParts = currentVersion.split('.');
+    const latestParts = latestVersion.split('.');
+
+    const currentMajor = parseInt(currentParts[0], 10);
+    const latestMajor = parseInt(latestParts[0], 10);
+    const currentMinor = parseInt(currentParts[1], 10);
+    const latestMinor = parseInt(latestParts[1], 10);
+
+    if (latestMajor === currentMajor && latestMinor > currentMinor) {
+        return {
+            isMinorUpdateAvailable: true,
+            currentVersion: currentVersion,
+            latestVersion: latestVersion
+        };
+    }
+
+    return {
+        isMinorUpdateAvailable: false,
+        currentVersion: currentVersion,
+        latestVersion: null
+    };
+};
 
 
 

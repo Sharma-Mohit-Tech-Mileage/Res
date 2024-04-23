@@ -1,24 +1,22 @@
 
 import React, { useEffect, useState } from "react";
-import {View,Image,StyleSheet,Text,ActivityIndicator,Linking,TouchableOpacity,Modal} from "react-native";
+import { View, Image, StyleSheet, Text, ActivityIndicator, Linking, TouchableOpacity, Modal,Platform } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
-import { saveUserInfo,logError,logInfo} from "../../redux/actions/UserAction";
-import { storeUser, storeSsoToken, getSsoToken } from "../../redux/utils/LocalStorage";
+import { saveUserInfo, logError, logInfo } from "../../redux/actions/UserAction";
+import { storeUser, storeSsoToken, getSsoToken,getUser, cleanUserData } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
-import {widthPercentageToDP as wp,heightPercentageToDP as hp,} from "react-native-responsive-screen";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import DeviceInfo from 'react-native-device-info';
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
-import { getUser, cleanUserData } from "../../redux/utils/LocalStorage";
 import { SetRenewTokenTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from 'react-native-version-check';
-import ZendeskChat from "react-native-zendesk-chat";
 const config = {
   issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
@@ -26,17 +24,16 @@ const config = {
   scopes: ["openid", "profile", "email", "phone", "address"],
   iosPrefersEphemeralSession: true,
 };
-//ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [bussinessApp,setIsBusiness]  =useState(false);
   const [loginEnable, setLoginEnable] = useState(true);
   const [disconnected, setDisconnected] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessage1, setErrorMessage1] = useState("");
-  const [isAppNewUpdate,setIsAppNewUpdate]=useState(false)
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -47,7 +44,7 @@ const SplashScreen = ({ navigation }) => {
     setLoading(false);
     handleLogin(res);
     dispatch(logInfo({
-      host: DeviceInfo.getBrand(), 
+      host: DeviceInfo.getBrand(),
       application: 'Sparklight Residential Mobile App',
       className: 'AuthenticationService',
       methodName: 'callSSOLoginApi',
@@ -68,19 +65,20 @@ const SplashScreen = ({ navigation }) => {
         refreshToken: res.refreshToken
       };
       if (res.userInfo.acctStatus === 'Disconnect') {
-        setTimeout(() => {setDisconnected(true)}, 500)
+        setTimeout(() => { setDisconnected(true) }, 500)
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
         setErrorMessage(strings.nonAdminUserMsg);
         setErrorMessage1(' to view information.')
-        setTimeout(() => {setModalVisible(true)}, 100);
+        setTimeout(() => { setModalVisible(true) }, 100);
       } else if (userInfo.customerType === 'Business') {
+        setIsBusiness(true);
         setErrorMessage(strings.BusinessUserMsg);
-        setErrorMessage1(' to view information.')
-        setTimeout(() => {setModalVisible(true);}, 100);
+        setErrorMessage1(' to manage your Sparklight Business services account');
+        setTimeout(() => { setModalVisible(true); }, 100);
       } else if (res.custServices.internet == false) {
         setErrorMessage(strings.nonInternetUserMessage);
         setErrorMessage1(' to manage your service.')
-        setTimeout(() => {setModalVisible(true);}, 100);
+        setTimeout(() => { setModalVisible(true); }, 100);
       } else {
         storeUser(user);
         dispatch(saveUserInfo(user));
@@ -88,7 +86,7 @@ const SplashScreen = ({ navigation }) => {
         if (user.userInfo.mobileTCAcceptanceFlag) {
           navigation.reset({
             index: 0,
-            routes: [{ name: 'MyTab' }], 
+            routes: [{ name: 'MyTab' }],
           });
         } else {
           navigation.reset({
@@ -111,22 +109,22 @@ const SplashScreen = ({ navigation }) => {
         saveUserInfo({});
         cleanUserData();
         if (postLogoutCallback) {
-          postLogoutCallback(); // Execute the callback after logout
+          postLogoutCallback();
         }
       }).catch((error) => {
         console.error("Logout error:", error);
         if (postLogoutCallback) {
-          postLogoutCallback(); // Even on error, execute the callback
+          postLogoutCallback();
         }
       });
     }).catch((error) => {
       console.error("Error getting SSO token:", error);
       if (postLogoutCallback) {
-        postLogoutCallback(); // Even on error, execute the callback
+        postLogoutCallback();
       }
     });
   };
-  
+
   const onError = (error) => {
     setLoading(false);
     setDisconnected(true)
@@ -141,41 +139,7 @@ const SplashScreen = ({ navigation }) => {
     }));
   };
 
-  const AppUpdateMsg=()=>{
-    return(
-      <View
-          style={{ alignItems:'center', flexDirection:'column' }}
-        >
-          <Text
-            style={{
-              color: "white",
-              fontSize: 20,
-              fontFamily:FontFamily.openSansSemiBold,
-              alignItems: "center",
-              marginTop:20
-            }}
-          >
-            New version available
-          </Text>
-          <Text
-            style={{
-              color: "white",
-              fontSize: 16,
-              fontFamily:FontFamily.openSansRegular,
-              alignItems: "center",
-              marginTop: 20,
-              textAlign:'center',
-              marginHorizontal: 22,
-            }}
-          >
-            Looks like you have an older version of the app. To get latest
-            features and best experience you'll need to update now
-          </Text>
-          </View>
-    )
-  }
-
-  const CustomAlertModal = ({ visible, message, message2, onClose ,closeModal}) => {
+  const CustomAlertModal = ({ visible, message, message2, onClose, closeModal }) => {
     return (
       <Modal
         visible={visible}
@@ -192,10 +156,10 @@ const SplashScreen = ({ navigation }) => {
                 </Text>
               </View>
             </View>
-            <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}/>
+            <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
             <Text style={styles.message}>{message}{" "}
-              <Text style={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue,textDecorationLine: 'underline',}]} onPress={onClose}>
-                {"login to your online account"}
+              <Text style={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: 'underline', }]} onPress={onClose}>
+                {bussinessApp?"download the MySparklight Business mobile app":"login to your online account"}
               </Text>
               {message2}
             </Text>
@@ -214,42 +178,28 @@ const SplashScreen = ({ navigation }) => {
       </Modal>
     );
   };
-  
+
   const handleCloseAlert = () => {
     setModalVisible(false);
     logoutAction(() => {
-      Linking.openURL(Env.URL); // Open the login web portal after logging out.
+      if(bussinessApp){
+        if(Platform.OS==='android'){
+          Linking.openURL('https://play.google.com/store/apps/details?id=com.sparklight');
+        }else{
+         Linking.openURL('https://apps.apple.com/us/app/mysparklight/id6469003880');
+        }
+      }else{
+        Linking.openURL(Env.URL);
+      }
+      
     });
   };
-  
-
-
-  const checkAppUpdate = () => {
-    let currentVersion = VersionCheck.getCurrentVersion();
-    VersionCheck.getLatestVersion()  
-      .then(latestVersion => {
-        if (Platform.OS === 'android') {
-          VersionCheck.needUpdate().then(res => {
-            setIsAppNewUpdate(res?.isNeeded)
-          });
-        } else {
-          VersionCheck.needUpdate({
-            currentVersion: currentVersion,
-            latestVersion: latestVersion,
-          }).then(res => {
-            setIsAppNewUpdate(res?.isNeeded)
-          });
-        }
-      });
-
-
-  }
 
   const closeModal = () => {
     setModalVisible(false);
     logoutAction();
   };
-  
+
 
   const loginAuth = async () => {
     try {
@@ -292,9 +242,7 @@ const SplashScreen = ({ navigation }) => {
         console.error("Error fetching data", error);
       }
     };
-
     fetchData();
-    checkAppUpdate();
   }, []);
 
   return (
@@ -311,9 +259,6 @@ const SplashScreen = ({ navigation }) => {
           source={require("../../res/images/Logo.png")}
           style={styles.logo}
         />
-{isAppNewUpdate && (
-  <AppUpdateMsg/>
-)}
 
       </View>
       {
@@ -321,16 +266,9 @@ const SplashScreen = ({ navigation }) => {
         (
           <>
             <TouchableOpacity
-              style={[styles.SSoBtnContainer,{marginTop:isAppNewUpdate?hp("15%"):hp("35%")}]}
+              style={[styles.SSoBtnContainer, { marginTop: hp("35%") }]}
               onPress={() => {
-                if(isAppNewUpdate){
-                  if (Platform.OS === 'android') {
-                    Linking.openURL('https://play.google.com/store/apps/details?id=com.sparklight');
-                  } else {
-                    Linking.openURL('https://apps.apple.com/us/app/mysparklight/id6469003880');
-                  }
-                }else
-               if (loginEnable ) {
+                if (loginEnable) {
                   setLoginEnable(false)
                   loginAuth();
                   setTimeout(() => {
@@ -339,7 +277,7 @@ const SplashScreen = ({ navigation }) => {
                 }
               }}
             >
-              <Text style={styles.SSoBtn}>{isAppNewUpdate?'Update' :'Login'}</Text>
+              <Text style={styles.SSoBtn}>{'Login'}</Text>
             </TouchableOpacity>
           </>
         )

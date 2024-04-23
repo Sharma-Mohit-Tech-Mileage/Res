@@ -77,16 +77,21 @@ function* getPushNotifications(action) {
         const response = yield call(fetchPushNotifications, action.payload);
         yield put(savePushNotifications(response));
     } catch (error) {
-        console.error('Fetch Paperless Details API Error:', error);
-        // Optionally, dispatch an action to handle this error state
+       
     }
 }
 
 function* updateNewEmail(action) {
     try {
         const response = yield call(postEmailNotification, action.payload);
-        if (action.isEmailChanged === true) {
-            yield call(postProfileInfo, action.ProfilePayLoad);
+        try {
+            if (action.isEmailChanged === true) {
+                yield call(postProfileInfo, action.ProfilePayLoad);
+            }
+        } catch (secondError) {
+            if (action.navigation !== null) {
+                action.navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Email' });
+            }
         }
         if (action.navigation !== null) {
             action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Email' });
@@ -97,6 +102,7 @@ function* updateNewEmail(action) {
         }
     }
 }
+
 
 function* updateProfile(action) {
     try {
@@ -148,8 +154,14 @@ function* updateTextNotification(action) {
 function* updateEmailNotification(action) {
     try {
         const response = yield call(putEmailNotification, action.payload);
-        if (action.isEmailChanged === true) {
-            yield call(postProfileInfo, action.ProfilePayLoad);
+        try {
+            if (action.isEmailChanged === true) {
+                yield call(postProfileInfo, action.ProfilePayLoad);
+            }
+        } catch (secondError) {
+            if (action.navigation !== null) {
+                action.navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Email' });
+            }
         }
         if (action.navigation !== null) {
             action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Email' });

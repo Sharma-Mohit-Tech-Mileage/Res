@@ -9,7 +9,8 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import { updatePushNotificationsv2 } from '../../redux/actions/ProfileActionSuite';
 import moment from 'moment';
 import Toggle from '../common/Toggle';
-import { getFcmToken, notifyPermission } from '../../firebase/FirebaseUtils';
+import { getFcmToken, notifyPermission, requestUserPermission } from '../../firebase/FirebaseUtils';
+import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
 const InAppNotifications = ({ navigation }) => {
   const [initialize, setInitializeSettings] = useState({});
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -17,22 +18,20 @@ const InAppNotifications = ({ navigation }) => {
   const additionalData = route.params?.additionalData;
   const dispatch = useDispatch();
   const scrollViewRef = useRef(null);
-  const isFocused = useIsFocused(); // Hook to determine if the screen is focused
-
+  const isFocused = useIsFocused(); 
   useEffect(() => {
-    // Check if the screen is focused
+
     if (isFocused) {
       const initializedSettings = transformToUserPreferences(additionalData);
       setInitializeSettings(initializedSettings);
     }
 
-    // Cleanup function
     return () => {
       if (isFocused) {
-        setInitializeSettings({}); // Reset state when leaving the screen
+        setInitializeSettings({}); 
       }
     };
-  }, [isFocused, additionalData]); // Depend on isFocused and additionalData
+  }, [isFocused, additionalData]); 
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
     setInitializeSettings(initialize => {
@@ -53,11 +52,17 @@ const InAppNotifications = ({ navigation }) => {
     }
   }, [route.params?.updateFailed, navigation, dispatch]);
 
-  const handleSave = async () => {  // Mark the function as async
-    const enabledPermission = await notifyPermission();
+  const handleSave = async () => { 
+      const pushNotification = await getPushNotificationStatus();
+      if(pushNotification?.permanentSkip){
+        await notifyPermission()
+      }else{
+        await requestUserPermission();
+      }
       const token = await getFcmToken();
-      initialize.deviceToken = token;  // Replace 'token' with your actual token variable
-      initialize.deviceTokenTimestamp = moment().format();  // Assuming 'moment' is imported and available
+      console.log('FCM IN NOTIFICATION  >>>>>>><<<<<<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^',token)
+      initialize.deviceToken = token;  
+      initialize.deviceTokenTimestamp = moment().format();  
       initialize.isAndroid = Platform.OS === "android"
       await dispatch(updatePushNotificationsv2(initialize, navigation));
 

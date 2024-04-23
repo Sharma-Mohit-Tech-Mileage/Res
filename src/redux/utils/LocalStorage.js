@@ -36,19 +36,23 @@ export const getSsoToken = async () => {
   }
 };
 
-// getting data
 export const cleanUserData = async () => {
   try {
     const keys = await AsyncStorage.getAllKeys();
-    await AsyncStorage.multiRemove(keys);
-} catch (error) {
-    console.error('Error clearing app data.');
-}
+    const keysToRemove = keys.filter(key => !key.includes("pushNotificationStatus"));
+
+    await AsyncStorage.multiRemove(keysToRemove);
+  } catch (error) {
+    console.error('Error selectively clearing app data.', error);
+  }
 };
 
 export const storePushNotificationStatus = async (value) => {
   try {
-    await AsyncStorage.setItem("pushNotificationStatus", JSON.stringify(value));
+    let user = await getUser();
+    const userName = user.userInfo?.userName || '';
+    const key = `pushNotificationStatus_${userName}`;
+    await AsyncStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
     console.log(error);
   }
@@ -57,7 +61,10 @@ export const storePushNotificationStatus = async (value) => {
 // getting data
 export const getPushNotificationStatus = async () => {
   try {
-    const userData = JSON.parse(await AsyncStorage.getItem("pushNotificationStatus"))
+    let user = await getUser();
+    const userName = user.userInfo?.userName || '';
+    const key = `pushNotificationStatus_${userName}`;
+    const userData = JSON.parse(await AsyncStorage.getItem(key))
     return userData;
   } catch (error) {
    console.log(error); 

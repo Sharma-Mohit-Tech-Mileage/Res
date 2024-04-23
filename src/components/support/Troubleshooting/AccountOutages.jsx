@@ -27,15 +27,15 @@ const TroubleshootComponent = ({
                         showCloseIcon={false}
                     />
                 </View>
-                <View style={{width: '90%',}}>
+                <View style={[styles.button]}>
                     <Pressable onPress={()=>{
-                        navigation.navigate("ArticalWindowUtility", {
-                            url: `${Env.URL}/billing`,
+                        navigation.navigate("ArticleWindowUtility", {
+                            url: `${Env.URL}business/billing/payments`,
                             name: "Billing Details",
                           });
                     }}
-                    style={[styles.button]}>
-                        <Text style={styles.accept}>Pay Bill</Text>
+                   >
+                        <Text style={[styles.accept]}>Pay Bill</Text>
                     </Pressable>  
                 </View>
             </View>
@@ -62,10 +62,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: Padding.p_base
     },
     btnContainer: {
-        // flex: 1,
-        // justifyContent: 'center',
-        // paddingHorizontal: Padding.p_base,
-        // width: '90%',
+        flex: 1,
+        justifyContent: 'center',
+        width: '90%',
     },
     circle: {
         width: windowWidth * 0.5,
@@ -99,6 +98,7 @@ const styles = StyleSheet.create({
     button: {
         backgroundColor: Color.colorMidnightblue,
         marginBottom: hp('15%'),
+        width:'90%',
         paddingVertical: Padding.p_3xs,
     },
     

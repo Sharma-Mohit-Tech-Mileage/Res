@@ -42,7 +42,7 @@ const TextNotifications = ({ navigation }) => {
 
     useEffect(() => {
         if (route.params?.updateFailed) {
-            setErrorText('Notifications updated failed.')
+            setErrorText('Something went wrong. Please try again.')
             setShowErrorAlert(true);
             scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
             navigation.setParams({ updateFailed: undefined });

@@ -185,8 +185,8 @@ const ManageEquipment = ({route}) => {
         }
         }
       />
-      <ScrollView >
-        <View accessible={true} style={styles.myModemParent}>
+      <ScrollView automaticallyAdjustContentInsets={false}>
+        <View style={styles.myModemParent}>
           <View style={[styles.myModem, styles.myModemSpaceBlock]}>
             <View
               style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}

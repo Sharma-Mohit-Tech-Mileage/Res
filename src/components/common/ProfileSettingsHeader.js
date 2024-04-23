@@ -5,7 +5,8 @@ import {
     StatusBar,
     Pressable,
     Image,
-    StyleSheet
+    StyleSheet,
+    AccessibilityInfo
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
@@ -14,10 +15,20 @@ const ProfileSettingsHeader = ({
     title,
     onPressBack,
     iconAlignment = 'right',
-    iconSource = require("../../../assets/chevronleft.png"), // Default icon source
-    showIcon = true // New prop to control icon visibility
+    iconSource = require("../../../assets/chevronleft.png"),
+    showIcon = true
 }) => {
     const [iconPressed, setIconPressed] = useState(false);
+
+    const handlePressIn = () => {
+        setIconPressed(true);
+        AccessibilityInfo.announceForAccessibility('Back button pressed');
+    };
+
+    const handlePressOut = () => {
+        setIconPressed(false);
+    };
+
     const iconStyle = iconAlignment === 'left' ? styles.chevronRight : styles.chevronLeft;
 
     return (
@@ -35,13 +46,13 @@ const ProfileSettingsHeader = ({
                         <Pressable
                             style={[iconStyle, styles.chevronLayout]}
                             onPress={onPressBack}
-                            accessibilityLabel="Back Button"
+                            accessible={true}
+                            accessibilityLabel="Back"
                             accessibilityHint="Returns to the previous screen"
                             accessibilityRole="button"
-                            accessible={true}
-                            hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }} 
-                            onPressIn={() => setIconPressed(true)}
-                            onPressOut={() => setIconPressed(false)}
+                            hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}
+                            onPressIn={handlePressIn}
+                            onPressOut={handlePressOut}
                         >
                             <Image
                                 style={[styles.icon, iconPressed ? styles.iconPressed : null]}
@@ -50,10 +61,14 @@ const ProfileSettingsHeader = ({
                             />
                         </Pressable>
                     )}
-                    <Text style={styles.title} 
-                    accessible={true}
-                    accessibilityRole="header" // Indicates this is a header/title
-                    accessibilityLabel={title} >{title}</Text>
+                    <Text 
+                        style={styles.title}
+                        accessible={true}
+                        accessibilityRole="header"
+                        accessibilityLabel={`Header: ${title}`}
+                    >
+                        {title}
+                    </Text>
                 </View>
             </LinearGradient>
         </>

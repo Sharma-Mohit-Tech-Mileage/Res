@@ -7,15 +7,11 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import BellIcon from "../../res/svgIcons/bellIcon";
 import BellRingingIcon from "../../res/svgIcons/BellRingingIcon";
-import {
-  getFcmToken,
-  requestUserPermission,
-} from '../../firebase/FirebaseUtils';
+import {getFcmToken,requestUserPermission} from '../../firebase/FirebaseUtils';
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 import { updatePushNotifications } from '../../redux/actions/ProfileActionSuite';
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
-import notifee from '@notifee/react-native';
 
 const PushNotifications = ({ navigation }) => {
     const [nextScreen, setNextScreen] = useState('EntryTextNotifications');
@@ -26,9 +22,10 @@ const PushNotifications = ({ navigation }) => {
     useEffect(() => {
         let goToPhoneScreen = false;
         let optOutCount = 0;
-  
-        if (profile.smsSubscription.length > 0) {
-            const firstSubscription = profile.smsSubscription[0];
+        const isValidStatus = ['approved', 'active'].includes(profile.paperLessInfo?.paperlessStatus?.toLowerCase());
+        
+        if (profile?.smsSubscription.length > 0) {
+            const firstSubscription = profile?.smsSubscription[0];
             firstSubscription.smsMessageType.forEach((messageType) => {
                 if (messageType.optOutFlag) {
                     optOutCount = optOutCount + 1;
@@ -45,13 +42,7 @@ const PushNotifications = ({ navigation }) => {
         if (goToPhoneScreen) {
             setNextScreen('EntryTextNotifications');  
         } else {
-            if (profile.paperLessInfo !== undefined
-                && profile.paperLessInfo.accountNumber !== undefined
-                && profile.paperLessInfo.accountNumber.length > 0
-                && profile.paperLessInfo.paperlessStatus !== undefined
-                && (profile.paperLessInfo.paperlessStatus.toLowerCase() === 'approved'
-                    || profile.paperLessInfo.paperlessStatus.toLowerCase() === 'active')
-                ) {
+            if (profile.paperLessInfo?.accountNumber?.length > 0 && isValidStatus) {
                 setNextScreen('MyTab');                  
             } else {
                 setNextScreen('EntryEmailNotifications');  
@@ -66,13 +57,11 @@ const PushNotifications = ({ navigation }) => {
     
     const enableNotifications = async () => {
         const enabledPermission = await requestUserPermission();
-        if (Platform.OS === 'android') {
-            await notifee.requestPermission();
-        }
         if (enabledPermission) {
             const token = await getFcmToken();
+            console.log('FCM TERM WITH PERMISSION >>>>>>><<<<<<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^',token)
             const data = {
-                accountNumber: user.userInfo.accountNumber,
+                accountNumber: user.userInfo?.accountNumber,
                 deviceToken: token,
                 deviceTokenTimestamp: moment().format(),
                 optOut: false,
@@ -81,12 +70,11 @@ const PushNotifications = ({ navigation }) => {
                 userName: user.userInfo.userName,
                 isAndroid: Platform.OS == "android",
             };
-            console.log('enableNotifications: ', data);
-            console.log('enableNotifications navigation: ', navigation);
             const localData = {
                 status: 'accepted',
-                date: new Date()
-            };            
+                date: new Date(),
+                permanentSkip: false
+            };
             storePushNotificationStatus(localData);
             await dispatch(updatePushNotifications(data, null));
             navigation.reset({
@@ -94,17 +82,29 @@ const PushNotifications = ({ navigation }) => {
                 routes: [{ name: nextScreen }],
             });
         } else {
+            const token = await getFcmToken();
+            console.log('FCM TERM WITHOUT PERMISSION >>>>>>><<<<<<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^',token)
+            const dataWithoutPermission = {
+                accountNumber: user.userInfo.accountNumber,
+                deviceToken: token, 
+                deviceTokenTimestamp: moment().format(),
+                optOut: true, 
+                outageOptOut: true, 
+                billingOptOutStatus: true, 
+                userName: user.userInfo.userName,
+                isAndroid: Platform.OS == "android",
+            };
             const localData = {
                 status: 'skip',
                 date: new Date(),
                 permanentSkip: true
             };            
             storePushNotificationStatus(localData);
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: nextScreen }],
-                });
-
+            await dispatch(updatePushNotifications(dataWithoutPermission, null)); 
+            navigation.reset({
+                index: 0,
+                routes: [{ name: nextScreen }],
+            });
         }
     };
 

@@ -48,7 +48,7 @@ const AppUpdateAlert = ({ visible, onClose }) => {
                 );
               } else {
                 Linking.openURL(
-                  "https://apps.apple.com/us/app/mysparklight/id6469003880"
+                  "https://apps.apple.com/app/6469003880"
                 );
               }
               onClose();
