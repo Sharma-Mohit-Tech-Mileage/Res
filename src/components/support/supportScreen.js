@@ -13,6 +13,8 @@ import {
 
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import ChatIcon from "../../res/svgIcons/ChatIcon";
 
 ZendeskChat.init(Env.ZENDESK_CHAT_KEY);  
 
@@ -406,7 +408,7 @@ const Support = ({route}) => {
                                                     accessibilityRole="button"
                                                     accessibilityHint="Chat with Tech Support">
                                                     <View style={styles.supportChatText}>
-                                                        <Text style={[styles.supportingText4]}>Chat With Us</Text>                                                            
+                                                                                                                  
                                                     </View>    
                                                 </Pressable>
                                                 <Pressable onPress={() => makeCall('877-692-2253')}>
@@ -425,11 +427,28 @@ const Support = ({route}) => {
                                                 <Text style={[styles.supportingText7, styles.supportingTypo,]}>
                                                     24h/7 days a week
                                                 </Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
+                          <TouchableOpacity
+                            style={{
+                              flexDirection: "row",
+                              marginTop: 16,
+                              alignItems: "center",
+                            }}
+                            onPress={()=>{
+                              toggleModal("tech");
+                            }}
+                          >
+                            <ChatIcon />
+                            <Text
+                              style={[styles.headingTypo, { marginLeft: 10,fontSize:16 }]}
+                            >
+                              Chat Available
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                </View>
                             <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}>
                                 <View style={[styles.integrationCardMobile1, styles.integrationCardBorder,]} >
                                     <View style={[styles.content, styles.contentSpaceBlock]}>
@@ -467,7 +486,7 @@ const Support = ({route}) => {
                                                         accessibilityRole="button"
                                                         accessibilityHint="Chat with Billing Support">    
                                                         <View style={styles.supportChatText}>
-                                                            <Text style={[styles.supportingText4]}>Chat With Us</Text>                                                            
+                                                                                                                       
                                                         </View>                                                     
                                                     </Pressable>
                                                     <Pressable onPress={() => makeCall('877-692-2253')}>
@@ -487,6 +506,23 @@ const Support = ({route}) => {
                                                     <Text style={[styles.supportingText7, styles.supportingTypo,]} >
                                                         M-F 8:00 AM-5:00 PM MST
                                                     </Text>
+                                                    <TouchableOpacity
+                            style={{
+                              flexDirection: "row",
+                              marginTop: 16,
+                              alignItems: "center",
+                            }}
+                            onPress={()=>{
+                              toggleModal("tech");
+                            }}
+                          >
+                            <ChatIcon />
+                            <Text
+                              style={[styles.headingTypo, { marginLeft: 10,fontSize:16 }]}
+                            >
+                              Chat Available
+                            </Text>
+                          </TouchableOpacity>
                                                 </View>
                                             </View>
                                         </View>
