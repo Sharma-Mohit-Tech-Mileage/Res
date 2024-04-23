@@ -45,8 +45,8 @@
           // });
           // zE('webWidget', 'identify', { name: "${user.name}", email: "${user.email}" });
 
-           zE('webWidget', 'chat:removeTags', 'afterhours','afterhours','spk-test'); 
-           zE('webWidget', 'chat:addTags', ['residential', 'test']);
+           //zE('webWidget', 'chat:removeTags', 'afterhours','afterhours','spk-test'); 
+           //zE('webWidget', 'chat:addTags', ['residential', 'test']);
           zE('webWidget', 'open');
           zE('webWidget:on', 'close', () => window.ReactNativeWebView.postMessage("close"));
         });

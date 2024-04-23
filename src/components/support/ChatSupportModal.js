@@ -18,6 +18,7 @@ import {
   Border,
   FontSize,
 } from "../../../GlobalStyles";
+import { useSelector } from 'react-redux';
 import techSupport from "../utility/ZendeskTechSupport.html"
 import billSupport from "../utility/ZendeskChat.html"
 import {
@@ -31,6 +32,45 @@ const ChatSupportModal = ({ department, onClose }) => {
   const [speedTestState, setSpeedTestState] = useState({});
   const [host, setHost] = useState("");
   const [loading,setLoading]=useState(false)
+  const user = useSelector(state => state.combinedReducers.user.userData);
+  
+ 
+  const tags = ['Residential','Mobileapp', 'pid_'+user.userInfo.accountNumber];
+
+  // Convert tags array to string format accepted by Zendesk Chat Widget
+  const tagsString = JSON.stringify(tags);
+ 
+  // JavaScript code to set tags for Zendesk Chat Widget
+  const injectedJavaScript = `
+    window.zESettings = {
+
+      
+      webWidget: {
+        color: { 
+          theme: '#8D3B90',
+          launcher: '#8D3B90', // This will also update the badge
+          launcherText: '#EBEEF1',
+          button: '#8D3B90',
+          resultLists: '#691840',
+          header: '#8D3B90',
+          articleLinks: '#8D3B90'
+        },
+        chat: {
+          departments: {
+            //  enabled: []
+              enabled: [${department==='tech'}?'Resi Tech Support':'Resi Bill Support'],
+  
+              select: [${department==='tech'}?'Resi Tech Support':'Resi Bill Support'],
+            },
+          tags: ${tagsString},
+        
+        }
+      }
+    };
+  `;
+  console.log('setting',injectedJavaScript)
+  
+
 
   const closeModal = () => {
     setModalVisible(false);
@@ -127,7 +167,7 @@ const ChatSupportModal = ({ department, onClose }) => {
               },1000)
             }}
             
-            //injectedJavaScript={INJECTED_JAVASCRIPT}
+            injectedJavaScript={injectedJavaScript}
           />
         </View>
         {loading && (
