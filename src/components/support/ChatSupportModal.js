@@ -43,6 +43,8 @@ const ChatSupportModal = ({ department, onClose }) => {
   // JavaScript code to set tags for Zendesk Chat Widget
   const injectedJavaScript = `
     window.zESettings = {
+
+      
       webWidget: {
         color: { 
           theme: '#8D3B90',
@@ -59,7 +61,6 @@ const ChatSupportModal = ({ department, onClose }) => {
               enabled: [${department==='tech'}?'Resi Tech Support':'Resi Bill Support'],
   
               select: [${department==='tech'}?'Resi Tech Support':'Resi Bill Support'],
-
             },
           tags: ${tagsString},
         
@@ -166,7 +167,7 @@ const ChatSupportModal = ({ department, onClose }) => {
               },1000)
             }}
             
-            //injectedJavaScript={injectedJavaScript}
+            injectedJavaScript={injectedJavaScript}
           />
         </View>
         {loading && (
