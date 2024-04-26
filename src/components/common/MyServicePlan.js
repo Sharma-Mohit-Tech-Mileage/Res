@@ -13,15 +13,12 @@ import { FontFamily, FontSize } from "../../../GlobalStyles";
 import TickIcon from "../../res/svgIcons/TickIcon";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
-import TVIcon from "../../res/svgIcons/TVIcon";
-import Phone from "../../res/svgIcons/Phone";
 
 const MyServicePlan = ({ plans, navigation }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [ShowComment, setModelComment] = useState(false);
   const [animateModal, setanimateModal] = useState(false);
   const [data, setData] = useState({});
-  const [bundle, setBundle] = useState({});
   const planDetailsRef = React.useRef(null);
   const setFocusToPlanDetails = () => {
     const reactTag = findNodeHandle(planDetailsRef.current);
@@ -40,30 +37,10 @@ const MyServicePlan = ({ plans, navigation }) => {
     });
   };
 
-  // get plan bundles
-  const getPlanBundle = () => {
-    getUser().then((res) => {
-     const request = `account/api/account/${res.userInfo.accountNumber}/bundle`;
-     GetApiRequest(request, (res)=>{
-      console.log('getPlanBundle',JSON.stringify(res))
-           if(res){
-            setBundle(res[0])
-           }
-     }, (error)=>{
-      console.log('getPlanBundle error',error)
-          console.log(error)
-     });
-   });
- };
-
-
   const MyPlanDetails = () => {
     
 
     const PlanDetailsItem = ({ item, index }) => {
-     let planIcon= (item.packageType==='High Speed Data')?<InternetIcon/> :(item.packageType==='Video')? <TVIcon/> : (item.packageType==='Phone')?<Phone/> :<InternetIcon/>
-     
-
       return (
         <View key={index} >
           <View
@@ -94,36 +71,27 @@ const MyServicePlan = ({ plans, navigation }) => {
                   alignSelf: "center",
                 }}
               >
-                {planIcon}
+                <InternetIcon />
               </LinearGradient>
             </View>
-            <Text style={styles.planDetailsRowHeader} accessibilityLabel={`Internet ${item.packageName}`} accessibilityRole="header">
-            {/* {item.packageType} {item.packageName} */}
-            {item.packageType==='Phone'? "Phone ".concat(item.packageName):(item.packageType=='High Speed Data')? `Intenet ${item.packageName}`: item.packageName } 
+            <Text style={styles.planDetailsRowHeader} accessibilityLabel={`Internet ${item.planName}`} accessibilityRole="header">
+              Internet {item.planName}
             </Text>
           </View>
-            { item.features.map((item)=>{
-              return(
-                <>
+
           <View style={[styles.planDetailsRow]}>
             <View style={{ alignSelf: "center" }}>
               <TickIcon  />
             </View>
-      
+
             <Text style={styles.planDetailsTxt} accessible={true} >
-              {item}
+              Download Speed Up To {item.downloadSpeed} Mbps
             </Text>
           </View>
 
-          <View style={{ backgroundColor: colors.grey, height: 1.5, marginTop: 5 }}
+          <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} />
 
-          
-          />
-          </>
-              )
-            })}
-       
-          {/* <View style={[styles.planDetailsRow]}>
+          <View style={[styles.planDetailsRow]}>
             <View style={{ alignSelf: "center" }}>
               <TickIcon />
             </View>
@@ -141,7 +109,7 @@ const MyServicePlan = ({ plans, navigation }) => {
               marginLeft: 10,
             }}
           >
-             <View style={{ flexDirection: "row" }}>
+            <View style={{ flexDirection: "row" }}>
               <View style={{ alignSelf: "center" }}>
                 <TickIcon />
               </View>
@@ -150,8 +118,8 @@ const MyServicePlan = ({ plans, navigation }) => {
                 accessibilityLabel={`Data Plan ${item.dataQuotaGB === '15000' ? 'UNLIMITED' : item.dataQuotaGB + ' gigabytes'}`}>
                 Data Plan {(item.dataQuotaGB=='15000')?'UNLIMITED':item.dataQuotaGB+' GB*'}
               </Text>
-            </View> 
-          </View> */}
+            </View>
+          </View>
 
           <View style={{ backgroundColor: colors.grey, height: 1, width: "100%", marginTop: 5 }}  />
         </View>
@@ -206,13 +174,13 @@ const MyServicePlan = ({ plans, navigation }) => {
               </TouchableOpacity>
             </View>
             <FlatList
-              data={bundle.packages||[]}
+              data={plans||[]}
               renderItem={({ item, index }) => (
                 <View key={index}>
                 <PlanDetailsItem item={item} index={index} key={index} />
                 </View>
               )}
-              keyExtractor={(item, index) =>index.toString()}
+              keyExtractor={(item, index) => item?.id?.toString() || index.toString()}
             />
           </View>
         }
@@ -228,7 +196,6 @@ const MyServicePlan = ({ plans, navigation }) => {
   useEffect(() => {
     //console.log("data");
     getDataUsage();
-    getPlanBundle();
   }, []);
   return (
     <View
@@ -388,7 +355,6 @@ const styles = StyleSheet.create({
   Modal: {
     backgroundColor: "#fff",
     marginTop: hp("40%"),
-    paddingBottom: 90,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
@@ -407,11 +373,10 @@ const styles = StyleSheet.create({
   },
   planDetailsTxt: {
     color: colors.darkest_grey,
-    fontSize: FontSize.size_lg,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     marginLeft: 10,
     fontWeight: "400",
-    
   },
 });
 
