@@ -191,11 +191,11 @@ const TroubleshootContainer = () => {
               navigation.navigate("ManageEquipment");
               }
             }
-          } else if (res.equipmentType === "ONU") {
-            temt.push(res.OnutP_State);
-            temt.push(res.OltrP_State);
-            temt.push(res.OnurP_State);
-            if (res.onU_State === "Online") {
+          } else if (res.EquipmentType === "ONU") {
+            temt.push(res.ONUTP_State);
+            temt.push(res.OLTRP_State);
+            temt.push(res.ONURP_State);
+            if (res.ONU_State === "Online") {
               updateModemStatus(temt);
             } else {
               if(isFocused){
@@ -272,12 +272,12 @@ const TroubleshootContainer = () => {
           let macAddress = response[0].macAddress;
           var mac = macAddress;
           if (user.userInfo.accountNumber === "128387263") {
-            mac = "00:1d:d0:d4:f8:02";
+            mac = "B8:19:04:8E:F3:EC";
           } else if (user.userInfo.accountNumber === "133370775") {
-            mac = "60:19:71:d5:10:72";
+            mac = "3c:75:4a:ef:a1:00";
           }
           else if(user.userInfo.accountNumber==='133437285'){
-            mac="60:19:71:1b:b7:62"
+            mac="60:19:71:27:61:b2"
           }
           else if(user.userInfo.accountNumber==='131684698'){
             mac="ac:20:2e:6d:82:f1"
