@@ -63,7 +63,7 @@ const ManageEquipment = ({route}) => {
             } else if (res.userInfo.accountNumber === "133437285") {
               mac = "60:19:71:27:61:b2";
             } else if (res.userInfo.accountNumber === "131684698") {
-              mac = "ac:20:2e:6d:82:f1";
+              mac = "28:7a:ee:97:4d:cc";
             } else if (res.userInfo.accountNumber === "136885142") {
               mac = "00:40:36:59:00:00";
             }
