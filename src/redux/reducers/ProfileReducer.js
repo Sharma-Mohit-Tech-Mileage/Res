@@ -2,7 +2,7 @@ import {
     LOGOUT,
     USER_PROFILE_DETAILS, SAVE_USER_LIST,
     SAVE_SMS_SELECTION, SAVE_EMAIL_SELECTION,
-    SAVE_PAPERLESS_DETAILS, SAVE_PUSH_NOTIFICATIONS
+    SAVE_PAPERLESS_DETAILS, SAVE_PUSH_NOTIFICATIONS,SAVE_USER_ACCOUNT_SERVICE
 } from '../constants/index';
 
 const initialState = {
@@ -36,6 +36,12 @@ const ProfileReducer = (state = initialState, action) => {
                 isLoading: false,
                 smsSubscription: action.payload,
             };
+            case SAVE_USER_ACCOUNT_SERVICE:
+                return {
+                    ...state,
+                    isLoading: false,
+                    services: action.payload,
+                };
         case SAVE_EMAIL_SELECTION:
             return {
                 ...state,
