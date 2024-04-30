@@ -10,10 +10,13 @@ import {
 import WebView from "react-native-webview";
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../../GlobalStyles";
 import { postCurrentSpeed } from "../../../redux/actions/DashboardAction";
+import ProfileSettingsHeader from "../ProfileSettingsHeader";
 import { useDispatch } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 
 const SpeedTestModal = ({ url, onClose }) => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(true);
   const [speedTestState, setSpeedTestState] = useState({});
   const [host, setHost] = useState("");
@@ -71,7 +74,12 @@ const SpeedTestModal = ({ url, onClose }) => {
       visible={modalVisible}
       onRequestClose={closeModal}
     >
+       <ProfileSettingsHeader
+          title="Speed Test"
+          onPressBack={closeModal}
+        />
       <SafeAreaView style={{ flex: 1 }}>
+     
         <View style={{flex:1}}>
         <View style={styles.header}>
         <Pressable
@@ -111,7 +119,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    padding: 10,
+    padding: 20,
     backgroundColor: "#f2f2f2",
     width: "100%",
   },

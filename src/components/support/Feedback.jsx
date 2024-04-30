@@ -36,6 +36,8 @@ const Feedback = () => {
     const handleValidationError = () => {
         setErrormsg('Please enter valid information to continue.')
         setShowErrorAlert(true);
+        isSubmittingRef.current = false;
+        setIsSubmitting(false); // Also update the state for UI feedback
     };
 
     const handleIconPress = (option) => {
@@ -68,6 +70,8 @@ const Feedback = () => {
             setErrormsg('Feedback submission failed. Please try again later or contact support')
             setShowErrorAlert(true);
             scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+            isSubmittingRef.current = false;
+            setIsSubmitting(false); // Also update the state for UI feedback
             navigation.setParams({ updateFailed: undefined });
         }
     }, [route.params?.updateFailed, navigation, dispatch]);
