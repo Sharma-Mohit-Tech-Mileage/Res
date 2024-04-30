@@ -10,7 +10,7 @@ import {
     UPDATE_PUSH_NOTIFICATIONS, FETCH_PUSH_NOTIFICATIONS,
     SAVE_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
     SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
-    UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION
+    UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION,SAVE_USER_ACCOUNT_SERVICE
 } from '../constants';
 export const fetchProfileSuccess = (response) => {
     return {
@@ -166,4 +166,9 @@ export const updateEntryEmailNotification = (data, navigation) => ({
 export const resentEmailVerifiction = (navigation) => ({
     type: RESEND_EMAIL_VERIFICTION,
     navigation
+})
+
+export const saveAccountServices = (data) => ({
+    type: SAVE_USER_ACCOUNT_SERVICE,
+    payload:data
 })

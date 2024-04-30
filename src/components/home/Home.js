@@ -18,7 +18,7 @@ import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
-import { updatePushNotifications, fetchPushNotifications, } from "../../redux/actions/ProfileActionSuite";
+import { updatePushNotifications, fetchPushNotifications,saveAccountServices } from "../../redux/actions/ProfileActionSuite";
 import { useSelector, useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
@@ -234,8 +234,9 @@ const HomeScreen = ({ navigation }) => {
       GetApiRequest(
         request,
         (res) => {
-          console.log("getUserAccountDetails", res);
+          //console.log("getUserAccountDetails", res);
           if (res) {
+            dispatch(saveAccountServices(res.services))
             if (res.currentCollectionStep == "Soft Disconnect") {
               setAccountStatus("Disconnect");
               setIsInternetDetails(true);
