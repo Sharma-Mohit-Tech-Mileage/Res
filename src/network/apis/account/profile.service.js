@@ -2,7 +2,7 @@ import { _axios, _axios_cableone } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import axios from 'axios'; // Make sure to import axios
 import { Env } from "./Constants";
-
+import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
 let getProfileDetailsCount = 0;
 const getProfileDetails = async () => {
     getProfileDetailsCount = getProfileDetailsCount + 1;
@@ -284,11 +284,12 @@ const postTermsAndConditions = async (flag) => {
 
 const postPushNotifications = async (data) => {
     let user = await getUser();
+    let deviceToken = await getDeviceUniqueId();
     const accountNumber = user.userInfo?.accountNumber || null;
     const userName = user.userInfo?.userName || null;
     data.accountNumber = accountNumber;
     data.userName = userName;
-
+    data['deviceToken'] = deviceToken;
     const config = {
         headers: {
             Authorization: `Bearer ${user.token}`
