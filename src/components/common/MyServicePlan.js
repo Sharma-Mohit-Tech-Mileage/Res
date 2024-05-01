@@ -24,7 +24,7 @@ const MyServicePlan = ({ plans,tvPlan,phonePlan, navigation }) => {
   const [data, setData] = useState({});
   const userInfo = useSelector(state => state.combinedReducers.profile);
   const Separator = () => (<View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} />);
-
+   console.log('TV pl',tvPlan)
   const getDataUsage = () => {
     getUser().then((res) => {
       const reqauest = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
@@ -74,11 +74,11 @@ const MyServicePlan = ({ plans,tvPlan,phonePlan, navigation }) => {
              {/* {tvPlan?.planName &&<ServiceMenu itemindex={10} item={[]} serviceType={tvPlan?.planName||''} menuIcon='tv' />} */}
             {/* {phonePlan &&<ServiceMenu itemindex={20} item={phonePlan} serviceType={"Business Phone Unlimited"} menuIcon='phone' />}  */}
            {((userInfo.services?.iptv!=undefined && userInfo.services.iptv)) &&
-           <ServiceMenuStatic key={30}  planName={"Sparklight TV"}  menuIcon='tv' serviceType={'Standard cable TV'} />
+           <ServiceMenuStatic key={30}  planName={"Sparklight TV"}  menuIcon='tv' serviceType={tvPlan?.planName||''} />
            }
            
            
-           {(userInfo.services?.tv || userInfo.services?.digital || userInfo.services?.basic ) &&
+           {(userInfo.services?.basic && !userInfo.services?.iptv) &&
            <ServiceMenuStatic key={34}  planName={"TV"}  menuIcon='tv' serviceType={'Standard cable TV'} />
            }
 
@@ -188,7 +188,18 @@ const MyServicePlan = ({ plans,tvPlan,phonePlan, navigation }) => {
           </Text>
         </View>
 
-        <DetailRow label={serviceType}  />
+        {
+          (planName==='Phone')? phonePlan.map((item)=>{
+            return(
+              <>
+               <DetailRow label={item}  />
+              <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 2 }} />
+              </>
+           
+            )
+          }): <DetailRow label={serviceType}  />
+
+        }
 
           
       </View>
