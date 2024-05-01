@@ -33,6 +33,7 @@ const HomeScreen = ({ navigation }) => {
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const dispatch = useDispatch();
   const [plans, setPlans] = useState([]);
+  const [tvPlan, setTVPlan] = useState('');
   const [billAmt, setBillAmt] = useState(0);
   const [dueDate, setDueDate] = useState("");
   const [currentHealth, setCurrentHealth] = useState("Optimal");
@@ -58,6 +59,21 @@ const HomeScreen = ({ navigation }) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
       GetApiRequest(request, onSuccessPlan, onError);
     });
+  };
+
+  const getTVServiceDetails = () => {
+    getUser().then((res) => {
+      const request = `sparklighttv/api/sparklighttv/${res.userInfo.accountNumber}/plan`;
+      GetApiRequest(request, onSuccessTVPlan, onErrorInPlanTV);
+    });
+  };
+
+  const onSuccessTVPlan = (res) => {
+    setTVPlan(res || '');
+  };
+
+  const onErrorInPlanTV = (error) => {
+    console.log("onErrorInPlanTV", error);
   };
 
   const getUpgradeToken = async () => {
@@ -247,7 +263,7 @@ const HomeScreen = ({ navigation }) => {
             let dueDate = moment(res.paymentDueDate).format("ll");
             setDueDate(dueDate);
             setBillAmt(res.currentBalance);
-
+            getTVServiceDetails();
             getInternetPlanDetails();
           }
         },
@@ -756,7 +772,7 @@ const HomeScreen = ({ navigation }) => {
               </View>
             </ScrollView>
 
-            <MyServicePlan plans={plans} navigation={navigation} />
+            <MyServicePlan plans={plans} tvPlan={tvPlan} navigation={navigation} />
           </View>
         </ScrollView>
       </SafeAreaView>

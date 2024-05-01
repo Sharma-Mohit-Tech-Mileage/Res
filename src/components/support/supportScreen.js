@@ -427,7 +427,7 @@ const Support = ({route}) => {
                                                 <Text style={[styles.supportingText7, styles.supportingTypo,]}>
                                                     24h/7 days a week
                                                 </Text>
-                         {/*   <TouchableOpacity
+                            <TouchableOpacity
                             style={{
                               flexDirection: "row",
                               marginTop: 16,
@@ -443,7 +443,7 @@ const Support = ({route}) => {
                             >
                               Chat Available
                             </Text>
-                          </TouchableOpacity>*/}
+                          </TouchableOpacity>
                         </View>
                       </View>
                     </View>
@@ -506,7 +506,7 @@ const Support = ({route}) => {
                                                     <Text style={[styles.supportingText7, styles.supportingTypo,]} >
                                                         M-F 8:00 AM-5:00 PM MST
                                                     </Text>
-                                                    {/*  <TouchableOpacity
+                                                     <TouchableOpacity
                             style={{
                               flexDirection: "row",
                               marginTop: 16,
@@ -522,7 +522,7 @@ const Support = ({route}) => {
                             >
                               Chat Available
                             </Text>
-                          </TouchableOpacity>*/}
+                          </TouchableOpacity>
                                                 </View>
                                             </View>
                                         </View>
