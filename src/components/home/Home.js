@@ -34,6 +34,7 @@ const HomeScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [plans, setPlans] = useState([]);
   const [tvPlan, setTVPlan] = useState('');
+  const [phonePlan, setPhonePlan] = useState([]);
   const [billAmt, setBillAmt] = useState(0);
   const [dueDate, setDueDate] = useState("");
   const [currentHealth, setCurrentHealth] = useState("Optimal");
@@ -59,6 +60,27 @@ const HomeScreen = ({ navigation }) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
       GetApiRequest(request, onSuccessPlan, onError);
     });
+  };
+
+  function getPhoneServiceDetails() {
+    getUser().then((res) => {
+      const request = `phone/api/phones/${res.userInfo.accountNumber}/phonelines`;
+      GetApiRequest(request,onSuccessPhonePlan, onError);
+    });
+  }
+  function getPhoneServicePlans(tgcCode) {
+    getUser().then((res) => {
+      const request = `phone/api/Plans/${tgcCode}`;
+      GetApiRequest(request, onFetchedPlan, onError);
+    });
+  }
+  const onFetchedPlan = (res) => {
+    setPhonePlan(res);
+  }
+  const onSuccessPhonePlan = (res) => {
+    if (res.length && res[0].tcgCode) {
+      getPhoneServicePlans(res[0].tcgCode);
+    }
   };
 
   const getTVServiceDetails = () => {
@@ -265,6 +287,7 @@ const HomeScreen = ({ navigation }) => {
             setBillAmt(res.currentBalance);
             getTVServiceDetails();
             getInternetPlanDetails();
+            getPhoneServiceDetails();
           }
         },
         onErrorBill
@@ -772,7 +795,7 @@ const HomeScreen = ({ navigation }) => {
               </View>
             </ScrollView>
 
-            <MyServicePlan plans={plans} tvPlan={tvPlan} navigation={navigation} />
+            <MyServicePlan plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
           </View>
         </ScrollView>
       </SafeAreaView>

@@ -188,7 +188,18 @@ const MyServicePlan = ({ plans,tvPlan,phonePlan, navigation }) => {
           </Text>
         </View>
 
-        <DetailRow label={serviceType}  />
+        {
+          (planName==='Phone')? phonePlan.map((item)=>{
+            return(
+              <>
+               <DetailRow label={item}  />
+              <View style={{ backgroundColor: colors.grey, height: 1, marginTop: 2 }} />
+              </>
+           
+            )
+          }): <DetailRow label={serviceType}  />
+
+        }
 
           
       </View>
