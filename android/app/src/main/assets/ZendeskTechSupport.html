@@ -44,12 +44,41 @@
           // });
           // zE('webWidget', 'identify', { name: "${user.name}", email: "${user.email}" });
 
-           //zE('webWidget', 'chat:removeTags', 'afterhours','afterhours','spk-test'); 
-           //zE('webWidget', 'chat:addTags', ['residential', 'test','Busuiness']);
+          //zE('webWidget', 'chat:removeTags', ['afterhours','afterhours','spk-test','residential']); 
+          //zE('webWidget', 'chat:addTags', ['Business', 'test']);
           zE('webWidget', 'open');
           zE('webWidget:on', 'close', () => window.ReactNativeWebView.postMessage("close"));
+					var elements = document.querySelectorAll('stzzW');
+
         });
         </script>
+       <script>
+        window.onload = function() {
+           var elements = document.querySelectorAll('stzzW');
+           var elementsString = JSON.stringify(elements);
+					var e =  document.querySelectorAll('iframe').forEach( item =>
+    console.log(item.contentWindow.document.body.querySelectorAll('a'))
+)
+    			console.log(elementsString);
+					var	timeout = alertFunc();
+  // alert('Hello');
+
+function alertFunc() {
+	setTimeout(function() {
+
+		test = document.querySelectorAll('iframe')[2];
+		var element = test.contentDocument.querySelector('.stzzW');
+		element.style.display = "none";		
+	}	, 2000);
+}
+
+
+    			// alert(elementsString);
+        elements.forEach(function(element) {
+            element.style.display = 'none'; 
+        })
+      };
+    </script>
     
     <!-- End of Zendesk Widget script -->
 </body>
