@@ -480,7 +480,7 @@ const Support = ({route}) => {
                                                     <Pressable
                                                         //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
                                                         onPress={() => {
-                                                            toggleModal("1500003312402");
+                                                            toggleModal("Bill");
                                                         }}
                                                         accessibilityLabel="Chat Support"
                                                         accessibilityRole="button"
@@ -513,7 +513,7 @@ const Support = ({route}) => {
                               alignItems: "center",
                             }}
                             onPress={()=>{
-                              toggleModal("tech");
+                              toggleModal("Bill");
                             }}
                           >
                             <ChatIcon />

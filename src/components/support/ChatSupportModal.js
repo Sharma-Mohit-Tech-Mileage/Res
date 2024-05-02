@@ -35,11 +35,13 @@ const ChatSupportModal = ({ department, onClose }) => {
   const user = useSelector(state => state.combinedReducers.user.userData);
   
  
-  const tags = ['Residential','Mobileapp', 'pid_'+user.userInfo.accountNumber];
+  let departmentTag=(department==='tech')? 'resi_tech' : 'resi_bill'
+  const tags = [departmentTag,'resimobileapp', 'pid_'+user.userInfo.accountNumber];
 
   // Convert tags array to string format accepted by Zendesk Chat Widget
   const tagsString = JSON.stringify(tags);
  
+  let departmentName=(department==='tech')? 'Tech' : 'Bill'
   // JavaScript code to set tags for Zendesk Chat Widget
   const injectedJavaScript = `
     window.zESettings = {
@@ -58,9 +60,9 @@ const ChatSupportModal = ({ department, onClose }) => {
         chat: {
           departments: {
             //  enabled: []
-              enabled: [${department==='tech'}?'Resi Tech Support':'Resi Bill Support'],
+              enabled: ['Resi ${departmentName} Support'],
   
-              select: [${department==='tech'}?'Resi Tech Support':'Resi Bill Support'],
+              select: ['Resi ${departmentName} Support'],
             },
           tags: ${tagsString},
         
@@ -112,27 +114,7 @@ const ChatSupportModal = ({ department, onClose }) => {
 
   //const INJECTED_JAVASCRIPT = `(function () {     var script = document.createElement('script');     script.src = 'https://static.zdassets.com/ekr/snippet.js?key=key=ad791f41-3c05-490b-8bb3-55afe1751f92'; // Replace YOUR_ZENDESK_KEY with your Zendesk key    script.setAttribute('id', 'ze-snippet');     document.getElementsByTagName('head')[0].appendChild(script);     script.onload = function () {         // Initialize Zendesk Web Widgetwindow.zESettings = {             webWidget: {                 chat: {                     tags: ['tag1', 'tag2'], // Add any necessary tagsdepartment: 'Your Department' // Set the department for the chat                }             }         };         // Open Zendesk chatwindow.zE('webWidget', 'show');     }; })();`;
 
-  const chatHTML=()=> {
-    
-    return `<!DOCTYPE html>
-    <html lang="en">
-    
-    <head>
-        <title>Hello, World!</title>
-    </head>
-    
-    <body>
-        <p>Hello, World!</p>
-    
-        <!-- Start of Zendesk Widget script -->
-        <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=5b6f4fab-f7a4-4a5a-a133-04bc0cb80009">
-        </script>
-        <!-- End of Zendesk Widget script -->
-    </body>
-    
-    </html>`;
-  }
-
+  
   return (
     <Modal
       animationType="slide"
