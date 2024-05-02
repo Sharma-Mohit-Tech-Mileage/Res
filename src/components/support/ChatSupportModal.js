@@ -49,13 +49,13 @@ const ChatSupportModal = ({ department, onClose }) => {
       
       webWidget: {
         color: { 
-          theme: '#8D3B90',
-          launcher: '#8D3B90', // This will also update the badge
+          theme: '#353091',
+          launcher: '#353091', // This will also update the badge
           launcherText: '#EBEEF1',
-          button: '#8D3B90',
-          resultLists: '#691840',
-          header: '#8D3B90',
-          articleLinks: '#8D3B90'
+          button: '#353091',
+          resultLists: '#353091',
+          header: '#353091',
+          articleLinks: '#353091'
         },
         chat: {
           departments: {
@@ -124,7 +124,7 @@ const ChatSupportModal = ({ department, onClose }) => {
     >
       <View style={{ flex: 1,backgroundColor:'#fff' }}>
         <ProfileSettingsHeader onPressBack={closeModal} title="Chat With Us" />
-        <View style={{ width: "100%", height: "78%" }}>
+        <View style={{ width: "100%", height: "84%" }}>
           <WebView
            originWhitelist={["*"]}
            allowFileAccess={true}
