@@ -343,13 +343,13 @@ const HomeScreen = ({ navigation }) => {
         const messageTypes = profile.pushNotifications[0].pushMessageType;
         messageTypes.forEach((messageType) => {
           switch (messageType.messageType) {
-            case 'Appointment':
+            case 'appointment':
               optOut = messageType.optOutFlag;
               break;
-            case 'Outage':
+            case 'outage':
               outageOptOut = messageType.optOutFlag;
               break;
-            case 'Billing':
+            case 'billing':
               billingOptOutStatus = messageType.optOutFlag;
               break;
           }
@@ -452,19 +452,11 @@ const HomeScreen = ({ navigation }) => {
     };
     fetchData();
   }, [dispatch]);
-
   useEffect(() => {
-    if (profile?.pushNotifications?.[0]?.pushMessageType !== undefined && user.userInfo !== undefined) {
-      console.log(
-        "[checkNotificationsEffect] pushMessageType is defined. Executing checkNotifications."
-      );
+    if (profile?.pushNotifications?.length > 0 && user.userInfo !== undefined) {
       checkNotifications();
-    } else {
-      console.log(
-        "[checkNotificationsEffect] pushMessageType is undefined. Skipping checkNotifications."
-      );
     }
-  }, [profile,user, checkNotifications]);
+  }, [profile, user]);
 
   const changeWalkThroughStep = (step) => {
     if (step > 2) {
