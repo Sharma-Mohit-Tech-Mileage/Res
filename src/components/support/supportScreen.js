@@ -441,7 +441,7 @@ const Support = ({route}) => {
                             <Text
                               style={[styles.headingTypo, { marginLeft: 10,fontSize:16 }]}
                             >
-                              Chat Available
+                              Chat
                             </Text>
                           </TouchableOpacity>
                         </View>
@@ -520,7 +520,7 @@ const Support = ({route}) => {
                             <Text
                               style={[styles.headingTypo, { marginLeft: 10,fontSize:16 }]}
                             >
-                              Chat Available
+                              Chat
                             </Text>
                           </TouchableOpacity>
                                                 </View>
