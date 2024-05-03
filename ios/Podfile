@@ -27,7 +27,7 @@ prepare_react_native_project!
 #  use_frameworks! :linkage => linkage.to_sym
 #end
 
-target 'Sparklight' do
+target 'My Sparklight' do
   config = use_native_modules!
   use_frameworks! :linkage => :static
   # Flags change depending on the env values.
@@ -51,7 +51,7 @@ target 'Sparklight' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  target 'SparklightTests' do
+  target 'My SparklightTests' do
     inherit! :complete
     # Pods for testing
   end

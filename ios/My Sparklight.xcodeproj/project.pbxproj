@@ -11,6 +11,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		6CE6FB97BEE719BE45FCBBF4 /* Pods_My_Sparklight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20538EB60AA90B60C171A757 /* Pods_My_Sparklight.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		9160E9BE2B1E3DEE0023F6E0 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9160E9BB2B1E3DEE0023F6E0 /* OpenSans-Bold.ttf */; };
 		9183127E2BD2FDD100204633 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 9183127D2BD2FDD100204633 /* GoogleService-Info.plist */; };
@@ -19,8 +20,7 @@
 		918501722B30B78E0048F5A3 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 918501712B30B78E0048F5A3 /* OpenSans-Bold.ttf */; };
 		918501742B30B8A60048F5A3 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 918501732B30B8A60048F5A3 /* Inter-Bold.ttf */; };
 		918501762B30B8C70048F5A3 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 918501752B30B8C70048F5A3 /* Inter-SemiBold.ttf */; };
-		D9A9467BF03F553096457A06 /* Pods_Sparklight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1534C127BB5949CFD746C553 /* Pods_Sparklight.framework */; };
-		EB166C11ABEB7A6BF9BD30E1 /* Pods_Sparklight_SparklightTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB42F54EA0B6919212802C08 /* Pods_Sparklight_SparklightTests.framework */; };
+		F84EF25C0615014D8DBBB823 /* Pods_My_Sparklight_My_SparklightTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B7DA79E4D51D8CD31E27B89 /* Pods_My_Sparklight_My_SparklightTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,10 +43,14 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Sparklight/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Sparklight/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Sparklight/main.m; sourceTree = "<group>"; };
-		1534C127BB5949CFD746C553 /* Pods_Sparklight.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Sparklight.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		1772FD8C6D450158B3576A81 /* Pods-My Sparklight-My SparklightTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-My Sparklight-My SparklightTests.release.xcconfig"; path = "Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests.release.xcconfig"; sourceTree = "<group>"; };
+		20538EB60AA90B60C171A757 /* Pods_My_Sparklight.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_My_Sparklight.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B4392A12AC88292D35C810B /* Pods-Sparklight.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sparklight.debug.xcconfig"; path = "Target Support Files/Pods-Sparklight/Pods-Sparklight.debug.xcconfig"; sourceTree = "<group>"; };
+		3B7DA79E4D51D8CD31E27B89 /* Pods_My_Sparklight_My_SparklightTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_My_Sparklight_My_SparklightTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5709B34CF0A7D63546082F79 /* Pods-Sparklight.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sparklight.release.xcconfig"; path = "Target Support Files/Pods-Sparklight/Pods-Sparklight.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-Sparklight-SparklightTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sparklight-SparklightTests.debug.xcconfig"; path = "Target Support Files/Pods-Sparklight-SparklightTests/Pods-Sparklight-SparklightTests.debug.xcconfig"; sourceTree = "<group>"; };
+		5F8F5F98259D0452D025C614 /* Pods-My Sparklight.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-My Sparklight.release.xcconfig"; path = "Target Support Files/Pods-My Sparklight/Pods-My Sparklight.release.xcconfig"; sourceTree = "<group>"; };
+		7A795FDD51D5A6C971BFFF08 /* Pods-My Sparklight-My SparklightTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-My Sparklight-My SparklightTests.debug.xcconfig"; path = "Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Sparklight/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-Sparklight-SparklightTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sparklight-SparklightTests.release.xcconfig"; path = "Target Support Files/Pods-Sparklight-SparklightTests/Pods-Sparklight-SparklightTests.release.xcconfig"; sourceTree = "<group>"; };
 		910951722B01E11E003F4BF8 /* Sparklight.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Sparklight.entitlements; path = Sparklight/Sparklight.entitlements; sourceTree = "<group>"; };
@@ -58,8 +62,8 @@
 		918501712B30B78E0048F5A3 /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Bold.ttf"; path = "../assets/fonts/OpenSans-Bold.ttf"; sourceTree = "<group>"; };
 		918501732B30B8A60048F5A3 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Bold.ttf"; path = "../assets/fonts/Inter-Bold.ttf"; sourceTree = "<group>"; };
 		918501752B30B8C70048F5A3 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-SemiBold.ttf"; path = "../assets/fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		C9F209CFC7418B870974590E /* Pods-My Sparklight.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-My Sparklight.debug.xcconfig"; path = "Target Support Files/Pods-My Sparklight/Pods-My Sparklight.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		FB42F54EA0B6919212802C08 /* Pods_Sparklight_SparklightTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Sparklight_SparklightTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,7 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EB166C11ABEB7A6BF9BD30E1 /* Pods_Sparklight_SparklightTests.framework in Frameworks */,
+				F84EF25C0615014D8DBBB823 /* Pods_My_Sparklight_My_SparklightTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,7 +79,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D9A9467BF03F553096457A06 /* Pods_Sparklight.framework in Frameworks */,
+				6CE6FB97BEE719BE45FCBBF4 /* Pods_My_Sparklight.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,8 +127,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				1534C127BB5949CFD746C553 /* Pods_Sparklight.framework */,
-				FB42F54EA0B6919212802C08 /* Pods_Sparklight_SparklightTests.framework */,
+				20538EB60AA90B60C171A757 /* Pods_My_Sparklight.framework */,
+				3B7DA79E4D51D8CD31E27B89 /* Pods_My_Sparklight_My_SparklightTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -170,6 +174,10 @@
 				5709B34CF0A7D63546082F79 /* Pods-Sparklight.release.xcconfig */,
 				5B7EB9410499542E8C5724F5 /* Pods-Sparklight-SparklightTests.debug.xcconfig */,
 				89C6BE57DB24E9ADA2F236DE /* Pods-Sparklight-SparklightTests.release.xcconfig */,
+				C9F209CFC7418B870974590E /* Pods-My Sparklight.debug.xcconfig */,
+				5F8F5F98259D0452D025C614 /* Pods-My Sparklight.release.xcconfig */,
+				7A795FDD51D5A6C971BFFF08 /* Pods-My Sparklight-My SparklightTests.debug.xcconfig */,
+				1772FD8C6D450158B3576A81 /* Pods-My Sparklight-My SparklightTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -314,15 +322,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sparklight/Pods-Sparklight-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-My Sparklight/Pods-My Sparklight-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sparklight/Pods-Sparklight-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-My Sparklight/Pods-My Sparklight-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sparklight/Pods-Sparklight-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-My Sparklight/Pods-My Sparklight-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		7338EEDFC833C891D21C7FA4 /* [CP-User] [RNFB] Core Configuration */ = {
@@ -353,7 +361,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Sparklight-SparklightTests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-My Sparklight-My SparklightTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -375,7 +383,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Sparklight-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-My Sparklight-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -388,15 +396,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sparklight-SparklightTests/Pods-Sparklight-SparklightTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sparklight-SparklightTests/Pods-Sparklight-SparklightTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sparklight-SparklightTests/Pods-Sparklight-SparklightTests-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
@@ -405,15 +413,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sparklight/Pods-Sparklight-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-My Sparklight/Pods-My Sparklight-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sparklight/Pods-Sparklight-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-My Sparklight/Pods-My Sparklight-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sparklight/Pods-Sparklight-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-My Sparklight/Pods-My Sparklight-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E7AE5F7C6A3B684191FD6916 /* [CP-User] [RNFB] Crashlytics Configuration */ = {
@@ -436,15 +444,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sparklight-SparklightTests/Pods-Sparklight-SparklightTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Sparklight-SparklightTests/Pods-Sparklight-SparklightTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Sparklight-SparklightTests/Pods-Sparklight-SparklightTests-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -499,7 +507,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-Sparklight-SparklightTests.debug.xcconfig */;
+			baseConfigurationReference = 7A795FDD51D5A6C971BFFF08 /* Pods-My Sparklight-My SparklightTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -526,7 +534,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 89C6BE57DB24E9ADA2F236DE /* Pods-Sparklight-SparklightTests.release.xcconfig */;
+			baseConfigurationReference = 1772FD8C6D450158B3576A81 /* Pods-My Sparklight-My SparklightTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -550,7 +558,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-Sparklight.debug.xcconfig */;
+			baseConfigurationReference = C9F209CFC7418B870974590E /* Pods-My Sparklight.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
@@ -588,7 +596,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-Sparklight.release.xcconfig */;
+			baseConfigurationReference = 5F8F5F98259D0452D025C614 /* Pods-My Sparklight.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
