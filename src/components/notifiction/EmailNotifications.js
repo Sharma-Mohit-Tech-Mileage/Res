@@ -92,7 +92,7 @@ const EmailNotifications = () => {
       />
       <ScrollView>
         <View style={styles.emailNotificationsInner}>
-          <View style={[styles.frameContainer, styles.navigationBorder]} accessible >
+          <View style={[styles.frameContainer, styles.navigationBorder]} >
             <View style={styles.frameGroup}>
               <View style={[styles.frameView, styles.frameFlexBox]}>
                 <View style={styles.frameParent1} >
@@ -115,11 +115,8 @@ const EmailNotifications = () => {
                       </View>
                       <Text style={[styles.youAreSubscribedContainer, styles.containerTypo,]} >
                         <Text
-                          style={styles.youAreSubscribed}
+                          style={{ lineHeight: 28 }}
                         >{`Please enter your email address below to opt into email notifications and stay connected with us. `}</Text>
-                        {/* <Text style={styles.replyStopTo}>
-                          Please enter your email address below to opt into email notifications and stay connected with us.
-                        </Text> */}
                       </Text>
                     </View>
                   </View>
@@ -194,11 +191,14 @@ const EmailNotifications = () => {
               </View>
             </View>
           </View>
-          <View style={styles.buttonsParent} accessible >
+          <View style={styles.buttonsParent} >
             <Pressable
-              style={[{ backgroundColor: Color.colorMidnightblue }, styles.buttonsLayout]}
+              style={({ pressed }) => [
+                { backgroundColor: Color.colorMidnightblue },
+                styles.buttonsLayout,
+                { opacity: pressed ? .7 : 1 }
+              ]}
               onPress={handleSubmit(handleSave, handleValidationError)}
-              accessible
               accessibilityRole="button"
               accessibilityLabel="Save"
             >
@@ -206,9 +206,11 @@ const EmailNotifications = () => {
               <Text style={[styles.makePayment, styles.makeTypo]}>{isSubmitting ? 'Submitting...' : 'Save'}</Text>
             </Pressable>
             <Pressable
-              style={[styles.buttons1, styles.buttonsLayout]}
+              style={({ pressed }) => [
+                styles.buttons1, styles.buttonsLayout,
+                { opacity: pressed ? .7 : 1 }
+              ]}
               onPress={() => navigation.navigate("Notifications")}
-              accessible
               accessibilityRole="button"
               accessibilityLabel="Cancel"
               accessibilityHint="Cancels the action and returns to Notifications screen"
@@ -248,12 +250,6 @@ const styles = StyleSheet.create({
   infoCircleWrapper: {
     paddingVertical: Padding.p_5xs,
     flexDirection: "row",
-  },
-  youAreSubscribed: {
-    lineHeight: 28,
-  },
-  replyStopTo: {
-    lineHeight: 24,
   },
   youAreSubscribedContainer: {
     marginLeft: 8,

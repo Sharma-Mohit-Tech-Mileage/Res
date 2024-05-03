@@ -75,119 +75,118 @@ const EmailNotifications = ({ navigation }) => {
         dispatch(updateEntryEmailNotification(data, navigation));
     };
     
-    return  (
-        <View style={styles.container}>
-            <TouchableWithoutFeedback onPress={keyboardDismiss}>
-                <ScrollView 
-                    style={styles.inner}
-                    contentContainerStyle={styles.innerContent}
-                    ref={scrollRef}
-                >          
-                    <ProfileSettingsHeader 
-                        showIcon={false}
-                        title={'Notifications'}
-                    />
-                    <View style={styles.headerTabView}>
-                        <View style={styles.headerTabOne} />
-                        <View style={styles.headerTabTwo} />
-                        <View style={styles.headerTabThree} />
-                    </View>
-                    <View style={styles.viewContainer}>
-                        <View>
-                            <View style={styles.headerIconViewContainer}>
-                                <View style={styles.headerIconView}>
-                                    <MailRingingIcon />
-                                </View>
+    return (
+        <View style={styles.container}  accessibilityLabel="Notifications Page">
+            <ScrollView 
+                style={styles.inner}
+                contentContainerStyle={styles.innerContent}
+                accessibilityLabel="Scrollable content for notification settings"
+            >          
+                <ProfileSettingsHeader 
+                    showIcon={false}
+                    title={'Notifications'}
+                    accessibilityLabel="Notifications Header"
+                />
+                <View style={styles.headerTabView}  accessibilityLabel="Notification Categories">
+                    <View style={styles.headerTabOne} />
+                    <View style={styles.headerTabTwo} />
+                    <View style={styles.headerTabThree} />
+                </View>
+                <View style={styles.viewContainer}>
+                    <View  accessibilityLabel="Email Notification Section">
+                        <View style={styles.headerIconViewContainer}>
+                            <View style={styles.headerIconView}  accessibilityLabel="Email Notification Icon">
+                                <MailRingingIcon />
                             </View>
-                            <View style={styles.header}>
-                                <Text style={styles.headerText}>Turn on Email Notifications</Text>
-                            </View>         
-                            <View style={styles.subHeader}>
-                                <Text style={styles.subHeaderText}>Receive email alerts related to your account, updates and more from Sparklight.</Text>
-                            </View>   
                         </View>
-                        <>
-                        {
-                            profile.profileDetails !== undefined
-                            && profile.profileDetails.multipleEmails ?
-                            (
-                                <View 
-                                    style={styles.notificationAlert}                        
-                                >
-                                    <NotificationAlert
-                                        type={"warning"}
-                                        title={"There is a problem retrieving your email address"}
-                                        showCloseIcon={false}
-                                        message={"We are not able to retrieve the email address for your account. Please contact us for assistance"}
-                                    />                                                 
-                                </View>   
-                            )
-                            :
-                            (
-                                <View 
-                                    style={styles.subInput}
-                                    onLayout={(event) => {
-                                        setTextInputLayout(event.nativeEvent.layout);
-                                    }}                            
-                                >
-                                <EntryInput
-                                    iconImage={require('../../../assets/mail.png')}
-                                    placeholder="Email Address"
-                                    input={input}
-                                    onChangeText={onChangeText}
-                                    onSubmitText={keyboardDismiss}
-                                    keyboardType="email-address"
-                                />                
-                                </View>   
-                            )
-                        } 
-                        </>                     
+                        <View style={styles.header}>
+                            <Text style={styles.headerText}  accessibilityLabel="Turn on Email Notifications">Turn on Email Notifications</Text>
+                        </View>         
+                        <View style={styles.subHeader}>
+                            <Text style={styles.subHeaderText}  accessibilityLabel="Notification Description">Receive email alerts related to your account, updates and more from Sparklight.</Text>
+                        </View>   
                     </View>
-                    <View style={styles.bottomContainer}>
-                    </View>                                    
-                    <View style={styles.bottomBar}>
-                        <Pressable
-                            disabled={!enableButton}
-                            accessible={true}
-                            accessibilityRole="button"
-                            accessibilityState={{ disabled: !enableButton }}
-                            accessibilityLabel="Enable Email Notifications"
-                            accessibilityHint="Taps to enable email notifications for your account."
-                            style={enableButton ? [styles.button, styles.buttonsLayout] : [styles.button, styles.buttonsLayout, styles.buttonDisabled]}
-                            onPress={enableEmailNotifications}
-                        >                      
-                            <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]}>Enable Email Notifications</Text>
-                        </Pressable>                
-                        <View style={styles.buttonsParent} 
-                            accessibilityLabel="Buttons Section">
-                            <Pressable
-                                style={[styles.buttonDecline, styles.buttonsLayout]}
-                                onPress={() => {
-                                    navigation.reset({
-                                        index: 0,
-                                        routes: [{ name: 'MyTab' }], // Navigate to 'MyTab' after reset
-                                    });
-                                }}
-                                accessibilityLabel="Skip for now"
-                                accessibilityRole="button"
-                                accessibilityHint="Skip Terms and Conditions"
-                            >
-                                <Text style={styles.decline}>
-                                    Skip for now
-                                </Text>
-                            </Pressable>
-                        </View>    
-                    </View>
+                    <>
                     {
-                        !keyboardHidden &&
+                        profile.profileDetails !== undefined
+                        && profile.profileDetails.multipleEmails ?
                         (
-                            <View style={styles.textBottomHeight} />
+                            <View 
+                                style={styles.notificationAlert}
+                                 accessibilityLabel="Email Retrieval Error"
+                            >
+                                <NotificationAlert
+                                    type={"warning"}
+                                    title={"There is a problem retrieving your email address"}
+                                    showCloseIcon={false}
+                                    message={"We are not able to retrieve the email address for your account. Please contact us for assistance"}
+                                />                                                 
+                            </View>   
                         )
-                    }                    
-                </ScrollView>
-            </TouchableWithoutFeedback>
+                        :
+                        (
+                            <View 
+                                style={styles.subInput}
+                                onLayout={(event) => {
+                                    setTextInputLayout(event.nativeEvent.layout);
+                                }}
+                            
+                                accessibilityLabel="Email Input"
+                            >
+                            <EntryInput
+                                iconImage={require('../../../assets/mail.png')}
+                                placeholder="Email Address"
+                                input={input}
+                                onChangeText={onChangeText}
+                                onSubmitText={keyboardDismiss}
+                                keyboardType="email-address"
+                                accessibilityLabel="Enter your email address"
+                                accessibilityHint="Double tap to edit your email address"
+                            />                
+                            </View>   
+                        )
+                    } 
+                    </>                     
+                </View>
+                <View style={styles.bottomContainer}>
+                </View>                                    
+                <View style={styles.bottomBar}>
+                    <Pressable
+                        disabled={!enableButton}
+                        style={enableButton ? [styles.button, styles.buttonsLayout] : [styles.button, styles.buttonsLayout, styles.buttonDisabled]}
+                        onPress={enableEmailNotifications}
+                        accessibilityRole="button"
+                        accessibilityLabel={enableButton ? "Enable Email Notifications" : "Enable Email Notifications (disabled)"}
+                    >                      
+                        <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]}  accessibilityLabel="Enable Button Text">Enable Email Notifications</Text>
+                    </Pressable>                
+                    <View style={styles.buttonsParent}  accessibilityLabel="Skip for now Button">
+                        <Pressable
+                            style={[styles.buttonDecline, styles.buttonsLayout]}
+                            onPress={() => {
+                                navigation.reset({
+                                    index: 0,
+                                    routes: [{ name: 'MyTab' }],
+                                });
+                            }}
+                            
+                            accessibilityRole="button"
+                            accessibilityLabel="Skip for now"
+                        >
+                            <Text style={styles.decline}  accessibilityLabel="Skip for now Text">Skip for now</Text>
+                        </Pressable>
+                    </View>    
+                </View>
+                {
+                    !keyboardHidden &&
+                    (
+                        <View style={styles.textBottomHeight} />
+                    )
+                }                    
+            </ScrollView>
         </View>
     );
+    
 };
 
 const styles = StyleSheet.create({

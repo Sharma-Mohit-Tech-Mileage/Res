@@ -14,27 +14,30 @@ const EntryInput = ({ input, placeholder, onChangeText, onSubmitText, iconImage,
     const inputRef = useRef(null);
 
     return (
-        <View style={styles.inputContainer}>
-            <Image
-                source={iconImage}
-                style={[styles.searchIcon, styles.leftIcon]}
-            />
-            <TextInput
-                autoCapitalize="none"
-                ref={inputRef}
-                style={styles.searchInput}
-                placeholder={placeholder}
-                value={input}
-                onChangeText={onChangeText}
-                onSubmitEditing={onSubmitText}
-                placeholderTextColor={Color.gray600}
-                autoCorrect={false}
-                clearButtonMode="always"
-                keyboardType={keyboardType}
-                returnKeyType="done"
-                enterKeyHint="done"
-            />
-        </View>
+        <View style={styles.inputContainer}  accessibilityLabel="Input field with icon">
+        <Image
+            source={iconImage}
+            style={[styles.searchIcon, styles.leftIcon]}
+        />
+        <TextInput
+            autoCapitalize="none"
+            ref={inputRef}
+            style={styles.searchInput}
+            placeholder={placeholder}
+            value={input}
+            onChangeText={onChangeText}
+            onSubmitEditing={onSubmitText}
+            placeholderTextColor={Color.gray600}
+            autoCorrect={false}
+            clearButtonMode="always"
+            keyboardType={keyboardType}
+            returnKeyType="done"
+            enterKeyHint="done"
+            accessibilityLabel={placeholder} // Use the placeholder as the label for clarity
+            accessibilityTraits="search field"
+        />
+    </View>
+    
     );
 };
 

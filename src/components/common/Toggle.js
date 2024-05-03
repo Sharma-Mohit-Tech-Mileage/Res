@@ -6,7 +6,6 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false }) => {
     const [isActive, setIsActive] = useState(initialValue);
     const translateX = useRef(new Animated.Value(isActive ? 8 : -8)).current;
 
-    // Adjust the position of the toggle when initialValue changes
     useEffect(() => {
         Animated.timing(translateX, {
             toValue: initialValue ? 8 : -8,
@@ -17,11 +16,10 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false }) => {
     }, [initialValue, translateX]);
 
     const handleToggle = () => {
-        if (disabled) return; // Prevent toggle if disabled
+        if (disabled) return;
         const nextState = !isActive;
         setIsActive(nextState);
 
-        // Create a synthetic event object
         const event = {
             target: {
                 name,

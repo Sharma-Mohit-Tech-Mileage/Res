@@ -15,9 +15,9 @@ import Toggle from '../common/Toggle';
 
 // Define your validation schema
 const validationSchema = yup.object().shape({
-    phoneNumber : yup.string()
-            .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number.')
-            .required('Phone number is required'),
+    phoneNumber: yup.string()
+        .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number.')
+        .required('Phone number is required'),
     optOut: yup.boolean(),
     outageOptOut: yup.boolean(),
     billingOptOutStatus: yup.boolean(),
@@ -36,7 +36,7 @@ const TextNotifications = ({ navigation }) => {
             optOut: formatedData?.optOut || false,
             outageOptOut: formatedData?.outageOptOut || false,
             billingOptOutStatus: formatedData?.billingOptOutStatus || false,
-            accountNumber:''
+            accountNumber: ''
         }
     });
 
@@ -68,13 +68,13 @@ const TextNotifications = ({ navigation }) => {
             />
             <ScrollView ref={scrollViewRef}>
                 <View style={styles.textNotificationsInner} >
-                    
+
                     <View style={[styles.navigationBorder]}>
                         <View style={styles.frameGroup}>
                             <NotificationAlert
                                 type="error"
                                 title="Failed"
-                                message={errorText ? errorText:"Notifications updated failed."}
+                                message={errorText ? errorText : "Notifications updated failed."}
                                 showCloseIcon={true}
                                 isVisible={showErrorAlert}
                                 onClose={() => setShowErrorAlert(false)}
@@ -91,7 +91,7 @@ const TextNotifications = ({ navigation }) => {
                                     <Text
                                         style={styles.youAreSubscribed}
                                     >{`You are subscribed to text message alerts. `}</Text>
-                                    <Text style={styles.replyStopTo}>
+                                    <Text style={{ lineHeight: 24 }}>
                                         Reply STOP to cancel at any time. Message and data rates may apply.
                                     </Text>
                                 </Text>
@@ -103,19 +103,19 @@ const TextNotifications = ({ navigation }) => {
                                 <Text style={styles.mobilePhoneTypo}>
                                     Mobile Phone
                                 </Text>
-                                <View style={{paddingVertical:4}}>
-                                <Controller
-                                    control={control}
-                                    name="phoneNumber"
-                                    render={({ field: { onChange, onBlur, value } }) => (
-                                        <SparkLightInput
-                                            placeholder="Mobile Number"
-                                            onBlur={onBlur}
-                                            onChangeText={onChange}
-                                            value={value}
-                                            error={errors.phoneNumber?.message}
-                                        />
-                                    )}
+                                <View style={{ paddingVertical: 4 }}>
+                                    <Controller
+                                        control={control}
+                                        name="phoneNumber"
+                                        render={({ field: { onChange, onBlur, value } }) => (
+                                            <SparkLightInput
+                                                placeholder="Mobile Number"
+                                                onBlur={onBlur}
+                                                onChangeText={onChange}
+                                                value={value}
+                                                error={errors.phoneNumber?.message}
+                                            />
+                                        )}
                                     /></View>
                                 <Text style={[styles.receiveTextNotifications1, styles.containerTypo,]}>
                                     Message and data rates may apply. Message frequency may vary. Text STOP to opt out or HELP
@@ -128,7 +128,7 @@ const TextNotifications = ({ navigation }) => {
                             <View style={styles.frameWrapper2}>
                                 <View style={styles.frameParent3}>
                                     <View style={styles.frameParent4}>
-                                        <Text style={[styles.appointments, styles.mobilePhoneTypo,]}>
+                                        <Text style={[{ flex: 1 }, styles.mobilePhoneTypo,]}>
                                             Appointments
                                         </Text>
                                         <View >
@@ -156,7 +156,7 @@ const TextNotifications = ({ navigation }) => {
                             <View style={styles.frameWrapper2}>
                                 <View style={styles.frameParent3}>
                                     <View style={styles.frameParent4}>
-                                        <Text style={[styles.appointments, styles.mobilePhoneTypo,]}>
+                                        <Text style={[{ flex: 1 }, styles.mobilePhoneTypo,]}>
                                             Outage Alerts
                                         </Text>
                                         <View >
@@ -184,7 +184,7 @@ const TextNotifications = ({ navigation }) => {
                             <View style={styles.frameWrapper2}>
                                 <View style={styles.frameParent3}>
                                     <View style={styles.frameParent4}>
-                                        <Text style={[styles.appointments, styles.mobilePhoneTypo,]} >
+                                        <Text style={[{ flex: 1 }, styles.mobilePhoneTypo,]} >
                                             Billing
                                         </Text>
                                         <View >
@@ -216,7 +216,7 @@ const TextNotifications = ({ navigation }) => {
                                             <Text
                                                 style={styles.youAreSubscribed}
                                             >{`By opting in for outage alerts, you agree to receive text `}</Text>
-                                            <Text style={styles.frequencyMayVary}>
+                                            <Text style={{ lineHeight: 22 }}>
                                                 messages regarding new service outages affecting
                                                 your home internet service and updates regarding
                                                 existing outages (updates go out about every two
@@ -229,16 +229,22 @@ const TextNotifications = ({ navigation }) => {
                             </View>
                         </View>
                     </View>
-                    <View style={styles.buttonsParent} accessibilityLabel="Buttons Section">
+                    <View style={[{ alignSelf: "stretch" }]} >
                         <Pressable
-                            style={[styles.buttons, styles.buttonsLayout]}
+                            style={({ pressed }) => [
+                                styles.buttons, styles.buttonsLayout,
+                                { opacity: pressed ? .7 : 1 }
+                            ]}
                             onPress={handleSubmit(onSubmit, handleValidationError)}
                         >
                             <Text style={[styles.makePayment, styles.makeTypo]}>Save</Text>
                         </Pressable>
                         <View style={{ padding: 8 }}></View>
                         <Pressable
-                            style={[styles.buttonsLayout]}
+                            style={({ pressed }) => [
+                                styles.buttonsLayout,
+                                { opacity: pressed ? .7 : 1 }
+                            ]}
                             onPress={() => navigation.navigate("Notifications")}
                         >
                             <Text style={[styles.accountClr, styles.makeTypo]}>
@@ -301,9 +307,6 @@ const styles = StyleSheet.create({
     youAreSubscribed: {
         lineHeight: 28,
     },
-    replyStopTo: {
-        lineHeight: 24,
-    },
     youAreSubscribedContainer: {
         marginLeft: 8,
         color: Color.colorGray_200,
@@ -340,16 +343,9 @@ const styles = StyleSheet.create({
         alignItems: "center",
         alignSelf: "stretch",
     },
-    frequencyMayVary: {
-        lineHeight: 22,
-    },
     frameWrapper2: {
-        //paddingVertical: Padding.p_5xs,
         flexDirection: "row",
         alignItems: "center",
-        flex: 1,
-    },
-    appointments: {
         flex: 1,
     },
     receiveTextNotifications1: {
@@ -387,10 +383,6 @@ const styles = StyleSheet.create({
     buttons: {
         marginTop: 16,
         backgroundColor: Color.colorMidnightblue,
-    },
-    buttonsParent: {
-       // marginTop: 16,
-        alignSelf: "stretch",
     },
     textNotificationsInner: {
         paddingTop: Padding.p_5xl,
