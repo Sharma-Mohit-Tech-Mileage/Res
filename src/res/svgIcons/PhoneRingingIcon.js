@@ -7,6 +7,9 @@ const BellRingingIcon = (props) => (
     height={74}
     fill="none"
     {...props}
+    accessible={true}
+    accessibilityRole="image"
+    accessibilityLabel="Bell Ringing Icon"
   >
     <Path
       stroke="url(#paint0_linear_927_4956)"

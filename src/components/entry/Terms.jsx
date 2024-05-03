@@ -178,9 +178,6 @@ const Terms = ({ navigation }) => {
                 source={{ uri: url }}
                 onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
                 onError={() => setIsError(true)}
-                //sharedCookiesEnabled={true}
-                //injectedJavaScriptBeforeContentLoaded={initScript}
-                //onNavigationStateChange={(navState) => setUrl(navState.url)}
             />  
             {isError && (
                 <View style={[styles.errorContainer, { marginTop: '23%' }]}>

@@ -115,7 +115,6 @@ const TextNotifications = ({ navigation }) => {
 
     return  (
         <View style={styles.container}>
-            <TouchableWithoutFeedback onPress={keyboardDismiss}>
                 <ScrollView 
                     style={styles.inner}
                     contentContainerStyle={styles.innerContent}
@@ -180,7 +179,6 @@ const TextNotifications = ({ navigation }) => {
                     <View style={styles.bottomBar}>
                         <Pressable
                             disabled={!enableButton}
-                            accessible={true}
                             accessibilityRole="button"
                             accessibilityState={{ disabled: !enableButton }}
                             accessibilityLabel="Enable Text Notifications"
@@ -217,7 +215,6 @@ const TextNotifications = ({ navigation }) => {
                         )
                     }                    
                 </ScrollView>
-            </TouchableWithoutFeedback>
         </View>
     );
 };

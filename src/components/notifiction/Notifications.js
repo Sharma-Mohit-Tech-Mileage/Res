@@ -211,7 +211,12 @@ const NotificationSection = ({
       <View style={{ ...styles.parentSpaceBlock, alignSelf: "stretch" }}>
         <Text style={styles.textNotifications}>{title}</Text>
         {!isAdmin && <Pressable
-          style={[styles.buttons, styles.buttonsBg, isDisabled && styles.buttonDisabled]}
+           style={({ pressed }) => [
+            styles.buttons,
+            styles.buttonsBg,
+            isDisabled && styles.buttonDisabled,
+            { opacity: pressed ? 0.7 : (isDisabled ? 0.5 : 1.0) }
+          ]}
           onPress={() => isDisabled ? {} : navigation.navigate(navigationTarget, { additionalData: transformedData })}
           disabled={isDisabled}>
           <Text style={isDisabled ? styles.makePaymentDisabled : styles.makePayment}>Edit</Text>
