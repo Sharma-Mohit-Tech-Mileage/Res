@@ -17,6 +17,7 @@ import { SetRenewTokenTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from 'react-native-version-check';
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 const config = {
   issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
@@ -220,6 +221,7 @@ const SplashScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
+
     const fetchData = async () => {
       try {
         const user = await getUser();
@@ -242,8 +244,28 @@ const SplashScreen = ({ navigation }) => {
         console.error("Error fetching data", error);
       }
     };
+
     fetchData();
+    //loginWithBiometrics();
   }, []);
+
+  const loginWithBiometrics=async()=>{
+    const rnBiometrics = new ReactNativeBiometrics()
+
+  rnBiometrics.simplePrompt({promptMessage: 'Confirm fingerprint'})
+  .then((resultObject) => {
+    const { success } = resultObject
+
+    if (success) {
+      console.log('successful biometrics provided')
+    } else {
+      console.log('user cancelled biometric prompt')
+    }
+  })
+  .catch(() => {
+    console.log('biometrics failed')
+  })
+  }
 
   return (
     <LinearGradient
