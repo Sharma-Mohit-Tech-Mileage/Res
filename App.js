@@ -9,6 +9,7 @@ import { AnalyticsContext } from './src/components/utility/AnalyticsContext';
 import DeviceInfo from 'react-native-device-info';
 import VersionCheck from 'react-native-version-check';
 import AppUpdateAlert from "./src/components/utility/AppUpdateAlert";
+import { initializeApp } from "./src/firebase/FirebaseUtils";
 Text.defaultProps = { ...Text.defaultProps, maxFontSizeMultiplier: 1.25, };
 
 const App = () => {
@@ -29,6 +30,14 @@ const App = () => {
       subscription.remove();
     };
   }, [appState]);
+
+  useEffect(() => {
+    async function init() {
+      const uuid = await initializeApp();
+      console.log("UUID initialized:-=------------------*************************************************************************************", uuid);
+    }
+    init();
+  }, []);
 
   async function checkForUpdates() {
     console.log("Checking for updates...");
