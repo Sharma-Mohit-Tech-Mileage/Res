@@ -1,27 +1,51 @@
-
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, Linking, TouchableOpacity, Modal,Platform } from "react-native";
+import {
+  View,
+  Image,
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+  Linking,
+  TouchableOpacity,
+  Modal,
+  Platform,
+  Alert
+} from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
-import { saveUserInfo, logError, logInfo } from "../../redux/actions/UserAction";
-import { storeUser, storeSsoToken, getSsoToken,getUser, cleanUserData } from "../../redux/utils/LocalStorage";
+import {
+  saveUserInfo,
+  logError,
+  logInfo,
+} from "../../redux/actions/UserAction";
+import {
+  storeUser,
+  storeSsoToken,
+  getSsoToken,
+  getUser,
+  cleanUserData,
+} from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
-import DeviceInfo from 'react-native-device-info';
+import DeviceInfo from "react-native-device-info";
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
-import { SetRenewTokenTimer } from './Session';
+import { SetRenewTokenTimer } from "./Session";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env, ISUAT } from "../../network/apis/account/Constants";
-import VersionCheck from 'react-native-version-check';
-import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
+import VersionCheck from "react-native-version-check";
+import ReactNativeBiometrics, { BiometryTypes } from "react-native-biometrics";
 const config = {
   issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
-  redirectUrl: "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
+  redirectUrl:
+    "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
   scopes: ["openid", "profile", "email", "phone", "address"],
   iosPrefersEphemeralSession: true,
 };
@@ -29,7 +53,7 @@ const config = {
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [bussinessApp,setIsBusiness]  =useState(false);
+  const [bussinessApp, setIsBusiness] = useState(false);
   const [loginEnable, setLoginEnable] = useState(true);
   const [disconnected, setDisconnected] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -44,15 +68,17 @@ const SplashScreen = ({ navigation }) => {
   const onSuccess = async (res) => {
     setLoading(false);
     handleLogin(res);
-    dispatch(logInfo({
-      host: DeviceInfo.getBrand(),
-      application: 'Sparklight Residential Mobile App',
-      className: 'AuthenticationService',
-      methodName: 'callSSOLoginApi',
-      messageDate: new Date().toISOString().split('T')[0],
-      errorCode: 0,
-      message: 'Successful SSO Login',
-    }));
+    dispatch(
+      logInfo({
+        host: DeviceInfo.getBrand(),
+        application: "Sparklight Residential Mobile App",
+        className: "AuthenticationService",
+        methodName: "callSSOLoginApi",
+        messageDate: new Date().toISOString().split("T")[0],
+        errorCode: 0,
+        message: "Successful SSO Login",
+      })
+    );
   };
 
   const handleLogin = async (res) => {
@@ -63,23 +89,36 @@ const SplashScreen = ({ navigation }) => {
         userInfo: userInfo,
         token: token,
         tokenGuid: res.idTokenGuid,
-        refreshToken: res.refreshToken
+        refreshToken: res.refreshToken,
       };
-      if (res.userInfo.acctStatus === 'Disconnect') {
-        setTimeout(() => { setDisconnected(true) }, 500)
-      } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
+      if (res.userInfo.acctStatus === "Disconnect") {
+        setTimeout(() => {
+          setDisconnected(true);
+        }, 500);
+      } else if (
+        userInfo.authLevel === "Limited" ||
+        userInfo.authLevel === "Restricted"
+      ) {
         setErrorMessage(strings.nonAdminUserMsg);
-        setErrorMessage1(' to view information.')
-        setTimeout(() => { setModalVisible(true) }, 100);
-      } else if (userInfo.customerType === 'Business') {
+        setErrorMessage1(" to view information.");
+        setTimeout(() => {
+          setModalVisible(true);
+        }, 100);
+      } else if (userInfo.customerType === "Business") {
         setIsBusiness(true);
         setErrorMessage(strings.BusinessUserMsg);
-        setErrorMessage1(' to manage your Sparklight Business services account');
-        setTimeout(() => { setModalVisible(true); }, 100);
+        setErrorMessage1(
+          " to manage your Sparklight Business services account"
+        );
+        setTimeout(() => {
+          setModalVisible(true);
+        }, 100);
       } else if (res.custServices.internet == false) {
         setErrorMessage(strings.nonInternetUserMessage);
-        setErrorMessage1(' to manage your service.')
-        setTimeout(() => { setModalVisible(true); }, 100);
+        setErrorMessage1(" to manage your service.");
+        setTimeout(() => {
+          setModalVisible(true);
+        }, 100);
       } else {
         storeUser(user);
         dispatch(saveUserInfo(user));
@@ -87,92 +126,111 @@ const SplashScreen = ({ navigation }) => {
         if (user.userInfo.mobileTCAcceptanceFlag) {
           navigation.reset({
             index: 0,
-            routes: [{ name: 'MyTab' }],
+            routes: [{ name: "MyTab" }],
           });
         } else {
           navigation.reset({
             index: 0,
-            routes: [{ name: 'Terms' }],
+            routes: [{ name: "Terms" }],
           });
         }
       }
     }
-  }
+  };
   const logoutAction = (postLogoutCallback) => {
-    getSsoToken().then((res) => {
-      const token = res.idToken;
-      logout(config, {
-        idToken: token,
-        postLogoutRedirectUrl: config.redirectUrl,
-      }).then(() => {
-        storeUser({});
-        storeSsoToken({});
-        saveUserInfo({});
-        cleanUserData();
-        if (postLogoutCallback) {
-          postLogoutCallback();
-        }
-      }).catch((error) => {
-        console.error("Logout error:", error);
+    getSsoToken()
+      .then((res) => {
+        const token = res.idToken;
+        logout(config, {
+          idToken: token,
+          postLogoutRedirectUrl: config.redirectUrl,
+        })
+          .then(() => {
+            storeUser({});
+            storeSsoToken({});
+            saveUserInfo({});
+            cleanUserData();
+            if (postLogoutCallback) {
+              postLogoutCallback();
+            }
+          })
+          .catch((error) => {
+            console.error("Logout error:", error);
+            if (postLogoutCallback) {
+              postLogoutCallback();
+            }
+          });
+      })
+      .catch((error) => {
+        console.error("Error getting SSO token:", error);
         if (postLogoutCallback) {
           postLogoutCallback();
         }
       });
-    }).catch((error) => {
-      console.error("Error getting SSO token:", error);
-      if (postLogoutCallback) {
-        postLogoutCallback();
-      }
-    });
   };
 
   const onError = (error) => {
     setLoading(false);
-    setDisconnected(true)
-    dispatch(logError({
-      host: DeviceInfo.getBrand(),
-      application: 'Sparklight Residential Mobile App',
-      className: 'AuthenticationService',
-      methodName: 'callSSOLoginApi',
-      errorDate: new Date().toISOString().split('T')[0],
-      errorData: error.message,
-      errorCode: 30800,
-    }));
+    setDisconnected(true);
+    dispatch(
+      logError({
+        host: DeviceInfo.getBrand(),
+        application: "Sparklight Residential Mobile App",
+        className: "AuthenticationService",
+        methodName: "callSSOLoginApi",
+        errorDate: new Date().toISOString().split("T")[0],
+        errorData: error.message,
+        errorCode: 30800,
+      })
+    );
   };
 
-  const CustomAlertModal = ({ visible, message, message2, onClose, closeModal }) => {
+  const CustomAlertModal = ({
+    visible,
+    message,
+    message2,
+    onClose,
+    closeModal,
+  }) => {
     return (
       <Modal
         visible={visible}
         transparent
         animationType="fade"
-        onRequestClose={onClose}>
+        onRequestClose={onClose}
+      >
         <View style={styles.overlay}>
           <View style={styles.alertContainer}>
             <View style={{ flexDirection: "row", justifyContent: "center" }}>
-              <View style={{ flexDirection: "row", alignItems: 'center' }}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <AlertIcon />
-                <Text style={styles.alertTitle}>
-                  {" Access Denied"}
-                </Text>
+                <Text style={styles.alertTitle}>{" Access Denied"}</Text>
               </View>
             </View>
-            <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
-            <Text style={styles.message}>{message}{" "}
-              <Text style={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: 'underline', }]} onPress={onClose}>
-                {bussinessApp?"download the MySparklight Business mobile app":"login to your online account"}
+            <View
+              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
+            />
+            <Text style={styles.message}>
+              {message}{" "}
+              <Text
+                style={[
+                  styles.message,
+                  {
+                    fontWeight: "600",
+                    color: colors.sparklight_purple_blue,
+                    textDecorationLine: "underline",
+                  },
+                ]}
+                onPress={onClose}
+              >
+                {bussinessApp
+                  ? "download the MySparklight Business mobile app"
+                  : "login to your online account"}
               </Text>
               {message2}
             </Text>
-            <TouchableOpacity
-              style={styles.closeBtn}
-              onPress={closeModal}
-            >
-              <Text
-                style={styles.closeAlertTxt}
-              >
-                Close
-              </Text>
+            <TouchableOpacity style={styles.closeBtn} onPress={closeModal}>
+              <Text style={styles.closeAlertTxt}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -183,16 +241,19 @@ const SplashScreen = ({ navigation }) => {
   const handleCloseAlert = () => {
     setModalVisible(false);
     logoutAction(() => {
-      if(bussinessApp){
-        if(Platform.OS==='android'){
-          Linking.openURL('https://play.google.com/store/apps/details?id=com.sparklight');
-        }else{
-         Linking.openURL('https://apps.apple.com/us/app/mysparklight/id6469003880');
+      if (bussinessApp) {
+        if (Platform.OS === "android") {
+          Linking.openURL(
+            "https://play.google.com/store/apps/details?id=com.sparklight"
+          );
+        } else {
+          Linking.openURL(
+            "https://apps.apple.com/us/app/mysparklight/id6469003880"
+          );
         }
-      }else{
+      } else {
         Linking.openURL(Env.URL);
       }
-      
     });
   };
 
@@ -201,7 +262,6 @@ const SplashScreen = ({ navigation }) => {
     logoutAction();
   };
 
-
   const loginAuth = async () => {
     try {
       const result = await authorize(config);
@@ -209,7 +269,7 @@ const SplashScreen = ({ navigation }) => {
         idToken: result.idToken,
         accessToken: result.accessToken,
         idTokenGuid: result.authorizeAdditionalParameters.session_state,
-        refreshToken: result.refreshToken
+        refreshToken: result.refreshToken,
       };
 
       setLoading(true);
@@ -221,7 +281,6 @@ const SplashScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-
     const fetchData = async () => {
       try {
         const user = await getUser();
@@ -233,7 +292,7 @@ const SplashScreen = ({ navigation }) => {
             idToken: result.idToken,
             accessToken: result.accessToken,
             idTokenGuid: result.additionalParameters.session_state,
-            refreshToken: result.refreshToken
+            refreshToken: result.refreshToken,
           };
 
           setLoading(true);
@@ -246,26 +305,50 @@ const SplashScreen = ({ navigation }) => {
     };
 
     fetchData();
-    //loginWithBiometrics();
+    //enableBiometricAuth();
   }, []);
 
-  const loginWithBiometrics=async()=>{
-    const rnBiometrics = new ReactNativeBiometrics()
 
-  rnBiometrics.simplePrompt({promptMessage: 'Confirm fingerprint'})
-  .then((resultObject) => {
-    const { success } = resultObject
-
-    if (success) {
-      console.log('successful biometrics provided')
-    } else {
-      console.log('user cancelled biometric prompt')
-    }
-  })
-  .catch(() => {
-    console.log('biometrics failed')
-  })
-  }
+  enableBiometricAuth = () => {
+    const rnBiometrics = new ReactNativeBiometrics();
+    rnBiometrics.isSensorAvailable()
+      .then((resultObject) => {
+        const { available, biometryType } = resultObject;
+  
+        if (available && biometryType === BiometryTypes.TouchID) {
+          Alert.alert('TouchID', 'Would you like to enable TouchID authentication for the next time?', [
+            {
+              text: 'Yes please',
+              onPress: async () => {
+                
+                Alert.alert('Success!', 'TouchID authentication enabled successfully!');
+              },
+            },
+            { text: 'Cancel', style: 'cancel' },
+          ]);
+        } else if (available && biometryType === BiometryTypes.FaceID) {
+          Alert.alert('FaceID', 'Would you like to enable FaceID authentication for the next time?', [
+            {
+              text: 'Yes please',
+              onPress: async () => {
+                
+                Alert.alert('Success!', 'FaceID authentication enabled successfully!');
+              },
+            },
+            { text: 'Cancel', style: 'cancel' },
+          ]);
+        } else if (available && biometryType === BiometryTypes.Biometrics) {
+          Alert.alert('Device Supported Biometrics', 'Biometrics authentication is supported.');
+        } else {
+          Alert.alert('Biometrics not supported', 'This device does not support biometric authentication.');
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+        Alert.alert('Error', 'An error occurred while checking biometrics availability.');
+      });
+  };
+  
 
   return (
     <LinearGradient
@@ -281,30 +364,36 @@ const SplashScreen = ({ navigation }) => {
           source={require("../../res/images/Logo.png")}
           style={styles.logo}
         />
-
       </View>
-      {
-        !loading &&
-        (
-          <>
-            <TouchableOpacity
-              style={[styles.SSoBtnContainer, { marginTop: hp("35%") }]}
-              onPress={() => {
-                if (loginEnable) {
-                  setLoginEnable(false)
-                  loginAuth();
-                  setTimeout(() => {
-                    setLoginEnable(true)
-                  }, 1500)
-                }
-              }}
-            >
-              <Text style={styles.SSoBtn}>{'Login'}</Text>
-            </TouchableOpacity>
-          </>
-        )
-      }
-      <Text style={{ color: 'white', alignSelf: 'center', marginTop: 45, fontSize: 16 }}> {(ISUAT) ? 'UAT' : ''} Version:{VersionCheck.getCurrentVersion()}</Text>
+      {!loading && (
+        <>
+          <TouchableOpacity
+            style={[styles.SSoBtnContainer, { marginTop: hp("35%") }]}
+            onPress={() => {
+              if (loginEnable) {
+                setLoginEnable(false);
+                loginAuth();
+                setTimeout(() => {
+                  setLoginEnable(true);
+                }, 1500);
+              }
+            }}
+          >
+            <Text style={styles.SSoBtn}>{"Login"}</Text>
+          </TouchableOpacity>
+        </>
+      )}
+      <Text
+        style={{
+          color: "white",
+          alignSelf: "center",
+          marginTop: 45,
+          fontSize: 16,
+        }}
+      >
+        {" "}
+        {ISUAT ? "UAT" : ""} Version:{VersionCheck.getCurrentVersion()}
+      </Text>
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
@@ -315,11 +404,11 @@ const SplashScreen = ({ navigation }) => {
       <CustomerDisconnectPage
         visible={disconnected}
         onLogin={() => {
-          setDisconnected(false)
+          setDisconnected(false);
           loginAuth();
         }}
         onClose={() => {
-          setDisconnected(false)
+          setDisconnected(false);
           logoutAction();
         }}
       />
@@ -335,11 +424,11 @@ const styles = StyleSheet.create({
   buttonTextFirstTime: {
     fontFamily: FontFamily.openSansRegular,
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
     color: Color.colorGray_100,
   },
   splashContainer: {
-    marginTop: hp('20%'),
+    marginTop: hp("20%"),
     justifyContent: "center",
     alignItems: "center",
   },
@@ -376,9 +465,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
     borderRadius: 5,
-    alignItems: 'center',
-    width: '90%',
-    alignSelf: 'center',
+    alignItems: "center",
+    width: "90%",
+    alignSelf: "center",
   },
   closeButton: {
     position: "absolute",
@@ -415,42 +504,40 @@ const styles = StyleSheet.create({
     height: 50,
     width: "45%",
     marginTop: 20,
-  }, alertTitle:
-  {
+  },
+  alertTitle: {
     color: colors.sparklight_grey,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 22,
     fontWeight: "700",
     marginLeft: 5,
-  }, openBtn:
-  {
+  },
+  openBtn: {
     backgroundColor: colors.sparklight_purple_blue,
     justifyContent: "center",
     width: "100%",
     marginTop: 20,
-  }, closeBtn:
-  {
+  },
+  closeBtn: {
     backgroundColor: colors.backgound_blue,
     justifyContent: "center",
     width: "100%",
     marginTop: 15,
-  }, openPortaltxt:
-  {
+  },
+  openPortaltxt: {
     color: colors.snow_white,
     textAlign: "center",
     padding: 8,
     fontSize: 16,
     fontFamily: FontFamily.openSansRegular,
-  }, closeAlertTxt:
-  {
+  },
+  closeAlertTxt: {
     color: colors.sparklight_purple_blue,
     textAlign: "center",
     padding: 8,
     fontSize: 16,
     fontFamily: FontFamily.openSansRegular,
-  }
+  },
 });
 
 export default SplashScreen;
-
-
