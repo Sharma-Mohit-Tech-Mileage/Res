@@ -7,19 +7,16 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
 import ZendeskChat from "react-native-zendesk-chat";
 import PubSub from 'pubsub-js'
-import {
-    heightPercentageToDP as hp,
-  } from "react-native-responsive-screen";
-
+import { heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
 
-ZendeskChat.init(Env.ZENDESK_CHAT_KEY);  
+ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
-const Support = ({route}) => {
-    console.log('Back to Support',JSON.stringify(route))
+const Support = ({ route }) => {
+    console.log('Back to Support', JSON.stringify(route))
     const navigation = useNavigation();
     const [showModal, setShowModal] = useState(false);
     const [department, setDepartment] = useState('');
@@ -40,42 +37,25 @@ const Support = ({route}) => {
 
     const toggleModal = (department) => {
         setDepartment(department);
-        setTimeout(()=>{
+        setTimeout(() => {
             setShowModal(!showModal);
-        },1000)
-        
-    };    
-    
-    //  useEffect(() => {
-    //     // Check if the triggerEvent parameter is present
-    //     if (route.params?.triggerEvent) {
-    //         // If present, perform the desired action after a delay
-    //         setTimeout(() => {
-    //             PubSub.publish('event.contactUsEvent', {});
-    //         }, 500);
+        }, 1000)
 
-    //         // Reset the parameter to avoid repeated actions if the screen is revisited
-    //         navigation.setParams({ triggerEvent: undefined });
-    //     }
-    // }, [route.params, navigation]);
+    };
 
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-          // The screen is focused
-          // Call any action
-          setTimeout(()=>{
-            if(!route.params?.isContactUs){
-            scrollViewRef.current?.scrollTo({y:0,x:0,animated: true})
-            }
+            setTimeout(() => {
+                if (!route.params?.isContactUs) {
+                    scrollViewRef.current?.scrollTo({ y: 0, x: 0, animated: true })
+                }
 
-        },500)
-          
-           
+            }, 500)
+
+
         });
-    
-        // Return the function to unsubscribe from the event so it gets removed on unmount
         return unsubscribe;
-      }, [navigation]);
+    }, [navigation]);
 
 
     const items = [
@@ -129,32 +109,25 @@ const Support = ({route}) => {
     ];
 
     var mySubscriber = function (msg, data) {
-        console.log( msg, data );
-        scrollViewRef.current?.scrollToEnd({animated: true})
+        console.log(msg, data);
+        scrollViewRef.current?.scrollToEnd({ animated: true })
     };
-    
 
     useEffect(() => {
-       if(route.params?.isContactUs){
-        setTimeout(()=>{
-            scrollViewRef.current?.scrollToEnd({animated: true})
-        },500)
-        
-       }
-       
+        if (route.params?.isContactUs) {
+            setTimeout(() => {
+                scrollViewRef.current?.scrollToEnd({ animated: true })
+            }, 500)
+
+        }
+
         var token = PubSub.subscribe('event.contactUsEvent', mySubscriber);
         return () => {
             PubSub.unsubscribe(token);
-        };     
-    }, []);
+        };
+    }, []);   
 
-    // useEffect(async () => {
-    //     const online = await ZendeskChat.areAgentsOnline();
-    //     console.log('setZenDeskSupportAvailable: ', online);
-    //     setZenDeskSupportAvailable(online);
-    // }, []);      
 
-    
     const handlePressOpenButton = (department, tags) => {
         const user = {
             full_name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
@@ -164,21 +137,18 @@ const Support = ({route}) => {
 
         tags.push('pid:_' + userData.userInfo.accountNumber);
 
-        // On button press, when you want to show chat:
         ZendeskChat.startChat({
             name: user.full_name,
             email: user.email,
             phone: user.phone,
             department: department,
             tags: tags,
-            // The behaviorFlags are optional, and each default to 'true' if omitted
             behaviorFlags: {
                 showAgentAvailability: true,
                 showChatTranscriptPrompt: false,
                 showPreChatForm: true,
                 showOfflineForm: true,
             },
-            // The preChatFormOptions are optional & each defaults to "optional" if omitted
             preChatFormOptions: {
                 name: "optional",
                 email: "optional",
@@ -190,14 +160,14 @@ const Support = ({route}) => {
             localizedDismissButtonTitle: "Dismiss",
         });
     };
-    
+
 
     return (
         <View style={styles.support}>
             <ProfileSettingsHeader
                 title="Support"
                 iconAlignment="right"
-                showIcon={false} // New prop to control icon visibility
+                showIcon={false} 
             />
 
             <LinearGradient
@@ -221,18 +191,18 @@ const Support = ({route}) => {
                             <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                         </View>
                     </View>
-                    <ScrollView automaticallyAdjustContentInsets={false} style={{ width: '100%', padding: Padding.p_base }} ref={scrollViewRef}>
+                    <ScrollView style={{ width: '100%', padding: Padding.p_base }} ref={scrollViewRef}>
                         <View style={{ marginBottom: hp('50%') }}>
                             <View style={styles.issuesFlexBox}>
-                            <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
+                                <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
                                     <Text style={[styles.heading, styles.headingTypo]}>
-                                       Knowledgebase
+                                        Knowledgebase
                                     </Text>
                                 </View>
-                                <View style={styles.frameChild}/>
+                                <View style={styles.frameChild} />
                                 {items.map((item, index) => (
                                     <React.Fragment key={index}>
-                                        
+
                                         <Pressable key={index} style={[styles.search, styles.navigationBorder]}
                                             onPress={() => {
                                                 if (item.iconAlignment === 'left') {
@@ -265,7 +235,7 @@ const Support = ({route}) => {
                                     </Text>
                                 </View>
 
-                                { <Pressable style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} onPress={() => { navigation.navigate('DiagnosticFlow') }}>
+                                {<Pressable style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} onPress={() => { navigation.navigate('DiagnosticFlow') }}>
                                     <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                         <View style={[styles.content, styles.contentSpaceBlock]}>
                                             <View style={styles.headingAndIcon}>
@@ -279,7 +249,7 @@ const Support = ({route}) => {
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
                                                         <Text style={[styles.headingTypo]}>
-                                                        Sparklight Smart Check
+                                                            Sparklight Smart Check
                                                         </Text>
                                                         <Image
                                                             style={styles.chevronIconLayout}
@@ -288,13 +258,13 @@ const Support = ({route}) => {
                                                         />
                                                     </View>
                                                     <Text style={[styles.supportingText, styles.supportingTypo1,]} >
-                                                    Automated troubleshooting scan.
+                                                        Automated troubleshooting scan.
                                                     </Text>
                                                 </View>
                                             </View>
                                         </View>
                                     </View>
-                                </Pressable> }
+                                </Pressable>}
 
                                 {/* <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} >
                                     <Pressable
@@ -364,112 +334,34 @@ const Support = ({route}) => {
                                     </Pressable>
                                 </View>
 
-                        </View>
-                        <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
-                            <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]} >
-                                <Text style={[styles.heading, styles.headingTypo]}>
-                                    Contact Us
-                                </Text>
-                            </View>                           
-                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
-                                <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
-                                    <View style={[styles.content, styles.contentSpaceBlock]}>
-                                        <View style={styles.headingAndIcon4}>
-                                            <View style={[styles.icon]}>
-                                                <Image
-                                                    style={styles.supportIcon}
-                                                    resizeMode="stretch"
-                                                    source={require("../../../assets/tool-02.png")}
-                                                />
-                                            </View>
-                                            <View style={styles.frameParent}>
-                                                <View style={styles.headingAndToggle}>
-                                                    <Text style={[styles.headingTypo]}>
-                                                        Tech Support
-                                                    </Text>                                                      
-                                                    <Pressable
-                                                        onPress={() => makeCall('877-692-2253')}
-                                                        accessibilityLabel="Call Tech Support"
-                                                        accessibilityRole="button"
-                                                        accessibilityHint="Dials the tech support number on your phone">
-                                                        <Image
-                                                            style={styles.chevronIconLayout}
-                                                            resizeMode="stretch"
-                                                            source={require("../../../assets/phone-outgoing-01.png")}
-                                                        />
-                                                    </Pressable>                                                        
-                                                </View>
-                                                <Pressable
-                                                   // onPress={() => handlePressOpenButton("1500003304301", ['Residential', 'Sales', 'ContactUs'])}
-                                                   onPress={() => {
-                                                        toggleModal("tech");
-                                                   }}
-                                                   accessibilityLabel="Chat Support"
-                                                    accessibilityRole="button"
-                                                    accessibilityHint="Chat with Tech Support">
-                                                    <View style={styles.supportChatText}>
-                                                                                                                  
-                                                    </View>    
-                                                </Pressable>
-                                                <Pressable onPress={() => makeCall('877-692-2253')}>
-                                                    <View style={styles.supportingTextWrapper}>
-                                                        <Text style={[styles.supportingText4, styles.support1Typo,]}>
-                                                            877-692-2253
-                                                        </Text>
-                                                    </View>
-                                                </Pressable>
-                                                <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
-                                                    Need a little help with your Sparklight® service? We're here 24 hours a day, seven days a week to support you.
-                                                </Text>
-                                                <Text style={[styles.supportingText6, styles.supportingTypo,]}>
-                                                    {`Call Center Hours: `}
-                                                </Text>
-                                                <Text style={[styles.supportingText7, styles.supportingTypo,]}>
-                                                    24h/7 days a week
-                                                </Text>
-                            <TouchableOpacity
-                            style={{
-                              flexDirection: "row",
-                              marginTop: 16,
-                              alignItems: "center",
-                            }}
-                            onPress={()=>{
-                              toggleModal("tech");
-                            }}
-                          >
-                            <ChatIcon />
-                            <Text
-                              style={[styles.headingTypo, { marginLeft: 10,fontSize:16 }]}
-                            >
-                              Chat
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}>
-                                <View style={[styles.integrationCardMobile1, styles.integrationCardBorder,]} >
-                                    <View style={[styles.content, styles.contentSpaceBlock]}>
-                                        <View style={styles.headingAndToggle}>
+                            </View>
+                            <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
+                                <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]} >
+                                    <Text style={[styles.heading, styles.headingTypo]}>
+                                        Contact Us
+                                    </Text>
+                                </View>
+                                <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
+                                    <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
+                                        <View style={[styles.content, styles.contentSpaceBlock]}>
                                             <View style={styles.headingAndIcon4}>
                                                 <View style={[styles.icon]}>
                                                     <Image
                                                         style={styles.supportIcon}
                                                         resizeMode="stretch"
-                                                        source={require("../../../assets/wallet-03.png")}
-                                                    /></View>
+                                                        source={require("../../../assets/tool-02.png")}
+                                                    />
+                                                </View>
                                                 <View style={styles.frameParent}>
                                                     <View style={styles.headingAndToggle}>
                                                         <Text style={[styles.headingTypo]}>
-                                                            Billing Support
-                                                        </Text>                                                              
+                                                            Tech Support
+                                                        </Text>
                                                         <Pressable
                                                             onPress={() => makeCall('877-692-2253')}
-                                                            accessibilityLabel="Call Billing Support"
+                                                            accessibilityLabel="Call Tech Support"
                                                             accessibilityRole="button"
-                                                            accessibilityHint="Dials the billing support number on your phone">
+                                                            accessibilityHint="Dials the tech support number on your phone">
                                                             <Image
                                                                 style={styles.chevronIconLayout}
                                                                 resizeMode="stretch"
@@ -478,16 +370,15 @@ const Support = ({route}) => {
                                                         </Pressable>
                                                     </View>
                                                     <Pressable
-                                                        //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
                                                         onPress={() => {
-                                                            toggleModal("Bill");
+                                                            toggleModal("tech");
                                                         }}
                                                         accessibilityLabel="Chat Support"
                                                         accessibilityRole="button"
-                                                        accessibilityHint="Chat with Billing Support">    
+                                                        accessibilityHint="Chat with Tech Support">
                                                         <View style={styles.supportChatText}>
-                                                                                                                       
-                                                        </View>                                                     
+
+                                                        </View>
                                                     </Pressable>
                                                     <Pressable onPress={() => makeCall('877-692-2253')}>
                                                         <View style={styles.supportingTextWrapper}>
@@ -497,51 +388,129 @@ const Support = ({route}) => {
                                                         </View>
                                                     </Pressable>
                                                     <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
-                                                        Want to upgrade your service, make a change, or have a
-                                                        billing question? Give us a call for assistance.
+                                                        Need a little help with your Sparklight® service? We're here 24 hours a day, seven days a week to support you.
                                                     </Text>
                                                     <Text style={[styles.supportingText6, styles.supportingTypo,]}>
                                                         {`Call Center Hours: `}
                                                     </Text>
-                                                    <Text style={[styles.supportingText7, styles.supportingTypo,]} >
-                                                        M-F 8:00 AM-5:00 PM MST
+                                                    <Text style={[styles.supportingText7, styles.supportingTypo,]}>
+                                                        24h/7 days a week
                                                     </Text>
-                                                     <TouchableOpacity
-                            style={{
-                              flexDirection: "row",
-                              marginTop: 16,
-                              alignItems: "center",
-                            }}
-                            onPress={()=>{
-                              toggleModal("Bill");
-                            }}
-                          >
-                            <ChatIcon />
-                            <Text
-                              style={[styles.headingTypo, { marginLeft: 10,fontSize:16 }]}
-                            >
-                              Chat
-                            </Text>
-                          </TouchableOpacity>
+                                                    <TouchableOpacity
+                                                        style={{
+                                                            flexDirection: "row",
+                                                            marginTop: 16,
+                                                            alignItems: "center",
+                                                        }}
+                                                        onPress={() => {
+                                                            toggleModal("tech");
+                                                        }}
+                                                    >
+                                                        <ChatIcon />
+                                                        <Text
+                                                            style={[styles.headingTypo, { marginLeft: 10, fontSize: 16 }]}
+                                                        >
+                                                            Chat
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </View>
+                                <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}>
+                                    <View style={[styles.integrationCardMobile1, styles.integrationCardBorder,]} >
+                                        <View style={[styles.content, styles.contentSpaceBlock]}>
+                                            <View style={styles.headingAndToggle}>
+                                                <View style={styles.headingAndIcon4}>
+                                                    <View style={[styles.icon]}>
+                                                        <Image
+                                                            style={styles.supportIcon}
+                                                            resizeMode="stretch"
+                                                            source={require("../../../assets/wallet-03.png")}
+                                                        /></View>
+                                                    <View style={styles.frameParent}>
+                                                        <View style={styles.headingAndToggle}>
+                                                            <Text style={[styles.headingTypo]}>
+                                                                Billing Support
+                                                            </Text>
+                                                            <Pressable
+                                                                onPress={() => makeCall('877-692-2253')}
+                                                                accessibilityLabel="Call Billing Support"
+                                                                accessibilityRole="button"
+                                                                accessibilityHint="Dials the billing support number on your phone">
+                                                                <Image
+                                                                    style={styles.chevronIconLayout}
+                                                                    resizeMode="stretch"
+                                                                    source={require("../../../assets/phone-outgoing-01.png")}
+                                                                />
+                                                            </Pressable>
+                                                        </View>
+                                                        <Pressable
+                                                            //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
+                                                            onPress={() => {
+                                                                toggleModal("Bill");
+                                                            }}
+                                                            accessibilityLabel="Chat Support"
+                                                            accessibilityRole="button"
+                                                            accessibilityHint="Chat with Billing Support">
+                                                            <View style={styles.supportChatText}>
+
+                                                            </View>
+                                                        </Pressable>
+                                                        <Pressable onPress={() => makeCall('877-692-2253')}>
+                                                            <View style={styles.supportingTextWrapper}>
+                                                                <Text style={[styles.supportingText4, styles.support1Typo,]}>
+                                                                    877-692-2253
+                                                                </Text>
+                                                            </View>
+                                                        </Pressable>
+                                                        <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
+                                                            Want to upgrade your service, make a change, or have a
+                                                            billing question? Give us a call for assistance.
+                                                        </Text>
+                                                        <Text style={[styles.supportingText6, styles.supportingTypo,]}>
+                                                            {`Call Center Hours: `}
+                                                        </Text>
+                                                        <Text style={[styles.supportingText7, styles.supportingTypo,]} >
+                                                            M-F 8:00 AM-5:00 PM MST
+                                                        </Text>
+                                                        <TouchableOpacity
+                                                            style={{
+                                                                flexDirection: "row",
+                                                                marginTop: 16,
+                                                                alignItems: "center",
+                                                            }}
+                                                            onPress={() => {
+                                                                toggleModal("Bill");
+                                                            }}
+                                                        >
+                                                            <ChatIcon />
+                                                            <Text
+                                                                style={[styles.headingTypo, { marginLeft: 10, fontSize: 16 }]}
+                                                            >
+                                                                Chat
+                                                            </Text>
+                                                        </TouchableOpacity>
+                                                    </View>
                                                 </View>
                                             </View>
                                         </View>
                                     </View>
                                 </View>
                             </View>
-                        </View>
-                        <View style={[styles.issuesFlexBox]} />
+                            <View style={[styles.issuesFlexBox]} />
                         </View>
                         {showModal && (
                             <ChatSupportModal
                                 department={department}
-                                onClose={()=>toggleModal()}
+                                onClose={() => toggleModal()}
                             />
-                        )}                        
-                        </ScrollView>
-                        </View>
+                        )}
+                    </ScrollView>
                 </View>
-            
+            </View>
+
         </View>
     );
 };
@@ -644,7 +613,7 @@ const styles = StyleSheet.create({
         lineHeight: 18,
         fontSize: FontSize.size_lg,
         fontFamily: FontFamily.openSansRegular,
-        flex: 1,        
+        flex: 1,
     },
     supportingTypo1: {
         lineHeight: 20,
@@ -712,7 +681,7 @@ const styles = StyleSheet.create({
         paddingVertical: Padding.p_base,
         fontSize: FontSize.size_lg,
         fontFamily: FontFamily.openSansRegular,
-        fontWeight:'400'
+        fontWeight: '400'
     },
     search: {
         justifyContent: "center",
