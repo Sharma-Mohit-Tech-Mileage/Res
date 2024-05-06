@@ -30,19 +30,21 @@ const Notifications = () => {
   if (profileDetails.multipleEmails) {
     isDisabled = true
     notificationsTitle = "Unable to retrieve email address.";
-    infoText = "We are not able to retrieve the email address for your account. Please contact us for assistance."
+    infoText = 'We are not able to retrieve the email address for your account. Please contact us for assistance.'
+    
   }
   else if (profileDetails.multipleEmails === false) {
     if (emailAddress || acknowledgement) {
       notificationsTitle = isEmailVerified ? '' : 'Email verification pending';
       infoText = isEmailVerified ? (<Text>Emails are sent to <Text style={styles.text}>{emailAddress}</Text></Text>) :
-        (<Text>
-          <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation.
+        (<View>
+          <Text style={{lineHeight:28}}><Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation.
           {isPrimary && (
             <>
-              {' Check your inbox for our verification link.'}
-              <Text> {"\n"}</Text> 
-              <Text
+              <Text>Check your inbox for our verification link.</Text> 
+            </>
+          )}</Text>
+            {isPrimary && (<Text
                 accessible={true}
                 accessibilityRole="link"
                 accessibilityLabel="Resend Confirmation Email"
@@ -50,15 +52,13 @@ const Notifications = () => {
                 style={styles.contactUsText}
                 hitSlop={{ top: 20, bottom:20, left: 20, right: 20 }}
                 onPress={() => dispatch(resentEmailVerifiction(navigation))}
-              >
-                Resend Confirmation Email
+              >{'Resend Confirmation Email'}
               </Text>
-            </>
           )}
-        </Text>);
+        </View>);
     }
     else if (profileDetails.svEmailAddress) {
-      infoText = (<Text>Emails are sent to <Text style={styles.text}>{profileDetails.svEmailAddress}</Text></Text>);
+      infoText = (<Text style={[styles.text]} >Emails are sent to <Text style={styles.text}>{profileDetails.svEmailAddress}</Text></Text>);
     }
   }
 
@@ -121,7 +121,7 @@ const Notifications = () => {
             setShowSuccessAlert={() => setShowSuccessAlert(false)}
             isDisabled={false}
             notificationsTitle="No mobile phone number on file"
-            infoText={data.phoneNum ? `Text alerts are sent to ` : ''}
+            infoText = {data.phoneNum ? <Text>Text alerts are sent to <Text style={[styles.text]}>{data.phoneNum}</Text></Text> : <Text></Text>}          
             number={data.phoneNum}
             transformedData={data}
             navigationTarget="TextNotifications"
@@ -161,7 +161,7 @@ const Notifications = () => {
             setShowSuccessAlert={() => setShowSuccessAlert(false)}
             isDisabled={false}
             notificationsTitle="Mobile No is missing"
-            infoText="Notifications sent from your application."
+            infoText = {<View ><Text>Notifications sent from your application.</Text></View>}
             navigationTarget="InAppNotifications"
             transformedData={transformedNotification}
             additionalSettings={transformedNotification}
@@ -244,14 +244,9 @@ const NotificationSection = ({
               source={require("../../../assets/infocircle.png")}
             />
           </View>
-          <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
+          <View style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
             {infoText}
-            {number && (
-              <Text style={[styles.text]} accessibilityLabel={`Phone Number: ${number}`}>
-                {number}
-              </Text>
-            )}
-          </Text>
+          </View>
         </View>}
       </View>
       {additionalSettings.map((setting, index) => (
@@ -304,8 +299,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontStyle: "normal",
     fontWeight: "700",
-    paddingLeft: 5,
-    flexWrap: 'wrap'
+    //paddingLeft: 5,
+    flexWrap: 'wrap',
+    lineHeight:28
   },
   frameBorder: {
     borderWidth: 1,
@@ -324,13 +320,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
-  notificationsSentFromTypo: {
-    color: Color.colorGray_200,
+  // notificationsSentFromTypo: {
+  //   color: Color.colorGray_200,
+  //   marginLeft: 8,
+  //   fontSize: FontSize.textXsSemibold_size,
+  //   textAlign: "left",
+  //   lineHeight: 28,
+  //   flex: 1,
+  // },
+  notificationsSentFrom: {
+    flex: 1,  // Take available space
+    justifyContent: 'center', // Center content vertically in the container
+    alignItems: 'center', // Center content horizontally in the container
     marginLeft: 8,
+    backgroundColor: Color.colorWhitesmoke_100, // Example background color
+  },
+  notificationsSentFromTypo: {
+    color: Color.colorGray_100,
+    fontWeight: '400',
     fontSize: FontSize.textXsSemibold_size,
-    textAlign: "left",
+    textAlign: 'center', // Ensures text itself is centered if it doesn't fill the full width
     lineHeight: 28,
-    flex: 1,
   },
   frameWrapperBorder: {
     borderBottomWidth: 1,
@@ -375,13 +385,13 @@ const styles = StyleSheet.create({
     marginTop: -3
   },
   infoCircleWrapper: {
-    paddingHorizontal: 0,
     paddingVertical: Padding.p_5xs,
     flexDirection: "row",
   },
   text: {
     color: Color.colorGray_100,
     fontWeight: "600",
+    lineHeight:28,
     fontSize: 14,
     flex: 1,
   },
@@ -410,11 +420,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
   },
-  notificationsSentFrom: {
-    marginLeft: 8,
-    color: Color.colorGray_100,
-    fontWeight: '400',
-  },
+  // notificationsSentFrom: {
+  //   marginLeft: 8,
+  //   color: Color.colorGray_100,
+  //   fontWeight: '400',
+  // },
   notificationsInner: {
     paddingVertical: Padding.p_5xl,
     paddingHorizontal: Padding.p_base,
