@@ -503,7 +503,7 @@ const HomeScreen = ({ navigation }) => {
     return (
       <>
         <View style={styles.walkThroughBubble} >
-          <View accessible accessibilityLabel={`${walkThrough.title}. ${walkThrough.description}`}>
+          <View >
             <View style={styles.title}>
               <Text style={styles.titleText}>{walkThrough.title}</Text>
             </View>
@@ -513,8 +513,8 @@ const HomeScreen = ({ navigation }) => {
               </Text>
             </View>
           </View>
-          <View style={styles.walkThroughBottomArea} accessible accessibilityLabel="Navigation Buttons">
-            <View style={styles.circlePaging} accessible>
+          <View style={styles.walkThroughBottomArea} >
+            <View style={styles.circlePaging}>
               <View style={styles.circle}></View>
               <View
                 style={
@@ -559,9 +559,6 @@ const HomeScreen = ({ navigation }) => {
               style={bottomCarotStyles}
               tintColor={"#FFF"}
               source={require("../../../assets/polygon.png")}
-              accessible
-              accessibilityLabel="Decoration"
-              accessibilityRole="image"
             />
           </View>
         </View>
