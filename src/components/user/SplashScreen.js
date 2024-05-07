@@ -305,14 +305,14 @@ const SplashScreen = ({ navigation }) => {
     };
 
     fetchData();
-    //enableBiometricAuth();
+    enableBiometricAuth();
   }, []);
 
 
   enableBiometricAuth = () => {
     const rnBiometrics = new ReactNativeBiometrics();
     rnBiometrics.isSensorAvailable()
-      .then((resultObject) => {
+      .then(async(resultObject) => {
         const { available, biometryType } = resultObject;
   
         if (available && biometryType === BiometryTypes.TouchID) {
@@ -338,8 +338,17 @@ const SplashScreen = ({ navigation }) => {
             { text: 'Cancel', style: 'cancel' },
           ]);
         } else if (available && biometryType === BiometryTypes.Biometrics) {
-          Alert.alert('Device Supported Biometrics', 'Biometrics authentication is supported.');
+          //Alert.alert('Device Supported Biometrics', 'Biometrics authentication is supported.');
+          const {success} = await rnBiometrics.simplePrompt({
+            promptMessage: 'Confirmation',
+          });
+          
+          if (success) {
+            // ...
+          }
+
         } else {
+          
           Alert.alert('Biometrics not supported', 'This device does not support biometric authentication.');
         }
       })
