@@ -84,7 +84,10 @@ const ChatSupportModal = ({ department, onClose }) => {
   };
 
   const onMessage = (event) => {
-    console.log("onMessageEvent: ", event);
+    console.log("onMessageEvent: ", event.nativeEvent.data)
+    if( event.nativeEvent.data==='close'){
+      closeModal()
+    }
   };
 
   // const INJECTED_JAVASCRIPT = `(function() {
