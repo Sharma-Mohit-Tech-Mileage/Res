@@ -237,14 +237,14 @@ const NotificationSection = ({
             message={"Only Primary Admin can make changes"} />}
         {isAdmin && <View style={{ marginVertical: 8 }} />}
         {(!isDisabled && infoText) && <View style={styles.frameView}>
-          <View style={styles.infoCircleWrapper}>
+          <View accessible={true} style={styles.infoCircleWrapper}>
             <Image
               style={styles.infoCircleIcon}
               resizeMode="contain"
               source={require("../../../assets/infocircle.png")}
             />
           </View>
-          <View style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
+          <View accessible={true} style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
             {infoText}
           </View>
         </View>}
@@ -277,8 +277,8 @@ const NotificationType = ({ type, status }) => {
   }
   return (
     <View style={styles.frameWrapperBorder}>
-      <View style={[styles.parentSpaceBlock]}>
-        <Text style={{ ...styles.subscribedTypo, flex: 1 }}>{type}</Text>
+      <View accessible={true} style={[styles.parentSpaceBlock]}>
+        <Text  style={{ ...styles.subscribedTypo, flex: 1 }}>{type}</Text>
         <View style={[styles.checkCircleParent]}>
           <Image
             style={styles.infoCircleIcon}
