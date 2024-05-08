@@ -1,7 +1,7 @@
 // SupportStack.js
 
 import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ManageEquipment from "../../components/support/ManageEquipment";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemRebootStack from "./ModemRebootStack";
@@ -10,7 +10,7 @@ import SupportStackScreen from "./SupportStack";
 import ModemConnectivityGuide from "../../components/support/Troubleshooting/ModemConnectivityGuide";
 import PeriodicProblems from "../../components/support/Troubleshooting/PeriodicProblems";
 
-const ModemStack = createStackNavigator();
+const ModemStack = createNativeStackNavigator();
 
 function ModemStackScreen({route}) {
   console.log('Manage equipment')

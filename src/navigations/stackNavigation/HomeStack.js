@@ -1,13 +1,13 @@
 // HomeStack.js
 
 import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../../components/home/Home";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemStackScreen from "./ManageEquepmentStack";
 
-const HomeStack = createStackNavigator();
+const HomeStack = createNativeStackNavigator();
 
 function HomeStackScreen() {
   const { setTabBarVisible } = useTabBarVisibility();

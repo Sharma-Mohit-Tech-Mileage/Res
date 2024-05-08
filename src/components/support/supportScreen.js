@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text } from "react-native";
+import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text,TouchableOpacity } from "react-native";
 import { useSelector } from 'react-redux';
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
@@ -10,7 +10,6 @@ import PubSub from 'pubsub-js'
 import { heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
 
 ZendeskChat.init(Env.ZENDESK_CHAT_KEY);

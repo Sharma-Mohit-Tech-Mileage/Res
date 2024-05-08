@@ -1,12 +1,12 @@
 // SupportStack.js
 
 import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ShopScreen from '../../components/home/ShopScreen';
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 
-const ShopStack = createStackNavigator();
+const ShopStack = createNativeStackNavigator();
 
 function ShopStackScreen() {
     const { setTabBarVisible } = useTabBarVisibility();

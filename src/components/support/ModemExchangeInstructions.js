@@ -11,7 +11,6 @@ import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { FontFamily, Color } from "../../../GlobalStyles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import PubSub from 'pubsub-js';
 
 const ModemExchangeInstructions = () => {
   const navigation = useNavigation();
