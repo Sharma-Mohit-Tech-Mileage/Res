@@ -320,8 +320,13 @@ const SplashScreen = ({ navigation }) => {
             {
               text: 'Yes please',
               onPress: async () => {
+                const {success} = await rnBiometrics.simplePrompt({
+                  promptMessage: 'Confirmation',
+                });
                 
-                Alert.alert('Success!', 'TouchID authentication enabled successfully!');
+                if (success) {
+                  Alert.alert('Success!', 'TouchID authentication enabled successfully!');
+                }
               },
             },
             { text: 'Cancel', style: 'cancel' },
@@ -331,14 +336,19 @@ const SplashScreen = ({ navigation }) => {
             {
               text: 'Yes please',
               onPress: async () => {
+                const {success} = await rnBiometrics.simplePrompt({
+                  promptMessage: 'Confirmation',
+                });
                 
-                Alert.alert('Success!', 'FaceID authentication enabled successfully!');
+                if (success) {
+                  Alert.alert('Success!', 'FaceID authentication enabled successfully!');
+                }
+                
               },
             },
             { text: 'Cancel', style: 'cancel' },
           ]);
         } else if (available && biometryType === BiometryTypes.Biometrics) {
-          //Alert.alert('Device Supported Biometrics', 'Biometrics authentication is supported.');
           const {success} = await rnBiometrics.simplePrompt({
             promptMessage: 'Confirmation',
           });
