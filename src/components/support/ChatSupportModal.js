@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Text,
   SafeAreaView,
-  Pressable,
+  Linking,
   Platform,
   ActivityIndicator
 } from "react-native";
@@ -84,7 +84,10 @@ const ChatSupportModal = ({ department, onClose }) => {
   };
 
   const onMessage = (event) => {
-    console.log("onMessageEvent: ", event);
+    console.log("onMessageEvent: ", event.nativeEvent.data)
+    if( event.nativeEvent.data==='close'){
+      closeModal()
+    }
   };
 
   // const INJECTED_JAVASCRIPT = `(function() {
@@ -138,7 +141,7 @@ const ChatSupportModal = ({ department, onClose }) => {
             allowUniversalAccessFromFileURLs={true}
             allowFileAccessFromFileURLs={true}
             mixedContentMode="always"
-            onNavigationStateChange={navigationChange}
+            //onNavigationStateChange={navigationChange}
             onMessage={onMessage}
             onLoadStart={()=>{
               setLoading(true)
@@ -147,6 +150,12 @@ const ChatSupportModal = ({ department, onClose }) => {
               setTimeout(()=>{
                 setLoading(false)
               },1000)
+            }}
+            onShouldStartLoadWithRequest={(request) => {
+              if(request.url !== "about:blank") {
+                Linking.openURL(request.url)
+                return false
+              } else return true
             }}
             
             injectedJavaScript={injectedJavaScript}

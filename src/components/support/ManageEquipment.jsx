@@ -1,9 +1,8 @@
 import * as React from "react";
-import { Image,StyleSheet,Text,TouchableOpacity,View, ActivityIndicator,} from "react-native";
+import { Image,StyleSheet,Text,TouchableOpacity,View, ActivityIndicator,ScrollView} from "react-native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import {FontFamily,Padding,Color,FontSize,Border,} from "../../../GlobalStyles";
 import MyServicePlan from "../common/MyServicePlan";
-import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import {GetApiRequest,GetModemStatusApiRequest} from "../../network/APIClient";
