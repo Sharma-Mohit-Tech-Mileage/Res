@@ -280,7 +280,7 @@ const HomeScreen = ({ navigation }) => {
               setIsInternetDetails(true);
               setInternetHealths((oldArray) => [...oldArray, "Red"]);
             } else {
-              updateInternetHealth(res.currentBalance);
+              updateInternetHealth(res.currentBalance,res.paymentDueDate);
             }
             let dueDate = moment(res.paymentDueDate).format("ll");
             setDueDate(dueDate);
@@ -295,8 +295,12 @@ const HomeScreen = ({ navigation }) => {
     });
   };
 
-  const updateInternetHealth = (dueAmount) => {
-    if (dueAmount <= 0) {
+  const updateInternetHealth = (dueAmount,dueDate) => {
+    //console.log('pppppast',moment(dueDate).isBefore() )
+    if(moment(dueDate).isAfter()){
+      setBillPaid(true);
+      setInternetHealths((oldArray) => [...oldArray, "Green"]);
+    }else if (dueAmount <= 0 ) {
       setBillPaid(true);
       setInternetHealths((oldArray) => [...oldArray, "Green"]);
     } else {
