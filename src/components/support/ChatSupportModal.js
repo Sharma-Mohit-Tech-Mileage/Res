@@ -152,7 +152,7 @@ const ChatSupportModal = ({ department, onClose }) => {
               },1000)
             }}
             onShouldStartLoadWithRequest={(request) => {
-              if(request.url !== "about:blank") {
+              if(request.url !== "about:blank" && request.url.includes('attachments')) {
                 Linking.openURL(request.url)
                 return false
               } else return true
