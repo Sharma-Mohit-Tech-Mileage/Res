@@ -35,6 +35,7 @@ const SplashScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessage1, setErrorMessage1] = useState("");
+  
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -65,6 +66,7 @@ const SplashScreen = ({ navigation }) => {
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken
       };
+      setIsBusiness(false);
       if (res.userInfo.acctStatus === 'Disconnect') {
         setTimeout(() => { setDisconnected(true) }, 500)
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
@@ -185,9 +187,9 @@ const SplashScreen = ({ navigation }) => {
     logoutAction(() => {
       if(bussinessApp){
         if(Platform.OS==='android'){
-          Linking.openURL('https://play.google.com/store/apps/details?id=com.sparklight');
+          Linking.openURL('https://play.google.com/store/apps/details?id=com.sparklight.customer.business.app&pcampaignid=web_share');
         }else{
-         Linking.openURL('https://apps.apple.com/us/app/mysparklight/id6469003880');
+         Linking.openURL('https://apps.apple.com/us/app/mysparklight-business/id6478375256');
         }
       }else{
         Linking.openURL(Env.URL);

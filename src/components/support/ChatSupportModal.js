@@ -45,6 +45,32 @@ const ChatSupportModal = ({ department, onClose }) => {
   // JavaScript code to set tags for Zendesk Chat Widget
   const injectedJavaScript = `
     window.zESettings = {
+      webWidget: {
+        color: { 
+          theme: '#353091',
+          launcher: '#353091', // This will also update the badge
+          launcherText: '#EBEEF1',
+          button: '#353091',
+          resultLists: '#353091',
+          header: '#353091',
+          articleLinks: '#353091'
+        },
+        chat: {
+          departments: {
+            //  enabled: []
+              enabled: ['SPK TCC Residential'],
+  
+              select: ['SPK TCC Residential'],
+            },
+          tags: ${tagsString},
+        
+        }
+      }
+    };
+  `;
+
+  const injectedJavaScriptBill = `
+    window.zESettings = {
 
       
       webWidget: {
@@ -60,9 +86,9 @@ const ChatSupportModal = ({ department, onClose }) => {
         chat: {
           departments: {
             //  enabled: []
-              enabled: ['Resi ${departmentName} Support'],
+              enabled: ['SPK Virtual Call Center'],
   
-              select: ['Resi ${departmentName} Support'],
+              select: ['SPK Virtual Call Center'],
             },
           tags: ${tagsString},
         
@@ -152,13 +178,13 @@ const ChatSupportModal = ({ department, onClose }) => {
               },1000)
             }}
             onShouldStartLoadWithRequest={(request) => {
-              if(request.url !== "about:blank" && request.url.includes('attachments')) {
+              if(request.url.includes('attachments')) {
                 Linking.openURL(request.url)
                 return false
               } else return true
             }}
             
-            injectedJavaScript={injectedJavaScript}
+            injectedJavaScript={(department==='tech')?injectedJavaScript:injectedJavaScriptBill}
           />
         </View>
         {loading && (
