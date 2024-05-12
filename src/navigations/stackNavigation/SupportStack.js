@@ -12,6 +12,7 @@ import TroubleShootStack from "./TroubleShootStack";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemStackScreen from "./ManageEquepmentStack";
 import ModemConnectivityGuide from '../../components/support/Troubleshooting/ModemConnectivityGuide';
+import ScanScreen from "../../components/utility/QRScanner";
 const SupportStack = createStackNavigator();
 
 function SupportStackScreen({route}) {
@@ -104,7 +105,18 @@ function SupportStackScreen({route}) {
         name="ModemConnectivityGuide"
         component={ModemConnectivityGuide}
       />
+       <SupportStack.Screen
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+        name="ScanScreen"
+        component={ScanScreen}
+      />
     </SupportStack.Navigator>
+
+    
   );
 }
 

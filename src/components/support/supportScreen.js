@@ -125,6 +125,14 @@ const Support = ({route}) => {
             iconAlignment: 'right', // Icon to the right of the text
             navigateTo: 'ArticalWindowUtility',
             url: 'https://support.sparklight.com/hc/en-us'
+        },
+        {
+            key: 'scanQrCode',
+            text: 'Scan Wifi Password',
+            icon: require("../../../assets/chevronright.png"),
+            iconAlignment: 'right', // Icon to the right of the text
+            navigateTo: 'ScanScreen',
+            url: 'https://support.sparklight.com/hc/en-us'
         }
     ];
 
@@ -235,7 +243,7 @@ const Support = ({route}) => {
                                         
                                         <Pressable key={index} style={[styles.search, styles.navigationBorder]}
                                             onPress={() => {
-                                                if (item.iconAlignment === 'left') {
+                                                  if (item.iconAlignment === 'left') {
                                                     navigation.navigate(item.navigateTo)
                                                 } else {
                                                     navigation.navigate(item.navigateTo, { url: item.url, name: item.text })

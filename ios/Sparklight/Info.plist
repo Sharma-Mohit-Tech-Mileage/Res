@@ -97,6 +97,8 @@
   
   <key>NSFaceIDUsageDescription</key>
   <string>$(PRODUCT_NAME) Authentication with TouchId or FaceID</string>
+  <key>NSCameraUsageDescription</key>
+  <string>Your message to user when the camera is accessed for the first time</string>
   
 </dict>
 </plist>
