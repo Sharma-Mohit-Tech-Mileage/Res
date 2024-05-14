@@ -1,19 +1,51 @@
-import  React,{useEffect,useState} from "react";
+import  React,{useEffect,useState,useRef} from "react";
 import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { FontFamily, Padding, Color, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import SparkLightInput from '../common/customui/SparkLightInput';
+import SparkLightDropdown from '../common/customui/SparkLightDropdown';
+import { useDispatch, useSelector } from 'react-redux';
+import { passwordSchema } from '../utility/validationSchema';
 
 const UserManagementEdit = ({ route }) => {
   const navigation = useNavigation();
   const user =route.params?.User
   console.log(user)
   const [firstName,setFirstName]=useState(user?.firstName ||'')
-
+  const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
+  const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
   const [lastName,setLastName]=useState(user?.lastName || '')
   const [userName,setUserName]=useState(user?.userName ||'')
   const [email,setEmail]=useState(user?.email ||'')
+
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
+  const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
+  const scrollViewRef = useRef(null);
+
+  const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
+    resolver: yupResolver(passwordSchema(isCustomQuestionSelected)),
+    defaultValues: profileDetails
+  });
+
+  useEffect(() => {
+    // Reset the form with the updated profile details
+    reset(profileDetails);
+  }, [profileDetails, reset])
+
+  useEffect(() => {
+    const storedSecurityQuestion = profileDetails?.securityQuestion;
+    const isCustomQuestion = storedSecurityQuestion && !securityQuestions.includes(storedSecurityQuestion);
+    setIsCustomQuestionSelected(isCustomQuestion);
+    if (isCustomQuestion) {
+      setCustomSecurityQuestion("Add your own question");
+    } else {
+      setCustomSecurityQuestion(storedSecurityQuestion);
+    }
+  }, []);
 
   return (
 
