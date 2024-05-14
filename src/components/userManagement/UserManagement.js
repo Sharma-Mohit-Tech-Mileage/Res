@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView,Pressable,Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
@@ -58,10 +58,10 @@ const UserManagement = () => {
               )}
             </View>
           </View>
-          {/* <View style={styles.frameParent2}>
+           <View style={styles.frameParent2}>
             <Pressable
               style={styles.rightFlexBox}
-              onPress={() => navigation.navigate("UserManagementEdit")}
+              onPress={() => navigation.navigate("UserManagementEdit",{User:user})}
             >
               <Image
                 style={styles.rightActionableIcon}
@@ -70,7 +70,7 @@ const UserManagement = () => {
               />
             </Pressable>
             <Pressable style={[styles.rightActionableContainer,styles.rightFlexBox, ]}
-              onPress={() => navigation.navigate("UserManagementEdit")}
+              onPress={() => navigation.navigate("UserManagementEdit",{User:user})}
             >
               <Image
                 style={styles.rightActionableIcon}
@@ -78,7 +78,7 @@ const UserManagement = () => {
                 source={require("../../../assets/right-actionable6.png")}
               />
             </Pressable>
-          </View> */}
+          </View> 
         </View>
         <View style={styles.frameWrapper}>
           <View style={styles.usernameParent}>
@@ -122,12 +122,12 @@ const UserManagement = () => {
           <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
             <View style={[styles.usersParent, styles.frameGroupSpaceBlock]}>
               <Text style={[styles.users, styles.usersFlexBox]}>Users</Text>
-              {/* <Pressable
+               <Pressable
                   style={[styles.buttons, styles.buttonsBg]}
                   onPress={() => navigation.navigate("UserManagementEdit")}
                 >
                   <Text style={[styles.makePayment, styles.textClr]}>Add User</Text>
-                </Pressable> */}
+                </Pressable> 
             </View>
             <View style={styles.frameContainer}>
               {userList.map((user, index) => (

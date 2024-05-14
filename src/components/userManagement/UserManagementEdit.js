@@ -1,18 +1,25 @@
-import * as React from "react";
+import  React,{useEffect,useState} from "react";
 import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { FontFamily, Padding, Color, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import SparkLightInput from '../common/customui/SparkLightInput';
 
-const UserManagementEdit = () => {
+const UserManagementEdit = ({ route }) => {
   const navigation = useNavigation();
+  const user =route.params?.User
+  console.log(user)
+  const [firstName,setFirstName]=useState(user?.firstName ||'')
+
+  const [lastName,setLastName]=useState(user?.lastName || '')
+  const [userName,setUserName]=useState(user?.userName ||'')
+  const [email,setEmail]=useState(user?.email ||'')
 
   return (
 
     <View style={styles.userManagementEdit}>
       <ProfileSettingsHeader
-        title="Edit User"
+        title= {(route.params===undefined)?"Add User" :"Edit User"}
         onPressBack={() => navigation.navigate('UserManagement')}
         accessibilityLabel="Go back to User Management"
         accessibilityRole="button"
@@ -34,7 +41,7 @@ const UserManagementEdit = () => {
                       <Text style={[styles.firstName, styles.firstClr]}>
                         First Name
                       </Text>
-                      <SparkLightInput placeholder="Enter text here" />
+                      <SparkLightInput placeholder="Enter text here" value={firstName} />
                     </View>
                   </View>
                   <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]}>
@@ -42,7 +49,7 @@ const UserManagementEdit = () => {
                       <Text style={[styles.firstName, styles.firstClr]}>
                         Last Name
                       </Text>
-                      <SparkLightInput placeholder="Enter text here" />
+                      <SparkLightInput placeholder="Enter text here" value={lastName} />
                     </View>
                   </View>
                   <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]} >
@@ -50,7 +57,7 @@ const UserManagementEdit = () => {
                       <Text style={[styles.firstName, styles.firstClr]}>
                         Username
                       </Text>
-                      <SparkLightInput placeholder="Enter text here" />
+                      <SparkLightInput placeholder="Enter text here" value={userName} />
                     </View>
                   </View>
                   <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]} >
@@ -117,6 +124,7 @@ const UserManagementEdit = () => {
                         placeholder="Enter text here"
                         accessibilityLabel="Email Input Field"
                         accessibilityHint="Input field for the Email"
+                        value={email}
                       />
                     </View>
                   </View>
