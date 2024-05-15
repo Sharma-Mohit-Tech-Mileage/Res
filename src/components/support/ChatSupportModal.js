@@ -111,7 +111,7 @@ const ChatSupportModal = ({ department, onClose }) => {
 
   const onMessage = (event) => {
     console.log("onMessageEvent: ", event.nativeEvent.data)
-    if( event.nativeEvent.data==='close'){
+    if( event.nativeEvent.data==='open'){
       closeModal()
     }
   };
