@@ -768,7 +768,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Color.colorWhitesmoke_200,
         width: "100%",
-        marginBottom: 280
     },
     linearGradientStyle: {
         position: 'absolute',
