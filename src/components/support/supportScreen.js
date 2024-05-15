@@ -762,6 +762,7 @@ const styles = StyleSheet.create({
     mainContainer: {
         padding: Padding.p_base,
         alignSelf: 'stretch',
+        marginBottom: 280
     },
     support: {
         flex: 1,
