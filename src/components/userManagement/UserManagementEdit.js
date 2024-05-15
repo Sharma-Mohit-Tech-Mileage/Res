@@ -1,44 +1,112 @@
-import  React,{useEffect,useState,useRef} from "react";
-import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  Pressable,
+  View,
+  ScrollView,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { FontFamily, Padding, Color, Border, FontSize } from "../../../GlobalStyles";
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import SparkLightInput from '../common/customui/SparkLightInput';
-import SparkLightDropdown from '../common/customui/SparkLightDropdown';
-import { useDispatch, useSelector } from 'react-redux';
-import { passwordSchema } from '../utility/validationSchema';
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import {
+  FontFamily,
+  Padding,
+  Color,
+  Border,
+  FontSize,
+} from "../../../GlobalStyles";
+import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import SparkLightInput from "../common/customui/SparkLightInput";
+import SparkLightDropdown from "../common/customui/SparkLightDropdown";
+import { useDispatch, useSelector } from "react-redux";
+import { passwordSchema,userSchema } from "../utility/validationSchema";
+import {
+  validatePassword,
+  securityQuestions,
+  passwordTerms,
+} from "../utility/constant";
 
 const UserManagementEdit = ({ route }) => {
   const navigation = useNavigation();
-  const user =route.params?.User
-  console.log(user)
-  const [firstName,setFirstName]=useState(user?.firstName ||'')
-  const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
-  const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
-  const [lastName,setLastName]=useState(user?.lastName || '')
-  const [userName,setUserName]=useState(user?.userName ||'')
-  const [email,setEmail]=useState(user?.email ||'')
+  var user = route.params?.User;
+  if(user==undefined){
+    user={ 
+        accountNumber: "", 
+        portalAdminRole: "None", 
+        billingRole: "None", 
+        paymentsRole: "None", 
+        ticketsRole: "None", 
+        userName: "", 
+        firstName: "", 
+        lastName: "", 
+        memberType: "Admin", 
+        securityAnswer: "", 
+        newPassword: "", 
+        email:'',
+        securityQuestion: "" 
+    }
+  }
+  
+  
+  const [firstName, setFirstName] = useState(user?.firstName || "");
+  const [isCustomQuestionSelected, setIsCustomQuestionSelected] =
+    useState(false);
+  const [customSecurityQuestion, setCustomSecurityQuestion] = useState("");
+  const [lastName, setLastName] = useState(user?.lastName || "");
+  const [userName, setUserName] = useState(user?.userName || "");
+  const [email, setEmail] = useState(user?.email || "");
 
-  const profile = useSelector(state => state.combinedReducers.profile || {});
-  const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
-  const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [showValidationAlert, setShowValidationAlert] = useState(false);
+
+  
+  const [profileDetails, setLocalProfile] = useState(user);
   const scrollViewRef = useRef(null);
 
-  const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
-    resolver: yupResolver(passwordSchema(isCustomQuestionSelected)),
-    defaultValues: profileDetails
+  // Handler for when the security question dropdown value changes
+  const handleSecurityQuestionChange = (itemValue) => {
+    setLocalProfile({
+      ...user,
+      securityQuestion: itemValue === "Add your own question" ? "" : itemValue,
+    });
+    setCustomSecurityQuestion(itemValue);
+    setIsCustomQuestionSelected(itemValue === "Add your own question");
+  };
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(userSchema(isCustomQuestionSelected)),
+    
+    defaultValues: profileDetails,
   });
+
+  const handleSave = (formData) => {
+    console.log('Save data',formData)
+    //dispatch(updateProfileSecurity(formData, navigation)); // Dispatch with formData
+  };
+
+  const handleValidationError = () => {
+    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+    setShowValidationAlert(true);
+  };
 
   useEffect(() => {
     // Reset the form with the updated profile details
     reset(profileDetails);
-  }, [profileDetails, reset])
+  }, [profileDetails, reset]);
 
   useEffect(() => {
     const storedSecurityQuestion = profileDetails?.securityQuestion;
-    const isCustomQuestion = storedSecurityQuestion && !securityQuestions.includes(storedSecurityQuestion);
+    const isCustomQuestion =
+      storedSecurityQuestion &&
+      !securityQuestions.includes(storedSecurityQuestion);
     setIsCustomQuestionSelected(isCustomQuestion);
     if (isCustomQuestion) {
       setCustomSecurityQuestion("Add your own question");
@@ -48,11 +116,10 @@ const UserManagementEdit = ({ route }) => {
   }, []);
 
   return (
-
     <View style={styles.userManagementEdit}>
       <ProfileSettingsHeader
-        title= {(route.params===undefined)?"Add User" :"Edit User"}
-        onPressBack={() => navigation.navigate('UserManagement')}
+        title={route.params === undefined ? "Add User" : "Edit User"}
+        onPressBack={() => navigation.navigate("UserManagement")}
         accessibilityLabel="Go back to User Management"
         accessibilityRole="button"
         accessibilityHint="Navigates back to the User Management screen"
@@ -60,7 +127,9 @@ const UserManagementEdit = ({ route }) => {
       <ScrollView>
         <View style={[styles.userManagementEditInner]}>
           <View style={styles.frameWrapper}>
-            <View style={[styles.frameGroup, styles.textinputWrapperSpaceBlock]} >
+            <View
+              style={[styles.frameGroup, styles.textinputWrapperSpaceBlock]}
+            >
               <View style={styles.generalInformationWrapper}>
                 <Text style={[styles.generalInformation, styles.firstClr]}>
                   General Information
@@ -68,38 +137,109 @@ const UserManagementEdit = ({ route }) => {
               </View>
               <View style={styles.frameWrapper}>
                 <View style={styles.frameWrapper}>
-                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]} >
+                  <View
+                    style={[
+                      styles.textinputWrapper,
+                      styles.textinputWrapperSpaceBlock,
+                    ]}
+                  >
                     <View style={styles.textinput}>
                       <Text style={[styles.firstName, styles.firstClr]}>
                         First Name
                       </Text>
-                      <SparkLightInput placeholder="Enter text here" value={firstName} />
+                          <Controller
+                            control={control}
+                            name="firstName"
+                            render={({
+                              field: { onChange, onBlur, value },
+                              fieldState: { error },
+                            }) => (
+                              <>
+                                <SparkLightInput
+                                  onBlur={onBlur}
+                                  label={"Enter your First Name"}
+                                  onChangeText={onChange}
+                                  value={value}
+                                  error={error?.message}
+                                />
+                              </>
+                            )}
+                          />
                     </View>
                   </View>
-                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]}>
+                  <View
+                    style={[
+                      styles.textinputWrapper,
+                      styles.textinputWrapperSpaceBlock,
+                    ]}
+                  >
                     <View style={styles.textinput}>
                       <Text style={[styles.firstName, styles.firstClr]}>
                         Last Name
                       </Text>
-                      <SparkLightInput placeholder="Enter text here" value={lastName} />
+                      <Controller
+                            control={control}
+                            name="lastName"
+                            render={({
+                              field: { onChange, onBlur, value },
+                              fieldState: { error },
+                            }) => (
+                              <>
+                                <SparkLightInput
+                                  onBlur={onBlur}
+                                  label={"Enter your Last Name"}
+                                  onChangeText={onChange}
+                                  value={value}
+                                  error={error?.message}
+                                />
+                              </>
+                            )}
+                          />
                     </View>
                   </View>
-                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]} >
+                  <View
+                    style={[
+                      styles.textinputWrapper,
+                      styles.textinputWrapperSpaceBlock,
+                    ]}
+                  >
                     <View style={styles.textinput}>
                       <Text style={[styles.firstName, styles.firstClr]}>
                         Username
                       </Text>
-                      <SparkLightInput placeholder="Enter text here" value={userName} />
+                      <Controller
+                            control={control}
+                            name="userName"
+                            render={({
+                              field: { onChange, onBlur, value },
+                              fieldState: { error },
+                            }) => (
+                              <>
+                                <SparkLightInput
+                                  onBlur={onBlur}
+                                  label={"Enter your User Name"}
+                                  onChangeText={onChange}
+                                  value={value}
+                                  error={error?.message}
+                                />
+                              </>
+                            )}
+                          />
                     </View>
                   </View>
-                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]} >
+                  <View
+                    style={[
+                      styles.textinputWrapper,
+                      styles.textinputWrapperSpaceBlock,
+                    ]}
+                  >
                     <View style={styles.textinput}>
                       <Text style={[styles.firstName, styles.firstClr]}>
                         Member Type
                       </Text>
                       <View style={styles.notifications}>
                         <Image
-                          style={{ height: '100%' }}
+                          style={{ height: "100%" }}
                           resizeMode="stretch"
                           source={require("../../../assets/rectangle-5281.png")}
                         />
@@ -112,7 +252,12 @@ const UserManagementEdit = ({ route }) => {
                             />
                             <View style={styles.creditCardWillExpireSoonParent}>
                               <Text style={styles.creditCardWill}>Admin</Text>
-                              <Text style={[styles.yourSavedCard, styles.taylorTypo,]} >
+                              <Text
+                                style={[
+                                  styles.yourSavedCard,
+                                  styles.taylorTypo,
+                                ]}
+                              >
                                 Users added here will have full access to My
                                 Account, which includes the power to add, edit
                                 and delete accounts.
@@ -124,7 +269,11 @@ const UserManagementEdit = ({ route }) => {
                               </View>
                             </View>
                           </View>
-                          <Image style={[styles.rightActionableIcon1, styles.rightIconLayout,]}
+                          <Image
+                            style={[
+                              styles.rightActionableIcon1,
+                              styles.rightIconLayout,
+                            ]}
                             resizeMode="stretch"
                             source={require("../../../assets/right-actionable4.png")}
                           />
@@ -133,7 +282,9 @@ const UserManagementEdit = ({ route }) => {
                     </View>
                   </View>
                 </View>
-                <View style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]} >
+                <View
+                  style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}
+                >
                   <View style={styles.frameChild} />
                 </View>
                 <View style={styles.frameParent1}>
@@ -152,16 +303,28 @@ const UserManagementEdit = ({ route }) => {
                       <Text style={[styles.firstName, styles.firstClr]}>
                         Email
                       </Text>
-                      <SparkLightInput
-                        placeholder="Enter text here"
-                        accessibilityLabel="Email Input Field"
-                        accessibilityHint="Input field for the Email"
-                        value={email}
-                      />
+                      <Controller
+                            control={control}
+                            name="userEmail"
+                            render={({ field: { onChange, onBlur, value } }) => (
+                                <SparkLightInput
+                                    label="Enter Your Email"
+                                    accessibilityLabel="Email Input Field"
+                                    accessibilityHint="Input field for the Email"
+                                    onChangeText={onChange}
+                                    onBlur={onBlur}
+                                    value={value}
+                                    error={errors.feedbackEmail?.message}
+                                />
+                            )}
+                        />
+                     
                     </View>
                   </View>
                 </View>
-                <View style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]} >
+                <View
+                  style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}
+                >
                   <View style={styles.frameChild} />
                 </View>
                 <View style={styles.frameParent1}>
@@ -170,109 +333,148 @@ const UserManagementEdit = ({ route }) => {
                       Password
                     </Text>
                   </View>
-                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]}>
-                    <View style={styles.textinput}>
-                      <Text style={[styles.firstName, styles.firstClr]}>
-                        New Password
-                      </Text>
-                      <SparkLightInput placeholder="Enter text here" />
+
+                  <View style={styles.frameParent}>
+                    <View
+                      style={[
+                        styles.textinputWrapper,
+                        styles.wrapperSpaceBlock1,
+                      ]}
+                    >
+                      <Controller
+                        control={control}
+                        name="newPassword"
+                        render={({
+                          field: { onChange, onBlur, value },
+                          fieldState: { error },
+                        }) => (
+                          <>
+                            <SparkLightInput
+                              placeholder="New Password"
+                              onBlur={onBlur}
+                              label={"New Password"}
+                              onChangeText={onChange}
+                              value={value}
+                              secure={true}
+                              error={error?.message}
+                            />
+                            <View
+                              style={[
+                                styles.passwordFlexBox,
+                                { marginTop: Padding.p_base },
+                              ]}
+                            >
+                              {validatePassword(
+                                value,
+                                profileDetails.userName
+                              ).map((isValid, index) => (
+                                <View
+                                  key={`point-${index}`}
+                                  style={styles.bulletPointContainer}
+                                >
+                                  <View style={{ marginTop: 7 }}>
+                                    <View
+                                      style={[
+                                        styles.bullet,
+                                        {
+                                          backgroundColor: isValid
+                                            ? Color.sparklightGreen
+                                            : Color.colorGray_200,
+                                        },
+                                      ]}
+                                    />
+                                  </View>
+                                  <Text style={styles.bulletPoiint}>
+                                    {passwordTerms[index]}
+                                  </Text>
+                                </View>
+                              ))}
+                            </View>
+                          </>
+                        )}
+                      />
                     </View>
                   </View>
-                  <View style={[styles.itMustBeDifferentThanYourWrapper, styles.wrapperSpaceBlock]}>
-                    <View style={styles.passwordFlexBox}>
-                      {[
-                        "It must be different than your user name.",
-                        "It must contain 8 to 20 characters.",
-                        "It must include an upper and lower case letter and a number.",
-                        "You may include special characters %,&,_,?,#,=,-.",
-                        "Your new password cannot have any spaces."
-                      ].map((point, index) => (
-                        <View key={`point-${index}`} style={styles.bulletPointContainer}>
-                          <Text style={styles.bulletPoint}>•</Text>
-                          <Text style={[styles.itMustBe, {
-                            color: Color.sparklightGray1,
-                            fontWeight: '400'
-                          }]}>{point}</Text>
+
+                  <View style={styles.frameParent1}>
+                    <View style={styles.securityQuestionWrapper}>
+                      <Text
+                        style={[styles.generalInformation, styles.firstClr]}
+                      >
+                        Security Questions
+                      </Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.textinputWrapper,
+                        styles.wrapperSpaceBlock1,
+                      ]}
+                    >
+                      <View style={styles.textinput}>
+                        <Text style={[styles.firstName1, styles.firstTypo]}>
+                          {" "}
+                          Password Reset Question
+                        </Text>
+                        <SparkLightDropdown
+                          items={securityQuestions}
+                          selectedValue={customSecurityQuestion}
+                          onValueChange={handleSecurityQuestionChange}
+                        />
+                      </View>
+                    </View>
+                    {isCustomQuestionSelected && (
+                      <View
+                        style={[
+                          styles.textinputWrapper,
+                          styles.wrapperSpaceBlock1,
+                        ]}
+                      >
+                        <View style={styles.textinput}>
+                          <Controller
+                            control={control}
+                            name="securityQuestion"
+                            render={({
+                              field: { onChange, onBlur, value },
+                              fieldState: { error },
+                            }) => (
+                              <>
+                                <SparkLightInput
+                                  onBlur={onBlur}
+                                  label={"Type your Question"}
+                                  onChangeText={onChange}
+                                  value={value}
+                                  error={error?.message}
+                                />
+                              </>
+                            )}
+                          />
                         </View>
-                      ))}
-                    </View>
-                  </View>
-                  <View style={[styles.textinputWrapper4, styles.textinputWrapperSpaceBlock,]}  >
-                    <View style={styles.textinput}>
-                      <Text style={[styles.firstName, styles.firstClr]}>
-                        Password Reset Question
-                      </Text>
-                      <View style={[styles.favoriteAuthorParent, styles.wrapperBorder,]}>
-                        <Text style={[styles.favoriteAuthor, styles.taylorTypo]}>
-                          Favorite Author
-                        </Text>
-                        <Image style={[styles.chevronDownIcon, styles.chevronIconLayout,]}
-                          resizeMode="stretch"
-                          source={require("../../../assets/chevrondown.png")}
-                        />
                       </View>
-                    </View>
-                  </View>
-                  <View style={[styles.textinputWrapper4, styles.textinputWrapperSpaceBlock,]}>
-                    <View style={styles.textinput}>
-                      <Text style={[styles.firstName, styles.firstClr]}>
-                        Password Reset Answer
-                      </Text>
-                      <View style={[styles.taylorWrapper, styles.wrapperBorder]} >
-                        <Text style={[styles.taylor, styles.taylorTypo]}>
-                          Someone
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-                <View style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]} >
-                  <View style={styles.frameChild} />
-                </View>
-                <View style={styles.frameParent1}>
-                  <View style={styles.contactInformationWrapper}>
-                    <Text style={[styles.generalInformation, styles.firstClr]}>
-                      Security Question
-                    </Text>
-                  </View>
-                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]}>
-                    <View style={styles.textinput}>
-                      <Text style={[styles.firstClr]}>
-                        Password Reset Question
-                      </Text>
-                      <View style={[styles.favoriteAuthorParent, styles.wrapperBorder,]} >
-                        <Text style={[styles.favoriteAuthor, styles.taylorTypo]} >
-                          Favorite Author
-                        </Text>
-                        <Image style={[styles.chevronDownIcon, styles.chevronIconLayout,]}
-                          resizeMode="stretch"
-                          source={require("../../../assets/chevrondown.png")}
-                        />
-                      </View>
-                    </View>
-                  </View>
-                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]}>
-                    <View style={styles.textinput}>
-                      <Text style={[styles.firstClr]}>
-                        Type your Question
-                      </Text>
-                      <View style={[styles.taylorWrapper, styles.wrapperBorder]}>
-                        <Text style={[styles.taylor, styles.taylorTypo]}>
-                          your nickname
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock,]}>
-                    <View style={styles.textinput}>
-                      <Text style={[styles.firstClr]}>
-                        Password Reset Answer
-                      </Text>
-                      <View style={[styles.taylorWrapper, styles.wrapperBorder]}>
-                        <Text style={[styles.taylor, styles.taylorTypo]}>
-                          Someone
-                        </Text>
-                      </View>
+                    )}
+                    <View
+                      style={[
+                        styles.textinputWrapper,
+                        styles.wrapperSpaceBlock1,
+                      ]}
+                    >
+                      <Controller
+                        control={control}
+                        name="securityAnswer"
+                        render={({
+                          field: { onChange, onBlur, value },
+                          fieldState: { error },
+                        }) => (
+                          <>
+                            <SparkLightInput
+                              onBlur={onBlur}
+                              onChangeText={onChange}
+                              label={"Password Reset Answer"}
+                              value={value}
+                              error={error?.message}
+                            />
+                          </>
+                        )}
+                      />
                     </View>
                   </View>
                 </View>
@@ -283,7 +485,7 @@ const UserManagementEdit = ({ route }) => {
             <View style={[styles.buttons1, styles.buttonsLayout]}>
               <Pressable
                 style={[styles.buttons1, styles.buttonsLayout]}
-                onPress={() => {/* Add your save logic here */ }}
+                onPress={handleSubmit(handleSave, handleValidationError)}
               >
                 <Text style={[styles.makePayment1, styles.makeTypo]}>Save</Text>
               </Pressable>
@@ -302,7 +504,6 @@ const UserManagementEdit = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-
   textinputWrapperSpaceBlock: {
     paddingVertical: Padding.p_base,
     alignSelf: "stretch",
@@ -311,15 +512,20 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     textAlign: "left",
   },
+  firstName1: {
+    color: Color.sparklightGray1,
+    fontSize: FontSize.textXsSemibold_size,
+    alignSelf: "stretch",
+  },
   bulletPointContainer: {
-    flexDirection: 'row', // Align bullet and text horizontally
-    alignItems: 'flex-start', // Align items to the start of the flex container
+    flexDirection: "row", // Align bullet and text horizontally
+    alignItems: "flex-start", // Align items to the start of the flex container
     marginBottom: 5, // Space between bullet points
   },
   bulletPoint: {
     marginRight: 10, // Space between bullet and text
     color: Color.sparklightGray1,
-    fontWeight: '400'
+    fontWeight: "400",
   },
   wrapperBorder: {
     paddingVertical: Padding.p_5xs,
@@ -352,7 +558,7 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   buttonsLayout: {
-    width: '100%',
+    width: "100%",
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: Padding.p_base,
@@ -369,14 +575,30 @@ const styles = StyleSheet.create({
   frameChild1SpaceBlock: {
     marginTop: 24,
     alignSelf: "stretch",
-
+  },
+  securityQuestionWrapper: {
+    paddingBottom: Padding.p_5xs,
+    alignItems: "center",
+    flexDirection: "row",
+    paddingHorizontal: Padding.p_5xl,
+    alignSelf: "stretch",
+  },
+  makeTypo: {
+    width: 282,
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+  },
+  frameParent1: {
+    marginTop: 16,
+    alignSelf: "stretch",
   },
   generalInformation: {
     fontSize: FontSize.size_3xl,
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 28,
-    fontWeight: '400',
+    fontWeight: "400",
     flex: 1,
   },
   generalInformationWrapper: {
@@ -475,7 +697,7 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: Color.sparklightGray,
     alignSelf: "stretch",
-    marginBottom: Padding.p_base
+    marginBottom: Padding.p_base,
   },
   rectangleWrapper: {
     marginTop: 16,
@@ -541,11 +763,22 @@ const styles = StyleSheet.create({
   },
   userManagementEditInner: {
     padding: Padding.p_base,
-    marginBottom: 200
+    marginBottom: 200,
   },
   userManagementEdit: {
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
+  },
+  wrapperSpaceBlock1: {
+    paddingVertical: Padding.p_base,
+    alignSelf: "stretch",
+  },frameParent: {
+    alignSelf: "stretch",
+  },bullet: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    marginRight: 10, 
   },
 });
 

@@ -284,7 +284,7 @@ const HomeScreen = ({ navigation }) => {
             }
             let dueDate = moment(res.paymentDueDate).format("ll");
             setDueDate(dueDate);
-            setBillAmt(res.currentBalance);
+            setBillAmt((Math.round(res.currentBalance * 100) / 100).toFixed(2));
             getTVServiceDetails();
             getInternetPlanDetails();
             getPhoneServiceDetails();
