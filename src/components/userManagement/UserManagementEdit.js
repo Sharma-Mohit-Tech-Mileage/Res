@@ -20,8 +20,9 @@ import {
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { passwordSchema,userSchema } from "../utility/validationSchema";
+import { addNewUser } from "../../redux/actions/ProfileActionSuite";
 import {
   validatePassword,
   securityQuestions,
@@ -30,10 +31,11 @@ import {
 
 const UserManagementEdit = ({ route }) => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   var user = route.params?.User;
   if(user==undefined){
     user={ 
-        accountNumber: "", 
+        accountNumber: "902878578", 
         portalAdminRole: "None", 
         billingRole: "None", 
         paymentsRole: "None", 
@@ -44,7 +46,6 @@ const UserManagementEdit = ({ route }) => {
         memberType: "Admin", 
         securityAnswer: "", 
         newPassword: "", 
-        email:'',
         securityQuestion: "" 
     }
   }
@@ -56,23 +57,24 @@ const UserManagementEdit = ({ route }) => {
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState("");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [userName, setUserName] = useState(user?.userName || "");
-  const [email, setEmail] = useState(user?.email || "");
+
 
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
 
   
-  const [profileDetails, setLocalProfile] = useState(user);
+  const [profileDetails, setProfileDetails] = useState(user);
   const scrollViewRef = useRef(null);
 
   // Handler for when the security question dropdown value changes
   const handleSecurityQuestionChange = (itemValue) => {
-    setLocalProfile({
+    setProfileDetails({
       ...user,
       securityQuestion: itemValue === "Add your own question" ? "" : itemValue,
     });
     setCustomSecurityQuestion(itemValue);
     setIsCustomQuestionSelected(itemValue === "Add your own question");
+    console.log(itemValue)
   };
 
   const {
@@ -83,13 +85,12 @@ const UserManagementEdit = ({ route }) => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(userSchema(isCustomQuestionSelected)),
-    
     defaultValues: profileDetails,
   });
 
   const handleSave = (formData) => {
-    console.log('Save data',formData)
-    //dispatch(updateProfileSecurity(formData, navigation)); // Dispatch with formData
+    console.log('Save dataa',formData)
+    dispatch(addNewUser(formData, navigation)); // Dispatch with formData
   };
 
   const handleValidationError = () => {
@@ -99,7 +100,8 @@ const UserManagementEdit = ({ route }) => {
 
   useEffect(() => {
     // Reset the form with the updated profile details
-    reset(profileDetails);
+   // reset(profileDetails);
+   console.log(profileDetails)
   }, [profileDetails, reset]);
 
   useEffect(() => {
@@ -144,9 +146,7 @@ const UserManagementEdit = ({ route }) => {
                     ]}
                   >
                     <View style={styles.textinput}>
-                      <Text style={[styles.firstName, styles.firstClr]}>
-                        First Name
-                      </Text>
+                     
                           <Controller
                             control={control}
                             name="firstName"
@@ -157,7 +157,8 @@ const UserManagementEdit = ({ route }) => {
                               <>
                                 <SparkLightInput
                                   onBlur={onBlur}
-                                  label={"Enter your First Name"}
+                                  label={"First Name"}
+                                  placeholder={"Enter your First Name"}
                                   onChangeText={onChange}
                                   value={value}
                                   error={error?.message}
@@ -174,9 +175,7 @@ const UserManagementEdit = ({ route }) => {
                     ]}
                   >
                     <View style={styles.textinput}>
-                      <Text style={[styles.firstName, styles.firstClr]}>
-                        Last Name
-                      </Text>
+                     
                       <Controller
                             control={control}
                             name="lastName"
@@ -187,7 +186,8 @@ const UserManagementEdit = ({ route }) => {
                               <>
                                 <SparkLightInput
                                   onBlur={onBlur}
-                                  label={"Enter your Last Name"}
+                                  label={"Last Name"}
+                                  placeholder={"Enter your Last Name"}
                                   onChangeText={onChange}
                                   value={value}
                                   error={error?.message}
@@ -204,9 +204,7 @@ const UserManagementEdit = ({ route }) => {
                     ]}
                   >
                     <View style={styles.textinput}>
-                      <Text style={[styles.firstName, styles.firstClr]}>
-                        Username
-                      </Text>
+                     
                       <Controller
                             control={control}
                             name="userName"
@@ -217,7 +215,8 @@ const UserManagementEdit = ({ route }) => {
                               <>
                                 <SparkLightInput
                                   onBlur={onBlur}
-                                  label={"Enter your User Name"}
+                                  label={"User Name"}
+                                  placeholder={"Enter your User Name"}
                                   onChangeText={onChange}
                                   value={value}
                                   error={error?.message}
@@ -282,51 +281,7 @@ const UserManagementEdit = ({ route }) => {
                     </View>
                   </View>
                 </View>
-                <View
-                  style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}
-                >
-                  <View style={styles.frameChild} />
-                </View>
-                <View style={styles.frameParent1}>
-                  <View style={styles.contactInformationWrapper}>
-                    <Text style={[styles.generalInformation, styles.firstClr]}>
-                      Contact Information
-                    </Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.textinputWrapper,
-                      styles.textinputWrapperSpaceBlock,
-                    ]}
-                  >
-                    <View style={styles.textinput}>
-                      <Text style={[styles.firstName, styles.firstClr]}>
-                        Email
-                      </Text>
-                      <Controller
-                            control={control}
-                            name="userEmail"
-                            render={({ field: { onChange, onBlur, value } }) => (
-                                <SparkLightInput
-                                    label="Enter Your Email"
-                                    accessibilityLabel="Email Input Field"
-                                    accessibilityHint="Input field for the Email"
-                                    onChangeText={onChange}
-                                    onBlur={onBlur}
-                                    value={value}
-                                    error={errors.feedbackEmail?.message}
-                                />
-                            )}
-                        />
-                     
-                    </View>
-                  </View>
-                </View>
-                <View
-                  style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}
-                >
-                  <View style={styles.frameChild} />
-                </View>
+                
                 <View style={styles.frameParent1}>
                   <View style={styles.contactInformationWrapper}>
                     <Text style={[styles.generalInformation, styles.firstClr]}>

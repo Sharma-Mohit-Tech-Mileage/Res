@@ -6,6 +6,7 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import { ROLE_COLORS, getUserType } from '../utility/constant';
 import { executeUserList } from '../../redux/actions/ProfileActionSuite'
+import { removeUser } from "../../redux/actions/ProfileActionSuite";
 
 const UserManagement = () => {
   const navigation = useNavigation();
@@ -16,6 +17,14 @@ const UserManagement = () => {
   useEffect(() => {
     dispatch(executeUserList(0));
   }, [dispatch]);
+
+const deleteUser=(user)=>{
+  console.log('dleted user',user)
+  const data={accountNumber:'902878578',userName:user?.userName}
+  dispatch(removeUser(data,navigation))
+  
+}
+
 
   const renderUserCard = (user) => {
     const convertedRole = getUserType(user.memberType);
@@ -70,7 +79,7 @@ const UserManagement = () => {
               />
             </Pressable>
             <Pressable style={[styles.rightActionableContainer,styles.rightFlexBox, ]}
-              onPress={() => navigation.navigate("UserManagementEdit",{User:user})}
+              onPress={() => deleteUser(user)}
             >
               <Image
                 style={styles.rightActionableIcon}

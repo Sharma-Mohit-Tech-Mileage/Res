@@ -17,7 +17,6 @@ export const userSchema = (isCustomQuestionSelected) => yup.object({
     firstName: yup.string().required('First Name is required'),
     lastName: yup.string().required('Last Name is required'),
     userName: yup.string().required('User Name is required'),
-    email: yup.string().email('Invalid email').required('Email is required'),
     securityAnswer: yup.string()
         .required('Security answer is required'),
     newPassword: yup.string()
@@ -27,7 +26,7 @@ export const userSchema = (isCustomQuestionSelected) => yup.object({
             'Password must meet the requirements',
             value => {
                 // If the value is null or empty, skip further validation
-                if (!value) return true;
+                //if (!value) return true;
 
                 // Define the password rules
                 const passwordRules = yup.string()

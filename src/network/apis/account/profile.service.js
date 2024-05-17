@@ -396,4 +396,47 @@ const logInfo = async (infoData) => {
     }
 };
 
-export { logError,logInfo,fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification }
+// Add, Edit And Delete User 
+const addUserAction = async (data) => {
+    let user = await getUser();
+
+    const config = {
+        headers: {
+            Authorization: "Bearer " + user.token
+        }
+    };
+
+    console.log('Making API Call to /users/api/users with data:', data); // Log the request data
+
+    try {
+        const response = await _axios.post('/users/api/users', data, config);
+        console.log('API Call Successful, Response:', response.data); // Log the successful response
+        return response.data;
+    } catch (error) {
+        console.error('API Call Failed, Error:', error); // Log the error
+        throw error;
+    }
+};
+
+const removeUser = async (data) => {
+    let user = await getUser();
+
+    const config = {
+        headers: {
+            Authorization: "Bearer " + user.token
+        }
+    };
+
+    console.log(`/users/api/users/remove/${data.accountNumber}/${data.userName}`); // Log the request data
+
+    try {
+        const response = await _axios.put(`/users/api/users/remove/${data.accountNumber}/${data.userName}`, data, config);
+        console.log('API Call Successful, Response:', response.data); // Log the successful response
+        return response.data;
+    } catch (error) {
+        console.error('API Call Failed, Error:', error); // Log the error
+        throw error;
+    }
+};
+
+export { logError,logInfo,fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification,addUserAction,removeUser }
