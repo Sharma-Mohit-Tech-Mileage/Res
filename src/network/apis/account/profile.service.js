@@ -1,6 +1,7 @@
 import { _axios, _axios_cableone } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import axios from 'axios'; // Make sure to import axios
+import moment from "moment";
 import { Env } from "./Constants";
 import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
 let getProfileDetailsCount = 0;
@@ -282,6 +283,37 @@ const postTermsAndConditions = async (flag) => {
     }
 };
 
+const postTermsAndConditionsv2 = async (flag) => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber ;
+    const userName = user.userInfo?.userName ;
+    const mobileTCAcceptanceFlag = flag;
+    const tcAccpetanceDate = moment().format();
+    const customerType = "Residential";
+
+    const payload = {
+        accountNumber,
+        userName,
+        mobileTCAcceptanceFlag,
+        tcAccpetanceDate,
+        customerType
+    };
+
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+
+    try {
+        const response = await _axios_cableone.post(`/mobile/api/MobileUser/updateMobiletAspnuserDataSec`, payload, config);
+        return response;
+    } catch (error) {
+        console.error(`Error in API Call to /mobile/api/MobileUser/updateMobiletAspnuserDataSec:`, error);
+        throw error;
+    }
+};
+
 const postPushNotifications = async (data) => {
     let user = await getUser();
     let deviceToken = await getDeviceUniqueId();
@@ -397,4 +429,4 @@ const logInfo = async (infoData) => {
     }
 };
 
-export { logError,logInfo,fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification }
+export { logError,logInfo,fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification ,postTermsAndConditionsv2}

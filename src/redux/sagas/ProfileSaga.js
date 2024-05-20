@@ -4,7 +4,7 @@ import {
     fetchSmsSubscription, fetchBillingStatus,
     postProfileInfo, postTextNotifictionInfo,
     fetchPaperLessDetails, postEmailNotification,
-    putEmailNotification, postTermsAndConditions,
+    putEmailNotification, postTermsAndConditions,postTermsAndConditionsv2,
     postPushNotifications, unsubscribPaperLess,
     fetchPushNotifications, handleSubmitFeedback, resendEmailVerification, logError, logInfo
 } from "../../network/apis/account/profile.service";
@@ -176,7 +176,7 @@ function* updateEmailNotification(action) {
 function* updateTermsAndConditions(action) {
     console.log('updateTermsAndConditions: ', action);
     try {
-        yield call(postTermsAndConditions, action.payload);
+        yield call(postTermsAndConditionsv2, action.payload);
         if (action.navigation !== null) {
             action.navigation.navigate('EntryPushNotifications');
         }
