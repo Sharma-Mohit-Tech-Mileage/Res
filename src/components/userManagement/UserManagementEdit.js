@@ -6,6 +6,8 @@ import {
   Pressable,
   View,
   ScrollView,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
@@ -21,8 +23,11 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
 import { useDispatch } from "react-redux";
-import { passwordSchema,userSchema } from "../utility/validationSchema";
-import { addNewUser } from "../../redux/actions/ProfileActionSuite";
+import { passwordSchema, userSchema } from "../utility/validationSchema";
+import {
+  addNewUser,
+  editNewUser,
+} from "../../redux/actions/ProfileActionSuite";
 import {
   validatePassword,
   securityQuestions,
@@ -33,24 +38,27 @@ const UserManagementEdit = ({ route }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   var user = route.params?.User;
-  if(user==undefined){
-    user={ 
-        accountNumber: "902878578", 
-        portalAdminRole: "None", 
-        billingRole: "None", 
-        paymentsRole: "None", 
-        ticketsRole: "None", 
-        userName: "", 
-        firstName: "", 
-        lastName: "", 
-        memberType: "Admin", 
-        securityAnswer: "", 
-        newPassword: "", 
-        securityQuestion: "" 
-    }
+  var isnewUser = false;
+  if (user == undefined) {
+    user = {
+      accountNumber: route.params?.acno,
+      portalAdminRole: "None",
+      billingRole: "None",
+      paymentsRole: "None",
+      ticketsRole: "None",
+      userName: "",
+      firstName: "",
+      lastName: "",
+      memberType: "Admin",
+      securityAnswer: "",
+      newPassword: "",
+      securityQuestion: "",
+    };
+    isnewUser = true;
+  } else {
+    isnewUser = false;
   }
-  
-  
+
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] =
     useState(false);
@@ -58,12 +66,11 @@ const UserManagementEdit = ({ route }) => {
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [userName, setUserName] = useState(user?.userName || "");
 
-
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
 
-  
   const [profileDetails, setProfileDetails] = useState(user);
+  const [loading, setLoading] = useState(false);
   const scrollViewRef = useRef(null);
 
   // Handler for when the security question dropdown value changes
@@ -74,7 +81,7 @@ const UserManagementEdit = ({ route }) => {
     });
     setCustomSecurityQuestion(itemValue);
     setIsCustomQuestionSelected(itemValue === "Add your own question");
-    console.log(itemValue)
+    console.log(itemValue);
   };
 
   const {
@@ -89,8 +96,13 @@ const UserManagementEdit = ({ route }) => {
   });
 
   const handleSave = (formData) => {
-    console.log('Save dataa',formData)
-    dispatch(addNewUser(formData, navigation)); // Dispatch with formData
+    console.log("Save dataa", formData);
+    setLoading(true);
+    if (route.params?.User != undefined) {
+      dispatch(editNewUser(formData, navigation)); // Dispatch with formData
+    } else {
+      dispatch(addNewUser(formData, navigation)); // Dispatch with formData
+    }
   };
 
   const handleValidationError = () => {
@@ -100,8 +112,8 @@ const UserManagementEdit = ({ route }) => {
 
   useEffect(() => {
     // Reset the form with the updated profile details
-   // reset(profileDetails);
-   console.log(profileDetails)
+    // reset(profileDetails);
+    console.log(profileDetails);
   }, [profileDetails, reset]);
 
   useEffect(() => {
@@ -117,10 +129,30 @@ const UserManagementEdit = ({ route }) => {
     }
   }, []);
 
+  const LoadingOverlay = () => {
+    return (
+      <Modal
+        visible={loading}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          setLoading(false);
+        }}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.alertContainer}>
+            <ActivityIndicator size="large" color={Color.colorGainsboro_200} />
+            <Text style={styles.loadingTxt}>Saving Data..</Text>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
   return (
     <View style={styles.userManagementEdit}>
       <ProfileSettingsHeader
-        title={route.params === undefined ? "Add User" : "Edit User"}
+        title={isnewUser ? "Add Admin User" : "Edit User"}
         onPressBack={() => navigation.navigate("UserManagement")}
         accessibilityLabel="Go back to User Management"
         accessibilityRole="button"
@@ -128,6 +160,12 @@ const UserManagementEdit = ({ route }) => {
       />
       <ScrollView>
         <View style={[styles.userManagementEditInner]}>
+        <Text style={[styles.yourSavedCard, styles.taylorTypo,{fontWeight:'800'}]}>
+          Admin
+          </Text>
+          <Text style={[styles.yourSavedCard, styles.taylorTypo,{paddingBottom:15}]}>
+          An admin can manage this account but is not the primary contact for this account.
+          </Text>
           <View style={styles.frameWrapper}>
             <View
               style={[styles.frameGroup, styles.textinputWrapperSpaceBlock]}
@@ -146,26 +184,25 @@ const UserManagementEdit = ({ route }) => {
                     ]}
                   >
                     <View style={styles.textinput}>
-                     
-                          <Controller
-                            control={control}
-                            name="firstName"
-                            render={({
-                              field: { onChange, onBlur, value },
-                              fieldState: { error },
-                            }) => (
-                              <>
-                                <SparkLightInput
-                                  onBlur={onBlur}
-                                  label={"First Name"}
-                                  placeholder={"Enter your First Name"}
-                                  onChangeText={onChange}
-                                  value={value}
-                                  error={error?.message}
-                                />
-                              </>
-                            )}
-                          />
+                      <Controller
+                        control={control}
+                        name="firstName"
+                        render={({
+                          field: { onChange, onBlur, value },
+                          fieldState: { error },
+                        }) => (
+                          <>
+                            <SparkLightInput
+                              onBlur={onBlur}
+                              label={"First Name"}
+                              placeholder={"Enter your First Name"}
+                              onChangeText={onChange}
+                              value={value}
+                              error={error?.message}
+                            />
+                          </>
+                        )}
+                      />
                     </View>
                   </View>
                   <View
@@ -175,29 +212,28 @@ const UserManagementEdit = ({ route }) => {
                     ]}
                   >
                     <View style={styles.textinput}>
-                     
                       <Controller
-                            control={control}
-                            name="lastName"
-                            render={({
-                              field: { onChange, onBlur, value },
-                              fieldState: { error },
-                            }) => (
-                              <>
-                                <SparkLightInput
-                                  onBlur={onBlur}
-                                  label={"Last Name"}
-                                  placeholder={"Enter your Last Name"}
-                                  onChangeText={onChange}
-                                  value={value}
-                                  error={error?.message}
-                                />
-                              </>
-                            )}
-                          />
+                        control={control}
+                        name="lastName"
+                        render={({
+                          field: { onChange, onBlur, value },
+                          fieldState: { error },
+                        }) => (
+                          <>
+                            <SparkLightInput
+                              onBlur={onBlur}
+                              label={"Last Name"}
+                              placeholder={"Enter your Last Name"}
+                              onChangeText={onChange}
+                              value={value}
+                              error={error?.message}
+                            />
+                          </>
+                        )}
+                      />
                     </View>
                   </View>
-                  <View
+                   <View
                     style={[
                       styles.textinputWrapper,
                       styles.textinputWrapperSpaceBlock,
@@ -218,6 +254,7 @@ const UserManagementEdit = ({ route }) => {
                                   label={"User Name"}
                                   placeholder={"Enter your User Name"}
                                   onChangeText={onChange}
+                                  editable={isnewUser}
                                   value={value}
                                   error={error?.message}
                                 />
@@ -226,6 +263,7 @@ const UserManagementEdit = ({ route }) => {
                           />
                     </View>
                   </View>
+                  {/*
                   <View
                     style={[
                       styles.textinputWrapper,
@@ -280,8 +318,9 @@ const UserManagementEdit = ({ route }) => {
                       </View>
                     </View>
                   </View>
+                   */}
                 </View>
-                
+
                 <View style={styles.frameParent1}>
                   <View style={styles.contactInformationWrapper}>
                     <Text style={[styles.generalInformation, styles.firstClr]}>
@@ -452,6 +491,7 @@ const UserManagementEdit = ({ route }) => {
               <Text style={[styles.makePayment2, styles.makeTypo]}>Cancel</Text>
             </Pressable>
           </View>
+          <LoadingOverlay />
         </View>
       </ScrollView>
     </View>
@@ -548,6 +588,27 @@ const styles = StyleSheet.create({
     marginTop: 16,
     alignSelf: "stretch",
   },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  alertContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 5,
+    width: "40%",
+  },
+  loadingTxt: {
+    color: Color.sparklightGray1,
+    textAlign: "center",
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 22,
+    fontStyle: "normal",
+    fontWeight: "400",
+  },
+
   generalInformation: {
     fontSize: FontSize.size_3xl,
     textAlign: "left",
@@ -727,13 +788,15 @@ const styles = StyleSheet.create({
   wrapperSpaceBlock1: {
     paddingVertical: Padding.p_base,
     alignSelf: "stretch",
-  },frameParent: {
+  },
+  frameParent: {
     alignSelf: "stretch",
-  },bullet: {
+  },
+  bullet: {
     width: 7,
     height: 7,
     borderRadius: 3.5,
-    marginRight: 10, 
+    marginRight: 10,
   },
 });
 

@@ -6,7 +6,7 @@ import {
     fetchPaperLessDetails, postEmailNotification,
     putEmailNotification, postTermsAndConditions,
     postPushNotifications, unsubscribPaperLess,
-    fetchPushNotifications, handleSubmitFeedback, resendEmailVerification, logError, logInfo,addUserAction,removeUser
+    fetchPushNotifications, handleSubmitFeedback, resendEmailVerification, logError, logInfo,addUserAction,removeUser,editUserAction
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
@@ -17,7 +17,7 @@ import {
     UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS,
     FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
     SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
-    UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION, LOG_ERROR, LOG_INFO,ADD_NEW_USER,DELETE_USER
+    UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION, LOG_ERROR, LOG_INFO,ADD_NEW_USER,DELETE_USER,EDIT_USER
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
@@ -280,7 +280,29 @@ function* addUser(action) {
         const response = yield call(addUserAction, action.payload);
         console.log('API Success Response:', response); // Log the success response
         if(response){
-        action.navigation.navigate('UserManagement', { updateSuccess: true });
+            action.navigation.reset({
+                index: 0,
+                routes: [{ name: "UserManagement" }],
+              });
+        //action.navigation.navigate('UserManagement', { updateSuccess: true });
+        }
+    } catch (error) {
+        //action.navigation.navigate('PasswordSecurityEdit', { updateFailed: true });
+        console.error('API Error Response:', error, action.payload); // Log the error response
+    }
+}
+
+
+function* editUser(action) {
+    try {
+
+        const response = yield call(editUserAction, action.payload);
+        console.log('API Success Response:', response); // Log the success response
+        if(response){
+            action.navigation.reset({
+                index: 0,
+                routes: [{ name: "UserManagement" }],
+              });
         }
     } catch (error) {
         //action.navigation.navigate('PasswordSecurityEdit', { updateFailed: true });
@@ -293,11 +315,15 @@ function* deleteUser(action) {
 
         const response = yield call(removeUser, action.payload);
         console.log('API Success Response:', response); // Log the success response
-        if(response){
-            action.navigation.navigate('UserManagement', { updateSuccess: true });
-            }
+        //if(response){
+            // action.navigation.reset({
+            //     index: 0,
+            //     routes: [{ name: "UserManagement" }],
+            //   });
+          //  }
+          action.navigation(true)
     } catch (error) {
-        
+        action.navigation(false)
         console.error('API Error Response:', error, action.payload); // Log the error response
     }
 }
@@ -323,6 +349,7 @@ function* ProfileSagas() {
     yield takeLatest(RESEND_EMAIL_VERIFICTION, resentVerifiction);
     yield takeLatest(ADD_NEW_USER,addUser)
     yield takeLatest(DELETE_USER,deleteUser)
+    yield takeLatest(EDIT_USER,editUser)
     yield takeLatest(LOG_ERROR, logErrorSaga);
     yield takeLatest(LOG_INFO, logInfoSaga);
 }

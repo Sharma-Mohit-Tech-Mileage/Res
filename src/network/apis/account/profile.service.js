@@ -418,6 +418,27 @@ const addUserAction = async (data) => {
     }
 };
 
+const editUserAction = async (data) => {
+    let user = await getUser();
+
+    const config = {
+        headers: {
+            Authorization: "Bearer " + user.token
+        }
+    };
+
+    console.log('Making API Call to /users/api/users with data:', data); // Log the request data
+
+    try {
+        const response = await _axios.put(`/users/api/users/${data.userName}`, data, config);
+        console.log('API Call Successful, Response:', response.data); // Log the successful response
+        return response.data;
+    } catch (error) {
+        console.error('API Call Failed, Error:', error); // Log the error
+        throw error;
+    }
+};
+
 const removeUser = async (data) => {
     let user = await getUser();
 
@@ -439,4 +460,9 @@ const removeUser = async (data) => {
     }
 };
 
-export { logError,logInfo,fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification,addUserAction,removeUser }
+export { logError,logInfo,fetchUserList, getProfileDetails, 
+    fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, 
+    fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, 
+    postEmailNotification, postTermsAndConditions, postPushNotifications,
+     unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,
+      resendEmailVerification,addUserAction,removeUser,editUserAction }

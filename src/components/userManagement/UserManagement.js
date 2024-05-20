@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { StyleSheet, Text, View, ScrollView,Pressable,Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
@@ -7,6 +7,7 @@ import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalSty
 import { ROLE_COLORS, getUserType } from '../utility/constant';
 import { executeUserList } from '../../redux/actions/ProfileActionSuite'
 import { removeUser } from "../../redux/actions/ProfileActionSuite";
+import NotificationAlert from '../common/customui/NotificationAlert';
 
 const UserManagement = () => {
   const navigation = useNavigation();
@@ -14,14 +15,21 @@ const UserManagement = () => {
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const userList = profile.userList || [];
   const userData = useSelector(state => state.combinedReducers.user.userData);
+  const [showError,setShowError]=useState(false)
+  const acNumber=userData?.userInfo?.accountNumber;
   useEffect(() => {
     dispatch(executeUserList(0));
   }, [dispatch]);
 
 const deleteUser=(user)=>{
-  console.log('dleted user',user)
-  const data={accountNumber:'902878578',userName:user?.userName}
-  dispatch(removeUser(data,navigation))
+  const data={accountNumber:acNumber,userName:user?.userName}
+  dispatch(removeUser(data,(isSuccess)=>{
+    if(isSuccess){
+       dispatch(executeUserList(0));
+    }else{
+      setShowError(true)
+    }
+  }))
   
 }
 
@@ -30,7 +38,7 @@ const deleteUser=(user)=>{
     const convertedRole = getUserType(user.memberType);
     const normalizedRole = convertedRole.replace(/\s+/g, '').toLowerCase();
     const avatarColor = ROLE_COLORS[normalizedRole] || Color.sparklightGreen;
-    const isLoggedInUser = user.userName === userData.userInfo.userName;
+    const isLoggedInUser = user?.userName === userData.userInfo?.userName;
     const firstName = user?.firstName || '';
     const lastName = user?.lastName || '';
 
@@ -70,7 +78,7 @@ const deleteUser=(user)=>{
            <View style={styles.frameParent2}>
             <Pressable
               style={styles.rightFlexBox}
-              onPress={() => navigation.navigate("UserManagementEdit",{User:user})}
+              onPress={() => navigation.navigate("UserManagementEdit",{User:user,acno:acNumber})}
             >
               <Image
                 style={styles.rightActionableIcon}
@@ -128,12 +136,24 @@ const deleteUser=(user)=>{
       />
       <ScrollView>
         <View style={[styles.frameParent, styles.frameSpaceBlock1]}>
+
+        <NotificationAlert
+                    type="error"
+                    title="Failed"
+                    message={"Something went wrong! Please try again"}
+                    showCloseIcon={true}
+                    isVisible={showError}
+                    onClose={()=>{
+                      setShowError(false)
+                    }}
+                    
+                  />
           <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
             <View style={[styles.usersParent, styles.frameGroupSpaceBlock]}>
               <Text style={[styles.users, styles.usersFlexBox]}>Users</Text>
                <Pressable
                   style={[styles.buttons, styles.buttonsBg]}
-                  onPress={() => navigation.navigate("UserManagementEdit")}
+                  onPress={() => navigation.navigate("UserManagementEdit",{acno:acNumber})}
                 >
                   <Text style={[styles.makePayment, styles.textClr]}>Add User</Text>
                 </Pressable> 

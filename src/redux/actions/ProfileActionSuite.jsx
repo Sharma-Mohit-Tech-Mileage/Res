@@ -10,7 +10,7 @@ import {
     UPDATE_PUSH_NOTIFICATIONS, FETCH_PUSH_NOTIFICATIONS,
     SAVE_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
     SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
-    UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION,SAVE_USER_ACCOUNT_SERVICE,ADD_NEW_USER,DELETE_USER
+    UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION,SAVE_USER_ACCOUNT_SERVICE,ADD_NEW_USER,DELETE_USER,EDIT_USER
 } from '../constants';
 export const fetchProfileSuccess = (response) => {
     return {
@@ -182,6 +182,12 @@ export const addNewUser = (data, navigation) => ({
 
 export const removeUser = (data, navigation) => ({
     type: DELETE_USER,
+    payload: data,
+    navigation,
+});
+
+export const editNewUser = (data, navigation) => ({
+    type: EDIT_USER,
     payload: data,
     navigation,
 });
