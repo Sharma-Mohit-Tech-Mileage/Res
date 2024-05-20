@@ -290,6 +290,7 @@ const postPushNotifications = async (data) => {
     data.accountNumber = accountNumber;
     data.userName = userName;
     data['deviceId'] = deviceToken;
+    data['customerType'] = 'Residential'
     const config = {
         headers: {
             Authorization: `Bearer ${user.token}`
