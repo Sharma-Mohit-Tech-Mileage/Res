@@ -305,7 +305,7 @@ const SplashScreen = ({ navigation }) => {
     };
 
     fetchData();
-    enableBiometricAuth();
+   // enableBiometricAuth();
   }, []);
 
 

@@ -23,7 +23,9 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
 import { useDispatch } from "react-redux";
-import { passwordSchema, userSchema } from "../utility/validationSchema";
+import { getUserType } from '../utility/constant';
+import {  userSchema } from "../utility/validationSchema";
+import Toast from 'react-native-toast-message';
 import {
   addNewUser,
   editNewUser,
@@ -33,12 +35,15 @@ import {
   securityQuestions,
   passwordTerms,
 } from "../utility/constant";
+import NotificationAlert from '../common/customui/NotificationAlert';
+
 
 const UserManagementEdit = ({ route }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   var user = route.params?.User;
   var isnewUser = false;
+
   if (user == undefined) {
     user = {
       accountNumber: route.params?.acno,
@@ -65,14 +70,15 @@ const UserManagementEdit = ({ route }) => {
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState("");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [userName, setUserName] = useState(user?.userName || "");
-
+  const [showError,setShowError]=useState(false)
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
-
+  const [errorMsg,setErrorMsg]=useState('')
   const [profileDetails, setProfileDetails] = useState(user);
   const [loading, setLoading] = useState(false);
   const scrollViewRef = useRef(null);
 
+  console.log('User type',profileDetails.memberType)
   // Handler for when the security question dropdown value changes
   const handleSecurityQuestionChange = (itemValue) => {
     setProfileDetails({
@@ -88,6 +94,7 @@ const UserManagementEdit = ({ route }) => {
     control,
     handleSubmit,
     setValue,
+    setError,
     reset,
     formState: { errors },
   } = useForm({
@@ -95,13 +102,43 @@ const UserManagementEdit = ({ route }) => {
     defaultValues: profileDetails,
   });
 
+  const showToast = (msg) => {
+    Toast.show({
+      type: 'error',
+      text1: msg,
+      position:'bottom'
+    });
+  }
+
   const handleSave = (formData) => {
-    console.log("Save dataa", formData);
     setLoading(true);
     if (route.params?.User != undefined) {
-      dispatch(editNewUser(formData, navigation)); // Dispatch with formData
+      dispatch(editNewUser(formData, (isSuccess)=>{
+        if(!isSuccess){
+          setLoading(false)
+        }else{
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "UserManagement" }],
+          });
+        }
+      })) // Dispatch with formData// Dispatch with formData
     } else {
-      dispatch(addNewUser(formData, navigation)); // Dispatch with formData
+      dispatch(addNewUser(formData, (isSuccess,msg)=>{
+        if(!isSuccess){
+          setLoading(false)
+          console.log('Message',msg.error)
+          //setErrorMsg(msg)
+          //setShowError(true)
+          //setError('userName', { type: 'custom', message:msg });
+          showToast(msg.error)
+        }else{
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "UserManagement" }],
+          });
+        }
+      })) // Dispatch with formData
     }
   };
 
@@ -160,12 +197,17 @@ const UserManagementEdit = ({ route }) => {
       />
       <ScrollView>
         <View style={[styles.userManagementEditInner]}>
+          { isnewUser && (
+            <>
+             
         <Text style={[styles.yourSavedCard, styles.taylorTypo,{fontWeight:'800'}]}>
           Admin
           </Text>
           <Text style={[styles.yourSavedCard, styles.taylorTypo,{paddingBottom:15}]}>
           An admin can manage this account but is not the primary contact for this account.
           </Text>
+          </>
+        )}
           <View style={styles.frameWrapper}>
             <View
               style={[styles.frameGroup, styles.textinputWrapperSpaceBlock]}
@@ -263,7 +305,8 @@ const UserManagementEdit = ({ route }) => {
                           />
                     </View>
                   </View>
-                  {/*
+              { !isnewUser && (
+
                   <View
                     style={[
                       styles.textinputWrapper,
@@ -287,17 +330,18 @@ const UserManagementEdit = ({ route }) => {
                               resizeMode="stretch"
                               source={require("../../../assets/right-actionable3.png")}
                             />
+
                             <View style={styles.creditCardWillExpireSoonParent}>
-                              <Text style={styles.creditCardWill}>Admin</Text>
+                              <Text style={styles.creditCardWill}>{getUserType(profileDetails?.memberType)}</Text>
                               <Text
                                 style={[
                                   styles.yourSavedCard,
                                   styles.taylorTypo,
                                 ]}
                               >
-                                Users added here will have full access to My
-                                Account, which includes the power to add, edit
-                                and delete accounts.
+                                { getUserType(profileDetails?.memberType)=="PRIMARY ADMIN"?
+                                'As the primary admin, you are the main contact and have full control over this account.' : 'As an admin, you can manage this account, but you are not the primary contact for this account.'
+                                }
                               </Text>
                               <View style={styles.buttons}>
                                 <Text style={styles.makePayment}>
@@ -318,7 +362,7 @@ const UserManagementEdit = ({ route }) => {
                       </View>
                     </View>
                   </View>
-                   */}
+               ) }
                 </View>
 
                 <View style={styles.frameParent1}>
@@ -492,6 +536,7 @@ const UserManagementEdit = ({ route }) => {
             </Pressable>
           </View>
           <LoadingOverlay />
+          <Toast />
         </View>
       </ScrollView>
     </View>

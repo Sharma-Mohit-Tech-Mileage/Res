@@ -280,15 +280,19 @@ function* addUser(action) {
         const response = yield call(addUserAction, action.payload);
         console.log('API Success Response:', response); // Log the success response
         if(response){
-            action.navigation.reset({
-                index: 0,
-                routes: [{ name: "UserManagement" }],
-              });
+            action.navigation(true,"")
         //action.navigation.navigate('UserManagement', { updateSuccess: true });
         }
     } catch (error) {
+        console.log('Error',error.response.data)
+        if(error.response){
+        action.navigation(false,error.response.data)
+        }else{
+            action.navigation(false,"")
+        }
+        
         //action.navigation.navigate('PasswordSecurityEdit', { updateFailed: true });
-        console.error('API Error Response:', error, action.payload); // Log the error response
+        //console.error('API Error Response:', error, action.payload); // Log the error response
     }
 }
 
@@ -298,15 +302,12 @@ function* editUser(action) {
 
         const response = yield call(editUserAction, action.payload);
         console.log('API Success Response:', response); // Log the success response
-        if(response){
-            action.navigation.reset({
-                index: 0,
-                routes: [{ name: "UserManagement" }],
-              });
-        }
+        action.navigation(true)
     } catch (error) {
+        action.navigation(false)
+        console.log('Error',error.response.data)
         //action.navigation.navigate('PasswordSecurityEdit', { updateFailed: true });
-        console.error('API Error Response:', error, action.payload); // Log the error response
+        //console.error('API Error Response:', error, action.payload); // Log the error response
     }
 }
 
