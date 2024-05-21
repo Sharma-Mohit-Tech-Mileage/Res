@@ -306,7 +306,7 @@ const postTermsAndConditionsv2 = async (flag) => {
     };
 
     try {
-        const response = await _axios_cableone.post(`/mobile/api/MobileUser/updateMobiletAspnuserDataSec`, payload, config);
+        const response = await _axios_cableone.put(`/mobile/api/MobileUser/updateMobiletAspnuserDataSec`, payload, config);
         return response;
     } catch (error) {
         console.error(`Error in API Call to /mobile/api/MobileUser/updateMobiletAspnuserDataSec:`, error);
