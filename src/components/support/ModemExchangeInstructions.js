@@ -1,11 +1,11 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Image,
   StyleSheet,
   Text,
   View,
   ScrollView,
-  TouchableOpacity,
+  AccessibilityInfo,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -14,7 +14,6 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 
 const ModemExchangeInstructions = () => {
   const navigation = useNavigation();
-
   // Define your instructions here
   const instructions = [
     `The average lifespan of a modem is approximately 2-3 years, although some high-quality modems can last up to 5-8 years.`,
@@ -23,12 +22,39 @@ const ModemExchangeInstructions = () => {
     `Our team will be happy to assist you and ensure that you have the best possible internet experience.`,
   ];
 
+  const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
+
+  useEffect(() => {
+    async function getAccessibility() {
+      try {
+        const accessibility = await AccessibilityInfo.isScreenReaderEnabled();
+        setIsScreenReaderEnabled(accessibility);
+      } catch (error) {
+        console.log(
+          "There has been a problem with AccessibilityInfo.isScreenReaderEnabled(): " +
+            error.message
+        );
+        setIsScreenReaderEnabled(false); // Setting a default value in case of error
+      }
+    }
+    getAccessibility();
+    const reduceMotionChangedSubscription = AccessibilityInfo.addEventListener(
+      "screenReaderChanged",
+      (isScreenReaderEnabled) => {
+        setIsScreenReaderEnabled(isScreenReaderEnabled);
+      }
+    );
+    return () => {
+      reduceMotionChangedSubscription.remove();
+    };
+  }, [screenReaderEnabled]);
+
   return (
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
         title="Modem Exchange Instructions"
         onPressBack={() => {
-          console.log('On Back Press');
+          console.log("On Back Press");
           navigation.goBack();
         }}
       />
@@ -44,32 +70,70 @@ const ModemExchangeInstructions = () => {
           {instructions.map((instruction, index) => (
             <View key={index} style={styles.instructionContainer}>
               <View style={styles.bulletPoint}></View>
-              <Text style={styles.instructionText}>
-                {instruction.includes('contact us') ? (
-                  <>
-                    {instruction.split('contact us')[0]}
-                    <Text accessible={true}
-                      accessibilityRole="link"
-                      accessibilityLabel="Contact us for more information"
-                      hitSlop={{ top: 20, bottom:20, left: 20, right: 20 }}
-                    style={styles.linkText} onPress={() => {
-                      navigation.navigate("SupportStack", {
-                        isContactUs: true,
-                      })
-                    }}>
-                      contact us
-                    </Text>
-                    {instruction.split('contact us')[1]}
-                  </>
-                ) : (
-                  instruction
-                )}
-              </Text>
+              {screenReaderEnabled ? (
+                <TextWithLinkVoiceOverEnabled instruction={instruction} />
+              ) : (
+                <TextWithLinkVoiceOverDisabled instruction={instruction} />
+              )}
             </View>
           ))}
         </View>
       </ScrollView>
     </View>
+  );
+};
+
+const TextWithLinkVoiceOverEnabled = ({ instruction }) => {
+  const navigation = useNavigation();
+  return instruction.includes("contact us") ? (
+    <Text
+      style={styles.instructionText}
+      accessible={true}
+      accessibilityRole="link"
+      onPress={() => navigation.navigate("SupportStack", { isContactUs: true })}
+    >
+      {instruction.split("contact us")[0]}
+      <Text
+        accessibilityLabel="Contact us for more information"
+        hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+        style={styles.linkText}
+      >
+        contact us
+      </Text>
+      {instruction.split("contact us")[1]}
+    </Text>
+  ) : (
+    <Text style={styles.instructionText}>{instruction}</Text>
+  );
+};
+
+const TextWithLinkVoiceOverDisabled = ({ instruction }) => {
+  const navigation = useNavigation();
+  return (
+    <Text style={styles.instructionText}>
+      {instruction.includes("contact us") ? (
+        <>
+          {instruction.split("contact us")[0]}
+          <Text
+            accessible={true}
+            accessibilityRole="link"
+            accessibilityLabel="Contact us for more information"
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+            style={styles.linkText}
+            onPress={() => {
+              navigation.navigate("SupportStack", {
+                isContactUs: true,
+              });
+            }}
+          >
+            contact us
+          </Text>
+          {instruction.split("contact us")[1]}
+        </>
+      ) : (
+        instruction
+      )}
+    </Text>
   );
 };
 
@@ -115,8 +179,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   instructionContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: 10,
   },
   bulletPoint: {
@@ -127,7 +191,7 @@ const styles = StyleSheet.create({
   instructionText: {
     flex: 1,
     paddingLeft: 10,
-    paddingRight:6,
+    paddingRight: 6,
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 16,
@@ -139,8 +203,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontStyle: "normal",
     fontWeight: "700",
-    paddingLeft:5,
-    flexWrap:'wrap'
+    paddingLeft: 5,
+    flexWrap: "wrap",
   },
   bulletPoint: {
     width: 6,
