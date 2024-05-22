@@ -280,7 +280,7 @@ const HomeScreen = ({ navigation }) => {
               setIsInternetDetails(true);
               setInternetHealths((oldArray) => [...oldArray, "Red"]);
             } else {
-              updateInternetHealth(res.currentBalance);
+              updateInternetHealth(res.currentBalance,res.paymentDueDate);
             }
             let dueDate = moment(res.paymentDueDate).format("ll");
             setDueDate(dueDate);
@@ -295,8 +295,12 @@ const HomeScreen = ({ navigation }) => {
     });
   };
 
-  const updateInternetHealth = (dueAmount) => {
-    if (dueAmount <= 0) {
+  const updateInternetHealth = (dueAmount,dueDate) => {
+    //console.log('pppppast',moment(dueDate).isBefore() )
+    if(moment(dueDate).isAfter()){
+      setBillPaid(true);
+      setInternetHealths((oldArray) => [...oldArray, "Green"]);
+    }else if (dueAmount <= 0 ) {
       setBillPaid(true);
       setInternetHealths((oldArray) => [...oldArray, "Green"]);
     } else {
@@ -343,13 +347,13 @@ const HomeScreen = ({ navigation }) => {
         const messageTypes = profile.pushNotifications[0].pushMessageType;
         messageTypes.forEach((messageType) => {
           switch (messageType.messageType) {
-            case 'Appointment':
+            case 'appointment':
               optOut = messageType.optOutFlag;
               break;
-            case 'Outage':
+            case 'outage':
               outageOptOut = messageType.optOutFlag;
               break;
-            case 'Billing':
+            case 'billing':
               billingOptOutStatus = messageType.optOutFlag;
               break;
           }
@@ -452,19 +456,11 @@ const HomeScreen = ({ navigation }) => {
     };
     fetchData();
   }, [dispatch]);
-
   useEffect(() => {
-    if (profile?.pushNotifications?.[0]?.pushMessageType !== undefined && user.userInfo !== undefined) {
-      console.log(
-        "[checkNotificationsEffect] pushMessageType is defined. Executing checkNotifications."
-      );
+    if (profile?.pushNotifications?.length > 0 && user.userInfo !== undefined) {
       checkNotifications();
-    } else {
-      console.log(
-        "[checkNotificationsEffect] pushMessageType is undefined. Skipping checkNotifications."
-      );
     }
-  }, [profile,user, checkNotifications]);
+  }, [profile, user]);
 
   const changeWalkThroughStep = (step) => {
     if (step > 2) {
@@ -511,7 +507,7 @@ const HomeScreen = ({ navigation }) => {
     return (
       <>
         <View style={styles.walkThroughBubble} >
-          <View accessible accessibilityLabel={`${walkThrough.title}. ${walkThrough.description}`}>
+          <View >
             <View style={styles.title}>
               <Text style={styles.titleText}>{walkThrough.title}</Text>
             </View>
@@ -521,8 +517,8 @@ const HomeScreen = ({ navigation }) => {
               </Text>
             </View>
           </View>
-          <View style={styles.walkThroughBottomArea} accessible accessibilityLabel="Navigation Buttons">
-            <View style={styles.circlePaging} accessible>
+          <View style={styles.walkThroughBottomArea} >
+            <View style={styles.circlePaging}>
               <View style={styles.circle}></View>
               <View
                 style={
@@ -567,9 +563,6 @@ const HomeScreen = ({ navigation }) => {
               style={bottomCarotStyles}
               tintColor={"#FFF"}
               source={require("../../../assets/polygon.png")}
-              accessible
-              accessibilityLabel="Decoration"
-              accessibilityRole="image"
             />
           </View>
         </View>

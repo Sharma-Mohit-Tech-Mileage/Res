@@ -74,7 +74,7 @@ const ZendeskChat =()=>  {
         <p>Hello, World!</p>
     
         <!-- Start of Zendesk Widget script -->
-        <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=5b6f4fab-f7a4-4a5a-a133-04bc0cb80009">
+        <script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=ad791f41-3c05-490b-8bb3-55afe1751f92">
         </script>
         <!-- End of Zendesk Widget script -->
         
