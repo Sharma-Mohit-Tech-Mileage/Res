@@ -23,9 +23,9 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
 import { useDispatch } from "react-redux";
-import { getUserType } from '../utility/constant';
-import {  userSchema } from "../utility/validationSchema";
-import Toast from 'react-native-toast-message';
+import { getUserType } from "../utility/constant";
+import { userSchema } from "../utility/validationSchema";
+
 import {
   addNewUser,
   editNewUser,
@@ -35,8 +35,7 @@ import {
   securityQuestions,
   passwordTerms,
 } from "../utility/constant";
-import NotificationAlert from '../common/customui/NotificationAlert';
-
+import NotificationError from "../common/customui/NotificationError";
 
 const UserManagementEdit = ({ route }) => {
   const navigation = useNavigation();
@@ -70,15 +69,14 @@ const UserManagementEdit = ({ route }) => {
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState("");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [userName, setUserName] = useState(user?.userName || "");
-  const [showError,setShowError]=useState(false)
+  const [showError, setShowError] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
-  const [errorMsg,setErrorMsg]=useState('')
+
+  const [errorMsg, setErrorMsg] = useState("");
   const [profileDetails, setProfileDetails] = useState(user);
   const [loading, setLoading] = useState(false);
   const scrollViewRef = useRef(null);
-
-  console.log('User type',profileDetails.memberType)
   // Handler for when the security question dropdown value changes
   const handleSecurityQuestionChange = (itemValue) => {
     setProfileDetails({
@@ -102,43 +100,38 @@ const UserManagementEdit = ({ route }) => {
     defaultValues: profileDetails,
   });
 
-  const showToast = (msg) => {
-    Toast.show({
-      type: 'error',
-      text1: msg,
-      position:'bottom'
-    });
-  }
-
   const handleSave = (formData) => {
     setLoading(true);
     if (route.params?.User != undefined) {
-      dispatch(editNewUser(formData, (isSuccess)=>{
-        if(!isSuccess){
-          setLoading(false)
-        }else{
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "UserManagement" }],
-          });
-        }
-      })) // Dispatch with formData// Dispatch with formData
+      dispatch(
+        editNewUser(formData, (isSuccess) => {
+          if (!isSuccess) {
+            setLoading(false);
+          } else {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "UserManagement" }],
+            });
+          }
+        })
+      ); // Dispatch with formData// Dispatch with formData
     } else {
-      dispatch(addNewUser(formData, (isSuccess,msg)=>{
-        if(!isSuccess){
-          setLoading(false)
-          console.log('Message',msg.error)
-          //setErrorMsg(msg)
-          //setShowError(true)
-          //setError('userName', { type: 'custom', message:msg });
-          showToast(msg.error)
-        }else{
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "UserManagement" }],
-          });
-        }
-      })) // Dispatch with formData
+      dispatch(
+        addNewUser(formData, (isSuccess, msg) => {
+          if (!isSuccess) {
+            setLoading(false);
+            console.log("Message", msg?.error);
+            setErrorMsg(msg?.error);
+            //setError('userName', { type: 'custom', message:msg });
+            scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: false });
+          } else {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "UserManagement" }],
+            });
+          }
+        })
+      ); // Dispatch with formData
     }
   };
 
@@ -152,6 +145,12 @@ const UserManagementEdit = ({ route }) => {
     // reset(profileDetails);
     console.log(profileDetails);
   }, [profileDetails, reset]);
+
+  useEffect(() => {
+    if (errorMsg != "") {
+      setShowError(true);
+    }
+  }, [errorMsg]);
 
   useEffect(() => {
     const storedSecurityQuestion = profileDetails?.securityQuestion;
@@ -195,19 +194,41 @@ const UserManagementEdit = ({ route }) => {
         accessibilityRole="button"
         accessibilityHint="Navigates back to the User Management screen"
       />
-      <ScrollView>
+      <ScrollView ref={scrollViewRef}>
         <View style={[styles.userManagementEditInner]}>
-          { isnewUser && (
+         <NotificationError
+            type="error"
+            title={"Error"}
+            message={errorMsg}
+            showCloseIcon={true}
+            isVisible={showError}
+            onClose={() => {
+              setShowError(false);
+            }}
+          /> 
+          {isnewUser && (
             <>
-             
-        <Text style={[styles.yourSavedCard, styles.taylorTypo,{fontWeight:'800'}]}>
-          Admin
-          </Text>
-          <Text style={[styles.yourSavedCard, styles.taylorTypo,{paddingBottom:15}]}>
-          An admin can manage this account but is not the primary contact for this account.
-          </Text>
-          </>
-        )}
+              <Text
+                style={[
+                  styles.yourSavedCard,
+                  styles.taylorTypo,
+                  { fontWeight: "800" },
+                ]}
+              >
+                Admin
+              </Text>
+              <Text
+                style={[
+                  styles.yourSavedCard,
+                  styles.taylorTypo,
+                  { paddingBottom: 15 },
+                ]}
+              >
+                An admin can manage this account but is not the primary contact
+                for this account.
+              </Text>
+            </>
+          )}
           <View style={styles.frameWrapper}>
             <View
               style={[styles.frameGroup, styles.textinputWrapperSpaceBlock]}
@@ -275,38 +296,6 @@ const UserManagementEdit = ({ route }) => {
                       />
                     </View>
                   </View>
-                   <View
-                    style={[
-                      styles.textinputWrapper,
-                      styles.textinputWrapperSpaceBlock,
-                    ]}
-                  >
-                    <View style={styles.textinput}>
-                     
-                      <Controller
-                            control={control}
-                            name="userName"
-                            render={({
-                              field: { onChange, onBlur, value },
-                              fieldState: { error },
-                            }) => (
-                              <>
-                                <SparkLightInput
-                                  onBlur={onBlur}
-                                  label={"User Name"}
-                                  placeholder={"Enter your User Name"}
-                                  onChangeText={onChange}
-                                  editable={isnewUser}
-                                  value={value}
-                                  error={error?.message}
-                                />
-                              </>
-                            )}
-                          />
-                    </View>
-                  </View>
-              { !isnewUser && (
-
                   <View
                     style={[
                       styles.textinputWrapper,
@@ -314,55 +303,90 @@ const UserManagementEdit = ({ route }) => {
                     ]}
                   >
                     <View style={styles.textinput}>
-                      <Text style={[styles.firstName, styles.firstClr]}>
-                        Member Type
-                      </Text>
-                      <View style={styles.notifications}>
-                        <Image
-                          style={{ height: "100%" }}
-                          resizeMode="stretch"
-                          source={require("../../../assets/rectangle-5281.png")}
-                        />
-                        <View style={styles.bannerWarning}>
-                          <View style={styles.rightActionableParent}>
-                            <Image
-                              style={styles.rightIconLayout}
-                              resizeMode="stretch"
-                              source={require("../../../assets/right-actionable3.png")}
+                      <Controller
+                        control={control}
+                        name="userName"
+                        render={({
+                          field: { onChange, onBlur, value },
+                          fieldState: { error },
+                        }) => (
+                          <>
+                            <SparkLightInput
+                              onBlur={onBlur}
+                              label={"User Name"}
+                              placeholder={"Enter your User Name"}
+                              onChangeText={onChange}
+                              editable={isnewUser}
+                              value={value}
+                              error={error?.message}
                             />
+                          </>
+                        )}
+                      />
+                    </View>
+                  </View>
+                  {!isnewUser && (
+                    <View
+                      style={[
+                        styles.textinputWrapper,
+                        styles.textinputWrapperSpaceBlock,
+                      ]}
+                    >
+                      <View style={styles.textinput}>
+                        <Text style={[styles.firstName, styles.firstClr]}>
+                          Member Type
+                        </Text>
+                        <View style={styles.notifications}>
+                          <Image
+                            style={{ height: "100%" }}
+                            resizeMode="stretch"
+                            source={require("../../../assets/rectangle-5281.png")}
+                          />
+                          <View style={styles.bannerWarning}>
+                            <View style={styles.rightActionableParent}>
+                              <Image
+                                style={styles.rightIconLayout}
+                                resizeMode="stretch"
+                                source={require("../../../assets/right-actionable3.png")}
+                              />
 
-                            <View style={styles.creditCardWillExpireSoonParent}>
-                              <Text style={styles.creditCardWill}>{getUserType(profileDetails?.memberType)}</Text>
-                              <Text
-                                style={[
-                                  styles.yourSavedCard,
-                                  styles.taylorTypo,
-                                ]}
+                              <View
+                                style={styles.creditCardWillExpireSoonParent}
                               >
-                                { getUserType(profileDetails?.memberType)=="PRIMARY ADMIN"?
-                                'As the primary admin, you are the main contact and have full control over this account.' : 'As an admin, you can manage this account, but you are not the primary contact for this account.'
-                                }
-                              </Text>
-                              <View style={styles.buttons}>
-                                <Text style={styles.makePayment}>
-                                  Change Primary Admin
+                                <Text style={styles.creditCardWill}>
+                                  {getUserType(profileDetails?.memberType)}
                                 </Text>
+                                <Text
+                                  style={[
+                                    styles.yourSavedCard,
+                                    styles.taylorTypo,
+                                  ]}
+                                >
+                                  {getUserType(profileDetails?.memberType) ==
+                                  "PRIMARY ADMIN"
+                                    ? "As the primary admin, you are the main contact and have full control over this account."
+                                    : "As an admin, you can manage this account, but you are not the primary contact for this account."}
+                                </Text>
+                                <View style={styles.buttons}>
+                                  <Text style={styles.makePayment}>
+                                    Change Primary Admin
+                                  </Text>
+                                </View>
                               </View>
                             </View>
+                            <Image
+                              style={[
+                                styles.rightActionableIcon1,
+                                styles.rightIconLayout,
+                              ]}
+                              resizeMode="stretch"
+                              source={require("../../../assets/right-actionable4.png")}
+                            />
                           </View>
-                          <Image
-                            style={[
-                              styles.rightActionableIcon1,
-                              styles.rightIconLayout,
-                            ]}
-                            resizeMode="stretch"
-                            source={require("../../../assets/right-actionable4.png")}
-                          />
                         </View>
                       </View>
                     </View>
-                  </View>
-               ) }
+                  )}
                 </View>
 
                 <View style={styles.frameParent1}>
@@ -536,7 +560,6 @@ const UserManagementEdit = ({ route }) => {
             </Pressable>
           </View>
           <LoadingOverlay />
-          <Toast />
         </View>
       </ScrollView>
     </View>

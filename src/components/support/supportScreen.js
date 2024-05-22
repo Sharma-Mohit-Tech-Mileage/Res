@@ -5,6 +5,7 @@ import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalSty
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
+import { GetApiRequest } from "../../network/APIClient";
 import ZendeskChat from "react-native-zendesk-chat";
 import PubSub from 'pubsub-js'
 import {
@@ -59,7 +60,18 @@ const Support = ({route}) => {
     //     }
     // }, [route.params, navigation]);
 
+    const getWifiPassword=()=>{
+        let accountNumber='902878578'
+        const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
+        GetApiRequest(request,(res)=>{
+           console.log(res)
+        },(error)=>{
+           console.log(error)
+        })
+    }
+
     React.useEffect(() => {
+        getWifiPassword();
         const unsubscribe = navigation.addListener('focus', () => {
           // The screen is focused
           // Call any action
@@ -128,7 +140,7 @@ const Support = ({route}) => {
         },
         {
             key: 'scanQrCode',
-            text: 'Scan Wifi Password',
+            text: 'Share Wifi Password',
             icon: require("../../../assets/chevronright.png"),
             iconAlignment: 'right', // Icon to the right of the text
             navigateTo: 'ScanScreen',

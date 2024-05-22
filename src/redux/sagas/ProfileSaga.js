@@ -284,13 +284,12 @@ function* addUser(action) {
         //action.navigation.navigate('UserManagement', { updateSuccess: true });
         }
     } catch (error) {
-        console.log('Error',error.response.data)
-        if(error.response){
-        action.navigation(false,error.response.data)
+        if(error?.response){
+        action.navigation(false,error?.response.data)
         }else{
             action.navigation(false,"")
         }
-        
+        console.log('Error:',error)
         //action.navigation.navigate('PasswordSecurityEdit', { updateFailed: true });
         //console.error('API Error Response:', error, action.payload); // Log the error response
     }
