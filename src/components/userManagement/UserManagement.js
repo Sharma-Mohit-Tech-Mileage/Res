@@ -1,31 +1,70 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Pressable,
+  Image,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
-import { ROLE_COLORS, getUserType } from '../utility/constant';
-import { executeUserList } from '../../redux/actions/ProfileActionSuite'
+import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import {
+  Color,
+  Padding,
+  Border,
+  FontSize,
+  FontFamily,
+} from "../../../GlobalStyles";
+import { ROLE_COLORS, getUserType } from "../utility/constant";
+import { executeUserList } from "../../redux/actions/ProfileActionSuite";
+import { removeUser } from "../../redux/actions/ProfileActionSuite";
+import NotificationAlert from "../common/customui/NotificationAlert";
+import CustomerErrorPage from "../utility/SystemErrorPopup";
 
 const UserManagement = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const [currentUser, setCurrentUser] = useState({});
+  const profile = useSelector((state) => state.combinedReducers.profile || {});
   const userList = profile.userList || [];
-  const userData = useSelector(state => state.combinedReducers.user.userData);
+  const userData = useSelector((state) => state.combinedReducers.user.userData);
+  const [showError, setShowError] = useState(false);
+  const acNumber = userData?.userInfo?.accountNumber;
+  const [isDeleteUser, setIsDeleteUser] = useState(false);
   useEffect(() => {
     dispatch(executeUserList(0));
   }, [dispatch]);
 
+  useEffect(() => {
+    if (Object.keys(currentUser).length > 0) {
+      setIsDeleteUser(true);
+    }
+  }, [currentUser]);
+
+  const deleteUser = (user) => {
+    const data = { accountNumber: acNumber, userName: user?.userName };
+    dispatch(
+      removeUser(data, (isSuccess) => {
+        if (isSuccess) {
+          dispatch(executeUserList(0));
+        } else {
+          setShowError(true);
+        }
+      })
+    );
+  };
+
   const renderUserCard = (user) => {
     const convertedRole = getUserType(user.memberType);
-    const normalizedRole = convertedRole.replace(/\s+/g, '').toLowerCase();
+    const normalizedRole = convertedRole.replace(/\s+/g, "").toLowerCase();
     const avatarColor = ROLE_COLORS[normalizedRole] || Color.sparklightGreen;
-    const isLoggedInUser = user.userName === userData.userInfo.userName;
-    const firstName = user?.firstName || '';
-    const lastName = user?.lastName || '';
+    const isLoggedInUser = user?.userName === userData.userInfo?.userName;
+    const firstName = user?.firstName || "";
+    const lastName = user?.lastName || "";
 
-    let initials = '';
+    let initials = "";
     if (firstName.length > 0) {
       initials += firstName.charAt(0).toUpperCase();
     }
@@ -34,14 +73,16 @@ const UserManagement = () => {
     }
     // Camel Case Full Name
     const fullNameCamelCase = [firstName, lastName]
-      .map(name => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase())
-      .join(' ');
+      .map((name) => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase())
+      .join(" ");
 
     return (
       <View style={[styles.frameParent3, styles.frameBorder]}>
         <View style={[styles.frameParent1, styles.navigationBorder]}>
           <View style={styles.rightActionableParent}>
-            <View style={[{ backgroundColor: avatarColor }, styles.rightLayout]}>
+            <View
+              style={[{ backgroundColor: avatarColor }, styles.rightLayout]}
+            >
               <View style={styles.avatarContrastInnerBorder} />
               <Text style={[styles.text, styles.textClr]}>{initials}</Text>
             </View>
@@ -52,16 +93,21 @@ const UserManagement = () => {
               {isLoggedInUser && (
                 <View style={styles.userParent}>
                   <Text style={[styles.loggedIn, styles.usersFlexBox]}>
-                    {'Logged In'}
+                    {"Logged In"}
                   </Text>
                 </View>
               )}
             </View>
           </View>
-          {/* <View style={styles.frameParent2}>
+          <View style={styles.frameParent2}>
             <Pressable
               style={styles.rightFlexBox}
-              onPress={() => navigation.navigate("UserManagementEdit")}
+              onPress={() =>
+                navigation.navigate("UserManagementEdit", {
+                  User: user,
+                  acno: acNumber,
+                })
+              }
             >
               <Image
                 style={styles.rightActionableIcon}
@@ -69,8 +115,9 @@ const UserManagement = () => {
                 source={require("../../../assets/right-actionable5.png")}
               />
             </Pressable>
-            <Pressable style={[styles.rightActionableContainer,styles.rightFlexBox, ]}
-              onPress={() => navigation.navigate("UserManagementEdit")}
+            <Pressable
+              style={[styles.rightActionableContainer, styles.rightFlexBox]}
+              onPress={() => setCurrentUser(user)}
             >
               <Image
                 style={styles.rightActionableIcon}
@@ -78,13 +125,11 @@ const UserManagement = () => {
                 source={require("../../../assets/right-actionable6.png")}
               />
             </Pressable>
-          </View> */}
+          </View>
         </View>
         <View style={styles.frameWrapper}>
           <View style={styles.usernameParent}>
-            <Text style={[styles.username, styles.usersFlexBox]}>
-              Username
-            </Text>
+            <Text style={[styles.username, styles.usersFlexBox]}>Username</Text>
             <Text style={styles.melsmith}>{user.userName}</Text>
           </View>
         </View>
@@ -94,8 +139,16 @@ const UserManagement = () => {
               Member Type
             </Text>
             <View style={styles.badgeWrapper}>
-              <View style={[styles.badge, styles.badgeBorder, isLoggedInUser ? styles.login : styles.loginOut]}>
-                <Text style={[styles.text3]}>{getUserType(user.memberType)}</Text>
+              <View
+                style={[
+                  styles.badge,
+                  styles.badgeBorder,
+                  isLoggedInUser ? styles.login : styles.loginOut,
+                ]}
+              >
+                <Text style={[styles.text3]}>
+                  {getUserType(user.memberType)}
+                </Text>
               </View>
             </View>
           </View>
@@ -109,41 +162,71 @@ const UserManagement = () => {
           </View>}
         </View> */}
       </View>
-    )
+    );
   };
   return (
     <View style={{ flex: 1 }}>
       <ProfileSettingsHeader
         title="User Management"
-        onPressBack={() => navigation.navigate('Account')}
+        onPressBack={() => navigation.navigate("Account")}
       />
       <ScrollView>
         <View style={[styles.frameParent, styles.frameSpaceBlock1]}>
+          <NotificationAlert
+            type="error"
+            title="Failed"
+            message={"Something went wrong! Please try again"}
+            showCloseIcon={true}
+            isVisible={showError}
+            onClose={() => {
+              setShowError(false);
+            }}
+          />
           <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
             <View style={[styles.usersParent, styles.frameGroupSpaceBlock]}>
               <Text style={[styles.users, styles.usersFlexBox]}>Users</Text>
-              {/* <Pressable
-                  style={[styles.buttons, styles.buttonsBg]}
-                  onPress={() => navigation.navigate("UserManagementEdit")}
-                >
-                  <Text style={[styles.makePayment, styles.textClr]}>Add User</Text>
-                </Pressable> */}
+              <Pressable
+                style={[styles.buttons, styles.buttonsBg]}
+                onPress={() =>
+                  navigation.navigate("UserManagementEdit", { acno: acNumber })
+                }
+              >
+                <Text style={[styles.makePayment, styles.textClr]}>
+                  Add User
+                </Text>
+              </Pressable>
             </View>
             <View style={styles.frameContainer}>
               {userList.map((user, index) => (
                 <React.Fragment key={index}>
                   {renderUserCard(user)}
-                  {index < userList.length - 1 && <View style={styles.boxspace} />}
+                  {index < userList.length - 1 && (
+                    <View style={styles.boxspace} />
+                  )}
                 </React.Fragment>
-
               ))}
             </View>
           </View>
           <View style={styles.frameChild} />
+          <CustomerErrorPage
+            visible={isDeleteUser}
+            message={
+              `Do you want to continue?.
+Deleted user will no longer be able to login.`
+            }
+            title={"Delete User Account"}
+            onActionTxt={"Yes"}
+            onAction={() => {
+              setIsDeleteUser(false);
+              deleteUser(currentUser);
+            }}
+            onClose={() => {
+              setIsDeleteUser(false);
+            }}
+          />
         </View>
       </ScrollView>
     </View>
-
   );
 };
 
@@ -165,15 +248,13 @@ const styles = StyleSheet.create({
     textAlign: "left",
     color: Color.sparklightGray1,
   },
-  login:
-  {
+  login: {
     backgroundColor: Color.success50,
-    borderColor: Color.colorAquamarine
+    borderColor: Color.colorAquamarine,
   },
-  loginOut:
-  {
+  loginOut: {
     backgroundColor: Color.colorWhitesmoke_200,
-    borderColor: Color.colorWhitesmoke_200
+    borderColor: Color.colorWhitesmoke_200,
   },
   frameBorder: {
     borderWidth: 1,
@@ -364,7 +445,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontSize: FontSize.size_xs,
     fontWeight: "600",
-
   },
   badge: {
     paddingHorizontal: Padding.p_5xs,
@@ -398,8 +478,8 @@ const styles = StyleSheet.create({
   },
   frameParent: {
     paddingTop: Padding.p_5xl,
-    width: '100%',
-    marginBottom: 200
+    width: "100%",
+    marginBottom: 200,
   },
 });
 

@@ -156,7 +156,7 @@ const Feedback = () => {
                                     label="Email"
                                     onChangeText={onChange}
                                     onBlur={onBlur}
-                                    value={value}
+                                    value={value.toLowerCase()}
                                     error={errors.feedbackEmail?.message}
                                 />
                             )}

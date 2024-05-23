@@ -37,3 +37,7 @@ export const RESEND_EMAIL_VERIFICTION = 'RESEND_EMAIL_VERIFICTION';
 export const LOG_INFO = 'LOG_INFO';
 export const LOG_ERROR = 'LOG_ERROR';
 export const SAVE_USER_ACCOUNT_SERVICE = 'SAVE_USER_ACCOUNT_SERVICE';
+
+export const ADD_NEW_USER = 'ADD_NEW_USER';
+export const DELETE_USER = 'DELETE_USER';
+export const EDIT_USER = 'EDIT_USER';
