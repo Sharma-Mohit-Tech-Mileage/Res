@@ -86,7 +86,7 @@ android {
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
         versionCode 85
-        versionName "2.0.2"
+        versionName "2.0.3"
     }
 
     
