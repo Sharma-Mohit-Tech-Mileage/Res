@@ -11,57 +11,70 @@ import {name as appName} from './app.json';
 import ZendeskChat from './src/components/support/ZendeskChat.js';
 
 // Register background handler
-messaging().setBackgroundMessageHandler(async remoteMessage => {     
-    console.log('Message handled in the background Again!', remoteMessage);
-    try {
-        // Create a channel (required for Android)
-        const channelId = await notifee.createChannel({
-            id: 'default',
-            name: 'Default Channel',
-        });
+messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('Message handled in the background!', remoteMessage);
 
-        // Display a notification
-        await notifee.displayNotification({
-            title: remoteMessage.notification.title,
-            body: remoteMessage.notification.body,
-            android: {
-            channelId,
-            //smallIcon: remoteMessage.notification.android.imageUrl, // optional, defaults to 'ic_launcher'.
-            // pressAction is needed if you want the notification to open the app when pressed
-            pressAction: {
+    // Only handle data messages to avoid duplicates and ensure valid data
+    if (remoteMessage.data && remoteMessage.data.title && remoteMessage.data.body) {
+        try {
+            const channelId = await notifee.createChannel({
                 id: 'default',
-            },
-            },
-        });
-    } catch (error) {
-        console.log('Error when setting background message: ', error);
+                name: 'Default Channel',
+            });
+
+            await notifee.displayNotification({
+                title: remoteMessage.data.title,
+                body: remoteMessage.data.body,
+                android: {
+                    channelId,
+                    pressAction: {
+                        id: 'default',
+                    },
+                },
+            });
+
+            // Optional: Clear notification if required
+            // await notifee.cancelNotification(remoteMessage.messageId);
+
+        } catch (error) {
+            console.log('Error when setting background message: ', error);
+        }
+    } else {
+        console.log('Notification data is missing, not displaying notification.');
     }
 });
 
+// Foreground message handler
 messaging().onMessage(async remoteMessage => {
     console.log('Push Notification Message: ', remoteMessage);
-    try {
-        // Create a channel (required for Android)
-        const channelId = await notifee.createChannel({
-            id: 'default',
-            name: 'Default Channel',
-        });
 
-        // Display a notification
-        await notifee.displayNotification({
-            title: remoteMessage.notification.title,
-            body: remoteMessage.notification.body,
-            android: {
-            channelId,
-            //smallIcon: remoteMessage.notification.android.imageUrl, // optional, defaults to 'ic_launcher'.
-            // pressAction is needed if you want the notification to open the app when pressed
-            pressAction: {
+    // Handle both notification and data messages with valid content
+    const title = remoteMessage.notification?.title || remoteMessage.data?.title;
+    const body = remoteMessage.notification?.body || remoteMessage.data?.body;
+
+    if (title && body) {
+        try {
+            const channelId = await notifee.createChannel({
                 id: 'default',
-            },
-            },
-        });
-    } catch (error) {
-        console.log('Error when setting background message: ', error);
+                name: 'Default Channel',
+            });
+
+            await notifee.displayNotification({
+                title,
+                body,
+                android: {
+                    channelId,
+                    pressAction: {
+                        id: 'default',
+                    },
+                },
+            });
+
+        } catch (error) {
+            console.log('Error when setting foreground message: ', error);
+        }
+    } else {
+        console.log('Notification or data is missing, not displaying notification.');
     }
 });
 

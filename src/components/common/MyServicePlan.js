@@ -79,7 +79,7 @@ const MyServicePlan = ({ plans,tvPlan,phonePlan, navigation }) => {
            
            
            {(userInfo.services?.basic && !userInfo.services?.iptv) &&
-           <ServiceMenuStatic key={34}  planName={"TV"}  menuIcon='tv' serviceType={'Standard cable TV'} />
+           <ServiceMenuStatic key={34}  planName={"TV"}  menuIcon='tv' serviceType={'Standard Cable TV'} />
            }
 
            {(userInfo.services?.phone || userInfo.services?.commercialPhone) && 

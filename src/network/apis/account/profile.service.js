@@ -1,6 +1,7 @@
 import { _axios, _axios_cableone } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import axios from 'axios'; // Make sure to import axios
+import moment from "moment";
 import { Env } from "./Constants";
 import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
 let getProfileDetailsCount = 0;
@@ -282,6 +283,37 @@ const postTermsAndConditions = async (flag) => {
     }
 };
 
+const postTermsAndConditionsv2 = async (flag) => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber ;
+    const userName = user.userInfo?.userName ;
+    const mobileTCAcceptanceFlag = flag;
+    const tcAccpetanceDate = moment().format();
+    const customerType = "Residential";
+
+    const payload = {
+        accountNumber,
+        userName,
+        mobileTCAcceptanceFlag,
+        tcAccpetanceDate,
+        customerType
+    };
+
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+
+    try {
+        const response = await _axios_cableone.put(`/mobile/api/MobileUser/updateMobiletAspnuserDataSec`, payload, config);
+        return response;
+    } catch (error) {
+        console.error(`Error in API Call to /mobile/api/MobileUser/updateMobiletAspnuserDataSec:`, error);
+        throw error;
+    }
+};
+
 const postPushNotifications = async (data) => {
     let user = await getUser();
     let deviceToken = await getDeviceUniqueId();
@@ -290,6 +322,7 @@ const postPushNotifications = async (data) => {
     data.accountNumber = accountNumber;
     data.userName = userName;
     data['deviceId'] = deviceToken;
+    data['customerType'] = 'Residential'
     const config = {
         headers: {
             Authorization: `Bearer ${user.token}`
@@ -396,73 +429,4 @@ const logInfo = async (infoData) => {
     }
 };
 
-// Add, Edit And Delete User 
-const addUserAction = async (data) => {
-    let user = await getUser();
-
-    const config = {
-        headers: {
-            Authorization: "Bearer " + user.token
-        }
-    };
-
-    console.log('Making API Call to /users/api/users with data:', data); // Log the request data
-
-    try {
-        const response = await _axios.post('/users/api/users', data, config);
-        console.log('API Call Successful, Response:', response.data); // Log the successful response
-        return response.data;
-    } catch (error) {
-        console.error('API Call Failed, Error:', error); // Log the error
-        throw error;
-    }
-};
-
-const editUserAction = async (data) => {
-    let user = await getUser();
-
-    const config = {
-        headers: {
-            Authorization: "Bearer " + user.token
-        }
-    };
-
-    console.log('Making API Call to /users/api/users with data:', data); // Log the request data
-
-    try {
-        const response = await _axios.put(`/users/api/users/${data.userName}`, data, config);
-        console.log('API Call Successful, Response:', response.data); // Log the successful response
-        return response.data;
-    } catch (error) {
-        console.error('API Call Failed, Error:', error); // Log the error
-        throw error;
-    }
-};
-
-const removeUser = async (data) => {
-    let user = await getUser();
-
-    const config = {
-        headers: {
-            Authorization: "Bearer " + user.token
-        }
-    };
-
-    console.log(`/users/api/users/remove/${data.accountNumber}/${data.userName}`); // Log the request data
-
-    try {
-        const response = await _axios.put(`/users/api/users/remove/${data.accountNumber}/${data.userName}`, data, config);
-        console.log('API Call Successful, Response:', response.data); // Log the successful response
-        return response.data;
-    } catch (error) {
-        console.error('API Call Failed, Error:', error); // Log the error
-        throw error;
-    }
-};
-
-export { logError,logInfo,fetchUserList, getProfileDetails, 
-    fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, 
-    fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, 
-    postEmailNotification, postTermsAndConditions, postPushNotifications,
-     unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,
-      resendEmailVerification,addUserAction,removeUser,editUserAction }
+export { logError,logInfo,fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification ,postTermsAndConditionsv2}

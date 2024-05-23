@@ -1,7 +1,7 @@
 // SupportStack.js
 
 import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import supportScreen from "../../components/support/supportScreen";
 import Search from "../../components/support/Search";
 import CreateTicket from "../../components/support/CreateTicket";
@@ -12,8 +12,7 @@ import TroubleShootStack from "./TroubleShootStack";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemStackScreen from "./ManageEquepmentStack";
 import ModemConnectivityGuide from '../../components/support/Troubleshooting/ModemConnectivityGuide';
-import ScanScreen from "../../components/utility/QRScanner";
-const SupportStack = createStackNavigator();
+const SupportStack = createNativeStackNavigator();
 
 function SupportStackScreen({route}) {
   console.log('Support',JSON.stringify(route))
@@ -105,18 +104,7 @@ function SupportStackScreen({route}) {
         name="ModemConnectivityGuide"
         component={ModemConnectivityGuide}
       />
-       <SupportStack.Screen
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-        name="ScanScreen"
-        component={ScanScreen}
-      />
     </SupportStack.Navigator>
-
-    
   );
 }
 

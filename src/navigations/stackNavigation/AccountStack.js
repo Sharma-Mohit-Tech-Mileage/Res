@@ -1,5 +1,5 @@
 import React from 'react'; 
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AccountScreen from '../../components/account/AccountOverview';
 import ProfileSettings from '../../components/userProfile/ProfileSettings';
 import ProfileSettingsEdit from '../../components/userProfile/ProfileSettingsEdit';
@@ -16,7 +16,8 @@ import ThumbsUp from '../../components/support/ThumbsUp';
 import ArticalWindowUtility from '../../components/utility/ArticalWindowUtility';
 import { useTabBarVisibility } from '../TabBarVisibilityContext';
 import supportScreen from "../../components/support/supportScreen";
-const AccountStack = createStackNavigator();
+import { createSelectorCreator } from 'reselect';
+const AccountStack = createNativeStackNavigator();
 function AccountStackScreen() {
     const { setTabBarVisible } = useTabBarVisibility();
     return (
