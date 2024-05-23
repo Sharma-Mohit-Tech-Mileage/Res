@@ -14,11 +14,13 @@ export const profileSchema = (isPrimaryAdmin, multipleEmails) => yup.object({
 });
 
 export const userSchema = (isCustomQuestionSelected) => yup.object({
+    
     firstName: yup.string().required('First Name is required'),
     lastName: yup.string().required('Last Name is required'),
     userName: yup.string().required('User Name is required'),
     securityAnswer: yup.string()
         .required('Security answer is required'),
+        
     newPassword: yup.string()
         .nullable()  // Allows null values
         .test(
@@ -53,6 +55,25 @@ export const userSchema = (isCustomQuestionSelected) => yup.object({
         ? yup.string().required('Custom security question is required')
         : yup.string().nullable(),
     // ... other fields
+
+    
+    
+});
+
+export const userSchemaNoPass = (isCustomQuestionSelected) => yup.object({
+    
+    firstName: yup.string().required('First Name is required'),
+    lastName: yup.string().required('Last Name is required'),
+    userName: yup.string().required('User Name is required'),
+    securityAnswer: yup.string()
+        .required('Security answer is required'),
+        
+    securityQuestion: isCustomQuestionSelected
+        ? yup.string().required('Custom security question is required')
+        : yup.string().nullable(),
+    // ... other fields
+
+    
     
 });
 

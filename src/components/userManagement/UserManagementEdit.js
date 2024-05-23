@@ -24,7 +24,7 @@ import SparkLightInput from "../common/customui/SparkLightInput";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
 import { useDispatch } from "react-redux";
 import { getUserType } from "../utility/constant";
-import { userSchema } from "../utility/validationSchema";
+import { userSchema,userSchemaNoPass } from "../utility/validationSchema";
 
 import {
   addNewUser,
@@ -99,7 +99,7 @@ const UserManagementEdit = ({ route }) => {
     resolver: yupResolver(userSchema(isCustomQuestionSelected)),
     defaultValues: profileDetails,
   });
-
+  //setValue('newPassword', 'value', { shouldValidate: false })
   const handleSave = (formData) => {
     setLoading(true);
     if (route.params?.User != undefined) {
@@ -108,10 +108,15 @@ const UserManagementEdit = ({ route }) => {
           if (!isSuccess) {
             setLoading(false);
           } else {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "UserManagement" }],
-            });
+
+            setLoading(false);
+
+            setTimeout(()=>{
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "UserManagement" }],
+              });
+            },1000)
           }
         })
       ); // Dispatch with formData// Dispatch with formData
@@ -120,15 +125,16 @@ const UserManagementEdit = ({ route }) => {
         addNewUser(formData, (isSuccess, msg) => {
           if (!isSuccess) {
             setLoading(false);
-            console.log("Message", msg?.error);
             setErrorMsg(msg?.error);
-            //setError('userName', { type: 'custom', message:msg });
             scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: false });
           } else {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "UserManagement" }],
-            });
+            setLoading(false);
+            setTimeout(()=>{
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "UserManagement" }],
+              });
+            },1000)
           }
         })
       ); // Dispatch with formData
@@ -405,16 +411,18 @@ const UserManagementEdit = ({ route }) => {
                     >
                       <Controller
                         control={control}
+                    
                         name="newPassword"
+                        
                         render={({
                           field: { onChange, onBlur, value },
                           fieldState: { error },
                         }) => (
                           <>
                             <SparkLightInput
-                              placeholder="New Password"
+                              placeholder= "New Password"
                               onBlur={onBlur}
-                              label={"New Password"}
+                              label={isnewUser?"New Password":"New Password(Optional)"}
                               onChangeText={onChange}
                               value={value}
                               secure={true}
