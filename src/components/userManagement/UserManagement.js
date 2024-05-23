@@ -100,6 +100,7 @@ const UserManagement = () => {
             </View>
           </View>
           <View style={styles.frameParent2}>
+          { getUserType(user.memberType)!='VIEW ONLY' && (
             <Pressable
               style={styles.rightFlexBox}
               onPress={() =>
@@ -115,6 +116,7 @@ const UserManagement = () => {
                 source={require("../../../assets/right-actionable5.png")}
               />
             </Pressable>
+          )}
             <Pressable
               style={[styles.rightActionableContainer, styles.rightFlexBox]}
               onPress={() => setCurrentUser(user)}
@@ -184,7 +186,11 @@ const UserManagement = () => {
           />
           <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
             <View style={[styles.usersParent, styles.frameGroupSpaceBlock]}>
+              <View style={{flexDirection:'column', flex:2}}>
               <Text style={[styles.users, styles.usersFlexBox]}>Users</Text>
+              <Text style={[styles.users, styles.usersFlexBox,{fontSize:14}]}>*Add Up To 5 User Accounts</Text>
+              </View>
+             { userList.length <5 && (
               <Pressable
                 style={[styles.buttons, styles.buttonsBg]}
                 onPress={() =>
@@ -195,6 +201,7 @@ const UserManagement = () => {
                   Add User
                 </Text>
               </Pressable>
+             )}
             </View>
             <View style={styles.frameContainer}>
               {userList.map((user, index) => (
