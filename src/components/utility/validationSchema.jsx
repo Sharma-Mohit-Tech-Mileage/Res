@@ -19,8 +19,7 @@ export const userSchema = (isCustomQuestionSelected) => yup.object({
     lastName: yup.string().required('Last Name is required'),
     userName: yup.string().required('User Name is required'),
     securityAnswer: yup.string()
-        .required('Security answer is required'),
-        
+        .required('Security answer is required'), 
     newPassword: yup.string()
         .nullable()  // Allows null values
         .test(
