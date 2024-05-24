@@ -79,14 +79,15 @@ const UserManagementEdit = ({ route }) => {
   const [pass,setPass]=useState('')
   const scrollViewRef = useRef(null);
   // Handler for when the security question dropdown value changes
-  const handleSecurityQuestionChange = (itemValue) => {
+  const handleSecurityQuestionChange = (itemValue,onChange) => {
     setProfileDetails({
-      ...user,
+      ...profileDetails,
       securityQuestion: itemValue === "Add your own question" ? "" : itemValue,
     });
     setCustomSecurityQuestion(itemValue);
     setIsCustomQuestionSelected(itemValue === "Add your own question");
     console.log(itemValue);
+    //onChange(itemValue)
   };
 
   const {
@@ -103,6 +104,7 @@ const UserManagementEdit = ({ route }) => {
   console.log('Password',(isnewUser || pass?.target?.value.length>0 ))
   //setValue('newPassword', 'value', { shouldValidate: false })
   const handleSave = (formData) => {
+    console.log('Request',formData)
     setLoading(true);
     if (route.params?.User != undefined) {
       dispatch(
@@ -124,7 +126,7 @@ const UserManagementEdit = ({ route }) => {
       ); // Dispatch with formData// Dispatch with formData
     } else {
       dispatch(
-        addNewUser(formData, (isSuccess, msg) => {
+        addNewUser({formData,...customSecurityQuestion}, (isSuccess, msg) => {
           if (!isSuccess) {
             setLoading(false);
             setErrorMsg(msg?.error);
@@ -496,11 +498,20 @@ const UserManagementEdit = ({ route }) => {
                           {" "}
                           Password Reset Question
                         </Text>
+                        <Controller
+            name="securityQuestion"
+            control={control}
+            render={({ onChange, value, ref }) => (
+              
                         <SparkLightDropdown
                           items={securityQuestions}
                           selectedValue={customSecurityQuestion}
-                          onValueChange={handleSecurityQuestionChange}
+                          onValueChange={(value)=>{handleSecurityQuestionChange(value,onChange)}}
+                          
                         />
+                      )}
+                      
+                    />
                       </View>
                     </View>
                     {isCustomQuestionSelected && (
