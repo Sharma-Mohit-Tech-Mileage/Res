@@ -121,6 +121,8 @@ const UserManagementEdit = ({ route }) => {
         })
       ); // Dispatch with formData// Dispatch with formData
     } else {
+      let request=formData.securityQuestion=customSecurityQuestion;
+      console.log('request',formData)
       dispatch(
         addNewUser(formData, (isSuccess, msg) => {
           if (!isSuccess) {
