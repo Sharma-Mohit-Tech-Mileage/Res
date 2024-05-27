@@ -76,16 +76,18 @@ const UserManagementEdit = ({ route }) => {
   const [errorMsg, setErrorMsg] = useState("");
   const [profileDetails, setProfileDetails] = useState(user);
   const [loading, setLoading] = useState(false);
+  const [pass,setPass]=useState('')
   const scrollViewRef = useRef(null);
   // Handler for when the security question dropdown value changes
-  const handleSecurityQuestionChange = (itemValue) => {
+  const handleSecurityQuestionChange = (itemValue,onChange) => {
     setProfileDetails({
-      ...user,
+      ...profileDetails,
       securityQuestion: itemValue === "Add your own question" ? "" : itemValue,
     });
     setCustomSecurityQuestion(itemValue);
     setIsCustomQuestionSelected(itemValue === "Add your own question");
     console.log(itemValue);
+    //onChange(itemValue)
   };
 
   const {
@@ -96,11 +98,13 @@ const UserManagementEdit = ({ route }) => {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(userSchema(isCustomQuestionSelected)),
+    resolver: yupResolver((isnewUser || pass?.target?.value.length>0 )?userSchema(isCustomQuestionSelected):userSchemaNoPass(isCustomQuestionSelected)),
     defaultValues: profileDetails,
   });
+  console.log('Password',(isnewUser || pass?.target?.value.length>0 ))
   //setValue('newPassword', 'value', { shouldValidate: false })
   const handleSave = (formData) => {
+    console.log('Request',formData)
     setLoading(true);
     if (route.params?.User != undefined) {
       dispatch(
@@ -124,7 +128,7 @@ const UserManagementEdit = ({ route }) => {
       let request=formData.securityQuestion=customSecurityQuestion;
       console.log('request',formData)
       dispatch(
-        addNewUser(formData, (isSuccess, msg) => {
+        addNewUser({formData,...customSecurityQuestion}, (isSuccess, msg) => {
           if (!isSuccess) {
             setLoading(false);
             setErrorMsg(msg?.error);
@@ -141,6 +145,14 @@ const UserManagementEdit = ({ route }) => {
         })
       ); // Dispatch with formData
     }
+  };
+
+  const handleOnChangeText = (
+    value,
+    onChange
+  ) => {
+    onChange(value);
+    setPass(value);
   };
 
   const handleValidationError = () => {
@@ -425,7 +437,8 @@ const UserManagementEdit = ({ route }) => {
                               placeholder= "New Password"
                               onBlur={onBlur}
                               label={isnewUser?"New Password":"New Password(Optional)"}
-                              onChangeText={onChange}
+                              //onChangeText={onChange}
+                              onChangeText={(value)=>{handleOnChangeText(value,onChange)}}
                               value={value}
                               secure={true}
                               error={error?.message}
@@ -456,7 +469,7 @@ const UserManagementEdit = ({ route }) => {
                                       ]}
                                     />
                                   </View>
-                                  <Text style={styles.bulletPoiint}>
+                                  <Text style={styles.bulletPoint}>
                                     {passwordTerms[index]}
                                   </Text>
                                 </View>
@@ -487,11 +500,20 @@ const UserManagementEdit = ({ route }) => {
                           {" "}
                           Password Reset Question
                         </Text>
+                        <Controller
+            name="securityQuestion"
+            control={control}
+            render={({ onChange, value, ref }) => (
+              
                         <SparkLightDropdown
                           items={securityQuestions}
                           selectedValue={customSecurityQuestion}
-                          onValueChange={handleSecurityQuestionChange}
+                          onValueChange={(value)=>{handleSecurityQuestionChange(value,onChange)}}
+                          
                         />
+                      )}
+                      
+                    />
                       </View>
                     </View>
                     {isCustomQuestionSelected && (
