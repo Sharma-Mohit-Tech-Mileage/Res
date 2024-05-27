@@ -10,6 +10,7 @@ import PubSub from 'pubsub-js'
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
+import { GetApiRequest } from "../../network/APIClient";
 
 ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
@@ -39,7 +40,18 @@ const Support = ({ route }) => {
 
     };
 
+    const getWifiPassword=()=>{
+        let accountNumber='902878578'
+        const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
+        GetApiRequest(request,(res)=>{
+           console.log(res)
+        },(error)=>{
+           console.log(error)
+        })
+    }
+
     React.useEffect(() => {
+        getWifiPassword();
         const unsubscribe = navigation.addListener('focus', () => {
             setTimeout(() => {
                 if (!route.params?.isContactUs) {
@@ -100,6 +112,16 @@ const Support = ({ route }) => {
             icon: require("../../../assets/chevronright.png"),
             iconAlignment: 'right', // Icon to the right of the text
             navigateTo: 'ArticalWindowUtility',
+            url: 'https://support.sparklight.com/hc/en-us'
+
+            
+        },
+        {
+            key: 'scanQrCode',
+            text: 'Share Wifi Password',
+            icon: require("../../../assets/chevronright.png"),
+            iconAlignment: 'left', // Icon to the right of the text
+            navigateTo: 'ShareWifiScreen',
             url: 'https://support.sparklight.com/hc/en-us'
         }
     ];
