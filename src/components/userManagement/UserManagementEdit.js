@@ -101,10 +101,10 @@ const UserManagementEdit = ({ route }) => {
     resolver: yupResolver((isnewUser || pass?.target?.value.length>0 )?userSchema(isCustomQuestionSelected):userSchemaNoPass(isCustomQuestionSelected)),
     defaultValues: profileDetails,
   });
-  console.log('Password',(isnewUser || pass?.target?.value.length>0 ))
+ // console.log('Password',(isnewUser || pass?.target?.value.length>0 ))
   //setValue('newPassword', 'value', { shouldValidate: false })
   const handleSave = (formData) => {
-    console.log('Request',formData)
+    //console.log('Request',formData)
     setLoading(true);
     if (route.params?.User != undefined) {
       dispatch(
@@ -134,11 +134,10 @@ const UserManagementEdit = ({ route }) => {
           } else {
             setLoading(false);
             setTimeout(()=>{
-              navigation.navigate('UserManagement', { isSuccess: true });
-              // navigation.reset({
-              //   index: 0,
-              //   routes: [{ name: "UserManagement" }],
-              // });
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "UserManagement" }],
+              });
             },1000)
           }
         })
