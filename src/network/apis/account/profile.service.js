@@ -359,6 +359,7 @@ const unsubscribPaperLess = async () => {
 };
 
 const handleSubmitFeedback = async (obj) => {
+    const accountNumber = user.userInfo?.accountNumber || null;
     const zendeskRequestApiUrl = Env.ZENDESK_FEEDBACK.Url
     let user = await getUser();
     const fullName = user.userInfo?.fullName;
@@ -383,7 +384,7 @@ const handleSubmitFeedback = async (obj) => {
                 body: obj.feedbackText,
                 uploads: null
             },
-            tags: ["Feedback", "Residential", "MobileApp"],
+            tags: ["Feedback", "Residential", "MobileApp",'pid:_'+accountNumber],
             via: { channel: "MobileApp" }
         }
     };
