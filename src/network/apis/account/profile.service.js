@@ -438,10 +438,10 @@ const addUserAction = async (data) => {
         }
     };
 
-    console.log('Making API Call to /users/api/users with data:', data); // Log the request data
+    console.log('Making API Call to /users/api/users with data:', data.formData); // Log the request data
 
     try {
-        const response = await _axios.post('/users/api/users', data, config);
+        const response = await _axios.post('/users/api/users', data.formData, config);
         console.log('API Call Successful, Response:', response.data); // Log the successful response
         return response.data;
     } catch (error) {
@@ -495,6 +495,6 @@ const removeUser = async (data) => {
 export { logError,logInfo,fetchUserList, getProfileDetails, 
     fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, 
     fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, 
-    postEmailNotification, postTermsAndConditions,postTermsAndConditionsv2, postPushNotifications,
+    postEmailNotification, postTermsAndConditions, postPushNotifications,
      unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,
       resendEmailVerification,addUserAction,removeUser,editUserAction }

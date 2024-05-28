@@ -87,7 +87,7 @@ const UserManagement = () => {
               <Text style={[styles.text, styles.textClr]}>{initials}</Text>
             </View>
             <View>
-              <Text style={[styles.taylorNickum, styles.melissaSmithTypo]}>
+              <Text style={[styles.taylorNickum, styles.melissaSmithTypo,{flexWrap:'wrap', marginRight:15}]}>
                 {fullNameCamelCase}
               </Text>
               {isLoggedInUser && (
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
   },
   melsmith: {
     fontSize: FontSize.size_base,
-    textAlign: "left",
+    textAlign: 'left',
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 28,
