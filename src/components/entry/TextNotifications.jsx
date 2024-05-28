@@ -62,7 +62,7 @@ const TextNotifications = ({ navigation }) => {
     }, []); 
 
     useEffect(() => {
-        if (profile.smsSubscription.length > 0) {
+        if (profile.smsSubscription?.length > 0) {
             if (profile.smsSubscription[0].phoneNum !== undefined
                 && profile.smsSubscription[0].phoneNum.length > 0) {
                 setInput(profile.smsSubscription[0].phoneNum.substring(1));
