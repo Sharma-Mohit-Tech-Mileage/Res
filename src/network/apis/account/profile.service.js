@@ -495,6 +495,6 @@ const removeUser = async (data) => {
 export { logError,logInfo,fetchUserList, getProfileDetails, 
     fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, 
     fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, 
-    postEmailNotification, postTermsAndConditions, postPushNotifications,
+    postEmailNotification, postTermsAndConditions,postTermsAndConditionsv2, postPushNotifications,
      unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,
       resendEmailVerification,addUserAction,removeUser,editUserAction }
