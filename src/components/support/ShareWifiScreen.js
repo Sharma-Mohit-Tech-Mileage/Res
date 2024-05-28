@@ -5,12 +5,15 @@ import QRCode from "react-native-qrcode-svg";
 import Share from "react-native-share";
 import { captureRef } from "react-native-view-shot";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { Color, FontFamily } from "../../../GlobalStyles";
+import { Color, FontFamily, Padding } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 
-const ShareWifiScreen = ({ ssidw, passwordw }) => {
-  const [ssid, setSsid] = useState("CGNM-7908");
-  const [password, setPassword] = useState("JackTest123");
+const ShareWifiScreen = ({route}) => {
+
+    console.log('route',JSON.stringify(route))
+
+  const [ssid, setSsid] = useState(route?.params?.ssid);
+  const [password, setPassword] = useState(route?.params?.skey);
   const [encryption, setEncryption] = useState("WPA");
   const qrCodeRef = useRef();
   const navigation = useNavigation();
@@ -47,9 +50,9 @@ const ShareWifiScreen = ({ ssidw, passwordw }) => {
         }}
       />
       <View ref={qrCodeRef} style={styles.qrContainer}>
-        <QRCode value={generateWifiQRCode()} size={300} />
+        <QRCode value={generateWifiQRCode()} size={250} />
       </View>
-      <View style={{ marginTop: 20,width:'100%' }}>
+      <View style={{marginTop:40, width:'75%' }}>
         <TouchableOpacity
           style={styles.BtnContainer}
           onPress={() => {
@@ -92,7 +95,10 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   qrContainer: {
-    marginVertical: 40,
+    marginTop:80,
+    padding: 40,
+    backgroundColor: Color.sparklightWhite,
+    alignItems: "center",
   },
   BtnContainer: {
     backgroundColor: colors.sparklight_purple_blue,

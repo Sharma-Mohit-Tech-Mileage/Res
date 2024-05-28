@@ -15,6 +15,8 @@ import { GetApiRequest } from "../../network/APIClient";
 ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
 const Support = ({ route }) => {
+    const [ssid, setSsid] = useState("");
+    const [password, setPassword] = useState("");
     const navigation = useNavigation();
     const [showModal, setShowModal] = useState(false);
     const [department, setDepartment] = useState('');
@@ -45,6 +47,10 @@ const Support = ({ route }) => {
         const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
         GetApiRequest(request,(res)=>{
            console.log(res)
+          if(res){
+            setPassword(res[0].securityKey)
+            setSsid(res[0].ssid)
+          }
         },(error)=>{
            console.log(error)
         })
@@ -216,7 +222,11 @@ const Support = ({ route }) => {
                                 <Pressable key={index} style={[styles.search, styles.navigationBorder]}
                                     onPress={() => {
                                         if (item.iconAlignment === 'left') {
+                                            if(item.key==='scanQrCode'){
+                                                navigation.navigate(item.navigateTo,{skey:password,ssid:ssid})
+                                            }else{
                                             navigation.navigate(item.navigateTo)
+                                            }
                                         } else {
                                             navigation.navigate(item.navigateTo, { url: item.url, name: item.text })
                                         }
