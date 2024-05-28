@@ -23,7 +23,7 @@ import { removeUser } from "../../redux/actions/ProfileActionSuite";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 
-const UserManagement = () => {
+const UserManagement = ({route}) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [currentUser, setCurrentUser] = useState({});
@@ -33,6 +33,11 @@ const UserManagement = () => {
   const [showError, setShowError] = useState(false);
   const acNumber = userData?.userInfo?.accountNumber;
   const [isDeleteUser, setIsDeleteUser] = useState(false);
+  console.log('Back',JSON.stringify(route))
+  if(route?.params?.isSuccess){
+    dispatch(executeUserList(0));
+  }
+
   useEffect(() => {
     dispatch(executeUserList(0));
   }, [dispatch]);

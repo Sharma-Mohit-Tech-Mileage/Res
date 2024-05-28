@@ -112,14 +112,13 @@ const UserManagementEdit = ({ route }) => {
           if (!isSuccess) {
             setLoading(false);
           } else {
-
             setLoading(false);
-
             setTimeout(()=>{
-              navigation.reset({
-                index: 0,
-                routes: [{ name: "UserManagement" }],
-              });
+              navigation.navigate('UserManagement', { isSuccess: true });
+              // navigation.reset({
+              //   index: 0,
+              //   routes: [{ name: "UserManagement" }],
+              // });
             },1000)
           }
         })
@@ -134,10 +133,11 @@ const UserManagementEdit = ({ route }) => {
           } else {
             setLoading(false);
             setTimeout(()=>{
-              navigation.reset({
-                index: 0,
-                routes: [{ name: "UserManagement" }],
-              });
+              navigation.navigate('UserManagement', { isSuccess: true });
+              // navigation.reset({
+              //   index: 0,
+              //   routes: [{ name: "UserManagement" }],
+              // });
             },1000)
           }
         })
