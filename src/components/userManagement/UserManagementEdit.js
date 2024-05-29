@@ -86,7 +86,6 @@ const UserManagementEdit = ({ route }) => {
     });
     setCustomSecurityQuestion(itemValue);
     setIsCustomQuestionSelected(itemValue === "Add your own question");
-    console.log(itemValue);
     //onChange(itemValue)
   };
 
@@ -101,34 +100,35 @@ const UserManagementEdit = ({ route }) => {
     resolver: yupResolver((isnewUser || pass?.target?.value.length>0 )?userSchema(isCustomQuestionSelected):userSchemaNoPass(isCustomQuestionSelected)),
     defaultValues: profileDetails,
   });
-  console.log('Password',(isnewUser || pass?.target?.value.length>0 ))
+ // console.log('Password',(isnewUser || pass?.target?.value.length>0 ))
   //setValue('newPassword', 'value', { shouldValidate: false })
   const handleSave = (formData) => {
-    console.log('Request',formData)
+    //console.log('Request',formData)
     setLoading(true);
     if (route.params?.User != undefined) {
+      let request=formData['securityQuestion']=customSecurityQuestion
       dispatch(
         editNewUser(formData, (isSuccess) => {
           if (!isSuccess) {
             setLoading(false);
           } else {
-
             setLoading(false);
-
             setTimeout(()=>{
-              navigation.reset({
-                index: 0,
-                routes: [{ name: "UserManagement" }],
-              });
+              navigation.navigate('UserManagement', { isSuccess: true });
+              // navigation.reset({
+              //   index: 0,
+              //   routes: [{ name: "UserManagement" }],
+              // });
             },1000)
           }
         })
       ); // Dispatch with formData// Dispatch with formData
     } else {
-      let request=formData.securityQuestion=customSecurityQuestion;
+      let request=formData['securityQuestion']=customSecurityQuestion
+
       console.log('request',formData)
       dispatch(
-        addNewUser({formData,...customSecurityQuestion}, (isSuccess, msg) => {
+        addNewUser(formData, (isSuccess, msg) => {
           if (!isSuccess) {
             setLoading(false);
             setErrorMsg(msg?.error);
@@ -136,14 +136,11 @@ const UserManagementEdit = ({ route }) => {
           } else {
             setLoading(false);
             setTimeout(()=>{
-              navigation.reset({
-                index: 0,
-                routes: [{ name: "UserManagement" }],
-              });
+              navigation.navigate('UserManagement', { isSuccess: true });
             },1000)
           }
         })
-      ); // Dispatch with formData
+      ); 
     }
   };
 
@@ -163,7 +160,7 @@ const UserManagementEdit = ({ route }) => {
   useEffect(() => {
     // Reset the form with the updated profile details
     // reset(profileDetails);
-    console.log(profileDetails);
+    //console.log(profileDetails);
   }, [profileDetails, reset]);
 
   useEffect(() => {

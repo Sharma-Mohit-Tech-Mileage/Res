@@ -359,7 +359,6 @@ const unsubscribPaperLess = async () => {
 };
 
 const handleSubmitFeedback = async (obj) => {
-    const accountNumber = user.userInfo?.accountNumber || null;
     const zendeskRequestApiUrl = Env.ZENDESK_FEEDBACK.Url
     let user = await getUser();
     const fullName = user.userInfo?.fullName;
@@ -384,7 +383,7 @@ const handleSubmitFeedback = async (obj) => {
                 body: obj.feedbackText,
                 uploads: null
             },
-            tags: ["Feedback", "Residential", "MobileApp",'pid:_'+accountNumber],
+            tags: ["Feedback", "Residential", "resimobileapp",'pid_'+user.userInfo.accountNumber],
             via: { channel: "MobileApp" }
         }
     };
@@ -439,10 +438,10 @@ const addUserAction = async (data) => {
         }
     };
 
-    console.log('Making API Call to /users/api/users with data:', data.formData); // Log the request data
+    console.log('Making API Call to /users/api/users with data:', data); // Log the request data
 
     try {
-        const response = await _axios.post('/users/api/users', data.formData, config);
+        const response = await _axios.post('/users/api/users', data, config);
         console.log('API Call Successful, Response:', response.data); // Log the successful response
         return response.data;
     } catch (error) {
@@ -496,6 +495,6 @@ const removeUser = async (data) => {
 export { logError,logInfo,fetchUserList, getProfileDetails, 
     fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, 
     fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, 
-    postEmailNotification, postTermsAndConditions, postPushNotifications,
+    postEmailNotification, postTermsAndConditions,postTermsAndConditionsv2, postPushNotifications,
      unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,
       resendEmailVerification,addUserAction,removeUser,editUserAction }

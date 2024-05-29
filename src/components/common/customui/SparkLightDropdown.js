@@ -20,6 +20,7 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style }) => {
                 }}
                 style={styles.dropdown}
                 onValueChange={itemValue => onValueChange(itemValue)}
+        
             >
                 {validItems.map((item, index) => (
                     <Select.Item key={index} label={item} value={item} />
