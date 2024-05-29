@@ -137,7 +137,7 @@ const EmailNotifications = () => {
                           placeholder="Email Address"
                           onBlur={onBlur}
                           onChangeText={onChange}
-                          value={value.toLowerCase()}
+                          value={value ? value.toLowerCase() : ''}
                           error={errors.email?.message}
                         />
                       )}

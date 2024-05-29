@@ -92,7 +92,7 @@ const UserManagement = ({route}) => {
               <Text style={[styles.text, styles.textClr]}>{initials}</Text>
             </View>
             <View>
-              <Text style={[styles.taylorNickum, styles.melissaSmithTypo,{flexWrap:'wrap', marginRight:15}]}>
+              <Text style={[styles.taylorNickum, styles.melissaSmithTypo,{flexWrap:'wrap', marginRight:75}]}>
                 {fullNameCamelCase}
               </Text>
               {isLoggedInUser && (
