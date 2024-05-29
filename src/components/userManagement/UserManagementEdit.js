@@ -24,7 +24,7 @@ import SparkLightInput from "../common/customui/SparkLightInput";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
 import { useDispatch } from "react-redux";
 import { getUserType } from "../utility/constant";
-import { userSchema,userSchemaNoPass } from "../utility/validationSchema";
+import { userSchema, userSchemaNoPass } from "../utility/validationSchema";
 
 import {
   addNewUser,
@@ -76,10 +76,10 @@ const UserManagementEdit = ({ route }) => {
   const [errorMsg, setErrorMsg] = useState("");
   const [profileDetails, setProfileDetails] = useState(user);
   const [loading, setLoading] = useState(false);
-  const [pass,setPass]=useState('')
+  const [pass, setPass] = useState("");
   const scrollViewRef = useRef(null);
   // Handler for when the security question dropdown value changes
-  const handleSecurityQuestionChange = (itemValue,onChange) => {
+  const handleSecurityQuestionChange = (itemValue, onChange) => {
     setProfileDetails({
       ...profileDetails,
       securityQuestion: itemValue === "Add your own question" ? "" : itemValue,
@@ -97,36 +97,40 @@ const UserManagementEdit = ({ route }) => {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver((isnewUser || pass?.target?.value.length>0 )?userSchema(isCustomQuestionSelected):userSchemaNoPass(isCustomQuestionSelected)),
+    resolver: yupResolver(
+      isnewUser || pass?.target?.value.length > 0
+        ? userSchema(isCustomQuestionSelected)
+        : userSchemaNoPass(isCustomQuestionSelected)
+    ),
     defaultValues: profileDetails,
   });
- // console.log('Password',(isnewUser || pass?.target?.value.length>0 ))
+  // console.log('Password',(isnewUser || pass?.target?.value.length>0 ))
   //setValue('newPassword', 'value', { shouldValidate: false })
   const handleSave = (formData) => {
     //console.log('Request',formData)
     setLoading(true);
     if (route.params?.User != undefined) {
-      let request=formData['securityQuestion']=customSecurityQuestion
+      let request = (formData["securityQuestion"] = customSecurityQuestion);
       dispatch(
         editNewUser(formData, (isSuccess) => {
           if (!isSuccess) {
             setLoading(false);
           } else {
             setLoading(false);
-            setTimeout(()=>{
-              navigation.navigate('UserManagement', { isSuccess: true });
+            setTimeout(() => {
+              navigation.navigate("UserManagement", { isSuccess: true });
               // navigation.reset({
               //   index: 0,
               //   routes: [{ name: "UserManagement" }],
               // });
-            },1000)
+            }, 1000);
           }
         })
       ); // Dispatch with formData// Dispatch with formData
     } else {
-      let request=formData['securityQuestion']=customSecurityQuestion
+      let request = (formData["securityQuestion"] = customSecurityQuestion);
 
-      console.log('request',formData)
+      console.log("request", formData);
       dispatch(
         addNewUser(formData, (isSuccess, msg) => {
           if (!isSuccess) {
@@ -135,19 +139,16 @@ const UserManagementEdit = ({ route }) => {
             scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: false });
           } else {
             setLoading(false);
-            setTimeout(()=>{
-              navigation.navigate('UserManagement', { isSuccess: true });
-            },1000)
+            setTimeout(() => {
+              navigation.navigate("UserManagement", { isSuccess: true });
+            }, 1000);
           }
         })
-      ); 
+      );
     }
   };
 
-  const handleOnChangeText = (
-    value,
-    onChange
-  ) => {
+  const handleOnChangeText = (value, onChange) => {
     onChange(value);
     setPass(value);
   };
@@ -213,7 +214,7 @@ const UserManagementEdit = ({ route }) => {
       />
       <ScrollView ref={scrollViewRef}>
         <View style={[styles.userManagementEditInner]}>
-         <NotificationError
+          <NotificationError
             type="error"
             title={"Error"}
             message={errorMsg}
@@ -222,7 +223,7 @@ const UserManagementEdit = ({ route }) => {
             onClose={() => {
               setShowError(false);
             }}
-          /> 
+          />
           {isnewUser && (
             <>
               <Text
@@ -422,20 +423,24 @@ const UserManagementEdit = ({ route }) => {
                     >
                       <Controller
                         control={control}
-                    
                         name="newPassword"
-                        
                         render={({
                           field: { onChange, onBlur, value },
                           fieldState: { error },
                         }) => (
                           <>
                             <SparkLightInput
-                              placeholder= "New Password"
+                              placeholder="New Password"
                               onBlur={onBlur}
-                              label={isnewUser?"New Password":"New Password(Optional)"}
+                              label={
+                                isnewUser
+                                  ? "New Password"
+                                  : "New Password(Optional)"
+                              }
                               //onChangeText={onChange}
-                              onChangeText={(value)=>{handleOnChangeText(value,onChange)}}
+                              onChangeText={(value) => {
+                                handleOnChangeText(value, onChange);
+                              }}
                               value={value}
                               secure={true}
                               error={error?.message}
@@ -498,19 +503,18 @@ const UserManagementEdit = ({ route }) => {
                           Password Reset Question
                         </Text>
                         <Controller
-            name="securityQuestion"
-            control={control}
-            render={({ onChange, value, ref }) => (
-              
-                        <SparkLightDropdown
-                          items={securityQuestions}
-                          selectedValue={customSecurityQuestion}
-                          onValueChange={(value)=>{handleSecurityQuestionChange(value,onChange)}}
-                          
+                          name="securityQuestion"
+                          control={control}
+                          render={({ onChange, value, ref }) => (
+                            <SparkLightDropdown
+                              items={securityQuestions}
+                              selectedValue={customSecurityQuestion}
+                              onValueChange={(value) => {
+                                handleSecurityQuestionChange(value, onChange);
+                              }}
+                            />
+                          )}
                         />
-                      )}
-                      
-                    />
                       </View>
                     </View>
                     {isCustomQuestionSelected && (

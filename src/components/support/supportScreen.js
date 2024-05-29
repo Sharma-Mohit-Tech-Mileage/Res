@@ -15,6 +15,8 @@ import { GetApiRequest } from "../../network/APIClient";
 ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
 const Support = ({ route }) => {
+
+    const [wifiData,setwifiData]=useState([])
     const [ssid, setSsid] = useState("");
     const [password, setPassword] = useState("");
     const navigation = useNavigation();
@@ -50,6 +52,7 @@ const Support = ({ route }) => {
           if(res){
             setPassword(res[0].securityKey)
             setSsid(res[0].ssid)
+            setwifiData(res)
           }
         },(error)=>{
            console.log(error)
@@ -223,7 +226,7 @@ const Support = ({ route }) => {
                                     onPress={() => {
                                         if (item.iconAlignment === 'left') {
                                             if(item.key==='scanQrCode'){
-                                                navigation.navigate(item.navigateTo,{skey:password,ssid:ssid})
+                                                navigation.navigate(item.navigateTo,{skey:password,ssid:ssid,wifiData:wifiData})
                                             }else{
                                             navigation.navigate(item.navigateTo)
                                             }
