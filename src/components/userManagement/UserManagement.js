@@ -122,6 +122,7 @@ const UserManagement = ({route}) => {
               />
             </Pressable>
           )}
+          { getUserType(user.memberType)!='PRIMARY ADMIN' && (
             <Pressable
               style={[styles.rightActionableContainer, styles.rightFlexBox]}
               onPress={() => setCurrentUser(user)}
@@ -132,6 +133,7 @@ const UserManagement = ({route}) => {
                 source={require("../../../assets/right-actionable6.png")}
               />
             </Pressable>
+          )}
           </View>
         </View>
         <View style={styles.frameWrapper}>

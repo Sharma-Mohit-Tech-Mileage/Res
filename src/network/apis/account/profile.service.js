@@ -383,7 +383,7 @@ const handleSubmitFeedback = async (obj) => {
                 body: obj.feedbackText,
                 uploads: null
             },
-            tags: ["Feedback", "Residential", "MobileApp",'pid_'+user.userInfo.accountNumber],
+            tags: ["Feedback", "Residential", "resimobileapp",'pid_'+user.userInfo.accountNumber],
             via: { channel: "MobileApp" }
         }
     };
@@ -438,10 +438,10 @@ const addUserAction = async (data) => {
         }
     };
 
-    console.log('Making API Call to /users/api/users with data:', data.formData); // Log the request data
+    console.log('Making API Call to /users/api/users with data:', data); // Log the request data
 
     try {
-        const response = await _axios.post('/users/api/users', data.formData, config);
+        const response = await _axios.post('/users/api/users', data, config);
         console.log('API Call Successful, Response:', response.data); // Log the successful response
         return response.data;
     } catch (error) {
