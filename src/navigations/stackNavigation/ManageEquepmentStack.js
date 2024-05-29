@@ -6,6 +6,8 @@ import ManageEquipment from "../../components/support/ManageEquipment";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemRebootStack from "./ModemRebootStack";
 import ModemExchangeInstructions from "../../components/support/ModemExchangeInstructions";
+import UpdateModemPassword from "../../components/support/UpdateModemPassword";
+import RetrieveModemPassword from "../../components/support/RetrieveModemPassword";
 import SupportStackScreen from "./SupportStack";
 import ModemConnectivityGuide from "../../components/support/Troubleshooting/ModemConnectivityGuide";
 import PeriodicProblems from "../../components/support/Troubleshooting/PeriodicProblems";
@@ -48,6 +50,25 @@ function ModemStackScreen({route}) {
           blur: () => setTabBarVisible(true),
         }}
       />
+        <ModemStack.Screen
+        name="UpdateModemPassword"
+        component={UpdateModemPassword}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+        <ModemStack.Screen
+        name="RetrieveModemPassword"
+        component={RetrieveModemPassword}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+      
       <ModemStack.Screen
         name="SupportStack"
         component={SupportStackScreen}
