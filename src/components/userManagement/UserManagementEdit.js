@@ -63,6 +63,8 @@ const UserManagementEdit = ({ route }) => {
     isnewUser = false;
   }
 
+  //console.log('NN',(user?.securityQuestion === "Add your own question"))
+
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] =
     useState(false);
@@ -72,7 +74,6 @@ const UserManagementEdit = ({ route }) => {
   const [showError, setShowError] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
-
   const [errorMsg, setErrorMsg] = useState("");
   const [profileDetails, setProfileDetails] = useState(user);
   const [loading, setLoading] = useState(false);
@@ -106,7 +107,11 @@ const UserManagementEdit = ({ route }) => {
     //console.log('Request',formData)
     setLoading(true);
     if (route.params?.User != undefined) {
-      let request=formData['securityQuestion']=customSecurityQuestion
+
+      console.log('Custom',customSecurityQuestion)
+      console.log('CustomF',formData.securityQuestion)
+      console.log('Ise',securityQuestions.includes(customSecurityQuestion))
+      formData['securityQuestion']= isCustomQuestionSelected ? formData.securityQuestion :customSecurityQuestion
       dispatch(
         editNewUser(formData, (isSuccess) => {
           if (!isSuccess) {
@@ -114,17 +119,17 @@ const UserManagementEdit = ({ route }) => {
           } else {
             setLoading(false);
             setTimeout(()=>{
-              navigation.navigate('UserManagement', { isSuccess: true });
-              // navigation.reset({
-              //   index: 0,
-              //   routes: [{ name: "UserManagement" }],
-              // });
+              //navigation.navigate('UserManagement', { isSuccess: true });
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "UserManagement" }],
+              });
             },1000)
           }
         })
       ); // Dispatch with formData// Dispatch with formData
     } else {
-      let request=formData['securityQuestion']=customSecurityQuestion
+      formData['securityQuestion']=customSecurityQuestion
 
       console.log('request',formData)
       dispatch(
@@ -136,7 +141,11 @@ const UserManagementEdit = ({ route }) => {
           } else {
             setLoading(false);
             setTimeout(()=>{
-              navigation.navigate('UserManagement', { isSuccess: true });
+              //navigation.navigate('UserManagement', { isSuccess: true });
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "UserManagement" }],
+              });
             },1000)
           }
         })
@@ -170,13 +179,15 @@ const UserManagementEdit = ({ route }) => {
   }, [errorMsg]);
 
   useEffect(() => {
+
     const storedSecurityQuestion = profileDetails?.securityQuestion;
-    const isCustomQuestion =
-      storedSecurityQuestion &&
-      !securityQuestions.includes(storedSecurityQuestion);
-    setIsCustomQuestionSelected(isCustomQuestion);
-    if (isCustomQuestion) {
+    console.log('custom Question',storedSecurityQuestion)
+    const isCustomQuestion =securityQuestions.includes(storedSecurityQuestion);
+      console.log('iscutom',isCustomQuestion),
+    setIsCustomQuestionSelected(!isCustomQuestion);
+    if (!isCustomQuestion) {
       setCustomSecurityQuestion("Add your own question");
+      
     } else {
       setCustomSecurityQuestion(storedSecurityQuestion);
     }
@@ -497,20 +508,12 @@ const UserManagementEdit = ({ route }) => {
                           {" "}
                           Password Reset Question
                         </Text>
-                        <Controller
-            name="securityQuestion"
-            control={control}
-            render={({ onChange, value, ref }) => (
-              
                         <SparkLightDropdown
                           items={securityQuestions}
                           selectedValue={customSecurityQuestion}
-                          onValueChange={(value)=>{handleSecurityQuestionChange(value,onChange)}}
+                          onValueChange={(value)=>{handleSecurityQuestionChange(value)}}
                           
                         />
-                      )}
-                      
-                    />
                       </View>
                     </View>
                     {isCustomQuestionSelected && (

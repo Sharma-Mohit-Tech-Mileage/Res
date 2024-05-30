@@ -33,10 +33,14 @@ const UserManagement = ({route}) => {
   const [showError, setShowError] = useState(false);
   const acNumber = userData?.userInfo?.accountNumber;
   const [isDeleteUser, setIsDeleteUser] = useState(false);
-  console.log('Back',JSON.stringify(route))
-  if(route?.params?.isSuccess){
-    dispatch(executeUserList(0));
-  }
+  const [isRefresh, setIsRefresh] = useState(false);
+  
+  // useEffect(()=>{
+  //   if(  route?.params?.isSuccess){
+  //     dispatch(executeUserList(0));
+  //     setIsRefresh(true)
+  //   }
+  // },[])
 
   useEffect(() => {
     dispatch(executeUserList(0));
