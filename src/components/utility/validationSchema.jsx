@@ -17,7 +17,7 @@ export const userSchema = (isCustomQuestionSelected) => yup.object({
     
     firstName: yup.string().required('First Name is required'),
     lastName: yup.string().required('Last Name is required'),
-    userName: yup.string().required('User Name is required'),
+    userName: yup.string().required('User Name is required').matches(/^[a-zA-Z ]{2,30}$/,'User Name can not contain any special characters'),
     securityAnswer: yup.string()
         .required('Security answer is required'), 
     newPassword: yup.string()

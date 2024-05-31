@@ -34,7 +34,7 @@ const UserManagement = ({route}) => {
   const acNumber = userData?.userInfo?.accountNumber;
   const [isDeleteUser, setIsDeleteUser] = useState(false);
 
-  console.log('Back',JSON.stringify(route))
+  //console.log('Back',JSON.stringify(route))
   if(route?.params?.isSuccess){
     dispatch(executeUserList(0));
   }

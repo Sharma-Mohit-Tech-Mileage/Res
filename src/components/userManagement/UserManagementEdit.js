@@ -108,9 +108,6 @@ const UserManagementEdit = ({ route }) => {
     setLoading(true);
     if (route.params?.User != undefined) {
 
-      console.log('Custom',customSecurityQuestion)
-      console.log('CustomF',formData.securityQuestion)
-      console.log('Ise',securityQuestions.includes(customSecurityQuestion))
       formData['securityQuestion']= isCustomQuestionSelected ? formData.securityQuestion :customSecurityQuestion
       dispatch(
         editNewUser(formData, (isSuccess) => {
@@ -129,7 +126,7 @@ const UserManagementEdit = ({ route }) => {
         })
       ); // Dispatch with formData// Dispatch with formData
     } else {
-      formData['securityQuestion']=customSecurityQuestion
+      formData['securityQuestion']= isCustomQuestionSelected ? formData.securityQuestion :customSecurityQuestion
 
       console.log('request',formData)
       dispatch(
@@ -180,6 +177,7 @@ const UserManagementEdit = ({ route }) => {
 
   useEffect(() => {
 
+    if(!isnewUser){
     const storedSecurityQuestion = profileDetails?.securityQuestion;
     console.log('custom Question',storedSecurityQuestion)
     const isCustomQuestion =securityQuestions.includes(storedSecurityQuestion);
@@ -191,6 +189,8 @@ const UserManagementEdit = ({ route }) => {
     } else {
       setCustomSecurityQuestion(storedSecurityQuestion);
     }
+  }
+
   }, []);
 
   const LoadingOverlay = () => {
@@ -352,6 +352,9 @@ const UserManagementEdit = ({ route }) => {
                         )}
                       />
                     </View>
+                    <Text style={styles.bulletPoint}>
+                    *User Name can not contain any special characters.
+                        </Text>
                   </View>
                   {!isnewUser && (
                     <View
