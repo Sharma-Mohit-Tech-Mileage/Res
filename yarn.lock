@@ -2447,30 +2447,30 @@
     prompts "^2.4.0"
     semver "^7.5.2"
 
-"@react-native-firebase/analytics@^19.1.2":
-  version "19.1.2"
-  resolved "https://registry.npmjs.org/@react-native-firebase/analytics/-/analytics-19.1.2.tgz"
-  integrity sha512-hIQl/7Rvfp11HMTJcqCGRf9HeYiVypoeP9zmDjN7CQwq54/eIw59FM+0I0WpT29NsMQv+nUkK9YTF18wSmVYOg==
+"@react-native-firebase/analytics@^20.0.0":
+  version "20.0.0"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/analytics/-/analytics-20.0.0.tgz#162ec36b758f664ff56725f6943bdb08150381e7"
+  integrity sha512-FSTr/FwzJOVYpUyd4xFWjeC0hPT9vwtwK4tObzAk4FDwgT6xZ/SrfkMTNh4PJHQX8RltqN5YZ85n8NenG3OGgw==
 
-"@react-native-firebase/app@^19.1.2":
-  version "19.1.2"
-  resolved "https://registry.npmjs.org/@react-native-firebase/app/-/app-19.1.2.tgz"
-  integrity sha512-5PJSbsdl6xvWq+V5/MfmeLWkpf1tcIheP6UYHgIy8p/mfsQRQIzUSDD7MMKdJqSQOrjdu91hWGdDvnRIdk+f1g==
+"@react-native-firebase/app@^20.0.0":
+  version "20.0.0"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/app/-/app-20.0.0.tgz#0aae0fdaaa0db48f6b248fb410e18687e285f2e1"
+  integrity sha512-h9Xgmj0Z0ga1ponhDnQ63yqkX288LOW+ZvstDWHDo2rgPu58nbAmdzs73MTmPjYdgm5Elm71puG1NRJX5n7wRw==
   dependencies:
     opencollective-postinstall "^2.0.3"
     superstruct "^0.6.2"
 
-"@react-native-firebase/crashlytics@^19.1.2":
-  version "19.1.2"
-  resolved "https://registry.npmjs.org/@react-native-firebase/crashlytics/-/crashlytics-19.1.2.tgz"
-  integrity sha512-pS/dc1N7QeMR3rc5tLRTf2zkKwdQclcOoFefqdtF49yeYYkVibkxOSxOvfnEP23iYpF5eSEFKHoN15dfr5YRIQ==
+"@react-native-firebase/crashlytics@^20.0.0":
+  version "20.0.0"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/crashlytics/-/crashlytics-20.0.0.tgz#ced4fe82b6b3d7ae6ad4b4934e3b92357e4f1a8a"
+  integrity sha512-xRh7q/+l3On+w6QJe6KjTxuI7CDwsBYj6tuqakkTPcjiTMu89OuDlAoQyQ+veaRKw3TFMT6HNvS1s6saJm+GIg==
   dependencies:
     stacktrace-js "^2.0.2"
 
-"@react-native-firebase/messaging@^19.1.2":
-  version "19.1.2"
-  resolved "https://registry.npmjs.org/@react-native-firebase/messaging/-/messaging-19.1.2.tgz"
-  integrity sha512-kc/jDzZAUnGPMPDtl7fc8gMB9i5e7psx+ZM3RRw4zO6/46fhzsyFXOd2vpXy53VsKdDPNwd0wg2asedDgS+u/A==
+"@react-native-firebase/messaging@^20.0.0":
+  version "20.0.0"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/messaging/-/messaging-20.0.0.tgz#92d25294361ef7e7341b916a903f8fc0abb53abc"
+  integrity sha512-sBc3SRmUW9+T75YKa374kV4TfAz5EemBc9rXHYlgTI2DQeBhWNQbazAbKEJyyZOJDbs2RgR9f330VWCP7jLTBA==
 
 "@react-native/assets-registry@^0.72.0":
   version "0.72.0"
