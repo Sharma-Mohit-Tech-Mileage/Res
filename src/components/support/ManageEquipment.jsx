@@ -1,21 +1,44 @@
 import * as React from "react";
-import { Image,StyleSheet,Text,TouchableOpacity,View, ActivityIndicator,ScrollView} from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+  ScrollView,
+} from "react-native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import {FontFamily,Padding,Color,FontSize,Border,} from "../../../GlobalStyles";
+import {
+  FontFamily,
+  Padding,
+  Color,
+  FontSize,
+  Border,
+} from "../../../GlobalStyles";
 import MyServicePlan from "../common/MyServicePlan";
 import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
-import {GetApiRequest,GetModemStatusApiRequest} from "../../network/APIClient";
+import {
+  GetApiRequest,
+  GetModemStatusApiRequest,
+} from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
 import colors from "../../res/Colors";
-import {widthPercentageToDP as wp,heightPercentageToDP as hp,} from "react-native-responsive-screen";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import CheckConnection from "../../res/svgIcons/CheckConnection";
 import RefreshIcon from "../../res/svgIcons/RefreshIcon";
 import PubSub from "pubsub-js";
 import WifiIssueIcon from "../../res/svgIcons/WifiIssueIcon";
 import IntermittentIssues from "../../res/svgIcons/IntermittentIssues";
+import PasswordKey  from "../../res/svgIcons/passwordKey";
+import Reload from "../../res/svgIcons/reload";
 import Surfingissue from "../../res/svgIcons/surfingissue";
-const ManageEquipment = ({route}) => {
+import { Icon } from "native-base";
+const ManageEquipment = ({ route }) => {
   const navigation = useNavigation();
   const [manufacturer, setManufacturer] = React.useState("");
   const [model, setModel] = React.useState("");
@@ -26,6 +49,35 @@ const ManageEquipment = ({route}) => {
   const [currentHealth, setCurrentHealth] = React.useState("Optimal");
   const [isOffline, setIsOffline] = React.useState(false);
   const [isContactUs, setIsContactUs] = React.useState(false);
+  const [wifiPasswordCanChange, setwifiPasswordCanChange] = React.useState(false);
+  const [wifiData,setwifiData]=React.useState([])
+
+  React.useEffect(()=>{
+    getModemPassword();
+  },[])
+
+  const getModemPassword = () => {
+    let re = getUser().then((res) => {
+      const request = `internet/api/internet/${res.userInfo.accountNumber}/modem/security/Get`;
+      GetApiRequest(request, onSuccessModemPassword, onErrorModemPassword);
+    });
+  };
+
+  const onSuccessModemPassword = (res) => {
+    console.log("getModemDetails", res);
+    if (res) {
+        console.log("sccess ")
+        console.log({res})
+       const list = res.map((value) => value.ssid)
+       setwifiPasswordCanChange(true)
+
+    }
+  };
+  const onErrorModemPassword = (error) => {
+    console.log("error", error);
+    setwifiPasswordCanChange(false)
+  };
+
 
   const getLeasedDetails = () => {
     let re = getUser().then((res) => {
@@ -117,9 +169,8 @@ const ManageEquipment = ({route}) => {
         ) {
           setCurrentHealth("Offline");
           setIsContactUs(true);
-        }else {
+        } else {
           setCurrentHealth("Offline");
-          
         }
       }
     );
@@ -165,24 +216,37 @@ const ManageEquipment = ({route}) => {
     getModemDetails();
     getLeasedDetails();
     getInternetPlanDetails();
+    getWifiPassword();
   }, []);
 
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
   }, [currentHealth]);
 
+  const getWifiPassword=()=>{
+    let accountNumber='902878578'
+    const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
+    GetApiRequest(request,(res)=>{
+       console.log(res)
+      if(res){
+        setwifiData(res)
+      }
+    },(error)=>{
+       console.log(error)
+    })
+}
+
   return (
     <View style={styles.manageEquipment}>
       <ProfileSettingsHeader
         title="Manage Equipment "
         onPressBack={() => {
-          if(route.params?.isFromTroubleshooting){
+          if (route.params?.isFromTroubleshooting) {
             navigation.goBack();
-          }else{
-          navigation.navigate("SupportStack")
+          } else {
+            navigation.navigate("SupportStack");
           }
-        }
-        }
+        }}
       />
       <ScrollView automaticallyAdjustContentInsets={false}>
         <View style={styles.myModemParent}>
@@ -205,9 +269,7 @@ const ManageEquipment = ({route}) => {
                       <Text style={[styles.motorola, styles.myModem1Typo]}>
                         {manufacturer}
                       </Text>
-                      <Text style={styles.mb8600Docsis}>
-                        {model}
-                      </Text>
+                      <Text style={styles.mb8600Docsis}>{model}</Text>
 
                       {!loadingHealth ? (
                         <View style={styles.poorHealthParent}>
@@ -242,13 +304,13 @@ const ManageEquipment = ({route}) => {
                           style={{ width: 40 }}
                         />
                       )}
-                      {leased.length>0 && (
-                      <View style={[styles.badge, styles.parentBorder]}>
-                        <Text style={[styles.text, styles.textTypo1]}>
-                          {leased.toLocaleUpperCase()}
-                        </Text>
-                      </View>
-                         )}
+                      {leased.length > 0 && (
+                        <View style={[styles.badge, styles.parentBorder]}>
+                          <Text style={[styles.text, styles.textTypo1]}>
+                            {leased.toLocaleUpperCase()}
+                          </Text>
+                        </View>
+                      )}
                     </View>
                   </View>
                 </View>
@@ -262,37 +324,57 @@ const ManageEquipment = ({route}) => {
                   ]}
                 >
                   <View style={[styles.notifications, styles.parentBorder1]}>
-
-          <View style={{ backgroundColor: isOffline
-                                ? colors.sparklight_red
-                                : currentHealth === "Offline"
-                                ? colors.sparklight_red
-                                : colors.sparklight_yellow , width: 4 }} />
+                    <View
+                      style={{
+                        backgroundColor: isOffline
+                          ? colors.sparklight_red
+                          : currentHealth === "Offline"
+                          ? colors.sparklight_red
+                          : colors.sparklight_yellow,
+                        width: 4,
+                      }}
+                    />
                     <View style={styles.bannerWarning}>
                       <View style={styles.rightActionableParent}>
-                        
                         <View style={styles.creditCardWillExpireSoonParent}>
-                          <View style={{flexDirection:'row'}}>
-                          <Image
-                          style={{ alignSelf: "center", width: 24, height: 24 }}
-                          resizeMode="cover"
-                          tintColor={isOffline
-                            ? colors.sparklight_red
-                            : currentHealth === "Optimal"
-                            ? colors.sparklight_green
-                            : currentHealth === "Offline"
-                            ? colors.sparklight_red
-                            : colors.sparklight_yellow}
-                          source={require("../../../assets/infocircle.png")}
-                        />
-                          <Text style={[styles.creditCardWill,{marginLeft:5,color:(currentHealth === "Poor")? '#000': Color.sparkLightRed }]}>
-                            {isOffline
-                              ? "Modem is Offline"
-                              : isContactUs
-                              ? "Please try again later"
-                              : "An issue has been detected"}
-                          </Text>
-                            </View>
+                          <View style={{ flexDirection: "row" }}>
+                            <Image
+                              style={{
+                                alignSelf: "center",
+                                width: 24,
+                                height: 24,
+                              }}
+                              resizeMode="cover"
+                              tintColor={
+                                isOffline
+                                  ? colors.sparklight_red
+                                  : currentHealth === "Optimal"
+                                  ? colors.sparklight_green
+                                  : currentHealth === "Offline"
+                                  ? colors.sparklight_red
+                                  : colors.sparklight_yellow
+                              }
+                              source={require("../../../assets/infocircle.png")}
+                            />
+                            <Text
+                              style={[
+                                styles.creditCardWill,
+                                {
+                                  marginLeft: 5,
+                                  color:
+                                    currentHealth === "Poor"
+                                      ? "#000"
+                                      : Color.sparkLightRed,
+                                },
+                              ]}
+                            >
+                              {isOffline
+                                ? "Modem is Offline"
+                                : isContactUs
+                                ? "Please try again later"
+                                : "An issue has been detected"}
+                            </Text>
+                          </View>
                           <Text
                             style={[
                               styles.yourSavedCard,
@@ -306,8 +388,6 @@ const ManageEquipment = ({route}) => {
                         </View>
                       </View>
                     </View>
-
-
                   </View>
                 </View>
               )}
@@ -441,9 +521,14 @@ const ManageEquipment = ({route}) => {
                   tintColor={Color.sparklightBrightPurple}
                   source={require("../../../assets/phone-outgoing-04.png")}
                 />
-                <Text style={styles.modemHealthSupport} accessible={true}
+                <Text
+                  style={styles.modemHealthSupport}
+                  accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel="Contact us for more information">Contact Us</Text>
+                  accessibilityLabel="Contact us for more information"
+                >
+                  Contact Us
+                </Text>
                 <Image
                   resizeMode="stretch"
                   source={require("../../../assets/chevronright.png")}
@@ -451,6 +536,78 @@ const ManageEquipment = ({route}) => {
               </TouchableOpacity>
             </View>
           </View>
+
+          {/*Wifi Passoword*/}
+          <View
+            style={[
+              styles.myModem,
+              styles.myModemSpaceBlock,
+              { marginTop: 20 },
+            ]}
+          > 
+             <View
+              style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
+            >
+              <Text style={[styles.myModem1, styles.myModem1Typo]}>
+                WiFi Passoword
+              </Text>
+            </View> 
+            <View
+              style={[
+                styles.supportAccordionParent,
+                styles.supportParentFlexBox,
+              ]}
+            >
+              <View style={[styles.frameLayout]} />
+
+              <TouchableOpacity
+                style={[styles.frame9defaultSpaceBlock]}
+                onPress={() => {
+                  navigation.navigate("UpdateModemPassword");
+                }}
+              >
+                <PasswordKey />
+                <Text style={styles.modemHealthSupport}>Update Password</Text>
+                <Image
+                  resizeMode="stretch"
+                  source={require("../../../assets/chevronright.png")}
+                />
+              </TouchableOpacity>
+
+              <View style={[styles.frameLayout]} />
+              <TouchableOpacity
+                style={[styles.frame9defaultSpaceBlock]}
+                onPress={() => {
+                  navigation.navigate("RetrieveModemPassword");
+                }}
+              >
+              <PasswordKey />
+                <Text style={styles.modemHealthSupport}>Retrieve Password</Text>
+                <Image
+                  resizeMode="stretch"
+                  source={require("../../../assets/chevronright.png")}
+                />
+              </TouchableOpacity>
+
+              <View style={[styles.frameLayout]} />
+              <TouchableOpacity
+                style={[styles.frame9defaultSpaceBlock]}
+                onPress={() => {
+                  navigation.navigate('ShareWifiScreen',{wifiData:wifiData})
+                }}
+              >
+                <PasswordKey />
+                <Text style={styles.modemHealthSupport}>
+                  Share Password
+                </Text>
+                <Image
+                  resizeMode="stretch"
+                  source={require("../../../assets/chevronright.png")}
+                />
+              </TouchableOpacity>
+            </View> 
+            </View> 
+            
 
           {/* Quick Link section */}
 
@@ -515,8 +672,10 @@ const ManageEquipment = ({route}) => {
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
-                  if(!loadingHealth){
-                  navigation.navigate("PeriodicProblems",{isError:(currentHealth !='Optimal' || isOffline)});
+                  if (!loadingHealth) {
+                    navigation.navigate("PeriodicProblems", {
+                      isError: currentHealth != "Optimal" || isOffline,
+                    });
                   }
                 }}
               >
@@ -571,7 +730,6 @@ const styles = StyleSheet.create({
   parentBorder1: {
     borderWidth: 1,
     borderStyle: "solid",
-    
   },
   textTypo1: {
     fontSize: FontSize.textXsSemibold_size,
@@ -684,7 +842,7 @@ const styles = StyleSheet.create({
     color: Color.sparkLightRed,
     fontSize: FontSize.textXsSemibold_size,
     textAlign: "left",
-    alignSelf:'center'
+    alignSelf: "center",
   },
   yourSavedCard: {
     color: Color.colorGray_100,
@@ -706,7 +864,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightWhite,
     alignSelf: "stretch",
     flex: 1,
-    padding:5
+    padding: 5,
   },
   notifications: {
     flexDirection: "row",
@@ -762,6 +920,41 @@ const styles = StyleSheet.create({
     alignContent: "center",
     alignItems: "center",
     justifyContent: "center",
+  },
+});
+
+const wifiStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#f5f5f5",
+    alignItems: "center",
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    width: "100%",
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "#f0f0f0",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  buttonText: {
+    fontSize: 16,
   },
 });
 

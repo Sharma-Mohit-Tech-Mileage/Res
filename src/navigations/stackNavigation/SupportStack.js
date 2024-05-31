@@ -12,6 +12,7 @@ import TroubleShootStack from "./TroubleShootStack";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemStackScreen from "./ManageEquepmentStack";
 import ModemConnectivityGuide from '../../components/support/Troubleshooting/ModemConnectivityGuide';
+import ShareWifiScreen from "../../components/support/ShareWifiScreen";
 const SupportStack = createNativeStackNavigator();
 
 function SupportStackScreen({route}) {
@@ -103,6 +104,16 @@ function SupportStackScreen({route}) {
         }}
         name="ModemConnectivityGuide"
         component={ModemConnectivityGuide}
+      />
+
+      <SupportStack.Screen
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+        name="ShareWifiScreen"
+        component={ShareWifiScreen}
       />
     </SupportStack.Navigator>
   );

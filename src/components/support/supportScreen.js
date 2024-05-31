@@ -10,6 +10,7 @@ import PubSub from 'pubsub-js'
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
+import { GetApiRequest } from "../../network/APIClient";
 
 ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
@@ -38,6 +39,8 @@ const Support = ({ route }) => {
         }, 1000)
 
     };
+
+    
 
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -100,7 +103,7 @@ const Support = ({ route }) => {
             icon: require("../../../assets/chevronright.png"),
             iconAlignment: 'right', // Icon to the right of the text
             navigateTo: 'ArticalWindowUtility',
-            url: 'https://support.sparklight.com/hc/en-us'
+            url: 'https://support.sparklight.com/hc/en-us'            
         }
     ];
 
