@@ -176,7 +176,7 @@ const UpdateModemPassword = () => {
             items={passwordList}
             selectedValue={slectedPasword}
             onValueChange={handlePasswordSelection}
-            dropDownStyle={{ fontSize: FontSize.size_sm }}
+            dropDownStyle={{ color: Color.sparklightDarkGray }}
           />
         </View>
 
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
   titleText: {
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
-    fontSize: FontSize.size_base,
+    fontSize: FontSize.size_3xl,
   },
   inputContainer: {
     borderWidth: 1,

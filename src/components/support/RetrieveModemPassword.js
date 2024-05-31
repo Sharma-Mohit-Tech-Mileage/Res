@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+
 import {
   View,
   Text,
@@ -25,6 +26,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { GetApiRequest } from "../../network/APIClient";
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import SparkLightInput from "../common/customui/SparkLightInput";
+import PlugIcon from "../../res/svgIcons/plug";
 const RetrieveModemPassword = () => {
 
   const navigation = useNavigation();
@@ -90,7 +92,7 @@ const RetrieveModemPassword = () => {
               items={passwordList}
               selectedValue={slectedPasword}
               onValueChange={handlePasswordSelection}
-              dropDownStyle={{ fontSize: FontSize.size_sm }}
+              dropDownStyle={{ color: Color.sparklightDarkGray }}
             />
           </View>
 
@@ -127,8 +129,8 @@ const RetrieveModemPassword = () => {
           }}
           style={styles.connectAndroidView}>
           <View style={styles.connectAndroidTextView}>
-            <Image style={styles.lockIcon} source={require('../../../assets/password_lock.png')} />
-            <Text style={[styles.connectTitleText]}>Connect Android Device</Text>
+            <PlugIcon />
+            <Text style={[styles.connectTitleText]}> Connect Android Device</Text>
           </View>
           <Image style={styles.lockIcon} source={require('../../../assets/chevronright.png')} />
         </TouchableOpacity>
@@ -139,8 +141,8 @@ const RetrieveModemPassword = () => {
           }}
           style={styles.connectAndroidView}>
           <View style={styles.connectAndroidTextView}>
-            <Image style={styles.lockIcon} source={require('../../../assets/password_lock.png')} />
-            <Text style={[styles.connectTitleText]}>Connect iphone Device</Text>
+          <PlugIcon />
+            <Text style={[styles.connectTitleText]}> Connect iphone Device</Text>
           </View>
           <Image style={styles.lockIcon} source={require('../../../assets/chevronright.png')} />
         </TouchableOpacity>
@@ -151,8 +153,8 @@ const RetrieveModemPassword = () => {
           }}
           style={styles.connectAndroidView}>
           <View style={styles.connectAndroidTextView}>
-            <Image style={styles.lockIcon} source={require('../../../assets/password_lock.png')} />
-            <Text style={[styles.connectTitleText]}>Connect PC/MAC</Text>
+          <PlugIcon />
+            <Text style={[styles.connectTitleText]}> Connect PC/MAC</Text>
           </View>
           <Image style={styles.lockIcon} source={require('../../../assets/chevronright.png')} />
         </TouchableOpacity>
@@ -188,18 +190,18 @@ const styles = StyleSheet.create({
   titleText: {
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
-    fontSize: FontSize.size_base,
+    fontSize: FontSize.size_3xl,
   },
   connectTitleText: {
     fontFamily: FontFamily.openSansRegular,
-    color: Color.sparklightGray1,
-    fontSize: FontSize.size_sm,
+    color: Color.colorGray_200,
+    fontSize: FontSize.size_base,
     flex: 1
   },
   howText: {
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
-    fontSize: FontSize.size_base,
+    fontSize: FontSize.size_3xl,
     marginTop: 30,
     paddingHorizontal: Padding.p_5xl,
   },
