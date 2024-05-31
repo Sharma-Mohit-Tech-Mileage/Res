@@ -10,18 +10,36 @@ import colors from "../../res/Colors";
 import { Select, Box, CheckIcon } from "native-base";
 
 const ShareWifiScreen = ({ route }) => {
-  console.log("route", JSON.stringify(route));
 
   const [ssid, setSsid] = useState('');
   const [password, setPassword] = useState('');
   const [encryption, setEncryption] = useState("WPA");
   const [wifiDetails, setWifiDetails] = useState(route?.params?.wifiData);
-  const [selectedItem, setSelectedItem] = useState("");
+  const [selectedItem, setSelectedItem] = useState(-1);
   const qrCodeRef = useRef();
   const navigation = useNavigation();
 
-
+useEffect(()=>{
+  if(route?.params?.wifiData.length>0){
+    setPassword(route?.params?.wifiData[0].securityKey)
+    setSsid(route?.params?.wifiData[0].ssid)
+  }
+},[])
   
+
+useEffect(()=>{
+  if(selectedItem!=-1){
+    console.log('select',selectedItem)
+    const wifi = route?.params?.wifiData.find(el => el.id==selectedItem);
+    console.log('selected',wifi)
+ //const reduced = found?.[raceId];
+    setPassword(wifi.securityKey)
+    setSsid(wifi.ssid)
+  }
+},[selectedItem])
+
+//setPassword(itemValue.securityKey)
+                //setSsid(itemValue.ssid)
   
 
   const generateWifiQRCode = () => {
@@ -70,10 +88,10 @@ const ShareWifiScreen = ({ route }) => {
                 endIcon: <CheckIcon size="5" />,
               }}
               style={styles.dropdown}
-              onValueChange={(itemValue) => {
+              
+              onValueChange={(itemValue) => {  
                 setSelectedItem(itemValue)
-                setPassword(itemValue.securityKey)
-                setSsid(itemValue.ssid)
+                
               }
               
               }
@@ -83,7 +101,7 @@ const ShareWifiScreen = ({ route }) => {
                 <Select.Item
                   key={index}
                   label={item.ssid}
-                  value={item}
+                  value={item.id}
                 />
               ))}
             </Select>
@@ -94,7 +112,7 @@ const ShareWifiScreen = ({ route }) => {
         </View>
         <Text style={{ fontSize: 14 , marginTop:40}}>Scan this QR code to connect My Network</Text>
       </View>
-      <View style={{ marginTop: 20, width: "75%" }}>
+      <View style={{ marginTop: 20, width: "90%" }}>
         <TouchableOpacity
           style={styles.BtnContainer}
           onPress={() => {
@@ -139,7 +157,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   qrContainer: {
-    marginTop: 80,
+    marginTop: 20,
     padding: 20,
     width:'90%',
     backgroundColor: Color.sparklightWhite,

@@ -15,10 +15,6 @@ import { GetApiRequest } from "../../network/APIClient";
 ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
 const Support = ({ route }) => {
-
-    const [wifiData,setwifiData]=useState([])
-    const [ssid, setSsid] = useState("");
-    const [password, setPassword] = useState("");
     const navigation = useNavigation();
     const [showModal, setShowModal] = useState(false);
     const [department, setDepartment] = useState('');
@@ -44,23 +40,9 @@ const Support = ({ route }) => {
 
     };
 
-    const getWifiPassword=()=>{
-        let accountNumber='902878578'
-        const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
-        GetApiRequest(request,(res)=>{
-           console.log(res)
-          if(res){
-            setPassword(res[0].securityKey)
-            setSsid(res[0].ssid)
-            setwifiData(res)
-          }
-        },(error)=>{
-           console.log(error)
-        })
-    }
+    
 
     React.useEffect(() => {
-        getWifiPassword();
         const unsubscribe = navigation.addListener('focus', () => {
             setTimeout(() => {
                 if (!route.params?.isContactUs) {
@@ -121,17 +103,7 @@ const Support = ({ route }) => {
             icon: require("../../../assets/chevronright.png"),
             iconAlignment: 'right', // Icon to the right of the text
             navigateTo: 'ArticalWindowUtility',
-            url: 'https://support.sparklight.com/hc/en-us'
-
-            
-        },
-        {
-            key: 'scanQrCode',
-            text: 'Share Wifi Password',
-            icon: require("../../../assets/chevronright.png"),
-            iconAlignment: 'left', // Icon to the right of the text
-            navigateTo: 'ShareWifiScreen',
-            url: 'https://support.sparklight.com/hc/en-us'
+            url: 'https://support.sparklight.com/hc/en-us'            
         }
     ];
 
@@ -225,11 +197,7 @@ const Support = ({ route }) => {
                                 <Pressable key={index} style={[styles.search, styles.navigationBorder]}
                                     onPress={() => {
                                         if (item.iconAlignment === 'left') {
-                                            if(item.key==='scanQrCode'){
-                                                navigation.navigate(item.navigateTo,{skey:password,ssid:ssid,wifiData:wifiData})
-                                            }else{
                                             navigation.navigate(item.navigateTo)
-                                            }
                                         } else {
                                             navigation.navigate(item.navigateTo, { url: item.url, name: item.text })
                                         }

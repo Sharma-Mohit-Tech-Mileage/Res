@@ -50,7 +50,8 @@ const ManageEquipment = ({ route }) => {
   const [isOffline, setIsOffline] = React.useState(false);
   const [isContactUs, setIsContactUs] = React.useState(false);
   const [wifiPasswordCanChange, setwifiPasswordCanChange] = React.useState(false);
-  
+  const [wifiData,setwifiData]=React.useState([])
+
   React.useEffect(()=>{
     getModemPassword();
   },[])
@@ -215,11 +216,25 @@ const ManageEquipment = ({ route }) => {
     getModemDetails();
     getLeasedDetails();
     getInternetPlanDetails();
+    getWifiPassword();
   }, []);
 
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
   }, [currentHealth]);
+
+  const getWifiPassword=()=>{
+    let accountNumber='902878578'
+    const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
+    GetApiRequest(request,(res)=>{
+       console.log(res)
+      if(res){
+        setwifiData(res)
+      }
+    },(error)=>{
+       console.log(error)
+    })
+}
 
   return (
     <View style={styles.manageEquipment}>
@@ -578,6 +593,7 @@ const ManageEquipment = ({ route }) => {
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
+                  navigation.navigate('ShareWifiScreen',{wifiData:wifiData})
                 }}
               >
                 <PasswordKey />
