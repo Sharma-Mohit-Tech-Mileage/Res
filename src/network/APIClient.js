@@ -71,6 +71,30 @@ fetch(`${BASE_URL}/${endpoint}`, {
     });
 
 }
+export const PutApiRequest=async(endpoint,body, onSuccess,onError)=>{
+// Example POST request
+const user= await getUser()
+const requestOptions = {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' , 'Authorization': `Bearer ${user.token}` },
+    body: JSON.stringify(body)
+};
+fetch(`${BASE_URL}${endpoint}`, requestOptions)
+    .then(response => Promise.all([response, response.json()]))
+    .then(([response, json]) => {
+        // console.log('response', response);
+        if (!response.ok || !response.status === 201) { // We should get a 201 (Created) status code if everything is fine/working
+            throw Error(`Respsonse status ${response.status} (${response.statusText}): ${json.message}`);
+        }
+        onSuccess(json)
+        // console.log(json);
+        // Whatever you want to do next after the POST request - maybe dispatch something?
+    })
+    .catch(exception => {
+        onError(exception.message)
+    });
+
+}
 
 export const GetApiRequest= async(endpoint, onSuccess,onError)=>{
  const user= await getUser()

@@ -34,10 +34,12 @@ import RefreshIcon from "../../res/svgIcons/RefreshIcon";
 import PubSub from "pubsub-js";
 import WifiIssueIcon from "../../res/svgIcons/WifiIssueIcon";
 import IntermittentIssues from "../../res/svgIcons/IntermittentIssues";
-import PasswordKey  from "../../res/svgIcons/passwordKey";
-import Reload from "../../res/svgIcons/reload";
+import PasswordKey from "../../res/svgIcons/passwordKey";
 import Surfingissue from "../../res/svgIcons/surfingissue";
+import PasswordRetrieve from "../../res/svgIcons/PasswordRetrieve";
+import PasswordShare from "../../res/svgIcons/PasswordShare";
 import { Icon } from "native-base";
+
 const ManageEquipment = ({ route }) => {
   const navigation = useNavigation();
   const [manufacturer, setManufacturer] = React.useState("");
@@ -51,10 +53,9 @@ const ManageEquipment = ({ route }) => {
   const [isContactUs, setIsContactUs] = React.useState(false);
   const [wifiPasswordCanChange, setwifiPasswordCanChange] = React.useState(false);
   const [wifiData,setwifiData]=React.useState([])
-
   React.useEffect(()=>{
     getModemPassword();
-  },[])
+  }, [])
 
   const getModemPassword = () => {
     let re = getUser().then((res) => {
@@ -66,11 +67,9 @@ const ManageEquipment = ({ route }) => {
   const onSuccessModemPassword = (res) => {
     console.log("getModemDetails", res);
     if (res) {
-        console.log("sccess ")
-        console.log({res})
-       const list = res.map((value) => value.ssid)
-       setwifiPasswordCanChange(true)
-
+      if (res.length == 0) setwifiPasswordCanChange(false)
+      else setwifiPasswordCanChange(true)
+      const list = res.map((value) => value.ssid)
     }
   };
   const onErrorModemPassword = (error) => {
@@ -277,10 +276,10 @@ const ManageEquipment = ({ route }) => {
                             {isOffline
                               ? "Offline"
                               : currentHealth === "Poor"
-                              ? "Issue Detected"
-                              : currentHealth == "Offline"
-                              ? "Issue Detected"
-                              : "Optimal Health"}
+                                ? "Issue Detected"
+                                : currentHealth == "Offline"
+                                  ? "Issue Detected"
+                                  : "Optimal Health"}
                           </Text>
                           <Image
                             style={styles.frameChild}
@@ -288,10 +287,10 @@ const ManageEquipment = ({ route }) => {
                               isOffline
                                 ? colors.sparklight_red
                                 : currentHealth === "Optimal"
-                                ? colors.sparklight_green
-                                : currentHealth === "Offline"
-                                ? colors.sparklight_red
-                                : colors.sparklight_yellow
+                                  ? colors.sparklight_green
+                                  : currentHealth === "Offline"
+                                    ? colors.sparklight_red
+                                    : colors.sparklight_yellow
                             }
                             resizeMode="cover"
                             source={require("../../../assets/Ellipse.png")}
@@ -329,8 +328,8 @@ const ManageEquipment = ({ route }) => {
                         backgroundColor: isOffline
                           ? colors.sparklight_red
                           : currentHealth === "Offline"
-                          ? colors.sparklight_red
-                          : colors.sparklight_yellow,
+                            ? colors.sparklight_red
+                            : colors.sparklight_yellow,
                         width: 4,
                       }}
                     />
@@ -349,10 +348,10 @@ const ManageEquipment = ({ route }) => {
                                 isOffline
                                   ? colors.sparklight_red
                                   : currentHealth === "Optimal"
-                                  ? colors.sparklight_green
-                                  : currentHealth === "Offline"
-                                  ? colors.sparklight_red
-                                  : colors.sparklight_yellow
+                                    ? colors.sparklight_green
+                                    : currentHealth === "Offline"
+                                      ? colors.sparklight_red
+                                      : colors.sparklight_yellow
                               }
                               source={require("../../../assets/infocircle.png")}
                             />
@@ -371,8 +370,8 @@ const ManageEquipment = ({ route }) => {
                               {isOffline
                                 ? "Modem is Offline"
                                 : isContactUs
-                                ? "Please try again later"
-                                : "An issue has been detected"}
+                                  ? "Please try again later"
+                                  : "An issue has been detected"}
                             </Text>
                           </View>
                           <Text
@@ -408,8 +407,8 @@ const ManageEquipment = ({ route }) => {
                       : currentHealth === "Offline" ||
                         isOffline ||
                         currentHealth === "Poor"
-                      ? "#EF4E3E10"
-                      : "white",
+                        ? "#EF4E3E10"
+                        : "white",
                   },
                 ]}
                 onPress={() => {
@@ -435,8 +434,8 @@ const ManageEquipment = ({ route }) => {
                         ? "white"
                         : currentHealth === "Offline" ||
                           currentHealth === "Poor"
-                        ? "#EF4E3E10"
-                        : "white",
+                          ? "#EF4E3E10"
+                          : "white",
                     },
                   ]}
                   onPress={() => {
@@ -473,8 +472,8 @@ const ManageEquipment = ({ route }) => {
                     backgroundColor: isContactUs
                       ? "white"
                       : currentHealth === "Offline"
-                      ? "#EF4E3E10"
-                      : "white",
+                        ? "#EF4E3E10"
+                        : "white",
                   },
                 ]}
                 onPress={() => {
@@ -538,20 +537,20 @@ const ManageEquipment = ({ route }) => {
           </View>
 
           {/*Wifi Passoword*/}
-          <View
+          {wifiPasswordCanChange && <View
             style={[
               styles.myModem,
               styles.myModemSpaceBlock,
               { marginTop: 20 },
             ]}
-          > 
-             <View
+          >
+            <View
               style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
             >
               <Text style={[styles.myModem1, styles.myModem1Typo]}>
                 WiFi Passoword
               </Text>
-            </View> 
+            </View>
             <View
               style={[
                 styles.supportAccordionParent,
@@ -581,7 +580,7 @@ const ManageEquipment = ({ route }) => {
                   navigation.navigate("RetrieveModemPassword");
                 }}
               >
-              <PasswordKey />
+                <PasswordRetrieve />
                 <Text style={styles.modemHealthSupport}>Retrieve Password</Text>
                 <Image
                   resizeMode="stretch"
@@ -596,7 +595,7 @@ const ManageEquipment = ({ route }) => {
                   navigation.navigate('ShareWifiScreen',{wifiData:wifiData})
                 }}
               >
-                <PasswordKey />
+                <PasswordShare />
                 <Text style={styles.modemHealthSupport}>
                   Share Password
                 </Text>
@@ -605,9 +604,9 @@ const ManageEquipment = ({ route }) => {
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
-            </View> 
-            </View> 
-            
+            </View>
+          </View>}
+
 
           {/* Quick Link section */}
 
