@@ -69,7 +69,6 @@ const UpdateModemPassword = () => {
   };
 
   const _onSuccess = (res) => {
-    console.log();
     if (res) {
       setShowValidationSuccessAlert(true)
     }
@@ -87,30 +86,12 @@ const UpdateModemPassword = () => {
     }
   };
   const onError = (error) => {
+    setShowValidationAlert(true)
     console.log("error", error);
   };
   const handlePasswordSelection = (value) => {
     setSelectedPassword(value)
   }
-
-
-  const handleUpdatePassword = () => {
-    if (newPassword?.target?.value !== confirmPassword?.target?.value) {
-      setShowValidationAlert(true)
-      // Alert.alert("Error", "Passwords do not match");
-      return;
-    }
-    // Handle the password update logic here
-    updateModemPassword()
-  };
-
-  const handleSave = (formData) => {
-    dispatch(updateProfileSecurity(formData, navigation)); // Dispatch with formData
-  };
-
-  const handleValidationError = () => {
-    setShowValidationAlert(true);
-  };
 
   const { control, handleSubmit, setValue, reset, formState: { errors }, getValues } = useForm({
     // resolver: yupResolver(passwordSchema()),
@@ -155,7 +136,7 @@ const UpdateModemPassword = () => {
         <NotificationAlert
           type="error"
           title="Error"
-          message="Your confirm password is not same."
+          message="There was an error, please try again later"
           showCloseIcon={true}
           isVisible={showValidationAlert}
           onClose={() => setShowValidationAlert(false)}
