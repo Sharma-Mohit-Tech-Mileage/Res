@@ -1,46 +1,85 @@
-import React, { useRef, useState,useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useRef, useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+  SafeAreaView,
+  Pressable,
+  Image,
+  StatusBar,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import QRCode from "react-native-qrcode-svg";
 import Share from "react-native-share";
 import { captureRef } from "react-native-view-shot";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { Color, FontFamily, FontSize, Padding } from "../../../GlobalStyles";
+import SparkLightDropdown from "../common/customui/SparkLightDropdown";
+import {
+  Color,
+  FontFamily,
+  FontSize,
+  Padding,
+  Border,
+} from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import { Select, Box, CheckIcon } from "native-base";
+import LinearGradient from "react-native-linear-gradient";
 
 const ShareWifiScreen = ({ route }) => {
-
-  const [ssid, setSsid] = useState('');
-  const [password, setPassword] = useState('');
+  const [ssid, setSsid] = useState("");
+  const [password, setPassword] = useState("");
   const [encryption, setEncryption] = useState("WPA");
   const [wifiDetails, setWifiDetails] = useState(route?.params?.wifiData);
-  const [selectedItem, setSelectedItem] = useState(-1);
+  const [iconPressed, setIconPressed] = useState(false);
+  const [slectedPasword, setSelectedPassword] = useState("")
+  const [passwordList, setPasswordList] = useState([]);
+  const [modemPasswordData, setModemPasswordData] = useState([])
+  const [selectedItem, setSelectedItem] = useState(null)
   const qrCodeRef = useRef();
   const navigation = useNavigation();
 
-useEffect(()=>{
-  if(route?.params?.wifiData.length>0){
-    setPassword(route?.params?.wifiData[0].securityKey)
-    setSsid(route?.params?.wifiData[0].ssid)
-  }
-},[])
-  
+  const closeModal = () => {
+    setModalVisible(false);
+    onClose();
+  };
 
-useEffect(()=>{
-  if(selectedItem!=-1){
-    console.log('select',selectedItem)
-    const wifi = route?.params?.wifiData.find(el => el.id==selectedItem);
-    console.log('selected',wifi)
- //const reduced = found?.[raceId];
-    setPassword(wifi.securityKey)
-    setSsid(wifi.ssid)
-  }
-},[selectedItem])
 
-//setPassword(itemValue.securityKey)
-                //setSsid(itemValue.ssid)
-  
+  useEffect(() => {
+    modemPasswordData?.map((item) => {
+      if (item.ssid == slectedPasword) {
+        setSelectedItem(item)
+      }
+    })
+  }, [slectedPasword])
+
+
+  useEffect(() => {
+    if (wifiDetails) {
+      setModemPasswordData(wifiDetails)
+      const list = wifiDetails.map((value) => value.ssid)
+      setPasswordList(list);
+      setSelectedPassword(list[0])
+    }
+  }, []);
+
+  // useEffect(() => {
+  //   if (selectedItem != -1) {
+  //     const wifi = route?.params?.wifiData.find((el) => el.ssid == selectedItem);
+  //     console.log("selected", wifi);
+  //     setItem(wifi)
+  //     setPassword(wifi.securityKey);
+  //     setSsid(wifi.ssid);
+  //   }
+  // }, [selectedItem]);
+
+  //setPassword(itemValue.securityKey)
+  //setSsid(itemValue.ssid)
+
+  const handlePasswordSelection = (value) => {
+    setSelectedPassword(value)
+  }
 
   const generateWifiQRCode = () => {
     return `WIFI:T:${encryption};S:${ssid};P:${password};;`;
@@ -66,78 +105,97 @@ useEffect(()=>{
   };
 
   return (
-    <View style={styles.container}>
-      <ProfileSettingsHeader
-        title="Share Wifi Password"
-        onPressBack={() => {
-          navigation.goBack();
-        }}
-      />
-      <View  style={styles.qrContainer}>
-        <View style={styles.textinput}>
-          <Text style={{ fontSize: 16 }}>SSID</Text>
-          <Box style={[styles.container1]}>
-            <Select
-              selectedValue={selectedItem}
-              minWidth="200"
-              accessibilityLabel="Choose wifi"
-              placeholder="Select an option"
-              maxFontSizeMultiplier={1.25}
-              _selectedItem={{
-                bg: Color.Gray300,
-                endIcon: <CheckIcon size="5" />,
-              }}
-              style={styles.dropdown}
-              
-              onValueChange={(itemValue) => {  
-                setSelectedItem(itemValue)
-                
-              }
-              
-              }
-              
-            >
-              {wifiDetails.map((item, index) => (
-                <Select.Item
-                  key={index}
-                  label={item.ssid}
-                  value={item.id}
-                />
-              ))}
-            </Select>
-          </Box>
-        </View>
-        <View  ref={qrCodeRef} style={{marginTop:40, justifyContent:'center', alignItems:'center'}}>
-        <QRCode value={generateWifiQRCode()} size={200}  />
-        </View>
-        <Text style={{ fontSize: 14 , marginTop:40}}>Scan this QR code to connect My Network</Text>
-      </View>
-      <View style={{ marginTop: 20, width: "90%" }}>
-        <TouchableOpacity
-          style={styles.BtnContainer}
-          onPress={() => {
-            if(selectedItem!=''){
-            shareQRCode();
-            }
-          }}
-        >
-          <Text style={styles.Btn}>Share Wifi Password</Text>
-        </TouchableOpacity>
-      </View>
+    <>
+      <LinearGradient
+        style={[styles.profileSettingsChild]}
+        locations={[0, 1]}
+        colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+        useAngle={true}
+        angle={90}
+      ></LinearGradient>
 
-      <View style={{ marginTop: 20 }}>
-        <TouchableOpacity
-          style={[styles.BtnContainer, { backgroundColor: "#00000000" }]}
-          onPress={() => {
-            navigation.goBack();
-          }}
+      <View style={styles.container}>
+        <StatusBar
+          barStyle="light-content"
+          translucent={true}
+          backgroundColor="transparent"
+        />
+        <LinearGradient
+          style={[styles.profileSettingsChild, { paddingTop: 40 }]}
+          locations={[0, 1]}
+          colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+          useAngle={true}
+          angle={90}
         >
-          <Text style={[styles.Btn, { color: colors.sparklight_purple_blue }]}>
-            Cancel
+          <View style={[styles.navBar]}>
+            <Pressable
+              style={[styles.navIcon, styles.chevronLayout]}
+              onPress={() => {
+                navigation.goBack();
+              }}
+              accessibilityLabel="Back"
+              accessibilityHint="Go back to the previous screen"
+              accessibilityRole="button"
+              accessible={true}
+              hitSlop={20}
+            >
+              <Image
+                style={[styles.icon, iconPressed ? styles.iconPressed : null]}
+                resizeMode="cover"
+                source={require("../../../assets/xclose.png")}
+                accessible={false}
+              />
+            </Pressable>
+            <Text style={styles.title}>Share Wifi Password</Text>
+            <Pressable
+              style={[styles.navIcon, styles.chevronLayout]}
+              onPress={() => {
+                shareQRCode();
+              }}
+              accessibilityLabel="Share"
+              accessibilityHint="Share your WiFi Password"
+              accessibilityRole="button"
+              accessible={true}
+              hitSlop={20}
+              onPressIn={() => setIconPressed(true)}
+              onPressOut={() => setIconPressed(false)}
+            >
+              <Image
+                style={[styles.icon, iconPressed ? styles.iconPressed : null]}
+                resizeMode="cover"
+                source={require("../../../assets/share.png")}
+                accessible={false}
+              />
+            </Pressable>
+          </View>
+        </LinearGradient>
+
+        <View style={styles.qrContainer}>
+          <View style={styles.textinput}>
+            <Text style={{ fontSize: 16 }}>SSID</Text>
+            <SparkLightDropdown
+            items={passwordList}
+            selectedValue={slectedPasword}
+            onValueChange={handlePasswordSelection}
+            dropDownStyle={{ color: Color.sparklightDarkGray }}
+          />
+          </View>
+          <View
+            ref={qrCodeRef}
+            style={{
+              marginTop: 40,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <QRCode value={generateWifiQRCode()} size={200} />
+          </View>
+          <Text style={{ fontSize: 14, marginTop: 40 }}>
+            Scan this QR code to connect "{slectedPasword}" Network
           </Text>
-        </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </>
   );
 };
 
@@ -159,7 +217,7 @@ const styles = StyleSheet.create({
   qrContainer: {
     marginTop: 20,
     padding: 20,
-    width:'90%',
+    width: "90%",
     backgroundColor: Color.sparklightWhite,
     alignItems: "center",
   },
@@ -200,6 +258,85 @@ const styles = StyleSheet.create({
     padding: Padding.p_base,
     borderBottomWidth: 1,
     borderColor: "#ccc",
+  },
+  closeButton: {
+    alignSelf: "flex-end",
+    color: "white",
+    fontSize: 16,
+    backgroundColor: Color.colorMidnightblue,
+  },
+  closeBtn: {
+    textAlign: "center",
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.openSansRegular,
+  },
+  buttons: {
+    marginLeft: 10,
+    backgroundColor: Color.colorMidnightblue,
+  },
+  buttonsLayout: {
+    paddingHorizontal: Padding.p_base,
+    height: 32,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: Border.br_11xs,
+  },
+  text1Clr: {
+    color: Color.colorWhitesmoke_200,
+    textAlign: "center",
+  },
+  pdf: {
+    flex: 1,
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
+  },
+  profileSettingsChild: {
+    overflow: "hidden",
+    width: "100%",
+    zIndex: 1,
+  },
+  navBar: {
+    height: 56,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center", // Center items in navBar
+    paddingHorizontal: 8, // Added for spacing
+  },
+  title: {
+    flex: 1,
+    fontSize: FontSize.size_lg,
+    textAlign: "center",
+    fontWeight: "600",
+    color: Color.sparklightWhite,
+    fontFamily: FontFamily.openSansSemiBold,
+    padding: 8,
+  },
+  chevronLeft: {
+    position: "absolute",
+    left: 18,
+  },
+  chevronRight: {
+    position: "absolute",
+    right: 18,
+  },
+  chevronLayout: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: 24,
+    width: 24,
+    zIndex: 1,
+  },
+  chevronLeftLayout: {
+    height: 24,
+    width: 24,
+  },
+  icon: {
+    height: 24,
+    width: 24,
+  },
+  iconPressed: {
+    // Style for icon when pressed
+    opacity: 0.5, // Change opacity on press
   },
 });
 

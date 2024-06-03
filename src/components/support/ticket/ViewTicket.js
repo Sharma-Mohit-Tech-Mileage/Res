@@ -1,9 +1,9 @@
 import * as React from "react";
 import { Image, StyleSheet, Text, ScrollView, View } from "react-native";
-import { Padding, Border, FontSize, Color, FontFamily } from "../../../GlobalStyles";
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import { Padding, Border, FontSize, Color, FontFamily } from "../../../../GlobalStyles";
+import ProfileSettingsHeader from '../../common/ProfileSettingsHeader';
 import { useNavigation } from "@react-navigation/native";
-const TicketView = () => {
+const ViewTicket = () => {
     const navigation = useNavigation();
     return (
         <View style={styles.ticketSupport}>
@@ -31,11 +31,7 @@ const TicketView = () => {
                                             <View style={styles.rightActionableParent}>
                                                 <View style={[
                                                     styles.icon
-                                                ]}><Image
-
-                                                        resizeMode="cover"
-                                                        source={require("../../../assets/user-02.png")}
-                                                    /></View>
+                                                ]}></View>
                                                 
                                                 <Text style={[styles.agentResponse, styles.pmTypo]}>
                                                     Agent Response
@@ -315,4 +311,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default TicketView;
+export default ViewTicket;
