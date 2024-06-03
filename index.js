@@ -5,7 +5,6 @@ import App from './App.js';
 import messaging from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
 import { name as appName } from './app.json';
-import CreateTicket from './src/components/support/ticket/CreateTicket.js';
 
 // Store processed message IDs to prevent duplicates
 const processedMessages = new Set();

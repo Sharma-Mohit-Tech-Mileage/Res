@@ -15,6 +15,7 @@ import QRCode from "react-native-qrcode-svg";
 import Share from "react-native-share";
 import { captureRef } from "react-native-view-shot";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import SparkLightDropdown from "../common/customui/SparkLightDropdown";
 import {
   Color,
   FontFamily,
@@ -31,8 +32,11 @@ const ShareWifiScreen = ({ route }) => {
   const [password, setPassword] = useState("");
   const [encryption, setEncryption] = useState("WPA");
   const [wifiDetails, setWifiDetails] = useState(route?.params?.wifiData);
-  const [selectedItem, setSelectedItem] = useState(-1);
   const [iconPressed, setIconPressed] = useState(false);
+  const [slectedPasword, setSelectedPassword] = useState("")
+  const [passwordList, setPasswordList] = useState([]);
+  const [modemPasswordData, setModemPasswordData] = useState([])
+  const [selectedItem, setSelectedItem] = useState(null)
   const qrCodeRef = useRef();
   const navigation = useNavigation();
 
@@ -41,26 +45,41 @@ const ShareWifiScreen = ({ route }) => {
     onClose();
   };
 
+
   useEffect(() => {
-    if (route?.params?.wifiData.length > 0) {
-      setPassword(route?.params?.wifiData[0].securityKey);
-      setSsid(route?.params?.wifiData[0].ssid);
+    modemPasswordData?.map((item) => {
+      if (item.ssid == slectedPasword) {
+        setSelectedItem(item)
+      }
+    })
+  }, [slectedPasword])
+
+
+  useEffect(() => {
+    if (wifiDetails) {
+      setModemPasswordData(wifiDetails)
+      const list = wifiDetails.map((value) => value.ssid)
+      setPasswordList(list);
+      setSelectedPassword(list[0])
     }
   }, []);
 
-  useEffect(() => {
-    if (selectedItem != -1) {
-      console.log("select", selectedItem);
-      const wifi = route?.params?.wifiData.find((el) => el.id == selectedItem);
-      console.log("selected", wifi);
-      //const reduced = found?.[raceId];
-      setPassword(wifi.securityKey);
-      setSsid(wifi.ssid);
-    }
-  }, [selectedItem]);
+  // useEffect(() => {
+  //   if (selectedItem != -1) {
+  //     const wifi = route?.params?.wifiData.find((el) => el.ssid == selectedItem);
+  //     console.log("selected", wifi);
+  //     setItem(wifi)
+  //     setPassword(wifi.securityKey);
+  //     setSsid(wifi.ssid);
+  //   }
+  // }, [selectedItem]);
 
   //setPassword(itemValue.securityKey)
   //setSsid(itemValue.ssid)
+
+  const handlePasswordSelection = (value) => {
+    setSelectedPassword(value)
+  }
 
   const generateWifiQRCode = () => {
     return `WIFI:T:${encryption};S:${ssid};P:${password};;`;
@@ -154,27 +173,12 @@ const ShareWifiScreen = ({ route }) => {
         <View style={styles.qrContainer}>
           <View style={styles.textinput}>
             <Text style={{ fontSize: 16 }}>SSID</Text>
-            <Box style={[styles.container1]}>
-              <Select
-                selectedValue={selectedItem}
-                minWidth="200"
-                accessibilityLabel="Choose wifi"
-                placeholder="Select an option"
-                maxFontSizeMultiplier={1.25}
-                _selectedItem={{
-                  bg: Color.Gray300,
-                  endIcon: <CheckIcon size="5" />,
-                }}
-                style={styles.dropdown}
-                onValueChange={(itemValue) => {
-                  setSelectedItem(itemValue);
-                }}
-              >
-                {wifiDetails.map((item, index) => (
-                  <Select.Item key={index} label={item.ssid} value={item.id} />
-                ))}
-              </Select>
-            </Box>
+            <SparkLightDropdown
+            items={passwordList}
+            selectedValue={slectedPasword}
+            onValueChange={handlePasswordSelection}
+            dropDownStyle={{ color: Color.sparklightDarkGray }}
+          />
           </View>
           <View
             ref={qrCodeRef}
@@ -187,7 +191,7 @@ const ShareWifiScreen = ({ route }) => {
             <QRCode value={generateWifiQRCode()} size={200} />
           </View>
           <Text style={{ fontSize: 14, marginTop: 40 }}>
-            Scan this QR code to connect My Network
+            Scan this QR code to connect "{slectedPasword}" Network
           </Text>
         </View>
       </View>

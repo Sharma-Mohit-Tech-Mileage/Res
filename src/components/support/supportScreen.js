@@ -11,6 +11,7 @@ import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
 import { GetApiRequest } from "../../network/APIClient";
+import CreateTicket from "./ticket/CreateTicket";
 
 ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
@@ -332,6 +333,45 @@ const Support = ({ route }) => {
                                 Contact Us
                             </Text>
                         </View>
+
+
+                        <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
+                            <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
+                                <View style={[styles.content, styles.contentSpaceBlock]}>
+
+                                    <Pressable style={styles.headingAndIcon4} onPress={()=>{
+                                            navigation.navigate('CreateTicket')
+                                    }}>
+                                        <View style={[styles.icon]}>
+                                            <Image
+                                                style={styles.supportIcon}
+                                                resizeMode="stretch"
+                                                source={require("../../../assets/tool-02.png")}
+                                            />
+                                        </View>
+                                        <View style={styles.frameParent}>
+                                            <View style={styles.headingAndToggle}>
+                                                <Text style={[styles.headingTypo]}>
+                                                    Ticket Support
+                                                </Text>
+                                            </View>
+                                            <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
+                                                Need help? Submit a support ticket and we'll respond within 48 hours.
+                                            </Text>
+                                            
+                                        </View>
+                                    </Pressable>
+                                </View>
+                            </View>
+                        </View>
+
+
+
+
+
+
+
+
                         <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
                             <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                 <View style={[styles.content, styles.contentSpaceBlock]}>
