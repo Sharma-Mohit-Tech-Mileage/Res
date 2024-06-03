@@ -4,7 +4,7 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import supportScreen from "../../components/support/supportScreen";
 import Search from "../../components/support/Search";
-import CreateTicket from "../../components/support/CreateTicket";
+import CreateTicket from "../../components/support/ticket/CreateTicket";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import TicketSupport from "../../components/support/TicketSupport";
 import TicketView from "../../components/support/TicketView";

@@ -2,9 +2,9 @@ import * as React from "react";
 import { Image, StyleSheet, Text, ScrollView, View } from "react-native";
 import { Padding, Border, FontSize, Color, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { useNavigation } from "@react-navigation/native";
+//import { useNavigation } from "@react-navigation/native";
 const TicketView = () => {
-    const navigation = useNavigation();
+    //const navigation = useNavigation();
     return (
         <View style={styles.ticketSupport}>
             <ProfileSettingsHeader

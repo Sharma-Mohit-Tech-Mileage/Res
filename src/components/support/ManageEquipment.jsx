@@ -70,6 +70,7 @@ const ManageEquipment = ({ route }) => {
       if (res.length == 0) setwifiPasswordCanChange(false)
       else setwifiPasswordCanChange(true)
       const list = res.map((value) => value.ssid)
+      setwifiData(res)
     }
   };
   const onErrorModemPassword = (error) => {
@@ -215,25 +216,13 @@ const ManageEquipment = ({ route }) => {
     getModemDetails();
     getLeasedDetails();
     getInternetPlanDetails();
-    getWifiPassword();
   }, []);
 
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
   }, [currentHealth]);
 
-  const getWifiPassword=()=>{
-    let accountNumber='902878578'
-    const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
-    GetApiRequest(request,(res)=>{
-       console.log(res)
-      if(res){
-        setwifiData(res)
-      }
-    },(error)=>{
-       console.log(error)
-    })
-}
+  
 
   return (
     <View style={styles.manageEquipment}>
@@ -420,6 +409,7 @@ const ManageEquipment = ({ route }) => {
                 <CheckConnection />
                 <Text style={styles.modemHealthSupport}>Check connection</Text>
                 <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
                   resizeMode="stretch"
                   source={require("../../../assets/chevronright.png")}
                 />
@@ -458,6 +448,7 @@ const ManageEquipment = ({ route }) => {
                   <RefreshIcon />
                   <Text style={styles.modemHealthSupport}>Reboot Modem</Text>
                   <Image
+                    style={{ width: 20, height: 20, flexShrink: 0 }}
                     resizeMode="stretch"
                     source={require("../../../assets/chevronright.png")}
                   />
@@ -487,6 +478,7 @@ const ManageEquipment = ({ route }) => {
                 />
                 <Text style={styles.modemHealthSupport}>Exchange Modem</Text>
                 <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
                   resizeMode="stretch"
                   source={require("../../../assets/chevronright.png")}
                 />
@@ -529,6 +521,7 @@ const ManageEquipment = ({ route }) => {
                   Contact Us
                 </Text>
                 <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
                   resizeMode="stretch"
                   source={require("../../../assets/chevronright.png")}
                 />
@@ -568,6 +561,7 @@ const ManageEquipment = ({ route }) => {
                 <PasswordKey />
                 <Text style={styles.modemHealthSupport}>Update Password</Text>
                 <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
                   resizeMode="stretch"
                   source={require("../../../assets/chevronright.png")}
                 />
@@ -583,6 +577,7 @@ const ManageEquipment = ({ route }) => {
                 <PasswordRetrieve />
                 <Text style={styles.modemHealthSupport}>Retrieve Password</Text>
                 <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
                   resizeMode="stretch"
                   source={require("../../../assets/chevronright.png")}
                 />
@@ -600,6 +595,7 @@ const ManageEquipment = ({ route }) => {
                   Share Password
                 </Text>
                 <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
                   resizeMode="stretch"
                   source={require("../../../assets/chevronright.png")}
                 />
@@ -644,6 +640,7 @@ const ManageEquipment = ({ route }) => {
                 <WifiIssueIcon />
                 <Text style={styles.modemHealthSupport}>Wifi Issues</Text>
                 <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
                   resizeMode="stretch"
                   source={require("../../../assets/chevronright.png")}
                 />
@@ -662,6 +659,7 @@ const ManageEquipment = ({ route }) => {
                 <Surfingissue />
                 <Text style={styles.modemHealthSupport}>Surfing Issues</Text>
                 <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
                   resizeMode="stretch"
                   source={require("../../../assets/chevronright.png")}
                 />
@@ -683,6 +681,7 @@ const ManageEquipment = ({ route }) => {
                   Intermittent Issues
                 </Text>
                 <Image
+                  style={{ width: 20, height: 20, flexShrink: 0 }}
                   resizeMode="stretch"
                   source={require("../../../assets/chevronright.png")}
                 />

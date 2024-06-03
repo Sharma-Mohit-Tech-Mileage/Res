@@ -1,28 +1,31 @@
 import * as React from "react";
 import {
-    Image, StyleSheet, TextInput, Text, View, TouchableWithoutFeedback,
-    Keyboard,
+    Image, StyleSheet, TextInput, Text, View, 
+    Keyboard,ScrollView
 } from "react-native";
-import { Padding, FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import SparkLightDropdown from '../../components/common/customui/SparkLightDropdown'
-import PrimaryButtom from '../common/customui/PrimaryButton'
-import { useNavigation } from "@react-navigation/native";
-import { ScrollView } from "react-native-gesture-handler";
+import { Padding, FontFamily, FontSize, Color, Border } from  "../../../../GlobalStyles";
+import ProfileSettingsHeader from '../../common/ProfileSettingsHeader';
+import SparkLightDropdown from '../../../components/common/customui/SparkLightDropdown'
+import PrimaryButtom from '../../common/customui/PrimaryButton'
+//import { useNavigation } from "@react-navigation/native";
 
-const CreateTicket = () => {
-    const navigation = useNavigation();
+
+const CreateTicket = ({navigation}) => {
+    //const navigation = useNavigation();
     const items = ["Item 1", "Item 2", "Item 3"];
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View >
 
             <View style={styles.ticketSupportNone}>
                 <ProfileSettingsHeader
                     title="Create Ticket"
                     onPressBack={() => navigation.navigate('support')}
                 />
+
                 <ScrollView>
-                    <View style={styles.frameParent}>
+                 <View style={styles.innerContainer}>
+
+                 <View style={styles.frameParent}>
                         <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
                             <View style={styles.ticketsParent}>
                                 <Text style={styles.tickets}>Tickets Details</Text>
@@ -30,7 +33,7 @@ const CreateTicket = () => {
                             <View style={styles.frameWrapper}>
                                 <View style={styles.textView}>
                                     <Text style={styles.text} >Describe Issue</Text>
-                                    <SparkLightDropdown items={items} />
+                                    
                                 </View>
                             </View>
                             <View style={styles.frameWrapper}>
@@ -55,30 +58,40 @@ const CreateTicket = () => {
                         <View >
                             <PrimaryButtom
                                 title="Submit"
-                                onPress={() => navigation.navigate("TicketView")}
+                                //onPress={() => navigation.navigate("TicketView")}
                                 buttonType="submit"
                             />
                         </View>
                         <View >
                             <PrimaryButtom
                                 title="Cancel"
-                                onPress={() => navigation.navigate("TicketSupport")}
+                                //onPress={() => navigation.navigate("TicketSupport")}
                                 buttonType="cancel"
                             />
                         </View>
                     </View>
+ 
+
+                 </View>
+
                 </ScrollView>
+                
             </View>
-        </TouchableWithoutFeedback>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     ticketSupportNone: {
         backgroundColor: Color.colorWhitesmoke_200,
-        width: '100%',
-        flex: 1,
-        overflow: "hidden",
+        
+    },innerContainer :{
+        flexDirection:'column',
+        marginVertical:Padding.p_5xl,
+        backgroundColor:'white',
+        width:'90%',
+        alignSelf:'center'
+        
     },
     frameGroupSpaceBlock: {
         paddingTop: Padding.p_13xl,
@@ -86,7 +99,6 @@ const styles = StyleSheet.create({
     frameParent: {
         paddingHorizontal: Padding.p_base,
         paddingVertical: Padding.p_5xl,
-        marginBottom:200
     },
     frameGroup: {
         //flex: 1,
