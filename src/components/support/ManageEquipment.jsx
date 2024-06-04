@@ -39,6 +39,7 @@ import Surfingissue from "../../res/svgIcons/surfingissue";
 import PasswordRetrieve from "../../res/svgIcons/PasswordRetrieve";
 import PasswordShare from "../../res/svgIcons/PasswordShare";
 import { Icon } from "native-base";
+import Loader from "../utility/Loader";
 
 const ManageEquipment = ({ route }) => {
   const navigation = useNavigation();
@@ -51,13 +52,15 @@ const ManageEquipment = ({ route }) => {
   const [currentHealth, setCurrentHealth] = React.useState("Optimal");
   const [isOffline, setIsOffline] = React.useState(false);
   const [isContactUs, setIsContactUs] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [wifiPasswordCanChange, setwifiPasswordCanChange] = React.useState(false);
-  const [wifiData,setwifiData]=React.useState([])
-  React.useEffect(()=>{
+  const [wifiData, setwifiData] = React.useState([])
+  React.useEffect(() => {
     getModemPassword();
   }, [])
 
   const getModemPassword = () => {
+    setLoading(true)
     let re = getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/modem/security/Get`;
       GetApiRequest(request, onSuccessModemPassword, onErrorModemPassword);
@@ -65,15 +68,16 @@ const ManageEquipment = ({ route }) => {
   };
 
   const onSuccessModemPassword = (res) => {
+    setLoading(false)
     console.log("getModemDetails", res);
     if (res) {
       if (res.length == 0) setwifiPasswordCanChange(false)
       else setwifiPasswordCanChange(true)
       const list = res.map((value) => value.ssid)
-      setwifiData(res)
     }
   };
   const onErrorModemPassword = (error) => {
+    setLoading(false)
     console.log("error", error);
     setwifiPasswordCanChange(false)
   };
@@ -216,13 +220,25 @@ const ManageEquipment = ({ route }) => {
     getModemDetails();
     getLeasedDetails();
     getInternetPlanDetails();
+    getWifiPassword();
   }, []);
 
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
   }, [currentHealth]);
 
-  
+  const getWifiPassword = () => {
+    let accountNumber = '902878578'
+    const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
+    GetApiRequest(request, (res) => {
+      console.log(res)
+      if (res) {
+        setwifiData(res)
+      }
+    }, (error) => {
+      console.log(error)
+    })
+  }
 
   return (
     <View style={styles.manageEquipment}>
@@ -409,8 +425,7 @@ const ManageEquipment = ({ route }) => {
                 <CheckConnection />
                 <Text style={styles.modemHealthSupport}>Check connection</Text>
                 <Image
-                  style={{ width: 20, height: 20, flexShrink: 0 }}
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -448,8 +463,7 @@ const ManageEquipment = ({ route }) => {
                   <RefreshIcon />
                   <Text style={styles.modemHealthSupport}>Reboot Modem</Text>
                   <Image
-                    style={{ width: 20, height: 20, flexShrink: 0 }}
-                    resizeMode="stretch"
+                    style={styles.rightIconStyle}
                     source={require("../../../assets/chevronright.png")}
                   />
                 </TouchableOpacity>
@@ -478,8 +492,7 @@ const ManageEquipment = ({ route }) => {
                 />
                 <Text style={styles.modemHealthSupport}>Exchange Modem</Text>
                 <Image
-                  style={{ width: 20, height: 20, flexShrink: 0 }}
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -521,8 +534,7 @@ const ManageEquipment = ({ route }) => {
                   Contact Us
                 </Text>
                 <Image
-                  style={{ width: 20, height: 20, flexShrink: 0 }}
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -561,8 +573,7 @@ const ManageEquipment = ({ route }) => {
                 <PasswordKey />
                 <Text style={styles.modemHealthSupport}>Update Password</Text>
                 <Image
-                  style={{ width: 20, height: 20, flexShrink: 0 }}
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -577,8 +588,7 @@ const ManageEquipment = ({ route }) => {
                 <PasswordRetrieve />
                 <Text style={styles.modemHealthSupport}>Retrieve Password</Text>
                 <Image
-                  style={{ width: 20, height: 20, flexShrink: 0 }}
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -587,7 +597,7 @@ const ManageEquipment = ({ route }) => {
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
-                  navigation.navigate('ShareWifiScreen',{wifiData:wifiData})
+                  navigation.navigate('ShareWifiScreen', { wifiData: wifiData })
                 }}
               >
                 <PasswordShare />
@@ -595,8 +605,7 @@ const ManageEquipment = ({ route }) => {
                   Share Password
                 </Text>
                 <Image
-                  style={{ width: 20, height: 20, flexShrink: 0 }}
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -640,8 +649,7 @@ const ManageEquipment = ({ route }) => {
                 <WifiIssueIcon />
                 <Text style={styles.modemHealthSupport}>Wifi Issues</Text>
                 <Image
-                  style={{ width: 20, height: 20, flexShrink: 0 }}
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -659,8 +667,7 @@ const ManageEquipment = ({ route }) => {
                 <Surfingissue />
                 <Text style={styles.modemHealthSupport}>Surfing Issues</Text>
                 <Image
-                  style={{ width: 20, height: 20, flexShrink: 0 }}
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -681,8 +688,7 @@ const ManageEquipment = ({ route }) => {
                   Intermittent Issues
                 </Text>
                 <Image
-                  style={{ width: 20, height: 20, flexShrink: 0 }}
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -694,6 +700,7 @@ const ManageEquipment = ({ route }) => {
           </View>
         </View>
       </ScrollView>
+      {loading ? <Loader /> : null}
     </View>
   );
 };
@@ -919,41 +926,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-});
-
-const wifiStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#f5f5f5",
-    alignItems: "center",
-  },
-  card: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    width: "100%",
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: "#f0f0f0",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  buttonText: {
-    fontSize: 16,
-  },
+  rightIconStyle: {
+    width: 20,
+    height: 20,
+    resizeMode: "contain"
+  }
 });
 
 export default ManageEquipment;

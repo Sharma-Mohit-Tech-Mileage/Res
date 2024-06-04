@@ -30,6 +30,9 @@ import { FlatList } from "native-base";
 import { color } from "native-base/lib/typescript/theme/styled-system";
 import { updatePasswordSchema, passwordSchema } from '../utility/validationSchema'; // Update the path as necessary
 import NotificationAlert from "../common/customui/NotificationAlert";
+import Loader from "../utility/Loader";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+
 
 
 const UpdateModemPassword = () => {
@@ -48,6 +51,8 @@ const UpdateModemPassword = () => {
   const [showError, setShowError] = useState(false)
   const [newPasswordLength, setNewPasswordLength] = useState(0)
   const [confirmPasswordLength, setConfirmPasswordLength] = useState(0)
+  const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
     getModemPassword();
@@ -62,6 +67,7 @@ const UpdateModemPassword = () => {
   }, [slectedPasword])
 
   const getModemPassword = () => {
+    setLoading(true)
     let re = getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/modem/security/Get`;
       GetApiRequest(request, onSuccess, onError);
@@ -69,11 +75,13 @@ const UpdateModemPassword = () => {
   };
 
   const _onSuccess = (res) => {
+    setLoading(false)
     if (res) {
       setShowValidationSuccessAlert(true)
     }
   }
   const onSuccess = (res) => {
+    setLoading(false)
     console.log("updateModemPassword", res);
     if (res) {
       console.log("sccess ")
@@ -86,9 +94,14 @@ const UpdateModemPassword = () => {
     }
   };
   const onError = (error) => {
-    setShowValidationAlert(true)
-    console.log("error", error);
+    setLoading(false)
   };
+
+  const _onError = () => {
+    setLoading(false)
+    setShowValidationAlert(true)
+  };
+
   const handlePasswordSelection = (value) => {
     setSelectedPassword(value)
   }
@@ -113,6 +126,7 @@ const UpdateModemPassword = () => {
     else updateModemPassword()
   };
   const updateModemPassword = () => {
+    setLoading(true)
     let body = {
       id: selectedItem?.id,
       ssid: slectedPasword,
@@ -122,7 +136,7 @@ const UpdateModemPassword = () => {
     let re = getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/modem/security/Put`;
       console.log(`request`, request);
-      PutApiRequest(request, body, _onSuccess, onError);
+      PutApiRequest(request, body, _onSuccess, _onError);
     });
   };
 
@@ -150,90 +164,96 @@ const UpdateModemPassword = () => {
           onClose={() => setShowValidationSuccessAlert(false)}
         />
       </View>
-      <View style={styles.viewBackgroundContainer}>
-        <Text style={styles.titleText}>SSID</Text>
-        <View style={{}}>
-          <SparkLightDropdown
-            items={passwordList}
-            selectedValue={slectedPasword}
-            onValueChange={handlePasswordSelection}
-            dropDownStyle={{ color: Color.sparklightDarkGray }}
-          />
-        </View>
+      <KeyboardAwareScrollView>
 
-        <View style={{ marginTop: 15 }}>
-          <Text style={[styles.titleText, { marginBottom: 5 }]}>New Password</Text>
-          <Controller
-            control={control}
-            name="newPassword"
-            rules={{
-              required: {
-                value: true,
-                message: 'Field is required!'
-              }
-            }}
-            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-              <SparkLightInput
-                onBlur={onBlur}
-                onChangeText={(text) => {
-                  if (text.length > 0) setNewPasswordLength(text.length);
-                  else setNewPasswordLength(0);
-                  // setNewPassword(text)
-                  onChange(text)
-                }}
-                placeholder="New Password"
-                // value={newPassword}
-                value={value}
-                showTextIcon
-              // error={error?.message}
-              />
-            )}
 
-          />
+        <View style={styles.viewBackgroundContainer}>
+          <Text style={styles.titleText}>SSID</Text>
+          <View style={{}}>
+            <SparkLightDropdown
+              items={passwordList}
+              selectedValue={slectedPasword}
+              onValueChange={handlePasswordSelection}
+              dropDownStyle={{ color: Color.sparklightDarkGray }}
+            />
+          </View>
+
+          <View style={{ marginTop: 15 }}>
+            <Text style={[styles.titleText, { marginBottom: 5 }]}>New Password</Text>
+            <Controller
+              control={control}
+              name="newPassword"
+              rules={{
+                required: {
+                  value: true,
+                  message: 'Field is required!'
+                }
+              }}
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <SparkLightInput
+                  onBlur={onBlur}
+                  onChangeText={(text) => {
+                    if (text.length > 0) setNewPasswordLength(text.length);
+                    else setNewPasswordLength(0);
+                    // setNewPassword(text)
+                    onChange(text)
+                  }}
+                  placeholder="New Password"
+                  // value={newPassword}
+                  value={value}
+                  showTextIcon
+                // error={error?.message}
+                />
+              )}
+
+            />
+          </View>
+          <View style={{ marginTop: 15 }}>
+            <Text style={[styles.titleText, { marginBottom: 5 }]}>Confirm New Password</Text>
+            <Controller
+              control={control}
+              name="confirmPassword"
+              rules={{ // Move your rules outside of the render prop
+                // required: {
+                //   value: true,
+                //   message: 'Field is required!'
+                // },
+                validate: value => value === getValues('newPassword') || 'Password do not match'
+              }}
+              render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                <SparkLightInput
+                  onBlur={onBlur}
+                  onChangeText={(text) => {
+                    if (text.length > 0) setConfirmPasswordLength(text.length);
+                    else setConfirmPasswordLength(0);
+                    onChange(text)
+                  }}
+                  placeholder="Confirm New Password"
+                  value={value}
+                  showTextIcon
+                // error={error?.message}
+                />
+              )}
+            />
+            {showError ? <Text style={styles.errorText}>{`Password do not match`}</Text> : null}
+          </View>
         </View>
-        <View style={{ marginTop: 15 }}>
-          <Text style={[styles.titleText, { marginBottom: 5 }]}>Confirm New Password</Text>
-          <Controller
-            control={control}
-            name="confirmPassword"
-            rules={{ // Move your rules outside of the render prop
-              // required: {
-              //   value: true,
-              //   message: 'Field is required!'
-              // },
-              validate: value => value === getValues('newPassword') || 'Password do not match'
-            }}
-            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-              <SparkLightInput
-                onBlur={onBlur}
-                onChangeText={(text) => {
-                  if (text.length > 0) setConfirmPasswordLength(text.length);
-                  else setConfirmPasswordLength(0);
-                  onChange(text)
-                }}
-                placeholder="Confirm New Password"
-                value={value}
-                showTextIcon
-              // error={error?.message}
-              />
-            )}
-          />
-          {showError ? <Text style={styles.errorText}>{`Password do not match`}</Text> : null}
+        <View style={styles.buttonContainer}>
+          <Pressable
+            accessible={true}
+            disabled={loading}
+            accessibilityRole="button"
+            accessibilityLabel="Update Modem Password"
+            style={[styles.button, styles.buttonsLayout]}
+            onPress={handleSubmit(onSubmit)}
+          >
+            <Text style={[styles.accept]}>
+              Update Modem Password
+            </Text>
+          </Pressable>
         </View>
-      </View>
-      <View style={styles.buttonContainer}>
-        <Pressable
-          accessible={true}
-          accessibilityRole="button"
-          accessibilityLabel="Update Modem Password"
-          style={[styles.button, styles.buttonsLayout]}
-          onPress={handleSubmit(onSubmit)}
-        >
-          <Text style={[styles.accept]}>
-            Update Modem Password
-          </Text>
-        </Pressable>
-      </View>
+      </KeyboardAwareScrollView>
+      {loading ? <Loader /> : null}
     </View>
   );
 };
