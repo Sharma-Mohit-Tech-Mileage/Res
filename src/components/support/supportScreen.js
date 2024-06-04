@@ -340,7 +340,7 @@ const Support = ({ route }) => {
                                 <View style={[styles.content, styles.contentSpaceBlock]}>
 
                                     <Pressable style={styles.headingAndIcon4} onPress={()=>{
-                                            navigation.navigate('CreateTicket')
+                                            navigation.navigate('TicketStackScreen')
                                     }}>
                                         <View style={[styles.icon]}>
                                             <Image
@@ -354,6 +354,11 @@ const Support = ({ route }) => {
                                                 <Text style={[styles.headingTypo]}>
                                                     Ticket Support
                                                 </Text>
+                                                <Image
+                                                    style={styles.chevronIconLayout}
+                                                    resizeMode="stretch"
+                                                    source={require("../../../assets/chevronright.png")}
+                                                />
                                             </View>
                                             <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
                                                 Need help? Submit a support ticket and we'll respond within 48 hours.

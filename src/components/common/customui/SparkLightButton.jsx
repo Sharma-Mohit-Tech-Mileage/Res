@@ -28,10 +28,11 @@ const styles = StyleSheet.create({
         backgroundColor: Color.colorMidnightblue,
     },
     makePayment: {
-        fontSize: FontSize.size_xs,
+        fontSize: FontSize.size_sm,
         fontFamily: FontFamily.openSansRegular,
         textAlign: "center",
         color: Color.sparklightWhite,
+        fontWeight:'600'
     },
 });
 

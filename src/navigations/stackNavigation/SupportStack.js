@@ -4,10 +4,8 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import supportScreen from "../../components/support/supportScreen";
 import Search from "../../components/support/Search";
-import CreateTicket from "../../components/support/ticket/CreateTicket";
+import TicketStackScreen from "./TicketStack";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
-import TicketSupport from "../../components/support/TicketSupport";
-import TicketView from "../../components/support/ticket/ViewTicket";
 import TroubleShootStack from "./TroubleShootStack";  
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemStackScreen from "./ManageEquepmentStack";
@@ -16,7 +14,7 @@ import ShareWifiScreen from "../../components/support/ShareWifiScreen";
 const SupportStack = createNativeStackNavigator();
 
 function SupportStackScreen({route}) {
-  console.log('Support',JSON.stringify(route))
+  
   const { setTabBarVisible } = useTabBarVisibility();
   return (
     <SupportStack.Navigator initialRouteName={(route.params?.isManagementEquipment)?"ManageEquipment":"support"} defaultNavigationOptions={{ gestureEnabled: true }}>
@@ -40,8 +38,8 @@ function SupportStackScreen({route}) {
         }}
       />
       <SupportStack.Screen
-        name="CreateTicket"
-        component={CreateTicket}
+        name="TicketStackScreen"
+        component={TicketStackScreen}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),
@@ -57,15 +55,7 @@ function SupportStackScreen({route}) {
           blur: () => setTabBarVisible(true),
         }}
       />
-      <SupportStack.Screen
-        name="TicketView"
-        component={TicketView}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
+      
       <SupportStack.Screen
         name="ArticalWindowUtility"
         component={ArticalWindowUtility}
@@ -78,15 +68,7 @@ function SupportStackScreen({route}) {
           blur: () => setTabBarVisible(true),
         }}
       />
-      <SupportStack.Screen
-        name="TicketSupport"
-        component={TicketSupport}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
+      
       <SupportStack.Screen
         name="DiagnosticFlow"
         component={TroubleShootStack}

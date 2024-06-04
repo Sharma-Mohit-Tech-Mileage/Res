@@ -18,6 +18,7 @@ import {
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightDropdown from "../../../components/common/customui/SparkLightDropdown";
 import PrimaryButtom from "../../common/customui/PrimaryButton";
+import colors from "../../../res/Colors";
 //import { useNavigation } from "@react-navigation/native";
 
 const CreateTicket = ({ navigation }) => {
@@ -25,7 +26,7 @@ const CreateTicket = ({ navigation }) => {
   const [selectedItem, setSelectedItem] = useState();
   const items = ["Item 1", "Item 2", "Item 3"];
   return (
-    <View>
+    <View style={{backgroundColor:colors.backgound_blue, flex:1}}>
       <View style={styles.ticketSupportNone}>
         <ProfileSettingsHeader
           title="Create Ticket"
@@ -141,7 +142,6 @@ const styles = StyleSheet.create({
     paddingBottom: Padding.p_5xl,
   },
   tickets: {
-    flex: 1,
     fontSize: FontSize.size_3xl,
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
@@ -149,23 +149,8 @@ const styles = StyleSheet.create({
   featuredIcon: {
     borderRadius: 24,
   },
-  featuredIconLayout: {
-    width: 48, // Width as per Figma design
-    height: 48, // Height as per Figma design
-    borderRadius: 24, // This will make it a circle
-    padding: 12, // Padding as per Figma design
-    justifyContent: "center", // Center content vertically
-    alignItems: "center", // Center content horizontally
-    borderColor: "#F4F4F5", // Border color from Figma design
-    borderWidth: 8, // Border width from Figma design (calculated based on Figma properties)
-    backgroundColor: "#F4F4F5", // Background color from Figma design
-  },
-  createATicketTypo: {
-    textAlign: "center",
-    fontFamily: FontFamily.openSansRegular,
-    lineHeight: 28,
-    marginTop: 8,
-  },
+  
+  
   noTicketsCreated: {
     fontSize: FontSize.size_base,
     color: Color.sparklightGray1,

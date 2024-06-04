@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
-import { Padding, FontFamily, FontSize, Color, Border } from "../../../GlobalStyles";
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import SparkLightButton from '../common/customui/SparkLightButton';
+import { Padding, FontFamily, FontSize, Color, Border } from "../../../../GlobalStyles";
+import ProfileSettingsHeader from '../../common/ProfileSettingsHeader';
+import SparkLightButton from '../../common/customui/SparkLightButton';
 import { useNavigation } from "@react-navigation/native";
-const TicketSupportNone = () => {
+const SupportTicket = () => {
     const navigation = useNavigation();
     return (
 
@@ -29,7 +29,7 @@ const TicketSupportNone = () => {
                                     <View style={styles.featuredIconLayout}>
                                         <Image
                                             resizeMode="cover"
-                                            source={require("../../../assets/ticket-02.png")}
+                                            source={require("../../../../assets/ticket-02.png")}
                                         />
                                     </View>
                                     <Text style={[styles.noTicketsCreated, styles.createATicketTypo]}>
@@ -136,4 +136,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default TicketSupportNone;
+export default SupportTicket;

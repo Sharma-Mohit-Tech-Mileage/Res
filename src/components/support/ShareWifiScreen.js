@@ -50,6 +50,8 @@ const ShareWifiScreen = ({ route }) => {
     modemPasswordData?.map((item) => {
       if (item.ssid == slectedPasword) {
         setSelectedItem(item)
+        setPassword(item.securityKey);
+        setSsid(item.ssid);
       }
     })
   }, [slectedPasword])
