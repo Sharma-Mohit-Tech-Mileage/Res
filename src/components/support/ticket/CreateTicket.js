@@ -15,18 +15,54 @@ import {
   Color,
   Border,
 } from "../../../../GlobalStyles";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightDropdown from "../../../components/common/customui/SparkLightDropdown";
 import PrimaryButtom from "../../common/customui/PrimaryButton";
-import colors from "../../../res/Colors";
-//import { useNavigation } from "@react-navigation/native";
 
-const CreateTicket = ({ navigation }) => {
-  //const navigation = useNavigation();
+import colors from "../../../res/Colors";
+import { useNavigation } from "@react-navigation/native";
+import SparkLightInput from "../../common/customui/SparkLightInput";
+import { userTicketSchema } from "../../utility/validationSchema";
+
+const CreateTicket = () => {
+  const navigation = useNavigation();
   const [selectedItem, setSelectedItem] = useState();
-  const items = ["Item 1", "Item 2", "Item 3"];
+  const [email, setEmail] = useState("");
+  const categories = ["Bill", "Support"];
+
+  var Data = {
+    accountNumber: "",
+    subject: "",
+    category: "",
+    comment: "",
+    email: "",
+    upload: [],
+  };
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    setError,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(userTicketSchema()),
+    defaultValues: Data,
+  });
+
+  const onChangeText = (text) => {
+    setEmail(text);
+  };
+
+  const keyboardDismiss = () => {
+    Keyboard.dismiss();
+  };
+
   return (
-    <View style={{backgroundColor:colors.backgound_blue, flex:1}}>
+    <View style={{ backgroundColor: colors.backgound_blue, flex: 1 }}>
       <View style={styles.ticketSupportNone}>
         <ProfileSettingsHeader
           title="Create Ticket"
@@ -41,15 +77,46 @@ const CreateTicket = ({ navigation }) => {
                   <Text style={styles.tickets}>Tickets Details</Text>
                 </View>
                 <View style={styles.frameWrapper}>
+                  <Controller
+                    control={control}
+                    name="subject"
+                    render={({
+                      field: { onChange, onBlur, value },
+                      fieldState: { error },
+                    }) => (
+                      <>
+                        <SparkLightInput
+                          onBlur={onBlur}
+                          label={"Subject"}
+                          placeholder={"Subject"}
+                          onChangeText={onChange}
+                          value={value}
+                          error={error?.message}
+                        />
+                      </>
+                    )}
+                  />
+                </View>
+
+                <View style={styles.frameWrapper}>
                   <View style={styles.textView}>
-                    <Text style={styles.text}>Describe Issue</Text>
-                    <SparkLightDropdown
-                      items={items}
-                      selectedValue={selectedItem}
-                      onValueChange={() => {
-                        
-                      }}
-                      dropDownStyle={{ color: Color.sparklightDarkGray }}
+                    <Text style={styles.text}>Category</Text>
+                    <Controller
+                      control={control}
+                      name="subject"
+                      render={({
+                        field: { onChange, onBlur, value },
+                        fieldState: { error },
+                      }) => (
+                        <>
+                          <SparkLightDropdown
+                            items={categories}
+                            selectedValue={selectedItem}
+                            onValueChange={() => {}}
+                            dropDownStyle={{ color: Color.sparklightDarkGray }}
+                          />
+                        </>
+                      )}
                     />
                   </View>
                 </View>
@@ -62,17 +129,51 @@ const CreateTicket = ({ navigation }) => {
                     </Text>
                   </View>
                   <View style={styles.frameBorder}>
-                    <TextInput
-                      style={{
-                        textAlignVertical: "top",
-                        color: "black", // Or any visible color
-                        fontSize: 16, // Or appropriate size
-                      }}
-                      multiline={true}
-                      numberOfLines={6}
-                      minHeight={FontSize.size_base * 6 + 16}
+                    <Controller
+                      control={control}
+                      name="comment"
+                      render={({
+                        field: { onChange, onBlur, value },
+                        fieldState: { error },
+                      }) => (
+                        <>
+                          <TextInput
+                            style={{
+                              textAlignVertical: "top",
+                              color: "black", // Or any visible color
+                              fontSize: 16, // Or appropriate size
+                            }}
+                            multiline={true}
+                            numberOfLines={6}
+                            minHeight={FontSize.size_base * 6 + 16}
+                          />
+                        </>
+                      )}
                     />
                   </View>
+                </View>
+
+                <View style={styles.frameWrapper}>
+                  <View style={styles.textView}>
+                    <Text
+                      style={[styles.text, { marginBottom: Padding.p_5xs }]}
+                    >
+                      Email
+                    </Text>
+                  </View>
+                  <Controller
+                    control={control}
+                    name="email"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <SparkLightInput
+                        placeholder="Email Address"
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value ? value.toLowerCase() : ""}
+                        error={errors.email?.message}
+                      />
+                    )}
+                  />
                 </View>
               </View>
               <View>
@@ -109,7 +210,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   frameGroupSpaceBlock: {
-    paddingTop: Padding.p_13xl,
+    paddingTop: Padding.p_8xs,
   },
   frameParent: {
     paddingHorizontal: Padding.p_base,
@@ -138,7 +239,7 @@ const styles = StyleSheet.create({
   ticketsParent: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: Padding.p_5xl,
+
     paddingBottom: Padding.p_5xl,
   },
   tickets: {
@@ -149,8 +250,7 @@ const styles = StyleSheet.create({
   featuredIcon: {
     borderRadius: 24,
   },
-  
-  
+
   noTicketsCreated: {
     fontSize: FontSize.size_base,
     color: Color.sparklightGray1,
@@ -178,7 +278,7 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_11xs,
   },
   frameWrapper: {
-    paddingHorizontal: Padding.p_5xl,
+    paddingHorizontal: Padding.p_5xs,
     paddingBottom: Padding.p_13xl,
   },
   frameChild: {
