@@ -27,6 +27,9 @@ import { GetApiRequest } from "../../network/APIClient";
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import SparkLightInput from "../common/customui/SparkLightInput";
 import PlugIcon from "../../res/svgIcons/plug";
+import Loader from "../utility/Loader";
+import WebView from 'react-native-webview';
+
 const RetrieveModemPassword = () => {
 
   const navigation = useNavigation();
@@ -35,11 +38,12 @@ const RetrieveModemPassword = () => {
   const [passwordList, setPasswordList] = useState([]);
   const [slectedPasword, setSelectedPassword] = useState("")
   const [modemPasswordData, setModemPasswordData] = useState([])
-
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     getModemPassword();
   }, [])
+
   useEffect(() => {
     modemPasswordData?.map((item) => {
       if (item.ssid == slectedPasword) {
@@ -49,6 +53,7 @@ const RetrieveModemPassword = () => {
   }, [slectedPasword])
 
   const getModemPassword = () => {
+    setLoading(true)
     let re = getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/modem/security/Get`;
       GetApiRequest(request, onSuccess, onError);
@@ -56,7 +61,7 @@ const RetrieveModemPassword = () => {
   };
 
   const onSuccess = (res) => {
-    console.log("getModemDetails", res);
+    setLoading(false)
     if (res) {
       setModemPasswordData(res)
       const list = res.map((value) => value.ssid)
@@ -65,6 +70,7 @@ const RetrieveModemPassword = () => {
     }
   };
   const onError = (error) => {
+    setLoading(false)
     console.log("error", error);
   };
   const handlePasswordSelection = (value) => {
@@ -113,7 +119,7 @@ const RetrieveModemPassword = () => {
                     placeholder="Password"
                     value={password}
                     editable={false}
-                    inputStyle={{backgroundColor: 'transparent'}}
+                    inputStyle={{ backgroundColor: 'transparent' }}
                   // error={error?.message}
                   />
                 </>
@@ -124,37 +130,31 @@ const RetrieveModemPassword = () => {
         <Text style={styles.howText}>How To</Text>
         <View style={styles.borderStyle} />
         <TouchableOpacity
-          onPress={() => {
-            Linking.openURL('https://support.cableone.net/hc/en-us/articles/115010513108-Wireless-Setup-Android')
-          }}
+          onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.cableone.net/hc/en-us/articles/115010513108-Wireless-Setup-Android', name: 'Connect Android Device' })}
           style={styles.connectAndroidView}>
           <View style={styles.connectAndroidTextView}>
             <PlugIcon />
-            <Text style={[styles.connectTitleText]}> Connect Android Device</Text>
+            <Text style={[styles.connectTitleText]}>Connect Android Device</Text>
           </View>
           <Image style={styles.lockIcon} source={require('../../../assets/chevronright.png')} />
         </TouchableOpacity>
         <View style={styles.borderStyle} />
         <TouchableOpacity
-          onPress={() => {
-            Linking.openURL('https://support.cableone.net/hc/en-us/articles/115010391107-Wireless-Connection-iPhone')
-          }}
+          onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.cableone.net/hc/en-us/articles/115010391107-Wireless-Connection-iPhone', name: 'Connect iphone Device' })}
           style={styles.connectAndroidView}>
           <View style={styles.connectAndroidTextView}>
-          <PlugIcon />
-            <Text style={[styles.connectTitleText]}> Connect iphone Device</Text>
+            <PlugIcon />
+            <Text style={[styles.connectTitleText]}>Connect iphone Device</Text>
           </View>
           <Image style={styles.lockIcon} source={require('../../../assets/chevronright.png')} />
         </TouchableOpacity>
         <View style={styles.borderStyle} />
         <TouchableOpacity
-          onPress={() => {
-            Linking.openURL('https://support.cableone.net/hc/en-us/articles/115009649447-Wireless-Connection-Settings')
-          }}
+          onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.cableone.net/hc/en-us/articles/115009649447-Wireless-Connection-Settings', name: 'Connect PC/MAC' })}
           style={styles.connectAndroidView}>
           <View style={styles.connectAndroidTextView}>
-          <PlugIcon />
-            <Text style={[styles.connectTitleText]}> Connect PC/MAC</Text>
+            <PlugIcon />
+            <Text style={[styles.connectTitleText]}>Connect PC/MAC</Text>
           </View>
           <Image style={styles.lockIcon} source={require('../../../assets/chevronright.png')} />
         </TouchableOpacity>
@@ -172,6 +172,7 @@ const RetrieveModemPassword = () => {
           </Text>
         </Pressable>
       </View>
+      {loading ? <Loader /> : null}
     </View>
   );
 };
