@@ -11,6 +11,7 @@ import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { FontFamily, Color } from "../../../GlobalStyles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import RenderText from "../common/RenderText";
 
 const ModemExchangeInstructions = () => {
   const navigation = useNavigation();
@@ -21,33 +22,6 @@ const ModemExchangeInstructions = () => {
     `If you suspect that your modem is not functioning properly, please contact us or visit your nearest Sparklight office to request a modem exchange.`,
     `Our team will be happy to assist you and ensure that you have the best possible internet experience.`,
   ];
-
-  const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
-
-  useEffect(() => {
-    async function getAccessibility() {
-      try {
-        const accessibility = await AccessibilityInfo.isScreenReaderEnabled();
-        setIsScreenReaderEnabled(accessibility);
-      } catch (error) {
-        console.log(
-          "There has been a problem with AccessibilityInfo.isScreenReaderEnabled(): " +
-            error.message
-        );
-        setIsScreenReaderEnabled(false); // Setting a default value in case of error
-      }
-    }
-    getAccessibility();
-    const reduceMotionChangedSubscription = AccessibilityInfo.addEventListener(
-      "screenReaderChanged",
-      (isScreenReaderEnabled) => {
-        setIsScreenReaderEnabled(isScreenReaderEnabled);
-      }
-    );
-    return () => {
-      reduceMotionChangedSubscription.remove();
-    };
-  }, [screenReaderEnabled]);
 
   return (
     <View style={styles.modemRebootContainer}>
@@ -70,70 +44,16 @@ const ModemExchangeInstructions = () => {
           {instructions.map((instruction, index) => (
             <View key={index} style={styles.instructionContainer}>
               <View style={styles.bulletPoint}></View>
-              {screenReaderEnabled ? (
-                <TextWithLinkVoiceOverEnabled instruction={instruction} />
-              ) : (
-                <TextWithLinkVoiceOverDisabled instruction={instruction} />
-              )}
+              <RenderText
+                navigation={navigation}
+                splitKey={`contact us`}
+                instruction={instruction}
+              />
             </View>
           ))}
         </View>
       </ScrollView>
     </View>
-  );
-};
-
-const TextWithLinkVoiceOverEnabled = ({ instruction }) => {
-  const navigation = useNavigation();
-  return instruction.includes("contact us") ? (
-    <Text
-      style={styles.instructionText}
-      accessible={true}
-      accessibilityRole="link"
-      onPress={() => navigation.navigate("SupportStack", { isContactUs: true })}
-    >
-      {instruction.split("contact us")[0]}
-      <Text
-        accessibilityLabel="Contact us for more information"
-        hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-        style={styles.linkText}
-      >
-        contact us
-      </Text>
-      {instruction.split("contact us")[1]}
-    </Text>
-  ) : (
-    <Text style={styles.instructionText}>{instruction}</Text>
-  );
-};
-
-const TextWithLinkVoiceOverDisabled = ({ instruction }) => {
-  const navigation = useNavigation();
-  return (
-    <Text style={styles.instructionText}>
-      {instruction.includes("contact us") ? (
-        <>
-          {instruction.split("contact us")[0]}
-          <Text
-            accessible={true}
-            accessibilityRole="link"
-            accessibilityLabel="Contact us for more information"
-            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-            style={styles.linkText}
-            onPress={() => {
-              navigation.navigate("SupportStack", {
-                isContactUs: true,
-              });
-            }}
-          >
-            contact us
-          </Text>
-          {instruction.split("contact us")[1]}
-        </>
-      ) : (
-        instruction
-      )}
-    </Text>
   );
 };
 

@@ -1,4 +1,4 @@
-import  React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Image,
   StyleSheet,
@@ -18,6 +18,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import PubSub from 'pubsub-js'
+import RenderText from "../common/RenderText";
 
 const ModemReboot = () => {
   const navigation = useNavigation();
@@ -32,7 +33,7 @@ const ModemReboot = () => {
       } catch (error) {
         console.log(
           "There has been a problem with AccessibilityInfo.isScreenReaderEnabled(): " +
-            error.message
+          error.message
         );
         setIsScreenReaderEnabled(false); // Setting a default value in case of error
       }
@@ -62,19 +63,19 @@ const ModemReboot = () => {
 
   React.useEffect(() => {
     return () => {
-        
-      };
-    }, []);
+
+    };
+  }, []);
 
   return (
     <View style={styles.modemRebootContainer}>
       <ProfileSettingsHeader
         title="Modem Reboot Instructions"
-         onPressBack={() => navigation.goBack()
+        onPressBack={() => navigation.goBack()
         }
       />
       <ScrollView showsVerticalScrollIndicator={false} >
-        <View style={{ flexDirection: "column",paddingBottom:hp('15%') }}>
+        <View style={{ flexDirection: "column", paddingBottom: hp('15%') }}>
           <View
             style={[
               styles.card,
@@ -92,9 +93,9 @@ const ModemReboot = () => {
               style={{ backgroundColor: "#F4F4F5", height: 1, marginVertical: 20 }}
             />
             <Text style={styles.text}>
-            {'You can reboot your modem by clicking '} 
-            <Text style={[styles.text,{fontWeight:'600'}]}> “Reboot Modem”</Text>{inst1}
-              </Text>
+              {'You can reboot your modem by clicking '}
+              <Text style={[styles.text, { fontWeight: '600' }]}> “Reboot Modem”</Text>{inst1}
+            </Text>
           </View>
 
           <View
@@ -128,13 +129,18 @@ const ModemReboot = () => {
               tintColor={Color.sparklightBrightPurple}
               source={require("../../../assets/phone-outgoing-04.png")}
             />
-           
-              {screenReaderEnabled ? (
-                <TextWithLinkVoiceOverEnabled instruction={inst3} />
-              ) : (
-                <TextWithLinkVoiceOverDisabled instruction={inst3} />
-              )}
-          
+            <RenderText
+              navigation={navigation}
+              splitKey={`contact us`}
+              instruction={inst3}
+              style={{width: '85%'}}
+            />
+            {/* {screenReaderEnabled ? (
+              <TextWithLinkVoiceOverEnabled instruction={inst3} />
+            ) : (
+              <TextWithLinkVoiceOverDisabled instruction={inst3} />
+            )} */}
+
           </View>
         </View>
       </ScrollView>
@@ -147,7 +153,7 @@ const TextWithLinkVoiceOverEnabled = ({ instruction }) => {
   console.log("TextWithLinkVoiceOverEnabled");
   return instruction.includes("contact us") ? (
     <Text
-      style={[styles.text,{width:wp('75%')}]}
+      style={[styles.text, { width: wp('75%') }]}
       accessibilityLabel="If neither option fixes your issue, please don't hesitate to contact us Link for further assistance."
       onPress={() => navigation.navigate("SupportStack", { isContactUs: true })}
     >
@@ -161,7 +167,7 @@ const TextWithLinkVoiceOverEnabled = ({ instruction }) => {
       {instruction.split("contact us")[1]}
     </Text>
   ) : (
-    <Text style={[styles.text,{width:wp('75%')}]}>{instruction}</Text>
+    <Text style={[styles.text, { width: wp('75%') }]}>{instruction}</Text>
   );
 };
 
@@ -169,13 +175,13 @@ const TextWithLinkVoiceOverDisabled = ({ instruction }) => {
   console.log("TextWithLinkVoiceOverDisabled");
   const navigation = useNavigation();
   return (
-    <Text style={[styles.text,{width:wp('75%')}]}
+    <Text style={[styles.text, { width: wp('75%') }]}
     >
       {instruction.includes("contact us") ? (
         <>
           {instruction.split("contact us")[0]}
           <Text
-            
+
             accessibilityRole="link"
             hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
             style={styles.linkText}
@@ -225,7 +231,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     width: 30,
     height: 30,
-    margin:10
+    margin: 10
   },
 
   modemInstruction: {
@@ -243,7 +249,7 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontWeight: "700",
     alignSelf: "center",
-    marginTop:10
+    marginTop: 10
   },
   text: {
     color: Color.sparklightGray1,
@@ -261,8 +267,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontStyle: "normal",
     fontWeight: "700",
-    paddingLeft:5,
-    flexWrap:'wrap'
+    paddingLeft: 5,
+    flexWrap: 'wrap'
   },
 });
 

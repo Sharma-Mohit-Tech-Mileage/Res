@@ -160,12 +160,17 @@ const SplashScreen = ({ navigation }) => {
               </View>
             </View>
             <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
-            <Text style={styles.message}>{message}{" "}
+            <RenderText
+              navigation={navigation}
+              splitKey={bussinessApp ? "download the MySparklight Business mobile app" : "logins to your online account"}
+              instruction={`${message} ${bussinessApp ? "download the MySparklight Business mobile app" : "logins to your online account"}${message2}`}
+            />
+            {/* <Text style={styles.message}>{message}{" "}
               <Text style={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: 'underline', }]} onPress={onClose}>
                 {bussinessApp?"download the MySparklight Business mobile app":"login to your online account"}
               </Text>
               {message2}
-            </Text>
+            </Text> */}
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={closeModal}

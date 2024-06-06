@@ -163,7 +163,6 @@ const RetrieveModemPassword = () => {
         <Pressable
           accessible={true}
           accessibilityRole="button"
-          accessibilityLabel="Update Modem Password"
           style={[styles.button, styles.buttonsLayout]}
           onPress={() => { navigation.navigate("ManageEquipmentScreen") }}
         >

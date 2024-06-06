@@ -243,7 +243,6 @@ const UpdateModemPassword = () => {
             accessible={true}
             disabled={loading}
             accessibilityRole="button"
-            accessibilityLabel="Update Modem Password"
             style={[styles.button, styles.buttonsLayout]}
             onPress={handleSubmit(onSubmit)}
           >
