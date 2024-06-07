@@ -553,7 +553,7 @@ const ManageEquipment = ({ route }) => {
               style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
             >
               <Text style={[styles.myModem1, styles.myModem1Typo]}>
-                WiFi Passoword
+                WiFi Password
               </Text>
             </View>
             <View
