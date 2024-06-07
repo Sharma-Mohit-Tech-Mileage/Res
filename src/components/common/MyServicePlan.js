@@ -66,7 +66,7 @@ const MyServicePlan = ({ plans,tvPlan,phonePlan, navigation }) => {
               </TouchableOpacity>
             </View>
             <ScrollView style={{ marginBottom: hp('10%')}} contentContainerStyle={{ flexGrow: 1 }}>
-            {plans && plans.map((item, index) => (
+            {plans && plans?.map((item, index) => (
               <View key={index}>
                 <ServiceDetailsItem item={item} index={index} serviceType="internet" />
               </View>

@@ -150,7 +150,7 @@ const UpdateModemPassword = () => {
         <NotificationAlert
           type="error"
           title="Error"
-          message="There was an error, please try again later"
+          message="An error occurred. Please try again later with a different password."
           showCloseIcon={true}
           isVisible={showValidationAlert}
           onClose={() => setShowValidationAlert(false)}
@@ -158,7 +158,7 @@ const UpdateModemPassword = () => {
         <NotificationAlert
           type="success"
           title="Success"
-          message="Your new password updated"
+          message="Your password has been saved successfully."
           showCloseIcon={true}
           isVisible={showValidationSuccessAlert}
           onClose={() => setShowValidationSuccessAlert(false)}
@@ -168,21 +168,20 @@ const UpdateModemPassword = () => {
 
 
         <View style={styles.viewBackgroundContainer}>
-          <Text style={styles.titleText}>SSID</Text>
+          <Text style={[styles.firstName1, styles.firstTypo]}>SSID</Text>
           <View style={{}}>
             <SparkLightDropdown
               items={passwordList}
               selectedValue={slectedPasword}
               onValueChange={handlePasswordSelection}
-              dropDownStyle={{ color: Color.sparklightDarkGray }}
             />
           </View>
 
           <View style={{ marginTop: 15 }}>
-            <Text style={[styles.titleText, { marginBottom: 5 }]}>New Password</Text>
             <Controller
               control={control}
               name="newPassword"
+              
               rules={{
                 required: {
                   value: true,
@@ -192,6 +191,7 @@ const UpdateModemPassword = () => {
               render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                 <SparkLightInput
                   onBlur={onBlur}
+                  label={'New Password'}
                   onChangeText={(text) => {
                     if (text.length > 0) setNewPasswordLength(text.length);
                     else setNewPasswordLength(0);
@@ -209,7 +209,6 @@ const UpdateModemPassword = () => {
             />
           </View>
           <View style={{ marginTop: 15 }}>
-            <Text style={[styles.titleText, { marginBottom: 5 }]}>Confirm New Password</Text>
             <Controller
               control={control}
               name="confirmPassword"
@@ -228,6 +227,7 @@ const UpdateModemPassword = () => {
                     else setConfirmPasswordLength(0);
                     onChange(text)
                   }}
+                  label={'Confirm New Password'}
                   placeholder="Confirm New Password"
                   value={value}
                   showTextIcon
@@ -315,6 +315,17 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
+  },
+  firstName1: {
+    color: Color.sparklightGray1,
+    fontSize: FontSize.textXsSemibold_size,
+    alignSelf: "stretch",
+  },
+  firstTypo: {
+    fontSize: FontSize.textXsSemibold_size,
+    textAlign: "left",
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "600",
   },
 });
 

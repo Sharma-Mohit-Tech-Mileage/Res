@@ -92,18 +92,16 @@ const RetrieveModemPassword = () => {
       />
       <View style={styles.viewBackgroundContainer}>
         <View style={{ paddingHorizontal: Padding.p_5xl, }}>
-          <Text style={styles.titleText}>SSID</Text>
+          <Text style={[styles.firstName1, styles.firstTypo]}>SSID</Text>
           <View style={{}}>
             <SparkLightDropdown
               items={passwordList}
               selectedValue={slectedPasword}
               onValueChange={handlePasswordSelection}
-              dropDownStyle={{ color: Color.sparklightDarkGray }}
             />
           </View>
 
           <View style={{ marginTop: 15 }}>
-            <Text style={[styles.titleText, { marginBottom: 5 }]}>Password</Text>
             <Controller
               control={control}
               name="password"
@@ -116,6 +114,7 @@ const RetrieveModemPassword = () => {
                         onChange(text);
                       }
                     }}
+                    label={'Password'}
                     placeholder="Password"
                     value={password}
                     editable={false}
@@ -140,11 +139,11 @@ const RetrieveModemPassword = () => {
         </TouchableOpacity>
         <View style={styles.borderStyle} />
         <TouchableOpacity
-          onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.cableone.net/hc/en-us/articles/115010391107-Wireless-Connection-iPhone', name: 'Connect iphone Device' })}
+          onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/115010391047-How-Do-I-Connect-Apple-Products-to-a-Wireless-Network', name: 'Connect iPhone Device' })}
           style={styles.connectAndroidView}>
           <View style={styles.connectAndroidTextView}>
             <PlugIcon />
-            <Text style={[styles.connectTitleText]}>Connect iphone Device</Text>
+            <Text style={[styles.connectTitleText]}>Connect iPhone Device</Text>
           </View>
           <Image style={styles.lockIcon} source={require('../../../assets/chevronright.png')} />
         </TouchableOpacity>
@@ -266,7 +265,18 @@ const styles = StyleSheet.create({
   connectAndroidTextView: {
     flexDirection: "row",
     flex: 1
-  }
+  },
+  firstName1: {
+    color: Color.sparklightGray1,
+    fontSize: FontSize.textXsSemibold_size,
+    alignSelf: "stretch",
+  },
+  firstTypo: {
+    fontSize: FontSize.textXsSemibold_size,
+    textAlign: "left",
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "600",
+  },
 });
 
 export default RetrieveModemPassword;
