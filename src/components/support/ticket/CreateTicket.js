@@ -25,19 +25,22 @@ import colors from "../../../res/Colors";
 import { useNavigation } from "@react-navigation/native";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import { userTicketSchema } from "../../utility/validationSchema";
+import WarningIcon from "../../../../assets/alert-triangle.png";
+import { GetApiRequest, PostApiRequest } from "../../../network/APIClient";
+import { getUser } from "../../../redux/utils/LocalStorage";
+;
 
 const CreateTicket = () => {
   const navigation = useNavigation();
   const [selectedItem, setSelectedItem] = useState();
-  const [email, setEmail] = useState("");
   const categories = ["Bill", "Support"];
 
   var Data = {
-    accountNumber: "",
     subject: "",
-    category: "",
     comment: "",
     email: "",
+    accountNumber: "",
+    category: "",
     upload: [],
   };
 
@@ -53,12 +56,25 @@ const CreateTicket = () => {
     defaultValues: Data,
   });
 
-  const onChangeText = (text) => {
-    setEmail(text);
+  const handleSave = (formData) => {
+    getUser().then((res) => {
+      formData.accountNumber = res.userInfo.accountNumber;
+      const request = `support/api/Tickets`;
+      console.log("OnSubmit", JSON.stringify(formData));
+      PostApiRequest(
+        request,
+        formData,
+        (res) => {
+          reset()
+        },
+        (error) => {}
+      );
+    });
   };
 
-  const keyboardDismiss = () => {
-    Keyboard.dismiss();
+  const handleValidationError = () => {
+    //scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+    // setShowValidationAlert(true);
   };
 
   return (
@@ -103,7 +119,7 @@ const CreateTicket = () => {
                     <Text style={styles.text}>Category</Text>
                     <Controller
                       control={control}
-                      name="subject"
+                      name="category"
                       render={({
                         field: { onChange, onBlur, value },
                         fieldState: { error },
@@ -112,23 +128,31 @@ const CreateTicket = () => {
                           <SparkLightDropdown
                             items={categories}
                             selectedValue={selectedItem}
-                            onValueChange={() => {}}
-                            dropDownStyle={{ color: Color.sparklightDarkGray }}
+                            onValueChange={onChange}
+                            error={error?.message}
                           />
+
+                          {error && (
+                            <View style={styles.errorContainer}>
+                              <Image
+                                source={WarningIcon}
+                                style={styles.errorIcon}
+                              />
+                              <Text style={styles.errorText}>
+                                {error?.message}
+                              </Text>
+                            </View>
+                          )}
                         </>
                       )}
                     />
                   </View>
                 </View>
                 <View style={styles.frameWrapper}>
-                  <View style={styles.textView}>
-                    <Text
-                      style={[styles.text, { marginBottom: Padding.p_5xs }]}
-                    >
-                      Describe Issue
-                    </Text>
-                  </View>
-                  <View style={styles.frameBorder}>
+                <View style={styles.textView}>
+                    <Text style={styles.text}>Comment</Text>
+                    </View>
+                  <View style={[styles.frameBorder,{marginTop:10}]}>
                     <Controller
                       control={control}
                       name="comment"
@@ -138,14 +162,11 @@ const CreateTicket = () => {
                       }) => (
                         <>
                           <TextInput
-                            style={{
-                              textAlignVertical: "top",
-                              color: "black", // Or any visible color
-                              fontSize: 16, // Or appropriate size
-                            }}
-                            multiline={true}
-                            numberOfLines={6}
-                            minHeight={FontSize.size_base * 6 + 16}
+                            placeholder="Comment"
+                            onChangeText={onChange}
+                            multiline
+                            numberOfLines={5}
+                            style={styles.textArea}
                           />
                         </>
                       )}
@@ -154,32 +175,38 @@ const CreateTicket = () => {
                 </View>
 
                 <View style={styles.frameWrapper}>
-                  <View style={styles.textView}>
-                    <Text
-                      style={[styles.text, { marginBottom: Padding.p_5xs }]}
-                    >
-                      Email
-                    </Text>
-                  </View>
                   <Controller
                     control={control}
                     name="email"
-                    render={({ field: { onChange, onBlur, value } }) => (
+                    render={({
+                      field: { onChange, onBlur, value },
+                      fieldState: { error },
+                    }) => (
                       <SparkLightInput
                         placeholder="Email Address"
+                        label={"Email"}
                         onBlur={onBlur}
                         onChangeText={onChange}
                         value={value ? value.toLowerCase() : ""}
-                        error={errors.email?.message}
+                        error={error?.message}
                       />
                     )}
                   />
                 </View>
               </View>
+               <View style={{backgroundColor:Color.colorWhitesmoke_200,height:120,flexDirection:'column'}}>
+               <View style={{ margin:40,borderColor:Color.sparklightaddGray,borderWidth:2, borderRadius:10,borderStyle: 'dashed' ,height:80,flexDirection:'column',alignItems:'center', justifyContent:'center'}}>
+                <View style={{padding:10,alignItems:'center',}}>
+               <Text style={{color:'black'}}>Upload File</Text>
+               <Text style={{color:'black', fontSize:12, marginTop:10}}>Acceptable formats:.pdf,.png, .jpeg, .gif, .txt</Text>
+               </View>
+               </View>
+               </View>
+
               <View>
                 <PrimaryButtom
                   title="Submit"
-                  //onPress={() => navigation.navigate("TicketView")}
+                  onPress={handleSubmit(handleSave)}
                   buttonType="submit"
                 />
               </View>
@@ -285,6 +312,29 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: Border.br_11xs,
     height: 24,
+  },
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4, // Space between the input and the error message
+  },
+  errorIcon: {
+    width: 20,
+    height: 20,
+    marginRight: Padding.p_xs,
+  },
+  errorText: {
+    color: "red",
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.openSansRegular,
+  },
+  textArea: {
+    color: Color.colorGray_200,
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    textAlignVertical: "top",
+    padding: Padding.p_xs,
+    height: 180,
   },
 });
 

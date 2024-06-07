@@ -45,25 +45,24 @@ export const PostAuthApiRequest=(endpoint, body, onSuccess, onError)=>{
 export const PostApiRequest=async(endpoint,body, onSuccess,onError)=>{
 // Example POST request
 const user= await getUser()
-console.log('API URL',BASE_URL)
+console.log('API URL',BASE_URL+endpoint)
 fetch(`${BASE_URL}/${endpoint}`, {
-    method: 'GET',
+    method: 'POST',
     headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Authorization': `Bearer ${user.token}`
     },
-    body: JSON.stringify({
-        body
-    })
+    body: JSON.stringify(body)
 })
     .then(response => Promise.all([response, response.json()]))
     .then(([response, json]) => {
-        // console.log('response', response);
+         console.log('response', response);
         if (!response.ok || !response.status === 201) { // We should get a 201 (Created) status code if everything is fine/working
             throw Error(`Respsonse status ${response.status} (${response.statusText}): ${json.message}`);
         }
         onSuccess(json)
-        // console.log(json);
+         console.log(json);
         // Whatever you want to do next after the POST request - maybe dispatch something?
     })
     .catch(exception => {
