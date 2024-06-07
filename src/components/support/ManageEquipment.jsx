@@ -74,6 +74,7 @@ const ManageEquipment = ({ route }) => {
       if (res.length == 0) setwifiPasswordCanChange(false)
       else setwifiPasswordCanChange(true)
       const list = res.map((value) => value.ssid)
+      setwifiData(res)
     }
   };
   const onErrorModemPassword = (error) => {
@@ -220,25 +221,14 @@ const ManageEquipment = ({ route }) => {
     getModemDetails();
     getLeasedDetails();
     getInternetPlanDetails();
-    getWifiPassword();
+    
   }, []);
 
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
   }, [currentHealth]);
 
-  const getWifiPassword = () => {
-    let accountNumber = '902878578'
-    const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
-    GetApiRequest(request, (res) => {
-      console.log(res)
-      if (res) {
-        setwifiData(res)
-      }
-    }, (error) => {
-      console.log(error)
-    })
-  }
+  
 
   return (
     <View style={styles.manageEquipment}>
