@@ -11,11 +11,11 @@ import NotificationAlert from '../common/customui/NotificationAlert';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveUserFeedback } from '../../redux/actions/ProfileActionSuite';
 const feedbackOptions = [
-    { value: 1, category: 'complaint', name: 'facesad', text: 'Terrible', image: require("../../../assets/facesad.png"), selectedImage: require("../../../assets/Smiley-VeryUnsatisfied-sel.png") },
-    { value: 2, category: 'complaint', name: 'facefrown', text: 'Poor', image: require("../../../assets/facefrown.png"), selectedImage: require("../../../assets/Smiley-Unsatisfied-sel.png") },
-    { value: 3, category: 'neutral', name: 'faceneutral', text: 'Neutral', image: require("../../../assets/faceneutral.png"), selectedImage: require("../../../assets/Smiley-Neutral-sel.png") },
-    { value: 4, category: 'compliment', name: 'facesmile', text: 'Satisfied', image: require("../../../assets/facesmile.png"), selectedImage: require("../../../assets/Smiley-Satisfied-sel.png") },
-    { value: 5, category: 'compliment', name: 'facehappy', text: 'Great', image: require("../../../assets/facehappy.png"), selectedImage: require("../../../assets/Smiley-VerySatisfied-sel.png") },
+    { value: 1, category: 'complaint', name: 'facesad', text: 'Terrible', image: require("../../../assets/facesad.png"), selectedImage: require("../../../assets/Terrible.png") },
+    { value: 2, category: 'complaint', name: 'facefrown', text: 'Poor', image: require("../../../assets/facefrown.png"), selectedImage: require("../../../assets/Poor.png") },
+    { value: 3, category: 'neutral', name: 'faceneutral', text: 'Neutral', image: require("../../../assets/faceneutral.png"), selectedImage: require("../../../assets/Neutral.png") },
+    { value: 4, category: 'compliment', name: 'facesmile', text: 'Satisfied', image: require("../../../assets/facesmile.png"), selectedImage: require("../../../assets/Satisfied.png") },
+    { value: 5, category: 'compliment', name: 'facehappy', text: 'Great', image: require("../../../assets/facehappy.png"), selectedImage: require("../../../assets/Great.png") },
 ];
 const Feedback = () => {
 
@@ -102,7 +102,11 @@ const Feedback = () => {
                             {feedbackOptions.map((option) => (
                                 <Pressable
                                     key={option.name}
-                                    style={[styles.faceSadParent, { flex: 1 }]}
+                                    style={[
+                                        styles.faceSadParent, 
+                                        { flex: 1 },
+                                        selectedFeedback === option.name && { backgroundColor: Color.colorMidnightblue }
+                                    ]} 
                                     onPress={() => handleIconPress(option)}
                                 >
                                     <Image
@@ -112,7 +116,11 @@ const Feedback = () => {
                                     />
                                     <Text
                                         allowFontScaling={false}
-                                        style={[styles.terrible, styles.greatTypo]}
+                                        style={[
+                                            styles.terrible, 
+                                            styles.greatTypo,
+                                            selectedFeedback === option.name && { color: Color.sparklightWhite }
+                                        ]}
                                     >
                                         {option.text}
                                     </Text>
