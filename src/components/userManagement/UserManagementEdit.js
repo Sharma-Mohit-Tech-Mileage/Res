@@ -179,9 +179,9 @@ const UserManagementEdit = ({ route }) => {
 
     if(!isnewUser){
     const storedSecurityQuestion = profileDetails?.securityQuestion;
-    //console.log('custom Question',storedSecurityQuestion)
+    console.log('custom Question',storedSecurityQuestion)
     const isCustomQuestion =securityQuestions.includes(storedSecurityQuestion);
-     // console.log('iscutom',isCustomQuestion),
+      console.log('iscutom',isCustomQuestion),
     setIsCustomQuestionSelected(!isCustomQuestion);
     if (!isCustomQuestion) {
       setCustomSecurityQuestion("Add your own question");
