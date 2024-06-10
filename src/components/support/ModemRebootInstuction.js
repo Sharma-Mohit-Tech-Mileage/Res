@@ -133,7 +133,12 @@ const ModemReboot = () => {
               navigation={navigation}
               splitKey={`contact us`}
               instruction={inst3}
-              style={{width: '85%'}}
+              style={[styles.text, { width: wp('75%') }]}
+              onTextPress={() => {
+                navigation.navigate("SupportStack", {
+                  isContactUs: true,
+                });
+              }}
             />
             {/* {screenReaderEnabled ? (
               <TextWithLinkVoiceOverEnabled instruction={inst3} />

@@ -7,7 +7,15 @@ import {
 import { FontFamily, Color } from "../../../GlobalStyles";
 
 
-export default RenderText = ({ instruction, navigation, splitKey = '' , style }) => {
+export default RenderText = ({
+  instruction,
+  navigation,
+  splitKey = '',
+  style,
+  internalTextStyle,
+  onTextPress = () => { },
+  isFromNotification = false
+}) => {
 
   const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
 
@@ -49,24 +57,23 @@ export default RenderText = ({ instruction, navigation, splitKey = '' , style })
       instruction.includes(splitKey)
         ?
         <Text
-          style={[styles.instructionText,style]}
+          style={[styles.instructionText, style]}
           accessible={true}
-          // accessibilityRole="link"
           accessibilityLabel={`${instructionFirstPart} ${splitKey} link ${instructionSecondPart}`}
-          onPress={() => navigation.navigate("SupportStack", { isContactUs: true })}
+          onPress={() => onTextPress()}
         >
-          {instructionFirstPart}
+          {isFromNotification ? instructionFirstPart.replace('Please', '\nPlease') : instructionFirstPart}
           <Text
             accessibilityLabel="Contact us for more information"
             hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-            style={styles.linkText}
+            style={[styles.linkText, internalTextStyle]}
           >
             {`${splitKey}`}
           </Text>
           {instructionSecondPart}
         </Text>
         :
-        <Text style={styles.instructionText}>
+        <Text style={[styles.instructionText, style]}>
           {instruction}
         </Text>
     )
@@ -74,18 +81,16 @@ export default RenderText = ({ instruction, navigation, splitKey = '' , style })
   else {
     return (
       instruction.includes(splitKey) ?
-        <Text style={[styles.instructionText,style]}>
-          {instructionFirstPart}
+        <Text style={[styles.instructionText, style]}>
+          {isFromNotification ? instructionFirstPart.replace('Please', '\nPlease') : instructionFirstPart}
           <Text
             accessible={true}
             accessibilityRole="link"
             accessibilityLabel="Contact us for more information"
             hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-            style={styles.linkText}
+            style={[styles.linkText, internalTextStyle]}
             onPress={() => {
-              navigation.navigate("SupportStack", {
-                isContactUs: true,
-              });
+              onTextPress()
             }}
           >
             {`${splitKey}`}
@@ -93,7 +98,7 @@ export default RenderText = ({ instruction, navigation, splitKey = '' , style })
           {instructionSecondPart?.length > 0 ? `${instructionSecondPart}` : null}
         </Text>
         :
-        <Text style={styles.instructionText}>
+        <Text style={[styles.instructionText, style]}>
           {instruction}
         </Text>
     )

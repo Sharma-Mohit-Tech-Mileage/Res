@@ -48,6 +48,12 @@ const ModemExchangeInstructions = () => {
                 navigation={navigation}
                 splitKey={`contact us`}
                 instruction={instruction}
+                style={[styles.text, { width: wp('75%') }]}
+                onTextPress={() => {
+                  navigation.navigate("SupportStack", {
+                    isContactUs: true,
+                  });
+                }}
               />
             </View>
           ))}
