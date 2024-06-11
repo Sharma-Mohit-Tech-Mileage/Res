@@ -46,7 +46,7 @@ const Support = ({ route }) => {
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             setTimeout(() => {
-                if (!route.params?.isContactUs) {
+                if (route.params?.isContactUs) {
                     scrollViewRef.current?.scrollTo({ y: 0, x: 0, animated: true })
                 }
 

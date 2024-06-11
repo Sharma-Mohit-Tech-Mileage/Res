@@ -1,5 +1,5 @@
-import * as React from "react";
-import { Image, StyleSheet, Text, ScrollView, View } from "react-native";
+import React,{useState,useEffect} from "react";
+import { Image, StyleSheet, Text, ScrollView, View, Pressable } from "react-native";
 import {
   Padding,
   Border,
@@ -9,23 +9,74 @@ import {
 } from "../../../../GlobalStyles";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
-const ViewTicket = () => {
+import { GetApiRequest } from "../../../network/APIClient";
+
+const ViewTicket = ({route}) => {
   const navigation = useNavigation();
+  const [data,setData]=useState({})
+
+  const getTicketCommnets=(ticketNo)=>{
+    const request = `support/api/TicketCommants/${ticketNo}`;
+    GetApiRequest(
+      request,
+      (res) => {
+        console.log("getTicketCommnets", res);
+        if (res) {
+         // setData(res[0]);
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    )
+  }
+
+  useEffect(()=>{
+    let ticketNo=route?.params?.ticketId
+    console.log('TicketNo',JSON.stringify(route))
+    if(ticketNo){
+      const request = `support/api/tickets/${ticketNo}`;
+      GetApiRequest(
+        request,
+        (res) => {
+          console.log("getTicketItem", res);
+          if (res) {
+            setData(res[0]);
+            getTicketCommnets(res[0].ticketNumber)
+          }
+        },
+        (error) => {
+          console.log(error);
+        }
+      )
+    }
+
+  },[])
+
+
+  const RenderComments=()=>{
+    return(
+      <>
+      </>
+    )
+  }
+
+
   return (
     <View style={styles.ticketSupport}>
       <ProfileSettingsHeader
         title="View Ticket"
-        onPressBack={() => navigation.navigate("support")}
+        onPressBack={() => navigation.goBack()}
       />
       <ScrollView>
         <View style={[styles.ticketSupportInner]}>
           <View style={[styles.frameParent, styles.parentSpaceBlock]}>
             <View style={[styles.ticket101Parent, styles.parentSpaceBlock]}>
-              <Text style={styles.ticket101}>Ticket # 101</Text>
+              <Text style={styles.ticket101}>Ticket # {data?.ticketNumber}</Text>
               <View style={styles.badgeWrapper}>
-                <View style={[styles.badge, styles.badgeBorder]}>
-                  <Text style={[styles.text, styles.textTypo]}>RESOLVED</Text>
-                </View>
+                <Pressable style={[styles.closeBtn,styles.badgeBorder]}>
+                  <Text style={[styles.text, styles.textTypo]}>Close Ticket</Text>
+                </Pressable>
               </View>
             </View>
             <View style={styles.frameWrapper}>
@@ -186,7 +237,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   text: {
-    color: Color.success700,
+    color: Color.colorGray_200,
+    padding:Padding.p_9xs,
     fontFamily: FontFamily.openSansSemiBold,
   },
   badge: {
@@ -194,6 +246,16 @@ const styles = StyleSheet.create({
     borderColor: Color.colorAquamarine,
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  closeBtn: {
+    backgroundColor: Color.colorGainsboro_200,
+    borderColor: '#000',
+    paddingHorizontal: Padding.p_5xs,
+    paddingVertical: Padding.p_11xs,
+    
+    borderWidth:1,
     alignItems: "center",
     flexDirection: "row",
   },

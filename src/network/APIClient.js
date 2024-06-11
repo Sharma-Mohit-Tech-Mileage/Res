@@ -98,7 +98,7 @@ fetch(`${BASE_URL}${endpoint}`, requestOptions)
 export const GetApiRequest= async(endpoint, onSuccess,onError)=>{
  const user= await getUser()
  console.log('API URL',BASE_URL+endpoint)
- console.log(user.token)
+ //console.log(user.token)
 fetch(`${BASE_URL}/${endpoint}`, {
         method: 'GET',
         headers: {

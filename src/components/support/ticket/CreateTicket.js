@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState ,useCallback} from "react";
 import {
   Image,
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   View,
   Keyboard,
   ScrollView,
+  Pressable,
 } from "react-native";
 import {
   Padding,
@@ -28,12 +29,13 @@ import { userTicketSchema } from "../../utility/validationSchema";
 import WarningIcon from "../../../../assets/alert-triangle.png";
 import { GetApiRequest, PostApiRequest } from "../../../network/APIClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
-;
+import DocumentPicker, { types } from 'react-native-document-picker';
 
 const CreateTicket = () => {
   const navigation = useNavigation();
   const [selectedItem, setSelectedItem] = useState();
   const categories = ["Bill", "Support"];
+  const [fileResponse, setFileResponse] = useState([]);
 
   var Data = {
     subject: "",
@@ -65,12 +67,28 @@ const CreateTicket = () => {
         request,
         formData,
         (res) => {
+          navigation.goBack()
           reset()
         },
         (error) => {}
       );
     });
   };
+
+  
+
+  const handleDocumentSelection = useCallback(async () => {
+    try {
+      const response = await DocumentPicker.pick({
+        presentationStyle: 'fullScreen',
+        type: [types.pdf, types.plainText,types.images]
+      });
+      setFileResponse(response);
+      console.log('File respose:',JSON.stringify(response))
+    } catch (err) {
+      console.warn(err);
+    }
+  }, []);
 
   const handleValidationError = () => {
     //scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
@@ -85,7 +103,7 @@ const CreateTicket = () => {
           onPressBack={() => navigation.navigate("support")}
         />
 
-        <ScrollView>
+        <ScrollView >
           <View style={styles.innerContainer}>
             <View style={styles.frameParent}>
               <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
@@ -194,13 +212,13 @@ const CreateTicket = () => {
                   />
                 </View>
               </View>
-               <View style={{backgroundColor:Color.colorWhitesmoke_200,height:120,flexDirection:'column'}}>
-               <View style={{ margin:40,borderColor:Color.sparklightaddGray,borderWidth:2, borderRadius:10,borderStyle: 'dashed' ,height:80,flexDirection:'column',alignItems:'center', justifyContent:'center'}}>
-                <View style={{padding:10,alignItems:'center',}}>
-               <Text style={{color:'black'}}>Upload File</Text>
-               <Text style={{color:'black', fontSize:12, marginTop:10}}>Acceptable formats:.pdf,.png, .jpeg, .gif, .txt</Text>
+               <View style={styles.fileContainer}>
+               <Pressable style={styles.fileInnerContainer} onPress={handleDocumentSelection}>
+                <View style={{padding:20,alignItems:'center',justifyContent:'center'}}>
+               <Text style={styles.fileTxt}>{(fileResponse.length>0)? `Upload File: ${fileResponse[0].name}`:'Upload File'}</Text>
+               <Text style={styles.fileTxtSub}>Acceptable formats:.pdf,.png, .jpeg, .gif, .txt</Text>
                </View>
-               </View>
+               </Pressable>
                </View>
 
               <View>
@@ -235,6 +253,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: "90%",
     alignSelf: "center",
+    paddingBottom:150
   },
   frameGroupSpaceBlock: {
     paddingTop: Padding.p_8xs,
@@ -335,7 +354,31 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
     padding: Padding.p_xs,
     height: 180,
-  },
+  },fileContainer :{
+    backgroundColor:
+    Color.colorWhitesmoke_200,
+    padding:20,
+    marginBottom:10,
+    flexDirection:'column'
+  }, fileInnerContainer :{
+    borderColor:Color.sparklightaddGray,
+    borderWidth:2,
+     borderRadius:10,
+     
+     borderStyle: 'dashed' ,
+     flexDirection:'column',
+     alignItems:'center', 
+     alignSelf:'center'
+    },fileTxt :
+    {
+      color:'black',
+      fontSize: FontSize.size_sm,
+      fontFamily: FontFamily.openSansRegular,
+    }, fileTxtSub :{color:'black', 
+       fontSize:FontSize.size_xs,
+       marginTop:10,
+       fontFamily: FontFamily.openSansRegular,
+    }
 });
 
 export default CreateTicket;
