@@ -1,5 +1,12 @@
-import React,{useState,useEffect} from "react";
-import { Image, StyleSheet, Text, ScrollView, View, Pressable } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  ScrollView,
+  View,
+  Pressable,
+} from "react-native";
 import {
   Padding,
   Border,
@@ -10,31 +17,33 @@ import {
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
 import { GetApiRequest } from "../../../network/APIClient";
+import moment from "moment";
 
-const ViewTicket = ({route}) => {
+const ViewTicket = ({ route }) => {
   const navigation = useNavigation();
-  const [data,setData]=useState({})
+  const [data, setData] = useState({});
+  const [comments, setComments] = useState([]);
 
-  const getTicketCommnets=(ticketNo)=>{
-    const request = `support/api/TicketCommants/${ticketNo}`;
+  const getTicketCommnets = (ticketNo) => {
+    const request = `support/api/TicketComments/${ticketNo}`;
     GetApiRequest(
       request,
       (res) => {
         console.log("getTicketCommnets", res);
-        if (res) {
-         // setData(res[0]);
+        if (res.length > 0) {
+          setComments(res);
         }
       },
       (error) => {
         console.log(error);
       }
-    )
-  }
+    );
+  };
 
-  useEffect(()=>{
-    let ticketNo=route?.params?.ticketId
-    console.log('TicketNo',JSON.stringify(route))
-    if(ticketNo){
+  useEffect(() => {
+    let ticketNo = route?.params?.ticketId;
+    console.log("TicketNo", JSON.stringify(route));
+    if (ticketNo) {
       const request = `support/api/tickets/${ticketNo}`;
       GetApiRequest(
         request,
@@ -42,25 +51,38 @@ const ViewTicket = ({route}) => {
           console.log("getTicketItem", res);
           if (res) {
             setData(res[0]);
-            getTicketCommnets(res[0].ticketNumber)
+            getTicketCommnets(res[0].ticketNumber);
           }
         },
         (error) => {
           console.log(error);
         }
-      )
+      );
     }
+  }, []);
 
-  },[])
-
-
-  const RenderComments=()=>{
-    return(
+  const RenderComments = () => {
+    return (
       <>
+      { comments.map((item)=>(
+      <View style={styles.frameWrapperBorder}>
+        <View style={styles.frameParent1}>
+          <View style={styles.rightActionableParent}>
+            <View style={[styles.icon]}></View>
+            <Text style={[styles.agentResponse, styles.pmTypo]}>
+              Agent Response
+            </Text>
+            <Text style={[styles.pm, styles.billingTypo]}>{moment(item.created_at).format("MM/DD/YY hh:mma")}</Text>
+          </View>
+          <Text style={[styles.yesYouCan, styles.billingTypo]}>
+            {item.body}
+          </Text>
+        </View>
+      </View>
+  ))}
       </>
-    )
-  }
-
+    );
+  };
 
   return (
     <View style={styles.ticketSupport}>
@@ -72,10 +94,14 @@ const ViewTicket = ({route}) => {
         <View style={[styles.ticketSupportInner]}>
           <View style={[styles.frameParent, styles.parentSpaceBlock]}>
             <View style={[styles.ticket101Parent, styles.parentSpaceBlock]}>
-              <Text style={styles.ticket101}>Ticket # {data?.ticketNumber}</Text>
+              <Text style={styles.ticket101}>
+                Ticket # {data?.ticketNumber}
+              </Text>
               <View style={styles.badgeWrapper}>
-                <Pressable style={[styles.closeBtn,styles.badgeBorder]}>
-                  <Text style={[styles.text, styles.textTypo]}>Close Ticket</Text>
+                <Pressable style={[styles.closeBtn, styles.badgeBorder]}>
+                  <Text style={[styles.text, styles.textTypo]}>
+                    Close Ticket
+                  </Text>
                 </Pressable>
               </View>
             </View>
@@ -83,23 +109,6 @@ const ViewTicket = ({route}) => {
               <View style={styles.frameContainer}>
                 <View style={styles.frameContainer}>
                   <View style={styles.frameGroup}>
-                    <View style={styles.frameWrapperBorder}>
-                      <View style={styles.frameParent1}>
-                        <View style={styles.rightActionableParent}>
-                          <View style={[styles.icon]}></View>
-
-                          <Text style={[styles.agentResponse, styles.pmTypo]}>
-                            Agent Response
-                          </Text>
-                          <Text style={[styles.pm, styles.billingTypo]}>
-                            10/06/23 2:12pm
-                          </Text>
-                        </View>
-                        <Text style={[styles.yesYouCan, styles.billingTypo]}>
-                          Yes you can set up automatic billing, please do (xyz).
-                        </Text>
-                      </View>
-                    </View>
                     <View
                       style={[styles.frameWrapper2, styles.frameWrapperBorder]}
                     >
@@ -119,10 +128,10 @@ const ViewTicket = ({route}) => {
                             </Text>
                           </View>
                           <Text style={[styles.agentResponse, styles.pmTypo]}>
-                            Melissa Smith
+                            {data?.createdBy}
                           </Text>
                           <Text style={[styles.pm, styles.billingTypo]}>
-                            10/06/23 11:32am
+                            {moment(data?.lastUpdated).format("MM/DD/YY hh:mma")}
                           </Text>
                         </View>
                         <View
@@ -133,7 +142,7 @@ const ViewTicket = ({route}) => {
                         >
                           <View style={styles.frameParent1}>
                             <Text style={styles.issueType}>Issue Type</Text>
-                            <Text style={styles.billingTypo}>Billing</Text>
+                            <Text style={styles.billingTypo}>{data?.category}</Text>
                           </View>
                         </View>
                         <View
@@ -147,13 +156,14 @@ const ViewTicket = ({route}) => {
                               Issue Description
                             </Text>
                             <Text style={styles.billingTypo}>
-                              Can I set up automatic billing?
+                              {data?.description}
                             </Text>
                           </View>
                         </View>
                       </View>
                     </View>
                   </View>
+                  <RenderComments/>
                 </View>
               </View>
             </View>
@@ -238,7 +248,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Color.colorGray_200,
-    padding:Padding.p_9xs,
+    padding: Padding.p_9xs,
     fontFamily: FontFamily.openSansSemiBold,
   },
   badge: {
@@ -251,11 +261,11 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     backgroundColor: Color.colorGainsboro_200,
-    borderColor: '#000',
+    borderColor: "#000",
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,
-    
-    borderWidth:1,
+
+    borderWidth: 1,
     alignItems: "center",
     flexDirection: "row",
   },
