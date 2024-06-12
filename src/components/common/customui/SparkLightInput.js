@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     textInputContainer: {
-        height: 48, // Keep the input field height
+       // height: 48, // Keep the input field height
         color: Color.colorGray_200,
         paddingHorizontal: 10,
         borderWidth: 1,
