@@ -1,16 +1,8 @@
 import axios from 'axios';
 import { Env } from "./apis/account/Constants";
-//const BASE_URL_CABLEONE="https://customer.uat.cableone.net/apiWrapper/"
-const BASE_URL=Env.API_BASEURL
-
-const _axios_auth = axios.create({
-    baseURL: BASE_URL,
-    timeout: 15000,
-    headers: {
-        'Content-Type': 'application/json',
-        
-    }
-});
+import { getUser, storeUser } from "../redux/utils/LocalStorage";
+import { RefreshToken } from '../components/user/Session'
+const BASE_URL = Env.API_BASEURL
 
 const _axios = axios.create({
     baseURL: BASE_URL,
@@ -20,88 +12,40 @@ const _axios = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        
+
     }
 });
 
-const _axios_cableone = axios.create({
-    baseURL: BASE_URL,
-    withCredentials: false,
-    crossDomain: true,
-    timeout: 10000,
-    headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        
+_axios.interceptors.response.use(
+    response => response,
+    async error => {
+        const originalRequest = error.config;
+        console.log('#############################################interceptors%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
+        if (error.response.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            try {
+                const refreshedData = await RefreshToken();
+                console.log('#############################################interceptorsDuplicate%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
+                const user = await getUser();
+                user.token = refreshedData.accessToken;
+                user.refreshToken = refreshedData.refreshToken;
+                await storeUser(user);
+                console.log('interceptors:Updated Access Token:', refreshedData.accessToken);
+                console.log('interceptors:Updated Refresh Token:', refreshedData.refreshToken);
+                console.log('interceptors:User Info:', user);
+
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + user.token;
+                originalRequest.headers['Authorization'] = 'Bearer ' + user.token;
+
+                return axios(originalRequest);
+            } catch (tokenRefreshError) {
+                return Promise.reject(tokenRefreshError);
+            }
+        }
+        return Promise.reject(error);
     }
-});
+);
 
-//https://customer.uat.cableone.net/apiWrapper/mobile/api/mobileuser/900690538/updatemobiletcacceptanceflag/900690538/true
-
-
-// /**
-//  * Setup axios
-//  */
-// export const setupAxios = (store) => {
-//     // get token
-//     //const token = window.localStorage.getItem('token');
-//       const token="";
-//     // if token exists set token
-//     // dispatch login action
-//     if (token && token !== '' && token !== 'null') {
-//         // store.dispatch(userActions.login(token));
-//     }
-
-//     // reqeust intercpetor
-//     axios.interceptors.request.use(
-//         config => {
-//             // config token as default per request
-//             const _token = ""
-//             if (_token) {
-//                 config.headers.Authorization = `Bearer ${_token}`;
-//             }
-//             return config;
-//         },
-//     );
-
-//     // Add a response interceptor
-//     axios.interceptors.response.use(
-//         (response) => {
-//             // if error: "No permission!"
-//             // logout & go to login page
-//             if (response && response.data && response.data.error === 'No permission!') {
-//                 // store.dispatch(userActions.logout());
-//             }
-
-//             return response;
-//         },
-//         (error) => {
-//             const _error = { ...error };
-
-//             if (_error.response && _error.response.status === 401) {
-//                 // Unauthorized Request
-//                 // store.dispatch(userActions.logout());
-//             } else if (_error.response && _error.response.status === 403) {
-//                 // Forbiden Request
-//                 // store.dispatch(forbidenRequest());
-//             } else if (_error.response && _error.response.status === 404) {
-//                 // route not found
-//                 // store.dispatch(erroredRequest());
-//                 console.error('error 404');
-//                 //history.push('/error/404');
-//             } else if (!_error.response) {
-//                 // route not found
-//                 // store.dispatch(erroredRequest());
-//                 console.error('error 404');
-//                 //history.push('/error/404');
-//             }
-
-//             return Promise.reject(_error);
-//         }
-//     );
-// };
-
-
-
-export  {_axios, _axios_auth, _axios_cableone};
+export { _axios };
 

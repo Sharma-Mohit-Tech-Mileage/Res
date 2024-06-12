@@ -85,7 +85,7 @@ const SplashScreen = ({ navigation }) => {
       } else {
         storeUser(user);
         dispatch(saveUserInfo(user));
-        SetRenewTokenTimer();
+       // SetRenewTokenTimer();
         if (user.userInfo.mobileTCAcceptanceFlag) {
           navigation.reset({
             index: 0,

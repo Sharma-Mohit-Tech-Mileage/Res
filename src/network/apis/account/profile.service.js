@@ -1,4 +1,4 @@
-import { _axios, _axios_cableone } from "../../RestApiClient";
+import { _axios } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import axios from 'axios'; // Make sure to import axios
 import moment from "moment";
@@ -147,7 +147,7 @@ const fetchPushNotifications = async () => {
     };
     console.log(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`);
     try {
-        const response = await _axios_cableone.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`, { ...config });
+        const response = await _axios.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`, { ...config });
         return response.data;
     } catch (error) {
         console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`, error);
@@ -274,7 +274,7 @@ const postTermsAndConditions = async (flag) => {
     };
 
     try {
-        const response = await _axios_cableone.put(`/mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}`, {}, config);
+        const response = await _axios.put(`/mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}`, {}, config);
 
         return response;
     } catch (error) {
@@ -306,7 +306,7 @@ const postTermsAndConditionsv2 = async (flag) => {
     };
 
     try {
-        const response = await _axios_cableone.put(`/mobile/api/MobileUser/updateMobiletAspnuserDataSec`, payload, config);
+        const response = await _axios.put(`/mobile/api/MobileUser/updateMobiletAspnuserDataSec`, payload, config);
         return response;
     } catch (error) {
         console.error(`Error in API Call to /mobile/api/MobileUser/updateMobiletAspnuserDataSec:`, error);
@@ -330,7 +330,7 @@ const postPushNotifications = async (data) => {
     };
 
     try {
-        const response = await _axios_cableone.post(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, data, config);
+        const response = await _axios.post(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, data, config);
 
         console.log(`API Call Successful to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:`, response);
         return response;
