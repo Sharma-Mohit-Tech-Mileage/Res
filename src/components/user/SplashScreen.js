@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { View, Image, StyleSheet, Text, ActivityIndicator, Linking, TouchableOpacity, Modal, Platform } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
-import { authorize, refresh, logout } from "react-native-app-auth";
+import { authorize, refresh, logout ,revoke} from "react-native-app-auth";
 import { useDispatch } from "react-redux";
 import { saveUserInfo, logError, logInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData } from "../../redux/utils/LocalStorage";
@@ -127,7 +127,16 @@ const SplashScreen = ({ navigation }) => {
       }
     });
   };
-
+  const revokeToken = async (token) => {
+    try {
+      await revoke(config, {
+        tokenToRevoke: token,
+        sendClientId: true,
+      });
+    } catch (error) {
+      console.error("Error revoking token:", error);
+    }
+  };
   const onError = (error) => {
     setLoading(false);
     setDisconnected(true)
@@ -216,6 +225,10 @@ const SplashScreen = ({ navigation }) => {
 
   const loginAuth = async () => {
     try {
+      const currentUser = await getUser();
+      if (currentUser?.token) {
+        await revokeToken(currentUser.refreshToken);
+      }
       const result = await authorize(config);
       const data = {
         idToken: result.idToken,
