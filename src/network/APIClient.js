@@ -1,18 +1,84 @@
 import { getUser, storeUser } from "../redux/utils/LocalStorage";
 import { Env } from "./apis/account/Constants";
-import { RefreshToken } from '../components/user/Session'
+import { RefreshToken } from '../components/user/Session';
 
 const BASE_URL = Env.API_BASEURL;
 const SUPPORT_URL = "https://support.sparklight.com/api/v2/help_center/";
 const MODEM_BASE_URL = Env.MODEM_BASE_URL;
 
-export let UserAuthorized = false;
+let UserAuthorized = false;
+let isRefreshing = false;
+let failedQueue = [];
 
 export const isUserAuthorized = (authorize) => {
     UserAuthorized = authorize;
-}
+};
 
-const handleFetchResponse = async (response, idTokenGuid, refreshToken, onSuccess, onError) => {
+const handleFetchResponse = async (response, onSuccess, onError) => {
+    try {
+        const json = await response.json();
+        if (response.ok) {
+            onSuccess(json);
+        } else {
+            onError(`Response status ${response.status} (${response.statusText}): ${json.message}`);
+        }
+    } catch (error) {
+        onError(error.message);
+    }
+};
+
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+
+    failedQueue = [];
+};
+
+const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess, onError) => {
+    try {
+        console.log('Attempting API call:', endpoint);
+        let response = await fetchFunction(endpoint, options);
+        if (response.status === 401) {
+            console.log('401 Unauthorized, attempting to refresh token...');
+            if (!isRefreshing) {
+                isRefreshing = true;
+                try {
+                    const refreshedData = await RefreshToken();
+                    const user = await getUser();
+                    options.headers['Authorization'] = `Bearer ${user.token}`;
+                    console.log('Token refreshed successfully');
+                    processQueue(null, user.token);
+                } catch (refreshError) {
+                    console.log('Token refresh failed:', refreshError);
+                    processQueue(refreshError, null);
+                } finally {
+                    isRefreshing = false;
+                }
+            }
+
+            return new Promise((resolve, reject) => {
+                console.log('Adding request to queue');
+                failedQueue.push({ resolve, reject });
+            }).then(token => {
+                console.log('Retrying request with new token:', token);
+                options.headers['Authorization'] = `Bearer ${token}`;
+                return fetchFunction(endpoint, options);
+            });
+        }
+
+        return response;
+    } catch (error) {
+        console.log('API call failed:', error.message);
+        onError(error.message);
+    }
+};
+
+const handleAuthResponse = async (response, idTokenGuid, refreshToken, onSuccess, onError) => {
     const json = await response.json();
     if (response.ok) {
         if (idTokenGuid && refreshToken) {
@@ -25,24 +91,6 @@ const handleFetchResponse = async (response, idTokenGuid, refreshToken, onSucces
     }
 };
 
-const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess, onError) => {
-    try {
-        const response = await fetchFunction(endpoint, options);
-        if (response.status === 401) {
-            const refreshedData = await RefreshToken();
-            const user = await getUser();
-            user.token = refreshedData.accessToken;
-            user.refreshToken = refreshedData.refreshToken;
-            await storeUser(user);
-            options.headers['Authorization'] = `Bearer ${user.token}`;
-            const retryResponse = await fetchFunction(endpoint, options);
-            return retryResponse;
-        }
-        return response;
-    } catch (error) {
-        onError(error.message);
-    }
-};
 
 export const PostAuthApiRequest = (endpoint, body, onSuccess, onError) => {
     const idTokenGuid = body.idTokenGuid;
@@ -61,7 +109,7 @@ export const PostAuthApiRequest = (endpoint, body, onSuccess, onError) => {
     };
 
     fetch(`${BASE_URL}/${endpoint}`, options)
-        .then(response => handleFetchResponse(response, idTokenGuid, refreshToken, onSuccess, onError))
+        .then(response => handleAuthResponse(response, idTokenGuid, refreshToken, onSuccess, onError))
         .catch(exception => onError(exception));
 };
 
@@ -77,8 +125,9 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
         body: JSON.stringify(body)
     };
 
+    console.log('PostApiRequest:', endpoint);
     fetchWithTokenRefresh(fetch, `${BASE_URL}/${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, null, null, onSuccess, onError));
+        .then(response => handleFetchResponse(response, onSuccess, onError));
 };
 
 export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
@@ -90,8 +139,9 @@ export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
         body: JSON.stringify(body)
     };
 
+    console.log('PutApiRequest:', endpoint);
     fetchWithTokenRefresh(fetch, `${BASE_URL}${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, null, null, onSuccess, onError));
+        .then(response => handleFetchResponse(response, onSuccess, onError));
 };
 
 export const GetApiRequest = async (endpoint, onSuccess, onError) => {
@@ -105,12 +155,13 @@ export const GetApiRequest = async (endpoint, onSuccess, onError) => {
         }
     };
 
+    console.log('GetApiRequest:', endpoint);
     fetchWithTokenRefresh(fetch, `${BASE_URL}/${endpoint}`, options, onSuccess, onError)
         .then(response => {
             if (response.status === 204) {
                 onError(response.status);
             } else {
-                return handleFetchResponse(response, null, null, onSuccess, onError);
+                return handleFetchResponse(response, onSuccess, onError);
             }
         });
 };
@@ -126,8 +177,9 @@ export const GetApiRequestSearch = async (endpoint, onSuccess, onError) => {
         }
     };
 
+    console.log('GetApiRequestSearch:', endpoint);
     fetchWithTokenRefresh(fetch, `${SUPPORT_URL}/${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, null, null, onSuccess, onError));
+        .then(response => handleFetchResponse(response, onSuccess, onError));
 };
 
 export const GetModemStatusApiRequest = async (endpoint, onSuccess, onError) => {
@@ -140,6 +192,7 @@ export const GetModemStatusApiRequest = async (endpoint, onSuccess, onError) => 
         }
     };
 
+    console.log('GetModemStatusApiRequest:', endpoint);
     fetch(`${MODEM_BASE_URL}/${endpoint}`, options)
         .then(response => {
             if (response.status >= 400 && response.status < 600) {
@@ -151,9 +204,3 @@ export const GetModemStatusApiRequest = async (endpoint, onSuccess, onError) => 
         .then(json => onSuccess(json))
         .catch(exception => onError(exception.message));
 };
-
-
-
-
-
-

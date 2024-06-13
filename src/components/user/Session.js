@@ -25,45 +25,41 @@ const onSuccess = async (res) => {
             tokenGuid: res.idTokenGuid,
             refreshToken: res.refreshToken
         };
-
-        const uniqueIdentifier = res.idTokenGuid;
-
-        console.log(`Unique Identifier: ${uniqueIdentifier}`);
-        console.log('User Info:', userInfo);
-        console.log('JWT Token:', token);
-        console.log('Token GUID:', res.idTokenGuid);
-        console.log('Refresh Token:', res.refreshToken);
-
         if (token) {
-            storeUser(user);
+            await storeUser(user);
+            console.log('User stored in local storage:', user);
         }
         store.dispatch(saveUserInfo(user));
+        console.log('User info saved in redux store:', user);
+        return token; // Return the token here
     }
-};
-
-const onError = (error) => {
-    console.log("PostAuthApiRequest error", error);
+    throw new Error("No token received");
 };
 
 export const RefreshToken = async () => {
     try {
         console.log('RefreshToken called');
         const user = await getUser();
-        if (!user || !user.refreshToken) {
-            throw new Error("No user or refresh token found");
-        }
+        console.log('User retrieved from local storage:', user);
+
         const result = await refresh(config, {
             refreshToken: user.refreshToken,
         });
-        console.log('RefreshToken result:', result);
+        console.log('Token refresh result:', result);
+
         const data = {
             idToken: result.idToken,
             accessToken: result.accessToken,
             idTokenGuid: result.additionalParameters.session_state,
             refreshToken: result.refreshToken
         };
-        PostAuthApiRequest("/mobile/api/gettoken", data, onSuccess, onError);
+        console.log('Data prepared for PostAuthApiRequest:', data);
+
+        return new Promise((resolve, reject) => {
+            PostAuthApiRequest("/mobile/api/gettoken", data, resolve, reject);
+        }).then(onSuccess);
     } catch (error) {
         console.error("Error fetching data", error);
+        throw error;
     }
 };

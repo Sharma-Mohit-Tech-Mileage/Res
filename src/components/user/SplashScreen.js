@@ -13,7 +13,6 @@ import AlertIcon from "../../res/svgIcons/AlertIcon";
 import DeviceInfo from 'react-native-device-info';
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
-import { SetRenewTokenTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from 'react-native-version-check';

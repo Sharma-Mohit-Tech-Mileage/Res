@@ -1,8 +1,11 @@
+import React, { useEffect } from 'react';
 import axios from 'axios';
 import { Env } from "./apis/account/Constants";
-import { getUser, storeUser } from "../redux/utils/LocalStorage";
-import { RefreshToken } from '../components/user/Session'
-const BASE_URL = Env.API_BASEURL
+import { getUser, storeUser, cleanUserData } from "../redux/utils/LocalStorage";
+import { RefreshToken } from '../components/user/Session';
+import { useAuthInterceptor } from '../network/useAuthInterceptor';
+
+const BASE_URL = Env.API_BASEURL;
 
 const _axios = axios.create({
     baseURL: BASE_URL,
@@ -12,40 +15,85 @@ const _axios = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-
     }
 });
 
-_axios.interceptors.response.use(
-    response => response,
-    async error => {
-        const originalRequest = error.config;
-        console.log('#############################################interceptors%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
-        if (error.response.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
+let isRefreshing = false;
+let failedQueue = [];
 
-            try {
-                const refreshedData = await RefreshToken();
-                console.log('#############################################interceptorsDuplicate%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%');
-                const user = await getUser();
-                user.token = refreshedData.accessToken;
-                user.refreshToken = refreshedData.refreshToken;
-                await storeUser(user);
-                console.log('interceptors:Updated Access Token:', refreshedData.accessToken);
-                console.log('interceptors:Updated Refresh Token:', refreshedData.refreshToken);
-                console.log('interceptors:User Info:', user);
-
-                axios.defaults.headers.common['Authorization'] = 'Bearer ' + user.token;
-                originalRequest.headers['Authorization'] = 'Bearer ' + user.token;
-
-                return axios(originalRequest);
-            } catch (tokenRefreshError) {
-                return Promise.reject(tokenRefreshError);
-            }
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
         }
-        return Promise.reject(error);
-    }
-);
+    });
 
-export { _axios };
+    failedQueue = [];
+};
 
+const AxiosInterceptorProvider = ({ children }) => {
+    const { redirectToLogin } = useAuthInterceptor();
+
+    useEffect(() => {
+        const interceptor = _axios.interceptors.response.use(
+            response => response,
+            async error => {
+                const originalRequest = error.config;
+
+                console.log("Interceptor caught an error:", error);
+
+                if (error.response && error.response.status === 401 && !originalRequest._retry) {
+                    console.log("401 error and not a retry:", originalRequest.url);
+
+                    if (isRefreshing) {
+                        console.log("Token is currently being refreshed, adding request to queue.");
+                        return new Promise((resolve, reject) => {
+                            failedQueue.push({ resolve, reject });
+                        }).then(token => {
+                            originalRequest.headers['Authorization'] = 'Bearer ' + token;
+                            return _axios(originalRequest);
+                        }).catch(err => {
+                            return Promise.reject(err);
+                        });
+                    }
+
+                    originalRequest._retry = true;
+                    isRefreshing = true;
+
+                    try {
+
+                        const refreshedData = await RefreshToken();
+                        console.log("Token refreshed successfully:", refreshedData);
+                        const user = await getUser();
+                        console.log("Retrieved user for token refresh:", user);
+                        await storeUser(user);
+                        _axios.defaults.headers.common['Authorization'] = 'Bearer ' + user.token;
+                        originalRequest.headers['Authorization'] = 'Bearer ' + user.token;
+                        processQueue(null, user.token);
+                        isRefreshing = false;
+                        return _axios(originalRequest);
+                    } catch (tokenRefreshError) {
+                        console.error("Refresh token error:", tokenRefreshError);
+                        processQueue(tokenRefreshError, null);
+                        isRefreshing = false;
+                        console.log("Redirecting to login due to token refresh error.");
+                        await redirectToLogin();
+                        return Promise.reject(tokenRefreshError);
+                    }
+                }
+
+                return Promise.reject(error);
+            }
+        );
+
+        return () => {
+            _axios.interceptors.response.eject(interceptor);
+        };
+    }, [redirectToLogin]);
+
+    return children;
+};
+
+export { AxiosInterceptorProvider, _axios };
