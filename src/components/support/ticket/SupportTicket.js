@@ -87,14 +87,20 @@ const SupportTicket = () => {
           marginBottom: Padding.p_5xl,
         }}
       >
-        <Pressable style={styles.ticketParent} onPress={()=>{
-            navigation.navigate('ViewTicket',{ticketId:item.ticketNumber})
-        }}>
+        <Pressable
+          style={styles.ticketParent}
+          onPress={() => {
+            navigation.navigate("ViewTicket", { ticketId: item.ticketNumber });
+          }}
+        >
           <View
             style={{ paddingHorizontal: Padding.p_base, flexDirection: "row" }}
           >
             <PasswordKey />
-            <Text style={{fontFamily:FontFamily.interBold,fontSize:14}}> Tiicket #{item.ticketNumber} </Text>
+            <Text style={{ fontFamily: FontFamily.interBold, fontSize: 14 }}>
+              {" "}
+              Tiicket #{item.ticketNumber}{" "}
+            </Text>
           </View>
           <Image
             style={styles.chevronIconLayout}
@@ -102,13 +108,27 @@ const SupportTicket = () => {
             source={require("../../../../assets/chevronright.png")}
           />
         </Pressable>
-        <View style={{ flexDirection: "column", paddingHorizontal: Padding.p_5xl,marginTop:10 }}>
-          
-            <Text style={styles.issueType}>Status</Text>
-            <View style={{alignSelf:'flex-start',padding:0}}>
-              <Text style={[styles.text, styles.textTypo,styles.badge,styles.badgeBorder]}>{item.status}</Text>
-            </View>
-          
+        <View
+          style={{
+            flexDirection: "column",
+            paddingHorizontal: Padding.p_5xl,
+            marginTop: 10,
+          }}
+        >
+          <Text style={styles.issueType}>Status</Text>
+          <View style={{ alignSelf: "flex-start", padding: 0 }}>
+            <Text
+              style={[
+                styles.text,
+                styles.textTypo,
+                styles.badge,
+                styles.badgeBorder,
+              ]}
+            >
+              {item.status}
+            </Text>
+          </View>
+
           <View
             style={{
               justifyContent: "center",
@@ -145,16 +165,16 @@ const SupportTicket = () => {
             />
           </View>
           {ticketList.length > 0 ? (
-            <View style={{height:'88%'}}>
-            <FlatList
-              data={ticketList}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={RenderTicketList}
-              
-              //onEndReached={onEndReached}
-              //onEndReachedThreshold={0.1}
-              //ListFooterComponent={Footer}
-            />
+            <View style={{ height: "88%" }}>
+              <FlatList
+                data={ticketList}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={RenderTicketList}
+
+                //onEndReached={onEndReached}
+                //onEndReachedThreshold={0.1}
+                //ListFooterComponent={Footer}
+              />
             </View>
           ) : loading ? (
             <ActivityIndicator
