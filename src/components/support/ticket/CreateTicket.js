@@ -27,7 +27,7 @@ import { useNavigation } from "@react-navigation/native";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import { userTicketSchema } from "../../utility/validationSchema";
 import WarningIcon from "../../../../assets/alert-triangle.png";
-import { GetApiRequest, PostApiRequest } from "../../../network/APIClient";
+import { UploadMultipartData, PostApiRequest } from "../../../network/APIClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import DocumentPicker, { types } from 'react-native-document-picker';
 
@@ -36,6 +36,7 @@ const CreateTicket = () => {
   const [selectedItem, setSelectedItem] = useState();
   const categories = ["Bill", "Support"];
   const [fileResponse, setFileResponse] = useState([]);
+  const [upoadFileKey,setUploadFileKey] = useState([])
 
   var Data = {
     subject: "",
@@ -59,10 +60,13 @@ const CreateTicket = () => {
   });
 
   const handleSave = (formData) => {
+    if(upoadFileKey){
+      formData?.upload?.push(upoadFileKey)
+    }
+    console.log('save ticket',JSON.stringify(formData))
     getUser().then((res) => {
       formData.accountNumber = res.userInfo.accountNumber;
       const request = `support/api/Tickets`;
-      console.log("OnSubmit", JSON.stringify(formData));
       PostApiRequest(
         request,
         formData,
@@ -75,6 +79,23 @@ const CreateTicket = () => {
     });
   };
 
+  const uploadFiles=(data)=>{
+  
+      const request = `support/api/Attachments`;
+      UploadMultipartData(
+        request,
+        data,
+        (res) => {
+          console.log('Data',res)
+          if(res){
+            setUploadFileKey(res)
+          }
+        },
+        (error) => {
+          console.log('File Upload Error',error)
+        }
+      );
+  }
   
 
   const handleDocumentSelection = useCallback(async () => {
@@ -83,7 +104,10 @@ const CreateTicket = () => {
         presentationStyle: 'fullScreen',
         type: [types.pdf, types.plainText,types.images]
       });
+      if(response.length>0){
       setFileResponse(response);
+      uploadFiles(response[0])
+      }
       console.log('File respose:',JSON.stringify(response))
     } catch (err) {
       console.warn(err);

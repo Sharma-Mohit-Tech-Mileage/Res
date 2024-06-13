@@ -1,5 +1,13 @@
-import React,{useState,useEffect} from "react";
-import { Image, StyleSheet, Text, ScrollView, View, Pressable } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  ScrollView,
+  View,
+  Pressable,
+  TextInput,
+} from "react-native";
 import {
   Padding,
   Border,
@@ -10,31 +18,36 @@ import {
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
 import { GetApiRequest } from "../../../network/APIClient";
+import SparkLightButton from "../../common/customui/SparkLightButton";
+import moment from "moment";
+import DocumentPicker, { types } from "react-native-document-picker";
 
-const ViewTicket = ({route}) => {
+const ViewTicket = ({ route }) => {
   const navigation = useNavigation();
-  const [data,setData]=useState({})
+  const [data, setData] = useState({});
+  const [comments, setComments] = useState([]);
+  const [fileResponse, setFileResponse] = useState([]);
 
-  const getTicketCommnets=(ticketNo)=>{
-    const request = `support/api/TicketCommants/${ticketNo}`;
+  const getTicketCommnets = (ticketNo) => {
+    const request = `support/api/TicketComments/${ticketNo}`;
     GetApiRequest(
       request,
       (res) => {
         console.log("getTicketCommnets", res);
-        if (res) {
-         // setData(res[0]);
+        if (res.length > 0) {
+          setComments(res);
         }
       },
       (error) => {
         console.log(error);
       }
-    )
-  }
+    );
+  };
 
-  useEffect(()=>{
-    let ticketNo=route?.params?.ticketId
-    console.log('TicketNo',JSON.stringify(route))
-    if(ticketNo){
+  useEffect(() => {
+    let ticketNo = route?.params?.ticketId;
+    console.log("TicketNo", JSON.stringify(route));
+    if (ticketNo) {
       const request = `support/api/tickets/${ticketNo}`;
       GetApiRequest(
         request,
@@ -42,25 +55,53 @@ const ViewTicket = ({route}) => {
           console.log("getTicketItem", res);
           if (res) {
             setData(res[0]);
-            getTicketCommnets(res[0].ticketNumber)
+            getTicketCommnets(res[0].ticketNumber);
           }
         },
         (error) => {
           console.log(error);
         }
-      )
+      );
     }
+  }, []);
 
-  },[])
+  const handleDocumentSelection = useCallback(async () => {
+    try {
+      const response = await DocumentPicker.pick({
+        presentationStyle: "fullScreen",
+        type: [types.pdf, types.plainText, types.images],
+      });
+      setFileResponse(response);
+      console.log("File respose:", JSON.stringify(response));
+    } catch (err) {
+      console.warn(err);
+    }
+  }, []);
 
-
-  const RenderComments=()=>{
-    return(
+  const RenderComments = () => {
+    return (
       <>
+        {comments.map((item) => (
+          <View style={styles.frameWrapperBorder}>
+            <View style={styles.frameParent1}>
+              <View style={styles.rightActionableParent}>
+                {/* <View style={[styles.icon]}></View> */}
+                <Text style={[styles.agentResponse, styles.pmTypo]}>
+                  {item.id}
+                </Text>
+                <Text style={[styles.pm, styles.billingTypo]}>
+                  {moment(item.created_at).format("MM/DD/YY hh:mma")}
+                </Text>
+              </View>
+              <Text style={[styles.yesYouCan, styles.billingTypo]}>
+                {item.body}
+              </Text>
+            </View>
+          </View>
+        ))}
       </>
-    )
-  }
-
+    );
+  };
 
   return (
     <View style={styles.ticketSupport}>
@@ -71,89 +112,113 @@ const ViewTicket = ({route}) => {
       <ScrollView>
         <View style={[styles.ticketSupportInner]}>
           <View style={[styles.frameParent, styles.parentSpaceBlock]}>
-            <View style={[styles.ticket101Parent, styles.parentSpaceBlock]}>
-              <Text style={styles.ticket101}>Ticket # {data?.ticketNumber}</Text>
-              <View style={styles.badgeWrapper}>
-                <Pressable style={[styles.closeBtn,styles.badgeBorder]}>
-                  <Text style={[styles.text, styles.textTypo]}>Close Ticket</Text>
-                </Pressable>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <View
+                style={[
+                  styles.ticket101Parent,
+                  styles.parentSpaceBlock,
+                  { justifyContent: "space-between", width: "60%" },
+                ]}
+              >
+                <View style={{ flexDirection: "column" }}>
+                  <Text style={styles.ticket101}>
+                    Ticket # {data?.ticketNumber}
+                  </Text>
+                  <View style={{ alignSelf: "flex-start", marginTop: 10 }}>
+                    <Text
+                      style={[
+                        styles.text,
+                        styles.textTypo,
+                        styles.badge,
+                        styles.badgeBorder,
+                        { color: Color.success700 },
+                      ]}
+                    >
+                      {data?.status}
+                    </Text>
+                  </View>
+                </View>
               </View>
+              <Pressable
+                style={[
+                  styles.closeBtn,
+                  styles.badgeBorder,
+                  { height: 30, marginRight: 10, marginTop: 10 },
+                ]}
+              >
+                <Text style={[styles.text, styles.textTypo]}>Close Ticket</Text>
+              </Pressable>
             </View>
+
             <View style={styles.frameWrapper}>
               <View style={styles.frameContainer}>
                 <View style={styles.frameContainer}>
                   <View style={styles.frameGroup}>
-                    <View style={styles.frameWrapperBorder}>
-                      <View style={styles.frameParent1}>
-                        <View style={styles.rightActionableParent}>
-                          <View style={[styles.icon]}></View>
-
-                          <Text style={[styles.agentResponse, styles.pmTypo]}>
-                            Agent Response
-                          </Text>
-                          <Text style={[styles.pm, styles.billingTypo]}>
-                            10/06/23 2:12pm
-                          </Text>
-                        </View>
-                        <Text style={[styles.yesYouCan, styles.billingTypo]}>
-                          Yes you can set up automatic billing, please do (xyz).
-                        </Text>
-                      </View>
-                    </View>
                     <View
-                      style={[styles.frameWrapper2, styles.frameWrapperBorder]}
+                      style={[
+                        styles.frameWrapper4,
+                        styles.frameWrapperSpaceBlock,
+                      ]}
                     >
                       <View style={styles.frameParent1}>
-                        <View style={styles.rightActionableParent}>
+                        <Text style={styles.issueType}>Subject</Text>
+                        <Text style={styles.billingTypo}>{data?.subject}</Text>
+                      </View>
+                    </View>
+
+                    <View style={[{ marginTop: 10 }]}>
+                      <Text style={styles.issueType}>Describe issue</Text>
+                      <View style={{ borderWidth: 1 }}>
+                        <TextInput
+                          placeholder="Comment"
+                          onChangeText={() => {}}
+                          multiline
+                          numberOfLines={5}
+                          style={styles.textArea}
+                        />
+                      </View>
+
+                      <View style={styles.fileContainer}>
+                        <Pressable
+                          style={styles.fileInnerContainer}
+                          onPress={handleDocumentSelection}
+                        >
                           <View
-                            style={[styles.rightActionable, styles.iconLayout]}
+                            style={{
+                              padding: 20,
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
                           >
-                            <View
-                              style={[
-                                styles.avatarContrastInnerBorder,
-                                styles.homeIndicator1Position,
-                              ]}
-                            />
-                            <Text style={[styles.text1, styles.textTypo]}>
-                              MS
+                            <Text style={styles.fileTxt}>
+                              {fileResponse.length > 0
+                                ? `Upload File: ${fileResponse[0].name}`
+                                : "Upload File"}
+                            </Text>
+                            <Text style={styles.fileTxtSub}>
+                              Acceptable formats:.pdf,.png, .jpeg, .gif, .txt
                             </Text>
                           </View>
-                          <Text style={[styles.agentResponse, styles.pmTypo]}>
-                            Melissa Smith
-                          </Text>
-                          <Text style={[styles.pm, styles.billingTypo]}>
-                            10/06/23 11:32am
-                          </Text>
-                        </View>
-                        <View
-                          style={[
-                            styles.frameWrapper3,
-                            styles.frameWrapperSpaceBlock,
-                          ]}
-                        >
-                          <View style={styles.frameParent1}>
-                            <Text style={styles.issueType}>Issue Type</Text>
-                            <Text style={styles.billingTypo}>Billing</Text>
-                          </View>
-                        </View>
-                        <View
-                          style={[
-                            styles.frameWrapper4,
-                            styles.frameWrapperSpaceBlock,
-                          ]}
-                        >
-                          <View style={styles.frameParent1}>
-                            <Text style={styles.issueType}>
-                              Issue Description
-                            </Text>
-                            <Text style={styles.billingTypo}>
-                              Can I set up automatic billing?
-                            </Text>
-                          </View>
-                        </View>
+                        </Pressable>
+                      </View>
+
+                      <View
+                        style={{
+                          width: "30%",
+                          alignSelf: "flex-end",
+                          marginVertical: 10,
+                        }}
+                      >
+                        <SparkLightButton
+                          onPress={() => {}}
+                          buttonText="Add Note"
+                        />
                       </View>
                     </View>
                   </View>
+                  <RenderComments />
                 </View>
               </View>
             </View>
@@ -197,7 +262,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   pmTypo: {
-    marginLeft: 8,
     fontSize: FontSize.size_sm,
     textAlign: "left",
     color: Color.colorGray_100,
@@ -238,7 +302,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: Color.colorGray_200,
-    padding:Padding.p_9xs,
+    padding: Padding.p_9xs,
     fontFamily: FontFamily.openSansSemiBold,
   },
   badge: {
@@ -251,13 +315,10 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     backgroundColor: Color.colorGainsboro_200,
-    borderColor: '#000',
+    borderColor: "#000",
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,
-    
-    borderWidth:1,
-    alignItems: "center",
-    flexDirection: "row",
+    borderWidth: 1,
   },
   badgeWrapper: {
     marginLeft: 10,
@@ -275,7 +336,6 @@ const styles = StyleSheet.create({
   },
   agentResponse: {
     fontFamily: FontFamily.openSansSemiBold,
-    marginLeft: 8,
     fontWeight: "600",
     flex: 1,
   },
@@ -374,6 +434,42 @@ const styles = StyleSheet.create({
     width: "100%",
     flex: 1,
     overflow: "hidden",
+  },
+  textArea: {
+    color: Color.colorGray_200,
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    textAlignVertical: "top",
+    padding: Padding.p_xs,
+    height: 180,
+  },
+  fileContainer: {
+    backgroundColor: Color.colorWhitesmoke_200,
+    padding: 20,
+    marginBottom: 10,
+    marginTop: 20,
+    flexDirection: "column",
+  },
+  fileInnerContainer: {
+    borderColor: Color.sparklightaddGray,
+    borderWidth: 2,
+    borderRadius: 10,
+
+    borderStyle: "dashed",
+    flexDirection: "column",
+    alignItems: "center",
+    alignSelf: "center",
+  },
+  fileTxt: {
+    color: "black",
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.openSansRegular,
+  },
+  fileTxtSub: {
+    color: "black",
+    fontSize: FontSize.size_xs,
+    marginTop: 10,
+    fontFamily: FontFamily.openSansRegular,
   },
 });
 
