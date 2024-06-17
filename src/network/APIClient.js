@@ -131,6 +131,7 @@ const user = await getUser();
 
 export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
   // Example POST request
+  console.log('request',body)
   const user = await getUser();
   const requestOptions = {
     method: "PUT",
@@ -143,7 +144,7 @@ export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
   fetch(`${BASE_URL}${endpoint}`, requestOptions)
     .then((response) => Promise.all([response, response.json()]))
     .then(([response, json]) => {
-      // console.log('response', response);
+       console.log('response', response);
       if (!response.ok || !response.status === 201) {
         // We should get a 201 (Created) status code if everything is fine/working
         throw Error(

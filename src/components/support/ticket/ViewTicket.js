@@ -17,7 +17,7 @@ import {
 } from "../../../../GlobalStyles";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
-import { GetApiRequest, PostApiRequest,PutApiRequest } from "../../../network/APIClient";
+import { GetApiRequest, PostApiRequest,PutApiRequest ,UploadMultipartData} from "../../../network/APIClient";
 import SparkLightButton from "../../common/customui/SparkLightButton";
 import moment from "moment";
 import DocumentPicker, { types } from "react-native-document-picker";
@@ -29,6 +29,28 @@ const ViewTicket = ({ route }) => {
   const [myComment, setMyCommnet] = useState("");
   const [comments, setComments] = useState([]);
   const [fileResponse, setFileResponse] = useState([]);
+  const [upoadFileKey,setUploadFileKey] = useState([])
+
+
+
+  const getTicketDetails=()=>{
+    let ticketNo = route?.params?.ticketId;
+    if (ticketNo) {
+    const request = `support/api/tickets/${ticketNo}`;
+      GetApiRequest(
+        request,
+        (res) => {
+          if (res) {
+            setData(res[0]);
+            getTicketCommnets(res[0].ticketNumber);
+          }
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    }
+  }
 
   const getTicketCommnets = (ticketNo) => {
     const request = `support/api/TicketComments/${ticketNo}`;
@@ -47,25 +69,27 @@ const ViewTicket = ({ route }) => {
   };
 
   useEffect(() => {
-    let ticketNo = route?.params?.ticketId;
-    console.log("TicketNo", JSON.stringify(route));
-    if (ticketNo) {
-      const request = `support/api/tickets/${ticketNo}`;
-      GetApiRequest(
-        request,
-        (res) => {
-          console.log("getTicketItem", res);
-          if (res) {
-            setData(res[0]);
-            getTicketCommnets(res[0].ticketNumber);
-          }
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
-    }
+    getTicketDetails()
   }, []);
+
+
+  const uploadFiles=(data)=>{
+    const request = `support/api/Attachments`;
+    UploadMultipartData(
+      request,
+      data,
+      (res) => {
+        console.log('Data',res)
+        if(res){
+          setUploadFileKey(res)
+        }
+      },
+      (error) => {
+        console.log('File Upload Error',error)
+      }
+    );
+}
+
 
   const addNote = () => {
     let ticketNo = route?.params?.ticketId;
@@ -73,8 +97,9 @@ const ViewTicket = ({ route }) => {
       body: myComment,
       ticketId: `${ticketNo}`,
       type: "comment",
-      upload: [],
+      uploads: [`${upoadFileKey}`],
     };
+
 
     const request = `support/api/TicketComments`;
     PostApiRequest(
@@ -93,21 +118,16 @@ const ViewTicket = ({ route }) => {
 
   const closeTicket = () => {
     let ticketNo = route?.params?.ticketId;
-    const data = {
-      ticketNo
-    };
-
     const request = `support/api/Tickets`;
     PutApiRequest(
       request,
-      data,
+      ticketNo,
       (res) => {
         console.log("close ticket", res);
-        
       },
       (error) => {
-        console.error("close ticket error", error);
-        
+        console.log("close ticket error", error);
+        getTicketDetails();
       }
     );
   };
@@ -120,6 +140,7 @@ const ViewTicket = ({ route }) => {
         type: [types.pdf, types.plainText, types.images],
       });
       setFileResponse(response);
+      uploadFiles(response[0])
       console.log("File respose:", JSON.stringify(response));
     } catch (err) {
       console.warn(err);
@@ -189,6 +210,7 @@ const ViewTicket = ({ route }) => {
                   </View>
                 </View>
               </View>
+              {data?.status!='Closed' && (
               <Pressable
                 style={[
                   styles.closeBtn,
@@ -201,6 +223,7 @@ const ViewTicket = ({ route }) => {
               >
                 <Text style={[styles.text, styles.textTypo,{color:Color.colorMidnightblue}]}>Close Ticket</Text>
               </Pressable>
+             )}
             </View>
 
             <View style={styles.frameWrapper}>
