@@ -45,6 +45,7 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
   // Example POST request
   const user = await getUser();
   console.log("API URL", BASE_URL + endpoint);
+  console.log("REQUEST BODY", body);
   fetch(`${BASE_URL}/${endpoint}`, {
     method: "POST",
     headers: {
@@ -79,14 +80,14 @@ export const UploadMultipartData = async (
   onError
 ) => {
   // Example POST request
-
+const user = await getUser();
   const formData = new FormData();
   formData.append("file", {
     name: data.name,
     type: data.type,
     uri: data.uri,
   });
-  const user = await getUser();
+  
   await axios
     .post(`${BASE_URL}/${endpoint}`, formData, {
       headers: {

@@ -30,6 +30,7 @@ import WarningIcon from "../../../../assets/alert-triangle.png";
 import { UploadMultipartData, PostApiRequest } from "../../../network/APIClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import DocumentPicker, { types } from 'react-native-document-picker';
+import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
 
 const CreateTicket = () => {
   const navigation = useNavigation();
@@ -61,7 +62,7 @@ const CreateTicket = () => {
 
   const handleSave = (formData) => {
     if(upoadFileKey){
-      formData?.upload?.push(upoadFileKey)
+      formData?.upload?.push("nvmpOG2P1d8jATcJoMjMKBXCl")
     }
     console.log('save ticket',JSON.stringify(formData))
     getUser().then((res) => {
@@ -239,7 +240,10 @@ const CreateTicket = () => {
                <View style={styles.fileContainer}>
                <Pressable style={styles.fileInnerContainer} onPress={handleDocumentSelection}>
                 <View style={{padding:20,alignItems:'center',justifyContent:'center'}}>
-               <Text style={styles.fileTxt}>{(fileResponse.length>0)? `Upload File: ${fileResponse[0].name}`:'Upload File'}</Text>
+              <View style={{flexDirection:'row'}}>
+                  <AttachmentIcon/>
+                  <Text style={styles.fileTxt}>{(fileResponse.length>0)? `Upload File: ${fileResponse[0].name}`:'Upload File'}</Text>
+               </View>
                <Text style={styles.fileTxtSub}>Acceptable formats:.pdf,.png, .jpeg, .gif, .txt</Text>
                </View>
                </Pressable>
@@ -396,8 +400,9 @@ const styles = StyleSheet.create({
     },fileTxt :
     {
       color:'black',
-      fontSize: FontSize.size_sm,
+      fontSize: FontSize.size_base,
       fontFamily: FontFamily.openSansRegular,
+      marginLeft:5
     }, fileTxtSub :{color:'black', 
        fontSize:FontSize.size_xs,
        marginTop:10,
