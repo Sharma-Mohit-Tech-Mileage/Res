@@ -45,6 +45,7 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
   // Example POST request
   const user = await getUser();
   console.log("API URL", BASE_URL + endpoint);
+  console.log("REQUEST BODY", body);
   fetch(`${BASE_URL}/${endpoint}`, {
     method: "POST",
     headers: {
@@ -79,14 +80,14 @@ export const UploadMultipartData = async (
   onError
 ) => {
   // Example POST request
-
+const user = await getUser();
   const formData = new FormData();
   formData.append("file", {
     name: data.name,
     type: data.type,
     uri: data.uri,
   });
-  const user = await getUser();
+  
   await axios
     .post(`${BASE_URL}/${endpoint}`, formData, {
       headers: {
@@ -130,6 +131,7 @@ export const UploadMultipartData = async (
 
 export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
   // Example POST request
+  console.log('request',body)
   const user = await getUser();
   const requestOptions = {
     method: "PUT",
@@ -142,7 +144,7 @@ export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
   fetch(`${BASE_URL}${endpoint}`, requestOptions)
     .then((response) => Promise.all([response, response.json()]))
     .then(([response, json]) => {
-      // console.log('response', response);
+       console.log('response', response);
       if (!response.ok || !response.status === 201) {
         // We should get a 201 (Created) status code if everything is fine/working
         throw Error(

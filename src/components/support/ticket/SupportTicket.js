@@ -21,6 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 import { GetApiRequest } from "../../../network/APIClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import PasswordKey from "../../../res/svgIcons/passwordKey";
+import TicketListIcon from "../../../res/svgIcons/TicketListIcon";
 const SupportTicket = () => {
   const navigation = useNavigation();
   const [ticketList, setTicketList] = useState([]);
@@ -96,8 +97,8 @@ const SupportTicket = () => {
           <View
             style={{ paddingHorizontal: Padding.p_base, flexDirection: "row" }}
           >
-            <PasswordKey />
-            <Text style={{ fontFamily: FontFamily.interBold, fontSize: 14 }}>
+            <TicketListIcon/>
+            <Text style={{ fontFamily: FontFamily.interBold, fontSize: 14,textAlignVertical:'center' }}>
               {" "}
               Tiicket #{item.ticketNumber}{" "}
             </Text>
@@ -165,7 +166,7 @@ const SupportTicket = () => {
             />
           </View>
           {ticketList.length > 0 ? (
-            <View style={{ height: "88%" }}>
+            <View style={{ height: "85%" }}>
               <FlatList
                 data={ticketList}
                 keyExtractor={(item, index) => index.toString()}

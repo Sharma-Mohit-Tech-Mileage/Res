@@ -1,4 +1,4 @@
-import React, { useState ,useCallback} from "react";
+import React, { useState, useCallback } from "react";
 import {
   Image,
   StyleSheet,
@@ -27,16 +27,20 @@ import { useNavigation } from "@react-navigation/native";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import { userTicketSchema } from "../../utility/validationSchema";
 import WarningIcon from "../../../../assets/alert-triangle.png";
-import { UploadMultipartData, PostApiRequest } from "../../../network/APIClient";
+import {
+  UploadMultipartData,
+  PostApiRequest,
+} from "../../../network/APIClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
-import DocumentPicker, { types } from 'react-native-document-picker';
+import DocumentPicker, { types } from "react-native-document-picker";
+import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
 
 const CreateTicket = () => {
   const navigation = useNavigation();
   const [selectedItem, setSelectedItem] = useState();
   const categories = ["Bill", "Support"];
   const [fileResponse, setFileResponse] = useState([]);
-  const [upoadFileKey,setUploadFileKey] = useState([])
+  const [upoadFileKey, setUploadFileKey] = useState([]);
 
   var Data = {
     subject: "",
@@ -44,7 +48,7 @@ const CreateTicket = () => {
     email: "",
     accountNumber: "",
     category: "",
-    upload: [],
+    uploads: [],
   };
 
   const {
@@ -60,10 +64,10 @@ const CreateTicket = () => {
   });
 
   const handleSave = (formData) => {
-    if(upoadFileKey){
-      formData?.upload?.push(upoadFileKey)
+    if (upoadFileKey) {
+      formData?.uploads?.push(upoadFileKey);
     }
-    console.log('save ticket',JSON.stringify(formData))
+
     getUser().then((res) => {
       formData.accountNumber = res.userInfo.accountNumber;
       const request = `support/api/Tickets`;
@@ -71,44 +75,42 @@ const CreateTicket = () => {
         request,
         formData,
         (res) => {
-          navigation.goBack()
-          reset()
+          navigation.goBack();
+          reset();
         },
         (error) => {}
       );
     });
   };
 
-  const uploadFiles=(data)=>{
-  
-      const request = `support/api/Attachments`;
-      UploadMultipartData(
-        request,
-        data,
-        (res) => {
-          console.log('Data',res)
-          if(res){
-            setUploadFileKey(res)
-          }
-        },
-        (error) => {
-          console.log('File Upload Error',error)
+  const uploadFiles = (data) => {
+    const request = `support/api/Attachments`;
+    UploadMultipartData(
+      request,
+      data,
+      (res) => {
+        console.log("Data", res);
+        if (res) {
+          setUploadFileKey(res);
         }
-      );
-  }
-  
+      },
+      (error) => {
+        console.log("File Upload Error", error);
+      }
+    );
+  };
 
   const handleDocumentSelection = useCallback(async () => {
     try {
       const response = await DocumentPicker.pick({
-        presentationStyle: 'fullScreen',
-        type: [types.pdf, types.plainText,types.images]
+        presentationStyle: "fullScreen",
+        type: [types.pdf, types.plainText, types.images],
       });
-      if(response.length>0){
-      setFileResponse(response);
-      uploadFiles(response[0])
+      if (response.length > 0) {
+        setFileResponse(response);
+        uploadFiles(response[0]);
       }
-      console.log('File respose:',JSON.stringify(response))
+      console.log("File respose:", JSON.stringify(response));
     } catch (err) {
       console.warn(err);
     }
@@ -127,7 +129,7 @@ const CreateTicket = () => {
           onPressBack={() => navigation.navigate("support")}
         />
 
-        <ScrollView >
+        <ScrollView>
           <View style={styles.innerContainer}>
             <View style={styles.frameParent}>
               <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
@@ -145,7 +147,7 @@ const CreateTicket = () => {
                       <>
                         <SparkLightInput
                           onBlur={onBlur}
-                          label={"Subject"}
+                          label={"Subject*"}
                           placeholder={"Subject"}
                           onChangeText={onChange}
                           value={value}
@@ -158,7 +160,7 @@ const CreateTicket = () => {
 
                 <View style={styles.frameWrapper}>
                   <View style={styles.textView}>
-                    <Text style={styles.text}>Category</Text>
+                    <Text style={styles.text}>Category*</Text>
                     <Controller
                       control={control}
                       name="category"
@@ -191,10 +193,10 @@ const CreateTicket = () => {
                   </View>
                 </View>
                 <View style={styles.frameWrapper}>
-                <View style={styles.textView}>
-                    <Text style={styles.text}>Comment</Text>
-                    </View>
-                  <View style={[styles.frameBorder,{marginTop:10}]}>
+                  <View style={styles.textView}>
+                    <Text style={styles.text}>Comment*</Text>
+                  </View>
+                  <View style={[styles.frameBorder, { marginTop: 10 }]}>
                     <Controller
                       control={control}
                       name="comment"
@@ -226,7 +228,7 @@ const CreateTicket = () => {
                     }) => (
                       <SparkLightInput
                         placeholder="Email Address"
-                        label={"Email"}
+                        label={"Email*"}
                         onBlur={onBlur}
                         onChangeText={onChange}
                         value={value ? value.toLowerCase() : ""}
@@ -236,14 +238,32 @@ const CreateTicket = () => {
                   />
                 </View>
               </View>
-               <View style={styles.fileContainer}>
-               <Pressable style={styles.fileInnerContainer} onPress={handleDocumentSelection}>
-                <View style={{padding:20,alignItems:'center',justifyContent:'center'}}>
-               <Text style={styles.fileTxt}>{(fileResponse.length>0)? `Upload File: ${fileResponse[0].name}`:'Upload File'}</Text>
-               <Text style={styles.fileTxtSub}>Acceptable formats:.pdf,.png, .jpeg, .gif, .txt</Text>
-               </View>
-               </Pressable>
-               </View>
+              <View style={styles.fileContainer}>
+                <Pressable
+                  style={styles.fileInnerContainer}
+                  onPress={handleDocumentSelection}
+                >
+                  <View
+                    style={{
+                      padding: 20,
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <View style={{ flexDirection: "row" }}>
+                      <AttachmentIcon />
+                      <Text style={styles.fileTxt}>
+                        {fileResponse.length > 0
+                          ? `Upload File: ${fileResponse[0].name}`
+                          : "Upload File"}
+                      </Text>
+                    </View>
+                    <Text style={styles.fileTxtSub}>
+                      Acceptable formats:.pdf,.png, .jpeg, .gif, .txt
+                    </Text>
+                  </View>
+                </Pressable>
+              </View>
 
               <View>
                 <PrimaryButtom
@@ -277,7 +297,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: "90%",
     alignSelf: "center",
-    paddingBottom:150
+    paddingBottom: 150,
   },
   frameGroupSpaceBlock: {
     paddingTop: Padding.p_8xs,
@@ -378,31 +398,35 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
     padding: Padding.p_xs,
     height: 180,
-  },fileContainer :{
-    backgroundColor:
-    Color.colorWhitesmoke_200,
-    padding:20,
-    marginBottom:10,
-    flexDirection:'column'
-  }, fileInnerContainer :{
-    borderColor:Color.sparklightaddGray,
-    borderWidth:2,
-     borderRadius:10,
-     
-     borderStyle: 'dashed' ,
-     flexDirection:'column',
-     alignItems:'center', 
-     alignSelf:'center'
-    },fileTxt :
-    {
-      color:'black',
-      fontSize: FontSize.size_sm,
-      fontFamily: FontFamily.openSansRegular,
-    }, fileTxtSub :{color:'black', 
-       fontSize:FontSize.size_xs,
-       marginTop:10,
-       fontFamily: FontFamily.openSansRegular,
-    }
+  },
+  fileContainer: {
+    backgroundColor: Color.colorWhitesmoke_200,
+    padding: 20,
+    marginBottom: 10,
+    flexDirection: "column",
+  },
+  fileInnerContainer: {
+    borderColor: Color.sparklightaddGray,
+    borderWidth: 2,
+    borderRadius: 10,
+
+    borderStyle: "dashed",
+    flexDirection: "column",
+    alignItems: "center",
+    alignSelf: "center",
+  },
+  fileTxt: {
+    color: "black",
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    marginLeft: 5,
+  },
+  fileTxtSub: {
+    color: "black",
+    fontSize: FontSize.size_xs,
+    marginTop: 10,
+    fontFamily: FontFamily.openSansRegular,
+  },
 });
 
 export default CreateTicket;

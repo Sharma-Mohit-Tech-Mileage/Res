@@ -17,16 +17,40 @@ import {
 } from "../../../../GlobalStyles";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
-import { GetApiRequest } from "../../../network/APIClient";
+import { GetApiRequest, PostApiRequest,PutApiRequest ,UploadMultipartData} from "../../../network/APIClient";
 import SparkLightButton from "../../common/customui/SparkLightButton";
 import moment from "moment";
 import DocumentPicker, { types } from "react-native-document-picker";
+import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
 
 const ViewTicket = ({ route }) => {
   const navigation = useNavigation();
   const [data, setData] = useState({});
+  const [myComment, setMyCommnet] = useState("");
   const [comments, setComments] = useState([]);
   const [fileResponse, setFileResponse] = useState([]);
+  const [upoadFileKey,setUploadFileKey] = useState([])
+
+
+
+  const getTicketDetails=()=>{
+    let ticketNo = route?.params?.ticketId;
+    if (ticketNo) {
+    const request = `support/api/tickets/${ticketNo}`;
+      GetApiRequest(
+        request,
+        (res) => {
+          if (res) {
+            setData(res[0]);
+            getTicketCommnets(res[0].ticketNumber);
+          }
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    }
+  }
 
   const getTicketCommnets = (ticketNo) => {
     const request = `support/api/TicketComments/${ticketNo}`;
@@ -45,25 +69,69 @@ const ViewTicket = ({ route }) => {
   };
 
   useEffect(() => {
-    let ticketNo = route?.params?.ticketId;
-    console.log("TicketNo", JSON.stringify(route));
-    if (ticketNo) {
-      const request = `support/api/tickets/${ticketNo}`;
-      GetApiRequest(
-        request,
-        (res) => {
-          console.log("getTicketItem", res);
-          if (res) {
-            setData(res[0]);
-            getTicketCommnets(res[0].ticketNumber);
-          }
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
-    }
+    getTicketDetails()
   }, []);
+
+
+  const uploadFiles=(data)=>{
+    const request = `support/api/Attachments`;
+    UploadMultipartData(
+      request,
+      data,
+      (res) => {
+        console.log('Data',res)
+        if(res){
+          setUploadFileKey(res)
+        }
+      },
+      (error) => {
+        console.log('File Upload Error',error)
+      }
+    );
+}
+
+
+  const addNote = () => {
+    let ticketNo = route?.params?.ticketId;
+    const data = {
+      body: myComment,
+      ticketId: `${ticketNo}`,
+      type: "comment",
+      uploads: [`${upoadFileKey}`],
+    };
+
+
+    const request = `support/api/TicketComments`;
+    PostApiRequest(
+      request,
+      data,
+      (res) => {
+        console.log("Add Note", res);
+        getTicketCommnets(ticketNo);
+      },
+      (error) => {
+        console.log("add note error", error);
+        getTicketCommnets(ticketNo);
+      }
+    );
+  };
+
+  const closeTicket = () => {
+    let ticketNo = route?.params?.ticketId;
+    const request = `support/api/Tickets`;
+    PutApiRequest(
+      request,
+      ticketNo,
+      (res) => {
+        console.log("close ticket", res);
+      },
+      (error) => {
+        console.log("close ticket error", error);
+        getTicketDetails();
+      }
+    );
+  };
+
 
   const handleDocumentSelection = useCallback(async () => {
     try {
@@ -72,6 +140,7 @@ const ViewTicket = ({ route }) => {
         type: [types.pdf, types.plainText, types.images],
       });
       setFileResponse(response);
+      uploadFiles(response[0])
       console.log("File respose:", JSON.stringify(response));
     } catch (err) {
       console.warn(err);
@@ -141,15 +210,20 @@ const ViewTicket = ({ route }) => {
                   </View>
                 </View>
               </View>
+              {data?.status!='Closed' && (
               <Pressable
                 style={[
                   styles.closeBtn,
                   styles.badgeBorder,
                   { height: 30, marginRight: 10, marginTop: 10 },
                 ]}
+                onPress={()=>{
+                  closeTicket();
+                }}
               >
-                <Text style={[styles.text, styles.textTypo]}>Close Ticket</Text>
+                <Text style={[styles.text, styles.textTypo,{color:Color.colorMidnightblue}]}>Close Ticket</Text>
               </Pressable>
+             )}
             </View>
 
             <View style={styles.frameWrapper}>
@@ -167,56 +241,64 @@ const ViewTicket = ({ route }) => {
                         <Text style={styles.billingTypo}>{data?.subject}</Text>
                       </View>
                     </View>
-
-                    <View style={[{ marginTop: 10 }]}>
-                      <Text style={styles.issueType}>Describe issue</Text>
-                      <View style={{ borderWidth: 1 }}>
-                        <TextInput
-                          placeholder="Comment"
-                          onChangeText={() => {}}
-                          multiline
-                          numberOfLines={5}
-                          style={styles.textArea}
-                        />
-                      </View>
-
-                      <View style={styles.fileContainer}>
-                        <Pressable
-                          style={styles.fileInnerContainer}
-                          onPress={handleDocumentSelection}
-                        >
-                          <View
-                            style={{
-                              padding: 20,
-                              alignItems: "center",
-                              justifyContent: "center",
+                    {data?.status != "close" && (
+                      <View style={[{ marginTop: 10 }]}>
+                        <Text style={styles.issueType}>Describe issue</Text>
+                        <View style={{ borderWidth: 1 }}>
+                          <TextInput
+                            placeholder="Comment"
+                            onChangeText={(text) => {
+                              setMyCommnet(text);
+                              //console.log('test',text)
                             }}
-                          >
-                            <Text style={styles.fileTxt}>
-                              {fileResponse.length > 0
-                                ? `Upload File: ${fileResponse[0].name}`
-                                : "Upload File"}
-                            </Text>
-                            <Text style={styles.fileTxtSub}>
-                              Acceptable formats:.pdf,.png, .jpeg, .gif, .txt
-                            </Text>
-                          </View>
-                        </Pressable>
-                      </View>
+                            multiline
+                            numberOfLines={5}
+                            style={styles.textArea}
+                          />
+                        </View>
 
-                      <View
-                        style={{
-                          width: "30%",
-                          alignSelf: "flex-end",
-                          marginVertical: 10,
-                        }}
-                      >
-                        <SparkLightButton
-                          onPress={() => {}}
-                          buttonText="Add Note"
-                        />
+                        <View style={styles.fileContainer}>
+                          <Pressable
+                            style={styles.fileInnerContainer}
+                            onPress={handleDocumentSelection}
+                          >
+                            <View
+                              style={{
+                                padding: 20,
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <View style={{ flexDirection: "row" }}>
+                                <AttachmentIcon />
+                                <Text style={styles.fileTxt}>
+                                  {fileResponse.length > 0
+                                    ? `Upload File: ${fileResponse[0].name}`
+                                    : "Upload File"}
+                                </Text>
+                              </View>
+                              <Text style={styles.fileTxtSub}>
+                                Acceptable formats:.pdf,.png, .jpeg, .gif, .txt
+                              </Text>
+                            </View>
+                          </Pressable>
+                        </View>
+
+                        <View
+                          style={{
+                            alignSelf: "flex-end",
+                            marginVertical: 10,
+                          }}
+                        >
+                          <SparkLightButton
+                            onPress={() => {
+                              addNote();
+                            }}
+                            buttonText="Add Note"
+                          />
+                        </View>
                       </View>
-                    </View>
+                    )}
                   </View>
                   <RenderComments />
                 </View>
@@ -314,8 +396,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   closeBtn: {
-    backgroundColor: Color.colorGainsboro_200,
-    borderColor: "#000",
+    backgroundColor: Color.colorWhitesmoke_300,
+    borderColor: Color.sparklightaddGray,
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,
     borderWidth: 1,
@@ -462,8 +544,9 @@ const styles = StyleSheet.create({
   },
   fileTxt: {
     color: "black",
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
+    marginLeft: 5,
   },
   fileTxtSub: {
     color: "black",
