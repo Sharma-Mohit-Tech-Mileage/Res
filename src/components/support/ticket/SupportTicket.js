@@ -59,10 +59,7 @@ const SupportTicket = () => {
           <View style={styles.frameView}>
             <View style={styles.featuredIconParent}>
               <View style={styles.featuredIconLayout}>
-                <Image
-                  resizeMode="cover"
-                  source={require("../../../../assets/ticket-02.png")}
-                />
+               <TicketListIcon isGrey={true}/>
               </View>
               <Text style={[styles.noTicketsCreated, styles.createATicketTypo]}>
                 No Tickets Created
@@ -100,7 +97,7 @@ const SupportTicket = () => {
             <TicketListIcon/>
             <Text style={{ fontFamily: FontFamily.interBold, fontSize: 14,textAlignVertical:'center' }}>
               {" "}
-              Tiicket #{item.ticketNumber}{" "}
+              Ticket #{item.ticketNumber}{" "}
             </Text>
           </View>
           <Image
@@ -179,7 +176,7 @@ const SupportTicket = () => {
             </View>
           ) : loading ? (
             <ActivityIndicator
-              size="large"
+              size="small"
               color="#8D3B90"
               style={[styles.activityIndicator]}
             />

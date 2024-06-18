@@ -188,7 +188,6 @@ const ViewTicket = ({ route }) => {
                 style={[
                   styles.ticket101Parent,
                   styles.parentSpaceBlock,
-                  { justifyContent: "space-between", width: "60%" },
                 ]}
               >
                 <View style={{ flexDirection: "column" }}>
@@ -243,7 +242,7 @@ const ViewTicket = ({ route }) => {
                     </View>
                     {data?.status != "close" && (
                       <View style={[{ marginTop: 10 }]}>
-                        <Text style={styles.issueType}>Describe issue</Text>
+                        <Text style={styles.issueType}>Comment</Text>
                         <View style={{ borderWidth: 1 }}>
                           <TextInput
                             placeholder="Comment"
@@ -274,7 +273,7 @@ const ViewTicket = ({ route }) => {
                                 <Text style={styles.fileTxt}>
                                   {fileResponse.length > 0
                                     ? `Upload File: ${fileResponse[0].name}`
-                                    : "Upload File"}
+                                    : "Upload File(Optional)"}
                                 </Text>
                               </View>
                               <Text style={styles.fileTxtSub}>
@@ -283,7 +282,7 @@ const ViewTicket = ({ route }) => {
                             </View>
                           </Pressable>
                         </View>
-
+                      { comments.length!=0 && (
                         <View
                           style={{
                             alignSelf: "flex-end",
@@ -297,6 +296,7 @@ const ViewTicket = ({ route }) => {
                             buttonText="Add Note"
                           />
                         </View>
+                      )}
                       </View>
                     )}
                   </View>
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
   ticket101Parent: {
     alignItems: "center",
     flexDirection: "row",
-    paddingHorizontal: Padding.p_5xl,
+    paddingHorizontal: Padding.p_base,
   },
   rightActionableIcon: {
     borderRadius: Border.br_181xl,
