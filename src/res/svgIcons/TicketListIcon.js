@@ -9,7 +9,7 @@ const TicketListIcon = (props) => (
     {...props}
   >
     <Path
-      stroke="#8D3B90"
+      stroke={props.isGrey ?"#c8c8c8":"#8D3B90"}
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}

@@ -34,6 +34,7 @@ import {
 import { getUser } from "../../../redux/utils/LocalStorage";
 import DocumentPicker, { types } from "react-native-document-picker";
 import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
+import LoadingOverlay from "../../common/customui/CustomLoading";
 
 const CreateTicket = () => {
   const navigation = useNavigation();
@@ -41,6 +42,7 @@ const CreateTicket = () => {
   const categories = ["Bill", "Support"];
   const [fileResponse, setFileResponse] = useState([]);
   const [upoadFileKey, setUploadFileKey] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   var Data = {
     subject: "",
@@ -64,10 +66,10 @@ const CreateTicket = () => {
   });
 
   const handleSave = (formData) => {
+    setLoading(true);
     if (upoadFileKey) {
-      formData?.uploads?.push(upoadFileKey);
+      formData?.uploads.splice(0, 0, upoadFileKey);
     }
-
     getUser().then((res) => {
       formData.accountNumber = res.userInfo.accountNumber;
       const request = `support/api/Tickets`;
@@ -76,7 +78,9 @@ const CreateTicket = () => {
         formData,
         (res) => {
           navigation.goBack();
-          reset();
+          setTimeout(() => {
+            setLoading(false);
+          }, 500);
         },
         (error) => {}
       );
@@ -130,155 +134,181 @@ const CreateTicket = () => {
         />
 
         <ScrollView>
-          <View style={styles.innerContainer}>
-            <View style={styles.frameParent}>
-              <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
-                <View style={styles.ticketsParent}>
-                  <Text style={styles.tickets}>Tickets Details</Text>
-                </View>
-                <View style={styles.frameWrapper}>
-                  <Controller
-                    control={control}
-                    name="subject"
-                    render={({
-                      field: { onChange, onBlur, value },
-                      fieldState: { error },
-                    }) => (
-                      <>
-                        <SparkLightInput
-                          onBlur={onBlur}
-                          label={"Subject*"}
-                          placeholder={"Subject"}
-                          onChangeText={onChange}
-                          value={value}
-                          error={error?.message}
-                        />
-                      </>
-                    )}
-                  />
-                </View>
-
-                <View style={styles.frameWrapper}>
-                  <View style={styles.textView}>
-                    <Text style={styles.text}>Category*</Text>
+          <View style={{ flexDirection: "column", paddingBottom: "40%" }}>
+            <View style={[styles.innerContainer]}>
+              <View style={[styles.frameParent]}>
+                <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
+                  <View style={styles.ticketsParent}>
+                    <Text style={styles.tickets}>Tickets Details</Text>
+                  </View>
+                  <View style={styles.frameWrapper}>
+                    <View style={styles.textView}>
+                      <Text style={styles.text}>Subject*</Text>
+                    </View>
                     <Controller
                       control={control}
-                      name="category"
+                      name="subject"
                       render={({
                         field: { onChange, onBlur, value },
                         fieldState: { error },
                       }) => (
                         <>
-                          <SparkLightDropdown
-                            items={categories}
-                            selectedValue={selectedItem}
-                            onValueChange={onChange}
+                          <SparkLightInput
+                            onBlur={onBlur}
+                            placeholder={"Subject"}
+                            onChangeText={onChange}
+                            value={value}
                             error={error?.message}
                           />
-
-                          {error && (
-                            <View style={styles.errorContainer}>
-                              <Image
-                                source={WarningIcon}
-                                style={styles.errorIcon}
-                              />
-                              <Text style={styles.errorText}>
-                                {error?.message}
-                              </Text>
-                            </View>
-                          )}
                         </>
                       )}
                     />
                   </View>
-                </View>
-                <View style={styles.frameWrapper}>
-                  <View style={styles.textView}>
-                    <Text style={styles.text}>Comment*</Text>
+
+                  <View style={styles.frameWrapper}>
+                    <View style={styles.textView}>
+                      <Text style={styles.text}>Category*</Text>
+                      <Controller
+                        control={control}
+                        name="category"
+                        render={({
+                          field: { onChange, onBlur, value },
+                          fieldState: { error },
+                        }) => (
+                          <>
+                            <SparkLightDropdown
+                              items={categories}
+                              selectedValue={selectedItem}
+                              onValueChange={onChange}
+                              error={error?.message}
+                            />
+
+                            {error && (
+                              <View style={styles.errorContainer}>
+                                <Image
+                                  source={WarningIcon}
+                                  style={styles.errorIcon}
+                                />
+                                <Text style={styles.errorText}>
+                                  {error?.message}
+                                </Text>
+                              </View>
+                            )}
+                          </>
+                        )}
+                      />
+                    </View>
                   </View>
-                  <View style={[styles.frameBorder, { marginTop: 10 }]}>
+                  <View style={styles.frameWrapper}>
+                    <View style={styles.textView}>
+                      <Text style={styles.text}>Issue Description*</Text>
+                    </View>
+                    
+                      <Controller
+                        control={control}
+                        name="comment"
+                        render={({
+                          field: { onChange, onBlur, value },
+                          fieldState: { error },
+                        }) => (
+                          <View style={[ { marginTop: 10 }]}>
+                            <TextInput
+                              placeholder="Issue Description"
+                              onChangeText={onChange}
+                              multiline
+                              numberOfLines={5}
+                              style={[styles.textArea,styles.frameBorder]}
+                            />
+
+                            {error && (
+                              <View style={styles.errorContainer}>
+                                <Image
+                                  source={WarningIcon}
+                                  style={styles.errorIcon}
+                                />
+                                <Text style={styles.errorText}>{error.message}</Text>
+                              </View>
+                            )}
+                         </View>
+                        )}
+                      />
+                    
+                  </View>
+
+                  <View style={styles.frameWrapper}>
+                    <View style={styles.textView}>
+                      <Text style={styles.text}>Email*</Text>
+                    </View>
                     <Controller
                       control={control}
-                      name="comment"
+                      name="email"
                       render={({
                         field: { onChange, onBlur, value },
                         fieldState: { error },
                       }) => (
-                        <>
-                          <TextInput
-                            placeholder="Comment"
-                            onChangeText={onChange}
-                            multiline
-                            numberOfLines={5}
-                            style={styles.textArea}
-                          />
-                        </>
+                        <SparkLightInput
+                          placeholder="Email Address"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value ? value.toLowerCase() : ""}
+                          error={error?.message}
+                        />
                       )}
                     />
                   </View>
                 </View>
-
-                <View style={styles.frameWrapper}>
-                  <Controller
-                    control={control}
-                    name="email"
-                    render={({
-                      field: { onChange, onBlur, value },
-                      fieldState: { error },
-                    }) => (
-                      <SparkLightInput
-                        placeholder="Email Address"
-                        label={"Email*"}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value ? value.toLowerCase() : ""}
-                        error={error?.message}
-                      />
-                    )}
-                  />
-                </View>
-              </View>
-              <View style={styles.fileContainer}>
-                <Pressable
-                  style={styles.fileInnerContainer}
-                  onPress={handleDocumentSelection}
-                >
-                  <View
-                    style={{
-                      padding: 20,
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
+                <View style={styles.fileContainer}>
+                  <Pressable
+                    style={styles.fileInnerContainer}
+                    onPress={handleDocumentSelection}
                   >
-                    <View style={{ flexDirection: "row" }}>
-                      <AttachmentIcon />
-                      <Text style={styles.fileTxt}>
-                        {fileResponse.length > 0
-                          ? `Upload File: ${fileResponse[0].name}`
-                          : "Upload File"}
+                    <View
+                      style={{
+                        padding: 20,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <View style={{ flexDirection: "row" }}>
+                        <AttachmentIcon />
+                        <Text style={styles.fileTxt}>
+                          {fileResponse.length > 0
+                            ? `Upload File: ${fileResponse[0].name}`
+                            : "Upload File(Optional)"}
+                        </Text>
+                      </View>
+                      <Text style={styles.fileTxtSub}>
+                        Acceptable formats:.pdf,.png, .jpeg, .gif, .txt
                       </Text>
                     </View>
-                    <Text style={styles.fileTxtSub}>
-                      Acceptable formats:.pdf,.png, .jpeg, .gif, .txt
-                    </Text>
-                  </View>
-                </Pressable>
+                  </Pressable>
+                </View>
               </View>
+              <LoadingOverlay
+                loading={loading}
+                loadingTxt={"Creating Ticket..."}
+                onRequestClose={() => {
+                  setLoading(false);
+                }}
+              />
+            </View>
 
-              <View>
-                <PrimaryButtom
-                  title="Submit"
-                  onPress={handleSubmit(handleSave)}
-                  buttonType="submit"
-                />
-              </View>
-              <View>
-                <PrimaryButtom
-                  title="Cancel"
-                  //onPress={() => navigation.navigate("TicketSupport")}
-                  buttonType="cancel"
-                />
-              </View>
+            <View style={{ width: "90%", alignSelf: "center" }}>
+              <PrimaryButtom
+                title="Submit"
+                onPress={handleSubmit(handleSave)}
+                buttonType="submit"
+              />
+            </View>
+            <View>
+              <Pressable
+                style={[styles.buttons2, styles.buttonsLayout]}
+                onPress={() => navigation.goBack()}
+              >
+                <Text style={[styles.makePayment2, styles.makeTypo]}>
+                  Cancel
+                </Text>
+              </Pressable>
             </View>
           </View>
         </ScrollView>
@@ -297,7 +327,38 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: "90%",
     alignSelf: "center",
-    paddingBottom: 150,
+  },
+  buttons2: {
+    marginTop: 16,
+    backgroundColor: Color.colorWhitesmoke_200,
+  },
+  makePayment2: {
+    color: Color.colorMidnightblue,
+  },
+  buttonsLayout: {
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: Padding.p_base,
+    paddingHorizontal: 0,
+    borderRadius: Border.br_11xs,
+    height: 56,
+  },
+  buttons: {
+    padding: Padding.p_base,
+    marginTop: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: Border.br_11xs,
+    height: 32,
+    display: "none",
+    backgroundColor: Color.colorWhitesmoke_200,
+  },
+  makeTypo: {
+    width: 282,
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
   },
   frameGroupSpaceBlock: {
     paddingTop: Padding.p_8xs,
@@ -397,7 +458,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     textAlignVertical: "top",
     padding: Padding.p_xs,
-    height: 180,
+    height: 150,
   },
   fileContainer: {
     backgroundColor: Color.colorWhitesmoke_200,
