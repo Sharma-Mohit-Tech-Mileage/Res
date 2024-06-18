@@ -130,6 +130,14 @@ const TroubleshootContainer = () => {
           //     // Soft disconnect
 
           //   }
+          if(moment(res.paymentDueDate).isAfter()){
+            networkStatus[currentStep] = true;
+            setTimeout(() => {
+              setCurrentStep(3);
+            }, 2000);
+
+            setKey(3);
+          }else
           if (res.currentBalance <= 0) {
             // Bill paide
             networkStatus[currentStep] = true;

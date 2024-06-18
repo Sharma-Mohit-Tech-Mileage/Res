@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
-import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import { Image, StyleSheet, Text, Pressable, View, ScrollView, AccessibilityInfo } from "react-native";
 import { Padding, Color, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import { fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails, resentEmailVerifiction } from '../../redux/actions/ProfileActionSuite';
 import { transformResponse, transformNotificationPreferences, isPrimaryAdmin, isAdminRole, isFreshEntry, extractAcknowledgementEmail } from '../../components/utility/constant';
@@ -20,11 +20,38 @@ const Notifications = () => {
   const paperLessInfo = profile.paperLessInfo || {};
   const transformedNotification = transformNotificationPreferences(profile.pushNotifications || {});
   const data = transformResponse(smsSubscription);
-  const emailAddress = paperLessInfo.emailAddress||'';
+  const emailAddress = paperLessInfo.emailAddress || '';
   const isEmailVerified = paperLessInfo.emailStatus === 'Verified';
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   const isAdmin = isAdminRole(profileDetails.memberType);
   const acknowledgement = extractAcknowledgementEmail(paperLessInfo);
+  const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
+
+
+  useEffect(() => {
+    async function getAccessibility() {
+      try {
+        const accessibility = await AccessibilityInfo.isScreenReaderEnabled();
+        setIsScreenReaderEnabled(accessibility);
+      } catch (error) {
+        console.log(
+          "There has been a problem with AccessibilityInfo.isScreenReaderEnabled(): " +
+          error.message
+        );
+        setIsScreenReaderEnabled(false); // Setting a default value in case of error
+      }
+    }
+    getAccessibility();
+    const reduceMotionChangedSubscription = AccessibilityInfo.addEventListener(
+      "screenReaderChanged",
+      (isScreenReaderEnabled) => {
+        setIsScreenReaderEnabled(isScreenReaderEnabled);
+      }
+    );
+    return () => {
+      reduceMotionChangedSubscription.remove();
+    };
+  }, [screenReaderEnabled]);
 
   let notificationsTitle = '', infoText = '', isDisabled = false;
   if (profileDetails.multipleEmails) {
@@ -35,30 +62,57 @@ const Notifications = () => {
   else if (profileDetails.multipleEmails === false) {
     if (emailAddress || acknowledgement) {
       notificationsTitle = isEmailVerified ? '' : 'Email verification pending';
-      infoText = isEmailVerified ? (<Text>Emails are sent to <Text style={styles.text}>{emailAddress}</Text></Text>) :
-        (<Text>
-          <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation.
-          {isPrimary && (
-            <>
-              {' Check your inbox for our verification link.'}
-              <Text> {"\n"}</Text> 
-              <Text
-                accessible={true}
-                accessibilityRole="link"
-                accessibilityLabel="Resend Confirmation Email"
-                accessibilityHint="Activates the email verification process again"
-                style={styles.contactUsText}
-                hitSlop={{ top: 20, bottom:20, left: 20, right: 20 }}
-                onPress={() => dispatch(resentEmailVerifiction(navigation))}
-              >
-                Resend Confirmation Email
-              </Text>
-            </>
-          )}
-        </Text>);
+      if (screenReaderEnabled) {
+        infoText =
+          isEmailVerified ? (<Text>Emails are sent to <Text style={styles.text}>{emailAddress}</Text></Text>) :
+            (<Text
+              accessible={true}
+              accessibilityLabel={`${acknowledgement} is awaiting confirmation.Check your inbox for our verification link. Resend Confirmation Email link`}
+              onPress={() => dispatch(resentEmailVerifiction(navigation))}
+            >
+              <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation.
+              {isPrimary && (
+                <>
+                  {' Check your inbox for our verification link.'}
+                  <Text> {"\n"}</Text>
+                  <Text
+                    style={styles.contactUsText}
+                    hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+                    onPress={() => dispatch(resentEmailVerifiction(navigation))}
+                  >
+                    Resend Confirmation Email
+                  </Text>
+                </>
+              )}
+            </Text>);
+      }
+      else {
+        infoText =
+          isEmailVerified ? (<Text>Emails are sent to <Text style={styles.text}>{emailAddress}</Text></Text>) :
+            (<Text>
+              <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation.
+              {isPrimary && (
+                <>
+                  {' Check your inbox for our verification link.'}
+                  <Text> {"\n"}</Text>
+                  <Text
+                    accessible={true}
+                    accessibilityRole="link"
+                    accessibilityLabel="Resend Confirmation Email"
+                    accessibilityHint="Activates the email verification process again"
+                    style={styles.contactUsText}
+                    hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+                    onPress={() => dispatch(resentEmailVerifiction(navigation))}
+                  >
+                    Resend Confirmation Email
+                  </Text>
+                </>
+              )}
+            </Text>);
+      }
     }
     else if (profileDetails.svEmailAddress) {
-      infoText = (<Text>Emails are sent to <Text style={styles.text}>{profileDetails.svEmailAddress}</Text></Text>);
+      infoText = (<Text>Emails are sent to <Text style={styles.text}>{profileDetails.svEmailAddress.toLowerCase()}</Text></Text>);
     }
   }
 
@@ -127,6 +181,11 @@ const Notifications = () => {
             navigationTarget="TextNotifications"
             additionalSettings={data.subscriptionDetails}
             isAdmin={isAdmin}
+            screenReaderEnabled={screenReaderEnabled}
+            isEmailVerified={isEmailVerified}
+            dispatch={dispatch}
+            acknowledgement={acknowledgement}
+            isPrimary={isPrimary}
           />
           <View style={{ marginBottom: Padding.p_base }} />
           <NotificationSection
@@ -151,6 +210,11 @@ const Notifications = () => {
               { type: 'Paperless Billing', status: paperLessInfo?.paperlessStatus === 'Active' ? 'On' : 'Off' }
             ]}
             isAdmin={isAdmin}
+            screenReaderEnabled={screenReaderEnabled}
+            isEmailVerified={isEmailVerified}
+            dispatch={dispatch}
+            acknowledgement={acknowledgement}
+            isPrimary={isPrimary}
           />
           <View style={{ marginBottom: Padding.p_base }} />
           <NotificationSection
@@ -166,6 +230,11 @@ const Notifications = () => {
             transformedData={transformedNotification}
             additionalSettings={transformedNotification}
             isAdmin={false}
+            screenReaderEnabled={screenReaderEnabled}
+            isEmailVerified={isEmailVerified}
+            dispatch={dispatch}
+            acknowledgement={acknowledgement}
+            isPrimary={isPrimary}
           />
         </View>
 
@@ -188,7 +257,12 @@ const NotificationSection = ({
   email,
   navigationTarget,
   additionalSettings = [],
-  isAdmin
+  isAdmin,
+  screenReaderEnabled,
+  isEmailVerified,
+  dispatch,
+  acknowledgement,
+  isPrimary
 }) => {
 
   const navigation = useNavigation();
@@ -211,7 +285,7 @@ const NotificationSection = ({
       <View style={{ ...styles.parentSpaceBlock, alignSelf: "stretch" }}>
         <Text style={styles.textNotifications}>{title}</Text>
         {!isAdmin && <Pressable
-           style={({ pressed }) => [
+          style={({ pressed }) => [
             styles.buttons,
             styles.buttonsBg,
             isDisabled && styles.buttonDisabled,
@@ -244,14 +318,38 @@ const NotificationSection = ({
               source={require("../../../assets/infocircle.png")}
             />
           </View>
-          <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
-            {infoText}
-            {number && (
-              <Text style={[styles.text]} accessibilityLabel={`Phone Number: ${number}`}>
-                {number}
-              </Text>
-            )}
-          </Text>
+          {screenReaderEnabled && !isEmailVerified ?
+            <Text
+              accessible={true}
+              accessibilityLabel={`${acknowledgement} is awaiting confirmation.Check your inbox for our verification link. Resend Confirmation Email link`}
+              onPress={() => dispatch(resentEmailVerifiction(navigation))}
+              style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}
+            >
+              <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation.
+              {isPrimary && (
+                <Text style>
+                  {' Check your inbox for our verification link.'}
+                  <Text> {"\n"}</Text>
+                  <Text
+                    style={styles.contactUsText}
+                    hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+                    onPress={() => dispatch(resentEmailVerifiction(navigation))}
+                  >
+                    Resend Confirmation Email
+                  </Text>
+                </Text>
+              )}
+            </Text>
+            :
+            <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
+              {infoText}
+              {number && (
+                <Text style={[styles.text]} accessibilityLabel={`Phone Number: ${number}`}>
+                  {number}
+                </Text>
+              )}
+            </Text>
+          }
         </View>}
       </View>
       {additionalSettings.map((setting, index) => (

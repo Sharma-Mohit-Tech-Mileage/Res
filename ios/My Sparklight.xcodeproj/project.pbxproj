@@ -570,13 +570,13 @@
 				DEVELOPMENT_TEAM = W486HD85BD;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Sparklight/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "My Sparklight";
+				INFOPLIST_KEY_CFBundleDisplayName = Sparklight;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.0.4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -607,13 +607,13 @@
 				CURRENT_PROJECT_VERSION = 02;
 				DEVELOPMENT_TEAM = W486HD85BD;
 				INFOPLIST_FILE = Sparklight/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "My Sparklight";
+				INFOPLIST_KEY_CFBundleDisplayName = Sparklight;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 2.0.4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

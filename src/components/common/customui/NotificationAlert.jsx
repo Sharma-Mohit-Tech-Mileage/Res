@@ -1,7 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, AccessibilityInfo } from 'react-native';
 import { Color, FontSize, FontFamily } from '../../../../GlobalStyles';
 import { useNavigation } from "@react-navigation/native";
+import RenderText from '../RenderText';
+
 const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true, isVisible = true }) => {
     if (!isVisible) return null;
     const typeStyles = {
@@ -16,6 +18,34 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
     const handleClose = () => {
         onClose && onClose(); // Call the onClose prop function if it exists
     };
+
+    const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
+
+    useEffect(() => {
+        async function getAccessibility() {
+            try {
+                const accessibility = await AccessibilityInfo.isScreenReaderEnabled();
+                setIsScreenReaderEnabled(accessibility);
+            } catch (error) {
+                console.log(
+                    "There has been a problem with AccessibilityInfo.isScreenReaderEnabled(): " +
+                    error.message
+                );
+                setIsScreenReaderEnabled(false); // Setting a default value in case of error
+            }
+        }
+        getAccessibility();
+        const reduceMotionChangedSubscription = AccessibilityInfo.addEventListener(
+            "screenReaderChanged",
+            (isScreenReaderEnabled) => {
+                setIsScreenReaderEnabled(isScreenReaderEnabled);
+            }
+        );
+        return () => {
+            reduceMotionChangedSubscription.remove();
+        };
+    }, [screenReaderEnabled]);
+
     return (
         <View style={[styles.notificationContainer, { borderLeftColor: currentTypeStyle.color }]}>
             <Image
@@ -32,38 +62,56 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
             ]}>
                 {title && <Text style={[styles.title, { color: currentTypeStyle.color }]}>{title}</Text>}
                 {message ? (
-                    <Text style={!title ? styles.messageOnEmpty : styles.message}>
-                        {message.split("Please contact us").map((part, index, arr) => index < arr.length - 1 ? (
-                            <React.Fragment key={index}>
-                                <Text style={!title ? styles.messageOnEmpty : styles.message}>{part}</Text>
-                                <Text style={!title ? styles.messageOnEmpty : styles.message}>
-                                    {'\nPlease '}
-                                    <Text 
-                                        accessible={true}
-                                        accessibilityLabel="Contact us"
-                                        accessibilityRole="button"
-                                        accessibilityHint="Navigates to the support screen"
-                                        style={styles.contactUsText}
-                                        onPress={() => {
-                                            navigation.reset({
-                                                index: 0,
-                                                routes: [
-                                                    {
-                                                        name: 'Support',
-                                                        params: { isContactUs: true }
-                                                    },
-                                                ],
-                                            });
-                                        }}
-                                    >
-                                        contact us
-                                    </Text>
-                                </Text>
-                            </React.Fragment>
-                        ) : (
-                                <Text style={!title ? styles.messageOnEmpty : styles.message} key={index}>{part}</Text>
-                        ))}
-                    </Text>
+                    <RenderText
+                        navigation={navigation}
+                        splitKey={`contact us`}
+                        instruction={message}
+                        isFromNotification={true}
+                        style={!title ? styles.messageOnEmpty : styles.message}
+                        onTextPress={() => {
+                            navigation.reset({
+                                index: 0,
+                                routes: [
+                                    {
+                                        name: 'Support',
+                                        params: { isContactUs: true }
+                                    },
+                                ],
+                            });
+                        }}
+                    />
+                    // <Text style={!title ? styles.messageOnEmpty : styles.message}>
+                    //     {message.split("Please contact us").map((part, index, arr) => index < arr.length - 1 ? (
+                    //         <React.Fragment key={index}>
+                    //             <Text style={!title ? styles.messageOnEmpty : styles.message}>{part}</Text>
+                    //             <Text style={!title ? styles.messageOnEmpty : styles.message}>
+                    //                 {'\nPlease '}
+                    //                 <Text
+                    //                     accessible={true}
+                    //                     accessibilityLabel="Contact us"
+                    //                     accessibilityRole="button"
+                    //                     accessibilityHint="Navigates to the support screen"
+                    //                     style={styles.contactUsText}
+                    //                     onPress={() => {
+                    //                         navigation.reset({
+                    //                             index: 0,
+                    //                             routes: [
+                    //                                 {
+                    //                                     name: 'Support',
+                    //                                     params: { isContactUs: true }
+                    //                                 },
+                    //                             ],
+                    //                         });
+                    //                     }}
+                    //                 >
+                    //                     contact us
+                    //                 </Text>
+                    //             </Text>
+                    //         </React.Fragment>
+                    //     ) : (
+                    //         <Text style={!title ? styles.messageOnEmpty : styles.message} key={index}>{part}</Text>
+                    //     ))}
+                    // </Text>
                 ) : null}
 
 
@@ -129,12 +177,16 @@ const styles = StyleSheet.create({
         fontFamily: FontFamily.openSansRegular,
         fontWeight: '400',
         color: Color.colorGray_200,
+        paddingLeft: 0,
+        paddingRight: 0,
     },
     messageOnEmpty: {
         fontSize: FontSize.size_sm,
         fontFamily: FontFamily.openSansRegular,
         fontWeight: '400',
         color: Color.colorGray_200,
+        paddingLeft: 0,
+        paddingRight: 0,
     },
     contactUsText: {
         color: Color.colorMidnightblue,

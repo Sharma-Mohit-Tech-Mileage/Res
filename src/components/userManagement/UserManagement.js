@@ -23,7 +23,7 @@ import { removeUser } from "../../redux/actions/ProfileActionSuite";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 
-const UserManagement = () => {
+const UserManagement = ({route}) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [currentUser, setCurrentUser] = useState({});
@@ -33,6 +33,21 @@ const UserManagement = () => {
   const [showError, setShowError] = useState(false);
   const acNumber = userData?.userInfo?.accountNumber;
   const [isDeleteUser, setIsDeleteUser] = useState(false);
+
+  //console.log('Back',JSON.stringify(route))
+  if(route?.params?.isSuccess){
+    dispatch(executeUserList(0));
+  }
+  //const [isRefresh, setIsRefresh] = useState(false);
+  
+  // useEffect(()=>{
+   //if(  route?.params?.isSuccess){
+  //dispatch(executeUserList(0));
+  //     setIsRefresh(true)
+  //   }
+  // },[])
+
+
   useEffect(() => {
     dispatch(executeUserList(0));
   }, [dispatch]);
@@ -87,7 +102,7 @@ const UserManagement = () => {
               <Text style={[styles.text, styles.textClr]}>{initials}</Text>
             </View>
             <View>
-              <Text style={[styles.taylorNickum, styles.melissaSmithTypo]}>
+              <Text style={[styles.taylorNickum, styles.melissaSmithTypo,{flexWrap:'wrap', marginRight:75}]}>
                 {fullNameCamelCase}
               </Text>
               {isLoggedInUser && (
@@ -100,6 +115,7 @@ const UserManagement = () => {
             </View>
           </View>
           <View style={styles.frameParent2}>
+          { getUserType(user.memberType)!='VIEW ONLY' && (
             <Pressable
               style={styles.rightFlexBox}
               onPress={() =>
@@ -115,6 +131,8 @@ const UserManagement = () => {
                 source={require("../../../assets/right-actionable5.png")}
               />
             </Pressable>
+          )}
+          { getUserType(user.memberType)!='PRIMARY ADMIN' && (
             <Pressable
               style={[styles.rightActionableContainer, styles.rightFlexBox]}
               onPress={() => setCurrentUser(user)}
@@ -125,6 +143,7 @@ const UserManagement = () => {
                 source={require("../../../assets/right-actionable6.png")}
               />
             </Pressable>
+          )}
           </View>
         </View>
         <View style={styles.frameWrapper}>
@@ -184,7 +203,11 @@ const UserManagement = () => {
           />
           <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
             <View style={[styles.usersParent, styles.frameGroupSpaceBlock]}>
+              <View style={{flexDirection:'column', flex:2}}>
               <Text style={[styles.users, styles.usersFlexBox]}>Users</Text>
+              <Text style={[styles.users, styles.usersFlexBox,{fontSize:14}]}>*Add Up To 5 User Accounts</Text>
+              </View>
+             { userList.length <5 && (
               <Pressable
                 style={[styles.buttons, styles.buttonsBg]}
                 onPress={() =>
@@ -195,6 +218,7 @@ const UserManagement = () => {
                   Add User
                 </Text>
               </Pressable>
+             )}
             </View>
             <View style={styles.frameContainer}>
               {userList.map((user, index) => (
@@ -411,7 +435,7 @@ const styles = StyleSheet.create({
   },
   melsmith: {
     fontSize: FontSize.size_base,
-    textAlign: "left",
+    textAlign: 'left',
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 28,

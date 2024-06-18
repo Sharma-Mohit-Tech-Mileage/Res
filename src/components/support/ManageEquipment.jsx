@@ -1,22 +1,47 @@
 import * as React from "react";
-import { Image,StyleSheet,Text,TouchableOpacity,View, ActivityIndicator,} from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+  ScrollView,
+} from "react-native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import {FontFamily,Padding,Color,FontSize,Border,} from "../../../GlobalStyles";
+import {
+  FontFamily,
+  Padding,
+  Color,
+  FontSize,
+  Border,
+} from "../../../GlobalStyles";
 import MyServicePlan from "../common/MyServicePlan";
-import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
-import {GetApiRequest,GetModemStatusApiRequest} from "../../network/APIClient";
+import {
+  GetApiRequest,
+  GetModemStatusApiRequest,
+} from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
 import colors from "../../res/Colors";
-import {widthPercentageToDP as wp,heightPercentageToDP as hp,} from "react-native-responsive-screen";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import CheckConnection from "../../res/svgIcons/CheckConnection";
 import RefreshIcon from "../../res/svgIcons/RefreshIcon";
 import PubSub from "pubsub-js";
 import WifiIssueIcon from "../../res/svgIcons/WifiIssueIcon";
 import IntermittentIssues from "../../res/svgIcons/IntermittentIssues";
+import PasswordKey from "../../res/svgIcons/passwordKey";
 import Surfingissue from "../../res/svgIcons/surfingissue";
-const ManageEquipment = ({route}) => {
+import PasswordRetrieve from "../../res/svgIcons/PasswordRetrieve";
+import PasswordShare from "../../res/svgIcons/PasswordShare";
+import { Icon } from "native-base";
+import Loader from "../utility/Loader";
+
+const ManageEquipment = ({ route }) => {
   const navigation = useNavigation();
   const [manufacturer, setManufacturer] = React.useState("");
   const [model, setModel] = React.useState("");
@@ -27,6 +52,37 @@ const ManageEquipment = ({route}) => {
   const [currentHealth, setCurrentHealth] = React.useState("Optimal");
   const [isOffline, setIsOffline] = React.useState(false);
   const [isContactUs, setIsContactUs] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [wifiPasswordCanChange, setwifiPasswordCanChange] = React.useState(false);
+  const [wifiData, setwifiData] = React.useState([])
+  React.useEffect(() => {
+    getModemPassword();
+  }, [])
+
+  const getModemPassword = () => {
+    setLoading(true)
+    let re = getUser().then((res) => {
+      const request = `internet/api/internet/${res.userInfo.accountNumber}/modem/security/Get`;
+      GetApiRequest(request, onSuccessModemPassword, onErrorModemPassword);
+    });
+  };
+
+  const onSuccessModemPassword = (res) => {
+    setLoading(false)
+    console.log("getModemDetails", res);
+    if (res) {
+      if (res.length == 0) setwifiPasswordCanChange(false)
+      else setwifiPasswordCanChange(true)
+      const list = res.map((value) => value.ssid)
+      setwifiData(res)
+    }
+  };
+  const onErrorModemPassword = (error) => {
+    setLoading(false)
+    console.log("error", error);
+    setwifiPasswordCanChange(false)
+  };
+
 
   const getLeasedDetails = () => {
     let re = getUser().then((res) => {
@@ -118,9 +174,8 @@ const ManageEquipment = ({route}) => {
         ) {
           setCurrentHealth("Offline");
           setIsContactUs(true);
-        }else {
+        } else {
           setCurrentHealth("Offline");
-          
         }
       }
     );
@@ -166,24 +221,26 @@ const ManageEquipment = ({route}) => {
     getModemDetails();
     getLeasedDetails();
     getInternetPlanDetails();
+    
   }, []);
 
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
   }, [currentHealth]);
 
+  
+
   return (
     <View style={styles.manageEquipment}>
       <ProfileSettingsHeader
         title="Manage Equipment "
         onPressBack={() => {
-          if(route.params?.isFromTroubleshooting){
+          if (route.params?.isFromTroubleshooting) {
             navigation.goBack();
-          }else{
-          navigation.navigate("SupportStack")
+          } else {
+            navigation.navigate("SupportStack");
           }
-        }
-        }
+        }}
       />
       <ScrollView automaticallyAdjustContentInsets={false}>
         <View style={styles.myModemParent}>
@@ -206,9 +263,7 @@ const ManageEquipment = ({route}) => {
                       <Text style={[styles.motorola, styles.myModem1Typo]}>
                         {manufacturer}
                       </Text>
-                      <Text style={styles.mb8600Docsis}>
-                        {model}
-                      </Text>
+                      <Text style={styles.mb8600Docsis}>{model}</Text>
 
                       {!loadingHealth ? (
                         <View style={styles.poorHealthParent}>
@@ -216,10 +271,10 @@ const ManageEquipment = ({route}) => {
                             {isOffline
                               ? "Offline"
                               : currentHealth === "Poor"
-                              ? "Issue Detected"
-                              : currentHealth == "Offline"
-                              ? "Issue Detected"
-                              : "Optimal Health"}
+                                ? "Issue Detected"
+                                : currentHealth == "Offline"
+                                  ? "Issue Detected"
+                                  : "Optimal Health"}
                           </Text>
                           <Image
                             style={styles.frameChild}
@@ -227,10 +282,10 @@ const ManageEquipment = ({route}) => {
                               isOffline
                                 ? colors.sparklight_red
                                 : currentHealth === "Optimal"
-                                ? colors.sparklight_green
-                                : currentHealth === "Offline"
-                                ? colors.sparklight_red
-                                : colors.sparklight_yellow
+                                  ? colors.sparklight_green
+                                  : currentHealth === "Offline"
+                                    ? colors.sparklight_red
+                                    : colors.sparklight_yellow
                             }
                             resizeMode="cover"
                             source={require("../../../assets/Ellipse.png")}
@@ -243,13 +298,13 @@ const ManageEquipment = ({route}) => {
                           style={{ width: 40 }}
                         />
                       )}
-                      {leased.length>0 && (
-                      <View style={[styles.badge, styles.parentBorder]}>
-                        <Text style={[styles.text, styles.textTypo1]}>
-                          {leased.toLocaleUpperCase()}
-                        </Text>
-                      </View>
-                         )}
+                      {leased.length > 0 && (
+                        <View style={[styles.badge, styles.parentBorder]}>
+                          <Text style={[styles.text, styles.textTypo1]}>
+                            {leased.toLocaleUpperCase()}
+                          </Text>
+                        </View>
+                      )}
                     </View>
                   </View>
                 </View>
@@ -263,37 +318,57 @@ const ManageEquipment = ({route}) => {
                   ]}
                 >
                   <View style={[styles.notifications, styles.parentBorder1]}>
-
-          <View style={{ backgroundColor: isOffline
-                                ? colors.sparklight_red
-                                : currentHealth === "Offline"
-                                ? colors.sparklight_red
-                                : colors.sparklight_yellow , width: 4 }} />
+                    <View
+                      style={{
+                        backgroundColor: isOffline
+                          ? colors.sparklight_red
+                          : currentHealth === "Offline"
+                            ? colors.sparklight_red
+                            : colors.sparklight_yellow,
+                        width: 4,
+                      }}
+                    />
                     <View style={styles.bannerWarning}>
                       <View style={styles.rightActionableParent}>
-                        
                         <View style={styles.creditCardWillExpireSoonParent}>
-                          <View style={{flexDirection:'row'}}>
-                          <Image
-                          style={{ alignSelf: "center", width: 24, height: 24 }}
-                          resizeMode="cover"
-                          tintColor={isOffline
-                            ? colors.sparklight_red
-                            : currentHealth === "Optimal"
-                            ? colors.sparklight_green
-                            : currentHealth === "Offline"
-                            ? colors.sparklight_red
-                            : colors.sparklight_yellow}
-                          source={require("../../../assets/infocircle.png")}
-                        />
-                          <Text style={[styles.creditCardWill,{marginLeft:5,color:(currentHealth === "Poor")? '#000': Color.sparkLightRed }]}>
-                            {isOffline
-                              ? "Modem is Offline"
-                              : isContactUs
-                              ? "Please try again later"
-                              : "An issue has been detected"}
-                          </Text>
-                            </View>
+                          <View style={{ flexDirection: "row" }}>
+                            <Image
+                              style={{
+                                alignSelf: "center",
+                                width: 24,
+                                height: 24,
+                              }}
+                              resizeMode="cover"
+                              tintColor={
+                                isOffline
+                                  ? colors.sparklight_red
+                                  : currentHealth === "Optimal"
+                                    ? colors.sparklight_green
+                                    : currentHealth === "Offline"
+                                      ? colors.sparklight_red
+                                      : colors.sparklight_yellow
+                              }
+                              source={require("../../../assets/infocircle.png")}
+                            />
+                            <Text
+                              style={[
+                                styles.creditCardWill,
+                                {
+                                  marginLeft: 5,
+                                  color:
+                                    currentHealth === "Poor"
+                                      ? "#000"
+                                      : Color.sparkLightRed,
+                                },
+                              ]}
+                            >
+                              {isOffline
+                                ? "Modem is Offline"
+                                : isContactUs
+                                  ? "Please try again later"
+                                  : "An issue has been detected"}
+                            </Text>
+                          </View>
                           <Text
                             style={[
                               styles.yourSavedCard,
@@ -307,8 +382,6 @@ const ManageEquipment = ({route}) => {
                         </View>
                       </View>
                     </View>
-
-
                   </View>
                 </View>
               )}
@@ -329,8 +402,8 @@ const ManageEquipment = ({route}) => {
                       : currentHealth === "Offline" ||
                         isOffline ||
                         currentHealth === "Poor"
-                      ? "#EF4E3E10"
-                      : "white",
+                        ? "#EF4E3E10"
+                        : "white",
                   },
                 ]}
                 onPress={() => {
@@ -342,7 +415,7 @@ const ManageEquipment = ({route}) => {
                 <CheckConnection />
                 <Text style={styles.modemHealthSupport}>Check connection</Text>
                 <Image
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -356,8 +429,8 @@ const ManageEquipment = ({route}) => {
                         ? "white"
                         : currentHealth === "Offline" ||
                           currentHealth === "Poor"
-                        ? "#EF4E3E10"
-                        : "white",
+                          ? "#EF4E3E10"
+                          : "white",
                     },
                   ]}
                   onPress={() => {
@@ -380,7 +453,7 @@ const ManageEquipment = ({route}) => {
                   <RefreshIcon />
                   <Text style={styles.modemHealthSupport}>Reboot Modem</Text>
                   <Image
-                    resizeMode="stretch"
+                    style={styles.rightIconStyle}
                     source={require("../../../assets/chevronright.png")}
                   />
                 </TouchableOpacity>
@@ -394,8 +467,8 @@ const ManageEquipment = ({route}) => {
                     backgroundColor: isContactUs
                       ? "white"
                       : currentHealth === "Offline"
-                      ? "#EF4E3E10"
-                      : "white",
+                        ? "#EF4E3E10"
+                        : "white",
                   },
                 ]}
                 onPress={() => {
@@ -409,7 +482,7 @@ const ManageEquipment = ({route}) => {
                 />
                 <Text style={styles.modemHealthSupport}>Exchange Modem</Text>
                 <Image
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -442,16 +515,93 @@ const ManageEquipment = ({route}) => {
                   tintColor={Color.sparklightBrightPurple}
                   source={require("../../../assets/phone-outgoing-04.png")}
                 />
-                <Text style={styles.modemHealthSupport} accessible={true}
+                <Text
+                  style={styles.modemHealthSupport}
+                  accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel="Contact us for more information">Contact Us</Text>
+                  accessibilityLabel="Contact us for more information"
+                >
+                  Contact Us
+                </Text>
                 <Image
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
             </View>
           </View>
+
+          {/*Wifi Passoword*/}
+          {wifiPasswordCanChange && <View
+            style={[
+              styles.myModem,
+              styles.myModemSpaceBlock,
+              { marginTop: 20 },
+            ]}
+          >
+            <View
+              style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
+            >
+              <Text style={[styles.myModem1, styles.myModem1Typo]}>
+                WiFi Password
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.supportAccordionParent,
+                styles.supportParentFlexBox,
+              ]}
+            >
+              <View style={[styles.frameLayout]} />
+
+              <TouchableOpacity
+                style={[styles.frame9defaultSpaceBlock]}
+                onPress={() => {
+                  navigation.navigate("UpdateModemPassword");
+                }}
+              >
+                <PasswordKey />
+                <Text style={styles.modemHealthSupport}>Update Password</Text>
+                <Image
+                  style={styles.rightIconStyle}
+                  source={require("../../../assets/chevronright.png")}
+                />
+              </TouchableOpacity>
+
+              <View style={[styles.frameLayout]} />
+              <TouchableOpacity
+                style={[styles.frame9defaultSpaceBlock]}
+                onPress={() => {
+                  navigation.navigate("RetrieveModemPassword");
+                }}
+              >
+                <PasswordRetrieve />
+                <Text style={styles.modemHealthSupport}>Retrieve Password</Text>
+                <Image
+                  style={styles.rightIconStyle}
+                  source={require("../../../assets/chevronright.png")}
+                />
+              </TouchableOpacity>
+
+              <View style={[styles.frameLayout]} />
+              <TouchableOpacity
+                style={[styles.frame9defaultSpaceBlock]}
+                onPress={() => {
+                  navigation.navigate('ShareWifiScreen', { wifiData: wifiData })
+                }}
+              >
+                <PasswordShare />
+                <Text style={styles.modemHealthSupport}>
+                  Share Password
+                </Text>
+                <Image
+                  style={styles.rightIconStyle}
+                  source={require("../../../assets/chevronright.png")}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>}
+
 
           {/* Quick Link section */}
 
@@ -489,7 +639,7 @@ const ManageEquipment = ({route}) => {
                 <WifiIssueIcon />
                 <Text style={styles.modemHealthSupport}>Wifi Issues</Text>
                 <Image
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -507,7 +657,7 @@ const ManageEquipment = ({route}) => {
                 <Surfingissue />
                 <Text style={styles.modemHealthSupport}>Surfing Issues</Text>
                 <Image
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -516,8 +666,10 @@ const ManageEquipment = ({route}) => {
               <TouchableOpacity
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
-                  if(!loadingHealth){
-                  navigation.navigate("PeriodicProblems",{isError:(currentHealth !='Optimal' || isOffline)});
+                  if (!loadingHealth) {
+                    navigation.navigate("PeriodicProblems", {
+                      isError: currentHealth != "Optimal" || isOffline,
+                    });
                   }
                 }}
               >
@@ -526,7 +678,7 @@ const ManageEquipment = ({route}) => {
                   Intermittent Issues
                 </Text>
                 <Image
-                  resizeMode="stretch"
+                  style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
                 />
               </TouchableOpacity>
@@ -538,6 +690,7 @@ const ManageEquipment = ({route}) => {
           </View>
         </View>
       </ScrollView>
+      {loading ? <Loader /> : null}
     </View>
   );
 };
@@ -572,7 +725,6 @@ const styles = StyleSheet.create({
   parentBorder1: {
     borderWidth: 1,
     borderStyle: "solid",
-    
   },
   textTypo1: {
     fontSize: FontSize.textXsSemibold_size,
@@ -685,7 +837,7 @@ const styles = StyleSheet.create({
     color: Color.sparkLightRed,
     fontSize: FontSize.textXsSemibold_size,
     textAlign: "left",
-    alignSelf:'center'
+    alignSelf: "center",
   },
   yourSavedCard: {
     color: Color.colorGray_100,
@@ -707,7 +859,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightWhite,
     alignSelf: "stretch",
     flex: 1,
-    padding:5
+    padding: 5,
   },
   notifications: {
     flexDirection: "row",
@@ -764,6 +916,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  rightIconStyle: {
+    width: 20,
+    height: 20,
+    resizeMode: "contain"
+  }
 });
 
 export default ManageEquipment;

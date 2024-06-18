@@ -1,16 +1,18 @@
 // SupportStack.js
 
 import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ManageEquipment from "../../components/support/ManageEquipment";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemRebootStack from "./ModemRebootStack";
 import ModemExchangeInstructions from "../../components/support/ModemExchangeInstructions";
+import UpdateModemPassword from "../../components/support/UpdateModemPassword";
+import RetrieveModemPassword from "../../components/support/RetrieveModemPassword";
 import SupportStackScreen from "./SupportStack";
 import ModemConnectivityGuide from "../../components/support/Troubleshooting/ModemConnectivityGuide";
 import PeriodicProblems from "../../components/support/Troubleshooting/PeriodicProblems";
 
-const ModemStack = createStackNavigator();
+const ModemStack = createNativeStackNavigator();
 
 function ModemStackScreen({route}) {
   console.log('Manage equipment')
@@ -48,6 +50,25 @@ function ModemStackScreen({route}) {
           blur: () => setTabBarVisible(true),
         }}
       />
+        <ModemStack.Screen
+        name="UpdateModemPassword"
+        component={UpdateModemPassword}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+        <ModemStack.Screen
+        name="RetrieveModemPassword"
+        component={RetrieveModemPassword}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+      
       <ModemStack.Screen
         name="SupportStack"
         component={SupportStackScreen}

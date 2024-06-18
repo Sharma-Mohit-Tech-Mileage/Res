@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Text,
   SafeAreaView,
-  Pressable,
+  Linking,
   Platform,
   ActivityIndicator
 } from "react-native";
@@ -45,24 +45,50 @@ const ChatSupportModal = ({ department, onClose }) => {
   // JavaScript code to set tags for Zendesk Chat Widget
   const injectedJavaScript = `
     window.zESettings = {
-
-      
       webWidget: {
         color: { 
-          theme: '#8D3B90',
-          launcher: '#8D3B90', // This will also update the badge
+          theme: '#353091',
+          launcher: '#353091', // This will also update the badge
           launcherText: '#EBEEF1',
-          button: '#8D3B90',
-          resultLists: '#691840',
-          header: '#8D3B90',
-          articleLinks: '#8D3B90'
+          button: '#353091',
+          resultLists: '#353091',
+          header: '#353091',
+          articleLinks: '#353091'
         },
         chat: {
           departments: {
             //  enabled: []
-              enabled: ['Resi ${departmentName} Support'],
+              enabled: ['SPK TCC Residential'],
   
-              select: ['Resi ${departmentName} Support'],
+              select: ['SPK TCC Residential'],
+            },
+          tags: ${tagsString},
+        
+        }
+      }
+    };
+  `;
+
+  const injectedJavaScriptBill = `
+    window.zESettings = {
+
+      
+      webWidget: {
+        color: { 
+          theme: '#353091',
+          launcher: '#353091', // This will also update the badge
+          launcherText: '#EBEEF1',
+          button: '#353091',
+          resultLists: '#353091',
+          header: '#353091',
+          articleLinks: '#353091'
+        },
+        chat: {
+          departments: {
+            //  enabled: []
+              enabled: ['SPK Virtual Call Center'],
+  
+              select: ['SPK Virtual Call Center'],
             },
           tags: ${tagsString},
         
@@ -84,7 +110,10 @@ const ChatSupportModal = ({ department, onClose }) => {
   };
 
   const onMessage = (event) => {
-    console.log("onMessageEvent: ", event);
+    console.log("onMessageEvent: ", event.nativeEvent.data)
+    if( event.nativeEvent.data==='open'){
+      closeModal()
+    }
   };
 
   // const INJECTED_JAVASCRIPT = `(function() {
@@ -124,7 +153,7 @@ const ChatSupportModal = ({ department, onClose }) => {
     >
       <View style={{ flex: 1,backgroundColor:'#fff' }}>
         <ProfileSettingsHeader onPressBack={closeModal} title="Chat With Us" />
-        <View style={{ width: "100%", height: "78%" }}>
+        <View style={{ width: "100%", height: "84%" }}>
           <WebView
            originWhitelist={["*"]}
            allowFileAccess={true}
@@ -138,7 +167,7 @@ const ChatSupportModal = ({ department, onClose }) => {
             allowUniversalAccessFromFileURLs={true}
             allowFileAccessFromFileURLs={true}
             mixedContentMode="always"
-            onNavigationStateChange={navigationChange}
+            //onNavigationStateChange={navigationChange}
             onMessage={onMessage}
             onLoadStart={()=>{
               setLoading(true)
@@ -148,8 +177,14 @@ const ChatSupportModal = ({ department, onClose }) => {
                 setLoading(false)
               },1000)
             }}
+            onShouldStartLoadWithRequest={(request) => {
+              if(request.url.includes('attachments')) {
+                Linking.openURL(request.url)
+                return false
+              } else return true
+            }}
             
-            injectedJavaScript={injectedJavaScript}
+            injectedJavaScript={(department==='tech')?injectedJavaScript:injectedJavaScriptBill}
           />
         </View>
         {loading && (

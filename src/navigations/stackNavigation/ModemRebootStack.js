@@ -1,13 +1,13 @@
 // SupportStack.js
 
 import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemReboot from "../../components/support/ModemReboot";
 import ModemRebootInstructions from "../../components/support/ModemRebootInstuction";
 import SupportStackScreen from "./SupportStack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-const ModemRebootStack1 = createStackNavigator();
+const ModemRebootStack1 = createNativeStackNavigator();
 
 function ModemRebootStack({route}) {
   const { setTabBarVisible } = useTabBarVisibility();

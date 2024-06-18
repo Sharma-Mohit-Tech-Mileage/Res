@@ -6,13 +6,27 @@ import eyeIcon from '../../../../assets/eye.png';
 import eyeSlashIcon from '../../../../assets/HidePassword-01.png'
 
 const SparkLightInput = ({
-    name, label,placeholder, value, onChangeText, style, accessibilityLabel, secure = false, error, editable = true, ...props }) => {
+    name,
+    label,
+    placeholder,
+    value,
+    onChangeText,
+    style,
+    accessibilityLabel,
+    secure = false,
+    error,
+    editable = true,
+    showTextIcon = false,
+    inputStyle,
+    ...props
+}) => {
     const [isFocused, setIsFocused] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState(!secure); // default to false if secure is true
 
     const handleInputChange = (text) => {
         if (onChangeText) {
-            onChangeText({ target: { name, value: text } });
+            onChangeText(text)
+            // onChangeText({ target: { name, value: text } });
         }
     };
 
@@ -36,25 +50,33 @@ const SparkLightInput = ({
                     </TouchableOpacity>
                 )}
             </View>
-            <TextInput
-                placeholder={placeholder}
-                value={value}
-                onChangeText={handleInputChange}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                editable={editable}
-                secureTextEntry={secure && !passwordVisible}
-                style={[
-                    styles.textInput,
-                    !editable && styles.disabledInput,
-                    isFocused && !error && { borderColor: Color.sparklightBrightPurple },
-                    error && { borderColor: 'red' },
-                    !isFocused && !error && { borderColor: Color.sparklightDarkGray }
-                ]}
-                accessibilityLabel={accessibilityLabel || placeholder}
-                maxFontSizeMultiplier={1.25}
-                {...props}
-            />
+            <View style={[styles.textInputContainer, {
+                borderColor: isFocused && !error ? Color.sparklightBrightPurple : Color.sparklightDarkGray
+            }]}>
+                {showTextIcon &&
+                    <Image style={styles.lockIcon} source={require('../../../../assets/password_lock.png')} />
+                }
+
+                <TextInput
+                    placeholder={placeholder}
+                    value={value}
+                    onChangeText={handleInputChange}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    editable={editable}
+                    secureTextEntry={secure && !passwordVisible}
+                    style={[
+                        styles.textInput,
+                        !editable && styles.disabledInput, inputStyle,
+                        isFocused && !error && { borderColor: Color.sparklightBrightPurple },
+                        error && { borderColor: 'red' },
+                        !isFocused && !error && { borderColor: Color.sparklightDarkGray }
+                    ]}
+                    accessibilityLabel={accessibilityLabel || placeholder}
+                    maxFontSizeMultiplier={1.25}
+                    {...props}
+                />
+            </View>
             {error && (
                 <View style={styles.errorContainer}>
                     <Image source={warningIcon} style={styles.errorIcon} />
@@ -82,10 +104,18 @@ const styles = StyleSheet.create({
         height: 48, // Keep the input field height
         color: Color.colorGray_200,
         fontSize: FontSize.size_base,
-        paddingHorizontal: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,
+        borderRadius: Border.br_11xs,
+        flex: 1
+    },
+    textInputContainer: {
+       // height: 48, // Keep the input field height
+        color: Color.colorGray_200,
+        paddingHorizontal: 10,
         borderWidth: 1,
         borderRadius: Border.br_11xs,
+        flexDirection: "row",
+        alignItems: "center"
     },
 
     errorContainer: {
@@ -144,6 +174,12 @@ const styles = StyleSheet.create({
         color: Color.colorMidnightblue,
         lineHeight: 28,
     },
+    lockIcon: {
+        width: 20,
+        height: 20,
+        resizeMode: "contain",
+        marginRight: 10
+    }
 });
 
 export default SparkLightInput;

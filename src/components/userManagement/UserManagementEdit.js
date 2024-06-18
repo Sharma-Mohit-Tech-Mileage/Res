@@ -24,7 +24,7 @@ import SparkLightInput from "../common/customui/SparkLightInput";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
 import { useDispatch } from "react-redux";
 import { getUserType } from "../utility/constant";
-import { userSchema } from "../utility/validationSchema";
+import { userSchema,userSchemaNoPass } from "../utility/validationSchema";
 
 import {
   addNewUser,
@@ -63,6 +63,8 @@ const UserManagementEdit = ({ route }) => {
     isnewUser = false;
   }
 
+  //console.log('NN',(user?.securityQuestion === "Add your own question"))
+
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] =
     useState(false);
@@ -72,20 +74,20 @@ const UserManagementEdit = ({ route }) => {
   const [showError, setShowError] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
-
   const [errorMsg, setErrorMsg] = useState("");
   const [profileDetails, setProfileDetails] = useState(user);
   const [loading, setLoading] = useState(false);
+  const [pass,setPass]=useState('')
   const scrollViewRef = useRef(null);
   // Handler for when the security question dropdown value changes
-  const handleSecurityQuestionChange = (itemValue) => {
+  const handleSecurityQuestionChange = (itemValue,onChange) => {
     setProfileDetails({
-      ...user,
+      ...profileDetails,
       securityQuestion: itemValue === "Add your own question" ? "" : itemValue,
     });
     setCustomSecurityQuestion(itemValue);
     setIsCustomQuestionSelected(itemValue === "Add your own question");
-    console.log(itemValue);
+    //onChange(itemValue)
   };
 
   const {
@@ -96,43 +98,64 @@ const UserManagementEdit = ({ route }) => {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(userSchema(isCustomQuestionSelected)),
+    resolver: yupResolver((isnewUser || pass?.target?.value.length>0 )?userSchema(isCustomQuestionSelected):userSchemaNoPass(isCustomQuestionSelected)),
     defaultValues: profileDetails,
   });
-
+ // console.log('Password',(isnewUser || pass?.target?.value.length>0 ))
+  //setValue('newPassword', 'value', { shouldValidate: false })
   const handleSave = (formData) => {
+    //console.log('Request',formData)
     setLoading(true);
     if (route.params?.User != undefined) {
+
+      formData['securityQuestion']= isCustomQuestionSelected ? formData.securityQuestion :customSecurityQuestion
       dispatch(
         editNewUser(formData, (isSuccess) => {
           if (!isSuccess) {
             setLoading(false);
           } else {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "UserManagement" }],
-            });
+            setLoading(false);
+            setTimeout(()=>{
+              navigation.navigate('UserManagement', { isSuccess: true });
+              //navigation.reset({
+                //index: 0,
+                //routes: [{ name: "UserManagement" }],
+              //});
+            },1000)
           }
         })
       ); // Dispatch with formData// Dispatch with formData
     } else {
+      formData['securityQuestion']= isCustomQuestionSelected ? formData.securityQuestion :customSecurityQuestion
+
+      console.log('request',formData)
       dispatch(
         addNewUser(formData, (isSuccess, msg) => {
           if (!isSuccess) {
             setLoading(false);
-            console.log("Message", msg?.error);
             setErrorMsg(msg?.error);
-            //setError('userName', { type: 'custom', message:msg });
             scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: false });
           } else {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "UserManagement" }],
-            });
+            setLoading(false);
+            setTimeout(()=>{
+              navigation.navigate('UserManagement', { isSuccess: true });
+              //navigation.reset({
+                //index: 0,
+                //routes: [{ name: "UserManagement" }],
+              //});
+            },1000)
           }
         })
-      ); // Dispatch with formData
+      ); 
     }
+  };
+
+  const handleOnChangeText = (
+    value,
+    onChange
+  ) => {
+    onChange(value);
+    setPass(value);
   };
 
   const handleValidationError = () => {
@@ -143,7 +166,7 @@ const UserManagementEdit = ({ route }) => {
   useEffect(() => {
     // Reset the form with the updated profile details
     // reset(profileDetails);
-    console.log(profileDetails);
+    //console.log(profileDetails);
   }, [profileDetails, reset]);
 
   useEffect(() => {
@@ -153,16 +176,21 @@ const UserManagementEdit = ({ route }) => {
   }, [errorMsg]);
 
   useEffect(() => {
+
+    if(!isnewUser){
     const storedSecurityQuestion = profileDetails?.securityQuestion;
-    const isCustomQuestion =
-      storedSecurityQuestion &&
-      !securityQuestions.includes(storedSecurityQuestion);
-    setIsCustomQuestionSelected(isCustomQuestion);
-    if (isCustomQuestion) {
+    console.log('custom Question',storedSecurityQuestion)
+    const isCustomQuestion =securityQuestions.includes(storedSecurityQuestion);
+      console.log('iscutom',isCustomQuestion),
+    setIsCustomQuestionSelected(!isCustomQuestion);
+    if (!isCustomQuestion) {
       setCustomSecurityQuestion("Add your own question");
+      
     } else {
       setCustomSecurityQuestion(storedSecurityQuestion);
     }
+  }
+
   }, []);
 
   const LoadingOverlay = () => {
@@ -324,6 +352,9 @@ const UserManagementEdit = ({ route }) => {
                         )}
                       />
                     </View>
+                    <Text style={styles.bulletPoint}>
+                    *User Name can not contain any special characters.
+                        </Text>
                   </View>
                   {!isnewUser && (
                     <View
@@ -405,17 +436,20 @@ const UserManagementEdit = ({ route }) => {
                     >
                       <Controller
                         control={control}
+                    
                         name="newPassword"
+                        
                         render={({
                           field: { onChange, onBlur, value },
                           fieldState: { error },
                         }) => (
                           <>
                             <SparkLightInput
-                              placeholder="New Password"
+                              placeholder= "New Password"
                               onBlur={onBlur}
-                              label={"New Password"}
-                              onChangeText={onChange}
+                              label={isnewUser?"New Password":"New Password(Optional)"}
+                              //onChangeText={onChange}
+                              onChangeText={(value)=>{handleOnChangeText(value,onChange)}}
                               value={value}
                               secure={true}
                               error={error?.message}
@@ -446,7 +480,7 @@ const UserManagementEdit = ({ route }) => {
                                       ]}
                                     />
                                   </View>
-                                  <Text style={styles.bulletPoiint}>
+                                  <Text style={styles.bulletPoint}>
                                     {passwordTerms[index]}
                                   </Text>
                                 </View>
@@ -480,7 +514,8 @@ const UserManagementEdit = ({ route }) => {
                         <SparkLightDropdown
                           items={securityQuestions}
                           selectedValue={customSecurityQuestion}
-                          onValueChange={handleSecurityQuestionChange}
+                          onValueChange={(value)=>{handleSecurityQuestionChange(value)}}
+                          
                         />
                       </View>
                     </View>

@@ -66,7 +66,7 @@ const MyServicePlan = ({ plans,tvPlan,phonePlan, navigation }) => {
               </TouchableOpacity>
             </View>
             <ScrollView style={{ marginBottom: hp('10%')}} contentContainerStyle={{ flexGrow: 1 }}>
-            {plans && plans.map((item, index) => (
+            {plans && plans?.map((item, index) => (
               <View key={index}>
                 <ServiceDetailsItem item={item} index={index} serviceType="internet" />
               </View>
@@ -79,7 +79,7 @@ const MyServicePlan = ({ plans,tvPlan,phonePlan, navigation }) => {
            
            
            {(userInfo.services?.basic && !userInfo.services?.iptv) &&
-           <ServiceMenuStatic key={34}  planName={"TV"}  menuIcon='tv' serviceType={'Standard cable TV'} />
+           <ServiceMenuStatic key={34}  planName={"TV"}  menuIcon='tv' serviceType={'Standard Cable TV'} />
            }
 
            {(userInfo.services?.phone || userInfo.services?.commercialPhone) && 

@@ -1,22 +1,20 @@
 // SupportStack.js
 
 import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import supportScreen from "../../components/support/supportScreen";
 import Search from "../../components/support/Search";
-import CreateTicket from "../../components/support/CreateTicket";
+import TicketStackScreen from "./TicketStack";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
-import TicketSupport from "../../components/support/TicketSupport";
-import TicketView from "../../components/support/TicketView";
-import TroubleShootStack from "./TroubleShootStack";
+import TroubleShootStack from "./TroubleShootStack";  
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemStackScreen from "./ManageEquepmentStack";
 import ModemConnectivityGuide from '../../components/support/Troubleshooting/ModemConnectivityGuide';
-import ScanScreen from "../../components/utility/QRScanner";
-const SupportStack = createStackNavigator();
+import ShareWifiScreen from "../../components/support/ShareWifiScreen";
+const SupportStack = createNativeStackNavigator();
 
 function SupportStackScreen({route}) {
-  console.log('Support',JSON.stringify(route))
+  
   const { setTabBarVisible } = useTabBarVisibility();
   return (
     <SupportStack.Navigator initialRouteName={(route.params?.isManagementEquipment)?"ManageEquipment":"support"} defaultNavigationOptions={{ gestureEnabled: true }}>
@@ -40,8 +38,8 @@ function SupportStackScreen({route}) {
         }}
       />
       <SupportStack.Screen
-        name="CreateTicket"
-        component={CreateTicket}
+        name="TicketStackScreen"
+        component={TicketStackScreen}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),
@@ -57,15 +55,7 @@ function SupportStackScreen({route}) {
           blur: () => setTabBarVisible(true),
         }}
       />
-      <SupportStack.Screen
-        name="TicketView"
-        component={TicketView}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
+      
       <SupportStack.Screen
         name="ArticalWindowUtility"
         component={ArticalWindowUtility}
@@ -78,15 +68,7 @@ function SupportStackScreen({route}) {
           blur: () => setTabBarVisible(true),
         }}
       />
-      <SupportStack.Screen
-        name="TicketSupport"
-        component={TicketSupport}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
+      
       <SupportStack.Screen
         name="DiagnosticFlow"
         component={TroubleShootStack}
@@ -105,18 +87,17 @@ function SupportStackScreen({route}) {
         name="ModemConnectivityGuide"
         component={ModemConnectivityGuide}
       />
-       <SupportStack.Screen
+
+      <SupportStack.Screen
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),
           blur: () => setTabBarVisible(true),
         }}
-        name="ScanScreen"
-        component={ScanScreen}
+        name="ShareWifiScreen"
+        component={ShareWifiScreen}
       />
     </SupportStack.Navigator>
-
-    
   );
 }
 

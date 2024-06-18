@@ -1,21 +1,20 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Image,
   StyleSheet,
   Text,
   View,
   ScrollView,
-  TouchableOpacity,
+  AccessibilityInfo,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { FontFamily, Color } from "../../../GlobalStyles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import PubSub from 'pubsub-js';
+import RenderText from "../common/RenderText";
 
 const ModemExchangeInstructions = () => {
   const navigation = useNavigation();
-
   // Define your instructions here
   const instructions = [
     `The average lifespan of a modem is approximately 2-3 years, although some high-quality modems can last up to 5-8 years.`,
@@ -29,7 +28,7 @@ const ModemExchangeInstructions = () => {
       <ProfileSettingsHeader
         title="Modem Exchange Instructions"
         onPressBack={() => {
-          console.log('On Back Press');
+          console.log("On Back Press");
           navigation.goBack();
         }}
       />
@@ -45,27 +44,17 @@ const ModemExchangeInstructions = () => {
           {instructions.map((instruction, index) => (
             <View key={index} style={styles.instructionContainer}>
               <View style={styles.bulletPoint}></View>
-              <Text style={styles.instructionText}>
-                {instruction.includes('contact us') ? (
-                  <>
-                    {instruction.split('contact us')[0]}
-                    <Text accessible={true}
-                      accessibilityRole="link"
-                      accessibilityLabel="Contact us for more information"
-                      hitSlop={{ top: 20, bottom:20, left: 20, right: 20 }}
-                    style={styles.linkText} onPress={() => {
-                      navigation.navigate("SupportStack", {
-                        isContactUs: true,
-                      })
-                    }}>
-                      contact us
-                    </Text>
-                    {instruction.split('contact us')[1]}
-                  </>
-                ) : (
-                  instruction
-                )}
-              </Text>
+              <RenderText
+                navigation={navigation}
+                splitKey={`contact us`}
+                instruction={instruction}
+                style={[styles.text, { width: wp('75%') }]}
+                onTextPress={() => {
+                  navigation.navigate("SupportStack", {
+                    isContactUs: true,
+                  });
+                }}
+              />
             </View>
           ))}
         </View>
@@ -116,8 +105,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   instructionContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: 10,
   },
   bulletPoint: {
@@ -128,7 +117,7 @@ const styles = StyleSheet.create({
   instructionText: {
     flex: 1,
     paddingLeft: 10,
-    paddingRight:6,
+    paddingRight: 6,
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 16,
@@ -140,8 +129,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontStyle: "normal",
     fontWeight: "700",
-    paddingLeft:5,
-    flexWrap:'wrap'
+    paddingLeft: 5,
+    flexWrap: "wrap",
   },
   bulletPoint: {
     width: 6,

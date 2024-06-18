@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { Select, Box, CheckIcon } from 'native-base';
 import { Padding, Color,FontFamily,FontSize } from "../../../../GlobalStyles";
 
-const SparkLightDropdown = ({ items, selectedValue, onValueChange, style }) => {
+const SparkLightDropdown = ({ items, selectedValue, onValueChange, style , dropDownStyle }) => {
     const validItems = Array.isArray(items) ? items : [];
 
     return (
@@ -18,8 +18,9 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style }) => {
                     bg: Color.Gray300,
                     endIcon: <CheckIcon size="5" />,
                 }}
-                style={styles.dropdown}
+                style={[styles.dropdown,dropDownStyle]}
                 onValueChange={itemValue => onValueChange(itemValue)}
+        
             >
                 {validItems.map((item, index) => (
                     <Select.Item key={index} label={item} value={item} />

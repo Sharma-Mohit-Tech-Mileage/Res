@@ -1,30 +1,24 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text } from "react-native";
+import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text,TouchableOpacity } from "react-native";
 import { useSelector } from 'react-redux';
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
-import { GetApiRequest } from "../../network/APIClient";
 import ZendeskChat from "react-native-zendesk-chat";
 import PubSub from 'pubsub-js'
-import {
-    heightPercentageToDP as hp,
-  } from "react-native-responsive-screen";
-
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
+import { GetApiRequest } from "../../network/APIClient";
+import CreateTicket from "./ticket/CreateTicket";
 
-ZendeskChat.init(Env.ZENDESK_CHAT_KEY);  
+ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
-const Support = ({route}) => {
-    console.log('Back to Support',JSON.stringify(route))
+const Support = ({ route }) => {
     const navigation = useNavigation();
     const [showModal, setShowModal] = useState(false);
     const [department, setDepartment] = useState('');
-    const [zenDeskSupportAvailable, setZenDeskSupportAvailable] = useState(false);
     const userData = useSelector(state => state.combinedReducers.user.userData);
     const scrollViewRef = useRef(null);
     const makeCall = (number) => {
@@ -41,53 +35,27 @@ const Support = ({route}) => {
 
     const toggleModal = (department) => {
         setDepartment(department);
-        setTimeout(()=>{
+        setTimeout(() => {
             setShowModal(!showModal);
-        },1000)
-        
-    };    
+        }, 1000)
+
+    };
+
     
-    //  useEffect(() => {
-    //     // Check if the triggerEvent parameter is present
-    //     if (route.params?.triggerEvent) {
-    //         // If present, perform the desired action after a delay
-    //         setTimeout(() => {
-    //             PubSub.publish('event.contactUsEvent', {});
-    //         }, 500);
-
-    //         // Reset the parameter to avoid repeated actions if the screen is revisited
-    //         navigation.setParams({ triggerEvent: undefined });
-    //     }
-    // }, [route.params, navigation]);
-
-    const getWifiPassword=()=>{
-        let accountNumber='902878578'
-        const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
-        GetApiRequest(request,(res)=>{
-           console.log(res)
-        },(error)=>{
-           console.log(error)
-        })
-    }
 
     React.useEffect(() => {
-        getWifiPassword();
         const unsubscribe = navigation.addListener('focus', () => {
-          // The screen is focused
-          // Call any action
-          setTimeout(()=>{
-            if(!route.params?.isContactUs){
-            scrollViewRef.current?.scrollTo({y:0,x:0,animated: true})
-            }
+            setTimeout(() => {
+                if (route.params?.isContactUs) {
+                    scrollViewRef.current?.scrollTo({ y: 0, x: 0, animated: true })
+                }
 
-        },500)
-          
-           
+            }, 500)
+
+
         });
-    
-        // Return the function to unsubscribe from the event so it gets removed on unmount
         return unsubscribe;
-      }, [navigation]);
+    }, [navigation]);
 
 
     const items = [
@@ -136,45 +104,29 @@ const Support = ({route}) => {
             icon: require("../../../assets/chevronright.png"),
             iconAlignment: 'right', // Icon to the right of the text
             navigateTo: 'ArticalWindowUtility',
-            url: 'https://support.sparklight.com/hc/en-us'
-        },
-        {
-            key: 'scanQrCode',
-            text: 'Share Wifi Password',
-            icon: require("../../../assets/chevronright.png"),
-            iconAlignment: 'right', // Icon to the right of the text
-            navigateTo: 'ScanScreen',
-            url: 'https://support.sparklight.com/hc/en-us'
+            url: 'https://support.sparklight.com/hc/en-us'            
         }
     ];
 
     var mySubscriber = function (msg, data) {
-        console.log( msg, data );
-        scrollViewRef.current?.scrollToEnd({animated: true})
+        console.log(msg, data);
+        scrollViewRef.current?.scrollToEnd({ animated: true })
     };
-    
 
     useEffect(() => {
-       if(route.params?.isContactUs){
-        setTimeout(()=>{
-            scrollViewRef.current?.scrollToEnd({animated: true})
-        },500)
-        
-       }
-       
+        if (route.params?.isContactUs) {
+            setTimeout(() => {
+                scrollViewRef.current?.scrollToEnd({ animated: true })
+            }, 500)
+        }
+
         var token = PubSub.subscribe('event.contactUsEvent', mySubscriber);
         return () => {
             PubSub.unsubscribe(token);
-        };     
+        };
     }, []);
 
-    // useEffect(async () => {
-    //     const online = await ZendeskChat.areAgentsOnline();
-    //     console.log('setZenDeskSupportAvailable: ', online);
-    //     setZenDeskSupportAvailable(online);
-    // }, []);      
 
-    
     const handlePressOpenButton = (department, tags) => {
         const user = {
             full_name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
@@ -184,21 +136,18 @@ const Support = ({route}) => {
 
         tags.push('pid:_' + userData.userInfo.accountNumber);
 
-        // On button press, when you want to show chat:
         ZendeskChat.startChat({
             name: user.full_name,
             email: user.email,
             phone: user.phone,
             department: department,
             tags: tags,
-            // The behaviorFlags are optional, and each default to 'true' if omitted
             behaviorFlags: {
                 showAgentAvailability: true,
                 showChatTranscriptPrompt: false,
                 showPreChatForm: true,
                 showOfflineForm: true,
             },
-            // The preChatFormOptions are optional & each defaults to "optional" if omitted
             preChatFormOptions: {
                 name: "optional",
                 email: "optional",
@@ -210,16 +159,11 @@ const Support = ({route}) => {
             localizedDismissButtonTitle: "Dismiss",
         });
     };
-    
+
 
     return (
         <View style={styles.support}>
-            <ProfileSettingsHeader
-                title="Support"
-                iconAlignment="right"
-                showIcon={false} // New prop to control icon visibility
-            />
-
+            <ProfileSettingsHeader title="Support" iconAlignment="right" showIcon={false} />
             <LinearGradient
                 style={styles.linearGradientStyle}
                 locations={[0, 1]}
@@ -228,93 +172,91 @@ const Support = ({route}) => {
                 angle={90}
             />
             <View style={[styles.mainContainer]}>
-                <View style={[styles.containerFlexBox]}>
-                    <View style={styles.header}>
-                        <View style={styles.featuredIcon}>
-                            <Image
-                                style={[styles.lifeBuoy02IconLayout]}
-                                resizeMode="stretch"
-                                source={require("../../../assets/right-actionable19.png")}
-                            />
-                        </View>
-                        <View style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}>
-                            <Text style={styles.wereHereTo}>We’re Here to Help</Text>
-                        </View>
+                <View style={styles.header}>
+                    <View style={styles.featuredIcon}>
+                        <Image
+                            style={[styles.lifeBuoy02IconLayout]}
+                            resizeMode="stretch"
+                            source={require("../../../assets/right-actionable19.png")}
+                        />
                     </View>
-                    <ScrollView automaticallyAdjustContentInsets={false} style={{ width: '100%', padding: Padding.p_base }} ref={scrollViewRef}>
-                        <View style={{ marginBottom: hp('50%') }}>
-                            <View style={styles.issuesFlexBox}>
-                            <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
-                                    <Text style={[styles.heading, styles.headingTypo]}>
-                                       Knowledgebase
-                                    </Text>
-                                </View>
-                                <View style={styles.frameChild}/>
-                                {items.map((item, index) => (
-                                    <React.Fragment key={index}>
-                                        
-                                        <Pressable key={index} style={[styles.search, styles.navigationBorder]}
-                                            onPress={() => {
-                                                  if (item.iconAlignment === 'left') {
-                                                    navigation.navigate(item.navigateTo)
-                                                } else {
-                                                    navigation.navigate(item.navigateTo, { url: item.url, name: item.text })
-                                                }
-                                            }}>
-                                            <View style={[styles.pressableContent, item.iconAlignment === 'right' && { flexDirection: 'row-reverse' }]}>
-                                                <Image
-                                                    source={item.icon}
-                                                    style={[styles.iconStyle, item.iconAlignment === 'right' ? styles.iconRight : styles.iconLeft]}
-                                                />
-                                                {item.iconAlignment === 'right' ? <Text style={[styles.searchChild, styles.textTypoRight]}>
-                                                    {item.text}
-                                                </Text>
-                                                    : <Text style={[{ paddingHorizontal: Padding.p_3xs, color: Color.sparklightGray1, fontSize: FontSize.size_base }]}>
-                                                        {item.text}
-                                                    </Text>}
-                                            </View>
-                                        </Pressable>
-                                        {index < items.length - 1 && <View style={styles.frameChild} />}
-                                    </React.Fragment>
-                                ))}
-                            </View>
-                            <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
-                                <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
-                                    <Text style={[styles.heading, styles.headingTypo]}>
-                                        Additional Support
-                                    </Text>
-                                </View>
+                    <View style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}>
+                        <Text style={styles.wereHereTo}>We’re Here to Help</Text>
+                    </View>
+                </View>
+                <ScrollView ref={scrollViewRef}>
+                    <View style={styles.issuesFlexBox}>
+                        <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
+                            <Text style={[styles.heading, styles.headingTypo]}>
+                                Knowledgebase
+                            </Text>
+                        </View>
+                        <View style={styles.frameChild} />
+                        {items.map((item, index) => (
+                            <React.Fragment key={index}>
 
-                                { <Pressable style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} onPress={() => { navigation.navigate('DiagnosticFlow') }}>
-                                    <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
-                                        <View style={[styles.content, styles.contentSpaceBlock]}>
-                                            <View style={styles.headingAndIcon}>
-                                                <View style={[styles.icon]}>
-                                                    <Image
-                                                        style={styles.supportIcon}
-                                                        resizeMode="stretch"
-                                                        source={require("../../../assets/tool-02.png")}
-                                                    />
-                                                </View>
-                                                <View style={styles.frameParent}>
-                                                    <View style={styles.headingAndToggle}>
-                                                        <Text style={[styles.headingTypo]}>
-                                                        Sparklight Smart Check
-                                                        </Text>
-                                                        <Image
-                                                            style={styles.chevronIconLayout}
-                                                            resizeMode="stretch"
-                                                            source={require("../../../assets/chevronright.png")}
-                                                        />
-                                                    </View>
-                                                    <Text style={[styles.supportingText, styles.supportingTypo1,]} >
-                                                    Automated troubleshooting scan.
-                                                    </Text>
-                                                </View>
+                                <Pressable key={index} style={[styles.search, styles.navigationBorder]}
+                                    onPress={() => {
+                                        if (item.iconAlignment === 'left') {
+                                            navigation.navigate(item.navigateTo)
+                                        } else {
+                                            navigation.navigate(item.navigateTo, { url: item.url, name: item.text })
+                                        }
+                                    }}>
+                                    <View style={[styles.pressableContent, item.iconAlignment === 'right' && { flexDirection: 'row-reverse' }]}>
+                                        <Image
+                                            source={item.icon}
+                                            style={[styles.iconStyle, item.iconAlignment === 'right' ? styles.iconRight : styles.iconLeft]}
+                                        />
+                                        {item.iconAlignment === 'right' ? <Text style={[styles.searchChild, styles.textTypoRight]}>
+                                            {item.text}
+                                        </Text>
+                                            : <Text style={[{ paddingHorizontal: Padding.p_3xs, color: Color.sparklightGray1, fontSize: FontSize.size_base }]}>
+                                                {item.text}
+                                            </Text>}
+                                    </View>
+                                </Pressable>
+                                {index < items.length - 1 && <View style={styles.frameChild} />}
+                            </React.Fragment>
+                        ))}
+                    </View>
+                    <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
+                        <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
+                            <Text style={[styles.heading, styles.headingTypo]}>
+                                Additional Support
+                            </Text>
+                        </View>
+
+                        {<Pressable style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} onPress={() => { navigation.navigate('DiagnosticFlow') }}>
+                            <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
+                                <View style={[{ paddingVertical: Padding.p_xl }, styles.contentSpaceBlock]}>
+                                    <View style={styles.headingAndIcon}>
+                                        <View style={[styles.icon]}>
+                                            <Image
+                                                style={styles.supportIcon}
+                                                resizeMode="stretch"
+                                                source={require("../../../assets/tool-02.png")}
+                                            />
+                                        </View>
+                                        <View style={styles.frameParent}>
+                                            <View style={styles.headingAndToggle}>
+                                                <Text style={[styles.headingTypo]}>
+                                                    Sparklight Smart Check
+                                                </Text>
+                                                <Image
+                                                    style={styles.chevronIconLayout}
+                                                    resizeMode="stretch"
+                                                    source={require("../../../assets/chevronright.png")}
+                                                />
                                             </View>
+                                            <Text style={[styles.supportingText, styles.supportingTypo1,]} >
+                                                Automated troubleshooting scan.
+                                            </Text>
                                         </View>
                                     </View>
-                                </Pressable> }
+                                </View>
+                            </View>
+                        </Pressable>}
 
                                 {/* <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} >
                                     <Pressable
@@ -350,86 +292,207 @@ const Support = ({route}) => {
                                 </View>
 
                                 */}
-                                <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
-                                    <Pressable
-                                        style={[styles.integrationCardMobile1, styles.integrationCardBorder]}
-                                        onPress={() => { navigation.navigate('ManageEquipment') }}
-                                    >
-                                        <View style={[styles.content, styles.contentSpaceBlock]}>
-                                            <View style={styles.headingAndIcon}>
-                                                <View style={[styles.icon]}>
-                                                    <Image
-                                                        style={styles.supportIcon}
-                                                        resizeMode="stretch"
-                                                        source={require("../../../assets/modem-02.png")}
-                                                    />
-                                                </View>
-                                                <View style={styles.frameParent}>
-                                                    <View style={styles.headingAndToggle}>
-                                                        <Text style={[styles.headingTypo]}>
-                                                            Equipment Management
-                                                        </Text>
-                                                        <Image
-                                                            style={styles.chevronIconLayout}
-                                                            resizeMode="stretch"
-                                                            source={require("../../../assets/chevronright.png")}
-                                                        />
-                                                    </View>
-                                                    <Text style={[styles.supportingText, styles.supportingTypo1,]}>
-                                                        View and manage equipment.
-                                                    </Text>
-                                                </View>
+                        <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
+                            <Pressable
+                                style={[styles.integrationCardMobile1, styles.integrationCardBorder]}
+                                onPress={() => { navigation.navigate('ManageEquipment') }}
+                            >
+                                <View style={[styles.content, styles.contentSpaceBlock]}>
+                                    <View style={styles.headingAndIcon}>
+                                        <View style={[styles.icon]}>
+                                            <Image
+                                                style={styles.supportIcon}
+                                                resizeMode="stretch"
+                                                source={require("../../../assets/modem-02.png")}
+                                            />
+                                        </View>
+                                        <View style={styles.frameParent}>
+                                            <View style={styles.headingAndToggle}>
+                                                <Text style={[styles.headingTypo]}>
+                                                    Equipment Management
+                                                </Text>
+                                                <Image
+                                                    style={styles.chevronIconLayout}
+                                                    resizeMode="stretch"
+                                                    source={require("../../../assets/chevronright.png")}
+                                                />
                                             </View>
+                                            <Text style={[styles.supportingText, styles.supportingTypo1,]}>
+                                                View and manage equipment.
+                                            </Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            </Pressable>
+                        </View>
+
+                    </View>
+                    <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
+                        <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]} >
+                            <Text style={[styles.heading, styles.headingTypo]}>
+                                Contact Us
+                            </Text>
+                        </View>
+
+
+                        <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
+                            <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
+                                <View style={[styles.content, styles.contentSpaceBlock]}>
+
+                                    <Pressable style={styles.headingAndIcon4} onPress={()=>{
+                                            navigation.navigate('TicketStackScreen')
+                                    }}>
+                                        <View style={[styles.icon]}>
+                                            <Image
+                                                style={styles.supportIcon}
+                                                resizeMode="stretch"
+                                                source={require("../../../assets/tool-02.png")}
+                                            />
+                                        </View>
+                                        <View style={styles.frameParent}>
+                                            <View style={styles.headingAndToggle}>
+                                                <Text style={[styles.headingTypo]}>
+                                                    Ticket Support
+                                                </Text>
+                                                <Image
+                                                    style={styles.chevronIconLayout}
+                                                    resizeMode="stretch"
+                                                    source={require("../../../assets/chevronright.png")}
+                                                />
+                                            </View>
+                                            <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
+                                                Need help? Submit a support ticket and we'll respond within 48 hours.
+                                            </Text>
+                                            
                                         </View>
                                     </Pressable>
                                 </View>
-
+                            </View>
                         </View>
-                        <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
-                            <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]} >
-                                <Text style={[styles.heading, styles.headingTypo]}>
-                                    Contact Us
-                                </Text>
-                            </View>                           
-                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
-                                <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
-                                    <View style={[styles.content, styles.contentSpaceBlock]}>
+
+
+
+
+
+
+
+
+                        <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
+                            <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
+                                <View style={[styles.content, styles.contentSpaceBlock]}>
+                                    <View style={styles.headingAndIcon4}>
+                                        <View style={[styles.icon]}>
+                                            <Image
+                                                style={styles.supportIcon}
+                                                resizeMode="stretch"
+                                                source={require("../../../assets/tool-02.png")}
+                                            />
+                                        </View>
+                                        <View style={styles.frameParent}>
+                                            <View style={styles.headingAndToggle}>
+                                                <Text style={[styles.headingTypo]}>
+                                                    Tech Support
+                                                </Text>
+                                                <Pressable
+                                                    onPress={() => makeCall('877-692-2253')}
+                                                    accessibilityLabel="Call Tech Support"
+                                                    accessibilityRole="button"
+                                                    accessibilityHint="Dials the tech support number on your phone">
+                                                    <Image
+                                                        style={styles.chevronIconLayout}
+                                                        resizeMode="stretch"
+                                                        source={require("../../../assets/phone-outgoing-01.png")}
+                                                    />
+                                                </Pressable>
+                                            </View>
+                                            <Pressable
+                                                onPress={() => {
+                                                    toggleModal("tech");
+                                                }}
+                                                accessibilityLabel="Chat Support"
+                                                accessibilityRole="button"
+                                                accessibilityHint="Chat with Tech Support">
+                                                <View style={styles.supportChatText}>
+
+                                                </View>
+                                            </Pressable>
+                                            <Pressable onPress={() => makeCall('877-692-2253')}>
+                                                <View style={styles.supportingTextWrapper}>
+                                                    <Text style={[styles.supportingText4, styles.support1Typo,]}>
+                                                        877-692-2253
+                                                    </Text>
+                                                </View>
+                                            </Pressable>
+                                            <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
+                                                Need a little help with your Sparklight® service? We're here 24 hours a day, seven days a week to support you.
+                                            </Text>
+                                            <Text style={[{ fontFamily: FontFamily.openSansRegular }, styles.supportingTypo,]}>
+                                                {`Call Center Hours: `}
+                                            </Text>
+                                            <Text style={[styles.supportingText7, styles.supportingTypo,]}>
+                                                24h/7 days a week
+                                            </Text>
+                                            <TouchableOpacity
+                                                style={{
+                                                    flexDirection: "row",
+                                                    marginTop: 16,
+                                                    alignItems: "center",
+                                                }}
+                                                onPress={() => {
+                                                    toggleModal("tech");
+                                                }}
+                                            >
+                                                <ChatIcon />
+                                                <Text
+                                                    style={[styles.headingTypo, { marginLeft: 10, fontSize: 16 }]}
+                                                >
+                                                    Chat
+                                                </Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+                        <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}>
+                            <View style={[styles.integrationCardMobile1, styles.integrationCardBorder,]} >
+                                <View style={[styles.content, styles.contentSpaceBlock]}>
+                                    <View style={styles.headingAndToggle}>
                                         <View style={styles.headingAndIcon4}>
                                             <View style={[styles.icon]}>
                                                 <Image
                                                     style={styles.supportIcon}
                                                     resizeMode="stretch"
-                                                    source={require("../../../assets/tool-02.png")}
-                                                />
-                                            </View>
+                                                    source={require("../../../assets/wallet-03.png")}
+                                                /></View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
                                                     <Text style={[styles.headingTypo]}>
-                                                        Tech Support
-                                                    </Text>                                                      
+                                                        Billing Support
+                                                    </Text>
                                                     <Pressable
                                                         onPress={() => makeCall('877-692-2253')}
-                                                        accessibilityLabel="Call Tech Support"
+                                                        accessibilityLabel="Call Billing Support"
                                                         accessibilityRole="button"
-                                                        accessibilityHint="Dials the tech support number on your phone">
+                                                        accessibilityHint="Dials the billing support number on your phone">
                                                         <Image
                                                             style={styles.chevronIconLayout}
                                                             resizeMode="stretch"
                                                             source={require("../../../assets/phone-outgoing-01.png")}
                                                         />
-                                                    </Pressable>                                                        
+                                                    </Pressable>
                                                 </View>
                                                 <Pressable
-                                                   // onPress={() => handlePressOpenButton("1500003304301", ['Residential', 'Sales', 'ContactUs'])}
-                                                   onPress={() => {
-                                                        toggleModal("tech");
-                                                   }}
-                                                   accessibilityLabel="Chat Support"
+                                                    //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
+                                                    onPress={() => {
+                                                        toggleModal("Bill");
+                                                    }}
+                                                    accessibilityLabel="Chat Support"
                                                     accessibilityRole="button"
-                                                    accessibilityHint="Chat with Tech Support">
+                                                    accessibilityHint="Chat with Billing Support">
                                                     <View style={styles.supportChatText}>
-                                                                                                                  
-                                                    </View>    
+
+                                                    </View>
                                                 </Pressable>
                                                 <Pressable onPress={() => makeCall('877-692-2253')}>
                                                     <View style={styles.supportingTextWrapper}>
@@ -439,145 +502,65 @@ const Support = ({route}) => {
                                                     </View>
                                                 </Pressable>
                                                 <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
-                                                    Need a little help with your Sparklight® service? We're here 24 hours a day, seven days a week to support you.
+                                                    Want to upgrade your service, make a change, or have a
+                                                    billing question? Give us a call for assistance.
                                                 </Text>
-                                                <Text style={[styles.supportingText6, styles.supportingTypo,]}>
+                                                <Text style={[{ fontFamily: FontFamily.openSansRegular }, styles.supportingTypo,]}>
                                                     {`Call Center Hours: `}
                                                 </Text>
-                                                <Text style={[styles.supportingText7, styles.supportingTypo,]}>
-                                                    24h/7 days a week
+                                                <Text style={[styles.supportingText7, styles.supportingTypo,]} >
+                                                    M-F 8:00 AM-5:00 PM MST
                                                 </Text>
-                            <TouchableOpacity
-                            style={{
-                              flexDirection: "row",
-                              marginTop: 16,
-                              alignItems: "center",
-                            }}
-                            onPress={()=>{
-                              toggleModal("tech");
-                            }}
-                          >
-                            <ChatIcon />
-                            <Text
-                              style={[styles.headingTypo, { marginLeft: 10,fontSize:16 }]}
-                            >
-                              Chat
-                            </Text>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-                            <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock,]}>
-                                <View style={[styles.integrationCardMobile1, styles.integrationCardBorder,]} >
-                                    <View style={[styles.content, styles.contentSpaceBlock]}>
-                                        <View style={styles.headingAndToggle}>
-                                            <View style={styles.headingAndIcon4}>
-                                                <View style={[styles.icon]}>
-                                                    <Image
-                                                        style={styles.supportIcon}
-                                                        resizeMode="stretch"
-                                                        source={require("../../../assets/wallet-03.png")}
-                                                    /></View>
-                                                <View style={styles.frameParent}>
-                                                    <View style={styles.headingAndToggle}>
-                                                        <Text style={[styles.headingTypo]}>
-                                                            Billing Support
-                                                        </Text>                                                              
-                                                        <Pressable
-                                                            onPress={() => makeCall('877-692-2253')}
-                                                            accessibilityLabel="Call Billing Support"
-                                                            accessibilityRole="button"
-                                                            accessibilityHint="Dials the billing support number on your phone">
-                                                            <Image
-                                                                style={styles.chevronIconLayout}
-                                                                resizeMode="stretch"
-                                                                source={require("../../../assets/phone-outgoing-01.png")}
-                                                            />
-                                                        </Pressable>
-                                                    </View>
-                                                    <Pressable
-                                                        //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
-                                                        onPress={() => {
-                                                            toggleModal("Bill");
-                                                        }}
-                                                        accessibilityLabel="Chat Support"
-                                                        accessibilityRole="button"
-                                                        accessibilityHint="Chat with Billing Support">    
-                                                        <View style={styles.supportChatText}>
-                                                                                                                       
-                                                        </View>                                                     
-                                                    </Pressable>
-                                                    <Pressable onPress={() => makeCall('877-692-2253')}>
-                                                        <View style={styles.supportingTextWrapper}>
-                                                            <Text style={[styles.supportingText4, styles.support1Typo,]}>
-                                                                877-692-2253
-                                                            </Text>
-                                                        </View>
-                                                    </Pressable>
-                                                    <Text style={[styles.supportingText5, styles.supportingTypo1,]}>
-                                                        Want to upgrade your service, make a change, or have a
-                                                        billing question? Give us a call for assistance.
+                                                <TouchableOpacity
+                                                    style={{
+                                                        flexDirection: "row",
+                                                        marginTop: 16,
+                                                        alignItems: "center",
+                                                    }}
+                                                    onPress={() => {
+                                                        toggleModal("Bill");
+                                                    }}
+                                                >
+                                                    <ChatIcon />
+                                                    <Text
+                                                        style={[styles.headingTypo, { marginLeft: 10, fontSize: 16 }]}
+                                                    >
+                                                        Chat
                                                     </Text>
-                                                    <Text style={[styles.supportingText6, styles.supportingTypo,]}>
-                                                        {`Call Center Hours: `}
-                                                    </Text>
-                                                    <Text style={[styles.supportingText7, styles.supportingTypo,]} >
-                                                        M-F 8:00 AM-5:00 PM MST
-                                                    </Text>
-                                                     <TouchableOpacity
-                            style={{
-                              flexDirection: "row",
-                              marginTop: 16,
-                              alignItems: "center",
-                            }}
-                            onPress={()=>{
-                              toggleModal("Bill");
-                            }}
-                          >
-                            <ChatIcon />
-                            <Text
-                              style={[styles.headingTypo, { marginLeft: 10,fontSize:16 }]}
-                            >
-                              Chat
-                            </Text>
-                          </TouchableOpacity>
-                                                </View>
+                                                </TouchableOpacity>
                                             </View>
                                         </View>
                                     </View>
                                 </View>
                             </View>
                         </View>
-                        <View style={[styles.issuesFlexBox]} />
-                        </View>
-                        {showModal && (
-                            <ChatSupportModal
-                                department={department}
-                                onClose={()=>toggleModal()}
-                            />
-                        )}                        
-                        </ScrollView>
-                        </View>
-                </View>
-            
+                    </View>
+                    <View style={[styles.issuesFlexBox]} />
+
+                    {showModal && (
+                        <ChatSupportModal
+                            department={department}
+                            onClose={() => toggleModal()}
+                        />
+                    )}
+                </ScrollView>
+            </View>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     pressableContent: {
-        flexDirection: 'row', // Default direction
+        flexDirection: 'row',
         alignItems: 'center',
         height: '100%',
     },
     textTypoRight: {
         fontFamily: FontFamily.openSansRegular,
-        fontWeight: 600,/* Corresponds to semi-bold in Open Sans */
+        fontWeight: 600,
         fontSize: FontSize.size_base,
         lineHeight: 20,
-        color: Color.colorMidnightblue,/* Spark Light Purple */
+        color: Color.colorMidnightblue,
     },
     frameChild: {
         paddingHorizontal: Padding.p_5xl,
@@ -613,19 +596,19 @@ const styles = StyleSheet.create({
         borderStyle: "solid",
     },
     icon: {
-        width: 48, // Width as per Figma design
-        height: 48, // Height as per Figma design
-        borderRadius: 24, // This will make it a circle
-        justifyContent: 'center', // Center content vertically
-        alignItems: 'center', // Center content horizontally
-        borderColor: '#F4F4F5', // Border color from Figma design
-        backgroundColor: '#F4F4F5', // Background color from Figma design
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderColor: '#F4F4F5',
+        backgroundColor: '#F4F4F5',
     },
     iconStyle: {
-        width: 20, // Set according to your icon size
-        height: 20, // Set according to your icon size
+        width: 20,
+        height: 20,
         resizeMode: 'contain',
-        marginRight: 8, // Add some margin if needed
+        marginRight: 8,
     },
     headingContainerSpaceBlock: {
         paddingBottom: Padding.p_base,
@@ -664,7 +647,7 @@ const styles = StyleSheet.create({
         lineHeight: 18,
         fontSize: FontSize.size_lg,
         fontFamily: FontFamily.openSansRegular,
-        flex: 1,        
+        flex: 1,
     },
     supportingTypo1: {
         lineHeight: 20,
@@ -688,14 +671,6 @@ const styles = StyleSheet.create({
         marginTop: 24,
         alignSelf: "stretch",
         alignItems: "center",
-    },
-    mainContainerChild: {
-        position: 'absolute',
-        height: '4%',
-        flex: 1,
-        backgroundColor: "transparent",
-        left: 0, // Ensure it takes the full width
-        right: 0,
     },
     featuredIcon: {
         backgroundColor: Color.colorMidnightblue,
@@ -725,6 +700,7 @@ const styles = StyleSheet.create({
     header: {
         alignSelf: "stretch",
         alignItems: "center",
+        paddingBottom: Padding.p_base
     },
     searchChild: {
         flex: 1,
@@ -732,12 +708,12 @@ const styles = StyleSheet.create({
         paddingVertical: Padding.p_base,
         fontSize: FontSize.size_lg,
         fontFamily: FontFamily.openSansRegular,
-        fontWeight:'400'
+        fontWeight: '400'
     },
     search: {
         justifyContent: "center",
         alignSelf: "stretch",
-        height: 58, // Set a fixed height for the search container
+        height: 58,
     },
     heading: {
         color: Color.colorGray_100,
@@ -783,12 +759,6 @@ const styles = StyleSheet.create({
         borderRadius: Border.br_11xs,
         alignSelf: "stretch",
     },
-    integrationCardMobileWrapper: {
-        padding: Padding.p_base,
-        backgroundColor: Color.sparklightWhite,
-        alignSelf: "stretch",
-        alignItems: "center",
-    },
     integrationCardMobile1: {
         borderColor: Color.sparklightGray,
         backgroundColor: Color.sparklightWhite,
@@ -829,9 +799,6 @@ const styles = StyleSheet.create({
         fontFamily: FontFamily.openSansRegular,
         alignSelf: "stretch",
     },
-    supportingText6: {
-        fontFamily: FontFamily.openSansRegular,
-    },
     supportingText7: {
         fontFamily: FontFamily.openSansSemiBold,
         fontWeight: "700",
@@ -841,9 +808,9 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     mainContainer: {
-        paddingVertical: Padding.p_base,
-        alignItems: "center",
+        padding: Padding.p_base,
         alignSelf: 'stretch',
+        marginBottom: 280
     },
     support: {
         flex: 1,
