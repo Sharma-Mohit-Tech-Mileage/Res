@@ -18,6 +18,16 @@ export const getUser = async () => {
   }
 };
 
+// getting data
+export const getUserBusi = async () => {
+  try {
+    const userData = JSON.parse(await AsyncStorage.getItem("busi_user"))
+    return userData;
+  } catch (error) {
+   console.log(error); 
+  }
+};
+
 export const storeSsoToken = async (value) => {
   try {
     await AsyncStorage.setItem("idToken", JSON.stringify(value));
