@@ -170,7 +170,7 @@ const HomeScreen = ({ navigation }) => {
         } else if (user.userInfo.accountNumber === "131684698") {
           mac = "28:7a:ee:97:4d:cc";
         } else if (user.userInfo.accountNumber === "136885142") {
-          mac = "00:40:36:59:00:00";
+          mac = "20:73:55:89:c7:00";
         }
         checkModemDetails(mac);
       }
