@@ -172,7 +172,7 @@ const ManageEquipment = ({ route }) => {
           errorCode === 400 ||
           (errorCode === 500) | (errorCode === 504)
         ) {
-          setCurrentHealth("Offline");
+          setCurrentHealth("Poor");
           setIsContactUs(true);
         } else {
           setCurrentHealth("Offline");

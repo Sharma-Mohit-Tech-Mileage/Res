@@ -67,7 +67,7 @@ const CreateTicket = () => {
 
   const handleSave = (formData) => {
     setLoading(true);
-    if (upoadFileKey) {
+    if (upoadFileKey.length>0) {
       formData?.uploads.splice(0, 0, upoadFileKey);
     }
     getUser().then((res) => {
@@ -133,8 +133,8 @@ const CreateTicket = () => {
           onPressBack={() => navigation.navigate("support")}
         />
 
-        <ScrollView>
-          <View style={{ flexDirection: "column", paddingBottom: "40%" }}>
+        <ScrollView >
+          <View style={{ flexDirection: "column", paddingBottom: "45%" }}>
             <View style={[styles.innerContainer]}>
               <View style={[styles.frameParent]}>
                 <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
@@ -143,7 +143,7 @@ const CreateTicket = () => {
                   </View>
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
-                      <Text style={styles.text}>Subject*</Text>
+                      <Text style={styles.text}>Subject</Text>
                     </View>
                     <Controller
                       control={control}
@@ -167,7 +167,7 @@ const CreateTicket = () => {
 
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
-                      <Text style={styles.text}>Category*</Text>
+                      <Text style={styles.text}>Category</Text>
                       <Controller
                         control={control}
                         name="category"
@@ -201,7 +201,7 @@ const CreateTicket = () => {
                   </View>
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
-                      <Text style={styles.text}>Issue Description*</Text>
+                      <Text style={styles.text}>Issue Description</Text>
                     </View>
                     
                       <Controller
@@ -237,7 +237,7 @@ const CreateTicket = () => {
 
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
-                      <Text style={styles.text}>Email*</Text>
+                      <Text style={styles.text}>Email</Text>
                     </View>
                     <Controller
                       control={control}
@@ -264,7 +264,7 @@ const CreateTicket = () => {
                   >
                     <View
                       style={{
-                        padding: 20,
+                        padding: 10,
                         alignItems: "center",
                         justifyContent: "center",
                       }}

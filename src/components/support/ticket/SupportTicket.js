@@ -30,7 +30,7 @@ const SupportTicket = () => {
   const getTicketList = () => {
     setLoading(true);
     let re = getUser().then((res) => {
-      const request = `support/api/tickets/account/${res.userInfo.accountNumber}/created_at/asc/1/100`;
+      const request = `support/api/tickets/account/${res.userInfo.accountNumber}/created_at/dsc/1/100`;
       GetApiRequest(
         request,
         (res) => {
@@ -76,7 +76,7 @@ const SupportTicket = () => {
 
   const RenderTicketList = ({ item }) => {
     return (
-      <View
+      <View key={item.id}
         style={{
           flexDirection: "column",
           borderColor: Color.Gray300,
@@ -139,7 +139,7 @@ const SupportTicket = () => {
           </View>
 
           <View style={{ marginTop: 10 }}>
-            <Text style={styles.issueType}>Issue Description</Text>
+            <Text style={styles.issueType}>Subject</Text>
             <Text style={styles.billingTypo}>{item.description}</Text>
           </View>
         </View>

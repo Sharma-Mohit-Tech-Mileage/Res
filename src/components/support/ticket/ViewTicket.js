@@ -17,11 +17,17 @@ import {
 } from "../../../../GlobalStyles";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
-import { GetApiRequest, PostApiRequest,PutApiRequest ,UploadMultipartData} from "../../../network/APIClient";
+import {
+  GetApiRequest,
+  PostApiRequest,
+  PutApiRequest,
+  UploadMultipartData,
+} from "../../../network/APIClient";
 import SparkLightButton from "../../common/customui/SparkLightButton";
 import moment from "moment";
 import DocumentPicker, { types } from "react-native-document-picker";
 import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
+import colors from "../../../res/Colors";
 
 const ViewTicket = ({ route }) => {
   const navigation = useNavigation();
@@ -29,14 +35,12 @@ const ViewTicket = ({ route }) => {
   const [myComment, setMyCommnet] = useState("");
   const [comments, setComments] = useState([]);
   const [fileResponse, setFileResponse] = useState([]);
-  const [upoadFileKey,setUploadFileKey] = useState([])
+  const [upoadFileKey, setUploadFileKey] = useState([]);
 
-
-
-  const getTicketDetails=()=>{
+  const getTicketDetails = () => {
     let ticketNo = route?.params?.ticketId;
     if (ticketNo) {
-    const request = `support/api/tickets/${ticketNo}`;
+      const request = `support/api/tickets/${ticketNo}`;
       GetApiRequest(
         request,
         (res) => {
@@ -50,14 +54,14 @@ const ViewTicket = ({ route }) => {
         }
       );
     }
-  }
+  };
 
   const getTicketCommnets = (ticketNo) => {
     const request = `support/api/TicketComments/${ticketNo}`;
     GetApiRequest(
       request,
       (res) => {
-        console.log("getTicketCommnets", res);
+        console.log("getTicketCommnets", JSON.stringify(res));
         if (res.length > 0) {
           setComments(res);
         }
@@ -69,27 +73,25 @@ const ViewTicket = ({ route }) => {
   };
 
   useEffect(() => {
-    getTicketDetails()
+    getTicketDetails();
   }, []);
 
-
-  const uploadFiles=(data)=>{
+  const uploadFiles = (data) => {
     const request = `support/api/Attachments`;
     UploadMultipartData(
       request,
       data,
       (res) => {
-        console.log('Data',res)
-        if(res){
-          setUploadFileKey(res)
+        console.log("Data", res);
+        if (res) {
+          setUploadFileKey(res);
         }
       },
       (error) => {
-        console.log('File Upload Error',error)
+        console.log("File Upload Error", error);
       }
     );
-}
-
+  };
 
   const addNote = () => {
     let ticketNo = route?.params?.ticketId;
@@ -99,7 +101,6 @@ const ViewTicket = ({ route }) => {
       type: "comment",
       uploads: [`${upoadFileKey}`],
     };
-
 
     const request = `support/api/TicketComments`;
     PostApiRequest(
@@ -132,7 +133,6 @@ const ViewTicket = ({ route }) => {
     );
   };
 
-
   const handleDocumentSelection = useCallback(async () => {
     try {
       const response = await DocumentPicker.pick({
@@ -140,7 +140,7 @@ const ViewTicket = ({ route }) => {
         type: [types.pdf, types.plainText, types.images],
       });
       setFileResponse(response);
-      uploadFiles(response[0])
+      uploadFiles(response[0]);
       console.log("File respose:", JSON.stringify(response));
     } catch (err) {
       console.warn(err);
@@ -151,7 +151,7 @@ const ViewTicket = ({ route }) => {
     return (
       <>
         {comments.map((item) => (
-          <View style={styles.frameWrapperBorder}>
+          <View key={item.id} style={styles.frameWrapperBorder}>
             <View style={styles.frameParent1}>
               <View style={styles.rightActionableParent}>
                 {/* <View style={[styles.icon]}></View> */}
@@ -159,12 +159,17 @@ const ViewTicket = ({ route }) => {
                   {item.id}
                 </Text>
                 <Text style={[styles.pm, styles.billingTypo]}>
-                  {moment(item.created_at).format("MM/DD/YY hh:mma")}
+                  {moment(item.created_at).format("MMM Do YY")}
                 </Text>
               </View>
               <Text style={[styles.yesYouCan, styles.billingTypo]}>
                 {item.body}
               </Text>
+            { item.attachments.length>0 && (
+              <Text style={[styles.yesYouCan, styles.billingTypo,{color:Color.colorMidnightblue}]}>
+                Attachment: {item.attachments[0].filename}
+              </Text>
+               )}
             </View>
           </View>
         ))}
@@ -184,12 +189,7 @@ const ViewTicket = ({ route }) => {
             <View
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
-              <View
-                style={[
-                  styles.ticket101Parent,
-                  styles.parentSpaceBlock,
-                ]}
-              >
+              <View style={[styles.ticket101Parent, styles.parentSpaceBlock]}>
                 <View style={{ flexDirection: "column" }}>
                   <Text style={styles.ticket101}>
                     Ticket # {data?.ticketNumber}
@@ -209,20 +209,28 @@ const ViewTicket = ({ route }) => {
                   </View>
                 </View>
               </View>
-              {data?.status!='Closed' && (
-              <Pressable
-                style={[
-                  styles.closeBtn,
-                  styles.badgeBorder,
-                  { height: 30, marginRight: 10, marginTop: 10 },
-                ]}
-                onPress={()=>{
-                  closeTicket();
-                }}
-              >
-                <Text style={[styles.text, styles.textTypo,{color:Color.colorMidnightblue}]}>Close Ticket</Text>
-              </Pressable>
-             )}
+              {data?.status != "Closed" && (
+                <Pressable
+                  style={[
+                    styles.closeBtn,
+                    styles.badgeBorder,
+                    { height: 30, marginRight: 10, marginTop: 10 },
+                  ]}
+                  onPress={() => {
+                    closeTicket();
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.text,
+                      styles.textTypo,
+                      { color: Color.colorMidnightblue },
+                    ]}
+                  >
+                    Close Ticket
+                  </Text>
+                </Pressable>
+              )}
             </View>
 
             <View style={styles.frameWrapper}>
@@ -239,6 +247,12 @@ const ViewTicket = ({ route }) => {
                         <Text style={styles.issueType}>Subject</Text>
                         <Text style={styles.billingTypo}>{data?.subject}</Text>
                       </View>
+
+                      <View style={styles.frameParent1}>
+                        <Text style={styles.issueType}>Category</Text>
+                        <Text style={styles.billingTypo}>{data?.category}</Text>
+                      </View>
+
                     </View>
                     {data?.status != "close" && (
                       <View style={[{ marginTop: 10 }]}>
@@ -248,7 +262,7 @@ const ViewTicket = ({ route }) => {
                             placeholder="Comment"
                             onChangeText={(text) => {
                               setMyCommnet(text);
-                              //console.log('test',text)
+                              //console.log("test", text);
                             }}
                             multiline
                             numberOfLines={5}
@@ -282,21 +296,25 @@ const ViewTicket = ({ route }) => {
                             </View>
                           </Pressable>
                         </View>
-                      { comments.length!=0 && (
-                        <View
-                          style={{
-                            alignSelf: "flex-end",
-                            marginVertical: 10,
-                          }}
-                        >
-                          <SparkLightButton
-                            onPress={() => {
-                              addNote();
+                        {comments.length != 0 && (
+                          <View
+                            style={{
+                              alignSelf: "flex-end",
+                              marginVertical: 10,
                             }}
-                            buttonText="Add Note"
-                          />
-                        </View>
-                      )}
+                          >
+                            <Pressable
+                              style={[styles.BtnContainer,{backgroundColor:(myComment.length>0)?colors.sparklight_purple_blue:colors.grey}]}
+                              onPress={() => {
+                                if(myComment.length>0){
+                                addNote();
+                                }
+                              }}
+                            >
+                              <Text style={[styles.Btn,{color:(myComment.length>0)?'white':colors.dark_grey}]}>Add Note</Text>
+                            </Pressable>
+                          </View>
+                        )}
                       </View>
                     )}
                   </View>
@@ -316,6 +334,17 @@ const styles = StyleSheet.create({
     height: 32,
     width: 32,
   },
+  BtnContainer: {
+    backgroundColor: colors.sparklight_purple_blue,
+    justifyContent: "center",
+  },
+  Btn: {
+    color: colors.snow_white,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+    padding: 12,
+    fontSize: 16,
+  },
   icon: {
     height: 32,
     width: 32,
@@ -328,7 +357,7 @@ const styles = StyleSheet.create({
     // Remove any additional styles that may distort the original image appearance
   },
   parentSpaceBlock: {
-    paddingBottom: Padding.p_5xl,
+    paddingBottom: Padding.p_5xs,
     paddingTop: Padding.p_base,
     alignSelf: "stretch",
   },
