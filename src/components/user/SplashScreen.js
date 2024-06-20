@@ -6,7 +6,7 @@ import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout ,revoke} from "react-native-app-auth";
 import { useDispatch } from "react-redux";
 import { saveUserInfo, logError, logInfo } from "../../redux/actions/UserAction";
-import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData ,getUserBusi} from "../../redux/utils/LocalStorage";
+import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
@@ -225,10 +225,10 @@ const SplashScreen = ({ navigation }) => {
 
   const loginAuth = async () => {
     try {
-      const currentUser = await getUserBusi();
-      if (currentUser?.token) {
-        await revokeToken(currentUser.refreshToken);
-      }
+      // const currentUser = await getUserBusi();
+      // if (currentUser?.token) {
+      //   await revokeToken(currentUser.refreshToken);
+      // }
       const result = await authorize(config);
       const data = {
         idToken: result.idToken,
