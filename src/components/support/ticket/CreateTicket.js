@@ -39,11 +39,12 @@ import LoadingOverlay from "../../common/customui/CustomLoading";
 const CreateTicket = () => {
   const navigation = useNavigation();
   const [selectedItem, setSelectedItem] = useState();
+  
   const categories = ["Bill", "Support"];
   const [fileResponse, setFileResponse] = useState([]);
   const [upoadFileKey, setUploadFileKey] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [loadingTxt, setLoadingTxt] = useState("Creating Ticket...");
   var Data = {
     subject: "",
     comment: "",
@@ -66,6 +67,7 @@ const CreateTicket = () => {
   });
 
   const handleSave = (formData) => {
+    setLoadingTxt("Creating Ticket...")
     setLoading(true);
     if (upoadFileKey.length>0) {
       formData?.uploads.splice(0, 0, upoadFileKey);
@@ -88,6 +90,8 @@ const CreateTicket = () => {
   };
 
   const uploadFiles = (data) => {
+    setLoadingTxt("File Uploading...")
+    setLoading(true)
     const request = `support/api/Attachments`;
     UploadMultipartData(
       request,
@@ -96,10 +100,12 @@ const CreateTicket = () => {
         console.log("Data", res);
         if (res) {
           setUploadFileKey(res);
+          setLoading(false)
         }
       },
       (error) => {
         console.log("File Upload Error", error);
+        setLoading(false)
       }
     );
   };
@@ -286,7 +292,7 @@ const CreateTicket = () => {
               </View>
               <LoadingOverlay
                 loading={loading}
-                loadingTxt={"Creating Ticket..."}
+                loadingTxt={loadingTxt}
                 onRequestClose={() => {
                   setLoading(false);
                 }}

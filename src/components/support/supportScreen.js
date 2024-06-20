@@ -368,7 +368,7 @@ const Support = ({ route }) => {
                                     </Pressable>
                                 </View>
                             </View>
-                        </View>
+                        </View> 
 
 
 

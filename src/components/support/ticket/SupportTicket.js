@@ -20,13 +20,15 @@ import SparkLightButton from "../../common/customui/SparkLightButton";
 import { useNavigation } from "@react-navigation/native";
 import { GetApiRequest } from "../../../network/APIClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
-import PasswordKey from "../../../res/svgIcons/passwordKey";
 import TicketListIcon from "../../../res/svgIcons/TicketListIcon";
+import SparkLightInput from "../../common/customui/SparkLightInput";
+
 const SupportTicket = () => {
   const navigation = useNavigation();
   const [ticketList, setTicketList] = useState([]);
+  const [mainList, setMainList] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [searchTxt, setSearchTxt] = useState("");
   const getTicketList = () => {
     setLoading(true);
     let re = getUser().then((res) => {
@@ -37,6 +39,7 @@ const SupportTicket = () => {
           console.log("getTicketList", res);
           if (res) {
             setTicketList(res);
+            setMainList(res)
           }
           setLoading(false);
         },
@@ -59,7 +62,7 @@ const SupportTicket = () => {
           <View style={styles.frameView}>
             <View style={styles.featuredIconParent}>
               <View style={styles.featuredIconLayout}>
-               <TicketListIcon isGrey={true}/>
+                <TicketListIcon isGrey={true} />
               </View>
               <Text style={[styles.noTicketsCreated, styles.createATicketTypo]}>
                 No Tickets Created
@@ -76,7 +79,8 @@ const SupportTicket = () => {
 
   const RenderTicketList = ({ item }) => {
     return (
-      <View key={item.id}
+      <View
+        key={item.id}
         style={{
           flexDirection: "column",
           borderColor: Color.Gray300,
@@ -94,8 +98,14 @@ const SupportTicket = () => {
           <View
             style={{ paddingHorizontal: Padding.p_base, flexDirection: "row" }}
           >
-            <TicketListIcon/>
-            <Text style={{ fontFamily: FontFamily.interBold, fontSize: 14,textAlignVertical:'center' }}>
+            <TicketListIcon />
+            <Text
+              style={{
+                fontFamily: FontFamily.interBold,
+                fontSize: 14,
+                textAlignVertical: "center",
+              }}
+            >
               {" "}
               Ticket #{item.ticketNumber}{" "}
             </Text>
@@ -140,7 +150,7 @@ const SupportTicket = () => {
 
           <View style={{ marginTop: 10 }}>
             <Text style={styles.issueType}>Subject</Text>
-            <Text style={styles.billingTypo}>{item.description}</Text>
+            <Text style={styles.billingTypo}>{item.subject}</Text>
           </View>
         </View>
       </View>
@@ -162,8 +172,37 @@ const SupportTicket = () => {
               buttonText="Create Ticket"
             />
           </View>
+          <View style={{ marginHorizontal: 16, marginBottom: 10 }}>
+                <SparkLightInput
+                  placeholder={"Search By name or Ticket"}
+                  onChangeText={(text) => {
+                    setSearchTxt(text)
+                     if(text.length>0){
+                    const newData1 = ticketList.filter(
+                      item => {
+                            console.log('test=',item.subject)
+                            if(item.ticketNumber.toString().includes(text)){
+                               return true
+                            }else if(item.subject.toLowerCase().includes(text.toLowerCase())){
+                              return true
+                            }else{
+                              return false
+                            }
+                             
+                              
+                      }) 
+                      setTicketList(newData1) 
+                    }else{
+                      setTicketList(mainList)
+                    }
+                    
+                  }}
+                  value={searchTxt}
+                />
+              </View>
           {ticketList.length > 0 ? (
-            <View style={{ height: "85%" }}>
+            <View style={{ height: "76%" }}>
+              
               <FlatList
                 data={ticketList}
                 keyExtractor={(item, index) => index.toString()}
@@ -197,7 +236,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   frameGroupSpaceBlock: {
-    paddingBottom: Padding.p_5xl,
+    paddingBottom: Padding.p_5xs,
     paddingTop: Padding.p_base,
   },
   frameParent: {

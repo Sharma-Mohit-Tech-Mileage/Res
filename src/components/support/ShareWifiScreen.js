@@ -144,7 +144,7 @@ const ShareWifiScreen = ({ route }) => {
               <Image
                 style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                 resizeMode="cover"
-                source={require("../../../assets/xclose.png")}
+                source={require("../../../assets/chevronleft.png")}
                 accessible={false}
               />
             </Pressable>
