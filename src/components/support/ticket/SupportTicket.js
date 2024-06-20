@@ -174,7 +174,7 @@ const SupportTicket = () => {
           </View>
           <View style={{ marginHorizontal: 16, marginBottom: 10 }}>
                 <SparkLightInput
-                  placeholder={"Search By name or Ticket"}
+                  placeholder={"Search by Ticket # or Subject"}
                   onChangeText={(text) => {
                     setSearchTxt(text)
                      if(text.length>0){
