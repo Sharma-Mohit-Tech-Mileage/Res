@@ -7,6 +7,7 @@ import {
   View,
   Pressable,
   TextInput,
+  Linking
 } from "react-native";
 import {
   Padding,
@@ -17,23 +18,55 @@ import {
 } from "../../../../GlobalStyles";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
-import { GetApiRequest } from "../../../network/APIClient";
+import {
+  GetApiRequest,
+  PostApiRequest,
+  PutApiRequest,
+  UploadMultipartData,
+} from "../../../network/APIClient";
 import SparkLightButton from "../../common/customui/SparkLightButton";
 import moment from "moment";
 import DocumentPicker, { types } from "react-native-document-picker";
+import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
+import colors from "../../../res/Colors";
+import { Env } from "../../../network/apis/account/Constants";
+import LoadingOverlay from "../../common/customui/CustomLoading";
 
 const ViewTicket = ({ route }) => {
   const navigation = useNavigation();
   const [data, setData] = useState({});
+  const [myComment, setMyCommnet] = useState("");
   const [comments, setComments] = useState([]);
   const [fileResponse, setFileResponse] = useState([]);
+  const [upoadFileKey, setUploadFileKey] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingTxt, setLoadingTxt] = useState("Creating Ticket...");
+
+  const getTicketDetails = () => {
+    let ticketNo = route?.params?.ticketId;
+    if (ticketNo) {
+      const request = `support/api/tickets/${ticketNo}`;
+      GetApiRequest(
+        request,
+        (res) => {
+          if (res) {
+            setData(res[0]);
+            getTicketCommnets(res[0].ticketNumber);
+          }
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    }
+  };
 
   const getTicketCommnets = (ticketNo) => {
     const request = `support/api/TicketComments/${ticketNo}`;
     GetApiRequest(
       request,
       (res) => {
-        console.log("getTicketCommnets", res);
+        console.log("getTicketCommnets", JSON.stringify(res));
         if (res.length > 0) {
           setComments(res);
         }
@@ -45,25 +78,74 @@ const ViewTicket = ({ route }) => {
   };
 
   useEffect(() => {
-    let ticketNo = route?.params?.ticketId;
-    console.log("TicketNo", JSON.stringify(route));
-    if (ticketNo) {
-      const request = `support/api/tickets/${ticketNo}`;
-      GetApiRequest(
-        request,
-        (res) => {
-          console.log("getTicketItem", res);
-          if (res) {
-            setData(res[0]);
-            getTicketCommnets(res[0].ticketNumber);
-          }
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
-    }
+    getTicketDetails();
   }, []);
+
+  const uploadFiles = (data) => {
+    setLoadingTxt("File Uploading...")
+    setLoading(true)
+    const request = `support/api/Attachments`;
+    UploadMultipartData(
+      request,
+      data,
+      (res) => {
+        console.log("Data", res);
+        if (res) {
+          setUploadFileKey(res);
+          setLoading(false)
+        }
+      },
+      (error) => {
+        console.log("File Upload Error", error);
+        setLoading(false)
+      }
+    );
+  };
+
+  const addNote = () => {
+    let ticketNo = route?.params?.ticketId;
+    const data = {
+      body: myComment,
+      ticketId: `${ticketNo}`,
+      type: "comment",
+      uploads: [`${upoadFileKey}`],
+    };
+
+    const request = `support/api/TicketComments`;
+    PostApiRequest(
+      request,
+      data,
+      (res) => {
+        console.log("Add Note", res);
+        getTicketCommnets(ticketNo);
+      },
+      (error) => {
+        console.log("add note error", error);
+        getTicketCommnets(ticketNo);
+        setMyCommnet('')
+      }
+    );
+  };
+
+  const closeTicket = () => {
+    let ticketNo = route?.params?.ticketId;
+    const request = `support/api/Tickets`;
+    PutApiRequest(
+      request,
+      ticketNo,
+      (res) => {
+        console.log("close ticket", res);
+      },
+      (error) => {
+        console.log("close ticket error", error);
+        //getTicketDetails();
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'SupportTicket' }],
+        });
+      }
+    );
+  };
 
   const handleDocumentSelection = useCallback(async () => {
     try {
@@ -72,17 +154,23 @@ const ViewTicket = ({ route }) => {
         type: [types.pdf, types.plainText, types.images],
       });
       setFileResponse(response);
+      uploadFiles(response[0]);
       console.log("File respose:", JSON.stringify(response));
     } catch (err) {
       console.warn(err);
     }
   }, []);
 
+  const capitalizeFirstLetter=(string)=> {
+
+    return string!= undefined && string.charAt(0).toUpperCase() + string.slice(1);
+}
+
   const RenderComments = () => {
     return (
       <>
         {comments.map((item) => (
-          <View style={styles.frameWrapperBorder}>
+          <View key={item.id} style={styles.frameWrapperBorder}>
             <View style={styles.frameParent1}>
               <View style={styles.rightActionableParent}>
                 {/* <View style={[styles.icon]}></View> */}
@@ -90,12 +178,22 @@ const ViewTicket = ({ route }) => {
                   {item.id}
                 </Text>
                 <Text style={[styles.pm, styles.billingTypo]}>
-                  {moment(item.created_at).format("MM/DD/YY hh:mma")}
+                  {moment(item.created_at).format("MMM Do YY")}
                 </Text>
               </View>
               <Text style={[styles.yesYouCan, styles.billingTypo]}>
                 {item.body}
               </Text>
+              <Pressable onPress={()=>{
+                console.log('file',Env.API_BASEURL+item.attachments[0].content_url)
+                Linking.openURL(Env.API_BASEURL+item.attachments[0].content_url)
+              }}>
+            { item.attachments.length>0 && (
+              <Text style={[styles.yesYouCan, styles.billingTypo,{color:Color.colorMidnightblue}]}>
+                Attachment: {item.attachments[0].filename}
+              </Text>
+               )}
+               </Pressable>
             </View>
           </View>
         ))}
@@ -115,13 +213,7 @@ const ViewTicket = ({ route }) => {
             <View
               style={{ flexDirection: "row", justifyContent: "space-between" }}
             >
-              <View
-                style={[
-                  styles.ticket101Parent,
-                  styles.parentSpaceBlock,
-                  { justifyContent: "space-between", width: "60%" },
-                ]}
-              >
+              <View style={[styles.ticket101Parent, styles.parentSpaceBlock]}>
                 <View style={{ flexDirection: "column" }}>
                   <Text style={styles.ticket101}>
                     Ticket # {data?.ticketNumber}
@@ -141,15 +233,28 @@ const ViewTicket = ({ route }) => {
                   </View>
                 </View>
               </View>
-              <Pressable
-                style={[
-                  styles.closeBtn,
-                  styles.badgeBorder,
-                  { height: 30, marginRight: 10, marginTop: 10 },
-                ]}
-              >
-                <Text style={[styles.text, styles.textTypo]}>Close Ticket</Text>
-              </Pressable>
+              {data?.status != "Closed" && (
+                <Pressable
+                  style={[
+                    styles.closeBtn,
+                    styles.badgeBorder,
+                    { height: 30, marginRight: 10, marginTop: 10 },
+                  ]}
+                  onPress={() => {
+                    closeTicket();
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.text,
+                      styles.textTypo,
+                      { color: Color.colorMidnightblue },
+                    ]}
+                  >
+                    Close Ticket
+                  </Text>
+                </Pressable>
+              )}
             </View>
 
             <View style={styles.frameWrapper}>
@@ -166,63 +271,90 @@ const ViewTicket = ({ route }) => {
                         <Text style={styles.issueType}>Subject</Text>
                         <Text style={styles.billingTypo}>{data?.subject}</Text>
                       </View>
-                    </View>
 
-                    <View style={[{ marginTop: 10 }]}>
-                      <Text style={styles.issueType}>Describe issue</Text>
-                      <View style={{ borderWidth: 1 }}>
-                        <TextInput
-                          placeholder="Comment"
-                          onChangeText={() => {}}
-                          multiline
-                          numberOfLines={5}
-                          style={styles.textArea}
-                        />
+                      <View style={styles.frameParent1}>
+                        <Text style={styles.issueType}>Category</Text>
+                        <Text style={styles.billingTypo}>{capitalizeFirstLetter(data?.category)}</Text>
                       </View>
 
-                      <View style={styles.fileContainer}>
-                        <Pressable
-                          style={styles.fileInnerContainer}
-                          onPress={handleDocumentSelection}
-                        >
+                    </View>
+                    {data?.status != "close" && (
+                      <View style={[{ marginTop: 10 }]}>
+                        <Text style={styles.issueType}>Comment</Text>
+                        <View style={{ borderWidth: 1 }}>
+                          <TextInput
+                            placeholder="Comment"
+                            onChangeText={(text) => {
+                              setMyCommnet(text);
+                              //console.log("test", text);
+                            }}
+                            multiline
+                            numberOfLines={5}
+                            value={myComment}
+                            style={styles.textArea}
+                          />
+                        </View>
+
+                        <View style={styles.fileContainer}>
+                          <Pressable
+                            style={styles.fileInnerContainer}
+                            onPress={handleDocumentSelection}
+                          >
+                            <View
+                              style={{
+                                padding: 20,
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                            >
+                              <View style={{ flexDirection: "row" }}>
+                                <AttachmentIcon />
+                                <Text style={styles.fileTxt}>
+                                  {fileResponse.length > 0
+                                    ? `Upload File: ${fileResponse[0].name}`
+                                    : "Upload File(Optional)"}
+                                </Text>
+                              </View>
+                              <Text style={styles.fileTxtSub}>
+                                Acceptable formats:.pdf,.png, .jpeg, .gif, .txt
+                              </Text>
+                            </View>
+                          </Pressable>
+                        </View>
+                        {comments.length != 0 && (
                           <View
                             style={{
-                              padding: 20,
-                              alignItems: "center",
-                              justifyContent: "center",
+                              alignSelf: "flex-end",
+                              marginVertical: 10,
                             }}
                           >
-                            <Text style={styles.fileTxt}>
-                              {fileResponse.length > 0
-                                ? `Upload File: ${fileResponse[0].name}`
-                                : "Upload File"}
-                            </Text>
-                            <Text style={styles.fileTxtSub}>
-                              Acceptable formats:.pdf,.png, .jpeg, .gif, .txt
-                            </Text>
+                            <Pressable
+                              style={[styles.BtnContainer,{backgroundColor:(myComment.length>0 || fileResponse.length>0)?colors.sparklight_purple_blue:colors.grey}]}
+                              onPress={() => {
+                                if(myComment.length>0){
+                                addNote();
+                                }
+                              }}
+                            >
+                              <Text style={[styles.Btn,{color:(myComment.length>0 || fileResponse.length>0)?'white':colors.dark_grey}]}>Add Note</Text>
+                            </Pressable>
                           </View>
-                        </Pressable>
+                        )}
                       </View>
-
-                      <View
-                        style={{
-                          width: "30%",
-                          alignSelf: "flex-end",
-                          marginVertical: 10,
-                        }}
-                      >
-                        <SparkLightButton
-                          onPress={() => {}}
-                          buttonText="Add Note"
-                        />
-                      </View>
-                    </View>
+                    )}
                   </View>
                   <RenderComments />
                 </View>
               </View>
             </View>
           </View>
+          <LoadingOverlay
+                loading={loading}
+                loadingTxt={loadingTxt}
+                onRequestClose={() => {
+                  setLoading(false);
+                }}
+              />
         </View>
       </ScrollView>
     </View>
@@ -233,6 +365,17 @@ const styles = StyleSheet.create({
   iconLayout: {
     height: 32,
     width: 32,
+  },
+  BtnContainer: {
+    backgroundColor: colors.sparklight_purple_blue,
+    justifyContent: "center",
+  },
+  Btn: {
+    color: colors.snow_white,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+    padding: 12,
+    fontSize: 16,
   },
   icon: {
     height: 32,
@@ -246,7 +389,7 @@ const styles = StyleSheet.create({
     // Remove any additional styles that may distort the original image appearance
   },
   parentSpaceBlock: {
-    paddingBottom: Padding.p_5xl,
+    paddingBottom: Padding.p_5xs,
     paddingTop: Padding.p_base,
     alignSelf: "stretch",
   },
@@ -314,8 +457,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   closeBtn: {
-    backgroundColor: Color.colorGainsboro_200,
-    borderColor: "#000",
+    backgroundColor: Color.colorWhitesmoke_300,
+    borderColor: Color.sparklightaddGray,
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,
     borderWidth: 1,
@@ -328,7 +471,7 @@ const styles = StyleSheet.create({
   ticket101Parent: {
     alignItems: "center",
     flexDirection: "row",
-    paddingHorizontal: Padding.p_5xl,
+    paddingHorizontal: Padding.p_base,
   },
   rightActionableIcon: {
     borderRadius: Border.br_181xl,
@@ -462,8 +605,9 @@ const styles = StyleSheet.create({
   },
   fileTxt: {
     color: "black",
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
+    marginLeft: 5,
   },
   fileTxtSub: {
     color: "black",

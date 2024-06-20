@@ -29,9 +29,9 @@ const TroubleshootComponent = ({
                 </View>
                 <View style={[styles.button]}>
                     <Pressable onPress={()=>{
-                        navigation.navigate("ArticleWindowUtility", {
-                            url: `${Env.URL}business/billing/payments`,
-                            name: "Billing Details",
+              navigation.navigate("ArticalWindowUtility", {
+                url: `${Env.URL}/billing`,
+                name: "Billing Details",
                           });
                     }}
                    >

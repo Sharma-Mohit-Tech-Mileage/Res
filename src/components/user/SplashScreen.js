@@ -225,10 +225,10 @@ const SplashScreen = ({ navigation }) => {
 
   const loginAuth = async () => {
     try {
-      const currentUser = await getUser();
-      if (currentUser?.token) {
-        await revokeToken(currentUser.refreshToken);
-      }
+      // const currentUser = await getUserBusi();
+      // if (currentUser?.token) {
+      //   await revokeToken(currentUser.refreshToken);
+      // }
       const result = await authorize(config);
       const data = {
         idToken: result.idToken,
