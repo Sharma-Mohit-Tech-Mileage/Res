@@ -7,6 +7,7 @@ import {
   View,
   Pressable,
   TextInput,
+  Linking
 } from "react-native";
 import {
   Padding,
@@ -28,6 +29,8 @@ import moment from "moment";
 import DocumentPicker, { types } from "react-native-document-picker";
 import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
 import colors from "../../../res/Colors";
+import { Env } from "../../../network/apis/account/Constants";
+import LoadingOverlay from "../../common/customui/CustomLoading";
 
 const ViewTicket = ({ route }) => {
   const navigation = useNavigation();
@@ -36,6 +39,8 @@ const ViewTicket = ({ route }) => {
   const [comments, setComments] = useState([]);
   const [fileResponse, setFileResponse] = useState([]);
   const [upoadFileKey, setUploadFileKey] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingTxt, setLoadingTxt] = useState("Creating Ticket...");
 
   const getTicketDetails = () => {
     let ticketNo = route?.params?.ticketId;
@@ -77,6 +82,8 @@ const ViewTicket = ({ route }) => {
   }, []);
 
   const uploadFiles = (data) => {
+    setLoadingTxt("File Uploading...")
+    setLoading(true)
     const request = `support/api/Attachments`;
     UploadMultipartData(
       request,
@@ -85,10 +92,12 @@ const ViewTicket = ({ route }) => {
         console.log("Data", res);
         if (res) {
           setUploadFileKey(res);
+          setLoading(false)
         }
       },
       (error) => {
         console.log("File Upload Error", error);
+        setLoading(false)
       }
     );
   };
@@ -113,6 +122,7 @@ const ViewTicket = ({ route }) => {
       (error) => {
         console.log("add note error", error);
         getTicketCommnets(ticketNo);
+        setMyCommnet('')
       }
     );
   };
@@ -128,7 +138,11 @@ const ViewTicket = ({ route }) => {
       },
       (error) => {
         console.log("close ticket error", error);
-        getTicketDetails();
+        //getTicketDetails();
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'SupportTicket' }],
+        });
       }
     );
   };
@@ -146,6 +160,11 @@ const ViewTicket = ({ route }) => {
       console.warn(err);
     }
   }, []);
+
+  const capitalizeFirstLetter=(string)=> {
+
+    return string!= undefined && string.charAt(0).toUpperCase() + string.slice(1);
+}
 
   const RenderComments = () => {
     return (
@@ -165,11 +184,16 @@ const ViewTicket = ({ route }) => {
               <Text style={[styles.yesYouCan, styles.billingTypo]}>
                 {item.body}
               </Text>
+              <Pressable onPress={()=>{
+                console.log('file',Env.API_BASEURL+item.attachments[0].content_url)
+                Linking.openURL(Env.API_BASEURL+item.attachments[0].content_url)
+              }}>
             { item.attachments.length>0 && (
               <Text style={[styles.yesYouCan, styles.billingTypo,{color:Color.colorMidnightblue}]}>
                 Attachment: {item.attachments[0].filename}
               </Text>
                )}
+               </Pressable>
             </View>
           </View>
         ))}
@@ -250,7 +274,7 @@ const ViewTicket = ({ route }) => {
 
                       <View style={styles.frameParent1}>
                         <Text style={styles.issueType}>Category</Text>
-                        <Text style={styles.billingTypo}>{data?.category}</Text>
+                        <Text style={styles.billingTypo}>{capitalizeFirstLetter(data?.category)}</Text>
                       </View>
 
                     </View>
@@ -266,6 +290,7 @@ const ViewTicket = ({ route }) => {
                             }}
                             multiline
                             numberOfLines={5}
+                            value={myComment}
                             style={styles.textArea}
                           />
                         </View>
@@ -304,14 +329,14 @@ const ViewTicket = ({ route }) => {
                             }}
                           >
                             <Pressable
-                              style={[styles.BtnContainer,{backgroundColor:(myComment.length>0)?colors.sparklight_purple_blue:colors.grey}]}
+                              style={[styles.BtnContainer,{backgroundColor:(myComment.length>0 || fileResponse.length>0)?colors.sparklight_purple_blue:colors.grey}]}
                               onPress={() => {
                                 if(myComment.length>0){
                                 addNote();
                                 }
                               }}
                             >
-                              <Text style={[styles.Btn,{color:(myComment.length>0)?'white':colors.dark_grey}]}>Add Note</Text>
+                              <Text style={[styles.Btn,{color:(myComment.length>0 || fileResponse.length>0)?'white':colors.dark_grey}]}>Add Note</Text>
                             </Pressable>
                           </View>
                         )}
@@ -323,6 +348,13 @@ const ViewTicket = ({ route }) => {
               </View>
             </View>
           </View>
+          <LoadingOverlay
+                loading={loading}
+                loadingTxt={loadingTxt}
+                onRequestClose={() => {
+                  setLoading(false);
+                }}
+              />
         </View>
       </ScrollView>
     </View>
