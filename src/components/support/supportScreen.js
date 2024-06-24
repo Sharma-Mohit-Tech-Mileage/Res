@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text,TouchableOpacity } from "react-native";
+import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text,TouchableOpacity,Alert } from "react-native";
 import { useSelector } from 'react-redux';
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
@@ -126,6 +126,18 @@ const Support = ({ route }) => {
         };
     }, []);
 
+    const exitConfirmation=()=>{
+        console.log('Wait exit')
+        Alert.alert("Wait!", "Are you sure to go back?", [
+            {
+              text: "Cancel",
+              onPress: () => null,
+              style: "cancel"
+            },
+            { text: "YES", onPress: () => navigation.goBack() }
+          ]);
+    }
+
 
     const handlePressOpenButton = (department, tags) => {
         const user = {
@@ -163,7 +175,7 @@ const Support = ({ route }) => {
 
     return (
         <View style={styles.support}>
-            <ProfileSettingsHeader title="Support" iconAlignment="right" showIcon={false} />
+            <ProfileSettingsHeader title="Support" iconAlignment="right" showIcon={false}  />
             <LinearGradient
                 style={styles.linearGradientStyle}
                 locations={[0, 1]}
