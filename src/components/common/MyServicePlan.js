@@ -119,7 +119,7 @@ const MyServicePlan = ({ plans,tvPlan,phonePlan, navigation }) => {
             <IconComponent accessible accessibilityLabel={`${serviceType} Icon`} />
           </LinearGradient>
           <Text style={styles.planDetailsRowHeader} accessibilityLabel={`${serviceType} ${item.planName}`}>
-            {serviceType.charAt(0).toUpperCase() + serviceType.slice(1)}  {/* Capitalize the service type */}
+            {(serviceType && typeof serviceType === 'string')? serviceType.charAt(0).toUpperCase() + serviceType.slice(1): ''}
           </Text>
         </View>
         <View style={[styles.planDetailsRow]}>
@@ -169,8 +169,7 @@ const MyServicePlan = ({ plans,tvPlan,phonePlan, navigation }) => {
         IconComponent = null;
     }
   
-  
-    const capitalizedServiceType = serviceType.charAt(0).toUpperCase() + serviceType.slice(1);
+    const capitalizedServiceType = (serviceType && typeof serviceType === 'string')? serviceType.charAt(0).toUpperCase() + serviceType.slice(1): '';
   
     return (
       <View key={itemindex} accessible accessibilityLabel={`Plan Details for ${capitalizedServiceType} ${planName}`}>
@@ -220,7 +219,7 @@ const MyServicePlan = ({ plans,tvPlan,phonePlan, navigation }) => {
         IconComponent = null;
     }
   
-    const capitalizedServiceType = serviceType.charAt(0).toUpperCase() + serviceType.slice(1);
+    const capitalizedServiceType = (serviceType && typeof serviceType === 'string')? serviceType.charAt(0).toUpperCase() + serviceType.slice(1): '';
   
     return (
       <View key={itemindex} accessible accessibilityLabel={`Plan Details for ${capitalizedServiceType} ${item.planName}`}>
