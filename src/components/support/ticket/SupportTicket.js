@@ -7,6 +7,7 @@ import {
   FlatList,
   ActivityIndicator,
   Pressable,
+  Platform,
 } from "react-native";
 import {
   Padding,
@@ -55,6 +56,11 @@ const SupportTicket = () => {
     getTicketList();
   }, []);
 
+  const capitalizeFirstLetter=(string)=> {
+
+    return string!= undefined && string.charAt(0).toUpperCase() + string.slice(1);
+}
+
   const RenderNoTicket = () => {
     return (
       <View style={styles.frameWrapper}>
@@ -65,10 +71,11 @@ const SupportTicket = () => {
                 <TicketListIcon isGrey={true} />
               </View>
               <Text style={[styles.noTicketsCreated, styles.createATicketTypo]}>
-                No Tickets Created
+                {(searchTxt.length>0 && ticketList.length==0)?'No Results found':'No Tickets Created'}
               </Text>
               <Text style={[styles.createATicket, styles.createATicketTypo]}>
-                Create a ticket to receive support
+              {(searchTxt.length>0 && ticketList.length==0)?' ':'Create a ticket to receive support'}
+                
               </Text>
             </View>
           </View>
@@ -76,6 +83,27 @@ const SupportTicket = () => {
       </View>
     );
   };
+
+  const getStatusColor=(status)=>{
+    let color="#067647"
+    switch(status) {
+      case 'new':
+        color= '#EF4E3E'
+        break;
+      case 'pending':
+        color= '#F88700'
+        break;
+        case 'resolved':
+        color= '#067647'
+        break;
+        case 'closed':
+        color= '#067647'
+        break;
+      default:
+        color= '#F88700'
+    }
+    return color;
+  }
 
   const RenderTicketList = ({ item }) => {
     return (
@@ -124,13 +152,15 @@ const SupportTicket = () => {
           }}
         >
           <Text style={styles.issueType}>Status</Text>
-          <View style={{ alignSelf: "flex-start", padding: 0 }}>
+          <View style={{ alignSelf: "flex-start",borderRadius:5, padding: 0,backgroundColor:getStatusColor(item?.status.toLowerCase()), }}>
             <Text
               style={[
                 styles.text,
                 styles.textTypo,
                 styles.badge,
                 styles.badgeBorder,
+                {color:'#FFF'}
+
               ]}
             >
               {item.status}
@@ -145,7 +175,7 @@ const SupportTicket = () => {
             }}
           >
             <Text style={styles.issueType}>Issue Type</Text>
-            <Text style={styles.billingTypo}>{item.category}</Text>
+            <Text style={styles.billingTypo}>{capitalizeFirstLetter(item?.category)}</Text>
           </View>
 
           <View style={{ marginTop: 10 }}>
@@ -180,7 +210,7 @@ const SupportTicket = () => {
                      if(text.length>0){
                     const newData1 = ticketList.filter(
                       item => {
-                            console.log('test=',item.subject)
+                            //console.log('test=',item.subject)
                             if(item.ticketNumber.toString().includes(text)){
                                return true
                             }else if(item.subject.toLowerCase().includes(text.toLowerCase())){
@@ -192,6 +222,7 @@ const SupportTicket = () => {
                               
                       }) 
                       setTicketList(newData1) 
+                      
                     }else{
                       setTicketList(mainList)
                     }
@@ -201,7 +232,7 @@ const SupportTicket = () => {
                 />
               </View>
           {ticketList.length > 0 ? (
-            <View style={{ height: "76%" }}>
+            <View style={{ height: (Platform.OS=='ios')?'76%':'80%' }}>
               
               <FlatList
                 data={ticketList}
@@ -344,7 +375,6 @@ const styles = StyleSheet.create({
     lineHeight: 28,
   },
   badge: {
-    backgroundColor: Color.success50,
     borderColor: Color.colorAquamarine,
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,

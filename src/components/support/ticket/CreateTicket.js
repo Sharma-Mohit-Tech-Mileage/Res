@@ -136,7 +136,7 @@ const CreateTicket = () => {
       <View style={styles.ticketSupportNone}>
         <ProfileSettingsHeader
           title="Create Ticket"
-          onPressBack={() => navigation.navigate("support")}
+          onPressBack={() => navigation.goBack()}
         />
 
         <ScrollView >
@@ -149,7 +149,7 @@ const CreateTicket = () => {
                   </View>
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
-                      <Text style={styles.text}>Subject</Text>
+                      <Text style={[styles.text,{paddingBottom:8}]}>Subject</Text>
                     </View>
                     <Controller
                       control={control}
@@ -174,6 +174,7 @@ const CreateTicket = () => {
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
                       <Text style={styles.text}>Category</Text>
+                      </View>
                       <Controller
                         control={control}
                         name="category"
@@ -203,7 +204,6 @@ const CreateTicket = () => {
                           </>
                         )}
                       />
-                    </View>
                   </View>
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
@@ -243,7 +243,7 @@ const CreateTicket = () => {
 
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
-                      <Text style={styles.text}>Email</Text>
+                      <Text style={[styles.text,{paddingBottom:8}]}>Email</Text>
                     </View>
                     <Controller
                       control={control}

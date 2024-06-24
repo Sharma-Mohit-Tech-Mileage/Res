@@ -7,7 +7,8 @@ import {
   View,
   Pressable,
   TextInput,
-  Linking
+  Linking,
+  TouchableOpacity
 } from "react-native";
 import {
   Padding,
@@ -166,6 +167,27 @@ const ViewTicket = ({ route }) => {
     return string!= undefined && string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+const getStatusColor=(status)=>{
+  let color="#067647"
+  switch(status) {
+    case 'new':
+      color= '#EF4E3E'
+      break;
+    case 'pending':
+      color= '#F88700'
+      break;
+      case 'resolved':
+      color= '#067647'
+      break;
+      case 'closed':
+      color= '#067647'
+      break;
+    default:
+      color= '#F88700'
+  }
+  return color;
+}
+
   const RenderComments = () => {
     return (
       <>
@@ -177,15 +199,15 @@ const ViewTicket = ({ route }) => {
                 <Text style={[styles.agentResponse, styles.pmTypo]}>
                   {item.id}
                 </Text>
-                <Text style={[styles.pm, styles.billingTypo]}>
-                  {moment(item.created_at).format("MMM Do YY")}
+                <Text style={[styles.pm, styles.billingTypo,{fontSize:12}]}>
+                  {moment(item.created_at).format("LT") +" on " +moment(item.created_at).format("MMMM Do YYYY")}
                 </Text>
               </View>
               <Text style={[styles.yesYouCan, styles.billingTypo]}>
                 {item.body}
               </Text>
               <Pressable onPress={()=>{
-                console.log('file',Env.API_BASEURL+item.attachments[0].content_url)
+                //console.log('file',Env.API_BASEURL+item.attachments[0].content_url)
                 Linking.openURL(Env.API_BASEURL+item.attachments[0].content_url)
               }}>
             { item.attachments.length>0 && (
@@ -218,14 +240,14 @@ const ViewTicket = ({ route }) => {
                   <Text style={styles.ticket101}>
                     Ticket # {data?.ticketNumber}
                   </Text>
-                  <View style={{ alignSelf: "flex-start", marginTop: 10 }}>
+                  <View style={{ alignSelf: "flex-start", marginTop: 10,backgroundColor:getStatusColor(data?.status?.toLowerCase()), }}>
                     <Text
                       style={[
                         styles.text,
                         styles.textTypo,
                         styles.badge,
                         styles.badgeBorder,
-                        { color: Color.success700 },
+                        { color: '#FFF' },
                       ]}
                     >
                       {data?.status}
@@ -279,7 +301,7 @@ const ViewTicket = ({ route }) => {
 
                     </View>
                     {data?.status != "close" && (
-                      <View style={[{ marginTop: 10 }]}>
+                      <View >
                         <Text style={styles.issueType}>Comment</Text>
                         <View style={{ borderWidth: 1 }}>
                           <TextInput
@@ -328,16 +350,16 @@ const ViewTicket = ({ route }) => {
                               marginVertical: 10,
                             }}
                           >
-                            <Pressable
+                            <TouchableOpacity
                               style={[styles.BtnContainer,{backgroundColor:(myComment.length>0 || fileResponse.length>0)?colors.sparklight_purple_blue:colors.grey}]}
                               onPress={() => {
-                                if(myComment.length>0){
+                                if(myComment.length>0 || fileResponse.length>0){
                                 addNote();
                                 }
                               }}
                             >
                               <Text style={[styles.Btn,{color:(myComment.length>0 || fileResponse.length>0)?'white':colors.dark_grey}]}>Add Note</Text>
-                            </Pressable>
+                            </TouchableOpacity>
                           </View>
                         )}
                       </View>
@@ -449,7 +471,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansSemiBold,
   },
   badge: {
-    backgroundColor: Color.success50,
     borderColor: Color.colorAquamarine,
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,
