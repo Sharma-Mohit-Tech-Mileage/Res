@@ -96,7 +96,7 @@ const SupportTicket = () => {
       case 'pending':
         color= '#8D3B90'
         break;
-        case 'resolved':
+        case 'solved':
         color= '#067647'
         break;
         case 'closed':
