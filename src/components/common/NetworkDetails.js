@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 import Billpaidicon from "../../res/svgIcons/Billpaidicon";
 import Outageicon from "../../res/svgIcons/Outageicon";
 import Modemicon from "../../res/svgIcons/Modemicon";
@@ -26,7 +26,10 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.rowContainer}>
-        <View style={styles.item}>
+        <View style={styles.item}
+          accessible={true}
+          accessibilityLabel={hasOutage ? strings.noOutageDetected : strings.noOutageTxt}
+        >
           <View style={styles.iconBg}>
             <Outageicon />
             {hasOutage ? <RedCircle /> : <GreenCircle />}
@@ -46,16 +49,16 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
       </View>
 
       <View style={[styles.rowContainer]}>
-        { <TouchableOpacity
+        {<TouchableOpacity
           style={{ flexDirection: "row" }}
           onPress={() => {
-            if(currentHealth!='Optimal'){
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'Support',params: { isManagementEquipment:true }, }],
-          });
-        }
-           // navigation.navigate('Support',{isManagementEquipment:true});
+            if (currentHealth != 'Optimal') {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Support', params: { isManagementEquipment: true }, }],
+              });
+            }
+            // navigation.navigate('Support',{isManagementEquipment:true});
           }}
         >
           <View style={styles.item}>
@@ -90,7 +93,7 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
               <></>
             )}
           </View>
-        </TouchableOpacity> }
+        </TouchableOpacity>}
         <TouchableOpacity
           style={{ flexDirection: "row" }}
           onPress={() => {
