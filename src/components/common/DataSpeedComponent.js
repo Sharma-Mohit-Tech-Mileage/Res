@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Pressable,
 } from "react-native";
 
 import colors from "../../res/Colors";
@@ -21,8 +22,8 @@ import { FontFamily } from "../../../GlobalStyles";
 import { Env } from "../../network/apis/account/Constants";
 
 
-const DataSpeedComponent = ({navigation}) => {
-  
+const DataSpeedComponent = ({ navigation }) => {
+
   const [showModal, setShowModal] = useState(false);
 
   const toggleModal = () => {
@@ -34,7 +35,7 @@ const DataSpeedComponent = ({navigation}) => {
   const [upload, setUpload] = useState(0);
   const [downloadFrac, setDownloadFrac] = useState(0);
   const [uploadFrac, setUploadFrac] = useState(0);
-  const [ speed ,setSpeed] = useState(false);
+  const [speed, setSpeed] = useState(false);
   const [testDate, setTestDate] = useState(0);
 
   const getCurrentSpeed = () => {
@@ -80,7 +81,7 @@ const DataSpeedComponent = ({navigation}) => {
             borderWidth: 1,
             borderRadius: 8,
             marginTop: 15,
-            marginHorizontal:20
+            marginHorizontal: 20
           }}
         >
           <View
@@ -99,14 +100,22 @@ const DataSpeedComponent = ({navigation}) => {
                 <Image source={require("../../../assets/frame-1645.png")} />
               </View>
 
-              <View style={{ flexDirection: "row" }}>
+              <View
+                style={{ flexDirection: "row" }}
+                accessible={true}
+                accessibilityLabel={`${download}.${downloadFrac}`}
+              >
                 <Text style={styles.speedtextLarge}>{download}</Text>
                 <Text style={[styles.speedtextLarge, { fontSize: 16 }]}>
                   .{downloadFrac}
                 </Text>
               </View>
 
-              <View style={{ flexDirection: "row" }}>
+              <View
+                style={{ flexDirection: "row" }}
+                accessible={true}
+                accessibilityLabel={`Download Mbps`}
+              >
                 <Text style={styles.downloadText}>Download</Text>
                 <Text
                   style={[
@@ -136,13 +145,20 @@ const DataSpeedComponent = ({navigation}) => {
                 <Image source={require("../../../assets/frame-1646.png")} />
               </View>
 
-              <View style={{ flexDirection: "row" }}>
+              <View style={{ flexDirection: "row" }}
+                accessible={true}
+                accessibilityLabel={`${upload}.${uploadFrac}`}
+              >
                 <Text style={styles.speedtextLarge}>{upload}</Text>
                 <Text style={[styles.speedtextLarge, { fontSize: 16 }]}>
                   .{uploadFrac}
                 </Text>
               </View>
-              <View style={{ flexDirection: "row" }}>
+              <View
+                style={{ flexDirection: "row" }}
+                accessible={true}
+                accessibilityLabel={`Upload Mbps`}
+              >
                 <Text style={styles.downloadText}>Upload</Text>
                 <Text
                   style={[
@@ -189,7 +205,7 @@ const DataSpeedComponent = ({navigation}) => {
 
   return (
     <View style={{ flexDirection: "column" }}>
-      <View style={[styles.internetStatusSection,{marginHorizontal:20}]}>
+      <View style={[styles.internetStatusSection, { marginHorizontal: 20 }]}>
         <View style={{ marginTop: 5 }}>
           <InfoIcon />
         </View>
@@ -221,9 +237,9 @@ const DataSpeedComponent = ({navigation}) => {
       />
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('ArticalWindowUtility', { 
+          navigation.navigate('ArticalWindowUtility', {
             url: `${Env.URL}/services/upgrade`,
-            name: 'Upgrade Plan' 
+            name: 'Upgrade Plan'
           })
         }}
         style={{
@@ -231,8 +247,8 @@ const DataSpeedComponent = ({navigation}) => {
           flexDirection: "row",
           justifyContent: "space-between",
           padding: 4,
-          marginHorizontal:20,
-          
+          marginHorizontal: 20,
+
         }}
       >
         <Text
@@ -240,7 +256,7 @@ const DataSpeedComponent = ({navigation}) => {
             fontSize: 16,
             fontWeight: "600",
             color: colors.sparklight_purple_blue,
-            fontFamily:FontFamily.openSansRegular,
+            fontFamily: FontFamily.openSansRegular,
           }}
         >
           Upgrade Plan
@@ -252,8 +268,8 @@ const DataSpeedComponent = ({navigation}) => {
 
       {showModal && (
         <SpeedTestModal
-          url="https://cableone.speedtestcustom.com/" 
-          onClose={()=>toggleModal()}
+          url="https://cableone.speedtestcustom.com/"
+          onClose={() => toggleModal()}
         />
       )}
     </View>
@@ -274,7 +290,7 @@ const styles = StyleSheet.create({
   },
   internetStatusTxt: {
     color: colors.darkest_grey,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     marginLeft: 5,
     fontStyle: "normal",
@@ -283,7 +299,7 @@ const styles = StyleSheet.create({
   },
   speedtextLarge: {
     color: colors.sparklight_bright_purple,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
     marginTop: 10,
     fontSize: 24,
@@ -293,7 +309,7 @@ const styles = StyleSheet.create({
   },
   downloadText: {
     color: colors.darkest_grey,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
     fontSize: 14,
     marginTop: 10,
@@ -317,26 +333,26 @@ const styles = StyleSheet.create({
     color: colors.dark_grey,
     marginLeft: 5,
     fontSize: 14,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontWeight: "400",
   },
   timerInfo2: {
     marginLeft: 5,
     color: colors.darkest_grey,
     fontSize: 14,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontWeight: "400",
   },
   learnMore: {
     color: colors.sparklight_purple_blue,
     fontSize: 14,
-    fontFamily:FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     fontStyle: "normal",
     fontWeight: "400",
   },
   verticle_saperator: {
     marginHorizontal: 10,
-    alignSelf:'center',
+    alignSelf: 'center',
     height: 15,
     backgroundColor: colors.dark_grey,
     width: 1,
