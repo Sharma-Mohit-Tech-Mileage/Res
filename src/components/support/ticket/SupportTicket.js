@@ -88,10 +88,13 @@ const SupportTicket = () => {
     let color="#067647"
     switch(status) {
       case 'new':
-        color= '#EF4E3E'
-        break;
-      case 'pending':
         color= '#F88700'
+        break;
+        case 'open':
+          color= '#EF4E3E'
+          break;
+      case 'pending':
+        color= '#8D3B90'
         break;
         case 'resolved':
         color= '#067647'
@@ -207,8 +210,9 @@ const SupportTicket = () => {
                   placeholder={"Search by Ticket # or Subject"}
                   onChangeText={(text) => {
                     setSearchTxt(text)
+                    console.log(":",text)
                      if(text.length>0){
-                    const newData1 = ticketList.filter(
+                    const newData1 = mainList.filter(
                       item => {
                             //console.log('test=',item.subject)
                             if(item.ticketNumber.toString().includes(text)){
@@ -230,6 +234,7 @@ const SupportTicket = () => {
                   }}
                   value={searchTxt}
                 />
+                <Text style={[styles.billingTypo,{fontSize:FontSize.size_xs}]}>Newly submitted tickets may takes some time to appear in the ticket log.</Text>
               </View>
           {ticketList.length > 0 ? (
             <View style={{ height: (Platform.OS=='ios')?'76%':'80%' }}>
@@ -405,3 +410,4 @@ const styles = StyleSheet.create({
 });
 
 export default SupportTicket;
+

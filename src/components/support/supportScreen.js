@@ -262,7 +262,7 @@ const Support = ({ route }) => {
                                                 />
                                             </View>
                                             <Text style={[styles.supportingText, styles.supportingTypo1,]} >
-                                                Automated troubleshooting scan.
+                                            Instant Troubleshooting & Outage Check.
                                             </Text>
                                         </View>
                                     </View>
