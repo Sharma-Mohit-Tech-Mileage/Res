@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Image,
   StyleSheet,
@@ -8,7 +8,7 @@ import {
   Pressable,
   TextInput,
   Linking,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import {
   Padding,
@@ -25,7 +25,7 @@ import {
   PutApiRequest,
   UploadMultipartData,
 } from "../../../network/APIClient";
-import SparkLightButton from "../../common/customui/SparkLightButton";
+import WarningIcon from "../../../../assets/alert-triangle.png";
 import moment from "moment";
 import DocumentPicker, { types } from "react-native-document-picker";
 import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
@@ -42,6 +42,7 @@ const ViewTicket = ({ route }) => {
   const [upoadFileKey, setUploadFileKey] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingTxt, setLoadingTxt] = useState("Creating Ticket...");
+  const scrollViewRef = useRef(null);
 
   const getTicketDetails = () => {
     let ticketNo = route?.params?.ticketId;
@@ -83,8 +84,8 @@ const ViewTicket = ({ route }) => {
   }, []);
 
   const uploadFiles = (data) => {
-    setLoadingTxt("File Uploading...")
-    setLoading(true)
+    setLoadingTxt("File Uploading...");
+    setLoading(true);
     const request = `support/api/Attachments`;
     UploadMultipartData(
       request,
@@ -93,12 +94,12 @@ const ViewTicket = ({ route }) => {
         console.log("Data", res);
         if (res) {
           setUploadFileKey(res);
-          setLoading(false)
+          setLoading(false);
         }
       },
       (error) => {
         console.log("File Upload Error", error);
-        setLoading(false)
+        setLoading(false);
       }
     );
   };
@@ -123,7 +124,9 @@ const ViewTicket = ({ route }) => {
       (error) => {
         console.log("add note error", error);
         getTicketCommnets(ticketNo);
-        setMyCommnet('')
+        setMyCommnet("");
+        setFileResponse([]);
+        scrollViewRef.current?.scrollToEnd({ animated: true });
       }
     );
   };
@@ -142,7 +145,7 @@ const ViewTicket = ({ route }) => {
         //getTicketDetails();
         navigation.reset({
           index: 0,
-          routes: [{ name: 'SupportTicket' }],
+          routes: [{ name: "SupportTicket" }],
         });
       }
     );
@@ -162,31 +165,35 @@ const ViewTicket = ({ route }) => {
     }
   }, []);
 
-  const capitalizeFirstLetter=(string)=> {
+  const capitalizeFirstLetter = (string) => {
+    return (
+      string != undefined && string.charAt(0).toUpperCase() + string.slice(1)
+    );
+  };
 
-    return string!= undefined && string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-const getStatusColor=(status)=>{
-  let color="#067647"
-  switch(status) {
-    case 'new':
-      color= '#EF4E3E'
-      break;
-    case 'pending':
-      color= '#F88700'
-      break;
-      case 'resolved':
-      color= '#067647'
-      break;
-      case 'closed':
-      color= '#067647'
-      break;
-    default:
-      color= '#F88700'
-  }
-  return color;
-}
+  const getStatusColor = (status) => {
+    let color = "#067647";
+    switch (status) {
+      case "new":
+        color = "#F88700";
+        break;
+      case "open":
+        color = "#EF4E3E";
+        break;
+      case "pending":
+        color = "#8D3B90";
+        break;
+      case "resolved":
+        color = "#067647";
+        break;
+      case "closed":
+        color = "#067647";
+        break;
+      default:
+        color = "#F88700";
+    }
+    return color;
+  };
 
   const RenderComments = () => {
     return (
@@ -199,23 +206,35 @@ const getStatusColor=(status)=>{
                 <Text style={[styles.agentResponse, styles.pmTypo]}>
                   {item.id}
                 </Text>
-                <Text style={[styles.pm, styles.billingTypo,{fontSize:12}]}>
-                  {moment(item.created_at).format("LT") +" on " +moment(item.created_at).format("MMMM Do YYYY")}
+                <Text style={[styles.pm, styles.billingTypo, { fontSize: 12 }]}>
+                  {moment(item.created_at).format("LT") +
+                    " on " +
+                    moment(item.created_at).format("MMM, DD, YYYY")}
                 </Text>
               </View>
               <Text style={[styles.yesYouCan, styles.billingTypo]}>
                 {item.body}
               </Text>
-              <Pressable onPress={()=>{
-                //console.log('file',Env.API_BASEURL+item.attachments[0].content_url)
-                Linking.openURL(Env.API_BASEURL+item.attachments[0].content_url)
-              }}>
-            { item.attachments.length>0 && (
-              <Text style={[styles.yesYouCan, styles.billingTypo,{color:Color.colorMidnightblue}]}>
-                Attachment: {item.attachments[0].filename}
-              </Text>
-               )}
-               </Pressable>
+              <Pressable
+                onPress={() => {
+                  //console.log('file',Env.API_BASEURL+item.attachments[0].content_url)
+                  Linking.openURL(
+                    Env.API_BASEURL + item.attachments[0].content_url
+                  );
+                }}
+              >
+                {item.attachments.length > 0 && (
+                  <Text
+                    style={[
+                      styles.yesYouCan,
+                      styles.billingTypo,
+                      { color: Color.colorMidnightblue },
+                    ]}
+                  >
+                    Attachment: {item.attachments[0].filename}
+                  </Text>
+                )}
+              </Pressable>
             </View>
           </View>
         ))}
@@ -229,7 +248,7 @@ const getStatusColor=(status)=>{
         title="View Ticket"
         onPressBack={() => navigation.goBack()}
       />
-      <ScrollView>
+      <ScrollView ref={scrollViewRef}>
         <View style={[styles.ticketSupportInner]}>
           <View style={[styles.frameParent, styles.parentSpaceBlock]}>
             <View
@@ -240,14 +259,22 @@ const getStatusColor=(status)=>{
                   <Text style={styles.ticket101}>
                     Ticket # {data?.ticketNumber}
                   </Text>
-                  <View style={{ alignSelf: "flex-start", marginTop: 10,backgroundColor:getStatusColor(data?.status?.toLowerCase()), }}>
+                  <View
+                    style={{
+                      alignSelf: "flex-start",
+                      marginTop: 10,
+                      backgroundColor: getStatusColor(
+                        data?.status?.toLowerCase()
+                      ),
+                    }}
+                  >
                     <Text
                       style={[
                         styles.text,
                         styles.textTypo,
                         styles.badge,
                         styles.badgeBorder,
-                        { color: '#FFF' },
+                        { color: "#FFF" },
                       ]}
                     >
                       {data?.status}
@@ -296,25 +323,39 @@ const getStatusColor=(status)=>{
 
                       <View style={styles.frameParent1}>
                         <Text style={styles.issueType}>Category</Text>
-                        <Text style={styles.billingTypo}>{capitalizeFirstLetter(data?.category)}</Text>
+                        <Text style={[styles.billingTypo]}>
+                          {capitalizeFirstLetter(data?.category)}
+                        </Text>
                       </View>
-
                     </View>
                     {data?.status != "close" && (
-                      <View >
+                      <View style={styles.frameParent1}>
                         <Text style={styles.issueType}>Comment</Text>
-                        <View style={{ borderWidth: 1 }}>
-                          <TextInput
-                            placeholder="Comment"
-                            onChangeText={(text) => {
-                              setMyCommnet(text);
-                              //console.log("test", text);
-                            }}
-                            multiline
-                            numberOfLines={5}
-                            value={myComment}
-                            style={styles.textArea}
-                          />
+                        <View style={{ flexDirection: "column" }}>
+                          <View style={{ borderWidth: 1 }}>
+                            <TextInput
+                              placeholder="Comment"
+                              onChangeText={(text) => {
+                                setMyCommnet(text);
+                                //console.log("test", text);
+                              }}
+                              multiline
+                              numberOfLines={5}
+                              value={myComment}
+                              style={styles.textArea}
+                            />
+                          </View>
+                          {myComment.length == 0 && (
+                            <View style={styles.errorContainer}>
+                              <Image
+                                source={WarningIcon}
+                                style={styles.errorIcon}
+                              />
+                              <Text style={styles.errorText}>
+                                {"Comment is required"}
+                              </Text>
+                            </View>
+                          )}
                         </View>
 
                         <View style={styles.fileContainer}>
@@ -351,14 +392,36 @@ const getStatusColor=(status)=>{
                             }}
                           >
                             <TouchableOpacity
-                              style={[styles.BtnContainer,{backgroundColor:(myComment.length>0 || fileResponse.length>0)?colors.sparklight_purple_blue:colors.grey}]}
+                              style={[
+                                styles.BtnContainer,
+                                {
+                                  backgroundColor:
+                                    myComment.length > 0 ||
+                                    fileResponse.length > 0
+                                      ? colors.sparklight_purple_blue
+                                      : colors.grey,
+                                },
+                              ]}
                               onPress={() => {
-                                if(myComment.length>0 || fileResponse.length>0){
-                                addNote();
+                                if (myComment.length > 0) {
+                                  addNote();
                                 }
                               }}
                             >
-                              <Text style={[styles.Btn,{color:(myComment.length>0 || fileResponse.length>0)?'white':colors.dark_grey}]}>Add Note</Text>
+                              <Text
+                                style={[
+                                  styles.Btn,
+                                  {
+                                    color:
+                                      myComment.length > 0 ||
+                                      fileResponse.length > 0
+                                        ? "white"
+                                        : colors.dark_grey,
+                                  },
+                                ]}
+                              >
+                                Add Note
+                              </Text>
                             </TouchableOpacity>
                           </View>
                         )}
@@ -371,12 +434,12 @@ const getStatusColor=(status)=>{
             </View>
           </View>
           <LoadingOverlay
-                loading={loading}
-                loadingTxt={loadingTxt}
-                onRequestClose={() => {
-                  setLoading(false);
-                }}
-              />
+            loading={loading}
+            loadingTxt={loadingTxt}
+            onRequestClose={() => {
+              setLoading(false);
+            }}
+          />
         </View>
       </ScrollView>
     </View>
@@ -634,6 +697,21 @@ const styles = StyleSheet.create({
     color: "black",
     fontSize: FontSize.size_xs,
     marginTop: 10,
+    fontFamily: FontFamily.openSansRegular,
+  },
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4, // Space between the input and the error message
+  },
+  errorIcon: {
+    width: 20,
+    height: 20,
+    marginRight: Padding.p_xs,
+  },
+  errorText: {
+    color: "red",
+    fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
   },
 });
