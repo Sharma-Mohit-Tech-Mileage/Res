@@ -35,6 +35,8 @@ import { getUser } from "../../../redux/utils/LocalStorage";
 import DocumentPicker, { types } from "react-native-document-picker";
 import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
 import LoadingOverlay from "../../common/customui/CustomLoading";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import SparkLightMobileInputField from "../../common/customui/SparklightMobileInputField";
 
 const CreateTicket = () => {
   const navigation = useNavigation();
@@ -52,6 +54,7 @@ const CreateTicket = () => {
     accountNumber: "",
     category: "",
     uploads: [],
+    PhoneNumber:''
   };
 
   const {
@@ -140,7 +143,7 @@ const CreateTicket = () => {
         />
 
         <ScrollView >
-          <View style={{ flexDirection: "column", paddingBottom: "45%" }}>
+          <View style={{ flexDirection: "column", paddingBottom: hp("40%") }}>
             <View style={[styles.innerContainer]}>
               <View style={[styles.frameParent]}>
                 <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
@@ -262,6 +265,30 @@ const CreateTicket = () => {
                       )}
                     />
                   </View>
+
+                  <View style={styles.frameWrapper}>
+                    <View style={styles.textView}>
+                      <Text style={[styles.text,{paddingBottom:8}]}>Phone Number</Text>
+                    </View>
+                    <Controller
+                      control={control}
+                      name="PhoneNumber"
+                      render={({
+                        field: { onChange, onBlur, value },
+                        fieldState: { error },
+                      }) => (
+                        <SparkLightMobileInputField
+                          placeholder="Phone Number"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          
+                          error={error?.message}
+                        />
+                      )}
+                    />
+                  </View>
+
                 </View>
                 <View style={styles.fileContainer}>
                   <Pressable

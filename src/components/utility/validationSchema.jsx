@@ -177,7 +177,8 @@ export const userTicketSchema = () => yup.object({
     email: yup
     .string()
     .email('Please enter a valid email address.')
-    .required('Email is required.')
+    .required('Email is required.'),
+    PhoneNumber: yup.string().required('Phone Number is required'),
     
     
     
