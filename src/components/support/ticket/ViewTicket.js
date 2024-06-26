@@ -17,6 +17,8 @@ import {
   Color,
   FontFamily,
 } from "../../../../GlobalStyles";
+
+import axios from 'axios';
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -32,11 +34,13 @@ import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
 import colors from "../../../res/Colors";
 import { Env } from "../../../network/apis/account/Constants";
 import LoadingOverlay from "../../common/customui/CustomLoading";
+import { getUser } from "../../../redux/utils/LocalStorage";
 
 const ViewTicket = ({ route }) => {
   const navigation = useNavigation();
   const [data, setData] = useState({});
   const [myComment, setMyCommnet] = useState("");
+  const [isNoComment, setIsNoComment] = useState(false);
   const [comments, setComments] = useState([]);
   const [fileResponse, setFileResponse] = useState([]);
   const [upoadFileKey, setUploadFileKey] = useState([]);
@@ -63,7 +67,8 @@ const ViewTicket = ({ route }) => {
     }
   };
 
-  const getTicketCommnets = (ticketNo) => {
+  const getTicketCommnets = async(ticketNo) => {
+   //const ticketUrl= `https://cableone.zendesk.com/api/v2/tickets/${ticketNo}/comments.json`
     const request = `support/api/TicketComments/${ticketNo}`;
     GetApiRequest(
       request,
@@ -77,6 +82,33 @@ const ViewTicket = ({ route }) => {
         console.log(error);
       }
     );
+  // console.log('request',ticketUrl)
+  //    fetch(ticketUrl)
+  //   .then(response => response.json())
+  //   .then(json => {
+  //     console.log('json',json)
+  //   })
+  //   .catch(error => {
+  //     console.error(error);
+  //   });
+  
+  // let user = await getUser();
+  // const config = {
+  //     headers: {
+  //         Authorization: `Bearer ${user.token}`
+  //     }
+  // };
+  //   try {
+  //     const response = await axios.post(ticketUrl,{},config);
+  //     console.log('API Call Successful, Response:', response.data); // Log the successful response
+  //     if(response.data){
+  //       setComments(response.data)
+  //     }
+  // } catch (error) {
+  //     console.error('API Call Failed, Error:', JSON.stringify(error)); // Log the error
+  //     throw error;
+  // }
+
   };
 
   useEffect(() => {
@@ -262,7 +294,7 @@ const ViewTicket = ({ route }) => {
                   <View
                     style={{
                       alignSelf: "flex-start",
-                      marginTop: 10,
+                      marginTop: 5,
                       backgroundColor: getStatusColor(
                         data?.status?.toLowerCase()
                       ),
@@ -273,7 +305,6 @@ const ViewTicket = ({ route }) => {
                         styles.text,
                         styles.textTypo,
                         styles.badge,
-                        styles.badgeBorder,
                         { color: "#FFF" },
                       ]}
                     >
@@ -329,14 +360,17 @@ const ViewTicket = ({ route }) => {
                       </View>
                     </View>
                     {data?.status != "close" && (
-                      <View style={styles.frameParent1}>
+                      <View style={[styles.frameParent1,{paddingTop:5}]}>
                         <Text style={styles.issueType}>Comment</Text>
-                        <View style={{ flexDirection: "column" }}>
-                          <View style={{ borderWidth: 1 }}>
+                        <View style={{ flexDirection: "column",paddingTop:Padding.p_5xs  }}>
+                          <View style={{ borderWidth: 1}}>
                             <TextInput
                               placeholder="Comment"
                               onChangeText={(text) => {
                                 setMyCommnet(text);
+                                if(text.length>0){
+                                   setIsNoComment(false)
+                                }
                                 //console.log("test", text);
                               }}
                               multiline
@@ -345,7 +379,7 @@ const ViewTicket = ({ route }) => {
                               style={styles.textArea}
                             />
                           </View>
-                          {myComment.length == 0 && (
+                          {isNoComment && (
                             <View style={styles.errorContainer}>
                               <Image
                                 source={WarningIcon}
@@ -391,7 +425,7 @@ const ViewTicket = ({ route }) => {
                               marginVertical: 10,
                             }}
                           >
-                            <TouchableOpacity
+                            <Pressable
                               style={[
                                 styles.BtnContainer,
                                 {
@@ -404,7 +438,10 @@ const ViewTicket = ({ route }) => {
                               ]}
                               onPress={() => {
                                 if (myComment.length > 0) {
+                                  setIsNoComment(false)
                                   addNote();
+                                }else{
+                                  setIsNoComment(true)
                                 }
                               }}
                             >
@@ -422,7 +459,7 @@ const ViewTicket = ({ route }) => {
                               >
                                 Add Note
                               </Text>
-                            </TouchableOpacity>
+                            </Pressable>
                           </View>
                         )}
                       </View>
@@ -474,8 +511,8 @@ const styles = StyleSheet.create({
     // Remove any additional styles that may distort the original image appearance
   },
   parentSpaceBlock: {
-    paddingBottom: Padding.p_5xs,
-    paddingTop: Padding.p_base,
+    paddingBottom: Padding.p_8xs,
+    paddingTop: Padding.p_8xs,
     alignSelf: "stretch",
   },
   badgeBorder: {
@@ -496,11 +533,11 @@ const styles = StyleSheet.create({
     lineHeight: 28,
   },
   billingTypo: {
-    fontSize: FontSize.size_base,
+    fontSize: FontSize.size_sm,
     textAlign: "left",
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
-    lineHeight: 28,
+    
   },
   frameWrapperBorder: {
     padding: Padding.p_base,
@@ -521,12 +558,12 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   ticket101: {
-    fontSize: 22,
+    fontSize: FontSize.size_lg,
     textAlign: "left",
     color: Color.sparklightGray1,
-    lineHeight: 28,
     fontFamily: FontFamily.openSansRegular,
-    flex: 1,
+    fontWeight:'600'
+    
   },
   text: {
     color: Color.colorGray_200,
@@ -534,7 +571,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansSemiBold,
   },
   badge: {
-    borderColor: Color.colorAquamarine,
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,
     alignItems: "center",
@@ -582,6 +618,7 @@ const styles = StyleSheet.create({
   frameParent1: {
     justifyContent: "center",
     alignSelf: "stretch",
+    marginTop:8
   },
   avatarContrastInnerBorder: {
     right: 0,
@@ -610,10 +647,9 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_181xl,
   },
   issueType: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     textAlign: "left",
     color: Color.colorGray_100,
-    lineHeight: 28,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "600",
   },

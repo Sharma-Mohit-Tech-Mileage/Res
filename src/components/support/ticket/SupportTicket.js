@@ -23,6 +23,7 @@ import { GetApiRequest } from "../../../network/APIClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import TicketListIcon from "../../../res/svgIcons/TicketListIcon";
 import SparkLightInput from "../../common/customui/SparkLightInput";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 const SupportTicket = () => {
   const navigation = useNavigation();
@@ -155,13 +156,12 @@ const SupportTicket = () => {
           }}
         >
           <Text style={styles.issueType}>Status</Text>
-          <View style={{ alignSelf: "flex-start",borderRadius:5, padding: 0,backgroundColor:getStatusColor(item?.status.toLowerCase()), }}>
+          <View style={{ alignSelf: "flex-start",borderRadius:2, padding: 0,backgroundColor:getStatusColor(item?.status.toLowerCase()), }}>
             <Text
               style={[
                 styles.text,
                 styles.textTypo,
                 styles.badge,
-                styles.badgeBorder,
                 {color:'#FFF'}
 
               ]}
@@ -237,13 +237,13 @@ const SupportTicket = () => {
                 <Text style={[styles.billingTypo,{fontSize:FontSize.size_xs}]}>Newly submitted tickets may takes some time to appear in the ticket log.</Text>
               </View>
           {ticketList.length > 0 ? (
-            <View style={{ height: (Platform.OS=='ios')?'76%':'80%' }}>
+            <View style={{paddingBottom:hp("50%")}}>
               
               <FlatList
                 data={ticketList}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={RenderTicketList}
-
+                
                 //onEndReached={onEndReached}
                 //onEndReachedThreshold={0.1}
                 //ListFooterComponent={Footer}
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     paddingTop: Padding.p_base,
   },
   frameParent: {
-    // flex: 1,
+     flex: 1,
     paddingHorizontal: Padding.p_base,
     paddingVertical: Padding.p_5xl,
   },
