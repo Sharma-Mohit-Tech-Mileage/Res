@@ -158,6 +158,7 @@ const EmailNotifications = () => {
                           onToggle={newValue => onChange(newValue)}
                           initialValue={value}
                           disabled={true}
+                          label="Critical notification"
                         />
                       )}
                     />
@@ -179,6 +180,7 @@ const EmailNotifications = () => {
                         <Toggle
                           onToggle={newValue => onChange(newValue)}
                           initialValue={value}
+                          label="Paperless Billing"
                         />
                       )}
                     />
