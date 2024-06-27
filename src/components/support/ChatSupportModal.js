@@ -10,7 +10,7 @@ import {
   ActivityIndicator
 } from "react-native";
 import WebView from "react-native-webview";
-import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+
 import {
   Padding,
   Color,
@@ -26,6 +26,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import colors from "../../res/Colors";
+import SupportChatHeader from "../common/SupportChatHeader";
 
 const ChatSupportModal = ({ department, onClose }) => {
   const [modalVisible, setModalVisible] = useState(true);
@@ -166,7 +167,7 @@ const ChatSupportModal = ({ department, onClose }) => {
       onRequestClose={closeModal}
     >
       <View style={{ flex: 1,backgroundColor:'#fff' }}>
-        <ProfileSettingsHeader onPressBack={()=>{
+        <SupportChatHeader onPressBack={()=>{
           exitConfirmation();
         }} title="Chat With Us" />
         <View style={{ width: "100%", height: "84%" }}>

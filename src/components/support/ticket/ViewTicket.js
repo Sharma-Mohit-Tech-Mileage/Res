@@ -349,12 +349,12 @@ const ViewTicket = ({ route }) => {
                     >
                       <View style={styles.frameParent1}>
                         <Text style={styles.issueType}>Subject</Text>
-                        <Text style={styles.billingTypo}>{data?.subject}</Text>
+                        <Text style={[styles.billingTypo,styles.melissaTypo]}>{data?.subject}</Text>
                       </View>
 
                       <View style={styles.frameParent1}>
                         <Text style={styles.issueType}>Category</Text>
-                        <Text style={[styles.billingTypo]}>
+                        <Text style={[styles.billingTypo,styles.melissaTypo]}>
                           {capitalizeFirstLetter(data?.category)}
                         </Text>
                       </View>
@@ -533,11 +533,17 @@ const styles = StyleSheet.create({
     lineHeight: 28,
   },
   billingTypo: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     textAlign: "left",
-    color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansRegular,
+    fontWeight: '400'
     
+    
+  },
+  melissaTypo: {
+    color: Color.sparklightGray1,
+    lineHeight: 28,
+    textAlign: "left",
+    fontFamily: FontFamily.openSansRegular,
   },
   frameWrapperBorder: {
     padding: Padding.p_base,
@@ -616,9 +622,9 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   frameParent1: {
+    paddingVertical: Padding.p_5xs,
     justifyContent: "center",
     alignSelf: "stretch",
-    marginTop:8
   },
   avatarContrastInnerBorder: {
     right: 0,
@@ -647,11 +653,12 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_181xl,
   },
   issueType: {
-    fontSize: FontSize.size_base,
-    textAlign: "left",
-    color: Color.colorGray_100,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "600",
+    fontSize: FontSize.size_sm,
+    textAlign: "left",
+    color: Color.colorGray_100,
+    lineHeight: 28,
   },
   frameWrapper3: {
     marginTop: 8,

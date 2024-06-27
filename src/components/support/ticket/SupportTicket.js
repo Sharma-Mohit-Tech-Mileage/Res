@@ -234,7 +234,7 @@ const SupportTicket = () => {
                   }}
                   value={searchTxt}
                 />
-                <Text style={[styles.billingTypo,{fontSize:FontSize.size_xs}]}>Newly submitted tickets may takes some time to appear in the ticket log.</Text>
+                <Text style={[styles.billingTypo,{fontSize:FontSize.size_xs,lineHeight:18}]}>Newly submitted tickets may take some time to appear in the ticket log.</Text>
               </View>
           {ticketList.length > 0 ? (
             <View style={{paddingBottom:hp("50%")}}>
