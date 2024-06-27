@@ -21,7 +21,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightDropdown from "../../../components/common/customui/SparkLightDropdown";
 import PrimaryButtom from "../../common/customui/PrimaryButton";
-
+import { useSelector } from 'react-redux';
 import colors from "../../../res/Colors";
 import { useNavigation } from "@react-navigation/native";
 import SparkLightInput from "../../common/customui/SparkLightInput";
@@ -41,7 +41,8 @@ import SparkLightMobileInputField from "../../common/customui/SparklightMobileIn
 const CreateTicket = () => {
   const navigation = useNavigation();
   const [selectedItem, setSelectedItem] = useState();
-  
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {};
   const categories = ["Bill", "Support"];
   const [fileResponse, setFileResponse] = useState([]);
   const [upoadFileKey, setUploadFileKey] = useState([]);
@@ -50,11 +51,11 @@ const CreateTicket = () => {
   var Data = {
     subject: "",
     comment: "",
-    email: "",
+    email: profileDetails.multipleEmails ? '' : profileDetails.svEmailAddress,
     accountNumber: "",
     category: "",
     uploads: [],
-    PhoneNumber:''
+    PhoneNumber: ''
   };
 
   const {
@@ -268,7 +269,7 @@ const CreateTicket = () => {
 
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
-                      <Text style={[styles.text,{paddingBottom:8}]}>Phone Number</Text>
+                      <Text style={[styles.text,{paddingBottom:8}]}>Phone Number (Optional)</Text>
                     </View>
                     <Controller
                       control={control}
