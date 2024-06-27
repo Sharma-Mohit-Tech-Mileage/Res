@@ -146,7 +146,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
             <Toggle
               name={name}
               initialValue={value}
-              label={name}
+              label={title}
               onToggle={onChange} />
           </View>
         </View>
