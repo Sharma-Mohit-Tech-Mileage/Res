@@ -15,13 +15,17 @@ import { ISUAT } from "./src/network/apis/account/Constants";
 
 Text.defaultProps = { ...Text.defaultProps, maxFontSizeMultiplier: 1.25, };
 
-
-analytics().setAnalyticsCollectionEnabled(!__DEV__ && !ISUAT);
-
 const App = () => {
 
   const [appState, setAppState] = useState(AppState.currentState);
   const [majorUpdateVisible, setMajorUpdateVisible] = useState(false);
+
+  useEffect(() => {
+    const enableAnalytics = async () => {
+      await analytics().setAnalyticsCollectionEnabled(!__DEV__ && !ISUAT);
+    };
+    enableAnalytics();
+  }, []);
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", nextAppState => {
