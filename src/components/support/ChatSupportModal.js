@@ -124,7 +124,7 @@ const ChatSupportModal = ({ department, onClose }) => {
           onPress: () => null,
           style: "cancel"
         },
-        { text: "YES", onPress: () => {
+        { text: "Yes", onPress: () => {
             onClose()
         }}
       ]);

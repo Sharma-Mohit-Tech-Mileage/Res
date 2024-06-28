@@ -43,6 +43,7 @@ const SupportChatHeader = ({
         useAngle={true}
         angle={90}
       >
+        
         <View style={[styles.navBar]}>
           {showIcon && (
             <View style={styles.buttonContainer}>
@@ -73,22 +74,26 @@ const SupportChatHeader = ({
               accessibilityLabel={`Header: ${title}`}
             >
               {title}
-            
-            </Text>
-            <Text
-              style={{
-                fontSize: FontSize.size_xs,
-                fontWeight: "400",
-                color: Color.sparklightWhite,
-                fontFamily: FontFamily.openSansSemiBold,
-                paddingEnd:20
-              }}
-            >
-              Please stay on this page while using the chat 
-              to ensure a smooth and uninterrupted experience.
             </Text>
           </View>
         </View>
+      
+        <Text
+          style={{
+            fontSize: FontSize.size_xs,
+            fontWeight: "400",
+            color: Color.sparklightWhite,
+            fontFamily: FontFamily.openSansSemiBold,
+            marginHorizontal:10,
+            alignSelf:'center',
+            textAlign:'center'
+            
+          }}
+        >
+          Please stay on this page while using the chat to ensure a smooth and
+          uninterrupted experience.
+        </Text>
+        
       </LinearGradient>
     </View>
   );
@@ -102,7 +107,7 @@ const styles = StyleSheet.create({
   profileSettingsChild: {
     overflow: "hidden",
     width: "100%",
-    height:120,
+    height: 140,
     paddingTop: 40,
   },
   navBar: {
@@ -111,7 +116,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 8,
-    marginTop:5
+    
   },
   buttonContainer: {
     flex: 0.1,
@@ -123,7 +128,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
-    marginTop:25
   },
   pressable: {
     justifyContent: "center",
@@ -136,7 +140,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Color.sparklightWhite,
     fontFamily: FontFamily.openSansSemiBold,
-    paddingVertical:5
+    paddingVertical: 5,
   },
   icon: {
     height: 24,
