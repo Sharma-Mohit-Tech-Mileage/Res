@@ -822,7 +822,6 @@ const HomeScreen = ({ navigation }) => {
                 />
               </View>
             </ScrollView>
-
             <MyServicePlan plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
           </View>
         </ScrollView>
