@@ -238,7 +238,7 @@ const ViewTicket = ({ route }) => {
                 <Text style={[styles.agentResponse, styles.pmTypo]}>
                   {item.id}
                 </Text>
-                <Text style={[styles.pm, styles.billingTypo, { fontSize: 12 }]}>
+                <Text style={[styles.pm, styles.billingTypo, { fontSize: 12,color:Color.sparklightaddGray }]}>
                   {moment(item.created_at).format("LT") +
                     " on " +
                     moment(item.created_at).format("MMM, DD, YYYY")}

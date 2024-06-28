@@ -4,8 +4,6 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
-import InternetHealthChart from "../common/InternetHealthChart";
-import InfoIcon from "../../res/svgIcons/InfoIcon";
 import DownArrow from "../../res/svgIcons/DownArrow";
 import UpArrow from "../../res/svgIcons/UpArrow";
 import NetworkDetails from "../common/NetworkDetails";
@@ -26,7 +24,7 @@ import { checkForMinorUpdate } from "../utility/constant";
 
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
-const HomeScreen = ({ navigation }) => {
+const NewBillerHome = ({ navigation }) => {
   const [isInternetDetails, setIsInternetDetails] = useState(false);
   const user = useSelector((state) => state.combinedReducers.user.userData);
   const home = useSelector((state) => state.combinedReducers.home);
@@ -713,69 +711,12 @@ const HomeScreen = ({ navigation }) => {
               <></>
             )}
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
-              <Text style={styles.internetHealth}>Service Health</Text>
-              {checkModemStatus ? (
-                <InternetHealthChart
-                  currentValue={getInternetHealth(currentHealth)}
-                  key={currentHealth}
-                />
-              ) : (
-                <ActivityIndicator
-                  size="large"
-                  color={Color.colorGainsboro_200}
-                />
-              )}
-              <View style={styles.internetStatusSection}>
-                <View style={{ marginTop: 5 }}>
-                  <InfoIcon />
-                </View>
-                <Text style={styles.internetStatusTxt}>
-                  {" "}
-                  {currentHealth != "Optimal"
-                    ? strings.internetStatusIssue
-                    : strings.internetStatus}
-                </Text>
-              </View>
+              
 
               <View
                 style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}
               />
-              <TouchableOpacity
-                onPress={() => {
-                  setIsInternetDetails(!isInternetDetails);
-                }}
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  padding: 5,
-                  marginVertical: 5,
-                  marginHorizontal: 25,
-                }}
-              >
-                <Text style={styles.hideShowDetails}>
-                  {isInternetDetails ? strings.collapseTxt : strings.expandTxt}
-                </Text>
-                <View style={{ marginTop: 15 }}>
-                  {isInternetDetails ? (
-                    <View style={{ marginTop: -10 }}>
-                      <UpArrow />
-                    </View>
-                  ) : (
-                    <DownArrow />
-                  )}
-                </View>
-              </TouchableOpacity>
-              {isInternetDetails ? (
-                <NetworkDetails
-                  billPaid={billPaid}
-                  hasOutage={hasOutage}
-                  currentHealth={currentHealth}
-                  navigation={navigation}
-                  accountStatus={accountStatus}
-                />
-              ) : (
-                <></>
-              )}
+              
             </View>
             <ScrollView horizontal={true} style={{ marginStart: 20 }}>
               <View>
@@ -1012,4 +953,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default NewBillerHome;

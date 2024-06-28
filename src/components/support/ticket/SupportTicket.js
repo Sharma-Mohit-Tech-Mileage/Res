@@ -136,6 +136,7 @@ const SupportTicket = () => {
                 fontFamily: FontFamily.interBold,
                 fontSize: 14,
                 textAlignVertical: "center",
+                color:Color.sparklightGray1
               }}
             >
               {" "}
