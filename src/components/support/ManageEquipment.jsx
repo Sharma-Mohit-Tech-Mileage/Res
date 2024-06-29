@@ -243,7 +243,7 @@ const ManageEquipment = ({ route }) => {
   }
   const getEuroAccountDetails = () => {
     setLoading(true)
-    const request = `https://customer.uat.cableone.net/apiWrapper/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${user?.userInfo?.accountNumber}`;
+    const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${user?.userInfo?.accountNumber}`;
     GetEuroApiRequest(request, (res) => {
       setLoading(false)
       console.log(`getEuroAccountDetails======`,res)
@@ -254,6 +254,7 @@ const ManageEquipment = ({ route }) => {
         getModemPassword()
       }
     }, (error) => {
+      setLoading(false)
       console.log(`getEuroAccountDetails==error`,error)
     })
   }
