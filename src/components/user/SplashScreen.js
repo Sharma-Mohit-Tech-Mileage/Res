@@ -1,12 +1,12 @@
 
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, Linking, TouchableOpacity, Modal,Platform } from "react-native";
+import { View, Image, StyleSheet, Text, ActivityIndicator, Linking, TouchableOpacity, Modal, Platform } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
 import { saveUserInfo, logError, logInfo } from "../../redux/actions/UserAction";
-import { storeUser, storeSsoToken, getSsoToken,getUser, cleanUserData } from "../../redux/utils/LocalStorage";
+import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
@@ -17,7 +17,8 @@ import { SetRenewTokenTimer } from './Session';
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from 'react-native-version-check';
-import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics';
+
 const config = {
   issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
@@ -29,13 +30,13 @@ const config = {
 const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const [bussinessApp,setIsBusiness]  =useState(false);
+  const [bussinessApp, setIsBusiness] = useState(false);
   const [loginEnable, setLoginEnable] = useState(true);
   const [disconnected, setDisconnected] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessage1, setErrorMessage1] = useState("");
-  
+
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -127,7 +128,6 @@ const SplashScreen = ({ navigation }) => {
       }
     });
   };
-
   const onError = (error) => {
     setLoading(false);
     setDisconnected(true)
@@ -160,12 +160,22 @@ const SplashScreen = ({ navigation }) => {
               </View>
             </View>
             <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
-            <Text style={styles.message}>{message}{" "}
+            <RenderText
+              navigation={navigation}
+              style={styles.message}
+              onTextPress={() => {
+                onClose()
+              }}
+              internalTextStyle={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: 'underline', }]}
+              splitKey={bussinessApp ? "download the MySparklight Business mobile app" : "login to your online account"}
+              instruction={`${message} ${bussinessApp ? "download the MySparklight Business mobile app" : "login to your online account"}${message2}`}
+            />
+            {/* <Text style={styles.message}>{message}{" "}
               <Text style={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: 'underline', }]} onPress={onClose}>
-                {bussinessApp?"download the MySparklight Business mobile app":"login to your online account"}
+                {bussinessApp ? "download the MySparklight Business mobile app" : "login to your online account"}
               </Text>
               {message2}
-            </Text>
+            </Text> */}
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={closeModal}
@@ -185,16 +195,16 @@ const SplashScreen = ({ navigation }) => {
   const handleCloseAlert = () => {
     setModalVisible(false);
     logoutAction(() => {
-      if(bussinessApp){
-        if(Platform.OS==='android'){
+      if (bussinessApp) {
+        if (Platform.OS === 'android') {
           Linking.openURL('https://play.google.com/store/apps/details?id=com.sparklight.customer.business.app&pcampaignid=web_share');
-        }else{
-         Linking.openURL('https://apps.apple.com/us/app/mysparklight-business/id6478375256');
+        } else {
+          Linking.openURL('https://apps.apple.com/us/app/mysparklight-business/id6478375256');
         }
-      }else{
+      } else {
         Linking.openURL(Env.URL);
       }
-      
+
     });
   };
 
@@ -251,22 +261,22 @@ const SplashScreen = ({ navigation }) => {
     //loginWithBiometrics();
   }, []);
 
-  const loginWithBiometrics=async()=>{
+  const loginWithBiometrics = async () => {
     const rnBiometrics = new ReactNativeBiometrics()
 
-  rnBiometrics.simplePrompt({promptMessage: 'Confirm fingerprint'})
-  .then((resultObject) => {
-    const { success } = resultObject
+    rnBiometrics.simplePrompt({ promptMessage: 'Confirm fingerprint' })
+      .then((resultObject) => {
+        const { success } = resultObject
 
-    if (success) {
-      console.log('successful biometrics provided')
-    } else {
-      console.log('user cancelled biometric prompt')
-    }
-  })
-  .catch(() => {
-    console.log('biometrics failed')
-  })
+        if (success) {
+          console.log('successful biometrics provided')
+        } else {
+          console.log('user cancelled biometric prompt')
+        }
+      })
+      .catch(() => {
+        console.log('biometrics failed')
+      })
   }
 
   return (
@@ -401,6 +411,8 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     lineHeight: 28,
     marginTop: 10,
+    paddingLeft: 0,
+    paddingRight: 0
   },
   buttonContainer: {
     alignItems: "center",

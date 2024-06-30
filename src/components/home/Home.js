@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Pressable, ActivityIndicator, Linking } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Pressable, ActivityIndicator, Linking, AccessibilityInfo } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
@@ -18,7 +18,7 @@ import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
-import { updatePushNotifications, fetchPushNotifications,saveAccountServices } from "../../redux/actions/ProfileActionSuite";
+import { updatePushNotifications, fetchPushNotifications, saveAccountServices } from "../../redux/actions/ProfileActionSuite";
 import { useSelector, useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
@@ -47,7 +47,33 @@ const HomeScreen = ({ navigation }) => {
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
-  const [updateStatus, setUpdateStatus] = useState({isMinorUpdateAvailable: false,currentVersion: '',latestVersion: ''});
+  const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: '', latestVersion: '' });
+  const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
+
+  useEffect(() => {
+    async function getAccessibility() {
+      try {
+        const accessibility = await AccessibilityInfo.isScreenReaderEnabled();
+        setIsScreenReaderEnabled(accessibility);
+      } catch (error) {
+        console.log(
+          "There has been a problem with AccessibilityInfo.isScreenReaderEnabled(): " +
+          error.message
+        );
+        setIsScreenReaderEnabled(false); // Setting a default value in case of error
+      }
+    }
+    getAccessibility();
+    const reduceMotionChangedSubscription = AccessibilityInfo.addEventListener(
+      "screenReaderChanged",
+      (isScreenReaderEnabled) => {
+        setIsScreenReaderEnabled(isScreenReaderEnabled);
+      }
+    );
+    return () => {
+      reduceMotionChangedSubscription.remove();
+    };
+  }, [screenReaderEnabled]);
 
 
   const getInternetHealth = (type) => {
@@ -65,7 +91,7 @@ const HomeScreen = ({ navigation }) => {
   function getPhoneServiceDetails() {
     getUser().then((res) => {
       const request = `phone/api/phones/${res.userInfo.accountNumber}/phonelines`;
-      GetApiRequest(request,onSuccessPhonePlan, onError);
+      GetApiRequest(request, onSuccessPhonePlan, onError);
     });
   }
   function getPhoneServicePlans(tgcCode) {
@@ -170,7 +196,7 @@ const HomeScreen = ({ navigation }) => {
         } else if (user.userInfo.accountNumber === "131684698") {
           mac = "28:7a:ee:97:4d:cc";
         } else if (user.userInfo.accountNumber === "136885142") {
-          mac = "00:40:36:59:00:00";
+          mac = "20:73:55:89:c7:00";
         }
         checkModemDetails(mac);
       }
@@ -280,7 +306,7 @@ const HomeScreen = ({ navigation }) => {
               setIsInternetDetails(true);
               setInternetHealths((oldArray) => [...oldArray, "Red"]);
             } else {
-              updateInternetHealth(res.currentBalance,res.paymentDueDate);
+              updateInternetHealth(res.currentBalance, res.paymentDueDate);
             }
             let dueDate = moment(res.paymentDueDate).format("ll");
             setDueDate(dueDate);
@@ -295,12 +321,12 @@ const HomeScreen = ({ navigation }) => {
     });
   };
 
-  const updateInternetHealth = (dueAmount,dueDate) => {
+  const updateInternetHealth = (dueAmount, dueDate) => {
     //console.log('pppppast',moment(dueDate).isBefore() )
-    if(moment(dueDate).isAfter()){
+    if (moment(dueDate).isAfter()) {
       setBillPaid(true);
       setInternetHealths((oldArray) => [...oldArray, "Green"]);
-    }else if (dueAmount <= 0 ) {
+    } else if (dueAmount <= 0) {
       setBillPaid(true);
       setInternetHealths((oldArray) => [...oldArray, "Green"]);
     } else {
@@ -369,7 +395,7 @@ const HomeScreen = ({ navigation }) => {
 
         if (enabledPermission) {
           const token = await getFcmToken();
-          console.log('FCM HOME WITH PERMISSION',token)
+          console.log('FCM HOME WITH PERMISSION', token)
           const data = {
             accountNumber: user.userInfo.accountNumber,
             deviceToken: token,
@@ -388,7 +414,7 @@ const HomeScreen = ({ navigation }) => {
           await dispatch(updatePushNotifications(data, null));
         } else {
           const token = await getFcmToken();
-          console.log('FCM HOME WITHOUT PERMISSION',token)
+          console.log('FCM HOME WITHOUT PERMISSION', token)
           const data = {
             accountNumber: user.userInfo.accountNumber,
             deviceToken: token,
@@ -680,6 +706,8 @@ const HomeScreen = ({ navigation }) => {
 
       <SafeAreaView style={{ flex: 1 }}>
         <View
+          accessible={true}
+          accessibilityLabel={`SparkLight`}
           style={{
             height: Platform.OS == "ios" ? 60 : 50,
             flexDirection: "row",
@@ -689,6 +717,8 @@ const HomeScreen = ({ navigation }) => {
           }}
         >
           <Image
+            //  accessible={true}
+            //  accessibilityLabel={`SparkLight`}
             resizeMode="contain"
             style={{ width: 120, height: 30.324, flexShrink: 0 }}
             source={require("../../../assets/SparklightEntryLogo.png")}
@@ -706,14 +736,19 @@ const HomeScreen = ({ navigation }) => {
               marginTop: 50,
             }}
           >
-            {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert />:null}
+            {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert /> : null}
             {isOutageAlert ? (
               <OutageAlert estimatedTime={estimatedRestoreTime} />
             ) : (
               <></>
             )}
-            <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
-              <Text style={styles.internetHealth}>Service Health</Text>
+            <View style={[styles.card, styles.shadowProp, { marginTop: screenReaderEnabled ? 0 : -40 }]}>
+
+              <Text
+                accessible={true}
+                accessibilityLabel={`Service Health`}
+                style={styles.internetHealth}>Service Health</Text>
+
               {checkModemStatus ? (
                 <InternetHealthChart
                   currentValue={getInternetHealth(currentHealth)}
@@ -787,7 +822,6 @@ const HomeScreen = ({ navigation }) => {
                 />
               </View>
             </ScrollView>
-
             <MyServicePlan plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
           </View>
         </ScrollView>
@@ -901,7 +935,6 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
     borderRadius: 2,
-    paddingTop: 45,
     width: wp("92%"),
   },
   shadowProp: {
@@ -935,12 +968,12 @@ const styles = StyleSheet.create({
   internetHealth: {
     color: colors.darkest_grey,
     fontSize: 22,
-    marginTop: -20,
     fontFamily: FontFamily.openSansRegular,
-    paddingHorizontal: 25,
     fontStyle: "normal",
     fontWeight: "400",
-    lineHeight: 22 /* 100% */,
+    width: '100%',
+    paddingVertical: 15,
+    paddingHorizontal: 25,
   },
   internetStatusSection: {
     backgroundColor: "#EBEEF180",

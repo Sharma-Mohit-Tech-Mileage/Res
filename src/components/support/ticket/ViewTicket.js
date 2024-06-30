@@ -18,7 +18,7 @@ import {
   FontFamily,
 } from "../../../../GlobalStyles";
 
-import axios from 'axios';
+import axios from "axios";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -67,8 +67,7 @@ const ViewTicket = ({ route }) => {
     }
   };
 
-  const getTicketCommnets = async(ticketNo) => {
-   //const ticketUrl= `https://cableone.zendesk.com/api/v2/tickets/${ticketNo}/comments.json`
+  const getTicketCommnets = async (ticketNo) => {
     const request = `support/api/TicketComments/${ticketNo}`;
     GetApiRequest(
       request,
@@ -82,33 +81,37 @@ const ViewTicket = ({ route }) => {
         console.log(error);
       }
     );
-  // console.log('request',ticketUrl)
-  //    fetch(ticketUrl)
-  //   .then(response => response.json())
-  //   .then(json => {
-  //     console.log('json',json)
-  //   })
-  //   .catch(error => {
-  //     console.error(error);
-  //   });
-  
-  // let user = await getUser();
-  // const config = {
-  //     headers: {
-  //         Authorization: `Bearer ${user.token}`
-  //     }
-  // };
-  //   try {
-  //     const response = await axios.post(ticketUrl,{},config);
-  //     console.log('API Call Successful, Response:', response.data); // Log the successful response
-  //     if(response.data){
-  //       setComments(response.data)
-  //     }
-  // } catch (error) {
-  //     console.error('API Call Failed, Error:', JSON.stringify(error)); // Log the error
-  //     throw error;
-  // }
+  };
 
+  const downloadCommentAttachment = async (fileToken) => {
+    const request = Env.API_BASEURL+`support/api/attachments/${fileToken}`;
+    let user = await getUser();
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+
+    fetch(request,{config})
+        .then((response)=> response.blob())
+        .then((response)=> {
+                //setData(URL.createObjectURL(response));
+               console.log(response)
+            })
+        .catch(err=>{
+                console.log(err);
+            });
+    
+    // const res = await axios.get(request,config);
+    // console.log('file response',JSON.stringify(res))
+    // if (res.status === 200 && res.data) {
+    //   // Extract binary data from the response
+    //   const binaryDataBuffer = res.data.image.data;
+
+    //   // Convert the binary data to an ArrayBuffer
+    //   const bufferArray = new Uint8Array(binaryDataBuffer).buffer;
+    //   console.log(bufferArray)
+    // }
   };
 
   useEffect(() => {
@@ -238,21 +241,34 @@ const ViewTicket = ({ route }) => {
                 <Text style={[styles.agentResponse, styles.pmTypo]}>
                   {item.id}
                 </Text>
-                <Text style={[styles.pm, styles.billingTypo, { fontSize: 12,color:Color.sparklightaddGray }]}>
+                <Text
+                  style={[
+                    styles.pm,
+                    styles.billingTypo,
+                    { fontSize: 12, color: Color.sparklightaddGray },
+                  ]}
+                >
                   {moment(item.created_at).format("LT") +
                     " on " +
                     moment(item.created_at).format("MMM, DD, YYYY")}
                 </Text>
               </View>
-              <Text style={[styles.yesYouCan, styles.billingTypo]}>
+              <Text
+                style={[
+                  styles.yesYouCan,
+                  styles.billingTypo,
+                  { color: Color.sparklightGray1 },
+                ]}
+              >
                 {item.body}
               </Text>
               <Pressable
                 onPress={() => {
                   //console.log('file',Env.API_BASEURL+item.attachments[0].content_url)
-                  Linking.openURL(
-                    Env.API_BASEURL + item.attachments[0].content_url
-                  );
+                  // Linking.openURL(
+                  //   Env.API_BASEURL + item.attachments[0].content_url
+                  // );
+                  downloadCommentAttachment(item.attachments[0].token);
                 }}
               >
                 {item.attachments.length > 0 && (
@@ -349,27 +365,34 @@ const ViewTicket = ({ route }) => {
                     >
                       <View style={styles.frameParent1}>
                         <Text style={styles.issueType}>Subject</Text>
-                        <Text style={[styles.billingTypo,styles.melissaTypo]}>{data?.subject}</Text>
+                        <Text style={[styles.billingTypo, styles.melissaTypo]}>
+                          {data?.subject}
+                        </Text>
                       </View>
 
                       <View style={styles.frameParent1}>
                         <Text style={styles.issueType}>Category</Text>
-                        <Text style={[styles.billingTypo,styles.melissaTypo]}>
+                        <Text style={[styles.billingTypo, styles.melissaTypo]}>
                           {capitalizeFirstLetter(data?.category)}
                         </Text>
                       </View>
                     </View>
                     {data?.status != "close" && (
-                      <View style={[styles.frameParent1,{paddingTop:5}]}>
+                      <View style={[styles.frameParent1, { paddingTop: 5 }]}>
                         <Text style={styles.issueType}>Comment</Text>
-                        <View style={{ flexDirection: "column",paddingTop:Padding.p_5xs  }}>
-                          <View style={{ borderWidth: 1}}>
+                        <View
+                          style={{
+                            flexDirection: "column",
+                            paddingTop: Padding.p_5xs,
+                          }}
+                        >
+                          <View style={{ borderWidth: 1 }}>
                             <TextInput
                               placeholder="Comment"
                               onChangeText={(text) => {
                                 setMyCommnet(text);
-                                if(text.length>0){
-                                   setIsNoComment(false)
+                                if (text.length > 0) {
+                                  setIsNoComment(false);
                                 }
                                 //console.log("test", text);
                               }}
@@ -438,10 +461,10 @@ const ViewTicket = ({ route }) => {
                               ]}
                               onPress={() => {
                                 if (myComment.length > 0) {
-                                  setIsNoComment(false)
+                                  setIsNoComment(false);
                                   addNote();
-                                }else{
-                                  setIsNoComment(true)
+                                } else {
+                                  setIsNoComment(true);
                                 }
                               }}
                             >
@@ -535,9 +558,7 @@ const styles = StyleSheet.create({
   billingTypo: {
     fontSize: FontSize.size_base,
     textAlign: "left",
-    fontWeight: '400'
-    
-    
+    fontWeight: "400",
   },
   melissaTypo: {
     color: Color.sparklightGray1,
@@ -568,8 +589,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
-    fontWeight:'600'
-    
+    fontWeight: "600",
   },
   text: {
     color: Color.colorGray_200,

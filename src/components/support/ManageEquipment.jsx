@@ -21,6 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import {
   GetApiRequest,
+  GetEuroApiRequest,
   GetModemStatusApiRequest,
 } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
@@ -40,9 +41,11 @@ import PasswordRetrieve from "../../res/svgIcons/PasswordRetrieve";
 import PasswordShare from "../../res/svgIcons/PasswordShare";
 import { Icon } from "native-base";
 import Loader from "../utility/Loader";
+import { useSelector } from "react-redux";
 
 const ManageEquipment = ({ route }) => {
   const navigation = useNavigation();
+  const user = useSelector(state => state.combinedReducers.user.userData);
   const [manufacturer, setManufacturer] = React.useState("");
   const [model, setModel] = React.useState("");
   const [transmissionType, setTransmissionType] = React.useState("");
@@ -55,9 +58,6 @@ const ManageEquipment = ({ route }) => {
   const [loading, setLoading] = React.useState(false);
   const [wifiPasswordCanChange, setwifiPasswordCanChange] = React.useState(false);
   const [wifiData, setwifiData] = React.useState([])
-  React.useEffect(() => {
-    getModemPassword();
-  }, [])
 
   const getModemPassword = () => {
     setLoading(true)
@@ -121,7 +121,7 @@ const ManageEquipment = ({ route }) => {
             } else if (res.userInfo.accountNumber === "131684698") {
               mac = "28:7a:ee:97:4d:cc";
             } else if (res.userInfo.accountNumber === "136885142") {
-              mac = "00:40:36:59:00:00";
+              mac = "20:73:55:89:c7:00";
             }
 
             checkModemDetails(mac);
@@ -221,14 +221,43 @@ const ManageEquipment = ({ route }) => {
     getModemDetails();
     getLeasedDetails();
     getInternetPlanDetails();
-    
+    getWifiPassword();
+    getEuroAccountDetails();
   }, []);
 
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
   }, [currentHealth]);
 
-  
+  const getWifiPassword = () => {
+    let accountNumber = '902878578'
+    const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
+    GetApiRequest(request, (res) => {
+      console.log(res)
+      if (res) {
+        setwifiData(res)
+      }
+    }, (error) => {
+      console.log(error)
+    })
+  }
+  const getEuroAccountDetails = () => {
+    setLoading(true)
+    const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${user?.userInfo?.accountNumber}`;
+    GetEuroApiRequest(request, (res) => {
+      setLoading(false)
+      console.log(`getEuroAccountDetails======`,res)
+      if (res?.data !== null) {
+        setwifiPasswordCanChange(false)
+      }
+      else{
+        getModemPassword()
+      }
+    }, (error) => {
+      setLoading(false)
+      console.log(`getEuroAccountDetails==error`,error)
+    })
+  }
 
   return (
     <View style={styles.manageEquipment}>
@@ -543,7 +572,7 @@ const ManageEquipment = ({ route }) => {
               style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
             >
               <Text style={[styles.myModem1, styles.myModem1Typo]}>
-                WiFi Passoword
+                WiFi Password
               </Text>
             </View>
             <View
