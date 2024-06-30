@@ -335,7 +335,7 @@ const Support = ({ route }) => {
                         </View>
 
 
-                        <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
+                         {/* <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
                             <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                 <View style={[styles.content, styles.contentSpaceBlock]}>
 
@@ -368,8 +368,7 @@ const Support = ({ route }) => {
                                     </Pressable>
                                 </View>
                             </View>
-                        </View> 
-
+                        </View> */}
 
 
 
