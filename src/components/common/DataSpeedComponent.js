@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   gifContainer: {
     alignItems: 'center',
-    marginTop:wp('6%'),
+    marginTop:wp('5%'),
     overflow: 'hidden',
     borderWidth: 1, // Border width for the GIF container
     borderColor: colors.grey, // Border color
