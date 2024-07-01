@@ -141,11 +141,11 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
     return (
       <>
         <View style={styles.testSpeedResultContainer}>
-          <View style={styles.gifContainer}>
+          <View style={[styles.gifContainer,{marginHorizontal: hasEeroDevice?wp('10%'):wp('18%')}]}>
             {loading ? (
-              <FastImage source={getGifSource()} style={styles.gif} />
+              <FastImage resizeMode={FastImage.resizeMode.contain} source={getGifSource()} style={styles.gif} />
             ) : (
-              <FastImage source={getGifSource()} style={styles.gif} />
+              <FastImage resizeMode={FastImage.resizeMode.contain} source={getGifSource()} style={styles.gif} />
             )}
           </View>
           <View style={styles.testSpeedInnerContainer}>
@@ -177,7 +177,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
               </View>
             </View>
           </View>
-          <View style={{ margin: 16 }}>
+          <View style={{ marginHorizontal: 16 }}>
             <SecondaryButton buttonText={"Test Speed"} onPress={handleTestSpeed} />
           </View>
           <View style={styles.divider} />
@@ -222,23 +222,23 @@ const styles = StyleSheet.create({
   testSpeedResultContainer: {
     borderColor: colors.grey,
     borderWidth: 1,
-    borderRadius: 0,
+    borderRadius: 0, // Optional: Rounded corners
     marginHorizontal: wp('6%'),
-    paddingBottom: 20, // Added padding to bottom
   },
   gifContainer: {
     alignItems: 'center',
-    margin: wp('6%'), 
+    marginTop:wp('6%'),
     overflow: 'hidden',
     borderWidth: 1, // Border width for the GIF container
     borderColor: colors.grey, // Border color
     borderRadius: 10, // Optional: Rounded corners
+
   },
   gif: {
-    width: wp('70%'),
+    width: wp('75%'),
     height: undefined, // Maintain aspect ratio
-    aspectRatio: 2.5, // Set aspect ratio for the gif
-    marginVertical: -5,
+    aspectRatio: 3,
+    marginVertical:-5
   },
   testSpeedInnerContainer: {
     flexDirection: "row",
