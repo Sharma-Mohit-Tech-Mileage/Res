@@ -653,6 +653,8 @@ PODS:
     - FirebaseCoreExtension
     - React-Core
     - RNFBApp
+  - RNFileViewer (2.1.5):
+    - React-Core
   - RNGestureHandler (2.13.1):
     - React-Core
   - RNKeychain (8.2.0):
@@ -790,6 +792,7 @@ DEPENDENCIES:
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBCrashlytics (from `../node_modules/@react-native-firebase/crashlytics`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
+  - RNFileViewer (from `../node_modules/react-native-file-viewer`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
   - "RNNotifee (from `../node_modules/@notifee/react-native`)"
@@ -956,6 +959,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/crashlytics"
   RNFBMessaging:
     :path: "../node_modules/@react-native-firebase/messaging"
+  RNFileViewer:
+    :path: "../node_modules/react-native-file-viewer"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
   RNKeychain:
@@ -1059,6 +1064,7 @@ SPEC CHECKSUMS:
   RNFBApp: 1ae7462cddf74a49df206d3418bc0170f8fa53e5
   RNFBCrashlytics: f8e899ea95991b769802cf4cb7a0eb362b6ab0f7
   RNFBMessaging: 85f661b9f16e2b081e6809ef63d3daa4458b9042
+  RNFileViewer: ce7ca3ac370e18554d35d6355cffd7c30437c592
   RNGestureHandler: 38aa38413896620338948fbb5c90579a7b1c3fde
   RNKeychain: bfe3d12bf4620fe488771c414530bf16e88f3678
   RNNotifee: 8e2d3df3f0e9ce8f5d1fe4c967431138190b6175

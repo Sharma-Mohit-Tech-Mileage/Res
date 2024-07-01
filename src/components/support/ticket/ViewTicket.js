@@ -18,7 +18,7 @@ import {
   FontFamily,
 } from "../../../../GlobalStyles";
 
-import axios from "axios";
+import FileViewer from "react-native-file-viewer";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -27,7 +27,7 @@ import {
   PutApiRequest,
   UploadMultipartData,
 } from "../../../network/APIClient";
-import ReactNativeBlobUtil from 'react-native-blob-util'
+import ReactNativeBlobUtil from "react-native-blob-util";
 import WarningIcon from "../../../../assets/alert-triangle.png";
 import moment from "moment";
 import DocumentPicker, { types } from "react-native-document-picker";
@@ -85,53 +85,33 @@ const ViewTicket = ({ route }) => {
   };
 
   const downloadCommentAttachment = async (item) => {
-    const request = Env.API_BASEURL+`support/api/attachments/${item.token}`;
-    let user = await getUser();
-    const config = {
-       // headers: {
-            Authorization: `Bearer ${user.token}`,
-            'Content-Type': 'multipart/form-data',
-            Accept: 'application/json',
-       // }
-    };
-    console.log('file ex',config)
-    ReactNativeBlobUtil
-    .config({
-        fileCache: true,
-        // by adding this option, the temp files will have a file extension
-        appendExt: item.content_type
-    })
-    .fetch('GET', request, {
-        //some headers ..
-        config
-    })
-    .then((res) => {
-        // the temp file path with file extension `png`
-        console.log('The file saved to ', JSON.stringify(res))
-        // Beware that when using a file path as Image source on Android,
-        // you must prepend "file://"" before the file path
-        
-    })
-    // fetch(request,{config})
-    //     .then((response)=> response.blob())
-    //     .then((response)=> {
-    //             //setData(URL.createObjectURL(response));
-    //            console.log(response)
-    //         })
-    //     .catch(err=>{
-    //             console.log(err);
-    //         });
-    
-    // const res = await axios.get(request,config);
-    // console.log('file response',JSON.stringify(res))
-    // if (res.status === 200 && res.data) {
-    //   // Extract binary data from the response
-    //   const binaryDataBuffer = res.data.image.data;
+    //setLoadingTxt('Please wait...')
+    //setLoading(true)
 
-    //   // Convert the binary data to an ArrayBuffer
-    //   const bufferArray = new Uint8Array(binaryDataBuffer).buffer;
-    //   console.log(bufferArray)
-    // }
+    const request = Env.API_BASEURL + `support/api/attachments/${item.token}`;
+    let user = await getUser();
+    ReactNativeBlobUtil.config({
+      // add this option that makes response data to be stored as a file,
+      // this is much more performant.
+      fileCache: true,
+      appendExt: item.filename,
+    })
+      .fetch("GET", request, {
+        Authorization: `Bearer ${user.token}`,
+        //some headers ..
+      })
+      .then((res) => {
+        // the temp file path
+        //setLoading(false)
+        console.log("The file saved to ", res.path());
+        FileViewer.open(res.path(), { showOpenWithDialog: true })
+          .then(() => {
+            // success
+          })
+          .catch((error) => {
+            // error
+          });
+      });
   };
 
   useEffect(() => {
