@@ -11,7 +11,7 @@ import moment from "moment";
 import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
 import { FontFamily } from "../../../GlobalStyles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-
+import { Env } from "../../network/apis/account/Constants";
 const speedGif = require("../../../assets/Wifi-Speed-Mobile-App.gif");
 const wifiGif = require("../../../assets/Wifi-Speed-Only-Mobile-App.gif");
 const modemSpeedGif = require("../../../assets/Modem-Speed-Mobile-App.gif");
