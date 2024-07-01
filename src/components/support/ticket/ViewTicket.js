@@ -18,7 +18,7 @@ import {
   FontFamily,
 } from "../../../../GlobalStyles";
 
-import axios from "axios";
+import FileViewer from "react-native-file-viewer";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
 import {
@@ -27,6 +27,7 @@ import {
   PutApiRequest,
   UploadMultipartData,
 } from "../../../network/APIClient";
+import ReactNativeBlobUtil from "react-native-blob-util";
 import WarningIcon from "../../../../assets/alert-triangle.png";
 import moment from "moment";
 import DocumentPicker, { types } from "react-native-document-picker";
@@ -83,35 +84,34 @@ const ViewTicket = ({ route }) => {
     );
   };
 
-  const downloadCommentAttachment = async (fileToken) => {
-    const request = Env.API_BASEURL+`support/api/attachments/${fileToken}`;
+  const downloadCommentAttachment = async (item) => {
+    //setLoadingTxt('Please wait...')
+    //setLoading(true)
+
+    const request = Env.API_BASEURL + `support/api/attachments/${item.token}`;
     let user = await getUser();
-    const config = {
-        headers: {
-            Authorization: `Bearer ${user.token}`
-        }
-    };
-
-    fetch(request,{config})
-        .then((response)=> response.blob())
-        .then((response)=> {
-                //setData(URL.createObjectURL(response));
-               console.log(response)
-            })
-        .catch(err=>{
-                console.log(err);
-            });
-    
-    // const res = await axios.get(request,config);
-    // console.log('file response',JSON.stringify(res))
-    // if (res.status === 200 && res.data) {
-    //   // Extract binary data from the response
-    //   const binaryDataBuffer = res.data.image.data;
-
-    //   // Convert the binary data to an ArrayBuffer
-    //   const bufferArray = new Uint8Array(binaryDataBuffer).buffer;
-    //   console.log(bufferArray)
-    // }
+    ReactNativeBlobUtil.config({
+      // add this option that makes response data to be stored as a file,
+      // this is much more performant.
+      fileCache: true,
+      appendExt: item.filename,
+    })
+      .fetch("GET", request, {
+        Authorization: `Bearer ${user.token}`,
+        //some headers ..
+      })
+      .then((res) => {
+        // the temp file path
+        //setLoading(false)
+        console.log("The file saved to ", res.path());
+        FileViewer.open(res.path(), { showOpenWithDialog: true })
+          .then(() => {
+            // success
+          })
+          .catch((error) => {
+            // error
+          });
+      });
   };
 
   useEffect(() => {
@@ -268,7 +268,7 @@ const ViewTicket = ({ route }) => {
                   // Linking.openURL(
                   //   Env.API_BASEURL + item.attachments[0].content_url
                   // );
-                  downloadCommentAttachment(item.attachments[0].token);
+                  downloadCommentAttachment(item.attachments[0]);
                 }}
               >
                 {item.attachments.length > 0 && (
