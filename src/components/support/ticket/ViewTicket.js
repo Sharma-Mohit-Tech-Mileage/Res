@@ -27,6 +27,7 @@ import {
   PutApiRequest,
   UploadMultipartData,
 } from "../../../network/APIClient";
+import ReactNativeBlobUtil from 'react-native-blob-util'
 import WarningIcon from "../../../../assets/alert-triangle.png";
 import moment from "moment";
 import DocumentPicker, { types } from "react-native-document-picker";
@@ -83,24 +84,43 @@ const ViewTicket = ({ route }) => {
     );
   };
 
-  const downloadCommentAttachment = async (fileToken) => {
-    const request = Env.API_BASEURL+`support/api/attachments/${fileToken}`;
+  const downloadCommentAttachment = async (item) => {
+    const request = Env.API_BASEURL+`support/api/attachments/${item.token}`;
     let user = await getUser();
     const config = {
-        headers: {
-            Authorization: `Bearer ${user.token}`
-        }
+       // headers: {
+            Authorization: `Bearer ${user.token}`,
+            'Content-Type': 'multipart/form-data',
+            Accept: 'application/json',
+       // }
     };
-
-    fetch(request,{config})
-        .then((response)=> response.blob())
-        .then((response)=> {
-                //setData(URL.createObjectURL(response));
-               console.log(response)
-            })
-        .catch(err=>{
-                console.log(err);
-            });
+    console.log('file ex',config)
+    ReactNativeBlobUtil
+    .config({
+        fileCache: true,
+        // by adding this option, the temp files will have a file extension
+        appendExt: item.content_type
+    })
+    .fetch('GET', request, {
+        //some headers ..
+        config
+    })
+    .then((res) => {
+        // the temp file path with file extension `png`
+        console.log('The file saved to ', JSON.stringify(res))
+        // Beware that when using a file path as Image source on Android,
+        // you must prepend "file://"" before the file path
+        
+    })
+    // fetch(request,{config})
+    //     .then((response)=> response.blob())
+    //     .then((response)=> {
+    //             //setData(URL.createObjectURL(response));
+    //            console.log(response)
+    //         })
+    //     .catch(err=>{
+    //             console.log(err);
+    //         });
     
     // const res = await axios.get(request,config);
     // console.log('file response',JSON.stringify(res))
@@ -268,7 +288,7 @@ const ViewTicket = ({ route }) => {
                   // Linking.openURL(
                   //   Env.API_BASEURL + item.attachments[0].content_url
                   // );
-                  downloadCommentAttachment(item.attachments[0].token);
+                  downloadCommentAttachment(item.attachments[0]);
                 }}
               >
                 {item.attachments.length > 0 && (
