@@ -1,26 +1,54 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Pressable, ActivityIndicator, Linking } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Platform,
+  Dimensions,
+  Pressable,
+  ActivityIndicator,
+  Linking,
+} from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
-import DownArrow from "../../res/svgIcons/DownArrow";
-import UpArrow from "../../res/svgIcons/UpArrow";
-import NetworkDetails from "../common/NetworkDetails";
-import strings from "../../res/Strings";
-import MyInternetDetials from "../common/MyInternetDetails";
+// import DownArrow from "../../res/svgIcons/DownArrow";
+// import UpArrow from "../../res/svgIcons/UpArrow";
+// import NetworkDetails from "../common/NetworkDetails";
+// import strings from "../../res/Strings";
+// import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
-import { getUser, getPushNotificationStatus, storePushNotificationStatus, storeUpgradeToken, } from "../../redux/utils/LocalStorage";
-import { GetApiRequest, GetModemStatusApiRequest, } from "../../network/APIClient";
+import {
+  getUser,
+  getPushNotificationStatus,
+  storePushNotificationStatus,
+  storeUpgradeToken,
+} from "../../redux/utils/LocalStorage";
+import {
+  GetApiRequest,
+  GetModemStatusApiRequest,
+} from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
-import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
-import { updatePushNotifications, fetchPushNotifications,saveAccountServices } from "../../redux/actions/ProfileActionSuite";
+import {
+  getFcmToken,
+  requestUserPermission,
+} from "../../firebase/FirebaseUtils";
+import {
+  updatePushNotifications,
+  fetchPushNotifications,
+  saveAccountServices,
+} from "../../redux/actions/ProfileActionSuite";
 import { useSelector, useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
 import { checkForMinorUpdate } from "../utility/constant";
+import MyInternetDetialsBiller from "../common/MyInternetDetailsBiller";
 
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
@@ -31,7 +59,7 @@ const NewBillerHome = ({ navigation }) => {
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const dispatch = useDispatch();
   const [plans, setPlans] = useState([]);
-  const [tvPlan, setTVPlan] = useState('');
+  const [tvPlan, setTVPlan] = useState("");
   const [phonePlan, setPhonePlan] = useState([]);
   const [billAmt, setBillAmt] = useState(0);
   const [dueDate, setDueDate] = useState("");
@@ -45,8 +73,11 @@ const NewBillerHome = ({ navigation }) => {
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
-  const [updateStatus, setUpdateStatus] = useState({isMinorUpdateAvailable: false,currentVersion: '',latestVersion: ''});
-
+  const [updateStatus, setUpdateStatus] = useState({
+    isMinorUpdateAvailable: false,
+    currentVersion: "",
+    latestVersion: "",
+  });
 
   const getInternetHealth = (type) => {
     var currentHealth = { Offline: 20, Poor: 50, Optimal: 80, default: 80 };
@@ -63,7 +94,7 @@ const NewBillerHome = ({ navigation }) => {
   function getPhoneServiceDetails() {
     getUser().then((res) => {
       const request = `phone/api/phones/${res.userInfo.accountNumber}/phonelines`;
-      GetApiRequest(request,onSuccessPhonePlan, onError);
+      GetApiRequest(request, onSuccessPhonePlan, onError);
     });
   }
   function getPhoneServicePlans(tgcCode) {
@@ -74,7 +105,7 @@ const NewBillerHome = ({ navigation }) => {
   }
   const onFetchedPlan = (res) => {
     setPhonePlan(res);
-  }
+  };
   const onSuccessPhonePlan = (res) => {
     if (res.length && res[0].tcgCode) {
       getPhoneServicePlans(res[0].tcgCode);
@@ -89,7 +120,7 @@ const NewBillerHome = ({ navigation }) => {
   };
 
   const onSuccessTVPlan = (res) => {
-    setTVPlan(res || '');
+    setTVPlan(res || "");
   };
 
   const onErrorInPlanTV = (error) => {
@@ -272,13 +303,13 @@ const NewBillerHome = ({ navigation }) => {
         (res) => {
           //console.log("getUserAccountDetails", res);
           if (res) {
-            dispatch(saveAccountServices(res.services))
+            dispatch(saveAccountServices(res.services));
             if (res.currentCollectionStep == "Soft Disconnect") {
               setAccountStatus("Disconnect");
               setIsInternetDetails(true);
               setInternetHealths((oldArray) => [...oldArray, "Red"]);
             } else {
-              updateInternetHealth(res.currentBalance,res.paymentDueDate);
+              updateInternetHealth(res.currentBalance, res.paymentDueDate);
             }
             let dueDate = moment(res.paymentDueDate).format("ll");
             setDueDate(dueDate);
@@ -293,12 +324,12 @@ const NewBillerHome = ({ navigation }) => {
     });
   };
 
-  const updateInternetHealth = (dueAmount,dueDate) => {
+  const updateInternetHealth = (dueAmount, dueDate) => {
     //console.log('pppppast',moment(dueDate).isBefore() )
-    if(moment(dueDate).isAfter()){
+    if (moment(dueDate).isAfter()) {
       setBillPaid(true);
       setInternetHealths((oldArray) => [...oldArray, "Green"]);
-    }else if (dueAmount <= 0 ) {
+    } else if (dueAmount <= 0) {
       setBillPaid(true);
       setInternetHealths((oldArray) => [...oldArray, "Green"]);
     } else {
@@ -345,13 +376,13 @@ const NewBillerHome = ({ navigation }) => {
         const messageTypes = profile.pushNotifications[0].pushMessageType;
         messageTypes.forEach((messageType) => {
           switch (messageType.messageType) {
-            case 'appointment':
+            case "appointment":
               optOut = messageType.optOutFlag;
               break;
-            case 'outage':
+            case "outage":
               outageOptOut = messageType.optOutFlag;
               break;
-            case 'billing':
+            case "billing":
               billingOptOutStatus = messageType.optOutFlag;
               break;
           }
@@ -359,7 +390,6 @@ const NewBillerHome = ({ navigation }) => {
             optOutCountPushNotification += 1;
           }
         });
-
       }
 
       if (enabledNotification) {
@@ -367,7 +397,7 @@ const NewBillerHome = ({ navigation }) => {
 
         if (enabledPermission) {
           const token = await getFcmToken();
-          console.log('FCM HOME WITH PERMISSION',token)
+          console.log("FCM HOME WITH PERMISSION", token);
           const data = {
             accountNumber: user.userInfo.accountNumber,
             deviceToken: token,
@@ -379,14 +409,14 @@ const NewBillerHome = ({ navigation }) => {
             isAndroid: Platform.OS == "android",
           };
           const localData = {
-            status: 'accepted',
-            date: new Date()
+            status: "accepted",
+            date: new Date(),
           };
           storePushNotificationStatus(localData);
           await dispatch(updatePushNotifications(data, null));
         } else {
           const token = await getFcmToken();
-          console.log('FCM HOME WITHOUT PERMISSION',token)
+          console.log("FCM HOME WITHOUT PERMISSION", token);
           const data = {
             accountNumber: user.userInfo.accountNumber,
             deviceToken: token,
@@ -398,9 +428,9 @@ const NewBillerHome = ({ navigation }) => {
             isAndroid: Platform.OS == "android",
           };
           const localData = {
-            status: 'skip',
+            status: "skip",
             date: new Date(),
-            permanentSkip: true
+            permanentSkip: true,
           };
           await dispatch(updatePushNotifications(data, null));
           storePushNotificationStatus(localData);
@@ -470,7 +500,6 @@ const NewBillerHome = ({ navigation }) => {
     }
   };
 
-
   const walkthroughModal = () => {
     const walkThroughScreens = [
       {
@@ -504,8 +533,8 @@ const NewBillerHome = ({ navigation }) => {
 
     return (
       <>
-        <View style={styles.walkThroughBubble} >
-          <View >
+        <View style={styles.walkThroughBubble}>
+          <View>
             <View style={styles.title}>
               <Text style={styles.titleText}>{walkThrough.title}</Text>
             </View>
@@ -515,7 +544,7 @@ const NewBillerHome = ({ navigation }) => {
               </Text>
             </View>
           </View>
-          <View style={styles.walkThroughBottomArea} >
+          <View style={styles.walkThroughBottomArea}>
             <View style={styles.circlePaging}>
               <View style={styles.circle}></View>
               <View
@@ -537,7 +566,11 @@ const NewBillerHome = ({ navigation }) => {
               <View style={styles.walkThroughSubButtons}>
                 {walkThroughStep > 0 && (
                   <Pressable
-                    style={[styles.button, styles.buttonsLayout, styles.buttonPrevious,]}
+                    style={[
+                      styles.button,
+                      styles.buttonsLayout,
+                      styles.buttonPrevious,
+                    ]}
                     onPress={() => changeWalkThroughStep(walkThroughStep - 1)}
                     accessibilityLabel="Previous Step"
                     accessibilityRole="button"
@@ -546,9 +579,17 @@ const NewBillerHome = ({ navigation }) => {
                   </Pressable>
                 )}
                 <Pressable
-                  style={[styles.button, styles.buttonsLayout, styles.buttonNext,]}
+                  style={[
+                    styles.button,
+                    styles.buttonsLayout,
+                    styles.buttonNext,
+                  ]}
                   onPress={() => changeWalkThroughStep(walkThroughStep + 1)}
-                  accessibilityLabel={walkThroughStep < walkThroughScreens.length - 1 ? "Next Step" : "Finish Walkthrough"}
+                  accessibilityLabel={
+                    walkThroughStep < walkThroughScreens.length - 1
+                      ? "Next Step"
+                      : "Finish Walkthrough"
+                  }
                   accessibilityRole="button"
                 >
                   <Text style={styles.accept}>{walkThrough.buttonText}</Text>
@@ -567,7 +608,6 @@ const NewBillerHome = ({ navigation }) => {
       </>
     );
   };
-
 
   const OutageAlert = ({ estimatedTime }) => {
     return (
@@ -654,8 +694,8 @@ const NewBillerHome = ({ navigation }) => {
             onPress={() => {
               setUpdateStatus({
                 isMinorUpdateAvailable: false,
-                currentVersion: '',
-                latestVersion: ''
+                currentVersion: "",
+                latestVersion: "",
               });
             }}
           >
@@ -702,25 +742,38 @@ const NewBillerHome = ({ navigation }) => {
               flex: 2,
               alignItems: "center",
               marginTop: 50,
+              paddingBottom:50
             }}
           >
-            {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert />:null}
+            {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert /> : null}
             {isOutageAlert ? (
               <OutageAlert estimatedTime={estimatedRestoreTime} />
             ) : (
               <></>
             )}
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
-              
-
               <View
-                style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}
+                style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
               />
-              
+              <Text style={[styles.descriptionText,{fontSize:FontSize.size_lg,fontWeight:'400', marginBottom:20}]}>Welcome</Text>
+              <View style={{flexDirection:'column'}}>
+                <Text style={styles.descriptionText}>
+                  Welcome to Sparklight We’re excited to connect with you!
+                  Sparklight is dedicated to offering our customers a variety of
+                  enhanced self-service options including online pay and Auto
+                  Pay through the customer portal and MySparklight app. As you
+                  navigate, please be aware that select features available to
+                  current customers may not be immediately accessible to you. We
+                  are working diligently to add new options and features to
+                  enhance your Sparklight experience. Thank you for your
+                  patience and understanding during this transition period.
+                </Text>
+                <Image style={{margin:24}}source={require('../../../assets/newbiller.png')}/>
+              </View>
             </View>
             <ScrollView horizontal={true} style={{ marginStart: 20 }}>
               <View>
-                <MyInternetDetials
+                <MyInternetDetialsBiller
                   plans={plans}
                   billAmt={billAmt}
                   dueDate={dueDate}
@@ -729,7 +782,12 @@ const NewBillerHome = ({ navigation }) => {
               </View>
             </ScrollView>
 
-            <MyServicePlan plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
+            {/* <MyServicePlan
+              plans={plans}
+              tvPlan={tvPlan}
+              phonePlan={phonePlan}
+              navigation={navigation}
+            /> */}
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -797,10 +855,11 @@ const styles = StyleSheet.create({
   },
   description: {},
   descriptionText: {
-    color: Color.sparklightGray1,
-    fontSize: FontSize.size_sm,
+    color: Color.colorGray_200,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 24,
+    paddingHorizontal:24
   },
   decline: {
     fontSize: FontSize.size_sm,
@@ -842,7 +901,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
     borderRadius: 2,
-    paddingTop: 45,
+    paddingTop: 20,
     width: wp("92%"),
   },
   shadowProp: {

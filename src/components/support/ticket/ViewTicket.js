@@ -85,8 +85,8 @@ const ViewTicket = ({ route }) => {
   };
 
   const downloadCommentAttachment = async (item) => {
-    //setLoadingTxt('Please wait...')
-    //setLoading(true)
+    setLoadingTxt('Please wait...')
+    setLoading(true)
 
     const request = Env.API_BASEURL + `support/api/attachments/${item.token}`;
     let user = await getUser();
@@ -102,15 +102,18 @@ const ViewTicket = ({ route }) => {
       })
       .then((res) => {
         // the temp file path
-        //setLoading(false)
+        setLoading(false)
         console.log("The file saved to ", res.path());
-        FileViewer.open(res.path(), { showOpenWithDialog: true })
+        setTimeout(()=>{
+          FileViewer.open(res.path(), { showOpenWithDialog: true })
           .then(() => {
             // success
           })
           .catch((error) => {
             // error
           });
+        },500)
+        
       });
   };
 
