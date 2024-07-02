@@ -256,6 +256,7 @@ const ManageEquipment = ({ route }) => {
     }, (error) => {
       setLoading(false)
       console.log(`getEuroAccountDetails==error`,error)
+      getModemPassword()
     })
   }
 
