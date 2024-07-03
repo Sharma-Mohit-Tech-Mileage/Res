@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { ProgressCircle } from "react-native-svg-charts";
 import colors from "../../res/Colors";
 import RightArrow from "../../res/svgIcons/RightArrow";
@@ -12,6 +12,8 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
   const [totalUsed, setTotalUsed] = useState(0);
   const [isUnlimitedPlan, setIsUnlimitedPlan] = useState(false);
   const [showComment, setShowComment] = useState(false);
+
+  const screenWidth = Dimensions.get('window').width;
 
   useEffect(() => {
     if (data) {
@@ -45,11 +47,29 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
             <Text style={styles.dataText}>{totalUsed}</Text>
             <Text style={[styles.dataText, styles.dataTextSmall]}>GB used</Text>
           </View>
-          <TouchableOpacity onPress={() => setShowComment(true)} style={styles.dataPlanBorder}>
-            <Text style={styles.dataPlanTxt}>Plan Details</Text>
-          </TouchableOpacity>
         </View>
       </ProgressCircle>
+
+      <TouchableOpacity
+        onPress={() => {
+          console.log("Plan Details clicked");
+          setShowComment(true);
+        }}
+        style={[
+          styles.dataPlanBorder,
+          {
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: [
+              { translateX: -45 }, // Adjust this based on your element's width
+              { translateY: -30 }, // Adjust this based on your element's height
+            ],
+          },
+        ]}
+      >
+        <Text style={styles.dataPlanTxt}>Plan Details</Text>
+      </TouchableOpacity>
 
       <View style={styles.usageInfoContainer}>
         <View style={styles.rowCenteredView}>
@@ -120,13 +140,16 @@ const styles = StyleSheet.create({
   },
   dataTextSmall: {
     fontSize: 16,
-    marginTop: 5,
+   // marginTop: 5,
     fontWeight: "400",
   },
   dataPlanBorder: {
-    borderWidth: 1,
+    //borderWidth: 1,
     borderColor: colors.sparklight_bright_purple,
-    marginTop: 5,
+    padding: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    zIndex: 1,  
+    elevation: 1,
   },
   dataPlanTxt: {
     color: colors.sparklight_bright_purple,
@@ -134,7 +157,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 12,
     fontWeight: "600",
-    padding: 5,
   },
   usageInfoContainer: {
     flexDirection: "row",
