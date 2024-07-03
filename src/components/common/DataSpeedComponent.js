@@ -12,9 +12,9 @@ import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
 import { FontFamily } from "../../../GlobalStyles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { Env } from "../../network/apis/account/Constants";
-const speedGif = require("../../../assets/Wifi-Speed-Mobile-App.gif");
-const wifiGif = require("../../../assets/Wifi-Speed-Only-Mobile-App.gif");
-const modemSpeedGif = require("../../../assets/Modem-Speed-Mobile-App.gif");
+const speedGif = require("../../../assets/Wifi-Speed-Animation.gif");
+const wifiGif = require("../../../assets/Wifi-Speed-Only-Animation.gif");
+const modemSpeedGif = require("../../../assets/Modem-Speed-Animation.gif");
 
 const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
   const [showModal, setShowModal] = useState(false);
@@ -141,7 +141,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
     return (
       <>
         <View style={styles.testSpeedResultContainer}>
-          <View style={[styles.gifContainer,{marginHorizontal: hasEeroDevice?wp('10%'):wp('18%')}]}>
+          <View style={[styles.gifContainer,{marginHorizontal: wp('6%')}]}>
             {loading ? (
               <FastImage resizeMode={FastImage.resizeMode.contain} source={getGifSource()} style={styles.gif} />
             ) : (
@@ -323,20 +323,16 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   result: {
-    minHeight: 30,
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 4,
-    marginHorizontal: 20,
+    paddingTop: 10,
+    marginHorizontal: wp('6%'),
   },
   planUpgrade: {
     fontSize: 16,
     fontWeight: "600",
     color: colors.sparklight_purple_blue,
     fontFamily: FontFamily.openSansRegular,
-  },
-  rightArrowContainer: {
-    marginTop: 5,
   },
   speedTypeHeader: {
     fontSize: 18,

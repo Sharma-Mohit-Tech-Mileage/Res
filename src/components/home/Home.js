@@ -12,6 +12,7 @@ import NetworkDetails from "../common/NetworkDetails";
 import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
+import MyDataUsage from "../common/MyDataUsage";
 import { getUser, getPushNotificationStatus, storePushNotificationStatus, storeUpgradeToken, } from "../../redux/utils/LocalStorage";
 import { GetApiRequest, GetModemStatusApiRequest, } from "../../network/APIClient";
 import moment from "moment";
@@ -813,16 +814,10 @@ const HomeScreen = ({ navigation }) => {
               )}
             </View>
             <ScrollView horizontal={true} style={{ marginStart: 20 }}>
-              <View>
-                <MyInternetDetials
-                  plans={plans}
-                  billAmt={billAmt}
-                  dueDate={dueDate}
-                  navigation={navigation}
-                />
-              </View>
+              <View><MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} navigation={navigation}/></View>
             </ScrollView>
             <MyServicePlan plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
+            <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
           </View>
         </ScrollView>
       </SafeAreaView>
