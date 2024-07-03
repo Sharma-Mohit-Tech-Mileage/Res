@@ -75,13 +75,13 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
         <View style={styles.rowCenteredView}>
           <View style={styles.dataUsageIndicator} />
           <Text style={styles.useLbl}>Used</Text>
-          <Text style={styles.useDataLbl}>{`${totalUsed} GB`}</Text>
+          <Text style={styles.useDataLbl}>{` ${totalUsed} GB`}</Text>
         </View>
         <View style={styles.rowCenteredView}>
           <View style={[styles.dataUsageIndicator, styles.remainingIndicator]} />
           <Text style={styles.useLbl}>Remaining</Text>
           <Text style={styles.useDataLbl}>
-            {isUnlimitedPlan ? "Unlimited" : `${typeof data?.remainingGB === "number" ? Math.round(data.remainingGB) : 0} GB`}
+            {isUnlimitedPlan ? " Unlimited" : ` ${typeof data?.remainingGB === "number" ? Math.round(data.remainingGB) : 0} GB`}
           </Text>
         </View>
       </View>
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   },
   dataTextSmall: {
     fontSize: 16,
-   // marginTop: 5,
+   marginTop: 5,
     fontWeight: "400",
   },
   dataPlanBorder: {
