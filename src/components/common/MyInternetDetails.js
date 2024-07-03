@@ -89,6 +89,9 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
             paddingHorizontal: 20,
             marginTop: 15,
           }}
+          accessible={true}
+          accessibilityLabel={`View Details`}
+          accessibilityRole="button"
         >
           <Text
             style={{

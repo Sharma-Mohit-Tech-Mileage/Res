@@ -29,6 +29,7 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
         <View style={styles.item}
           accessible={true}
           accessibilityLabel={hasOutage ? strings.noOutageDetected : strings.noOutageTxt}
+          accessibilityRole="button"
         >
           <View style={styles.iconBg}>
             <Outageicon />
@@ -51,6 +52,11 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
       <View style={[styles.rowContainer]}>
         {<TouchableOpacity
           style={{ flexDirection: "row" }}
+          accessible={true}
+          accessibilityRole="button"
+          accessabilityLabel={currentHealth != "Optimal"
+          ? strings.modem_issue_detected
+          : strings.no_modem_issue}
           onPress={() => {
             if (currentHealth != 'Optimal') {
               navigation.reset({
@@ -96,6 +102,9 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
         </TouchableOpacity>}
         <TouchableOpacity
           style={{ flexDirection: "row" }}
+          accessible={true}
+          accessibilityLabel={strings.bill_paid}
+          accessibilityRole="button"
           onPress={() => {
             if (!billPaid) {
               navigation.navigate("ArticalWindowUtility", {
