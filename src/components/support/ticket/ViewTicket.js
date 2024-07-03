@@ -79,7 +79,7 @@ const ViewTicket = ({ route }) => {
         }
       },
       (error) => {
-        console.log(error);
+        console.log('GetComments',JSON.stringify(error));
       }
     );
   };
@@ -87,14 +87,18 @@ const ViewTicket = ({ route }) => {
   const downloadCommentAttachment = async (item) => {
     setLoadingTxt('Please wait...')
     setLoading(true)
-
     const request = Env.API_BASEURL + `support/api/attachments/${item.token}`;
     let user = await getUser();
+
+    let dirs = ReactNativeBlobUtil.fs.dirs
+    var todayTime = Math.round((new Date()).getTime() / 1000);
     ReactNativeBlobUtil.config({
       // add this option that makes response data to be stored as a file,
       // this is much more performant.
-      fileCache: true,
-      appendExt: item.filename,
+      //fileCache: true,
+      //appendExt: item.filename,
+      
+      path: dirs.DocumentDir + '/'+todayTime +item.filename
     })
       .fetch("GET", request, {
         Authorization: `Bearer ${user.token}`,
@@ -444,7 +448,7 @@ const ViewTicket = ({ route }) => {
                             </View>
                           </Pressable>
                         </View>
-                        {comments.length != 0 && (
+                        {myComment.length != 0 && (
                           <View
                             style={{
                               alignSelf: "flex-end",

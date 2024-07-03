@@ -755,14 +755,14 @@ const NewBillerHome = ({ navigation }) => {
               <View
                 style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
               />
-              <Text style={[styles.descriptionText,{fontSize:FontSize.size_lg,fontWeight:'400', marginBottom:20}]}>Welcome</Text>
+              <Text style={[styles.descriptionText,{fontSize:FontSize.size_lg,fontWeight:'400', marginBottom:20}]}>Welcome to Sparklight</Text>
               <View style={{flexDirection:'column'}}>
                 <Text style={styles.descriptionText}>
                   Welcome to Sparklight We’re excited to connect with you!
                   Sparklight is dedicated to offering our customers a variety of
                   enhanced self-service options including online pay and Auto
-                  Pay through the customer portal and MySparklight app. As you
-                  navigate, please be aware that select features available to
+                  Pay through the customer portal and MySparklight app.{"\n"}{"\n"}
+                  As you navigate, please be aware that select features available to
                   current customers may not be immediately accessible to you. We
                   are working diligently to add new options and features to
                   enhance your Sparklight experience. Thank you for your

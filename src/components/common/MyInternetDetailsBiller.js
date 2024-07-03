@@ -16,6 +16,7 @@ import Myplanicon from "../../res/svgIcons/Myplanicon";
 import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import { Env } from "../../network/apis/account/Constants";
 import TickIcon from "../../res/svgIcons/TickIcon";
+import AutoPayIcon from "../../res/svgIcons/AutoPayIcon";
 
 const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
   //const [billAmt,setBillAmt]=useState(0)
@@ -81,14 +82,13 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
           </View>
 
           <Text style={[styles.subTitle, { paddingRight: 10,fontSize:FontSize.size_base }]}>
-            <TickIcon/> On
+            <TickIcon color={'#2BA948'}/> On
           </Text>
         </View>
        
         
-        <View
-          style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
-        />
+        
+        <View style={{flexDirection:'column'}}>
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
@@ -97,11 +97,14 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
             });
           }}
           style={{
-            paddingBottom: 5,
+            borderTopColor:'#F4F4F5',
+            borderTopWidth:1,
             flexDirection: "row",
             justifyContent: "space-between",
-            paddingHorizontal: 20,
-            marginTop: 15,
+            paddingVertical: 5,
+            paddingHorizontal:10,
+            height:30,
+            width:'95%'
           }}
         >
           <Text
@@ -112,12 +115,13 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
               fontFamily:FontFamily.openSansRegular,
             }}
           >
-            {"Make Payment"}
+            {"Make a Payment"}
           </Text>
           <View>
             <RightArrow />
           </View>
         </TouchableOpacity>
+        </View>
       </View>
 
       <View
@@ -140,14 +144,14 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
               alignItems: "center",
             }}
           >
-            <Myplanicon />
+            <AutoPayIcon />
           </LinearGradient>
           <Text style={styles.title}>Auto Pay</Text>
         </View>
         <View style={styles.subSec}>
-          <View style={{ flexDirection: "row" }}>
+          <View style={{ flexDirection: "row"}}>
             
-            <Text style={[styles.subTitle,{fontSize:FontSize.size_lg,color:Color.success700,fontWeight:'600'}]}>On</Text>
+            <Text style={[styles.subTitle,{fontSize:FontSize.size_lg,color:'#2BA948',fontWeight:'500'}]}>On</Text>
           </View>
 
           <Text style={[styles.date, { paddingRight: 10} ]}>
@@ -157,6 +161,8 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
         {/* <View
           style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10,marginBottom:10 }}
         /> */}
+        <View style={{flexDirection:'column',position:'absolute',
+            bottom:0}}>
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
@@ -167,13 +173,12 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
           style={{
             borderTopColor:'#F4F4F5',
             borderTopWidth:1,
-            
             flexDirection: "row",
             justifyContent: "space-between",
-            paddingVertical: 20,
+            paddingVertical: 5,
             paddingHorizontal:20,
-            marginTop:50
-            
+            height:40,
+            width:'85%'
           }}
         >
           <Text
@@ -186,10 +191,11 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
           >
             {"Manage Auto Pay"}
           </Text>
-          <View>
+          <View >
             <RightArrow />
           </View>
         </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -221,7 +227,7 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontWeight: "400",
     marginLeft: 10,
-    marginTop: 10,
+    marginTop: 5,
   },
   subTitle: {
     color: colors.darkest_grey,
