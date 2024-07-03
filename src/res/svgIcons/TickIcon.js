@@ -13,7 +13,7 @@ const TickIcon = (props) => (
   >
     <G clipPath="url(#a)">
       <Path
-        stroke="#8D3B90"
+        stroke={props?.color?props.color:"#8D3B90"}
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={1.5}

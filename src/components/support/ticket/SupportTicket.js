@@ -41,7 +41,7 @@ const SupportTicket = () => {
           console.log("getTicketList", res);
           if (res) {
             setTicketList(res);
-            setMainList(res)
+            setMainList(res);
           }
           setLoading(false);
         },
@@ -57,10 +57,11 @@ const SupportTicket = () => {
     getTicketList();
   }, []);
 
-  const capitalizeFirstLetter=(string)=> {
-
-    return string!= undefined && string.charAt(0).toUpperCase() + string.slice(1);
-}
+  const capitalizeFirstLetter = (string) => {
+    return (
+      string != undefined && string.charAt(0).toUpperCase() + string.slice(1)
+    );
+  };
 
   const RenderNoTicket = () => {
     return (
@@ -72,11 +73,14 @@ const SupportTicket = () => {
                 <TicketListIcon isGrey={true} />
               </View>
               <Text style={[styles.noTicketsCreated, styles.createATicketTypo]}>
-                {(searchTxt.length>0 && ticketList.length==0)?'No Results found':'No Tickets Created'}
+                {searchTxt.length > 0 && ticketList.length == 0
+                  ? "No Results found"
+                  : "No Tickets Created"}
               </Text>
               <Text style={[styles.createATicket, styles.createATicketTypo]}>
-              {(searchTxt.length>0 && ticketList.length==0)?' ':'Create a ticket to receive support'}
-                
+                {searchTxt.length > 0 && ticketList.length == 0
+                  ? " "
+                  : "Create a ticket to receive support"}
               </Text>
             </View>
           </View>
@@ -85,29 +89,29 @@ const SupportTicket = () => {
     );
   };
 
-  const getStatusColor=(status)=>{
-    let color="#067647"
-    switch(status) {
-      case 'new':
-        color= '#F88700'
+  const getStatusColor = (status) => {
+    let color = "#067647";
+    switch (status) {
+      case "new":
+        color = "#F88700";
         break;
-        case 'open':
-          color= '#EF4E3E'
-          break;
-      case 'pending':
-        color= '#8D3B90'
+      case "open":
+        color = "#EF4E3E";
         break;
-        case 'solved':
-        color= '#067647'
+      case "pending":
+        color = "#8D3B90";
         break;
-        case 'closed':
-        color= '#067647'
+      case "solved":
+        color = "#067647";
+        break;
+      case "closed":
+        color = "#067647";
         break;
       default:
-        color= '#F88700'
+        color = "#F88700";
     }
     return color;
-  }
+  };
 
   const RenderTicketList = ({ item }) => {
     return (
@@ -136,7 +140,7 @@ const SupportTicket = () => {
                 fontFamily: FontFamily.interBold,
                 fontSize: 14,
                 textAlignVertical: "center",
-                color:Color.sparklightGray1
+                color: Color.sparklightGray1,
               }}
             >
               {" "}
@@ -157,14 +161,20 @@ const SupportTicket = () => {
           }}
         >
           <Text style={styles.issueType}>Status</Text>
-          <View style={{ alignSelf: "flex-start",borderRadius:2, padding: 0,backgroundColor:getStatusColor(item?.status.toLowerCase()), }}>
+          <View
+            style={{
+              alignSelf: "flex-start",
+              borderRadius: 2,
+              padding: 0,
+              backgroundColor: getStatusColor(item?.status.toLowerCase()),
+            }}
+          >
             <Text
               style={[
                 styles.text,
                 styles.textTypo,
                 styles.badge,
-                {color:'#FFF'}
-
+                { color: "#FFF" },
               ]}
             >
               {item.status}
@@ -179,7 +189,9 @@ const SupportTicket = () => {
             }}
           >
             <Text style={styles.issueType}>Issue Type</Text>
-            <Text style={styles.billingTypo}>{capitalizeFirstLetter(item?.category)}</Text>
+            <Text style={styles.billingTypo}>
+              {capitalizeFirstLetter(item?.category)}
+            </Text>
           </View>
 
           <View style={{ marginTop: 10 }}>
@@ -207,44 +219,53 @@ const SupportTicket = () => {
             />
           </View>
           <View style={{ marginHorizontal: 16, marginBottom: 10 }}>
-                <SparkLightInput
-                  placeholder={"Search by Ticket # or Subject"}
-                  onChangeText={(text) => {
-                    setSearchTxt(text)
-                    console.log(":",text)
-                     if(text.length>0){
-                    const newData1 = mainList.filter(
-                      item => {
-                            //console.log('test=',item.subject)
-                            if(item.ticketNumber.toString().includes(text)){
-                               return true
-                            }else if(item.subject.toLowerCase().includes(text.toLowerCase())){
-                              return true
-                            }else{
-                              return false
-                            }
-                             
-                              
-                      }) 
-                      setTicketList(newData1) 
-                      
-                    }else{
-                      setTicketList(mainList)
+            <SparkLightInput
+              placeholder={"Search by Ticket # or Subject"}
+              onChangeText={(text) => {
+                setSearchTxt(text);
+                console.log(":", text);
+                if (text.length > 0) {
+                  const newData1 = mainList.filter((item) => {
+                    //console.log('test=',item.subject)
+                    if (item.ticketNumber.toString().includes(text)) {
+                      return true;
+                    } else if (
+                      item.subject.toLowerCase().includes(text.toLowerCase())
+                    ) {
+                      return true;
+                    } else {
+                      return false;
                     }
-                    
-                  }}
-                  value={searchTxt}
-                />
-                <Text style={[styles.billingTypo,{fontSize:FontSize.size_xs,lineHeight:18}]}>Newly submitted tickets may take some time to appear in the ticket log.</Text>
-              </View>
+                  });
+                  setTicketList(newData1);
+                } else {
+                  setTicketList(mainList);
+                }
+              }}
+              value={searchTxt}
+            />
+            <Text
+              style={[
+                styles.supportingTypo1,
+                {
+                  marginTop: 10,
+                  color: Color.sparklightaddGray,
+                  fontFamily: FontFamily.openSansRegular,
+                  alignSelf: "stretch",
+                },
+              ]}
+            >
+              Newly submitted tickets may take some time to appear in the ticket
+              log.
+            </Text>
+          </View>
           {ticketList.length > 0 ? (
-            <View style={{paddingBottom:hp("50%")}}>
-              
+            <View style={{ paddingBottom: hp("50%") }}>
               <FlatList
                 data={ticketList}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={RenderTicketList}
-                
+
                 //onEndReached={onEndReached}
                 //onEndReachedThreshold={0.1}
                 //ListFooterComponent={Footer}
@@ -277,7 +298,7 @@ const styles = StyleSheet.create({
     paddingTop: Padding.p_base,
   },
   frameParent: {
-     flex: 1,
+    flex: 1,
     paddingHorizontal: Padding.p_base,
     paddingVertical: Padding.p_5xl,
   },
@@ -379,7 +400,11 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 28,
-  },
+  },supportingTypo1: {
+    lineHeight: 20,
+    fontSize: FontSize.textXsSemibold_size,
+    textAlign: "left",
+},
   badge: {
     borderColor: Color.colorAquamarine,
     paddingHorizontal: Padding.p_5xs,
@@ -411,4 +436,3 @@ const styles = StyleSheet.create({
 });
 
 export default SupportTicket;
-
