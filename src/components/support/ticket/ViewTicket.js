@@ -91,14 +91,14 @@ const ViewTicket = ({ route }) => {
     let user = await getUser();
 
     let dirs = ReactNativeBlobUtil.fs.dirs
-    var todayTime = Math.round((new Date()).getTime() / 1000);
+    //var todayTime = Math.round((new Date()).getTime() / 1000);
     ReactNativeBlobUtil.config({
       // add this option that makes response data to be stored as a file,
       // this is much more performant.
       //fileCache: true,
       //appendExt: item.filename,
       
-      path: dirs.DocumentDir + '/'+todayTime +item.filename
+      path: dirs.DocumentDir + '/' +item.filename
     })
       .fetch("GET", request, {
         Authorization: `Bearer ${user.token}`,
