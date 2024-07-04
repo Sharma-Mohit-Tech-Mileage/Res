@@ -16,8 +16,8 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
-// import DownArrow from "../../res/svgIcons/DownArrow";
-// import UpArrow from "../../res/svgIcons/UpArrow";
+import DownArrow from "../../res/svgIcons/DownArrow";
+import UpArrow from "../../res/svgIcons/UpArrow";
 // import NetworkDetails from "../common/NetworkDetails";
 // import strings from "../../res/Strings";
 // import MyInternetDetials from "../common/MyInternetDetails";
@@ -53,7 +53,7 @@ import MyInternetDetialsBiller from "../common/MyInternetDetailsBiller";
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
 const NewBillerHome = ({ navigation }) => {
-  const [isInternetDetails, setIsInternetDetails] = useState(false);
+  const [isImageDispaly, setIsImageDispaly] = useState(true);
   const user = useSelector((state) => state.combinedReducers.user.userData);
   const home = useSelector((state) => state.combinedReducers.home);
   const profile = useSelector((state) => state.combinedReducers.profile || {});
@@ -164,7 +164,7 @@ const NewBillerHome = ({ navigation }) => {
               );
               setEstimatedRestoreTime(time);
               setAccountStatus("Disconnect");
-              setIsInternetDetails(true);
+             // setIsInternetDetails(true);
               setHasOutage(true);
               setIsOutageAlert(true);
               setInternetHealths((oldArray) => [...oldArray, "Red"]);
@@ -283,15 +283,15 @@ const NewBillerHome = ({ navigation }) => {
     if (checkRed) {
       console.log("Internet Health is Red");
       setCurrentHealth("Offline");
-      setIsInternetDetails(true);
+      //setIsInternetDetails(true);
     } else if (checkYellow) {
       console.log("Internet Health is Yellow");
       setCurrentHealth("Poor");
-      setIsInternetDetails(true);
+      //setIsInternetDetails(true);
     } else {
       console.log("Internet Health is Green");
       setCurrentHealth("Optimal");
-      setIsInternetDetails(false);
+      //setIsInternetDetails(false);
     }
   };
 
@@ -306,7 +306,7 @@ const NewBillerHome = ({ navigation }) => {
             dispatch(saveAccountServices(res.services));
             if (res.currentCollectionStep == "Soft Disconnect") {
               setAccountStatus("Disconnect");
-              setIsInternetDetails(true);
+              
               setInternetHealths((oldArray) => [...oldArray, "Red"]);
             } else {
               updateInternetHealth(res.currentBalance, res.paymentDueDate);
@@ -755,10 +755,10 @@ const NewBillerHome = ({ navigation }) => {
               <View
                 style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
               />
-              <Text style={[styles.descriptionText,{fontSize:FontSize.size_lg,fontWeight:'400', marginBottom:20}]}>Welcome to Sparklight</Text>
+              <Text style={[styles.descriptionText,{fontSize:FontSize.size_3xl,fontWeight:'400', marginBottom:20}]}>Welcome to Sparklight</Text>
               <View style={{flexDirection:'column'}}>
                 <Text style={styles.descriptionText}>
-                  Welcome to Sparklight We’re excited to connect with you!
+                  We’re excited to connect with you!
                   Sparklight is dedicated to offering our customers a variety of
                   enhanced self-service options including online pay and Auto
                   Pay through the customer portal and MySparklight app.{"\n"}{"\n"}
@@ -768,7 +768,41 @@ const NewBillerHome = ({ navigation }) => {
                   enhance your Sparklight experience. Thank you for your
                   patience and understanding during this transition period.
                 </Text>
-                <Image style={{margin:24}}source={require('../../../assets/newbiller.png')}/>
+               
+                
+              {isImageDispaly ? (
+                 <Image style={{width:wp('80%'),borderRadius:5,alignSelf:'center', marginTop:10}}source={require('../../../assets/newbiller.png')}/>
+              ) : (
+                <></>
+              )}
+
+              <TouchableOpacity
+                onPress={() => {
+                  setIsImageDispaly(!isImageDispaly);
+                }}
+                style={{
+                  flexDirection: "row",
+                  alignSelf:'center',
+                  padding:5,
+                  marginVertical: 5,
+                  marginHorizontal: 25,
+                }}
+              >
+                <Text style={styles.hideShowDetails}>
+                  {isImageDispaly ? 'Collapse' : 'Expand'}
+                </Text>
+                <View style={{ marginTop: 5 }}>
+                  {isImageDispaly ? (
+                    <View style={{ marginTop: 2, marginLeft:5 }}>
+                      <UpArrow />
+                    </View>
+                  ) : (
+                    <View style={{ marginTop: 7, marginLeft:5 }}>
+                    <DownArrow />
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
               </View>
             </View>
             <ScrollView horizontal={true} style={{ marginStart: 20 }}>
@@ -964,11 +998,11 @@ const styles = StyleSheet.create({
   },
   hideShowDetails: {
     fontFamily: FontFamily.openSansRegular,
-    fontSize: 16,
+    fontSize: 14,
     marginVertical: 5,
     color: colors.sparklight_purple_blue,
     lineHeight: 20,
-    fontWeight: "600",
+    fontWeight: "400",
   },
   modemError1: {
     color: "#000",

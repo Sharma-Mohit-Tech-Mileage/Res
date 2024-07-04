@@ -75,7 +75,7 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
           </Text>
         </View>
 
-        <View style={styles.subSec}>
+        <View style={[styles.subSec,{ marginTop:-10}]}>
           <View style={{ flexDirection: "row" }}>
             
             <Text style={[styles.subTitle,{fontSize:FontSize.size_base}]}>Auto Pay</Text>
@@ -101,10 +101,11 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
             borderTopWidth:1,
             flexDirection: "row",
             justifyContent: "space-between",
-            paddingVertical: 5,
+            paddingTop: 5,
+            paddingBottom:5,
             paddingHorizontal:10,
             height:30,
-            width:'95%'
+            
           }}
         >
           <Text
@@ -113,6 +114,7 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
               fontWeight: "600",
               color: colors.sparklight_purple_blue,
               fontFamily:FontFamily.openSansRegular,
+              
             }}
           >
             {"Make a Payment"}
@@ -178,7 +180,7 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
             paddingVertical: 5,
             paddingHorizontal:20,
             height:40,
-            width:'85%'
+            width:'88%'
           }}
         >
           <Text
@@ -247,7 +249,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 10,
     paddingRight: 5,
-    marginTop: 10,
     paddingHorizontal: 20,
   },
 });
