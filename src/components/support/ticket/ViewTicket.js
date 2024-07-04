@@ -244,9 +244,11 @@ const ViewTicket = ({ route }) => {
           <View key={item.id} style={styles.frameWrapperBorder}>
             <View style={styles.frameParent1}>
               <View style={styles.rightActionableParent}>
-                {/* <View style={[styles.icon]}></View> */}
+                 <View style={[styles.icon]}>
+                   <Image style={{width:24,height:24}}source={require('../../../../assets/user-01.png')}/>
+                  </View> 
                 <Text style={[styles.agentResponse, styles.pmTypo]}>
-                  {item.id}
+                  {item.role=='end-user'? item.name:'Agent Response'}
                 </Text>
                 <Text
                   style={[
@@ -560,7 +562,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_sm,
     textAlign: "left",
     color: Color.colorGray_100,
-    lineHeight: 28,
+    lineHeight: 20,
   },
   billingTypo: {
     fontSize: FontSize.size_base,
@@ -632,8 +634,10 @@ const styles = StyleSheet.create({
   },
   agentResponse: {
     fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "600",
+    fontWeight: "400",
     flex: 1,
+    marginLeft:5,
+
   },
   pm: {
     fontFamily: FontFamily.openSansRegular,
