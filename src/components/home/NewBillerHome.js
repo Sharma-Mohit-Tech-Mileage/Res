@@ -755,7 +755,7 @@ const NewBillerHome = ({ navigation }) => {
               <View
                 style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
               />
-              <Text style={[styles.descriptionText,{fontSize:FontSize.size_lg,fontWeight:'400', marginBottom:20}]}>Welcome to Sparklight</Text>
+              <Text style={[styles.descriptionText,{fontSize:FontSize.size_3xl,fontWeight:'400', marginBottom:20}]}>Welcome to Sparklight</Text>
               <View style={{flexDirection:'column'}}>
                 <Text style={styles.descriptionText}>
                   We’re excited to connect with you!
@@ -793,11 +793,11 @@ const NewBillerHome = ({ navigation }) => {
                 </Text>
                 <View style={{ marginTop: 5 }}>
                   {isImageDispaly ? (
-                    <View style={{ marginTop: 0 }}>
+                    <View style={{ marginTop: 2, marginLeft:5 }}>
                       <UpArrow />
                     </View>
                   ) : (
-                    <View style={{ marginTop: 5, marginLeft:5 }}>
+                    <View style={{ marginTop: 7, marginLeft:5 }}>
                     <DownArrow />
                     </View>
                   )}
