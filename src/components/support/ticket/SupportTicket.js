@@ -431,7 +431,8 @@ const styles = StyleSheet.create({
   },
   activityIndicator: {
     transform: [{ scale: 2 }],
-    marginTop: 10,
+    marginVertical: 10,
+    paddingVertical:5
   },
 });
 

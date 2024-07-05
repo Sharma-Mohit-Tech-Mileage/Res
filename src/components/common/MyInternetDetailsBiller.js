@@ -101,10 +101,9 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
             borderTopWidth:1,
             flexDirection: "row",
             justifyContent: "space-between",
-            paddingTop: 5,
-            paddingBottom:5,
-            paddingHorizontal:10,
-            height:30,
+            paddingVertical: 5,
+            paddingHorizontal:20,
+            height:40,
             
           }}
         >
@@ -114,12 +113,12 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
               fontWeight: "600",
               color: colors.sparklight_purple_blue,
               fontFamily:FontFamily.openSansRegular,
-              
+              alignSelf:'center',
             }}
           >
             {"Make a Payment"}
           </Text>
-          <View>
+          <View style={{ alignSelf:'center'}}>
             <RightArrow />
           </View>
         </TouchableOpacity>
@@ -151,7 +150,7 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
           <Text style={styles.title}>Auto Pay</Text>
         </View>
         <View style={styles.subSec}>
-          <View style={{ flexDirection: "row"}}>
+          <View style={{ flexDirection: "row",marginTop:10}}>
             
             <Text style={[styles.subTitle,{fontSize:FontSize.size_lg,color:'#2BA948',fontWeight:'500'}]}>On</Text>
           </View>
@@ -189,11 +188,12 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
               fontWeight: "600",
               color: colors.sparklight_purple_blue,
               fontFamily:FontFamily.openSansRegular,
+              alignSelf:'center'
             }}
           >
             {"Manage Auto Pay"}
           </Text>
-          <View >
+          <View style={{alignSelf:'center',marginRight:10}} >
             <RightArrow />
           </View>
         </TouchableOpacity>
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
     borderRadius: 2,
-    paddingVertical: 10,
+    paddingTop: 10,
     width: wp("84%"),
   },
   shadowProp: {
