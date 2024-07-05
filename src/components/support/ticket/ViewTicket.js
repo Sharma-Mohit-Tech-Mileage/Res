@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef} from "react";
 import {
   Image,
   StyleSheet,
@@ -8,7 +8,7 @@ import {
   Pressable,
   TextInput,
   Linking,
-  TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import {
   Padding,
@@ -20,7 +20,7 @@ import {
 
 import FileViewer from "react-native-file-viewer";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation,useFocusEffect  } from "@react-navigation/native";
 import {
   GetApiRequest,
   PostApiRequest,
@@ -36,6 +36,7 @@ import colors from "../../../res/Colors";
 import { Env } from "../../../network/apis/account/Constants";
 import LoadingOverlay from "../../common/customui/CustomLoading";
 import { getUser } from "../../../redux/utils/LocalStorage";
+import { useSelector } from "react-redux";
 
 const ViewTicket = ({ route }) => {
   const navigation = useNavigation();
@@ -46,8 +47,12 @@ const ViewTicket = ({ route }) => {
   const [fileResponse, setFileResponse] = useState([]);
   const [upoadFileKey, setUploadFileKey] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [initials, setInitials] = useState("");
+  const [isCommentLoading,setIsCommentLoading] =useState('')
   const [loadingTxt, setLoadingTxt] = useState("Creating Ticket...");
   const scrollViewRef = useRef(null);
+  const user = useSelector((state) => state.combinedReducers.user.userData);
 
   const getTicketDetails = () => {
     let ticketNo = route?.params?.ticketId;
@@ -69,6 +74,7 @@ const ViewTicket = ({ route }) => {
   };
 
   const getTicketCommnets = async (ticketNo) => {
+    setIsCommentLoading(true)
     const request = `support/api/TicketComments/${ticketNo}`;
     GetApiRequest(
       request,
@@ -76,29 +82,31 @@ const ViewTicket = ({ route }) => {
         console.log("getTicketCommnets", JSON.stringify(res));
         if (res.length > 0) {
           setComments(res);
+          setIsCommentLoading(false)
         }
       },
       (error) => {
-        console.log('GetComments',JSON.stringify(error));
+        console.log("GetComments", JSON.stringify(error));
+        setIsCommentLoading(false)
       }
     );
   };
 
   const downloadCommentAttachment = async (item) => {
-    setLoadingTxt('Please wait...')
-    setLoading(true)
+    setLoadingTxt("Please wait...");
+    setLoading(true);
     const request = Env.API_BASEURL + `support/api/attachments/${item.token}`;
     let user = await getUser();
 
-    let dirs = ReactNativeBlobUtil.fs.dirs
+    let dirs = ReactNativeBlobUtil.fs.dirs;
     //var todayTime = Math.round((new Date()).getTime() / 1000);
     ReactNativeBlobUtil.config({
       // add this option that makes response data to be stored as a file,
       // this is much more performant.
       //fileCache: true,
       //appendExt: item.filename,
-      
-      path: dirs.DocumentDir + '/' +item.filename
+
+      path: dirs.DocumentDir + "/" + item.filename,
     })
       .fetch("GET", request, {
         Authorization: `Bearer ${user.token}`,
@@ -106,18 +114,17 @@ const ViewTicket = ({ route }) => {
       })
       .then((res) => {
         // the temp file path
-        setLoading(false)
+        setLoading(false);
         console.log("The file saved to ", res.path());
-        setTimeout(()=>{
+        setTimeout(() => {
           FileViewer.open(res.path(), { showOpenWithDialog: true })
-          .then(() => {
-            // success
-          })
-          .catch((error) => {
-            // error
-          });
-        },500)
-        
+            .then(() => {
+              // success
+            })
+            .catch((error) => {
+              // error
+            });
+        }, 500);
       });
   };
 
@@ -237,6 +244,31 @@ const ViewTicket = ({ route }) => {
     return color;
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      const firstName = user.userInfo?.firstName || "";
+      const lastName = user.userInfo?.lastName || "";
+
+      let initials = "";
+      if (firstName.length > 0) {
+        initials += firstName.charAt(0).toUpperCase();
+      }
+      if (lastName.length > 0) {
+        initials += lastName.charAt(0).toUpperCase();
+      }
+
+      const fullNameCamelCase = [firstName, lastName]
+        .map(
+          (name) => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+        )
+        .join(" ");
+
+      setFullName(fullNameCamelCase);
+      setInitials(initials);
+      return () => {};
+    }, [user?.userInfo])
+  );
+
   const RenderComments = () => {
     return (
       <>
@@ -244,11 +276,22 @@ const ViewTicket = ({ route }) => {
           <View key={item.id} style={styles.frameWrapperBorder}>
             <View style={styles.frameParent1}>
               <View style={styles.rightActionableParent}>
-                 <View style={[styles.icon]}>
-                   <Image style={{width:24,height:24}}source={require('../../../../assets/user-01.png')}/>
-                  </View> 
+                <View style={[styles.icon]}>
+                  {item.role == "end-user" ? (
+                    <Text
+                      style={styles.name}
+                    >
+                      {initials}
+                    </Text>
+                  ) : (
+                    <Image
+                      style={{ width: 24, height: 24 }}
+                      source={require("../../../../assets/user-01.png")}
+                    />
+                  )}
+                </View>
                 <Text style={[styles.agentResponse, styles.pmTypo]}>
-                  {item.role=='end-user'? item.name:'Agent Response'}
+                  {item.role == "end-user" ? fullName : "Agent Response"}
                 </Text>
                 <Text
                   style={[
@@ -497,7 +540,13 @@ const ViewTicket = ({ route }) => {
                       </View>
                     )}
                   </View>
-                  <RenderComments />
+                  {isCommentLoading?
+                  <ActivityIndicator
+                  size="small"
+                  color="#8D3B90"
+                  style={[styles.activityIndicator]}
+                />:<RenderComments />}
+                  
                 </View>
               </View>
             </View>
@@ -530,6 +579,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     padding: 12,
     fontSize: 16,
+  },name:{
+    fontSize: 14,
+    fontWeight: "600",
+    color: Color.sparklightWhite,
+    fontFamily: FontFamily.openSansSemiBold,
   },
   icon: {
     height: 32,
@@ -636,8 +690,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "400",
     flex: 1,
-    marginLeft:5,
-
+    marginLeft: 5,
   },
   pm: {
     fontFamily: FontFamily.openSansRegular,
@@ -787,6 +840,10 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
+  },activityIndicator: {
+    transform: [{ scale: 2 }],
+    marginVertical: 10,
+    paddingVertical:5
   },
 });
 
