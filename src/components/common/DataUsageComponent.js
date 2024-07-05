@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { ProgressCircle } from "react-native-svg-charts";
 import colors from "../../res/Colors";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
 import { Env } from "../../network/apis/account/Constants";
 import MyPlanDetails from '../common/MyPlanDetails';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
   const [progress, setProgress] = useState(0.0);
   const [totalUsed, setTotalUsed] = useState(0);
   const [isUnlimitedPlan, setIsUnlimitedPlan] = useState(false);
   const [showComment, setShowComment] = useState(false);
-
-  const screenWidth = Dimensions.get('window').width;
+  const [currentDate, setCurrentDate] = useState('');
 
   useEffect(() => {
     if (data) {
@@ -28,6 +28,10 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
     } else {
       getDataUsage();
     }
+
+    const date = new Date();
+    const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    setCurrentDate(formattedDate);
   }, [data]);
 
   return (
@@ -47,12 +51,13 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
             <Text style={styles.dataText}>{totalUsed}</Text>
             <Text style={[styles.dataText, styles.dataTextSmall]}>GB used</Text>
           </View>
+          <Text style={styles.dateText}>{''}</Text>
+          <Text style={styles.dateText}>{''}</Text>
         </View>
       </ProgressCircle>
 
       <TouchableOpacity
         onPress={() => {
-          console.log("Plan Details clicked");
           setShowComment(true);
         }}
         style={[
@@ -62,8 +67,8 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
             top: '50%',
             left: '50%',
             transform: [
-              { translateX: -45 }, // Adjust this based on your element's width
-              { translateY: -30 }, // Adjust this based on your element's height
+              { translateX: -45 }, 
+              { translateY: -45 },
             ],
           },
         ]}
@@ -116,10 +121,10 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     justifyContent: "center",
-    marginTop: 20,
+    marginTop: 16,
   },
   progressCircle: {
-    height: 220,
+    height: 246,
   },
   centeredView: {
     flexDirection: "column",
@@ -140,11 +145,17 @@ const styles = StyleSheet.create({
   },
   dataTextSmall: {
     fontSize: 16,
-   marginTop: 5,
+    marginTop: 5,
     fontWeight: "400",
   },
+  dateText: {
+    color: colors.dark_grey,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+    fontSize: 14,
+    marginTop: 10,
+  },
   dataPlanBorder: {
-    //borderWidth: 1,
     borderColor: colors.sparklight_bright_purple,
     padding: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -155,14 +166,14 @@ const styles = StyleSheet.create({
     color: colors.sparklight_bright_purple,
     fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "600",
   },
   usageInfoContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
-    marginHorizontal: 20,
+    marginTop: 16,
+    marginHorizontal: 16,
   },
   dataUsageIndicator: {
     width: 20,
@@ -198,11 +209,9 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   upgradeButton: {
-    minHeight: 30,
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 4,
-    marginHorizontal: 20,
+    marginHorizontal: wp('6%'),
   },
   upgradeButtonText: {
     fontSize: 16,

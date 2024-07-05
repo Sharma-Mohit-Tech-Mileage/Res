@@ -141,7 +141,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
     return (
       <>
         <View style={styles.testSpeedResultContainer}>
-          <View style={[styles.gifContainer,{marginHorizontal: wp('6%')}]}>
+          <View style={[styles.gifContainer, { marginHorizontal: wp('6%') }]}>
             {loading ? (
               <FastImage resizeMode={FastImage.resizeMode.contain} source={getGifSource()} style={styles.gif} />
             ) : (
@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   },
   gifContainer: {
     alignItems: 'center',
-    marginTop:wp('5%'),
+    marginTop: 16,
     overflow: 'hidden',
     borderWidth: 1, // Border width for the GIF container
     borderColor: colors.grey, // Border color
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     width: wp('75%'),
     height: undefined, // Maintain aspect ratio
     aspectRatio: 3,
-    marginVertical:-5
+    marginVertical: -5
   },
   testSpeedInnerContainer: {
     flexDirection: "row",
@@ -248,8 +248,8 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignContent: "center",
     alignItems: "center",
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 16,
+    marginBottom: 16,
   },
   speedRow: {
     flexDirection: "row",
@@ -295,13 +295,13 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignContent: "center",
     alignItems: "center",
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 16,
+    marginBottom: 16,
   },
   divider: {
     backgroundColor: "#F4F4F5",
     height: 2,
-    marginTop: 20,
+    marginTop: 16,
   },
   timer: {
     flexDirection: "row",

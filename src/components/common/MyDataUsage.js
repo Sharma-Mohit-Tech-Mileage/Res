@@ -34,7 +34,7 @@ const MyDataUsage = ({ plans, tvPlan, phonePlan, navigation }) => {
     <View style={{ ...styles.card, ...styles.shadowProp, flexDirection: "column", marginBottom: hp("10%") }}>
       <View style={{ ...styles.subSec, flexDirection: "row", alignItems: "center" }}>
         <Text style={styles.subTitle}>{'My Data'}</Text>
-        <Text style={styles.date}>{isUnlimitedPlan?'UNLIMITED':data.dataPlanGB+' Mbps'} </Text>
+        <Text style={styles.date}>{isUnlimitedPlan?'UNLIMITED':data.dataPlanGB||0+' Mbps'} </Text>
       </View>
       <View style={styles.subSec} />
       <DataUsageComponent navigation={navigation} data={data} plans={plans} tvPlan={tvPlan} phonePlan={phonePlan}/>
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
     borderRadius: 2,
-    paddingVertical: 15,
+    paddingVertical: 16,
     width: wp("92%"),
   },
   shadowProp: {
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingRight: 5,
-    marginHorizontal: 20
+    marginHorizontal: wp('5%')
   },
 });
 

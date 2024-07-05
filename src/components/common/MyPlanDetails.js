@@ -14,8 +14,6 @@ import LinearGradient from "react-native-linear-gradient";
 const MyPlanDetails = ({ showComment, setShowComment, plans, tvPlan, phonePlan }) => {
   const userInfo = useSelector(state => state.combinedReducers.profile);
 
-  const Separator = () => (<View style={{ backgroundColor: colors.grey, height: 1, marginTop: 5 }} />);
-
   const ServiceDetailsItem = ({ item, index, serviceType }) => {
     let IconComponent = InternetIcon;
     return (

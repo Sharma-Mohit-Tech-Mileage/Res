@@ -41,7 +41,7 @@ const MyServicePlan = ({ plans, navigation }) => {
         <Text style={styles.date}>{plans[0]?.downloadSpeed ?? 0} Mbps</Text>
       </View>
       <View style={styles.subSec} />
-      <View style={[styles.internetStatusSection, { margin: wp('5%'), }]}>
+      <View style={[styles.internetStatusSection, { marginHorizontal: wp('5%'),marginVertical:16 }]}>
         <View style={{ marginTop: 5 }}>
           <InfoIcon />
         </View>
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingRight: 5,
-    marginHorizontal: 20
+    marginHorizontal: wp('5%')
   },
   selectedTab: {
     backgroundColor: colors.backgound_blue,
