@@ -23,6 +23,7 @@ import {
   GetApiRequest,
   GetEuroApiRequest,
   GetModemStatusApiRequest,
+  PostruckRollApi
 } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
 import colors from "../../res/Colors";
@@ -125,6 +126,8 @@ const ManageEquipment = ({ route }) => {
             }
 
             checkModemDetails(mac);
+            //getTruckRollPostApiRequets(macAddress,res.userInfo.accountNumber)
+            getTruckRollPostApiRequets("DC:36:0C:EE:74:18",'140774597')
           }
         },
         (error) => {
@@ -257,6 +260,26 @@ const ManageEquipment = ({ route }) => {
       setLoading(false)
       console.log(`getEuroAccountDetails==error`,error)
     })
+  }
+
+  // Call TruckRoll API
+  const getTruckRollPostApiRequets=(macAddress,accountNumber)=>{
+      let request= {
+        "dataframe_split":{
+        "columns":["accountnumber","mac"],
+            "data":[
+                [accountNumber,macAddress]
+            ]
+        }
+        }
+      PostruckRollApi('/model/lgb_model_fs/Staging/invocations',request,(res)=>{
+       if(res){
+        console.log('TruckRollApi Res',JSON.stringify(res))
+       }
+      },(error)=>{
+        console.log('TruckRollApi Error',JSON.stringify(error))
+      })
+        
   }
 
   return (
