@@ -70,7 +70,7 @@ const MyServicePlan = ({ plans, navigation }) => {
             }
           ]}
           onPress={() => setTabIndex(0)}>
-          <Text style={{ color: tabIndex == 0 ? colors.sparklight_purple_blue : "#000", ...styles.usage }} >{" WiFi Speed"}
+          <Text style={{ color: tabIndex == 0 ? colors.sparklight_purple_blue : "#4C5458", ...styles.usage }} >{" WiFi Speed"}
           </Text>
         </TouchableOpacity>
         {hasEeroDevice && (
@@ -78,7 +78,7 @@ const MyServicePlan = ({ plans, navigation }) => {
             style={[tabIndex == 1 ? styles.selectedTab : styles.defaultTab, { borderWidth: 1 }]}
             onPress={() => setTabIndex(1)}
           >
-            <Text style={{ color: tabIndex == 1 ? colors.sparklight_purple_blue : "#000", ...styles.usage }}>
+            <Text style={{ color: tabIndex == 1 ? colors.sparklight_purple_blue : "#4C5458", ...styles.usage }}>
               {" Modem Speed"}
             </Text>
           </TouchableOpacity>

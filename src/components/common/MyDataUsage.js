@@ -14,7 +14,6 @@ const MyDataUsage = ({ plans, tvPlan, phonePlan, navigation }) => {
     getUser().then((res) => {
       const reqauest = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
       GetApiRequest(reqauest, (res) => {
-        console.log("Data plan used_______________________________________________________",JSON.stringify(res))
         if (res) { setData(res); }
       }, (error) => { console.log(error) });
     });
@@ -29,12 +28,12 @@ const MyDataUsage = ({ plans, tvPlan, phonePlan, navigation }) => {
       setIsUnlimitedPlan(planData === 15000);
     } 
   }, [data]);
-
+console.log('Print plan details===================================================================',plans)
   return (
     <View style={{ ...styles.card, ...styles.shadowProp, flexDirection: "column", marginBottom: hp("10%") }}>
       <View style={{ ...styles.subSec, flexDirection: "row", alignItems: "center" }}>
         <Text style={styles.subTitle}>{'My Data'}</Text>
-        <Text style={styles.date}>{isUnlimitedPlan?'UNLIMITED':data.dataPlanGB||0+' Mbps'} </Text>
+        <Text style={styles.date}>{plans[0]?.unlimited?'UNLIMITED':plans[0]?.dataPlanGB||0+' Mbps'} </Text>
       </View>
       <View style={styles.subSec} />
       <DataUsageComponent navigation={navigation} data={data} plans={plans} tvPlan={tvPlan} phonePlan={phonePlan}/>

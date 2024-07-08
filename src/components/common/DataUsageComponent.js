@@ -67,7 +67,7 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
             top: '50%',
             left: '50%',
             transform: [
-              { translateX: -45 }, 
+              { translateX: -55 }, 
               { translateY: -45 },
             ],
           },
@@ -156,6 +156,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   dataPlanBorder: {
+    borderWidth:1,
     borderColor: colors.sparklight_bright_purple,
     padding: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
     color: colors.sparklight_bright_purple,
     fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "600",
   },
   usageInfoContainer: {
@@ -204,14 +205,15 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   separator: {
-    backgroundColor: colors.grey,
-    height: 1,
-    marginVertical: 10,
+    backgroundColor: "#F4F4F5",
+    height: 2,
+    marginTop: 16,
   },
   upgradeButton: {
     flexDirection: "row",
     justifyContent: "space-between",
     marginHorizontal: wp('6%'),
+    paddingTop: 10,
   },
   upgradeButtonText: {
     fontSize: 16,
