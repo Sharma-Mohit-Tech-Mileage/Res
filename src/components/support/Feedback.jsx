@@ -175,6 +175,9 @@ const Feedback = () => {
                     </View>
                     <View style={styles.buttonContainer}>
                         <Pressable
+                        accessibilityLabel={isSubmitting ? 'Submitting...' : 'Submit Feedback'}
+                        accessibilityRole="button"
+                        accessible={true}
                             style={[styles.button]}
                             onPress={handleSubmit(onSubmit, handleValidationError)}
                             disabled={isSubmitting} // Use state for UI updates
@@ -186,7 +189,11 @@ const Feedback = () => {
 
                     </View>
                     <View style={styles.buttonContainer}>
-                        <Pressable onPress={() => navigation.navigate('Account')} >
+                        <Pressable 
+                        accessibilityLabel="Cancel"
+                        accessibilityRole="button"
+                        accessible={true}
+                        onPress={() => navigation.navigate('Account')} >
                             <Text style={[styles.textStyle, { color: Color.colorMidnightblue }]}>Cancel</Text>
                         </Pressable>
                     </View>
