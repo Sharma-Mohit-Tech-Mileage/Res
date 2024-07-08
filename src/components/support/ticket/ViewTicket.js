@@ -9,6 +9,7 @@ import {
   TextInput,
   Linking,
   ActivityIndicator,
+  Alert
 } from "react-native";
 import {
   Padding,
@@ -206,9 +207,17 @@ const ViewTicket = ({ route }) => {
         presentationStyle: "fullScreen",
         type: [types.pdf, types.plainText, types.images],
       });
+
+      let fileSize=response[0].size
+      var sizeInMB = (fileSize / (1024*1024)).toFixed(2);
+      if(sizeInMB<50){
       setFileResponse(response);
       uploadFiles(response[0]);
       console.log("File respose:", JSON.stringify(response));
+      }else{
+        Alert.alert('Warning', 'Maximum 50 MB file size to allowed')
+      }
+      
     } catch (err) {
       console.warn(err);
     }
@@ -276,7 +285,7 @@ const ViewTicket = ({ route }) => {
           <View key={item.id} style={styles.frameWrapperBorder}>
             <View style={styles.frameParent1}>
               <View style={styles.rightActionableParent}>
-                <View style={[styles.icon]}>
+                <View style={[styles.icon,{backgroundColor:item.role == "end-user"?'#353091':Color.sparklightGreen}]}>
                   {item.role == "end-user" ? (
                     <Text
                       style={styles.name}
@@ -331,7 +340,7 @@ const ViewTicket = ({ route }) => {
                       { color: Color.colorMidnightblue },
                     ]}
                   >
-                    Attachment: {item.attachments[0].filename}
+                    Attachment: {item.attachments[0]?.filename?.replaceAll('+'," ")}
                   </Text>
                 )}
               </Pressable>
