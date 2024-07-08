@@ -41,7 +41,11 @@ const SparkLightInput = ({
                     <Text style={[styles.label, error && styles.errorLabel]}>{label}</Text>
                 )}
                 {secure && (
-                    <TouchableOpacity onPress={togglePasswordVisibility} style={styles.eyeButton}>
+                    <TouchableOpacity 
+                    accessibilityLabel={passwordVisible ? 'Hide' : 'Show'}
+                    accessibilityRole="button"
+                    accessible={true}
+                    onPress={togglePasswordVisibility} style={styles.eyeButton}>
                         <Image
                             source={passwordVisible ? eyeSlashIcon : eyeIcon}
                             style={styles.eyeIcon}

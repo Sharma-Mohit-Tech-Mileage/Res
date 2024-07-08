@@ -129,6 +129,9 @@ const RetrieveModemPassword = () => {
         <Text style={styles.howText}>How To</Text>
         <View style={styles.borderStyle} />
         <TouchableOpacity
+        accessibilityLabel="Connect Android Device"
+        accessibilityRole="link"
+        accessible={true}
           onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.cableone.net/hc/en-us/articles/115010513108-Wireless-Setup-Android', name: 'Connect Android Device' })}
           style={styles.connectAndroidView}>
           <View style={styles.connectAndroidTextView}>
@@ -139,6 +142,9 @@ const RetrieveModemPassword = () => {
         </TouchableOpacity>
         <View style={styles.borderStyle} />
         <TouchableOpacity
+        accessibilityLabel="Connect iPhone Device"
+        accessibilityRole="link"
+        accessible={true}
           onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/115010391047-How-Do-I-Connect-Apple-Products-to-a-Wireless-Network', name: 'Connect iPhone Device' })}
           style={styles.connectAndroidView}>
           <View style={styles.connectAndroidTextView}>
@@ -149,6 +155,9 @@ const RetrieveModemPassword = () => {
         </TouchableOpacity>
         <View style={styles.borderStyle} />
         <TouchableOpacity
+        accessibilityLabel="Connect PC/MAC"
+        accessibilityRole="link"
+        accessible={true}
           onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.cableone.net/hc/en-us/articles/115009649447-Wireless-Connection-Settings', name: 'Connect PC/MAC' })}
           style={styles.connectAndroidView}>
           <View style={styles.connectAndroidTextView}>
@@ -162,6 +171,7 @@ const RetrieveModemPassword = () => {
         <Pressable
           accessible={true}
           accessibilityRole="button"
+          accessibilityLabel="Close"
           style={[styles.button, styles.buttonsLayout]}
           onPress={() => { navigation.navigate("ManageEquipmentScreen") }}
         >
