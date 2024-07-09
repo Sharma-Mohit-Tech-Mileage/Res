@@ -23,7 +23,7 @@ import {
   GetApiRequest,
   GetEuroApiRequest,
   GetModemStatusApiRequest,
-  PostruckRollApi
+  PostruckRollApi,
 } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
 import colors from "../../res/Colors";
@@ -46,7 +46,7 @@ import { useSelector } from "react-redux";
 
 const ManageEquipment = ({ route }) => {
   const navigation = useNavigation();
-  const user = useSelector(state => state.combinedReducers.user.userData);
+  const user = useSelector((state) => state.combinedReducers.user.userData);
   const [manufacturer, setManufacturer] = React.useState("");
   const [model, setModel] = React.useState("");
   const [transmissionType, setTransmissionType] = React.useState("");
@@ -57,11 +57,13 @@ const ManageEquipment = ({ route }) => {
   const [isOffline, setIsOffline] = React.useState(false);
   const [isContactUs, setIsContactUs] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [wifiPasswordCanChange, setwifiPasswordCanChange] = React.useState(false);
-  const [wifiData, setwifiData] = React.useState([])
+  const [wifiPasswordCanChange, setwifiPasswordCanChange] =
+    React.useState(false);
+  const [wifiData, setwifiData] = React.useState([]);
+  const [truckrollPrediction, setTruckrollPrediction] = React.useState(0);
 
   const getModemPassword = () => {
-    setLoading(true)
+    setLoading(true);
     let re = getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/modem/security/Get`;
       GetApiRequest(request, onSuccessModemPassword, onErrorModemPassword);
@@ -69,21 +71,20 @@ const ManageEquipment = ({ route }) => {
   };
 
   const onSuccessModemPassword = (res) => {
-    setLoading(false)
+    setLoading(false);
     console.log("getModemDetails", res);
     if (res) {
-      if (res.length == 0) setwifiPasswordCanChange(false)
-      else setwifiPasswordCanChange(true)
-      const list = res.map((value) => value.ssid)
-      setwifiData(res)
+      if (res.length == 0) setwifiPasswordCanChange(false);
+      else setwifiPasswordCanChange(true);
+      const list = res.map((value) => value.ssid);
+      setwifiData(res);
     }
   };
   const onErrorModemPassword = (error) => {
-    setLoading(false)
+    setLoading(false);
     console.log("error", error);
-    setwifiPasswordCanChange(false)
+    setwifiPasswordCanChange(false);
   };
-
 
   const getLeasedDetails = () => {
     let re = getUser().then((res) => {
@@ -126,8 +127,8 @@ const ManageEquipment = ({ route }) => {
             }
 
             checkModemDetails(mac);
-            //getTruckRollPostApiRequets(macAddress,res.userInfo.accountNumber)
-            getTruckRollPostApiRequets("DC:36:0C:EE:74:18",'140774597')
+            getTruckRollPostApiRequets(macAddress,res.userInfo.accountNumber)
+            //getTruckRollPostApiRequets("DC360C6781B0", "126703933");
           }
         },
         (error) => {
@@ -233,54 +234,65 @@ const ManageEquipment = ({ route }) => {
   }, [currentHealth]);
 
   const getWifiPassword = () => {
-    let accountNumber = '902878578'
+    let accountNumber = "902878578";
     const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
-    GetApiRequest(request, (res) => {
-      console.log(res)
-      if (res) {
-        setwifiData(res)
+    GetApiRequest(
+      request,
+      (res) => {
+        console.log(res);
+        if (res) {
+          setwifiData(res);
+        }
+      },
+      (error) => {
+        console.log(error);
       }
-    }, (error) => {
-      console.log(error)
-    })
-  }
+    );
+  };
   const getEuroAccountDetails = () => {
-    setLoading(true)
+    setLoading(true);
     const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${user?.userInfo?.accountNumber}`;
-    GetEuroApiRequest(request, (res) => {
-      setLoading(false)
-      console.log(`getEuroAccountDetails======`,res)
-      if (res?.data !== null) {
-        setwifiPasswordCanChange(false)
+    GetEuroApiRequest(
+      request,
+      (res) => {
+        setLoading(false);
+        console.log(`getEuroAccountDetails======`, res);
+        if (res?.data !== null) {
+          setwifiPasswordCanChange(false);
+        } else {
+          getModemPassword();
+        }
+      },
+      (error) => {
+        setLoading(false);
+        console.log(`getEuroAccountDetails==error`, error);
       }
-      else{
-        getModemPassword()
-      }
-    }, (error) => {
-      setLoading(false)
-      console.log(`getEuroAccountDetails==error`,error)
-    })
-  }
+    );
+  };
 
   // Call TruckRoll API
-  const getTruckRollPostApiRequets=(macAddress,accountNumber)=>{
-      let request= {
-        "dataframe_split":{
-        "columns":["accountnumber","mac"],
-            "data":[
-                [accountNumber,macAddress]
-            ]
+  const getTruckRollPostApiRequets = (macAddress, accountNumber) => {
+    let request = {
+      dataframe_split: {
+        columns: ["accountnumber", "mac"],
+        data: [[accountNumber, macAddress]],
+      },
+    };
+    PostruckRollApi(
+      "model/lgb_model_fs/Staging/invocations",
+      request,
+      (res) => {
+        if (res) {
+          if (res.predictions.length > 0) {
+            setTruckrollPrediction(res.predictions[0]);
+          }
         }
-        }
-      PostruckRollApi('/model/lgb_model_fs/Staging/invocations',request,(res)=>{
-       if(res){
-        console.log('TruckRollApi Res',JSON.stringify(res))
-       }
-      },(error)=>{
-        console.log('TruckRollApi Error',JSON.stringify(error))
-      })
-        
-  }
+      },
+      (error) => {
+        console.log("TruckRollApi Error", JSON.stringify(error));
+      }
+    );
+  };
 
   return (
     <View style={styles.manageEquipment}>
@@ -323,10 +335,10 @@ const ManageEquipment = ({ route }) => {
                             {isOffline
                               ? "Offline"
                               : currentHealth === "Poor"
-                                ? "Issue Detected"
-                                : currentHealth == "Offline"
-                                  ? "Issue Detected"
-                                  : "Optimal Health"}
+                              ? "Issue Detected"
+                              : currentHealth == "Offline"
+                              ? "Issue Detected"
+                              : "Optimal Health"}
                           </Text>
                           <Image
                             style={styles.frameChild}
@@ -334,10 +346,10 @@ const ManageEquipment = ({ route }) => {
                               isOffline
                                 ? colors.sparklight_red
                                 : currentHealth === "Optimal"
-                                  ? colors.sparklight_green
-                                  : currentHealth === "Offline"
-                                    ? colors.sparklight_red
-                                    : colors.sparklight_yellow
+                                ? colors.sparklight_green
+                                : currentHealth === "Offline"
+                                ? colors.sparklight_red
+                                : colors.sparklight_yellow
                             }
                             resizeMode="cover"
                             source={require("../../../assets/Ellipse.png")}
@@ -375,8 +387,8 @@ const ManageEquipment = ({ route }) => {
                         backgroundColor: isOffline
                           ? colors.sparklight_red
                           : currentHealth === "Offline"
-                            ? colors.sparklight_red
-                            : colors.sparklight_yellow,
+                          ? colors.sparklight_red
+                          : colors.sparklight_yellow,
                         width: 4,
                       }}
                     />
@@ -395,10 +407,10 @@ const ManageEquipment = ({ route }) => {
                                 isOffline
                                   ? colors.sparklight_red
                                   : currentHealth === "Optimal"
-                                    ? colors.sparklight_green
-                                    : currentHealth === "Offline"
-                                      ? colors.sparklight_red
-                                      : colors.sparklight_yellow
+                                  ? colors.sparklight_green
+                                  : currentHealth === "Offline"
+                                  ? colors.sparklight_red
+                                  : colors.sparklight_yellow
                               }
                               source={require("../../../assets/infocircle.png")}
                             />
@@ -414,11 +426,16 @@ const ManageEquipment = ({ route }) => {
                                 },
                               ]}
                             >
+                              { truckrollPrediction==1? 'Schedule a Service Appointment' :
+                              <>
+                              
                               {isOffline
                                 ? "Modem is Offline"
                                 : isContactUs
-                                  ? "Please try again later"
-                                  : "An issue has been detected"}
+                                ? "Please try again later"
+                                : "An issue has been detected"}
+                                </>
+                                 }
                             </Text>
                           </View>
                           <Text
@@ -427,9 +444,13 @@ const ManageEquipment = ({ route }) => {
                               styles.yourSavedCardSpaceBlock,
                             ]}
                           >
+                            { truckrollPrediction == 1? 'We\'ve noticed that your modem has been experiencing repeated issues, which may be affecting your internet service quality. We recommend you contact us to schedule a service appointment.' :
+                            <>
                             {isContactUs
                               ? `Sorry, we're having trouble completing the modem system check right now. This seems to be an issue on our end. Please try again later. If the problem persists, please contact our support team for assistance.`
-                              : "Try one of the highlighted options below to resolve"}
+                              : "Try one of the highlighted options below to resolve" }
+                              </>
+                               }
                           </Text>
                         </View>
                       </View>
@@ -454,8 +475,8 @@ const ManageEquipment = ({ route }) => {
                       : currentHealth === "Offline" ||
                         isOffline ||
                         currentHealth === "Poor"
-                        ? "#EF4E3E10"
-                        : "white",
+                      ? "#EF4E3E10"
+                      : "white",
                   },
                 ]}
                 onPress={() => {
@@ -481,8 +502,8 @@ const ManageEquipment = ({ route }) => {
                         ? "white"
                         : currentHealth === "Offline" ||
                           currentHealth === "Poor"
-                          ? "#EF4E3E10"
-                          : "white",
+                        ? "#EF4E3E10"
+                        : "white",
                     },
                   ]}
                   onPress={() => {
@@ -519,8 +540,8 @@ const ManageEquipment = ({ route }) => {
                     backgroundColor: isContactUs
                       ? "white"
                       : currentHealth === "Offline"
-                        ? "#EF4E3E10"
-                        : "white",
+                      ? "#EF4E3E10"
+                      : "white",
                   },
                 ]}
                 onPress={() => {
@@ -584,76 +605,79 @@ const ManageEquipment = ({ route }) => {
           </View>
 
           {/*Wifi Passoword*/}
-          {wifiPasswordCanChange && <View
-            style={[
-              styles.myModem,
-              styles.myModemSpaceBlock,
-              { marginTop: 20 },
-            ]}
-          >
-            <View
-              style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
-            >
-              <Text style={[styles.myModem1, styles.myModem1Typo]}>
-                WiFi Password
-              </Text>
-            </View>
+          {wifiPasswordCanChange && (
             <View
               style={[
-                styles.supportAccordionParent,
-                styles.supportParentFlexBox,
+                styles.myModem,
+                styles.myModemSpaceBlock,
+                { marginTop: 20 },
               ]}
             >
-              <View style={[styles.frameLayout]} />
-
-              <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock]}
-                onPress={() => {
-                  navigation.navigate("UpdateModemPassword");
-                }}
+              <View
+                style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
               >
-                <PasswordKey />
-                <Text style={styles.modemHealthSupport}>Update Password</Text>
-                <Image
-                  style={styles.rightIconStyle}
-                  source={require("../../../assets/chevronright.png")}
-                />
-              </TouchableOpacity>
-
-              <View style={[styles.frameLayout]} />
-              <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock]}
-                onPress={() => {
-                  navigation.navigate("RetrieveModemPassword");
-                }}
-              >
-                <PasswordRetrieve />
-                <Text style={styles.modemHealthSupport}>Retrieve Password</Text>
-                <Image
-                  style={styles.rightIconStyle}
-                  source={require("../../../assets/chevronright.png")}
-                />
-              </TouchableOpacity>
-
-              <View style={[styles.frameLayout]} />
-              <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock]}
-                onPress={() => {
-                  navigation.navigate('ShareWifiScreen', { wifiData: wifiData })
-                }}
-              >
-                <PasswordShare />
-                <Text style={styles.modemHealthSupport}>
-                  Share Password
+                <Text style={[styles.myModem1, styles.myModem1Typo]}>
+                  WiFi Password
                 </Text>
-                <Image
-                  style={styles.rightIconStyle}
-                  source={require("../../../assets/chevronright.png")}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>}
+              </View>
+              <View
+                style={[
+                  styles.supportAccordionParent,
+                  styles.supportParentFlexBox,
+                ]}
+              >
+                <View style={[styles.frameLayout]} />
 
+                <TouchableOpacity
+                  style={[styles.frame9defaultSpaceBlock]}
+                  onPress={() => {
+                    navigation.navigate("UpdateModemPassword");
+                  }}
+                >
+                  <PasswordKey />
+                  <Text style={styles.modemHealthSupport}>Update Password</Text>
+                  <Image
+                    style={styles.rightIconStyle}
+                    source={require("../../../assets/chevronright.png")}
+                  />
+                </TouchableOpacity>
+
+                <View style={[styles.frameLayout]} />
+                <TouchableOpacity
+                  style={[styles.frame9defaultSpaceBlock]}
+                  onPress={() => {
+                    navigation.navigate("RetrieveModemPassword");
+                  }}
+                >
+                  <PasswordRetrieve />
+                  <Text style={styles.modemHealthSupport}>
+                    Retrieve Password
+                  </Text>
+                  <Image
+                    style={styles.rightIconStyle}
+                    source={require("../../../assets/chevronright.png")}
+                  />
+                </TouchableOpacity>
+
+                <View style={[styles.frameLayout]} />
+                <TouchableOpacity
+                  style={[styles.frame9defaultSpaceBlock]}
+                  onPress={() => {
+                    navigation.navigate("ShareWifiScreen", {
+                      wifiData: wifiData,
+                    });
+                  }}
+                >
+                  <PasswordShare />
+                  <Text style={styles.modemHealthSupport}>Share Password</Text>
+                  <Image
+                    style={styles.rightIconStyle}
+                    source={require("../../../assets/chevronright.png")}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
 
           {/* Quick Link section */}
 
@@ -971,8 +995,8 @@ const styles = StyleSheet.create({
   rightIconStyle: {
     width: 20,
     height: 20,
-    resizeMode: "contain"
-  }
+    resizeMode: "contain",
+  },
 });
 
 export default ManageEquipment;

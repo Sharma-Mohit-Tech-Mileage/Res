@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Pressable,
   Platform,
+  RefreshControl
 } from "react-native";
 import {
   Padding,
@@ -31,6 +32,16 @@ const SupportTicket = () => {
   const [mainList, setMainList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTxt, setSearchTxt] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+  
+    setTimeout(() => {
+        //setRefreshing(false);
+        getTicketList();
+    }, 500); 
+};
   const getTicketList = () => {
     setLoading(true);
     let re = getUser().then((res) => {
@@ -44,6 +55,7 @@ const SupportTicket = () => {
             setMainList(res);
           }
           setLoading(false);
+          setRefreshing(false)
         },
         (error) => {
           setLoading(false);
@@ -265,7 +277,12 @@ const SupportTicket = () => {
                 data={ticketList}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={RenderTicketList}
-
+                refreshControl={
+                  <RefreshControl
+                      refreshing={refreshing}
+                      onRefresh={onRefresh}
+                  />
+              }
                 //onEndReached={onEndReached}
                 //onEndReachedThreshold={0.1}
                 //ListFooterComponent={Footer}
