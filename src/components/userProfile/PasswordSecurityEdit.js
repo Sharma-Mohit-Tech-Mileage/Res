@@ -199,11 +199,19 @@ const PasswordSecurityEdit = () => {
             </View>
           </View>
           <View style={styles.frameParent1}>
-            <Pressable style={[styles.buttons, styles.buttonsLayout]}
+            <Pressable 
+             accessibilityLabel={'Save'}
+             accessibilityRole="button"
+             accessible={true}
+            style={[styles.buttons, styles.buttonsLayout]}
               onPress={handleSubmit(handleSave, handleValidationError)}>
               <Text style={[styles.makePayment, styles.makeTypo]}> Save </Text>
             </Pressable>
-            <Pressable style={[styles.buttons1, styles.buttonsLayout]} onPress={() => navigation.navigate("PasswordSecurity")}>
+            <Pressable 
+             accessibilityLabel={`Cancel`}
+             accessibilityRole="button"
+             accessible={true}
+            style={[styles.buttons1, styles.buttonsLayout]} onPress={() => navigation.navigate("PasswordSecurity")}>
               <Text style={[styles.makePayment1, styles.makeTypo]}> Cancel</Text>
             </Pressable>
           </View>

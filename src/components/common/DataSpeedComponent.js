@@ -11,10 +11,10 @@ import moment from "moment";
 import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
 import { FontFamily } from "../../../GlobalStyles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-
-const speedGif = require("../../../assets/Wifi-Speed-Mobile-App.gif");
-const wifiGif = require("../../../assets/Wifi-Speed-Only-Mobile-App.gif");
-const modemSpeedGif = require("../../../assets/Modem-Speed-Mobile-App.gif");
+import { Env } from "../../network/apis/account/Constants";
+const speedGif = require("../../../assets/Wifi-Speed-Animation.gif");
+const wifiGif = require("../../../assets/Wifi-Speed-Only-Animation.gif");
+const modemSpeedGif = require("../../../assets/Modem-Speed-Animation.gif");
 
 const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
   const [showModal, setShowModal] = useState(false);
@@ -141,11 +141,11 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
     return (
       <>
         <View style={styles.testSpeedResultContainer}>
-          <View style={styles.gifContainer}>
+          <View style={[styles.gifContainer, { marginHorizontal: wp('6%') }]}>
             {loading ? (
-              <FastImage source={getGifSource()} style={styles.gif} />
+              <FastImage resizeMode={FastImage.resizeMode.contain} source={getGifSource()} style={styles.gif} />
             ) : (
-              <FastImage source={getGifSource()} style={styles.gif} />
+              <FastImage resizeMode={FastImage.resizeMode.contain} source={getGifSource()} style={styles.gif} />
             )}
           </View>
           <View style={styles.testSpeedInnerContainer}>
@@ -177,7 +177,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
               </View>
             </View>
           </View>
-          <View style={{ margin: 16 }}>
+          <View style={{ marginHorizontal: 16 }}>
             <SecondaryButton buttonText={"Test Speed"} onPress={handleTestSpeed} />
           </View>
           <View style={styles.divider} />
@@ -222,23 +222,23 @@ const styles = StyleSheet.create({
   testSpeedResultContainer: {
     borderColor: colors.grey,
     borderWidth: 1,
-    borderRadius: 0,
+    borderRadius: 0, // Optional: Rounded corners
     marginHorizontal: wp('6%'),
-    paddingBottom: 20, // Added padding to bottom
   },
   gifContainer: {
     alignItems: 'center',
-    margin: wp('6%'), 
+    marginTop: 16,
     overflow: 'hidden',
     borderWidth: 1, // Border width for the GIF container
     borderColor: colors.grey, // Border color
     borderRadius: 10, // Optional: Rounded corners
+
   },
   gif: {
-    width: wp('70%'),
+    width: wp('75%'),
     height: undefined, // Maintain aspect ratio
-    aspectRatio: 2.5, // Set aspect ratio for the gif
-    marginVertical: -5,
+    aspectRatio: 3,
+    marginVertical: -5
   },
   testSpeedInnerContainer: {
     flexDirection: "row",
@@ -248,8 +248,8 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignContent: "center",
     alignItems: "center",
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 16,
+    marginBottom: 16,
   },
   speedRow: {
     flexDirection: "row",
@@ -295,13 +295,13 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignContent: "center",
     alignItems: "center",
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 16,
+    marginBottom: 16,
   },
   divider: {
     backgroundColor: "#F4F4F5",
     height: 2,
-    marginTop: 20,
+    marginTop: 16,
   },
   timer: {
     flexDirection: "row",
@@ -323,20 +323,16 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
   result: {
-    minHeight: 30,
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 4,
-    marginHorizontal: 20,
+    paddingTop: 10,
+    marginHorizontal: wp('6%'),
   },
   planUpgrade: {
     fontSize: 16,
     fontWeight: "600",
     color: colors.sparklight_purple_blue,
     fontFamily: FontFamily.openSansRegular,
-  },
-  rightArrowContainer: {
-    marginTop: 5,
   },
   speedTypeHeader: {
     fontSize: 18,
