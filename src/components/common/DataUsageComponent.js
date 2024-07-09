@@ -86,7 +86,7 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
           <View style={[styles.dataUsageIndicator, styles.remainingIndicator]} />
           <Text style={styles.useLbl}>Remaining</Text>
           <Text style={styles.useDataLbl}>
-            {isUnlimitedPlan ? " Unlimited" : ` ${typeof data?.remainingGB === "number" ? Math.round(data.remainingGB) : 0} GB`}
+            {plans[0]?.unlimited ? " Unlimited" : ` ${typeof data?.remainingGB === "number" ? Math.round(data.remainingGB) : 0} GB`}
           </Text>
         </View>
       </View>

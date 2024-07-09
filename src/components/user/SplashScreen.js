@@ -47,7 +47,7 @@ const SplashScreen = ({ navigation }) => {
     setLoading(false);
     handleLogin(res);
     dispatch(logInfo({
-      host: DeviceInfo.getBrand(),
+      host: DeviceInfo.getBaseOs(),
       application: 'Sparklight Residential Mobile App',
       className: 'AuthenticationService',
       methodName: 'callSSOLoginApi',
@@ -132,12 +132,12 @@ const SplashScreen = ({ navigation }) => {
     setLoading(false);
     setDisconnected(true)
     dispatch(logError({
-      host: DeviceInfo.getBrand(),
+      host: DeviceInfo.getBaseOs(),
       application: 'Sparklight Residential Mobile App',
       className: 'AuthenticationService',
       methodName: 'callSSOLoginApi',
       errorDate: new Date().toISOString().split('T')[0],
-      errorData: error.message,
+      errorData: error,
       errorCode: 30800,
     }));
   };
