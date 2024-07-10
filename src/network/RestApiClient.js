@@ -1,16 +1,11 @@
+import React, { useEffect } from 'react';
 import axios from 'axios';
 import { Env } from "./apis/account/Constants";
-//const BASE_URL_CABLEONE="https://customer.uat.cableone.net/apiWrapper/"
-const BASE_URL=Env.API_BASEURL
+import { getUser, storeUser, cleanUserData } from "../redux/utils/LocalStorage";
+import { RefreshToken } from '../components/user/Session';
+import { useAuthInterceptor } from '../network/useAuthInterceptor';
 
-const _axios_auth = axios.create({
-    baseURL: BASE_URL,
-    timeout: 15000,
-    headers: {
-        'Content-Type': 'application/json',
-        
-    }
-});
+const BASE_URL = Env.API_BASEURL;
 
 const _axios = axios.create({
     baseURL: BASE_URL,
@@ -20,88 +15,85 @@ const _axios = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        
     }
 });
 
-const _axios_cableone = axios.create({
-    baseURL: BASE_URL,
-    withCredentials: false,
-    crossDomain: true,
-    timeout: 10000,
-    headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        
-    }
-});
+let isRefreshing = false;
+let failedQueue = [];
 
-//https://customer.uat.cableone.net/apiWrapper/mobile/api/mobileuser/900690538/updatemobiletcacceptanceflag/900690538/true
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
 
+    failedQueue = [];
+};
 
-// /**
-//  * Setup axios
-//  */
-// export const setupAxios = (store) => {
-//     // get token
-//     //const token = window.localStorage.getItem('token');
-//       const token="";
-//     // if token exists set token
-//     // dispatch login action
-//     if (token && token !== '' && token !== 'null') {
-//         // store.dispatch(userActions.login(token));
-//     }
+const AxiosInterceptorProvider = ({ children }) => {
+    const { redirectToLogin } = useAuthInterceptor();
 
-//     // reqeust intercpetor
-//     axios.interceptors.request.use(
-//         config => {
-//             // config token as default per request
-//             const _token = ""
-//             if (_token) {
-//                 config.headers.Authorization = `Bearer ${_token}`;
-//             }
-//             return config;
-//         },
-//     );
+    useEffect(() => {
+        const interceptor = _axios.interceptors.response.use(
+            response => response,
+            async error => {
+                const originalRequest = error.config;
 
-//     // Add a response interceptor
-//     axios.interceptors.response.use(
-//         (response) => {
-//             // if error: "No permission!"
-//             // logout & go to login page
-//             if (response && response.data && response.data.error === 'No permission!') {
-//                 // store.dispatch(userActions.logout());
-//             }
+                console.log("Interceptor caught an error:", error);
 
-//             return response;
-//         },
-//         (error) => {
-//             const _error = { ...error };
+                if (error.response && error.response.status === 401 && !originalRequest._retry) {
+                    console.log("401 error and not a retry:", originalRequest.url);
 
-//             if (_error.response && _error.response.status === 401) {
-//                 // Unauthorized Request
-//                 // store.dispatch(userActions.logout());
-//             } else if (_error.response && _error.response.status === 403) {
-//                 // Forbiden Request
-//                 // store.dispatch(forbidenRequest());
-//             } else if (_error.response && _error.response.status === 404) {
-//                 // route not found
-//                 // store.dispatch(erroredRequest());
-//                 console.error('error 404');
-//                 //history.push('/error/404');
-//             } else if (!_error.response) {
-//                 // route not found
-//                 // store.dispatch(erroredRequest());
-//                 console.error('error 404');
-//                 //history.push('/error/404');
-//             }
+                    if (isRefreshing) {
+                        console.log("Token is currently being refreshed, adding request to queue.");
+                        return new Promise((resolve, reject) => {
+                            failedQueue.push({ resolve, reject });
+                        }).then(token => {
+                            originalRequest.headers['Authorization'] = 'Bearer ' + token;
+                            return _axios(originalRequest);
+                        }).catch(err => {
+                            return Promise.reject(err);
+                        });
+                    }
 
-//             return Promise.reject(_error);
-//         }
-//     );
-// };
+                    originalRequest._retry = true;
+                    isRefreshing = true;
 
+                    try {
 
+                        const refreshedData = await RefreshToken();
+                        console.log("Token refreshed successfully:", refreshedData);
+                        const user = await getUser();
+                        console.log("Retrieved user for token refresh:", user);
+                        await storeUser(user);
+                        _axios.defaults.headers.common['Authorization'] = 'Bearer ' + user.token;
+                        originalRequest.headers['Authorization'] = 'Bearer ' + user.token;
+                        processQueue(null, user.token);
+                        isRefreshing = false;
+                        return _axios(originalRequest);
+                    } catch (tokenRefreshError) {
+                        console.error("Refresh token error:", tokenRefreshError);
+                        processQueue(tokenRefreshError, null);
+                        isRefreshing = false;
+                        console.log("Redirecting to login due to token refresh error.");
+                        await redirectToLogin();
+                        return Promise.reject(tokenRefreshError);
+                    }
+                }
 
-export  {_axios, _axios_auth, _axios_cableone};
+                return Promise.reject(error);
+            }
+        );
 
+        return () => {
+            _axios.interceptors.response.eject(interceptor);
+        };
+    }, [redirectToLogin]);
+
+    return children;
+};
+
+export { AxiosInterceptorProvider, _axios };
