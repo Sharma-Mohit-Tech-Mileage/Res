@@ -46,7 +46,7 @@ const SplashScreen = ({ navigation }) => {
     setLoading(false);
     handleLogin(res);
     dispatch(logInfo({
-      host: DeviceInfo.getBaseOs(),
+      host: DeviceInfo.getSystemName(),
       application: 'Sparklight Residential Mobile App',
       className: 'AuthenticationService',
       methodName: 'callSSOLoginApi',
@@ -85,7 +85,6 @@ const SplashScreen = ({ navigation }) => {
       } else {
         storeUser(user);
         dispatch(saveUserInfo(user));
-       // SetRenewTokenTimer();
         if (user.userInfo.mobileTCAcceptanceFlag) {
           navigation.reset({
             index: 0,
@@ -131,7 +130,7 @@ const SplashScreen = ({ navigation }) => {
     setLoading(false);
     setDisconnected(true)
     dispatch(logError({
-      host: DeviceInfo.getBaseOs(),
+      host: DeviceInfo.getSystemName(),
       application: 'Sparklight Residential Mobile App',
       className: 'AuthenticationService',
       methodName: 'callSSOLoginApi',
@@ -228,6 +227,7 @@ const SplashScreen = ({ navigation }) => {
       callSSOLoginApi(data);
     } catch (error) {
       console.log(error);
+      setLoginEnable(true);
     }
   };
 
