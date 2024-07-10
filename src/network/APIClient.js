@@ -146,7 +146,7 @@ export const UploadMultipartData = async (endpoint, data, onSuccess, onError) =>
         method: 'POST',
         headers: {
             'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${user.token+1}`
+            'Authorization': `Bearer ${user.token}`
         },
         data: formData
     };
