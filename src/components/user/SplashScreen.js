@@ -47,7 +47,7 @@ const SplashScreen = ({ navigation }) => {
     setLoading(false);
     handleLogin(res);
     dispatch(logInfo({
-      host: DeviceInfo.getBaseOs(),
+      host: DeviceInfo.getSystemName(),
       application: 'Sparklight Residential Mobile App',
       className: 'AuthenticationService',
       methodName: 'callSSOLoginApi',
@@ -132,7 +132,7 @@ const SplashScreen = ({ navigation }) => {
     setLoading(false);
     setDisconnected(true)
     dispatch(logError({
-      host: DeviceInfo.getBaseOs(),
+      host: DeviceInfo.getSystemName(),
       application: 'Sparklight Residential Mobile App',
       className: 'AuthenticationService',
       methodName: 'callSSOLoginApi',
@@ -228,6 +228,7 @@ const SplashScreen = ({ navigation }) => {
       storeSsoToken(data);
       callSSOLoginApi(data);
     } catch (error) {
+      setLoginEnable(true)
       console.log(error);
     }
   };
