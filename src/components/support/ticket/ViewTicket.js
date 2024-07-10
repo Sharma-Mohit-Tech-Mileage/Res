@@ -281,12 +281,12 @@ const ViewTicket = ({ route }) => {
   const RenderComments = () => {
     return (
       <>
-        {comments.map((item) => (
+        {comments.map((item,index) => (
           <View key={item.id} style={styles.frameWrapperBorder}>
             <View style={styles.frameParent1}>
               <View style={styles.rightActionableParent}>
-                <View style={[styles.icon,{backgroundColor:item.role == "end-user"?'#353091':Color.sparklightGreen}]}>
-                  {item.role == "end-user" ? (
+                <View style={[styles.icon,{backgroundColor:(item.name == "C1ServiceProxy" )?'#353091':Color.sparklightGreen}]}>
+                  {item.name == "C1ServiceProxy"  ? (
                     <Text
                       style={styles.name}
                     >
@@ -300,7 +300,7 @@ const ViewTicket = ({ route }) => {
                   )}
                 </View>
                 <Text style={[styles.agentResponse, styles.pmTypo]}>
-                  {item.role == "end-user" ? fullName : "Agent Response"}
+                  {item.name == "C1ServiceProxy" ? fullName : "Agent Response"}
                 </Text>
                 <Text
                   style={[
