@@ -232,7 +232,8 @@ const ManageEquipment = ({ route }) => {
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
     if(currentHealth!='Optimal' || currentHealth!='Offline' || isOffline){
-       getTruckRollPostApiRequets('DC360C6781B0','126703933')
+       //getTruckRollPostApiRequets('DC360C6781B0','126703933')
+       getTruckRollPostApiRequets(macAddress.replaceAll(':',''),user?.userInfo?.accountNumber)
     }
   }, [currentHealth]);
 
