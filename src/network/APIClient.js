@@ -282,7 +282,7 @@ export const GetEuroApiRequest = async (endpoint, onSuccess, onError) => {
 
 // Truck roll API 
 export const PostruckRollApi = (endpoint, body, onSuccess, onError) => {
- console.log(`endpoint=endpoint`, `https://adb-1771418802186593.13.azuredatabricks.net/${endpoint}`);
+ console.log(`endpoint=endpoint`, JSON.stringify(body));
     fetch(`https://adb-1771418802186593.13.azuredatabricks.net/${endpoint}`, {
         method: "POST",
         headers: {

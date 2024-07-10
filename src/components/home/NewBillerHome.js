@@ -191,7 +191,7 @@ const NewBillerHome = ({ navigation }) => {
         let macAddress = res[0].macAddress;
         var mac = macAddress;
         if (user.userInfo.accountNumber === "128387263") {
-          mac = "B8:19:04:8E:F3:EC";
+          mac = "3c:75:4a:ef:a1:00";
         } else if (user.userInfo.accountNumber === "133370775") {
           mac = "3c:75:4a:ef:a1:00";
         } else if (user.userInfo.accountNumber === "133437285") {

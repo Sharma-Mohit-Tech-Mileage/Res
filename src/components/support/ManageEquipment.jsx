@@ -48,6 +48,7 @@ const ManageEquipment = ({ route }) => {
   const navigation = useNavigation();
   const user = useSelector((state) => state.combinedReducers.user.userData);
   const [manufacturer, setManufacturer] = React.useState("");
+  const [macAddress, setMacAddress] = React.useState("");
   const [model, setModel] = React.useState("");
   const [transmissionType, setTransmissionType] = React.useState("");
   const [leased, setLeased] = React.useState("");
@@ -109,13 +110,13 @@ const ManageEquipment = ({ route }) => {
       GetApiRequest(
         request,
         (response) => {
-          console.log("getInternetPlanDetails", response.length);
+          console.log("getInternetPlanDetails", JSON.stringify(response));
           setPlans(response);
           if (response.length > 0) {
             let macAddress = response[0].macAddress;
             var mac = macAddress;
             if (res.userInfo.accountNumber === "128387263") {
-              mac = "B8:19:04:8E:F3:EC";
+              mac = "6c:b0:ce:dc:cd:91";
             } else if (res.userInfo.accountNumber === "133370775") {
               mac = "3c:75:4a:ef:a1:00";
             } else if (res.userInfo.accountNumber === "133437285") {
@@ -127,8 +128,7 @@ const ManageEquipment = ({ route }) => {
             }
 
             checkModemDetails(mac);
-            getTruckRollPostApiRequets(macAddress,res.userInfo.accountNumber)
-            //getTruckRollPostApiRequets("DC360C6781B0", "126703933");
+            setMacAddress(mac)
           }
         },
         (error) => {
@@ -231,11 +231,14 @@ const ManageEquipment = ({ route }) => {
 
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
+    if(currentHealth!='Optimal' || currentHealth!='Offline' || isOffline){
+       getTruckRollPostApiRequets('DC360C6781B0','126703933')
+    }
   }, [currentHealth]);
 
   const getWifiPassword = () => {
-    let accountNumber = "902878578";
-    const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
+    //let accountNumber = "902878578";
+    const request = `/internet/api/internet/${user?.userInfo?.accountNumber}/modem/security/Get`;
     GetApiRequest(
       request,
       (res) => {
@@ -283,6 +286,7 @@ const ManageEquipment = ({ route }) => {
       request,
       (res) => {
         if (res) {
+          console.log('getTruckRollPostApiRequets',JSON.stringify(res))
           if (res.predictions.length > 0) {
             setTruckrollPrediction(res.predictions[0]);
           }
