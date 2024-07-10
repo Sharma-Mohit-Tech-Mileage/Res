@@ -1,10 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView } from 'react-native';
+import React,{useEffect , useRef} from 'react';
+import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView , AccessibilityInfo , findNodeHandle } from 'react-native';
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import WalletIcon from '../../../res/svgIcons/troubleshooting/WalletIcon';
 import { Env } from '../../../network/apis/account/Constants';
+import { useIsFocused } from '@react-navigation/native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
@@ -13,6 +14,18 @@ const TroubleshootComponent = ({
     step, title, description, success, pageCount
 }) => {
     const navigation = useNavigation();
+    const focused = useIsFocused();
+    let alertRef = useRef(null);
+
+    useEffect(() => {
+        const announceText = () => {
+          AccessibilityInfo.announceForAccessibility(`Uh oh. Looks like there is a past-due balance on your account.`);
+          const reactTag = findNodeHandle(alertRef.current);
+          AccessibilityInfo.setAccessibilityFocus(reactTag);
+        };
+        setTimeout(announceText, 100); 
+      }, [focused]);
+
     return (
         <View style={styles.container}>
             {pageCount ? <Text style={styles.topLeftText}>2 of 3</Text> : null}
@@ -20,7 +33,12 @@ const TroubleshootComponent = ({
                 <View style={styles.circle}>
                     <WalletIcon />
                 </View>
-                <View style={styles.spinnerContainer}>
+                <View
+                 ref={alertRef}
+                 accessibilityLiveRegion="assertive"
+                 accessibility={true}
+                 accessibilityLabel='Uh oh. Looks like there is a past-due balance on your account.'
+                style={styles.spinnerContainer}>
                     <NotificationAlert
                         type="warning"
                         title={(<Text style={styles.textStyle}>Uh oh. Looks like there is a past-due balance on your account.</Text>)}

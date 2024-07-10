@@ -57,6 +57,9 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
       </ProgressCircle>
 
       <TouchableOpacity
+       accessible={true}
+       accessibilityLabel={`Plan Details`}
+       accessibilityRole="button"
         onPress={() => {
           setShowComment(true);
         }}
@@ -94,6 +97,9 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
       <View style={styles.separator} />
 
       <TouchableOpacity
+       accessible={true}
+       accessibilityLabel={`Upgrade Plan`}
+       accessibilityRole="button"
         onPress={() => {
           navigation.navigate("ArticalWindowUtility", {
             url: `${Env.URL}/services/internet/internet-usage`,

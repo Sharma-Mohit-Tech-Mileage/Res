@@ -51,6 +51,9 @@ const MyServicePlan = ({ plans, navigation }) => {
           </Text>
           <View style={{ flexDirection: "row", marginLeft: 10, marginTop: 10 }}>
             <TouchableOpacity
+             accessible={true}
+              accessibilityLabel={strings.learn_more}
+              accessibilityRole="link"
               onPress={() => {
                 navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/115010349927-Can-I-Run-an-Internet-Speed-Test-', name: ' More Details' })
               }}
@@ -62,6 +65,9 @@ const MyServicePlan = ({ plans, navigation }) => {
       </View>
       <View style={styles.switchContainer}>
         <TouchableOpacity
+         accessible={true}
+         accessibilityLabel={`WiFi Speed`}
+         accessibilityRole="button"
           style={[
             tabIndex == 0 ? styles.selectedTab : styles.defaultTab,
             {
@@ -75,6 +81,9 @@ const MyServicePlan = ({ plans, navigation }) => {
         </TouchableOpacity>
         {hasEeroDevice && (
           <TouchableOpacity
+          accessible={true}
+          accessibilityLabel={`Modem Speed`}
+          accessibilityRole="button"
             style={[tabIndex == 1 ? styles.selectedTab : styles.defaultTab, { borderWidth: 1 }]}
             onPress={() => setTabIndex(1)}
           >

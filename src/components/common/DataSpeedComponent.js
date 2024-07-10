@@ -177,7 +177,12 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
               </View>
             </View>
           </View>
-          <View style={{ marginHorizontal: 16 }}>
+          <View 
+          style={{ marginHorizontal: 16 }}
+          accessible={true}
+          accessibilityLabel={`Test Speed`}
+          accessibilityRole="button"
+          >
             <SecondaryButton buttonText={"Test Speed"} onPress={handleTestSpeed} />
           </View>
           <View style={styles.divider} />
@@ -201,6 +206,9 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
       <TestSpeedResultSection />
       <View style={styles.divider} />
       <TouchableOpacity
+      accessible={true}
+      accessibilityLabel={`Upgrade Plan`}
+      accessibilityRole="button"
         onPress={() => navigation.navigate('ArticalWindowUtility', { url: `${Env.URL}/services/upgrade`, name: 'Upgrade Plan' })}
         style={styles.result}
       >
