@@ -73,10 +73,17 @@ const AccountOverview = () => {
   const navigation = useNavigation();
   const [fullName, setFullName] = useState('');
   const [initials, setInitials] = useState('');
+  const [isBiller, setIsBiller] = useState(false);
+  const [menues, setMenues] = useState([]);
   const dispatch = useDispatch();
   const user = useSelector(state => state.combinedReducers.user.userData);
   useEffect(() => {
     dispatch(fetchProfileDetails());
+    if(isBiller){
+      setMenues(menuItems1)
+    }else{
+      setMenues(menuItems)
+    }
   }, []);
 
   const menuItems = [
@@ -116,6 +123,32 @@ const AccountOverview = () => {
       includeInMenu: true,
     }
   ];
+
+  const menuItems1 = [
+    {
+      name: 'Profile Settings',
+      onPress: () => navigation.navigate('ProfileSettings'),
+      icon: profileSettingsIcon,
+      accessibilityLabel: 'Navigate to profile settings',
+      includeInMenu: true,
+    },
+    {
+      name: 'Password & Security',
+      onPress: () => navigation.navigate('PasswordSecurity'),
+      icon: passwordSecurityIcon,
+      accessibilityLabel: 'Navigate to password and security settings',
+      includeInMenu: true,
+    },
+    
+    {
+      name: 'App Feedback',
+      onPress: () => navigation.navigate('Feedback'),
+      icon: feedbackicon,
+      accessibilityLabel: 'Navigate to user management settings',
+      includeInMenu: true,
+    }
+  ];
+
 
   useFocusEffect(
     useCallback(() => {
@@ -172,7 +205,7 @@ const AccountOverview = () => {
             <View style={styles.frameGroup}>
               <View style={styles.navigationBorder}>
                 {/* Mapping through menu items */}
-                {menuItems.map((item, index) => (
+                {menues.map((item, index) => (
                   item.includeInMenu && (<React.Fragment key={item.name}>
                     <Pressable
                       style={[styles.rightActionableGroup, styles.tabsFlexBox]}

@@ -16,7 +16,8 @@ import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from 'react-native-version-check';
-import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics';
+
 const config = {
   issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
@@ -29,7 +30,7 @@ const SplashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [bussinessApp, setIsBusiness] = useState(false);
-  const [loginEnable, setLoginEnable] = useState(true);
+  const [loginEnable, setLoginEnable] = useState(false);
   const [disconnected, setDisconnected] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -45,7 +46,7 @@ const SplashScreen = ({ navigation }) => {
     setLoading(false);
     handleLogin(res);
     dispatch(logInfo({
-      host: DeviceInfo.getBrand(),
+      host: DeviceInfo.getBaseOs(),
       application: 'Sparklight Residential Mobile App',
       className: 'AuthenticationService',
       methodName: 'callSSOLoginApi',
@@ -126,17 +127,16 @@ const SplashScreen = ({ navigation }) => {
       }
     });
   };
-
   const onError = (error) => {
     setLoading(false);
     setDisconnected(true)
     dispatch(logError({
-      host: DeviceInfo.getBrand(),
+      host: DeviceInfo.getBaseOs(),
       application: 'Sparklight Residential Mobile App',
       className: 'AuthenticationService',
       methodName: 'callSSOLoginApi',
       errorDate: new Date().toISOString().split('T')[0],
-      errorData: error.message,
+      errorData: error,
       errorCode: 30800,
     }));
   };
@@ -250,8 +250,9 @@ const SplashScreen = ({ navigation }) => {
           setLoading(true);
           storeSsoToken(data);
           callSSOLoginApi(data);
-        }
+        }else{setLoginEnable(true)}
       } catch (error) {
+        setLoginEnable(true)
         console.error("Error fetching data", error);
       }
     };
@@ -295,20 +296,14 @@ const SplashScreen = ({ navigation }) => {
 
       </View>
       {
-        !loading &&
+        !loading && loginEnable &&
         (
           <>
             <TouchableOpacity
               style={[styles.SSoBtnContainer, { marginTop: hp("35%") }]}
               onPress={() => {
-                if (loginEnable) {
-                  setLoginEnable(false)
-                  loginAuth();
-                  setTimeout(() => {
-                    setLoginEnable(true)
-                  }, 1500)
-                }
-              }}
+                loginAuth();
+                }}
             >
               <Text style={styles.SSoBtn}>{'Login'}</Text>
             </TouchableOpacity>

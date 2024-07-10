@@ -27,14 +27,14 @@ export const config={
     API_SHOPPING_CART_BASEURL:'https://secure.uat.cableone.net/ShoppingCartBackBoneAPIWrapperDemo',
     MODEM_BASE_URL:"https://mule-gateway.uat.cableone.net/customer-api",
     ZENDESK_FEEDBACK:{
-      Url:'https://cableone1615402851.zendesk.com/api/v2/requests.json',
-      ticket_form_id: "1500000315922",
-      recipient: "1503384311321",
-      assignee_id: "1503384311321",
+      Url:'https://cableone1718812169.zendesk.com/api/v2/requests.json',
+      ticket_form_id: "24297809981847",
+      recipient: "24290572271767",
+      assignee_id: "24290572271767",
       group_id: "360017953054",
-      category_id: "1500002176201",
-      feedbackValue_id: "18708581262999",
-      email_id: "1500002222302",
+      category_id: "24347657899927",
+      feedbackValue_id: "24297761149335",
+      email_id: "24297758328599",
    },
    ZENDESK_CHAT_KEY: '84AFF64rwYVgQS35EsTakO03d98WTdJb'
  }

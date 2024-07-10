@@ -1,4 +1,4 @@
-import React, { useState ,useCallback} from "react";
+import React, { useState, useCallback } from "react";
 import {
   Image,
   StyleSheet,
@@ -21,29 +21,41 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightDropdown from "../../../components/common/customui/SparkLightDropdown";
 import PrimaryButtom from "../../common/customui/PrimaryButton";
-
+import { useSelector } from 'react-redux';
 import colors from "../../../res/Colors";
 import { useNavigation } from "@react-navigation/native";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import { userTicketSchema } from "../../utility/validationSchema";
 import WarningIcon from "../../../../assets/alert-triangle.png";
-import { GetApiRequest, PostApiRequest } from "../../../network/APIClient";
+import {
+  UploadMultipartData,
+  PostApiRequest,
+} from "../../../network/APIClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
-import DocumentPicker, { types } from 'react-native-document-picker';
+import DocumentPicker, { types } from "react-native-document-picker";
+import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
+import LoadingOverlay from "../../common/customui/CustomLoading";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import SparkLightMobileInputField from "../../common/customui/SparklightMobileInputField";
 
 const CreateTicket = () => {
   const navigation = useNavigation();
   const [selectedItem, setSelectedItem] = useState();
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {};
   const categories = ["Bill", "Support"];
   const [fileResponse, setFileResponse] = useState([]);
-
+  const [upoadFileKey, setUploadFileKey] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingTxt, setLoadingTxt] = useState("Creating Ticket...");
   var Data = {
     subject: "",
     comment: "",
-    email: "",
+    email: profileDetails.multipleEmails ? '' : profileDetails.svEmailAddress,
     accountNumber: "",
     category: "",
-    upload: [],
+    uploads: [],
+    PhoneNumber: ''
   };
 
   const {
@@ -59,32 +71,60 @@ const CreateTicket = () => {
   });
 
   const handleSave = (formData) => {
+    setLoadingTxt("Creating Ticket...")
+    setLoading(true);
+    if (upoadFileKey.length>0) {
+      formData?.uploads.splice(0, 0, upoadFileKey);
+    }
     getUser().then((res) => {
       formData.accountNumber = res.userInfo.accountNumber;
       const request = `support/api/Tickets`;
-      console.log("OnSubmit", JSON.stringify(formData));
       PostApiRequest(
         request,
         formData,
         (res) => {
-          navigation.goBack()
-          reset()
+          navigation.goBack();
+          setTimeout(() => {
+            setLoading(false);
+          }, 500);
         },
         (error) => {}
       );
     });
   };
 
-  
+  const uploadFiles = (data) => {
+    setLoadingTxt("File Uploading...")
+    setLoading(true)
+    const request = `support/api/Attachments`;
+    UploadMultipartData(
+      request,
+      data,
+      (res) => {
+        console.log("Data", res);
+        if (res) {
+          setUploadFileKey(res);
+          setLoading(false)
+        }
+      },
+      (error) => {
+        console.log("File Upload Error", error);
+        setLoading(false)
+      }
+    );
+  };
 
   const handleDocumentSelection = useCallback(async () => {
     try {
       const response = await DocumentPicker.pick({
-        presentationStyle: 'fullScreen',
-        type: [types.pdf, types.plainText,types.images]
+        presentationStyle: "fullScreen",
+        type: [types.pdf, types.plainText, types.images],
       });
-      setFileResponse(response);
-      console.log('File respose:',JSON.stringify(response))
+      if (response.length > 0) {
+        setFileResponse(response);
+        uploadFiles(response[0]);
+      }
+      console.log("File respose:", JSON.stringify(response));
     } catch (err) {
       console.warn(err);
     }
@@ -100,141 +140,209 @@ const CreateTicket = () => {
       <View style={styles.ticketSupportNone}>
         <ProfileSettingsHeader
           title="Create Ticket"
-          onPressBack={() => navigation.navigate("support")}
+          onPressBack={() => navigation.goBack()}
         />
 
         <ScrollView >
-          <View style={styles.innerContainer}>
-            <View style={styles.frameParent}>
-              <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
-                <View style={styles.ticketsParent}>
-                  <Text style={styles.tickets}>Tickets Details</Text>
-                </View>
-                <View style={styles.frameWrapper}>
-                  <Controller
-                    control={control}
-                    name="subject"
-                    render={({
-                      field: { onChange, onBlur, value },
-                      fieldState: { error },
-                    }) => (
-                      <>
-                        <SparkLightInput
-                          onBlur={onBlur}
-                          label={"Subject"}
-                          placeholder={"Subject"}
-                          onChangeText={onChange}
-                          value={value}
-                          error={error?.message}
-                        />
-                      </>
-                    )}
-                  />
-                </View>
-
-                <View style={styles.frameWrapper}>
-                  <View style={styles.textView}>
-                    <Text style={styles.text}>Category</Text>
+          <View style={{ flexDirection: "column", paddingBottom: hp("40%") }}>
+            <View style={[styles.innerContainer]}>
+              <View style={[styles.frameParent]}>
+                <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
+                  <View style={styles.ticketsParent}>
+                    <Text style={styles.tickets}>Tickets Details</Text>
+                  </View>
+                  <View style={styles.frameWrapper}>
+                    <View style={styles.textView}>
+                      <Text style={[styles.text,{paddingBottom:8}]}>Subject</Text>
+                    </View>
                     <Controller
                       control={control}
-                      name="category"
+                      name="subject"
                       render={({
                         field: { onChange, onBlur, value },
                         fieldState: { error },
                       }) => (
                         <>
-                          <SparkLightDropdown
-                            items={categories}
-                            selectedValue={selectedItem}
-                            onValueChange={onChange}
+                          <SparkLightInput
+                            onBlur={onBlur}
+                            placeholder={"Subject"}
+                            onChangeText={onChange}
+                            value={value}
                             error={error?.message}
                           />
-
-                          {error && (
-                            <View style={styles.errorContainer}>
-                              <Image
-                                source={WarningIcon}
-                                style={styles.errorIcon}
-                              />
-                              <Text style={styles.errorText}>
-                                {error?.message}
-                              </Text>
-                            </View>
-                          )}
                         </>
                       )}
                     />
                   </View>
-                </View>
-                <View style={styles.frameWrapper}>
-                <View style={styles.textView}>
-                    <Text style={styles.text}>Comment</Text>
+
+                  <View style={styles.frameWrapper}>
+                    <View style={styles.textView}>
+                      <Text style={styles.text}>Category</Text>
+                      </View>
+                      <Controller
+                        control={control}
+                        name="category"
+                        render={({
+                          field: { onChange, onBlur, value },
+                          fieldState: { error },
+                        }) => (
+                          <>
+                            <SparkLightDropdown
+                              items={categories}
+                              selectedValue={selectedItem}
+                              onValueChange={onChange}
+                              error={error?.message}
+                            />
+
+                            {error && (
+                              <View style={styles.errorContainer}>
+                                <Image
+                                  source={WarningIcon}
+                                  style={styles.errorIcon}
+                                />
+                                <Text style={styles.errorText}>
+                                  {error?.message}
+                                </Text>
+                              </View>
+                            )}
+                          </>
+                        )}
+                      />
+                  </View>
+                  <View style={styles.frameWrapper}>
+                    <View style={styles.textView}>
+                      <Text style={styles.text}>Issue Description</Text>
                     </View>
-                  <View style={[styles.frameBorder,{marginTop:10}]}>
+                    
+                      <Controller
+                        control={control}
+                        name="comment"
+                        render={({
+                          field: { onChange, onBlur, value },
+                          fieldState: { error },
+                        }) => (
+                          <View style={[ { marginTop: 10 }]}>
+                            <TextInput
+                              placeholder="Issue Description"
+                              onChangeText={onChange}
+                              multiline
+                              numberOfLines={5}
+                              style={[styles.textArea,styles.frameBorder]}
+                            />
+
+                            {error && (
+                              <View style={styles.errorContainer}>
+                                <Image
+                                  source={WarningIcon}
+                                  style={styles.errorIcon}
+                                />
+                                <Text style={styles.errorText}>{error.message}</Text>
+                              </View>
+                            )}
+                         </View>
+                        )}
+                      />
+                    
+                  </View>
+
+                  <View style={styles.frameWrapper}>
+                    <View style={styles.textView}>
+                      <Text style={[styles.text,{paddingBottom:8}]}>Email</Text>
+                    </View>
                     <Controller
                       control={control}
-                      name="comment"
+                      name="email"
                       render={({
                         field: { onChange, onBlur, value },
                         fieldState: { error },
                       }) => (
-                        <>
-                          <TextInput
-                            placeholder="Comment"
-                            onChangeText={onChange}
-                            multiline
-                            numberOfLines={5}
-                            style={styles.textArea}
-                          />
-                        </>
+                        <SparkLightInput
+                          placeholder="Email Address"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value ? value.toLowerCase() : ""}
+                          error={error?.message}
+                        />
                       )}
                     />
                   </View>
-                </View>
 
-                <View style={styles.frameWrapper}>
-                  <Controller
-                    control={control}
-                    name="email"
-                    render={({
-                      field: { onChange, onBlur, value },
-                      fieldState: { error },
-                    }) => (
-                      <SparkLightInput
-                        placeholder="Email Address"
-                        label={"Email"}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value ? value.toLowerCase() : ""}
-                        error={error?.message}
-                      />
-                    )}
-                  />
+                  <View style={styles.frameWrapper}>
+                    <View style={styles.textView}>
+                      <Text style={[styles.text,{paddingBottom:8}]}>Phone Number (Optional)</Text>
+                    </View>
+                    <Controller
+                      control={control}
+                      name="PhoneNumber"
+                      render={({
+                        field: { onChange, onBlur, value },
+                        fieldState: { error },
+                      }) => (
+                        <SparkLightMobileInputField
+                          placeholder="Phone Number"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          
+                          error={error?.message}
+                        />
+                      )}
+                    />
+                  </View>
+
+                </View>
+                <View style={styles.fileContainer}>
+                  <Pressable
+                    style={styles.fileInnerContainer}
+                    onPress={handleDocumentSelection}
+                  >
+                    <View
+                      style={{
+                        padding: 10,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <View style={{ flexDirection: "row" }}>
+                        <AttachmentIcon />
+                        <Text style={styles.fileTxt}>
+                          {fileResponse.length > 0
+                            ? `Upload File: ${fileResponse[0].name}`
+                            : "Upload File(Optional)"}
+                        </Text>
+                      </View>
+                      <Text style={styles.fileTxtSub}>
+                        Acceptable formats:.pdf,.png, .jpeg, .gif, .txt
+                      </Text>
+                    </View>
+                  </Pressable>
                 </View>
               </View>
-               <View style={styles.fileContainer}>
-               <Pressable style={styles.fileInnerContainer} onPress={handleDocumentSelection}>
-                <View style={{padding:20,alignItems:'center',justifyContent:'center'}}>
-               <Text style={styles.fileTxt}>{(fileResponse.length>0)? `Upload File: ${fileResponse[0].name}`:'Upload File'}</Text>
-               <Text style={styles.fileTxtSub}>Acceptable formats:.pdf,.png, .jpeg, .gif, .txt</Text>
-               </View>
-               </Pressable>
-               </View>
+              <LoadingOverlay
+                loading={loading}
+                loadingTxt={loadingTxt}
+                onRequestClose={() => {
+                  setLoading(false);
+                }}
+              />
+            </View>
 
-              <View>
-                <PrimaryButtom
-                  title="Submit"
-                  onPress={handleSubmit(handleSave)}
-                  buttonType="submit"
-                />
-              </View>
-              <View>
-                <PrimaryButtom
-                  title="Cancel"
-                  //onPress={() => navigation.navigate("TicketSupport")}
-                  buttonType="cancel"
-                />
-              </View>
+            <View style={{ width: "90%", alignSelf: "center" }}>
+              <PrimaryButtom
+                title="Submit"
+                onPress={handleSubmit(handleSave)}
+                buttonType="submit"
+              />
+            </View>
+            <View>
+              <Pressable
+                style={[styles.buttons2, styles.buttonsLayout]}
+                onPress={() => navigation.goBack()}
+              >
+                <Text style={[styles.makePayment2, styles.makeTypo]}>
+                  Cancel
+                </Text>
+              </Pressable>
             </View>
           </View>
         </ScrollView>
@@ -253,7 +361,38 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: "90%",
     alignSelf: "center",
-    paddingBottom:150
+  },
+  buttons2: {
+    marginTop: 16,
+    backgroundColor: Color.colorWhitesmoke_200,
+  },
+  makePayment2: {
+    color: Color.colorMidnightblue,
+  },
+  buttonsLayout: {
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: Padding.p_base,
+    paddingHorizontal: 0,
+    borderRadius: Border.br_11xs,
+    height: 56,
+  },
+  buttons: {
+    padding: Padding.p_base,
+    marginTop: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: Border.br_11xs,
+    height: 32,
+    display: "none",
+    backgroundColor: Color.colorWhitesmoke_200,
+  },
+  makeTypo: {
+    width: 282,
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
   },
   frameGroupSpaceBlock: {
     paddingTop: Padding.p_8xs,
@@ -353,32 +492,36 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     textAlignVertical: "top",
     padding: Padding.p_xs,
-    height: 180,
-  },fileContainer :{
-    backgroundColor:
-    Color.colorWhitesmoke_200,
-    padding:20,
-    marginBottom:10,
-    flexDirection:'column'
-  }, fileInnerContainer :{
-    borderColor:Color.sparklightaddGray,
-    borderWidth:2,
-     borderRadius:10,
-     
-     borderStyle: 'dashed' ,
-     flexDirection:'column',
-     alignItems:'center', 
-     alignSelf:'center'
-    },fileTxt :
-    {
-      color:'black',
-      fontSize: FontSize.size_sm,
-      fontFamily: FontFamily.openSansRegular,
-    }, fileTxtSub :{color:'black', 
-       fontSize:FontSize.size_xs,
-       marginTop:10,
-       fontFamily: FontFamily.openSansRegular,
-    }
+    height: 150,
+  },
+  fileContainer: {
+    backgroundColor: Color.colorWhitesmoke_200,
+    padding: 20,
+    marginBottom: 10,
+    flexDirection: "column",
+  },
+  fileInnerContainer: {
+    borderColor: Color.sparklightaddGray,
+    borderWidth: 2,
+    borderRadius: 10,
+
+    borderStyle: "dashed",
+    flexDirection: "column",
+    alignItems: "center",
+    alignSelf: "center",
+  },
+  fileTxt: {
+    color: "black",
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    marginLeft: 5,
+  },
+  fileTxtSub: {
+    color: "black",
+    fontSize: FontSize.size_xs,
+    marginTop: 10,
+    fontFamily: FontFamily.openSansRegular,
+  },
 });
 
 export default CreateTicket;

@@ -41,7 +41,11 @@ const SparkLightInput = ({
                     <Text style={[styles.label, error && styles.errorLabel]}>{label}</Text>
                 )}
                 {secure && (
-                    <TouchableOpacity onPress={togglePasswordVisibility} style={styles.eyeButton}>
+                    <TouchableOpacity 
+                    accessibilityLabel={passwordVisible ? 'Hide' : 'Show'}
+                    accessibilityRole="button"
+                    accessible={true}
+                    onPress={togglePasswordVisibility} style={styles.eyeButton}>
                         <Image
                             source={passwordVisible ? eyeSlashIcon : eyeIcon}
                             style={styles.eyeIcon}
@@ -106,12 +110,12 @@ const styles = StyleSheet.create({
         fontSize: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,
         borderRadius: Border.br_11xs,
+        paddingHorizontal: 10,
         flex: 1
     },
     textInputContainer: {
        // height: 48, // Keep the input field height
         color: Color.colorGray_200,
-        paddingHorizontal: 10,
         borderWidth: 1,
         borderRadius: Border.br_11xs,
         flexDirection: "row",

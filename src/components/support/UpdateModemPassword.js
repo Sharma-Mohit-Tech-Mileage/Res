@@ -37,6 +37,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 const UpdateModemPassword = () => {
 
+
+  
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [newPassword, setNewPassword] = useState("");
@@ -74,7 +76,16 @@ const UpdateModemPassword = () => {
     });
   };
 
+  const { control, handleSubmit, setValue, reset, formState: { errors }, getValues } = useForm({
+    // resolver: yupResolver(passwordSchema()),
+    defaultValues: {
+      newPassword: newPassword?.target?.value,
+      confirmPassword: confirmPassword?.target?.value
+    }
+  });
+
   const _onSuccess = (res) => {
+    reset()
     setLoading(false)
     if (res) {
       setShowValidationSuccessAlert(true)
@@ -98,6 +109,7 @@ const UpdateModemPassword = () => {
   };
 
   const _onError = () => {
+    reset();
     setLoading(false)
     setShowValidationAlert(true)
   };
@@ -105,14 +117,6 @@ const UpdateModemPassword = () => {
   const handlePasswordSelection = (value) => {
     setSelectedPassword(value)
   }
-
-  const { control, handleSubmit, setValue, reset, formState: { errors }, getValues } = useForm({
-    // resolver: yupResolver(passwordSchema()),
-    defaultValues: {
-      newPassword: newPassword?.target?.value,
-      confirmPassword: confirmPassword?.target?.value
-    }
-  });
 
   useEffect(() => {
     if (getValues('newPassword')?.length > 0 && getValues('confirmPassword') !== getValues('newPassword')) setShowError(true)
@@ -243,6 +247,7 @@ const UpdateModemPassword = () => {
             accessible={true}
             disabled={loading}
             accessibilityRole="button"
+            accessibilityLabel="Update Modem Password"
             style={[styles.button, styles.buttonsLayout]}
             onPress={handleSubmit(onSubmit)}
           >

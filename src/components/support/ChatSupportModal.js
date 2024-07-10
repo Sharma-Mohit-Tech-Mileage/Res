@@ -3,14 +3,14 @@ import {
   Modal,
   View,
   StyleSheet,
-  Text,
+  Alert,
   SafeAreaView,
   Linking,
   Platform,
   ActivityIndicator
 } from "react-native";
 import WebView from "react-native-webview";
-import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+
 import {
   Padding,
   Color,
@@ -26,6 +26,7 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import colors from "../../res/Colors";
+import SupportChatHeader from "../common/SupportChatHeader";
 
 const ChatSupportModal = ({ department, onClose }) => {
   const [modalVisible, setModalVisible] = useState(true);
@@ -96,7 +97,7 @@ const ChatSupportModal = ({ department, onClose }) => {
       }
     };
   `;
-  console.log('setting',injectedJavaScript)
+  //console.log('setting',injectedJavaScript)
   
 
 
@@ -110,11 +111,25 @@ const ChatSupportModal = ({ department, onClose }) => {
   };
 
   const onMessage = (event) => {
-    console.log("onMessageEvent: ", event.nativeEvent.data)
+    //console.log("onMessageEvent: ", event.nativeEvent.data)
     if( event.nativeEvent.data==='open'){
       closeModal()
     }
   };
+  const exitConfirmation=()=>{
+    console.log('Wait exit')
+    Alert.alert("Please stay on this page to continue the chat", "Are you sure you want to leave?", [
+        {
+          text: "Cancel",
+          onPress: () => null,
+          style: "cancel"
+        },
+        { text: "Yes", onPress: () => {
+            onClose()
+        }}
+      ]);
+}
+
 
   // const INJECTED_JAVASCRIPT = `(function() {
   //   var open = XMLHttpRequest.prototype.open;
@@ -152,7 +167,9 @@ const ChatSupportModal = ({ department, onClose }) => {
       onRequestClose={closeModal}
     >
       <View style={{ flex: 1,backgroundColor:'#fff' }}>
-        <ProfileSettingsHeader onPressBack={closeModal} title="Chat With Us" />
+        <SupportChatHeader onPressBack={()=>{
+          exitConfirmation();
+        }} title="Chat With Us" />
         <View style={{ width: "100%", height: "84%" }}>
           <WebView
            originWhitelist={["*"]}

@@ -173,11 +173,12 @@ export const passwordSchema = (isCustomQuestionSelected) => yup.object({
 export const userTicketSchema = () => yup.object({
     subject: yup.string().required('Subject is required'),
     category: yup.string().required('Category is required'),
-    comment: yup.string().required('Comment is required'),
+    comment: yup.string().required('Issue Description is required'),
     email: yup
     .string()
     .email('Please enter a valid email address.')
-    .required('Email is required.')
+    .required('Email is required.'),
+    PhoneNumber: yup.string().notRequired()
     
     
     

@@ -581,6 +581,9 @@ const UserManagementEdit = ({ route }) => {
           <View style={styles.frameChild1SpaceBlock}>
             <View style={[styles.buttons1, styles.buttonsLayout]}>
               <Pressable
+              accessibilityLabel="Save"
+              accessibilityRole="button"
+              accessible={true}
                 style={[styles.buttons1, styles.buttonsLayout]}
                 onPress={handleSubmit(handleSave, handleValidationError)}
               >
@@ -588,6 +591,9 @@ const UserManagementEdit = ({ route }) => {
               </Pressable>
             </View>
             <Pressable
+            accessibilityLabel="Cancel"
+            accessibilityRole="button"
+            accessible={true}
               style={[styles.buttons2, styles.buttonsLayout]}
               onPress={() => navigation.navigate("UserManagement")}
             >

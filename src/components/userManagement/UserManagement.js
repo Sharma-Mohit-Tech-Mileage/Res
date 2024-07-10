@@ -117,6 +117,9 @@ const UserManagement = ({route}) => {
           <View style={styles.frameParent2}>
           { getUserType(user.memberType)!='VIEW ONLY' && (
             <Pressable
+            accessibilityLabel="Edit"
+            accessibilityRole="button"
+            accessible={true}
               style={styles.rightFlexBox}
               onPress={() =>
                 navigation.navigate("UserManagementEdit", {
@@ -134,6 +137,9 @@ const UserManagement = ({route}) => {
           )}
           { getUserType(user.memberType)!='PRIMARY ADMIN' && (
             <Pressable
+            accessibilityLabel="Delete"
+            accessibilityRole="button"
+            accessible={true}
               style={[styles.rightActionableContainer, styles.rightFlexBox]}
               onPress={() => setCurrentUser(user)}
             >
@@ -209,6 +215,9 @@ const UserManagement = ({route}) => {
               </View>
              { userList.length <5 && (
               <Pressable
+              accessibilityLabel="Add User"
+              accessibilityRole="button"
+              accessible={true}
                 style={[styles.buttons, styles.buttonsBg]}
                 onPress={() =>
                   navigation.navigate("UserManagementEdit", { acno: acNumber })

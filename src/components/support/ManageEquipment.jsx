@@ -21,7 +21,9 @@ import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import {
   GetApiRequest,
+  GetEuroApiRequest,
   GetModemStatusApiRequest,
+  PostruckRollApi
 } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
 import colors from "../../res/Colors";
@@ -40,9 +42,11 @@ import PasswordRetrieve from "../../res/svgIcons/PasswordRetrieve";
 import PasswordShare from "../../res/svgIcons/PasswordShare";
 import { Icon } from "native-base";
 import Loader from "../utility/Loader";
+import { useSelector } from "react-redux";
 
 const ManageEquipment = ({ route }) => {
   const navigation = useNavigation();
+  const user = useSelector(state => state.combinedReducers.user.userData);
   const [manufacturer, setManufacturer] = React.useState("");
   const [model, setModel] = React.useState("");
   const [transmissionType, setTransmissionType] = React.useState("");
@@ -55,9 +59,6 @@ const ManageEquipment = ({ route }) => {
   const [loading, setLoading] = React.useState(false);
   const [wifiPasswordCanChange, setwifiPasswordCanChange] = React.useState(false);
   const [wifiData, setwifiData] = React.useState([])
-  React.useEffect(() => {
-    getModemPassword();
-  }, [])
 
   const getModemPassword = () => {
     setLoading(true)
@@ -121,10 +122,12 @@ const ManageEquipment = ({ route }) => {
             } else if (res.userInfo.accountNumber === "131684698") {
               mac = "28:7a:ee:97:4d:cc";
             } else if (res.userInfo.accountNumber === "136885142") {
-              mac = "00:40:36:59:00:00";
+              mac = "20:73:55:89:c7:00";
             }
 
             checkModemDetails(mac);
+            //getTruckRollPostApiRequets(macAddress,res.userInfo.accountNumber)
+            getTruckRollPostApiRequets("DC:36:0C:EE:74:18",'140774597')
           }
         },
         (error) => {
@@ -172,7 +175,7 @@ const ManageEquipment = ({ route }) => {
           errorCode === 400 ||
           (errorCode === 500) | (errorCode === 504)
         ) {
-          setCurrentHealth("Offline");
+          setCurrentHealth("Poor");
           setIsContactUs(true);
         } else {
           setCurrentHealth("Offline");
@@ -221,14 +224,64 @@ const ManageEquipment = ({ route }) => {
     getModemDetails();
     getLeasedDetails();
     getInternetPlanDetails();
-    
+    getWifiPassword();
+    getEuroAccountDetails();
   }, []);
 
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
   }, [currentHealth]);
 
-  
+  const getWifiPassword = () => {
+    let accountNumber = '902878578'
+    const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
+    GetApiRequest(request, (res) => {
+      console.log(res)
+      if (res) {
+        setwifiData(res)
+      }
+    }, (error) => {
+      console.log(error)
+    })
+  }
+  const getEuroAccountDetails = () => {
+    setLoading(true)
+    const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${user?.userInfo?.accountNumber}`;
+    GetEuroApiRequest(request, (res) => {
+      setLoading(false)
+      console.log(`getEuroAccountDetails======`, res)
+      if (res?.data !== null) {
+        setwifiPasswordCanChange(false)
+      }
+      else {
+        getModemPassword()
+      }
+    }, (error) => {
+      setLoading(false)
+      console.log(`getEuroAccountDetails==error`,error)
+      getModemPassword()
+    })
+  }
+
+  // Call TruckRoll API
+  const getTruckRollPostApiRequets=(macAddress,accountNumber)=>{
+      let request= {
+        "dataframe_split":{
+        "columns":["accountnumber","mac"],
+            "data":[
+                [accountNumber,macAddress]
+            ]
+        }
+        }
+      PostruckRollApi('/model/lgb_model_fs/Staging/invocations',request,(res)=>{
+       if(res){
+        console.log('TruckRollApi Res',JSON.stringify(res))
+       }
+      },(error)=>{
+        console.log('TruckRollApi Error',JSON.stringify(error))
+      })
+        
+  }
 
   return (
     <View style={styles.manageEquipment}>
@@ -394,6 +447,9 @@ const ManageEquipment = ({ route }) => {
             >
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
+                accessibilityLabel="Check connection"
+                accessibilityRole="button"
+                accessible={true}
                 style={[
                   styles.frame9defaultSpaceBlock,
                   {
@@ -422,6 +478,9 @@ const ManageEquipment = ({ route }) => {
               <View style={[styles.frameLayout]} />
               {manufacturer != "Calix" && (
                 <TouchableOpacity
+                accessibilityLabel="Reboot Modem"
+                accessibilityRole="button"
+                accessible={true}
                   style={[
                     styles.frame9defaultSpaceBlock,
                     {
@@ -461,6 +520,9 @@ const ManageEquipment = ({ route }) => {
 
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
+              accessibilityLabel="Exchange Modem"
+              accessibilityRole="button"
+              accessible={true}
                 style={[
                   styles.frame9defaultSpaceBlock,
                   {
@@ -489,6 +551,9 @@ const ManageEquipment = ({ route }) => {
 
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
+              accessibilityLabel="Contact us"
+              accessibilityRole="button"
+              accessible={true}
                 style={[
                   styles.frame9defaultSpaceBlock,
                   {
@@ -517,9 +582,6 @@ const ManageEquipment = ({ route }) => {
                 />
                 <Text
                   style={styles.modemHealthSupport}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="Contact us for more information"
                 >
                   Contact Us
                 </Text>
@@ -555,6 +617,9 @@ const ManageEquipment = ({ route }) => {
               <View style={[styles.frameLayout]} />
 
               <TouchableOpacity
+              accessibilityLabel="Update Password"
+              accessibilityRole="button"
+              accessible={true}
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
                   navigation.navigate("UpdateModemPassword");
@@ -570,6 +635,9 @@ const ManageEquipment = ({ route }) => {
 
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
+              accessibilityLabel="Retrieve Password"
+              accessibilityRole="button"
+              accessible={true}
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
                   navigation.navigate("RetrieveModemPassword");
@@ -585,6 +653,9 @@ const ManageEquipment = ({ route }) => {
 
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
+              accessibilityLabel="Share Password"
+              accessibilityRole="button"
+              accessible={true}
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
                   navigation.navigate('ShareWifiScreen', { wifiData: wifiData })
@@ -628,6 +699,9 @@ const ManageEquipment = ({ route }) => {
               <View style={[styles.frameLayout]} />
 
               <TouchableOpacity
+              accessibilityLabel="Wifi Issues"
+              accessibilityRole="link"
+              accessible={true}
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
                   navigation.navigate("ArticalWindowUtility", {
@@ -646,6 +720,9 @@ const ManageEquipment = ({ route }) => {
 
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
+              accessibilityLabel="Surfacing Issues"
+              accessibilityRole="link"
+              accessible={true}
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
                   navigation.navigate("ArticalWindowUtility", {
@@ -664,6 +741,9 @@ const ManageEquipment = ({ route }) => {
 
               <View style={[styles.frameLayout]} />
               <TouchableOpacity
+              accessibilityLabel="Intermittent Issues"
+              accessibilityRole="button"
+              accessible={true}
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
                   if (!loadingHealth) {
