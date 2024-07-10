@@ -226,6 +226,7 @@ const SplashScreen = ({ navigation }) => {
       storeSsoToken(data);
       callSSOLoginApi(data);
     } catch (error) {
+      setLoginEnable(true)
       console.log(error);
       setLoginEnable(true);
     }

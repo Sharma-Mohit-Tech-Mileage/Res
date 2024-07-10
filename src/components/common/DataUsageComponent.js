@@ -96,13 +96,13 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
       <TouchableOpacity
         onPress={() => {
           navigation.navigate("ArticalWindowUtility", {
-            url: `${Env.URL}/services/upgrade`,
-            name: "Upgrade Plan",
+            url: `${Env.URL}/services/internet/internet-usage`,
+            name: "Historical Data Usage",
           });
         }}
         style={styles.upgradeButton}
       >
-        <Text style={styles.upgradeButtonText}>Upgrade Plan</Text>
+        <Text style={styles.upgradeButtonText}>Historical Data Usage</Text>
         <RightArrow style={styles.rightArrow} />
       </TouchableOpacity>
       <MyPlanDetails
