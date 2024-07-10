@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect , useRef} from "react";
 import {
   View,
   Text,
@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   Dimensions,
   SafeAreaView,
-  ScrollView
+  ScrollView,
+  AccessibilityInfo , findNodeHandle
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -26,11 +27,24 @@ import Surfingissue from "../../../res/svgIcons/surfingissue";
 import IntermittentIssues from "../../../res/svgIcons/IntermittentIssues";
 import Noconnection from "../../../res/svgIcons/Noconnection";
 import Modemicon from "../../../res/svgIcons/Modemicon";
+import { useIsFocused } from '@react-navigation/native';
 const windowHeight = Dimensions.get("window").height;
 const windowWidth = Dimensions.get("window").width;
 
 const ModemHealthy = () => {
   const navigation = useNavigation();
+  const focused = useIsFocused();
+  let alertRef = useRef(null);
+
+  useEffect(() => {
+    const announceText = () => {
+      AccessibilityInfo.announceForAccessibility(`No service issues were detected.`);
+      const reactTag = findNodeHandle(alertRef.current);
+      AccessibilityInfo.setAccessibilityFocus(reactTag);
+    };
+    setTimeout(announceText, 100); 
+  }, [focused]);
+
   return (
     <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
       <ProfileSettingsHeader
@@ -60,7 +74,12 @@ const ModemHealthy = () => {
               <SuccessIcon />
             </View>
 
-            <View style={{ justifyContent: "center", paddingVertical: 8 }}>
+            <View 
+            ref={alertRef}
+            accessibilityLiveRegion="assertive"
+            accessibility={true}
+            accessibilityLabel="No service issues were detected."
+            style={{ justifyContent: "center", paddingVertical: 8 }}>
               <Text style={styles.title}>
                 {"No service issues were detected."}
               </Text>

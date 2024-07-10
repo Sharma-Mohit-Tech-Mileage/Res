@@ -89,6 +89,9 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
             paddingHorizontal: 20,
             marginTop: 15,
           }}
+          accessible={true}
+          accessibilityLabel={`View Details`}
+          accessibilityRole="button"
         >
           <Text
             style={{
@@ -152,6 +155,9 @@ const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
           style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
         />
         <TouchableOpacity
+         accessible={true}
+         accessibilityLabel={`Upgrade Plan`}
+         accessibilityRole="button"
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
               url: `${Env.URL}/services/upgrade`,
