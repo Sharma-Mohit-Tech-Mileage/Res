@@ -33,7 +33,7 @@ console.log('Print plan details=================================================
     <View style={{ ...styles.card, ...styles.shadowProp, flexDirection: "column", marginBottom: hp("10%") }}>
       <View style={{ ...styles.subSec, flexDirection: "row", alignItems: "center" }}>
         <Text style={styles.subTitle}>{'My Data'}</Text>
-        <Text style={styles.date}>{plans[0]?.unlimited?'UNLIMITED':plans[0]?.dataQuotaGB||0+' Mbps'} </Text>
+        <Text style={styles.date}>{plans[0]?.unlimited?'UNLIMITED':(plans[0]?.dataQuotaGB||0)+' GB'} </Text>
       </View>
       <View style={styles.subSec} />
       <DataUsageComponent navigation={navigation} data={data} plans={plans} tvPlan={tvPlan} phonePlan={phonePlan}/>

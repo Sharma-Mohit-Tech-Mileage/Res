@@ -761,7 +761,14 @@ const HomeScreen = ({ navigation }) => {
                   color={Color.colorGainsboro_200}
                 />
               )}
-              <View style={styles.internetStatusSection}>
+              <View 
+              style={styles.internetStatusSection}
+                accessible={true}
+                accessibilityRole="text"
+                accessibilityLabel={currentHealth != "Optimal"
+                ? strings.internetStatusIssue
+                : strings.internetStatus}
+              >
                 <View style={{ marginTop: 5 }}>
                   <InfoIcon />
                 </View>
@@ -787,6 +794,9 @@ const HomeScreen = ({ navigation }) => {
                   marginVertical: 5,
                   marginHorizontal: 25,
                 }}
+                accessible={true}
+                accessibilityRole="button"
+                accessabilityLabel={isInternetDetails ? strings.collapseTxt : strings.expandTxt}
               >
                 <Text style={styles.hideShowDetails}>
                   {isInternetDetails ? strings.collapseTxt : strings.expandTxt}

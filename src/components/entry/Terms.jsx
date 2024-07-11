@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { updateTermsAndConditions, fetchSMSSelection, fetchBillingStatus, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
 import { logout } from 'react-native-app-auth';
-import { SetClearTimer } from '../user/Session';
+//import { SetClearTimer } from '../user/Session';
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { Env } from "../../network/apis/account/Constants";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
@@ -150,7 +150,7 @@ const Terms = ({ navigation }) => {
                 storeSsoToken({});
                 saveUserInfo({});
                 cleanUserData();
-                SetClearTimer();
+                //SetClearTimer();
                 navigation.reset({
                     index: 0,
                     routes: [{ name: 'Splash' }]

@@ -165,6 +165,9 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
         <View style={{flexDirection:'column',position:'absolute',
             bottom:0}}>
         <TouchableOpacity
+         accessible={true}
+         accessibilityLabel={`Upgrade Plan`}
+         accessibilityRole="button"
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
               url: `${Env.URL}/services/upgrade`,

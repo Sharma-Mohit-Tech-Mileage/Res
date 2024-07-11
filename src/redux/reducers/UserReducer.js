@@ -1,4 +1,4 @@
-import { LOGOUT, SAVE_USER_INFO, SSO_LOGIN_REQUEST } from '../constants/index';
+import { LOGOUT, SAVE_USER_INFO } from '../constants/index';
 
 const initialState = {
   isLoading: false,
@@ -8,11 +8,6 @@ const initialState = {
 
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
-    case SSO_LOGIN_REQUEST:
-      return {
-        ...state,
-        isLoading: true
-      }
     case SAVE_USER_INFO:
       return {
         isLoading: false,
