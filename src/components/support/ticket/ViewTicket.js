@@ -285,8 +285,8 @@ const ViewTicket = ({ route }) => {
           <View key={item.id} style={styles.frameWrapperBorder}>
             <View style={styles.frameParent1}>
               <View style={styles.rightActionableParent}>
-                <View style={[styles.icon,{backgroundColor:(item.name == "C1ServiceProxy" )?'#353091':Color.sparklightGreen}]}>
-                  {item.name == "C1ServiceProxy"  ? (
+                <View style={[styles.icon,{backgroundColor:(item.name == "C1ServiceProxy" || index == 0 )?'#353091':Color.sparklightGreen}]}>
+                  {item.name == "C1ServiceProxy" || index==0 ? (
                     <Text
                       style={styles.name}
                     >
@@ -300,7 +300,7 @@ const ViewTicket = ({ route }) => {
                   )}
                 </View>
                 <Text style={[styles.agentResponse, styles.pmTypo]}>
-                  {item.name == "C1ServiceProxy" ? fullName : "Agent Response"}
+                  {item.name == "C1ServiceProxy" || index==0 ? fullName : "Agent Response"}
                 </Text>
                 <Text
                   style={[
