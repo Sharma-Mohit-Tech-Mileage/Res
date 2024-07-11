@@ -12,7 +12,7 @@ import ChatSupportModal from "./ChatSupportModal";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
 import { GetApiRequest } from "../../network/APIClient";
 import CreateTicket from "./ticket/CreateTicket";
-
+//import ZendDesk from '@pagopa/io-react-native-zendesk';
 ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
 const Support = ({ route }) => {
@@ -514,7 +514,8 @@ const Support = ({ route }) => {
                                                 <Pressable
                                                     //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
                                                     onPress={() => {
-                                                        toggleModal("Bill");
+                                                        //toggleModal("Bill");
+                                                        //ZendDesk.initChat('ad791f41-3c05-490b-8bb3-55afe1751f92d')
                                                     }}
                                                     accessibilityLabel="Chat Support"
                                                     accessibilityRole="button"

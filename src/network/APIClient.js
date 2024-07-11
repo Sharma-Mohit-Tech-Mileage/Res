@@ -246,6 +246,7 @@ export const GetApiRequest = async (endpoint, onSuccess, onError) => {
     };
 
     console.log('GetApiRequest:', endpoint);
+    console.log('request Token:', user.token);
     fetchWithTokenRefresh(fetch, `${BASE_URL}/${endpoint}`, options, onSuccess, onError)
         .then(response => {
             if (response.status === 204) {
