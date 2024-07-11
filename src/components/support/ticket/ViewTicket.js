@@ -44,6 +44,7 @@ const ViewTicket = ({ route }) => {
   const [data, setData] = useState({});
   const [myComment, setMyCommnet] = useState("");
   const [isNoComment, setIsNoComment] = useState(false);
+  const [isMaximumFileSize, setIsMaximumFileSize] = useState(false);
   const [comments, setComments] = useState([]);
   const [fileResponse, setFileResponse] = useState([]);
   const [upoadFileKey, setUploadFileKey] = useState([]);
@@ -211,11 +212,13 @@ const ViewTicket = ({ route }) => {
       let fileSize=response[0].size
       var sizeInMB = (fileSize / (1024*1024)).toFixed(2);
       if(sizeInMB<50){
+      setIsMaximumFileSize(false)
       setFileResponse(response);
       uploadFiles(response[0]);
       console.log("File respose:", JSON.stringify(response));
       }else{
-        Alert.alert('Warning', 'Maximum 50 MB file size to allowed')
+        setIsMaximumFileSize(true)
+       // Alert.alert('Warning', 'Maximum 50 MB file size to allowed')
       }
       
     } catch (err) {
@@ -501,6 +504,17 @@ const ViewTicket = ({ route }) => {
                               </Text>
                             </View>
                           </Pressable>
+                          {isMaximumFileSize && (
+                            <View style={[styles.errorContainer,{marginRight:10}]}>
+                              <Image
+                                source={WarningIcon}
+                                style={styles.errorIcon}
+                              />
+                              <Text style={styles.errorText}>
+                                {"File is larger than the maximum supported file size of 50 MB."}
+                              </Text>
+                            </View>
+                          )}
                         </View>
                         {myComment.length != 0 && (
                           <View
