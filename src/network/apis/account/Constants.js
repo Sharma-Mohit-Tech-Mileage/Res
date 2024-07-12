@@ -21,9 +21,9 @@ export const config={
    ZENDESK_CHAT_KEY: '4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC'   
  },
  UAT:{
-    URL:'https://customer.uat.sparklight.com/residential',
+    URL:'https://customer.uat.cableone.net/residential',
     SSO_LOGIN:'https://login.uat.cableone.net/auth/realms/external-sso-realm',
-    API_BASEURL:'https://customer.uat.sparklight.com/apiWrapper/',
+    API_BASEURL:'https://customer.uat.cableone.net/apiWrapper',
     API_SHOPPING_CART_BASEURL:'https://secure.uat.cableone.net/ShoppingCartBackBoneAPIWrapperDemo',
     MODEM_BASE_URL:"https://mule-gateway.uat.cableone.net/customer-api",
     ZENDESK_FEEDBACK:{
@@ -41,6 +41,6 @@ export const config={
 
 }
 
-export const ISUAT = false
+export const ISUAT = true
 
 export const Env=(ISUAT)? config.UAT : config.PRODUCTION
