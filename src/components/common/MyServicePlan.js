@@ -23,7 +23,7 @@ const MyServicePlan = ({ plans, navigation }) => {
       GetApiRequest(request, (response) => {
         const networkId = response.data.networks[0]?.split('/').pop();
         if (networkId) {
-          setHasEeroDevice(false);
+          setHasEeroDevice(true);
         } else {
           setHasEeroDevice(false);
         }
