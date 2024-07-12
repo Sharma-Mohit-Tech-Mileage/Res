@@ -11,20 +11,18 @@ const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
 const TroubleshootComponent = ({
-    step, title, description, success, pageCount
+     pageCount
 }) => {
     const navigation = useNavigation();
-    const focused = useIsFocused();
     let alertRef = useRef(null);
 
     useEffect(() => {
         const announceText = () => {
-          AccessibilityInfo.announceForAccessibility(`Uh oh. Looks like there is a past-due balance on your account.`);
           const reactTag = findNodeHandle(alertRef.current);
           AccessibilityInfo.setAccessibilityFocus(reactTag);
         };
         setTimeout(announceText, 100); 
-      }, [focused]);
+      }, []);
 
     return (
         <View style={styles.container}>
@@ -37,7 +35,6 @@ const TroubleshootComponent = ({
                  ref={alertRef}
                  accessibilityLiveRegion="assertive"
                  accessibility={true}
-                 accessibilityLabel='Uh oh. Looks like there is a past-due balance on your account.'
                 style={styles.spinnerContainer}>
                     <NotificationAlert
                         type="warning"
