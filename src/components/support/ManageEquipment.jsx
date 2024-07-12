@@ -116,7 +116,7 @@ const ManageEquipment = ({ route }) => {
             let macAddress = response[0].macAddress;
             var mac = macAddress;
             if (res.userInfo.accountNumber === "128387263") {
-              mac = "6c:b0:ce:dc:cd:91";
+              mac = "3c:75:4a:ef:a1:00";
             } else if (res.userInfo.accountNumber === "133370775") {
               mac = "3c:75:4a:ef:a1:00";
             } else if (res.userInfo.accountNumber === "133437285") {
@@ -232,8 +232,8 @@ const ManageEquipment = ({ route }) => {
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
     if(currentHealth!='Optimal' || currentHealth!='Offline' || isOffline){
-       //getTruckRollPostApiRequets('DC360C6781B0','126703933')
-       getTruckRollPostApiRequets(macAddress.replaceAll(':',''),user?.userInfo?.accountNumber)
+       getTruckRollPostApiRequets('DC360C6781B0','126703933')
+       //getTruckRollPostApiRequets(macAddress.replaceAll(':',''),user?.userInfo?.accountNumber)
     }
   }, [currentHealth]);
 
@@ -475,11 +475,11 @@ const ManageEquipment = ({ route }) => {
                 style={[
                   styles.frame9defaultSpaceBlock,
                   {
-                    backgroundColor: isContactUs
+                    backgroundColor: (isContactUs || truckrollPrediction ==1)
                       ? "white"
                       : currentHealth === "Offline" ||
                         isOffline ||
-                        currentHealth === "Poor"
+                        currentHealth === "Poor" 
                       ? "#EF4E3E10"
                       : "white",
                   },
@@ -503,7 +503,7 @@ const ManageEquipment = ({ route }) => {
                   style={[
                     styles.frame9defaultSpaceBlock,
                     {
-                      backgroundColor: isContactUs
+                      backgroundColor: (isContactUs || truckrollPrediction ==1)
                         ? "white"
                         : currentHealth === "Offline" ||
                           currentHealth === "Poor"
@@ -542,7 +542,7 @@ const ManageEquipment = ({ route }) => {
                 style={[
                   styles.frame9defaultSpaceBlock,
                   {
-                    backgroundColor: isContactUs
+                    backgroundColor: (isContactUs || truckrollPrediction ==1)
                       ? "white"
                       : currentHealth === "Offline"
                       ? "#EF4E3E10"
@@ -571,7 +571,7 @@ const ManageEquipment = ({ route }) => {
                   styles.frame9defaultSpaceBlock,
                   {
                     backgroundColor:
-                      currentHealth === "Offline" || isContactUs
+                      currentHealth === "Offline" || isContactUs || truckrollPrediction==1
                         ? "#EF4E3E10"
                         : "white",
                   },
