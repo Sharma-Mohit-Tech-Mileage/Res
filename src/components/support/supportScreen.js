@@ -512,11 +512,11 @@ const Support = ({ route }) => {
                                                     </Pressable>
                                                 </View>
                                                 <Pressable
-                                                    //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
-                                                    onPress={() => {
+                                                    onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
+                                                    //</View>onPress={() => {
                                                         //toggleModal("Bill");
                                                         //ZendDesk.initChat('ad791f41-3c05-490b-8bb3-55afe1751f92d')
-                                                    }}
+                                                    //}}
                                                     accessibilityLabel="Chat Support"
                                                     accessibilityRole="button"
                                                     accessibilityHint="Chat with Billing Support">
@@ -551,7 +551,8 @@ const Support = ({ route }) => {
                                                         alignItems: "center",
                                                     }}
                                                     onPress={() => {
-                                                        toggleModal("Bill");
+                                                        //toggleModal("Bill");
+                                                        handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])
                                                     }}
                                                 >
                                                     <ChatIcon />
