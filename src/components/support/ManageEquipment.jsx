@@ -61,7 +61,7 @@ const ManageEquipment = ({ route }) => {
   const [wifiPasswordCanChange, setwifiPasswordCanChange] =
     React.useState(false);
   const [wifiData, setwifiData] = React.useState([]);
-  const [truckrollPrediction, setTruckrollPrediction] = React.useState(0);
+  const [truckrollPrediction, setTruckrollPrediction] = React.useState(-1);
 
   const getModemPassword = () => {
     setLoading(true);
@@ -287,6 +287,7 @@ const ManageEquipment = ({ route }) => {
       request,
       (res) => {
         if (res) {
+          console.log('isLoading',loading)
           console.log('getTruckRollPostApiRequets',JSON.stringify(res))
           if (res.predictions.length > 0) {
             setTruckrollPrediction(res.predictions[0]);
@@ -571,7 +572,7 @@ const ManageEquipment = ({ route }) => {
                   styles.frame9defaultSpaceBlock,
                   {
                     backgroundColor:
-                      currentHealth === "Offline" || isContactUs || truckrollPrediction==1
+                      (currentHealth === "Offline" || isContactUs  || (!loadingHealth && truckrollPrediction==1))
                         ? "#EF4E3E10"
                         : "white",
                   },
