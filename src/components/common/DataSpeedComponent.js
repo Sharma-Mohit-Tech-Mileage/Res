@@ -202,7 +202,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
             <Text style={[styles.loadingText,{fontSize:24}]}>Testing speed...</Text>
             <Text style={[styles.loadingText,{fontSize:16}]}>This process may take a while, so please check back in a minute.</Text>
           </View>
-          <View style={{ marginHorizontal: 16 }} accessible={true} accessibilityLabel={`Test Speed`} accessibilityRole="button">
+          <View  accessible={true} accessibilityLabel={`Test Speed`} accessibilityRole="button">
             <SparkLightButton text={"Cancel"} onPress={handleCancel} />
           </View>
           <View style={styles.divider} />
