@@ -285,6 +285,9 @@ const NotificationSection = ({
       <View style={{ ...styles.parentSpaceBlock, alignSelf: "stretch" }}>
         <Text style={styles.textNotifications}>{title}</Text>
         {!isAdmin && <Pressable
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Edit"
           style={({ pressed }) => [
             styles.buttons,
             styles.buttonsBg,
@@ -318,7 +321,7 @@ const NotificationSection = ({
               source={require("../../../assets/infocircle.png")}
             />
           </View>
-          {!isEmailVerified ?
+          {!isEmailVerified && title == `Email Notifications` ?
             screenReaderEnabled ?
               <Text
                 accessible={true}
@@ -364,9 +367,9 @@ const NotificationSection = ({
               </Text>
             : <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
               {infoText}
-              {number && (
-                <Text style={[styles.text]} accessibilityLabel={`Phone Number: ${number}`}>
-                  {number}
+              {number != null && (
+               <Text style={[styles.text]}>
+                  {String(number)}
                 </Text>
               )}
             </Text>}
