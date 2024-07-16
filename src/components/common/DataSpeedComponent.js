@@ -54,7 +54,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
         GetApiRequest(request, (response) => {
           const networkId = response.data.networks[0].split('/').pop();
           setNetworkId(networkId);
-          fetchModemSpeedDetails(res.userInfo.accountNumber, networkId);
+          handleTestSpeed();
         }, onError);
       }
     });
