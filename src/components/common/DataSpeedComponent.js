@@ -28,13 +28,16 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
   const [loading, setLoading] = useState(false);
   const [networkId, setNetworkId] = useState(null);
 
+  useEffect(() => {
+    getCurrentSpeed();
+  }, [speedType]);
+
   const toggleModal = () => {
     setShowModal(!showModal);
     getCurrentSpeed();
   };
 
   const getCurrentSpeed = () => {
-    setLoading(true);
     setDownload(0);
     setUpload(0);
     setDownloadFrac(0);
@@ -46,6 +49,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
         const request = `/Internet/api/internet/${res.userInfo.accountNumber}/speedTest/Get`;
         GetApiRequest(request, onSuccess, onError);
       } else {
+        setLoading(true);
         const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${res.userInfo.accountNumber}`;
         GetApiRequest(request, (response) => {
           const networkId = response.data.networks[0].split('/').pop();
@@ -110,7 +114,6 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
   };
 
   const handleTestSpeed = () => {
-    setLoading(true);
     setDownload(0);
     setUpload(0);
     setDownloadFrac(0);
@@ -119,6 +122,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
     if (speedType === 'wifi') {
       toggleModal();
     } else {
+      setLoading(true);
       getUser().then((res) => {
         const postRequest = `/mobile/api/eero/InsertSpeedTestResults?accountnumber=${res.userInfo.accountNumber}&networkId=${networkId}`;
         PostApiRequest(postRequest, {}, () => {
@@ -132,10 +136,6 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    getCurrentSpeed();
-  }, [speedType]);
-
   const getGifSource = () => {
     if (speedType === 'wifi') {
       return hasEeroDevice ? speedGif : wifiGif;
@@ -147,9 +147,20 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
     return (
       <>
         <View style={styles.testSpeedResultContainer}>
+          
           <View style={[styles.gifContainer, { marginHorizontal: wp('6%') }]}>
             <FastImage resizeMode={FastImage.resizeMode.contain} source={getGifSource()} style={styles.gif} />
           </View>
+          {speedType !== 'wifi' && (
+            <View style={styles.refreshContainer}>
+              <Text style={styles.refreshText}>
+                <Text onPress={getCurrentSpeed} style={styles.refreshButton}>
+                  <Text style={styles.refreshButtonText}>Tap here</Text>
+                </Text>
+                {' to refresh for latest information'}
+              </Text>
+            </View>
+          )}
           <View style={styles.testSpeedInnerContainer}>
             <View style={styles.testSpeedColumn}>
               <View style={styles.speedRow} accessible={true} accessibilityLabel={`${download}.${downloadFrac}`}>
@@ -164,7 +175,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
                 <Text style={[styles.downloadText, styles.downloadsupport]}> Mbps</Text>
               </View>
             </View>
-
+  
             <View style={styles.uploadParent}>
               <View style={styles.speedRow} accessible={true} accessibilityLabel={`${upload}.${uploadFrac}`}>
                 <FastImage source={require("../../../assets/upload.png")} style={styles.icon} />
@@ -199,10 +210,10 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
         <View style={styles.loadingContainer}>
           <View style={styles.loadingSpinnerContainer}>
             <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
-            <Text style={[styles.loadingText,{fontSize:24}]}>Testing speed...</Text>
-            <Text style={[styles.loadingText,{fontSize:16}]}>This process may take a while, so please check back in a minute.</Text>
+            <Text style={[styles.loadingText, { fontSize: 24 }]}>Testing speed...</Text>
+            <Text style={[styles.loadingText, { fontSize: 16 }]}>This process may take a while, so please check back in a minute.</Text>
           </View>
-          <View  accessible={true} accessibilityLabel={`Test Speed`} accessibilityRole="button">
+          <View accessible={true} accessibilityLabel={`Test Speed`} accessibilityRole="button">
             <SparkLightButton text={"Cancel"} onPress={handleCancel} />
           </View>
           <View style={styles.divider} />
@@ -242,7 +253,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginHorizontal: wp('6%'),
     paddingHorizontal: 20,
-    paddingTop:16
+    paddingTop: 16
   },
   loadingSpinnerContainer: {
     justifyContent: 'center',
@@ -379,7 +390,22 @@ const styles = StyleSheet.create({
     color: colors.sparklight_grey,
     marginTop: 10,
   },
+  refreshContainer: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  refreshText: {
+    textAlign: 'center',
+  },
+  refreshButton: {
+    color: colors.sparklight_bright_purple,
+    fontWeight: 'bold',
+  },
+  refreshButtonText: {
+    color: colors.sparklight_bright_purple,
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
+  },
 });
 
 export default DataSpeedComponent;
-
