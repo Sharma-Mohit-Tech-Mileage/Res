@@ -231,6 +231,9 @@ const TextNotifications = ({ navigation }) => {
                     </View>
                     <View style={[{ alignSelf: "stretch" }]} >
                         <Pressable
+                        accessible={true}
+                        accessibilityLabel="Save"
+                         accessibilityRole="button"
                             style={({ pressed }) => [
                                 styles.buttons, styles.buttonsLayout,
                                 { opacity: pressed ? .7 : 1 }
@@ -241,6 +244,9 @@ const TextNotifications = ({ navigation }) => {
                         </Pressable>
                         <View style={{ padding: 8 }}></View>
                         <Pressable
+                        accessible={true}
+                        accessibilityLabel="Cancel"
+                         accessibilityRole="button"
                             style={({ pressed }) => [
                                 styles.buttonsLayout,
                                 { opacity: pressed ? .7 : 1 }
