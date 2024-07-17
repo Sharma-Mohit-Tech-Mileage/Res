@@ -12,24 +12,14 @@ const windowWidth = Dimensions.get('window').width;
 const TroubleshootComponent = ({
     step, success, pageCount,loading,isError,item
 }) => {
-    let textRef = useRef(null);
-
+    const textRef = useRef(null);
     useEffect(() => {
         const announceText = () => {
-          const textToRead = loading 
-            ? item?.title ?? "Loading..." 
-            : isError 
-              ? item?.errorMsg ?? "An error occurred." 
-              : item?.resultMsg ?? "Operation successful.";
-          const description = item?.description ? ` ${item.description}` : '';
-          const combinedText = textToRead + description;
-          AccessibilityInfo.announceForAccessibility(combinedText);
           const reactTag = findNodeHandle(textRef.current);
           AccessibilityInfo.setAccessibilityFocus(reactTag);
         };
-        AccessibilityInfo.announceForAccessibility('');
-        setTimeout(announceText, 100); 
-      }, [loading, isError, item]);
+        setTimeout(announceText, 100)
+      }, [item]);
 
 
     let IconComponent;
@@ -54,12 +44,11 @@ const TroubleshootComponent = ({
                     </View>
                 )}
                 <View 
-                accessibilityLiveRegion="assertive"
+                ref={textRef}
                 accessibility={true}
-                accessibilityLabel={(loading ? item?.title ?? "Loading..." : isError ? item?.errorMsg ?? "An error occurred." : item?.resultMsg ?? "Operation successful.") + (item?.description ? ` ${item.description}` : '')}
+                accessibilityLiveRegion="assertive"
                 style={styles.spinnerContainer}>
                     <Text 
-                    ref={textRef}
                     style={styles.title}>{loading ? item?.title ?? "Loading..." : isError ? item?.errorMsg ?? "An error occurred." : item?.resultMsg ?? "Operation successful."}</Text>
                     {item.description && <Text style={styles.description}>{item.description}</Text>}
                 </View>

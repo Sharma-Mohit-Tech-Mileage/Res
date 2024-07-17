@@ -33,17 +33,16 @@ const windowWidth = Dimensions.get("window").width;
 
 const ModemHealthy = () => {
   const navigation = useNavigation();
-  const focused = useIsFocused();
-  let alertRef = useRef(null);
+  const alertRef = useRef(null);
 
   useEffect(() => {
     const announceText = () => {
-      AccessibilityInfo.announceForAccessibility(`No service issues were detected.`);
-      const reactTag = findNodeHandle(alertRef.current);
+      const reactTag = findNodeHandle(alertRef?.current);
       AccessibilityInfo.setAccessibilityFocus(reactTag);
     };
     setTimeout(announceText, 100); 
-  }, [focused]);
+  }, []);
+
 
   return (
     <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
@@ -78,7 +77,6 @@ const ModemHealthy = () => {
             ref={alertRef}
             accessibilityLiveRegion="assertive"
             accessibility={true}
-            accessibilityLabel="No service issues were detected."
             style={{ justifyContent: "center", paddingVertical: 8 }}>
               <Text style={styles.title}>
                 {"No service issues were detected."}

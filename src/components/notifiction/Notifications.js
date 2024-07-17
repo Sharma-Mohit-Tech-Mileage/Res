@@ -285,6 +285,9 @@ const NotificationSection = ({
       <View style={{ ...styles.parentSpaceBlock, alignSelf: "stretch" }}>
         <Text style={styles.textNotifications}>{title}</Text>
         {!isAdmin && <Pressable
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Edit"
           style={({ pressed }) => [
             styles.buttons,
             styles.buttonsBg,
@@ -318,38 +321,58 @@ const NotificationSection = ({
               source={require("../../../assets/infocircle.png")}
             />
           </View>
-          {screenReaderEnabled && !isEmailVerified ?
-            <Text
-              accessible={true}
-              accessibilityLabel={`${acknowledgement} is awaiting confirmation.Check your inbox for our verification link. Resend Confirmation Email link`}
-              onPress={() => dispatch(resentEmailVerifiction(navigation))}
-              style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}
-            >
-              <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation.
-              {isPrimary && (
-                <Text style>
-                  {' Check your inbox for our verification link.'}
-                  <Text> {"\n"}</Text>
-                  <Text
-                    style={styles.contactUsText}
-                    hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-                    onPress={() => dispatch(resentEmailVerifiction(navigation))}
-                  >
-                    Resend Confirmation Email
+          {!isEmailVerified && title == `Email Notifications` ?
+            screenReaderEnabled ?
+              <Text
+                accessible={true}
+                accessibilityLabel={`${acknowledgement} is awaiting confirmation.Check your inbox for our verification link. Resend Confirmation Email link`}
+                onPress={() => dispatch(resentEmailVerifiction(navigation))}
+                style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}
+              >
+                <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation.
+                {isPrimary && (
+                  <Text style>
+                    {' Check your inbox for our verification link.'}
+                    <Text> {"\n"}</Text>
+                    <Text
+                      style={styles.contactUsText}
+                      hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+                      onPress={() => dispatch(resentEmailVerifiction(navigation))}
+                    >
+                      Resend Confirmation Email
+                    </Text>
                   </Text>
-                </Text>
-              )}
-            </Text>
-            :
-            <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
+                )}
+              </Text>
+              :
+              <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
+                <Text style={styles.contactUsText}>{acknowledgement}</Text> is awaiting confirmation.
+                {isPrimary && (
+                  <>
+                    {' Check your inbox for our verification link.'}
+                    <Text> {"\n"}</Text>
+                    <Text
+                      accessible={true}
+                      accessibilityRole="link"
+                      accessibilityLabel="Resend Confirmation Email"
+                      accessibilityHint="Activates the email verification process again"
+                      style={styles.contactUsText}
+                      hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+                      onPress={() => dispatch(resentEmailVerifiction(navigation))}
+                    >
+                      Resend Confirmation Email
+                    </Text>
+                  </>
+                )}
+              </Text>
+            : <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
               {infoText}
-              {number && (
-                <Text style={[styles.text]} accessibilityLabel={`Phone Number: ${number}`}>
-                  {number}
+              {number != null && (
+               <Text style={[styles.text]}>
+                  {String(number)}
                 </Text>
               )}
-            </Text>
-          }
+            </Text>}
         </View>}
       </View>
       {additionalSettings.map((setting, index) => (

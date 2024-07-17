@@ -193,9 +193,9 @@ const NewBillerHome = ({ navigation }) => {
         if (user.userInfo.accountNumber === "128387263") {
           mac = "3c:75:4a:ef:a1:00";
         } else if (user.userInfo.accountNumber === "133370775") {
-          mac = "3c:75:4a:ef:a1:00";
-        } else if (user.userInfo.accountNumber === "133437285") {
           mac = "60:19:71:27:61:b2";
+        } else if (user.userInfo.accountNumber === "133437285") {
+          mac = "6c:cd:d6:6c:d0:1c";
         } else if (user.userInfo.accountNumber === "131684698") {
           mac = "28:7a:ee:97:4d:cc";
         } else if (user.userInfo.accountNumber === "136885142") {

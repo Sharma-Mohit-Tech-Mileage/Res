@@ -342,7 +342,7 @@ const UserManagementEdit = ({ route }) => {
                             <SparkLightInput
                               onBlur={onBlur}
                               label={"User Name"}
-                              placeholder={"Enter your User Name"}
+                              placeholder={!isnewUser ? `` : "Enter your User Name"}
                               onChangeText={onChange}
                               editable={isnewUser}
                               value={value}

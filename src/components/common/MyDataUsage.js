@@ -28,7 +28,6 @@ const MyDataUsage = ({ plans, tvPlan, phonePlan, navigation }) => {
       setIsUnlimitedPlan(planData === 15000);
     } 
   }, [data]);
-console.log('Print plan details===================================================================',plans)
   return (
     <View style={{ ...styles.card, ...styles.shadowProp, flexDirection: "column", marginBottom: hp("10%") }}>
       <View style={{ ...styles.subSec, flexDirection: "row", alignItems: "center" }}>
