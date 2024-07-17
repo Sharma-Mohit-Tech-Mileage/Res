@@ -21,7 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import {
   GetApiRequest,
-  GetEuroApiRequest,
+  //GetEuroApiRequest,
   GetModemStatusApiRequest,
   PostruckRollApi
 } from "../../network/APIClient";
@@ -247,7 +247,7 @@ const ManageEquipment = ({ route }) => {
   const getEuroAccountDetails = () => {
     setLoading(true)
     const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${user?.userInfo?.accountNumber}`;
-    GetEuroApiRequest(request, (res) => {
+    GetApiRequest(request, (res) => {
       setLoading(false)
       console.log(`getEuroAccountDetails======`, res)
       if (res?.data !== null) {
