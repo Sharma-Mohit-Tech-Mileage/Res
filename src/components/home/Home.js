@@ -323,7 +323,6 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const updateInternetHealth = (dueAmount, dueDate) => {
-    //console.log('pppppast',moment(dueDate).isBefore() )
     if (moment(dueDate).isAfter()) {
       setBillPaid(true);
       setInternetHealths((oldArray) => [...oldArray, "Green"]);
@@ -718,8 +717,6 @@ const HomeScreen = ({ navigation }) => {
           }}
         >
           <Image
-            //  accessible={true}
-            //  accessibilityLabel={`SparkLight`}
             resizeMode="contain"
             style={{ width: 120, height: 30.324, flexShrink: 0 }}
             source={require("../../../assets/SparklightEntryLogo.png")}
