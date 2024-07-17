@@ -234,7 +234,7 @@ const ManageEquipment = ({ route }) => {
 
   const getWifiPassword = () => {
     //let accountNumber = '902878578'
-    const request = `/internet/api/internet/${accountNumber}/modem/security/Get`;
+    const request = `/internet/api/internet/${user?.userInfo?.accountNumber}/modem/security/Get`;
     GetApiRequest(request, (res) => {
       console.log(res)
       if (res) {
