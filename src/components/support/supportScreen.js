@@ -5,15 +5,13 @@ import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalSty
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
-import ZendeskChat from "react-native-zendesk-chat";
 import PubSub from 'pubsub-js'
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
 import { GetApiRequest } from "../../network/APIClient";
 import CreateTicket from "./ticket/CreateTicket";
-//import ZendDesk from '@pagopa/io-react-native-zendesk';
-ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
+
 
 const Support = ({ route }) => {
     const navigation = useNavigation();
@@ -139,38 +137,38 @@ const Support = ({ route }) => {
     }
 
 
-    const handlePressOpenButton = (department, tags) => {
-        const user = {
-            full_name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
-            email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
-            phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
-        };
+    // const handlePressOpenButton = (department, tags) => {
+    //     const user = {
+    //         full_name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
+    //         email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
+    //         phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
+    //     };
 
-        tags.push('pid:_' + userData.userInfo.accountNumber);
+    //     tags.push('pid:_' + userData.userInfo.accountNumber);
 
-        ZendeskChat.startChat({
-            name: user.full_name,
-            email: user.email,
-            phone: user.phone,
-            department: department,
-            tags: tags,
-            behaviorFlags: {
-                showAgentAvailability: true,
-                showChatTranscriptPrompt: false,
-                showPreChatForm: true,
-                showOfflineForm: true,
-            },
-            preChatFormOptions: {
-                name: "optional",
-                email: "optional",
-            },
-            messagingOptions: {
-                botName: 'Sparklight',
-                botAvatarName: 'chatIcon'
-            },
-            localizedDismissButtonTitle: "Dismiss",
-        });
-    };
+    //     ZendeskChat.startChat({
+    //         name: user.full_name,
+    //         email: user.email,
+    //         phone: user.phone,
+    //         department: department,
+    //         tags: tags,
+    //         behaviorFlags: {
+    //             showAgentAvailability: true,
+    //             showChatTranscriptPrompt: false,
+    //             showPreChatForm: true,
+    //             showOfflineForm: true,
+    //         },
+    //         preChatFormOptions: {
+    //             name: "optional",
+    //             email: "optional",
+    //         },
+    //         messagingOptions: {
+    //             botName: 'Sparklight',
+    //             botAvatarName: 'chatIcon'
+    //         },
+    //         localizedDismissButtonTitle: "Dismiss",
+    //     });
+    // };
 
 
     return (
@@ -514,8 +512,8 @@ const Support = ({ route }) => {
                                                 <Pressable
                                                     //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
                                                     onPress={() => {
-                                                        //toggleModal("Bill");
-                                                        //ZendDesk.initChat('ad791f41-3c05-490b-8bb3-55afe1751f92d')
+                                                        toggleModal("Bill");
+                            
                                                     }}
                                                     accessibilityLabel="Chat Support"
                                                     accessibilityRole="button"
@@ -552,6 +550,7 @@ const Support = ({ route }) => {
                                                     }}
                                                     onPress={() => {
                                                         toggleModal("Bill");
+                                                        //handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])
                                                     }}
                                                 >
                                                     <ChatIcon />

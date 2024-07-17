@@ -126,7 +126,7 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
         body: JSON.stringify(body)
     };
 
-    console.log('PostApiRequest:', endpoint);
+    console.log('PostApiRequest:', body);
     fetchWithTokenRefresh(fetch, `${BASE_URL}/${endpoint}`, options, onSuccess, onError)
         .then(response => handleFetchResponse(response, onSuccess, onError));
 };

@@ -55,7 +55,8 @@ const CreateTicket = () => {
     accountNumber: "",
     category: "",
     uploads: [],
-    PhoneNumber: ''
+    PhoneNumber: '',
+    IsMobile:true
   };
 
   const {
@@ -83,6 +84,7 @@ const CreateTicket = () => {
         request,
         formData,
         (res) => {
+          console.log('Ticket:',res)
           navigation.goBack();
           setTimeout(() => {
             setLoading(false);
