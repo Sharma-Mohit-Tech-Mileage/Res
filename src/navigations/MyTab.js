@@ -25,6 +25,7 @@ const MyTabs = ({ route, navigation }) => {
   const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
   const [shadowStyle, setShadowStyle] = useState(styles.shadowTabs);
   const { tabBarVisible } = useTabBarVisibility();
+  const [isBillerUser,setIsBillerUser]= useState(true)
   const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector(state => state.combinedReducers.home);
 
@@ -39,6 +40,9 @@ const MyTabs = ({ route, navigation }) => {
     } else if (home.walkThroughStep === 2) {
       setShadowStyle([styles.shadowTabs, styles.shadowTabsStep3]);
       setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left]);
+    }
+    if(user?.userInfo.accountNumber.toString().length>=16){
+        setIsBillerUser(true)
     }
   }, [home]);
 
@@ -88,6 +92,7 @@ const MyTabs = ({ route, navigation }) => {
         listeners={({ navigation }) => ({
           tabPress: (e) => {
             e.preventDefault();
+            if(!isBillerUser){    
             navigation.reset({
               index: 0,
               routes: [
@@ -108,13 +113,16 @@ const MyTabs = ({ route, navigation }) => {
                 },
               ],
             });
+          }
+
           },
         })}
-
+        
         options={{
           tabBarLabel: 'Shop',
           headerShown: false,
-          tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected /> : <ShopIcon />)
+          tabBarLabelStyle:{color: isBillerUser ? '#c8c8c8':''},
+          tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected isNewBillerUser={isBillerUser}/> : <ShopIcon isNewBillerUser={isBillerUser} />)
         }}
       />
 
@@ -124,6 +132,7 @@ const MyTabs = ({ route, navigation }) => {
         listeners={({ navigation }) => ({
           tabPress: (e) => {
             e.preventDefault();
+            if(!isBillerUser){ 
             navigation.reset({
               index: 0,
               routes: [
@@ -133,15 +142,18 @@ const MyTabs = ({ route, navigation }) => {
                 },
               ],
             });
+           }   
           },
         })}
+        
         options={{
           headerShown: false,
           tabBarLabel: 'Support',
+          tabBarLabelStyle:{color: isBillerUser ? '#c8c8c8':''},
           tabBarIcon: ({ focused }) => {
             return (
               <View style={styles.tabItem}>
-                {focused ? <SupportIconSelected /> : <SupportIcon />}
+                {focused ? <SupportIconSelected /> : <SupportIcon isNewBillerUser={isBillerUser} />}
               </View>
             );
           }

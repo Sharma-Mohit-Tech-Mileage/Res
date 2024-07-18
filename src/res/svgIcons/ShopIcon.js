@@ -9,7 +9,7 @@ const ShopIcon = (props) => (
     {...props}
   >
     <Path
-      stroke="#767676"
+      stroke={props?.isNewBillerUser ? '#c8c8c8' :"#353091"}
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}
