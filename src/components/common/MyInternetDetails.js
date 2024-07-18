@@ -132,10 +132,10 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
               </View>
               <View style={styles.subSec}>
                 <View style={[styles.row, { flexWrap: "wrap" }]}>
-                <Text style={styles.cardTitle}>{isAutoPayStatus ? " On" : " Off"}</Text>
+                <Text style={[styles.cardTitle,{color:!isAutoPayStatus?colors.darkest_grey:null}]}>{isAutoPayStatus ? " On" : " Off"}</Text>
                 </View>
                 <View style={[styles.row, { flexWrap: "wrap" }, styles.rightAlign]}>
-                  <Text style={[styles.date, styles.paddingRight, styles.textContainer, styles.rightAlign]}> Account ending in {cardDigit}</Text>
+                {isAutoPayStatus?<Text style={[styles.date, styles.paddingRight, styles.textContainer, styles.rightAlign]}> Account ending in {cardDigit}</Text>:null}
                 </View>
               </View>
               <View style={{ flex: 1 }} />
@@ -175,7 +175,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
               </View>
               <View style={styles.subSec}>
                 <View style={[styles.row, { flexWrap: "wrap" }]}>
-                  <Text style={styles.cardTitle}>{paperlessStatus ? " On" : " Off"}</Text>
+                  <Text style={[styles.cardTitle,{color:!paperlessStatus?colors.darkest_grey:null}]}>{paperlessStatus ? " On" : " Off"}</Text>
                 </View>
                 <Text style={[styles.date, styles.paddingRight, styles.textContainer, styles.rightAlign]}>{paperLessInfo?.emailAddress}</Text>
               </View>
@@ -212,7 +212,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "flex-start",
-    justifyContent: "space-between",
   },
   cardContainer: {
     flex: 1,
