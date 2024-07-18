@@ -126,7 +126,7 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
         body: JSON.stringify(body)
     };
 
-    console.log('PostApiRequest:', body);
+    console.log('PostApiRequest:', endpoint);
     fetchWithTokenRefresh(fetch, `${BASE_URL}/${endpoint}`, options, onSuccess, onError)
         .then(response => handleFetchResponse(response, onSuccess, onError));
 };
@@ -296,25 +296,25 @@ export const GetModemStatusApiRequest = async (endpoint, onSuccess, onError) => 
         .catch(exception => onError(exception.message));
 };
 
-export const GetEuroApiRequest = async (endpoint, onSuccess, onError) => {
-    const user = await getUser();
+// export const GetEuroApiRequest = async (endpoint, onSuccess, onError) => {
+//     const user = await getUser();
 
-    const options = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
-        }
-    };
+//     const options = {
+//         method: 'GET',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'Authorization': `Bearer ${user.token}`
+//         }
+//     };
 
-    const fetchFunction = (url, opts) => {
-        return fetch(url, opts);
-    };
+//     const fetchFunction = (url, opts) => {
+//         return fetch(url, opts);
+//     };
 
-    fetchWithTokenRefresh(fetchFunction, endpoint, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, onSuccess, onError))
-        .catch(error => onError(error.message));
-};
+//     fetchWithTokenRefresh(fetchFunction, endpoint, options, onSuccess, onError)
+//         .then(response => handleFetchResponse(response, onSuccess, onError))
+//         .catch(error => onError(error.message));
+// };
 
 
 // export const GetEuroApiRequest = async (endpoint, onSuccess, onError) => {
