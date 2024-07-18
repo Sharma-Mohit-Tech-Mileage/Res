@@ -46,11 +46,11 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
 
     getUser().then((res) => {
       if (speedType === 'wifi') {
-        const request = `/Internet/api/internet/${res.userInfo.accountNumber}/speedTest/Get`;
+        const request = `Internet/api/internet/${res.userInfo.accountNumber}/speedTest/Get`;
         GetApiRequest(request, onSuccess, onError);
       } else {
         setSpeedLoading(true)
-        const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${res.userInfo.accountNumber}`;
+        const request = `mobile/api/Eero/GetEeroAccountDetails?accountnumber=${res.userInfo.accountNumber}`;
         GetApiRequest(request, (response) => {
           const networkId = response.data.networks[0].split('/').pop();
           setNetworkId(networkId);
@@ -61,7 +61,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
   };
 
   const fetchModemSpeedDetails = (accountNumber, networkId) => {
-    const speedTestRequest = `/mobile/api/Eero/GetEeroSpeedTestDetails?accountnumber=${accountNumber}&networkId=${networkId}`;
+    const speedTestRequest = `mobile/api/Eero/GetEeroSpeedTestDetails?accountnumber=${accountNumber}&networkId=${networkId}`;
     GetApiRequest(speedTestRequest, onSuccessModem, onError);
   };
 
@@ -125,7 +125,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
     } else {
       setLoading(true);
       getUser().then((res) => {
-        const postRequest = `/mobile/api/eero/InsertSpeedTestResults?accountnumber=${res.userInfo.accountNumber}&networkId=${networkId}`;
+        const postRequest = `mobile/api/eero/InsertSpeedTestResults?accountnumber=${res.userInfo.accountNumber}&networkId=${networkId}`;
         PostApiRequest(postRequest, {}, () => {
           setLoading(false);
           setSpeedLoading(true);

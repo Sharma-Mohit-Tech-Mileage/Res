@@ -109,7 +109,7 @@ export const PostAuthApiRequest = (endpoint, body, onSuccess, onError) => {
         body: JSON.stringify(body)
     };
 
-    fetch(`${BASE_URL}/${endpoint}`, options)
+    fetch(`${BASE_URL}${endpoint}`, options)
         .then(response => handleAuthResponse(response, idTokenGuid, refreshToken, onSuccess, onError))
         .catch(exception => onError(exception));
 };
@@ -127,7 +127,7 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     };
 
     console.log('PostApiRequest:', endpoint);
-    fetchWithTokenRefresh(fetch, `${BASE_URL}/${endpoint}`, options, onSuccess, onError)
+    fetchWithTokenRefresh(fetch, `${BASE_URL}${endpoint}`, options, onSuccess, onError)
         .then(response => handleFetchResponse(response, onSuccess, onError));
 };
 
@@ -155,7 +155,7 @@ export const UploadMultipartData = async (endpoint, data, onSuccess, onError) =>
         return axios.post(url, opts.data, { headers: opts.headers });
     };
 
-    fetchWithTokenRefresh(fetchFunction, `${BASE_URL}/${endpoint}`, options, onSuccess, onError)
+    fetchWithTokenRefresh(fetchFunction, `${BASE_URL}${endpoint}`, options, onSuccess, onError)
         .then(response => {
             onSuccess(response.data);
         })
@@ -247,7 +247,7 @@ export const GetApiRequest = async (endpoint, onSuccess, onError) => {
 
     console.log('GetApiRequest:', endpoint);
     console.log('request Token:', user.token);
-    fetchWithTokenRefresh(fetch, `${BASE_URL}/${endpoint}`, options, onSuccess, onError)
+    fetchWithTokenRefresh(fetch, `${BASE_URL}${endpoint}`, options, onSuccess, onError)
         .then(response => {
             if (response.status === 204) {
                 onError(response.status);
@@ -269,7 +269,7 @@ export const GetApiRequestSearch = async (endpoint, onSuccess, onError) => {
     };
 
     console.log('GetApiRequestSearch:', endpoint);
-    fetchWithTokenRefresh(fetch, `${SUPPORT_URL}/${endpoint}`, options, onSuccess, onError)
+    fetchWithTokenRefresh(fetch, `${SUPPORT_URL}${endpoint}`, options, onSuccess, onError)
         .then(response => handleFetchResponse(response, onSuccess, onError));
 };
 
