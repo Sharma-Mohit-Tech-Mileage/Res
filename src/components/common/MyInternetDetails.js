@@ -5,6 +5,7 @@ import LinearGradient from "react-native-linear-gradient";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import Wallet2icon from "../../res/svgIcons/Wallet2icon";
+import AutoPayIcon from "../../res/svgIcons/AutoPayIcon";
 import Myplanicon from "../../res/svgIcons/Myplanicon";
 import { FontFamily } from "../../../GlobalStyles";
 import { Env } from "../../network/apis/account/Constants";
@@ -92,7 +93,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
                 </View>
                 <Text style={[styles.dollarSign, styles.paddingRight]}>
                   <Image resizeMode="cover" source={paperlessStatus ? check : uncheck} />
-                  {isAutoPayStatus ? " On" : " Off"}
+                  {paperlessStatus ? " On" : " Off"}
                 </Text>
               </View>
               <View style={styles.separator} />
@@ -109,7 +110,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
               accessibilityLabel="View Details"
               accessibilityRole="button"
             >
-              <Text style={styles.viewDetails}>View Details</Text>
+              <Text style={styles.viewDetails}>Make a Payment</Text>
               <RightArrow />
             </TouchableOpacity>
           </View>
@@ -125,15 +126,17 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
                   colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
                   style={styles.gradient}
                 >
-                  <Myplanicon />
+                  <AutoPayIcon />
                 </LinearGradient>
                 <Text style={styles.title}>Auto Pay</Text>
               </View>
               <View style={styles.subSec}>
                 <View style={[styles.row, { flexWrap: "wrap" }]}>
-                <Text style={styles.subTitle}>{isAutoPayStatus ? " On" : " Off"}</Text>
+                <Text style={styles.cardTitle}>{isAutoPayStatus ? " On" : " Off"}</Text>
                 </View>
-                <Text style={[styles.date, styles.paddingRight, styles.flexWrap]}>Account ending in {cardDigit}</Text>
+                <View style={[styles.row, { flexWrap: "wrap" }, styles.rightAlign]}>
+                  <Text style={[styles.date, styles.paddingRight, styles.textContainer, styles.rightAlign]}> Account ending in {cardDigit}</Text>
+                </View>
               </View>
               <View style={{ flex: 1 }} />
               <View style={styles.separator} />
@@ -150,7 +153,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
               accessibilityLabel="View Details"
               accessibilityRole="button"
             >
-              <Text style={styles.viewDetails}>View Details</Text>
+              <Text style={styles.viewDetails}>Manage Auto Pay</Text>
               <RightArrow />
             </TouchableOpacity>
           </View>
@@ -172,9 +175,9 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
               </View>
               <View style={styles.subSec}>
                 <View style={[styles.row, { flexWrap: "wrap" }]}>
-                  <Text style={styles.subTitle}>{paperlessStatus ? " On" : " Off"}</Text>
+                  <Text style={styles.cardTitle}>{paperlessStatus ? " On" : " Off"}</Text>
                 </View>
-                <Text style={[styles.date, styles.paddingRight, styles.flexWrap]}>{paperLessInfo?.emailAddress}</Text>
+                <Text style={[styles.date, styles.paddingRight, styles.textContainer, styles.rightAlign]}>{paperLessInfo?.emailAddress}</Text>
               </View>
               <View style={{ flex: 1 }} />
               <View style={styles.separator} />
@@ -191,7 +194,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
               accessibilityLabel="View Details"
               accessibilityRole="button"
             >
-              <Text style={styles.viewDetails}>View Details</Text>
+              <Text style={styles.viewDetails}>Manage Paperless</Text>
               <RightArrow />
             </TouchableOpacity>
           </View>
@@ -271,17 +274,30 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "400",
   },
+  cardTitle: {
+    color: colors.sparklight_green,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 22,
+    fontWeight: "400",
+  },
   date: {
     fontSize: 14,
     color: colors.dark_grey,
     alignSelf: "center",
     fontFamily: FontFamily.openSansRegular,
+    flexWrap: "wrap",
   },
   paddingRight: {
     paddingRight: 10,
   },
+  textContainer: {
+    maxWidth: wp("45%"), // Adjust the max width as needed
+  },
   flexWrap: {
     flexWrap: "wrap",
+  },
+  rightAlign: {
+    textAlign: 'right',
   },
   separator: {
     backgroundColor: "#F4F4F5",

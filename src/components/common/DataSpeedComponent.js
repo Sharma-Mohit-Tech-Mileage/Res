@@ -27,7 +27,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
   const [testDate, setTestDate] = useState(0);
   const [loading, setLoading] = useState(false);
   const [networkId, setNetworkId] = useState(null);
-
+  const [speedLoading,setSpeedLoading] = useState(false);
   useEffect(() => {
     getCurrentSpeed();
   }, [speedType]);
@@ -49,12 +49,12 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
         const request = `/Internet/api/internet/${res.userInfo.accountNumber}/speedTest/Get`;
         GetApiRequest(request, onSuccess, onError);
       } else {
-        setLoading(true);
+        setSpeedLoading(true)
         const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${res.userInfo.accountNumber}`;
         GetApiRequest(request, (response) => {
           const networkId = response.data.networks[0].split('/').pop();
           setNetworkId(networkId);
-          handleTestSpeed();
+          fetchModemSpeedDetails(res.userInfo.accountNumber, networkId);
         }, onError);
       }
     });
@@ -105,12 +105,13 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
       setUpload(upl[0]);
       setUploadFrac(upl[1]);
     }
-    setLoading(false);
+    setSpeedLoading(false);
   };
 
   const onError = (error) => {
     console.log("error", error);
     setLoading(false);
+    setSpeedLoading(false);
   };
 
   const handleTestSpeed = () => {
@@ -126,6 +127,8 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
       getUser().then((res) => {
         const postRequest = `/mobile/api/eero/InsertSpeedTestResults?accountnumber=${res.userInfo.accountNumber}&networkId=${networkId}`;
         PostApiRequest(postRequest, {}, () => {
+          setLoading(false);
+          setSpeedLoading(true);
           fetchModemSpeedDetails(res.userInfo.accountNumber, networkId);
         }, onError);
       });
@@ -147,20 +150,21 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
     return (
       <>
         <View style={styles.testSpeedResultContainer}>
-          
           <View style={[styles.gifContainer, { marginHorizontal: wp('6%') }]}>
             <FastImage resizeMode={FastImage.resizeMode.contain} source={getGifSource()} style={styles.gif} />
           </View>
           {speedType !== 'wifi' && (
             <View style={styles.refreshContainer}>
-              <Text style={styles.refreshText}>
+              <Text style={styles.refreshText}><Text style={styles.speedRow}>Tap </Text> 
                 <Text onPress={getCurrentSpeed} style={styles.refreshButton}>
-                  <Text style={styles.refreshButtonText}>Tap here</Text>
+                  <Text style={styles.refreshButtonText}>here</Text>
                 </Text>
-                {' to refresh for latest information'}
+                <Text style={styles.speedRow}> to refresh for latest information </Text> 
               </Text>
             </View>
           )}
+          {speedLoading?
+            <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />:null}
           <View style={styles.testSpeedInnerContainer}>
             <View style={styles.testSpeedColumn}>
               <View style={styles.speedRow} accessible={true} accessibilityLabel={`${download}.${downloadFrac}`}>
