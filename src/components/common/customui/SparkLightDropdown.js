@@ -1,17 +1,49 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { StyleSheet , findNodeHandle , AccessibilityInfo } from 'react-native';
 import { Select, Box, CheckIcon } from 'native-base';
 import { Padding, Color,FontFamily,FontSize } from "../../../../GlobalStyles";
+import { useIsFocused } from "@react-navigation/native";
 
 const SparkLightDropdown = ({ items, selectedValue, onValueChange, style , dropDownStyle }) => {
     const validItems = Array.isArray(items) ? items : [];
+    const selectedItemRef = useRef(null);
+    const firstItemRef = useRef(null);
+    const isFocused = useIsFocused();
+
+    const handleDropdownOpen = () => {
+        setTimeout(() => {
+          const itemRef = selectedValue ? selectedItemRef.current : firstItemRef.current;
+          const itemLabel = selectedValue ? selectedValue : validItems[0];
+    
+          if (itemRef) {
+            const reactTag = findNodeHandle(itemRef);
+            if (reactTag) {
+              AccessibilityInfo.setAccessibilityFocus(reactTag);
+              AccessibilityInfo.announceForAccessibility(itemLabel); // Announce the item
+            }
+          }
+        }, 500);
+      };
+      useEffect(() => {
+        handleDropdownOpen();
+      }, [selectedValue , isFocused ,validItems]);
+
+      const getAccessibilityLabel = () => {
+        return selectedValue 
+          ? `${selectedValue}.`
+          : "Select an option.";
+      };
 
     return (
-        <Box style={[styles.container, style]}>
+        <Box 
+        accessible={true}
+            accessibilityRole="menu"
+            accessibilityLabel={getAccessibilityLabel()}
+            accessibilityHint="Double tap to open the menu and select an option"
+        style={[styles.container, style]}>
             <Select
                 selectedValue={selectedValue}
                 minWidth="200"
-                accessibilityLabel="Choose Service"
                 placeholder="Select an option"
                 maxFontSizeMultiplier={1.25}
                 _selectedItem={{
@@ -19,11 +51,14 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style , dropD
                     endIcon: <CheckIcon size="5" />,
                 }}
                 style={[styles.dropdown,dropDownStyle]}
+                onOpen={handleDropdownOpen}
                 onValueChange={itemValue => onValueChange(itemValue)}
         
             >
                 {validItems.map((item, index) => (
-                    <Select.Item key={index} label={item} value={item} />
+                    <Select.Item 
+                    ref={selectedValue === item ? selectedItemRef : index === 0 ? firstItemRef : null}
+                    key={index} label={item} value={item} />
                 ))}
             </Select>
         </Box>
