@@ -215,7 +215,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
           <View style={styles.loadingSpinnerContainer}>
             <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
             <Text style={[styles.loadingText, { fontSize: 24 }]}>Testing speed...</Text>
-            <Text style={[styles.loadingText, { fontSize: 16 }]}>This process may take a while, so please check back in a minute.</Text>
+            <Text style={[styles.loading, { fontSize: 16 }]}>This process may take a while, so please check back in a minute.</Text>
           </View>
           <View accessible={true} accessibilityLabel={`Test Speed`} accessibilityRole="button">
             <SparkLightButton text={"Cancel"} onPress={handleCancel} />
@@ -392,6 +392,11 @@ const styles = StyleSheet.create({
   loadingText: {
     textAlign: 'center',
     color: colors.sparklight_grey,
+    marginTop: 10,
+  },
+  loading: {
+    textAlign: 'center',
+    color: colors.dark_grey,
     marginTop: 10,
   },
   refreshContainer: {
