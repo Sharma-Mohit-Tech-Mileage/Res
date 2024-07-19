@@ -155,11 +155,11 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
           </View>
           {speedType !== 'wifi' && (
             <View style={styles.refreshContainer}>
-              <Text style={styles.refreshText}><Text style={styles.speedRow}>Tap </Text> 
+              <Text style={styles.refreshText}><Text style={[styles.downloadText, styles.downloadsupport]}>Tap </Text> 
                 <Text onPress={getCurrentSpeed} style={styles.refreshButton}>
                   <Text style={styles.refreshButtonText}>here</Text>
                 </Text>
-                <Text style={styles.speedRow}> to refresh for latest information </Text> 
+                <Text style={[styles.downloadText, styles.downloadsupport]}> to refresh for latest information </Text> 
               </Text>
             </View>
           )}
