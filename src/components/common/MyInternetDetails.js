@@ -79,22 +79,22 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
                 <Text style={[styles.date, styles.paddingRight]}>Due on {dueDate}</Text>
               </View>
               <View style={styles.subSec}>
-                <View style={[styles.row, { flexWrap: "wrap" }]}>
-                  <Text style={styles.dollarSign}>Auto Pay</Text>
+                <Text style={styles.dollarSign}>Auto Pay</Text>
+                <View style={[styles.statusContainer,{paddingRight: 10}]}>
+                  <Image resizeMode="cover" source={isAutoPayStatus ? check : uncheck} style={styles.icon} />
+                  <Text style={[styles.statusText, { color: isAutoPayStatus ? colors.green : colors.red }]}>
+                    {isAutoPayStatus ? " On" : " Off"}
+                  </Text>
                 </View>
-                <Text style={[styles.dollarSign, styles.paddingRight]}>
-                  <Image resizeMode="cover" source={isAutoPayStatus ? check : uncheck} />
-                  {isAutoPayStatus ? " On" : " Off"}
-                </Text>
               </View>
               <View style={styles.subSec}>
-                <View style={[styles.row, { flexWrap: "wrap" }]}>
-                  <Text style={styles.dollarSign}>Paperless</Text>
+                <Text style={styles.dollarSign}>Paperless</Text>
+                <View style={[styles.statusContainer,{paddingRight: 10}]}>
+                  <Image resizeMode="cover" source={paperlessStatus ? check : uncheck} style={styles.icon} />
+                  <Text style={[styles.statusText, { color: paperlessStatus ? colors.green : colors.red }]}>
+                    {paperlessStatus ? " On" : " Off"}
+                  </Text>
                 </View>
-                <Text style={[styles.dollarSign, styles.paddingRight]}>
-                  <Image resizeMode="cover" source={paperlessStatus ? check : uncheck} />
-                  {paperlessStatus ? " On" : " Off"}
-                </Text>
               </View>
               <View style={styles.separator} />
             </View>
@@ -131,12 +131,14 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
                 <Text style={styles.title}>Auto Pay</Text>
               </View>
               <View style={styles.subSec}>
-                <View style={[styles.row, { flexWrap: "wrap" }]}>
-                <Text style={[styles.cardTitle,{color:!isAutoPayStatus?colors.darkest_grey:null}]}>{isAutoPayStatus ? " On" : " Off"}</Text>
-                </View>
-                <View style={[styles.row, { flexWrap: "wrap" }, styles.rightAlign]}>
-                {isAutoPayStatus?<Text style={[styles.date, styles.paddingRight, styles.textContainer, styles.rightAlign]}> Account ending in {cardDigit}</Text>:null}
-                </View>
+                <Text style={[styles.cardTitle, { color: !isAutoPayStatus ? colors.darkest_grey : null }]}>
+                  {isAutoPayStatus ? " On" : " Off"}
+                </Text>
+                {isAutoPayStatus ? (
+                  <Text style={[styles.date, styles.paddingRight, styles.textContainer, styles.rightAlign]}>
+                    Account ending in {cardDigit}
+                  </Text>
+                ) : null}
               </View>
               <View style={{ flex: 1 }} />
               <View style={styles.separator} />
@@ -174,10 +176,12 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
                 <Text style={styles.title}>Paperless</Text>
               </View>
               <View style={styles.subSec}>
-                <View style={[styles.row, { flexWrap: "wrap" }]}>
-                  <Text style={[styles.cardTitle,{color:!paperlessStatus?colors.darkest_grey:null}]}>{paperlessStatus ? " On" : " Off"}</Text>
-                </View>
-                <Text style={[styles.date, styles.paddingRight, styles.textContainer, styles.rightAlign]}>{paperLessInfo?.emailAddress}</Text>
+                <Text style={[styles.cardTitle, { color: !paperlessStatus ? colors.darkest_grey : null }]}>
+                  {paperlessStatus ? " On" : " Off"}
+                </Text>
+                <Text style={[styles.date, styles.paddingRight, styles.textContainer, styles.rightAlign]}>
+                  {paperlessStatus?paperLessInfo?.emailAddress:""}
+                </Text>
               </View>
               <View style={{ flex: 1 }} />
               <View style={styles.separator} />
@@ -259,10 +263,10 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingRight: 5,
     paddingHorizontal: 20,
+    alignItems: "center",
   },
   dollarSign: {
     fontSize: 14,
-    alignSelf: "center",
     color: colors.darkest_grey,
     fontWeight: "400",
     fontFamily: FontFamily.openSansRegular,
@@ -297,6 +301,20 @@ const styles = StyleSheet.create({
   },
   rightAlign: {
     textAlign: 'right',
+  },
+  statusContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 'auto',
+  },
+  icon: {
+    width: 16,
+    height: 16,
+    marginRight: 5,
+  },
+  statusText: {
+    fontSize: 14,
+    fontFamily: FontFamily.openSansRegular,
   },
   separator: {
     backgroundColor: "#F4F4F5",
