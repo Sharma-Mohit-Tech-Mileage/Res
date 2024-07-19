@@ -25,12 +25,12 @@ const MyTabs = ({ route, navigation }) => {
   const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
   const [shadowStyle, setShadowStyle] = useState(styles.shadowTabs);
   const { tabBarVisible } = useTabBarVisibility();
-  const [isBillerUser,setIsBillerUser]= useState(true)
+  const [isBillerUser,setIsBillerUser]= useState(false)
   const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector(state => state.combinedReducers.home);
 
   useEffect(() => {
-    console.log('MyTabHome: ', home);
+    
     if (home.walkThroughStep === 0) {
       setShadowStyle(styles.shadowTabs);
       setShadowStyleLeft(styles.shadowTabsLeft);
@@ -133,12 +133,11 @@ const MyTabs = ({ route, navigation }) => {
           tabPress: (e) => {
             e.preventDefault();
             if(!isBillerUser){ 
-            navigation.reset({
+             navigation.reset({
               index: 0,
               routes: [
                 {
                   name: 'Support',
-                  //params: { triggerEvent: true }
                 },
               ],
             });
