@@ -753,7 +753,7 @@ const NewBillerHome = ({ navigation }) => {
             )}
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <View
-                style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
+                //style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
               />
               <Text style={[styles.descriptionText,{fontSize:FontSize.size_3xl,fontWeight:'400', marginBottom:20}]}>Welcome to Sparklight</Text>
               <View style={{flexDirection:'column'}}>
