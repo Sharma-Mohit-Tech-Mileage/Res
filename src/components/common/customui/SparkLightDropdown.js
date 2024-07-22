@@ -1,32 +1,11 @@
-import React, { useRef, useEffect } from 'react';
-import { StyleSheet , findNodeHandle , AccessibilityInfo } from 'react-native';
+import React, { useRef } from 'react';
+import { StyleSheet  } from 'react-native';
 import { Select, Box, CheckIcon } from 'native-base';
 import { Padding, Color,FontFamily,FontSize } from "../../../../GlobalStyles";
 import { useIsFocused } from "@react-navigation/native";
 
 const SparkLightDropdown = ({ items, selectedValue, onValueChange, style , dropDownStyle }) => {
     const validItems = Array.isArray(items) ? items : [];
-    const selectedItemRef = useRef(null);
-    const firstItemRef = useRef(null);
-    const isFocused = useIsFocused();
-
-    const handleDropdownOpen = () => {
-        setTimeout(() => {
-          const itemRef = selectedValue ? selectedItemRef.current : firstItemRef.current;
-          const itemLabel = selectedValue ? selectedValue : validItems[0];
-    
-          if (itemRef) {
-            const reactTag = findNodeHandle(itemRef);
-            if (reactTag) {
-              AccessibilityInfo.setAccessibilityFocus(reactTag);
-              AccessibilityInfo.announceForAccessibility(itemLabel); // Announce the item
-            }
-          }
-        }, 500);
-      };
-      useEffect(() => {
-        handleDropdownOpen();
-      }, [selectedValue , isFocused ,validItems]);
 
       const getAccessibilityLabel = () => {
         return selectedValue 
@@ -51,13 +30,11 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style , dropD
                     endIcon: <CheckIcon size="5" />,
                 }}
                 style={[styles.dropdown,dropDownStyle]}
-                onOpen={handleDropdownOpen}
                 onValueChange={itemValue => onValueChange(itemValue)}
         
             >
                 {validItems.map((item, index) => (
-                    <Select.Item 
-                    ref={selectedValue === item ? selectedItemRef : index === 0 ? firstItemRef : null}
+                    <Select.Item
                     key={index} label={item} value={item} />
                 ))}
             </Select>
