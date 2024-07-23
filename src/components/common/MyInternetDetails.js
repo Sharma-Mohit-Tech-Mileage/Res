@@ -84,7 +84,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
                 <Text style={styles.dollarSign}>Auto Pay</Text>
                 <View style={[styles.statusContainer,{paddingRight: 10}]}>
                   <Image resizeMode="cover" source={isAutoPayStatus ? check : uncheck} style={styles.icon} />
-                  <Text style={[styles.statusText, { color: isAutoPayStatus ? colors.green : colors.red }]}>
+                  <Text style={[styles.statusText, { color: isAutoPayStatus ? colors.sparklight_green : colors.darkest_grey }]}>
                     {isAutoPayStatus ? " On" : " Off"}
                   </Text>
                 </View>
@@ -93,7 +93,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
                 <Text style={styles.dollarSign}>Paperless</Text>
                 <View style={[styles.statusContainer,{paddingRight: 10}]}>
                   <Image resizeMode="cover" source={paperlessStatus ? check : uncheck} style={styles.icon} />
-                  <Text style={[styles.statusText, { color: paperlessStatus ? colors.green : colors.red }]}>
+                  <Text style={[styles.statusText, { color: paperlessStatus ? colors.sparklight_green : colors.darkest_grey }]}>
                     {paperlessStatus ? " On" : " Off"}
                   </Text>
                 </View>
