@@ -8,6 +8,7 @@ export const config={
      API_BASEURL:'https://publicservices.sparklight.com/portalservices/',
      API_SHOPPING_CART_BASEURL:'https://publicservices.sparklight.com/ShoppingCart',
      MODEM_BASE_URL:"https://mule-gateway.cableone.net/customer-api",
+     TRUCK_ROLL_BASE_URL:'https://adb-1771418802186593.13.azuredatabricks.net/model/lgb_model_fs_mobile/Production/invocations',
      ZENDESK_FEEDBACK:{
        Url:'https://cableone.zendesk.com/api/v2/requests.json',
        ticket_form_id: "360000052934",
@@ -26,6 +27,7 @@ export const config={
      API_BASEURL:'https://customer.uat.sparklight.com/apiWrapper/',
      API_SHOPPING_CART_BASEURL:'https://secure.uat.cableone.net/ShoppingCartBackBoneAPIWrapperDemo',
      MODEM_BASE_URL:"https://mule-gateway.uat.cableone.net/customer-api",
+     TRUCK_ROLL_BASE_URL:'https://adb-1771418802186593.13.azuredatabricks.net/model/lgb_model_fs/Staging/invocations',
      ZENDESK_FEEDBACK:{
        Url:'https://cableone1718812169.zendesk.com/api/v2/requests.json',
        ticket_form_id: "24297809981847",
@@ -41,6 +43,6 @@ export const config={
  
  }
  
- export const ISUAT = true
+ export const ISUAT = false
  
  export const Env=(ISUAT)? config.UAT : config.PRODUCTION
