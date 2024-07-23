@@ -12,8 +12,8 @@ import { Env } from "../../network/apis/account/Constants";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBillingPaper } from "../../redux/actions/ProfileActionSuite";
-
+import { fetchBillingPaper,fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
+import {isFreshEntry } from '../../components/utility/constant';
 const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
   const dispatch = useDispatch();
   const [paperlessStatus, setPaperlessStatus] = useState(false);
@@ -21,6 +21,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const paperLessInfo = profile.paperLessInfo || {};
+  const profileDetails = profile.profileDetails || {};
   const uncheck = require("../../../assets/checkcircle1.png");
   const check = require("../../../assets/checkcircle.png");
 
@@ -52,6 +53,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
   useEffect(() => {
     getStatus();
     dispatch(fetchBillingPaper());
+    dispatch(fetchProfileDetails());
   }, []);
 
   return (
@@ -147,12 +149,12 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
               onPress={() => {
                 navigation.navigate("ArticalWindowUtility", {
                   url: `${Env.URL}/billing`,
-                  name: "Billing Details",
+                  name: "Manage Paperless",
                 });
               }}
               style={styles.touchable}
               accessible={true}
-              accessibilityLabel="View Details"
+              accessibilityLabel="Manage Auto Pay"
               accessibilityRole="button"
             >
               <Text style={styles.viewDetails}>Manage Auto Pay</Text>
@@ -187,15 +189,23 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
               <View style={styles.separator} />
             </View>
             <TouchableOpacity
+              
               onPress={() => {
-                navigation.navigate("ArticalWindowUtility", {
-                  url: `${Env.URL}/billing`,
-                  name: "Billing Details",
-                });
+                navigation.navigate('account', {
+                  screen: 'EmailNotifications',
+                  params: {
+                  additionalData: {
+                    status: paperLessInfo?.paperlessStatus === 'Active',
+                    email: paperLessInfo.emailAddress || profileDetails.svEmailAddress,
+                    isNew: isFreshEntry(paperLessInfo),
+                    critNotif: !!profileDetails.svEmailAddress
+                  }
+                }
+                })
               }}
               style={styles.touchable}
               accessible={true}
-              accessibilityLabel="View Details"
+              accessibilityLabel="Manage Paperless"
               accessibilityRole="button"
             >
               <Text style={styles.viewDetails}>Manage Paperless</Text>
