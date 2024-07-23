@@ -61,7 +61,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
   };
 
   const fetchModemSpeedDetails = (accountNumber, networkId) => {
-    const speedTestRequest = `mobile/api/Eero/GetEeroSpeedTestDetails?accountnumber=${accountNumber}&networkId=${networkId}`;
+    const speedTestRequest = `mobile/api/Eero/GetEeroSpeedTest?accountnumber=${accountNumber}&networkId=${networkId}`;
     GetApiRequest(speedTestRequest, onSuccessModem, onError);
   };
 
@@ -87,11 +87,12 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
   };
 
   const onSuccessModem = (res) => {
-    if (res && res.length > 0) {
-      const latestResult = res[0];
-      const downloadSpeed = latestResult.download_Result * 1000; // Convert to Kbps
-      const uploadSpeed = latestResult.upload_Result * 1000; // Convert to Kbps
-      const date = latestResult.tstamp;
+    console.log('onSuccessModem**************************', res);
+    if (res && res.data && res.data.length > 0) {
+      const latestResult = res.data[0];
+      const downloadSpeed = latestResult.down_Mbps * 1000; // Convert to Kbps
+      const uploadSpeed = latestResult.up_Mbps * 1000; // Convert to Kbps
+      const date = latestResult.date;
 
       const speedInMbps_download = (downloadSpeed / 1000).toFixed(2);
       const speedInMbps_upload = (uploadSpeed / 1000).toFixed(2);
@@ -106,7 +107,8 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
       setUploadFrac(upl[1]);
     }
     setSpeedLoading(false);
-  };
+};
+
 
   const onError = (error) => {
     console.log("error", error);
