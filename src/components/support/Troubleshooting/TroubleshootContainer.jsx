@@ -4,9 +4,9 @@ import OutagesAlert from "./OutagesAlert";
 import TroubleshootComponent from "./TroubleshootComponent";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
-import { View, SafeAreaView, StyleSheet, ScrollView } from "react-native";
-import {Color, Padding} from "../../../../GlobalStyles";
-import {GetApiRequest,GetModemStatusApiRequest,} from "../../../network/APIClient";
+import { View, SafeAreaView } from "react-native";
+import { Color, Padding } from "../../../../GlobalStyles";
+import { GetApiRequest, GetModemStatusApiRequest } from "../../../network/APIClient";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import { useIsFocused } from '@react-navigation/native';
@@ -50,28 +50,15 @@ const TroubleshootContainer = () => {
   const isFocused = useIsFocused();
   const user = useSelector((state) => state.combinedReducers.user.userData);
   const [currentStep, setCurrentStep] = useState(0);
-  const [networkStatus, setNetworkStatus] = useState([
-    false,
-    false,
-    false,
-    false,
-  ]);
-
-  const [networkError, setNetworkError] = useState([
-    false,
-    false,
-    false,
-    false,
-  ]);
+  const [networkStatus, setNetworkStatus] = useState([false, false, false, false]);
+  const [networkError, setNetworkError] = useState([false, false, false, false]);
   const [outageIssueDetected, setOutageIssueDetected] = useState(false);
   const [billIssueDetected, setBillIssueDetected] = useState(false);
-  const [modemsIsueDetected, setModemIssueDetected] = useState(false);
   const [issueDetected, setIssueDetected] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
-
   const [loading, setLoading] = useState(true);
   const [key, setKey] = useState(1);
-  const [macAddress, setMacAddress] = useState("");
+  const [isReadingComplete, setIsReadingComplete] = useState(false);
 
   /**
    * check Modem Outage status
@@ -126,10 +113,6 @@ const TroubleshootContainer = () => {
       (res) => {
         console.log("checkBillPaid", res);
         if (res) {
-          // if(res.currentCollectionStep=='Soft Disconnect'){
-          //     // Soft disconnect
-
-          //   }
           if(moment(res.paymentDueDate).isAfter()){
             networkStatus[currentStep] = true;
             setTimeout(() => {
@@ -242,15 +225,11 @@ const TroubleshootContainer = () => {
       const checkYellow = temt.includes("Yellow");
       const checkRed = temt.includes("Red");
       if (checkRed || checkYellow) {
-        // stepsData[currentStep].success = false;
-        //setModemIssueDetected(true);
         setIssueDetected(true);
         if(isFocused){
         navigation.navigate("ManageEquipment",{isError:true});;
         }
       } else {
-        //stepsData[currentStep].success = false;
-        //setModemIssueDetected(true);
         setIssueDetected(true);
         if(isFocused){
         navigation.navigate("ManageEquipment",{isError:true});
@@ -318,19 +297,20 @@ const TroubleshootContainer = () => {
     if (currentStep === 2) {
       checkBillPaid(user.userInfo.accountNumber);
     }
-
     if (currentStep === 3) {
       getInternetPlanDetails();
     }
   }, [currentStep]);
-  useEffect(() => {
-    // const interval = setInterval(() => {
-    //     setCurrentStep((prevStep) => (prevStep === 6 ? 1 : prevStep + 1));
-    // }, 4000);
 
-    // return () => clearInterval(interval);
+  useEffect(() => {
     startTroubleShooting();
   }, []);
+
+  useEffect(() => {
+    if (isReadingComplete) {
+      console.log('Screen readout complete');
+    }
+  }, [isReadingComplete]);
 
   const step = stepsData[currentStep];
 
@@ -361,9 +341,9 @@ const TroubleshootContainer = () => {
               pageCount={step.pageCount}
               loading={loading}
               isError={networkError[currentStep]}
+              setIsReadingComplete={setIsReadingComplete}
             />
           )}
-
           {outageIssueDetected && (
             <OutagesAlert
               step={currentStep}
@@ -373,7 +353,6 @@ const TroubleshootContainer = () => {
               pageCount={step.pageCount}
             />
           )}
-
           {billIssueDetected && (
             <AccountOutages
               step={currentStep}
