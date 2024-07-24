@@ -2,6 +2,6 @@
 import { NativeModules } from 'react-native';
 const { RNZendeskChatModule } = NativeModules;
 
-export const startChat = () => {
-    RNZendeskChatModule.startChat();
+export const startChatWithConfig = (config) => {
+    RNZendeskChatModule.startChatWithConfig(config);
 };

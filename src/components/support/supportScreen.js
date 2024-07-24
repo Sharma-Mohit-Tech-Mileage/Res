@@ -13,7 +13,7 @@ import ChatIcon from "../../res/svgIcons/ChatIcon";
 import { GetApiRequest } from "../../network/APIClient";
 import CreateTicket from "./ticket/CreateTicket";
 //import ZendDesk from '@pagopa/io-react-native-zendesk';
-ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
+import { startChatWithConfig } from "../utility/RNZendeskChat";
 
 const Support = ({ route }) => {
     const navigation = useNavigation();
@@ -140,36 +140,17 @@ const Support = ({ route }) => {
 
 
     const handlePressOpenButton = (department, tags) => {
-        const user = {
-            full_name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
+        const data= {
+            name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
             email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
             phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
+            tags:['pid:_' + userData.userInfo.accountNumber],
+            department:department
         };
 
-        tags.push('pid:_' + userData.userInfo.accountNumber);
+        //tags.push('pid:_' + userData.userInfo.accountNumber);
+        //startChatWithConfig(data)
 
-        ZendeskChat.startChat({
-            name: user.full_name,
-            email: user.email,
-            phone: user.phone,
-            department: department,
-            tags: tags,
-            behaviorFlags: {
-                showAgentAvailability: true,
-                showChatTranscriptPrompt: false,
-                showPreChatForm: true,
-                showOfflineForm: true,
-            },
-            preChatFormOptions: {
-                name: "optional",
-                email: "optional",
-            },
-            messagingOptions: {
-                botName: 'Sparklight',
-                botAvatarName: 'chatIcon'
-            },
-            localizedDismissButtonTitle: "Dismiss",
-        });
     };
 
 
