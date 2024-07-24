@@ -25,8 +25,6 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
   const uncheck = require("../../../assets/checkcircle1.png");
   const check = require("../../../assets/checkcircle.png");
 
-  console.log("Paperless Info:", paperLessInfo);
-
   const getStatus = () => {
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
@@ -84,7 +82,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
                 <Text style={styles.dollarSign}>Auto Pay</Text>
                 <View style={[styles.statusContainer,{paddingRight: 10}]}>
                   <Image resizeMode="cover" source={isAutoPayStatus ? check : uncheck} style={styles.icon} />
-                  <Text style={[styles.statusText, { color: isAutoPayStatus ? colors.sparklight_green : colors.darkest_grey }]}>
+                  <Text style={[styles.statusText]}>
                     {isAutoPayStatus ? " On" : " Off"}
                   </Text>
                 </View>
@@ -93,7 +91,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
                 <Text style={styles.dollarSign}>Paperless</Text>
                 <View style={[styles.statusContainer,{paddingRight: 10}]}>
                   <Image resizeMode="cover" source={paperlessStatus ? check : uncheck} style={styles.icon} />
-                  <Text style={[styles.statusText, { color: paperlessStatus ? colors.sparklight_green : colors.darkest_grey }]}>
+                  <Text style={[styles.statusText]}>
                     {paperlessStatus ? " On" : " Off"}
                   </Text>
                 </View>
@@ -133,7 +131,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
                 <Text style={styles.title}>Auto Pay</Text>
               </View>
               <View style={styles.subSec}>
-                <Text style={[styles.cardTitle, { color: !isAutoPayStatus ? colors.darkest_grey : null }]}>
+                <Text style={[styles.cardTitle, { color: !isAutoPayStatus ? colors.darkest_grey : colors.sparklight_green }]}>
                   {isAutoPayStatus ? " On" : " Off"}
                 </Text>
                 {isAutoPayStatus ? (
@@ -146,12 +144,12 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
               <View style={styles.separator} />
             </View>
             <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("ArticalWindowUtility", {
-                  url: `${Env.URL}/billing`,
-                  name: "Manage Paperless",
-                });
-              }}
+             onPress={() => {
+              navigation.navigate("ArticalWindowUtility", {
+                url: `${Env.URL}/billing`,
+                name: "Billing Details",
+              });
+            }}
               style={styles.touchable}
               accessible={true}
               accessibilityLabel="Manage Auto Pay"
@@ -178,7 +176,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
                 <Text style={styles.title}>Paperless</Text>
               </View>
               <View style={styles.subSec}>
-                <Text style={[styles.cardTitle, { color: !paperlessStatus ? colors.darkest_grey : null }]}>
+                <Text style={[styles.cardTitle, { color: !paperlessStatus ? colors.darkest_grey : colors.sparklight_green }]}>
                   {paperlessStatus ? " On" : " Off"}
                 </Text>
                 <Text style={[styles.date, styles.paddingRight, styles.textContainer, styles.rightAlign]}>
@@ -325,6 +323,7 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 14,
     fontFamily: FontFamily.openSansRegular,
+    color:colors.darkest_grey
   },
   separator: {
     backgroundColor: "#F4F4F5",
