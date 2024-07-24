@@ -5,3 +5,7 @@ const { RNZendeskChatModule } = NativeModules;
 export const startChatWithConfig = (config) => {
     RNZendeskChatModule.startChatWithConfig(config);
 };
+
+export const clearChatData = () => {
+    RNZendeskChatModule.clearChatSession();
+};

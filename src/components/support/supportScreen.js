@@ -5,7 +5,7 @@ import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalSty
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
-import ZendeskChat from "react-native-zendesk-chat";
+
 import PubSub from 'pubsub-js'
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
@@ -147,9 +147,7 @@ const Support = ({ route }) => {
             tags:['pid:_' + userData.userInfo.accountNumber],
             department:department
         };
-
-        //tags.push('pid:_' + userData.userInfo.accountNumber);
-        //startChatWithConfig(data)
+        startChatWithConfig(data)
 
     };
 
@@ -449,7 +447,8 @@ const Support = ({ route }) => {
                                                     alignItems: "center",
                                                 }}
                                                 onPress={() => {
-                                                    toggleModal("tech");
+                                                    //toggleModal("tech");
+                                                    handlePressOpenButton("SPK TCC Residential", ['Residential', 'ContactUs'])
                                                 }}
                                             >
                                                 <ChatIcon />
@@ -497,6 +496,7 @@ const Support = ({ route }) => {
                                                     onPress={() => {
                                                         //toggleModal("Bill");
                                                         //ZendDesk.initChat('ad791f41-3c05-490b-8bb3-55afe1751f92d')
+                                                       
                                                     }}
                                                     accessibilityLabel="Chat Support"
                                                     accessibilityRole="button"
@@ -532,7 +532,8 @@ const Support = ({ route }) => {
                                                         alignItems: "center",
                                                     }}
                                                     onPress={() => {
-                                                        toggleModal("Bill");
+                                                        //toggleModal("Bill");
+                                                        handlePressOpenButton("SPK TCC Residential", ['Residential', 'ContactUs'])
                                                     }}
                                                 >
                                                     <ChatIcon />
