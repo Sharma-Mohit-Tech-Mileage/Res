@@ -349,7 +349,7 @@ export const GetModemStatusApiRequest = async (endpoint, onSuccess, onError) => 
 // Truck roll API 
 export const PostruckRollApi = (endpoint, body, onSuccess, onError) => {
  console.log(`endpoint=endpoint`, JSON.stringify(body));
-    fetch(`https://adb-1771418802186593.13.azuredatabricks.net/${endpoint}`, {
+    fetch(Env.TRUCK_ROLL_BASE_URL, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

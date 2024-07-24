@@ -73,13 +73,12 @@ const AccountOverview = () => {
   const navigation = useNavigation();
   const [fullName, setFullName] = useState('');
   const [initials, setInitials] = useState('');
-  const [isBiller, setIsBiller] = useState(false);
   const [menues, setMenues] = useState([]);
   const dispatch = useDispatch();
   const user = useSelector(state => state.combinedReducers.user.userData);
   useEffect(() => {
     dispatch(fetchProfileDetails());
-    if(isBiller){
+    if(user?.userInfo.accountNumber.toString().length>=16){
       setMenues(menuItems1)
     }else{
       setMenues(menuItems)

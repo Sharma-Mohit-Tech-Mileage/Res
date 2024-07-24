@@ -24,9 +24,9 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
   //const [dueDate,setDueDate]=useState('')
 
   useEffect(() => {
-    if (plans.length > 0) {
-      setPlanSpeed(plans[0].downloadSpeed);
-    }
+    // if (plans.length > 0) {
+    //   setPlanSpeed(plans[0].downloadSpeed);
+    // }
   });
   return (
     <View style={{ flexDirection: "row" }}>
@@ -82,7 +82,7 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
           </View>
 
           <Text style={[styles.subTitle, { paddingRight: 10,fontSize:FontSize.size_base }]}>
-            <TickIcon color={'#2BA948'}/> On
+            <TickIcon color={plans.isEasyPay?colors.sparklight_green:colors.sparklight_red}/> {plans.isEasyPay?'On':'Off'}
           </Text>
         </View>
        
@@ -152,12 +152,13 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
         <View style={styles.subSec}>
           <View style={{ flexDirection: "row",marginTop:10}}>
             
-            <Text style={[styles.subTitle,{fontSize:FontSize.size_lg,color:'#2BA948',fontWeight:'500'}]}>On</Text>
+            <Text style={[styles.subTitle,{fontSize:FontSize.size_lg,color:plans.isEasyPay?colors.sparklight_green:colors.sparklight_red,fontWeight:'500'}]}>{plans.isEasyPay?'On':'Off'}</Text>
           </View>
-
+         {plans.easyPayId!='' &&
           <Text style={[styles.date, { paddingRight: 10} ]}>
-             Account ending in 9100
+             Account ending in {plans.easyPayId}
           </Text>
+           }
         </View>
         {/* <View
           style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10,marginBottom:10 }}
