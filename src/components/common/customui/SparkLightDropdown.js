@@ -4,7 +4,7 @@ import { Select, Box, CheckIcon } from 'native-base';
 import { Padding, Color,FontFamily,FontSize } from "../../../../GlobalStyles";
 import { useIsFocused } from "@react-navigation/native";
 
-const SparkLightDropdown = ({ items, selectedValue, onValueChange, style , dropDownStyle }) => {
+const SparkLightDropdown = ({ items, selectedValue, onValueChange, style , dropDownStyle , isDropDownOpen = () => {}}) => {
     const validItems = Array.isArray(items) ? items : [];
 
       const getAccessibilityLabel = () => {
@@ -30,6 +30,12 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style , dropD
                     endIcon: <CheckIcon size="5" />,
                 }}
                 style={[styles.dropdown,dropDownStyle]}
+                onOpen={()=> {
+                    isDropDownOpen(true)
+                }}
+                onClose={() => {
+                    isDropDownOpen(false)
+                }}
                 onValueChange={itemValue => onValueChange(itemValue)}
         
             >
