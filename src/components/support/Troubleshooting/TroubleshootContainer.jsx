@@ -259,7 +259,7 @@ const TroubleshootContainer = () => {
           let macAddress = response[0].macAddress;
           var mac = macAddress;
           if (user.userInfo.accountNumber === "128387263") {
-            mac = "34:98:b5:d2:a8:71";
+            mac = "3c:75:4a:ef:a1:00";
           } else if (user.userInfo.accountNumber === "133370775") {
             mac = "00:40:36:5f:cc:7f";
           }
