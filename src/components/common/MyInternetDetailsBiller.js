@@ -69,10 +69,11 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
             </Text>
             <Text style={styles.subTitle}>{billAmt}</Text>
           </View>
-
+          { dueDate.toLowerCase()!='invalid date' &&
           <Text style={[styles.date, { paddingRight: 10 }]}>
             Due on {dueDate}
-          </Text>
+          </Text>              
+        }
         </View>
 
         <View style={[styles.subSec,{ marginTop:-10}]}>
@@ -81,8 +82,8 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
             <Text style={[styles.subTitle,{fontSize:FontSize.size_base}]}>Auto Pay</Text>
           </View>
 
-          <Text style={[styles.subTitle, { paddingRight: 10,fontSize:FontSize.size_base }]}>
-            <TickIcon color={plans.isEasyPay?colors.sparklight_green:colors.sparklight_red}/> {plans.isEasyPay?'On':'Off'}
+          <Text style={[styles.subTitle, { paddingRight: 10,fontSize:FontSize.size_base,color:'#4C5458' }]}>
+            <TickIcon color={plans.isEasyPay?colors.sparklight_green:'#4C5458'}/> {plans.isEasyPay?'On':'Off'}
           </Text>
         </View>
        
@@ -152,7 +153,7 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
         <View style={styles.subSec}>
           <View style={{ flexDirection: "row",marginTop:10}}>
             
-            <Text style={[styles.subTitle,{fontSize:FontSize.size_lg,color:plans.isEasyPay?colors.sparklight_green:colors.sparklight_red,fontWeight:'500'}]}>{plans.isEasyPay?'On':'Off'}</Text>
+            <Text style={[styles.subTitle,{fontSize:FontSize.size_lg,color:plans.isEasyPay?colors.sparklight_green:'#4C5458',fontWeight:'500'}]}>{plans.isEasyPay?'On':'Off'}</Text>
           </View>
          {plans.easyPayId!='' &&
           <Text style={[styles.date, { paddingRight: 10} ]}>
