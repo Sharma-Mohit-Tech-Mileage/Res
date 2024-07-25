@@ -54,6 +54,7 @@ const UpdateModemPassword = () => {
   const [newPasswordLength, setNewPasswordLength] = useState(0)
   const [confirmPasswordLength, setConfirmPasswordLength] = useState(0)
   const [loading, setLoading] = useState(false);
+  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
 
 
   useEffect(() => {
@@ -115,6 +116,7 @@ const UpdateModemPassword = () => {
   };
 
   const handlePasswordSelection = (value) => {
+    setIsDropDownOpen(false)
     setSelectedPassword(value)
   }
 
@@ -147,10 +149,15 @@ const UpdateModemPassword = () => {
   return (
     <View style={styles.viewBackground}>
       <ProfileSettingsHeader
+       accessibilityElementsHidden={isDropDownOpen}
+       importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
         title="Update Modem Password"
         onPressBack={() => navigation.navigate("ManageEquipmentScreen")}
       />
-      <View style={{ marginHorizontal: 20, marginTop: 20 }}>
+      <View 
+       accessibilityElementsHidden={isDropDownOpen}
+       importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+      style={{ marginHorizontal: 20, marginTop: 20 }}>
         <NotificationAlert
           type="error"
           title="Error"
@@ -178,10 +185,16 @@ const UpdateModemPassword = () => {
               items={passwordList}
               selectedValue={slectedPasword}
               onValueChange={handlePasswordSelection}
+              isDropDownOpen={(value) => {
+                setIsDropDownOpen(true)
+              }}
             />
           </View>
 
-          <View style={{ marginTop: 15 }}>
+          <View 
+           accessibilityElementsHidden={isDropDownOpen}
+           importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+          style={{ marginTop: 15 }}>
             <Controller
               control={control}
               name="newPassword"
@@ -212,7 +225,10 @@ const UpdateModemPassword = () => {
 
             />
           </View>
-          <View style={{ marginTop: 15 }}>
+          <View 
+           accessibilityElementsHidden={isDropDownOpen}
+           importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+          style={{ marginTop: 15 }}>
             <Controller
               control={control}
               name="confirmPassword"
@@ -242,7 +258,10 @@ const UpdateModemPassword = () => {
             {showError ? <Text style={styles.errorText}>{`Password do not match`}</Text> : null}
           </View>
         </View>
-        <View style={styles.buttonContainer}>
+        <View 
+         accessibilityElementsHidden={isDropDownOpen}
+         importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+        style={styles.buttonContainer}>
           <Pressable
             accessible={true}
             disabled={loading}

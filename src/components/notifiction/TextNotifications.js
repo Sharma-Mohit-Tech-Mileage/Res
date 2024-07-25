@@ -91,7 +91,7 @@ const TextNotifications = ({ navigation }) => {
                                     <Text
                                         style={styles.youAreSubscribed}
                                     >{`You are subscribed to text message alerts. `}</Text>
-                                    <Text style={{ lineHeight: 24 }}>
+                                    <Text>
                                         Reply STOP to cancel at any time. Message and data rates may apply.
                                     </Text>
                                 </Text>
@@ -216,7 +216,7 @@ const TextNotifications = ({ navigation }) => {
                                             <Text
                                                 style={styles.youAreSubscribed}
                                             >{`By opting in for outage alerts, you agree to receive text `}</Text>
-                                            <Text style={{ lineHeight: 22 }}>
+                                            <Text>
                                                 messages regarding new service outages affecting
                                                 your home internet service and updates regarding
                                                 existing outages (updates go out about every two
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     mobilePhoneTypo: {
         color: Color.sparklightGray1,
         fontSize: FontSize.size_base,
-        lineHeight: 28,
+        lineHeight: 22,
         textAlign: "left",
         fontFamily: FontFamily.openSansRegular,
     },
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
     },
     youAreSubscribed: {
-        lineHeight: 28,
+        lineHeight: 22,
     },
     youAreSubscribedContainer: {
         marginLeft: 8,
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: FontSize.size_base,
-        lineHeight: 28,
+        lineHeight: 22,
         textAlign: "left",
         color: Color.colorGray_200,
         fontFamily: FontFamily.openSansRegular,
