@@ -107,7 +107,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
               }}
               style={styles.touchable}
               accessible={true}
-              accessibilityLabel="Billing Details"
+              accessibilityLabel="Make a Payment"
               accessibilityRole="button"
             >
               <Text style={styles.viewDetails}>Make a Payment</Text>
