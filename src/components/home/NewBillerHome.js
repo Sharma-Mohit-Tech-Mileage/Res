@@ -737,6 +737,9 @@ const NewBillerHome = ({ navigation }) => {
 
       <SafeAreaView style={{ flex: 1 }}>
         <View
+         accessibilityElementsHidden={showWalkThrough}
+         importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
+          accessibilityLabel={`SparkLight`}
           style={{
             height: Platform.OS == "ios" ? 60 : 50,
             flexDirection: "row",
@@ -746,6 +749,8 @@ const NewBillerHome = ({ navigation }) => {
           }}
         >
           <Image
+          accessible={!showWalkThrough}
+          accessibilityLabel={`SparkLight`}
             resizeMode="contain"
             style={{ width: 120, height: 30.324, flexShrink: 0 }}
             source={require("../../../assets/SparklightEntryLogo.png")}
@@ -796,6 +801,9 @@ const NewBillerHome = ({ navigation }) => {
               )}
 
               <TouchableOpacity
+               accessible={true}
+               accessibilityLabel={isImageDispaly ? 'Collapse' : 'Expand'}
+               accessibilityRole="button"
                 onPress={() => {
                   setIsImageDispaly(!isImageDispaly);
                 }}
