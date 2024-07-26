@@ -90,6 +90,9 @@ private ChatConfiguration chatConfiguration;
                 .withDepartment(Objects.requireNonNull(config.getString("department")))
                 .build();
 
+
+
+
         Chat.INSTANCE.setChatProvidersConfiguration(chatProvidersConfiguration);
 
         ChatConfiguration chatConfiguration = ChatConfiguration.builder().
