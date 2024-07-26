@@ -91,6 +91,9 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
         
         <View style={{flexDirection:'column'}}>
         <TouchableOpacity
+        accessible={true}
+        accessibilityLabel={`Make a Payment`}
+        accessibilityRole="button"
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
               url: `${Env.URL}/billing`,
@@ -168,7 +171,7 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
             bottom:0}}>
         <TouchableOpacity
          accessible={true}
-         accessibilityLabel={`Upgrade Plan`}
+         accessibilityLabel={`Manage Auto Pay`}
          accessibilityRole="button"
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
