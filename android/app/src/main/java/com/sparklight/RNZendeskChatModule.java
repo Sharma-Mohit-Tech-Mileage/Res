@@ -59,7 +59,8 @@ private ChatConfiguration chatConfiguration;
         Chat.INSTANCE.resetIdentity();
         VisitorInfo.Builder visitorInfoBuilder = VisitorInfo.builder();
         ProfileProvider profileProvider = Chat.INSTANCE.providers().profileProvider();
-        ChatProvider chatProvider = Chat.INSTANCE.providers().chatProvider();
+
+
         if (config.hasKey("name")) {
             visitorInfoBuilder = visitorInfoBuilder.withName(config.getString("name"));
         }
