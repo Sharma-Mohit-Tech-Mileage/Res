@@ -73,6 +73,7 @@ const NewBillerHome = ({ navigation }) => {
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
+  
   const [updateStatus, setUpdateStatus] = useState({
     isMinorUpdateAvailable: false,
     currentVersion: "",
@@ -487,27 +488,29 @@ const NewBillerHome = ({ navigation }) => {
         console.error("Error fetching data", error);
       }
       if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
-        setShowWalkThrough(true);
+        //setShowWalkThrough(true);
       }
     };
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        dispatch(fetchPushNotifications());
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-    };
-    fetchData();
-  }, [dispatch]);
-  useEffect(() => {
-    if (profile?.pushNotifications?.length > 0 && user.userInfo !== undefined) {
-      checkNotifications();
-    }
-  }, [profile, user]);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       dispatch(fetchPushNotifications());
+  //     } catch (error) {
+  //       console.error("Error fetching data", error);
+  //     }
+  //   };
+  //   fetchData();
+  // }, [dispatch]);
+
+
+  // useEffect(() => {
+  //   if (profile?.pushNotifications?.length > 0 && user.userInfo !== undefined) {
+  //     checkNotifications();
+  //   }
+  // }, [profile, user]);
 
   const changeWalkThroughStep = (step) => {
     if (step > 2) {
@@ -732,8 +735,8 @@ const NewBillerHome = ({ navigation }) => {
       colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
       style={styles.container}
     >
-      {showWalkThrough && <View style={styles.shadowFullScreen} />}
-      {showWalkThrough && walkthroughModal()}
+      {/* {showWalkThrough && <View style={styles.shadowFullScreen} />}
+      {showWalkThrough && walkthroughModal()} */}
 
       <SafeAreaView style={{ flex: 1 }}>
         <View
