@@ -533,7 +533,7 @@ const Support = ({ route }) => {
                                                     }}
                                                     onPress={() => {
                                                         //toggleModal("Bill");
-                                                        handlePressOpenButton("SPK Virtual Call Center", ['Residential', 'ContactUs'])
+                                                        handlePressOpenButton("mobiletest", ['Residential', 'ContactUs'])
                                                     }}
                                                 >
                                                     <ChatIcon />
