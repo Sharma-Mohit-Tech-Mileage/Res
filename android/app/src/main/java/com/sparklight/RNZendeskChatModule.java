@@ -107,6 +107,7 @@ private ChatConfiguration chatConfiguration;
 
         MessagingActivity.builder()
                 .withEngines(ChatEngine.engine())
+                .withBotLabelString("Welcome to the Sparklight Support")
                 .show(Objects.requireNonNull(reactContext.getCurrentActivity()), chatConfiguration);
     }
 }
