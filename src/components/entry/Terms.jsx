@@ -130,9 +130,9 @@ const Terms = ({ navigation }) => {
     
 
     const termsAccepted = async () => {
-        if(userData?.userInfo.accountNumber.toString().length==9){
         await dispatch(updateTermsAndConditions(true, null));
         await dispatch(updateWalkThroughStep(0));
+        if(userData?.userInfo.accountNumber.toString().length==9){
         console.log('termsAccepted: ', nextScreen);
         navigation.reset({
             index: 0,

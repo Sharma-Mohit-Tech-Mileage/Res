@@ -85,6 +85,7 @@ const SplashScreen = ({ navigation }) => {
       } else {
         storeUser(user);
         dispatch(saveUserInfo(user));
+        console.log('IsUserAcceptedTermandCondition',user.userInfo.mobileTCAcceptanceFlag)
         if (user.userInfo.mobileTCAcceptanceFlag) {
           navigation.reset({
             index: 0,
