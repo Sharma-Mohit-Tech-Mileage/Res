@@ -39,7 +39,7 @@ private ChatConfiguration chatConfiguration;
     private void init(){
         Chat.INSTANCE.init(reactContext, ZendeskConfig.CHAT_ACCOUNT_KEY);
          chatConfiguration = ChatConfiguration.builder()
-                .withAgentAvailabilityEnabled(false)
+                .withAgentAvailabilityEnabled(true)
                 .build();
     }
 
@@ -57,14 +57,13 @@ private ChatConfiguration chatConfiguration;
                 .build();
         Chat.INSTANCE.providers().profileProvider().setVisitorInfo(visitorInfo, null);
         Chat.INSTANCE.resetIdentity();
-      
+
     }
 
     @ReactMethod
     public void startChatWithConfig(ReadableMap config) {
         VisitorInfo.Builder visitorInfoBuilder = VisitorInfo.builder();
         ProfileProvider profileProvider = Chat.INSTANCE.providers().profileProvider();
-
 
         if (config.hasKey("name")) {
             visitorInfoBuilder = visitorInfoBuilder.withName(config.getString("name"));
@@ -104,7 +103,8 @@ private ChatConfiguration chatConfiguration;
         Chat.INSTANCE.setChatProvidersConfiguration(chatProvidersConfiguration);
 
         ChatConfiguration chatConfiguration = ChatConfiguration.builder().
-                withAgentAvailabilityEnabled(false)
+                withOfflineFormEnabled(true).
+                withAgentAvailabilityEnabled(true)
                 .build();
         
        // profileProvider.setVisitorInfo(visitorInfoBuilder.build(), null);
@@ -114,7 +114,7 @@ private ChatConfiguration chatConfiguration;
 
         MessagingActivity.builder()
                 .withEngines(ChatEngine.engine())
-                .withBotLabelString("Welcome to the Sparklight Support")
+                .withBotLabelString("Sparklight Support")
                 .withBotAvatarDrawable(R.drawable.ic_launcher)
                 .show(Objects.requireNonNull(reactContext.getCurrentActivity()), chatConfiguration);
     }
