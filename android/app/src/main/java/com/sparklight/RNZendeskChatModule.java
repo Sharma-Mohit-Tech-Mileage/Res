@@ -50,13 +50,18 @@ private ChatConfiguration chatConfiguration;
 
     @ReactMethod
     public void clearChatSession() {
+        VisitorInfo visitorInfo = VisitorInfo.builder()
+                .withName("")
+                .withEmail("")
+                .withPhoneNumber("")
+                .build();
+        Chat.INSTANCE.providers().profileProvider().setVisitorInfo(visitorInfo, null);
         Chat.INSTANCE.resetIdentity();
-        Chat.INSTANCE.clearCache();
+      
     }
 
     @ReactMethod
     public void startChatWithConfig(ReadableMap config) {
-        Chat.INSTANCE.resetIdentity();
         VisitorInfo.Builder visitorInfoBuilder = VisitorInfo.builder();
         ProfileProvider profileProvider = Chat.INSTANCE.providers().profileProvider();
 
@@ -70,6 +75,8 @@ private ChatConfiguration chatConfiguration;
         if (config.hasKey("phone")) {
             visitorInfoBuilder = visitorInfoBuilder.withPhoneNumber(config.getString("phone"));
         }
+
+
 
         List<String> tags = new ArrayList<>();
         if (config.hasKey("tags") && config.getType("tags") == ReadableType.Array) {
@@ -108,6 +115,7 @@ private ChatConfiguration chatConfiguration;
         MessagingActivity.builder()
                 .withEngines(ChatEngine.engine())
                 .withBotLabelString("Welcome to the Sparklight Support")
+                .withBotAvatarDrawable(R.drawable.ic_launcher)
                 .show(Objects.requireNonNull(reactContext.getCurrentActivity()), chatConfiguration);
     }
 }
