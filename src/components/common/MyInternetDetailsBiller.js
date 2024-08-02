@@ -93,7 +93,7 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
         <TouchableOpacity
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
-              url: `${Env.URL}/billing`,
+              url: Env.PAYMENT,
               name: "Billing Details",
             });
           }}
