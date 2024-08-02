@@ -116,7 +116,7 @@ const ManageEquipment = ({ route }) => {
             let macAddress = response[0].macAddress;
             var mac = macAddress;
             if (res.userInfo.accountNumber === "128387263") {
-              mac = "08:02:8e:bb:f7:e0";
+              mac = "bc:3e:07:38:56:d0";
             } else if (res.userInfo.accountNumber === "133370775") {
               mac = "00:40:36:5f:cc:7f";
             } else if (res.userInfo.accountNumber === "133437285") {
@@ -231,9 +231,9 @@ const ManageEquipment = ({ route }) => {
 
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
-    if (currentHealth == 'Poor') {
-      getTruckRollPostApiRequets('ACDB48B5B8E1', '101169084')
-      //getTruckRollPostApiRequets(macAddress.replaceAll(':',''),user?.userInfo?.accountNumber)
+    if(currentHealth=='Poor'){
+       //getTruckRollPostApiRequets('ACDB48B5B8E1','101169084')
+       getTruckRollPostApiRequets(macAddress.replaceAll(':',''),user?.userInfo?.accountNumber)
     }
   }, [currentHealth]);
 

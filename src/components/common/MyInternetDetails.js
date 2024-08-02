@@ -145,7 +145,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
             </View>
             <TouchableOpacity
              onPress={() => {
-              navigation.navigate("ArticalWindowUtility", {
+              navigation.navigate("AutoPayPCIConnector", {
                 url: `${Env.URL}/billing`,
                 name: "Billing Details",
               });
@@ -187,20 +187,21 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
               <View style={styles.separator} />
             </View>
             <TouchableOpacity
-              
-              onPress={() => {
-                navigation.navigate('account', {
-                  screen: 'EmailNotifications',
-                  params: {
+             onPress={() => {
+              navigation.navigate('account', {
+                screen:'Account',
+                screen: 'EmailNotifications',
+                params: {
                   additionalData: {
                     status: paperLessInfo?.paperlessStatus === 'Active',
                     email: paperLessInfo.emailAddress || profileDetails.svEmailAddress,
                     isNew: isFreshEntry(paperLessInfo),
-                    critNotif: !!profileDetails.svEmailAddress
-                  }
-                }
-                })
-              }}
+                    critNotif: !!profileDetails.svEmailAddress,
+                  },
+                },
+              });
+            }}
+            
               style={styles.touchable}
               accessible={true}
               accessibilityLabel="Manage Paperless"

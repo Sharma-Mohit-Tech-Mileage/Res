@@ -96,7 +96,7 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
         accessibilityRole="button"
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
-              url: `${Env.URL}/billing`,
+              url: Env.PAYMENTURLNEW,
               name: "Billing Details",
             });
           }}
@@ -175,8 +175,8 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
          accessibilityRole="button"
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
-              url: `${Env.URL}/services/upgrade`,
-              name: "Upgrade Plan",
+              url: Env.EASYPAYNEW,
+              name: "Manage Auto Pay",
             });
           }}
           style={{

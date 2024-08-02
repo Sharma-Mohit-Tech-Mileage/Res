@@ -33,7 +33,7 @@ const MyTabs = ({ route, navigation }) => {
     if(user?.userInfo.accountNumber.toString().length>=16){
       setIsBillerUser(true)
   }
-    if(user?.userInfo.accountNumber.toString().length==10){
+    if(user?.userInfo.accountNumber.toString().length==9){
     if (home.walkThroughStep === 0) {
       setShadowStyle(styles.shadowTabs);
       setShadowStyleLeft(styles.shadowTabsLeft);
