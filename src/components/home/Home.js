@@ -189,11 +189,11 @@ const HomeScreen = ({ navigation }) => {
         let macAddress = res[0].macAddress;
         var mac = macAddress;
         if (user.userInfo.accountNumber === "128387263") {
-          mac = "3c:75:4a:ef:a1:00";
+          mac = "bc:3e:07:38:56:d0";
         } else if (user.userInfo.accountNumber === "133370775") {
-          mac = "3c:75:4a:ef:a1:00";
+          mac = "00:40:36:5f:cc:7f";
         } else if (user.userInfo.accountNumber === "133437285") {
-          mac = "60:19:71:27:61:b2";
+          mac = "6c:cd:d6:6c:d0:1c";
         } else if (user.userInfo.accountNumber === "131684698") {
           mac = "28:7a:ee:97:4d:cc";
         } else if (user.userInfo.accountNumber === "136885142") {
@@ -323,7 +323,6 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const updateInternetHealth = (dueAmount, dueDate) => {
-    //console.log('pppppast',moment(dueDate).isBefore() )
     if (moment(dueDate).isAfter()) {
       setBillPaid(true);
       setInternetHealths((oldArray) => [...oldArray, "Green"]);
@@ -533,12 +532,21 @@ const HomeScreen = ({ navigation }) => {
 
     return (
       <>
-        <View style={styles.walkThroughBubble} >
+        <View 
+                accessibilityElementsHidden={!showWalkThrough}
+                importantForAccessibility={showWalkThrough ? "yes" : "no-hide-descendants"}
+        style={styles.walkThroughBubble} >
           <View >
-            <View style={styles.title}>
+            <View 
+             accessible={true} 
+             accessibilityLabel={walkThrough.title}     
+            style={styles.title}>
               <Text style={styles.titleText}>{walkThrough.title}</Text>
             </View>
-            <View style={styles.description}>
+            <View 
+             accessible={true} 
+             accessibilityLabel={walkThrough.description}
+            style={styles.description}>
               <Text style={styles.descriptionText}>
                 {walkThrough.description}
               </Text>
@@ -600,11 +608,20 @@ const HomeScreen = ({ navigation }) => {
 
   const OutageAlert = ({ estimatedTime }) => {
     return (
-      <View style={styles.errorBox}>
-        <View style={{ flexDirection: "row", width: "90%" }}>
+      <View 
+      accessibilityElementsHidden={showWalkThrough}
+      importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
+      style={styles.errorBox}>
+        <View 
+         accessibilityElementsHidden={showWalkThrough}
+         importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
+        style={{ flexDirection: "row", width: "90%" }}>
           <View style={{ backgroundColor: "#F88700", width: 4 }} />
           <View style={{ flexDirection: "column", padding: 10 }}>
-            <View style={{ flexDirection: "row" }}>
+            <View 
+             accessibilityElementsHidden={showWalkThrough}
+             importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
+            style={{ flexDirection: "row" }}>
               <Image
                 style={{ alignSelf: "center" }}
                 resizeMode="contain"
@@ -613,7 +630,10 @@ const HomeScreen = ({ navigation }) => {
               />
               <Text style={styles.modemError1}>Outage Alert</Text>
             </View>
-            <Text style={styles.modemError2}>
+            <Text 
+             accessibilityElementsHidden={showWalkThrough}
+             importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
+            style={styles.modemError2}>
               Our systems show that you may be experiencing an outage related to
               your Internet service. We are working to restore service as soon
               as possible.
@@ -655,9 +675,14 @@ const HomeScreen = ({ navigation }) => {
                 What's New
               </Text>
             </View>
-            <Text style={styles.modemError2}>
+            <Text
+            accessible={!showWalkThrough}
+            accessibilityElementsHidden={showWalkThrough}
+            importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
+            style={styles.modemError2}>
               Enhance your app experience with the latest version.
               <Text
+              accessible={!showWalkThrough}
                 style={styles.updateNow}
                 onPress={() => {
                   if (Platform.OS === "android") {
@@ -705,9 +730,13 @@ const HomeScreen = ({ navigation }) => {
       {showWalkThrough && <View style={styles.shadowFullScreen} />}
       {showWalkThrough && walkthroughModal()}
 
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView 
+      accessibilityElementsHidden={showWalkThrough}
+      importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
+      style={{ flex: 1 }}>
         <View
-          accessible={true}
+         accessibilityElementsHidden={showWalkThrough}
+         importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
           accessibilityLabel={`SparkLight`}
           style={{
             height: Platform.OS == "ios" ? 60 : 50,
@@ -718,15 +747,12 @@ const HomeScreen = ({ navigation }) => {
           }}
         >
           <Image
-            //  accessible={true}
-            //  accessibilityLabel={`SparkLight`}
+            accessible={!showWalkThrough}
+            accessibilityLabel={`SparkLight`}
             resizeMode="contain"
             style={{ width: 120, height: 30.324, flexShrink: 0 }}
             source={require("../../../assets/SparklightEntryLogo.png")}
           />
-          {/* <View>
-            <BellIcon />
-          </View> */}
         </View>
         <ScrollView style={{ height: "100%", paddingBottom: 100 }}>
           <View

@@ -21,7 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import {
   GetApiRequest,
-  GetEuroApiRequest,
+  //GetEuroApiRequest,
   GetModemStatusApiRequest,
   PostruckRollApi,
 } from "../../network/APIClient";
@@ -61,7 +61,7 @@ const ManageEquipment = ({ route }) => {
   const [wifiPasswordCanChange, setwifiPasswordCanChange] =
     React.useState(false);
   const [wifiData, setwifiData] = React.useState([]);
-  const [truckrollPrediction, setTruckrollPrediction] = React.useState(0);
+  const [truckrollPrediction, setTruckrollPrediction] = React.useState(-1);
 
   const getModemPassword = () => {
     setLoading(true);
@@ -116,11 +116,11 @@ const ManageEquipment = ({ route }) => {
             let macAddress = response[0].macAddress;
             var mac = macAddress;
             if (res.userInfo.accountNumber === "128387263") {
-              mac = "3c:75:4a:ef:a1:00";
+              mac = "bc:3e:07:38:56:d0";
             } else if (res.userInfo.accountNumber === "133370775") {
-              mac = "3c:75:4a:ef:a1:00";
+              mac = "00:40:36:5f:cc:7f";
             } else if (res.userInfo.accountNumber === "133437285") {
-              mac = "60:19:71:27:61:b2";
+              mac = "6c:cd:d6:6c:d0:1c";
             } else if (res.userInfo.accountNumber === "131684698") {
               mac = "28:7a:ee:97:4d:cc";
             } else if (res.userInfo.accountNumber === "136885142") {
@@ -231,9 +231,9 @@ const ManageEquipment = ({ route }) => {
 
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
-    if(currentHealth!='Optimal' || currentHealth!='Offline' || isOffline){
-       getTruckRollPostApiRequets('DC360C6781B0','126703933')
-       //getTruckRollPostApiRequets(macAddress.replaceAll(':',''),user?.userInfo?.accountNumber)
+    if(currentHealth=='Poor'){
+       //getTruckRollPostApiRequets('ACDB48B5B8E1','101169084')
+       getTruckRollPostApiRequets(macAddress.replaceAll(':',''),user?.userInfo?.accountNumber)
     }
   }, [currentHealth]);
 
@@ -256,7 +256,7 @@ const ManageEquipment = ({ route }) => {
   const getEuroAccountDetails = () => {
     setLoading(true);
     const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${user?.userInfo?.accountNumber}`;
-    GetEuroApiRequest(
+    GetApiRequest(
       request,
       (res) => {
         setLoading(false);
@@ -276,6 +276,7 @@ const ManageEquipment = ({ route }) => {
 
   // Call TruckRoll API
   const getTruckRollPostApiRequets = (macAddress, accountNumber) => {
+    setLoadingHealth(true);
     let request = {
       dataframe_split: {
         columns: ["accountnumber", "mac"],
@@ -287,13 +288,16 @@ const ManageEquipment = ({ route }) => {
       request,
       (res) => {
         if (res) {
+          console.log('isLoading',loading)
           console.log('getTruckRollPostApiRequets',JSON.stringify(res))
           if (res.predictions.length > 0) {
             setTruckrollPrediction(res.predictions[0]);
           }
         }
+        setLoadingHealth(false);
       },
       (error) => {
+        setLoadingHealth(false);
         console.log("TruckRollApi Error", JSON.stringify(error));
       }
     );
@@ -304,11 +308,7 @@ const ManageEquipment = ({ route }) => {
       <ProfileSettingsHeader
         title="Manage Equipment "
         onPressBack={() => {
-          if (route.params?.isFromTroubleshooting) {
-            navigation.goBack();
-          } else {
-            navigation.navigate("SupportStack");
-          }
+          navigation.goBack();
         }}
       />
       <ScrollView automaticallyAdjustContentInsets={false}>
@@ -475,7 +475,7 @@ const ManageEquipment = ({ route }) => {
                 style={[
                   styles.frame9defaultSpaceBlock,
                   {
-                    backgroundColor: (isContactUs || truckrollPrediction ==1)
+                    backgroundColor: (isContactUs || truckrollPrediction ==1 || loadingHealth)
                       ? "white"
                       : currentHealth === "Offline" ||
                         isOffline ||
@@ -503,7 +503,7 @@ const ManageEquipment = ({ route }) => {
                   style={[
                     styles.frame9defaultSpaceBlock,
                     {
-                      backgroundColor: (isContactUs || truckrollPrediction ==1)
+                      backgroundColor: (isContactUs || truckrollPrediction ==1 ||loadingHealth)
                         ? "white"
                         : currentHealth === "Offline" ||
                           currentHealth === "Poor"
@@ -542,7 +542,7 @@ const ManageEquipment = ({ route }) => {
                 style={[
                   styles.frame9defaultSpaceBlock,
                   {
-                    backgroundColor: (isContactUs || truckrollPrediction ==1)
+                    backgroundColor: (isContactUs || truckrollPrediction ==1 ||loadingHealth)
                       ? "white"
                       : currentHealth === "Offline"
                       ? "#EF4E3E10"
@@ -571,7 +571,7 @@ const ManageEquipment = ({ route }) => {
                   styles.frame9defaultSpaceBlock,
                   {
                     backgroundColor:
-                      currentHealth === "Offline" || isContactUs || truckrollPrediction==1
+                      (currentHealth === "Offline" || isContactUs  || (!loadingHealth && truckrollPrediction==1))
                         ? "#EF4E3E10"
                         : "white",
                   },

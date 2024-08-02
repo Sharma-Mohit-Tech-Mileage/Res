@@ -24,9 +24,9 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
   //const [dueDate,setDueDate]=useState('')
 
   useEffect(() => {
-    if (plans.length > 0) {
-      setPlanSpeed(plans[0].downloadSpeed);
-    }
+    // if (plans.length > 0) {
+    //   setPlanSpeed(plans[0].downloadSpeed);
+    // }
   });
   return (
     <View style={{ flexDirection: "row" }}>
@@ -69,10 +69,11 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
             </Text>
             <Text style={styles.subTitle}>{billAmt}</Text>
           </View>
-
+          { dueDate.toLowerCase()!='invalid date' &&
           <Text style={[styles.date, { paddingRight: 10 }]}>
             Due on {dueDate}
-          </Text>
+          </Text>              
+        }
         </View>
 
         <View style={[styles.subSec,{ marginTop:-10}]}>
@@ -81,8 +82,8 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
             <Text style={[styles.subTitle,{fontSize:FontSize.size_base}]}>Auto Pay</Text>
           </View>
 
-          <Text style={[styles.subTitle, { paddingRight: 10,fontSize:FontSize.size_base }]}>
-            <TickIcon color={'#2BA948'}/> On
+          <Text style={[styles.subTitle, { paddingRight: 10,fontSize:FontSize.size_base,color:'#4C5458' }]}>
+            <TickIcon color={plans.isEasyPay?colors.sparklight_green:'#4C5458'}/> {plans.isEasyPay?'On':'Off'}
           </Text>
         </View>
        
@@ -90,6 +91,9 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
         
         <View style={{flexDirection:'column'}}>
         <TouchableOpacity
+        accessible={true}
+        accessibilityLabel={`Make a Payment`}
+        accessibilityRole="button"
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
               url: `${Env.URL}/billing`,
@@ -152,12 +156,13 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
         <View style={styles.subSec}>
           <View style={{ flexDirection: "row",marginTop:10}}>
             
-            <Text style={[styles.subTitle,{fontSize:FontSize.size_lg,color:'#2BA948',fontWeight:'500'}]}>On</Text>
+            <Text style={[styles.subTitle,{fontSize:FontSize.size_lg,color:plans.isEasyPay?colors.sparklight_green:'#4C5458',fontWeight:'500'}]}>{plans.isEasyPay?'On':'Off'}</Text>
           </View>
-
+         {plans.easyPayId!='' &&
           <Text style={[styles.date, { paddingRight: 10} ]}>
-             Account ending in 9100
+             Account ending in {plans.easyPayId}
           </Text>
+           }
         </View>
         {/* <View
           style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10,marginBottom:10 }}
@@ -166,7 +171,7 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
             bottom:0}}>
         <TouchableOpacity
          accessible={true}
-         accessibilityLabel={`Upgrade Plan`}
+         accessibilityLabel={`Manage Auto Pay`}
          accessibilityRole="button"
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {

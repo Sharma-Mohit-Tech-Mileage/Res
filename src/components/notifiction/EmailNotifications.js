@@ -86,7 +86,7 @@ const EmailNotifications = () => {
     <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
       <ProfileSettingsHeader
         title="Edit Email Notifications"
-        onPressBack={() => navigation.navigate('Notifications')}
+        onPressBack={() => navigation.goBack()}
         accessibilityLabel="Back to Account"
         accessibilityHint="Navigates back to the Notifications screen"
       />
@@ -115,7 +115,7 @@ const EmailNotifications = () => {
                       </View>
                       <Text style={[styles.youAreSubscribedContainer, styles.containerTypo,]} >
                         <Text
-                          style={{ lineHeight: 28 }}
+                          style={{ lineHeight: 22 }}
                         >{`Please enter your email address below to opt into email notifications and stay connected with us. `}</Text>
                       </Text>
                     </View>
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
-    lineHeight: 28,
+    lineHeight: 22,
     flex: 1,
   },
   paperlessBillingParent: {
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
   },
   receiveBillingStatements: {
     color: Color.colorGray_100,
-    lineHeight: 28,
+    lineHeight: 22,
     paddingHorizontal: Padding.p_5xl
   },
   frameParent1: {

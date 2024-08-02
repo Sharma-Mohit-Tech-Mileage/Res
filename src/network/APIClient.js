@@ -109,7 +109,7 @@ export const PostAuthApiRequest = (endpoint, body, onSuccess, onError) => {
         body: JSON.stringify(body)
     };
 
-    fetch(`${BASE_URL}/${endpoint}`, options)
+    fetch(`${BASE_URL}${endpoint}`, options)
         .then(response => handleAuthResponse(response, idTokenGuid, refreshToken, onSuccess, onError))
         .catch(exception => onError(exception));
 };
@@ -127,7 +127,7 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     };
 
     console.log('PostApiRequest:', endpoint);
-    fetchWithTokenRefresh(fetch, `${BASE_URL}/${endpoint}`, options, onSuccess, onError)
+    fetchWithTokenRefresh(fetch, `${BASE_URL}${endpoint}`, options, onSuccess, onError)
         .then(response => handleFetchResponse(response, onSuccess, onError));
 };
 
@@ -155,7 +155,7 @@ export const UploadMultipartData = async (endpoint, data, onSuccess, onError) =>
         return axios.post(url, opts.data, { headers: opts.headers });
     };
 
-    fetchWithTokenRefresh(fetchFunction, `${BASE_URL}/${endpoint}`, options, onSuccess, onError)
+    fetchWithTokenRefresh(fetchFunction, `${BASE_URL}${endpoint}`, options, onSuccess, onError)
         .then(response => {
             onSuccess(response.data);
         })
@@ -247,7 +247,7 @@ export const GetApiRequest = async (endpoint, onSuccess, onError) => {
 
     console.log('GetApiRequest:', endpoint);
     console.log('request Token:', user.token);
-    fetchWithTokenRefresh(fetch, `${BASE_URL}/${endpoint}`, options, onSuccess, onError)
+    fetchWithTokenRefresh(fetch, `${BASE_URL}${endpoint}`, options, onSuccess, onError)
         .then(response => {
             if (response.status === 204) {
                 onError(response.status);
@@ -269,7 +269,7 @@ export const GetApiRequestSearch = async (endpoint, onSuccess, onError) => {
     };
 
     console.log('GetApiRequestSearch:', endpoint);
-    fetchWithTokenRefresh(fetch, `${SUPPORT_URL}/${endpoint}`, options, onSuccess, onError)
+    fetchWithTokenRefresh(fetch, `${SUPPORT_URL}${endpoint}`, options, onSuccess, onError)
         .then(response => handleFetchResponse(response, onSuccess, onError));
 };
 
@@ -296,25 +296,25 @@ export const GetModemStatusApiRequest = async (endpoint, onSuccess, onError) => 
         .catch(exception => onError(exception.message));
 };
 
-export const GetEuroApiRequest = async (endpoint, onSuccess, onError) => {
-    const user = await getUser();
+// export const GetEuroApiRequest = async (endpoint, onSuccess, onError) => {
+//     const user = await getUser();
 
-    const options = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
-        }
-    };
+//     const options = {
+//         method: 'GET',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'Authorization': `Bearer ${user.token}`
+//         }
+//     };
 
-    const fetchFunction = (url, opts) => {
-        return fetch(url, opts);
-    };
+//     const fetchFunction = (url, opts) => {
+//         return fetch(url, opts);
+//     };
 
-    fetchWithTokenRefresh(fetchFunction, endpoint, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, onSuccess, onError))
-        .catch(error => onError(error.message));
-};
+//     fetchWithTokenRefresh(fetchFunction, endpoint, options, onSuccess, onError)
+//         .then(response => handleFetchResponse(response, onSuccess, onError))
+//         .catch(error => onError(error.message));
+// };
 
 
 // export const GetEuroApiRequest = async (endpoint, onSuccess, onError) => {
@@ -349,7 +349,7 @@ export const GetEuroApiRequest = async (endpoint, onSuccess, onError) => {
 // Truck roll API 
 export const PostruckRollApi = (endpoint, body, onSuccess, onError) => {
  console.log(`endpoint=endpoint`, JSON.stringify(body));
-    fetch(`https://adb-1771418802186593.13.azuredatabricks.net/${endpoint}`, {
+    fetch(Env.TRUCK_ROLL_BASE_URL, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

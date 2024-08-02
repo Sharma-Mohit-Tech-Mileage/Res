@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "rea
 import FastImage from "react-native-fast-image";
 import colors from "../../res/Colors";
 import SecondaryButton from "./customui/SparkLightButton";
+import SparkLightButton from "./customui/SecondaryButton";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import TimerInfo from "../../res/svgIcons/TimerInfo";
 import { getUser } from "../../redux/utils/LocalStorage";
@@ -12,6 +13,7 @@ import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
 import { FontFamily } from "../../../GlobalStyles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { Env } from "../../network/apis/account/Constants";
+
 const speedGif = require("../../../assets/Wifi-Speed-Animation.gif");
 const wifiGif = require("../../../assets/Wifi-Speed-Only-Animation.gif");
 const modemSpeedGif = require("../../../assets/Modem-Speed-Animation.gif");
@@ -25,6 +27,10 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
   const [testDate, setTestDate] = useState(0);
   const [loading, setLoading] = useState(false);
   const [networkId, setNetworkId] = useState(null);
+  const [speedLoading,setSpeedLoading] = useState(false);
+  useEffect(() => {
+    getCurrentSpeed();
+  }, [speedType]);
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -32,7 +38,6 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
   };
 
   const getCurrentSpeed = () => {
-    setLoading(true);
     setDownload(0);
     setUpload(0);
     setDownloadFrac(0);
@@ -41,10 +46,11 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
 
     getUser().then((res) => {
       if (speedType === 'wifi') {
-        const request = `/Internet/api/internet/${res.userInfo.accountNumber}/speedTest/Get`;
+        const request = `Internet/api/internet/${res.userInfo.accountNumber}/speedTest/Get`;
         GetApiRequest(request, onSuccess, onError);
       } else {
-        const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${res.userInfo.accountNumber}`;
+        setSpeedLoading(true)
+        const request = `mobile/api/Eero/GetEeroAccountDetails?accountnumber=${res.userInfo.accountNumber}`;
         GetApiRequest(request, (response) => {
           const networkId = response.data.networks[0].split('/').pop();
           setNetworkId(networkId);
@@ -55,7 +61,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
   };
 
   const fetchModemSpeedDetails = (accountNumber, networkId) => {
-    const speedTestRequest = `/mobile/api/Eero/GetEeroSpeedTestDetails?accountnumber=${accountNumber}&networkId=${networkId}`;
+    const speedTestRequest = `mobile/api/Eero/GetEeroSpeedTest?accountnumber=${accountNumber}&networkId=${networkId}`;
     GetApiRequest(speedTestRequest, onSuccessModem, onError);
   };
 
@@ -81,11 +87,12 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
   };
 
   const onSuccessModem = (res) => {
-    if (res && res.length > 0) {
-      const latestResult = res[0];
-      const downloadSpeed = latestResult.download_Result * 1000; // Convert to Kbps
-      const uploadSpeed = latestResult.upload_Result * 1000; // Convert to Kbps
-      const date = latestResult.tstamp;
+    console.log('onSuccessModem**************************', res);
+    if (res && res.data && res.data.length > 0) {
+      const latestResult = res.data[0];
+      const downloadSpeed = latestResult.down_Mbps * 1000; // Convert to Kbps
+      const uploadSpeed = latestResult.up_Mbps * 1000; // Convert to Kbps
+      const date = latestResult.date;
 
       const speedInMbps_download = (downloadSpeed / 1000).toFixed(2);
       const speedInMbps_upload = (uploadSpeed / 1000).toFixed(2);
@@ -99,16 +106,17 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
       setUpload(upl[0]);
       setUploadFrac(upl[1]);
     }
-    setLoading(false);
-  };
+    setSpeedLoading(false);
+};
+
 
   const onError = (error) => {
     console.log("error", error);
     setLoading(false);
+    setSpeedLoading(false);
   };
 
   const handleTestSpeed = () => {
-    setLoading(true);
     setDownload(0);
     setUpload(0);
     setDownloadFrac(0);
@@ -117,18 +125,21 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
     if (speedType === 'wifi') {
       toggleModal();
     } else {
+      setLoading(true);
       getUser().then((res) => {
-        const postRequest = `/mobile/api/eero/InsertSpeedTestResults?accountnumber=${res.userInfo.accountNumber}&networkId=${networkId}`;
+        const postRequest = `mobile/api/eero/InsertSpeedTestResults?accountnumber=${res.userInfo.accountNumber}&networkId=${networkId}`;
         PostApiRequest(postRequest, {}, () => {
+          setLoading(false);
+          setSpeedLoading(true);
           fetchModemSpeedDetails(res.userInfo.accountNumber, networkId);
         }, onError);
       });
     }
   };
 
-  useEffect(() => {
-    getCurrentSpeed();
-  }, [speedType]);
+  const handleCancel = () => {
+    setLoading(false);
+  };
 
   const getGifSource = () => {
     if (speedType === 'wifi') {
@@ -142,12 +153,20 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
       <>
         <View style={styles.testSpeedResultContainer}>
           <View style={[styles.gifContainer, { marginHorizontal: wp('6%') }]}>
-            {loading ? (
-              <FastImage resizeMode={FastImage.resizeMode.contain} source={getGifSource()} style={styles.gif} />
-            ) : (
-              <FastImage resizeMode={FastImage.resizeMode.contain} source={getGifSource()} style={styles.gif} />
-            )}
+            <FastImage resizeMode={FastImage.resizeMode.contain} source={getGifSource()} style={styles.gif} />
           </View>
+          {speedType !== 'wifi' && (
+            <View style={styles.refreshContainer}>
+              <Text style={styles.refreshText}><Text style={[styles.downloadText, styles.downloadsupport]}>Tap </Text> 
+                <Text onPress={getCurrentSpeed} style={styles.refreshButton}>
+                  <Text style={styles.refreshButtonText}>here</Text>
+                </Text>
+                <Text style={[styles.downloadText, styles.downloadsupport]}> to refresh for latest information </Text> 
+              </Text>
+            </View>
+          )}
+          {speedLoading?
+            <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />:null}
           <View style={styles.testSpeedInnerContainer}>
             <View style={styles.testSpeedColumn}>
               <View style={styles.speedRow} accessible={true} accessibilityLabel={`${download}.${downloadFrac}`}>
@@ -162,7 +181,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
                 <Text style={[styles.downloadText, styles.downloadsupport]}> Mbps</Text>
               </View>
             </View>
-
+  
             <View style={styles.uploadParent}>
               <View style={styles.speedRow} accessible={true} accessibilityLabel={`${upload}.${uploadFrac}`}>
                 <FastImage source={require("../../../assets/upload.png")} style={styles.icon} />
@@ -177,12 +196,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
               </View>
             </View>
           </View>
-          <View 
-          style={{ marginHorizontal: 16 }}
-          accessible={true}
-          accessibilityLabel={`Test Speed`}
-          accessibilityRole="button"
-          >
+          <View style={{ marginHorizontal: 16 }} accessible={true} accessibilityLabel={`Test Speed`} accessibilityRole="button">
             <SecondaryButton buttonText={"Test Speed"} onPress={handleTestSpeed} />
           </View>
           <View style={styles.divider} />
@@ -199,22 +213,34 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
   return (
     <View style={{ flex: 1 }}>
       {loading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
+        <View style={styles.loadingContainer}>
+          <View style={styles.loadingSpinnerContainer}>
+            <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
+            <Text style={[styles.loadingText, { fontSize: 24 }]}>Testing speed...</Text>
+            <Text style={[styles.loading, { fontSize: 16 }]}>This process may take a while, so please check back in a minute.</Text>
+          </View>
+          <View accessible={true} accessibilityLabel={`Test Speed`} accessibilityRole="button">
+            <SparkLightButton text={"Cancel"} onPress={handleCancel} />
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.timer}>
+            <TimerInfo />
+            <Text style={styles.timerInfo1}>Last run</Text>
+            <Text style={styles.timerInfo2}>{testDate}</Text>
+          </View>
         </View>
       )}
-      <TestSpeedResultSection />
+      {!loading ? <TestSpeedResultSection /> : null}
       <View style={styles.divider} />
       <TouchableOpacity
-      accessible={true}
-      accessibilityLabel={`Upgrade Plan`}
-      accessibilityRole="button"
+        accessible={true}
+        accessibilityLabel={`Upgrade Plan`}
+        accessibilityRole="button"
         onPress={() => navigation.navigate('ArticalWindowUtility', { url: `${Env.URL}/services/upgrade`, name: 'Upgrade Plan' })}
         style={styles.result}
       >
         <Text style={styles.planUpgrade}>Upgrade Plan</Text>
-        <View style={styles.rightArrowContainer}><RightArrow />
-        </View>
+        <View style={styles.rightArrowContainer}><RightArrow /></View>
       </TouchableOpacity>
       {showModal && <SpeedTestModal url="https://cableone.speedtestcustom.com/" onClose={toggleModal} />}
     </View>
@@ -227,11 +253,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingContainer: {
+    borderColor: colors.grey,
+    borderWidth: 1,
+    borderRadius: 10,
+    marginHorizontal: wp('6%'),
+    paddingHorizontal: 20,
+    paddingTop: 16
+  },
+  loadingSpinnerContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    borderColor: colors.grey,
+    borderWidth: 1,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
   testSpeedResultContainer: {
     borderColor: colors.grey,
     borderWidth: 1,
     borderRadius: 0, // Optional: Rounded corners
     marginHorizontal: wp('6%'),
+    //padding: 16, // Added padding for better spacing
   },
   gifContainer: {
     alignItems: 'center',
@@ -240,7 +284,6 @@ const styles = StyleSheet.create({
     borderWidth: 1, // Border width for the GIF container
     borderColor: colors.grey, // Border color
     borderRadius: 10, // Optional: Rounded corners
-
   },
   gif: {
     width: wp('75%'),
@@ -347,6 +390,32 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 10,
+  },
+  loadingText: {
+    textAlign: 'center',
+    color: colors.sparklight_grey,
+    marginTop: 10,
+  },
+  loading: {
+    textAlign: 'center',
+    color: colors.dark_grey,
+    marginTop: 10,
+  },
+  refreshContainer: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  refreshText: {
+    textAlign: 'center',
+  },
+  refreshButton: {
+    color: colors.sparklight_bright_purple,
+    fontWeight: 'bold',
+  },
+  refreshButtonText: {
+    color: colors.sparklight_bright_purple,
+    fontWeight: 'bold',
+    textDecorationLine: 'underline',
   },
 });
 

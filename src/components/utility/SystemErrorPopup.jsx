@@ -49,6 +49,9 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
              <TouchableOpacity
               style={styles.openBtn}
               onPress={onAction}
+              accessible={true}
+              accessibilityLabel={onActionTxt}
+              accessibilityRole="button"
             >
               <Text
                 style={styles.openPortaltxt}
@@ -60,6 +63,9 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={onClose}
+              accessible={true}
+              accessibilityLabel="Cancel"
+              accessibilityRole="button"
             >
               <Text
                 style={styles.closeAlertTxt}

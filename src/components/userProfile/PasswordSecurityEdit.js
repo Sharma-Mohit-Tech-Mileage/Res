@@ -19,6 +19,7 @@ const PasswordSecurityEdit = () => {
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
+  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   const route = useRoute(); // Use the useRoute hook
   const dispatch = useDispatch();
   const profile = useSelector(state => state.combinedReducers.profile || {});
@@ -30,8 +31,10 @@ const PasswordSecurityEdit = () => {
   const handleSecurityQuestionChange = (itemValue) => {
     setLocalProfile({ ...profileDetails, securityQuestion: itemValue === "Add your own question" ? '' : itemValue });
     setCustomSecurityQuestion(itemValue);
+    setIsDropDownOpen(false)
     setIsCustomQuestionSelected(itemValue === "Add your own question");
   };
+
 
   const handleSave = (formData) => {
     dispatch(updateProfileSecurity(formData, navigation)); // Dispatch with formData
@@ -74,8 +77,13 @@ const PasswordSecurityEdit = () => {
 
 
   return (
-    <View style={styles.passwordSecurityEdit}>
+    <View style={styles.passwordSecurityEdit}
+    accessibilityElementsHidden={isDropDownOpen}
+    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+    >
       <ProfileSettingsHeader
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
         title="Edit Password & Security"
         onPressBack={() => navigation.navigate('PasswordSecurity')}
       />
@@ -106,7 +114,10 @@ const PasswordSecurityEdit = () => {
                   Password
                 </Text>
               </View>
-              <View style={styles.frameParent}>
+              <View style={styles.frameParent}
+              accessibilityElementsHidden={isDropDownOpen}
+              importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+              >
                 <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                     <Controller
                       control={control}
@@ -122,7 +133,10 @@ const PasswordSecurityEdit = () => {
                             secure={true}
                             error={error?.message}
                           />
-                          <View style={[styles.passwordFlexBox, { marginTop: Padding.p_base }]}>
+                          <View 
+                          accessibilityElementsHidden={isDropDownOpen}
+                          importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                          style={[styles.passwordFlexBox, { marginTop: Padding.p_base }]}>
                             {validatePassword(value, profileDetails.userName).map((isValid, index) => (
                               <View key={`point-${index}`} style={styles.bulletPointContainer}>
                                 <View style={{ marginTop: 7 }}>
@@ -144,21 +158,36 @@ const PasswordSecurityEdit = () => {
                 <View style={styles.frameChild} />
               </View>
               <View style={styles.frameParent1}>
-                <View style={styles.securityQuestionWrapper}>
+                <View 
+                accessibilityElementsHidden={isDropDownOpen}
+                importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                style={styles.securityQuestionWrapper}>
                   <Text style={[styles.password, styles.passwordFlexBox]} >Security Question</Text>
                 </View>
-                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                <View 
+                style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                   <View style={styles.textinput}>
-                    <Text style={[styles.firstName1, styles.firstTypo]} > Password Reset Question</Text>
+                    <Text 
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                     style={[styles.firstName1, styles.firstTypo]} > Password Reset Question</Text>
                     <SparkLightDropdown
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
                       items={securityQuestions}
                       selectedValue={customSecurityQuestion}
                       onValueChange={handleSecurityQuestionChange}
+                      isDropDownOpen={(value) => {
+                        setIsDropDownOpen(true)
+                      }}
                     />
                   </View>
                 </View>
                 {isCustomQuestionSelected && (
-                  <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                  <View 
+                 accessibilityElementsHidden={isDropDownOpen}
+                 importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                  style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                     <View style={styles.textinput}>
                       <Controller
                         control={control}
@@ -178,7 +207,10 @@ const PasswordSecurityEdit = () => {
                     </View>
                   </View>
                 )}
-                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                <View 
+                accessibilityElementsHidden={isDropDownOpen}
+                importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                     <Controller
                       control={control}
                       name="securityAnswer"

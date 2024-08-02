@@ -39,6 +39,7 @@ const RetrieveModemPassword = () => {
   const [slectedPasword, setSelectedPassword] = useState("")
   const [modemPasswordData, setModemPasswordData] = useState([])
   const [loading, setLoading] = useState(false);
+  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
 
   useEffect(() => {
     getModemPassword();
@@ -74,6 +75,7 @@ const RetrieveModemPassword = () => {
     console.log("error", error);
   };
   const handlePasswordSelection = (value) => {
+    setIsDropDownOpen(false)
     setSelectedPassword(value)
   }
 
@@ -87,6 +89,8 @@ const RetrieveModemPassword = () => {
   return (
     <View style={styles.viewBackground}>
       <ProfileSettingsHeader
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
         title="Retrieve Modem Password"
         onPressBack={() => navigation.navigate("ManageEquipmentScreen")}
       />
@@ -98,6 +102,9 @@ const RetrieveModemPassword = () => {
               items={passwordList}
               selectedValue={slectedPasword}
               onValueChange={handlePasswordSelection}
+              isDropDownOpen={(value) => {
+                setIsDropDownOpen(true)
+              }}
             />
           </View>
 
@@ -126,9 +133,14 @@ const RetrieveModemPassword = () => {
             />
           </View>
         </View>
-        <Text style={styles.howText}>How To</Text>
+        <Text
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+        style={styles.howText}>How To</Text>
         <View style={styles.borderStyle} />
         <TouchableOpacity
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
         accessibilityLabel="Connect Android Device"
         accessibilityRole="link"
         accessible={true}
@@ -142,6 +154,8 @@ const RetrieveModemPassword = () => {
         </TouchableOpacity>
         <View style={styles.borderStyle} />
         <TouchableOpacity
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
         accessibilityLabel="Connect iPhone Device"
         accessibilityRole="link"
         accessible={true}
@@ -155,6 +169,8 @@ const RetrieveModemPassword = () => {
         </TouchableOpacity>
         <View style={styles.borderStyle} />
         <TouchableOpacity
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
         accessibilityLabel="Connect PC/MAC"
         accessibilityRole="link"
         accessible={true}
@@ -167,7 +183,10 @@ const RetrieveModemPassword = () => {
           <Image style={styles.lockIcon} source={require('../../../assets/chevronright.png')} />
         </TouchableOpacity>
       </View>
-      <View style={styles.buttonContainer}>
+      <View 
+      accessibilityElementsHidden={isDropDownOpen}
+      importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+      style={styles.buttonContainer}>
         <Pressable
           accessible={true}
           accessibilityRole="button"

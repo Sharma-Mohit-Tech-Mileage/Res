@@ -64,7 +64,7 @@ const NewBillerHome = ({ navigation }) => {
   const [billAmt, setBillAmt] = useState(0);
   const [dueDate, setDueDate] = useState("");
   const [currentHealth, setCurrentHealth] = useState("Optimal");
-  const [billPaid, setBillPaid] = useState(false);
+  const [payStatus, setPayStatus] = useState({});
   const [accountStatus, setAccountStatus] = useState("Active");
   const [hasOutage, setHasOutage] = useState(false);
   const [isOutageAlert, setIsOutageAlert] = useState(false);
@@ -73,6 +73,7 @@ const NewBillerHome = ({ navigation }) => {
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
+  
   const [updateStatus, setUpdateStatus] = useState({
     isMinorUpdateAvailable: false,
     currentVersion: "",
@@ -84,10 +85,24 @@ const NewBillerHome = ({ navigation }) => {
     return currentHealth[type] || currentHealth["default"];
   };
 
-  const getInternetPlanDetails = () => {
+  // const getInternetPlanDetails = () => {
+  //   getUser().then((res) => {
+  //     const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
+  //     GetApiRequest(request, onSuccessPlan, onError);
+  //   });
+  // };
+
+  const getEasyPlanStatus = () => {
     getUser().then((res) => {
-      const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
-      GetApiRequest(request, onSuccessPlan, onError);
+      const request = `AccountSvc/api/Accounts/${res.userInfo.accountNumber}/easypay`;
+      GetApiRequest(request, (res)=>{
+            if(res){
+              console.log('getEasyPlanStatus',res)
+              setPayStatus(res)
+            }
+      }, (error)=>{
+          console.log('getEasyPlanStatus error',error)
+      });
     });
   };
 
@@ -191,11 +206,11 @@ const NewBillerHome = ({ navigation }) => {
         let macAddress = res[0].macAddress;
         var mac = macAddress;
         if (user.userInfo.accountNumber === "128387263") {
-          mac = "3c:75:4a:ef:a1:00";
+          mac = "bc:3e:07:38:56:d0";
         } else if (user.userInfo.accountNumber === "133370775") {
-          mac = "3c:75:4a:ef:a1:00";
-        } else if (user.userInfo.accountNumber === "133437285") {
           mac = "60:19:71:27:61:b2";
+        } else if (user.userInfo.accountNumber === "133437285") {
+          mac = "6c:cd:d6:6c:d0:1c";
         } else if (user.userInfo.accountNumber === "131684698") {
           mac = "28:7a:ee:97:4d:cc";
         } else if (user.userInfo.accountNumber === "136885142") {
@@ -297,26 +312,30 @@ const NewBillerHome = ({ navigation }) => {
 
   const getUserAccountDetails = () => {
     getUser().then((res) => {
-      const request = `account/api/account/${res.userInfo.accountNumber}`;
+      const request = `AccountSvc/api/Accounts/GetAccountDetailsByAccountNumber?accountNumber=${res.userInfo.accountNumber}`;
       GetApiRequest(
         request,
         (res) => {
-          //console.log("getUserAccountDetails", res);
+          console.log("getUserAccountDetails", res);
           if (res) {
             dispatch(saveAccountServices(res.services));
-            if (res.currentCollectionStep == "Soft Disconnect") {
-              setAccountStatus("Disconnect");
+            // if (res.currentCollectionStep == "Soft Disconnect") {
+            //   setAccountStatus("Disconnect");
               
-              setInternetHealths((oldArray) => [...oldArray, "Red"]);
-            } else {
-              updateInternetHealth(res.currentBalance, res.paymentDueDate);
-            }
-            let dueDate = moment(res.paymentDueDate).format("ll");
-            setDueDate(dueDate);
-            setBillAmt((Math.round(res.currentBalance * 100) / 100).toFixed(2));
-            getTVServiceDetails();
-            getInternetPlanDetails();
-            getPhoneServiceDetails();
+            //   setInternetHealths((oldArray) => [...oldArray, "Red"]);
+            // } else {
+            //   updateInternetHealth(res.currentBalance, res.paymentDueDate);
+            // }
+            // let dueDate = moment(res.paymentDueDate).format("ll");
+            // setDueDate(dueDate);
+            // setBillAmt((Math.round(res.currentBalance * 100) / 100).toFixed(2));
+            // getTVServiceDetails();
+            // getInternetPlanDetails();
+            // getPhoneServiceDetails();
+
+             let dueDate = moment(res.payment_due_date).format("ll");
+             setDueDate(dueDate);
+             setBillAmt(res.payment_due_amount);
           }
         },
         onErrorBill
@@ -446,17 +465,18 @@ const NewBillerHome = ({ navigation }) => {
     };
 
     fetchUpdateStatus();
+    getEasyPlanStatus();
   }, []);
 
   useEffect(() => {
     if (internetHealths.length >= 3) {
       setCheckModemStatus(true);
-      refreshInternetHealth();
+      //refreshInternetHealth();
     }
   }, [internetHealths]);
 
   useEffect(() => {
-    checkModemOutagStatus();
+    //checkModemOutagStatus();
     getUserAccountDetails();
 
     const fetchData = async () => {
@@ -468,27 +488,29 @@ const NewBillerHome = ({ navigation }) => {
         console.error("Error fetching data", error);
       }
       if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
-        setShowWalkThrough(true);
+        //setShowWalkThrough(true);
       }
     };
     fetchData();
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        dispatch(fetchPushNotifications());
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-    };
-    fetchData();
-  }, [dispatch]);
-  useEffect(() => {
-    if (profile?.pushNotifications?.length > 0 && user.userInfo !== undefined) {
-      checkNotifications();
-    }
-  }, [profile, user]);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       dispatch(fetchPushNotifications());
+  //     } catch (error) {
+  //       console.error("Error fetching data", error);
+  //     }
+  //   };
+  //   fetchData();
+  // }, [dispatch]);
+
+
+  // useEffect(() => {
+  //   if (profile?.pushNotifications?.length > 0 && user.userInfo !== undefined) {
+  //     checkNotifications();
+  //   }
+  // }, [profile, user]);
 
   const changeWalkThroughStep = (step) => {
     if (step > 2) {
@@ -713,11 +735,14 @@ const NewBillerHome = ({ navigation }) => {
       colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
       style={styles.container}
     >
-      {showWalkThrough && <View style={styles.shadowFullScreen} />}
-      {showWalkThrough && walkthroughModal()}
+      {/* {showWalkThrough && <View style={styles.shadowFullScreen} />}
+      {showWalkThrough && walkthroughModal()} */}
 
       <SafeAreaView style={{ flex: 1 }}>
         <View
+         accessibilityElementsHidden={showWalkThrough}
+         importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
+          accessibilityLabel={`SparkLight`}
           style={{
             height: Platform.OS == "ios" ? 60 : 50,
             flexDirection: "row",
@@ -727,6 +752,8 @@ const NewBillerHome = ({ navigation }) => {
           }}
         >
           <Image
+          accessible={!showWalkThrough}
+          accessibilityLabel={`SparkLight`}
             resizeMode="contain"
             style={{ width: 120, height: 30.324, flexShrink: 0 }}
             source={require("../../../assets/SparklightEntryLogo.png")}
@@ -753,7 +780,7 @@ const NewBillerHome = ({ navigation }) => {
             )}
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <View
-                style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
+                //style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
               />
               <Text style={[styles.descriptionText,{fontSize:FontSize.size_3xl,fontWeight:'400', marginBottom:20}]}>Welcome to Sparklight</Text>
               <View style={{flexDirection:'column'}}>
@@ -777,6 +804,9 @@ const NewBillerHome = ({ navigation }) => {
               )}
 
               <TouchableOpacity
+               accessible={true}
+               accessibilityLabel={isImageDispaly ? 'Collapse' : 'Expand'}
+               accessibilityRole="button"
                 onPress={() => {
                   setIsImageDispaly(!isImageDispaly);
                 }}
@@ -808,7 +838,7 @@ const NewBillerHome = ({ navigation }) => {
             <ScrollView horizontal={true} style={{ marginStart: 20 }}>
               <View>
                 <MyInternetDetialsBiller
-                  plans={plans}
+                  plans={payStatus}
                   billAmt={billAmt}
                   dueDate={dueDate}
                   navigation={navigation}

@@ -110,6 +110,9 @@ const InAppNotifications = ({ navigation }) => {
             </View>
             <View style={styles.buttonsParent}  >
               <Pressable
+               accessible={true}
+               accessibilityLabel="Save"
+                accessibilityRole="button"
                 style={({ pressed }) => [
                   { backgroundColor: Color.colorMidnightblue, opacity: pressed ? 0.7 : 1.0 }, // Changes opacity based on press state
                   styles.buttonsLayout
@@ -119,6 +122,9 @@ const InAppNotifications = ({ navigation }) => {
                 <Text style={[{ color: Color.sparklightWhite }, styles.makeTypo]}>Save</Text>
               </Pressable>
               <Pressable
+               accessible={true}
+               accessibilityLabel="Cancel"
+                accessibilityRole="button"
                 style={({ pressed }) => [
                   styles.buttons1,
                   styles.buttonsLayout,
@@ -197,7 +203,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
-    lineHeight: 28,
+    lineHeight: 22,
     flex: 1,
   },
   appointmentsParent: {
@@ -220,7 +226,7 @@ const styles = StyleSheet.create({
   },
   receiveAppNotifications1: {
     color: Color.colorGray_100,
-    lineHeight: 28,
+    lineHeight: 22,
   },
   frameGroup: {
     borderWidth: 1,
