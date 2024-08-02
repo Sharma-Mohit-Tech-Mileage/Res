@@ -96,7 +96,7 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
         accessibilityRole="button"
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
-              url: `${Env.URL}/billing`,
+              url: Env.PAYMENT,
               name: "Billing Details",
             });
           }}
