@@ -34,6 +34,9 @@ export const config={
      PAYMENTURL: 'https://payment.uat.sparklight.com/PortalsV2/PortalsPayment',
      URL_EASYPAY: 'https://payment.uat.sparklight.com/PortalsV2/setup-auto-pay',
      encryptvalPassword: '1 0 7 2 8 3 3634',
+     PAYMENTURLNEW: 'https://customer.uat.sparklight.com/portals/app-secure/billing',
+     EASYPAYNEW: 'https://payment.uat.sparklight.com/portalsV3-Demo/manage-autopay',
+     //PAYMENT:'https://payment.sparklight.com/portalsV3-Demo/activate-autopay',
      ZENDESK_FEEDBACK:{
        Url:'https://cableone1718812169.zendesk.com/api/v2/requests.json',
        ticket_form_id: "24297809981847",
@@ -49,6 +52,6 @@ export const config={
  
  }
  
- export const ISUAT = false
+ export const ISUAT = true
  
  export const Env=(ISUAT)? config.UAT : config.PRODUCTION
