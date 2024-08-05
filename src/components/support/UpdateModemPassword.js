@@ -61,7 +61,9 @@ const UpdateModemPassword = (props) => {
 
 
   useEffect(() => {
-    // getModemPassword();
+    if(!isEEroDevice){
+    getModemPassword();
+    }
   }, [])
 
   useEffect(() => {
