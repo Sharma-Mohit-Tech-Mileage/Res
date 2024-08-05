@@ -7,7 +7,9 @@ import {
   Button,
   Alert,
   Image,
-  Pressable
+  Pressable,
+  Platform,
+  Linking
 } from "react-native";
 import {
   FontFamily,
@@ -113,12 +115,11 @@ const EEroFeatures = (props) => {
             accessibilityLabel="Open the eero App"
             style={[styles.button, styles.buttonsLayout]}
             onPress={() => { 
-
-              // if (Platform.OS === 'android') {
-              // }
-              // else {
-
-              // }
+              if (Platform.OS === 'android') {
+                Linking.openURL('https://play.google.com/store/apps/details?id=com.eero.android');
+              } else {
+                Linking.openURL('https://apps.apple.com/us/app/eero-wifi-system/id1023499075');
+              }
             }}
           >
             <Text style={[styles.accept]}>
