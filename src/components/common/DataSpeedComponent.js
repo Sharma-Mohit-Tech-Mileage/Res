@@ -240,7 +240,7 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice }) => {
         style={styles.result}
       >
         <Text style={styles.planUpgrade}>Upgrade Plan</Text>
-        <View style={styles.rightArrowContainer}><RightArrow /></View>
+        <RightArrow />
       </TouchableOpacity>
       {showModal && <SpeedTestModal url="https://cableone.speedtestcustom.com/" onClose={toggleModal} />}
     </View>
