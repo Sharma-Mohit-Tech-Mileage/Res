@@ -9,3 +9,7 @@ export const startChatWithConfig = (config) => {
 export const clearChatData = () => {
     RNZendeskChatModule.clearChatSession();
 };
+
+export const ZendDeskInitialize = (accountKey) => {
+    RNZendeskChatModule.initialize(accountKey);
+};

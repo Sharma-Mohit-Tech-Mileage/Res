@@ -1,46 +1,39 @@
 #import "RNZendeskChatModule.h"
+#import <ZendeskSDKMessaging/ZendeskSDKMessaging.h>
+#import <ZendeskSDK/ZendeskSDK.h>
 #import <ZendeskCoreSDK/ZendeskCoreSDK.h>
-#import <SupportProvidersSDK/SupportProvidersSDK.h>
-#import <AnswerBotProvidersSDK/AnswerBotProvidersSDK.h>
-#import <ChatProvidersSDK/ChatProvidersSDK.h>
+
+
 
 
 @implementation RNZendeskChatModule
 
 RCT_EXPORT_MODULE();
 
-RCT_EXPORT_METHOD(initialize:(NSString *)accountKey)
+RCT_EXPORT_METHOD(initialize:(NSString *)appId clientId:(NSString *)clientId zendeskUrl:(NSString *)zendeskUrl accountKey:(NSString *)accountKey)
 {
-  
-  [ZDKChat initializeWithAccountKey: accountKey queue: dispatch_get_main_queue()];
-
+    [ZDKZendesk initializeWithAppId:appId clientId:clientId zendeskUrl:zendeskUrl];
+    [ZDKChat initializeWithAccountKey:accountKey];
+  [ZDKChat initializeWithAccountKey: <#accountKey#>, queue: dispatch_get_main_queue()];
 }
-
 
 RCT_EXPORT_METHOD(startChat:(NSDictionary *)config resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-    ZDKVisitorInfo *visitorInfo = [[ZDKVisitorInfo alloc] initWithName:config[@"name"]
-                                                                 email:config[@"email"]
-                                                          phoneNumber:config[@"phone"]];
-    [[ZDKChat instance].providers.profileProvider setVisitorInfo:visitorInfo completion:nil];
+//    ZDKVisitorInfo *visitorInfo = [[ZDKVisitorInfo alloc] initWithName:config[@"name"]
+//                                                                 email:config[@"email"]
+//                                                          phoneNumber:config[@"phone"]];
+//    [[ZDKChat instance].providers.profileProvider setVisitorInfo:visitorInfo completion:nil];
+//
+//    ZDKChatConfiguration *chatConfiguration = [[ZDKChatConfiguration alloc] init];
+//    chatConfiguration.isAgentAvailabilityEnabled = NO;
 
-  ZDKChatAPIConfiguration *chatConfiguration = [[ZDKChatAPIConfiguration alloc] init];
-  
-  ZDKClassicMessagingConfiguration *messagingConfiguration = [ZDKClassicMessagingConfiguration new];
-      NSError *error = nil;
-      NSArray *engines = @[
-          (id <ZDKEngine>) [ZDKAnswerBotEngine engineAndReturnError:&error],
-          (id <ZDKEngine>) [ZDKSupportEngine engineAndReturnError:&error],
-          (id <ZDKEngine>) [ZDKChatEngine engineAndReturnError:&error]
-      ];
+    // Create an instance of ZDKClassicMessagingConfiguration
+    ZDKClassicMessagingConfiguration *classicConfig = [[ZDKClassicMessagingConfiguration alloc] init];
+    classicConfig.isAgentAvailabilityEnabled = YES;  // Customize your classic messaging configuration here
 
-      return [[ZDKClassicMessaging instance] buildUIWithEngines:engines
-                                                 configs:@[messagingConfiguration]
-                                                   error:&error];
-    
+    UIViewController *chatViewController = [ZDKMessaging.instance buildUIWithEngines:@[ZDKChatEngine.engine]
+                                                                             configs:@[chatConfiguration, classicConfig]];  // Add classicConfig
 
-    UIViewController *chatViewController = [ZDKMessaging.instance buildUIWithEngines:@[ZDKChatEngine.engine] configs:@[chatConfiguration]];
-  
     dispatch_async(dispatch_get_main_queue(), ^{
         UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
         if (rootViewController) {
@@ -55,4 +48,3 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config resolver:(RCTPromiseResolveBl
 }
 
 @end
-

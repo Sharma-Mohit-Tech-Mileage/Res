@@ -13,7 +13,7 @@ import ChatIcon from "../../res/svgIcons/ChatIcon";
 import { GetApiRequest } from "../../network/APIClient";
 import CreateTicket from "./ticket/CreateTicket";
 //import ZendDesk from '@pagopa/io-react-native-zendesk';
-import { startChatWithConfig } from "../utility/RNZendeskChat";
+import { startChatWithConfig,ZendDeskInitialize } from "../utility/RNZendeskChat";
 
 const Support = ({ route }) => {
     const navigation = useNavigation();
@@ -114,6 +114,11 @@ const Support = ({ route }) => {
     };
 
     useEffect(() => {
+
+        if(Platform.OS==='ios'){
+            ZendDeskInitialize("4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC")
+        }
+
         if (route.params?.isContactUs) {
             setTimeout(() => {
                 scrollViewRef.current?.scrollToEnd({ animated: true })
@@ -124,6 +129,8 @@ const Support = ({ route }) => {
         return () => {
             PubSub.unsubscribe(token);
         };
+
+       
     }, []);
 
     const exitConfirmation=()=>{
