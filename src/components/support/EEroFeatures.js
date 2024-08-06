@@ -60,14 +60,15 @@ const EEroFeatures = (props) => {
         onPressBack={() => navigation.goBack()}
       />
       <KeyboardAwareScrollView
-      contentContainerStyle={{flexGrow:1}}
-      style={{marginBottom: '30%'}}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{paddingBottom: '15%'}}
+      style={{marginBottom: '25%'}}
       >
         <View style={styles.viewBackgroundContainer}>
           <View style={{ paddingHorizontal: Padding.p_base, }}>
             <EEroDevice />
           </View>
-          <Text style={styles.reliabilityText}>{`Reliability.Safety.Security.`}</Text>
+          <Text style={styles.reliabilityText}>{`Reliability. Safety. Security.`}</Text>
           <Text style={styles.eeroText}>{`Get it all and more with eero.`}</Text>
 
           <View style={{
@@ -83,7 +84,7 @@ const EEroFeatures = (props) => {
                   flexDirection: 'row',
                   justifyContent: "space-between",
                   paddingHorizontal: Padding.p_5xl,
-                  paddingVertical: Padding.p_3xs,
+                  paddingVertical: Padding.p_5xs,
                   backgroundColor: index % 2 == 0 ? Color.colorWhitesmoke_100 : Color.sparklightWhite
                 }}>
                   <View style={{
@@ -104,7 +105,7 @@ const EEroFeatures = (props) => {
                 </View>
               )
             })}
-            <Text style={[styles.reliabilityText,{paddingBottom: 20}]}>{`And much more!`}</Text>
+            <Text style={[styles.reliabilityText,{paddingTop: Padding.p_5xs}]}>{`And much more!`}</Text>
           </View>
         </View>
         <View

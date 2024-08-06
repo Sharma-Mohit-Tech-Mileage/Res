@@ -39,9 +39,9 @@ const UpdateModemPassword = (props) => {
 
   const isEEroDevice = props?.route?.params?.isEEroDevice || false;
   const eeroDeviceData = props?.route?.params?.eeroDeviceData || null;
-  const networkPath = eeroDeviceData.networks[0];
-  const parts = networkPath.split('/');
-  const networkId = parts[parts.length - 1];
+  const networkPath = eeroDeviceData?.networks[0];
+  const parts = networkPath?.split('/');
+  const networkId = parts[parts?.length - 1];
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [newPassword, setNewPassword] = useState("");
@@ -215,7 +215,7 @@ const UpdateModemPassword = (props) => {
                 />
               </View>
               <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
-                {`To access more features of your Eero device,please download the `}
+                {`To access more features of your Eero device, please download the `}
                 <Text onPress={() => {
                   navigation.navigate("EEroFeatures");
                 }} style={[styles.text]}>
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: FontSize.textXsSemibold_size,
     textAlign: "left",
-    lineHeight: 28,
+    lineHeight: 22,
     flex: 1,
   },
   text: {
