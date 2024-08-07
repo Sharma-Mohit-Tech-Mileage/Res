@@ -58,7 +58,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
       return (
         <AutoPayCard
           billAmt={billAmt}
-          cardDigit={cardDigit}
+          cardDigit={""}
           isAutoPayStatus={isAutoPayStatus}
           paperlessStatus={paperlessStatus}
           navigation={navigation}

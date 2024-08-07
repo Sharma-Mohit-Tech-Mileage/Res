@@ -194,8 +194,8 @@ const styles = StyleSheet.create({
   },
   statusRow: {
     flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
+    justifyContent: "center",
+    alignItems: "center",
     width: "100%",
     marginVertical: 5,
   },
