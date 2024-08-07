@@ -65,8 +65,9 @@ const EEroFeatures = (props) => {
       style={{marginBottom: '25%'}}
       >
         <View style={styles.viewBackgroundContainer}>
-          <View style={{ paddingHorizontal: Padding.p_base, }}>
-            <EEroDevice />
+          <View style={{ height: 180 }}>
+          <Image style={{width: '100%',height: '100%',resizeMode: 'cover'}} source={require('../../../assets/eero_device.png')} />
+            {/* <EEroDevice /> */}
           </View>
           <Text style={styles.reliabilityText}>{`Reliability. Safety. Security.`}</Text>
           <Text style={styles.eeroText}>{`Get it all and more with eero.`}</Text>
@@ -80,6 +81,7 @@ const EEroFeatures = (props) => {
                 accessible={true}
                 accessibilityLabel={item.title}
                 justifyContent="flex-start"
+                height= {60}
                 style={{
                   flexDirection: 'row',
                   justifyContent: "space-between",
@@ -90,8 +92,7 @@ const EEroFeatures = (props) => {
                   <View style={{
                     flexDirection: "row",
                     alignItems :"center"
-                    
-                  }}>
+ }}>
                   <View style={{ width: 60}}>
                     {item.icon}
                     </View>
