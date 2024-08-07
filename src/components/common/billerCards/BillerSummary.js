@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     statusIcon: {
         width: 13,
         height: 13,
-        marginRight: 5,
+        marginRight: 3,
     },
     paymentButton: {
         flexDirection: "row",

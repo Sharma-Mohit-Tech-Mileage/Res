@@ -22,7 +22,7 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
                 <>
                   <Text style={[styles.dueDate, { fontWeight: '400' , color: colors.gray600 }]}>Email Associated: </Text>
                   <Text style={[styles.dueDate]}>{paperLessInfo.emailAddress}</Text>
-                  <Text style={styles.autoPayStatusText}>Paperless Billing On</Text>
+                  <Text style={styles.autoPayStatusText}>Paperless Billing!</Text>
                   <Text style={styles.thankYouText}>Thank you for choosing Paperless Billing On!</Text>
                 </>
               ) : (
