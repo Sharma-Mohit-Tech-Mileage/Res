@@ -849,11 +849,8 @@ const HomeScreen = ({ navigation }) => {
                 <></>
               )}
             </View>
-            <ScrollView horizontal={true} >
-              <View style={{ flexDirection: "row" }}>
               <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} navigation={navigation}/>
-              </View>
-            </ScrollView>
+          
             <MyServicePlan plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
             <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
           </View>
