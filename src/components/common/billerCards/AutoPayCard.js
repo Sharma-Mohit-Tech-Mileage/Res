@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignSelf: "center",
     overflow: 'hidden',
-    width: wp('90%'), // Adjust the width to fit properly
+    width: wp('90%'),
   },
   leftSection: {
     paddingHorizontal: Padding.p_5xl,
@@ -88,9 +88,10 @@ const styles = StyleSheet.create({
     width: wp('84%'),
     height: wp('84%'),
     borderRadius: wp('41.5%'),
-    backgroundColor: colors.grey,
+    backgroundColor: 'rgba(71, 84, 103, 0.05)',
     transform: [{ translateY: -wp('41.5%') }],
   },
+  
   circleContainer: {
     position: 'absolute',
     top: '50%',
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: colors.dark_grey,
-    backgroundColor: Color.backgound_blue,
+    backgroundColor: Color.sparklightGray,
     textAlign: 'center',
     borderColor: colors.dark_grey,
     borderWidth: 1,

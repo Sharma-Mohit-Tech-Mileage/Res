@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
         width: wp('84%'),
         height: wp('84%'),
         borderRadius: wp('41.5%'),
-        backgroundColor: colors.grey,
+        backgroundColor: 'rgba(71, 84, 103, 0.05)',
         transform: [{ translateY: -wp('41.5%') }],
     },
     circleContainer: {

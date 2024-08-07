@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { View, StyleSheet, Dimensions, ScrollView } from "react-native";
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import Card from "./billerCards/BillerSummary";
 import AutoPayCard from "./billerCards/AutoPayCard";
@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchBillingPaper, fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { Padding } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
+
 const { width: viewportWidth } = Dimensions.get('window');
 
 const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
@@ -22,13 +23,13 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const paperLessInfo = profile.paperLessInfo || {};
   const profileDetails = profile.profileDetails || {};
+
   const getStatus = () => {
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
       GetApiRequest(
         `account/api/account/${accountNumber}/easypay`,
         (res) => {
-
           setIsAutoPayStatus(res?.isEasyPay);
           setCardDigit(res?.epLastfour);
         },
@@ -87,32 +88,37 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Carousel
-        data={[{}, {}, {}]}
-        renderItem={renderCard}
-        sliderWidth={viewportWidth}
-        itemWidth={wp('90%')}
-        inactiveSlideScale={0.94}
-        inactiveSlideOpacity={0.7}
-        containerCustomStyle={styles.carousel}
-        contentContainerCustomStyle={styles.carouselContentContainer}
-        onSnapToItem={(index) => setActiveSlide(index)}
-      />
-      <Pagination
-        dotsLength={3}
-        activeDotIndex={activeSlide}
-        containerStyle={styles.paginationContainer}
-        dotStyle={styles.dotStyle}
-        inactiveDotStyle={styles.inactiveDotStyle}
-        inactiveDotOpacity={0.4}
-        inactiveDotScale={0.6}
-      />
-    </View>
+    <ScrollView contentContainerStyle={styles.scrollView}>
+      <View style={styles.container}>
+        <Carousel
+          data={[{}, {}, {}]}
+          renderItem={renderCard}
+          sliderWidth={viewportWidth}
+          itemWidth={wp('90%')}
+          inactiveSlideScale={0.94}
+          inactiveSlideOpacity={0.7}
+          containerCustomStyle={styles.carousel}
+          contentContainerCustomStyle={styles.carouselContentContainer}
+          onSnapToItem={(index) => setActiveSlide(index)}
+        />
+        <Pagination
+          dotsLength={3}
+          activeDotIndex={activeSlide}
+          containerStyle={styles.paginationContainer}
+          dotStyle={styles.dotStyle}
+          inactiveDotStyle={styles.inactiveDotStyle}
+          inactiveDotOpacity={0.4}
+          inactiveDotScale={0.6}
+        />
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flexGrow: 1,
+  },
   container: {
     paddingTop: 16,
   },
