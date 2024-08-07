@@ -6,10 +6,7 @@ import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding ,Color} from "../../../../GlobalStyles";
 import { Env }  from "../../../network/apis/account/Constants";
-
 const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatus, navigation }) => {
-    const uncheck = require("../../../../assets/checkcircle1.png");
-    const check = require("../../../../assets/checkcircle.png");
 
     return (
         <View style={styles.shadowContainer}>
@@ -31,28 +28,30 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
               ) : (
                 <>
                   <Text style={styles.autoPayStatusTextInActive}>Paperless Billing Off</Text>
-                  <View style={{ flexDirection: "row", alignItems: "center",marginVertical:5 }}>
-                  <Text style={[styles.dueDate]}>Turn on Paperless Billing today! <Text style={styles.subText}>Never miss a payment with peace of mind.</Text></Text>
+                  <View style={styles.headerContainer}>
+                  <Text style={[styles.dueDate]}>Turn on Paperless Billing today! <Text style={styles.subText}>Statements delivered via email.</Text></Text>
                   </View>
                 </>
               )}
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("AutoPayPCIConnector", {
-                    url: `${Env.URL}/billing`,
-                    name: "Billing Details",
-                  });
-                }}
-                accessible={true}
-                accessibilityLabel="Manage Auto Pay"
-                accessibilityRole="button"
-                style={styles.paymentButton}
-              >
-                <Text style={styles.paymentButtonText}>Manage Paperless</Text>
-                <View style={{ marginLeft: 2 }}>
-                  <RightArrow color={colors.snow_white} />
-                </View>
-              </TouchableOpacity>
+                <View style={styles.statusRow}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("AutoPayPCIConnector", {
+                url: `${Env.URL}/billing`,
+                name: "Billing Details",
+              });
+            }}
+            accessible={true}
+            accessibilityLabel="Manage Auto Pay"
+            accessibilityRole="button"
+            style={styles.paymentButton}
+          >
+            <Text style={styles.paymentButtonText}>Manage Paperless</Text>
+            <View style={{marginLeft:2}}>
+                <RightArrow color={colors.snow_white} />
+              </View>
+          </TouchableOpacity>
+          </View>
             </View>
           </View>
         </View>
@@ -60,7 +59,13 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
     };
     
     const styles = StyleSheet.create({
-      shadowContainer: {
+        headerContainer: { 
+            flexDirection: "row", 
+            alignItems: "center", 
+            marginTop: Padding.p_xs, 
+            marginBottom: 23
+        },
+        shadowContainer: {
         shadowColor: "#171717",
         shadowOffset: { width: -2, height: 4 },
         shadowOpacity: 0.2,
@@ -72,20 +77,21 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
         borderRadius: 10,
         alignSelf: "center",
         overflow: 'hidden',
-        width: wp('90%'), // Adjust the width to fit properly
+        width: wp('90%'),
       },
       leftSection: {
-        paddingHorizontal: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: wp('40%'),
-        height: '100%',
-        position: 'relative',
+          paddingHorizontal: Padding.p_5xl,
+          paddingBottom: Padding.p_xs,
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: wp('39%'),
+          height: '100%',
+          position: 'relative',
       },
       circleContainerShadow: {
         position: 'absolute',
         top: '50%',
-        left: -wp('38.75%') - 10,
+        left: -wp('38.75%') - 20,
         width: wp('84%'),
         height: wp('84%'),
         borderRadius: wp('41.5%'),
@@ -95,7 +101,7 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
       circleContainer: {
         position: 'absolute',
         top: '50%',
-        left: -wp('38.75%') - 5,
+        left: -wp('38.75%') - 15,
         width: wp('77.5%'),
         height: wp('77.5%'),
         borderRadius: wp('38.75%'),
@@ -117,9 +123,17 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
       },
       cardContent: {
         flex: 1,
-        padding: Padding.p_base,
+        paddingVertical: Padding.p_base,
+        paddingRight: 14,
         alignItems: 'center',
         justifyContent: 'center',
+      },
+      statusRow: {
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        alignItems: "flex-end",
+        width: "100%",
+        marginVertical: 5,
       },
       dueDate: {
         fontSize: 14,
@@ -135,6 +149,8 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
         textAlign: 'center',
         fontWeight: "700",
         FontFamily: FontFamily.openSansRegular,
+        marginTop: Padding.p_xs,
+        marginBottom: 23,
       },
       subText: {
         fontSize: 14,
@@ -153,35 +169,36 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
         borderWidth: 1,
         borderRadius: 5,
         padding: 5,
-        marginVertical: 12,
+        marginTop:13,
+        marginBottom: Padding.p_base,
       },
       autoPayStatusTextInActive: {
         fontSize: 14,
         fontWeight: "700",
         color: colors.dark_grey,
-        backgroundColor: Color.backgound_blue,
+        backgroundColor: Color.sparklightGray,
         textAlign: 'center',
         borderColor: colors.dark_grey,
         borderWidth: 1,
         borderRadius: 5,
         padding: 5,
-        marginVertical: 12,
+        marginVertical: Padding.p_base,
       },
       paymentButton: {
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: colors.sparklight_purple_blue,
-        padding: 5,
+        paddingLeft: 8,
+        paddingVertical: 5,
         borderRadius: 5,
-        marginTop: 20,
       },
       paymentButtonText: {
         color: colors.snow_white,
         fontSize: 14,
         fontWeight: "600",
         flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: "flex-end",
+        alignItems: "flex-end",
         fontFamily: FontFamily.openSansRegular,
       },
     });

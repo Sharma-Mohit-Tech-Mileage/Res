@@ -29,10 +29,10 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, navigation }) => {
           ) : (
             <>
               <Text style={styles.autoPayStatusTextInActive}>Auto Pay Off</Text>
-              <Text style={[styles.dueDate,{marginVertical:5}]}>Turn on Auto Pay today!</Text>
-              <Text style={styles.subText}>Never miss a payment with peace of mind.</Text>
+              <Text style={[styles.infoAuto]}>Turn on Auto Pay today!  <Text style={styles.subText}>Never miss a payment with peace of mind.</Text></Text>
             </>
           )}
+          <View style={styles.statusRow}>
           <TouchableOpacity
             onPress={() => {
               navigation.navigate("AutoPayPCIConnector", {
@@ -46,10 +46,11 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, navigation }) => {
             style={styles.paymentButton}
           >
             <Text style={styles.paymentButtonText}>Manage Auto Pay</Text>
-            <View style={{ marginLeft: 2 }}>
-              <RightArrow color={colors.snow_white} />
-            </View>
+            <View style={{marginLeft:2}}>
+                <RightArrow color={colors.snow_white} />
+              </View>
           </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -72,7 +73,8 @@ const styles = StyleSheet.create({
     width: wp('90%'), // Adjust the width to fit properly
   },
   leftSection: {
-    paddingHorizontal: 10,
+    paddingHorizontal: Padding.p_5xl,
+    paddingBottom: Padding.p_xs,
     alignItems: 'center',
     justifyContent: 'center',
     width: wp('40%'),
@@ -82,7 +84,7 @@ const styles = StyleSheet.create({
   circleContainerShadow: {
     position: 'absolute',
     top: '50%',
-    left: -wp('38.75%') - 10,
+    left: -wp('38.75%') - 20,
     width: wp('84%'),
     height: wp('84%'),
     borderRadius: wp('41.5%'),
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
   circleContainer: {
     position: 'absolute',
     top: '50%',
-    left: -wp('38.75%') - 5,
+    left: -wp('38.75%') - 15,
     width: wp('77.5%'),
     height: wp('77.5%'),
     borderRadius: wp('38.75%'),
@@ -114,9 +116,11 @@ const styles = StyleSheet.create({
   },
   cardContent: {
     flex: 1,
-    padding: Padding.p_base,
+    paddingVertical: Padding.p_base,
+    paddingRight: Padding.p_base,
     alignItems: 'center',
     justifyContent: 'center',
+    width: wp('60%'),
   },
   dueDate: {
     fontSize: 14,
@@ -125,19 +129,30 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: colors.sparklight_purple_blue,
     textAlign: 'center',
+    marginVertical: 5,
+  },
+  infoAuto: {
+    fontSize: 14,
+    fontWeight: "600",
+    alignContent: 'center',
+    fontFamily: FontFamily.openSansRegular,
+    color: colors.sparklight_purple_blue,
+    textAlign: 'center',
+    marginTop: Padding.p_xs,
+    marginBottom: 23,
   },
   thankYouText: {
     fontSize: 14,
     color: colors.sparklight_purple_blue,
     textAlign: 'center',
     fontWeight: "700",
-    marginVertical: 20,
+    marginTop: Padding.p_xs,
+    marginBottom: 23,
   },
   subText: {
     fontSize: 14,
     color: colors.gray600,
     textAlign: 'center',
-    marginVertical: 5,
     fontFamily: FontFamily.openSansRegular,
     fontWeight: "400",
   },
@@ -151,7 +166,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
-    marginVertical: 12,
+    marginTop:13,
+    marginBottom: Padding.p_base,
   },
   autoPayStatusTextInActive: {
     fontSize: 14,
@@ -163,23 +179,30 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
-    marginVertical: 12,
+    marginVertical: Padding.p_base,
   },
   paymentButton: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: colors.sparklight_purple_blue,
-    padding: 5,
+    paddingLeft: 8,
+    paddingVertical: 5,
     borderRadius: 5,
-    marginTop: 20,
+  },
+  statusRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+    width: "100%",
+    marginVertical: 5,
   },
   paymentButtonText: {
     color: colors.snow_white,
     fontSize: 14,
     fontWeight: "600",
     flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
     fontFamily: FontFamily.openSansRegular,
   },
 });

@@ -13,7 +13,7 @@ import { Padding } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 const { width: viewportWidth } = Dimensions.get('window');
 
-const MyInternetDetails = ({ plans,billAmt,dueDate,navigation }) => {
+const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
   const dispatch = useDispatch();
   const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [cardDigit, setCardDigit] = useState("");
@@ -22,7 +22,6 @@ const MyInternetDetails = ({ plans,billAmt,dueDate,navigation }) => {
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const paperLessInfo = profile.paperLessInfo || {};
   const profileDetails = profile.profileDetails || {};
-console.log("paperLessInfo***********************************************",paperLessInfo)
   const getStatus = () => {
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
