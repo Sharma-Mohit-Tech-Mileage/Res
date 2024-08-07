@@ -13,7 +13,7 @@ import ChatIcon from "../../res/svgIcons/ChatIcon";
 import { GetApiRequest } from "../../network/APIClient";
 import CreateTicket from "./ticket/CreateTicket";
 //import ZendDesk from '@pagopa/io-react-native-zendesk';
-import { startChatWithConfig,ZendDeskInitialize } from "../utility/RNZendeskChat";
+import { startChatWithConfig,ZendDeskInitialize,startChat } from "../utility/RNZendeskChat";
 
 const Support = ({ route }) => {
     const navigation = useNavigation();
@@ -154,8 +154,25 @@ const Support = ({ route }) => {
             tags:['pid:_' + userData.userInfo.accountNumber],
             department:department
         };
-        startChatWithConfig(data)
+        if(Platform.OS==='ios'){
+            handleStartChat();
+        }else{
+            startChatWithConfig(data)
+        }
 
+    };
+    const handleStartChat = async () => {
+        const config = {
+            name: "John Doe",
+            email: "johndoe@example.com",
+            phone: "+123456789"
+        };
+        try {
+            await startChat(config);
+            console.log('Chat started successfully');
+        } catch (error) {
+            console.error('Failed to start chat', error);
+        }
     };
 
 
