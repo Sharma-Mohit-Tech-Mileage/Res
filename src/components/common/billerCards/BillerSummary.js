@@ -16,7 +16,7 @@ const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation }
                 <View style={styles.leftSection}>
                     <View style={styles.circleContainerShadow}></View>
                     <View style={styles.circleContainer}></View>
-                    <View style={styles.icon}><WalletIcon /></View>
+                    <View style={[styles.icon,{paddingRight:24}]}><WalletIcon /></View>
                     <Text style={styles.leftTitle}>Bill Summary</Text>
                 </View>
                 <View style={styles.cardContent}>
@@ -112,8 +112,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     icon: {
-        alignContent: 'flex-start',
-        alignSelf: 'flex-start',
+        alignContent: 'center',
+        alignSelf: 'center',
     },
     leftTitle: {
         color: colors.snow_white,

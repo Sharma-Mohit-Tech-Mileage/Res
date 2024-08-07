@@ -103,17 +103,19 @@ const styles = StyleSheet.create({
     transform: [{ translateY: -wp('38.75%') }],
   },
   icon: {
-    alignContent: 'flex-start',
-    alignSelf: 'flex-start',
+    alignContent: 'center',
+    alignSelf: 'center',
     marginBottom: 10,
+    paddingRight: 24,
   },
   leftTitle: {
     color: colors.snow_white,
     fontSize: 18,
     fontWeight: "400",
     textAlign: 'center',
-    alignContent: 'flex-start',
-    alignSelf: 'flex-start',
+    alignContent: 'center',
+    alignSelf: 'center',
+    paddingRight: 24,
   },
   cardContent: {
     flex: 1,
