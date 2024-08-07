@@ -41,7 +41,7 @@ const UpdateModemPassword = (props) => {
   const eeroDeviceData = props?.route?.params?.eeroDeviceData || null;
   const networkPath = eeroDeviceData?.networks[0];
   const parts = networkPath?.split('/');
-  const networkId = parts[parts?.length - 1];
+  const networkId = parts?.length > 0 ? parts[parts.length - 1] : null;
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [newPassword, setNewPassword] = useState("");
