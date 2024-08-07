@@ -66,7 +66,7 @@ const SplashScreen = ({ navigation }) => {
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken
       };
-      let isInternet=(userInfo.accountNumber.toString().length==9)?true:false
+      let isInternet = (userInfo && userInfo.accountNumber && userInfo.accountNumber.toString().length ===9) ? false : true;
       setIsBusiness(false);
       if (res.userInfo.acctStatus === 'Disconnect') {
         setTimeout(() => { setDisconnected(true) }, 500)
