@@ -49,6 +49,6 @@ export const config={
  
  }
  
- export const ISUAT = false
+ export const ISUAT = true
  
  export const Env=(ISUAT)? config.UAT : config.PRODUCTION

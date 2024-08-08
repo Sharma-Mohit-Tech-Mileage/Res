@@ -114,11 +114,6 @@ const Support = ({ route }) => {
     };
 
     useEffect(() => {
-
-        if(Platform.OS==='ios'){
-            ZendDeskInitialize("4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC")
-        }
-
         if (route.params?.isContactUs) {
             setTimeout(() => {
                 scrollViewRef.current?.scrollToEnd({ animated: true })
@@ -155,20 +150,16 @@ const Support = ({ route }) => {
             department:department
         };
         if(Platform.OS==='ios'){
-            handleStartChat();
+            handleStartChat(data);
         }else{
             startChatWithConfig(data)
         }
 
     };
-    const handleStartChat = async () => {
-        const config = {
-            name: "John Doe",
-            email: "johndoe@example.com",
-            phone: "+123456789"
-        };
+    const handleStartChat = async (data) => {
+        
         try {
-            await startChat(config);
+            await startChat(data);
             console.log('Chat started successfully');
         } catch (error) {
             console.error('Failed to start chat', error);

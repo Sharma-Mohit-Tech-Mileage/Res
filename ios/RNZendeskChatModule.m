@@ -13,10 +13,12 @@
 
 RCT_EXPORT_MODULE(RNZendeskChatModule);
 
-RCT_EXPORT_METHOD(initialize:(NSString *)accountKey)
-{
+
++ (void) init {
+
+  
+    [ZDKChat initializeWithAccountKey:@"4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC" queue: dispatch_get_main_queue()];
     
-  [ZDKChat initializeWithAccountKey: accountKey queue: dispatch_get_main_queue()];
 }
 
 - (ZDKClassicMessagingConfiguration *) messagingConfiguration {
@@ -54,10 +56,17 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config resolver:(RCTPromiseResolveBl
   UIViewController *viewController = [ZDKClassicMessaging.instance buildUIWithEngines:engines
                                    configs:configs
                                      error:&error];
-      if (!!error) {
-        NSLog(@"[RNZendeskChatModule] Internal Error building ZDKMessagingUI %@",error);
-        return;
-      }
+  dispatch_async(dispatch_get_main_queue(), ^{
+          UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+          if (rootViewController) {
+              [rootViewController presentViewController:viewController animated:YES completion:^{
+                  resolve(nil);
+              }];
+          } else {
+              NSError *error = [NSError errorWithDomain:@"RNZendeskChatModule" code:500 userInfo:@{NSLocalizedDescriptionKey: @"Root view controller is not available"}];
+              reject(@"no_root_view_controller", @"Root view controller is not available", error);
+          }
+      });
 
     
 }
