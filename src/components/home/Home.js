@@ -850,7 +850,6 @@ const HomeScreen = ({ navigation }) => {
               )}
             </View>
               <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} navigation={navigation}/>
-          
             <MyServicePlan plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
             <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
           </View>

@@ -6,11 +6,11 @@ import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding ,Color} from "../../../../GlobalStyles";
 import { Env }  from "../../../network/apis/account/Constants";
-const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatus, navigation }) => {
+const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatus, navigation ,style}) => {
 
     return (
         <View style={styles.shadowContainer}>
-          <View style={styles.card}>
+          <View style={[styles.card,style]}>
             <View style={styles.leftSection}>
               <View style={styles.circleContainerShadow}></View>
               <View style={styles.circleContainer}></View>
@@ -21,7 +21,7 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
               {paperlessStatus ? (
                 <>
                   <Text style={[styles.dueDate, { fontWeight: '400' , color: colors.gray600 }]}>Email Associated: </Text>
-                  <Text style={[styles.dueDate]}>{paperLessInfo.emailAddress}</Text>
+                  <Text style={[styles.dueDate]}>{paperLessInfo.emailAddress }</Text>
                   <Text style={styles.autoPayStatusText}>Paperless Billing on!</Text>
                   <Text style={styles.thankYouText}>Thank you for choosing Paperless Billing On!</Text>
                 </>
@@ -36,13 +36,10 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
                 <View style={styles.statusRow}>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("AutoPayPCIConnector", {
-                url: `${Env.URL}/billing`,
-                name: "Billing Details",
-              });
+              navigation.navigate("Notifications");
             }}
             accessible={true}
-            accessibilityLabel="Manage Auto Pay"
+            accessibilityLabel="Manage Paperless"
             accessibilityRole="button"
             style={styles.paymentButton}
           >

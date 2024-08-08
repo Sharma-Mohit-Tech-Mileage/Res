@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Dimensions, ScrollView } from "react-native";
-import Carousel, { Pagination } from 'react-native-snap-carousel';
+import Carousel from 'react-native-snap-carousel';
 import Card from "./billerCards/BillerSummary";
 import AutoPayCard from "./billerCards/AutoPayCard";
 import PeperLessCard from "./billerCards/PeperLessCard";
@@ -62,6 +62,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
           isAutoPayStatus={isAutoPayStatus}
           paperlessStatus={paperlessStatus}
           navigation={navigation}
+          style={styles.card}
         />
       );
     }
@@ -73,6 +74,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
           isAutoPayStatus={isAutoPayStatus}
           paperlessStatus={paperlessStatus}
           navigation={navigation}
+          style={styles.card}
         />
       );
     }
@@ -83,12 +85,13 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
         isAutoPayStatus={isAutoPayStatus}
         paperlessStatus={paperlessStatus}
         navigation={navigation}
+        style={styles.card}
       />
     );
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollView}>
+    <ScrollView contentContainerStyle={styles.scrollView} style={{ marginStart: -24 }}>
       <View style={styles.container}>
         <Carousel
           data={[{}, {}, {}]}
@@ -101,15 +104,6 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
           contentContainerCustomStyle={styles.carouselContentContainer}
           onSnapToItem={(index) => setActiveSlide(index)}
         />
-        {/* <Pagination
-          dotsLength={3}
-          activeDotIndex={activeSlide}
-          containerStyle={styles.paginationContainer}
-          dotStyle={styles.dotStyle}
-          inactiveDotStyle={styles.inactiveDotStyle}
-          inactiveDotOpacity={0.4}
-          inactiveDotScale={0.6}
-        /> */}
       </View>
     </ScrollView>
   );
@@ -121,6 +115,7 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingVertical: 16,
+    flex: 1, // Ensure the container takes up full height
   },
   carousel: {
     overflow: 'visible',
@@ -128,17 +123,8 @@ const styles = StyleSheet.create({
   carouselContentContainer: {
     paddingHorizontal: wp('2.5%'),
   },
-  paginationContainer: {
-    paddingVertical: Padding.p_base,
-  },
-  dotStyle: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: colors.sparklight_purple_blue,
-  },
-  inactiveDotStyle: {
-    backgroundColor: colors.dark_grey,
+  card: {
+    height: 230,  // Set the height for the cards
   },
 });
 

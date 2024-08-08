@@ -6,10 +6,10 @@ import DollerIconBg from "../../../res/svgIcons/DollerIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding ,Color} from "../../../../GlobalStyles";
 import { Env }  from "../../../network/apis/account/Constants";
-const AutoPayCard = ({ cardDigit, isAutoPayStatus, navigation }) => {
+const AutoPayCard = ({ cardDigit, isAutoPayStatus, navigation ,style}) => {
   return (
     <View style={styles.shadowContainer}>
-      <View style={styles.card}>
+      <View style={[styles.card,style]}>
         <View style={styles.leftSection}>
           <View style={styles.circleContainerShadow}></View>
           <View style={styles.circleContainer}></View>
