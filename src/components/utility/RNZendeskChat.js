@@ -11,7 +11,7 @@ export const clearChatData = () => {
 };
 
 export const startChat = (config) => {
-    return new Promise((resolve, reject) => {
-        RNZendeskChatModule.startChat(config, resolve, reject);
-    });
+    //return new Promise((resolve, reject) => {
+        RNZendeskChatModule.startChat(config);
+    //});
 };

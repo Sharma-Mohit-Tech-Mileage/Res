@@ -41,34 +41,36 @@ RCT_EXPORT_MODULE(RNZendeskChatModule);
     return config;
 }
 
-RCT_EXPORT_METHOD(startChat:(NSDictionary *)config resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
 {
-  [[ZDKChat instance] setConfiguration: [self chatAPIConfiguration]];
-  NSError *error = nil;
-  NSArray *engines = @[
-       (id <ZDKEngine>) [ZDKChatEngine engineAndReturnError: &error]
-   ];
-
-  NSArray<id<ZDKConfiguration>> *configs = @[[self messagingConfiguration], [self chatConfiguration]];
   
-
-   //[[ZDKClassicMessaging instance] buildUIWithEngines: engines configs:configs error: &error];
-  UIViewController *viewController = [ZDKClassicMessaging.instance buildUIWithEngines:engines
-                                   configs:configs
-                                     error:&error];
   dispatch_async(dispatch_get_main_queue(), ^{
+    [[ZDKChat instance] setConfiguration: [self chatAPIConfiguration]];
+    NSError *error = nil;
+    NSArray *engines = @[
+         (id <ZDKEngine>) [ZDKChatEngine engineAndReturnError: &error]
+     ];
+
+    NSArray<id<ZDKConfiguration>> *configs = @[[self messagingConfiguration], [self chatConfiguration]];
+    
+
+     //[[ZDKClassicMessaging instance] buildUIWithEngines: engines configs:configs error: &error];
+    UIViewController *viewController = [ZDKClassicMessaging.instance buildUIWithEngines:engines
+                                     configs:configs
+                                       error:&error];
+    
           UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
           if (rootViewController) {
               [rootViewController presentViewController:viewController animated:YES completion:^{
-                  resolve(nil);
+                  //resolve(nil);
               }];
           } else {
               NSError *error = [NSError errorWithDomain:@"RNZendeskChatModule" code:500 userInfo:@{NSLocalizedDescriptionKey: @"Root view controller is not available"}];
-              reject(@"no_root_view_controller", @"Root view controller is not available", error);
+              //reject(@"no_root_view_controller", @"Root view controller is not available", error);
           }
       });
 
-    
+  NSLog(@"Something To Print");
 }
 
 @end

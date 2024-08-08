@@ -150,7 +150,7 @@ const Support = ({ route }) => {
             department:department
         };
         if(Platform.OS==='ios'){
-            handleStartChat(data);
+            startChat(data);
         }else{
             startChatWithConfig(data)
         }
