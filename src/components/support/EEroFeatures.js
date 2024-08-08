@@ -69,8 +69,8 @@ const EEroFeatures = (props) => {
           <Image style={{width: '100%',height: '100%',resizeMode: 'cover'}} source={require('../../../assets/eero_device.png')} />
             {/* <EEroDevice /> */}
           </View>
-          <Text style={styles.reliabilityText}>{`Reliability. Safety. Security.`}</Text>
-          <Text style={styles.eeroText}>{`Get it all and more with eero.`}</Text>
+          <Text style={styles.eeroText}>{`always connected.`}</Text>
+          <Text style={[styles.reliabilityText,{color: '#8D3B90'}]}>{`Always working for you.`}</Text>
 
           <View style={{
             paddingVertical: Padding.p_13xl
@@ -106,7 +106,7 @@ const EEroFeatures = (props) => {
                 </View>
               )
             })}
-            <Text style={[styles.reliabilityText,{paddingTop: Padding.p_5xs}]}>{`And much more!`}</Text>
+            <Text style={[styles.reliabilityText,{paddingTop: Padding.p_3xs}]}>{`And much more!`}</Text>
           </View>
         </View>
         <View
@@ -195,8 +195,8 @@ const styles = StyleSheet.create({
     color: Color.colorMidnightblue,
   },
   eeroText: {
-    fontSize: FontSize.size_5xl,
-    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_6xl,
+    fontFamily: FontFamily.interBold,
     textAlign: "center",
     color: Color.colorGray_100,
     marginTop: 5
