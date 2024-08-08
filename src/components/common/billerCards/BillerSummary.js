@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignSelf: "center",
         overflow: 'hidden',
-        width: wp('90%'),
+        width: wp('85%'),
     },
     leftSection: {
         paddingHorizontal: Padding.p_3xs,
@@ -125,11 +125,12 @@ const styles = StyleSheet.create({
     },
     cardContent: {
         flex: 1,
-        padding: Padding.p_base,
+        paddingVertical: Padding.p_base,
+        paddingRight: Padding.p_5xl,
         alignItems: 'center',
     },
     amount: {
-        fontSize: 32,
+        fontSize: 28,
         fontWeight: "bold",
         color: colors.sp_black,
         marginVertical: Padding.p_8xs,

@@ -58,7 +58,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
       return (
         <AutoPayCard
           billAmt={billAmt}
-          cardDigit={""}
+          cardDigit={cardDigit}
           isAutoPayStatus={isAutoPayStatus}
           paperlessStatus={paperlessStatus}
           navigation={navigation}
@@ -94,14 +94,14 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
           data={[{}, {}, {}]}
           renderItem={renderCard}
           sliderWidth={viewportWidth}
-          itemWidth={wp('90%')}
+          itemWidth={wp('85%')}
           inactiveSlideScale={0.94}
           inactiveSlideOpacity={0.7}
           containerCustomStyle={styles.carousel}
           contentContainerCustomStyle={styles.carouselContentContainer}
           onSnapToItem={(index) => setActiveSlide(index)}
         />
-        <Pagination
+        {/* <Pagination
           dotsLength={3}
           activeDotIndex={activeSlide}
           containerStyle={styles.paginationContainer}
@@ -109,7 +109,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
           inactiveDotStyle={styles.inactiveDotStyle}
           inactiveDotOpacity={0.4}
           inactiveDotScale={0.6}
-        />
+        /> */}
       </View>
     </ScrollView>
   );
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   container: {
-    paddingTop: 16,
+    paddingVertical: 16,
   },
   carousel: {
     overflow: 'visible',

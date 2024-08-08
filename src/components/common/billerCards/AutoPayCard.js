@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignSelf: "center",
     overflow: 'hidden',
-    width: wp('90%'),
+    width: wp('85%'),
   },
   leftSection: {
     paddingHorizontal: Padding.p_5xl,

@@ -116,14 +116,13 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     }, []);
 
     const navigationChange = async (navState) => {
+        console.log('*****************************navState***************************************************', navState);
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
                 setProgress(1);
                 setNavStateReloading(true);
                 await RefreshToken();
-                setTimeout(async () => {
-                    await userUpdate();
-                }, 1000);
+                navigation.navigate('Dashboard');
             }
         }
     };
@@ -174,7 +173,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
 
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS === 'ios') ? 90 : 60 }}>
-            <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); }} title="Auto Pay PCI Integration" />
+            <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); }} title="Auto Pay" />
             {progress < 1 && (
                 <View style={styles.progressBar}>
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />

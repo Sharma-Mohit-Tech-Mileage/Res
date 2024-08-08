@@ -22,7 +22,7 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
                 <>
                   <Text style={[styles.dueDate, { fontWeight: '400' , color: colors.gray600 }]}>Email Associated: </Text>
                   <Text style={[styles.dueDate]}>{paperLessInfo.emailAddress}</Text>
-                  <Text style={styles.autoPayStatusText}>Paperless Billing!</Text>
+                  <Text style={styles.autoPayStatusText}>Paperless Billing on!</Text>
                   <Text style={styles.thankYouText}>Thank you for choosing Paperless Billing On!</Text>
                 </>
               ) : (
@@ -77,7 +77,7 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
         borderRadius: 10,
         alignSelf: "center",
         overflow: 'hidden',
-        width: wp('90%'),
+        width: wp('85%'),
       },
       leftSection: {
           paddingHorizontal: Padding.p_5xl,
@@ -150,7 +150,7 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
         fontWeight: "700",
         FontFamily: FontFamily.openSansRegular,
         marginTop: Padding.p_xs,
-        marginBottom: 23,
+        marginBottom: 19,
       },
       subText: {
         fontSize: 14,
@@ -170,7 +170,7 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
         borderRadius: 5,
         padding: 5,
         marginTop:13,
-        marginBottom: Padding.p_base,
+        marginBottom: 12,
       },
       autoPayStatusTextInActive: {
         fontSize: 14,
