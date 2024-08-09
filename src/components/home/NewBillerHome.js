@@ -206,7 +206,7 @@ const NewBillerHome = ({ navigation }) => {
         let macAddress = res[0].macAddress;
         var mac = macAddress;
         if (user.userInfo.accountNumber === "128387263") {
-          mac = "34:98:b5:d2:a8:71";
+          mac = "bc:3e:07:38:56:d0";
         } else if (user.userInfo.accountNumber === "133370775") {
           mac = "60:19:71:27:61:b2";
         } else if (user.userInfo.accountNumber === "133437285") {
@@ -740,6 +740,9 @@ const NewBillerHome = ({ navigation }) => {
 
       <SafeAreaView style={{ flex: 1 }}>
         <View
+         accessibilityElementsHidden={showWalkThrough}
+         importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
+          accessibilityLabel={`SparkLight`}
           style={{
             height: Platform.OS == "ios" ? 60 : 50,
             flexDirection: "row",
@@ -749,6 +752,8 @@ const NewBillerHome = ({ navigation }) => {
           }}
         >
           <Image
+          accessible={!showWalkThrough}
+          accessibilityLabel={`SparkLight`}
             resizeMode="contain"
             style={{ width: 120, height: 30.324, flexShrink: 0 }}
             source={require("../../../assets/SparklightEntryLogo.png")}
@@ -799,6 +804,9 @@ const NewBillerHome = ({ navigation }) => {
               )}
 
               <TouchableOpacity
+               accessible={true}
+               accessibilityLabel={isImageDispaly ? 'Collapse' : 'Expand'}
+               accessibilityRole="button"
                 onPress={() => {
                   setIsImageDispaly(!isImageDispaly);
                 }}

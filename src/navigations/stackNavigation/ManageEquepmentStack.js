@@ -7,6 +7,7 @@ import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemRebootStack from "./ModemRebootStack";
 import ModemExchangeInstructions from "../../components/support/ModemExchangeInstructions";
 import UpdateModemPassword from "../../components/support/UpdateModemPassword";
+import EEroFeatures from "../../components/support/EEroFeatures";
 import RetrieveModemPassword from "../../components/support/RetrieveModemPassword";
 import SupportStackScreen from "./SupportStack";
 import ModemConnectivityGuide from "../../components/support/Troubleshooting/ModemConnectivityGuide";
@@ -53,6 +54,15 @@ function ModemStackScreen({route}) {
         <ModemStack.Screen
         name="UpdateModemPassword"
         component={UpdateModemPassword}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+        <ModemStack.Screen
+        name="EEroFeatures"
+        component={EEroFeatures}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),

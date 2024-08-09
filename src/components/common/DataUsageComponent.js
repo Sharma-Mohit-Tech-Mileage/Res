@@ -117,6 +117,7 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
         plans={plans}
         tvPlan={tvPlan}
         phonePlan={phonePlan}
+        accessible={true}
       />
     </View>
   );
