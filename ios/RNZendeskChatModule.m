@@ -53,24 +53,24 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
 
     NSArray<id<ZDKConfiguration>> *configs = @[[self messagingConfiguration], [self chatConfiguration]];
     
-
-     //[[ZDKClassicMessaging instance] buildUIWithEngines: engines configs:configs error: &error];
     UIViewController *viewController = [ZDKClassicMessaging.instance buildUIWithEngines:engines
                                      configs:configs
                                        error:&error];
     
-          UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
-          if (rootViewController) {
-              [rootViewController presentViewController:viewController animated:YES completion:^{
-                  //resolve(nil);
-              }];
-          } else {
-              NSError *error = [NSError errorWithDomain:@"RNZendeskChatModule" code:500 userInfo:@{NSLocalizedDescriptionKey: @"Root view controller is not available"}];
-              //reject(@"no_root_view_controller", @"Root view controller is not available", error);
-          }
-      });
+    UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+    if (rootViewController) {
+        [rootViewController presentViewController:viewController animated:YES completion:^{
+            //resolve(nil);
+        }];
+    } else {
+        NSError *error = [NSError errorWithDomain:@"RNZendeskChatModule" code:500 userInfo:@{NSLocalizedDescriptionKey: @"Root view controller is not available"}];
+        //reject(@"no_root_view_controller", @"Root view controller is not available", error);
+    }
+});
 
-  NSLog(@"Something To Print");
+  
 }
+
+
 
 @end
