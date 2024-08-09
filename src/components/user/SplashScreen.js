@@ -66,6 +66,7 @@ const SplashScreen = ({ navigation }) => {
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken
       };
+      let isInternet = (userInfo && userInfo.accountNumber && userInfo.accountNumber.toString().length ===9) ? false : true;
       setIsBusiness(false);
       if (res.userInfo.acctStatus === 'Disconnect') {
         setTimeout(() => { setDisconnected(true) }, 500)
@@ -78,13 +79,14 @@ const SplashScreen = ({ navigation }) => {
         setErrorMessage(strings.BusinessUserMsg);
         setErrorMessage1(' to manage your Sparklight Business services account');
         setTimeout(() => { setModalVisible(true); }, 100);
-      } else if (res.custServices.internet == false) {
+      } else if (res.custServices.internet == isInternet) {
         setErrorMessage(strings.nonInternetUserMessage);
         setErrorMessage1(' to manage your service.')
         setTimeout(() => { setModalVisible(true); }, 100);
       } else {
         storeUser(user);
         dispatch(saveUserInfo(user));
+        console.log('IsUserAcceptedTermandCondition',user.userInfo.mobileTCAcceptanceFlag)
         if (user.userInfo.mobileTCAcceptanceFlag) {
           navigation.reset({
             index: 0,

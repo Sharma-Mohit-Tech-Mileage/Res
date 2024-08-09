@@ -96,7 +96,7 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
         accessibilityRole="button"
           onPress={() => {
             navigation.navigate("ArticalWindowUtility", {
-              url: `${Env.URL}/billing`,
+              url: Env.PAYMENTURLNEW,
               name: "Billing Details",
             });
           }}
@@ -173,12 +173,13 @@ const MyInternetDetialsBiller = ({ plans, billAmt, dueDate, navigation }) => {
          accessible={true}
          accessibilityLabel={`Manage Auto Pay`}
          accessibilityRole="button"
-          onPress={() => {
-            navigation.navigate("ArticalWindowUtility", {
-              url: `${Env.URL}/services/upgrade`,
-              name: "Upgrade Plan",
-            });
-          }}
+         onPress={() => {
+          navigation.navigate("AutoPayPCIConnector", {
+            url: `${Env.URL}/billing`,
+            name: "Billing Details",
+            useNewPayment: true,
+          });
+        }}
           style={{
             borderTopColor:'#F4F4F5',
             borderTopWidth:1,

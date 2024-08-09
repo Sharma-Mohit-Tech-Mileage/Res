@@ -61,7 +61,7 @@ const HomeScreen = ({ navigation }) => {
           "There has been a problem with AccessibilityInfo.isScreenReaderEnabled(): " +
           error.message
         );
-        setIsScreenReaderEnabled(false); // Setting a default value in case of error
+        setIsScreenReaderEnabled(false); 
       }
     }
     getAccessibility();
@@ -849,9 +849,7 @@ const HomeScreen = ({ navigation }) => {
                 <></>
               )}
             </View>
-            <ScrollView horizontal={true} style={{ marginStart: 20 }}>
-              <View><MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} navigation={navigation}/></View>
-            </ScrollView>
+              <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} navigation={navigation}/>
             <MyServicePlan plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
             <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
           </View>
