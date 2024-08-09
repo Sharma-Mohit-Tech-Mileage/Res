@@ -38,7 +38,7 @@ const AutoPayCardNewBiller = ({ cardDigit, isAutoPayStatus, navigation ,style}) 
               navigation.navigate("AutoPayPCIConnector", {
                 url: Env.EASYPAYNEW,
                 name: "Manage Auto Pay",
-                useNewPayment: true,
+                useNewPayment: true,'status':isAutoPayStatus
               });
             }}
             accessible={true}

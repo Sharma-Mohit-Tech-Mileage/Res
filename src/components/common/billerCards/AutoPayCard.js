@@ -51,6 +51,7 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, navigation ,style}) => {
                 url: `${Env.URL}/billing`,
                 name: "Manage Auto Pay",
                 useNewPayment: useNewPayment,
+                status: isAutoPayStatus,
               });
             }}
             accessible={true}
