@@ -13,6 +13,8 @@ export const config={
      URL_EASYPAY: 'https://payment.uat.sparklight.com/PortalsV2/setup-auto-pay',
      NEW_PAYMENTURL: 'https://payment.uat.sparklight.com/portalsV3-Demo/PortalsBiller',
      NEW_URL_EASYPAY: 'https://payment.uat.sparklight.com/portalsV3-Dev/activate-auto-pay',
+     PAYMENTURLNEW: 'https://customer.uat.sparklight.com/portals/app-secure/billing',
+     EASYPAYNEW: 'https://payment.uat.sparklight.com/portalsV3-Demo/manage-autopay',
      encryptvalPassword: '1 0 7 2 8 3 3634',
      ZENDESK_FEEDBACK:{
        Url:'https://cableone.zendesk.com/api/v2/requests.json',

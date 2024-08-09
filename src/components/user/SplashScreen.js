@@ -66,9 +66,10 @@ const SplashScreen = ({ navigation }) => {
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken
       };
-      let isInternet = (userInfo && userInfo.accountNumber && userInfo.accountNumber.toString().length ===9) ? false : true;
+      let isNormalUser = (userInfo && userInfo.accountNumber && userInfo.accountNumber.toString().length ===9) ? true : false;
+      console.log('Isnewbiller',isNormalUser)
       setIsBusiness(false);
-      if (res.userInfo.acctStatus === 'Disconnect') {
+      if (res.userInfo.acctStatus === 'Disconnect' || ( !isNormalUser && res.userInfo.acctStatus!='Normal')) {
         setTimeout(() => { setDisconnected(true) }, 500)
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
         setErrorMessage(strings.nonAdminUserMsg);
@@ -79,7 +80,7 @@ const SplashScreen = ({ navigation }) => {
         setErrorMessage(strings.BusinessUserMsg);
         setErrorMessage1(' to manage your Sparklight Business services account');
         setTimeout(() => { setModalVisible(true); }, 100);
-      } else if (res.custServices.internet == isInternet) {
+      } else if (isNormalUser && res.custServices.internet == false ) {
         setErrorMessage(strings.nonInternetUserMessage);
         setErrorMessage1(' to manage your service.')
         setTimeout(() => { setModalVisible(true); }, 100);
