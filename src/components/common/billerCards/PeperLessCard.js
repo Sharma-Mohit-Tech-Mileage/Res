@@ -36,7 +36,7 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
                 <View style={styles.statusRow}>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate("Notifications");
+              navigation.navigate("account",{screen: 'Notifications', params: {screen: 'Notifications'}});
             }}
             accessible={true}
             accessibilityLabel="Manage Paperless"

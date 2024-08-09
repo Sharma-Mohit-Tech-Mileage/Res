@@ -37,7 +37,8 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, navigation ,style}) => {
             onPress={() => {
               navigation.navigate("AutoPayPCIConnector", {
                 url: `${Env.URL}/billing`,
-                name: "Billing Details",
+                name: "Manage Auto Pay",
+                useNewPayment: false,
               });
             }}
             accessible={true}
