@@ -21,7 +21,9 @@ const CardNewBiller = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, nav
                 </View>
                 <View style={styles.cardContent}>
                     <Text style={styles.amount}>${billAmt}</Text>
+                    { dueDate!='Invalid date' && (
                     <Text style={styles.dueDate}>{dueDate ? 'Due on ' : ''}<Text style={[styles.dueDate, { fontWeight: '400' }]}>{dueDate}</Text></Text>
+                    )}
                     <View style={{ marginVertical: Padding.p_base }}>
                         <View style={styles.statusRow}>
                             <Text style={styles.label}>Auto Pay : </Text>
