@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
@@ -6,7 +6,19 @@ import DollerIconBg from "../../../res/svgIcons/DollerIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding ,Color} from "../../../../GlobalStyles";
 import { Env }  from "../../../network/apis/account/Constants";
+import { getUser } from "../../../redux/utils/LocalStorage";
 const AutoPayCard = ({ cardDigit, isAutoPayStatus, navigation ,style}) => {
+  const [useNewPayment, setUseNewPayment] = useState(false);
+  const getStatus = () => {
+    getUser().then((res) => {
+      const accountNumber = res.userInfo.accountNumber;
+      setUseNewPayment(accountNumber.toString().length >= 16);
+    });
+  };
+  useEffect(() => {
+    getStatus();
+  }, []);
+
   return (
     <View style={styles.shadowContainer}>
       <View style={[styles.card,style]}>
@@ -17,7 +29,7 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, navigation ,style}) => {
           <Text style={styles.leftTitle}>Auto Pay</Text>
         </View>
         <View style={styles.cardContent}>
-          {cardDigit ? (
+          {isAutoPayStatus ? (
             <>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Text style={[styles.dueDate, { fontWeight: '400' , color: colors.gray600 }]}>Account ending in  </Text>
@@ -38,7 +50,7 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, navigation ,style}) => {
               navigation.navigate("AutoPayPCIConnector", {
                 url: `${Env.URL}/billing`,
                 name: "Manage Auto Pay",
-                useNewPayment: false,
+                useNewPayment: useNewPayment,
               });
             }}
             accessible={true}
@@ -46,7 +58,7 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, navigation ,style}) => {
             accessibilityRole="button"
             style={styles.paymentButton}
           >
-            <Text style={styles.paymentButtonText}>Manage Auto Pay</Text>
+            <Text style={styles.paymentButtonText}>{isAutoPayStatus?'Manage Auto Pay':'Setup Auto Pay'}</Text>
             <View style={{marginLeft:2}}>
                 <RightArrow color={colors.snow_white} />
               </View>
