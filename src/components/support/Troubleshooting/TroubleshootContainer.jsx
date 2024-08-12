@@ -260,13 +260,11 @@ const TroubleshootContainer = () => {
           var mac = macAddress;
           if (user.userInfo.accountNumber === "128387263") {
             mac = "bc:3e:07:38:56:d0";
-          } else if (user.userInfo.accountNumber === "133370775") {
-            mac = "00:40:36:5f:cc:7f";
-          }
-          else if(user.userInfo.accountNumber==='133437285'){
-            mac="6c:cd:d6:6c:d0:1c"
-          }
-          else if(user.userInfo.accountNumber==='131684698'){
+          }else if (user.userInfo.accountNumber === "902880244") {
+            mac = "bc:3e:07:38:56:d0";  
+          }else if (user.userInfo.accountNumber === "902880236") {
+            mac = "28:7a:ee:8e:cf:8c";
+          }else if(user.userInfo.accountNumber==='131684698'){
             mac="28:7a:ee:97:4d:cc"
           }
           else if(user.userInfo.accountNumber==='136885142'){
