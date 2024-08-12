@@ -49,13 +49,13 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, navigation ,style}) => {
             onPress={() => {
               navigation.navigate("AutoPayPCIConnector", {
                 url: `${Env.URL}/billing`,
-                name: "Manage Auto Pay",
+                name: isAutoPayStatus ?"Manage Auto Pay":"Active Auto Pay",
                 useNewPayment: useNewPayment,
                 status: isAutoPayStatus,
               });
             }}
             accessible={true}
-            accessibilityLabel="Manage Auto Pay"
+            accessibilityLabel={isAutoPayStatus ?"Manage Auto Pay":"Active Auto Pay"}
             accessibilityRole="button"
             style={styles.paymentButton}
           >
