@@ -97,11 +97,11 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
           data={[{}, {}, {}]}
           renderItem={renderCard}
           sliderWidth={viewportWidth}
-          itemWidth={wp('85%')}
+          itemWidth={wp('87%')}
           inactiveSlideScale={0.94}
           inactiveSlideOpacity={0.7}
-          containerCustomStyle={styles.carousel}
-          contentContainerCustomStyle={styles.carouselContentContainer}
+          containerCustomStyle={[styles.carousel, { marginRight: 0 }]} // Ensure no margin on right
+          contentContainerCustomStyle={[styles.carouselContentContainer, { paddingEnd: 0 }]} // Ensure no padding at the end
           onSnapToItem={(index) => setActiveSlide(index)}
         />
       </View>
