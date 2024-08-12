@@ -66,19 +66,18 @@ const ManageEquipment = ({ route }) => {
   const [truckrollPrediction, setTruckrollPrediction] = React.useState(-1);  const getModemPassword = () => {
     setLoading(true);
     let re = getUser().then((res) => {
-      const request = `internet/api/internet/${res.userInfo.accountNumber}/modem/security/Get`;
+      const request = `internet/api/internet/${res.userInfo.accountNumber}/modemmobile`;
       GetApiRequest(request, onSuccessModemPassword, onErrorModemPassword);
     });
   };
 
   const onSuccessModemPassword = (res) => {
     setLoading(false);
-    console.log("getModemDetails", res);
     if (res) {
-      if (res.length == 0) setwifiPasswordCanChange(false);
-      else setwifiPasswordCanChange(true);
-      const list = res.map((value) => value.ssid);
-      setwifiData(res);
+      setwifiPasswordCanChange(true)
+    }
+    else{
+      setwifiPasswordCanChange(false)
     }
   };
   const onErrorModemPassword = (error) => {
