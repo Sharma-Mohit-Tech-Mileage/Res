@@ -8,15 +8,14 @@ import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import { GetApiRequest } from '../../network/APIClient';
-
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 const AutoPayPCIConnector = ({ navigation, route }) => {
     const [initScript, setInitScript] = useState('');
     const [progress, setProgress] = useState(0);
     const [url, setUrl] = useState(route.params?.url || 'https://customer.uat.sparklight.com/residential');
     const [currentUser, setCurrentUser] = useState({});
-    const [useNewPayment, setuseNewPayment] = useState(route.params?.useNewPayment||false);
+    const [useNewPayment, setuseNewPayment] = useState(route.params?.useNewPayment || false);
     const [status, setStatus] = useState(route.params?.status || false);
     const [name, setTitle] = useState(route.params?.name);
     const [navStateReloading, setNavStateReloading] = useState(false);
@@ -103,7 +102,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 `account/api/account/${accountNumber}/easypay`,
                 (res) => {
                     const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.paymentId, res?.EasyPayId);
-                    redirectToEBillpay(paymentObj, useNewPayment ? (status ?Env.URL_EASYPAY_MANAGE_V3:Env.URL_EASYPAY_SETUP_V3) : (status?Env.URL_EASYPAY_MANAGE_V2:Env.URL_EASYPAY_SETUP_V2)); 
+                    redirectToEBillpay(paymentObj, useNewPayment ? (status ? Env.URL_EASYPAY_MANAGE_V3 : Env.URL_EASYPAY_SETUP_V3) : (status ? Env.URL_EASYPAY_MANAGE_V2 : Env.URL_EASYPAY_SETUP_V2));
                 },
                 (error) => {
                     console.error("Error fetching payment details:", error);
@@ -182,25 +181,25 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 </View>
             )}
             {html && (
-               <WebView
-               ref={webViewRef}
-               source={{ html }}
-               onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
-               sharedCookiesEnabled={true}
-               injectedJavaScriptBeforeContentLoaded={initScript}
-               onNavigationStateChange={navigationChange}
-               originWhitelist={['http://*', 'https://*', 'data:*']}
-               incognito={true}
-               onError={(syntheticEvent) => {
-                   const { nativeEvent } = syntheticEvent;
-                   console.error('WebView error: ', nativeEvent);
-               }}
-               onHttpError={(syntheticEvent) => {
-                   const { nativeEvent } = syntheticEvent;
-                   console.error('WebView HTTP error: ', nativeEvent);
-               }}
-           />
-           
+                <WebView
+                    ref={webViewRef}
+                    source={{ html }}
+                    onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
+                    sharedCookiesEnabled={true}
+                    injectedJavaScriptBeforeContentLoaded={initScript}
+                    onNavigationStateChange={navigationChange}
+                    originWhitelist={['http://*', 'https://*', 'data:*']}
+                    incognito={true}
+                    onError={(syntheticEvent) => {
+                        const { nativeEvent } = syntheticEvent;
+                        console.error('WebView error: ', nativeEvent);
+                    }}
+                    onHttpError={(syntheticEvent) => {
+                        const { nativeEvent } = syntheticEvent;
+                        console.error('WebView HTTP error: ', nativeEvent);
+                    }}
+                />
+
             )}
         </View>
     );
@@ -216,5 +215,4 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(141, 59, 144, 1)',
     },
 });
-
 export default AutoPayPCIConnector;
