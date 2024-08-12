@@ -5,7 +5,7 @@ import RightArrow from "../../../res/svgIcons/RightArrow";
 import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
-import { Env } from "../../../network/apis/account/Constants";
+import { CommonActions } from '@react-navigation/native';
 const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatus, navigation, style }) => {
 
   return (
@@ -22,8 +22,8 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
             <>
               <Text style={[styles.dueDate, { fontWeight: '400', color: colors.gray600 }]}>Email Associated: </Text>
               <Text style={[styles.dueDate]}>{paperLessInfo.emailAddress}</Text>
-              <Text style={styles.autoPayStatusText}>Paperless Billing on!</Text>
-              <Text style={styles.thankYouText}>Thank you for choosing Paperless Billing On!</Text>
+              <Text style={styles.autoPayStatusText}>Paperless Billing On!</Text>
+              <Text style={styles.thankYouText}>Thank you for choosing Paperless Billing!</Text>
             </>
           ) : (
             <>
@@ -35,9 +35,16 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
           )}
           <View style={styles.statusRow}>
             <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("account", { screen: 'Notifications', params: { screen: 'Notifications' } });
-              }}
+             onPress={() => {
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [
+                    { name: 'account', params: { screen: 'Notifications' } },
+                  ],
+                })
+              );
+            }}
               accessible={true}
               accessibilityLabel="Manage Paperless"
               accessibilityRole="button"
