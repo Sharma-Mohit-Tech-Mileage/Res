@@ -46,6 +46,9 @@ const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation,s
                                     name: "Billing Details",
                                 });
                             }}
+                            accessible={true}
+                            accessibilityLabel="Billing Details"
+                            accessibilityRole="button"
                             style={styles.paymentButton}
                         >
                             <Text style={styles.paymentButtonText}>Make a Payment</Text>
