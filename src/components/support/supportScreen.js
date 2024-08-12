@@ -13,7 +13,7 @@ import ChatIcon from "../../res/svgIcons/ChatIcon";
 import { GetApiRequest } from "../../network/APIClient";
 import CreateTicket from "./ticket/CreateTicket";
 //import ZendDesk from '@pagopa/io-react-native-zendesk';
-import { startChatWithConfig,ZendDeskInitialize,startChat } from "../utility/RNZendeskChat";
+import { startChatWithConfig,setVisitorInfo,startChat } from "../utility/RNZendeskChat";
 
 const Support = ({ route }) => {
     const navigation = useNavigation();
@@ -150,6 +150,7 @@ const Support = ({ route }) => {
             department:department
         };
         if(Platform.OS==='ios'){
+            setVisitorInfo(data)
             startChat(data);
         }else{
             startChatWithConfig(data)

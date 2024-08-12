@@ -15,3 +15,10 @@ export const startChat = (config) => {
         RNZendeskChatModule.startChat(config);
     //});
 };
+
+export const setVisitorInfo = (config) => {
+    
+    RNZendeskChatModule.setVisitorInfo(config);
+
+};
+

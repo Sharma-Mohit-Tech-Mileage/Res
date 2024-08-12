@@ -12,7 +12,7 @@
 @implementation RNZendeskChatModule
 
 RCT_EXPORT_MODULE(RNZendeskChatModule);
-
+ZDKChatAPIConfiguration *_visitorAPIConfig;
 
 + (void) init {
 
@@ -21,9 +21,35 @@ RCT_EXPORT_MODULE(RNZendeskChatModule);
     
 }
 
+RCT_EXPORT_METHOD(setVisitorInfo:(NSDictionary *)options) {
+  if (!NSThread.isMainThread) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [self setVisitorInfo:options];
+    });
+    return;
+  }
+
+  ZDKChat.instance.configuration = _visitorAPIConfig = [self applyVisitorInfo:options intoConfig: _visitorAPIConfig ?: [[ZDKChatAPIConfiguration alloc] init]];
+}
+
+- (ZDKChatAPIConfiguration*)applyVisitorInfo:(NSDictionary*)options intoConfig:(ZDKChatAPIConfiguration*)config {
+  if (options[@"department"]) {
+    config.departmentName = options[@"department"];
+  }
+  if (options[@"tags"]) {
+    config.tags = options[@"tags"];
+  }
+  config.visitorInfo = [[ZDKVisitorInfo alloc] initWithName:options[@"name"]
+                            email:options[@"email"]
+                          phoneNumber:options[@"phone"]];
+
+  NSLog(@"[RNZendeskChatModule] Applied visitor info: department: %@ tags: %@, email: %@, name: %@, phone: %@", config.departmentName, config.tags, config.visitorInfo.email, config.visitorInfo.name, config.visitorInfo.phoneNumber);
+  return config;
+}
+
 - (ZDKClassicMessagingConfiguration *) messagingConfiguration {
     ZDKClassicMessagingConfiguration *config = [ZDKClassicMessagingConfiguration new];
-    config.name = @"Sparklight Bot";
+    config.name = @"Sparklight Support";
     config.isMultilineResponseOptionsEnabled = YES;
     return config;
 }
@@ -35,9 +61,11 @@ RCT_EXPORT_MODULE(RNZendeskChatModule);
     return config;
 }
 
-- (ZDKChatAPIConfiguration *) chatAPIConfiguration {
+- (ZDKChatAPIConfiguration *) chatAPIConfiguration:(NSDictionary *)options {
     ZDKChatAPIConfiguration *config = [ZDKChatAPIConfiguration new];
-    config.tags = @[@"iOS", @"chat_v2"];
+  if (options[@"tags"]) {
+      config.tags = options[@"tags"];
+    }
     return config;
 }
 
@@ -45,11 +73,13 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
 {
   
   dispatch_async(dispatch_get_main_queue(), ^{
-    [[ZDKChat instance] setConfiguration: [self chatAPIConfiguration]];
+    [[ZDKChat instance] setConfiguration: [self chatAPIConfiguration : config]];
     NSError *error = nil;
     NSArray *engines = @[
          (id <ZDKEngine>) [ZDKChatEngine engineAndReturnError: &error]
      ];
+    
+    
 
     NSArray<id<ZDKConfiguration>> *configs = @[[self messagingConfiguration], [self chatConfiguration]];
     
