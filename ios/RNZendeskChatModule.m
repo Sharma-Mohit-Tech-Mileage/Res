@@ -50,14 +50,12 @@ RCT_EXPORT_METHOD(setVisitorInfo:(NSDictionary *)options) {
 - (ZDKClassicMessagingConfiguration *) messagingConfiguration {
     ZDKClassicMessagingConfiguration *config = [ZDKClassicMessagingConfiguration new];
     config.name = @"Sparklight Support";
-    config.isMultilineResponseOptionsEnabled = YES;
     return config;
 }
 
 - (ZDKChatConfiguration *) chatConfiguration {
     ZDKChatConfiguration *config = [ZDKChatConfiguration new];
-    config.isAgentAvailabilityEnabled = NO;
-    config.isPreChatFormEnabled = YES;
+    config.isAgentAvailabilityEnabled = YES;
     return config;
 }
 
@@ -65,7 +63,10 @@ RCT_EXPORT_METHOD(setVisitorInfo:(NSDictionary *)options) {
     ZDKChatAPIConfiguration *config = [ZDKChatAPIConfiguration new];
   if (options[@"tags"]) {
       config.tags = options[@"tags"];
+    
     }
+  
+  config.departmentName = options[@"department"]; // Set the department
     return config;
 }
 
@@ -79,9 +80,12 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
          (id <ZDKEngine>) [ZDKChatEngine engineAndReturnError: &error]
      ];
     
-    
 
     NSArray<id<ZDKConfiguration>> *configs = @[[self messagingConfiguration], [self chatConfiguration]];
+    
+   
+        
+        
     
     UIViewController *viewController = [ZDKClassicMessaging.instance buildUIWithEngines:engines
                                      configs:configs

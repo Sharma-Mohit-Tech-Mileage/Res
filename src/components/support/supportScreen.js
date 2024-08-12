@@ -147,7 +147,7 @@ const Support = ({ route }) => {
             email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
             phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
             tags:['pid:_' + userData.userInfo.accountNumber],
-            department:department
+            department: department
         };
         if(Platform.OS==='ios'){
             setVisitorInfo(data)
@@ -157,17 +157,7 @@ const Support = ({ route }) => {
         }
 
     };
-    const handleStartChat = async (data) => {
-        
-        try {
-            await startChat(data);
-            console.log('Chat started successfully');
-        } catch (error) {
-            console.error('Failed to start chat', error);
-        }
-    };
-
-
+    
     return (
         <View style={styles.support}>
             <ProfileSettingsHeader title="Support" iconAlignment="right" showIcon={false}  />
