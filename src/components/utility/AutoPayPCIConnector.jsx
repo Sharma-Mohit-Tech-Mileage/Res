@@ -8,6 +8,7 @@ import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import { GetApiRequest } from '../../network/APIClient';
+
 const { height } = Dimensions.get('window');
 
 const AutoPayPCIConnector = ({ navigation, route }) => {
@@ -114,8 +115,12 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     useEffect(() => {
-        RefreshToken();
-        initializePayment();
+        const refreshAndInitialize = async () => {
+            await RefreshToken();
+            await initializePayment();
+        };
+
+        refreshAndInitialize();
     }, []);
 
     const navigationChange = async (navState) => {
@@ -197,7 +202,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                         console.error('WebView HTTP error: ', nativeEvent);
                     }}
                 />
-
             )}
         </View>
     );
@@ -213,4 +217,5 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(141, 59, 144, 1)',
     },
 });
+
 export default AutoPayPCIConnector;
