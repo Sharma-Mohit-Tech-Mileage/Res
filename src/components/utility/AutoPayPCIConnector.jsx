@@ -114,15 +114,13 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     useEffect(() => {
+        RefreshToken();
         initializePayment();
     }, []);
 
     const navigationChange = async (navState) => {
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
-                setProgress(1);
-                setNavStateReloading(true);
-                await RefreshToken();
                 navigation.navigate('Dashboard');
             }
         }
