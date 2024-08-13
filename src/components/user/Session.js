@@ -5,7 +5,6 @@ import store from '../../redux/configureStore';
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { Env } from "../../network/apis/account/Constants";
-import { CommonActions } from '@react-navigation/native'; // Import navigation utilities
 
 const config = {
     issuer: Env.SSO_LOGIN,
@@ -41,12 +40,7 @@ const onError = async (res, navigation) => {
     console.log('onError:', res);
     // Check if navigation is defined and navigate to the dashboard if it is
     if (navigation) {
-        navigation.dispatch(
-            CommonActions.reset({
-                index: 1,
-                routes: [{ name: 'Dashboard' }], // Replace 'Dashboard' with your actual dashboard route name
-            })
-        );
+        navigation.navigate('Dashboard');
     }
 };
 
@@ -76,6 +70,9 @@ export const RefreshToken = async (navigation) => {
         .catch((error) => onError(error, navigation)); // Pass navigation to onError
     } catch (error) {
         console.error("Error fetching data", error);
+        if (navigation) {
+            navigation.navigate('Dashboard');
+        }
         throw error;
     }
 };
