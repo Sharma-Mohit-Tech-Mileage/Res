@@ -14,8 +14,15 @@ const getProfileDetails = async () => {
             Authorization: "Bearer " + data.token
         }
     };
+    let ApiMethod=''
+    if(accountNumber.toString().length>=16){
+     ApiMethod=`/usersvc/api/profile/${accountNumber}`
+    }else{
+        ApiMethod=`/users/api/profile/${accountNumber}`
+    }
 
-    return _axios.get(`/users/api/profile/${accountNumber}`, { ...config })
+
+    return _axios.get(ApiMethod, { ...config })
         .then(res => res.data)
         .catch(error => {
             console.error(`Error fetching /users/api/profile/${accountNumber}`, error);            
@@ -162,17 +169,23 @@ const fetchPushNotifications = async () => {
 
 const postProfileInfo = async (data) => {
     let user = await getUser();
-
+    let accountNumber = user.userInfo.accountNumber ||null
     const config = {
         headers: {
             Authorization: "Bearer " + user.token
         }
     };
 
-    console.log('Making API Call to /users/api/profile with data:', data); // Log the request data
+    let ApiMethod=''
+    if(accountNumber.toString().length>=16){
+         ApiMethod=`/usersvc/api/profile/password/${accountNumber}`
+    }else{
+        ApiMethod=`/users/api/profile/`
+    }
+    console.log(`Making API Call to ${ApiMethod} with data:`, data); // Log the request data
 
     try {
-        const response = await _axios.put(`/users/api/profile`, data, config);
+        const response = await _axios.put(ApiMethod, data, config);
         console.log('API Call Successful, Response:', response.data); // Log the successful response
         return response.data;
     } catch (error) {
