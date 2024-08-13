@@ -37,17 +37,17 @@ const AutoPayCardNewBiller = ({ cardDigit, isAutoPayStatus, navigation ,style}) 
             onPress={() => {
               navigation.navigate("AutoPayPCIConnector", {
                 url: Env.EASYPAYNEW,
-                name: isAutoPayStatus ?"Manage Auto Pay":"Active Auto Pay",
+                name: isAutoPayStatus ?"Manage Auto Pay":"Setup Auto Pay",
                 useNewPayment: true,
                 status:isAutoPayStatus
               });
             }}
             accessible={true}
-            accessibilityLabel={isAutoPayStatus ?"Manage Auto Pay":"Active Auto Pay"}
+            accessibilityLabel={isAutoPayStatus ?"Manage Auto Pay":"Setup Auto Pay"}
             accessibilityRole="button"
             style={styles.paymentButton}
           >
-            <Text style={styles.paymentButtonText}>{isAutoPayStatus ?"Manage Auto Pay":"Active Auto Pay"}</Text>
+            <Text style={styles.paymentButtonText}>{isAutoPayStatus ?"Manage Auto Pay":"Setup Auto Pay"}</Text>
             <View style={{marginLeft:2}}>
                 <RightArrow color={colors.snow_white} />
               </View>
