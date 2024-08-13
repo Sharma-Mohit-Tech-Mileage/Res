@@ -5,6 +5,7 @@ import store from '../../redux/configureStore';
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { Env } from "../../network/apis/account/Constants";
+import { CommonActions } from '@react-navigation/native'; // Import navigation utilities
 
 const config = {
     issuer: Env.SSO_LOGIN,
@@ -36,7 +37,20 @@ const onSuccess = async (res) => {
     throw new Error("No token received");
 };
 
-export const RefreshToken = async () => {
+const onError = async (res, navigation) => {
+    console.log('onError:', res);
+    // Check if navigation is defined and navigate to the dashboard if it is
+    if (navigation) {
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 1,
+                routes: [{ name: 'Dashboard' }], // Replace 'Dashboard' with your actual dashboard route name
+            })
+        );
+    }
+};
+
+export const RefreshToken = async (navigation) => {
     try {
         console.log('RefreshToken called');
         const user = await getUser();
@@ -57,7 +71,9 @@ export const RefreshToken = async () => {
 
         return new Promise((resolve, reject) => {
             PostAuthApiRequest("/mobile/api/gettoken", data, resolve, reject);
-        }).then(onSuccess);
+        })
+        .then(onSuccess)
+        .catch((error) => onError(error, navigation)); // Pass navigation to onError
     } catch (error) {
         console.error("Error fetching data", error);
         throw error;

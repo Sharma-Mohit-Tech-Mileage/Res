@@ -116,7 +116,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
 
     useEffect(() => {
         const refreshAndInitialize = async () => {
-            await RefreshToken();
+            await RefreshToken(navigation);
             await initializePayment();
         };
 
