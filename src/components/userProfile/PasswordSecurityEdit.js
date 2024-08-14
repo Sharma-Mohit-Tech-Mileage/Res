@@ -4,13 +4,14 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
-import { validatePassword, securityQuestions, passwordTerms } from "../utility/constant";
+import { validatePassword, passwordTerms } from "../utility/constant";
 import SparkLightInput from '../common/customui/SparkLightInput';
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
+import { GetApiRequest } from "../../network/APIClient";
 import { passwordSchema } from '../utility/validationSchema'; // Update the path as necessary
 const PasswordSecurityEdit = () => {
 
@@ -20,6 +21,7 @@ const PasswordSecurityEdit = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
+  const [securityQuestions,setSecurityQuestions] =useState([])
   const route = useRoute(); // Use the useRoute hook
   const dispatch = useDispatch();
   const profile = useSelector(state => state.combinedReducers.profile || {});
@@ -37,6 +39,7 @@ const PasswordSecurityEdit = () => {
 
 
   const handleSave = (formData) => {
+    
     dispatch(updateProfileSecurity(formData, navigation)); // Dispatch with formData
   };
 
@@ -50,13 +53,32 @@ const PasswordSecurityEdit = () => {
     setShowValidationAlert(true);
   };
 
+
+  const getSecurityQuestions=()=>{
+    const request = `usersvc/api/securityquestions/`;
+    GetApiRequest(
+      request,
+      (res) => {
+        console.log("getSecurityQuestions", res);
+        if (res) {
+          res.push("Add your own question")
+          setSecurityQuestions(res)
+        }
+        
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  }
+
   useEffect(() => {
     // Reset the form with the updated profile details
     reset(profileDetails);
   }, [profileDetails, reset]);
 
 
-  useEffect(() => {
+  const checkCustomSecurityQuestion=()=>{
     const storedSecurityQuestion = profileDetails.securityQuestion;
     const isCustomQuestion = storedSecurityQuestion && !securityQuestions.includes(storedSecurityQuestion);
     setIsCustomQuestionSelected(isCustomQuestion);
@@ -65,7 +87,14 @@ const PasswordSecurityEdit = () => {
     } else {
       setCustomSecurityQuestion(storedSecurityQuestion);
     }
-  }, []);
+  }
+
+  useEffect(() => {
+    getSecurityQuestions();
+    if(securityQuestions.length>0){
+      checkCustomSecurityQuestion()
+    }
+  }, [securityQuestions]);
 
   useEffect(() => {
     if (route.params?.updateFailed) {

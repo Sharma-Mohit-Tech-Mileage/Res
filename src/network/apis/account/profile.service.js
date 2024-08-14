@@ -169,13 +169,15 @@ const fetchPushNotifications = async () => {
 
 const postProfileInfo = async (data) => {
     let user = await getUser();
-    let accountNumber = user.userInfo.accountNumber ||null
+   
     const config = {
         headers: {
             Authorization: "Bearer " + user.token
         }
     };
-
+    console.log('Account config',config)
+    let accountNumber = user.userInfo?.accountNumber || null
+    console.log('Account Number',accountNumber)
     let ApiMethod=''
     if(accountNumber.toString().length>=16){
          ApiMethod=`/usersvc/api/profile/password/${accountNumber}`
@@ -504,6 +506,9 @@ const removeUser = async (data) => {
         throw error;
     }
 };
+
+
+
 
 export { logError,logInfo,fetchUserList, getProfileDetails, 
     fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, 
