@@ -35,13 +35,11 @@ const AutoPayCardNewBiller = ({ cardDigit, isAutoPayStatus, navigation, style })
           <View style={styles.statusRow}>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("AutoPayPCIConnector", {
-                  url: Env.EASYPAYNEW,
-                  name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-                  useNewPayment: true,
-                  status: isAutoPayStatus
+                navigation.navigate("ArticalWindowUtility", {
+                    url: `${Env.URL}/billing`,
+                    name: "Billing Details",
                 });
-              }}
+            }}
               accessible={true}
               accessibilityLabel={isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"}
               accessibilityRole="button"
