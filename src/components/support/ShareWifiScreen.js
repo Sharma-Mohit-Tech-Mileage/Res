@@ -179,7 +179,7 @@ const ShareWifiScreen = ({ route }) => {
 
         <View style={styles.qrContainer}>
           <View style={styles.textinput}>
-            <Text style={{ fontSize: 16 }}>SSID</Text>
+            <Text style={{ fontSize: 16,color:Color.sparklightGray1 }}>SSID</Text>
             <SparkLightDropdown
             items={passwordList}
             selectedValue={slectedPasword}
