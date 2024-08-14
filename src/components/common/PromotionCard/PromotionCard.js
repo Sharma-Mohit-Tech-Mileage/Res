@@ -33,7 +33,7 @@ const PromotionCard = () => {
         <View style={styles.textContainerStyle}>
           <Text style={styles.headingStyle}>$5 off every month!</Text>
           <Text style={styles.subTextStyle}>
-            Turn on <Text style={styles.boldText}>Auto Pay</Text> and <Text style={styles.boldText}>Paperless Billing</Text> to enjoy additional savings.
+            Turn on <Text style={styles.boldText}>Auto Pay*</Text> and <Text style={styles.boldText}>Paperless Billing</Text> to enjoy additional savings.
           </Text>
           <Text style={styles.disclaimerStyle}>
             *Only valid with a checking/savings account or a debit card. Plans for the Affordable Connectivity Program, School Programs, and Sparklight TV are not eligible for this discount .
@@ -46,7 +46,6 @@ const PromotionCard = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
     paddingTop: 16,
     flex: 1,
   },
@@ -56,7 +55,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightBrightPurple,
     borderRadius: 10,
     paddingVertical: 16,
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     width: width - 32,
     height: 190,
     overflow: 'hidden',
@@ -97,7 +96,7 @@ const styles = StyleSheet.create({
     top: -20,
   },
   numberStyle: {
-    fontSize: 55,
+    fontSize: 60,
     color: Color.sparklightBrightPurple,
     fontWeight: 'bold',
     marginLeft: -2,
@@ -127,7 +126,7 @@ const styles = StyleSheet.create({
     color: '#F8F8F8',
   },
   disclaimerStyle: {
-    fontSize: 13,
+    fontSize: 12,
     marginTop: 10,
     color: '#F8F8F8',
     fontStyle: 'italic', // Apply italic style
