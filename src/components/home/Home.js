@@ -24,6 +24,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
 import { checkForMinorUpdate } from "../utility/constant";
+import PromotionCard from "../common/PromotionCard/PromotionCard";
 
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
@@ -770,12 +771,10 @@ const HomeScreen = ({ navigation }) => {
               <></>
             )}
             <View style={[styles.card, styles.shadowProp, { marginTop: screenReaderEnabled ? 0 : -40 }]}>
-
               <Text
                 accessible={true}
                 accessibilityLabel={`Service Health`}
                 style={styles.internetHealth}>Service Health</Text>
-
               {checkModemStatus ? (
                 <InternetHealthChart
                   currentValue={getInternetHealth(currentHealth)}
@@ -849,7 +848,8 @@ const HomeScreen = ({ navigation }) => {
                 <></>
               )}
             </View>
-              <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} navigation={navigation}/>
+            <PromotionCard />
+            <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} navigation={navigation}/>
             <MyServicePlan plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
             <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
           </View>
