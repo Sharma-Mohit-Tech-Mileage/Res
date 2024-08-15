@@ -9,9 +9,10 @@ import SparkLightInput from '../common/customui/SparkLightInput';
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
+import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
-import { GetApiRequest } from "../../network/APIClient";
+import { GetApiRequest,PutApiRequest } from "../../network/APIClient";
 import { passwordSchema } from '../utility/validationSchema'; // Update the path as necessary
 const PasswordSecurityEdit = () => {
 
@@ -39,8 +40,9 @@ const PasswordSecurityEdit = () => {
 
 
   const handleSave = (formData) => {
-    
+    console.log("request save data",JSON.stringify(formData))
     dispatch(updateProfileSecurity(formData, navigation)); // Dispatch with formData
+    updateUserPassword(formData.accountNumber)
   };
 
   const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
@@ -63,6 +65,7 @@ const PasswordSecurityEdit = () => {
         if (res) {
           res.push("Add your own question")
           setSecurityQuestions(res)
+          checkCustomSecurityQuestion(res)
         }
         
       },
@@ -71,6 +74,24 @@ const PasswordSecurityEdit = () => {
       }
     );
   }
+  //usersvc/api/profile/password/8160210010000010
+
+  const updateUserPassword=(newPassword)=>{
+    let re = getUser().then((res) => {
+    const request = `usersvc/api/profile/password/${res.userInfo.accountNumber}`;
+    let body={"newPassword":newPassword}
+    PutApiRequest(
+      request,
+      body,
+      (res) => {
+        console.log("update pass", res);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+   });
+  }
 
   useEffect(() => {
     // Reset the form with the updated profile details
@@ -78,7 +99,7 @@ const PasswordSecurityEdit = () => {
   }, [profileDetails, reset]);
 
 
-  const checkCustomSecurityQuestion=()=>{
+  const checkCustomSecurityQuestion=(securityQuestions)=>{
     const storedSecurityQuestion = profileDetails.securityQuestion;
     const isCustomQuestion = storedSecurityQuestion && !securityQuestions.includes(storedSecurityQuestion);
     setIsCustomQuestionSelected(isCustomQuestion);
@@ -91,10 +112,10 @@ const PasswordSecurityEdit = () => {
 
   useEffect(() => {
     getSecurityQuestions();
-    if(securityQuestions.length>0){
-      checkCustomSecurityQuestion()
-    }
-  }, [securityQuestions]);
+    //if(securityQuestions.length>0){
+      
+    //}
+  }, []);
 
   useEffect(() => {
     if (route.params?.updateFailed) {
