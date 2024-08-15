@@ -9,7 +9,7 @@ const SupportIcon = (props) => (
     {...props}
   >
     <Path
-      stroke={props?.isNewBillerUser ? '#c8c8c8' :"#353091"}
+      stroke="#767676"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}

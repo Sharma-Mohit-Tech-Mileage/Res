@@ -9,7 +9,7 @@ const HomeIcone = (props) => (
     {...props}
   >
     <Path
-      stroke="#353091"
+      stroke="#767676"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}
