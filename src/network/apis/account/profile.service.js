@@ -25,7 +25,7 @@ const getProfileDetails = async () => {
     return _axios.get(ApiMethod, { ...config })
         .then(res => res.data)
         .catch(error => {
-            console.error(`Error fetching /users/api/profile/${accountNumber}`, error);            
+            console.error(`Error fetching /${ApiMethod}`, error);            
             if (error.toString().includes('AxiosError: timeout of') && getProfileDetailsCount < 2) {
                 getProfileDetails();
             } else {
