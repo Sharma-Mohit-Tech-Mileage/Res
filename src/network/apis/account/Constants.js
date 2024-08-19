@@ -12,7 +12,6 @@ export const config = {
     PAYMENTURL_V2 : 'https://payment.uat.sparklight.com/PortalsV2/PortalsPayment',
     URL_EASYPAY_SETUP_V2 : 'https://payment.uat.sparklight.com/PortalsV2/setup-auto-pay',
     URL_EASYPAY_MANAGE_V2 : 'https://payment.uat.sparklight.com/PortalsV2/manage-auto-pay',
-    
     PAYMENTURL_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/PortalsBiller',
     URL_EASYPAY_SETUP_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/activate-autopay',
     URL_EASYPAY_MANAGE_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/manage-autopay',

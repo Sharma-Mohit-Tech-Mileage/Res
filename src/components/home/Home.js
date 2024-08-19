@@ -300,7 +300,7 @@ const HomeScreen = ({ navigation }) => {
       GetApiRequest(
         request,
         (res) => {
-          //console.log("getUserAccountDetails", res);
+          console.log("getUserAccountDetails", res);
           if (res) {
             dispatch(saveAccountServices(res.services))
             if (res.currentCollectionStep == "Soft Disconnect") {

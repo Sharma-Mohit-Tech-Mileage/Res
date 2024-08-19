@@ -12,6 +12,8 @@ import { Env } from "../../network/apis/account/Constants";
 import PubSub from "pubsub-js";
 import { CommonActions } from '@react-navigation/native';
 const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
+
+  console.log('Internethealth',currentHealth)
   const GreenCircle = () => {
     return <View style={styles.greenTick}></View>;
   };

@@ -63,7 +63,8 @@ const ManageEquipment = ({ route }) => {
   const [wifiPasswordCanChange, setwifiPasswordCanChange] =
     React.useState(false);
   const [wifiData, setwifiData] = React.useState([]);
-  const [truckrollPrediction, setTruckrollPrediction] = React.useState(-1);  const getModemPassword = () => {
+  const [truckrollPrediction, setTruckrollPrediction] = React.useState(-1);  
+  const getModemPassword = () => {
     setLoading(true);
     let re = getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/modemmobile`;
@@ -289,9 +290,10 @@ const ManageEquipment = ({ route }) => {
       request,
       (res) => {
         if (res) {
-          console.log('isLoading', loading)
-          console.log('getTruckRollPostApiRequets', JSON.stringify(res))
-          if (res.predictions.length > 0) {
+          console.log('isLoading', res.predictions[0] )
+      
+          if (res.predictions.length > 0 && res.predictions[0]==1) {
+            console.log('getTruckRollPostApiRequets', JSON.stringify(res))
             setTruckrollPrediction(res.predictions[0]);
           }
         }
@@ -537,7 +539,7 @@ const ManageEquipment = ({ route }) => {
                                 },
                               ]}
                             >
-                              {truckrollPrediction == 1 ? 'Schedule a Service Appointment' :
+                              {truckrollPrediction === 1 ? 'Schedule a Service Appointment' :
                                 <>
 
                                   {isOffline
@@ -555,7 +557,7 @@ const ManageEquipment = ({ route }) => {
                               styles.yourSavedCardSpaceBlock,
                             ]}
                           >
-                            {truckrollPrediction == 1 ? 'We\'ve noticed that your modem has been experiencing repeated issues, which may be affecting your internet service quality. We recommend you contact us to schedule a service appointment.' :
+                            {truckrollPrediction === 1 ? 'We\'ve noticed that your modem has been experiencing repeated issues, which may be affecting your internet service quality. We recommend you contact us to schedule a service appointment.' :
                               <>
                                 {isContactUs
                                   ? `Sorry, we're having trouble completing the modem system check right now. This seems to be an issue on our end. Please try again later. If the problem persists, please contact our support team for assistance.`
