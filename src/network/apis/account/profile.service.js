@@ -180,7 +180,7 @@ const postProfileInfo = async (data) => {
     console.log('Account Number',accountNumber)
     let ApiMethod=''
     if(accountNumber.toString().length>=16){
-         ApiMethod=`/usersvc/api/profile/password/${accountNumber}`
+         ApiMethod=`/usersvc/api/profile/`
     }else{
         ApiMethod=`/users/api/profile/`
     }

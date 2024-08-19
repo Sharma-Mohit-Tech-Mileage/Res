@@ -39,6 +39,8 @@ const CardNewBiller = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, nav
                                 <Text style={paperlessStatus ? styles.labelActive : styles.label}>{paperlessStatus ? "On" : "Off"}</Text>
                             </View>
                         </View> */}
+                        <View style={{paddingVertical:15}}></View>
+                        <View style={{paddingVertical:10}}></View>
                     </View>
                     <View style={styles.statusRow}>
                         <TouchableOpacity
