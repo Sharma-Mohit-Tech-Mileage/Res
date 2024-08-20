@@ -95,7 +95,9 @@ const ModemSpeedTest = ({ navigation, route }) => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={[Color.sparklightBrightPurple]}
+            title="Pull to refresh"
+            tintColor={Color.sparklightBrightPurple}
+            titleColor={Color.colorMidnightblue}
           />
         }
       >
