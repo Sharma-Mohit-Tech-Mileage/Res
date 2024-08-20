@@ -9,6 +9,7 @@ import { Color, Padding, FontSize ,FontFamily} from '../../../../GlobalStyles';
 import CheckCircleOutline from "../../../res/svgIcons/CheckCircleOutline";
 import DownloadSpeed from "../../../res/svgIcons/DownloadSpeed";
 import UploadSpeed from "../../../res/svgIcons/UploadSpeed";
+import WatchIcon from "../../../res/svgIcons/WatchIcon";
 const ModemSpeedTest = ({ navigation, route }) => {
   const { networkId } = route?.params || {};
   const [loading, setLoading] = useState(false);
@@ -159,13 +160,18 @@ const ModemSpeedTest = ({ navigation, route }) => {
           {/* Updated Section */}
           <View style={styles.updatedContainer}>
             <Text style={styles.updatedTitle}>Updated</Text>
-            {loading ? (
-              <SkeletonPlaceholder>
-                <SkeletonPlaceholder.Item width={120} height={20} borderRadius={4} />
-              </SkeletonPlaceholder>
-            ) : (
-              <Text style={styles.updatedValue}>{testDate || "---"}</Text>
-            )}
+            <View style={styles.resultIconContainer}>
+              {!loading ? <View style={[styles.indicatorIcon, { marginTop: 10 }]}>
+                <WatchIcon />
+              </View> : null}
+              {loading ? (
+                <SkeletonPlaceholder>
+                  <SkeletonPlaceholder.Item width={120} height={20} borderRadius={4} />
+                </SkeletonPlaceholder>
+              ) : (
+                <Text style={styles.updatedValue}>{testDate || "---"}</Text>
+              )}
+            </View>
           </View>
         </View>
 
