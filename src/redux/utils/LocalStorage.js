@@ -89,3 +89,22 @@ export const getUpgradeToken = async () => {
   }
 };
 
+// store pending tickets
+export const storeValue = async (value) => {
+  try {
+    await AsyncStorage.setItem("ptickets", JSON.stringify(value));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// getting data
+export const getPendingTicket = async () => {
+  try {
+    const data = JSON.parse(await AsyncStorage.getItem("ptickets"));
+    return data;
+  } catch (error) {
+   console.log(error); 
+  }
+};
+
