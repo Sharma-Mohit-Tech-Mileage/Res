@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorMidnightblue,
     paddingVertical: Padding.p_base,
     alignItems: 'center',
-    margin: Padding.p_xl,
+    margin: Padding.p_base,
     borderRadius: 1,
   },
   disabledButton: {
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   cancelButton: {
     paddingVertical: Padding.p_base,
     alignItems: 'center',
-    margin: Padding.p_xl,
+    margin: Padding.p_base,
     borderRadius: 1,
     backgroundColor: Color.sparklightWhite
   },
