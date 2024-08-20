@@ -34,8 +34,8 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice, networkId })
 
   useFocusEffect(
     useCallback(() => {
-       getCurrentSpeed(); 
-      }, []));
+      getCurrentSpeed();
+    }, []));
   const toggleModal = () => {
     setShowModal(!showModal);
     getCurrentSpeed();

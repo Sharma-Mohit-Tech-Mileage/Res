@@ -34,8 +34,10 @@ const ModemSpeedTest = ({ navigation, route }) => {
     getUser().then((res) => {
       const postRequest = `mobile/api/eero/InsertSpeedTestResults?accountnumber=${res.userInfo.accountNumber}&networkId=${networkId}`;
       PostApiRequest(postRequest, {}, () => {
-        fetchModemSpeedDetails(res.userInfo.accountNumber, networkId);
-      }, onError);
+  //Put sleep for 1 minute to get the speed test results
+  setTimeout(() => {
+    fetchModemSpeedDetails(res.userInfo.accountNumber,networkId);
+  }, 60000);      }, onError);
     });
   };
 
