@@ -8,6 +8,7 @@ import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import { GetApiRequest } from '../../network/APIClient';
+
 const { height } = Dimensions.get('window');
 
 const AutoPayPCIConnector = ({ navigation, route }) => {
@@ -114,15 +115,17 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     useEffect(() => {
-        initializePayment();
+        const refreshAndInitialize = async () => {
+            await RefreshToken(navigation);
+            await initializePayment();
+        };
+
+        refreshAndInitialize();
     }, []);
 
     const navigationChange = async (navState) => {
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
-                setProgress(1);
-                setNavStateReloading(true);
-                await RefreshToken();
                 navigation.navigate('Dashboard');
             }
         }
@@ -199,7 +202,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                         console.error('WebView HTTP error: ', nativeEvent);
                     }}
                 />
-
             )}
         </View>
     );
@@ -215,4 +217,5 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(141, 59, 144, 1)',
     },
 });
+
 export default AutoPayPCIConnector;

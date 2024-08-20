@@ -4,12 +4,12 @@ import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import DollerIconBg from "../../../res/svgIcons/DollerIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { FontFamily, Padding ,Color} from "../../../../GlobalStyles";
-import { Env }  from "../../../network/apis/account/Constants";
-const AutoPayCardNewBiller = ({ cardDigit, isAutoPayStatus, navigation ,style}) => {
+import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
+import { Env } from "../../../network/apis/account/Constants";
+const AutoPayCardNewBiller = ({ cardDigit, isAutoPayStatus, navigation, style }) => {
   return (
     <View style={styles.shadowContainer}>
-      <View style={[styles.card,style]}>
+      <View style={[styles.card, style]}>
         <View style={styles.leftSection}>
           <View style={styles.circleContainerShadow}></View>
           <View style={styles.circleContainer}></View>
@@ -19,9 +19,9 @@ const AutoPayCardNewBiller = ({ cardDigit, isAutoPayStatus, navigation ,style}) 
         <View style={styles.cardContent}>
           {cardDigit ? (
             <>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text style={[styles.dueDate, { fontWeight: '400' , color: colors.gray600 }]}>Account ending in  </Text>
-              <Text style={[styles.dueDate]}>{cardDigit}</Text>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text style={[styles.dueDate, { fontWeight: '400', color: colors.gray600 }]}>Account ending in  </Text>
+                <Text style={[styles.dueDate]}>{cardDigit}</Text>
               </View>
               <Text style={styles.autoPayStatusText}>Auto Pay On</Text>
               <Text style={styles.thankYouText}>Thank you for choosing Auto Pay!</Text>
@@ -33,25 +33,25 @@ const AutoPayCardNewBiller = ({ cardDigit, isAutoPayStatus, navigation ,style}) 
             </>
           )}
           <View style={styles.statusRow}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("AutoPayPCIConnector", {
-                url: Env.EASYPAYNEW,
-                name: isAutoPayStatus ?"Manage Auto Pay":"Active Auto Pay",
-                useNewPayment: true,
-                status:isAutoPayStatus
-              });
-            }}
-            accessible={true}
-            accessibilityLabel={isAutoPayStatus ?"Manage Auto Pay":"Active Auto Pay"}
-            accessibilityRole="button"
-            style={styles.paymentButton}
-          >
-            <Text style={styles.paymentButtonText}>{isAutoPayStatus ?"Manage Auto Pay":"Active Auto Pay"}</Text>
-            <View style={{marginLeft:2}}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("AutoPayPCIConnector", {
+                  url: Env.EASYPAYNEW,
+                  name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
+                  useNewPayment: true,
+                  status: isAutoPayStatus
+                });
+              }}
+              accessible={true}
+              accessibilityLabel={isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"}
+              accessibilityRole="button"
+              style={styles.paymentButton}
+            >
+              <Text style={styles.paymentButtonText}>{isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"}</Text>
+              <View style={{ marginLeft: 2 }}>
                 <RightArrow color={colors.snow_white} />
               </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(71, 84, 103, 0.05)',
     transform: [{ translateY: -wp('41.5%') }],
   },
-  
+
   circleContainer: {
     position: 'absolute',
     top: '50%',
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
-    marginTop:13,
+    marginTop: 13,
     marginBottom: Padding.p_base,
   },
   autoPayStatusTextInActive: {
