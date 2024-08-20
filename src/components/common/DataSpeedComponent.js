@@ -132,9 +132,14 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice, networkId })
     return (
       <>
         <View style={styles.testSpeedResultContainer}>
+          <View style={styles.refreshContainer}>
+            <Text style={[styles.downloadText, styles.downloadsupport, { color: '#000000' }]}>
+            {speedType !== "wifi" ?'Modem speed reported by your eero device':'Wifi speed reported by your mobile device'}
+            </Text>
+          </View>
           {speedLoading ? (
             <SkeletonPlaceholder>
-              <View style={styles.gifContainer}>
+              <View style={[styles.gifContainer,{borderWidth:0}]}>
                 <View style={{ width: wp("75%"), height: 100, borderRadius: 10 }} />
               </View>
               <View style={styles.testSpeedInnerContainer}>
@@ -163,20 +168,6 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice, networkId })
                   style={styles.gif}
                 />
               </View>
-              {speedType !== "wifi" && (
-                <View style={styles.refreshContainer}>
-                  <Text style={styles.refreshText}>
-                    <Text style={[styles.downloadText, styles.downloadsupport]}>Tap </Text>
-                    <Text onPress={getCurrentSpeed} style={styles.refreshButton}>
-                      <Text style={styles.refreshButtonText}>here</Text>
-                    </Text>
-                    <Text style={[styles.downloadText, styles.downloadsupport]}>
-                      {" "}
-                      to refresh for latest information{" "}
-                    </Text>
-                  </Text>
-                </View>
-              )}
               <View style={styles.testSpeedInnerContainer}>
                 <View style={styles.testSpeedColumn}>
                   <View
@@ -474,7 +465,7 @@ const styles = StyleSheet.create({
   },
   refreshContainer: {
     alignItems: "center",
-    paddingVertical: 10,
+    paddingVertical: 4,
   },
   refreshText: {
     textAlign: "center",

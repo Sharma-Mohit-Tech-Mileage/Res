@@ -10,6 +10,7 @@ import CheckCircleOutline from "../../../res/svgIcons/CheckCircleOutline";
 import DownloadSpeed from "../../../res/svgIcons/DownloadSpeed";
 import UploadSpeed from "../../../res/svgIcons/UploadSpeed";
 import WatchIcon from "../../../res/svgIcons/WatchIcon";
+
 const ModemSpeedTest = ({ navigation, route }) => {
   const { networkId } = route?.params || {};
   const [loading, setLoading] = useState(false);
@@ -34,16 +35,18 @@ const ModemSpeedTest = ({ navigation, route }) => {
     getUser().then((res) => {
       const postRequest = `mobile/api/eero/InsertSpeedTestResults?accountnumber=${res.userInfo.accountNumber}&networkId=${networkId}`;
       PostApiRequest(postRequest, {}, () => {
-  //Put sleep for 1 minute to get the speed test results
-  setTimeout(() => {
-    fetchModemSpeedDetails(res.userInfo.accountNumber,networkId);
-  }, 60000);      }, onError);
+        // Put sleep for 1 minute to get the speed test results
+        setTimeout(() => {
+          fetchModemSpeedDetails(res.userInfo.accountNumber, networkId);
+        }, 60000);
+      }, onError);
     });
   };
 
-  const fetchModemSpeedDetails = (accountNumber,networkId) => {
+  const fetchModemSpeedDetails = (accountNumber, networkId) => {
     const speedTestRequest = `mobile/api/Eero/GetEeroSpeedTest?accountnumber=${accountNumber}&networkId=${networkId}`;
     console.log("Speed Test Request URL:", speedTestRequest);
+    setLoading(true); // Set loading state to true to show skeleton placeholders
     GetApiRequest(
       speedTestRequest,
       (res) => {
@@ -60,7 +63,7 @@ const ModemSpeedTest = ({ navigation, route }) => {
         } else {
           console.log("No speed test results found.");
         }
-        setLoading(false);
+        setLoading(false); // Stop skeleton loading once data is fetched
         setTestCompleted(true);
         setRefreshing(false);
       },
@@ -75,7 +78,9 @@ const ModemSpeedTest = ({ navigation, route }) => {
 
   const onRefresh = () => {
     setRefreshing(true);
-    handleTestSpeed();
+    getUser().then((res) => {
+      fetchModemSpeedDetails(res.userInfo.accountNumber, networkId);
+    });
   };
 
   const onError = (error) => {
@@ -107,7 +112,7 @@ const ModemSpeedTest = ({ navigation, route }) => {
           {/* Top Section */}
           <View style={styles.topSectionContainer}>
             <View style={styles.topSection}>
-              {loading ? (
+              {loading && !refreshing ? (
                 <View style={styles.topSectionContent}>
                   <ActivityIndicator size="large" color={Color.sparklightBrightPurple} style={styles.indicatorIcon} />
                   <Text style={styles.topSectionText}>
@@ -117,7 +122,7 @@ const ModemSpeedTest = ({ navigation, route }) => {
               ) : testCompleted ? (
                 <View style={styles.topSectionContent}>
                   <View style={styles.indicatorIcon}>
-                  <CheckCircleOutline />
+                    <CheckCircleOutline />
                   </View>
                   <Text style={styles.topSectionText}>
                     <Text style={{fontWeight:'700',color:Color.sparklightGreen}}>Speed test complete.</Text> Thank you for your patience.
@@ -137,7 +142,7 @@ const ModemSpeedTest = ({ navigation, route }) => {
               <Text style={styles.resultTitle}>Download</Text>
               <View style={styles.resultIconContainer}>
                 <DownloadSpeed />
-                {loading ? (
+                {(loading || refreshing) ? (
                   <SkeletonPlaceholder>
                     <SkeletonPlaceholder.Item width={80} height={20} borderRadius={4} />
                   </SkeletonPlaceholder>
@@ -150,7 +155,7 @@ const ModemSpeedTest = ({ navigation, route }) => {
               <Text style={styles.resultTitle}>Upload</Text>
               <View style={styles.resultIconContainer}>
                 <UploadSpeed/>
-                {loading ? (
+                {(loading || refreshing) ? (
                   <SkeletonPlaceholder>
                     <SkeletonPlaceholder.Item width={80} height={20} borderRadius={4} />
                   </SkeletonPlaceholder>
@@ -165,10 +170,10 @@ const ModemSpeedTest = ({ navigation, route }) => {
           <View style={styles.updatedContainer}>
             <Text style={styles.updatedTitle}>Updated</Text>
             <View style={styles.resultIconContainer}>
-              {!loading ? <View style={[styles.indicatorIcon, { marginTop: 10 }]}>
+              {!loading && !refreshing && <View style={[styles.indicatorIcon, { marginTop: 10 }]}>
                 <WatchIcon />
-              </View> : null}
-              {loading ? (
+              </View>}
+              {(loading || refreshing) ? (
                 <SkeletonPlaceholder>
                   <SkeletonPlaceholder.Item width={120} height={20} borderRadius={4} />
                 </SkeletonPlaceholder>
@@ -183,11 +188,13 @@ const ModemSpeedTest = ({ navigation, route }) => {
         <TouchableOpacity
           style={[styles.runButton, loading && styles.disabledButton]}
           onPress={handleTestSpeed}
-          disabled={loading}
+          disabled={loading || refreshing}
         >
-          <Text style={styles.runButtonText}>
-            {testCompleted ? "Run Speed Test Again" : "Run Speed Test"}
-          </Text>
+          { (
+            <Text style={styles.runButtonText}>
+              {testCompleted ? "Run Speed Test Again" : "Run Speed Test"}
+            </Text>
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
