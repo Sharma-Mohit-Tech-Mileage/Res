@@ -12,6 +12,7 @@ import { GetApiRequest } from "../../network/APIClient";
 const MyServicePlan = ({ plans, navigation }) => {
   const [tabIndex, setTabIndex] = useState(0);
   const [hasEeroDevice, setHasEeroDevice] = useState(false);
+  const [networkId, setNetworkId] = useState(null);
 
   useEffect(() => {
     checkEeroDevice();
@@ -24,6 +25,7 @@ const MyServicePlan = ({ plans, navigation }) => {
         const networkId = response.data.networks[0]?.split('/').pop();
         if (networkId) {
           setHasEeroDevice(true);
+          setNetworkId(networkId);
         } else {
           setHasEeroDevice(false);
         }
@@ -94,9 +96,9 @@ const MyServicePlan = ({ plans, navigation }) => {
         )}
       </View>
       {tabIndex == 0 ? (
-        <DataSpeedComponent navigation={navigation} speedType="wifi" hasEeroDevice={hasEeroDevice} />
+        <DataSpeedComponent navigation={navigation} speedType="wifi" hasEeroDevice={hasEeroDevice} networkId={networkId}/>
       ) : (
-        hasEeroDevice && <DataSpeedComponent navigation={navigation} speedType="modem" hasEeroDevice={hasEeroDevice} />
+        hasEeroDevice && <DataSpeedComponent navigation={navigation} speedType="modem" hasEeroDevice={hasEeroDevice} networkId={networkId}/>
       )}
     </View>
   );
