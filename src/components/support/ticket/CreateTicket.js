@@ -31,7 +31,7 @@ import {
   UploadMultipartData,
   PostApiRequest,
 } from "../../../network/APIClient";
-import { getUser } from "../../../redux/utils/LocalStorage";
+import { getUser,storeValue } from "../../../redux/utils/LocalStorage";
 import DocumentPicker, { types } from "react-native-document-picker";
 import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
 import LoadingOverlay from "../../common/customui/CustomLoading";
@@ -85,6 +85,9 @@ const CreateTicket = () => {
         request,
         formData,
         (res) => {
+          console.log('saved data',JSON.stringify(formData))
+          let data={...formData,ticketNumber:res, status:'Pending'}
+          storeValue(data)
           console.log('Ticket:',res)
           navigation.goBack();
           setTimeout(() => {

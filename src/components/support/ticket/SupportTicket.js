@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Pressable,
   Platform,
-  RefreshControl
+  RefreshControl,
 } from "react-native";
 import {
   Padding,
@@ -21,7 +21,7 @@ import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightButton from "../../common/customui/SparkLightButton";
 import { useNavigation } from "@react-navigation/native";
 import { GetApiRequest } from "../../../network/APIClient";
-import { getUser } from "../../../redux/utils/LocalStorage";
+import { getUser, getPendingTicket } from "../../../redux/utils/LocalStorage";
 import TicketListIcon from "../../../res/svgIcons/TicketListIcon";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -36,12 +36,12 @@ const SupportTicket = () => {
 
   const onRefresh = () => {
     setRefreshing(true);
-  
+
     setTimeout(() => {
-        //setRefreshing(false);
-        getTicketList();
-    }, 500); 
-};
+      //setRefreshing(false);
+      getTicketList();
+    }, 500);
+  };
   const getTicketList = () => {
     setLoading(true);
     let re = getUser().then((res) => {
@@ -51,11 +51,24 @@ const SupportTicket = () => {
         (res) => {
           console.log("getTicketList", res);
           if (res) {
-            setTicketList(res);
-            setMainList(res);
+            getPendingTicket().then((data) => {
+              console.log("Pending Ticket", res.includes(data.ticketNumber));
+              // let pendingList=[]
+              if (res.length > 0) {
+                if (
+                  res.filter((item) => item.ticketNumber == data.ticketNumber)
+                    .length == 0
+                ) {
+                  res.unshift(data);
+                }
+              }
+
+              setTicketList(res);
+              setMainList(res);
+            });
           }
           setLoading(false);
-          setRefreshing(false)
+          setRefreshing(false);
         },
         (error) => {
           setLoading(false);
@@ -279,10 +292,10 @@ const SupportTicket = () => {
                 renderItem={RenderTicketList}
                 refreshControl={
                   <RefreshControl
-                      refreshing={refreshing}
-                      onRefresh={onRefresh}
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
                   />
-              }
+                }
                 //onEndReached={onEndReached}
                 //onEndReachedThreshold={0.1}
                 //ListFooterComponent={Footer}
@@ -417,11 +430,12 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 28,
-  },supportingTypo1: {
+  },
+  supportingTypo1: {
     lineHeight: 20,
     fontSize: FontSize.textXsSemibold_size,
     textAlign: "left",
-},
+  },
   badge: {
     borderColor: Color.colorAquamarine,
     paddingHorizontal: Padding.p_5xs,
@@ -449,7 +463,7 @@ const styles = StyleSheet.create({
   activityIndicator: {
     transform: [{ scale: 2 }],
     marginVertical: 10,
-    paddingVertical:5
+    paddingVertical: 5,
   },
 });
 

@@ -17,6 +17,7 @@ export const isUserAuthorized = (authorize) => {
 
 const handleFetchResponse = async (response, onSuccess, onError) => {
     try {
+
         const json = await response.json();
         if (response.ok) {
             onSuccess(json);
@@ -24,7 +25,8 @@ const handleFetchResponse = async (response, onSuccess, onError) => {
             onError(`Response status ${response.status} (${response.statusText}): ${json.message}`);
         }
     } catch (error) {
-        onError(error.message);
+        //onError(error.message);
+        onError(`Response status ${response.status} (${response.statusText}): ${error.message}`);
     }
 };
 
