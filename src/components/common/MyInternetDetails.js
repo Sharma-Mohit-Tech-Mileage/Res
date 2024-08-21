@@ -54,6 +54,8 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
   }, []);
 
   const renderCard = ({ item, index }) => {
+    const isActive = index === activeSlide;
+  
     if (index === 1) {
       return (
         <AutoPayCard
@@ -63,6 +65,9 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
           paperlessStatus={paperlessStatus}
           navigation={navigation}
           style={styles.card}
+          accessible={true}
+          accessibilityLabel="Auto Pay Card"
+          accessibilityState={{ selected: isActive }}
         />
       );
     }
@@ -75,6 +80,9 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
           paperlessStatus={paperlessStatus}
           navigation={navigation}
           style={styles.card}
+          accessible={true}
+          accessibilityLabel="Paperless Billing Card"
+          accessibilityState={{ selected: isActive }}
         />
       );
     }
@@ -86,9 +94,13 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
         paperlessStatus={paperlessStatus}
         navigation={navigation}
         style={styles.card}
+        accessible={true}
+        accessibilityLabel="Billing Summary Card"
+        accessibilityState={{ selected: isActive }}
       />
     );
   };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.scrollView} style={{ marginStart: -24 }}>
@@ -97,11 +109,11 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
           data={[{}, {}, {}]}
           renderItem={renderCard}
           sliderWidth={viewportWidth}
-          itemWidth={wp('85%')}
+          itemWidth={wp('87%')}
           inactiveSlideScale={0.94}
           inactiveSlideOpacity={0.7}
-          containerCustomStyle={styles.carousel}
-          contentContainerCustomStyle={styles.carouselContentContainer}
+          containerCustomStyle={[styles.carousel, { marginRight: 0 }]} // Ensure no margin on right
+          contentContainerCustomStyle={[styles.carouselContentContainer, { paddingEnd: 0 }]} // Ensure no padding at the end
           onSnapToItem={(index) => setActiveSlide(index)}
         />
       </View>

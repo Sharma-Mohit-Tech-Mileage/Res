@@ -39,10 +39,10 @@ const EEroFeatures = (props) => {
       title: "Wifi Scheduling",
       icon: <WifiScheduling />
     },
-    {
-      title: "Internet Backup",
-      icon: <InternetBackUp />
-    },
+    // {
+    //   title: "Internet Backup",
+    //   icon: <InternetBackUp />
+    // },
     {
       title: "Multi-Admin",
       icon: <MultiAdmin />
@@ -106,7 +106,7 @@ const EEroFeatures = (props) => {
                 </View>
               )
             })}
-            <Text style={[styles.reliabilityText,{paddingTop: Padding.p_3xs}]}>{`And much more!`}</Text>
+            <Text style={[styles.reliabilityText,{paddingTop: Padding.p_13xl}]}>{`And much more!`}</Text>
           </View>
         </View>
         <View

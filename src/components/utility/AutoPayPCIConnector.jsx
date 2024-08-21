@@ -9,14 +9,15 @@ import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import { GetApiRequest } from '../../network/APIClient';
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 const AutoPayPCIConnector = ({ navigation, route }) => {
     const [initScript, setInitScript] = useState('');
     const [progress, setProgress] = useState(0);
     const [url, setUrl] = useState(route.params?.url || 'https://customer.uat.sparklight.com/residential');
     const [currentUser, setCurrentUser] = useState({});
-    const [useNewPayment, setuseNewPayment] = useState(route.params?.useNewPayment||false);
+    const [useNewPayment, setuseNewPayment] = useState(route.params?.useNewPayment || false);
+    const [status, setStatus] = useState(route.params?.status || false);
     const [name, setTitle] = useState(route.params?.name);
     const [navStateReloading, setNavStateReloading] = useState(false);
     const user = useSelector(state => state.combinedReducers.user.userData);
@@ -74,7 +75,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         }).toString();
 
         const param = { guid: gui, key: ix, PaymentObj: baX, RefererUrl: makePaymentUrl };
-        post(param, useNewPayment ? Env.NEW_PAYMENTURL : Env.PAYMENTURL);
+        post(param, useNewPayment ? Env.PAYMENTURL_V3 : Env.PAYMENTURL_V2);
     };
 
     const post = (obj, url) => {
@@ -102,7 +103,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 `account/api/account/${accountNumber}/easypay`,
                 (res) => {
                     const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.paymentId, res?.EasyPayId);
-                    redirectToEBillpay(paymentObj, useNewPayment ? Env.NEW_URL_EASYPAY : Env.URL_EASYPAY);
+                    redirectToEBillpay(paymentObj, useNewPayment ? (status ? Env.URL_EASYPAY_MANAGE_V3 : Env.URL_EASYPAY_SETUP_V3) : (status ? Env.URL_EASYPAY_MANAGE_V2 : Env.URL_EASYPAY_SETUP_V2));
                 },
                 (error) => {
                     console.error("Error fetching payment details:", error);
@@ -114,16 +115,17 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     useEffect(() => {
-        initializePayment();
+        const refreshAndInitialize = async () => {
+            await RefreshToken(navigation);
+            await initializePayment();
+        };
+
+        refreshAndInitialize();
     }, []);
 
     const navigationChange = async (navState) => {
-        console.log('*****************************navState***************************************************', navState);
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
-                setProgress(1);
-                setNavStateReloading(true);
-                await RefreshToken();
                 navigation.navigate('Dashboard');
             }
         }
@@ -191,6 +193,14 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     onNavigationStateChange={navigationChange}
                     originWhitelist={['http://*', 'https://*', 'data:*']}
                     incognito={true}
+                    onError={(syntheticEvent) => {
+                        const { nativeEvent } = syntheticEvent;
+                        console.error('WebView error: ', nativeEvent);
+                    }}
+                    onHttpError={(syntheticEvent) => {
+                        const { nativeEvent } = syntheticEvent;
+                        console.error('WebView HTTP error: ', nativeEvent);
+                    }}
                 />
             )}
         </View>

@@ -5,11 +5,9 @@ import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
 import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
-import { isUserAuthorized } from "../../network/APIClient";
 import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
-import LinearGradient from "react-native-linear-gradient";
-import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
+import { Color } from "../../../GlobalStyles";
 const { width, height } = Dimensions.get('window');
 const ArticalWindowUtility = ({ navigation, route }) => {
     const [initScript, setInitScript] = useState('');

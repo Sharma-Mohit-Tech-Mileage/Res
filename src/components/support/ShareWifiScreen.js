@@ -179,7 +179,7 @@ const ShareWifiScreen = ({ route }) => {
 
         <View style={styles.qrContainer}>
           <View style={styles.textinput}>
-            <Text style={{ fontSize: 16 }}>SSID</Text>
+            <Text style={{ fontSize: 16,color:Color.sparklightGray1 }}>SSID</Text>
             <SparkLightDropdown
             items={passwordList}
             selectedValue={slectedPasword}
@@ -205,7 +205,7 @@ const ShareWifiScreen = ({ route }) => {
           <Text 
            accessibilityElementsHidden={isDropDownOpen}
            importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-          style={{ fontSize: 14, marginTop: 40 }}>
+          style={{ fontSize: 14, marginTop: 40,color:Color.sparklightGray1 }}>
             Scan this QR code to connect "{slectedPasword}" Network
           </Text>
         </View>

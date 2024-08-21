@@ -123,7 +123,7 @@ const MyTabs = ({ route, navigation }) => {
         options={{
           tabBarLabel: 'Shop',
           headerShown: false,
-          tabBarLabelStyle:{color: isBillerUser ? '#c8c8c8':''},
+          //tabBarLabelStyle:{color: isBillerUser ? '#c8c8c8':''},
           tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected isNewBillerUser={isBillerUser}/> : <ShopIcon isNewBillerUser={isBillerUser} />)
         }}
       />
@@ -150,7 +150,7 @@ const MyTabs = ({ route, navigation }) => {
         options={{
           headerShown: false,
           tabBarLabel: 'Support',
-          tabBarLabelStyle:{color: isBillerUser ? '#c8c8c8':''},
+         // tabBarLabelStyle:{color: isBillerUser ? '#c8c8c8':''},
           tabBarIcon: ({ focused }) => {
             return (
               <View style={styles.tabItem}>

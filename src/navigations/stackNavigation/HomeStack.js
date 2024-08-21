@@ -7,6 +7,7 @@ import NewBillerHome from "../../components/home/NewBillerHome";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemStackScreen from "./ManageEquepmentStack";
+import ModemSpeedTest from "../../components/common/speedTest/ModemSpeedTest";
 import { useSelector } from 'react-redux';
 
 const HomeStack = createNativeStackNavigator();
@@ -50,6 +51,15 @@ function HomeStackScreen() {
       <HomeStack.Screen
         name="ManageEquipment"
         component={ModemStackScreen}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+      <HomeStack.Screen
+        name="ModemSpeedTest"
+        component={ModemSpeedTest}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),

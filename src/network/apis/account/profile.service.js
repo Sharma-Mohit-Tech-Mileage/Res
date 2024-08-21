@@ -14,11 +14,18 @@ const getProfileDetails = async () => {
             Authorization: "Bearer " + data.token
         }
     };
+    let ApiMethod=''
+    if(accountNumber.toString().length>=16){
+     ApiMethod=`/usersvc/api/profile/${accountNumber}`
+    }else{
+        ApiMethod=`/users/api/profile/${accountNumber}`
+    }
 
-    return _axios.get(`/users/api/profile/${accountNumber}`, { ...config })
+
+    return _axios.get(ApiMethod, { ...config })
         .then(res => res.data)
         .catch(error => {
-            console.error(`Error fetching /users/api/profile/${accountNumber}`, error);            
+            console.error(`Error fetching /${ApiMethod}`, error);            
             if (error.toString().includes('AxiosError: timeout of') && getProfileDetailsCount < 2) {
                 getProfileDetails();
             } else {
@@ -162,17 +169,25 @@ const fetchPushNotifications = async () => {
 
 const postProfileInfo = async (data) => {
     let user = await getUser();
-
+   
     const config = {
         headers: {
             Authorization: "Bearer " + user.token
         }
     };
-
-    console.log('Making API Call to /users/api/profile with data:', data); // Log the request data
+    console.log('Account config',config)
+    let accountNumber = user.userInfo?.accountNumber || null
+    console.log('Account Number',accountNumber)
+    let ApiMethod=''
+    if(accountNumber.toString().length>=16){
+         ApiMethod=`/usersvc/api/profile/`
+    }else{
+        ApiMethod=`/users/api/profile/`
+    }
+    console.log(`Making API Call to ${ApiMethod} with data:`, data); // Log the request data
 
     try {
-        const response = await _axios.put(`/users/api/profile`, data, config);
+        const response = await _axios.put(ApiMethod, data, config);
         console.log('API Call Successful, Response:', response.data); // Log the successful response
         return response.data;
     } catch (error) {
@@ -491,6 +506,9 @@ const removeUser = async (data) => {
         throw error;
     }
 };
+
+
+
 
 export { logError,logInfo,fetchUserList, getProfileDetails, 
     fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, 

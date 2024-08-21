@@ -63,22 +63,22 @@ const ManageEquipment = ({ route }) => {
   const [wifiPasswordCanChange, setwifiPasswordCanChange] =
     React.useState(false);
   const [wifiData, setwifiData] = React.useState([]);
-  const [truckrollPrediction, setTruckrollPrediction] = React.useState(-1);  const getModemPassword = () => {
+  const [truckrollPrediction, setTruckrollPrediction] = React.useState(-1);  
+  const getModemPassword = () => {
     setLoading(true);
     let re = getUser().then((res) => {
-      const request = `internet/api/internet/${res.userInfo.accountNumber}/modem/security/Get`;
+      const request = `internet/api/internet/${res.userInfo.accountNumber}/modemmobile`;
       GetApiRequest(request, onSuccessModemPassword, onErrorModemPassword);
     });
   };
 
   const onSuccessModemPassword = (res) => {
     setLoading(false);
-    console.log("getModemDetails", res);
     if (res) {
-      if (res.length == 0) setwifiPasswordCanChange(false);
-      else setwifiPasswordCanChange(true);
-      const list = res.map((value) => value.ssid);
-      setwifiData(res);
+      setwifiPasswordCanChange(true)
+    }
+    else{
+      setwifiPasswordCanChange(false)
     }
   };
   const onErrorModemPassword = (error) => {
@@ -117,12 +117,12 @@ const ManageEquipment = ({ route }) => {
             var mac = macAddress;
             if (res.userInfo.accountNumber === "128387263") {
               mac = "bc:3e:07:38:56:d0";
-            } else if (res.userInfo.accountNumber === "133370775") {
+            } else if (user.userInfo.accountNumber === "902880244") {
+              mac = "bc:3e:07:38:56:d0";
+            } else if (user.userInfo.accountNumber === "902880236") {
+              mac = "28:7a:ee:8e:cf:8c";
+            } else if (user.userInfo.accountNumber === "902880079") {
               mac = "00:40:36:5f:cc:7f";
-            } else if (res.userInfo.accountNumber === "133437285") {
-              mac = "6c:cd:d6:6c:d0:1c";
-            } else if (res.userInfo.accountNumber === "131684698") {
-              mac = "28:7a:ee:97:4d:cc";
             } else if (res.userInfo.accountNumber === "136885142") {
               mac = "20:73:55:89:c7:00";
             }
@@ -290,9 +290,10 @@ const ManageEquipment = ({ route }) => {
       request,
       (res) => {
         if (res) {
-          console.log('isLoading', loading)
-          console.log('getTruckRollPostApiRequets', JSON.stringify(res))
-          if (res.predictions.length > 0) {
+          console.log('isLoading', res.predictions[0] )
+      
+          if (res.predictions.length > 0 && res.predictions[0]==1) {
+            console.log('getTruckRollPostApiRequets', JSON.stringify(res))
             setTruckrollPrediction(res.predictions[0]);
           }
         }
@@ -538,7 +539,7 @@ const ManageEquipment = ({ route }) => {
                                 },
                               ]}
                             >
-                              {truckrollPrediction == 1 ? 'Schedule a Service Appointment' :
+                              {truckrollPrediction === 1 ? 'Schedule a Service Appointment' :
                                 <>
 
                                   {isOffline
@@ -556,7 +557,7 @@ const ManageEquipment = ({ route }) => {
                               styles.yourSavedCardSpaceBlock,
                             ]}
                           >
-                            {truckrollPrediction == 1 ? 'We\'ve noticed that your modem has been experiencing repeated issues, which may be affecting your internet service quality. We recommend you contact us to schedule a service appointment.' :
+                            {truckrollPrediction === 1 ? 'We\'ve noticed that your modem has been experiencing repeated issues, which may be affecting your internet service quality. We recommend you contact us to schedule a service appointment.' :
                               <>
                                 {isContactUs
                                   ? `Sorry, we're having trouble completing the modem system check right now. This seems to be an issue on our end. Please try again later. If the problem persists, please contact our support team for assistance.`

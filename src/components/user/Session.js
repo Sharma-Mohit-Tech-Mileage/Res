@@ -36,7 +36,15 @@ const onSuccess = async (res) => {
     throw new Error("No token received");
 };
 
-export const RefreshToken = async () => {
+const onError = async (res, navigation) => {
+    console.log('onError:', res);
+    // Check if navigation is defined and navigate to the dashboard if it is
+    if (navigation) {
+        navigation.navigate('Dashboard');
+    }
+};
+
+export const RefreshToken = async (navigation) => {
     try {
         console.log('RefreshToken called');
         const user = await getUser();
@@ -57,9 +65,14 @@ export const RefreshToken = async () => {
 
         return new Promise((resolve, reject) => {
             PostAuthApiRequest("/mobile/api/gettoken", data, resolve, reject);
-        }).then(onSuccess);
+        })
+        .then(onSuccess)
+        .catch((error) => onError(error, navigation)); // Pass navigation to onError
     } catch (error) {
         console.error("Error fetching data", error);
+        if (navigation) {
+            navigation.navigate('Dashboard');
+        }
         throw error;
     }
 };
