@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Platform } from 'react-native';
+import { View, StyleSheet, Dimensions, Text,Platform, AppState ,ActivityIndicator} from 'react-native';
 import WebView from 'react-native-webview';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import CryptoJS from 'crypto-js';
@@ -9,7 +9,7 @@ import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import { GetApiRequest } from '../../network/APIClient';
 
-const { height } = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 
 const AutoPayPCIConnector = ({ navigation, route }) => {
     const [initScript, setInitScript] = useState('');
@@ -23,6 +23,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
     const [html, setHtml] = useState('');
+    const [appState, setAppState] = useState(AppState.currentState);
 
     const generateGuid = () => {
         const p8 = (s) => {
@@ -175,9 +176,28 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         userUpdateScript(user);
     }, [user]);
 
+    useEffect(() => {
+        const subscription = AppState.addEventListener('change', nextAppState => {
+            if (appState.match(/inactive|background/) && nextAppState === 'active') {
+                webViewRef.current.reload();
+            }
+            setAppState(nextAppState);
+        });
+
+        return () => {
+            subscription.remove();
+        };
+    }, [appState]);
+
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS === 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); }} title={name} />
+            {progress < 1 && (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="rgba(141, 59, 144, 1)" />
+                    <Text style={styles.loadingText}>Loading...</Text>
+                </View>
+            )}
             {progress < 1 && (
                 <View style={styles.progressBar}>
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
@@ -208,6 +228,20 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
+    loadingContainer: {
+        position: 'absolute',
+        top: height / 2 - 50, // Center vertically
+        left: width / 2 - 50, // Center horizontally
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 10, // Ensure it's above other content
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: 'rgba(141, 59, 144, 1)',
+        textAlign: 'center',
+    },
     progressBar: {
         height: height * 0.004, // 0.4% of screen height
         backgroundColor: 'lightgrey',

@@ -8,6 +8,7 @@ import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility"
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemStackScreen from "./ManageEquepmentStack";
 import ModemSpeedTest from "../../components/common/speedTest/ModemSpeedTest";
+import AutoPayPCIConnector from '../../components/utility/AutoPayPCIConnector'
 import { useSelector } from 'react-redux';
 
 const HomeStack = createNativeStackNavigator();
@@ -57,6 +58,15 @@ function HomeStackScreen() {
           blur: () => setTabBarVisible(true),
         }}
       />
+      <HomeStack.Screen
+            name="AutoPayPCIConnector"
+            component={AutoPayPCIConnector}
+            options={{ headerShown: false }}
+            listeners={{
+              focus: () => setTabBarVisible(true),
+              blur: () => setTabBarVisible(true),
+            }}
+          />
       <HomeStack.Screen
         name="ModemSpeedTest"
         component={ModemSpeedTest}

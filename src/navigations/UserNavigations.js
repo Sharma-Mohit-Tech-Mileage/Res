@@ -5,7 +5,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import analytics from '@react-native-firebase/analytics';
 import SplashScreen from "../components/user/SplashScreen";
 import ArticalWindowUtility from '../components/utility/ArticalWindowUtility'
-import AutoPayPCIConnector from '../components/utility/AutoPayPCIConnector'
 import EmailNotifications from '../components/entry/EmailNotifications';
 import PushNotifications from '../components/entry/PushNotifications';
 import TextNotifications from '../components/entry/TextNotifications';
@@ -97,11 +96,6 @@ const UserNavigations = (props) => {
           <Stack.Screen
             name="ArticalWindowUtility"
             component={ArticalWindowUtility}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="AutoPayPCIConnector"
-            component={AutoPayPCIConnector}
             options={{ headerShown: false }}
           />
           <Stack.Screen
