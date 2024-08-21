@@ -49,12 +49,7 @@ const PasswordSecurityEdit = () => {
     }
   };
 
-  const handleSavePass = (formData) => {
-    console.log("request save data",formData?.newPassword)
-   if(formData?.newPassword){
-     updateUserPassword(formData.newPassword)
-    }
-  };
+  
 
 
   const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
@@ -87,22 +82,7 @@ const PasswordSecurityEdit = () => {
   }
   //usersvc/api/profile/password/8160210010000010
 
-  const updateUserPassword=(newPassword)=>{
-    let re = getUser().then((res) => {
-    const request = `usersvc/api/profile/password/${res.userInfo.accountNumber}`;
-    let body={"newPassword":newPassword}
-    PutApiRequest(
-      request,
-      body,
-      (res) => {
-        console.log("update pass", res);
-      },
-      (error) => {
-        console.log("Error on updateUserPassword ",JSON.stringify(error));
-      }
-    );
-   });
-  }
+  
 
   useEffect(() => {
     // Reset the form with the updated profile details
@@ -162,7 +142,7 @@ const PasswordSecurityEdit = () => {
       <ProfileSettingsHeader
         accessibilityElementsHidden={isDropDownOpen}
         importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-        title="Edit Password & Security"
+        title="Edit Security Question"
         onPressBack={() => navigation.navigate('PasswordSecurity')}
       />
       <ScrollView ref={scrollViewRef} >
@@ -186,81 +166,6 @@ const PasswordSecurityEdit = () => {
                   isVisible={showValidationAlert}
                   onClose={() => setShowValidationAlert(false)}
                 />
-              </View>
-              <View style={[styles.passwordWrapper, styles.wrapperSpaceBlock1]}>
-                <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header">
-                  Password
-                </Text>
-              </View>
-              <View style={styles.frameParent}
-              accessibilityElementsHidden={isDropDownOpen}
-              importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-              >
-                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
-                    <Controller
-                      control={control}
-                      name="newPassword"
-                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                        <>
-                          <SparkLightInput
-                            placeholder="New Password"
-                            onBlur={onBlur}
-                            label={'New Password'}
-                            onChangeText={onChange}
-                            value={value}
-                            secure={true}
-                            error={error?.message}
-                          />
-                          <View 
-                          accessibilityElementsHidden={isDropDownOpen}
-                          importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                          style={[styles.passwordFlexBox, { marginTop: Padding.p_base }]}>
-                            {validatePassword(value, profileDetails.userName).map((isValid, index) => (
-                              <View key={`point-${index}`} style={styles.bulletPointContainer}>
-                                <View style={{ marginTop: 7 }}>
-                                  <View style={[
-                                    styles.bullet,
-                                    { backgroundColor: isValid ? Color.sparklightGreen : Color.colorGray_200 }
-                                  ]} />
-                                </View>
-                                <Text style={styles.bulletPoiint}>{passwordTerms[index]}</Text>
-                              </View>
-                            ))}
-                          </View>
-                        </>
-                      )}
-                    />
-                </View>
-              </View>
-              <View style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}>
-                <View style={styles.frameChild} />
-              <View>
-              <View style={{ marginTop: 20 }}>
-            <Pressable
-              style={styles.BtnContainer}
-              onPress={handleSubmit(handleSavePass, handleValidationError)}
-            >
-              <Text style={styles.Btn}>Save</Text>
-            </Pressable>
-          </View>
-
-          <View style={{ marginTop: 20 }}>
-            <TouchableOpacity
-              style={[styles.BtnContainer, { backgroundColor: "#00000000" }]}
-              onPress={() => {
-                //goBackAction();
-                navigation.goBack()
-              }}
-            >
-              <Text
-                style={[styles.Btn, { color: colors.sparklight_purple_blue }]}
-              >
-                Cancel
-              </Text>
-            </TouchableOpacity>
-          </View>
-              </View>
-
               </View>
               <View style={styles.frameParent1}>
                 <View 

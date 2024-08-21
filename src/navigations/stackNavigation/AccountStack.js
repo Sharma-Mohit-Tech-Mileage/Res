@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AccountScreen from '../../components/account/AccountOverview';
 import ProfileSettings from '../../components/userProfile/ProfileSettings';
 import ProfileSettingsEdit from '../../components/userProfile/ProfileSettingsEdit';
+import ChangePassword from '../../components/userProfile/ChangePassword';
 import PasswordSecurity from '../../components/userProfile/PasswordSecurity';
 import PasswordSecurityEdit from '../../components/userProfile/PasswordSecurityEdit';
 import Notifications from '../../components/notifiction/Notifications';
@@ -70,6 +71,16 @@ function AccountStackScreen() {
             <AccountStack.Screen
                 name="PasswordSecurityEdit"
                 component={PasswordSecurityEdit}
+                options={{ headerShown: false }}
+                listeners={{
+                    focus: () => setTabBarVisible(true),
+                    blur: () => setTabBarVisible(true)
+                }}
+            />
+
+              <AccountStack.Screen
+                name="PasswordEdit"
+                component={ChangePassword}
                 options={{ headerShown: false }}
                 listeners={{
                     focus: () => setTabBarVisible(true),
