@@ -66,34 +66,43 @@ RCT_EXPORT_METHOD(setVisitorInfo:(NSDictionary *)options) {
     
     }
   
-  config.departmentName = options[@"department"]; // Set the department
+  config.department = options[@"department"]; // Set the department
+  [ZDKChat instance].configuration = config;
     return config;
+}
+
+//[[ZDKChat instance] endChat];
+
+RCT_EXPORT_METHOD(clearChatSession)
+{
+  [[ZDKChat instance] resetIdentity];
 }
 
 RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
 {
+  [[ZDKChat instance] setConfiguration: [self chatAPIConfiguration : config]];
   
   dispatch_async(dispatch_get_main_queue(), ^{
-    [[ZDKChat instance] setConfiguration: [self chatAPIConfiguration : config]];
+   
     NSError *error = nil;
     NSArray *engines = @[
          (id <ZDKEngine>) [ZDKChatEngine engineAndReturnError: &error]
      ];
-    
-
     NSArray<id<ZDKConfiguration>> *configs = @[[self messagingConfiguration], [self chatConfiguration]];
-    
-   
-        
-        
-    
     UIViewController *viewController = [ZDKClassicMessaging.instance buildUIWithEngines:engines
                                      configs:configs
                                        error:&error];
     
     UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
     if (rootViewController) {
-        [rootViewController presentViewController:viewController animated:YES completion:^{
+      viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle: @"Close"
+                                                                                             style: UIBarButtonItemStylePlain
+                                                                                            target: self
+                                                                                            action: @selector(dismiss)];
+
+          UINavigationController *chatController = [[UINavigationController alloc] initWithRootViewController: viewController];
+          //[self.navigationController presentViewController:chatController animated:YES completion:nil];
+        [rootViewController presentViewController:chatController animated:YES completion:^{
             //resolve(nil);
         }];
     } else {
@@ -105,6 +114,8 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
   
 }
 
-
+- (void) dismiss {
+  [[ZDKChat instance] resetIdentity];
+}
 
 @end
