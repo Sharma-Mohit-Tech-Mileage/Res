@@ -34,8 +34,10 @@ const DataSpeedComponent = ({ navigation, speedType, hasEeroDevice, networkId })
 
   useFocusEffect(
     useCallback(() => {
-      getCurrentSpeed();
-    }, []));
+      getCurrentSpeed(); // This should refetch the data when navigating back to the component
+    }, [speedType, networkId])
+  );
+  
   const toggleModal = () => {
     setShowModal(!showModal);
     getCurrentSpeed();
