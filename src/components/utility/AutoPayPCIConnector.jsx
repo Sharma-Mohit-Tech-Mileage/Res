@@ -41,7 +41,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         return bytes;
     };
 
-    const getPaymentObj = (token, user, paymentId, easyPayId) => {
+    const getPaymentObj = (token, user, isEasyPay, easyPayId) => {
         return {
             AccountNumber: user.accountNumber || '',
             FirstName: user.firstName || '',
@@ -52,14 +52,14 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             PaymentDueDate: '',
             Email: user.email || '',
             EasyPayId: easyPayId || '',
-            EasyPayEnabled: '',
+            EasyPayEnabled: isEasyPay || false,
             TokenCookie: token || '',
-            PaymentId: paymentId || '',
         };
     };
 
     const redirectToEBillpay = (paymentObj, makePaymentUrl) => {
         const data = JSON.stringify(paymentObj);
+        console.log('PaymentObj:', data);
         const gui = generateGuid();
         const guiTrim = gui.split('-').join('');
 
@@ -103,7 +103,8 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             GetApiRequest(
                 `account/api/account/${accountNumber}/easypay`,
                 (res) => {
-                    const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.paymentId, res?.EasyPayId);
+                    console.log("Payment details fetched successfully:", res);
+                    const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.isEasyPay, res?.easyPayId);
                     redirectToEBillpay(paymentObj, useNewPayment ? (status ? Env.URL_EASYPAY_MANAGE_V3 : Env.URL_EASYPAY_SETUP_V3) : (status ? Env.URL_EASYPAY_MANAGE_V2 : Env.URL_EASYPAY_SETUP_V2));
                 },
                 (error) => {
