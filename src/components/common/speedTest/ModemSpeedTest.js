@@ -182,6 +182,9 @@ const ModemSpeedTest = ({ navigation, route }) => {
               )}
             </View>
           </View>
+            <View style={[styles.resultIconContainer,{marginTop:8}]}>
+                <Text style={styles.updatedValue}><Text style={{fontWeight:'600',color:'#000000'}}>Tip:</Text> Pull screen down to update content.</Text>
+            </View>
         </View>
 
         {/* Buttons */}
@@ -278,7 +281,11 @@ const styles = StyleSheet.create({
   },
   updatedContainer: {
     marginTop: 16,
-    alignItems: 'center',
+    alignItems: 'center',// Gray background for the top section
+    padding: Padding.p_base,
+    backgroundColor: Color.colorWhitesmoke_100, 
+    borderRadius: 8,
+    width: '100%',
   },
   updatedTitle: {
     color: Color.colorMidnightblue,

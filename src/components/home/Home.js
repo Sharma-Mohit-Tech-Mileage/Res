@@ -51,6 +51,8 @@ const HomeScreen = ({ navigation }) => {
   const [internetHealths, setInternetHealths] = useState([]);
   const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: '', latestVersion: '' });
   const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
+  const [hasEeroDevice, setHasEeroDevice] = useState(false);
+  const [networkId, setNetworkId] = useState(null);
 
   useEffect(() => {
     async function getAccessibility() {
@@ -437,11 +439,29 @@ const HomeScreen = ({ navigation }) => {
       }
     }
   };
+  const checkEeroDevice = () => {
+    getUser().then((res) => {
+      const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${res.userInfo.accountNumber}`;
+      GetApiRequest(request, (response) => {
+        const networkId = response.data.networks[0]?.split('/').pop();
+        if (networkId) {
+          setHasEeroDevice(true);
+          setNetworkId(networkId);
+        } else {
+          setHasEeroDevice(false);
+        }
+      }, (error) => {
+        console.log("error", error);
+        setHasEeroDevice(false);
+      });
+    });
+  };
 
   useEffect(() => {
     const fetchUpdateStatus = async () => {
       const status = await checkForMinorUpdate();
       setUpdateStatus(status);
+      checkEeroDevice();
     };
 
     fetchUpdateStatus();
@@ -850,7 +870,7 @@ const HomeScreen = ({ navigation }) => {
             </View>
             <PromotionCard />
             <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} navigation={navigation}/>
-            <MyServicePlan plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
+            <MyServicePlan plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} hasEeroDevice={hasEeroDevice} networkId={networkId} navigation={navigation} />
             <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
           </View>
         </ScrollView>

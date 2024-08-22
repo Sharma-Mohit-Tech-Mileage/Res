@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Text,Platform, AppState ,ActivityIndicator} from 'react-native';
+import { View, StyleSheet, Dimensions, Text, Platform, AppState, ActivityIndicator } from 'react-native';
 import WebView from 'react-native-webview';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import CryptoJS from 'crypto-js';
@@ -193,17 +193,11 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         <View style={{ flex: 1, marginBottom: (Platform.OS === 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); }} title={name} />
             {progress < 1 && (
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="rgba(141, 59, 144, 1)" />
-                    <Text style={styles.loadingText}>Loading...</Text>
-                </View>
-            )}
-            {progress < 1 && (
                 <View style={styles.progressBar}>
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
                 </View>
             )}
-            {html && (
+            {html ? (
                 <WebView
                     ref={webViewRef}
                     source={{ html }}
@@ -222,6 +216,11 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                         console.error('WebView HTTP error: ', nativeEvent);
                     }}
                 />
+            ) : (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="rgba(141, 59, 144, 1)" />
+                    <Text style={styles.loadingText}>Preparing content...</Text>
+                </View>
             )}
         </View>
     );
@@ -229,12 +228,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
     loadingContainer: {
-        position: 'absolute',
-        top: height / 2 - 50, // Center vertically
-        left: width / 2 - 50, // Center horizontally
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 10, // Ensure it's above other content
     },
     loadingText: {
         marginTop: 10,
