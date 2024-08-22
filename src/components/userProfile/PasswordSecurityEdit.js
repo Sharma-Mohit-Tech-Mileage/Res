@@ -43,10 +43,9 @@ const PasswordSecurityEdit = () => {
 
   const handleSave = (formData) => {
     console.log("request save data",JSON.stringify(formData))
+    formData.securityQuestion=customSecurityQuestion
     dispatch(updateProfileSecurity(formData, navigation)); // Dispatch with formData
-   if(formData?.newPassword){
-     updateUserPassword(formData.newPassword)
-    }
+   
   };
 
   

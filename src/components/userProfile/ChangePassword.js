@@ -39,10 +39,16 @@ const ChangePassword = () => {
 
   const handleSavePass = (formData) => {
     console.log("request save data",formData?.newPassword)
-   if(formData?.newPassword){
-     updateUserPassword(formData.newPassword)
+    if(isNewBiller){
+        if(formData?.newPassword){
+            updateUserPassword(formData.newPassword)
+           }
+    }else{
+        dispatch(updateProfileSecurity(formData, navigation));
     }
+   
   };
+
 
 
   const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
