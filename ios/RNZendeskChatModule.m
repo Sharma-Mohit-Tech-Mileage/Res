@@ -115,7 +115,7 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
 }
 
 - (void) dismiss {
-  [[ZDKChat instance] resetIdentity];
+  [[ZDKChat instance] resetIdentity ];
 }
 
 @end
