@@ -59,7 +59,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
 
     const redirectToEBillpay = (paymentObj, makePaymentUrl) => {
         const data = JSON.stringify(paymentObj);
-        console.log('PaymentObj:', data);
         const gui = generateGuid();
         const guiTrim = gui.split('-').join('');
 
@@ -105,7 +104,11 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 (res) => {
                     console.log("Payment details fetched successfully:", res);
                     const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.isEasyPay, res?.easyPayId);
-                    redirectToEBillpay(paymentObj, useNewPayment ? (status ? Env.URL_EASYPAY_MANAGE_V3 : Env.URL_EASYPAY_SETUP_V3) : (status ? Env.URL_EASYPAY_MANAGE_V2 : Env.URL_EASYPAY_SETUP_V2));
+                    const payURL = useNewPayment
+                        ? (status ? Env.URL_EASYPAY_MANAGE_V3 : Env.URL_EASYPAY_SETUP_V3)
+                        : (status ? Env.URL_EASYPAY_MANAGE_V2 : Env.URL_EASYPAY_SETUP_V2);
+                        console.log("Payment details fetched successfully:", payURL);
+                    redirectToEBillpay(paymentObj,payURL );
                 },
                 (error) => {
                     console.error("Error fetching payment details:", error);
