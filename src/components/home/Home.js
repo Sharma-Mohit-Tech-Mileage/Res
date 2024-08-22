@@ -459,11 +459,10 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     const fetchUpdateStatus = async () => {
+      checkEeroDevice();
       const status = await checkForMinorUpdate();
       setUpdateStatus(status);
-      checkEeroDevice();
     };
-
     fetchUpdateStatus();
   }, []);
 
