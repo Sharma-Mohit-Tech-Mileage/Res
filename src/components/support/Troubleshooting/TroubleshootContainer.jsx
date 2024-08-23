@@ -61,7 +61,7 @@ const TroubleshootContainer = () => {
   const [loading, setLoading] = useState(true);
   const [key, setKey] = useState(1);
   const [isReadingComplete, setIsReadingComplete] = useState(false);
-  const [standardtimeout, setStandardTimeout] = useState(4000);
+  const [standardtimeout, setStandardTimeout] = useState(2000);
 
   /**
    * useEffect to increase standardtimeout to 20 seconds if accessibility is turned on
@@ -81,7 +81,7 @@ const TroubleshootContainer = () => {
         if (isScreenReaderEnabled) {
           setStandardTimeout(20000);
         } else {
-          setStandardTimeout(4000);
+          setStandardTimeout(2000);
         }
       }
     );
