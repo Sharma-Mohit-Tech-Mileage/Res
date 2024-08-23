@@ -51,10 +51,11 @@ const SupportTicket = () => {
         (res) => {
           console.log("getTicketList", res);
           if (res) {
+            setTicketList(res);
+            setMainList(res);
             getPendingTicket().then((data) => {
-              console.log("Pending Ticket", res.includes(data.ticketNumber));
               // let pendingList=[]
-              if (res.length > 0) {
+              if (res.length > 0 && data) {
                 if (
                   res.filter((item) => item.ticketNumber == data.ticketNumber)
                     .length == 0
@@ -153,7 +154,9 @@ const SupportTicket = () => {
         <Pressable
           style={styles.ticketParent}
           onPress={() => {
+            if(!item?.isLocal){
             navigation.navigate("ViewTicket", { ticketId: item.ticketNumber });
+            }
           }}
         >
           <View
@@ -172,11 +175,13 @@ const SupportTicket = () => {
               Ticket #{item.ticketNumber}{" "}
             </Text>
           </View>
+          { !item?.isLocal && (
           <Image
             style={styles.chevronIconLayout}
             resizeMode="stretch"
             source={require("../../../../assets/chevronright.png")}
           />
+          )}
         </Pressable>
         <View
           style={{
@@ -285,7 +290,7 @@ const SupportTicket = () => {
             </Text>
           </View>
           {ticketList.length > 0 ? (
-            <View style={{ paddingBottom: hp("50%") }}>
+            <View style={{ paddingBottom: hp("42%") }}>
               <FlatList
                 data={ticketList}
                 keyExtractor={(item, index) => index.toString()}
