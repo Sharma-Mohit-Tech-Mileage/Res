@@ -320,7 +320,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     margin: Padding.p_base,
     borderRadius: 1,
-    backgroundColor: Color.sparklightWhite
   },
   cancelButtonText: {
     color: Color.colorMidnightblue,
