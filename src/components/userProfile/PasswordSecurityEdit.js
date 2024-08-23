@@ -13,6 +13,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
 import { GetApiRequest,PutApiRequest } from "../../network/APIClient";
+import LoadingOverlay from "../common/customui/CustomLoading";
 import { passwordSchema } from '../utility/validationSchema'; // Update the path as necessary
 import colors from "../../res/Colors";
 const PasswordSecurityEdit = () => {
@@ -21,8 +22,11 @@ const PasswordSecurityEdit = () => {
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
   const [isNewBiller, setIsNewBiller] = useState(false);
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
+  const [mySecurityQuestion, setMySecurityQuestion] = useState('');
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingTxt, setLoadingTxt] = useState("Please wait...");
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   const [securityQuestionsNew,setSecurityQuestionsNew] =useState(securityQuestions)
   const route = useRoute(); // Use the useRoute hook
@@ -43,7 +47,8 @@ const PasswordSecurityEdit = () => {
 
   const handleSave = (formData) => {
     console.log("request save data",JSON.stringify(formData))
-    formData.securityQuestion=customSecurityQuestion
+    setLoading(true)
+    formData.securityQuestion=(isCustomQuestionSelected)? formData.securityQuestion : customSecurityQuestion
     dispatch(updateProfileSecurity(formData, navigation)); // Dispatch with formData
    
   };
@@ -86,6 +91,7 @@ const PasswordSecurityEdit = () => {
   useEffect(() => {
     // Reset the form with the updated profile details
     //reset(profileDetails);
+    setLoading(false)
   }, [profileDetails, reset]);
 
 
@@ -101,6 +107,18 @@ const PasswordSecurityEdit = () => {
     }
   }
 
+  useEffect(()=>{
+    const storedSecurityQuestion = profileDetails.securityQuestion;
+    const isCustomQuestion = storedSecurityQuestion && !securityQuestionsNew.includes(storedSecurityQuestion);
+    setIsCustomQuestionSelected(isCustomQuestion);
+    if (isCustomQuestion) {
+      setCustomSecurityQuestion("Add your own question");
+    } else {
+      setCustomSecurityQuestion(storedSecurityQuestion);
+    }
+
+  },[])
+
   useEffect(() => {
     let re = getUser().then((res) => {
       if(res.userInfo.accountNumber.toString().length>=16){
@@ -112,14 +130,7 @@ const PasswordSecurityEdit = () => {
       getSecurityQuestions();
     }else{
       
-      const storedSecurityQuestion = profileDetails.securityQuestion;
-      const isCustomQuestion = storedSecurityQuestion && !securityQuestionsNew.includes(storedSecurityQuestion);
-      setIsCustomQuestionSelected(isCustomQuestion);
-      if (isCustomQuestion) {
-        setCustomSecurityQuestion("Add your own question");
-      } else {
-        setCustomSecurityQuestion(storedSecurityQuestion);
-      }
+     
 
     }
   }, [isNewBiller]);
@@ -211,6 +222,7 @@ const PasswordSecurityEdit = () => {
                               error={error?.message}
                             />
                           </>
+                          
                         )}
                       />
                     </View>
@@ -256,6 +268,14 @@ const PasswordSecurityEdit = () => {
               <Text style={[styles.makePayment1, styles.makeTypo]}> Cancel</Text>
             </Pressable>
           </View>
+
+          <LoadingOverlay
+                loading={loading}
+                loadingTxt={loadingTxt}
+                onRequestClose={() => {
+                  setLoading(false);
+                }}
+              />
         </View>
       </ScrollView>
     </View>

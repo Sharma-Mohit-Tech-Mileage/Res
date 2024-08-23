@@ -154,7 +154,7 @@ const SupportTicket = () => {
         <Pressable
           style={styles.ticketParent}
           onPress={() => {
-            if(item.status!='Pending'){
+            if(!item?.isLocal){
             navigation.navigate("ViewTicket", { ticketId: item.ticketNumber });
             }
           }}
@@ -175,7 +175,7 @@ const SupportTicket = () => {
               Ticket #{item.ticketNumber}{" "}
             </Text>
           </View>
-          { item.status!='Pending' && (
+          { !item?.isLocal && (
           <Image
             style={styles.chevronIconLayout}
             resizeMode="stretch"

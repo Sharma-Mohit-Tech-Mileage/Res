@@ -13,6 +13,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
 import { GetApiRequest,PutApiRequest } from "../../network/APIClient";
+import LoadingOverlay from "../common/customui/CustomLoading";
 import { passwordSchema } from '../utility/validationSchema'; // Update the path as necessary
 import colors from "../../res/Colors";
 const ChangePassword = () => {
@@ -20,6 +21,8 @@ const ChangePassword = () => {
   const navigation = useNavigation();
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
   const [isNewBiller, setIsNewBiller] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingTxt, setLoadingTxt] = useState("Please wait...");
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
@@ -32,13 +35,10 @@ const ChangePassword = () => {
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const scrollViewRef = useRef(null);
 
-  
-
-
-  
 
   const handleSavePass = (formData) => {
     console.log("request save data",formData?.newPassword)
+    setLoading(true)
     if(isNewBiller){
         if(formData?.newPassword){
             updateUserPassword(formData.newPassword)
@@ -104,6 +104,7 @@ const ChangePassword = () => {
   useEffect(() => {
     // Reset the form with the updated profile details
     //reset(profileDetails);
+    setLoading(false)
   }, [profileDetails, reset]);
 
 
@@ -252,6 +253,14 @@ const ChangePassword = () => {
               <Text style={[styles.makePayment1, styles.makeTypo]}> Cancel</Text>
             </Pressable>
           </View>
+
+          <LoadingOverlay
+                loading={loading}
+                loadingTxt={loadingTxt}
+                onRequestClose={() => {
+                  setLoading(false);
+                }}
+              />
         </View>
       </ScrollView>
     </View>
