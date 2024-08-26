@@ -835,7 +835,6 @@ const NewBillerHome = ({ navigation }) => {
               </TouchableOpacity>
               </View>
             </View>
-            <ScrollView horizontal={true} style={{ marginStart: 20 }}>
               <View>
                 <MyInternetDetialsBiller
                   plans={payStatus}
@@ -844,14 +843,6 @@ const NewBillerHome = ({ navigation }) => {
                   navigation={navigation}
                 />
               </View>
-            </ScrollView>
-
-            {/* <MyServicePlan
-              plans={plans}
-              tvPlan={tvPlan}
-              phonePlan={phonePlan}
-              navigation={navigation}
-            /> */}
           </View>
         </ScrollView>
       </SafeAreaView>
