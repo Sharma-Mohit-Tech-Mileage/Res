@@ -3,6 +3,7 @@ import { getUser } from "../redux/utils/LocalStorage";
 import { Env } from "./apis/account/Constants";
 import axios from "axios";
 import { RefreshToken } from '../components/user/Session';
+import { navigationRef } from '../navigations/UserNavigations';
 const BASE_URL = Env.API_BASEURL;
 const SUPPORT_URL = "https://support.sparklight.com/api/v2/help_center/";
 const MODEM_BASE_URL = Env.MODEM_BASE_URL;
@@ -60,6 +61,10 @@ try {
             } catch (refreshError) {
                 console.log('Token refresh failed:', refreshError);
                 processQueue(refreshError, null);
+                // Navigate to splash screen on refresh token failure
+                if (navigationRef.current) {
+                    navigationRef.current.navigate('Splash');  // Adjust the name based on your Splash Screen route
+                }
             } finally {
                 isRefreshing = false;
             }
