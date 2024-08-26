@@ -4,6 +4,7 @@
 #import <CommonUISDK/CommonUISDK.h>
 #import <ChatSDK/ChatSDK.h>
 #import <ChatProvidersSDK/ChatProvidersSDK.h>
+#import <CommonUISDK/CommonUISDK.h>
 
 
 
@@ -13,6 +14,15 @@
 
 RCT_EXPORT_MODULE(RNZendeskChatModule);
 ZDKChatAPIConfiguration *_visitorAPIConfig;
+UINavigationController *_chatController;
+
+- (UIColor *)colorFromHexString:(NSString *)hexString {
+    unsigned rgbValue = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:hexString];
+    [scanner setScanLocation:1]; // bypass '#' character
+    [scanner scanHexInt:&rgbValue];
+    return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:1.0];
+}
 
 + (void) init {
 
@@ -81,6 +91,7 @@ RCT_EXPORT_METHOD(clearChatSession)
 RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
 {
   [[ZDKChat instance] setConfiguration: [self chatAPIConfiguration : config]];
+  [ZDKCommonTheme currentTheme].primaryColor = [UIColor purpleColor];
   
   dispatch_async(dispatch_get_main_queue(), ^{
    
@@ -95,14 +106,19 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
     
     UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
     if (rootViewController) {
+      [[UINavigationBar appearance] setBarTintColor:[UIColor purpleColor]];
+     
       viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle: @"Close"
                                                                                              style: UIBarButtonItemStylePlain
                                                                                             target: self
                                                                                             action: @selector(dismiss)];
-
-          UINavigationController *chatController = [[UINavigationController alloc] initWithRootViewController: viewController];
+      [viewController.navigationItem.leftBarButtonItem setTitleTextAttributes:
+                [NSDictionary dictionaryWithObjectsAndKeys:
+                     [UIColor whiteColor], NSForegroundColorAttributeName,nil]
+                                                  forState:UIControlStateNormal];
+      _chatController = [[UINavigationController alloc] initWithRootViewController: viewController];
           //[self.navigationController presentViewController:chatController animated:YES completion:nil];
-        [rootViewController presentViewController:chatController animated:YES completion:^{
+        [rootViewController presentViewController:_chatController animated:YES completion:^{
             //resolve(nil);
         }];
     } else {
@@ -115,7 +131,13 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
 }
 
 - (void) dismiss {
-  [[ZDKChat instance] resetIdentity ];
+  NSLog(@"Chat Close called");
+  
+  //[_chatController popViewControllerAnimated:YES];
+  [_chatController dismissViewControllerAnimated:YES completion:nil];
+
+ // [[ZDKChat instance] resetIdentity ];
+  
 }
 
 @end
