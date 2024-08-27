@@ -79,7 +79,6 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate, navigation }) => {
           inactiveSlideOpacity={0.7}
           containerCustomStyle={styles.carousel}
           contentContainerCustomStyle={styles.carouselContentContainer}
-          onSnapToItem={(index) => setActiveSlide(index)}
         />
       </View>
     </ScrollView>
