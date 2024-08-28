@@ -39,13 +39,11 @@ const ChangePassword = () => {
   const handleSavePass = (formData) => {
     console.log("request save data",formData?.newPassword)
     setLoading(true)
-    if(isNewBiller){
-        if(formData?.newPassword){
-            updateUserPassword(formData.newPassword)
-           }
-    }else{
-        dispatch(updateProfileSecurity(formData, navigation));
-    }
+   
+    if(formData?.newPassword){
+    updateUserPassword(formData.newPassword)
+   }
+    
    
   };
 
@@ -83,17 +81,20 @@ const ChangePassword = () => {
 
   const updateUserPassword=(newPassword)=>{
     let re = getUser().then((res) => {
-    const request = `usersvc/api/profile/password/${res.userInfo.accountNumber}`;
+    const request = isNewBiller ? `usersvc/api/profile/password/${res.userInfo.accountNumber}`:`users/api/profile/password/${res.userInfo.accountNumber}`;
     let body={"newPassword":newPassword}
     PutApiRequest(
       request,
       body,
       (res) => {
+        setLoading(false)
         console.log("update pass", res);
       },
       (error) => {
+        setLoading(false)
         console.log("Error on updateUserPassword ",JSON.stringify(error));
         if(error.includes('204')){
+          
             navigation.navigate('PasswordSecurity', { updateSuccess: true, isPassword:true });
         }
       }

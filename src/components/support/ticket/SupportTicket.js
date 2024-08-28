@@ -19,7 +19,7 @@ import {
 } from "../../../../GlobalStyles";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightButton from "../../common/customui/SparkLightButton";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation ,useIsFocused} from "@react-navigation/native";
 import { GetApiRequest } from "../../../network/APIClient";
 import { getUser, getPendingTicket } from "../../../redux/utils/LocalStorage";
 import TicketListIcon from "../../../res/svgIcons/TicketListIcon";
@@ -33,6 +33,7 @@ const SupportTicket = () => {
   const [loading, setLoading] = useState(false);
   const [searchTxt, setSearchTxt] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const isFocused = useIsFocused();
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -67,6 +68,13 @@ const SupportTicket = () => {
               setTicketList(res);
               setMainList(res);
             });
+          }else{
+            getPendingTicket().then((data) => {
+              if(data){   
+              setTicketList(data);
+              setMainList(data);
+              }
+            });
           }
           setLoading(false);
           setRefreshing(false);
@@ -82,6 +90,10 @@ const SupportTicket = () => {
   useEffect(() => {
     getTicketList();
   }, []);
+
+  useEffect(() => {
+    isFocused && getTicketList()
+  },[isFocused]);
 
   const capitalizeFirstLetter = (string) => {
     return (
