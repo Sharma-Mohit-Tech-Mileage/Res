@@ -8,6 +8,7 @@ import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import { GetApiRequest } from '../../network/APIClient';
+import CookieManager from '@react-native-cookies/cookies'; // Add this line for cookie management
 
 const { height, width } = Dimensions.get('window');
 
@@ -94,6 +95,27 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         setHtml(html);
     };
 
+    const injectCookie = async (currentUrl) => {
+        const domain = new URL(currentUrl).hostname;
+        const cookieValue = 'MobileApp'; // Replace this with the actual value needed
+    
+        // Calculate the expiration time 20 minutes from now
+        const expirationDate = new Date();
+        expirationDate.setMinutes(expirationDate.getMinutes() + 20);
+    
+        await CookieManager.set(domain, {
+            name: 'Source',
+            value: cookieValue,
+            domain: domain,
+            path: '/',
+            version: '1',
+            expires: expirationDate.toISOString() // Use the calculated expiration date
+        });
+    
+        console.log(`Cookie set for domain: ${domain}`);
+    };
+    
+
     const initializePayment = async () => {
         try {
             const userLocal = await getUser();
@@ -107,8 +129,8 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     const payURL = useNewPayment
                         ? (status ? Env.URL_EASYPAY_MANAGE_V3 : Env.URL_EASYPAY_SETUP_V3)
                         : (status ? Env.URL_EASYPAY_MANAGE_V2 : Env.URL_EASYPAY_SETUP_V2);
-                        console.log("Payment details fetched successfully:", payURL);
-                    redirectToEBillpay(paymentObj,payURL );
+                    console.log("Payment details fetched successfully:", payURL);
+                    redirectToEBillpay(paymentObj, payURL);
                 },
                 (error) => {
                     console.error("Error fetching payment details:", error);
@@ -129,6 +151,8 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     }, []);
 
     const navigationChange = async (navState) => {
+        await injectCookie(navState.url); // Inject the cookie whenever navigation changes
+
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
                 navigation.navigate('Dashboard');

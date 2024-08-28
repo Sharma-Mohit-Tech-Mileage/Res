@@ -61,28 +61,25 @@ const TroubleshootContainer = () => {
   const [loading, setLoading] = useState(true);
   const [key, setKey] = useState(1);
   const [isReadingComplete, setIsReadingComplete] = useState(false);
-  const [standardtimeout, setStandardTimeout] = useState(2000);
+  const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
 
   /**
-   * useEffect to increase standardtimeout to 20 seconds if accessibility is turned on
+   * Checks if screen reader is enabled and adjusts the logic accordingly
    */
   useEffect(() => {
     const checkAccessibility = async () => {
-      const isScreenReaderEnabled = await AccessibilityInfo.isScreenReaderEnabled();
-      if (isScreenReaderEnabled) {
-        setStandardTimeout(20000);
-      }
+      const enabled = await AccessibilityInfo.isScreenReaderEnabled();
+      setIsScreenReaderEnabled(enabled);
+      setIsReadingComplete(!enabled); // Set as complete if screen reader is off
     };
+
     checkAccessibility();
 
     const accessibilityChangeListener = AccessibilityInfo.addEventListener(
       'change',
-      (isScreenReaderEnabled) => {
-        if (isScreenReaderEnabled) {
-          setStandardTimeout(20000);
-        } else {
-          setStandardTimeout(2000);
-        }
+      (enabled) => {
+        setIsScreenReaderEnabled(enabled);
+        setIsReadingComplete(!enabled); // Update based on screen reader state
       }
     );
 
@@ -92,7 +89,19 @@ const TroubleshootContainer = () => {
   }, []);
 
   /**
-   * check Modem Outage status
+   * Proceeds to the next step if the screen reader has finished reading
+   */
+  const proceedToNextStep = () => {
+    if (!isScreenReaderEnabled || isReadingComplete) {
+      setTimeout(() => {
+        setCurrentStep((prevStep) => prevStep + 1);
+        setIsReadingComplete(false); // Reset for the next step
+      }, 2000);
+    }
+  };
+
+  /**
+   * Triggers Modem Outage status check
    */
   const checkModemOutagStatus = () => {
     setLoading(true);
@@ -110,9 +119,7 @@ const TroubleshootContainer = () => {
           } else {
             networkStatus[currentStep] = true;
             setKey(2);
-            setTimeout(() => {
-              setCurrentStep(2);
-            }, standardtimeout);
+            proceedToNextStep();
           }
           setLoading(false);
         }
@@ -125,16 +132,14 @@ const TroubleshootContainer = () => {
           networkError[currentStep] = true;
         }
         setKey(2);
-        setTimeout(() => {
-          setCurrentStep(2);
-        }, standardtimeout);
+        proceedToNextStep();
         setLoading(false);
       }
     );
   };
 
   /**
-   *  Check Bill paid status
+   * Triggers Bill paid status check
    */
   const checkBillPaid = (accountNumber) => {
     setLoading(true);
@@ -144,24 +149,15 @@ const TroubleshootContainer = () => {
       (res) => {
         console.log("checkBillPaid", res);
         if (res) {
-          if(moment(res.paymentDueDate).isAfter()){
+          if (moment(res.paymentDueDate).isAfter()) {
             networkStatus[currentStep] = true;
-            setTimeout(() => {
-              setCurrentStep(3);
-            }, standardtimeout);
-
             setKey(3);
-          }else
-          if (res.currentBalance <= 0) {
-            // Bill paide
+            proceedToNextStep();
+          } else if (res.currentBalance <= 0) {
             networkStatus[currentStep] = true;
-            setTimeout(() => {
-              setCurrentStep(3);
-            }, standardtimeout);
-
             setKey(3);
+            proceedToNextStep();
           } else {
-            // Bill Pending
             setIssueDetected(true);
             setBillIssueDetected(true);
           }
@@ -172,9 +168,7 @@ const TroubleshootContainer = () => {
         console.log("checkBillPaid error", Error);
         networkError[currentStep] = true;
         setKey(3);
-        setTimeout(() => {
-          setCurrentStep(3);
-        }, standardtimeout);
+        proceedToNextStep();
         setLoading(false);
       }
     );
@@ -188,15 +182,14 @@ const TroubleshootContainer = () => {
       (res) => {
         console.log("checkModemHealth", res);
         if (res) {
-          if(res?.status){
-            if(res.status===408){
-              setIssueDetected(true);
-              if(isFocused){
-              navigation.navigate("ManageEquipment",{isError:true})
-              }
-              return
+          if (res?.status && res.status === 408) {
+            setIssueDetected(true);
+            if (isFocused) {
+              navigation.navigate("ManageEquipment", { isError: true });
             }
+            return;
           }
+
           let temt = [];
           console.log("checkModemHealth", res.EquipmentType);
           if (res.EquipmentType === "DOCSIS") {
@@ -206,12 +199,9 @@ const TroubleshootContainer = () => {
             temt.push(res.DSNR_State);
             temt.push(res.DRxL_State);
             if (res.Modem_State === "Online") {
-              console.log("checkModemHealth online", temt);
               updateModemStatus(temt);
-            } else {
-              if(isFocused){
+            } else if (isFocused) {
               navigation.navigate("ManageEquipment");
-              }
             }
           } else if (res.EquipmentType === "ONU") {
             temt.push(res.ONUTP_State);
@@ -219,31 +209,23 @@ const TroubleshootContainer = () => {
             temt.push(res.ONURP_State);
             if (res.ONU_State === "Online") {
               updateModemStatus(temt);
-            } else {
-              if(isFocused){
+            } else if (isFocused) {
               navigation.navigate("ManageEquipment");
-              }
             }
           }
           setLoading(false);
-        }else{
-          if(isFocused){
+        } else if (isFocused) {
           navigation.navigate("ManageEquipment");
-          }
         }
       },
       (error) => {
         console.log("Modem details Error1", error);
-        console.log("Modem details Error", error);
         setIssueDetected(true);
-        if(isFocused){
-        navigation.navigate("ManageEquipment",{isError:true});;
+        if (isFocused) {
+          navigation.navigate("ManageEquipment", { isError: true });
         }
-        
-        //networkError[currentStep] = true;
         setKey(3);
         setLoading(false);
-        
       }
     );
   };
@@ -251,37 +233,29 @@ const TroubleshootContainer = () => {
   const updateModemStatus = (temt) => {
     console.log("checkModemHealth", temt);
     const allGreen = temt.every((v) => v === "Green");
-    console.log("modem status", allGreen);
     if (!allGreen) {
-      const checkYellow = temt.includes("Yellow");
-      const checkRed = temt.includes("Red");
-      if (checkRed || checkYellow) {
+      if (temt.includes("Yellow") || temt.includes("Red")) {
         setIssueDetected(true);
-        if(isFocused){
-        navigation.navigate("ManageEquipment",{isError:true});;
+        if (isFocused) {
+          navigation.navigate("ManageEquipment", { isError: true });
         }
-      } else {
-        setIssueDetected(true);
-        if(isFocused){
-        navigation.navigate("ManageEquipment",{isError:true});
-        }
+      } else if (isFocused) {
+        navigation.navigate("ManageEquipment", { isError: true });
       }
     } else {
-      // modem health is good
-      setIssueDetected(true);
       networkStatus[currentStep] = true;
       setKey(5);
-      if(isFocused){
-      navigation.navigate("ModemHealthy");
+      if (isFocused) {
+        navigation.navigate("ModemHealthy");
       }
     }
   };
 
   /**
-   * check plan details
+   * Triggers plan details check
    */
   const getInternetPlanDetails = () => {
-    setLoading(true)
+    setLoading(true);
     const request = `internet/api/internet/${user.userInfo.accountNumber}/plan`;
     GetApiRequest(
       request,
@@ -289,17 +263,22 @@ const TroubleshootContainer = () => {
         if (response.length > 0) {
           let macAddress = response[0].macAddress;
           var mac = macAddress;
-          if (user.userInfo.accountNumber === "128387263") {
-            mac = "bc:3e:07:38:56:d0";
-          }else if (user.userInfo.accountNumber === "902880244") {
-            mac = "bc:3e:07:38:56:d0";  
-          }else if (user.userInfo.accountNumber === "902880236") {
-            mac = "28:7a:ee:8e:cf:8c";
-          } else if (user.userInfo.accountNumber === "902880079") {
-            mac = "00:40:36:5f:cc:7f";
-          }
-          else if(user.userInfo.accountNumber==='136885142'){
-            mac="20:73:55:89:c7:00"
+          switch (user.userInfo.accountNumber) {
+            case "128387263":
+            case "902880244":
+              mac = "bc:3e:07:38:56:d0";
+              break;
+            case "902880236":
+              mac = "28:7a:ee:8e:cf:8c";
+              break;
+            case "902880079":
+              mac = "00:40:36:5f:cc:7f";
+              break;
+            case '136885142':
+              mac = "20:73:55:89:c7:00";
+              break;
+            default:
+              break;
           }
           checkModemHealth(mac);
         }
@@ -311,12 +290,6 @@ const TroubleshootContainer = () => {
         setLoading(false);
       }
     );
-  };
-
-  const startTroubleShooting = () => {
-    setTimeout(() => {
-      setCurrentStep(1);
-    }, standardtimeout);
   };
 
   useEffect(() => {
@@ -332,12 +305,8 @@ const TroubleshootContainer = () => {
   }, [currentStep]);
 
   useEffect(() => {
-    startTroubleShooting();
-  }, []);
-
-  useEffect(() => {
     if (isReadingComplete) {
-      console.log('Screen readout complete');
+      proceedToNextStep();
     }
   }, [isReadingComplete]);
 
@@ -360,38 +329,36 @@ const TroubleshootContainer = () => {
           marginBottom: "15%",
         }}
       >
-        <>
-          {!issueDetected && (
-            <TroubleshootComponent
-              key={key}
-              step={currentStep}
-              item={step}
-              success={networkStatus[currentStep]}
-              pageCount={step.pageCount}
-              loading={loading}
-              isError={networkError[currentStep]}
-              setIsReadingComplete={setIsReadingComplete}
-            />
-          )}
-          {outageIssueDetected && (
-            <OutagesAlert
-              step={currentStep}
-              title={""}
-              description={estimatedRestoreTime}
-              success={true}
-              pageCount={step.pageCount}
-            />
-          )}
-          {billIssueDetected && (
-            <AccountOutages
-              step={currentStep}
-              title={""}
-              description={estimatedRestoreTime}
-              success={true}
-              pageCount={step.pageCount}
-            />
-          )}
-        </>
+        {!issueDetected && (
+          <TroubleshootComponent
+            key={key}
+            step={currentStep}
+            item={step}
+            success={networkStatus[currentStep]}
+            pageCount={step.pageCount}
+            loading={loading}
+            isError={networkError[currentStep]}
+            setIsReadingComplete={setIsReadingComplete}
+          />
+        )}
+        {outageIssueDetected && (
+          <OutagesAlert
+            step={currentStep}
+            title={""}
+            description={estimatedRestoreTime}
+            success={true}
+            pageCount={step.pageCount}
+          />
+        )}
+        {billIssueDetected && (
+          <AccountOutages
+            step={currentStep}
+            title={""}
+            description={estimatedRestoreTime}
+            success={true}
+            pageCount={step.pageCount}
+          />
+        )}
       </SafeAreaView>
     </View>
   );
