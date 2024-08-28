@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { AccessibilityInfo } from "react-native";  // Import AccessibilityInfo
+import { AccessibilityInfo, View, SafeAreaView } from "react-native";
 import AccountOutages from "./AccountOutages";
 import OutagesAlert from "./OutagesAlert";
 import TroubleshootComponent from "./TroubleshootComponent";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
-import { View, SafeAreaView } from "react-native";
 import { Color, Padding } from "../../../../GlobalStyles";
 import { GetApiRequest, GetModemStatusApiRequest } from "../../../network/APIClient";
 import { useSelector } from "react-redux";
 import moment from "moment";
-import { useIsFocused } from '@react-navigation/native';
 
 const stepsData = [
   {
@@ -63,9 +61,6 @@ const TroubleshootContainer = () => {
   const [isReadingComplete, setIsReadingComplete] = useState(false);
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
 
-  /**
-   * Checks if screen reader is enabled and adjusts the logic accordingly
-   */
   useEffect(() => {
     const checkAccessibility = async () => {
       const enabled = await AccessibilityInfo.isScreenReaderEnabled();
@@ -88,9 +83,6 @@ const TroubleshootContainer = () => {
     };
   }, []);
 
-  /**
-   * Proceeds to the next step if the screen reader has finished reading
-   */
   const proceedToNextStep = () => {
     if (!isScreenReaderEnabled || isReadingComplete) {
       setTimeout(() => {
@@ -99,6 +91,24 @@ const TroubleshootContainer = () => {
       }, 2000);
     }
   };
+
+  const announceStep = (message) => {
+    AccessibilityInfo.announceForAccessibility(message);
+    setTimeout(() => {
+      setIsReadingComplete(true); // Wait for announcement to finish
+    }, 3000); // Adjust timeout based on the length of the message
+  };
+
+  useEffect(() => {
+    if (isScreenReaderEnabled && !isReadingComplete) {
+      const step = stepsData[currentStep];
+      announceStep(step.title + " " + (step.description || step.resultMsg));
+    }
+  }, [currentStep, isReadingComplete, isScreenReaderEnabled]);
+
+  /**
+   * Proceeds to the next step if the screen reader has finished reading
+   */
 
   /**
    * Triggers Modem Outage status check
