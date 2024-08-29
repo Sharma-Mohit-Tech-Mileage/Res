@@ -106,11 +106,15 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
     
     UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
     if (rootViewController) {
-      //[[UINavigationBar appearance] setBarTintColor:[UIColor purpleColor]];
+      // Define your custom color using the hex code EAEAEA
+      UIColor *customColor = [UIColor colorWithRed:234/255.0 green:234/255.0 blue:234/255.0 alpha:1.0];
+
+      // Set the custom color as the bar tint color
+      [[UINavigationBar appearance] setBarTintColor:customColor];
       viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle: @"Close"
-                                                                                             style: UIBarButtonItemStylePlain
-                                                                                            target: self
-                                                                                            action: @selector(dismiss)];
+                                                                                                   style: UIBarButtonItemStylePlain
+                                                                                                  target: self
+                                                                                                  action: @selector(dismiss)];
 //      [viewController.navigationItem.leftBarButtonItem setTitleTextAttributes:
 //                [NSDictionary dictionaryWithObjectsAndKeys:
 //                     [UIColor whiteColor], NSForegroundColorAttributeName,nil]
