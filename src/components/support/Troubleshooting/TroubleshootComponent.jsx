@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Dimensions } from 'react-native';
+import React, { useEffect, useRef, memo } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, Dimensions, AccessibilityInfo } from 'react-native';
 import { Color } from "../../../../GlobalStyles";
 import OutageAreaIcon from '../../../res/svgIcons/troubleshooting/OutageAreaIcon';
 import TroubleshootIcon from '../../../res/svgIcons/troubleshooting/TroubleshootIcon';
@@ -11,8 +11,11 @@ const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
 const TroubleshootComponent = ({
-    step, success, pageCount, loading, isError, item
+    step, success, pageCount, loading, isError, item, onTimeoutReceived
 }) => {
+    const announcementTimeoutRef = useRef(null);
+    const isScreenReaderEnabled = useRef(false);
+
     let IconComponent;
     switch (step) {
         case 0: IconComponent = <TroubleshootIcon />; break;
@@ -21,6 +24,57 @@ const TroubleshootComponent = ({
         case 3: IconComponent = <ServiceIcon />; break;
         default: IconComponent = <TroubleshootIcon />;
     }
+
+    // Calculate the estimated reading time based on the word count
+    const calculateAnnouncementTime = (text) => {
+        const words = text.split(' ').length;
+        const wordsPerSecond = 3; // Adjust based on average reading speed
+        return (words / wordsPerSecond) * 1000; // Convert to milliseconds
+    };
+
+    // Function to handle the accessibility announcement
+    const announceAccessibilityMessage = (message) => {
+        let timeout;
+        if (isScreenReaderEnabled.current) {
+            timeout = calculateAnnouncementTime(message) + 5000; // Add a 5-second buffer
+        } else {
+            timeout = 2000; // Default 2-second timeout if accessibility is off
+        }
+
+        if (announcementTimeoutRef.current) clearTimeout(announcementTimeoutRef.current);
+
+        console.log(`Text to be read: ${message}`); // Print the text to be read
+
+        announcementTimeoutRef.current = setTimeout(() => {
+            if (isScreenReaderEnabled.current) {
+                AccessibilityInfo.announceForAccessibility(message);
+            }
+        }, 0);
+
+        if (onTimeoutReceived) {
+            onTimeoutReceived(timeout); // Send the calculated timeout back to the parent
+        }
+
+        return timeout;
+    };
+
+    // Combine title and description for announcement
+    const combinedText = `${loading ? item?.title ?? "Loading..." : isError ? item?.errorMsg ?? "An error occurred." : item?.resultMsg ?? "Operation successful."} ${item.description || ''}`;
+
+    // Use effect to handle content changes for accessibility
+    useEffect(() => {
+        // Check if screen reader is enabled
+        AccessibilityInfo.isScreenReaderEnabled().then((enabled) => {
+            isScreenReaderEnabled.current = enabled;
+            announceAccessibilityMessage(combinedText);
+        });
+
+        return () => {
+            if (announcementTimeoutRef.current) {
+                clearTimeout(announcementTimeoutRef.current);
+            }
+        };
+    }, [combinedText]);
 
     return (
         <View style={styles.container}>
@@ -41,7 +95,7 @@ const TroubleshootComponent = ({
                     {item.description && <Text style={styles.description}>{item.description}</Text>}
                 </View>
                 <View style={styles.spinnerContainer}>
-                    { loading ? <ActivityIndicator size="large" color="#8D3B90" style={styles.activityIndicator} /> : null }
+                    {loading ? <ActivityIndicator size="large" color="#8D3B90" style={styles.activityIndicator} /> : null}
                 </View>
             </View>
         </View>
@@ -111,4 +165,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default TroubleshootComponent;
+export default memo(TroubleshootComponent);

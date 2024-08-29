@@ -21,16 +21,24 @@ const TroubleshootComponent = ({ pageCount }) => {
             setIsAccessibilityOn(enabled);
         });
 
-        const announceText = () => {
-            const reactTag = findNodeHandle(alertRef.current);
-            AccessibilityInfo.setAccessibilityFocus(reactTag);
-        };
-
-        // Announce only if accessibility is on
+        // Announce the message if accessibility is on
         if (isAccessibilityOn) {
-            setTimeout(announceText, 100);
+            AccessibilityInfo.announceForAccessibility(
+                " Please click the 'Pay Bill' button below to settle the amount as soon as possible."
+            );
         }
     }, [isAccessibilityOn]);
+
+    const handlePress = () => {
+        // Annulment logic if VoiceOver or TalkBack is enabled
+        if (isAccessibilityOn) {
+            return; // Prevent the action if accessibility is on
+        }
+        navigation.navigate("ArticalWindowUtility", {
+            url: `${Env.URL}/billing`,
+            name: "Billing Details",
+        });
+    };
 
     return (
         <View style={styles.container}>
@@ -57,12 +65,7 @@ const TroubleshootComponent = ({ pageCount }) => {
                     />
                 </View>
                 <View style={[styles.button]}>
-                    <Pressable onPress={() => {
-                        navigation.navigate("ArticalWindowUtility", {
-                            url: `${Env.URL}/billing`,
-                            name: "Billing Details",
-                        });
-                    }}>
+                    <Pressable onPress={handlePress}>
                         <Text style={[styles.accept]}>Pay Bill</Text>
                     </Pressable>
                 </View>
