@@ -106,16 +106,15 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
     
     UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
     if (rootViewController) {
-      [[UINavigationBar appearance] setBarTintColor:[UIColor purpleColor]];
-     
+      //[[UINavigationBar appearance] setBarTintColor:[UIColor purpleColor]];
       viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle: @"Close"
                                                                                              style: UIBarButtonItemStylePlain
                                                                                             target: self
                                                                                             action: @selector(dismiss)];
-      [viewController.navigationItem.leftBarButtonItem setTitleTextAttributes:
-                [NSDictionary dictionaryWithObjectsAndKeys:
-                     [UIColor whiteColor], NSForegroundColorAttributeName,nil]
-                                                  forState:UIControlStateNormal];
+//      [viewController.navigationItem.leftBarButtonItem setTitleTextAttributes:
+//                [NSDictionary dictionaryWithObjectsAndKeys:
+//                     [UIColor whiteColor], NSForegroundColorAttributeName,nil]
+//                                                  forState:UIControlStateNormal];
       _chatController = [[UINavigationController alloc] initWithRootViewController: viewController];
           //[self.navigationController presentViewController:chatController animated:YES completion:nil];
         [rootViewController presentViewController:_chatController animated:YES completion:^{
