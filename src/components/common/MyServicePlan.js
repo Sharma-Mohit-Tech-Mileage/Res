@@ -1,38 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import colors from "../../res/Colors";
 import strings from "../../res/Strings";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import DataSpeedComponent from "./DataSpeedComponent";
 import { FontFamily } from "../../../GlobalStyles";
-import { getUser } from "../../redux/utils/LocalStorage";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { GetApiRequest } from "../../network/APIClient";
 
-const MyServicePlan = ({ plans, navigation }) => {
+const MyServicePlan = ({ plans, tvPlan, phonePlan, hasEeroDevice, networkId, navigation }) => {
   const [tabIndex, setTabIndex] = useState(0);
-  const [hasEeroDevice, setHasEeroDevice] = useState(false);
-
-  useEffect(() => {
-    checkEeroDevice();
-  }, []);
-
-  const checkEeroDevice = () => {
-    getUser().then((res) => {
-      const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${res.userInfo.accountNumber}`;
-      GetApiRequest(request, (response) => {
-        const networkId = response.data.networks[0]?.split('/').pop();
-        if (networkId) {
-          setHasEeroDevice(true);
-        } else {
-          setHasEeroDevice(false);
-        }
-      }, (error) => {
-        console.log("error", error);
-        setHasEeroDevice(false);
-      });
-    });
-  };
 
   return (
     <View style={{ ...styles.card, ...styles.shadowProp, flexDirection: "column", marginBottom: 20 }}>
@@ -41,7 +17,7 @@ const MyServicePlan = ({ plans, navigation }) => {
         <Text style={styles.date}>{plans[0]?.downloadSpeed ?? 0} Mbps</Text>
       </View>
       <View style={styles.subSec} />
-      <View style={[styles.internetStatusSection, { marginHorizontal: wp('5%'),marginVertical:16 }]}>
+      <View style={[styles.internetStatusSection, { marginHorizontal: wp('5%'), marginVertical: 16 }]}>
         <View style={{ marginTop: 5 }}>
           <InfoIcon />
         </View>
@@ -51,7 +27,7 @@ const MyServicePlan = ({ plans, navigation }) => {
           </Text>
           <View style={{ flexDirection: "row", marginLeft: 10, marginTop: 10 }}>
             <TouchableOpacity
-             accessible={true}
+              accessible={true}
               accessibilityLabel={strings.learn_more}
               accessibilityRole="link"
               onPress={() => {
@@ -65,9 +41,9 @@ const MyServicePlan = ({ plans, navigation }) => {
       </View>
       <View style={styles.switchContainer}>
         <TouchableOpacity
-         accessible={true}
-         accessibilityLabel={`WiFi Speed`}
-         accessibilityRole="button"
+          accessible={true}
+          accessibilityLabel={`WiFi Speed`}
+          accessibilityRole="button"
           style={[
             tabIndex == 0 ? styles.selectedTab : styles.defaultTab,
             {
@@ -81,9 +57,9 @@ const MyServicePlan = ({ plans, navigation }) => {
         </TouchableOpacity>
         {hasEeroDevice && (
           <TouchableOpacity
-          accessible={true}
-          accessibilityLabel={`Modem Speed`}
-          accessibilityRole="button"
+            accessible={true}
+            accessibilityLabel={`Modem Speed`}
+            accessibilityRole="button"
             style={[tabIndex == 1 ? styles.selectedTab : styles.defaultTab, { borderWidth: 1 }]}
             onPress={() => setTabIndex(1)}
           >
@@ -94,9 +70,9 @@ const MyServicePlan = ({ plans, navigation }) => {
         )}
       </View>
       {tabIndex == 0 ? (
-        <DataSpeedComponent navigation={navigation} speedType="wifi" hasEeroDevice={hasEeroDevice} />
+        <DataSpeedComponent navigation={navigation} speedType="wifi" hasEeroDevice={hasEeroDevice} networkId={networkId} />
       ) : (
-        hasEeroDevice && <DataSpeedComponent navigation={navigation} speedType="modem" hasEeroDevice={hasEeroDevice} />
+        hasEeroDevice && <DataSpeedComponent navigation={navigation} speedType="modem" hasEeroDevice={hasEeroDevice} networkId={networkId} />
       )}
     </View>
   );

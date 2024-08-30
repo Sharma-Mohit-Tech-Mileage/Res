@@ -3,26 +3,16 @@ import { View, StyleSheet, Dimensions, ScrollView } from "react-native";
 import Carousel from 'react-native-snap-carousel';
 import Card from "./billerCards/NewBillerSummary";
 import AutoPayCard from "./billerCards/AutoPayCardNewBiller";
-import PeperLessCard from "./billerCards/PeperLessCard";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchBillingPaper, fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
-import { Padding } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
 
 const { width: viewportWidth } = Dimensions.get('window');
 
 const MyInternetDetailsBiller = ({ plans, billAmt, dueDate, navigation }) => {
-  const dispatch = useDispatch();
   const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [cardDigit, setCardDigit] = useState("");
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
-  const [activeSlide, setActiveSlide] = useState(0);
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
-  const paperLessInfo = profile.paperLessInfo || {};
-  const profileDetails = profile.profileDetails || {};
 
   const getStatus = () => {
     getUser().then((res) => {
@@ -49,8 +39,6 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate, navigation }) => {
 
   useEffect(() => {
     getStatus();
-    dispatch(fetchBillingPaper());
-    dispatch(fetchProfileDetails());
   }, []);
 
   const renderCard = ({ item, index }) => {
@@ -91,7 +79,6 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate, navigation }) => {
           inactiveSlideOpacity={0.7}
           containerCustomStyle={styles.carousel}
           contentContainerCustomStyle={styles.carouselContentContainer}
-          onSnapToItem={(index) => setActiveSlide(index)}
         />
       </View>
     </ScrollView>

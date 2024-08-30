@@ -1,10 +1,10 @@
-import { getUser } from "../../redux/utils/LocalStorage";
+import { getUser, storeUser } from "../../redux/utils/LocalStorage";
 import { refresh } from "react-native-app-auth";
-import { storeUser } from "../../redux/utils/LocalStorage";
 import store from '../../redux/configureStore';
-import { PostAuthApiRequest } from "../../network/APIClient";
 import { saveUserInfo } from "../../redux/actions/UserAction";
+import { PostAuthApiRequest } from "../../network/APIClient";
 import { Env } from "../../network/apis/account/Constants";
+import { navigationRef } from '../../navigations/UserNavigations';
 
 const config = {
     issuer: Env.SSO_LOGIN,
@@ -15,11 +15,11 @@ const config = {
 };
 
 const onSuccess = async (res) => {
-    console.log('onSuccess:', res);
+    console.log('Session onSuccess:', res);
     if (res) {
-        let token = res.jwtToken;
-        let userInfo = res.userInfo;
-        let user = {
+        const token = res.jwtToken;
+        const userInfo = res.userInfo;
+        const user = {
             userInfo: userInfo,
             token: token,
             tokenGuid: res.idTokenGuid,
@@ -30,21 +30,35 @@ const onSuccess = async (res) => {
             console.log('User stored in local storage:', user);
         }
         store.dispatch(saveUserInfo(user));
-        console.log('User info saved in redux store:', user);
-        return token; // Return the token here
+        console.log('User info saved in Redux store:', user);
+        return token;
     }
     throw new Error("No token received");
 };
 
-const onError = async (res, navigation) => {
-    console.log('onError:', res);
-    // Check if navigation is defined and navigate to the dashboard if it is
-    if (navigation) {
-        navigation.navigate('Dashboard');
+const onError = (error) => {
+    console.error('Session onError:', error);
+    if (navigationRef.current) {
+        navigationRef.current.navigate('Splash');  // Ensure this route name matches your actual Splash screen route
+    }
+    throw error;  // Re-throw the error if needed
+};
+
+const retryRequest = async (data, retries = 1) => {
+    try {
+        return await new Promise((resolve, reject) => {
+            PostAuthApiRequest("/mobile/api/gettoken", data, resolve, reject);
+        });
+    } catch (error) {
+        if (retries > 0) {
+            console.log('Retrying request, attempts left:', retries);
+            return retryRequest(data, retries - 1);
+        }
+        throw error;
     }
 };
 
-export const RefreshToken = async (navigation) => {
+export const RefreshToken = async () => {
     try {
         console.log('RefreshToken called');
         const user = await getUser();
@@ -59,20 +73,13 @@ export const RefreshToken = async (navigation) => {
             idToken: result.idToken,
             accessToken: result.accessToken,
             idTokenGuid: result.additionalParameters.session_state,
-            refreshToken: result.refreshToken
+            refreshToken: result.refreshToken + 1,
         };
         console.log('Data prepared for PostAuthApiRequest:', data);
 
-        return new Promise((resolve, reject) => {
-            PostAuthApiRequest("/mobile/api/gettoken", data, resolve, reject);
-        })
-        .then(onSuccess)
-        .catch((error) => onError(error, navigation)); // Pass navigation to onError
+        const apiResponse = await retryRequest(data, 2);
+        return onSuccess(apiResponse);
     } catch (error) {
-        console.error("Error fetching data", error);
-        if (navigation) {
-            navigation.navigate('Dashboard');
-        }
-        throw error;
+        return onError(error);  // Handle the error and navigate to Splash
     }
 };

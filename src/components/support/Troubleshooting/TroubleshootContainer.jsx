@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { AccessibilityInfo } from "react-native";  // Import AccessibilityInfo
 import AccountOutages from "./AccountOutages";
 import OutagesAlert from "./OutagesAlert";
 import TroubleshootComponent from "./TroubleshootComponent";
@@ -10,6 +11,7 @@ import { GetApiRequest, GetModemStatusApiRequest } from "../../../network/APICli
 import { useSelector } from "react-redux";
 import moment from "moment";
 import { useIsFocused } from '@react-navigation/native';
+
 const stepsData = [
   {
     title: "Let's resolve your issues.",
@@ -59,6 +61,35 @@ const TroubleshootContainer = () => {
   const [loading, setLoading] = useState(true);
   const [key, setKey] = useState(1);
   const [isReadingComplete, setIsReadingComplete] = useState(false);
+  const [standardtimeout, setStandardTimeout] = useState(2000);
+
+  /**
+   * useEffect to increase standardtimeout to 20 seconds if accessibility is turned on
+   */
+  useEffect(() => {
+    const checkAccessibility = async () => {
+      const isScreenReaderEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+      if (isScreenReaderEnabled) {
+        setStandardTimeout(15000);
+      }
+    };
+    checkAccessibility();
+
+    const accessibilityChangeListener = AccessibilityInfo.addEventListener(
+      'change',
+      (isScreenReaderEnabled) => {
+        if (isScreenReaderEnabled) {
+          setStandardTimeout(15000);
+        } else {
+          setStandardTimeout(2000);
+        }
+      }
+    );
+
+    return () => {
+      accessibilityChangeListener.remove();
+    };
+  }, []);
 
   /**
    * check Modem Outage status
@@ -81,7 +112,7 @@ const TroubleshootContainer = () => {
             setKey(2);
             setTimeout(() => {
               setCurrentStep(2);
-            }, 2000);
+            }, standardtimeout);
           }
           setLoading(false);
         }
@@ -96,7 +127,7 @@ const TroubleshootContainer = () => {
         setKey(2);
         setTimeout(() => {
           setCurrentStep(2);
-        }, 2000);
+        }, standardtimeout);
         setLoading(false);
       }
     );
@@ -117,7 +148,7 @@ const TroubleshootContainer = () => {
             networkStatus[currentStep] = true;
             setTimeout(() => {
               setCurrentStep(3);
-            }, 2000);
+            }, standardtimeout);
 
             setKey(3);
           }else
@@ -126,7 +157,7 @@ const TroubleshootContainer = () => {
             networkStatus[currentStep] = true;
             setTimeout(() => {
               setCurrentStep(3);
-            }, 2000);
+            }, standardtimeout);
 
             setKey(3);
           } else {
@@ -143,7 +174,7 @@ const TroubleshootContainer = () => {
         setKey(3);
         setTimeout(() => {
           setCurrentStep(3);
-        }, 2000);
+        }, standardtimeout);
         setLoading(false);
       }
     );
@@ -285,7 +316,7 @@ const TroubleshootContainer = () => {
   const startTroubleShooting = () => {
     setTimeout(() => {
       setCurrentStep(1);
-    }, 4000);
+    }, standardtimeout);
   };
 
   useEffect(() => {
@@ -301,7 +332,9 @@ const TroubleshootContainer = () => {
   }, [currentStep]);
 
   useEffect(() => {
-    startTroubleShooting();
+    setTimeout(() => {
+      startTroubleShooting();
+    }, 4000);
   }, []);
 
   useEffect(() => {

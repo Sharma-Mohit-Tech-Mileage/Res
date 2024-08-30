@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Platform } from 'react-native';
+import { View, StyleSheet, Dimensions, Text, Platform, AppState, ActivityIndicator } from 'react-native';
 import WebView from 'react-native-webview';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import CryptoJS from 'crypto-js';
@@ -9,7 +9,7 @@ import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import { GetApiRequest } from '../../network/APIClient';
 
-const { height } = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 
 const AutoPayPCIConnector = ({ navigation, route }) => {
     const [initScript, setInitScript] = useState('');
@@ -23,6 +23,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
     const [html, setHtml] = useState('');
+    const [appState, setAppState] = useState(AppState.currentState);
 
     const generateGuid = () => {
         const p8 = (s) => {
@@ -40,7 +41,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         return bytes;
     };
 
-    const getPaymentObj = (token, user, paymentId, easyPayId) => {
+    const getPaymentObj = (token, user, isEasyPay, easyPayId) => {
         return {
             AccountNumber: user.accountNumber || '',
             FirstName: user.firstName || '',
@@ -51,9 +52,8 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             PaymentDueDate: '',
             Email: user.email || '',
             EasyPayId: easyPayId || '',
-            EasyPayEnabled: '',
+            EasyPayEnabled: isEasyPay || false,
             TokenCookie: token || '',
-            PaymentId: paymentId || '',
         };
     };
 
@@ -94,6 +94,28 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         setHtml(html);
     };
 
+    const setDynamicCookie = () => {
+        const script = `(function() {
+            var cookieValue = "MobileApp";
+            var domain = document.location.hostname; 
+            var expirationDate = new Date();
+            expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+            
+            document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+            
+            localStorage.setItem('jwt_token', '${currentUser.token}');
+            localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo)}');
+            var upgradeToken = '${currentUser.upgradeToken}';
+            localStorage.setItem('upgrades_token', upgradeToken);
+        })();`;
+    
+        if (webViewRef.current) {
+            webViewRef.current.injectJavaScript(script);
+        } else {
+            console.warn('WebView reference is not available to inject JavaScript.');
+        }
+    };
+
     const initializePayment = async () => {
         try {
             const userLocal = await getUser();
@@ -102,8 +124,13 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             GetApiRequest(
                 `account/api/account/${accountNumber}/easypay`,
                 (res) => {
-                    const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.paymentId, res?.EasyPayId);
-                    redirectToEBillpay(paymentObj, useNewPayment ? (status ? Env.URL_EASYPAY_MANAGE_V3 : Env.URL_EASYPAY_SETUP_V3) : (status ? Env.URL_EASYPAY_MANAGE_V2 : Env.URL_EASYPAY_SETUP_V2));
+                    console.log("Payment details fetched successfully:", res);
+                    const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.isEasyPay, res?.easyPayId);
+                    const payURL = useNewPayment
+                        ? (status ? Env.URL_EASYPAY_MANAGE_V3 : Env.URL_EASYPAY_SETUP_V3)
+                        : (status ? Env.URL_EASYPAY_MANAGE_V2 : Env.URL_EASYPAY_SETUP_V2);
+                    console.log("Payment details fetched successfully:", payURL);
+                    redirectToEBillpay(paymentObj, payURL);
                 },
                 (error) => {
                     console.error("Error fetching payment details:", error);
@@ -124,6 +151,8 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     }, []);
 
     const navigationChange = async (navState) => {
+        setDynamicCookie();  // Update cookie on any navigation change
+
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
                 navigation.navigate('Dashboard');
@@ -151,6 +180,11 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
                 localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
+                var cookieValue = "MobileApp";
+                var domain = document.location.hostname; 
+                var expirationDate = new Date();
+                expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+                document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
                 var open = XMLHttpRequest.prototype.open;
                 XMLHttpRequest.prototype.open = function() {
                     this.addEventListener("load", function(event) {
@@ -173,7 +207,35 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     useEffect(() => {
         setCurrentUser(user);
         userUpdateScript(user);
+        setDynamicCookie();  // Set cookie when user is updated
     }, [user]);
+
+    useEffect(() => {
+        const handleAppStateChange = nextAppState => {
+            if (appState.match(/inactive|background/) && nextAppState === 'active') {
+                setTimeout(() => {
+                    if (webViewRef.current) {
+                        webViewRef.current.reload();
+                    } else {
+                        console.warn('WebView ref is not available for reload.');
+                    }
+                }, 500);
+            }
+            setAppState(nextAppState);
+        };
+
+        const subscription = AppState.addEventListener('change', handleAppStateChange);
+
+        return () => {
+            if (subscription) {
+                subscription.remove();
+            }
+        };
+    }, [appState]);
+
+    useEffect(() => {
+        setDynamicCookie();  // Push cookie when component is first mounted
+    }, [url, appState]);
 
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS === 'ios') ? 90 : 60 }}>
@@ -183,7 +245,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
                 </View>
             )}
-            {html && (
+            {html ? (
                 <WebView
                     ref={webViewRef}
                     source={{ html }}
@@ -202,12 +264,28 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                         console.error('WebView HTTP error: ', nativeEvent);
                     }}
                 />
+            ) : (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="rgba(141, 59, 144, 1)" />
+                    <Text style={styles.loadingText}>Preparing content...</Text>
+                </View>
             )}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: 'rgba(141, 59, 144, 1)',
+        textAlign: 'center',
+    },
     progressBar: {
         height: height * 0.004, // 0.4% of screen height
         backgroundColor: 'lightgrey',

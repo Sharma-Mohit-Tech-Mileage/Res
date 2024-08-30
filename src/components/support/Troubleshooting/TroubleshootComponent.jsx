@@ -82,6 +82,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingTop: windowHeight * 0.05,
         backgroundColor: Color.sparklightWhite,
+        marginBottom: windowHeight * 0.05,
     },
     content: {
         flexGrow: 1,

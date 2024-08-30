@@ -6,23 +6,23 @@ import WalletIcon from "../../../res/svgIcons/WalletIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
-const CardNewBiller = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation,style }) => {
+const CardNewBiller = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, style }) => {
     const uncheck = require("../../../../assets/checkcircle1.png");
     const check = require("../../../../assets/checkcircle.png");
 
     return (
         <View style={styles.shadowContainer}>
-            <View style={[styles.card,style]}>
+            <View style={[styles.card, style]}>
                 <View style={styles.leftSection}>
                     <View style={styles.circleContainerShadow}></View>
                     <View style={styles.circleContainer}></View>
-                    <View style={[styles.icon,{paddingRight:24}]}><WalletIcon /></View>
+                    <View style={[styles.icon, { paddingRight: 24 }]}><WalletIcon /></View>
                     <Text style={styles.leftTitle}>Bill Summary</Text>
                 </View>
                 <View style={styles.cardContent}>
                     <Text style={styles.amount}>${billAmt}</Text>
-                    { dueDate!='Invalid date' && (
-                    <Text style={styles.dueDate}>{dueDate ? 'Due on ' : ''}<Text style={[styles.dueDate, { fontWeight: '400' }]}>{dueDate}</Text></Text>
+                    {dueDate != 'Invalid date' && (
+                        <Text style={styles.dueDate}>{dueDate ? 'Due on ' : ''}<Text style={[styles.dueDate, { fontWeight: '400' }]}>{dueDate}</Text></Text>
                     )}
                     <View style={{ marginVertical: Padding.p_base }}>
                         <View style={styles.statusRow}>
@@ -39,8 +39,8 @@ const CardNewBiller = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, nav
                                 <Text style={paperlessStatus ? styles.labelActive : styles.label}>{paperlessStatus ? "On" : "Off"}</Text>
                             </View>
                         </View> */}
-                        <View style={{paddingVertical:15}}></View>
-                        <View style={{paddingVertical:10}}></View>
+                        <View style={{ paddingVertical: 15 }}></View>
+                        <View style={{ paddingVertical: 10 }}></View>
                     </View>
                     <View style={styles.statusRow}>
                         <TouchableOpacity
