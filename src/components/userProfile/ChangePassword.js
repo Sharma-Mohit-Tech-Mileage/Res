@@ -81,7 +81,7 @@ const ChangePassword = () => {
 
   const updateUserPassword=(newPassword)=>{
     let re = getUser().then((res) => {
-    const request = isNewBiller ? `usersvc/api/profile/password/${res.userInfo.accountNumber}`:`users/api/profile/password/${res.userInfo.accountNumber}`;
+    const request = isNewBiller ? `users/api/profile/passwordACP/${res.userInfo.accountNumber}/${res.userInfo.userName}`:`users/api/profile/password/${res.userInfo.accountNumber}`;
     let body={"newPassword":newPassword}
     PutApiRequest(
       request,
