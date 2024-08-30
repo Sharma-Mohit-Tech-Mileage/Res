@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
+import { AccessibilityInfo } from "react-native";  // Import AccessibilityInfo
 import AccountOutages from "./AccountOutages";
 import OutagesAlert from "./OutagesAlert";
 import TroubleshootComponent from "./TroubleshootComponent";
@@ -59,7 +60,36 @@ const TroubleshootContainer = () => {
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [loading, setLoading] = useState(true);
   const [key, setKey] = useState(1);
+  const [isReadingComplete, setIsReadingComplete] = useState(false);
   const [standardtimeout, setStandardTimeout] = useState(2000);
+
+  /**
+   * useEffect to increase standardtimeout to 20 seconds if accessibility is turned on
+   */
+  useEffect(() => {
+    const checkAccessibility = async () => {
+      const isScreenReaderEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+      if (isScreenReaderEnabled) {
+        setStandardTimeout(15000);
+      }
+    };
+    checkAccessibility();
+
+    const accessibilityChangeListener = AccessibilityInfo.addEventListener(
+      'change',
+      (isScreenReaderEnabled) => {
+        if (isScreenReaderEnabled) {
+          setStandardTimeout(15000);
+        } else {
+          setStandardTimeout(2000);
+        }
+      }
+    );
+
+    return () => {
+      accessibilityChangeListener.remove();
+    };
+  }, []);
 
   /**
    * check Modem Outage status
@@ -71,7 +101,6 @@ const TroubleshootContainer = () => {
       request,
       (response) => {
         if (response) {
-          setTimeout(() => {
           console.log("checkModemOutagStatus", response);
           if (response.hasOutage === true) {
             let time = moment(response.estimatedTimeOfResolution).format("LT");
@@ -81,25 +110,27 @@ const TroubleshootContainer = () => {
           } else {
             networkStatus[currentStep] = true;
             setKey(2);
+            setTimeout(() => {
               setCurrentStep(2);
+            }, standardtimeout);
           }
           setLoading(false);
-        }, standardtimeout);
         }
       },
       (error) => {
         console.log(error);
-        setTimeout(() => {
         if (error === 204) {
           networkStatus[currentStep] = true;
         } else {
           networkError[currentStep] = true;
         }
         setKey(2);
+        setTimeout(() => {
           setCurrentStep(2);
+        }, standardtimeout);
         setLoading(false);
       }
-    );},  standardtimeout);
+    );
   };
 
   /**
@@ -113,16 +144,20 @@ const TroubleshootContainer = () => {
       (res) => {
         console.log("checkBillPaid", res);
         if (res) {
-          setTimeout(() => {
           if(moment(res.paymentDueDate).isAfter()){
             networkStatus[currentStep] = true;
+            setTimeout(() => {
               setCurrentStep(3);
+            }, standardtimeout);
+
             setKey(3);
           }else
           if (res.currentBalance <= 0) {
             // Bill paide
             networkStatus[currentStep] = true;
+            setTimeout(() => {
               setCurrentStep(3);
+            }, standardtimeout);
 
             setKey(3);
           } else {
@@ -130,19 +165,19 @@ const TroubleshootContainer = () => {
             setIssueDetected(true);
             setBillIssueDetected(true);
           }
+        }
         setLoading(false);
-        }, standardtimeout);
-      }
       },
       (Error) => {
-        setTimeout(() => {
         console.log("checkBillPaid error", Error);
         networkError[currentStep] = true;
         setKey(3);
+        setTimeout(() => {
           setCurrentStep(3);
+        }, standardtimeout);
         setLoading(false);
       }
-    );}, standardtimeout);
+    );
   };
 
   const checkModemHealth = (macAddress) => {
@@ -157,9 +192,7 @@ const TroubleshootContainer = () => {
             if(res.status===408){
               setIssueDetected(true);
               if(isFocused){
-                setTimeout(() => {
-                  navigation.navigate("ManageEquipment",{isError:true})
-                }, standardtimeout);
+              navigation.navigate("ManageEquipment",{isError:true})
               }
               return
             }
@@ -177,9 +210,7 @@ const TroubleshootContainer = () => {
               updateModemStatus(temt);
             } else {
               if(isFocused){
-                setTimeout(() => {
-                  navigation.navigate("ManageEquipment")
-                }, standardtimeout);
+              navigation.navigate("ManageEquipment");
               }
             }
           } else if (res.EquipmentType === "ONU") {
@@ -190,18 +221,14 @@ const TroubleshootContainer = () => {
               updateModemStatus(temt);
             } else {
               if(isFocused){
-                setTimeout(() => {
-                  navigation.navigate("ManageEquipment")
-                }, standardtimeout);
+              navigation.navigate("ManageEquipment");
               }
             }
           }
           setLoading(false);
         }else{
           if(isFocused){
-            setTimeout(() => {
-              navigation.navigate("ManageEquipment")
-            }, standardtimeout);
+          navigation.navigate("ManageEquipment");
           }
         }
       },
@@ -210,9 +237,7 @@ const TroubleshootContainer = () => {
         console.log("Modem details Error", error);
         setIssueDetected(true);
         if(isFocused){
-          setTimeout(() => {
-            navigation.navigate("ManageEquipment",{isError:true})
-          }, standardtimeout);
+        navigation.navigate("ManageEquipment",{isError:true});;
         }
         
         //networkError[currentStep] = true;
@@ -222,11 +247,7 @@ const TroubleshootContainer = () => {
       }
     );
   };
-// Callback function to receive the timeout from TroubleshootComponent
-const handleTimeoutReceived = useCallback((timeout) => {
-  console.log('Timeout received from TroubleshootComponent:', timeout);
-  setStandardTimeout(timeout);
-}, []);
+
   const updateModemStatus = (temt) => {
     console.log("checkModemHealth", temt);
     const allGreen = temt.every((v) => v === "Green");
@@ -237,16 +258,12 @@ const handleTimeoutReceived = useCallback((timeout) => {
       if (checkRed || checkYellow) {
         setIssueDetected(true);
         if(isFocused){
-          setTimeout(() => {
-            navigation.navigate("ManageEquipment",{isError:true})
-          }, standardtimeout);
+        navigation.navigate("ManageEquipment",{isError:true});;
         }
       } else {
         setIssueDetected(true);
         if(isFocused){
-          setTimeout(() => {
-            navigation.navigate("ManageEquipment",{isError:true})
-          }, standardtimeout);
+        navigation.navigate("ManageEquipment",{isError:true});
         }
       }
     } else {
@@ -255,9 +272,7 @@ const handleTimeoutReceived = useCallback((timeout) => {
       networkStatus[currentStep] = true;
       setKey(5);
       if(isFocused){
-      setTimeout(() => {
-        navigation.navigate("ModemHealthy");
-      }, standardtimeout);
+      navigation.navigate("ModemHealthy");
       }
     }
   };
@@ -309,19 +324,24 @@ const handleTimeoutReceived = useCallback((timeout) => {
       checkModemOutagStatus();
     }
     if (currentStep === 2) {
-        checkBillPaid(user.userInfo.accountNumber);
+      checkBillPaid(user.userInfo.accountNumber);
     }
     if (currentStep === 3) {
-        getInternetPlanDetails();
+      getInternetPlanDetails();
     }
   }, [currentStep]);
 
   useEffect(() => {
     setTimeout(() => {
       startTroubleShooting();
-    }, standardtimeout);
+    }, 4000);
   }, []);
 
+  useEffect(() => {
+    if (isReadingComplete) {
+      console.log('Screen readout complete');
+    }
+  }, [isReadingComplete]);
 
   const step = stepsData[currentStep];
 
@@ -352,7 +372,7 @@ const handleTimeoutReceived = useCallback((timeout) => {
               pageCount={step.pageCount}
               loading={loading}
               isError={networkError[currentStep]}
-              onTimeoutReceived={handleTimeoutReceived} // Pass the callback to the child component
+              setIsReadingComplete={setIsReadingComplete}
             />
           )}
           {outageIssueDetected && (
