@@ -5,13 +5,15 @@ import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalSty
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
+
 import PubSub from 'pubsub-js'
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
 import { GetApiRequest } from "../../network/APIClient";
 import CreateTicket from "./ticket/CreateTicket";
-
+//import ZendDesk from '@pagopa/io-react-native-zendesk';
+import { startChatWithConfig,setVisitorInfo,startChat } from "../utility/RNZendeskChat";
 
 const Support = ({ route }) => {
     const navigation = useNavigation();
@@ -122,6 +124,8 @@ const Support = ({ route }) => {
         return () => {
             PubSub.unsubscribe(token);
         };
+
+       
     }, []);
 
     const exitConfirmation=()=>{
@@ -137,40 +141,23 @@ const Support = ({ route }) => {
     }
 
 
-    // const handlePressOpenButton = (department, tags) => {
-    //     const user = {
-    //         full_name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
-    //         email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
-    //         phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
-    //     };
+    const handlePressOpenButton = (department, tags) => {
+        const data= {
+            name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
+            email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
+            phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
+            tags:['pid:_' + userData.userInfo.accountNumber],
+            department: department
+        };
+        if(Platform.OS==='ios'){
+            setVisitorInfo(data)
+            startChat(data);
+        }else{
+            startChatWithConfig(data)
+        }
 
-    //     tags.push('pid:_' + userData.userInfo.accountNumber);
-
-    //     ZendeskChat.startChat({
-    //         name: user.full_name,
-    //         email: user.email,
-    //         phone: user.phone,
-    //         department: department,
-    //         tags: tags,
-    //         behaviorFlags: {
-    //             showAgentAvailability: true,
-    //             showChatTranscriptPrompt: false,
-    //             showPreChatForm: true,
-    //             showOfflineForm: true,
-    //         },
-    //         preChatFormOptions: {
-    //             name: "optional",
-    //             email: "optional",
-    //         },
-    //         messagingOptions: {
-    //             botName: 'Sparklight',
-    //             botAvatarName: 'chatIcon'
-    //         },
-    //         localizedDismissButtonTitle: "Dismiss",
-    //     });
-    // };
-
-
+    };
+    
     return (
         <View style={styles.support}>
             <ProfileSettingsHeader title="Support" iconAlignment="right" showIcon={false}  />
@@ -466,7 +453,8 @@ const Support = ({ route }) => {
                                                     alignItems: "center",
                                                 }}
                                                 onPress={() => {
-                                                    toggleModal("tech");
+                                                    //toggleModal("tech");
+                                                    handlePressOpenButton("SPK TCC Residential", ['Residential', 'ContactUs'])
                                                 }}
                                             >
                                                 <ChatIcon />
@@ -512,8 +500,9 @@ const Support = ({ route }) => {
                                                 <Pressable
                                                     //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
                                                     onPress={() => {
-                                                        toggleModal("Bill");
-                            
+                                                        //toggleModal("Bill");
+                                                        //ZendDesk.initChat('ad791f41-3c05-490b-8bb3-55afe1751f92d')
+                                                       
                                                     }}
                                                     accessibilityLabel="Chat Support"
                                                     accessibilityRole="button"
@@ -549,8 +538,8 @@ const Support = ({ route }) => {
                                                         alignItems: "center",
                                                     }}
                                                     onPress={() => {
-                                                        toggleModal("Bill");
-                                                        //handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])
+                                                        //toggleModal("Bill");
+                                                        handlePressOpenButton("mobiletest", ['Residential', 'ContactUs'])
                                                     }}
                                                 >
                                                     <ChatIcon />

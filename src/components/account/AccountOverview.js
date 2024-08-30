@@ -19,6 +19,8 @@ import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
 import { Env } from "../../network/apis/account/Constants";
 
+import { clearChatData } from "../utility/RNZendeskChat";
+
 const config = {
   issuer: Env.SSO_LOGIN,
   iosPrefersEphemeralSession: true,
@@ -60,6 +62,7 @@ const logoutAction = (dispatch, navigation) => {
        dispatch(saveUserInfo({}));
        dispatch(logoutApp());
       cleanUserData();
+      clearChatData();
       //SetClearTimer();
       navigation.reset({
         index: 0,
