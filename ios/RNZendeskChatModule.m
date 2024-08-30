@@ -105,6 +105,7 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
                                        error:&error];
     
     UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+    
     if (rootViewController) {
       // Define your custom color using the hex code EAEAEA
       UIColor *customColor = [UIColor colorWithRed:234/255.0 green:234/255.0 blue:234/255.0 alpha:1.0];
