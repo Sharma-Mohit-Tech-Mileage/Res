@@ -17,9 +17,9 @@ const config = {
 const onSuccess = async (res) => {
     console.log('Session onSuccess:', res);
     if (res) {
-        let token = res.jwtToken;
-        let userInfo = res.userInfo;
-        let user = {
+        const token = res.jwtToken;
+        const userInfo = res.userInfo;
+        const user = {
             userInfo: userInfo,
             token: token,
             tokenGuid: res.idTokenGuid,
@@ -31,16 +31,17 @@ const onSuccess = async (res) => {
         }
         store.dispatch(saveUserInfo(user));
         console.log('User info saved in Redux store:', user);
-        return token; // Return the token here
+        return token;
     }
     throw new Error("No token received");
 };
 
-const onError = async (res) => {
-    console.error('Session onError:', res);
+const onError = (error) => {
+    console.error('Session onError:', error);
     if (navigationRef.current) {
-        navigationRef.current.navigate('Splash');  // Adjust the name based on your Splash Screen route
+        navigationRef.current.navigate('Splash');  // Ensure this route name matches your actual Splash screen route
     }
+    throw error;  // Re-throw the error if needed
 };
 
 const retryRequest = async (data, retries = 1) => {
@@ -72,17 +73,13 @@ export const RefreshToken = async () => {
             idToken: result.idToken,
             accessToken: result.accessToken,
             idTokenGuid: result.additionalParameters.session_state,
-            refreshToken: result.refreshToken
+            refreshToken: result.refreshToken + 1,
         };
         console.log('Data prepared for PostAuthApiRequest:', data);
 
         const apiResponse = await retryRequest(data, 2);
         return onSuccess(apiResponse);
     } catch (error) {
-        console.error("Error during token refresh", error);
-        if (navigationRef.current) {
-            navigationRef.current.navigate('Splash'); 
-        }
-        throw error;
+        return onError(error);  // Handle the error and navigate to Splash
     }
 };

@@ -7,8 +7,7 @@ import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
-import { Color } from "../../../GlobalStyles";
-
+import { navigationRef } from '../../navigations/UserNavigations';
 const { width, height } = Dimensions.get('window');
 
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -37,13 +36,21 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 setModalOpen(false);
                 setProgress(1);
                 setNavStateReloading(true);
-                await RefreshToken();
-                setTimeout(async () => {
-                    await userUpdate();
-                }, 1000);
+                try {
+                    await RefreshToken();  // Attempt to refresh the token
+                    setTimeout(async () => {
+                        await userUpdate();
+                    }, 1000);
+                } catch (error) {
+                    console.error("Error during navigation change token refresh", error);
+                    if (navigationRef.current) {
+                        navigationRef.current.navigate('Splash');  // Navigate to Splash screen on error
+                    }
+                }
             }
         }
     };
+    
 
     const onMessage = (event) => {
         try {
@@ -121,17 +128,31 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }, [user]);
 
     useEffect(() => {
-        const subscription = AppState.addEventListener('change', nextAppState => {
+        const handleAppStateChange = nextAppState => {
             if (appState.match(/inactive|background/) && nextAppState === 'active') {
-                webViewRef.current.reload();
+                // Delay to ensure WebView is fully initialized before reload
+                setTimeout(() => {
+                    if (webViewRef.current) {
+                        webViewRef.current.reload();
+                    } else {
+                        console.warn('WebView ref is not available for reload.');
+                    }
+                }, 500);  // Adjust delay as needed
             }
             setAppState(nextAppState);
-        });
-
+        };
+    
+        const subscription = AppState.addEventListener('change', handleAppStateChange);
+    
         return () => {
-            subscription.remove();
+            // Clean up listener on component unmount
+            if (subscription) {
+                subscription.remove();
+            }
         };
     }, [appState]);
+    
+    
 
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
