@@ -30,7 +30,26 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         setShowPDFModal(!showPDFModal);
     };
 
+    const setDynamicCookie = () => {
+        const script = `(function() {
+            var cookieValue = "MobileApp";
+            var domain = document.location.hostname; 
+            var expirationDate = new Date();
+            expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+            
+            document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+            
+            localStorage.setItem('jwt_token', '${currentUser.token}');
+            localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo)}');
+            var upgradeToken = '${currentUser.upgradeToken}';
+            localStorage.setItem('upgrades_token', upgradeToken);
+        })();`;
+        webViewRef.current.injectJavaScript(script);
+    };
+
     const navigationChange = async (navState) => {
+        setDynamicCookie();  // Update cookie on any navigation change
+
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
                 setModalOpen(false);
@@ -50,7 +69,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             }
         }
     };
-    
 
     const onMessage = (event) => {
         try {
@@ -92,6 +110,11 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
                 localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
+                var cookieValue = "MobileApp";
+            var domain = document.location.hostname; 
+            var expirationDate = new Date();
+            expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+            document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
                 var open = XMLHttpRequest.prototype.open;
                 XMLHttpRequest.prototype.open = function() {
                     this.addEventListener("load", function(event) {
@@ -125,34 +148,35 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     useEffect(() => {
         setCurrentUser(user);
         userUpdateScript(user);
+        setDynamicCookie();  // Set cookie when user is updated
     }, [user]);
 
     useEffect(() => {
         const handleAppStateChange = nextAppState => {
             if (appState.match(/inactive|background/) && nextAppState === 'active') {
-                // Delay to ensure WebView is fully initialized before reload
                 setTimeout(() => {
                     if (webViewRef.current) {
                         webViewRef.current.reload();
                     } else {
                         console.warn('WebView ref is not available for reload.');
                     }
-                }, 500);  // Adjust delay as needed
+                }, 500);
             }
             setAppState(nextAppState);
         };
-    
+
         const subscription = AppState.addEventListener('change', handleAppStateChange);
-    
+
         return () => {
-            // Clean up listener on component unmount
             if (subscription) {
                 subscription.remove();
             }
         };
     }, [appState]);
-    
-    
+
+    useEffect(() => {
+        setDynamicCookie();  // Push cookie when component is first mounted
+    }, [url, modalOpen, appState]);
 
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>

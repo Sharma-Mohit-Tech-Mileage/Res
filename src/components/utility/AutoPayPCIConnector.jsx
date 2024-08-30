@@ -8,7 +8,6 @@ import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import { GetApiRequest } from '../../network/APIClient';
-import CookieManager from '@react-native-cookies/cookies'; // Add this line for cookie management
 
 const { height, width } = Dimensions.get('window');
 
@@ -95,26 +94,27 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         setHtml(html);
     };
 
-    const injectCookie = async (currentUrl) => {
-        const domain = new URL(currentUrl).hostname;
-        const cookieValue = 'MobileApp'; // Replace this with the actual value needed
+    const setDynamicCookie = () => {
+        const script = `(function() {
+            var cookieValue = "MobileApp";
+            var domain = document.location.hostname; 
+            var expirationDate = new Date();
+            expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+            
+            document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+            
+            localStorage.setItem('jwt_token', '${currentUser.token}');
+            localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo)}');
+            var upgradeToken = '${currentUser.upgradeToken}';
+            localStorage.setItem('upgrades_token', upgradeToken);
+        })();`;
     
-        // Calculate the expiration time 20 minutes from now
-        const expirationDate = new Date();
-        expirationDate.setMinutes(expirationDate.getMinutes() + 20);
-    
-        await CookieManager.set(domain, {
-            name: 'Source',
-            value: cookieValue,
-            domain: domain,
-            path: '/',
-            version: '1',
-            expires: expirationDate.toISOString() // Use the calculated expiration date
-        });
-    
-        console.log(`Cookie set for domain: ${domain}`);
+        if (webViewRef.current) {
+            webViewRef.current.injectJavaScript(script);
+        } else {
+            console.warn('WebView reference is not available to inject JavaScript.');
+        }
     };
-    
 
     const initializePayment = async () => {
         try {
@@ -151,7 +151,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     }, []);
 
     const navigationChange = async (navState) => {
-        await injectCookie(navState.url); // Inject the cookie whenever navigation changes
+        setDynamicCookie();  // Update cookie on any navigation change
 
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
@@ -180,6 +180,11 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
                 localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
+                var cookieValue = "MobileApp";
+                var domain = document.location.hostname; 
+                var expirationDate = new Date();
+                expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+                document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
                 var open = XMLHttpRequest.prototype.open;
                 XMLHttpRequest.prototype.open = function() {
                     this.addEventListener("load", function(event) {
@@ -202,20 +207,35 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     useEffect(() => {
         setCurrentUser(user);
         userUpdateScript(user);
+        setDynamicCookie();  // Set cookie when user is updated
     }, [user]);
 
     useEffect(() => {
-        const subscription = AppState.addEventListener('change', nextAppState => {
+        const handleAppStateChange = nextAppState => {
             if (appState.match(/inactive|background/) && nextAppState === 'active') {
-                webViewRef.current.reload();
+                setTimeout(() => {
+                    if (webViewRef.current) {
+                        webViewRef.current.reload();
+                    } else {
+                        console.warn('WebView ref is not available for reload.');
+                    }
+                }, 500);
             }
             setAppState(nextAppState);
-        });
+        };
+
+        const subscription = AppState.addEventListener('change', handleAppStateChange);
 
         return () => {
-            subscription.remove();
+            if (subscription) {
+                subscription.remove();
+            }
         };
     }, [appState]);
+
+    useEffect(() => {
+        setDynamicCookie();  // Push cookie when component is first mounted
+    }, [url, appState]);
 
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS === 'ios') ? 90 : 60 }}>
