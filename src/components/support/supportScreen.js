@@ -146,7 +146,7 @@ const Support = ({ route }) => {
             name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
             email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
             phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
-            tags:['pid:_' + userData.userInfo.accountNumber],
+            tags:['pid:_' + userData.userInfo.accountNumber,'mobiletest'],
             department: department
         };
         if(Platform.OS==='ios'){
