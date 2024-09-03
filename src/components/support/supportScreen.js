@@ -146,7 +146,7 @@ const Support = ({ route }) => {
             name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
             email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
             phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
-            tags:['pid:_' + userData.userInfo.accountNumber,'mobiletest'],
+            tags:['pid:_' + userData.userInfo.accountNumber,...tags],
             department: department
         };
         if(Platform.OS==='ios'){
@@ -454,7 +454,7 @@ const Support = ({ route }) => {
                                                 }}
                                                 onPress={() => {
                                                     //toggleModal("tech");
-                                                    handlePressOpenButton("SPK TCC Residential", ['Residential', 'ContactUs'])
+                                                    handlePressOpenButton("SPK TCC Residential", ['Resi_TechSupport'])
                                                 }}
                                             >
                                                 <ChatIcon />
@@ -539,7 +539,7 @@ const Support = ({ route }) => {
                                                     }}
                                                     onPress={() => {
                                                         //toggleModal("Bill");
-                                                        handlePressOpenButton("mobiletest", ['Residential', 'ContactUs'])
+                                                        handlePressOpenButton("mobiletest", ['Resi_BillSupport'])
                                                     }}
                                                 >
                                                     <ChatIcon />
