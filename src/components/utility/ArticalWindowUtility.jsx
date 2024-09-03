@@ -153,26 +153,33 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     useEffect(() => {
         const handleAppStateChange = nextAppState => {
-            if (appState.match(/inactive|background/) && nextAppState === 'active') {
+            if (appState?.match(/inactive|background/) && nextAppState === 'active') {
                 setTimeout(() => {
-                    if (webViewRef.current) {
+                    if (webViewRef?.current) {
                         webViewRef.current.reload();
                     } else {
                         console.warn('WebView ref is not available for reload.');
                     }
                 }, 500);
             }
-            setAppState(nextAppState);
+            if (setAppState) {
+                setAppState(nextAppState);
+            } else {
+                console.warn('setAppState function is not available.');
+            }
         };
-
-        const subscription = AppState.addEventListener('change', handleAppStateChange);
-
+    
+        const subscription = AppState?.addEventListener('change', handleAppStateChange);
+    
         return () => {
             if (subscription) {
                 subscription.remove();
+            } else {
+                console.warn('AppState subscription is not available for removal.');
             }
         };
     }, [appState]);
+    
 
     useEffect(() => {
         setDynamicCookie();  // Push cookie when component is first mounted
