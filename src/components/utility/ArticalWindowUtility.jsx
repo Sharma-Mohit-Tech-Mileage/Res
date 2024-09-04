@@ -31,30 +31,21 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     };
 
     const setDynamicCookie = () => {
-        if (webViewRef?.current) {
-            const script = `(function() {
-                var cookieValue = "MobileApp";
-                var domain = document.location.hostname; 
-                var expirationDate = new Date();
-                expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
-                
-                document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-                
-                localStorage.setItem('jwt_token', '${currentUser.token}');
-                localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo)}');
-                var upgradeToken = '${currentUser.upgradeToken}';
-                localStorage.setItem('upgrades_token', upgradeToken);
-            })();`;
-            webViewRef.current.injectJavaScript(script);
-        } else {
-            console.warn('WebView ref is not available for injecting JavaScript. Navigating back to Dashboard.');
-            // Navigate back to the Dashboard
-            if (navigationRef.current) {
-                navigationRef.current.navigate('Dashboard'); // Replace 'Dashboard' with your dashboard route name
-            }
-        }
+        const script = `(function() {
+            var cookieValue = "MobileApp";
+            var domain = document.location.hostname; 
+            var expirationDate = new Date();
+            expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+            
+            document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+            
+            localStorage.setItem('jwt_token', '${currentUser.token}');
+            localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo)}');
+            var upgradeToken = '${currentUser.upgradeToken}';
+            localStorage.setItem('upgrades_token', upgradeToken);
+        })();`;
+        webViewRef.current.injectJavaScript(script);
     };
-    
 
     const navigationChange = async (navState) => {
         setDynamicCookie();  // Update cookie on any navigation change
@@ -162,34 +153,26 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     useEffect(() => {
         const handleAppStateChange = nextAppState => {
-            if (appState?.match(/inactive|background/) && nextAppState === 'active') {
+            if (appState.match(/inactive|background/) && nextAppState === 'active') {
                 setTimeout(() => {
-                    if (webViewRef?.current) {
+                    if (webViewRef.current) {
                         webViewRef.current.reload();
                     } else {
-                        console.warn('WebView ref is not available for reload. Navigating back to Dashboard.');
-                        // Navigate back to the Dashboard
-                        if (navigationRef.current) {
-                            navigationRef.current.navigate('Dashboard'); // Replace 'Dashboard' with your dashboard route name
-                        }
+                        console.warn('WebView ref is not available for reload.');
                     }
                 }, 500);
             }
             setAppState(nextAppState);
         };
-    
+
         const subscription = AppState.addEventListener('change', handleAppStateChange);
-    
+
         return () => {
             if (subscription) {
                 subscription.remove();
-            } else {
-                console.warn('AppState subscription is not available for removal.');
             }
         };
     }, [appState]);
-    
-    
 
     useEffect(() => {
         setDynamicCookie();  // Push cookie when component is first mounted

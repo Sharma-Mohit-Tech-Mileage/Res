@@ -151,7 +151,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     }, []);
 
     const navigationChange = async (navState) => {
-        //setDynamicCookie();  // Update cookie on any navigation change
+        setDynamicCookie();  // Update cookie on any navigation change
 
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
@@ -214,10 +214,10 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         const handleAppStateChange = nextAppState => {
             if (appState.match(/inactive|background/) && nextAppState === 'active') {
                 setTimeout(() => {
-                    if (webViewRef.current && !webViewRef.current.loading) {
+                    if (webViewRef.current) {
                         webViewRef.current.reload();
                     } else {
-                        console.warn('WebView ref is not available for reload or is still loading.');
+                        console.warn('WebView ref is not available for reload.');
                     }
                 }, 500);
             }
@@ -250,7 +250,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     ref={webViewRef}
                     source={{ html }}
                     onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
-                    onLoadEnd={() => setProgress(1)}  // Set progress to 1 when load ends
                     sharedCookiesEnabled={true}
                     injectedJavaScriptBeforeContentLoaded={initScript}
                     onNavigationStateChange={navigationChange}
@@ -263,9 +262,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     onHttpError={(syntheticEvent) => {
                         const { nativeEvent } = syntheticEvent;
                         console.error('WebView HTTP error: ', nativeEvent);
-                        if (!navStateReloading) {
-                            navigation.navigate('Dashboard');
-                        }
                     }}
                 />
             ) : (

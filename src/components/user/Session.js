@@ -12,7 +12,7 @@ const config = {
     redirectUrl: "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
     scopes: ["openid", "profile", "email", "phone", "address"],
     iosPrefersEphemeralSession: true,
-  };
+};
 
 const onSuccess = async (res) => {
     console.log('Session onSuccess:', res);
@@ -73,7 +73,7 @@ export const RefreshToken = async () => {
             idToken: result.idToken,
             accessToken: result.accessToken,
             idTokenGuid: result.additionalParameters.session_state,
-            refreshToken: result.refreshToken,
+            refreshToken: result.refreshToken + 1,
         };
         console.log('Data prepared for PostAuthApiRequest:', data);
 
