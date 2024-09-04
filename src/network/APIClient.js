@@ -21,7 +21,9 @@ export const isUserAuthorized = (authorize) => {
 // Helper to handle response processing
 const handleFetchResponse = async (response, onSuccess, onError) => {
     try {
+        
         const json = await response.json();
+        
         if (response.ok) {
             onSuccess(json);
         } else {
@@ -78,6 +80,8 @@ const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess
                 options.headers['Authorization'] = `Bearer ${token}`;
                 return fetchFunction(endpoint, options);
             });
+        }else if(response.status === 204){
+            onError(response.status)
         }
         return response;
     } catch (error) {

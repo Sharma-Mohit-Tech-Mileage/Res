@@ -93,8 +93,7 @@ const ChangePassword = () => {
       (error) => {
         setLoading(false)
         console.log("Error on updateUserPassword ",JSON.stringify(error));
-        if(error.includes('204')){
-          
+        if(error==204){
             navigation.navigate('PasswordSecurity', { updateSuccess: true, isPassword:true });
         }
       }
