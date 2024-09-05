@@ -40,7 +40,7 @@ const CardNewBiller = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, nav
                             </View>
                         </View> */}
                         <View style={{ paddingVertical: 15 }}></View>
-                        <View style={{ paddingVertical: 10 }}></View>
+                        
                     </View>
                     <View style={styles.statusRow}>
                         <TouchableOpacity

@@ -10,6 +10,7 @@
 
 
 
+
 @implementation RNZendeskChatModule
 
 RCT_EXPORT_MODULE(RNZendeskChatModule);
@@ -53,6 +54,7 @@ RCT_EXPORT_METHOD(setVisitorInfo:(NSDictionary *)options) {
                             email:options[@"email"]
                           phoneNumber:options[@"phone"]];
 
+
   NSLog(@"[RNZendeskChatModule] Applied visitor info: department: %@ tags: %@, email: %@, name: %@, phone: %@", config.departmentName, config.tags, config.visitorInfo.email, config.visitorInfo.name, config.visitorInfo.phoneNumber);
   return config;
 }
@@ -67,7 +69,8 @@ RCT_EXPORT_METHOD(setVisitorInfo:(NSDictionary *)options) {
     ZDKChatConfiguration *config = [ZDKChatConfiguration new];
     config.isAgentAvailabilityEnabled = YES;
     config.isPreChatFormEnabled = YES;
-  config.preChatFormConfiguration = [[ZDKChatFormConfiguration alloc] initWithName:ZDKFormFieldStatusRequired
+    //config.isChatTranscriptPromptEnabled=NO;
+    config.preChatFormConfiguration = [[ZDKChatFormConfiguration alloc] initWithName:ZDKFormFieldStatusRequired
                                                                                            email:ZDKFormFieldStatusRequired
                                                                                     phoneNumber:ZDKFormFieldStatusOptional
                                                                                       department:ZDKFormFieldStatusHidden];

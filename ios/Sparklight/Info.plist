@@ -96,5 +96,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+  <key>NSCameraUsageDescription</key>
+  <string>This app requires access to the camera to take photos for chat support.</string>
 </dict>
 </plist>
