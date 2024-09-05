@@ -23,7 +23,12 @@ const ProfileSettings = () => {
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
-      RefreshToken();
+      //put RefreshToken in try catch block
+      try {
+        RefreshToken();
+      } catch (error) {
+        navigation.navigate('Splash');
+      }
       dispatch(fetchProfileDetails());
       navigation.setParams({ updateSuccess: undefined });
     }
