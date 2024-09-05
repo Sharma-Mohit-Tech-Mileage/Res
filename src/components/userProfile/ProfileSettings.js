@@ -46,7 +46,7 @@ const ProfileSettings = () => {
     };
     fetchUserData();
   }, []);
-
+  
   useEffect(() => {
    
     //console.log('Profile details',JSON.stringify(profileDetails))
@@ -55,6 +55,7 @@ const ProfileSettings = () => {
     }
     
   }, [profileDetails]);
+    
 
 
   return (
