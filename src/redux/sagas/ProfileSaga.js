@@ -6,7 +6,8 @@ import {
     fetchPaperLessDetails, postEmailNotification,
     putEmailNotification, postTermsAndConditions,postTermsAndConditionsv2,
     postPushNotifications, unsubscribPaperLess,
-    fetchPushNotifications, handleSubmitFeedback, resendEmailVerification, logError, logInfo,addUserAction,removeUser,editUserAction,fetchSecurityQuestions
+    fetchPushNotifications, handleSubmitFeedback, resendEmailVerification, logError,
+     logInfo,addUserAction,removeUser,editUserAction,fetchSecurityQuestions,fetchAllSvEmails,
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
@@ -17,11 +18,13 @@ import {
     UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS,
     FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
     SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
-    UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION, LOG_ERROR, LOG_INFO,ADD_NEW_USER,DELETE_USER,EDIT_USER,GET_SECURITY_QUESTION
+    UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION,
+     LOG_ERROR, LOG_INFO,ADD_NEW_USER,DELETE_USER,EDIT_USER,
+     GET_SECURITY_QUESTION, ALLSVEMAILASSOCIATED
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
-    saveSMSSelection, saveEmailBillings,
+    saveSMSSelection, saveEmailBillings,saveSvEmailAssociation,
     savePaperlessDetails, savePushNotifications,updatedSecurityQuestions
 } from "../actions/ProfileActionSuite";
 
@@ -327,6 +330,17 @@ function* deleteUser(action) {
         console.error('API Error Response:', error, action.payload); // Log the error response
     }
 }
+function* fetchSvEmails(action) {
+    console.log('fetchAllSvEmails API Success Response');
+    try {
+        const response = yield call(fetchAllSvEmails);
+        yield put(saveSvEmailAssociation(response));
+        console.log('fetchAllSvEmails API Success Response:', response);
+    } catch (error) {
+        console.error('fetchAllSvEmails API Error Response:', error, action.payload); // Log the error response
+    }
+}
+
 
 function* ProfileSagas() {
     yield takeLatest(FETCH_PROFILE_DETAILS, fetchProfileDetails);
@@ -352,5 +366,6 @@ function* ProfileSagas() {
     yield takeLatest(EDIT_USER,editUser)
     yield takeLatest(LOG_ERROR, logErrorSaga);
     yield takeLatest(LOG_INFO, logInfoSaga);
+    yield takeLatest(ALLSVEMAILASSOCIATED,fetchSvEmails);
 }
 export default ProfileSagas;

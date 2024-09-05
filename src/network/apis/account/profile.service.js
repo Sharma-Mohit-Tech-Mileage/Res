@@ -506,6 +506,24 @@ const removeUser = async (data) => {
         throw error;
     }
 };
+const fetchAllSvEmails = async (data) => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+        headers: {
+            Authorization: "Bearer " + user.token
+        }
+    };
+    console.log(`/mobile/api/email/${accountNumber}/GetAllSVEmails`); // Log the request data
+    try {
+        const response = await _axios.get(`/mobile/api/email/${accountNumber}/GetAllSVEmails`, config);
+        console.log('API Call Successful, Response:', response.data); // Log the successful response
+        return response.data;
+    } catch (error) {
+        console.error('API Call Failed, Error:', error); // Log the error
+        throw error;
+    }
+};
 
 
 
@@ -515,4 +533,4 @@ export { logError,logInfo,fetchUserList, getProfileDetails,
     fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, 
     postEmailNotification, postTermsAndConditions,postTermsAndConditionsv2, postPushNotifications,
      unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,
-      resendEmailVerification,addUserAction,removeUser,editUserAction }
+    resendEmailVerification,addUserAction,removeUser,editUserAction ,fetchAllSvEmails}
