@@ -563,7 +563,7 @@ const deleteSVEmail = async (email) => {
     }
 };
 
-export const updateSVEmails = async (emailList) => {
+ const updateSVEmails = async (emailList) => {
     const accountNumber = await getAccountNumber(); // Fetch the account number from storage or any appropriate source
     const config = {
         headers: {

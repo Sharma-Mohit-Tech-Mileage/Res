@@ -12,7 +12,7 @@ import {
     SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
     UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION,
     SAVE_USER_ACCOUNT_SERVICE,ADD_NEW_USER,DELETE_USER,EDIT_USER,
-    ALLSVEMAILASSOCIATED,SAVEALLSVEMAILASSOCIATED,ADD_SV_EMAIL_NO_FLAGS_REQUEST,DELETE_SV_EMAIL_REQUEST
+    ALLSVEMAILASSOCIATED,SAVEALLSVEMAILASSOCIATED,ADD_SV_EMAIL_NO_FLAGS_REQUEST,DELETE_SV_EMAIL_REQUEST,UPDATE_SV_EMAILS_REQUEST
 } from '../constants';
 export const fetchProfileSuccess = (response) => {
     return {
@@ -214,5 +214,12 @@ export const addSVEmailNoFlagsRequest = (email, navigation) => ({
 export const deleteSVEmailRequest = (email, navigation) => ({
     type: DELETE_SV_EMAIL_REQUEST,
     payload: { email },
+    navigation
+});
+// actions/ProfileActionSuite.js
+
+export const updateSVEmailsRequest = (emailList, navigation) => ({
+    type: UPDATE_SV_EMAILS_REQUEST,
+    payload: { emailList },
     navigation
 });
