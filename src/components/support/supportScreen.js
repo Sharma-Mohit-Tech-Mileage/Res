@@ -254,7 +254,7 @@ const Support = ({ route }) => {
                                                 />
                                             </View>
                                             <Text style={[styles.supportingText, styles.supportingTypo1,]} >
-                                            Instant Troubleshooting & Outage Check.
+                                            Instant troubleshooting & outage check.
                                             </Text>
                                         </View>
                                     </View>

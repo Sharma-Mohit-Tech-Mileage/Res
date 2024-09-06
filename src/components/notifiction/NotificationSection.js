@@ -115,11 +115,11 @@ const renderInfoText = ({ title, infoText, screenReaderEnabled, isEmailVerified,
       return (
         <Text
           accessible={true}
-          accessibilityLabel={`${acknowledgement} is awaiting confirmation. Check your inbox for our verification link. Resend Confirmation Email link`}
+          accessibilityLabel={`${acknowledgement} is pending confirmation. Check your inbox for our verification link. Resend Confirmation Email link`}
           onPress={() => dispatch(resentEmailVerifiction(navigation))}
           style={styles.infoText}
         >
-          <Text style={styles.linkText}>{acknowledgement}</Text> is awaiting confirmation.
+          <Text style={styles.linkText}>{acknowledgement}</Text> is pending confirmation.
           {isPrimary && (
             <>
               {' Check your inbox for our verification link.'}
@@ -138,7 +138,7 @@ const renderInfoText = ({ title, infoText, screenReaderEnabled, isEmailVerified,
     }
     return (
       <Text style={styles.infoText}>
-        <Text style={styles.linkText}>{acknowledgement}</Text> is awaiting confirmation.
+        <Text style={styles.linkText}>{acknowledgement}</Text> is pending confirmation.
         {isPrimary && (
           <>
             {' Check your inbox for our verification link.'}

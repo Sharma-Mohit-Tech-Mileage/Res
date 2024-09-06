@@ -51,7 +51,7 @@ export const fetchInitialData = (profile) => {
     infoText = "We are not able to retrieve the email address for your account. Please contact us for assistance.";
   } else if (!profileDetails.multipleEmails && (emailAddress || acknowledgement)) {
     notificationsTitle = isEmailVerified ? '' : 'Email verification pending';
-    infoText = isEmailVerified ? `Emails are sent to ${emailAddress}` : `${acknowledgement} is awaiting confirmation.`;
+    infoText = isEmailVerified ? `Emails are sent to ${emailAddress}` : `${acknowledgement} is pending confirmation.`;
   }
 
   return {
