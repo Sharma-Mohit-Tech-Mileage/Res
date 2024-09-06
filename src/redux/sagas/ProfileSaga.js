@@ -362,11 +362,9 @@ function* handleDeleteSVEmailRequest(action) {
 function* handleUpdateSVEmailsRequest(action) {
     try {
         const response = yield call(updateSVEmails, action.payload.emailList);
-        yield put(updateSVEmailsSuccess(response));
         // Navigate on success, if needed
         if (action.navigation) action.navigation.navigate('SuccessScreen');
     } catch (error) {
-        yield put(updateSVEmailsFailure(error));
         // Handle navigation on failure
         if (action.navigation) action.navigation.navigate('ErrorScreen');
     }
