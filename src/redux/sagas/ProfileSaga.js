@@ -7,7 +7,7 @@ import {
     putEmailNotification, postTermsAndConditions,postTermsAndConditionsv2,
     postPushNotifications, unsubscribPaperLess,
     fetchPushNotifications, handleSubmitFeedback, resendEmailVerification, logError,
-     logInfo,addUserAction,removeUser,editUserAction,fetchSecurityQuestions,fetchAllSvEmails,
+     logInfo,addUserAction,removeUser,editUserAction,fetchSecurityQuestions,fetchAllSvEmails,addSVEmailNoFlags, deleteSVEmail
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
@@ -20,7 +20,7 @@ import {
     SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
     UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION,
      LOG_ERROR, LOG_INFO,ADD_NEW_USER,DELETE_USER,EDIT_USER,
-     GET_SECURITY_QUESTION, ALLSVEMAILASSOCIATED
+     GET_SECURITY_QUESTION, ALLSVEMAILASSOCIATED,ADD_SV_EMAIL_NO_FLAGS_REQUEST, DELETE_SV_EMAIL_REQUEST
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
@@ -341,6 +341,24 @@ function* fetchSvEmails(action) {
     }
 }
 
+function* handleAddSVEmailNoFlagsRequest(action) {
+    try {
+        const response = yield call(addSVEmailNoFlags, action.payload.email);
+        if (action.navigation) action.navigation.navigate('SuccessScreen');
+    } catch (error) {
+        if (action.navigation) action.navigation.navigate('ErrorScreen');
+    }
+}
+
+function* handleDeleteSVEmailRequest(action) {
+    try {
+        const response = yield call(deleteSVEmail, action.payload.email);
+        if (action.navigation) action.navigation.navigate('SuccessScreen');
+    } catch (error) {
+        if (action.navigation) action.navigation.navigate('ErrorScreen');
+    }
+}
+
 
 function* ProfileSagas() {
     yield takeLatest(FETCH_PROFILE_DETAILS, fetchProfileDetails);
@@ -367,5 +385,7 @@ function* ProfileSagas() {
     yield takeLatest(LOG_ERROR, logErrorSaga);
     yield takeLatest(LOG_INFO, logInfoSaga);
     yield takeLatest(ALLSVEMAILASSOCIATED,fetchSvEmails);
+    yield takeLatest(ADD_SV_EMAIL_NO_FLAGS_REQUEST, handleAddSVEmailNoFlagsRequest);
+    yield takeLatest(DELETE_SV_EMAIL_REQUEST, handleDeleteSVEmailRequest);
 }
 export default ProfileSagas;

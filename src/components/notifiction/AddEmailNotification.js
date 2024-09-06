@@ -17,7 +17,7 @@ const validationSchema = yup.object().shape({
     paperlessBilling: yup.boolean(),
 });
 
-const EmailNotifications = () => {
+const AddEmailNotification = () => {
     const scrollViewRef = useRef(null);
     const isSubmittingRef = useRef(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -346,4 +346,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default EmailNotifications;
+export default AddEmailNotification;

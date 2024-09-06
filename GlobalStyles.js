@@ -43,7 +43,8 @@ export const Color = {
     gray600: "#475467",
     sparkLightRed: "#EF4E3E",
     sparkLightInfo:'#F88700',
-    Gray300: '#EAEAEA'
+    Gray300: '#EAEAEA',
+    colorlightRed: '#EF4E3E33',
 };
 export const Padding = {
     p_5xs: 8,
