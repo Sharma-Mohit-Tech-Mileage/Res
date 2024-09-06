@@ -108,7 +108,7 @@ const AddEmailNotification = () => {
                                     </View>
                                     <View style={[styles.paddingContainer]}>
                                         <View style={[styles.frameFlexBox]}>
-                                            <Text style={styles.paperlessBilling}>Email</Text>
+                                            <Text style={styles.paperlessBilling}>Email Address</Text>
                                         </View>
                                         <Controller
                                             control={control}
@@ -264,6 +264,7 @@ const styles = StyleSheet.create({
         fontSize: FontSize.size_base,
         lineHeight: 22,
         flex: 1,
+        marginVertical:4
     },
     paperlessBillingParent: {
         alignItems: "center",
