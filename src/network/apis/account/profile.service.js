@@ -535,7 +535,7 @@ const addSVEmailNoFlags = async (email) => {
     };
 
     try {
-        const response = await _axios.post(`/apiWrapper/Mobile/api/email/${accountNumber}/${email}/AddSVEmailNoFlags`, {}, config);
+        const response = await _axios.post(`Mobile/api/email/${accountNumber}/${email}/AddSVEmailNoFlags`, {}, config);
         console.log(`API Call Successful to add SV email without flags: ${email}`, response.data);
         return response.data;
     } catch (error) {
@@ -554,7 +554,7 @@ const deleteSVEmail = async (email) => {
     };
 
     try {
-        const response = await _axios.post(`/apiWrapper/mobile/api/email/${accountNumber}/${email}/DeleteSVEmail`, {}, config);
+        const response = await _axios.post(`mobile/api/email/${accountNumber}/${email}/DeleteSVEmail`, {}, config);
         console.log(`API Call Successful to delete SV email: ${email}`, response.data);
         return response.data;
     } catch (error) {
@@ -564,26 +564,45 @@ const deleteSVEmail = async (email) => {
 };
 
  const updateSVEmails = async (emailList) => {
-    const accountNumber = await getAccountNumber(); // Fetch the account number from storage or any appropriate source
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
     const config = {
         headers: {
-            Authorization: `Bearer ${await getToken()}` // Fetch token from storage or any appropriate source
+            Authorization: `Bearer ${user.token}`
         }
     };
 
     const body = emailList.map(email => ({ "EmailAddress": email }));
 
     try {
-        const response = await _axios.post(`/apiWrapper/Mobile/api/email/${accountNumber}/UpdateSVEmails`, body, config);
+        const response = await _axios.post(`Mobile/api/email/${accountNumber}/UpdateSVEmails`, body, config);
         return response.data;
     } catch (error) {
         throw error;
     }
 };
 
+const addSVEmailMktFlag = async (email) => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+        headers: {
+            Authorization: "Bearer " + user.token
+        }
+    };
+
+    try {
+        const response = await _axios.post(`/Mobile/api/email/${accountNumber}/${email}/AddSVEmailMktFlag`, {}, config);
+        console.log(`API Call Successful to add SV email marketing flag: ${email}`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error in API Call to add SV email marketing flag: ${email}`, error);
+        throw error;
+    }
+};
 export { logError,logInfo,fetchUserList, getProfileDetails, 
     fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, 
     fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, 
     postEmailNotification, postTermsAndConditions,postTermsAndConditionsv2, postPushNotifications,
      unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,
-    resendEmailVerification,addUserAction,removeUser,editUserAction ,fetchAllSvEmails,addSVEmailNoFlags, deleteSVEmail,updateSVEmails}
+    resendEmailVerification,addUserAction,removeUser,editUserAction ,fetchAllSvEmails,addSVEmailNoFlags, deleteSVEmail,updateSVEmails,addSVEmailMktFlag}

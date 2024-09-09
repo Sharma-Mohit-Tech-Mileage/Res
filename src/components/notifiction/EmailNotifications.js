@@ -1,21 +1,34 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, Pressable, View, FlatList ,Image} from "react-native";
+import { StyleSheet, Text, Pressable, View, FlatList, Image } from "react-native";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import Toggle from '../common/Toggle';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
+import CustomerErrorPage from "../utility/SystemErrorPopup";
+import { deleteSVEmailRequest, fetchSvEmailAssociation } from '../../redux/actions/ProfileActionSuite';
+
 const EmailNotifications = () => {
   const isSubmittingRef = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+  const [deleteSVEmail, setDeleteSVEmail] = useState(false);
+  const [emailToDelete, setEmailToDelete] = useState(null);
   const route = useRoute();
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const allSvEmailAssociated = profile.allSvEmailAssociated || [];
+
+  // Categorize emails by settings
+  const paperlessEmails = allSvEmailAssociated.filter(email => email.invoice);
+  const marketingEmails = allSvEmailAssociated.filter(email => email.marketing);
+  const sparklightTvEmails = allSvEmailAssociated.filter(email => email.iptv);
+  const additionalEmails = allSvEmailAssociated.filter(email => !email.marketing && !email.invoice && !email.iptv);
 
   const handleSave = useCallback(() => {
     if (isSubmittingRef.current) return;
@@ -26,27 +39,35 @@ const EmailNotifications = () => {
     setIsSubmitting(false);
   }, [dispatch]);
 
-  const handleValidationError = useCallback(() => {
-    setErrorMsg('Please enter valid information to continue.');
-    setShowErrorAlert(true);
-    isSubmittingRef.current = false;
-    setIsSubmitting(false);
-  }, []);
-
   useEffect(() => {
     if (route.params?.updateFailed) {
       setShowErrorAlert(true);
       setErrorMsg('Something went wrong. Please try again.');
       isSubmittingRef.current = false;
       setIsSubmitting(false);
+    } else if (route.params?.updateSuccess) {
+      setShowSuccessAlert(true);
+      setSuccessMsg(route.params?.successMessage || 'Operation completed successfully.');
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
+      dispatch(fetchSvEmailAssociation());
     }
-  }, [route.params?.updateFailed]);
+  }, [route.params]);
 
-  // Categorize emails by settings
-  const paperlessEmails = allSvEmailAssociated.filter(email => email.invoice);
-  const marketingEmails = allSvEmailAssociated.filter(email => email.marketing);
-  const sparklightTvEmails = allSvEmailAssociated.filter(email => email.iptv);
-  const additionalEmails = allSvEmailAssociated.filter(email => email.marketing || email.invoice || email.iptv);
+  const handleDelete = (email) => {
+    setEmailToDelete(email);
+    setDeleteSVEmail(true);
+  };
+
+  const confirmDelete = () => {
+    dispatch(deleteSVEmailRequest(emailToDelete, navigation));
+    setDeleteSVEmail(false);
+  };
+
+  const cancelDelete = () => {
+    setEmailToDelete(null);
+    setDeleteSVEmail(false);
+  };
 
   const renderEmailItem = ({ item }) => (
     <View key={item.emailAddress} style={styles.emailItem}>
@@ -63,70 +84,99 @@ const EmailNotifications = () => {
       <Text style={styles.infoTitle}>Email address</Text>
       <View style={styles.emailAddressContainer}>
         <Text style={styles.emailText}>{item.emailAddress.toLowerCase()}</Text>
-        <Image source={require("../../../assets/right-actionable6.png")} />
-        </View>
+        <Pressable onPress={() => handleDelete(item.emailAddress)}>
+          <Image source={require("../../../assets/right-actionable6.png")} />
+        </Pressable>
+      </View>
     </View>
   );
 
-  const ListHeaderComponent = () => (
-    <View style={styles.sectionContainer}>
-      <View style={styles.sectionBox}>
-        <Pressable
-          style={styles.addButton}
-          onPress={() => navigation.navigate('AddEmailNotification')}
-        >
-          <Text style={styles.addButtonText}>Add</Text>
-        </Pressable>
-        <NotificationAlert
-          type="warning"
-          title="Critical Notifications"
-          showCloseIcon={false}
-          message="We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications."
-        />
+  const ListHeaderComponent = () => {
+    const maxEmails = 15; // Define the maximum number of allowed emails
+    const showAddButton = allSvEmailAssociated.length < maxEmails;
+
+    return (
+      <View style={styles.sectionContainer}>
+
+
+        <View style={styles.sectionBox}>
+          {showSuccessAlert && (
+            <NotificationAlert
+              type="success"
+              title="Success"
+              message={route.params.successMessage || "Operation completed successfully."}
+              showCloseIcon={true}
+              onClose={() => setShowSuccessAlert(false)} // Optional: Reset success state if needed
+            />
+          )}
+          {showErrorAlert && (
+            <NotificationAlert
+              type="error"
+              title="Error"
+              message="Something went wrong. Please try again."
+              showCloseIcon={true}
+              onClose={() => setShowErrorAlert(false)} // Optional: Reset error state if needed
+            />
+          )}
+          {showAddButton && (
+            <Pressable
+              style={styles.addButton}
+              onPress={() => navigation.navigate('AddEmailNotification', { newEmail: paperlessEmails.length === 0 })}
+            >
+              <Text style={styles.addButtonText}>Add</Text>
+            </Pressable>
+          )}
+          <NotificationAlert
+            type="warning"
+            title="Critical Notifications"
+            showCloseIcon={false}
+            message="We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications."
+          />
+        </View>
+        {paperlessEmails.length > 0 &&
+          <View style={styles.sectionBox}>
+            <Text style={styles.infoTitle}>Paperless Billing</Text>
+            <Text style={styles.infoText}>Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information secure.</Text>
+            <FlatList
+              data={paperlessEmails}
+              renderItem={renderEmailItem}
+              keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
+            />
+          </View>}
+        {sparklightTvEmails.length > 0 &&
+          <View style={styles.sectionBox}>
+            <Text style={styles.infoTitle}>Sparklight TV</Text>
+            <Text style={styles.infoText}>This email address is tied to your TV service and can only be managed via the Sparklight TV Interface.</Text>
+            <FlatList
+              data={sparklightTvEmails}
+              renderItem={renderEmailItem}
+              keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
+            />
+          </View>}
+        {marketingEmails.length > 0 &&
+          <View style={styles.sectionBox}>
+            <Text style={styles.infoTitle}>Marketing Communications</Text>
+            <Text style={styles.infoText}>
+              Be the first to know about our latest offers, promotions, and news.
+            </Text>
+            <FlatList
+              data={marketingEmails}
+              renderItem={renderEmailItem}
+              keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
+            />
+          </View>}
+        {additionalEmails.length > 0 &&
+          <View style={styles.sectionBox}>
+            <Text style={styles.infoTitle}>Additional Email Addresses</Text>
+            <FlatList
+              data={[...new Set(additionalEmails)]} // Ensure unique emails
+              renderItem={renderEmailItemWithTrash}
+              keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
+            />
+          </View>}
       </View>
-      {paperlessEmails.length > 0 &&
-        <View style={styles.sectionBox}>
-          <Text style={styles.infoTitle}>Paperless Billing</Text>
-          <Text style={styles.infoText}>Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information secure.</Text>
-          <FlatList
-            data={paperlessEmails}
-            renderItem={renderEmailItem}
-            keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
-          />
-        </View>}
-      {sparklightTvEmails.length > 0 &&
-        <View style={styles.sectionBox}>
-          <Text style={styles.infoTitle}>Sparklight TV</Text>
-          <Text style={styles.infoText}>This email address is tied to your TV service and can only be managed via the Sparkight TV Interface.</Text>
-          <FlatList
-            data={sparklightTvEmails}
-            renderItem={renderEmailItem}
-            keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
-          />
-        </View>}
-      {marketingEmails.length > 0 &&
-        <View style={styles.sectionBox}>
-          <Text style={styles.infoTitle}>Marketing Communications</Text>
-          <Text style={styles.infoText}>
-            Be the first to know about our latest offers, promotions, and news.
-          </Text>
-          <FlatList
-            data={marketingEmails}
-            renderItem={renderEmailItem}
-            keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
-          />
-        </View>}
-      {additionalEmails.length > 0 &&
-        <View style={styles.sectionBox}>
-          <Text style={styles.infoTitle}>Additional Email Addresses</Text>
-          <FlatList
-            data={[...new Set(additionalEmails)]} // Ensure unique emails
-            renderItem={renderEmailItemWithTrash}
-            keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
-          />
-        </View>}
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -168,6 +218,34 @@ const EmailNotifications = () => {
           </View>
         } // Moved footer inside FlatList for better positioning
         contentContainerStyle={styles.scrollContainer}
+      />
+
+      {/* Notification Alerts */}
+      {showSuccessAlert && (
+        <NotificationAlert
+          type="success"
+          title="Success"
+          message={successMsg}
+          onClose={() => setShowSuccessAlert(false)}
+        />
+      )}
+      {showErrorAlert && (
+        <NotificationAlert
+          type="error"
+          title="Error"
+          message={errorMsg}
+          onClose={() => setShowErrorAlert(false)}
+        />
+      )}
+
+      {/* Confirmation Modal */}
+      <CustomerErrorPage
+        visible={deleteSVEmail}
+        message={`Do you want to continue deleting ${emailToDelete}?`}
+        title={"Delete Email Id"}
+        onActionTxt={"Yes"}
+        onAction={confirmDelete}
+        onClose={cancelDelete}
       />
     </View>
   );
@@ -246,8 +324,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontWeight: "400",
     marginVertical: 2
-
-,
   },
   submitButton: {
     backgroundColor: Color.colorMidnightblue,
