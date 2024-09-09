@@ -92,7 +92,7 @@ const EmailNotifications = () => {
   );
 
   const ListHeaderComponent = () => {
-    const maxEmails = 5; // Define the maximum number of allowed emails
+    const maxEmails = 10; // Define the maximum number of allowed emails
     const showAddButton = allSvEmailAssociated.length < maxEmails;
 
     return (
