@@ -136,8 +136,7 @@ dependencies {
         exclude group:'com.squareup.okhttp3', module:'okhttp'
     }
 
-    implementation 'com.google.android:flexbox:2.0.0' // Add this line
-
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
     api group: 'com.zendesk', name: 'chat', version: '2.2.0'
     api group: 'com.zendesk', name: 'messaging', version: '4.3.1'
 
