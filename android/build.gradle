@@ -20,5 +20,6 @@ buildscript {
         // Add the Google Services Gradle plugin
         classpath 'com.google.gms:google-services:4.4.0'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.7.1'
+        classpath 'com.google.android:flexbox:2.0.1'
     }
 }
