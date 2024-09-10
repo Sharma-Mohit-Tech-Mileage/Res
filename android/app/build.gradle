@@ -85,11 +85,11 @@ android {
                                  appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
-        versionCode 139
-        versionName "3.0.1"
+        versionCode 126
+        versionName "4.1.2"
     }
 
-
+    
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -110,7 +110,7 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
-
+    
 }
 
 repositories {
@@ -136,10 +136,9 @@ dependencies {
         exclude group:'com.squareup.okhttp3', module:'okhttp'
     }
 
-    //implementation 'com.google.android:flexbox:2.0.1' // Add this line
-
-    api group: 'com.zendesk', name: 'chat', version: '3.4.0'
-    api group: 'com.zendesk', name: 'messaging', version: '5.4.0'
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
+    api group: 'com.zendesk', name: 'chat', version: '2.2.0'
+    api group: 'com.zendesk', name: 'messaging', version: '4.3.1'
 
     debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
     if (hermesEnabled.toBoolean()) {

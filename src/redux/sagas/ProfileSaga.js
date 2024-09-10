@@ -1,13 +1,14 @@
-import { call, put, takeLatest} from "redux-saga/effects";
+import { all,call, put, takeLatest } from "redux-saga/effects";
+
 import {
     getProfileDetails, fetchUserList,
     fetchSmsSubscription, fetchBillingStatus,
     postProfileInfo, postTextNotifictionInfo,
     fetchPaperLessDetails, postEmailNotification,
-    putEmailNotification, postTermsAndConditions,postTermsAndConditionsv2,
+    putEmailNotification, postTermsAndConditions, postTermsAndConditionsv2,
     postPushNotifications, unsubscribPaperLess,
     fetchPushNotifications, handleSubmitFeedback, resendEmailVerification, logError,
-     logInfo,addUserAction,removeUser,editUserAction,fetchSecurityQuestions,fetchAllSvEmails,
+    logInfo, addUserAction, removeUser, editUserAction, fetchSecurityQuestions, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails,addSVEmailMktFlag
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
@@ -19,13 +20,13 @@ import {
     FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
     SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
     UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION,
-     LOG_ERROR, LOG_INFO,ADD_NEW_USER,DELETE_USER,EDIT_USER,
-     GET_SECURITY_QUESTION, ALLSVEMAILASSOCIATED
+    LOG_ERROR, LOG_INFO, ADD_NEW_USER, DELETE_USER, EDIT_USER,
+    GET_SECURITY_QUESTION, ALLSVEMAILASSOCIATED, ADD_SV_EMAIL_NO_FLAGS_REQUEST, DELETE_SV_EMAIL_REQUEST, UPDATE_SV_EMAILS_REQUEST,MANAGE_EMAIL_REQUEST
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
-    saveSMSSelection, saveEmailBillings,saveSvEmailAssociation,
-    savePaperlessDetails, savePushNotifications,updatedSecurityQuestions
+    saveSMSSelection, saveEmailBillings, saveSvEmailAssociation,
+    savePaperlessDetails, savePushNotifications, updatedSecurityQuestions
 } from "../actions/ProfileActionSuite";
 
 function* getProfileUsers(action) {
@@ -80,7 +81,7 @@ function* getPushNotifications(action) {
         const response = yield call(fetchPushNotifications, action.payload);
         yield put(savePushNotifications(response));
     } catch (error) {
-       
+
     }
 }
 
@@ -112,7 +113,7 @@ function* updateProfile(action) {
         console.log('updateProfile: ', JSON.stringify(action.payload));
         const response = yield call(postProfileInfo, action.payload);
         //console.log('action.smsPayload', action.smsPayload)
-       // const textNotifiction = yield call(postTextNotifictionInfo, action.smsPayload);
+        // const textNotifiction = yield call(postTextNotifictionInfo, action.smsPayload);
         action.navigation.navigate('ProfileSettings', { updateSuccess: true });
     } catch (error) {
         action.navigation.navigate('ProfileSettingsEdit', { updateFailed: true });
@@ -243,7 +244,7 @@ function* updateEntryEmailNotification(action) {
         const profile = action.payload.profile;
         const updateEmail = action.payload.email;
         const oldEmail = action.payload.profile.svEmailAddress;
-        
+
         if (updateEmail !== oldEmail) {
             profile.svEmailAddress = updateEmail;
             profile.email = oldEmail;
@@ -269,7 +270,7 @@ function* logErrorSaga(action) {
 function* logInfoSaga(action) {
     try {
         const response = yield call(logInfo, action.payload);
-        
+
     } catch (error) {
         console.error('API Error Response:', error);
     }
@@ -282,17 +283,17 @@ function* addUser(action) {
 
         const response = yield call(addUserAction, action.payload);
         console.log('API Success Response:', response); // Log the success response
-        if(response){
-            action.navigation(true,"")
-        //action.navigation.navigate('UserManagement', { updateSuccess: true });
+        if (response) {
+            action.navigation(true, "")
+            //action.navigation.navigate('UserManagement', { updateSuccess: true });
         }
     } catch (error) {
-        if(error?.response){
-        action.navigation(false,error?.response.data)
-        }else{
-            action.navigation(false,"")
+        if (error?.response) {
+            action.navigation(false, error?.response.data)
+        } else {
+            action.navigation(false, "")
         }
-        console.log('Error:',error)
+        console.log('Error:', error)
         //action.navigation.navigate('PasswordSecurityEdit', { updateFailed: true });
         //console.error('API Error Response:', error, action.payload); // Log the error response
     }
@@ -307,7 +308,7 @@ function* editUser(action) {
         action.navigation(true)
     } catch (error) {
         action.navigation(false)
-        console.log('Error',error.response.data)
+        console.log('Error', error.response.data)
         //action.navigation.navigate('PasswordSecurityEdit', { updateFailed: true });
         //console.error('API Error Response:', error, action.payload); // Log the error response
     }
@@ -319,12 +320,12 @@ function* deleteUser(action) {
         const response = yield call(removeUser, action.payload);
         console.log('API Success Response:', response); // Log the success response
         //if(response){
-            // action.navigation.reset({
-            //     index: 0,
-            //     routes: [{ name: "UserManagement" }],
-            //   });
-          //  }
-          action.navigation(true)
+        // action.navigation.reset({
+        //     index: 0,
+        //     routes: [{ name: "UserManagement" }],
+        //   });
+        //  }
+        action.navigation(true)
     } catch (error) {
         action.navigation(false)
         console.error('API Error Response:', error, action.payload); // Log the error response
@@ -341,7 +342,97 @@ function* fetchSvEmails(action) {
     }
 }
 
+function* handleAddSVEmailNoFlagsRequest(action) {
+    try {
+        const response = yield call(addSVEmailNoFlags, action.payload.email);
+        if (action.navigation) action.navigation.navigate('SuccessScreen');
+    } catch (error) {
+        if (action.navigation) action.navigation.navigate('ErrorScreen');
+    }
+}
 
+function* handleDeleteSVEmailRequest(action) {
+    const { navigation } = action;
+    try {
+        const response = yield call(deleteSVEmail, action.payload.email);
+        if (navigation) navigation.navigate('EmailNotifications', { updateSuccess: true ,updatedType: 'Email'});
+    } catch (error) {
+        if (navigation) navigation.navigate('EmailNotifications', { updateFailed: true ,updatedType: 'Email'});
+    }
+}
+
+function* handleUpdateSVEmailsRequest(action) {
+    try {
+        const response = yield call(updateSVEmails, action.payload.emailList);
+        // Navigate on success, if needed
+        if (action.navigation) action.navigation.navigate('SuccessScreen');
+    } catch (error) {
+        // Handle navigation on failure
+        if (navigation) navigation.navigate('AddEmailNotification', { updateFailed: true ,updatedType: 'Email'});
+    }
+}
+
+function* handleManageEmailRequest(action) {
+    const { email, isPaperless, isMarketing, newEmail } = action.payload;
+    const { navigation } = action;
+
+    console.log('handleManageEmailRequest: action.payload:', action.payload);
+    console.log('handleManageEmailRequest: navigation:', navigation);
+
+    try {
+        let response = null;
+        let successMessage = '';
+
+        if (!isPaperless && !isMarketing) {
+            console.log('Adding email with no flags:', email);
+            response = yield call(addSVEmailNoFlags, email);
+            successMessage = 'Email added successfully.';
+            console.log('Email added with no flags successfully', response);
+        }
+
+        if (isPaperless && isMarketing) {
+            console.log('Adding email as paperless and updating for marketing:', email);
+            const [paperlessResponse, marketingResponse] = yield all([
+                call(newEmail ? postEmailNotification : putEmailNotification, email),
+                call(addSVEmailMktFlag, email)
+            ]);
+            response = { ...paperlessResponse, ...marketingResponse };
+            successMessage = 'Email updated for both paperless billing and marketing.';
+            console.log('Email added to paperless notifications and updated for marketing successfully');
+        } else {
+            if (isPaperless) {
+                console.log('Adding email as paperless:', email);
+                response = yield call(newEmail ? postEmailNotification : putEmailNotification, email);
+                successMessage = 'Email added for paperless billing.';
+                console.log('Email added to paperless notifications successfully', response);
+            }
+
+            if (isMarketing) {
+                console.log('Updating email for marketing:', email);
+                response = yield call(addSVEmailMktFlag, email);
+                successMessage = 'Email updated for marketing.';
+                console.log('Email updated for marketing successfully', response);
+            }
+        }
+
+        if (response) {
+            // yield put(saveSvEmailAssociation(response));
+            console.log('Response saved to store:', response);
+        }
+
+        if (navigation) {
+            console.log(`Navigating to Notifications screen with success message: ${successMessage}`);
+            navigation.navigate('EmailNotifications', { updateSuccess: true, updatedType: 'Email', successMessage });
+        }
+    } catch (error) {
+        console.error('Error in handleManageEmailRequest:', error);
+
+        if (navigation) {
+            console.log('Navigating back to AddEmailNotification with failure');
+            navigation.navigate('AddEmailNotification', { updateFailed: true, updatedType: 'Email' });
+        }
+    }
+}
 function* ProfileSagas() {
     yield takeLatest(FETCH_PROFILE_DETAILS, fetchProfileDetails);
     yield takeLatest(FETCH_USER_LIST, getProfileUsers);
@@ -361,11 +452,15 @@ function* ProfileSagas() {
     yield takeLatest(UPDATE_ENTRY_EMAIL_NOTIFICATION, updateEntryEmailNotification);
     yield takeLatest(UPDATE_EXISTING_EMAIL_NOTIFICATION, updateNewEmail);
     yield takeLatest(RESEND_EMAIL_VERIFICTION, resentVerifiction);
-    yield takeLatest(ADD_NEW_USER,addUser)
-    yield takeLatest(DELETE_USER,deleteUser)
-    yield takeLatest(EDIT_USER,editUser)
+    yield takeLatest(ADD_NEW_USER, addUser)
+    yield takeLatest(DELETE_USER, deleteUser)
+    yield takeLatest(EDIT_USER, editUser)
     yield takeLatest(LOG_ERROR, logErrorSaga);
     yield takeLatest(LOG_INFO, logInfoSaga);
-    yield takeLatest(ALLSVEMAILASSOCIATED,fetchSvEmails);
+    yield takeLatest(ALLSVEMAILASSOCIATED, fetchSvEmails);
+    yield takeLatest(ADD_SV_EMAIL_NO_FLAGS_REQUEST, handleAddSVEmailNoFlagsRequest);
+    yield takeLatest(DELETE_SV_EMAIL_REQUEST, handleDeleteSVEmailRequest);
+    yield takeLatest(UPDATE_SV_EMAILS_REQUEST, handleUpdateSVEmailsRequest);
+    yield takeLatest(MANAGE_EMAIL_REQUEST, handleManageEmailRequest);
 }
 export default ProfileSagas;

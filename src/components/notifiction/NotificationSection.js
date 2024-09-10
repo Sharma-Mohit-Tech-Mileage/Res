@@ -55,13 +55,11 @@ const NotificationSection = ({
             accessibilityLabel="Edit"
             style={({ pressed }) => [
               styles.editButton,
-              isDisabled && styles.buttonDisabled,
-              { opacity: pressed ? 0.7 : (isDisabled ? 0.5 : 1.0) }
+              { opacity: pressed ? 0.7 : 1.0 }
             ]}
-            onPress={() => !isDisabled && navigation.navigate(navigationTarget, { additionalData: transformedData })}
-            disabled={isDisabled}
+            onPress={() =>  navigation.navigate(navigationTarget, { additionalData: transformedData })}
           >
-            <Text style={isDisabled ? styles.disabledButtonText : styles.buttonText}>Edit</Text>
+            <Text style={styles.buttonText}>Edit</Text>
           </Pressable>
         )}
       </View>
@@ -92,7 +90,7 @@ const NotificationSection = ({
                 source={require("../../../assets/infocircle.png")}
               />
             </View>
-            {renderInfoText({ title, infoText, screenReaderEnabled, isEmailVerified, acknowledgement, isPrimary, dispatch, navigation })}
+            <Text style={styles.infoText}>{infoText}</Text>
           </View>
         )}
         </View>
@@ -101,6 +99,7 @@ const NotificationSection = ({
             key={index} 
             type={setting.type} 
             status={setting.status} 
+            warn={setting.warn}
             isLastItem={index === additionalSettings.length - 1} // Handle last item in the section
           />
         ))}
@@ -162,7 +161,7 @@ const renderInfoText = ({ title, infoText, screenReaderEnabled, isEmailVerified,
   return <Text style={styles.infoText}>{infoText}</Text>;
 };
 
-const NotificationType = ({ type, status, isLastItem }) => {
+const NotificationType = ({ type, status,warn, isLastItem }) => {
   let displayStatus;
   let imageSource;
   switch (status) {
@@ -183,7 +182,7 @@ const NotificationType = ({ type, status, isLastItem }) => {
   }
 
   return (
-    <View style={[styles.settingRow, !isLastItem && styles.settingRowBorder]}>
+    <View style={[styles.settingRow, !isLastItem && styles.settingRowBorder,warn&& {backgroundColor:Color.colorlightRed}]}>
       <Text style={styles.settingText}>{type}</Text>
       <View style={styles.statusWrapper}>
         <Image style={styles.icon} resizeMode="cover" source={imageSource} />

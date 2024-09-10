@@ -8,7 +8,7 @@ import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import { GetApiRequest } from '../../network/APIClient';
-
+import { navigationRef } from '../../navigations/UserNavigations';
 const { height, width } = Dimensions.get('window');
 
 const AutoPayPCIConnector = ({ navigation, route }) => {
@@ -108,7 +108,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             var upgradeToken = '${currentUser.upgradeToken}';
             localStorage.setItem('upgrades_token', upgradeToken);
         })();`;
-    
+
         if (webViewRef.current) {
             webViewRef.current.injectJavaScript(script);
         } else {
@@ -143,8 +143,15 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
 
     useEffect(() => {
         const refreshAndInitialize = async () => {
-            await RefreshToken(navigation);
-            await initializePayment();
+            try {
+                await RefreshToken();
+                await initializePayment();
+            } catch (error) {
+                console.error("Error during navigation change token refresh", error);
+                if (navigationRef.current) {
+                    navigationRef.current.navigate('Splash');  // Navigate to Splash screen on error
+                }
+            }
         };
 
         refreshAndInitialize();

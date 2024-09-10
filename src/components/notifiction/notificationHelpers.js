@@ -1,6 +1,6 @@
 // notificationHelpers.js
 
-import { AccessibilityInfo } from 'react-native';
+import { AccessibilityInfo, Text } from 'react-native';
 import { transformResponse, transformNotificationPreferences, isPrimaryAdmin, isAdminRole, extractAcknowledgementEmail } from '../../components/utility/constant';
 import { fetchBillingPaper, fetchProfileDetails, fetchSMSSelection, fetchPushNotifications, fetchSvEmailAssociation } from '../../redux/actions/ProfileActionSuite';
 
@@ -16,12 +16,10 @@ export const fetchInitialData = (profile) => {
   const isAdmin = isAdminRole(profileDetails.memberType);
   const acknowledgement = extractAcknowledgementEmail(paperLessInfo);
   const allSvEmailAssociated = profile.allSvEmailAssociated || [];
-
-  // Determine settings status
+  const emailsWithOnSettings = [];
   let anySettingOn = false;
   let multipleEmailsOn = false;
-  const emailsWithOnSettings = [];
-
+  let notificationsTitle = '', infoText = '', isDisabled = false;
   Array.isArray(allSvEmailAssociated) && allSvEmailAssociated.forEach(setting => {
     if (setting && (setting.invoice || setting.marketing || setting.collection || setting.iptv || setting.tiVo)) {
       anySettingOn = true;
@@ -31,28 +29,31 @@ export const fetchInitialData = (profile) => {
 
   multipleEmailsOn = emailsWithOnSettings.length > 1;
 
-  // Additional settings array
+  // Additional settings array with conditional Sparklight TV
   const additionalSettings = [
-    { type: 'Critical notifications', status: !!profileDetails?.svEmailAddress ? 'On' : 'Off' },
-    { type: 'Paperless Billing', status: allSvEmailAssociated?.some(setting => setting?.invoice) ? 'On' : 'Off' },
-    { type: 'Sparklight Emails', status: allSvEmailAssociated?.some(setting => setting?.marketing) ? 'On' : 'Off' },
-    { type: 'IPTV Notifications', status: allSvEmailAssociated?.some(setting => setting?.iptv) ? 'On' : 'Off' },
+    { type: 'Critical notifications', status: emailsWithOnSettings.length>0? 'On' : 'Off' ,warn :false},
+    { type: 'Paperless Billing', status: allSvEmailAssociated?.some(setting => setting?.invoice) ? 'On' : 'Off' ,warn:acknowledgement?true:false},
+    { type: 'Marketing Communications', status: allSvEmailAssociated?.some(setting => setting?.marketing) ? 'On' : 'Off' ,warn:false},
   ];
 
-  // Notification title and info text
-  let notificationsTitle = '', infoText = '', isDisabled = false;
-  if (multipleEmailsOn) {
-    isDisabled = true;
-    notificationsTitle = "";
-    infoText = "Multiple emails associated with this account";
-  } else if (profileDetails.multipleEmails) {
-    isDisabled = true;
-    notificationsTitle = "Unable to retrieve email address.";
-    infoText = "We are not able to retrieve the email address for your account. Please contact us for assistance.";
-  } else if (!profileDetails.multipleEmails && (emailAddress || acknowledgement)) {
-    notificationsTitle = isEmailVerified ? '' : 'Email verification pending';
-    infoText = isEmailVerified ? `Emails are sent to ${emailAddress}` : `${acknowledgement} is pending confirmation.`;
+  // Conditionally add Sparklight TV setting
+  const sparklightTVStatus = allSvEmailAssociated?.some(setting => setting?.iptv);
+  if (sparklightTVStatus) {
+    additionalSettings.push({ type: 'Sparklight TV', status: 'On',warn:false });
   }
+    if (multipleEmailsOn) {
+        isDisabled = true;
+        notificationsTitle = "";
+        infoText = "Multiple emails associated with this account";
+    } else if ((emailAddress || acknowledgement)) {
+        infoText =
+            (isEmailVerified && emailAddress)
+                ? <Text>Emails are sent to <Text style={{ fontWeight: 'bold' }}>{emailAddress}</Text></Text>
+                : acknowledgement
+                    ? "There is an problem with an email address on this account."
+                    : "";
+        isDisabled=(isEmailVerified && emailAddress) ? false : acknowledgement ? true : false;
+    }
 
   return {
     transformedNotification,

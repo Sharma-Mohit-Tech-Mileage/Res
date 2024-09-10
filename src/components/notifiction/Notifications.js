@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, ScrollView, StyleSheet,Text } from "react-native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { fetchInitialData, handleResentNotification, handleUpdateSuccess, handleAccessibility } from './notificationHelpers';
 import NotificationSection from "./NotificationSection";
 import { fetchProfileDetails, fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, fetchSvEmailAssociation } from '../../redux/actions/ProfileActionSuite';
-import { Padding, Color } from "../../../GlobalStyles";
+import { Padding, Color ,FontFamily} from "../../../GlobalStyles";
 
 const Notifications = () => {
   const navigation = useNavigation();
@@ -51,7 +51,7 @@ const Notifications = () => {
             setShowSuccessAlert={setShowSuccessAlert}
             isDisabled={false}
             notificationsTitle="No mobile phone number on file"
-            infoText={data.phoneNum ? `Text alerts are sent to ${data.phoneNum}` : ''}
+            infoText={data.phoneNum? ( <Text>Text alerts are sent to <Text style={styles.boldText}>{data.phoneNum}</Text></Text>): ''}
             transformedData={data}
             navigationTarget="TextNotifications"
             additionalSettings={data.subscriptionDetails}
@@ -117,6 +117,11 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_5xl,
     paddingHorizontal: Padding.p_base,
     marginBottom: 200
+  },
+  boldText: {
+    fontWeight: '600',
+    fontFamily: FontFamily.openSansRegular, // Assuming you have a bold version of the font
+    color: Color.colorGray_100, // Match this to the surrounding text color if needed
   },
 });
 
