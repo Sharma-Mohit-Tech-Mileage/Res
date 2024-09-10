@@ -7,7 +7,7 @@ import Toggle from '../common/Toggle';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
-import { deleteSVEmailRequest, fetchSvEmailAssociation } from '../../redux/actions/ProfileActionSuite';
+import { deleteSVEmailRequest, fetchSvEmailAssociation, updateEmailAssociations } from '../../redux/actions/ProfileActionSuite';
 
 const EmailNotifications = () => {
   const isSubmittingRef = useRef(false);
@@ -18,6 +18,7 @@ const EmailNotifications = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [deleteSVEmail, setDeleteSVEmail] = useState(false);
   const [emailToDelete, setEmailToDelete] = useState(null);
+  const [toggleStates, setToggleStates] = useState({});
   const route = useRoute();
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -30,29 +31,66 @@ const EmailNotifications = () => {
   const sparklightTvEmails = allSvEmailAssociated.filter(email => email.iptv);
   const additionalEmails = allSvEmailAssociated.filter(email => !email.marketing && !email.invoice && !email.iptv);
 
+  useEffect(() => {
+    // Initialize toggle states based on the initial data
+    const initialStates = {};
+    allSvEmailAssociated.forEach(email => {
+      initialStates[email.emailAddress] = {
+        paperless: email.invoice,
+        marketing: email.marketing,
+      };
+    });
+    setToggleStates(initialStates);
+  }, [allSvEmailAssociated]);
+
+  const handleToggleChange = (event, section) => {
+    const { name, value } = event.target;
+    setToggleStates(prevState => ({
+      ...prevState,
+      [name]: {
+        ...prevState[name],
+        [section]: value
+      }
+    }));
+  };
+
   const handleSave = useCallback(() => {
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     setIsSubmitting(true);
-    // Simulate saving process...
+
+    // Prepare the paperless payload (a single email)
+    const paperlessPayload = paperlessEmails
+      .find(email => !toggleStates[email.emailAddress]?.paperless)?.emailAddress || null;
+
+    // Prepare the marketing payload (an array of emails)
+    const marketingPayload = marketingEmails
+      .filter(email => !toggleStates[email.emailAddress]?.marketing)
+      .map(email => email.emailAddress);
+
+    // Dispatch API calls via saga
+    dispatch(updateEmailAssociations(
+      paperlessPayload,  // Single email for paperless
+      marketingPayload,  // Array of emails for marketing
+      navigation
+    ));
+
     isSubmittingRef.current = false;
     setIsSubmitting(false);
-  }, [dispatch]);
+  }, [dispatch, toggleStates, paperlessEmails, marketingEmails, navigation]);
 
   useEffect(() => {
     if (route.params?.updateFailed) {
       setShowErrorAlert(true);
       setErrorMsg('Something went wrong. Please try again.');
-      isSubmittingRef.current = false;
       setIsSubmitting(false);
     } else if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
-      setSuccessMsg(route.params?.successMessage || 'Operation completed successfully.');
-      isSubmittingRef.current = false;
-      setIsSubmitting(false);
+      setSuccessMsg(route.params.successMessage || 'Operation completed successfully.');
       dispatch(fetchSvEmailAssociation());
+      setIsSubmitting(false);
     }
-  }, [route.params]);
+  }, [route.params, dispatch]);
 
   const handleDelete = (email) => {
     setEmailToDelete(email);
@@ -69,12 +107,17 @@ const EmailNotifications = () => {
     setDeleteSVEmail(false);
   };
 
-  const renderEmailItem = ({ item }) => (
+  const renderEmailItem = ({ item, section }) => (
     <View key={item.emailAddress} style={styles.emailItem}>
       <Text style={styles.infoTitle}>Email address</Text>
       <View style={styles.emailAddressContainer}>
         <Text style={styles.emailText}>{item.emailAddress.toLowerCase()}</Text>
-        <Toggle initialValue={true} />
+        <Toggle
+          name={item.emailAddress}
+          initialValue={toggleStates[item.emailAddress]?.[section] || false}
+          onToggle={(event) => handleToggleChange(event, section)}
+          label={`${section} email`}
+        />
       </View>
     </View>
   );
@@ -92,32 +135,31 @@ const EmailNotifications = () => {
   );
 
   const ListHeaderComponent = () => {
-    const maxEmails = 10; // Define the maximum number of allowed emails
+    const maxEmails = 5;
     const showAddButton = allSvEmailAssociated.length < maxEmails;
 
     return (
       <View style={styles.sectionContainer}>
-
-
         <View style={styles.sectionBox}>
           {showSuccessAlert && (
             <NotificationAlert
               type="success"
               title="Success"
-              message={route.params.successMessage || "Operation completed successfully."}
+              message={successMsg}
               showCloseIcon={true}
-              onClose={() => setShowSuccessAlert(false)} // Optional: Reset success state if needed
+              onClose={() => setShowSuccessAlert(false)}
             />
           )}
           {showErrorAlert && (
             <NotificationAlert
               type="error"
               title="Error"
-              message="Something went wrong. Please try again."
+              message={errorMsg}
               showCloseIcon={true}
-              onClose={() => setShowErrorAlert(false)} // Optional: Reset error state if needed
+              onClose={() => setShowErrorAlert(false)}
             />
           )}
+          {(showSuccessAlert || showErrorAlert) && <View style={{ marginBottom: Padding.p_base }} />}
           {showAddButton && (
             <Pressable
               style={styles.addButton}
@@ -139,7 +181,7 @@ const EmailNotifications = () => {
             <Text style={styles.infoText}>Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information secure.</Text>
             <FlatList
               data={paperlessEmails}
-              renderItem={renderEmailItem}
+              renderItem={(item) => renderEmailItem({ ...item, section: 'paperless' })}
               keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
             />
           </View>}
@@ -161,7 +203,7 @@ const EmailNotifications = () => {
             </Text>
             <FlatList
               data={marketingEmails}
-              renderItem={renderEmailItem}
+              renderItem={(item) => renderEmailItem({ ...item, section: 'marketing' })}
               keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
             />
           </View>}
@@ -169,7 +211,7 @@ const EmailNotifications = () => {
           <View style={styles.sectionBox}>
             <Text style={styles.infoTitle}>Additional Email Addresses</Text>
             <FlatList
-              data={[...new Set(additionalEmails)]} // Ensure unique emails
+              data={[...new Set(additionalEmails)]}
               renderItem={renderEmailItemWithTrash}
               keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
             />
@@ -216,28 +258,9 @@ const EmailNotifications = () => {
               </Pressable>
             </View>
           </View>
-        } // Moved footer inside FlatList for better positioning
+        }
         contentContainerStyle={styles.scrollContainer}
       />
-
-      {/* Notification Alerts */}
-      {showSuccessAlert && (
-        <NotificationAlert
-          type="success"
-          title="Success"
-          message={successMsg}
-          onClose={() => setShowSuccessAlert(false)}
-        />
-      )}
-      {showErrorAlert && (
-        <NotificationAlert
-          type="error"
-          title="Error"
-          message={errorMsg}
-          onClose={() => setShowErrorAlert(false)}
-        />
-      )}
-
       {/* Confirmation Modal */}
       <CustomerErrorPage
         visible={deleteSVEmail}
@@ -257,12 +280,11 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorWhitesmoke_200,
   },
   scrollContainer: {
-    paddingVertical: Padding.p_base,
+    paddingVertical: Padding.p_xl,
     paddingBottom: 100,
   },
   footer: {
     backgroundColor: Color.colorWhitesmoke_200,
-    paddingVertical: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     borderTopWidth: 1,
     borderTopColor: Color.colorWhitesmoke_300,
@@ -284,7 +306,7 @@ const styles = StyleSheet.create({
   sectionContainer: {
     backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_11xs,
-    margin: Padding.p_base,
+    marginHorizontal: Padding.p_base,
   },
   sectionBox: {
     borderBottomWidth: 1,
