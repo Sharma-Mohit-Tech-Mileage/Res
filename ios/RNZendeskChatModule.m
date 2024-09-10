@@ -92,12 +92,30 @@ RCT_EXPORT_METHOD(setVisitorInfo:(NSDictionary *)options) {
 //[[ZDKChat instance] endChat];
 
 RCT_EXPORT_METHOD(clearChatSession)
+
 {
   [[ZDKChat instance] resetIdentity];
 }
 
+- (void)resetSession {
+    // Your shared logic here
+  // Clear the visitor identity
+  
+  // Create an anonymous identity without an email
+  ZDKChatAPIConfiguration *config = [[ZDKChatAPIConfiguration alloc] init];
+  config.visitorInfo = [[ZDKVisitorInfo alloc] initWithName:nil email:nil phoneNumber:nil];
+
+  // Apply the configuration
+ // [ZDKChat.instance.configuration applyWithConfiguration:config];
+
+
+  [[ZDKChat instance] resetIdentity];
+    NSLog(@"Helper method called");
+}
+
 RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
 {
+  [ self resetSession ];
   [[ZDKChat instance] setConfiguration: [self chatAPIConfiguration : config]];
   [ZDKCommonTheme currentTheme].primaryColor = [UIColor purpleColor];
   
