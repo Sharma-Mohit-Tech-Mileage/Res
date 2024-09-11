@@ -169,7 +169,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                         console.warn('WebView ref is not available for reload. Navigating back to Dashboard.');
                         // Navigate back to the Dashboard
                         if (navigationRef.current) {
-                            navigationRef.current.navigate('dashboard'); 
+                            navigationRef.current.navigate('Dashboard'); 
                         }
                     }
                 }, 500);
