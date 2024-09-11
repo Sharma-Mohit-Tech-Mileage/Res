@@ -57,8 +57,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     
 
     const navigationChange = async (navState) => {
-        setDynamicCookie();  // Update cookie on any navigation change
-
+        setDynamicCookie();  
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
                 setModalOpen(false);
@@ -72,7 +71,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 } catch (error) {
                     console.error("Error during navigation change token refresh", error);
                     if (navigationRef.current) {
-                        navigationRef.current.navigate('Splash');  // Navigate to Splash screen on error
+                        navigationRef.current.navigate('Splash');
                     }
                 }
             }
@@ -170,7 +169,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                         console.warn('WebView ref is not available for reload. Navigating back to Dashboard.');
                         // Navigate back to the Dashboard
                         if (navigationRef.current) {
-                            navigationRef.current.navigate('Dashboard'); // Replace 'Dashboard' with your dashboard route name
+                            navigationRef.current.navigate('dashboard'); 
                         }
                     }
                 }, 500);
