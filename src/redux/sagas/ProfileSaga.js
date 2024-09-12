@@ -452,14 +452,14 @@ function* handleUpdateEmailAssociations(action) {
                 call(postEmailNotification),
                 call(updateSVEmails, marketingEmails)
             ]);
-            successMessage = 'Email updated for both paperless billing and marketing.';
+            successMessage = 'Email updated for both paperless billing and marketing. ';
             console.log('Both paperless and marketing emails updated successfully');
         } else {
             // If only paperlessEmail is present
             if (paperlessEmail) {
                 console.log('Updating paperless email:', paperlessEmail);
                 paperlessResponse = yield call(unsubscribPaperLess);
-                successMessage = 'Email updated for paperless billing.';
+                successMessage = 'Email updated for paperless billing. ';
                 console.log('Paperless email updated successfully');
             }
 
@@ -467,9 +467,14 @@ function* handleUpdateEmailAssociations(action) {
             if (marketingEmails && marketingEmails.length > 0) {
                 console.log('Updating marketing emails:', marketingEmails);
                 marketingResponse = yield call(updateSVEmails, marketingEmails);
-                successMessage = 'Emails updated for marketing.';
+                successMessage += 'Emails updated for marketing.';
                 console.log('Marketing emails updated successfully');
             }
+        }
+
+        if (paperlessResponse) {
+            // Add the 24-hour reflection message specifically for paperless billing updates
+            successMessage += 'Please note that changes to paperless billing status might take up to 24 hours to reflect.';
         }
 
         if (paperlessResponse || marketingResponse) {

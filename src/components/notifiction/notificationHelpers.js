@@ -17,11 +17,14 @@ export const fetchInitialData = (profile) => {
   const acknowledgement = extractAcknowledgementEmail(paperLessInfo);
   const allSvEmailAssociated = profile.allSvEmailAssociated || [];
   const emailsWithOnSettings = [];
+  let paperlessStatus = ((paperLessInfo.paperlessStatus === "Processing") || 
+                      (paperLessInfo.emailStatus === "Pending")) &&
+                      (acknowledgement && Object.values(acknowledgement).some(value => typeof value === 'string' && value.includes('@')));
   let anySettingOn = false;
   let multipleEmailsOn = false;
   let notificationsTitle = '', infoText = '', isDisabled = false;
   Array.isArray(allSvEmailAssociated) && allSvEmailAssociated.forEach(setting => {
-    if (setting && (setting.invoice || setting.marketing || setting.collection || setting.iptv || setting.tiVo)) {
+    if (setting && (setting.invoice || setting.marketing || setting.iptv)) {
       anySettingOn = true;
       setting.emailAddress && emailsWithOnSettings.push(setting.emailAddress);
     }
@@ -32,7 +35,7 @@ export const fetchInitialData = (profile) => {
   // Additional settings array with conditional Sparklight TV
   const additionalSettings = [
     { type: 'Critical notifications', status: emailsWithOnSettings.length>0? 'On' : 'Off' ,warn :false},
-    { type: 'Paperless Billing', status: allSvEmailAssociated?.some(setting => setting?.invoice) ? 'On' : 'Off' ,warn:acknowledgement?true:false},
+    { type: 'Paperless Billing', status: allSvEmailAssociated?.some(setting => setting?.invoice) ? 'On' : 'Off' ,warn:paperlessStatus},
     { type: 'Marketing Communications', status: allSvEmailAssociated?.some(setting => setting?.marketing) ? 'On' : 'Off' ,warn:false},
   ];
 
@@ -41,19 +44,20 @@ export const fetchInitialData = (profile) => {
   if (sparklightTVStatus) {
     additionalSettings.push({ type: 'Sparklight TV', status: 'On',warn:false });
   }
-    if (multipleEmailsOn) {
-        isDisabled = true;
-        notificationsTitle = "";
-        infoText = "Multiple emails associated with this account";
-    } else if ((emailAddress || acknowledgement)) {
-        infoText =
-            (isEmailVerified && emailAddress)
-                ? <Text>Emails are sent to <Text style={{ fontWeight: 'bold' }}>{emailAddress}</Text></Text>
-                : acknowledgement
-                    ? "There is an problem with an email address on this account."
-                    : "";
-        isDisabled=(isEmailVerified && emailAddress) ? false : acknowledgement ? true : false;
-    }
+
+  if (paperlessStatus) {
+    infoText = "There is a problem with an email address on this account.";
+    isDisabled = true;
+} else if (multipleEmailsOn) {
+    isDisabled = true;
+    notificationsTitle = "";
+    infoText = "Multiple emails associated with this account";
+} else if (emailAddress) {
+    infoText = (isEmailVerified && emailAddress)
+        ? <Text>Emails are sent to <Text style={{ fontWeight: 'bold' }}>{emailAddress}</Text></Text>
+        : "";
+    isDisabled = (isEmailVerified && emailAddress) ? false : true;
+}
 
   return {
     transformedNotification,

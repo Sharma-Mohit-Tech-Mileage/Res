@@ -8,11 +8,12 @@ import debounce from 'lodash/debounce';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Toggle from '../common/Toggle';
 import SparkLightInput from "../common/customui/SparkLightInput";
-import { useDispatch, } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { manageEmailRequest } from '../../redux/actions/ProfileActionSuite';
 import SecondaryButton from '../common/customui/PrimaryButton';
+import LoadingOverlay from '../common/LoadingOverlay';
 
 const validationSchema = yup.object().shape({
     email: yup.string().email('Invalid email address').required('Email is required'),
@@ -21,14 +22,15 @@ const validationSchema = yup.object().shape({
 const AddEmailNotification = () => {
     const scrollViewRef = useRef(null);
     const isSubmittingRef = useRef(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false); // Controls the LoadingOverlay visibility
     const [showErrorAlert, setShowErrorAlert] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
-    const [formState, setFormState] = useState({ paperlessBilling: false,marketing: false});
+    const [formState, setFormState] = useState({ paperlessBilling: false, marketing: false });
     const route = useRoute();
     const dispatch = useDispatch();
     const navigation = useNavigation();
-    const newEmail = route.params?.newEmail||false; // newEmail is a boolean value
+    const newEmail = route.params?.newEmail || false;
+
     const { control, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(validationSchema),
         defaultValues: {
@@ -42,7 +44,7 @@ const AddEmailNotification = () => {
             setShowErrorAlert(true);
             setErrorMsg('Something went wrong. Please try again.');
             isSubmittingRef.current = false;
-            setIsSubmitting(false);
+            setIsSubmitting(false); // Hide LoadingOverlay on failure
         }
     }, [route.params?.updateFailed]);
 
@@ -54,20 +56,20 @@ const AddEmailNotification = () => {
     const handleSave = useCallback(async (data) => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
-        setIsSubmitting(true);
+        setIsSubmitting(true); // Show LoadingOverlay
 
         const { email } = data;
         const { paperlessBilling, marketing } = formState;
-        console.log('email', email, paperlessBilling, marketing);
+
         try {
-            await dispatch(manageEmailRequest(email, paperlessBilling, marketing,newEmail, navigation));
+            await dispatch(manageEmailRequest(email, paperlessBilling, marketing, newEmail, navigation));
+            // Handle success (e.g., navigate back or show a success message)
         } catch (error) {
             setErrorMsg('An error occurred while saving your settings. Please try again.');
             setShowErrorAlert(true);
-        } finally {
             isSubmittingRef.current = false;
-            setIsSubmitting(false);
-        }
+            setIsSubmitting(false); // Hide LoadingOverlay when done
+        } 
     }, [dispatch, navigation, formState]);
 
     const handleValidationError = useCallback(() => {
@@ -75,7 +77,7 @@ const AddEmailNotification = () => {
         setErrorMsg('Please enter valid information to continue.');
         setShowErrorAlert(true);
         isSubmittingRef.current = false;
-        setIsSubmitting(false);
+        setIsSubmitting(false); // Hide LoadingOverlay on validation error
     }, []);
 
     return (
@@ -84,6 +86,10 @@ const AddEmailNotification = () => {
                 title="Add Email Notifications"
                 onPressBack={() => navigation.goBack()}
             />
+            
+            {/* LoadingOverlay to show loading indicator during submission */}
+            <LoadingOverlay isLoading={isSubmitting} message="Saving..." />
+
             <ScrollView ref={scrollViewRef}>
                 <View style={styles.frameContainer}>
                     <View style={styles.section}>
@@ -145,7 +151,6 @@ const AddEmailNotification = () => {
                     <View style={styles.section}>
                         <View style={styles.toggleContainer}>
                             <Text style={styles.sectionLabel}>Marketing Communications</Text>
-                          
                             <Toggle
                                 key={formState.marketing ? 'on' : 'off'}
                                 onToggle={handleToggleChange}
