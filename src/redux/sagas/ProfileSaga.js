@@ -366,11 +366,22 @@ function* handleAddSVEmailNoFlagsRequest(action) {
 
 function* handleDeleteSVEmailRequest(action) {
     const { navigation } = action;
+    const email = action.payload.email;
+    
     try {
-        const response = yield call(deleteSVEmail, action.payload.email);
-        if (navigation) navigation.navigate('EmailNotifications', { updateSuccess: true, updatedType: 'Email' });
+        yield call(deleteSVEmail, email);
+
+        const successMessage = `Email address (${email}) deleted successfully.`;
+
+        if (navigation) {
+            navigation.navigate('EmailNotifications', { updateSuccess: true, updatedType: 'Email', successMessage });
+        }
     } catch (error) {
-        if (navigation) navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Email' });
+        const failureMessage = `Failed to delete email address (${email}).`;
+
+        if (navigation) {
+            navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Email', failureMessage });
+        }
     }
 }
 

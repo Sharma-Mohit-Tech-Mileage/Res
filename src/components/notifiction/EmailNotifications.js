@@ -158,6 +158,7 @@ const EmailNotifications = () => {
     if (route.params?.updateFailed || route.params?.updateSuccess) {
       scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
       setIsSubmitting(false);
+      setIsDeleting(false);
       isSubmittingRef.current = false;
       if (route.params?.updateFailed) {
         setShowErrorAlert(true);
