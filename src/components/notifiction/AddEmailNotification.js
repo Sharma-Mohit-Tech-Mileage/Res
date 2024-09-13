@@ -63,15 +63,10 @@ const AddEmailNotification = () => {
 
         try {
             await dispatch(manageEmailRequest(email, paperlessBilling, marketing, newEmail, navigation));
-            // Handle success (e.g., navigate back or show a success message)
         } catch (error) {
             setErrorMsg('An error occurred while saving your settings. Please try again.');
             setShowErrorAlert(true);
-        } finally {
-            // Ensure that the loading state is reset after the operation, even if it fails
-            isSubmittingRef.current = false;
-            setIsSubmitting(false);
-        }
+        } 
     }, [dispatch, navigation, formState]);
 
     const handleValidationError = useCallback(() => {
