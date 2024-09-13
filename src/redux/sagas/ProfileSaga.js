@@ -227,14 +227,27 @@ function* updatePushNotificationsV2(action) {
 }
 
 function* resentVerifiction(action) {
+    const { navigation } = action;
+    console.log('resentVerifiction: action:', action);
+
     try {
+        // Call the resend email verification function
         yield call(resendEmailVerification);
-        if (action.navigation !== null) {
-            action.navigation.navigate('Notifications', { resentNotification: true, updatedType: true });
+
+        const successMessage = 'Verification email resent successfully. Please check your inbox.';
+
+        if (navigation) {
+            console.log(`Navigating to Notifications screen with success message: ${successMessage}`);
+            navigation.navigate('EmailNotifications', { updateSuccess: true, updatedType: 'Verification', successMessage });
         }
     } catch (error) {
-        if (action.navigation !== null) {
-            action.navigation.navigate('Notifications', { resentNotification: true, updatedType: false });
+        console.error('Error in resentVerifiction:', error);
+
+        const failureMessage = 'Failed to resend verification email. Please try again later.';
+
+        if (navigation) {
+            console.log('Navigating back to Notifications with failure');
+            navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Verification', failureMessage });
         }
     }
 }

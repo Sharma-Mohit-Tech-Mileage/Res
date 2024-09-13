@@ -7,7 +7,7 @@ import * as yup from 'yup';
 import debounce from 'lodash/debounce';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Toggle from '../common/Toggle';
-import SparkLightInput from "../common/customui/SparkLightInput";
+import SparkLightInput from '../common/customui/SparkLightInput';
 import { useDispatch } from 'react-redux';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
@@ -22,7 +22,7 @@ const validationSchema = yup.object().shape({
 const AddEmailNotification = () => {
     const scrollViewRef = useRef(null);
     const isSubmittingRef = useRef(false);
-    const [isSubmitting, setIsSubmitting] = useState(false); // Controls the LoadingOverlay visibility
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [showErrorAlert, setShowErrorAlert] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const [formState, setFormState] = useState({ paperlessBilling: false, marketing: false });
@@ -41,10 +41,10 @@ const AddEmailNotification = () => {
     useEffect(() => {
         if (route.params?.updateFailed) {
             scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-            setShowErrorAlert(true);
             setErrorMsg('Something went wrong. Please try again.');
-            isSubmittingRef.current = false;
-            setIsSubmitting(false); // Hide LoadingOverlay on failure
+            setShowErrorAlert(true);
+            isSubmittingRef.current = false; // Resetting the flag on failure
+            setIsSubmitting(false);
         }
     }, [route.params?.updateFailed]);
 
@@ -56,7 +56,7 @@ const AddEmailNotification = () => {
     const handleSave = useCallback(async (data) => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
-        setIsSubmitting(true); // Show LoadingOverlay
+        setIsSubmitting(true);
 
         const { email } = data;
         const { paperlessBilling, marketing } = formState;
@@ -67,17 +67,19 @@ const AddEmailNotification = () => {
         } catch (error) {
             setErrorMsg('An error occurred while saving your settings. Please try again.');
             setShowErrorAlert(true);
+        } finally {
+            // Ensure that the loading state is reset after the operation, even if it fails
             isSubmittingRef.current = false;
-            setIsSubmitting(false); // Hide LoadingOverlay when done
-        } 
+            setIsSubmitting(false);
+        }
     }, [dispatch, navigation, formState]);
 
     const handleValidationError = useCallback(() => {
         scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
         setErrorMsg('Please enter valid information to continue.');
         setShowErrorAlert(true);
-        isSubmittingRef.current = false;
-        setIsSubmitting(false); // Hide LoadingOverlay on validation error
+        isSubmittingRef.current = false; 
+        setIsSubmitting(false);
     }, []);
 
     return (
@@ -87,7 +89,6 @@ const AddEmailNotification = () => {
                 onPressBack={() => navigation.goBack()}
             />
             
-            {/* LoadingOverlay to show loading indicator during submission */}
             <LoadingOverlay isLoading={isSubmitting} message="Saving..." />
 
             <ScrollView ref={scrollViewRef}>
@@ -129,7 +130,6 @@ const AddEmailNotification = () => {
                             message="We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications."
                             showCloseIcon={false}
                             isVisible={true}
-                            onClose={() => setShowErrorAlert(false)}
                         />
                     </View>
                     <View style={styles.divider} />

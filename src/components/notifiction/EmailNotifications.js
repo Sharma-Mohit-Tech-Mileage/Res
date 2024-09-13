@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, Pressable, View, FlatList, Image, ScrollView } from "react-native";
+import { StyleSheet, Text, Pressable, View, FlatList, Image, ScrollView, Alert } from "react-native";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
@@ -11,10 +11,10 @@ import { deleteSVEmailRequest, fetchSvEmailAssociation, updateEmailAssociations 
 import LoadingOverlay from '../common/LoadingOverlay';
 
 const EmailNotifications = () => {
-  const scrollViewRef = useRef(null); // Reference to scroll to top
+  const scrollViewRef = useRef(null);
   const isSubmittingRef = useRef(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Controls the LoadingOverlay visibility for save
-  const [isDeleting, setIsDeleting] = useState(false); // Controls the LoadingOverlay visibility for delete
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -22,28 +22,31 @@ const EmailNotifications = () => {
   const [deleteSVEmail, setDeleteSVEmail] = useState(false);
   const [emailToDelete, setEmailToDelete] = useState(null);
   const [toggleStates, setToggleStates] = useState({});
-  const initialToggleStatesRef = useRef({}); // Reference to hold initial toggle states
+  const initialToggleStatesRef = useRef({});
   const route = useRoute();
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const profile = useSelector(state => state.combinedReducers.profile || {});
-  const allSvEmailAssociated = profile.allSvEmailAssociated || [];
-
+  const { allSvEmailAssociated = [] } = profile;
+  const acknowledgement = route.params?.acknowledgement;
   const paperlessEmails = allSvEmailAssociated.filter(email => email.invoice);
   const marketingEmails = allSvEmailAssociated.filter(email => email.marketing);
   const sparklightTvEmails = allSvEmailAssociated.filter(email => email.iptv);
-  const additionalEmails = allSvEmailAssociated.filter(email => !email.marketing && !email.invoice && !email.iptv);
+  const additionalEmails = allSvEmailAssociated.filter(email => !email.marketing && !email.invoice && !email.iptv && !email.collection && !email.tiVo);
 
   useEffect(() => {
-    const initialStates = {};
-    allSvEmailAssociated.forEach(email => {
-      initialStates[email.emailAddress] = {
-        paperless: email.invoice,
-        marketing: email.marketing,
-      };
-    });
-    setToggleStates(initialStates);
-    initialToggleStatesRef.current = initialStates; // Store initial states for comparison
+    const initializeToggleStates = () => {
+      const initialStates = {};
+      allSvEmailAssociated.forEach(email => {
+        initialStates[email.emailAddress] = {
+          paperless: email.invoice,
+          marketing: email.marketing,
+        };
+      });
+      setToggleStates(initialStates);
+      initialToggleStatesRef.current = initialStates;
+    };
+    initializeToggleStates();
   }, [allSvEmailAssociated]);
 
   const handleToggleChange = (event, section) => {
@@ -57,17 +60,15 @@ const EmailNotifications = () => {
     }));
   };
 
-  const hasChanges = useCallback(() => {
-    return Object.keys(toggleStates).some(email => {
+  const hasChanges = useCallback(() => (
+    Object.keys(toggleStates).some(email => {
       const current = toggleStates[email];
       const initial = initialToggleStatesRef.current[email];
       return current.paperless !== initial.paperless || current.marketing !== initial.marketing;
-    });
-  }, [toggleStates]);
+    })
+  ), [toggleStates]);
 
-  const handleSave = useCallback(() => {
-    if (isSubmittingRef.current) return;
-
+  const saveChanges = useCallback(async () => {
     if (!hasChanges()) {
       setErrorMsg('No changes to update.');
       setShowErrorAlert(true);
@@ -76,38 +77,88 @@ const EmailNotifications = () => {
     }
 
     isSubmittingRef.current = true;
-    setIsSubmitting(true); // Show LoadingOverlay for save
+    setIsSubmitting(true);
 
-    const paperlessPayload = paperlessEmails
-      .find(email => !toggleStates[email.emailAddress]?.paperless)?.emailAddress || null;
+    try {
+      const paperlessPayload = paperlessEmails
+        .find(email => !toggleStates[email.emailAddress]?.paperless)?.emailAddress || null;
 
-    const marketingPayload = marketingEmails
-      .filter(email => !toggleStates[email.emailAddress]?.marketing)
-      .map(email => email.emailAddress);
+      const marketingPayload = marketingEmails
+        .filter(email => !toggleStates[email.emailAddress]?.marketing)
+        .map(email => email.emailAddress);
 
-    dispatch(updateEmailAssociations(
-      paperlessPayload,
-      marketingPayload,
-      navigation
-    ));
-  }, [dispatch, toggleStates, paperlessEmails, marketingEmails, navigation, hasChanges]);
+      await dispatch(updateEmailAssociations(paperlessPayload, marketingPayload, navigation));
 
-  const handleDelete = (email) => {
-    setEmailToDelete(email);
-    setDeleteSVEmail(true); // Open confirmation modal
-  };
+      setShowSuccessAlert(true);
+      setSuccessMsg('Changes updated successfully.');
+      await dispatch(fetchSvEmailAssociation());
 
-  const confirmDelete = () => {
-    setIsDeleting(true); // Show LoadingOverlay for delete
-    setDeleteSVEmail(false); // Close confirmation modal
+      const updatedInitialStates = {};
+      allSvEmailAssociated.forEach(email => {
+        updatedInitialStates[email.emailAddress] = {
+          paperless: toggleStates[email.emailAddress]?.paperless || false,
+          marketing: toggleStates[email.emailAddress]?.marketing || false,
+        };
+      });
+      initialToggleStatesRef.current = updatedInitialStates;
 
+    } catch (error) {
+      setShowErrorAlert(true);
+      setErrorMsg('Something went wrong. Please try again.');
+    }
+  }, [dispatch, toggleStates, paperlessEmails, marketingEmails, navigation, hasChanges, allSvEmailAssociated]);
+
+  const handleSave = useCallback(async () => {
+    await saveChanges();
+  }, [saveChanges]);
+
+  const handleDelete = useCallback((email) => {
+    if (hasChanges()) {
+      Alert.alert(
+        'Unsaved Changes',
+        'You have unsaved changes. Do you want to save these changes before deleting the email?',
+        [
+          {
+            text: 'Save Changes',
+            onPress: async () => {
+              await saveChanges();
+              setEmailToDelete(email);
+              setDeleteSVEmail(true);
+            }
+          },
+          {
+            text: 'Don’t Save',
+            onPress: () => {
+              setEmailToDelete(email);
+              setDeleteSVEmail(true);
+            },
+            style: 'destructive'
+          },
+          {
+            text: 'Cancel',
+            onPress: () => { },
+            style: 'cancel'
+          }
+        ],
+        { cancelable: true }
+      );
+    } else {
+      setEmailToDelete(email);
+      setDeleteSVEmail(true);
+    }
+  }, [hasChanges, saveChanges]);
+
+  const confirmDelete = useCallback(() => {
+    setIsDeleting(true);
+    setDeleteSVEmail(false);
     dispatch(deleteSVEmailRequest(emailToDelete, navigation));
-  };
+  }, [dispatch, emailToDelete, navigation]);
 
   useEffect(() => {
     if (route.params?.updateFailed || route.params?.updateSuccess) {
-      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true }); // Scroll to top
-
+      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+      setIsSubmitting(false);
+      isSubmittingRef.current = false;
       if (route.params?.updateFailed) {
         setShowErrorAlert(true);
         setErrorMsg('Something went wrong. Please try again.');
@@ -116,9 +167,6 @@ const EmailNotifications = () => {
         setSuccessMsg(route.params.successMessage || 'Operation completed successfully.');
         dispatch(fetchSvEmailAssociation());
       }
-
-      setIsSubmitting(false); // Hide LoadingOverlay
-      setIsDeleting(false);   // Hide LoadingOverlay
     }
   }, [route.params, dispatch]);
 
@@ -188,12 +236,19 @@ const EmailNotifications = () => {
               <Text style={styles.addButtonText}>Add</Text>
             </Pressable>
           )}
-          <NotificationAlert
-            type="warning"
-            title="Critical Notifications"
-            showCloseIcon={false}
-            message="We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications."
-          />
+        </View>
+        <View style={styles.sectionBox_info}>
+        <View style={styles.emailItem}>
+            <Text style={[styles.emailText,{fontWeight:'600'}]}>Critical Notifications</Text>
+            <Image
+                style={styles.icon}
+                resizeMode="contain"
+                source={require("../../../assets/checkcircle.png")}
+              />
+          </View>
+          <Text style={[styles.infoText,{color:Color.colorGray_200}]}>
+            We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications.
+          </Text>
         </View>
         {paperlessEmails.length > 0 &&
           <View style={styles.sectionBox}>
@@ -204,6 +259,16 @@ const EmailNotifications = () => {
               renderItem={(item) => renderEmailItem({ ...item, section: 'paperless' })}
               keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
             />
+            {acknowledgement&& 
+            <NotificationAlert
+            type="warning"
+            title=""
+            resentemail={true}
+            showCloseIcon={false}
+            splitKey="Resend Confirmation Email"
+            nextRow={true}
+            message={`To continue with Paperless Billing, please confirm your email address (${acknowledgement}) with the verification link sent to your inbox.`}
+          />}
           </View>}
         {sparklightTvEmails.length > 0 &&
           <View style={styles.sectionBox}>
@@ -219,9 +284,7 @@ const EmailNotifications = () => {
           <View style={styles.sectionBox}>
             <Text style={styles.infoTitle}>Marketing Communications</Text>
             <Text style={styles.infoText}>
-              Be the
-
- first to know about our latest offers, promotions, and news.
+              Be the first to know about our latest offers, promotions, and news.
             </Text>
             <FlatList
               data={marketingEmails}
@@ -285,7 +348,9 @@ const EmailNotifications = () => {
           contentContainerStyle={styles.scrollContainer}
         />
       </ScrollView>
-      <LoadingOverlay isLoading={isSubmitting || isDeleting} message={isDeleting ? "Deleting..." : "Saving..."} />
+      {(isSubmitting || isDeleting) && (
+        <LoadingOverlay isLoading={true} message={isDeleting ? "Deleting..." : "Saving..."} />
+      )}
       <CustomerErrorPage
         visible={deleteSVEmail}
         message={`Do you want to continue deleting ${emailToDelete}?`}
@@ -335,6 +400,10 @@ const styles = StyleSheet.create({
   sectionBox: {
     borderBottomWidth: 1,
     borderBottomColor: Color.colorWhitesmoke_200,
+    padding: Padding.p_base,
+  },
+  sectionBox_info: {
+    backgroundColor: Color.backgroundBlur,
     padding: Padding.p_base,
   },
   emailItem: {

@@ -57,7 +57,7 @@ const NotificationSection = ({
               styles.editButton,
               { opacity: pressed ? 0.7 : 1.0 }
             ]}
-            onPress={() =>  navigation.navigate(navigationTarget, { additionalData: transformedData })}
+            onPress={() =>  navigation.navigate(navigationTarget, { additionalData: transformedData ,acknowledgement:acknowledgement})}
           >
             <Text style={styles.buttonText}>Edit</Text>
           </Pressable>
