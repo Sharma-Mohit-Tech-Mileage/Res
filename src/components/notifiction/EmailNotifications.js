@@ -9,6 +9,7 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 import { deleteSVEmailRequest, fetchSvEmailAssociation, updateEmailAssociations } from '../../redux/actions/ProfileActionSuite';
 import LoadingOverlay from '../common/LoadingOverlay';
+import  {extractAcknowledgementEmail } from '../../components/utility/constant';
 
 const EmailNotifications = () => {
   const scrollViewRef = useRef(null);
@@ -28,7 +29,8 @@ const EmailNotifications = () => {
   const navigation = useNavigation();
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const { allSvEmailAssociated = [] } = profile;
-  const acknowledgement = route.params?.acknowledgement;
+  const paperLessInfo = profile.paperLessInfo || {};
+  const acknowledgement = extractAcknowledgementEmail(paperLessInfo);
   const paperlessEmails = allSvEmailAssociated.filter(email => email.invoice);
   const marketingEmails = allSvEmailAssociated.filter(email => email.marketing);
   const sparklightTvEmails = allSvEmailAssociated.filter(email => email.iptv);
