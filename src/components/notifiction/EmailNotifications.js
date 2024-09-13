@@ -253,7 +253,7 @@ const EmailNotifications = () => {
             We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications.
           </Text>
         </View>
-        {paperlessEmails.length > 0 &&
+        {(paperlessEmails.length > 0||acknowledgement) &&
           <View style={styles.sectionBox}>
             <Text style={styles.infoTitle}>Paperless Billing</Text>
             <Text style={styles.infoText}>Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information secure.</Text>
@@ -263,6 +263,7 @@ const EmailNotifications = () => {
               keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
             />
             {acknowledgement&& 
+            <View style={{marginVertical:8}}>
             <NotificationAlert
             type="warning"
             title=""
@@ -271,7 +272,8 @@ const EmailNotifications = () => {
             splitKey="Resend Confirmation Email"
             nextRow={true}
             message={`To continue with Paperless Billing, please confirm your email address (${acknowledgement}) with the verification link sent to your inbox.`}
-          />}
+          />
+          </View>}
           </View>}
         {sparklightTvEmails.length > 0 &&
           <View style={styles.sectionBox}>
