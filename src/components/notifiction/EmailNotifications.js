@@ -178,7 +178,7 @@ const EmailNotifications = () => {
     setDeleteSVEmail(false);
   };
 
-  const renderEmailItem = ({ item, section }) => (
+  const renderEmailItem = ({ item, section,disabled }) => (
     <View key={item.emailAddress} style={styles.emailItem}>
       <Text style={styles.infoTitle}>Email address</Text>
       <View style={styles.emailAddressContainer}>
@@ -187,6 +187,7 @@ const EmailNotifications = () => {
           name={item.emailAddress}
           initialValue={toggleStates[item.emailAddress]?.[section] || false}
           onToggle={(event) => handleToggleChange(event, section)}
+          disabled={disabled}
           label={`${section} email`}
         />
       </View>
@@ -259,7 +260,7 @@ const EmailNotifications = () => {
             <Text style={styles.infoText}>Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information secure.</Text>
             <FlatList
               data={paperlessEmails}
-              renderItem={(item) => renderEmailItem({ ...item, section: 'paperless' })}
+              renderItem={(item) => renderEmailItem({ ...item, section: 'paperless',disabled:acknowledgement })}
               keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
             />
             {acknowledgement&& 

@@ -52,7 +52,7 @@
 <dict>
     <key>NSExceptionDomains</key>
     <dict>
-        <key>uat.sparklight.com</key>
+        <key>sparklight.com</key>
         <dict>
             <!-- Allow insecure HTTP loads for this domain -->
             <key>NSExceptionAllowsInsecureHTTPLoads</key>

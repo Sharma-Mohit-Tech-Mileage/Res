@@ -404,49 +404,55 @@ function* handleManageEmailRequest(action) {
     console.log('handleManageEmailRequest: navigation:', navigation);
 
     try {
-        let response = null;
+        let paperlessResponse = null;
+        let marketingResponse = null;
         let successMessage = '';
 
         if (!isPaperless && !isMarketing) {
             console.log('Adding email with no flags:', email);
-            response = yield call(addSVEmailNoFlags, email);
+            const response = yield call(addSVEmailNoFlags, email);
             successMessage = 'Email added successfully.';
             console.log('Email added with no flags successfully', response);
-        }
-
-        if (isPaperless && isMarketing) {
+        } else if (isPaperless && isMarketing) {
             console.log('Adding email as paperless and updating for marketing:', email);
-            const [paperlessResponse, marketingResponse] = yield all([
+            [paperlessResponse, marketingResponse] = yield all([
                 call(newEmail ? postEmailNotification : putEmailNotification, email),
                 call(addSVEmailMktFlag, email)
             ]);
-            response = { ...paperlessResponse, ...marketingResponse };
             successMessage = 'Email updated for both paperless billing and marketing.';
             console.log('Email added to paperless notifications and updated for marketing successfully');
         } else {
             if (isPaperless) {
                 console.log('Adding email as paperless:', email);
-                response = yield call(newEmail ? postEmailNotification : putEmailNotification, email);
+                paperlessResponse = yield call(newEmail ? postEmailNotification : putEmailNotification, email);
                 successMessage = 'Email added for paperless billing.';
-                console.log('Email added to paperless notifications successfully', response);
+                console.log('Email added to paperless notifications successfully', paperlessResponse);
             }
 
             if (isMarketing) {
                 console.log('Updating email for marketing:', email);
-                response = yield call(addSVEmailMktFlag, email);
+                marketingResponse = yield call(addSVEmailMktFlag, email);
                 successMessage = 'Email updated for marketing.';
-                console.log('Email updated for marketing successfully', response);
+                console.log('Email updated for marketing successfully', marketingResponse);
             }
         }
 
-        if (response) {
-            // yield put(saveSvEmailAssociation(response));
-            console.log('Response saved to store:', response);
+        // Add the 24-hour reflection message specifically for paperless billing updates
+        if (paperlessResponse) {
+            successMessage += ' Please note that changes to paperless billing status might take up to 24 hours to reflect.';
+        }
+
+        if (paperlessResponse || marketingResponse) {
+            console.log('Responses saved to store:', { paperlessResponse, marketingResponse });
         }
 
         if (navigation) {
             console.log(`Navigating to Notifications screen with success message: ${successMessage}`);
-            navigation.navigate('EmailNotifications', { updateSuccess: true, updatedType: 'Email', successMessage });
+            navigation.navigate('EmailNotifications', {
+                updateSuccess: true,
+                updatedType: 'Email',
+                successMessage
+            });
         }
     } catch (error) {
         console.error('Error in handleManageEmailRequest:', error);
