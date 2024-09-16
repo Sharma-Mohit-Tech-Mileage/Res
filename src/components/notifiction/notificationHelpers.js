@@ -5,59 +5,57 @@ import { transformResponse, transformNotificationPreferences, isPrimaryAdmin, is
 import { fetchBillingPaper, fetchProfileDetails, fetchSMSSelection, fetchPushNotifications, fetchSvEmailAssociation } from '../../redux/actions/ProfileActionSuite';
 
 export const fetchInitialData = (profile) => {
-  const smsSubscription = profile.smsSubscription || [];
-  const profileDetails = profile.profileDetails || {};
-  const paperLessInfo = profile.paperLessInfo || {};
+  const { smsSubscription = [], profileDetails = {}, paperLessInfo = {}, allSvEmailAssociated = [] } = profile;
   const transformedNotification = transformNotificationPreferences(profile.pushNotifications || {});
   const data = transformResponse(smsSubscription);
-  const emailAddress = paperLessInfo.emailAddress || '';
   const isEmailVerified = paperLessInfo.emailStatus === 'Verified';
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   const isAdmin = isAdminRole(profileDetails.memberType);
   const acknowledgement = extractAcknowledgementEmail(paperLessInfo);
-  const allSvEmailAssociated = profile.allSvEmailAssociated || [];
   const emailsWithOnSettings = [];
+
   let paperlessStatus = ((paperLessInfo.paperlessStatus === "Processing") || 
                       (paperLessInfo.emailStatus === "Pending")) &&
                       (acknowledgement && Object.values(acknowledgement).some(value => typeof value === 'string' && value.includes('@')));
-  let anySettingOn = false;
+  let emailAddress = '';
   let multipleEmailsOn = false;
-  let notificationsTitle = '', infoText = '', isDisabled = false;
-  Array.isArray(allSvEmailAssociated) && allSvEmailAssociated.forEach(setting => {
-    if (setting && (setting.invoice || setting.marketing || setting.iptv)) {
-      anySettingOn = true;
+
+  // Select email based on priority: invoice first, then marketing
+  const invoiceEmail = allSvEmailAssociated.find(setting => setting.invoice)?.emailAddress;
+  const marketingEmail = allSvEmailAssociated.find(setting => setting.marketing)?.emailAddress;
+  emailAddress = invoiceEmail || marketingEmail || '';
+
+  // Determine if multiple emails are associated with active settings
+  allSvEmailAssociated.forEach(setting => {
+    if (setting.invoice || setting.marketing || setting.iptv) {
       setting.emailAddress && emailsWithOnSettings.push(setting.emailAddress);
     }
   });
-
   multipleEmailsOn = emailsWithOnSettings.length > 1;
 
-  // Additional settings array with conditional Sparklight TV
+  // Prepare additional settings, conditionally add Sparklight TV
   const additionalSettings = [
-    { type: 'Critical notifications', status: emailsWithOnSettings.length>0? 'On' : 'Off' ,warn :false},
-    { type: 'Paperless Billing', status: allSvEmailAssociated?.some(setting => setting?.invoice) ? 'On' : 'Off' ,warn:paperlessStatus},
-    { type: 'Marketing Communications', status: allSvEmailAssociated?.some(setting => setting?.marketing) ? 'On' : 'Off' ,warn:false},
+    { type: 'Critical notifications', status: emailsWithOnSettings.length > 0 ? 'On' : 'Off', warn: false },
+    { type: 'Paperless Billing', status: allSvEmailAssociated.some(setting => setting.invoice) ? 'On' : 'Off', warn: paperlessStatus },
+    { type: 'Marketing Communications', status: allSvEmailAssociated.some(setting => setting.marketing) ? 'On' : 'Off', warn: false },
   ];
 
-  // Conditionally add Sparklight TV setting
-  const sparklightTVStatus = allSvEmailAssociated?.some(setting => setting?.iptv);
-  if (sparklightTVStatus) {
-    additionalSettings.push({ type: 'Sparklight TV', status: 'On',warn:false });
+  if (allSvEmailAssociated.some(setting => setting.iptv)) {
+    additionalSettings.push({ type: 'Sparklight TV', status: 'On', warn: false });
   }
 
+  // Set notification and info text based on email status
+  let notificationsTitle = '', infoText = '', isDisabled = false;
   if (paperlessStatus) {
     infoText = "There is a problem with an email address on this account.";
     isDisabled = true;
-} else if (multipleEmailsOn) {
-    isDisabled = true;
-    notificationsTitle = "";
+  } else if (multipleEmailsOn) {
     infoText = "Multiple emails associated with this account";
-} else if (emailAddress) {
-    infoText = (isEmailVerified && emailAddress)
-        ? <Text>Emails are sent to <Text style={{ fontWeight: 'bold' }}>{emailAddress}</Text></Text>
-        : "";
-    isDisabled = (isEmailVerified && emailAddress) ? false : true;
-}
+    isDisabled = true;
+  } else if (emailAddress) {
+    infoText = isEmailVerified ? <Text>Emails are sent to <Text style={{ fontWeight: 'bold' }}>{emailAddress}</Text></Text> : "";
+    isDisabled = !isEmailVerified;
+  }
 
   return {
     transformedNotification,
