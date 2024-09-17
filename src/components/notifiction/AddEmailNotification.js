@@ -7,13 +7,13 @@ import * as yup from 'yup';
 import debounce from 'lodash/debounce';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Toggle from '../common/Toggle';
-import SparkLightInput from "../common/customui/SparkLightInput";
-import { useDispatch, } from 'react-redux';
+import SparkLightInput from '../common/customui/SparkLightInput';
+import { useDispatch,useSelector } from 'react-redux';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { manageEmailRequest } from '../../redux/actions/ProfileActionSuite';
 import SecondaryButton from '../common/customui/PrimaryButton';
-
+import LoadingOverlay from '../common/LoadingOverlay';
 const validationSchema = yup.object().shape({
     email: yup.string().email('Invalid email address').required('Email is required'),
 });
@@ -24,11 +24,13 @@ const AddEmailNotification = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showErrorAlert, setShowErrorAlert] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
-    const [formState, setFormState] = useState({ paperlessBilling: false,marketing: false});
+    const [formState, setFormState] = useState({ paperlessBilling: false, marketing: false });
     const route = useRoute();
     const dispatch = useDispatch();
     const navigation = useNavigation();
-    const newEmail = route.params?.newEmail||false; // newEmail is a boolean value
+    const newEmail = route.params?.newEmail || false;
+    const profile = useSelector(state => state.combinedReducers.profile || {});
+  const { allSvEmailAssociated = [] } = profile;
     const { control, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(validationSchema),
         defaultValues: {
@@ -39,9 +41,9 @@ const AddEmailNotification = () => {
     useEffect(() => {
         if (route.params?.updateFailed) {
             scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-            setShowErrorAlert(true);
             setErrorMsg('Something went wrong. Please try again.');
-            isSubmittingRef.current = false;
+            setShowErrorAlert(true);
+            isSubmittingRef.current = false; // Resetting the flag on failure
             setIsSubmitting(false);
         }
     }, [route.params?.updateFailed]);
@@ -55,26 +57,61 @@ const AddEmailNotification = () => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
         setIsSubmitting(true);
-
+    
         const { email } = data;
         const { paperlessBilling, marketing } = formState;
-        console.log('email', email, paperlessBilling, marketing);
+    
+        // Check if the email already exists with the selected associations
+        const associatedWithPaperless = allSvEmailAssociated.find(setting => 
+            setting.emailAddress?.toLowerCase() === email.toLowerCase() && setting.invoice
+        );
+    
+        const associatedWithMarketing = allSvEmailAssociated.find(setting => 
+            setting.emailAddress?.toLowerCase() === email.toLowerCase() && setting.marketing
+        );
+    
+        if (associatedWithPaperless && associatedWithMarketing) {
+            setErrorMsg('This email is already associated with both Paperless Billing and Marketing Communications. You can edit the existing notification to adjust these settings.');
+            setShowErrorAlert(true);
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
+            return;
+        } else if (associatedWithPaperless) {
+            setErrorMsg('This email is already associated with Paperless Billing. You can edit the existing notification to add it to Marketing Communications.');
+            setShowErrorAlert(true);
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
+            return;
+        } else if (associatedWithMarketing) {
+            setErrorMsg('This email is already associated with Marketing Communications. You can edit the existing notification to add it to Paperless Billing.');
+            setShowErrorAlert(true);
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
+            return;
+        }
+    
+        // Ensure at least one checkbox is selected
+        if (!paperlessBilling && !marketing) {
+            setErrorMsg('Please select at least one option (Paperless Billing or Marketing Communications) before saving.');
+            setShowErrorAlert(true);
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
+            return;
+        }
+    
         try {
-            await dispatch(manageEmailRequest(email, paperlessBilling, marketing,newEmail, navigation));
+            await dispatch(manageEmailRequest(email, paperlessBilling, marketing, newEmail, navigation));
         } catch (error) {
             setErrorMsg('An error occurred while saving your settings. Please try again.');
             setShowErrorAlert(true);
-        } finally {
-            isSubmittingRef.current = false;
-            setIsSubmitting(false);
-        }
-    }, [dispatch, navigation, formState]);
+        } 
+    }, [dispatch, navigation, formState, allSvEmailAssociated]);
 
     const handleValidationError = useCallback(() => {
         scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
         setErrorMsg('Please enter valid information to continue.');
         setShowErrorAlert(true);
-        isSubmittingRef.current = false;
+        isSubmittingRef.current = false; 
         setIsSubmitting(false);
     }, []);
 
@@ -84,6 +121,9 @@ const AddEmailNotification = () => {
                 title="Add Email Notifications"
                 onPressBack={() => navigation.goBack()}
             />
+            
+            <LoadingOverlay isLoading={isSubmitting} message="Saving..." />
+
             <ScrollView ref={scrollViewRef}>
                 <View style={styles.frameContainer}>
                     <View style={styles.section}>
@@ -123,7 +163,6 @@ const AddEmailNotification = () => {
                             message="We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications."
                             showCloseIcon={false}
                             isVisible={true}
-                            onClose={() => setShowErrorAlert(false)}
                         />
                     </View>
                     <View style={styles.divider} />
@@ -145,7 +184,6 @@ const AddEmailNotification = () => {
                     <View style={styles.section}>
                         <View style={styles.toggleContainer}>
                             <Text style={styles.sectionLabel}>Marketing Communications</Text>
-                          
                             <Toggle
                                 key={formState.marketing ? 'on' : 'off'}
                                 onToggle={handleToggleChange}

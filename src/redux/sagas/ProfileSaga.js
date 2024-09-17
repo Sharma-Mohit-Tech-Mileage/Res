@@ -1,4 +1,4 @@
-import { all,call, put, takeLatest } from "redux-saga/effects";
+import { all, call, put, takeLatest } from "redux-saga/effects";
 
 import {
     getProfileDetails, fetchUserList,
@@ -8,7 +8,7 @@ import {
     putEmailNotification, postTermsAndConditions, postTermsAndConditionsv2,
     postPushNotifications, unsubscribPaperLess,
     fetchPushNotifications, handleSubmitFeedback, resendEmailVerification, logError,
-    logInfo, addUserAction, removeUser, editUserAction, fetchSecurityQuestions, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails,addSVEmailMktFlag
+    logInfo, addUserAction, removeUser, editUserAction, fetchSecurityQuestions, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, addSVEmailMktFlag
 } from "../../network/apis/account/profile.service";
 import {
     FETCH_PROFILE_DETAILS, FETCH_USER_LIST,
@@ -21,7 +21,7 @@ import {
     SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
     UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION,
     LOG_ERROR, LOG_INFO, ADD_NEW_USER, DELETE_USER, EDIT_USER,
-    GET_SECURITY_QUESTION, ALLSVEMAILASSOCIATED, ADD_SV_EMAIL_NO_FLAGS_REQUEST, DELETE_SV_EMAIL_REQUEST, UPDATE_SV_EMAILS_REQUEST,MANAGE_EMAIL_REQUEST
+    GET_SECURITY_QUESTION, ALLSVEMAILASSOCIATED, ADD_SV_EMAIL_NO_FLAGS_REQUEST, DELETE_SV_EMAIL_REQUEST, UPDATE_SV_EMAILS_REQUEST, MANAGE_EMAIL_REQUEST, UPDATE_EMAIL_ASSOCIATIONS
 } from "../constants";
 import {
     fetchProfileSuccess, fetchUserListSuccess,
@@ -227,14 +227,27 @@ function* updatePushNotificationsV2(action) {
 }
 
 function* resentVerifiction(action) {
+    const { navigation } = action;
+    console.log('resentVerifiction: action:', action);
+
     try {
+        // Call the resend email verification function
         yield call(resendEmailVerification);
-        if (action.navigation !== null) {
-            action.navigation.navigate('Notifications', { resentNotification: true, updatedType: true });
+
+        const successMessage = 'Verification email resent successfully. Please check your inbox.';
+
+        if (navigation) {
+            console.log(`Navigating to Notifications screen with success message: ${successMessage}`);
+            navigation.navigate('EmailNotifications', { updateSuccess: true, updatedType: 'Verification', successMessage });
         }
     } catch (error) {
-        if (action.navigation !== null) {
-            action.navigation.navigate('Notifications', { resentNotification: true, updatedType: false });
+        console.error('Error in resentVerifiction:', error);
+
+        const failureMessage = 'Failed to resend verification email. Please try again later.';
+
+        if (navigation) {
+            console.log('Navigating back to Notifications with failure');
+            navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Verification', failureMessage });
         }
     }
 }
@@ -353,11 +366,22 @@ function* handleAddSVEmailNoFlagsRequest(action) {
 
 function* handleDeleteSVEmailRequest(action) {
     const { navigation } = action;
+    const email = action.payload.email;
+    
     try {
-        const response = yield call(deleteSVEmail, action.payload.email);
-        if (navigation) navigation.navigate('EmailNotifications', { updateSuccess: true ,updatedType: 'Email'});
+        yield call(deleteSVEmail, email);
+
+        const successMessage = `Email address (${email}) deleted successfully.`;
+
+        if (navigation) {
+            navigation.navigate('EmailNotifications', { updateSuccess: true, updatedType: 'Email', successMessage });
+        }
     } catch (error) {
-        if (navigation) navigation.navigate('EmailNotifications', { updateFailed: true ,updatedType: 'Email'});
+        const failureMessage = `Failed to delete email address (${email}).`;
+
+        if (navigation) {
+            navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Email', failureMessage });
+        }
     }
 }
 
@@ -368,7 +392,7 @@ function* handleUpdateSVEmailsRequest(action) {
         if (action.navigation) action.navigation.navigate('SuccessScreen');
     } catch (error) {
         // Handle navigation on failure
-        if (navigation) navigation.navigate('AddEmailNotification', { updateFailed: true ,updatedType: 'Email'});
+        if (navigation) navigation.navigate('AddEmailNotification', { updateFailed: true, updatedType: 'Email' });
     }
 }
 
@@ -380,49 +404,55 @@ function* handleManageEmailRequest(action) {
     console.log('handleManageEmailRequest: navigation:', navigation);
 
     try {
-        let response = null;
+        let paperlessResponse = null;
+        let marketingResponse = null;
         let successMessage = '';
 
         if (!isPaperless && !isMarketing) {
             console.log('Adding email with no flags:', email);
-            response = yield call(addSVEmailNoFlags, email);
+            const response = yield call(addSVEmailNoFlags, email);
             successMessage = 'Email added successfully.';
             console.log('Email added with no flags successfully', response);
-        }
-
-        if (isPaperless && isMarketing) {
+        } else if (isPaperless && isMarketing) {
             console.log('Adding email as paperless and updating for marketing:', email);
-            const [paperlessResponse, marketingResponse] = yield all([
+            [paperlessResponse, marketingResponse] = yield all([
                 call(newEmail ? postEmailNotification : putEmailNotification, email),
                 call(addSVEmailMktFlag, email)
             ]);
-            response = { ...paperlessResponse, ...marketingResponse };
             successMessage = 'Email updated for both paperless billing and marketing.';
             console.log('Email added to paperless notifications and updated for marketing successfully');
         } else {
             if (isPaperless) {
                 console.log('Adding email as paperless:', email);
-                response = yield call(newEmail ? postEmailNotification : putEmailNotification, email);
+                paperlessResponse = yield call(newEmail ? postEmailNotification : putEmailNotification, email);
                 successMessage = 'Email added for paperless billing.';
-                console.log('Email added to paperless notifications successfully', response);
+                console.log('Email added to paperless notifications successfully', paperlessResponse);
             }
 
             if (isMarketing) {
                 console.log('Updating email for marketing:', email);
-                response = yield call(addSVEmailMktFlag, email);
+                marketingResponse = yield call(addSVEmailMktFlag, email);
                 successMessage = 'Email updated for marketing.';
-                console.log('Email updated for marketing successfully', response);
+                console.log('Email updated for marketing successfully', marketingResponse);
             }
         }
 
-        if (response) {
-            // yield put(saveSvEmailAssociation(response));
-            console.log('Response saved to store:', response);
+        // Add the 24-hour reflection message specifically for paperless billing updates
+        if (paperlessResponse) {
+            successMessage += ' Please note that changes to paperless billing status might take up to 24 hours to reflect.';
+        }
+
+        if (paperlessResponse || marketingResponse) {
+            console.log('Responses saved to store:', { paperlessResponse, marketingResponse });
         }
 
         if (navigation) {
             console.log(`Navigating to Notifications screen with success message: ${successMessage}`);
-            navigation.navigate('EmailNotifications', { updateSuccess: true, updatedType: 'Email', successMessage });
+            navigation.navigate('EmailNotifications', {
+                updateSuccess: true,
+                updatedType: 'Email',
+                successMessage
+            });
         }
     } catch (error) {
         console.error('Error in handleManageEmailRequest:', error);
@@ -433,6 +463,68 @@ function* handleManageEmailRequest(action) {
         }
     }
 }
+
+function* handleUpdateEmailAssociations(action) {
+    const { paperlessEmail, marketingEmails } = action.payload;
+    const { navigation } = action;
+    console.log('handleUpdateEmailAssociations: action.payload:', action.payload);
+    console.log('handleUpdateEmailAssociations: navigation:', navigation);
+
+    try {
+        let paperlessResponse = null;
+        let marketingResponse = null;
+        let successMessage = '';
+
+        // If both paperlessEmail and marketingEmails are present, use `all` to make the API calls concurrently
+        if (paperlessEmail && marketingEmails && marketingEmails.length > 0) {
+            console.log('Updating both paperless and marketing emails');
+            [paperlessResponse, marketingResponse] = yield all([
+                call(postEmailNotification),
+                call(updateSVEmails, marketingEmails)
+            ]);
+            successMessage = 'Email updated for both paperless billing and marketing. ';
+            console.log('Both paperless and marketing emails updated successfully');
+        } else {
+            // If only paperlessEmail is present
+            if (paperlessEmail) {
+                console.log('Updating paperless email:', paperlessEmail);
+                paperlessResponse = yield call(unsubscribPaperLess);
+                successMessage = 'Email updated for paperless billing. ';
+                console.log('Paperless email updated successfully');
+            }
+
+            // If only marketingEmails are present
+            if (marketingEmails && marketingEmails.length > 0) {
+                console.log('Updating marketing emails:', marketingEmails);
+                marketingResponse = yield call(updateSVEmails, marketingEmails);
+                successMessage += 'Emails updated for marketing.';
+                console.log('Marketing emails updated successfully');
+            }
+        }
+
+        if (paperlessResponse) {
+            // Add the 24-hour reflection message specifically for paperless billing updates
+            successMessage += 'Please note that changes to paperless billing status might take up to 24 hours to reflect.';
+        }
+
+        if (paperlessResponse || marketingResponse) {
+            // If either response is successful, save the responses and navigate to success screen
+            console.log('Responses saved to store:', { paperlessResponse, marketingResponse });
+            if (navigation) {
+                console.log(`Navigating to Notifications screen with success message: ${successMessage}`);
+                navigation.navigate('EmailNotifications', { updateSuccess: true, updatedType: 'Email', successMessage });
+            }
+        }
+    } catch (error) {
+        console.error('Error in handleUpdateEmailAssociations:', error);
+
+        if (navigation) {
+            console.log('Navigating back to EmailNotifications with failure');
+            navigation.navigate('EmailNotifications', { updateFailed: true, updatedType: 'Email' });
+        }
+    }
+}
+
 function* ProfileSagas() {
     yield takeLatest(FETCH_PROFILE_DETAILS, fetchProfileDetails);
     yield takeLatest(FETCH_USER_LIST, getProfileUsers);
@@ -462,5 +554,6 @@ function* ProfileSagas() {
     yield takeLatest(DELETE_SV_EMAIL_REQUEST, handleDeleteSVEmailRequest);
     yield takeLatest(UPDATE_SV_EMAILS_REQUEST, handleUpdateSVEmailsRequest);
     yield takeLatest(MANAGE_EMAIL_REQUEST, handleManageEmailRequest);
+    yield takeLatest(UPDATE_EMAIL_ASSOCIATIONS, handleUpdateEmailAssociations);
 }
 export default ProfileSagas;
