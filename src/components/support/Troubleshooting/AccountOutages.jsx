@@ -57,7 +57,7 @@ const TroubleshootComponent = ({ pageCount }) => {
                         type="warning"
                         title={
                             <Text style={styles.textStyle}>
-                                Uh oh. Looks like there is a Past Due balance on your account.
+                                Uh oh. Looks like there is a Past due balance on your account.
                             </Text>
                         }
                         showCloseIcon={false}

@@ -173,7 +173,7 @@ const TextNotifications = ({ navigation }) => {
                             />   
                         </View>
                         <View style={styles.checkBoxAreaView}>
-                            <Text style={styles.checkBoxAreaViewText}>I agree that message and data rates may apply. Message frequency may vary.</Text>
+                            <Text style={styles.checkBoxAreaViewText}>I understand that message and data rates may apply. Message frequency may vary.</Text>
                         </View>             
                     </View>                                
                     <View style={styles.bottomBar}>
