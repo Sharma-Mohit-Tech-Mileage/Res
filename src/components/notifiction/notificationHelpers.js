@@ -48,13 +48,13 @@ export const fetchInitialData = (profile) => {
   let notificationsTitle = '', infoText = '', isDisabled = false;
   if (paperlessStatus) {
     infoText = "There is a problem with an email address on this account.";
-    isDisabled = true;
+    isDisabled = false;
   } else if (multipleEmailsOn) {
     infoText = "Multiple emails associated with this account";
-    isDisabled = true;
+    isDisabled = false;
   } else if (emailAddress) {
     infoText = isEmailVerified ? <Text>Emails are sent to <Text style={{ fontWeight: 'bold' }}>{emailAddress}</Text></Text> : "";
-    isDisabled = !isEmailVerified;
+    isDisabled = false;
   }
 
   return {
