@@ -57,11 +57,11 @@ const TroubleshootComponent = ({ pageCount }) => {
                         type="warning"
                         title={
                             <Text style={styles.textStyle}>
-                                Uh oh. Looks like there is a past-due balance on your account.
+                                Uh oh. Looks like there is a Past Due balance on your account.
                             </Text>
                         }
                         showCloseIcon={false}
-                        accessibilityLabel="Uh oh! It looks like there’s a past-due balance on your account. Please click the 'Pay Bill' button below to settle the amount as soon as possible."
+                        accessibilityLabel="Uh oh! It looks like there’s a Past Due balance on your account. Please click the 'Pay Bill' button below to settle the amount as soon as possible."
                     />
                 </View>
                 <View style={[styles.button]}>

@@ -297,8 +297,7 @@ const SupportTicket = () => {
                 },
               ]}
             >
-              Newly submitted tickets may take some time to appear in the ticket
-              log.
+              New tickets may take up to 15 minutes to appear. If not, please submit a new ticket or contact support via chat.
             </Text>
           </View>
           {ticketList.length > 0 ? (

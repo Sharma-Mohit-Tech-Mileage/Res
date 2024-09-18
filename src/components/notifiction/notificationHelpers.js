@@ -53,7 +53,7 @@ export const fetchInitialData = (profile) => {
     infoText = "Multiple emails associated with this account";
     isDisabled = false;
   } else if (emailAddress) {
-    infoText = isEmailVerified ? <Text>Emails are sent to <Text style={{ fontWeight: 'bold' }}>{emailAddress}</Text></Text> : "";
+    infoText = isEmailVerified ? `Emails are sent to ${emailAddress}` : `${acknowledgement} is pending confirmation.`;
     isDisabled = false;
   }
 

@@ -599,7 +599,7 @@ const ManageEquipment = ({ route }) => {
                 }}
               >
                 <CheckConnection />
-                <Text style={styles.modemHealthSupport}>Check connection</Text>
+                <Text style={styles.modemHealthSupport}>Check Connection</Text>
                 <Image
                   style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}

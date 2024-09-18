@@ -174,7 +174,7 @@ const TextNotifications = ({ navigation }) => {
                                         </View>
                                     </View>
                                     <Text style={[styles.receiveTextNotifications1, styles.containerTypo,]}>
-                                        Receive text notifications when outages occur.
+                                    Receive text notifications when outage occur.
                                     </Text>
                                 </View>
                             </View>
