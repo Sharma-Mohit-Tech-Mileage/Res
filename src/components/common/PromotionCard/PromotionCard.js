@@ -36,7 +36,7 @@ const PromotionCard = () => {
             Turn on <Text style={styles.boldText}>Auto Pay*</Text> and <Text style={styles.boldText}>Paperless Billing</Text> to enjoy additional savings.
           </Text>
           <Text style={styles.disclaimerStyle}>
-            *Only valid with a checking/savings account or a debit card. Plans for the Affordable Connectivity Program, School Programs, and Sparklight TV are not eligible for this discount .
+            *Only valid with a checking/savings account or a debit card. Plans for the Affordable Connectivity Program, School Programs, and Sparklight TV are not eligible for this discount.
           </Text>
         </View>
       </LinearGradient>
