@@ -160,34 +160,19 @@ const MyTabs = ({ route, navigation }) => {
           }
         }}
       /> 
-        {/* <Tab.Screen
-          name="Support"
-          component={SupportStack}
-          options={{
-            headerShown: false,
-            tabBarLabel: 'Support',
-            tabBarIcon: ({ focused }) => (
-              <View style={styles.tabItem}>
-                {focused ? <SupportIconSelected /> : <SupportIcon />}
-              </View>
-            ),
-          }}
-          listeners={({ navigation, route }) => ({
-            tabPress: e => {
-              if (route.params?.triggerEvent) {
-                e.preventDefault();
-                navigation.navigate('Support', {
-                  screen: 'support',
-                  params: { triggerEvent: true },
-                });
-              }
-            },
-          })}
-        /> */}
+       
 
       <Tab.Screen
         name="account"
         component={AccountStackScreen}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+              e.preventDefault();
+              navigation.navigate('account', {
+                  screen: 'Account', 
+              });
+          },
+      })}
         options={{
           headerShown: false,
           tabBarLabel: 'Account',
