@@ -61,7 +61,7 @@ const NewBillerHome = ({ navigation }) => {
   const [plans, setPlans] = useState([]);
   const [tvPlan, setTVPlan] = useState("");
   const [phonePlan, setPhonePlan] = useState([]);
-  const [billAmt, setBillAmt] = useState(0);
+  const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
   const [currentHealth, setCurrentHealth] = useState("Optimal");
   const [payStatus, setPayStatus] = useState({});
@@ -835,6 +835,7 @@ const NewBillerHome = ({ navigation }) => {
               </TouchableOpacity>
               </View>
             </View>
+            <ScrollView horizontal={false}>
               <View>
                 <MyInternetDetialsBiller
                   plans={payStatus}
@@ -843,6 +844,7 @@ const NewBillerHome = ({ navigation }) => {
                   navigation={navigation}
                 />
               </View>
+              </ScrollView>
           </View>
         </ScrollView>
       </SafeAreaView>
