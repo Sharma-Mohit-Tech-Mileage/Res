@@ -8,7 +8,7 @@ import debounce from 'lodash/debounce';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Toggle from '../common/Toggle';
 import SparkLightInput from '../common/customui/SparkLightInput';
-import { useDispatch,useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { manageEmailRequest } from '../../redux/actions/ProfileActionSuite';
@@ -30,7 +30,7 @@ const AddEmailNotification = () => {
     const navigation = useNavigation();
     const newEmail = route.params?.newEmail || false;
     const profile = useSelector(state => state.combinedReducers.profile || {});
-  const { allSvEmailAssociated = [] } = profile;
+    const { allSvEmailAssociated = [] } = profile;
     const { control, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(validationSchema),
         defaultValues: {
@@ -57,19 +57,19 @@ const AddEmailNotification = () => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
         setIsSubmitting(true);
-    
+
         const { email } = data;
         const { paperlessBilling, marketing } = formState;
-    
+
         // Check if the email already exists with the selected associations
-        const associatedWithPaperless = allSvEmailAssociated.find(setting => 
+        const associatedWithPaperless = allSvEmailAssociated.find(setting =>
             setting.emailAddress?.toLowerCase() === email.toLowerCase() && setting.invoice
         );
-    
-        const associatedWithMarketing = allSvEmailAssociated.find(setting => 
+
+        const associatedWithMarketing = allSvEmailAssociated.find(setting =>
             setting.emailAddress?.toLowerCase() === email.toLowerCase() && setting.marketing
         );
-    
+
         if (associatedWithPaperless && associatedWithMarketing) {
             setErrorMsg('This email is already associated with both Paperless Billing and Marketing Communications. You can edit the existing notification to adjust these settings.');
             setShowErrorAlert(true);
@@ -89,7 +89,7 @@ const AddEmailNotification = () => {
             setIsSubmitting(false);
             return;
         }
-    
+
         // Ensure at least one checkbox is selected
         if (!paperlessBilling && !marketing) {
             setErrorMsg('Please select at least one option (Paperless Billing or Marketing Communications) before saving.');
@@ -98,20 +98,20 @@ const AddEmailNotification = () => {
             setIsSubmitting(false);
             return;
         }
-    
+
         try {
             await dispatch(manageEmailRequest(email, paperlessBilling, marketing, newEmail, navigation));
         } catch (error) {
             setErrorMsg('An error occurred while saving your settings. Please try again.');
             setShowErrorAlert(true);
-        } 
+        }
     }, [dispatch, navigation, formState, allSvEmailAssociated]);
 
     const handleValidationError = useCallback(() => {
         scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
         setErrorMsg('Please enter valid information to continue.');
         setShowErrorAlert(true);
-        isSubmittingRef.current = false; 
+        isSubmittingRef.current = false;
         setIsSubmitting(false);
     }, []);
 
@@ -121,7 +121,7 @@ const AddEmailNotification = () => {
                 title="Add Email Notifications"
                 onPressBack={() => navigation.goBack()}
             />
-            
+
             <LoadingOverlay isLoading={isSubmitting} message="Saving..." />
 
             <ScrollView ref={scrollViewRef}>

@@ -1,12 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { View, ScrollView, StyleSheet,Text } from "react-native";
+import { View, ScrollView, StyleSheet, Text } from "react-native";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { fetchInitialData, handleResentNotification, handleUpdateSuccess, handleAccessibility } from './notificationHelpers';
+import { 
+  fetchInitialData, 
+  handleResentNotification, 
+  handleUpdateSuccess, 
+  handleAccessibility 
+} from './notificationHelpers';
 import NotificationSection from "./NotificationSection";
-import { fetchProfileDetails, fetchSMSSelection, fetchPushNotifications, fetchBillingPaper, fetchSvEmailAssociation } from '../../redux/actions/ProfileActionSuite';
-import { Padding, Color ,FontFamily} from "../../../GlobalStyles";
+import { 
+  fetchProfileDetails, 
+  fetchSMSSelection, 
+  fetchPushNotifications, 
+  fetchBillingPaper, 
+  fetchSvEmailAssociation 
+} from '../../redux/actions/ProfileActionSuite';
+import { Padding, Color, FontFamily } from "../../../GlobalStyles";
 
 const Notifications = () => {
   const navigation = useNavigation();
@@ -51,7 +62,7 @@ const Notifications = () => {
             setShowSuccessAlert={setShowSuccessAlert}
             isDisabled={false}
             notificationsTitle="No mobile phone number on file"
-            infoText={data.phoneNum? ( <Text>Text alerts are sent to <Text style={styles.boldText}>{data.phoneNum}</Text></Text>): ''}
+            infoText={data.phoneNum ? (<Text>Text alerts are sent to <Text style={styles.boldText}>{data.phoneNum}</Text></Text>) : ''}
             transformedData={data}
             navigationTarget="TextNotifications"
             additionalSettings={data.subscriptionDetails}

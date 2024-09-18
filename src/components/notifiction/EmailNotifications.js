@@ -7,7 +7,7 @@ import Toggle from '../common/Toggle';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
-import { deleteSVEmailRequest, fetchSvEmailAssociation, updateEmailAssociations } from '../../redux/actions/ProfileActionSuite';
+import { deleteSVEmailRequest, fetchSvEmailAssociation, updateEmailAssociations ,fetchBillingPaper} from '../../redux/actions/ProfileActionSuite';
 import LoadingOverlay from '../common/LoadingOverlay';
 import  {extractAcknowledgementEmail } from '../../components/utility/constant';
 
@@ -35,6 +35,12 @@ const EmailNotifications = () => {
   const marketingEmails = allSvEmailAssociated.filter(email => email.marketing);
   const sparklightTvEmails = allSvEmailAssociated.filter(email => email.iptv);
   const additionalEmails = allSvEmailAssociated.filter(email => !email.marketing && !email.invoice && !email.iptv && !email.collection && !email.tiVo);
+  const emailsWithOnSettings = [];
+  allSvEmailAssociated.forEach(setting => {
+    if (setting.invoice || setting.marketing || setting.iptv) {
+      setting.emailAddress && emailsWithOnSettings.push(setting.emailAddress);
+    }
+  });
 
   useEffect(() => {
     const initializeToggleStates = () => {
@@ -163,12 +169,15 @@ const EmailNotifications = () => {
       setIsDeleting(false);
       isSubmittingRef.current = false;
       if (route.params?.updateFailed) {
+        setShowSuccessAlert(false);
         setShowErrorAlert(true);
         setErrorMsg('Something went wrong. Please try again.');
       } else if (route.params?.updateSuccess) {
+        setShowErrorAlert(false);
         setShowSuccessAlert(true);
         setSuccessMsg(route.params.successMessage || 'Operation completed successfully.');
         dispatch(fetchSvEmailAssociation());
+        dispatch(fetchBillingPaper());
       }
     }
   }, [route.params, dispatch]);
@@ -244,11 +253,15 @@ const EmailNotifications = () => {
         <View style={styles.sectionBox_info}>
         <View style={styles.emailItem}>
             <Text style={[styles.emailText,{fontWeight:'600'}]}>Critical Notifications</Text>
-            <Image
-                style={styles.icon}
-                resizeMode="contain"
-                source={require("../../../assets/checkcircle.png")}
-              />
+            {emailsWithOnSettings.length > 0 ? <Image
+              style={styles.icon}
+              resizeMode="contain"
+              source={require("../../../assets/checkcircle.png")}
+            /> : <Image
+              style={styles.icon}
+              resizeMode="contain"
+              source={require("../../../assets/checkcircle1.png")}
+            />}
           </View>
           <Text style={[styles.infoText,{color:Color.colorGray_200}]}>
             We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications.

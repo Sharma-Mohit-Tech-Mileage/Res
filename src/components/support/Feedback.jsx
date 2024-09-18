@@ -94,7 +94,7 @@ const Feedback = () => {
                     </View>}
                     <View style={styles.howWouldYourRateYourExperWrapper}>
                         <Text style={[styles.howWouldYour]}>
-                            How would your rate your experience using the Sparklight app?
+                        How would you rate your experience using the MySparklight app?
                         </Text>
                     </View>
                     <View style={[styles.frameContainer]}>
