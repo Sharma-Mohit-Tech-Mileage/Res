@@ -90,15 +90,6 @@ const AddEmailNotification = () => {
             return;
         }
 
-        // Ensure at least one checkbox is selected
-        if (!paperlessBilling && !marketing) {
-            setErrorMsg('Please select at least one option (Paperless Billing or Marketing Communications) before saving.');
-            setShowErrorAlert(true);
-            isSubmittingRef.current = false;
-            setIsSubmitting(false);
-            return;
-        }
-
         try {
             await dispatch(manageEmailRequest(email, paperlessBilling, marketing, newEmail, navigation));
         } catch (error) {
