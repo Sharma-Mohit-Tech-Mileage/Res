@@ -51,8 +51,8 @@ const ModemReboot = () => {
   }, [screenReaderEnabled]);
 
   const [inst1] = React.useState(
-    ` button through the app. 
-During the reboot, your internet service will be temporarily unavailable, and the lights on the front of the modem will start flashing. Your modem is ready once the status symbol light on the front of the modem is solid. This can take up to 10 minutes.`
+    `button through the app. 
+  During the reboot, your internet service will be temporarily unavailable, and the lights on the front of the modem will start flashing. Your modem is ready once the status symbol light on the front of the modem is solid. This can take up to 10 minutes.`
   );
 
   const [inst2] = React.useState(
