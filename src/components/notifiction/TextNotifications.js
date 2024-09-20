@@ -174,7 +174,7 @@ const TextNotifications = ({ navigation }) => {
                                         </View>
                                     </View>
                                     <Text style={[styles.receiveTextNotifications1, styles.containerTypo,]}>
-                                        Receive text notifications when outages occur.
+                                        Receive text notifications when outage occur.
                                     </Text>
                                 </View>
                             </View>
@@ -217,10 +217,10 @@ const TextNotifications = ({ navigation }) => {
                                                 style={styles.youAreSubscribed}
                                             >{`By opting in for outage alerts, you agree to receive text `}</Text>
                                             <Text>
-                                                messages regarding new service outages affecting
+                                                messages regarding new service outage affecting
                                                 your home internet service and updates regarding
-                                                existing outages (updates go out about every two
-                                                hours for existing outages). We will not send
+                                                existing outage (updates go out about every two
+                                                hours for existing outage). We will not send
                                                 messages between 9 PM and 6 AM.
                                             </Text>
                                         </Text>

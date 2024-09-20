@@ -97,7 +97,7 @@ const InAppNotifications = ({ navigation }) => {
                 title="Outage Alerts"
                 name='outageOptOut'
                 value={!initialize.outageOptOut}
-                description="Receive app notifications when outages occur."
+                description="Receive app notifications when outage occur."
                 onChange={handleToggleChange}
               />
               <NotificationSetting

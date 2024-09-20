@@ -20,8 +20,8 @@ const stepsData = [
     pageCount: 0,
   },
   {
-    title: "Checking for outages in your area...",
-    resultMsg: "No outages were detected in your area...",
+    title: "Checking for outage in your area...",
+    resultMsg: "No outage were detected in your area...",
     errorMsg: "Uh oh. Looks like there is a server error.",
     description: null,
     success: false,

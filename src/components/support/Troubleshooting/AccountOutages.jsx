@@ -38,7 +38,7 @@ const TroubleshootComponent = ({
                 style={styles.spinnerContainer}>
                     <NotificationAlert
                         type="warning"
-                        title={(<Text style={styles.textStyle}>Uh oh. Looks like there is a past-due balance on your account.</Text>)}
+                        title={(<Text style={styles.textStyle}>Uh oh. Looks like there is a past due balance on your account.</Text>)}
                         showCloseIcon={false}
                     />
                 </View>
