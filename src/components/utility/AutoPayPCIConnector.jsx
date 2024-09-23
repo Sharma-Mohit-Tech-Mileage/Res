@@ -53,7 +53,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             TotalDue: paymentDetails.billAmount,
             PastDue: paymentDetails.pastPaymentDue || 0,
             DueDate: paymentDetails.dueDate,
-            CustomerType: user.customerType || '',
+            CustomerType: 'Residential' || '',
             PastDueAmount: '',
             PaymentDueDate: '',
             Email: paymentDetails.email || '',
@@ -103,12 +103,13 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
 
     const setDynamicCookie = () => {
         const script = `(function() {
-            var cookieValue = "MobileApp";
+           var cookieValue = "MobileApp";
+            var customerType = "Residential";
             var domain = document.location.hostname; 
             var expirationDate = new Date();
             expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
-            
             document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+            document.cookie = "CustomerType=" + customerType + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
             
             localStorage.setItem('jwt_token', '${currentUser.token}');
             localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo)}');
@@ -194,11 +195,13 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
                 localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
-                var cookieValue = "MobileApp";
-                var domain = document.location.hostname; 
-                var expirationDate = new Date();
-                expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
-                document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+               var cookieValue = "MobileApp";
+            var customerType = "Residential";
+            var domain = document.location.hostname; 
+            var expirationDate = new Date();
+            expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+            document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+            document.cookie = "CustomerType=" + customerType + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
                 var open = XMLHttpRequest.prototype.open;
                 XMLHttpRequest.prototype.open = function() {
                     this.addEventListener("load", function(event) {
