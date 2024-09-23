@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Pressable, ActivityIndicator, Linking, AccessibilityInfo } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
@@ -25,6 +25,7 @@ import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
 import { checkForMinorUpdate } from "../utility/constant";
 import PromotionCard from "../common/PromotionCard/PromotionCard";
+import { useFocusEffect } from "@react-navigation/native";
 
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
@@ -468,7 +469,11 @@ const HomeScreen = ({ navigation }) => {
       });
     });
   };
-
+  useFocusEffect(
+    useCallback(() => {
+      getUserAccountDetails();
+    }, [])
+  );
   useEffect(() => {
     const fetchUpdateStatus = async () => {
       checkEeroDevice();
@@ -487,7 +492,6 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     checkModemOutagStatus();
-    getUserAccountDetails();
 
     const fetchData = async () => {
       try {
