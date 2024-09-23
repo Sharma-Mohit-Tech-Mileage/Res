@@ -58,17 +58,11 @@ const NewBillerHome = ({ navigation }) => {
   const home = useSelector((state) => state.combinedReducers.home);
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const dispatch = useDispatch();
-  const [plans, setPlans] = useState([]);
-  const [tvPlan, setTVPlan] = useState("");
-  const [phonePlan, setPhonePlan] = useState([]);
+ 
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
-  const [currentHealth, setCurrentHealth] = useState("Optimal");
   const [payStatus, setPayStatus] = useState({});
-  const [accountStatus, setAccountStatus] = useState("Active");
-  const [hasOutage, setHasOutage] = useState(false);
   const [isOutageAlert, setIsOutageAlert] = useState(false);
-  const [checkModemStatus, setCheckModemStatus] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
@@ -80,17 +74,7 @@ const NewBillerHome = ({ navigation }) => {
     latestVersion: "",
   });
 
-  const getInternetHealth = (type) => {
-    var currentHealth = { Offline: 20, Poor: 50, Optimal: 80, default: 80 };
-    return currentHealth[type] || currentHealth["default"];
-  };
-
-  // const getInternetPlanDetails = () => {
-  //   getUser().then((res) => {
-  //     const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
-  //     GetApiRequest(request, onSuccessPlan, onError);
-  //   });
-  // };
+  
 
   const getEasyPlanStatus = () => {
     getUser().then((res) => {
@@ -106,41 +90,7 @@ const NewBillerHome = ({ navigation }) => {
     });
   };
 
-  function getPhoneServiceDetails() {
-    getUser().then((res) => {
-      const request = `phone/api/phones/${res.userInfo.accountNumber}/phonelines`;
-      GetApiRequest(request, onSuccessPhonePlan, onError);
-    });
-  }
-  function getPhoneServicePlans(tgcCode) {
-    getUser().then((res) => {
-      const request = `phone/api/Plans/${tgcCode}`;
-      GetApiRequest(request, onFetchedPlan, onError);
-    });
-  }
-  const onFetchedPlan = (res) => {
-    setPhonePlan(res);
-  };
-  const onSuccessPhonePlan = (res) => {
-    if (res.length && res[0].tcgCode) {
-      getPhoneServicePlans(res[0].tcgCode);
-    }
-  };
 
-  const getTVServiceDetails = () => {
-    getUser().then((res) => {
-      const request = `sparklighttv/api/sparklighttv/${res.userInfo.accountNumber}/plan`;
-      GetApiRequest(request, onSuccessTVPlan, onErrorInPlanTV);
-    });
-  };
-
-  const onSuccessTVPlan = (res) => {
-    setTVPlan(res || "");
-  };
-
-  const onErrorInPlanTV = (error) => {
-    console.log("onErrorInPlanTV", error);
-  };
 
   const getUpgradeToken = async () => {
     const url = Env.API_SHOPPING_CART_BASEURL + "/api/UpgradeOrder/token";
@@ -165,151 +115,11 @@ const NewBillerHome = ({ navigation }) => {
     return json;
   };
 
-  const checkModemOutagStatus = () => {
-    getUser().then((res) => {
-      const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${res.userInfo.accountNumber}`;
-      GetApiRequest(
-        request,
-        (response) => {
-          console.log("checkModemOutagStatus", response);
-          if (response != undefined) {
-            if (response.hasOutage === true) {
-              let time = moment(response.estimatedTimeOfResolution).format(
-                "LT"
-              );
-              setEstimatedRestoreTime(time);
-              setAccountStatus("Disconnect");
-             // setIsInternetDetails(true);
-              setHasOutage(true);
-              setIsOutageAlert(true);
-              setInternetHealths((oldArray) => [...oldArray, "Red"]);
-            } else {
-              setInternetHealths((oldArray) => [...oldArray, "Green"]);
-            }
-          }
-        },
-        (errorCode) => {
-          console.log("checkModemOutagStatus erro", errorCode);
-          if (errorCode == 204) {
-            setInternetHealths((oldArray) => [...oldArray, "Green"]);
-          }
-        }
-      );
-    });
-  };
-
-  const onSuccessPlan = (res) => {
-    console.log("getInternetPlanDetails", res);
-    if (res) {
-      setPlans(res);
-      if (res.length > 0) {
-        let macAddress = res[0].macAddress;
-        var mac = macAddress;
-        if (user.userInfo.accountNumber === "128387263") {
-          mac = "bc:3e:07:38:56:d0";
-        } else if (user.userInfo.accountNumber === "902880244") {
-          mac = "bc:3e:07:38:56:d0";
-        } else if (user.userInfo.accountNumber === "902880236") {
-          mac = "28:7a:ee:8e:cf:8c";
-        } else if (user.userInfo.accountNumber === "902880079") {
-          mac = "00:40:36:5f:cc:7f";
-        } else if (user.userInfo.accountNumber === "136885142") {
-          mac = "00:40:36:59:00:00";
-        }
-        checkModemDetails(mac);
-      }
-    }
-  };
   const onError = (error) => {
     console.log("error", error);
   };
 
-  const checkModemDetails = (macAddress) => {
-    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
-    GetModemStatusApiRequest(
-      request,
-      (res) => {
-        console.log("checkModemDetails", res);
-        if (res) {
-          if (res?.status) {
-            if (res.status === 408) {
-              setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
-              return;
-            }
-          }
-
-          let temt = [];
-          if (res.EquipmentType === "DOCSIS") {
-            temt.push(res.UTxP_State);
-            temt.push(res.URxL_State);
-            temt.push(res.USNR_State);
-            temt.push(res.DSNR_State);
-            temt.push(res.DRxL_State);
-            updateModemStatus(temt);
-          } else if (res.EquipmentType === "ONU") {
-            temt.push(res.ONUTP_State);
-            temt.push(res.OLTRP_State);
-            temt.push(res.ONURP_State);
-            updateModemStatus(temt);
-          }
-        }
-      },
-      (errorCode) => {
-        console.log("Modem details on Error", errorCode);
-        if (errorCode === 404) {
-          setInternetHealths((oldArray) => [...oldArray, "Red"]);
-        } else if (
-          errorCode === 400 ||
-          errorCode === 500 ||
-          errorCode === 504
-        ) {
-          setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
-        } else {
-          setInternetHealths((oldArray) => [...oldArray, "Red"]);
-        }
-      }
-    );
-  };
-
-  const updateModemStatus = (temt) => {
-    const allGreen = temt.every((v) => v === "Green");
-    console.log("modem status", allGreen);
-    if (!allGreen) {
-      const checkYellow = temt.includes("Yellow");
-      const checkRed = temt.includes("Red");
-      if (checkRed) {
-        console.log("modem status", "Red");
-        setInternetHealths((oldArray) => [...oldArray, "Red"]);
-      } else if (checkYellow) {
-        console.log("modem status", "Yellow");
-        setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
-      } else {
-        setInternetHealths((oldArray) => [...oldArray, "Red"]);
-      }
-    } else {
-      setInternetHealths((oldArray) => [...oldArray, "Green"]);
-    }
-  };
-
-  const refreshInternetHealth = () => {
-    const checkYellow = internetHealths.includes("Yellow");
-    const checkRed = internetHealths.includes("Red");
-    const checkGreen = internetHealths.includes("Green");
-    if (checkRed) {
-      console.log("Internet Health is Red");
-      setCurrentHealth("Offline");
-      //setIsInternetDetails(true);
-    } else if (checkYellow) {
-      console.log("Internet Health is Yellow");
-      setCurrentHealth("Poor");
-      //setIsInternetDetails(true);
-    } else {
-      console.log("Internet Health is Green");
-      setCurrentHealth("Optimal");
-      //setIsInternetDetails(false);
-    }
-  };
-
+  
   const getUserAccountDetails = () => {
     getUser().then((res) => {
       const request = `AccountSvc/api/Accounts/GetAccountDetailsByAccountNumber?accountNumber=${res.userInfo.accountNumber}`;
@@ -319,23 +129,12 @@ const NewBillerHome = ({ navigation }) => {
           console.log("getUserAccountDetails", res);
           if (res) {
             dispatch(saveAccountServices(res.services));
-            // if (res.currentCollectionStep == "Soft Disconnect") {
-            //   setAccountStatus("Disconnect");
-              
-            //   setInternetHealths((oldArray) => [...oldArray, "Red"]);
-            // } else {
-            //   updateInternetHealth(res.currentBalance, res.paymentDueDate);
-            // }
-            // let dueDate = moment(res.paymentDueDate).format("ll");
-            // setDueDate(dueDate);
-            // setBillAmt((Math.round(res.currentBalance * 100) / 100).toFixed(2));
-            // getTVServiceDetails();
-            // getInternetPlanDetails();
-            // getPhoneServiceDetails();
+            
 
              let dueDate = moment(res.payment_due_date).format("ll");
              setDueDate(dueDate);
-             setBillAmt(res.payment_due_amount);
+             let userBillAmt=(res.past_due_amount==0) ? res.payment_due_amount: res.past_due_amount
+             setBillAmt(userBillAmt);
           }
         },
         onErrorBill
