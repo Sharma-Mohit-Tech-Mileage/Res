@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect,useCallback, useRef } from "react";
 import {
   View,
   Text,
@@ -46,7 +46,7 @@ import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
 import { checkForMinorUpdate } from "../utility/constant";
 import MyInternetDetialsBiller from "../common/MyInternetDetailsBiller";
-
+import { useFocusEffect } from "@react-navigation/native";
 const tabWidth = Number(Dimensions.get("window").width / 4);
 const NewBillerHome = ({ navigation }) => {
   const [isImageDispaly, setIsImageDispaly] = useState(true);
@@ -452,7 +452,7 @@ const NewBillerHome = ({ navigation }) => {
     };
 
     fetchUpdateStatus();
-    getEasyPlanStatus();
+   // getEasyPlanStatus();
   }, []);
 
   useEffect(() => {
@@ -464,7 +464,7 @@ const NewBillerHome = ({ navigation }) => {
 
   useEffect(() => {
     //checkModemOutagStatus();
-    getUserAccountDetails();
+    //getUserAccountDetails();
 
     const fetchData = async () => {
       try {
@@ -481,7 +481,19 @@ const NewBillerHome = ({ navigation }) => {
     fetchData();
   }, []);
 
-
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUpdateStatus = async () => {
+        const status = await checkForMinorUpdate();
+        setUpdateStatus(status);
+      };
+  
+      fetchUpdateStatus();
+      getEasyPlanStatus();
+      getUserAccountDetails();
+      checkModemOutagStatus();
+    }, [])
+  );
   const changeWalkThroughStep = (step) => {
     if (step > 2) {
       dispatch(updateWalkThroughStep(null));
