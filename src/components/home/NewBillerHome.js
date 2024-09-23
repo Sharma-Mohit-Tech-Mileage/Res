@@ -18,9 +18,6 @@ import colors from "../../res/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DownArrow from "../../res/svgIcons/DownArrow";
 import UpArrow from "../../res/svgIcons/UpArrow";
-// import NetworkDetails from "../common/NetworkDetails";
-// import strings from "../../res/Strings";
-// import MyInternetDetials from "../common/MyInternetDetails";
 import MyServicePlan from "../common/MyServicePlan";
 import {
   getUser,
@@ -51,46 +48,90 @@ import { checkForMinorUpdate } from "../utility/constant";
 import MyInternetDetialsBiller from "../common/MyInternetDetailsBiller";
 
 const tabWidth = Number(Dimensions.get("window").width / 4);
-
 const NewBillerHome = ({ navigation }) => {
   const [isImageDispaly, setIsImageDispaly] = useState(true);
   const user = useSelector((state) => state.combinedReducers.user.userData);
   const home = useSelector((state) => state.combinedReducers.home);
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const dispatch = useDispatch();
- 
+  const [plans, setPlans] = useState([]);
+  const [tvPlan, setTVPlan] = useState("");
+  const [phonePlan, setPhonePlan] = useState([]);
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
+  const [pastPaymentDue, setPastPaymentDue] = useState(0.0);
+  const [currentHealth, setCurrentHealth] = useState("Optimal");
   const [payStatus, setPayStatus] = useState({});
+  const [accountStatus, setAccountStatus] = useState("Active");
+  const [hasOutage, setHasOutage] = useState(false);
   const [isOutageAlert, setIsOutageAlert] = useState(false);
+  const [checkModemStatus, setCheckModemStatus] = useState(false);
+  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null });
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
-  
+
   const [updateStatus, setUpdateStatus] = useState({
     isMinorUpdateAvailable: false,
     currentVersion: "",
     latestVersion: "",
   });
 
-  
+  const getInternetHealth = (type) => {
+    var currentHealth = { Offline: 20, Poor: 50, Optimal: 80, default: 80 };
+    return currentHealth[type] || currentHealth["default"];
+  };
 
   const getEasyPlanStatus = () => {
     getUser().then((res) => {
       const request = `AccountSvc/api/Accounts/${res.userInfo.accountNumber}/easypay`;
-      GetApiRequest(request, (res)=>{
-            if(res){
-              console.log('getEasyPlanStatus',res)
-              setPayStatus(res)
-            }
-      }, (error)=>{
-          console.log('getEasyPlanStatus error',error)
+      GetApiRequest(request, (res) => {
+        if (res) {
+          console.log('getEasyPlanStatus', res)
+          setPayStatus(res)
+        }
+      }, (error) => {
+        console.log('getEasyPlanStatus error', error)
       });
     });
   };
 
+  function getPhoneServiceDetails() {
+    getUser().then((res) => {
+      const request = `phone/api/phones/${res.userInfo.accountNumber}/phonelines`;
+      GetApiRequest(request, onSuccessPhonePlan, onError);
+    });
+  }
+  function getPhoneServicePlans(tgcCode) {
+    getUser().then((res) => {
+      const request = `phone/api/Plans/${tgcCode}`;
+      GetApiRequest(request, onFetchedPlan, onError);
+    });
+  }
+  const onFetchedPlan = (res) => {
+    setPhonePlan(res);
+  };
+  const onSuccessPhonePlan = (res) => {
+    if (res.length && res[0].tcgCode) {
+      getPhoneServicePlans(res[0].tcgCode);
+    }
+  };
 
+  const getTVServiceDetails = () => {
+    getUser().then((res) => {
+      const request = `sparklighttv/api/sparklighttv/${res.userInfo.accountNumber}/plan`;
+      GetApiRequest(request, onSuccessTVPlan, onErrorInPlanTV);
+    });
+  };
+
+  const onSuccessTVPlan = (res) => {
+    setTVPlan(res || "");
+  };
+
+  const onErrorInPlanTV = (error) => {
+    console.log("onErrorInPlanTV", error);
+  };
 
   const getUpgradeToken = async () => {
     const url = Env.API_SHOPPING_CART_BASEURL + "/api/UpgradeOrder/token";
@@ -115,26 +156,174 @@ const NewBillerHome = ({ navigation }) => {
     return json;
   };
 
+  const checkModemOutagStatus = () => {
+    getUser().then((res) => {
+      const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${res.userInfo.accountNumber}`;
+      GetApiRequest(
+        request,
+        (response) => {
+          console.log("checkModemOutagStatus", response);
+          if (response != undefined) {
+            if (response.hasOutage === true) {
+              let time = moment(response.estimatedTimeOfResolution).format(
+                "LT"
+              );
+              setEstimatedRestoreTime(time);
+              setAccountStatus("Disconnect");
+              // setIsInternetDetails(true);
+              setHasOutage(true);
+              setIsOutageAlert(true);
+              setInternetHealths((oldArray) => [...oldArray, "Red"]);
+            } else {
+              setInternetHealths((oldArray) => [...oldArray, "Green"]);
+            }
+          }
+        },
+        (errorCode) => {
+          console.log("checkModemOutagStatus erro", errorCode);
+          if (errorCode == 204) {
+            setInternetHealths((oldArray) => [...oldArray, "Green"]);
+          }
+        }
+      );
+    });
+  };
+
+  const onSuccessPlan = (res) => {
+    console.log("getInternetPlanDetails", res);
+    if (res) {
+      setPlans(res);
+      if (res.length > 0) {
+        let macAddress = res[0].macAddress;
+        var mac = macAddress;
+        if (user.userInfo.accountNumber === "128387263") {
+          mac = "bc:3e:07:38:56:d0";
+        } else if (user.userInfo.accountNumber === "902880244") {
+          mac = "bc:3e:07:38:56:d0";
+        } else if (user.userInfo.accountNumber === "902880236") {
+          mac = "28:7a:ee:8e:cf:8c";
+        } else if (user.userInfo.accountNumber === "902880079") {
+          mac = "00:40:36:5f:cc:7f";
+        } else if (user.userInfo.accountNumber === "136885142") {
+          mac = "00:40:36:59:00:00";
+        }
+        checkModemDetails(mac);
+      }
+    }
+  };
   const onError = (error) => {
     console.log("error", error);
   };
 
-  
+  const checkModemDetails = (macAddress) => {
+    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
+    GetModemStatusApiRequest(
+      request,
+      (res) => {
+        console.log("checkModemDetails", res);
+        if (res) {
+          if (res?.status) {
+            if (res.status === 408) {
+              setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
+              return;
+            }
+          }
+
+          let temt = [];
+          if (res.EquipmentType === "DOCSIS") {
+            temt.push(res.UTxP_State);
+            temt.push(res.URxL_State);
+            temt.push(res.USNR_State);
+            temt.push(res.DSNR_State);
+            temt.push(res.DRxL_State);
+            updateModemStatus(temt);
+          } else if (res.EquipmentType === "ONU") {
+            temt.push(res.ONUTP_State);
+            temt.push(res.OLTRP_State);
+            temt.push(res.ONURP_State);
+            updateModemStatus(temt);
+          }
+        }
+      },
+      (errorCode) => {
+        console.log("Modem details on Error", errorCode);
+        if (errorCode === 404) {
+          setInternetHealths((oldArray) => [...oldArray, "Red"]);
+        } else if (
+          errorCode === 400 ||
+          errorCode === 500 ||
+          errorCode === 504
+        ) {
+          setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
+        } else {
+          setInternetHealths((oldArray) => [...oldArray, "Red"]);
+        }
+      }
+    );
+  };
+
+  const updateModemStatus = (temt) => {
+    const allGreen = temt.every((v) => v === "Green");
+    console.log("modem status", allGreen);
+    if (!allGreen) {
+      const checkYellow = temt.includes("Yellow");
+      const checkRed = temt.includes("Red");
+      if (checkRed) {
+        console.log("modem status", "Red");
+        setInternetHealths((oldArray) => [...oldArray, "Red"]);
+      } else if (checkYellow) {
+        console.log("modem status", "Yellow");
+        setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
+      } else {
+        setInternetHealths((oldArray) => [...oldArray, "Red"]);
+      }
+    } else {
+      setInternetHealths((oldArray) => [...oldArray, "Green"]);
+    }
+  };
+
+  const refreshInternetHealth = () => {
+    const checkYellow = internetHealths.includes("Yellow");
+    const checkRed = internetHealths.includes("Red");
+    const checkGreen = internetHealths.includes("Green");
+    if (checkRed) {
+      console.log("Internet Health is Red");
+      setCurrentHealth("Offline");
+      //setIsInternetDetails(true);
+    } else if (checkYellow) {
+      console.log("Internet Health is Yellow");
+      setCurrentHealth("Poor");
+      //setIsInternetDetails(true);
+    } else {
+      console.log("Internet Health is Green");
+      setCurrentHealth("Optimal");
+      //setIsInternetDetails(false);
+    }
+  };
+
   const getUserAccountDetails = () => {
     getUser().then((res) => {
       const request = `AccountSvc/api/Accounts/GetAccountDetailsByAccountNumber?accountNumber=${res.userInfo.accountNumber}`;
       GetApiRequest(
         request,
         (res) => {
-          console.log("getUserAccountDetails", res);
           if (res) {
             dispatch(saveAccountServices(res.services));
-            
-
-             let dueDate = moment(res.payment_due_date).format("ll");
-             setDueDate(dueDate);
-             let userBillAmt=(res.past_due_amount==0) ? res.payment_due_amount: res.past_due_amount
-             setBillAmt(userBillAmt);
+            let dueDate = moment(res.payment_due_date).format("ll");
+            setDueDate(dueDate);
+            setBillAmt(res.payment_due_amount);
+            setPastPaymentDue(res.past_due_amount);
+            function getFirstEmail(emailArray) {
+              return (emailArray && emailArray.length > 0 && emailArray[0])
+                ? emailArray[0]
+                : null;
+            }
+            let paymentDetails = { ...defaultPaymentDetails };
+            paymentDetails.dueDate = dueDate;
+            paymentDetails.billAmount = res.payment_due_amount;
+            paymentDetails.pastPaymentDue = res.past_due_amount;
+            paymentDetails.email = getFirstEmail(res.email);
+            setDefaultPaymentDetails(paymentDetails);
           }
         },
         onErrorBill
@@ -143,7 +332,6 @@ const NewBillerHome = ({ navigation }) => {
   };
 
   const updateInternetHealth = (dueAmount, dueDate) => {
-    //console.log('pppppast',moment(dueDate).isBefore() )
     if (moment(dueDate).isAfter()) {
       setBillPaid(true);
       setInternetHealths((oldArray) => [...oldArray, "Green"]);
@@ -293,23 +481,6 @@ const NewBillerHome = ({ navigation }) => {
     fetchData();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       dispatch(fetchPushNotifications());
-  //     } catch (error) {
-  //       console.error("Error fetching data", error);
-  //     }
-  //   };
-  //   fetchData();
-  // }, [dispatch]);
-
-
-  // useEffect(() => {
-  //   if (profile?.pushNotifications?.length > 0 && user.userInfo !== undefined) {
-  //     checkNotifications();
-  //   }
-  // }, [profile, user]);
 
   const changeWalkThroughStep = (step) => {
     if (step > 2) {
@@ -534,13 +705,11 @@ const NewBillerHome = ({ navigation }) => {
       colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
       style={styles.container}
     >
-      {/* {showWalkThrough && <View style={styles.shadowFullScreen} />}
-      {showWalkThrough && walkthroughModal()} */}
 
       <SafeAreaView style={{ flex: 1 }}>
         <View
-         accessibilityElementsHidden={showWalkThrough}
-         importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
+          accessibilityElementsHidden={showWalkThrough}
+          importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
           accessibilityLabel={`SparkLight`}
           style={{
             height: Platform.OS == "ios" ? 60 : 50,
@@ -551,8 +720,8 @@ const NewBillerHome = ({ navigation }) => {
           }}
         >
           <Image
-          accessible={!showWalkThrough}
-          accessibilityLabel={`SparkLight`}
+            accessible={!showWalkThrough}
+            accessibilityLabel={`SparkLight`}
             resizeMode="contain"
             style={{ width: 120, height: 30.324, flexShrink: 0 }}
             source={require("../../../assets/SparklightEntryLogo.png")}
@@ -568,7 +737,7 @@ const NewBillerHome = ({ navigation }) => {
               flex: 2,
               alignItems: "center",
               marginTop: 50,
-              paddingBottom:50
+              paddingBottom: 50
             }}
           >
             {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert /> : null}
@@ -579,10 +748,10 @@ const NewBillerHome = ({ navigation }) => {
             )}
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <View
-                //style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
+              //style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
               />
-              <Text style={[styles.descriptionText,{fontSize:FontSize.size_3xl,fontWeight:'400', marginBottom:20}]}>Welcome to Sparklight</Text>
-              <View style={{flexDirection:'column'}}>
+              <Text style={[styles.descriptionText, { fontSize: FontSize.size_3xl, fontWeight: '400', marginBottom: 20 }]}>Welcome to Sparklight</Text>
+              <View style={{ flexDirection: 'column' }}>
                 <Text style={styles.descriptionText}>
                   We’re excited to connect with you!
                   Sparklight is dedicated to offering our customers a variety of
@@ -594,44 +763,44 @@ const NewBillerHome = ({ navigation }) => {
                   enhance your Sparklight experience. Thank you for your
                   patience and understanding during this transition period.
                 </Text>
-               
-                
-              {isImageDispaly ? (
-                 <Image style={{width:wp('80%'),borderRadius:5,alignSelf:'center', marginTop:10}}source={require('../../../assets/newbiller.png')}/>
-              ) : (
-                <></>
-              )}
 
-              <TouchableOpacity
-               accessible={true}
-               accessibilityLabel={isImageDispaly ? 'Collapse' : 'Expand'}
-               accessibilityRole="button"
-                onPress={() => {
-                  setIsImageDispaly(!isImageDispaly);
-                }}
-                style={{
-                  flexDirection: "row",
-                  alignSelf:'center',
-                  padding:5,
-                  marginVertical: 5,
-                  marginHorizontal: 25,
-                }}
-              >
-                <Text style={styles.hideShowDetails}>
-                  {isImageDispaly ? 'Collapse' : 'Expand'}
-                </Text>
-                <View style={{ marginTop: 5 }}>
-                  {isImageDispaly ? (
-                    <View style={{ marginTop: 2, marginLeft:5 }}>
-                      <UpArrow />
-                    </View>
-                  ) : (
-                    <View style={{ marginTop: 7, marginLeft:5 }}>
-                    <DownArrow />
-                    </View>
-                  )}
-                </View>
-              </TouchableOpacity>
+
+                {isImageDispaly ? (
+                  <Image style={{ width: wp('80%'), borderRadius: 5, alignSelf: 'center', marginTop: 10 }} source={require('../../../assets/newbiller.png')} />
+                ) : (
+                  <></>
+                )}
+
+                <TouchableOpacity
+                  accessible={true}
+                  accessibilityLabel={isImageDispaly ? 'Collapse' : 'Expand'}
+                  accessibilityRole="button"
+                  onPress={() => {
+                    setIsImageDispaly(!isImageDispaly);
+                  }}
+                  style={{
+                    flexDirection: "row",
+                    alignSelf: 'center',
+                    padding: 5,
+                    marginVertical: 5,
+                    marginHorizontal: 25,
+                  }}
+                >
+                  <Text style={styles.hideShowDetails}>
+                    {isImageDispaly ? 'Collapse' : 'Expand'}
+                  </Text>
+                  <View style={{ marginTop: 5 }}>
+                    {isImageDispaly ? (
+                      <View style={{ marginTop: 2, marginLeft: 5 }}>
+                        <UpArrow />
+                      </View>
+                    ) : (
+                      <View style={{ marginTop: 7, marginLeft: 5 }}>
+                        <DownArrow />
+                      </View>
+                    )}
+                  </View>
+                </TouchableOpacity>
               </View>
             </View>
             <ScrollView horizontal={false}>
@@ -640,10 +809,12 @@ const NewBillerHome = ({ navigation }) => {
                   plans={payStatus}
                   billAmt={billAmt}
                   dueDate={dueDate}
+                  pastPaymentDue={pastPaymentDue}
+                  paymentDetails={defaultPaymentDetails}
                   navigation={navigation}
                 />
               </View>
-              </ScrollView>
+            </ScrollView>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -715,7 +886,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 24,
-    paddingHorizontal:24
+    paddingHorizontal: 24
   },
   decline: {
     fontSize: FontSize.size_sm,

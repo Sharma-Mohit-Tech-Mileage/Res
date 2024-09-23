@@ -19,6 +19,10 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const [useNewPayment, setuseNewPayment] = useState(route.params?.useNewPayment || false);
     const [status, setStatus] = useState(route.params?.status || false);
     const [name, setTitle] = useState(route.params?.name);
+    const [billAmt, setbillAmt] = useState(route.params?.billAmt);
+    const [dueDate, setdueDate] = useState(route.params?.dueDate);
+    const [pastPaymentDue, setpastPaymentDue] = useState(route.params?.pastPaymentDue);
+    const [paymentDetails, setpaymentDetails] = useState(route.params?.paymentDetails);
     const [navStateReloading, setNavStateReloading] = useState(false);
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
@@ -46,11 +50,13 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             AccountNumber: user.accountNumber || '',
             FirstName: user.firstName || '',
             LastName: user.lastName || '',
-            TotalDue: '0',
+            TotalDue: paymentDetails.billAmount,
+            PastDue: paymentDetails.pastPaymentDue || 0,
+            DueDate: paymentDetails.dueDate,
             CustomerType: user.customerType || '',
             PastDueAmount: '',
             PaymentDueDate: '',
-            Email: user.email || '',
+            Email: paymentDetails.email || '',
             EasyPayId: easyPayId || '',
             EasyPayEnabled: isEasyPay || false,
             TokenCookie: token || '',
@@ -58,6 +64,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     const redirectToEBillpay = (paymentObj, makePaymentUrl) => {
+        console.log("Payment object:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::", paymentObj);
         const data = JSON.stringify(paymentObj);
         const gui = generateGuid();
         const guiTrim = gui.split('-').join('');
@@ -308,3 +315,4 @@ const styles = StyleSheet.create({
 });
 
 export default AutoPayPCIConnector;
+

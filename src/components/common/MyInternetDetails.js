@@ -14,7 +14,7 @@ import colors from "../../res/Colors";
 
 const { width: viewportWidth } = Dimensions.get('window');
 
-const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
+const MyInternetDetails = ({ plans, billAmt, dueDate, paymentDetails,navigation }) => {
   const dispatch = useDispatch();
   const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [cardDigit, setCardDigit] = useState("");
@@ -63,6 +63,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, navigation }) => {
           cardDigit={cardDigit}
           isAutoPayStatus={isAutoPayStatus}
           paperlessStatus={paperlessStatus}
+          paymentDetails={paymentDetails}
           navigation={navigation}
           style={styles.card}
           accessible={true}

@@ -50,6 +50,7 @@ const HomeScreen = ({ navigation }) => {
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
   const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: '', latestVersion: '' });
+  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null });
   const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
   const [hasEeroDevice, setHasEeroDevice] = useState(false);
   const [networkId, setNetworkId] = useState(null);
@@ -302,7 +303,7 @@ const HomeScreen = ({ navigation }) => {
       GetApiRequest(
         request,
         (res) => {
-          console.log("getUserAccountDetails", res);
+          console.log("getUserAccountDetails for normal user :::::::::::::::::::::::::::::::::::::::", res);
           if (res) {
             dispatch(saveAccountServices(res.services))
             if (res.currentCollectionStep == "Soft Disconnect") {
@@ -312,9 +313,20 @@ const HomeScreen = ({ navigation }) => {
             } else {
               updateInternetHealth(res.currentBalance, res.paymentDueDate);
             }
+            function getFirstEmail(emailArray) {
+              return (emailArray && emailArray.length > 0 && emailArray[0])
+                ? emailArray[0]
+                : null;
+            }
             let dueDate = moment(res.paymentDueDate).format("ll");
             setDueDate(dueDate);
             setBillAmt((Math.round(res.currentBalance * 100) / 100).toFixed(2));
+            let paymentDetails = { ...defaultPaymentDetails };
+            paymentDetails.dueDate = res.paymentDueDate;
+            paymentDetails.billAmount = (Math.round(res.currentBalance * 100) / 100).toFixed(2);
+            paymentDetails.pastPaymentDue = res.pastDueAmount;
+            paymentDetails.email = getFirstEmail(res.email);
+            setDefaultPaymentDetails(paymentDetails);
             getTVServiceDetails();
             getInternetPlanDetails();
             getPhoneServiceDetails();
@@ -868,7 +880,7 @@ const HomeScreen = ({ navigation }) => {
               )}
             </View>
             <PromotionCard />
-            <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} navigation={navigation}/>
+            <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} paymentDetails={defaultPaymentDetails} navigation={navigation}/>
             <MyServicePlan plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} hasEeroDevice={hasEeroDevice} networkId={networkId} navigation={navigation} />
             <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
           </View>

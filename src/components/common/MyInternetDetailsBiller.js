@@ -10,7 +10,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 const { width: viewportWidth } = Dimensions.get('window');
 
-const MyInternetDetailsBiller = ({ plans, billAmt, dueDate, navigation }) => {
+const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymentDetails, navigation }) => {
   const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [cardDigit, setCardDigit] = useState("");
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
@@ -38,10 +38,6 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate, navigation }) => {
     console.log("error", error);
   };
 
-  // useEffect(() => {
-  //   getStatus();
-  // }, []);
-
   useFocusEffect(
     useCallback(() => {
       getStatus();
@@ -56,9 +52,12 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate, navigation }) => {
       return (
         <AutoPayCard
           billAmt={billAmt}
+          dueDate={dueDate}
+          pastPaymentDue={pastPaymentDue}
           cardDigit={cardDigit}
           isAutoPayStatus={isAutoPayStatus}
           paperlessStatus={paperlessStatus}
+          paymentDetails={paymentDetails}
           navigation={navigation}
           style={styles.card}
         />

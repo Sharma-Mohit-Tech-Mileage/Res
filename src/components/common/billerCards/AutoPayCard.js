@@ -7,7 +7,7 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding ,Color} from "../../../../GlobalStyles";
 import { Env }  from "../../../network/apis/account/Constants";
 import { getUser } from "../../../redux/utils/LocalStorage";
-const AutoPayCard = ({ cardDigit, isAutoPayStatus, navigation ,style}) => {
+const AutoPayCard = ({ cardDigit, isAutoPayStatus, paymentDetails,navigation ,style}) => {
   const [useNewPayment, setUseNewPayment] = useState(false);
   const getStatus = () => {
     getUser().then((res) => {
@@ -52,6 +52,7 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, navigation ,style}) => {
                 name: isAutoPayStatus ?"Manage Auto Pay":"Setup Auto Pay",
                 useNewPayment: useNewPayment,
                 status: isAutoPayStatus,
+                paymentDetails:paymentDetails
               });
             }}
             accessible={true}

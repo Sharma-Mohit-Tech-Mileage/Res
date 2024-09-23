@@ -6,7 +6,7 @@ import DollerIconBg from "../../../res/svgIcons/DollerIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
-const AutoPayCardNewBiller = ({ cardDigit, isAutoPayStatus, navigation, style }) => {
+const AutoPayCardNewBiller = ({ billAmt,dueDate,pastPaymentDue,cardDigit, isAutoPayStatus,paymentDetails, navigation, style }) => {
   return (
     <View style={styles.shadowContainer}>
       <View style={[styles.card, style]}>
@@ -38,8 +38,12 @@ const AutoPayCardNewBiller = ({ cardDigit, isAutoPayStatus, navigation, style })
                 navigation.navigate("AutoPayPCIConnector", {
                   url: Env.EASYPAYNEW,
                   name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
+                  billAmt: billAmt,
+                  dueDate: dueDate,
+                  pastPaymentDue: pastPaymentDue,
                   useNewPayment: true,
-                  status: isAutoPayStatus
+                  status: isAutoPayStatus,
+                  paymentDetails: paymentDetails,
                 });
               }}
               accessible={true}
