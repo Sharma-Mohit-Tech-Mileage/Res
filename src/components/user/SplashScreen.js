@@ -110,16 +110,18 @@ const SplashScreen = ({ navigation }) => {
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
-        } else if (userInfo.customerType != "RES") {
-          setIsBusiness(true);
+        } else if (userInfo.customerType === "COM") {
           setErrorMessage(strings.BusinessUserMsg);
-          setErrorMessage1(
-            " to manage your Sparklight Business services account"
-          );
+          setErrorMessage1(" to manage your Sparklight Business services account.");
+          setIsResidential(true);
           setTimeout(() => {
             setModalVisible(true);
-          }, 100);
-        } else {
+          }, 500);
+      }else if (userInfo?.acctStatus != "Normal" ) {
+        setTimeout(() => {
+          setDisconnected(true);
+        }, 500);
+      } else {
           moveAfterLogin(user);
         }
       } else if (res.userInfo.acctStatus === "Disconnect") {
