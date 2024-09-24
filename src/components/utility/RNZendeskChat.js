@@ -16,9 +16,4 @@ export const startChat = (config) => {
     //});
 };
 
-export const setVisitorInfo = (config) => {
-    
-    RNZendeskChatModule.setVisitorInfo(config);
-
-};
 

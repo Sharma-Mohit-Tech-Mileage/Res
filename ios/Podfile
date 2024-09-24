@@ -37,6 +37,7 @@ target 'My Sparklight' do
     pod 'GoogleUtilities', :modular_headers => true
     pod 'FirebaseCore', :modular_headers => true
     pod 'ZendeskChatSDK'
+    pod 'ZendeskCoreSDK'
     
   use_react_native!(
     :path => config[:reactNativePath],

@@ -150,7 +150,6 @@ const Support = ({ route }) => {
             department: department
         };
         if(Platform.OS==='ios'){
-            setVisitorInfo(data)
             startChat(data);
         }else{
             startChatWithConfig(data)

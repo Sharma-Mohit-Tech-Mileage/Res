@@ -708,6 +708,7 @@ PODS:
     - ZendeskChatProvidersSDK (~> 5.0.3)
     - ZendeskMessagingSDK (~> 6.0.1)
   - ZendeskCommonUISDK (9.0.1)
+  - ZendeskCoreSDK (5.0.3)
   - ZendeskMessagingAPISDK (6.0.0):
     - ZendeskSDKConfigurationsSDK (~> 4.0.0)
   - ZendeskMessagingSDK (6.0.1):
@@ -795,6 +796,7 @@ DEPENDENCIES:
   - RNSVG (from `../node_modules/react-native-svg`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
   - ZendeskChatSDK
+  - ZendeskCoreSDK
 
 SPEC REPOS:
   trunk:
@@ -825,6 +827,7 @@ SPEC REPOS:
     - ZendeskChatProvidersSDK
     - ZendeskChatSDK
     - ZendeskCommonUISDK
+    - ZendeskCoreSDK
     - ZendeskMessagingAPISDK
     - ZendeskMessagingSDK
     - ZendeskSDKConfigurationsSDK
@@ -1076,10 +1079,11 @@ SPEC CHECKSUMS:
   ZendeskChatProvidersSDK: 80485584b6b5af1b3e15ea54ba93600c225290b2
   ZendeskChatSDK: 5f64abb74eb3bd4e52250b8984f0408f6e703490
   ZendeskCommonUISDK: 720e6e34eff34ddae5feb1935f788a0893eaf672
+  ZendeskCoreSDK: 04db322c3e087d21984ff80118a890305fab2533
   ZendeskMessagingAPISDK: 9ce539eebcaa014fe6acc44da31262a2c52891c1
   ZendeskMessagingSDK: d0f65229188cb4936a56be6707992a2511b5175b
   ZendeskSDKConfigurationsSDK: 79c444da987390456ec05657ffa2f5ca0eb54aef
 
-PODFILE CHECKSUM: 1979264d9b332807771256163272f9bdcc14c339
+PODFILE CHECKSUM: c85eacd7d8649234d9bd2e0010ea7f92921efe19
 
 COCOAPODS: 1.15.2
