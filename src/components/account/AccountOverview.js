@@ -15,7 +15,6 @@ import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redu
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
  //import * as Zendesk from 'react-native-zendesk-messaging';
-import { SetClearTimer } from '../user/Session';
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
 import { Env } from "../../network/apis/account/Constants";
@@ -28,7 +27,7 @@ const config = {
 const logoutConfirmationPopup = (dispatch, navigation) => {
   Alert.alert(
     'Confirm Logout',
-    'Are you sure you want to Logout the app?',
+    'Are you sure you want to Log out of the app?',
     [
       {
         text: 'Cancel',
@@ -61,7 +60,7 @@ const logoutAction = (dispatch, navigation) => {
        dispatch(saveUserInfo({}));
        dispatch(logoutApp());
       cleanUserData();
-      SetClearTimer();
+      //SetClearTimer();
       navigation.reset({
         index: 0,
         routes: [{ name: 'Splash' }],
@@ -74,10 +73,16 @@ const AccountOverview = () => {
   const navigation = useNavigation();
   const [fullName, setFullName] = useState('');
   const [initials, setInitials] = useState('');
+  const [menues, setMenues] = useState([]);
   const dispatch = useDispatch();
   const user = useSelector(state => state.combinedReducers.user.userData);
   useEffect(() => {
     dispatch(fetchProfileDetails());
+    if(user?.userInfo.accountNumber.toString().length>=16){
+      setMenues(menuItems1)
+    }else{
+      setMenues(menuItems)
+    }
   }, []);
 
   const menuItems = [
@@ -117,6 +122,32 @@ const AccountOverview = () => {
       includeInMenu: true,
     }
   ];
+
+  const menuItems1 = [
+    {
+      name: 'Profile Settings',
+      onPress: () => navigation.navigate('ProfileSettings'),
+      icon: profileSettingsIcon,
+      accessibilityLabel: 'Navigate to profile settings',
+      includeInMenu: true,
+    },
+    {
+      name: 'Password & Security',
+      onPress: () => navigation.navigate('PasswordSecurity'),
+      icon: passwordSecurityIcon,
+      accessibilityLabel: 'Navigate to password and security settings',
+      includeInMenu: true,
+    },
+    
+    {
+      name: 'App Feedback',
+      onPress: () => navigation.navigate('Feedback'),
+      icon: feedbackicon,
+      accessibilityLabel: 'Navigate to user management settings',
+      includeInMenu: true,
+    }
+  ];
+
 
   useFocusEffect(
     useCallback(() => {
@@ -173,7 +204,7 @@ const AccountOverview = () => {
             <View style={styles.frameGroup}>
               <View style={styles.navigationBorder}>
                 {/* Mapping through menu items */}
-                {menuItems.map((item, index) => (
+                {menues.map((item, index) => (
                   item.includeInMenu && (<React.Fragment key={item.name}>
                     <Pressable
                       style={[styles.rightActionableGroup, styles.tabsFlexBox]}

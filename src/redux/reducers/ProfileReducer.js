@@ -1,5 +1,5 @@
 import {
-    LOGOUT,
+    LOGOUT,ALLSVEMAILASSOCIATED,SAVEALLSVEMAILASSOCIATED,
     USER_PROFILE_DETAILS, SAVE_USER_LIST,
     SAVE_SMS_SELECTION, SAVE_EMAIL_SELECTION,
     SAVE_PAPERLESS_DETAILS, SAVE_PUSH_NOTIFICATIONS,SAVE_USER_ACCOUNT_SERVICE
@@ -13,6 +13,7 @@ const initialState = {
     paperlessStatus: false,
     paperLessInfo: {},
     pushNotifications: [],
+    allSvEmailAssociated:[],
     erro: ""
 }
 
@@ -58,6 +59,11 @@ const ProfileReducer = (state = initialState, action) => {
             return {
                 ...state,
                 pushNotifications: action.payload,
+            };
+        case SAVEALLSVEMAILASSOCIATED:
+            return {
+                ...state,
+                allSvEmailAssociated: action.payload,
             };
         case LOGOUT:
             return {

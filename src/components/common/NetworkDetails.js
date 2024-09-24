@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 import Billpaidicon from "../../res/svgIcons/Billpaidicon";
 import Outageicon from "../../res/svgIcons/Outageicon";
 import Modemicon from "../../res/svgIcons/Modemicon";
@@ -12,6 +12,8 @@ import { Env } from "../../network/apis/account/Constants";
 import PubSub from "pubsub-js";
 import { CommonActions } from '@react-navigation/native';
 const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
+
+  console.log('Internethealth',currentHealth)
   const GreenCircle = () => {
     return <View style={styles.greenTick}></View>;
   };
@@ -26,7 +28,10 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.rowContainer}>
-        <View style={styles.item}>
+        <View style={styles.item}
+          accessible={true}
+          accessibilityLabel={hasOutage ? strings.noOutageDetected : strings.noOutageTxt}
+        >
           <View style={styles.iconBg}>
             <Outageicon />
             {hasOutage ? <RedCircle /> : <GreenCircle />}
@@ -46,16 +51,22 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
       </View>
 
       <View style={[styles.rowContainer]}>
-        { <TouchableOpacity
+        {<TouchableOpacity
           style={{ flexDirection: "row" }}
+          disabled={currentHealth != "Optimal" ? false : true}
+          accessible={true}
+          accessibilityRole={currentHealth != "Optimal" ? "button" : null }
+          accessabilityLabel={currentHealth != "Optimal"
+          ? strings.modem_issue_detected
+          : strings.no_modem_issue}
           onPress={() => {
-            if(currentHealth!='Optimal'){
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'Support',params: { isManagementEquipment:true }, }],
-          });
-        }
-           // navigation.navigate('Support',{isManagementEquipment:true});
+            if (currentHealth != 'Optimal') {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Support', params: { isManagementEquipment: true }, }],
+              });
+            }
+            // navigation.navigate('Support',{isManagementEquipment:true});
           }}
         >
           <View style={styles.item}>
@@ -90,9 +101,13 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
               <></>
             )}
           </View>
-        </TouchableOpacity> }
+        </TouchableOpacity>}
         <TouchableOpacity
           style={{ flexDirection: "row" }}
+          disabled={!billPaid ? false : true}
+          accessible={true}
+          accessibilityLabel={strings.bill_paid}
+          accessibilityRole={!billPaid ? "button" : null }
           onPress={() => {
             if (!billPaid) {
               navigation.navigate("ArticalWindowUtility", {
@@ -102,7 +117,9 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
             }
           }}
         >
-          <View style={styles.item}>
+          <View 
+          style={styles.item}
+          >
             <View style={styles.iconBg}>
               <Billpaidicon />
               {billPaid ? <GreenCircle /> : <OrangeCircle />}

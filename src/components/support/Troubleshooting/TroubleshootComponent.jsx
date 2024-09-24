@@ -1,17 +1,40 @@
-import React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Dimensions, ScrollView } from 'react-native';
-import { Color, Padding, Border, FontSize, FontFamily } from "../../../../GlobalStyles";
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, Dimensions, AccessibilityInfo, findNodeHandle } from 'react-native';
+import { Color } from "../../../../GlobalStyles";
 import OutageAreaIcon from '../../../res/svgIcons/troubleshooting/OutageAreaIcon';
 import TroubleshootIcon from '../../../res/svgIcons/troubleshooting/TroubleshootIcon';
 import ServiceIcon from '../../../res/svgIcons/troubleshooting/ServiceIcon';
 import SuccessIcon from '../../../res/svgIcons/troubleshooting/SuccessIcon';
 import WalletIcon from '../../../res/svgIcons/troubleshooting/WalletIcon';
+
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
 const TroubleshootComponent = ({
-    step, success, pageCount,loading,isError,item
+    step, success, pageCount, loading, isError, item, setIsReadingComplete
 }) => {
+    const textRef = useRef(null);
+
+    useEffect(() => {
+        const announceText = () => {
+            const reactTag = findNodeHandle(textRef.current);
+            AccessibilityInfo.setAccessibilityFocus(reactTag);
+        };
+        setTimeout(announceText, 100);
+    }, [item]);
+
+    useEffect(() => {
+        const handleAnnouncementFinished = () => {
+            setIsReadingComplete(true);
+        };
+
+        AccessibilityInfo.addEventListener('announcementFinished', handleAnnouncementFinished);
+
+        return () => {
+            AccessibilityInfo.removeEventListener('announcementFinished', handleAnnouncementFinished);
+        };
+    }, []);
+
     let IconComponent;
     switch (step) {
         case 0: IconComponent = <TroubleshootIcon />; break;
@@ -20,12 +43,12 @@ const TroubleshootComponent = ({
         case 3: IconComponent = <ServiceIcon />; break;
         default: IconComponent = <TroubleshootIcon />;
     }
-   
+
     return (
         <View style={styles.container}>
-            {pageCount>0 ? <Text style={styles.topLeftText}>{pageCount} of 3</Text> : null}
+            {pageCount > 0 ? <Text style={styles.topLeftText}>{pageCount} of 3</Text> : null}
             <View style={styles.content}>
-                <View style={[styles.circle,{overflow:(step==1)?'hidden':'visible'}]}>
+                <View style={[styles.circle, { overflow: (step == 1) ? 'hidden' : 'visible' }]}>
                     {IconComponent}
                 </View>
                 {success && (
@@ -33,13 +56,20 @@ const TroubleshootComponent = ({
                         <SuccessIcon />
                     </View>
                 )}
-                <View style={styles.spinnerContainer}>
-                    <Text style={styles.title}>{(loading)?item.title :(isError)? item.errorMsg:item.resultMsg}</Text>
+                <View 
+                  ref={textRef}
+                  accessibility={true}
+                  accessibilityLiveRegion="assertive"
+                  style={styles.spinnerContainer}
+                >
+                    <Text 
+                      style={styles.title}>
+                      {loading ? item?.title ?? "Loading..." : isError ? item?.errorMsg ?? "An error occurred." : item?.resultMsg ?? "Operation successful."}
+                    </Text>
                     {item.description && <Text style={styles.description}>{item.description}</Text>}
                 </View>
                 <View style={styles.spinnerContainer}>
-
-                    { loading ? <ActivityIndicator size="large" color="#8D3B90" style={styles.activityIndicator} /> :<></>}
+                    { loading ? <ActivityIndicator size="large" color="#8D3B90" style={styles.activityIndicator} /> : null }
                 </View>
             </View>
         </View>
@@ -52,6 +82,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingTop: windowHeight * 0.05,
         backgroundColor: Color.sparklightWhite,
+        marginBottom: windowHeight * 0.05,
     },
     content: {
         flexGrow: 1,
@@ -90,7 +121,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#4C5458',
         textAlign: 'center',
-        paddingVertical:8
+        paddingVertical: 8,
     },
     activityIndicator: {
         transform: [{ scale: 2 }],
@@ -104,7 +135,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '700',
         lineHeight: 28,
-        padding: 10, // Add some padding around the text
+        padding: 10,
     },
 });
 

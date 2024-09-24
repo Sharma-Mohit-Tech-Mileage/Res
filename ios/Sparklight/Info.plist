@@ -49,16 +49,24 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>localhost</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-			</dict>
-		</dict>
-	</dict>
+<dict>
+    <key>NSExceptionDomains</key>
+    <dict>
+        <key>sparklight.com</key>
+        <dict>
+            <!-- Allow insecure HTTP loads for this domain -->
+            <key>NSExceptionAllowsInsecureHTTPLoads</key>
+            <true/>
+            <!-- Allow connections to this domain with subdomains -->
+            <key>NSIncludesSubdomains</key>
+            <true/>
+            <!-- Disable the requirement for HTTPS (you should only use this if you cannot update the server to HTTPS) -->
+            <key>NSExceptionRequiresForwardSecrecy</key>
+            <false/>
+        </dict>
+    </dict>
+</dict>
+
 	<key>NSFaceIDUsageDescription</key>
 	<string>$(PRODUCT_NAME) Authentication with TouchId or FaceID</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

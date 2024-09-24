@@ -35,10 +35,13 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 
 
-const UpdateModemPassword = () => {
+const UpdateModemPassword = (props) => {
 
-
-  
+  const isEEroDevice = props?.route?.params?.isEEroDevice || false;
+  const eeroDeviceData = props?.route?.params?.eeroDeviceData || null;
+  const networkPath = eeroDeviceData?.networks[0];
+  const parts = networkPath?.split('/');
+  const networkId = parts?.length > 0 ? parts[parts.length - 1] : null;
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [newPassword, setNewPassword] = useState("");
@@ -54,10 +57,13 @@ const UpdateModemPassword = () => {
   const [newPasswordLength, setNewPasswordLength] = useState(0)
   const [confirmPasswordLength, setConfirmPasswordLength] = useState(0)
   const [loading, setLoading] = useState(false);
+  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
 
 
   useEffect(() => {
+    if(!isEEroDevice){
     getModemPassword();
+    }
   }, [])
 
   useEffect(() => {
@@ -115,6 +121,7 @@ const UpdateModemPassword = () => {
   };
 
   const handlePasswordSelection = (value) => {
+    setIsDropDownOpen(false)
     setSelectedPassword(value)
   }
 
@@ -124,10 +131,18 @@ const UpdateModemPassword = () => {
   }, [newPasswordLength, confirmPasswordLength])
 
   const onSubmit = data => {
+    if(getValues('newPassword')?.length == 0 || getValues('newPassword')?.length == undefined) {
+      setShowError(true)
+      return
+    }
+    console.log(`getValues('newPassword')?.length > 0`,getValues('newPassword')?.length);
     if (showError) {
       return
     }
-    else updateModemPassword()
+    else {
+      if (isEEroDevice) updateEEroModemPassword()
+      else updateModemPassword()
+    }
   };
   const updateModemPassword = () => {
     setLoading(true)
@@ -143,14 +158,32 @@ const UpdateModemPassword = () => {
       PutApiRequest(request, body, _onSuccess, _onError);
     });
   };
+  const updateEEroModemPassword = () => {
+    setLoading(true)
+    let body = {
+      accountNumber: eeroDeviceData?.partner_account_id,
+      password: getValues('newPassword'),
+      networkId: networkId
+    }
+    let re = getUser().then((res) => {
+      const request = `/mobile/api/eero/UpdatePassword`;
+      console.log(`request`, request);
+      PutApiRequest(request, body, _onSuccess, _onError);
+    });
+  };
 
   return (
     <View style={styles.viewBackground}>
       <ProfileSettingsHeader
-        title="Update Modem Password"
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+        title={isEEroDevice ? 'Update Wifi Password' : "Update Modem Password"}
         onPressBack={() => navigation.navigate("ManageEquipmentScreen")}
       />
-      <View style={{ marginHorizontal: 20, marginTop: 20 }}>
+      <View
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+        style={{ marginHorizontal: 20, marginTop: 20 }}>
         <NotificationAlert
           type="error"
           title="Error"
@@ -172,26 +205,48 @@ const UpdateModemPassword = () => {
 
 
         <View style={styles.viewBackgroundContainer}>
-          <Text style={[styles.firstName1, styles.firstTypo]}>SSID</Text>
-          <View style={{}}>
-            <SparkLightDropdown
-              items={passwordList}
-              selectedValue={slectedPasword}
-              onValueChange={handlePasswordSelection}
-            />
-          </View>
-
-          <View style={{ marginTop: 15 }}>
+          {isEEroDevice &&
+            <View style={styles.frameWrapper}>
+              <View style={styles.infoCircleWrapper}>
+                <Image
+                  style={styles.infoCircleIcon}
+                  resizeMode="contain"
+                  source={require("../../../assets/infocircle.png")}
+                />
+              </View>
+              <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
+                {`To access more features of your Eero device, please download the `}
+                <Text onPress={() => {
+                  navigation.navigate("EEroFeatures");
+                }} style={[styles.text]}>
+                  {`eero Wifi App`}
+                </Text>
+              </Text>
+            </View>
+          }
+          {!isEEroDevice && <>
+            <Text
+              accessibilityElementsHidden={isDropDownOpen}
+              importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+              style={[styles.firstName1, styles.firstTypo]}>SSID</Text>
+            <View style={{}}>
+              <SparkLightDropdown
+                items={passwordList}
+                selectedValue={slectedPasword}
+                onValueChange={handlePasswordSelection}
+                isDropDownOpen={(value) => {
+                  setIsDropDownOpen(true)
+                }}
+              />
+            </View>
+          </>}
+          <View
+            accessibilityElementsHidden={isDropDownOpen}
+            importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+            style={{ marginTop: 15 }}>
             <Controller
               control={control}
               name="newPassword"
-              
-              rules={{
-                required: {
-                  value: true,
-                  message: 'Field is required!'
-                }
-              }}
               render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                 <SparkLightInput
                   onBlur={onBlur}
@@ -212,17 +267,13 @@ const UpdateModemPassword = () => {
 
             />
           </View>
-          <View style={{ marginTop: 15 }}>
+          <View
+            accessibilityElementsHidden={isDropDownOpen}
+            importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+            style={{ marginTop: 15 }}>
             <Controller
               control={control}
               name="confirmPassword"
-              rules={{ // Move your rules outside of the render prop
-                // required: {
-                //   value: true,
-                //   message: 'Field is required!'
-                // },
-                validate: value => value === getValues('newPassword') || 'Password do not match'
-              }}
               render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
                 <SparkLightInput
                   onBlur={onBlur}
@@ -242,16 +293,22 @@ const UpdateModemPassword = () => {
             {showError ? <Text style={styles.errorText}>{`Password do not match`}</Text> : null}
           </View>
         </View>
-        <View style={styles.buttonContainer}>
+        <View
+          accessibilityElementsHidden={isDropDownOpen}
+          importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+          style={styles.buttonContainer}>
           <Pressable
             accessible={true}
             disabled={loading}
             accessibilityRole="button"
+            accessibilityLabel={isEEroDevice ? `Update Wifi Password` : `Update Modem Password`}
             style={[styles.button, styles.buttonsLayout]}
-            onPress={handleSubmit(onSubmit)}
+            onPress={handleSubmit(onSubmit, onInvalid = (error) => {
+              setShowError(true)
+            })}
           >
             <Text style={[styles.accept]}>
-              Update Modem Password
+              {isEEroDevice ? `Update Wifi Password` : `Update Modem Password`}
             </Text>
           </Pressable>
         </View>
@@ -263,7 +320,7 @@ const UpdateModemPassword = () => {
 
 const styles = StyleSheet.create({
   viewBackgroundContainer: {
-    padding: Padding.p_5xl,
+    padding: Padding.p_base,
     backgroundColor: Color.sparklightWhite,
     margin: Padding.p_5xl
   },
@@ -330,6 +387,43 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "600",
+  },
+  frameWrapper: {
+    paddingHorizontal: Padding.p_base,
+    justifyContent: "center",
+    flexDirection: "row",
+    backgroundColor: Color.colorWhitesmoke_100,
+    borderRadius: 10,
+    paddingVertical: Padding.p_5xs
+  },
+  notificationsSentFrom: {
+    marginLeft: 8,
+    color: Color.colorGray_100,
+    fontWeight: '400',
+  },
+  notificationsSentFromTypo: {
+    color: Color.colorGray_200,
+    marginLeft: 8,
+    fontSize: FontSize.textXsSemibold_size,
+    textAlign: "left",
+    lineHeight: 22,
+    flex: 1,
+  },
+  text: {
+    color: Color.colorMidnightblue,
+    fontWeight: "600",
+    fontSize: 14,
+    flex: 1,
+  },
+  infoCircleIcon: {
+    width: 18,
+    height: 18,
+    marginTop: -3
+  },
+  infoCircleWrapper: {
+    paddingHorizontal: 0,
+    paddingVertical: Padding.p_5xs,
+    flexDirection: "row",
   },
 });
 

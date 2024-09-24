@@ -39,6 +39,7 @@ const RetrieveModemPassword = () => {
   const [slectedPasword, setSelectedPassword] = useState("")
   const [modemPasswordData, setModemPasswordData] = useState([])
   const [loading, setLoading] = useState(false);
+  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
 
   useEffect(() => {
     getModemPassword();
@@ -74,6 +75,7 @@ const RetrieveModemPassword = () => {
     console.log("error", error);
   };
   const handlePasswordSelection = (value) => {
+    setIsDropDownOpen(false)
     setSelectedPassword(value)
   }
 
@@ -87,6 +89,8 @@ const RetrieveModemPassword = () => {
   return (
     <View style={styles.viewBackground}>
       <ProfileSettingsHeader
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
         title="Retrieve Modem Password"
         onPressBack={() => navigation.navigate("ManageEquipmentScreen")}
       />
@@ -98,6 +102,9 @@ const RetrieveModemPassword = () => {
               items={passwordList}
               selectedValue={slectedPasword}
               onValueChange={handlePasswordSelection}
+              isDropDownOpen={(value) => {
+                setIsDropDownOpen(true)
+              }}
             />
           </View>
 
@@ -126,9 +133,17 @@ const RetrieveModemPassword = () => {
             />
           </View>
         </View>
-        <Text style={styles.howText}>How To</Text>
+        <Text
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+        style={styles.howText}>How To</Text>
         <View style={styles.borderStyle} />
         <TouchableOpacity
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+        accessibilityLabel="Connect Android Device"
+        accessibilityRole="link"
+        accessible={true}
           onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.cableone.net/hc/en-us/articles/115010513108-Wireless-Setup-Android', name: 'Connect Android Device' })}
           style={styles.connectAndroidView}>
           <View style={styles.connectAndroidTextView}>
@@ -139,6 +154,11 @@ const RetrieveModemPassword = () => {
         </TouchableOpacity>
         <View style={styles.borderStyle} />
         <TouchableOpacity
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+        accessibilityLabel="Connect iPhone Device"
+        accessibilityRole="link"
+        accessible={true}
           onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/115010391047-How-Do-I-Connect-Apple-Products-to-a-Wireless-Network', name: 'Connect iPhone Device' })}
           style={styles.connectAndroidView}>
           <View style={styles.connectAndroidTextView}>
@@ -149,6 +169,11 @@ const RetrieveModemPassword = () => {
         </TouchableOpacity>
         <View style={styles.borderStyle} />
         <TouchableOpacity
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+        accessibilityLabel="Connect PC/MAC"
+        accessibilityRole="link"
+        accessible={true}
           onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.cableone.net/hc/en-us/articles/115009649447-Wireless-Connection-Settings', name: 'Connect PC/MAC' })}
           style={styles.connectAndroidView}>
           <View style={styles.connectAndroidTextView}>
@@ -158,10 +183,14 @@ const RetrieveModemPassword = () => {
           <Image style={styles.lockIcon} source={require('../../../assets/chevronright.png')} />
         </TouchableOpacity>
       </View>
-      <View style={styles.buttonContainer}>
+      <View 
+      accessibilityElementsHidden={isDropDownOpen}
+      importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+      style={styles.buttonContainer}>
         <Pressable
           accessible={true}
           accessibilityRole="button"
+          accessibilityLabel="Close"
           style={[styles.button, styles.buttonsLayout]}
           onPress={() => { navigation.navigate("ManageEquipmentScreen") }}
         >

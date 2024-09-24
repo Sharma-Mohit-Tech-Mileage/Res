@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, Pressable, View } from "react-native";
-import { useNavigation , useRoute} from "@react-navigation/native";
-import { Color, Padding, FontSize, FontFamily, Border } from "../../../GlobalStyles";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+  Color,
+  Padding,
+  FontSize,
+  FontFamily,
+  Border,
+} from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { useDispatch, useSelector } from 'react-redux';
-import NotificationAlert from '../common/customui/NotificationAlert';
-import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
+import { useDispatch, useSelector } from "react-redux";
+import NotificationAlert from "../common/customui/NotificationAlert";
+import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 const PasswordSecurity = () => {
   const navigation = useNavigation();
   const route = useRoute(); // Use the useRoute hook
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profile = useSelector((state) => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   useEffect(() => {
     if (route.params?.updateSuccess) {
@@ -30,7 +36,7 @@ const PasswordSecurity = () => {
     <View style={styles.passwordSecurity}>
       <ProfileSettingsHeader
         title="Password & Security"
-        onPressBack={() => navigation.navigate('Account')}
+        onPressBack={() => navigation.navigate("Account")}
         accessibilityHint="Go back to Account"
       />
       <View style={[styles.passwordSecurityInner, styles.securitySpaceBlock]}>
@@ -39,7 +45,7 @@ const PasswordSecurity = () => {
             <NotificationAlert
               type="success"
               title="Update Successful"
-              message="Your password and security has been updated successfully."
+              message={(route.params?.isPassword)?"Your password has been updated successfully.":"Your Security Questions has been updated successfully."}
               showCloseIcon={true}
               isVisible={showSuccessAlert}
               onClose={() => setShowSuccessAlert(false)}
@@ -50,8 +56,11 @@ const PasswordSecurity = () => {
               Password
             </Text>
             <Pressable
+              accessible={true}
+              accessibilityLabel="Edit"
+              accessibilityRole="button"
               style={[styles.buttons, styles.buttonsBg]}
-              onPress={() => navigation.navigate("PasswordSecurityEdit")}
+              onPress={() => navigation.navigate("PasswordEdit")}
             >
               <Text style={[styles.makePayment, styles.titleFlexBox]}>
                 Edit
@@ -60,26 +69,42 @@ const PasswordSecurity = () => {
           </View>
           <View style={styles.frameGroup}>
             <View style={styles.passwordGroup}>
-              <Text style={[styles.passwordFlexBox]}>
-                Password
-              </Text>
-              <Text style={[styles.text, styles.passwordFlexBox]} accessibilityRole="text">
+              <Text style={[styles.passwordFlexBox]}>Password</Text>
+              <Text
+                style={[styles.text, styles.passwordFlexBox]}
+                accessibilityRole="text"
+              >
                 **********
               </Text>
             </View>
-            <View style={[styles.rectangleWrapper, styles.frameContainerSpaceBlock]}>
+            <View
+              style={[styles.rectangleWrapper, styles.frameContainerSpaceBlock]}
+            >
               <View style={styles.frameChild} />
             </View>
             <View style={styles.frameContainerSpaceBlock}>
-              <View style={[styles.securityQuestionWrapper, styles.tabsFlexBox]}>
+              <View
+                style={[styles.securityQuestionWrapper, styles.tabsFlexBox]}
+              >
                 <Text style={[styles.password, styles.passwordFlexBox]}>
                   Security Question
                 </Text>
+                <Pressable
+                  accessible={true}
+                  accessibilityLabel="Edit"
+                  accessibilityRole="button"
+                  style={[styles.buttons, styles.buttonsBg]}
+                  onPress={() => navigation.navigate("PasswordSecurityEdit")}
+                >
+                  <Text style={[styles.makePayment, styles.titleFlexBox]}>
+                    Edit
+                  </Text>
+                </Pressable>
               </View>
               <View style={styles.passwordGroup}>
                 <View style={styles.nameOfYourFirstPetParent}>
                   <Text style={[styles.passwordFlexBox]}>
-                    {profileDetails.securityQuestion} 
+                    {profileDetails.securityQuestion}
                   </Text>
                   <Text style={[styles.text, styles.passwordFlexBox]}>
                     ******

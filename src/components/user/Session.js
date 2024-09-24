@@ -1,90 +1,100 @@
-
-import { getUser } from "../../redux/utils/LocalStorage";
+import { getUser, storeUser } from "../../redux/utils/LocalStorage";
 import { refresh } from "react-native-app-auth";
-import { storeUser } from "../../redux/utils/LocalStorage";
-import  store  from '../../redux/configureStore';
-import { PostAuthApiRequest } from "../../network/APIClient";
+import store from '../../redux/configureStore';
 import { saveUserInfo } from "../../redux/actions/UserAction";
+import { PostAuthApiRequest } from "../../network/APIClient";
 import { Env } from "../../network/apis/account/Constants";
-
-// import { getUser } from "../redux/utils/LocalStorage";
-
-//const [refresh, setRefresh] = useState();
+import { navigationRef } from '../../navigations/UserNavigations';
 
 const config = {
     issuer: Env.SSO_LOGIN,
     clientId: "sparklight-customer-mobile-app",
-    redirectUrl:
-        "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
+    redirectUrl: "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
     scopes: ["openid", "profile", "email", "phone", "address"],
-    iosPrefersEphemeralSession: false,
-    additionalParameters: { prompt: "login" },
+    iosPrefersEphemeralSession: true,
 };
 
-let loop;
-let loopContinue;
-
-let timer = 0;
-
-const renewToken = async () => {
-    loop = setTimeout(async () => {
-        await RefreshToken();
-    }, 900000);
-}
-
 const onSuccess = async (res) => {
-    if (res) {
-        let token = res.jwtToken;
-        let userInfo = res.userInfo;
-        let user = {
-            userInfo: userInfo,
-            token: token,
-            tokenGuid: res.idTokenGuid,
-            refreshToken: res.refreshToken
+    try {
+        console.log('Session onSuccess:', res);
+        if (!res) throw new Error("No token received");
+
+        const { jwtToken: token, userInfo, idTokenGuid, refreshToken } = res;
+        const user = {
+            userInfo,
+            token,
+            tokenGuid: idTokenGuid,
+            refreshToken,
         };
 
         if (token) {
-            storeUser(user);
+            await storeUser(user);
+            console.log('User stored in local storage:', user);
         }
-        store.dispatch(saveUserInfo(user));
 
-        console.log('setTimeout: ', timer);
-        timer = timer + 900000;
-        if (loopContinue) {
-            renewToken();
-        }        
+        store.dispatch(saveUserInfo(user));
+        console.log('User info saved in Redux store:', user);
+        return token;
+
+    } catch (error) {
+        console.error('Error in onSuccess:', error);
+        throw error;
     }
 };
 
 const onError = (error) => {
-    console.log("PostAuthApiRequest error", error);
+    console.error('Session onError:', error);
+    // Handle the error or navigate to the appropriate screen
+    // You could navigate to Splash here if needed
+    // navigationRef.current?.navigate('Splash');
+    throw error;  // Re-throw the error if needed
 };
 
-export const SetRenewTokenTimer = () => {
-    loopContinue = true;
-    renewToken();
-}
-
-export const SetClearTimer = () => {
-    loopContinue = false;
-    clearTimeout(loop);
-}
+const retryRequest = async (data, retries = 1) => {
+    try {
+        return await new Promise((resolve, reject) => {
+            PostAuthApiRequest("/mobile/api/gettoken", data, resolve, reject);
+        });
+    } catch (error) {
+        if (retries > 0) {
+            console.log('Retrying request, attempts left:', retries);
+            return retryRequest(data, retries - 1);
+        }
+        console.error('Retry request failed after retries:', error);
+        throw error;
+    }
+};
 
 export const RefreshToken = async () => {
     try {
+        console.log('RefreshToken called');
         const user = await getUser();
+
+        if (!user || !user.refreshToken) {
+            throw new Error("No user or refresh token found");
+        }
+
+        console.log('User retrieved from local storage:', user);
+
         const result = await refresh(config, {
             refreshToken: user.refreshToken,
         });
-        const data = { 
+
+        console.log('Token refresh result:', result);
+
+        const data = {
             idToken: result.idToken,
             accessToken: result.accessToken,
-            idTokenGuid: result.additionalParameters.session_state,
-            refreshToken: result.refreshToken
+            idTokenGuid: result.additionalParameters?.session_state || '',
+            refreshToken: result.refreshToken,
         };
-        PostAuthApiRequest("/mobile/api/gettoken", data, onSuccess, onError);
+
+        console.log('Data prepared for PostAuthApiRequest:', data);
+
+        const apiResponse = await retryRequest(data, 2);
+        return onSuccess(apiResponse);
+
     } catch (error) {
-        console.error("Error fetching data", error);
+        return onError(error);  // Handle the error and navigate to Splash
     }
-}
-    
+};

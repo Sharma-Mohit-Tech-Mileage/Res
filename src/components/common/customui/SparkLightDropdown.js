@@ -1,17 +1,28 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useRef } from 'react';
+import { StyleSheet  } from 'react-native';
 import { Select, Box, CheckIcon } from 'native-base';
 import { Padding, Color,FontFamily,FontSize } from "../../../../GlobalStyles";
+import { useIsFocused } from "@react-navigation/native";
 
-const SparkLightDropdown = ({ items, selectedValue, onValueChange, style , dropDownStyle }) => {
+const SparkLightDropdown = ({ items, selectedValue, onValueChange, style , dropDownStyle , isDropDownOpen = () => {}}) => {
     const validItems = Array.isArray(items) ? items : [];
 
+      const getAccessibilityLabel = () => {
+        return selectedValue 
+          ? `${selectedValue}.`
+          : "Select an option.";
+      };
+
     return (
-        <Box style={[styles.container, style]}>
+        <Box 
+        accessible={true}
+            accessibilityRole="menu"
+            accessibilityLabel={getAccessibilityLabel()}
+            accessibilityHint="Double tap to open the menu and select an option"
+        style={[styles.container, style]}>
             <Select
                 selectedValue={selectedValue}
                 minWidth="200"
-                accessibilityLabel="Choose Service"
                 placeholder="Select an option"
                 maxFontSizeMultiplier={1.25}
                 _selectedItem={{
@@ -19,11 +30,18 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style , dropD
                     endIcon: <CheckIcon size="5" />,
                 }}
                 style={[styles.dropdown,dropDownStyle]}
+                onOpen={()=> {
+                    isDropDownOpen(true)
+                }}
+                onClose={() => {
+                    isDropDownOpen(false)
+                }}
                 onValueChange={itemValue => onValueChange(itemValue)}
         
             >
                 {validItems.map((item, index) => (
-                    <Select.Item key={index} label={item} value={item} />
+                    <Select.Item
+                    key={index} label={item} value={item} />
                 ))}
             </Select>
         </Box>

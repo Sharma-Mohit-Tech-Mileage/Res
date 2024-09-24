@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text,TouchableOpacity } from "react-native";
+import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text,TouchableOpacity,Alert } from "react-native";
 import { useSelector } from 'react-redux';
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
-import ZendeskChat from "react-native-zendesk-chat";
 import PubSub from 'pubsub-js'
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
@@ -13,7 +12,6 @@ import ChatIcon from "../../res/svgIcons/ChatIcon";
 import { GetApiRequest } from "../../network/APIClient";
 import CreateTicket from "./ticket/CreateTicket";
 
-ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
 
 const Support = ({ route }) => {
     const navigation = useNavigation();
@@ -126,44 +124,56 @@ const Support = ({ route }) => {
         };
     }, []);
 
-
-    const handlePressOpenButton = (department, tags) => {
-        const user = {
-            full_name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
-            email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
-            phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
-        };
-
-        tags.push('pid:_' + userData.userInfo.accountNumber);
-
-        ZendeskChat.startChat({
-            name: user.full_name,
-            email: user.email,
-            phone: user.phone,
-            department: department,
-            tags: tags,
-            behaviorFlags: {
-                showAgentAvailability: true,
-                showChatTranscriptPrompt: false,
-                showPreChatForm: true,
-                showOfflineForm: true,
+    const exitConfirmation=()=>{
+        console.log('Wait exit')
+        Alert.alert("Wait!", "Are you sure to go back?", [
+            {
+              text: "Cancel",
+              onPress: () => null,
+              style: "cancel"
             },
-            preChatFormOptions: {
-                name: "optional",
-                email: "optional",
-            },
-            messagingOptions: {
-                botName: 'Sparklight',
-                botAvatarName: 'chatIcon'
-            },
-            localizedDismissButtonTitle: "Dismiss",
-        });
-    };
+            { text: "YES", onPress: () => navigation.goBack() }
+          ]);
+    }
+
+
+    // const handlePressOpenButton = (department, tags) => {
+    //     const user = {
+    //         full_name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
+    //         email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
+    //         phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
+    //     };
+
+    //     tags.push('pid:_' + userData.userInfo.accountNumber);
+
+    //     ZendeskChat.startChat({
+    //         name: user.full_name,
+    //         email: user.email,
+    //         phone: user.phone,
+    //         department: department,
+    //         tags: tags,
+    //         behaviorFlags: {
+    //             showAgentAvailability: true,
+    //             showChatTranscriptPrompt: false,
+    //             showPreChatForm: true,
+    //             showOfflineForm: true,
+    //         },
+    //         preChatFormOptions: {
+    //             name: "optional",
+    //             email: "optional",
+    //         },
+    //         messagingOptions: {
+    //             botName: 'Sparklight',
+    //             botAvatarName: 'chatIcon'
+    //         },
+    //         localizedDismissButtonTitle: "Dismiss",
+    //     });
+    // };
 
 
     return (
         <View style={styles.support}>
-            <ProfileSettingsHeader title="Support" iconAlignment="right" showIcon={false} />
+            <ProfileSettingsHeader title="Support" iconAlignment="right" showIcon={false}  />
             <LinearGradient
                 style={styles.linearGradientStyle}
                 locations={[0, 1]}
@@ -196,6 +206,9 @@ const Support = ({ route }) => {
                             <React.Fragment key={index}>
 
                                 <Pressable key={index} style={[styles.search, styles.navigationBorder]}
+                                     accessible={true}
+                                     accessibilityLabel={item.text == `More...` ? 'More' : item.text}
+                                     accessibilityRole="button"
                                     onPress={() => {
                                         if (item.iconAlignment === 'left') {
                                             navigation.navigate(item.navigateTo)
@@ -227,7 +240,11 @@ const Support = ({ route }) => {
                             </Text>
                         </View>
 
-                        {<Pressable style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} onPress={() => { navigation.navigate('DiagnosticFlow') }}>
+                        {<Pressable 
+                         accessible={true}
+                         accessibilityLabel={`Sparklight Smart Check`}
+                         accessibilityRole="button"
+                        style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} onPress={() => { navigation.navigate('DiagnosticFlow') }}>
                             <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                 <View style={[{ paddingVertical: Padding.p_xl }, styles.contentSpaceBlock]}>
                                     <View style={styles.headingAndIcon}>
@@ -250,7 +267,7 @@ const Support = ({ route }) => {
                                                 />
                                             </View>
                                             <Text style={[styles.supportingText, styles.supportingTypo1,]} >
-                                                Automated troubleshooting scan.
+                                            Instant troubleshooting & outage check.
                                             </Text>
                                         </View>
                                     </View>
@@ -294,6 +311,9 @@ const Support = ({ route }) => {
                                 */}
                         <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]}>
                             <Pressable
+                             accessible={true}
+                             accessibilityLabel={`Equipment Management`}
+                             accessibilityRole="button"
                                 style={[styles.integrationCardMobile1, styles.integrationCardBorder]}
                                 onPress={() => { navigation.navigate('ManageEquipment') }}
                             >
@@ -339,7 +359,11 @@ const Support = ({ route }) => {
                             <View style={[styles.integrationCardMobile1, styles.integrationCardBorder]}>
                                 <View style={[styles.content, styles.contentSpaceBlock]}>
 
-                                    <Pressable style={styles.headingAndIcon4} onPress={()=>{
+                                    <Pressable 
+                                    accessible={true}
+                                    accessibilityLabel={`Ticket Support`}
+                                    accessibilityRole="button"
+                                    style={styles.headingAndIcon4} onPress={()=>{
                                             navigation.navigate('TicketStackScreen')
                                     }}>
                                         <View style={[styles.icon]}>
@@ -368,7 +392,7 @@ const Support = ({ route }) => {
                                     </Pressable>
                                 </View>
                             </View>
-                        </View>
+                        </View> 
 
 
 
@@ -433,6 +457,9 @@ const Support = ({ route }) => {
                                                 24h/7 days a week
                                             </Text>
                                             <TouchableOpacity
+                                             accessibilityLabel="Chat"
+                                             accessibilityRole="button"
+                                             accessible={true}
                                                 style={{
                                                     flexDirection: "row",
                                                     marginTop: 16,
@@ -486,6 +513,7 @@ const Support = ({ route }) => {
                                                     //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
                                                     onPress={() => {
                                                         toggleModal("Bill");
+                            
                                                     }}
                                                     accessibilityLabel="Chat Support"
                                                     accessibilityRole="button"
@@ -512,6 +540,9 @@ const Support = ({ route }) => {
                                                     M-F 8:00 AM-5:00 PM MST
                                                 </Text>
                                                 <TouchableOpacity
+                                                accessibilityLabel="Chat"
+                                                accessibilityRole="button"
+                                                accessible={true}
                                                     style={{
                                                         flexDirection: "row",
                                                         marginTop: 16,
@@ -519,6 +550,7 @@ const Support = ({ route }) => {
                                                     }}
                                                     onPress={() => {
                                                         toggleModal("Bill");
+                                                        //handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])
                                                     }}
                                                 >
                                                     <ChatIcon />

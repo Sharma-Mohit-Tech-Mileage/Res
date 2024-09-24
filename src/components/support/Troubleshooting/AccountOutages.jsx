@@ -1,18 +1,45 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView } from 'react-native';
-import { Color, Padding, Border, FontSize, FontFamily } from "../../../../GlobalStyles";
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Dimensions, AccessibilityInfo, findNodeHandle } from 'react-native';
+import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import WalletIcon from '../../../res/svgIcons/troubleshooting/WalletIcon';
 import { Env } from '../../../network/apis/account/Constants';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
+
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
-const TroubleshootComponent = ({
-    step, title, description, success, pageCount
-}) => {
+const TroubleshootComponent = ({ pageCount }) => {
     const navigation = useNavigation();
+    const alertRef = useRef(null);
+    const [isAccessibilityOn, setIsAccessibilityOn] = useState(false);
+
+    useEffect(() => {
+        // Check if accessibility is enabled
+        AccessibilityInfo.isScreenReaderEnabled().then((enabled) => {
+            setIsAccessibilityOn(enabled);
+        });
+
+        // Announce the message if accessibility is on
+        if (isAccessibilityOn) {
+            AccessibilityInfo.announceForAccessibility(
+                " Please click the 'Pay Bill' button below to settle the amount as soon as possible."
+            );
+        }
+    }, [isAccessibilityOn]);
+
+    const handlePress = () => {
+        // Annulment logic if VoiceOver or TalkBack is enabled
+        if (isAccessibilityOn) {
+            return; // Prevent the action if accessibility is on
+        }
+        navigation.navigate("ArticalWindowUtility", {
+            url: `${Env.URL}/billing`,
+            name: "Billing Details",
+        });
+    };
+
     return (
         <View style={styles.container}>
             {pageCount ? <Text style={styles.topLeftText}>2 of 3</Text> : null}
@@ -20,23 +47,27 @@ const TroubleshootComponent = ({
                 <View style={styles.circle}>
                     <WalletIcon />
                 </View>
-                <View style={styles.spinnerContainer}>
+                <View
+                    ref={alertRef}
+                    accessibilityLiveRegion="assertive"
+                    accessibility={true}
+                    style={styles.spinnerContainer}
+                >
                     <NotificationAlert
                         type="warning"
-                        title={(<Text style={styles.textStyle}>Uh oh. Looks like there is a past-due balance on your account.</Text>)}
+                        title={
+                            <Text style={styles.textStyle}>
+                                Uh oh. Looks like there is a past due balance on your account.
+                            </Text>
+                        }
                         showCloseIcon={false}
+                        accessibilityLabel="Uh oh! It looks like there’s a Past Due balance on your account. Please click the 'Pay Bill' button below to settle the amount as soon as possible."
                     />
                 </View>
                 <View style={[styles.button]}>
-                    <Pressable onPress={()=>{
-                        navigation.navigate("ArticleWindowUtility", {
-                            url: `${Env.URL}business/billing/payments`,
-                            name: "Billing Details",
-                          });
-                    }}
-                   >
+                    <Pressable onPress={handlePress}>
                         <Text style={[styles.accept]}>Pay Bill</Text>
-                    </Pressable>  
+                    </Pressable>
                 </View>
             </View>
         </View>

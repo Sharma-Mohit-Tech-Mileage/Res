@@ -37,6 +37,7 @@ const ShareWifiScreen = ({ route }) => {
   const [passwordList, setPasswordList] = useState([]);
   const [modemPasswordData, setModemPasswordData] = useState([])
   const [selectedItem, setSelectedItem] = useState(null)
+  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   const qrCodeRef = useRef();
   const navigation = useNavigation();
 
@@ -80,6 +81,7 @@ const ShareWifiScreen = ({ route }) => {
   //setSsid(itemValue.ssid)
 
   const handlePasswordSelection = (value) => {
+    setIsDropDownOpen(false)
     setSelectedPassword(value)
   }
 
@@ -129,7 +131,10 @@ const ShareWifiScreen = ({ route }) => {
           useAngle={true}
           angle={90}
         >
-          <View style={[styles.navBar]}>
+          <View 
+           accessibilityElementsHidden={isDropDownOpen}
+           importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+          style={[styles.navBar]}>
             <Pressable
               style={[styles.navIcon, styles.chevronLayout]}
               onPress={() => {
@@ -144,7 +149,7 @@ const ShareWifiScreen = ({ route }) => {
               <Image
                 style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                 resizeMode="cover"
-                source={require("../../../assets/xclose.png")}
+                source={require("../../../assets/chevronleft.png")}
                 accessible={false}
               />
             </Pressable>
@@ -174,15 +179,20 @@ const ShareWifiScreen = ({ route }) => {
 
         <View style={styles.qrContainer}>
           <View style={styles.textinput}>
-            <Text style={{ fontSize: 16 }}>SSID</Text>
+            <Text style={{ fontSize: 16,color:Color.sparklightGray1 }}>SSID</Text>
             <SparkLightDropdown
             items={passwordList}
             selectedValue={slectedPasword}
             onValueChange={handlePasswordSelection}
             dropDownStyle={{ color: Color.sparklightDarkGray }}
+            isDropDownOpen={(value) => {
+              setIsDropDownOpen(true)
+            }}
           />
           </View>
           <View
+           accessibilityElementsHidden={isDropDownOpen}
+           importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
             ref={qrCodeRef}
             style={{
               marginTop: 40,
@@ -192,7 +202,10 @@ const ShareWifiScreen = ({ route }) => {
           >
             <QRCode value={generateWifiQRCode()} size={200} />
           </View>
-          <Text style={{ fontSize: 14, marginTop: 40 }}>
+          <Text 
+           accessibilityElementsHidden={isDropDownOpen}
+           importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+          style={{ fontSize: 14, marginTop: 40,color:Color.sparklightGray1 }}>
             Scan this QR code to connect "{slectedPasword}" Network
           </Text>
         </View>

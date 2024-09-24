@@ -18,6 +18,7 @@ export const FontSize = {
     size_base: 16,
     size_smi: 13,
     size_5xl: 24,
+    size_6xl: 28,
 };
 /* Colors */
 export const Color = {
@@ -42,7 +43,9 @@ export const Color = {
     gray600: "#475467",
     sparkLightRed: "#EF4E3E",
     sparkLightInfo:'#F88700',
-    Gray300: '#EAEAEA'
+    Gray300: '#EAEAEA',
+    colorlightRed: '#EF4E3E33',
+    backgroundBlur: "#F8F8F8",
 };
 export const Padding = {
     p_5xs: 8,

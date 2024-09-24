@@ -91,7 +91,7 @@ const TextNotifications = ({ navigation }) => {
                                     <Text
                                         style={styles.youAreSubscribed}
                                     >{`You are subscribed to text message alerts. `}</Text>
-                                    <Text style={{ lineHeight: 24 }}>
+                                    <Text>
                                         Reply STOP to cancel at any time. Message and data rates may apply.
                                     </Text>
                                 </Text>
@@ -174,7 +174,7 @@ const TextNotifications = ({ navigation }) => {
                                         </View>
                                     </View>
                                     <Text style={[styles.receiveTextNotifications1, styles.containerTypo,]}>
-                                        Receive text notifications when outages occur.
+                                    Receive text notifications when outage occur.
                                     </Text>
                                 </View>
                             </View>
@@ -216,11 +216,11 @@ const TextNotifications = ({ navigation }) => {
                                             <Text
                                                 style={styles.youAreSubscribed}
                                             >{`By opting in for outage alerts, you agree to receive text `}</Text>
-                                            <Text style={{ lineHeight: 22 }}>
-                                                messages regarding new service outages affecting
+                                            <Text>
+                                                messages regarding new service outage affecting
                                                 your home internet service and updates regarding
-                                                existing outages (updates go out about every two
-                                                hours for existing outages). We will not send
+                                                existing outage (updates go out about every two
+                                                hours for existing outage). We will not send
                                                 messages between 9 PM and 6 AM.
                                             </Text>
                                         </Text>
@@ -231,6 +231,9 @@ const TextNotifications = ({ navigation }) => {
                     </View>
                     <View style={[{ alignSelf: "stretch" }]} >
                         <Pressable
+                        accessible={true}
+                        accessibilityLabel="Save"
+                         accessibilityRole="button"
                             style={({ pressed }) => [
                                 styles.buttons, styles.buttonsLayout,
                                 { opacity: pressed ? .7 : 1 }
@@ -241,6 +244,9 @@ const TextNotifications = ({ navigation }) => {
                         </Pressable>
                         <View style={{ padding: 8 }}></View>
                         <Pressable
+                        accessible={true}
+                        accessibilityLabel="Cancel"
+                         accessibilityRole="button"
                             style={({ pressed }) => [
                                 styles.buttonsLayout,
                                 { opacity: pressed ? .7 : 1 }
@@ -274,7 +280,7 @@ const styles = StyleSheet.create({
     mobilePhoneTypo: {
         color: Color.sparklightGray1,
         fontSize: FontSize.size_base,
-        lineHeight: 28,
+        lineHeight: 22,
         textAlign: "left",
         fontFamily: FontFamily.openSansRegular,
     },
@@ -305,7 +311,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
     },
     youAreSubscribed: {
-        lineHeight: 28,
+        lineHeight: 22,
     },
     youAreSubscribedContainer: {
         marginLeft: 8,
@@ -329,7 +335,7 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: FontSize.size_base,
-        lineHeight: 28,
+        lineHeight: 22,
         textAlign: "left",
         color: Color.colorGray_200,
         fontFamily: FontFamily.openSansRegular,

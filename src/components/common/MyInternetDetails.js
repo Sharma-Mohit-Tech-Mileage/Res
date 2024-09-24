@@ -1,238 +1,144 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { View, StyleSheet, Dimensions, ScrollView } from "react-native";
+import Carousel from 'react-native-snap-carousel';
+import Card from "./billerCards/BillerSummary";
+import AutoPayCard from "./billerCards/AutoPayCard";
+import PeperLessCard from "./billerCards/PeperLessCard";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { getUser } from "../../redux/utils/LocalStorage";
+import { GetApiRequest } from "../../network/APIClient";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchBillingPaper, fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
+import { Padding } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
-import LinearGradient from "react-native-linear-gradient";
-import RightArrow from "../../res/svgIcons/RightArrow";
-import {
-  widthPercentageToDP as wp,
-} from "react-native-responsive-screen";
-import Wallet2icon from "../../res/svgIcons/Wallet2icon";
-import Myplanicon from "../../res/svgIcons/Myplanicon";
-import { FontFamily } from "../../../GlobalStyles";
-import { Env } from "../../network/apis/account/Constants";
 
-const MyInternetDetials = ({ plans, billAmt, dueDate, navigation }) => {
-  //const [billAmt,setBillAmt]=useState(0)
-  const [planSpeed, setPlanSpeed] = useState("");
-  //const [dueDate,setDueDate]=useState('')
+const { width: viewportWidth } = Dimensions.get('window');
+
+const MyInternetDetails = ({ plans, billAmt, dueDate, paymentDetails,navigation }) => {
+  const dispatch = useDispatch();
+  const [paperlessStatus, setPaperlessStatus] = useState(false);
+  const [cardDigit, setCardDigit] = useState("");
+  const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const paperLessInfo = profile.paperLessInfo || {};
+  const profileDetails = profile.profileDetails || {};
+
+  const getStatus = () => {
+    getUser().then((res) => {
+      const accountNumber = res.userInfo.accountNumber;
+      GetApiRequest(
+        `account/api/account/${accountNumber}/easypay`,
+        (res) => {
+          setIsAutoPayStatus(res?.isEasyPay);
+          setCardDigit(res?.epLastfour);
+        },
+        onError
+      );
+      GetApiRequest(
+        `account/api/account/${accountNumber}/paperless/status`,
+        setPaperlessStatus,
+        onError
+      );
+    });
+  };
+
+  const onError = (error) => {
+    console.log("error", error);
+  };
 
   useEffect(() => {
-    if (plans.length > 0) {
-      setPlanSpeed(plans[0].downloadSpeed);
+    getStatus();
+    dispatch(fetchBillingPaper());
+    dispatch(fetchProfileDetails());
+  }, []);
+
+  const renderCard = ({ item, index }) => {
+    const isActive = index === activeSlide;
+  
+    if (index === 1) {
+      return (
+        <AutoPayCard
+          billAmt={billAmt}
+          cardDigit={cardDigit}
+          isAutoPayStatus={isAutoPayStatus}
+          paperlessStatus={paperlessStatus}
+          paymentDetails={paymentDetails}
+          navigation={navigation}
+          style={styles.card}
+          accessible={true}
+          accessibilityLabel="Auto Pay Card"
+          accessibilityState={{ selected: isActive }}
+        />
+      );
     }
-  });
+    if (index === 2) {
+      return (
+        <PeperLessCard
+          billAmt={billAmt}
+          paperLessInfo={paperLessInfo}
+          isAutoPayStatus={isAutoPayStatus}
+          paperlessStatus={paperlessStatus}
+          navigation={navigation}
+          style={styles.card}
+          accessible={true}
+          accessibilityLabel="Paperless Billing Card"
+          accessibilityState={{ selected: isActive }}
+        />
+      );
+    }
+    return (
+      <Card
+        billAmt={billAmt}
+        dueDate={dueDate}
+        isAutoPayStatus={isAutoPayStatus}
+        paperlessStatus={paperlessStatus}
+        navigation={navigation}
+        style={styles.card}
+        accessible={true}
+        accessibilityLabel="Billing Summary Card"
+        accessibilityState={{ selected: isActive }}
+      />
+    );
+  };
+  
+
   return (
-    <View style={{ flexDirection: "row" }}>
-      <View
-        style={[
-          styles.card,
-          styles.shadowProp,
-          { flexDirection: "column", marginVertical: 20 },
-        ]}
-      >
-        <View style={{ flexDirection: "row", paddingHorizontal: 20 }}>
-          <LinearGradient
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
-            style={{
-              width: wp("10%"),
-              height: wp("10%"),
-              borderRadius: 10,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Wallet2icon />
-          </LinearGradient>
-          <Text style={styles.title}>{"Bill Summary"}</Text>
-        </View>
-        <View style={styles.subSec}>
-          <View style={{ flexDirection: "row" }}>
-            <Text
-              style={{
-                fontSize: 14,
-                alignSelf: "center",
-                color: colors.darkest_grey,
-                fontWeight: "400",
-                fontFamily:FontFamily.openSansRegular,
-              }}
-            >
-              $
-            </Text>
-            <Text style={styles.subTitle}>{billAmt}</Text>
-          </View>
-
-          <Text style={[styles.date, { paddingRight: 10 }]}>
-            Due on {dueDate}
-          </Text>
-        </View>
-        <View
-          style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
+    <ScrollView contentContainerStyle={styles.scrollView} style={{ marginStart: -24 }}>
+      <View style={styles.container}>
+        <Carousel
+          data={[{}, {}, {}]}
+          renderItem={renderCard}
+          sliderWidth={viewportWidth}
+          itemWidth={wp('87%')}
+          inactiveSlideScale={0.94}
+          inactiveSlideOpacity={0.7}
+          containerCustomStyle={[styles.carousel, { marginRight: 0 }]} // Ensure no margin on right
+          contentContainerCustomStyle={[styles.carouselContentContainer, { paddingEnd: 0 }]} // Ensure no padding at the end
+          onSnapToItem={(index) => setActiveSlide(index)}
         />
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("ArticalWindowUtility", {
-              url: `${Env.URL}/billing`,
-              name: "Billing Details",
-            });
-          }}
-          style={{
-            paddingBottom: 5,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingHorizontal: 20,
-            marginTop: 15,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              color: colors.sparklight_purple_blue,
-              fontFamily:FontFamily.openSansRegular,
-            }}
-          >
-            {"View Details"}
-          </Text>
-          <View>
-            <RightArrow />
-          </View>
-        </TouchableOpacity>
       </View>
-
-      <View
-        style={[
-          styles.card,
-          styles.shadowProp,
-          { flexDirection: "column", marginVertical: 20, marginHorizontal: 20 },
-        ]}
-      >
-        <View style={{ flexDirection: "row", paddingHorizontal: 20 }}>
-          <LinearGradient
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
-            style={{
-              width: wp("10%"),
-              height: wp("10%"),
-              borderRadius: 10,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Myplanicon />
-          </LinearGradient>
-          <Text style={styles.title}>My Plan</Text>
-        </View>
-        <View style={styles.subSec}>
-          <View style={{ flexDirection: "row" }}>
-            <Text style={styles.subTitle}>{planSpeed}</Text>
-            <Text
-              style={{
-                fontSize: 14,
-                alignSelf: "center",
-                color: colors.darkest_grey,
-                fontWeight: "400",
-                fontFamily:FontFamily.openSansRegular,
-                marginTop: 4,
-                marginLeft:4
-              }}
-            >
-              mb/s
-            </Text>
-          </View>
-        </View>
-        <View
-          style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
-        />
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("ArticalWindowUtility", {
-              url: `${Env.URL}/services/upgrade`,
-              name: "Upgrade Plan",
-            });
-          }}
-          style={{
-            paddingBottom: 5,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingHorizontal: 20,
-            marginTop: 15,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              color: colors.sparklight_purple_blue,
-              fontFamily:FontFamily.openSansRegular,
-            }}
-          >
-            {"Upgrade Plan"}
-          </Text>
-          <View>
-            <RightArrow />
-          </View>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  mainContainer: {
-    backgroundColor: "#EAECF0",
-    alignContent: "center",
-    alignItems: "center",
+  scrollView: {
+    flexGrow: 1,
+  },
+  container: {
+    paddingVertical: 16,
+    flex: 1, // Ensure the container takes up full height
+  },
+  carousel: {
+    overflow: 'visible',
+  },
+  carouselContentContainer: {
+    paddingHorizontal: wp('2.5%'),
   },
   card: {
-    backgroundColor: "white",
-    borderRadius: 2,
-    paddingVertical: 10,
-    width: wp("84%"),
-  },
-  shadowProp: {
-    shadowColor: "#171717",
-    shadowOffset: { width: -2, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
-  title: {
-    color: colors.darkest_grey,
-    fontSize: 20,
-    fontFamily:FontFamily.openSansRegular,
-    textAlign: "center",
-    fontStyle: "normal",
-    fontWeight: "400",
-    marginLeft: 10,
-    marginTop: 10,
-  },
-  subTitle: {
-    color: colors.darkest_grey,
-    fontFamily:FontFamily.openSansRegular,
-    fontSize: 22,
-    fontStyle: "normal",
-    fontWeight: "400",
-  },
-  date: {
-    fontSize: 14,
-    color: colors.dark_grey,
-    alignSelf: "center",
-    fontFamily:FontFamily.openSansRegular,
-  },
-  subSec: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 10,
-    paddingRight: 5,
-    marginTop: 10,
-    paddingHorizontal: 20,
+    height: 230,  // Set the height for the cards
   },
 });
-export default MyInternetDetials;
+
+export default MyInternetDetails;

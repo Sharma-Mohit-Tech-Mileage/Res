@@ -25,11 +25,15 @@ const MyTabs = ({ route, navigation }) => {
   const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
   const [shadowStyle, setShadowStyle] = useState(styles.shadowTabs);
   const { tabBarVisible } = useTabBarVisibility();
+  const [isBillerUser,setIsBillerUser]= useState(false)
   const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector(state => state.combinedReducers.home);
 
   useEffect(() => {
-    console.log('MyTabHome: ', home);
+    if(user?.userInfo.accountNumber.toString().length>=16){
+      setIsBillerUser(true)
+  }
+    if(user?.userInfo.accountNumber.toString().length==9){
     if (home.walkThroughStep === 0) {
       setShadowStyle(styles.shadowTabs);
       setShadowStyleLeft(styles.shadowTabsLeft);
@@ -40,11 +44,13 @@ const MyTabs = ({ route, navigation }) => {
       setShadowStyle([styles.shadowTabs, styles.shadowTabsStep3]);
       setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left]);
     }
+  }
+    
   }, [home]);
 
   return (
     <>
-    { home.walkThroughStep !== null && home.walkThroughStep !== undefined &&
+    { !isBillerUser && home.walkThroughStep !== null && home.walkThroughStep !== undefined &&
       (
         <>
           <View style={shadowStyleLeft}>
@@ -88,6 +94,7 @@ const MyTabs = ({ route, navigation }) => {
         listeners={({ navigation }) => ({
           tabPress: (e) => {
             e.preventDefault();
+            if(!isBillerUser){    
             navigation.reset({
               index: 0,
               routes: [
@@ -108,13 +115,16 @@ const MyTabs = ({ route, navigation }) => {
                 },
               ],
             });
+          }
+
           },
         })}
-
+        
         options={{
           tabBarLabel: 'Shop',
           headerShown: false,
-          tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected /> : <ShopIcon />)
+          //tabBarLabelStyle:{color: isBillerUser ? '#c8c8c8':''},
+          tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected isNewBillerUser={isBillerUser}/> : <ShopIcon isNewBillerUser={isBillerUser} />)
         }}
       />
 
@@ -124,57 +134,45 @@ const MyTabs = ({ route, navigation }) => {
         listeners={({ navigation }) => ({
           tabPress: (e) => {
             e.preventDefault();
-            navigation.reset({
+            if(!isBillerUser){ 
+             navigation.reset({
               index: 0,
               routes: [
                 {
                   name: 'Support',
-                  //params: { triggerEvent: true }
                 },
               ],
             });
+           }   
           },
         })}
+        
         options={{
           headerShown: false,
           tabBarLabel: 'Support',
+         // tabBarLabelStyle:{color: isBillerUser ? '#c8c8c8':''},
           tabBarIcon: ({ focused }) => {
             return (
               <View style={styles.tabItem}>
-                {focused ? <SupportIconSelected /> : <SupportIcon />}
+                {focused ? <SupportIconSelected /> : <SupportIcon isNewBillerUser={isBillerUser} />}
               </View>
             );
           }
         }}
       /> 
-        {/* <Tab.Screen
-          name="Support"
-          component={SupportStack}
-          options={{
-            headerShown: false,
-            tabBarLabel: 'Support',
-            tabBarIcon: ({ focused }) => (
-              <View style={styles.tabItem}>
-                {focused ? <SupportIconSelected /> : <SupportIcon />}
-              </View>
-            ),
-          }}
-          listeners={({ navigation, route }) => ({
-            tabPress: e => {
-              if (route.params?.triggerEvent) {
-                e.preventDefault();
-                navigation.navigate('Support', {
-                  screen: 'support',
-                  params: { triggerEvent: true },
-                });
-              }
-            },
-          })}
-        /> */}
+       
 
       <Tab.Screen
         name="account"
         component={AccountStackScreen}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+              e.preventDefault();
+              navigation.navigate('account', {
+                  screen: 'Account', 
+              });
+          },
+      })}
         options={{
           headerShown: false,
           tabBarLabel: 'Account',

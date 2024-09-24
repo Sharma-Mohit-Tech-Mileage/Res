@@ -26,7 +26,6 @@ const SparkLightInput = ({
     const handleInputChange = (text) => {
         if (onChangeText) {
             onChangeText(text)
-            // onChangeText({ target: { name, value: text } });
         }
     };
 
@@ -41,7 +40,11 @@ const SparkLightInput = ({
                     <Text style={[styles.label, error && styles.errorLabel]}>{label}</Text>
                 )}
                 {secure && (
-                    <TouchableOpacity onPress={togglePasswordVisibility} style={styles.eyeButton}>
+                    <TouchableOpacity 
+                    accessibilityLabel={passwordVisible ? 'Hide' : 'Show'}
+                    accessibilityRole="button"
+                    accessible={true}
+                    onPress={togglePasswordVisibility} style={styles.eyeButton}>
                         <Image
                             source={passwordVisible ? eyeSlashIcon : eyeIcon}
                             style={styles.eyeIcon}
@@ -73,6 +76,8 @@ const SparkLightInput = ({
                         !isFocused && !error && { borderColor: Color.sparklightDarkGray }
                     ]}
                     accessibilityLabel={accessibilityLabel || placeholder}
+                    returnKeyType="done" // Set the return key type to "done"
+                    keyboardAppearance="default" // Ensures the default keyboard appearance
                     maxFontSizeMultiplier={1.25}
                     {...props}
                 />
@@ -106,12 +111,12 @@ const styles = StyleSheet.create({
         fontSize: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,
         borderRadius: Border.br_11xs,
+        paddingHorizontal: 10,
         flex: 1
     },
     textInputContainer: {
        // height: 48, // Keep the input field height
         color: Color.colorGray_200,
-        paddingHorizontal: 10,
         borderWidth: 1,
         borderRadius: Border.br_11xs,
         flexDirection: "row",
@@ -178,7 +183,7 @@ const styles = StyleSheet.create({
         width: 20,
         height: 20,
         resizeMode: "contain",
-        marginRight: 10
+        marginHorizontal: 10
     }
 });
 

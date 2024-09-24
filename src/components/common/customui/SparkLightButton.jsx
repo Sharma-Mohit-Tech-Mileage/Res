@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
         borderRadius: Border.br_11xs,
     },
     buttons: {
-        marginLeft: 10,
+        //marginLeft: 10,
         backgroundColor: Color.colorMidnightblue,
     },
     makePayment: {

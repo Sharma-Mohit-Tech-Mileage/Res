@@ -21,7 +21,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightDropdown from "../../../components/common/customui/SparkLightDropdown";
 import PrimaryButtom from "../../common/customui/PrimaryButton";
-
+import { useSelector } from 'react-redux';
 import colors from "../../../res/Colors";
 import { useNavigation } from "@react-navigation/native";
 import SparkLightInput from "../../common/customui/SparkLightInput";
@@ -31,26 +31,33 @@ import {
   UploadMultipartData,
   PostApiRequest,
 } from "../../../network/APIClient";
-import { getUser } from "../../../redux/utils/LocalStorage";
+import { getUser,storeValue } from "../../../redux/utils/LocalStorage";
 import DocumentPicker, { types } from "react-native-document-picker";
 import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
 import LoadingOverlay from "../../common/customui/CustomLoading";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import SparkLightMobileInputField from "../../common/customui/SparklightMobileInputField";
 
 const CreateTicket = () => {
   const navigation = useNavigation();
   const [selectedItem, setSelectedItem] = useState();
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {};
   const categories = ["Bill", "Support"];
   const [fileResponse, setFileResponse] = useState([]);
   const [upoadFileKey, setUploadFileKey] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [loadingTxt, setLoadingTxt] = useState("Creating Ticket...");
+  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   var Data = {
     subject: "",
     comment: "",
-    email: "",
+    email: profileDetails.multipleEmails ? '' : profileDetails.svEmailAddress,
     accountNumber: "",
     category: "",
     uploads: [],
+    PhoneNumber: '',
+    IsMobile:true
   };
 
   const {
@@ -66,8 +73,9 @@ const CreateTicket = () => {
   });
 
   const handleSave = (formData) => {
+    setLoadingTxt("Creating Ticket...")
     setLoading(true);
-    if (upoadFileKey) {
+    if (upoadFileKey.length>0) {
       formData?.uploads.splice(0, 0, upoadFileKey);
     }
     getUser().then((res) => {
@@ -77,6 +85,10 @@ const CreateTicket = () => {
         request,
         formData,
         (res) => {
+          console.log('saved data',JSON.stringify(formData))
+          let data={...formData,ticketNumber:res, status:'Pending',isLocal:true}
+          storeValue(data)
+          console.log('Ticket:',res)
           navigation.goBack();
           setTimeout(() => {
             setLoading(false);
@@ -88,6 +100,8 @@ const CreateTicket = () => {
   };
 
   const uploadFiles = (data) => {
+    setLoadingTxt("File Uploading...")
+    setLoading(true)
     const request = `support/api/Attachments`;
     UploadMultipartData(
       request,
@@ -96,10 +110,12 @@ const CreateTicket = () => {
         console.log("Data", res);
         if (res) {
           setUploadFileKey(res);
+          setLoading(false)
         }
       },
       (error) => {
         console.log("File Upload Error", error);
+        setLoading(false)
       }
     );
   };
@@ -129,21 +145,29 @@ const CreateTicket = () => {
     <View style={{ backgroundColor: colors.backgound_blue, flex: 1 }}>
       <View style={styles.ticketSupportNone}>
         <ProfileSettingsHeader
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
           title="Create Ticket"
-          onPressBack={() => navigation.navigate("support")}
+          onPressBack={() => navigation.goBack()}
         />
 
-        <ScrollView>
-          <View style={{ flexDirection: "column", paddingBottom: "40%" }}>
+        <ScrollView >
+          <View style={{ flexDirection: "column", paddingBottom: hp("40%") }}>
             <View style={[styles.innerContainer]}>
               <View style={[styles.frameParent]}>
                 <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
-                  <View style={styles.ticketsParent}>
-                    <Text style={styles.tickets}>Tickets Details</Text>
+                  <View 
+                  // accessibilityElementsHidden={isDropDownOpen}
+                  // importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                  style={styles.ticketsParent}>
+                    <Text  style={styles.tickets}>Tickets Details</Text>
                   </View>
                   <View style={styles.frameWrapper}>
-                    <View style={styles.textView}>
-                      <Text style={styles.text}>Subject*</Text>
+                    <View 
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                    style={styles.textView}>
+                      <Text style={[styles.text,{paddingBottom:8}]}>Subject</Text>
                     </View>
                     <Controller
                       control={control}
@@ -166,8 +190,12 @@ const CreateTicket = () => {
                   </View>
 
                   <View style={styles.frameWrapper}>
-                    <View style={styles.textView}>
-                      <Text style={styles.text}>Category*</Text>
+                    <View 
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                    style={styles.textView}>
+                      <Text style={styles.text}>Category</Text>
+                      </View>
                       <Controller
                         control={control}
                         name="category"
@@ -179,12 +207,21 @@ const CreateTicket = () => {
                             <SparkLightDropdown
                               items={categories}
                               selectedValue={selectedItem}
-                              onValueChange={onChange}
+                              onValueChange={(value) => {
+                                setIsDropDownOpen(true)
+                                onChange(value)
+                              }}
                               error={error?.message}
+                              isDropDownOpen={(value) => {
+                                setIsDropDownOpen(true)
+                              }}
                             />
 
                             {error && (
-                              <View style={styles.errorContainer}>
+                              <View 
+                              accessibilityElementsHidden={isDropDownOpen}
+                              importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                              style={styles.errorContainer}>
                                 <Image
                                   source={WarningIcon}
                                   style={styles.errorIcon}
@@ -197,11 +234,13 @@ const CreateTicket = () => {
                           </>
                         )}
                       />
-                    </View>
                   </View>
                   <View style={styles.frameWrapper}>
-                    <View style={styles.textView}>
-                      <Text style={styles.text}>Issue Description*</Text>
+                    <View 
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                    style={styles.textView}>
+                      <Text style={styles.text}>Issue Description</Text>
                     </View>
                     
                       <Controller
@@ -211,7 +250,10 @@ const CreateTicket = () => {
                           field: { onChange, onBlur, value },
                           fieldState: { error },
                         }) => (
-                          <View style={[ { marginTop: 10 }]}>
+                          <View 
+                          accessibilityElementsHidden={isDropDownOpen}
+                          importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                          style={[ { marginTop: 10 }]}>
                             <TextInput
                               placeholder="Issue Description"
                               onChangeText={onChange}
@@ -236,8 +278,11 @@ const CreateTicket = () => {
                   </View>
 
                   <View style={styles.frameWrapper}>
-                    <View style={styles.textView}>
-                      <Text style={styles.text}>Email*</Text>
+                    <View 
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                    style={styles.textView}>
+                      <Text style={[styles.text,{paddingBottom:8}]}>Email</Text>
                     </View>
                     <Controller
                       control={control}
@@ -256,6 +301,35 @@ const CreateTicket = () => {
                       )}
                     />
                   </View>
+
+                  <View style={styles.frameWrapper}>
+                    <View 
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                    style={styles.textView}>
+                      <Text style={[styles.text,{paddingBottom:8}]}>Phone Number (Optional)</Text>
+                    </View>
+                    <Controller
+                      control={control}
+                      name="PhoneNumber"
+                      render={({
+                        field: { onChange, onBlur, value },
+                        fieldState: { error },
+                      }) => (
+                        <SparkLightMobileInputField
+                        accessibilityElementsHidden={isDropDownOpen}
+                        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                          placeholder="Phone Number"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value}
+                          
+                          error={error?.message}
+                        />
+                      )}
+                    />
+                  </View>
+
                 </View>
                 <View style={styles.fileContainer}>
                   <Pressable
@@ -264,20 +338,26 @@ const CreateTicket = () => {
                   >
                     <View
                       style={{
-                        padding: 20,
+                        padding: 10,
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
-                      <View style={{ flexDirection: "row" }}>
+                      <View 
+                      accessibilityElementsHidden={isDropDownOpen}
+                      importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                      style={{ flexDirection: "row" }}>
                         <AttachmentIcon />
                         <Text style={styles.fileTxt}>
                           {fileResponse.length > 0
                             ? `Upload File: ${fileResponse[0].name}`
-                            : "Upload File(Optional)"}
+                            : "Upload File (Optional)"}
                         </Text>
                       </View>
-                      <Text style={styles.fileTxtSub}>
+                      <Text 
+                      accessibilityElementsHidden={isDropDownOpen}
+                      importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                      style={styles.fileTxtSub}>
                         Acceptable formats:.pdf,.png, .jpeg, .gif, .txt
                       </Text>
                     </View>
@@ -286,14 +366,17 @@ const CreateTicket = () => {
               </View>
               <LoadingOverlay
                 loading={loading}
-                loadingTxt={"Creating Ticket..."}
+                loadingTxt={loadingTxt}
                 onRequestClose={() => {
                   setLoading(false);
                 }}
               />
             </View>
 
-            <View style={{ width: "90%", alignSelf: "center" }}>
+            <View 
+            accessibilityElementsHidden={isDropDownOpen}
+            importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+            style={{ width: "90%", alignSelf: "center" }}>
               <PrimaryButtom
                 title="Submit"
                 onPress={handleSubmit(handleSave)}
@@ -302,6 +385,8 @@ const CreateTicket = () => {
             </View>
             <View>
               <Pressable
+              accessibilityElementsHidden={isDropDownOpen}
+              importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
                 style={[styles.buttons2, styles.buttonsLayout]}
                 onPress={() => navigation.goBack()}
               >

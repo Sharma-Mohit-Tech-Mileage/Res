@@ -21,7 +21,9 @@ import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import {
   GetApiRequest,
+  //GetEuroApiRequest,
   GetModemStatusApiRequest,
+  PostruckRollApi,
 } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
 import colors from "../../res/Colors";
@@ -40,10 +42,13 @@ import PasswordRetrieve from "../../res/svgIcons/PasswordRetrieve";
 import PasswordShare from "../../res/svgIcons/PasswordShare";
 import { Icon } from "native-base";
 import Loader from "../utility/Loader";
+import { useSelector } from "react-redux";
 
 const ManageEquipment = ({ route }) => {
   const navigation = useNavigation();
+  const user = useSelector((state) => state.combinedReducers.user.userData);
   const [manufacturer, setManufacturer] = React.useState("");
+  const [macAddress, setMacAddress] = React.useState("");
   const [model, setModel] = React.useState("");
   const [transmissionType, setTransmissionType] = React.useState("");
   const [leased, setLeased] = React.useState("");
@@ -53,36 +58,34 @@ const ManageEquipment = ({ route }) => {
   const [isOffline, setIsOffline] = React.useState(false);
   const [isContactUs, setIsContactUs] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [wifiPasswordCanChange, setwifiPasswordCanChange] = React.useState(false);
-  const [wifiData, setwifiData] = React.useState([])
-  React.useEffect(() => {
-    getModemPassword();
-  }, [])
-
+  const [isEEroDevice, setIsEEroDevice] = React.useState(false);
+  const [eeroDeviceData, setEEroDeviceData] = React.useState(null);
+  const [wifiPasswordCanChange, setwifiPasswordCanChange] =
+    React.useState(false);
+  const [wifiData, setwifiData] = React.useState([]);
+  const [truckrollPrediction, setTruckrollPrediction] = React.useState(-1);  
   const getModemPassword = () => {
-    setLoading(true)
+    setLoading(true);
     let re = getUser().then((res) => {
-      const request = `internet/api/internet/${res.userInfo.accountNumber}/modem/security/Get`;
+      const request = `internet/api/internet/${res.userInfo.accountNumber}/modemmobile`;
       GetApiRequest(request, onSuccessModemPassword, onErrorModemPassword);
     });
   };
 
   const onSuccessModemPassword = (res) => {
-    setLoading(false)
-    console.log("getModemDetails", res);
+    setLoading(false);
     if (res) {
-      if (res.length == 0) setwifiPasswordCanChange(false)
-      else setwifiPasswordCanChange(true)
-      const list = res.map((value) => value.ssid)
-      setwifiData(res)
+      setwifiPasswordCanChange(true)
+    }
+    else{
+      setwifiPasswordCanChange(false)
     }
   };
   const onErrorModemPassword = (error) => {
-    setLoading(false)
+    setLoading(false);
     console.log("error", error);
-    setwifiPasswordCanChange(false)
+    setwifiPasswordCanChange(false);
   };
-
 
   const getLeasedDetails = () => {
     let re = getUser().then((res) => {
@@ -107,24 +110,25 @@ const ManageEquipment = ({ route }) => {
       GetApiRequest(
         request,
         (response) => {
-          console.log("getInternetPlanDetails", response.length);
+          console.log("getInternetPlanDetails", JSON.stringify(response));
           setPlans(response);
           if (response.length > 0) {
             let macAddress = response[0].macAddress;
             var mac = macAddress;
             if (res.userInfo.accountNumber === "128387263") {
-              mac = "B8:19:04:8E:F3:EC";
-            } else if (res.userInfo.accountNumber === "133370775") {
-              mac = "3c:75:4a:ef:a1:00";
-            } else if (res.userInfo.accountNumber === "133437285") {
-              mac = "60:19:71:27:61:b2";
-            } else if (res.userInfo.accountNumber === "131684698") {
-              mac = "28:7a:ee:97:4d:cc";
+              mac = "bc:3e:07:38:56:d0";
+            } else if (user.userInfo.accountNumber === "902880244") {
+              mac = "bc:3e:07:38:56:d0";
+            } else if (user.userInfo.accountNumber === "902880236") {
+              mac = "28:7a:ee:8e:cf:8c";
+            } else if (user.userInfo.accountNumber === "902880079") {
+              mac = "00:40:36:5f:cc:7f";
             } else if (res.userInfo.accountNumber === "136885142") {
-              mac = "00:40:36:59:00:00";
+              mac = "20:73:55:89:c7:00";
             }
 
             checkModemDetails(mac);
+            setMacAddress(mac)
           }
         },
         (error) => {
@@ -172,7 +176,7 @@ const ManageEquipment = ({ route }) => {
           errorCode === 400 ||
           (errorCode === 500) | (errorCode === 504)
         ) {
-          setCurrentHealth("Offline");
+          setCurrentHealth("Poor");
           setIsContactUs(true);
         } else {
           setCurrentHealth("Offline");
@@ -221,25 +225,198 @@ const ManageEquipment = ({ route }) => {
     getModemDetails();
     getLeasedDetails();
     getInternetPlanDetails();
-    
+    getWifiPassword();
+    getEuroAccountDetails();
   }, []);
 
   React.useEffect(() => {
     console.log("Current Health", currentHealth);
+    if(currentHealth=='Poor'){
+       //getTruckRollPostApiRequets('ACDB48B5B8E1','101169084')
+       getTruckRollPostApiRequets(macAddress.replaceAll(':',''),user?.userInfo?.accountNumber)
+    }
   }, [currentHealth]);
 
-  
+  const getWifiPassword = () => {
+    //let accountNumber = "902878578";
+    const request = `/internet/api/internet/${user?.userInfo?.accountNumber}/modem/security/Get`;
+    GetApiRequest(
+      request,
+      (res) => {
+        console.log(res);
+        if (res) {
+          setwifiData(res);
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  };
+  const getEuroAccountDetails = () => {
+    setLoading(true);
+    const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${user?.userInfo?.accountNumber}`;
+    GetApiRequest(
+      request,
+      (res) => {
+        setLoading(false);
+        console.log(`getEuroAccountDetails======`, res);
+        if (res?.data !== null) {
+          setIsEEroDevice(true)
+          setEEroDeviceData(res.data)
+          setwifiPasswordCanChange(false);
+        } else {
+          getModemPassword();
+        }
+      },
+      (error) => {
+        setLoading(false);
+        console.log(`getEuroAccountDetails==error`, error);
+      }
+    );
+  };
+
+  // Call TruckRoll API
+  const getTruckRollPostApiRequets = (macAddress, accountNumber) => {
+    setLoadingHealth(true);
+    let request = {
+      dataframe_split: {
+        columns: ["accountnumber", "mac"],
+        data: [[accountNumber, macAddress]],
+      },
+    };
+    PostruckRollApi(
+      "model/lgb_model_fs/Staging/invocations",
+      request,
+      (res) => {
+        if (res) {
+          console.log('isLoading', res.predictions[0] )
+      
+          if (res.predictions.length > 0 && res.predictions[0]==1) {
+            console.log('getTruckRollPostApiRequets', JSON.stringify(res))
+            setTruckrollPrediction(res.predictions[0]);
+          }
+        }
+        setLoadingHealth(false);
+      },
+      (error) => {
+        setLoadingHealth(false);
+        console.log("TruckRollApi Error", JSON.stringify(error));
+      }
+    );
+  };
+
+  const renderOtherDeviceOptions = () => {
+    return (
+      <View
+        style={[
+          styles.supportAccordionParent,
+          styles.supportParentFlexBox,
+        ]}
+      >
+        <View style={[styles.frameLayout]} />
+
+        <TouchableOpacity
+          style={[styles.frame9defaultSpaceBlock]}
+          onPress={() => {
+            navigation.navigate("UpdateModemPassword");
+          }}
+        >
+          <PasswordKey />
+          <Text style={styles.modemHealthSupport}>Update Password</Text>
+          <Image
+            style={styles.rightIconStyle}
+            source={require("../../../assets/chevronright.png")}
+          />
+        </TouchableOpacity>
+
+        <View style={[styles.frameLayout]} />
+        <TouchableOpacity
+          style={[styles.frame9defaultSpaceBlock]}
+          onPress={() => {
+            navigation.navigate("RetrieveModemPassword");
+          }}
+        >
+          <PasswordRetrieve />
+          <Text style={styles.modemHealthSupport}>
+            Retrieve Password
+          </Text>
+          <Image
+            style={styles.rightIconStyle}
+            source={require("../../../assets/chevronright.png")}
+          />
+        </TouchableOpacity>
+
+        <View style={[styles.frameLayout]} />
+        <TouchableOpacity
+          style={[styles.frame9defaultSpaceBlock]}
+          onPress={() => {
+            navigation.navigate("ShareWifiScreen", {
+              wifiData: wifiData,
+            });
+          }}
+        >
+          <PasswordShare />
+          <Text style={styles.modemHealthSupport}>Share Password</Text>
+          <Image
+            style={styles.rightIconStyle}
+            source={require("../../../assets/chevronright.png")}
+          />
+        </TouchableOpacity>
+      </View>
+    )
+  }
+
+  const renderEEroDeviceOptions = () => {
+    return(
+              <View
+                style={[
+                  styles.supportAccordionParent,
+                  styles.supportParentFlexBox,
+                ]}
+              >
+                <View style={[styles.frameLayout]} />
+
+                <TouchableOpacity
+                  style={[styles.frame9defaultSpaceBlock]}
+                  onPress={() => {
+                    navigation.navigate("UpdateModemPassword",{isEEroDevice: true , eeroDeviceData: eeroDeviceData});
+                  }}
+                >
+                  <PasswordKey />
+                  <Text style={styles.modemHealthSupport}>Update Password</Text>
+                  <Image
+                    style={styles.rightIconStyle}
+                    source={require("../../../assets/chevronright.png")}
+                  />
+                </TouchableOpacity>
+
+                <View style={[styles.frameLayout]} />
+                <TouchableOpacity
+                  style={[styles.frame9defaultSpaceBlock]}
+                  onPress={() => {
+                    navigation.navigate("EEroFeatures");
+                  }}
+                >
+                  <PasswordRetrieve />
+                  <Text style={styles.modemHealthSupport}>
+                    Open eero App
+                  </Text>
+                  <Image
+                    style={styles.rightIconStyle}
+                    source={require("../../../assets/chevronright.png")}
+                  />
+                </TouchableOpacity>
+              </View>
+    )
+  }
 
   return (
     <View style={styles.manageEquipment}>
       <ProfileSettingsHeader
         title="Manage Equipment "
         onPressBack={() => {
-          if (route.params?.isFromTroubleshooting) {
-            navigation.goBack();
-          } else {
-            navigation.navigate("SupportStack");
-          }
+          navigation.goBack();
         }}
       />
       <ScrollView automaticallyAdjustContentInsets={false}>
@@ -362,11 +539,16 @@ const ManageEquipment = ({ route }) => {
                                 },
                               ]}
                             >
-                              {isOffline
-                                ? "Modem is Offline"
-                                : isContactUs
-                                  ? "Please try again later"
-                                  : "An issue has been detected"}
+                              {truckrollPrediction === 1 ? 'Schedule a Service Appointment' :
+                                <>
+
+                                  {isOffline
+                                    ? "Modem is Offline"
+                                    : isContactUs
+                                      ? "Please try again later"
+                                      : "An issue has been detected"}
+                                </>
+                              }
                             </Text>
                           </View>
                           <Text
@@ -375,9 +557,13 @@ const ManageEquipment = ({ route }) => {
                               styles.yourSavedCardSpaceBlock,
                             ]}
                           >
-                            {isContactUs
-                              ? `Sorry, we're having trouble completing the modem system check right now. This seems to be an issue on our end. Please try again later. If the problem persists, please contact our support team for assistance.`
-                              : "Try one of the highlighted options below to resolve"}
+                            {truckrollPrediction === 1 ? 'We\'ve noticed that your modem has been experiencing repeated issues, which may be affecting your internet service quality. We recommend you contact us to schedule a service appointment.' :
+                              <>
+                                {isContactUs
+                                  ? `Sorry, we're having trouble completing the modem system check right now. This seems to be an issue on our end. Please try again later. If the problem persists, please contact our support team for assistance.`
+                                  : "Try one of the highlighted options below to resolve"}
+                              </>
+                            }
                           </Text>
                         </View>
                       </View>
@@ -397,7 +583,7 @@ const ManageEquipment = ({ route }) => {
                 style={[
                   styles.frame9defaultSpaceBlock,
                   {
-                    backgroundColor: isContactUs
+                    backgroundColor: (isContactUs || truckrollPrediction == 1 || loadingHealth)
                       ? "white"
                       : currentHealth === "Offline" ||
                         isOffline ||
@@ -413,7 +599,7 @@ const ManageEquipment = ({ route }) => {
                 }}
               >
                 <CheckConnection />
-                <Text style={styles.modemHealthSupport}>Check connection</Text>
+                <Text style={styles.modemHealthSupport}>Check Connection</Text>
                 <Image
                   style={styles.rightIconStyle}
                   source={require("../../../assets/chevronright.png")}
@@ -425,7 +611,7 @@ const ManageEquipment = ({ route }) => {
                   style={[
                     styles.frame9defaultSpaceBlock,
                     {
-                      backgroundColor: isContactUs
+                      backgroundColor: (isContactUs || truckrollPrediction == 1 || loadingHealth)
                         ? "white"
                         : currentHealth === "Offline" ||
                           currentHealth === "Poor"
@@ -464,7 +650,7 @@ const ManageEquipment = ({ route }) => {
                 style={[
                   styles.frame9defaultSpaceBlock,
                   {
-                    backgroundColor: isContactUs
+                    backgroundColor: (isContactUs || truckrollPrediction == 1 || loadingHealth)
                       ? "white"
                       : currentHealth === "Offline"
                         ? "#EF4E3E10"
@@ -493,7 +679,7 @@ const ManageEquipment = ({ route }) => {
                   styles.frame9defaultSpaceBlock,
                   {
                     backgroundColor:
-                      currentHealth === "Offline" || isContactUs
+                      (currentHealth === "Offline" || isContactUs || (!loadingHealth && truckrollPrediction == 1))
                         ? "#EF4E3E10"
                         : "white",
                   },
@@ -532,76 +718,24 @@ const ManageEquipment = ({ route }) => {
           </View>
 
           {/*Wifi Passoword*/}
-          {wifiPasswordCanChange && <View
-            style={[
-              styles.myModem,
-              styles.myModemSpaceBlock,
-              { marginTop: 20 },
-            ]}
-          >
-            <View
-              style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
-            >
-              <Text style={[styles.myModem1, styles.myModem1Typo]}>
-                WiFi Password
-              </Text>
-            </View>
+          {(wifiPasswordCanChange || isEEroDevice) && (
             <View
               style={[
-                styles.supportAccordionParent,
-                styles.supportParentFlexBox,
+                styles.myModem,
+                styles.myModemSpaceBlock,
+                { marginTop: 20 },
               ]}
             >
-              <View style={[styles.frameLayout]} />
-
-              <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock]}
-                onPress={() => {
-                  navigation.navigate("UpdateModemPassword");
-                }}
+              <View
+                style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
               >
-                <PasswordKey />
-                <Text style={styles.modemHealthSupport}>Update Password</Text>
-                <Image
-                  style={styles.rightIconStyle}
-                  source={require("../../../assets/chevronright.png")}
-                />
-              </TouchableOpacity>
-
-              <View style={[styles.frameLayout]} />
-              <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock]}
-                onPress={() => {
-                  navigation.navigate("RetrieveModemPassword");
-                }}
-              >
-                <PasswordRetrieve />
-                <Text style={styles.modemHealthSupport}>Retrieve Password</Text>
-                <Image
-                  style={styles.rightIconStyle}
-                  source={require("../../../assets/chevronright.png")}
-                />
-              </TouchableOpacity>
-
-              <View style={[styles.frameLayout]} />
-              <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock]}
-                onPress={() => {
-                  navigation.navigate('ShareWifiScreen', { wifiData: wifiData })
-                }}
-              >
-                <PasswordShare />
-                <Text style={styles.modemHealthSupport}>
-                  Share Password
+                <Text style={[styles.myModem1, styles.myModem1Typo]}>
+                  WiFi Password
                 </Text>
-                <Image
-                  style={styles.rightIconStyle}
-                  source={require("../../../assets/chevronright.png")}
-                />
-              </TouchableOpacity>
+              </View>
+              {isEEroDevice ? renderEEroDeviceOptions() : renderOtherDeviceOptions()}
             </View>
-          </View>}
-
+          )}
 
           {/* Quick Link section */}
 
@@ -919,8 +1053,8 @@ const styles = StyleSheet.create({
   rightIconStyle: {
     width: 20,
     height: 20,
-    resizeMode: "contain"
-  }
+    resizeMode: "contain",
+  },
 });
 
 export default ManageEquipment;

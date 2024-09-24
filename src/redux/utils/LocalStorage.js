@@ -18,16 +18,6 @@ export const getUser = async () => {
   }
 };
 
-// getting data
-export const getUserBusi = async () => {
-  try {
-    const userData = JSON.parse(await AsyncStorage.getItem("busi_user"))
-    return userData;
-  } catch (error) {
-   console.log(error); 
-  }
-};
-
 export const storeSsoToken = async (value) => {
   try {
     await AsyncStorage.setItem("idToken", JSON.stringify(value));
@@ -94,6 +84,25 @@ export const getUpgradeToken = async () => {
   try {
     const upgradeData = JSON.parse(await AsyncStorage.getItem("upgradeToken"));
     return upgradeData;
+  } catch (error) {
+   console.log(error); 
+  }
+};
+
+// store pending tickets
+export const storeValue = async (value) => {
+  try {
+    await AsyncStorage.setItem("ptickets", JSON.stringify(value));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// getting data
+export const getPendingTicket = async () => {
+  try {
+    const data = JSON.parse(await AsyncStorage.getItem("ptickets"));
+    return data;
   } catch (error) {
    console.log(error); 
   }

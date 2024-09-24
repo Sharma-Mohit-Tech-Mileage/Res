@@ -1,24 +1,34 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import { StyleSheet,TouchableOpacity, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
-import { validatePassword, securityQuestions, passwordTerms } from "../utility/constant";
+import { validatePassword, passwordTerms,securityQuestions } from "../utility/constant";
 import SparkLightInput from '../common/customui/SparkLightInput';
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
+import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
+import { GetApiRequest,PutApiRequest } from "../../network/APIClient";
+import LoadingOverlay from "../common/customui/CustomLoading";
 import { passwordSchema } from '../utility/validationSchema'; // Update the path as necessary
+import colors from "../../res/Colors";
 const PasswordSecurityEdit = () => {
 
   const navigation = useNavigation();
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
+  const [isNewBiller, setIsNewBiller] = useState(false);
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
+  const [mySecurityQuestion, setMySecurityQuestion] = useState('');
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingTxt, setLoadingTxt] = useState("Please wait...");
+  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
+  const [securityQuestionsNew,setSecurityQuestionsNew] =useState(securityQuestions)
   const route = useRoute(); // Use the useRoute hook
   const dispatch = useDispatch();
   const profile = useSelector(state => state.combinedReducers.profile || {});
@@ -30,12 +40,21 @@ const PasswordSecurityEdit = () => {
   const handleSecurityQuestionChange = (itemValue) => {
     setLocalProfile({ ...profileDetails, securityQuestion: itemValue === "Add your own question" ? '' : itemValue });
     setCustomSecurityQuestion(itemValue);
+    setIsDropDownOpen(false)
     setIsCustomQuestionSelected(itemValue === "Add your own question");
   };
 
+
   const handleSave = (formData) => {
+    console.log("request save data",JSON.stringify(formData))
+    setLoading(true)
+    formData.securityQuestion=(isCustomQuestionSelected)? formData.securityQuestion : customSecurityQuestion
     dispatch(updateProfileSecurity(formData, navigation)); // Dispatch with formData
+   
   };
+
+  
+
 
   const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
     resolver: yupResolver(passwordSchema(isCustomQuestionSelected)),
@@ -47,22 +66,74 @@ const PasswordSecurityEdit = () => {
     setShowValidationAlert(true);
   };
 
+
+  const getSecurityQuestions=()=>{
+    const request = `usersvc/api/securityquestions/`;
+    GetApiRequest(
+      request,
+      (res) => {
+        console.log("getSecurityQuestions", res);
+        if (res) {
+          setSecurityQuestionsNew(res)
+          checkCustomSecurityQuestion(res)
+        }
+        
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+  }
+  //usersvc/api/profile/password/8160210010000010
+
+  
+
   useEffect(() => {
     // Reset the form with the updated profile details
-    reset(profileDetails);
+    //reset(profileDetails);
+    setLoading(false)
   }, [profileDetails, reset]);
 
 
-  useEffect(() => {
+  const checkCustomSecurityQuestion=(securityQuestions)=>{
+      console.log('Profile Details',profileDetails)
     const storedSecurityQuestion = profileDetails.securityQuestion;
-    const isCustomQuestion = storedSecurityQuestion && !securityQuestions.includes(storedSecurityQuestion);
+    const isCustomQuestion = storedSecurityQuestion && !securityQuestionsNew.includes(storedSecurityQuestion);
     setIsCustomQuestionSelected(isCustomQuestion);
     if (isCustomQuestion) {
       setCustomSecurityQuestion("Add your own question");
     } else {
       setCustomSecurityQuestion(storedSecurityQuestion);
     }
-  }, []);
+  }
+
+  useEffect(()=>{
+    const storedSecurityQuestion = profileDetails.securityQuestion;
+    const isCustomQuestion = storedSecurityQuestion && !securityQuestionsNew.includes(storedSecurityQuestion);
+    setIsCustomQuestionSelected(isCustomQuestion);
+    if (isCustomQuestion) {
+      setCustomSecurityQuestion("Add your own question");
+    } else {
+      setCustomSecurityQuestion(storedSecurityQuestion);
+    }
+
+  },[])
+
+  useEffect(() => {
+    let re = getUser().then((res) => {
+      if(res.userInfo.accountNumber.toString().length>=16){
+        setIsNewBiller(true)
+      }
+    });
+   
+    if(isNewBiller){
+      getSecurityQuestions();
+    }else{
+      
+     
+
+    }
+  }, [isNewBiller]);
 
   useEffect(() => {
     if (route.params?.updateFailed) {
@@ -74,9 +145,14 @@ const PasswordSecurityEdit = () => {
 
 
   return (
-    <View style={styles.passwordSecurityEdit}>
+    <View style={styles.passwordSecurityEdit}
+    accessibilityElementsHidden={isDropDownOpen}
+    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+    >
       <ProfileSettingsHeader
-        title="Edit Password & Security"
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+        title="Edit Security Question"
         onPressBack={() => navigation.navigate('PasswordSecurity')}
       />
       <ScrollView ref={scrollViewRef} >
@@ -101,64 +177,37 @@ const PasswordSecurityEdit = () => {
                   onClose={() => setShowValidationAlert(false)}
                 />
               </View>
-              <View style={[styles.passwordWrapper, styles.wrapperSpaceBlock1]}>
-                <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header">
-                  Password
-                </Text>
-              </View>
-              <View style={styles.frameParent}>
-                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
-                    <Controller
-                      control={control}
-                      name="newPassword"
-                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                        <>
-                          <SparkLightInput
-                            placeholder="New Password"
-                            onBlur={onBlur}
-                            label={'New Password'}
-                            onChangeText={onChange}
-                            value={value}
-                            secure={true}
-                            error={error?.message}
-                          />
-                          <View style={[styles.passwordFlexBox, { marginTop: Padding.p_base }]}>
-                            {validatePassword(value, profileDetails.userName).map((isValid, index) => (
-                              <View key={`point-${index}`} style={styles.bulletPointContainer}>
-                                <View style={{ marginTop: 7 }}>
-                                  <View style={[
-                                    styles.bullet,
-                                    { backgroundColor: isValid ? Color.sparklightGreen : Color.colorGray_200 }
-                                  ]} />
-                                </View>
-                                <Text style={styles.bulletPoiint}>{passwordTerms[index]}</Text>
-                              </View>
-                            ))}
-                          </View>
-                        </>
-                      )}
-                    />
-                </View>
-              </View>
-              <View style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}>
-                <View style={styles.frameChild} />
-              </View>
               <View style={styles.frameParent1}>
-                <View style={styles.securityQuestionWrapper}>
+                <View 
+                accessibilityElementsHidden={isDropDownOpen}
+                importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                style={styles.securityQuestionWrapper}>
                   <Text style={[styles.password, styles.passwordFlexBox]} >Security Question</Text>
                 </View>
-                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                <View 
+                style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                   <View style={styles.textinput}>
-                    <Text style={[styles.firstName1, styles.firstTypo]} > Password Reset Question</Text>
+                    <Text 
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                     style={[styles.firstName1, styles.firstTypo]} > Password Reset Question</Text>
                     <SparkLightDropdown
-                      items={securityQuestions}
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                      items={securityQuestionsNew}
                       selectedValue={customSecurityQuestion}
                       onValueChange={handleSecurityQuestionChange}
+                      isDropDownOpen={(value) => {
+                        setIsDropDownOpen(true)
+                      }}
                     />
                   </View>
                 </View>
                 {isCustomQuestionSelected && (
-                  <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                  <View 
+                 accessibilityElementsHidden={isDropDownOpen}
+                 importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                  style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                     <View style={styles.textinput}>
                       <Controller
                         control={control}
@@ -173,12 +222,16 @@ const PasswordSecurityEdit = () => {
                               error={error?.message}
                             />
                           </>
+                          
                         )}
                       />
                     </View>
                   </View>
                 )}
-                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                <View 
+                accessibilityElementsHidden={isDropDownOpen}
+                importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                     <Controller
                       control={control}
                       name="securityAnswer"
@@ -199,14 +252,30 @@ const PasswordSecurityEdit = () => {
             </View>
           </View>
           <View style={styles.frameParent1}>
-            <Pressable style={[styles.buttons, styles.buttonsLayout]}
+            <Pressable 
+             accessibilityLabel={'Save'}
+             accessibilityRole="button"
+             accessible={true}
+            style={[styles.buttons, styles.buttonsLayout]}
               onPress={handleSubmit(handleSave, handleValidationError)}>
               <Text style={[styles.makePayment, styles.makeTypo]}> Save </Text>
             </Pressable>
-            <Pressable style={[styles.buttons1, styles.buttonsLayout]} onPress={() => navigation.navigate("PasswordSecurity")}>
+            <Pressable 
+             accessibilityLabel={`Cancel`}
+             accessibilityRole="button"
+             accessible={true}
+            style={[styles.buttons1, styles.buttonsLayout]} onPress={() => navigation.navigate("PasswordSecurity")}>
               <Text style={[styles.makePayment1, styles.makeTypo]}> Cancel</Text>
             </Pressable>
           </View>
+
+          <LoadingOverlay
+                loading={loading}
+                loadingTxt={loadingTxt}
+                onRequestClose={() => {
+                  setLoading(false);
+                }}
+              />
         </View>
       </ScrollView>
     </View>
@@ -379,6 +448,16 @@ const styles = StyleSheet.create({
   passwordSecurityEdit: {
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
+  }, BtnContainer: {
+    backgroundColor: colors.sparklight_purple_blue,
+    justifyContent: "center",
+  },
+  Btn: {
+    color: colors.snow_white,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+    padding: 16,
+    fontSize: 16,
   },
 });
 

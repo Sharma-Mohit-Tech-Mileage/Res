@@ -7,6 +7,8 @@ import {
   FlatList,
   ActivityIndicator,
   Pressable,
+  Platform,
+  RefreshControl,
 } from "react-native";
 import {
   Padding,
@@ -17,28 +19,65 @@ import {
 } from "../../../../GlobalStyles";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightButton from "../../common/customui/SparkLightButton";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation ,useIsFocused} from "@react-navigation/native";
 import { GetApiRequest } from "../../../network/APIClient";
-import { getUser } from "../../../redux/utils/LocalStorage";
-import PasswordKey from "../../../res/svgIcons/passwordKey";
+import { getUser, getPendingTicket } from "../../../redux/utils/LocalStorage";
 import TicketListIcon from "../../../res/svgIcons/TicketListIcon";
+import SparkLightInput from "../../common/customui/SparkLightInput";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+
 const SupportTicket = () => {
   const navigation = useNavigation();
   const [ticketList, setTicketList] = useState([]);
+  const [mainList, setMainList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchTxt, setSearchTxt] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+  const isFocused = useIsFocused();
 
+  const onRefresh = () => {
+    setRefreshing(true);
+
+    setTimeout(() => {
+      //setRefreshing(false);
+      getTicketList();
+    }, 500);
+  };
   const getTicketList = () => {
     setLoading(true);
     let re = getUser().then((res) => {
-      const request = `support/api/tickets/account/${res.userInfo.accountNumber}/created_at/asc/1/100`;
+      const request = `support/api/tickets/account/${res.userInfo.accountNumber}/created_at/dsc/1/100`;
       GetApiRequest(
         request,
         (res) => {
           console.log("getTicketList", res);
           if (res) {
             setTicketList(res);
+            setMainList(res);
+            getPendingTicket().then((data) => {
+              // let pendingList=[]
+              if (res.length > 0 && data) {
+                if (
+                  res.filter((item) => item.ticketNumber == data.ticketNumber)
+                    .length == 0
+                ) {
+                  res.unshift(data);
+                }
+              }
+
+              setTicketList(res);
+              setMainList(res);
+            });
+          }else{
+            getPendingTicket().then((data) => {
+              if(data){   
+              setTicketList(data);
+              setMainList(data);
+              }
+            });
           }
           setLoading(false);
+          setRefreshing(false);
         },
         (error) => {
           setLoading(false);
@@ -52,6 +91,16 @@ const SupportTicket = () => {
     getTicketList();
   }, []);
 
+  useEffect(() => {
+    isFocused && getTicketList()
+  },[isFocused]);
+
+  const capitalizeFirstLetter = (string) => {
+    return (
+      string != undefined && string.charAt(0).toUpperCase() + string.slice(1)
+    );
+  };
+
   const RenderNoTicket = () => {
     return (
       <View style={styles.frameWrapper}>
@@ -59,13 +108,17 @@ const SupportTicket = () => {
           <View style={styles.frameView}>
             <View style={styles.featuredIconParent}>
               <View style={styles.featuredIconLayout}>
-               <TicketListIcon isGrey={true}/>
+                <TicketListIcon isGrey={true} />
               </View>
               <Text style={[styles.noTicketsCreated, styles.createATicketTypo]}>
-                No Tickets Created
+                {searchTxt.length > 0 && ticketList.length == 0
+                  ? "No Results found"
+                  : "No Tickets Created"}
               </Text>
               <Text style={[styles.createATicket, styles.createATicketTypo]}>
-                Create a ticket to receive support
+                {searchTxt.length > 0 && ticketList.length == 0
+                  ? " "
+                  : "Create a ticket to receive support"}
               </Text>
             </View>
           </View>
@@ -74,9 +127,34 @@ const SupportTicket = () => {
     );
   };
 
+  const getStatusColor = (status) => {
+    let color = "#067647";
+    switch (status) {
+      case "new":
+        color = "#F88700";
+        break;
+      case "open":
+        color = "#EF4E3E";
+        break;
+      case "pending":
+        color = "#8D3B90";
+        break;
+      case "solved":
+        color = "#067647";
+        break;
+      case "closed":
+        color = "#067647";
+        break;
+      default:
+        color = "#F88700";
+    }
+    return color;
+  };
+
   const RenderTicketList = ({ item }) => {
     return (
       <View
+        key={item.id}
         style={{
           flexDirection: "column",
           borderColor: Color.Gray300,
@@ -88,23 +166,34 @@ const SupportTicket = () => {
         <Pressable
           style={styles.ticketParent}
           onPress={() => {
+            if(!item?.isLocal){
             navigation.navigate("ViewTicket", { ticketId: item.ticketNumber });
+            }
           }}
         >
           <View
             style={{ paddingHorizontal: Padding.p_base, flexDirection: "row" }}
           >
-            <TicketListIcon/>
-            <Text style={{ fontFamily: FontFamily.interBold, fontSize: 14,textAlignVertical:'center' }}>
+            <TicketListIcon />
+            <Text
+              style={{
+                fontFamily: FontFamily.interBold,
+                fontSize: 14,
+                textAlignVertical: "center",
+                color: Color.sparklightGray1,
+              }}
+            >
               {" "}
               Ticket #{item.ticketNumber}{" "}
             </Text>
           </View>
+          { !item?.isLocal && (
           <Image
             style={styles.chevronIconLayout}
             resizeMode="stretch"
             source={require("../../../../assets/chevronright.png")}
           />
+          )}
         </Pressable>
         <View
           style={{
@@ -114,13 +203,20 @@ const SupportTicket = () => {
           }}
         >
           <Text style={styles.issueType}>Status</Text>
-          <View style={{ alignSelf: "flex-start", padding: 0 }}>
+          <View
+            style={{
+              alignSelf: "flex-start",
+              borderRadius: 2,
+              padding: 0,
+              backgroundColor: getStatusColor(item?.status.toLowerCase()),
+            }}
+          >
             <Text
               style={[
                 styles.text,
                 styles.textTypo,
                 styles.badge,
-                styles.badgeBorder,
+                { color: "#FFF" },
               ]}
             >
               {item.status}
@@ -135,12 +231,14 @@ const SupportTicket = () => {
             }}
           >
             <Text style={styles.issueType}>Issue Type</Text>
-            <Text style={styles.billingTypo}>{item.category}</Text>
+            <Text style={styles.billingTypo}>
+              {capitalizeFirstLetter(item?.category)}
+            </Text>
           </View>
 
           <View style={{ marginTop: 10 }}>
-            <Text style={styles.issueType}>Issue Description</Text>
-            <Text style={styles.billingTypo}>{item.description}</Text>
+            <Text style={styles.issueType}>Subject</Text>
+            <Text style={styles.billingTypo}>{item.subject}</Text>
           </View>
         </View>
       </View>
@@ -162,13 +260,58 @@ const SupportTicket = () => {
               buttonText="Create Ticket"
             />
           </View>
+          <View style={{ marginHorizontal: 16, marginBottom: 10 }}>
+            <SparkLightInput
+              placeholder={"Search by Ticket # or Subject"}
+              onChangeText={(text) => {
+                setSearchTxt(text);
+                console.log(":", text);
+                if (text.length > 0) {
+                  const newData1 = mainList.filter((item) => {
+                    //console.log('test=',item.subject)
+                    if (item.ticketNumber.toString().includes(text)) {
+                      return true;
+                    } else if (
+                      item.subject.toLowerCase().includes(text.toLowerCase())
+                    ) {
+                      return true;
+                    } else {
+                      return false;
+                    }
+                  });
+                  setTicketList(newData1);
+                } else {
+                  setTicketList(mainList);
+                }
+              }}
+              value={searchTxt}
+            />
+            <Text
+              style={[
+                styles.supportingTypo1,
+                {
+                  marginTop: 10,
+                  color: Color.sparklightaddGray,
+                  fontFamily: FontFamily.openSansRegular,
+                  alignSelf: "stretch",
+                },
+              ]}
+            >
+              New tickets may take up to 15 minutes to appear. If not, please submit a new ticket or contact support via chat.
+            </Text>
+          </View>
           {ticketList.length > 0 ? (
-            <View style={{ height: "85%" }}>
+            <View style={{ paddingBottom: hp("42%") }}>
               <FlatList
                 data={ticketList}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={RenderTicketList}
-
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                  />
+                }
                 //onEndReached={onEndReached}
                 //onEndReachedThreshold={0.1}
                 //ListFooterComponent={Footer}
@@ -197,11 +340,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   frameGroupSpaceBlock: {
-    paddingBottom: Padding.p_5xl,
+    paddingBottom: Padding.p_5xs,
     paddingTop: Padding.p_base,
   },
   frameParent: {
-    // flex: 1,
+    flex: 1,
     paddingHorizontal: Padding.p_base,
     paddingVertical: Padding.p_5xl,
   },
@@ -304,8 +447,12 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 28,
   },
+  supportingTypo1: {
+    lineHeight: 20,
+    fontSize: FontSize.textXsSemibold_size,
+    textAlign: "left",
+  },
   badge: {
-    backgroundColor: Color.success50,
     borderColor: Color.colorAquamarine,
     paddingHorizontal: Padding.p_5xs,
     paddingVertical: Padding.p_11xs,
@@ -331,7 +478,8 @@ const styles = StyleSheet.create({
   },
   activityIndicator: {
     transform: [{ scale: 2 }],
-    marginTop: 10,
+    marginVertical: 10,
+    paddingVertical: 5,
   },
 });
 
