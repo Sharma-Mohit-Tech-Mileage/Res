@@ -323,7 +323,7 @@ const NewBillerHome = ({ navigation }) => {
                 : null;
             }
             let paymentDetails = { ...defaultPaymentDetails };
-            paymentDetails.dueDate = dueDate;
+            paymentDetails.dueDate = res.payment_due_date;
             paymentDetails.billAmount = res.payment_due_amount;
             paymentDetails.pastPaymentDue = res.past_due_amount;
             paymentDetails.email = getFirstEmail(res.email);
