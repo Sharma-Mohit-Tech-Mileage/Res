@@ -113,6 +113,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         const upgradeToken = await getUpgradeToken();
         console.log('userUpdateScript: ', user);
         console.log('upgradeToken.access_token: ', upgradeToken.access_token);
+        user.userInfo['customerType']= "Residential";
         if (user.token !== undefined) {
             const SAVE_FROM_RN = `(function() {
                 localStorage.setItem('jwt_token', '${user.token}');

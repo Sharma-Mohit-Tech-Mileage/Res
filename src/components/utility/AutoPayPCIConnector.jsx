@@ -98,6 +98,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     const setDynamicCookie = () => {
+        user.userInfo['customerType']= "Residential";
         const script = `(function() {
            var cookieValue = "MobileApp";
             var customerType = "Residential";
