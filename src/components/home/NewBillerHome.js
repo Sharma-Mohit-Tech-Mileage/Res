@@ -309,10 +309,13 @@ const NewBillerHome = ({ navigation }) => {
         (res) => {
           if (res) {
             dispatch(saveAccountServices(res.services));
-            let dueDate = moment(res.payment_due_date).format("ll");
-            setDueDate(dueDate);
+            
             let userBillAmt=(res.past_due_amount==0) ? res.payment_due_amount: res.past_due_amount
             setBillAmt(userBillAmt);
+
+            let dueDate =(res.past_due_amount==0)? 'Immediately': moment(res.payment_due_date).format("ll");
+            setDueDate(dueDate);
+
             function getFirstEmail(emailArray) {
               return (emailArray && emailArray.length > 0 && emailArray[0])
                 ? emailArray[0]

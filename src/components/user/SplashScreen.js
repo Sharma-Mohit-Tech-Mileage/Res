@@ -102,7 +102,6 @@ const SplashScreen = ({ navigation }) => {
 
       if (!isNormalUser) {
         if (
-          
           res.userInfo.authLevel != "HeadOfHousehold"
         ) {
           setErrorMessage(strings.nonAdminUserMsg);
@@ -113,7 +112,7 @@ const SplashScreen = ({ navigation }) => {
         } else if (res.userInfo.customerType === "COM") {
           setErrorMessage(strings.BusinessUserMsg);
           setErrorMessage1(" to manage your Sparklight Business services account.");
-          setIsResidential(true);
+          
           setTimeout(() => {
             setModalVisible(true);
           }, 500);

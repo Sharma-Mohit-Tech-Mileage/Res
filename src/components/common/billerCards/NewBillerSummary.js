@@ -45,10 +45,10 @@ const CardNewBiller = ({
             <Text style={styles.amount}>${billAmt}</Text>
           )}
           {dueDate != "Invalid date" && (
-            <Text style={styles.dueDate}>
-              {dueDate ? "Due on " : ""}
-              <Text style={[styles.dueDate, { fontWeight: "400" }]}>
-                {dueDate}
+            <Text style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.dark_grey,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
+              {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": ""}
+              <Text style={[styles.dueDate, { fontWeight: "400",color:(dueDate=='Immediately')?colors.sparklight_red:colors.dark_grey }]}>
+                {' '+dueDate}
               </Text>
             </Text>
           )}
