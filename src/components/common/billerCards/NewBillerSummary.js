@@ -87,7 +87,7 @@ const CardNewBiller = ({
                 });
               }}
               accessible={true}
-              accessibilityLabel="Billing Details"
+              accessibilityLabel="Make a Payment"
               accessibilityRole="button"
               style={styles.paymentButton}
             >
