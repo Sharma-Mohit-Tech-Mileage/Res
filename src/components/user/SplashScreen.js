@@ -102,7 +102,7 @@ const SplashScreen = ({ navigation }) => {
 
       if (!isNormalUser) {
         if (
-          res.userInfo.acctStatus != "Normal" ||
+          
           res.userInfo.authLevel != "HeadOfHousehold"
         ) {
           setErrorMessage(strings.nonAdminUserMsg);
@@ -110,14 +110,14 @@ const SplashScreen = ({ navigation }) => {
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
-        } else if (userInfo.customerType === "COM") {
+        } else if (res.userInfo.customerType === "COM") {
           setErrorMessage(strings.BusinessUserMsg);
           setErrorMessage1(" to manage your Sparklight Business services account.");
           setIsResidential(true);
           setTimeout(() => {
             setModalVisible(true);
           }, 500);
-      }else if (userInfo?.acctStatus != "Normal" ) {
+      }else if (res.userInfo.acctStatus != "Normal" ) {
         setTimeout(() => {
           setDisconnected(true);
         }, 500);
