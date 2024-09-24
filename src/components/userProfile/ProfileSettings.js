@@ -15,6 +15,7 @@ const ProfileSettings = () => {
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [accountObj, setAccountObj] = useState({});
+  const [isNewBiller, setIsNewBiller] = useState(false);
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
   const isPrimary = isPrimaryAdmin(profileDetails.memberType);
@@ -45,6 +46,18 @@ const ProfileSettings = () => {
     };
     fetchUserData();
   }, []);
+  
+  useEffect(() => {
+   
+    //console.log('Profile details',JSON.stringify(profileDetails))
+    if(profileDetails.accountNumber.toString().length>=16){
+      setIsNewBiller(true)
+    }
+    
+  }, [profileDetails]);
+    
+
+
   return (
     <View style={{ zIndex: 1 }}>
       <ProfileSettingsHeader title="Profile Settings" onPressBack={() => navigation.navigate('Account')} />
@@ -73,15 +86,17 @@ const ProfileSettings = () => {
             </View>
             <View style={styles.frameContainer}>
               <View style={styles.firstNameParent} accessible={true} >
-                <Text style={styles.firstName}>First Name</Text>
+                <Text style={styles.firstName}>{isNewBiller?'Customer Name':'First Name'}</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {isPrimary ? accountObj.firstName : profileDetails.firstName}
+                  {isNewBiller? profileDetails.fullName:isPrimary ? accountObj.firstName : profileDetails.firstName}
                 </Text>
               </View>
+              {!isNewBiller && (
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Last Name</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>{isPrimary ? accountObj.lastName : profileDetails.lastName}</Text>
               </View>
+              )}
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Username</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
