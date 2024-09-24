@@ -302,6 +302,7 @@ const NewBillerHome = ({ navigation }) => {
   };
 
   const getUserAccountDetails = () => {
+    setBillAmt(undefined)
     getUser().then((res) => {
       const request = `AccountSvc/api/Accounts/GetAccountDetailsByAccountNumber?accountNumber=${res.userInfo.accountNumber}`;
       GetApiRequest(
