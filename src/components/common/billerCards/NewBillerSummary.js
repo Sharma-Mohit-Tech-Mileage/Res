@@ -52,8 +52,8 @@ const CardNewBiller = ({
               </Text>
             </Text>
           )}
-          <View style={{ marginVertical: Padding.p_5xs }}>
-            <View style={styles.statusRow}>
+          <View style={{ marginVertical: Padding.p_base }}>
+            <View style={[styles.statusRow,{marginTop:10}]}>
               <Text style={styles.label}>Auto Pay : </Text>
               <View style={styles.status}>
                 <Image
@@ -68,16 +68,11 @@ const CardNewBiller = ({
                 </Text>
               </View>
             </View>
-             <View style={styles.statusRow}>
-                            <Text style={styles.label}>{""} </Text>
-                            <View style={styles.status}>
-                                
-                            <Text style={paperlessStatus ? styles.labelActive : styles.label}>{""}</Text>
-                            </View>
-                        </View> 
+      
+                               
             
           </View>
-          <View style={[styles.statusRow,{marginTop:23}]}>
+          <View style={[styles.statusRow,{marginTop:26}]}>
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("ArticalWindowUtility", {
