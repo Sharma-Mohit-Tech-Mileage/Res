@@ -129,9 +129,12 @@ const SplashScreen = ({ navigation }) => {
           setDisconnected(true);
         }, 500);
       } else if (
-        userInfo.authLevel != "HeadOfHousehold" ||
-        userInfo.acctStatus != "Active"
-      ) {
+        (userInfo.authLevel !== "HeadOfHousehold" && userInfo.authLevel !== "Admin") || 
+        userInfo.acctStatus !== "Active"
+    )
+    
+    
+     {
         setErrorMessage(strings.nonAdminUserMsg);
         setErrorMessage1(" to view information.");
         setTimeout(() => {
@@ -146,7 +149,19 @@ const SplashScreen = ({ navigation }) => {
         setTimeout(() => {
           setModalVisible(true);
         }, 100);
-      } else if (res.custServices.internet == false) {
+      } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
+        setErrorMessage(strings.nonAdminUserMsg);
+        setErrorMessage1(' to view information.')
+        setTimeout(() => {
+          setModalVisible(true);
+        }, 100);
+       } else if(userInfo.customerType === 'Business'){
+        setErrorMessage(strings.BusinessUserMsg);
+        setErrorMessage1(' to view information.')
+        setTimeout(() => {
+          setModalVisible(true);
+        }, 100);
+      }else if (res.custServices.internet == false) {
         setErrorMessage(strings.nonInternetUserMessage);
         setErrorMessage1(" to manage your service.");
         setTimeout(() => {
