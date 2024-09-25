@@ -310,7 +310,7 @@ const NewBillerHome = ({ navigation }) => {
         (res) => {
           if (res) {
             dispatch(saveAccountServices(res.services));
-            
+            console.log("getUserAccountDetails **************************************************", res);
             let userBillAmt=(res.past_due_amount==0) ? res.current_balance: res.past_due_amount
             setBillAmt(userBillAmt);
 
@@ -318,15 +318,15 @@ const NewBillerHome = ({ navigation }) => {
             setDueDate(dueDate);
 
             function getFirstEmail(emailArray) {
-              return (emailArray && emailArray.length > 0 && emailArray[0])
-                ? emailArray[0]
+              return (emailArray && emailArray.length > 0 && emailArray[0].email_address)
+                ? emailArray[0].email_address
                 : null;
             }
             let paymentDetails = { ...defaultPaymentDetails };
             paymentDetails.dueDate = res.payment_due_date;
             paymentDetails.billAmount = res.payment_due_amount;
             paymentDetails.pastPaymentDue = res.past_due_amount;
-            paymentDetails.email = getFirstEmail(res.email);
+            paymentDetails.email = getFirstEmail(res.email_details);
             setDefaultPaymentDetails(paymentDetails);
           }
         },
