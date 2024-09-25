@@ -52,7 +52,7 @@ const CardNewBiller = ({
               </Text>
             </Text>
           )}
-          <View style={{ marginVertical: Padding.p_base }}>
+          <View style={{ marginVertical: Padding.p_5xs }}>
             <View style={styles.statusRow}>
               <Text style={styles.label}>Auto Pay : </Text>
               <View style={styles.status}>
@@ -68,17 +68,16 @@ const CardNewBiller = ({
                 </Text>
               </View>
             </View>
-            {/* <View style={styles.statusRow}>
-                            <Text style={styles.label}>Paperless Billing : </Text>
+             <View style={styles.statusRow}>
+                            <Text style={styles.label}>{""} </Text>
                             <View style={styles.status}>
-                                <Image resizeMode="cover" source={paperlessStatus ? check : uncheck} style={styles.statusIcon} />
-                                <Text style={paperlessStatus ? styles.labelActive : styles.label}>{paperlessStatus ? "On" : "Off"}</Text>
+                                
+                            <Text style={paperlessStatus ? styles.labelActive : styles.label}>{""}</Text>
                             </View>
-                        </View> */}
-            <View style={{ paddingVertical: 15 }}></View>
-            <View style={{ paddingVertical: 5 }}></View>
+                        </View> 
+            
           </View>
-          <View style={styles.statusRow}>
+          <View style={[styles.statusRow,{marginTop:23}]}>
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("ArticalWindowUtility", {
@@ -177,12 +176,13 @@ const styles = StyleSheet.create({
     color: colors.sp_black,
     marginVertical: Padding.p_8xs,
     fontWeight: "700",
+    alignSelf:'flex-end'
   },
   dueDate: {
     fontSize: 14,
     fontWeight: "700",
     color: colors.dark_grey,
-    alignContent: "center",
+    alignSelf: 'flex-end',
     fontFamily: FontFamily.openSansRegular,
     color: colors.sparklight_purple_blue,
   },
