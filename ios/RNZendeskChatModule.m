@@ -1,6 +1,3 @@
-// New code for chat
-
-
 #import "RNZendeskChatModule.h"
 #import <MessagingSDK/MessagingSDK.h>
 #import <MessagingAPI/MessagingAPI.h>
@@ -9,6 +6,15 @@
 #import <ChatProvidersSDK/ChatProvidersSDK.h>
 #import <CommonUISDK/CommonUISDK.h>
 #import <ZendeskCoreSDK/ZendeskCoreSDK.h>
+
+#import <SupportProvidersSDK/SupportProvidersSDK.h>
+#import <AnswerBotProvidersSDK/AnswerBotProvidersSDK.h>
+#import <ChatProvidersSDK/ChatProvidersSDK.h>
+#import <AnswerBotSDK/AnswerBotSDK.h>
+#import <MessagingSDK/MessagingSDK.h>
+#import <SupportSDK/SupportSDK.h>
+#import <MessagingSDK/MessagingSDK.h>
+
 
 @implementation RNZendeskChatModule
 
@@ -82,18 +88,33 @@ RCT_EXPORT_METHOD(clearChatSession) {
 }
 
 RCT_EXPORT_METHOD(startChat:(NSDictionary *)config) {
+  
+//  ZDKChat.instance.configuration = _visitorAPIConfig = [self applyVisitorInfo:config intoConfig:_visitorAPIConfig ?: [[ZDKChatAPIConfiguration alloc] init]];
+//  
     [[ZDKChat instance] setConfiguration:[self chatAPIConfiguration:config]];
     [ZDKCommonTheme currentTheme].primaryColor = [UIColor purpleColor];
   
   
 
     dispatch_async(dispatch_get_main_queue(), ^{
-      ZDKChat.instance.configuration = _visitorAPIConfig = [self applyVisitorInfo:config intoConfig:_visitorAPIConfig ?: [[ZDKChatAPIConfiguration alloc] init]];
+//     
+//      ZDKClassicMessagingConfiguration *messagingConfiguration = [ZDKClassicMessagingConfiguration new];
+//      messagingConfiguration.name = @"Sparklight Support";
+//      messagingConfiguration.isMultilineResponseOptionsEnabled = YES;
+//      
+//         NSError *error = nil;
+//         NSArray *engines = @[
+//             (id <ZDKEngine>) [ZDKAnswerBotEngine engineAndReturnError:&error],
+//             (id <ZDKEngine>) [ZDKSupportEngine engineAndReturnError:&error],
+//             (id <ZDKEngine>) [ZDKChatEngine engineAndReturnError:&error]
+//         ];
+
       
-        NSError *error = nil;
-        NSArray *engines = @[(id<ZDKEngine>)[ZDKChatEngine engineAndReturnError:&error]];
-        NSArray<id<ZDKConfiguration>> *configs = @[[self messagingConfiguration], [self chatConfiguration]];
-        UIViewController *viewController = [ZDKClassicMessaging.instance buildUIWithEngines:engines configs:configs error:&error];
+      NSError *error = nil;
+        
+       NSArray *engines = @[(id<ZDKEngine>)[ZDKChatEngine engineAndReturnError:&error]];
+       NSArray<id<ZDKConfiguration>> *configs = @[[self messagingConfiguration], [self chatConfiguration]];
+      UIViewController *viewController = [ZDKClassicMessaging.instance buildUIWithEngines:engines configs:config error:&error];
 
         UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
 
@@ -124,12 +145,12 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config) {
 }
 
 - (void)handleChatSessionEnd {
-    
+  [self resetVisitorInfo];
     dispatch_async(dispatch_get_main_queue(), ^{
         [[ZDKChat instance] resetIdentity:^{
             // Completion block code here
         }];
-      [self resetVisitorInfo];
+    
         
     });
 }

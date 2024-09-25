@@ -703,6 +703,11 @@ PODS:
     - SDWebImage/Core (~> 5.10)
   - SocketRocket (0.6.1)
   - Yoga (1.14.0)
+  - ZendeskAnswerBotProvidersSDK (5.0.3):
+    - ZendeskSupportProvidersSDK (~> 8.0.3)
+  - ZendeskAnswerBotSDK (5.0.3):
+    - ZendeskAnswerBotProvidersSDK (~> 5.0.3)
+    - ZendeskMessagingSDK (~> 6.0.1)
   - ZendeskChatProvidersSDK (5.0.3)
   - ZendeskChatSDK (5.0.3):
     - ZendeskChatProvidersSDK (~> 5.0.3)
@@ -715,6 +720,11 @@ PODS:
     - ZendeskCommonUISDK (~> 9.0.1)
     - ZendeskMessagingAPISDK (~> 6.0.0)
   - ZendeskSDKConfigurationsSDK (4.0.0)
+  - ZendeskSupportProvidersSDK (8.0.3):
+    - ZendeskCoreSDK (~> 5.0.3)
+  - ZendeskSupportSDK (8.0.3):
+    - ZendeskMessagingSDK (~> 6.0.1)
+    - ZendeskSupportProvidersSDK (~> 8.0.3)
 
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
@@ -795,8 +805,10 @@ DEPENDENCIES:
   - RNShare (from `../node_modules/react-native-share`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
+  - ZendeskAnswerBotSDK
   - ZendeskChatSDK
   - ZendeskCoreSDK
+  - ZendeskSupportSDK
 
 SPEC REPOS:
   trunk:
@@ -824,6 +836,8 @@ SPEC REPOS:
     - SDWebImage
     - SDWebImageWebPCoder
     - SocketRocket
+    - ZendeskAnswerBotProvidersSDK
+    - ZendeskAnswerBotSDK
     - ZendeskChatProvidersSDK
     - ZendeskChatSDK
     - ZendeskCommonUISDK
@@ -831,6 +845,8 @@ SPEC REPOS:
     - ZendeskMessagingAPISDK
     - ZendeskMessagingSDK
     - ZendeskSDKConfigurationsSDK
+    - ZendeskSupportProvidersSDK
+    - ZendeskSupportSDK
 
 EXTERNAL SOURCES:
   boost:
@@ -1076,6 +1092,8 @@ SPEC CHECKSUMS:
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 3efc43e0d48686ce2e8c60f99d4e6bd349aff981
+  ZendeskAnswerBotProvidersSDK: 3ac6a38f1cbb23e55a5ff072cd2c6863a5fcbfb3
+  ZendeskAnswerBotSDK: fefde73349dbae50f8cc9c8b055ed7fad081353e
   ZendeskChatProvidersSDK: 80485584b6b5af1b3e15ea54ba93600c225290b2
   ZendeskChatSDK: 5f64abb74eb3bd4e52250b8984f0408f6e703490
   ZendeskCommonUISDK: 720e6e34eff34ddae5feb1935f788a0893eaf672
@@ -1083,7 +1101,9 @@ SPEC CHECKSUMS:
   ZendeskMessagingAPISDK: 9ce539eebcaa014fe6acc44da31262a2c52891c1
   ZendeskMessagingSDK: d0f65229188cb4936a56be6707992a2511b5175b
   ZendeskSDKConfigurationsSDK: 79c444da987390456ec05657ffa2f5ca0eb54aef
+  ZendeskSupportProvidersSDK: 2fbd2a9597af5d69760088bfb5e0e595e942f218
+  ZendeskSupportSDK: 22156384d20d30b0aeb263c03f49bef44e1364b2
 
-PODFILE CHECKSUM: c85eacd7d8649234d9bd2e0010ea7f92921efe19
+PODFILE CHECKSUM: ab6b8e459875938a947b8a8b162e778f75e297e5
 
 COCOAPODS: 1.15.2
