@@ -50,7 +50,7 @@ const ProfileSettings = () => {
   useEffect(() => {
    
     //console.log('Profile details',JSON.stringify(profileDetails))
-    if(profileDetails.accountNumber.toString().length>=16){
+    if(profileDetails?.accountNumber?.toString().length>=16){
       setIsNewBiller(true)
     }
     

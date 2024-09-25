@@ -231,9 +231,6 @@ const ChangePassword = () => {
                     />
                 </View>
               </View>
-              <View style={[styles.rectangleWrapper, styles.wrapperSpaceBlock]}>
-                <View style={styles.frameChild} />
-              </View>
               
             </View>
           </View>

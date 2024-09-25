@@ -110,6 +110,7 @@ const SplashScreen = ({ navigation }) => {
             setModalVisible(true);
           }, 100);
         } else if (res.userInfo.customerType === "COM") {
+          setIsBusiness(true)
           setErrorMessage(strings.BusinessUserMsg);
           setErrorMessage1(" to manage your Sparklight Business services account.");
           
