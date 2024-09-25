@@ -49,8 +49,10 @@ const EmailNotifications = () => {
         initialStates[email.emailAddress] = {
           paperless: email.invoice,
           marketing: email.marketing,
+          iptv: email.iptv,
         };
       });
+      console.log('initialStates>>>>>>>>>>>>>', initialStates);
       setToggleStates(initialStates);
       initialToggleStatesRef.current = initialStates;
     };
@@ -295,7 +297,8 @@ const EmailNotifications = () => {
             <Text style={styles.infoText}>This email address is tied to your TV service and can only be managed via the Sparklight TV Interface.</Text>
             <FlatList
               data={sparklightTvEmails}
-              renderItem={renderEmailItem}
+              //renderItem={renderEmailItem}
+              renderItem={(item) => renderEmailItem({ ...item, section: 'iptv' ,disabled:true})}
               keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
             />
           </View>}

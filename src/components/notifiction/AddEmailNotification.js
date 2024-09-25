@@ -57,45 +57,64 @@ const AddEmailNotification = () => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
         setIsSubmitting(true);
-
+    
         const { email } = data;
         const { paperlessBilling, marketing } = formState;
-
+    
         // Check if the email already exists with the selected associations
         const associatedWithPaperless = allSvEmailAssociated.find(setting =>
             setting.emailAddress?.toLowerCase() === email.toLowerCase() && setting.invoice
         );
-
+    
         const associatedWithMarketing = allSvEmailAssociated.find(setting =>
             setting.emailAddress?.toLowerCase() === email.toLowerCase() && setting.marketing
         );
-
-        if (associatedWithPaperless && associatedWithMarketing) {
-            setErrorMsg('This email is already associated with both Paperless Billing and Marketing Communications. You can edit the existing notification to adjust these settings.');
-            setShowErrorAlert(true);
-            isSubmittingRef.current = false;
-            setIsSubmitting(false);
-            return;
-        } else if (associatedWithPaperless) {
-            setErrorMsg('This email is already associated with Paperless Billing. You can edit the existing notification to add it to Marketing Communications.');
-            setShowErrorAlert(true);
-            isSubmittingRef.current = false;
-            setIsSubmitting(false);
-            return;
-        } else if (associatedWithMarketing) {
-            setErrorMsg('This email is already associated with Marketing Communications. You can edit the existing notification to add it to Paperless Billing.');
+    
+        // Check if trying to add to Marketing but it's already in Marketing
+        if (marketing && associatedWithMarketing) {
+            setErrorMsg('This email is already subscribed to Marketing Updates. Please choose another email or update the current subscription.');
             setShowErrorAlert(true);
             isSubmittingRef.current = false;
             setIsSubmitting(false);
             return;
         }
-
+    
+        // Check if trying to add to Paperless Billing but it's already in Paperless Billing
+        if (paperlessBilling && associatedWithPaperless) {
+            setErrorMsg('This email is already subscribed to Paperless Billing. You can update the subscription if needed.');
+            setShowErrorAlert(true);
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
+            return;
+        }
+    
+        // Restrict adding if it's already associated with both
+        if (associatedWithPaperless && associatedWithMarketing) {
+            setErrorMsg('This email is already subscribed to both Paperless Billing and Marketing Updates. Please edit the existing settings to make changes.');
+            setShowErrorAlert(true);
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
+            return;
+        }
+    
+        // NEW CONDITION: Check if the email is associated with any flag but trying to save with no flag
+        if ((associatedWithPaperless || associatedWithMarketing) && !paperlessBilling && !marketing) {
+            setErrorMsg('This email is currently associated with notifications. Please select at least one subscription option.');
+            setShowErrorAlert(true);
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
+            return;
+        }
+    
         try {
             await dispatch(manageEmailRequest(email, paperlessBilling, marketing, newEmail, navigation));
         } catch (error) {
-            setErrorMsg('An error occurred while saving your settings. Please try again.');
+            setErrorMsg('We encountered an issue while saving your settings. Please try again.');
             setShowErrorAlert(true);
         }
+    
+        isSubmittingRef.current = false;
+        setIsSubmitting(false);
     }, [dispatch, navigation, formState, allSvEmailAssociated]);
 
     const handleValidationError = useCallback(() => {

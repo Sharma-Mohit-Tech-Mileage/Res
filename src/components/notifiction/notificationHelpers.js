@@ -31,7 +31,7 @@ export const fetchInitialData = (profile) => {
       setting.emailAddress && emailsWithOnSettings.push(setting.emailAddress);
     }
   });
-  multipleEmailsOn = emailsWithOnSettings.length > 1;
+  multipleEmailsOn = allSvEmailAssociated.length > 1;
 
   // Prepare additional settings, conditionally add Sparklight TV
   const additionalSettings = [
