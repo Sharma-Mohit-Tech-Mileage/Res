@@ -51,3 +51,7 @@ steps:
     jarsignerKeystoreAlias: 'sparklight'
     jarsignerKeyPassword: '$(jarsignerKeyPassword)'
     zipalign: true
+- task: CopyFiles@2
+  inputs:
+    Contents: '**/*.apk'
+    TargetFolder: '$(build.artifactstagingdirectory)'
