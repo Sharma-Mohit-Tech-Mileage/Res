@@ -762,7 +762,7 @@ const NewBillerHome = ({ navigation }) => {
             ) : (
               <></>
             )}
-            <Text style={[styles.descriptionText, { fontSize: FontSize.size_3xl, fontWeight: '400', zIndex: 100,alignSelf: 'flex-start',paddingLeft:16 }]}>Welcome to Sparklight</Text>
+            <Text style={[styles.descriptionText, { fontSize: FontSize.size_3xl, fontWeight: '400', zIndex: 100, width: wp("92%"), }]}>Welcome to Sparklight</Text>
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <View/>
               <Text style={[styles.descriptionText, { fontSize: FontSize.size_3xl, fontWeight: '400', marginBottom: 20 }]}></Text>
