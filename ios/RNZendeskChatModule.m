@@ -5,16 +5,7 @@
 #import <ChatSDK/ChatSDK.h>
 #import <ChatProvidersSDK/ChatProvidersSDK.h>
 #import <CommonUISDK/CommonUISDK.h>
-#import <ZendeskCoreSDK/ZendeskCoreSDK.h>
-
-#import <SupportProvidersSDK/SupportProvidersSDK.h>
 #import <AnswerBotProvidersSDK/AnswerBotProvidersSDK.h>
-#import <ChatProvidersSDK/ChatProvidersSDK.h>
-#import <AnswerBotSDK/AnswerBotSDK.h>
-#import <MessagingSDK/MessagingSDK.h>
-#import <SupportSDK/SupportSDK.h>
-#import <MessagingSDK/MessagingSDK.h>
-
 
 @implementation RNZendeskChatModule
 
@@ -27,137 +18,140 @@ UINavigationController *_chatController;
     NSScanner *scanner = [NSScanner scannerWithString:hexString];
     [scanner setScanLocation:1]; // bypass '#' character
     [scanner scanHexInt:&rgbValue];
-    return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0
-                           green:((rgbValue & 0xFF00) >> 8)/255.0
-                            blue:(rgbValue & 0xFF)/255.0
-                           alpha:1.0];
+    return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:1.0];
 }
 
-+ (void)init {
-    [ZDKChat initializeWithAccountKey:@"4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC" queue:dispatch_get_main_queue()];
++ (void) init {
+
+  [ZDKChat initializeWithAccountKey:@"4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC" queue: dispatch_get_main_queue()];
 }
 
-- (void)resetVisitorInfo {
-    id<ZDKObjCIdentity> newIdentity = [[ZDKObjCAnonymous alloc] initWithName:nil email:nil];
-    [[ZDKClassicZendesk instance] setIdentity:newIdentity];
+RCT_EXPORT_METHOD(setVisitorInfo:(NSDictionary *)options) {
+  if (!NSThread.isMainThread) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [self setVisitorInfo:options];
+    });
+    return;
+  }
+
+  ZDKChat.instance.configuration = _visitorAPIConfig = [self applyVisitorInfo:options intoConfig: _visitorAPIConfig ?: [[ZDKChatAPIConfiguration alloc] init]];
 }
-
-
 
 - (ZDKChatAPIConfiguration*)applyVisitorInfo:(NSDictionary*)options intoConfig:(ZDKChatAPIConfiguration*)config {
-    if (options[@"department"]) {
-        config.departmentName = options[@"department"];
-    }
-    if (options[@"tags"]) {
-        config.tags = options[@"tags"];
-    }
-    config.visitorInfo = [[ZDKVisitorInfo alloc] initWithName:options[@"name"]
-                                                        email:options[@"email"]
-                                                  phoneNumber:options[@"phone"]];
-    NSLog(@"[RNZendeskChatModule] Applied visitor info: department: %@ tags: %@, email: %@, name: %@, phone: %@", config.departmentName, config.tags, config.visitorInfo.email, config.visitorInfo.name, config.visitorInfo.phoneNumber);
-    return config;
+  if (options[@"department"]) {
+    config.departmentName = options[@"department"];
+  }
+  if (options[@"tags"]) {
+    config.tags = options[@"tags"];
+  }
+  config.visitorInfo = [[ZDKVisitorInfo alloc] initWithName:options[@"name"]
+                            email:options[@"email"]
+                          phoneNumber:options[@"phone"]];
+
+  NSLog(@"[RNZendeskChatModule] Applied visitor info: department: %@ tags: %@, email: %@, name: %@, phone: %@", config.departmentName, config.tags, config.visitorInfo.email, config.visitorInfo.name, config.visitorInfo.phoneNumber);
+  return config;
 }
 
-- (ZDKClassicMessagingConfiguration *)messagingConfiguration {
+- (ZDKClassicMessagingConfiguration *) messagingConfiguration {
     ZDKClassicMessagingConfiguration *config = [ZDKClassicMessagingConfiguration new];
     config.name = @"Sparklight Support";
     config.isMultilineResponseOptionsEnabled = YES;
     return config;
 }
 
-- (ZDKChatConfiguration *)chatConfiguration {
+- (ZDKChatConfiguration *) chatConfiguration {
     ZDKChatConfiguration *config = [ZDKChatConfiguration new];
-    config.isAgentAvailabilityEnabled = YES;
-    return config;
-}
-
-- (ZDKChatAPIConfiguration *)chatAPIConfiguration:(NSDictionary *)options {
-    ZDKChatAPIConfiguration *config = [ZDKChatAPIConfiguration new];
-    if (options[@"tags"]) {
-        config.tags = options[@"tags"];
-    }
-    config.department = options[@"department"];
-    [ZDKChat instance].configuration = config;
-    return config;
-}
-
-RCT_EXPORT_METHOD(clearChatSession) {
-  [[ZDKChat instance] resetIdentity:^{
-      // Completion block code here
-  }];
-}
-
-RCT_EXPORT_METHOD(startChat:(NSDictionary *)config) {
-  
-//  ZDKChat.instance.configuration = _visitorAPIConfig = [self applyVisitorInfo:config intoConfig:_visitorAPIConfig ?: [[ZDKChatAPIConfiguration alloc] init]];
-//  
-    [[ZDKChat instance] setConfiguration:[self chatAPIConfiguration:config]];
-    [ZDKCommonTheme currentTheme].primaryColor = [UIColor purpleColor];
-  
-  
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-//     
-//      ZDKClassicMessagingConfiguration *messagingConfiguration = [ZDKClassicMessagingConfiguration new];
-//      messagingConfiguration.name = @"Sparklight Support";
-//      messagingConfiguration.isMultilineResponseOptionsEnabled = YES;
-//      
-//         NSError *error = nil;
-//         NSArray *engines = @[
-//             (id <ZDKEngine>) [ZDKAnswerBotEngine engineAndReturnError:&error],
-//             (id <ZDKEngine>) [ZDKSupportEngine engineAndReturnError:&error],
-//             (id <ZDKEngine>) [ZDKChatEngine engineAndReturnError:&error]
-//         ];
-
-      
-      NSError *error = nil;
-        
-       NSArray *engines = @[(id<ZDKEngine>)[ZDKChatEngine engineAndReturnError:&error]];
-       NSArray<id<ZDKConfiguration>> *configs = @[[self messagingConfiguration], [self chatConfiguration]];
-      UIViewController *viewController = [ZDKClassicMessaging.instance buildUIWithEngines:engines configs:config error:&error];
-
-        UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
-
-        if (rootViewController) {
-            UIColor *customColor = [UIColor colorWithRed:234/255.0 green:234/255.0 blue:234/255.0 alpha:1.0];
-            [[UINavigationBar appearance] setBarTintColor:customColor];
-            viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Close" style:UIBarButtonItemStylePlain target:self action:@selector(dismiss)];
-
-            _chatController = [[UINavigationController alloc] initWithRootViewController:viewController];
-
-            // Present the chat controller
-            [rootViewController presentViewController:_chatController animated:YES completion:^{
-                // Setup chat state observation after presentation
-                [ZDKChat.chatProvider observeChatState:^(ZDKChatState *state) {
-                    if (state.chatSessionStatus == ChatSessionStatusEnded) {
-                        NSLog(@"Chat session ended");
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                        
-                            [self handleChatSessionEnd];
-                        });
-                    }
-                }];
-            }];
-        } else {
-            NSError *error = [NSError errorWithDomain:@"RNZendeskChatModule" code:500 userInfo:@{NSLocalizedDescriptionKey: @"Root view controller is not available"}];
-        }
-    });
-}
-
-- (void)handleChatSessionEnd {
-  [self resetVisitorInfo];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[ZDKChat instance] resetIdentity:^{
-            // Completion block code here
-        }];
     
-        
-    });
+     config.isAgentAvailabilityEnabled = NO;
+     config.isPreChatFormEnabled = YES;
+     config.preChatFormConfiguration = [[ZDKChatFormConfiguration alloc] initWithName:ZDKFormFieldStatusRequired
+                                                                                           email:ZDKFormFieldStatusOptional
+                                                                                    phoneNumber:ZDKFormFieldStatusOptional
+                                                                                      department:ZDKFormFieldStatusHidden];
+    return config;
+}
+
+- (ZDKChatAPIConfiguration *) chatAPIConfiguration:(NSDictionary *)options {
+    ZDKChatAPIConfiguration *config = [ZDKChatAPIConfiguration new];
+  if (options[@"tags"]) {
+      config.tags = options[@"tags"];
+    }
+  
+  config.department = options[@"department"]; // Set the department
+  [ZDKChat instance].configuration = config;
+    return config;
+}
+
+RCT_EXPORT_METHOD(clearChatSession)
+{
+  [[ZDKChat instance] resetIdentity:^{
+             // Completion block code here
+         }];
+}
+
+- (void)resetSession {
+  // Clear the visitor identity
+  ZDKChatAPIConfiguration *config = [[ZDKChatAPIConfiguration alloc] init];
+  config.visitorInfo = [[ZDKVisitorInfo alloc] initWithName:@"" email:@"" phoneNumber:@""];
+
+  [[ZDKChat instance] resetIdentity:^{
+             // Completion block code here
+         }];
+     
+  NSLog(@"Helper method called");
+}
+
+UIViewController *viewController;
+RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
+{
+  
+  [[ZDKChat instance] setConfiguration: [self chatAPIConfiguration: config]];
+  
+
+  NSArray<id<ZDKConfiguration>> *configs = @[[self messagingConfiguration], [self chatConfiguration]];
+  
+  
+  [[ZDKChat instance] setConfiguration: [self chatAPIConfiguration: config]];
+  [ZDKCommonTheme currentTheme].primaryColor = [UIColor purpleColor];
+  NSArray<id<ZDKConfiguration>> *configs1 = @[[self messagingConfiguration], [self chatConfiguration]];
+  dispatch_async(dispatch_get_main_queue(), ^{
+
+    NSError *error = nil;
+    NSArray *engines = @[
+      (id <ZDKEngine>) [ZDKChatEngine engineAndReturnError:&error]
+    ];
+   
+    UIViewController *viewController = [ZDKClassicMessaging.instance buildUIWithEngines:engines
+                                     configs:configs1
+                                       error:&error];
+
+    UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+
+    if (rootViewController) {
+      // Define your custom color using the hex code EAEAEA
+      UIColor *customColor = [UIColor colorWithRed:234/255.0 green:234/255.0 blue:234/255.0 alpha:1.0];
+
+      // Set the custom color as the bar tint color
+      [[UINavigationBar appearance] setBarTintColor:customColor];
+      viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle: @"Close"
+                                                                                                   style: UIBarButtonItemStylePlain
+                                                                                                  target: self
+                                                                                                  action: @selector(dismiss)];
+      UINavigationController *chatController = [[UINavigationController alloc] initWithRootViewController: viewController];
+      [rootViewController presentViewController:chatController animated:YES completion:nil];
+    } else {
+        NSError *error = [NSError errorWithDomain:@"RNZendeskChatModule" code:500 userInfo:@{NSLocalizedDescriptionKey: @"Root view controller is not available"}];
+    }
+  });
 }
 
 - (void)dismiss {
-    NSLog(@"Chat Close called");
-    [_chatController dismissViewControllerAnimated:YES completion:nil];
+  NSLog(@"Chat Close called");
+
+  // Dismiss the chat controller and reset the session after chat ends
+  [_chatController dismissViewControllerAnimated:YES completion:^{
+      
+  }];
 }
 
 @end
