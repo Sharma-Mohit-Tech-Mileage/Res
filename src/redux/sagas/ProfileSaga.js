@@ -479,7 +479,7 @@ function* handleUpdateEmailAssociations(action) {
         if (paperlessEmail && marketingEmails && marketingEmails.length > 0) {
             console.log('Updating both paperless and marketing emails');
             [paperlessResponse, marketingResponse] = yield all([
-                call(postEmailNotification),
+                call(unsubscribPaperLess),
                 call(updateSVEmails, marketingEmails)
             ]);
             successMessage = 'Email updated for both paperless billing and marketing. ';
