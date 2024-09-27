@@ -9,13 +9,13 @@ export const config = {
     API_SHOPPING_CART_BASEURL: 'https://publicservices.sparklight.com/ShoppingCart',
     MODEM_BASE_URL: "https://mule-gateway.cableone.net/customer-api",
     TRUCK_ROLL_BASE_URL: 'https://adb-1771418802186593.13.azuredatabricks.net/model/lgb_model_fs_mobile/Production/invocations',
-    PAYMENTURL_V2 : 'https://payment.uat.sparklight.com/PortalsV2/PortalsPayment',
-    URL_EASYPAY_SETUP_V2 : 'https://payment.uat.sparklight.com/PortalsV2/setup-auto-pay',
-    URL_EASYPAY_MANAGE_V2 : 'https://payment.uat.sparklight.com/PortalsV2/manage-auto-pay',
-    PAYMENTURL_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/PortalsBiller',
-    URL_EASYPAY_SETUP_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/activate-autopay',
-    URL_EASYPAY_MANAGE_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/manage-autopay',
-    
+    PAYMENTURL_V2 : 'https://payment.sparklight.com/PortalsV2/PortalsPayment',
+    URL_EASYPAY_SETUP_V2 : 'https://payment.sparklight.com/portalsV2/setup-auto-pay',
+    URL_EASYPAY_MANAGE_V2 : 'https://payment.sparklight.com/portalsV2/manage-auto-pay',
+    PAYMENTURL_V3 : 'https://payment.sparklight.com/portalsV3-Demo/PortalsBiller',
+    URL_EASYPAY_SETUP_V3 : 'https://payment.sparklight.com/portalsV3-Demo/activate-autopay',
+    URL_EASYPAY_MANAGE_V3 : 'https://payment.sparklight.com/portalsV3-Demo/manage-autopay',
+    PAYMENTURLNEW: 'https://customer.sparklight.com/portals/app-secure/billing',
     encryptvalPassword: '1 0 7 2 8 3 3634',
     ZENDESK_FEEDBACK: {
       Url: 'https://cableone.zendesk.com/api/v2/requests.json',
@@ -62,6 +62,6 @@ export const config = {
 
 }
 
-export const ISUAT = true
+export const ISUAT = false
 
 export const Env = (ISUAT) ? config.UAT : config.PRODUCTION
