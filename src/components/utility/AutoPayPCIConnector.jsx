@@ -61,6 +61,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     const redirectToEBillpay = (paymentObj, makePaymentUrl) => {
+        console.log('Payment object:', paymentObj);
         const data = JSON.stringify(paymentObj);
         const gui = generateGuid();
         const guiTrim = gui.split('-').join('');
@@ -100,7 +101,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const setDynamicCookie = () => {
         user.userInfo['customerType']= "Residential";
         const script = `(function() {
-           var cookieValue = "MobileApp";
+            var cookieValue = "MobileApp";
             var customerType = "Residential";
             var domain = document.location.hostname; 
             var expirationDate = new Date();
