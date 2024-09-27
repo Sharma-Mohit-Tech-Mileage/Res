@@ -438,10 +438,8 @@ const logInfo = async (infoData) => {
             Authorization: `Bearer ${user.token}`
         }
     };
-    console.log('Info logged Payload^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^', JSON.stringify(infoData));
     try {
         const response = await _axios.post('/logging/api/log/info', infoData);
-        console.log('==================================================================================', response)
         console.log('Info logged successfully');
     } catch (logErr) {
         console.error('Failed to log info:', logErr);
@@ -457,14 +455,12 @@ const addUserAction = async (data) => {
         }
     };
 
-    console.log('Making API Call to /users/api/users with data:', data); // Log the request data
-
     try {
         const response = await _axios.post('/users/api/users', data, config);
-        console.log('API Call Successful, Response:', response.data); // Log the successful response
+        console.log('API Call Successful, Response:', response.data);
         return response.data;
     } catch (error) {
-        console.error('API Call Failed, Error:', error); // Log the error
+        console.error('API Call Failed, Error:', error);
         throw error;
     }
 };
@@ -518,10 +514,10 @@ const fetchAllSvEmails = async (data) => {
             Authorization: "Bearer " + user.token
         }
     };
-    console.log(`/mobile/api/email/${accountNumber}/GetAllSVEmails`); // Log the request data
+    console.log(`/mobile/api/email/${accountNumber}/GetAllSVEmails`);
     try {
         const response = await _axios.get(`/mobile/api/email/${accountNumber}/GetAllSVEmails`, config);
-        console.log('API Call Successful, Response:', response.data); // Log the successful response
+        console.log('API Call Successful, Response:', response.data);
         return response.data;
     } catch (error) {
         console.error('API Call Failed, Error:', error); // Log the error

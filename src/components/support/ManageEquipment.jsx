@@ -321,6 +321,9 @@ const ManageEquipment = ({ route }) => {
           onPress={() => {
             navigation.navigate("UpdateModemPassword");
           }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Update your WiFi password"
         >
           <PasswordKey />
           <Text style={styles.modemHealthSupport}>Update Password</Text>
@@ -336,6 +339,9 @@ const ManageEquipment = ({ route }) => {
           onPress={() => {
             navigation.navigate("RetrieveModemPassword");
           }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Retrieve your WiFi password"
         >
           <PasswordRetrieve />
           <Text style={styles.modemHealthSupport}>
@@ -355,6 +361,9 @@ const ManageEquipment = ({ route }) => {
               wifiData: wifiData,
             });
           }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Share your WiFi password"
         >
           <PasswordShare />
           <Text style={styles.modemHealthSupport}>Share Password</Text>
@@ -367,47 +376,54 @@ const ManageEquipment = ({ route }) => {
     )
   }
 
+
   const renderEEroDeviceOptions = () => {
     return(
-              <View
-                style={[
-                  styles.supportAccordionParent,
-                  styles.supportParentFlexBox,
-                ]}
-              >
-                <View style={[styles.frameLayout]} />
+      <View
+        style={[
+          styles.supportAccordionParent,
+          styles.supportParentFlexBox,
+        ]}
+      >
+        <View style={[styles.frameLayout]} />
 
-                <TouchableOpacity
-                  style={[styles.frame9defaultSpaceBlock]}
-                  onPress={() => {
-                    navigation.navigate("UpdateModemPassword",{isEEroDevice: true , eeroDeviceData: eeroDeviceData});
-                  }}
-                >
-                  <PasswordKey />
-                  <Text style={styles.modemHealthSupport}>Update Password</Text>
-                  <Image
-                    style={styles.rightIconStyle}
-                    source={require("../../../assets/chevronright.png")}
-                  />
-                </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.frame9defaultSpaceBlock]}
+          onPress={() => {
+            navigation.navigate("UpdateModemPassword",{isEEroDevice: true , eeroDeviceData: eeroDeviceData});
+          }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Update your eero device password"
+        >
+          <PasswordKey />
+          <Text style={styles.modemHealthSupport}>Update Password</Text>
+          <Image
+            style={styles.rightIconStyle}
+            source={require("../../../assets/chevronright.png")}
+          />
+        </TouchableOpacity>
 
-                <View style={[styles.frameLayout]} />
-                <TouchableOpacity
-                  style={[styles.frame9defaultSpaceBlock]}
-                  onPress={() => {
-                    navigation.navigate("EEroFeatures");
-                  }}
-                >
-                  <PasswordRetrieve />
-                  <Text style={styles.modemHealthSupport}>
-                    Open eero App
-                  </Text>
-                  <Image
-                    style={styles.rightIconStyle}
-                    source={require("../../../assets/chevronright.png")}
-                  />
-                </TouchableOpacity>
-              </View>
+        <View style={[styles.frameLayout]} />
+        <TouchableOpacity
+          style={[styles.frame9defaultSpaceBlock]}
+          onPress={() => {
+            navigation.navigate("EEroFeatures");
+          }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Open the eero app for more features"
+        >
+          <PasswordRetrieve />
+          <Text style={styles.modemHealthSupport}>
+            Open eero App
+          </Text>
+          <Image
+            style={styles.rightIconStyle}
+            source={require("../../../assets/chevronright.png")}
+          />
+        </TouchableOpacity>
+      </View>
     )
   }
 
@@ -419,411 +435,408 @@ const ManageEquipment = ({ route }) => {
           navigation.goBack();
         }}
       />
-      <ScrollView automaticallyAdjustContentInsets={false}>
-        <View style={styles.myModemParent}>
-          <View style={[styles.myModem, styles.myModemSpaceBlock]}>
-            <View
-              style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
-            >
-              <Text style={[styles.myModem1, styles.myModem1Typo]}>
-                My Modem
-              </Text>
-            </View>
-            <View style={styles.frameParentSpaceBlock1}>
-              <View style={[styles.frameWrapper, styles.contentSpaceBlock]}>
-                <View style={styles.frameContainer}>
-                  <View style={styles.docsis31Parent}>
-                    <View style={styles.iconBg}>
-                      <ModemIcon1 />
-                    </View>
-                    <View style={styles.motorolaParent}>
-                      <Text style={[styles.motorola, styles.myModem1Typo]}>
-                        {manufacturer}
-                      </Text>
-                      <Text style={styles.mb8600Docsis}>{model}</Text>
-
-                      {!loadingHealth ? (
-                        <View style={styles.poorHealthParent}>
-                          <Text style={[styles.poorHealth, styles.textTypo2]}>
-                            {isOffline
-                              ? "Offline"
-                              : currentHealth === "Poor"
-                                ? "Issue Detected"
-                                : currentHealth == "Offline"
-                                  ? "Issue Detected"
-                                  : "Optimal Health"}
-                          </Text>
-                          <Image
-                            style={styles.frameChild}
-                            tintColor={
-                              isOffline
-                                ? colors.sparklight_red
-                                : currentHealth === "Optimal"
-                                  ? colors.sparklight_green
-                                  : currentHealth === "Offline"
-                                    ? colors.sparklight_red
-                                    : colors.sparklight_yellow
-                            }
-                            resizeMode="cover"
-                            source={require("../../../assets/Ellipse.png")}
-                          />
-                        </View>
-                      ) : (
-                        <ActivityIndicator
-                          size="small"
-                          color={Color.colorGainsboro_200}
-                          style={{ width: 40 }}
-                        />
-                      )}
-                      {leased.length > 0 && (
-                        <View style={[styles.badge, styles.parentBorder]}>
-                          <Text style={[styles.text, styles.textTypo1]}>
-                            {leased.toLocaleUpperCase()}
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-                </View>
+     <ScrollView automaticallyAdjustContentInsets={false}>
+  <View style={styles.myModemParent}>
+    <View style={[styles.myModem, styles.myModemSpaceBlock]}>
+      <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
+        <Text style={[styles.myModem1, styles.myModem1Typo]}>
+          My Modem
+        </Text>
+      </View>
+      <View style={styles.frameParentSpaceBlock1}>
+        <View style={[styles.frameWrapper, styles.contentSpaceBlock]}>
+          <View style={styles.frameContainer}>
+            <View style={styles.docsis31Parent}>
+              <View style={styles.iconBg}>
+                <ModemIcon1 />
               </View>
+              <View style={styles.motorolaParent}>
+                <Text style={[styles.motorola, styles.myModem1Typo]}>
+                  {manufacturer}
+                </Text>
+                <Text style={styles.mb8600Docsis}>{model}</Text>
 
-              {(currentHealth != "Optimal" || isOffline) && !loadingHealth && (
-                <View
-                  style={[
-                    styles.notificationsWrapper,
-                    styles.myModemSpaceBlock,
-                  ]}
-                >
-                  <View style={[styles.notifications, styles.parentBorder1]}>
-                    <View
-                      style={{
-                        backgroundColor: isOffline
+                {!loadingHealth ? (
+                  <View style={styles.poorHealthParent}>
+                    <Text style={[styles.poorHealth, styles.textTypo2]}>
+                      {isOffline
+                        ? "Offline"
+                        : currentHealth === "Poor"
+                        ? "Issue Detected"
+                        : currentHealth == "Offline"
+                        ? "Issue Detected"
+                        : "Optimal Health"}
+                    </Text>
+                    <Image
+                      style={styles.frameChild}
+                      tintColor={
+                        isOffline
                           ? colors.sparklight_red
+                          : currentHealth === "Optimal"
+                          ? colors.sparklight_green
                           : currentHealth === "Offline"
-                            ? colors.sparklight_red
-                            : colors.sparklight_yellow,
-                        width: 4,
-                      }}
+                          ? colors.sparklight_red
+                          : colors.sparklight_yellow
+                      }
+                      resizeMode="cover"
+                      source={require("../../../assets/Ellipse.png")}
                     />
-                    <View style={styles.bannerWarning}>
-                      <View style={styles.rightActionableParent}>
-                        <View style={styles.creditCardWillExpireSoonParent}>
-                          <View style={{ flexDirection: "row" }}>
-                            <Image
-                              style={{
-                                alignSelf: "center",
-                                width: 24,
-                                height: 24,
-                              }}
-                              resizeMode="cover"
-                              tintColor={
-                                isOffline
-                                  ? colors.sparklight_red
-                                  : currentHealth === "Optimal"
-                                    ? colors.sparklight_green
-                                    : currentHealth === "Offline"
-                                      ? colors.sparklight_red
-                                      : colors.sparklight_yellow
-                              }
-                              source={require("../../../assets/infocircle.png")}
-                            />
-                            <Text
-                              style={[
-                                styles.creditCardWill,
-                                {
-                                  marginLeft: 5,
-                                  color:
-                                    currentHealth === "Poor"
-                                      ? "#000"
-                                      : Color.sparkLightRed,
-                                },
-                              ]}
-                            >
-                              {truckrollPrediction === 1 ? 'Schedule a Service Appointment' :
-                                <>
-
-                                  {isOffline
-                                    ? "Modem is Offline"
-                                    : isContactUs
-                                      ? "Please try again later"
-                                      : "An issue has been detected"}
-                                </>
-                              }
-                            </Text>
-                          </View>
-                          <Text
-                            style={[
-                              styles.yourSavedCard,
-                              styles.yourSavedCardSpaceBlock,
-                            ]}
-                          >
-                            {truckrollPrediction === 1 ? 'We\'ve noticed that your modem has been experiencing repeated issues, which may be affecting your internet service quality. We recommend you contact us to schedule a service appointment.' :
-                              <>
-                                {isContactUs
-                                  ? `Sorry, we're having trouble completing the modem system check right now. This seems to be an issue on our end. Please try again later. If the problem persists, please contact our support team for assistance.`
-                                  : "Try one of the highlighted options below to resolve"}
-                              </>
-                            }
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
                   </View>
-                </View>
-              )}
-            </View>
-            <View
-              style={[
-                styles.supportAccordionParent,
-                styles.supportParentFlexBox,
-              ]}
-            >
-              <View style={[styles.frameLayout]} />
-              <TouchableOpacity
-                style={[
-                  styles.frame9defaultSpaceBlock,
-                  {
-                    backgroundColor: (isContactUs || truckrollPrediction == 1 || loadingHealth)
-                      ? "white"
-                      : currentHealth === "Offline" ||
-                        isOffline ||
-                        currentHealth === "Poor"
-                        ? "#EF4E3E10"
-                        : "white",
-                  },
-                ]}
-                onPress={() => {
-                  navigation.navigate("ModemConnectivityGuide", {
-                    isSuccess: true,
-                  });
-                }}
-              >
-                <CheckConnection />
-                <Text style={styles.modemHealthSupport}>Check Connection</Text>
-                <Image
-                  style={styles.rightIconStyle}
-                  source={require("../../../assets/chevronright.png")}
-                />
-              </TouchableOpacity>
-              <View style={[styles.frameLayout]} />
-              {manufacturer != "Calix" && (
-                <TouchableOpacity
-                  style={[
-                    styles.frame9defaultSpaceBlock,
-                    {
-                      backgroundColor: (isContactUs || truckrollPrediction == 1 || loadingHealth)
-                        ? "white"
-                        : currentHealth === "Offline" ||
-                          currentHealth === "Poor"
-                          ? "#EF4E3E10"
-                          : "white",
-                    },
-                  ]}
-                  onPress={() => {
-                    if (!loadingHealth) {
-                      navigation.navigate("ModemRebootScreen", {
-                        isError:
-                          currentHealth != "Optimal" || isOffline
-                            ? true
-                            : false,
-                        isFromT: true,
-                      });
-                    }
-                  }}
-                >
-                  {/* <Image
-                  style={{ width: 20, height: 20, flexShrink: 0 }}
-                  resizeMode="contain"
-                  source={require("../../../assets/refresh.png")}
-                /> */}
-                  <RefreshIcon />
-                  <Text style={styles.modemHealthSupport}>Reboot Modem</Text>
-                  <Image
-                    style={styles.rightIconStyle}
-                    source={require("../../../assets/chevronright.png")}
+                ) : (
+                  <ActivityIndicator
+                    size="small"
+                    color={Color.colorGainsboro_200}
+                    style={{ width: 40 }}
                   />
-                </TouchableOpacity>
-              )}
-
-              <View style={[styles.frameLayout]} />
-              <TouchableOpacity
-                style={[
-                  styles.frame9defaultSpaceBlock,
-                  {
-                    backgroundColor: (isContactUs || truckrollPrediction == 1 || loadingHealth)
-                      ? "white"
-                      : currentHealth === "Offline"
-                        ? "#EF4E3E10"
-                        : "white",
-                  },
-                ]}
-                onPress={() => {
-                  navigation.navigate("ModemExchange");
-                }}
-              >
-                <Image
-                  style={{ width: 20, height: 20, flexShrink: 0 }}
-                  resizeMode="contain"
-                  source={require("../../../assets/repeat-01.png")}
-                />
-                <Text style={styles.modemHealthSupport}>Exchange Modem</Text>
-                <Image
-                  style={styles.rightIconStyle}
-                  source={require("../../../assets/chevronright.png")}
-                />
-              </TouchableOpacity>
-
-              <View style={[styles.frameLayout]} />
-              <TouchableOpacity
-                style={[
-                  styles.frame9defaultSpaceBlock,
-                  {
-                    backgroundColor:
-                      (currentHealth === "Offline" || isContactUs || (!loadingHealth && truckrollPrediction == 1))
-                        ? "#EF4E3E10"
-                        : "white",
-                  },
-                ]}
-                onPress={() => {
-                  PubSub.publish("event.contactUsEvent", {});
-                  setTimeout(
-                    () =>
-                      navigation.navigate("SupportStack", {
-                        isContactUs: true,
-                      }),
-                    500
-                  );
-                }}
-              >
-                <Image
-                  style={{ width: 20, height: 20, flexShrink: 0 }}
-                  resizeMode="contain"
-                  tintColor={Color.sparklightBrightPurple}
-                  source={require("../../../assets/phone-outgoing-04.png")}
-                />
-                <Text
-                  style={styles.modemHealthSupport}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="Contact us for more information"
-                >
-                  Contact Us
-                </Text>
-                <Image
-                  style={styles.rightIconStyle}
-                  source={require("../../../assets/chevronright.png")}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/*Wifi Passoword*/}
-          {(wifiPasswordCanChange || isEEroDevice) && (
-            <View
-              style={[
-                styles.myModem,
-                styles.myModemSpaceBlock,
-                { marginTop: 20 },
-              ]}
-            >
-              <View
-                style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
-              >
-                <Text style={[styles.myModem1, styles.myModem1Typo]}>
-                  WiFi Password
-                </Text>
+                )}
+                {leased.length > 0 && (
+                  <View style={[styles.badge, styles.parentBorder]}>
+                    <Text style={[styles.text, styles.textTypo1]}>
+                      {leased.toLocaleUpperCase()}
+                    </Text>
+                  </View>
+                )}
               </View>
-              {isEEroDevice ? renderEEroDeviceOptions() : renderOtherDeviceOptions()}
             </View>
-          )}
-
-          {/* Quick Link section */}
-
-          <View
-            style={[
-              styles.myModem,
-              styles.myModemSpaceBlock,
-              { marginTop: 20 },
-            ]}
-          >
-            <View
-              style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
-            >
-              <Text style={[styles.myModem1, styles.myModem1Typo]}>
-                Quick Links
-              </Text>
-            </View>
-            <View
-              style={[
-                styles.supportAccordionParent,
-                styles.supportParentFlexBox,
-              ]}
-            >
-              <View style={[styles.frameLayout]} />
-
-              <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock]}
-                onPress={() => {
-                  navigation.navigate("ArticalWindowUtility", {
-                    url: "https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues",
-                    name: "Wifi Issues",
-                  });
-                }}
-              >
-                <WifiIssueIcon />
-                <Text style={styles.modemHealthSupport}>Wifi Issues</Text>
-                <Image
-                  style={styles.rightIconStyle}
-                  source={require("../../../assets/chevronright.png")}
-                />
-              </TouchableOpacity>
-
-              <View style={[styles.frameLayout]} />
-              <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock]}
-                onPress={() => {
-                  navigation.navigate("ArticalWindowUtility", {
-                    url: "https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email",
-                    name: "Surfing Issues",
-                  });
-                }}
-              >
-                <Surfingissue />
-                <Text style={styles.modemHealthSupport}>Surfing Issues</Text>
-                <Image
-                  style={styles.rightIconStyle}
-                  source={require("../../../assets/chevronright.png")}
-                />
-              </TouchableOpacity>
-
-              <View style={[styles.frameLayout]} />
-              <TouchableOpacity
-                style={[styles.frame9defaultSpaceBlock]}
-                onPress={() => {
-                  if (!loadingHealth) {
-                    navigation.navigate("PeriodicProblems", {
-                      isError: currentHealth != "Optimal" || isOffline,
-                    });
-                  }
-                }}
-              >
-                <IntermittentIssues />
-                <Text style={styles.modemHealthSupport}>
-                  Intermittent Issues
-                </Text>
-                <Image
-                  style={styles.rightIconStyle}
-                  source={require("../../../assets/chevronright.png")}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={[styles.frameFlexBox]}>
-            <MyServicePlan plans={plans} navigation={navigation} />
           </View>
         </View>
-      </ScrollView>
+
+        {(currentHealth != "Optimal" || isOffline) && !loadingHealth && (
+          <View
+            style={[
+              styles.notificationsWrapper,
+              styles.myModemSpaceBlock,
+            ]}
+          >
+            <View style={[styles.notifications, styles.parentBorder1]}>
+              <View
+                style={{
+                  backgroundColor: isOffline
+                    ? colors.sparklight_red
+                    : currentHealth === "Offline"
+                    ? colors.sparklight_red
+                    : colors.sparklight_yellow,
+                  width: 4,
+                }}
+              />
+              <View style={styles.bannerWarning}>
+                <View style={styles.rightActionableParent}>
+                  <View style={styles.creditCardWillExpireSoonParent}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Image
+                        style={{
+                          alignSelf: "center",
+                          width: 24,
+                          height: 24,
+                        }}
+                        resizeMode="cover"
+                        tintColor={
+                          isOffline
+                            ? colors.sparklight_red
+                            : currentHealth === "Optimal"
+                            ? colors.sparklight_green
+                            : currentHealth === "Offline"
+                            ? colors.sparklight_red
+                            : colors.sparklight_yellow
+                        }
+                        source={require("../../../assets/infocircle.png")}
+                      />
+                      <Text
+                        style={[
+                          styles.creditCardWill,
+                          {
+                            marginLeft: 5,
+                            color:
+                              currentHealth === "Poor"
+                                ? "#000"
+                                : Color.sparkLightRed,
+                          },
+                        ]}
+                      >
+                        {truckrollPrediction === 1
+                          ? 'Schedule a Service Appointment'
+                          : isOffline
+                          ? "Modem is Offline"
+                          : isContactUs
+                          ? "Please try again later"
+                          : "An issue has been detected"}
+                      </Text>
+                    </View>
+                    <Text
+                      style={[
+                        styles.yourSavedCard,
+                        styles.yourSavedCardSpaceBlock,
+                      ]}
+                    >
+                      {truckrollPrediction === 1
+                        ? "We've noticed that your modem has been experiencing repeated issues, which may be affecting your internet service quality. We recommend you contact us to schedule a service appointment."
+                        : isContactUs
+                        ? "Sorry, we're having trouble completing the modem system check right now. This seems to be an issue on our end. Please try again later. If the problem persists, please contact our support team for assistance."
+                        : "Try one of the highlighted options below to resolve"}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        )}
+      </View>
+      <View
+        style={[
+          styles.supportAccordionParent,
+          styles.supportParentFlexBox,
+        ]}
+      >
+        <View style={[styles.frameLayout]} />
+        <TouchableOpacity
+          style={[
+            styles.frame9defaultSpaceBlock,
+            {
+              backgroundColor:
+                isContactUs || truckrollPrediction == 1 || loadingHealth
+                  ? "white"
+                  : currentHealth === "Offline" ||
+                    isOffline ||
+                    currentHealth === "Poor"
+                  ? "#EF4E3E10"
+                  : "white",
+            },
+          ]}
+          onPress={() => {
+            navigation.navigate("ModemConnectivityGuide", {
+              isSuccess: true,
+            });
+          }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Check your modem connection"
+        >
+          <CheckConnection />
+          <Text style={styles.modemHealthSupport}>Check Connection</Text>
+          <Image
+            style={styles.rightIconStyle}
+            source={require("../../../assets/chevronright.png")}
+          />
+        </TouchableOpacity>
+        <View style={[styles.frameLayout]} />
+        {manufacturer != "Calix" && (
+          <TouchableOpacity
+            style={[
+              styles.frame9defaultSpaceBlock,
+              {
+                backgroundColor:
+                  isContactUs || truckrollPrediction == 1 || loadingHealth
+                    ? "white"
+                    : currentHealth === "Offline" ||
+                      currentHealth === "Poor"
+                    ? "#EF4E3E10"
+                    : "white",
+              },
+            ]}
+            onPress={() => {
+              if (!loadingHealth) {
+                navigation.navigate("ModemRebootScreen", {
+                  isError:
+                    currentHealth != "Optimal" || isOffline
+                      ? true
+                      : false,
+                  isFromT: true,
+                });
+              }
+            }}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Reboot your modem"
+          >
+            <RefreshIcon />
+            <Text style={styles.modemHealthSupport}>Reboot Modem</Text>
+            <Image
+              style={styles.rightIconStyle}
+              source={require("../../../assets/chevronright.png")}
+            />
+          </TouchableOpacity>
+        )}
+
+        <View style={[styles.frameLayout]} />
+        <TouchableOpacity
+          style={[
+            styles.frame9defaultSpaceBlock,
+            {
+              backgroundColor:
+                isContactUs || truckrollPrediction == 1 || loadingHealth
+                  ? "white"
+                  : currentHealth === "Offline"
+                  ? "#EF4E3E10"
+                  : "white",
+            },
+          ]}
+          onPress={() => {
+            navigation.navigate("ModemExchange");
+          }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Exchange your modem"
+        >
+          <Image
+            style={{ width: 20, height: 20, flexShrink: 0 }}
+            resizeMode="contain"
+            source={require("../../../assets/repeat-01.png")}
+          />
+          <Text style={styles.modemHealthSupport}>Exchange Modem</Text>
+          <Image
+            style={styles.rightIconStyle}
+            source={require("../../../assets/chevronright.png")}
+          />
+        </TouchableOpacity>
+
+        <View style={[styles.frameLayout]} />
+        <TouchableOpacity
+          style={[
+            styles.frame9defaultSpaceBlock,
+            {
+              backgroundColor:
+                currentHealth === "Offline" ||
+                isContactUs ||
+                (!loadingHealth && truckrollPrediction == 1)
+                  ? "#EF4E3E10"
+                  : "white",
+            },
+          ]}
+          onPress={() => {
+            PubSub.publish("event.contactUsEvent", {});
+            setTimeout(
+              () =>
+                navigation.navigate("SupportStack", {
+                  isContactUs: true,
+                }),
+              500
+            );
+          }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Contact support for further assistance"
+        >
+          <Image
+            style={{ width: 20, height: 20, flexShrink: 0 }}
+            resizeMode="contain"
+            tintColor={Color.sparklightBrightPurple}
+            source={require("../../../assets/phone-outgoing-04.png")}
+          />
+          <Text style={styles.modemHealthSupport}>Contact Us</Text>
+          <Image
+            style={styles.rightIconStyle}
+            source={require("../../../assets/chevronright.png")}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+
+    {/* WiFi Password */}
+    {(wifiPasswordCanChange || isEEroDevice) && (
+      <View
+        style={[
+          styles.myModem,
+          styles.myModemSpaceBlock,
+          { marginTop: 20 },
+        ]}
+      >
+        <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
+          <Text style={[styles.myModem1, styles.myModem1Typo]}>
+            WiFi Password
+          </Text>
+        </View>
+        {isEEroDevice ? renderEEroDeviceOptions() : renderOtherDeviceOptions()}
+      </View>
+    )}
+
+    {/* Quick Link section */}
+    <View
+      style={[
+        styles.myModem,
+        styles.myModemSpaceBlock,
+        { marginTop: 20 },
+      ]}
+    >
+      <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
+        <Text style={[styles.myModem1, styles.myModem1Typo]}>
+          Quick Links
+        </Text>
+      </View>
+      <View style={[styles.supportAccordionParent, styles.supportParentFlexBox]}>
+        <View style={[styles.frameLayout]} />
+
+        <TouchableOpacity
+          style={[styles.frame9defaultSpaceBlock]}
+          onPress={() => {
+            navigation.navigate("ArticalWindowUtility", {
+              url: "https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues",
+              name: "Wifi Issues",
+            });
+          }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Learn more about WiFi issues"
+        >
+          <WifiIssueIcon />
+          <Text style={styles.modemHealthSupport}>Wifi Issues</Text>
+          <Image
+            style={styles.rightIconStyle}
+            source={require("../../../assets/chevronright.png")}
+          />
+        </TouchableOpacity>
+
+        <View style={[styles.frameLayout]} />
+        <TouchableOpacity
+          style={[styles.frame9defaultSpaceBlock]}
+          onPress={() => {
+            navigation.navigate("ArticalWindowUtility", {
+              url: "https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email",
+              name: "Surfing Issues",
+            });
+          }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Learn more about surfing issues"
+        >
+          <Surfingissue />
+          <Text style={styles.modemHealthSupport}>Surfing Issues</Text>
+          <Image
+            style={styles.rightIconStyle}
+            source={require("../../../assets/chevronright.png")}
+          />
+        </TouchableOpacity>
+
+        <View style={[styles.frameLayout]} />
+        <TouchableOpacity
+          style={[styles.frame9defaultSpaceBlock]}
+          onPress={() => {
+            if (!loadingHealth) {
+              navigation.navigate("PeriodicProblems", {
+                isError: currentHealth != "Optimal" || isOffline,
+              });
+            }
+          }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Learn more about intermittent issues"
+        >
+          <IntermittentIssues />
+          <Text style={styles.modemHealthSupport}>
+            Intermittent Issues
+          </Text>
+          <Image
+            style={styles.rightIconStyle}
+            source={require("../../../assets/chevronright.png")}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+
+    <View style={[styles.frameFlexBox]}>
+      <MyServicePlan plans={plans} navigation={navigation} />
+    </View>
+  </View>
+</ScrollView>
       {loading ? <Loader /> : null}
     </View>
   );
