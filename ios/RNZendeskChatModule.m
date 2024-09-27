@@ -5,7 +5,7 @@
 #import <ChatSDK/ChatSDK.h>
 #import <ChatProvidersSDK/ChatProvidersSDK.h>
 #import <CommonUISDK/CommonUISDK.h>
-#import <AnswerBotProvidersSDK/AnswerBotProvidersSDK.h>
+
 
 @implementation RNZendeskChatModule
 
