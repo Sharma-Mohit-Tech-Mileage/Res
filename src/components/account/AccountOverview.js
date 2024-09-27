@@ -115,7 +115,7 @@ const AccountOverview = () => {
       includeInMenu: true,
     },
     {
-      name: 'Feedback',
+      name: 'App Feedback',
       onPress: () => navigation.navigate('Feedback'),
       icon: feedbackicon,
       accessibilityLabel: 'Navigate to user management settings',

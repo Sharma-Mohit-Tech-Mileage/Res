@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontWeight: "bold",
         color: colors.sp_black,
+        alignSelf:'flex-end',
         marginVertical: Padding.p_8xs,
         fontWeight: "700",
     },
@@ -146,6 +147,7 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         fontFamily: FontFamily.openSansRegular,
         color: colors.sparklight_purple_blue,
+        alignSelf:'flex-end',
     },
     statusRow: {
         flexDirection: "row",
