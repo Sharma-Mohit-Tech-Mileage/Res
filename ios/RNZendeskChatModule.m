@@ -11,7 +11,6 @@
 
 RCT_EXPORT_MODULE(RNZendeskChatModule);
 ZDKChatAPIConfiguration *_visitorAPIConfig;
-UINavigationController *_chatController;
 
 - (UIColor *)colorFromHexString:(NSString *)hexString {
     unsigned rgbValue = 0;
@@ -139,18 +138,36 @@ RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
                                                                                                   action: @selector(dismiss)];
       UINavigationController *chatController = [[UINavigationController alloc] initWithRootViewController: viewController];
       [rootViewController presentViewController:chatController animated:YES completion:nil];
+     
     } else {
         NSError *error = [NSError errorWithDomain:@"RNZendeskChatModule" code:500 userInfo:@{NSLocalizedDescriptionKey: @"Root view controller is not available"}];
     }
   });
 }
 
+- (UIViewController *)topViewController {
+    UIViewController *rootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
+    return [self getTopViewController:rootViewController];
+}
+
+- (UIViewController *)getTopViewController:(UIViewController *)viewController {
+    if ([viewController isKindOfClass:[UINavigationController class]]) {
+        return [self getTopViewController:[(UINavigationController *)viewController topViewController]];
+    } else if ([viewController isKindOfClass:[UITabBarController class]]) {
+        return [self getTopViewController:[(UITabBarController *)viewController selectedViewController]];
+    } else if (viewController.presentedViewController) {
+        return [self getTopViewController:viewController.presentedViewController];
+    }
+    return viewController;
+}
+
 - (void)dismiss {
   NSLog(@"Chat Close called");
+  UIViewController *currentVC = [self topViewController];
 
   // Dismiss the chat controller and reset the session after chat ends
-  [_chatController dismissViewControllerAnimated:YES completion:^{
-      
+  [currentVC dismissViewControllerAnimated:YES completion:^{
+
   }];
 }
 
