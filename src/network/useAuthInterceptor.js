@@ -5,11 +5,20 @@ export const useAuthInterceptor = () => {
     const navigation = useNavigation();
 
     const redirectToLogin = async () => {
-        await cleanUserData();
-        navigation.reset({
-            index: 0,
-            routes: [{ name: 'Splash' }], // Adjust this to match your navigation setup
-        });
+        try {
+            console.log("Cleaning user data before redirecting to login...");
+            await cleanUserData();
+            console.log("User data cleaned. Redirecting to login...");
+
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Splash' }], // Ensure 'Splash' is a valid route in your navigator
+            });
+
+            console.log("Navigation reset to Splash screen.");
+        } catch (error) {
+            console.error("Error during redirectToLogin:", error);
+        }
     };
 
     return { redirectToLogin };

@@ -14,18 +14,18 @@ const getProfileDetails = async () => {
             Authorization: "Bearer " + data.token
         }
     };
-    let ApiMethod=''
-    if(accountNumber.toString().length>=16){
-     ApiMethod=`/usersvc/api/profile/${accountNumber}`
-    }else{
-        ApiMethod=`/users/api/profile/${accountNumber}`
+    let ApiMethod = ''
+    if (accountNumber.toString().length >= 16) {
+        ApiMethod = `/usersvc/api/profile/${accountNumber}`
+    } else {
+        ApiMethod = `/users/api/profile/${accountNumber}`
     }
 
 
     return _axios.get(ApiMethod, { ...config })
         .then(res => res.data)
         .catch(error => {
-            console.error(`Error fetching /${ApiMethod}`, error);            
+            console.error(`Error fetching /${ApiMethod}`, error);
             if (error.toString().includes('AxiosError: timeout of') && getProfileDetailsCount < 2) {
                 getProfileDetails();
             } else {
@@ -46,8 +46,8 @@ const fetchUserList = async () => {
 
     return _axios.get(`/users/api/account/${accountNumber}/users`, { ...config })
         .then(res => {
-            console.log(JSON.stringify(res.data, null, 2)); 
-            return res.data;  
+            console.log(JSON.stringify(res.data, null, 2));
+            return res.data;
         })
         .catch(error => {
             // Log and throw the error
@@ -78,8 +78,8 @@ const fetchSmsSubscription = async () => {
                 fetchSmsSubscription();
             } else {
                 fetchSmsSubscriptionCount = 0;
-                throw error;                
-            }            
+                throw error;
+            }
             throw error;
         });
 };
@@ -100,7 +100,7 @@ const fetchBillingStatus = async () => {
     return _axios.get(`/account/api/account/${accountNumber}/paperless/status`, { ...config })
         .then(res => {
             console.log('fetching fetching /account/api/account/`${accountNumber}`/paperless/status', JSON.stringify(res.data, null, 2));
-            return res.data;  
+            return res.data;
         })
         .catch(error => {
             console.error('Error fetching /account/api/account/`${accountNumber}`/paperless/status', error);
@@ -109,7 +109,7 @@ const fetchBillingStatus = async () => {
                 fetchBillingStatus();
             } else {
                 fetchBillingStatusCount = 0;
-                throw error;                
+                throw error;
             }
         });
 };
@@ -168,30 +168,34 @@ const fetchPushNotifications = async () => {
 };
 
 const postProfileInfo = async (data) => {
-    let user = await getUser();
-   
-    const config = {
-        headers: {
-            Authorization: "Bearer " + user.token
-        }
-    };
-    console.log('Account config',config)
-    let accountNumber = user.userInfo?.accountNumber || null
-    console.log('Account Number',accountNumber)
-    let ApiMethod=''
-    if(accountNumber.toString().length>=16){
-         ApiMethod=`/usersvc/api/profile/`
-    }else{
-        ApiMethod=`/users/api/profile/`
-    }
-    console.log(`Making API Call to ${ApiMethod} with data:`, data); // Log the request data
-
     try {
-        const response = await _axios.put(ApiMethod, data, config);
-        console.log('API Call Successful, Response:', response.data); // Log the successful response
+        const user = await getUser();
+        if (!user || !user.token) {
+            throw new Error("User information or token is missing");
+        }
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${user.token}`,
+            },
+        };
+        console.log('API Request Configuration:', config);
+
+        const accountNumber = user.userInfo?.accountNumber;
+        if (!accountNumber) {
+            throw new Error("Account number is missing");
+        }
+
+        const isEnterpriseAccount = accountNumber.toString().length >= 16;
+        const apiEndpoint = isEnterpriseAccount ? '/usersvc/api/profile/' : '/users/api/profile/';
+        console.log(`Making API Call to ${apiEndpoint} with data:`, data);
+
+        const response = await _axios.put(apiEndpoint, data, config);
+        console.log('API Call Successful, Response:', response.data);
+
         return response.data;
     } catch (error) {
-        console.error('API Call Failed, Error:', error); // Log the error
+        console.error('API Call Failed:', error.message);
         throw error;
     }
 };
@@ -300,8 +304,8 @@ const postTermsAndConditions = async (flag) => {
 
 const postTermsAndConditionsv2 = async (flag) => {
     let user = await getUser();
-    const accountNumber = user.userInfo?.accountNumber ;
-    const userName = user.userInfo?.userName ;
+    const accountNumber = user.userInfo?.accountNumber;
+    const userName = user.userInfo?.userName;
     const mobileTCAcceptanceFlag = flag;
     const tcAccpetanceDate = moment().format();
     const customerType = "Residential";
@@ -379,18 +383,18 @@ const handleSubmitFeedback = async (obj) => {
     const fullName = user.userInfo?.fullName;
     const payload = {
         request: {
-            ticket_form_id:Env.ZENDESK_FEEDBACK.ticket_form_id ,
+            ticket_form_id: Env.ZENDESK_FEEDBACK.ticket_form_id,
             requester: {
                 name: fullName,
                 email: obj.feedbackEmail
             },
             recipient: Env.ZENDESK_FEEDBACK.recipient,
-            assignee_id:Env.ZENDESK_FEEDBACK.assignee_id,
+            assignee_id: Env.ZENDESK_FEEDBACK.assignee_id,
             group_id: Env.ZENDESK_FEEDBACK.group_id,
             type: null,
             custom_fields: [
-                { id:Env.ZENDESK_FEEDBACK.category_id , value: obj.category },
-                { id:Env.ZENDESK_FEEDBACK.feedbackValue_id, value: obj.feedbackValue },
+                { id: Env.ZENDESK_FEEDBACK.category_id, value: obj.category },
+                { id: Env.ZENDESK_FEEDBACK.feedbackValue_id, value: obj.feedbackValue },
                 { id: Env.ZENDESK_FEEDBACK.email_id, value: obj.feedbackEmail }
             ],
             subject: "Residential MobileApp Feedback",
@@ -398,7 +402,7 @@ const handleSubmitFeedback = async (obj) => {
                 body: obj.feedbackText,
                 uploads: null
             },
-            tags: ["Feedback", "Residential", "resimobileapp",'pid_'+user.userInfo.accountNumber],
+            tags: ["Feedback", "Residential", "resimobileapp", 'pid_' + user.userInfo.accountNumber],
             via: { channel: "MobileApp" }
         }
     };
@@ -418,7 +422,7 @@ const logError = async (errorData) => {
             Authorization: `Bearer ${user.token}`
         }
     };
-    console.log('error logged Payload^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^',JSON.stringify(errorData));
+    console.log('error logged Payload^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^', JSON.stringify(errorData));
     try {
         await _axios.post('/logging/api/log/error', errorData);
         console.log('Error logged successfully');
@@ -434,10 +438,10 @@ const logInfo = async (infoData) => {
             Authorization: `Bearer ${user.token}`
         }
     };
-    console.log('Info logged Payload^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^',JSON.stringify(infoData));
+    console.log('Info logged Payload^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^', JSON.stringify(infoData));
     try {
-       const response = await _axios.post('/logging/api/log/info', infoData);
-       console.log('==================================================================================',response)
+        const response = await _axios.post('/logging/api/log/info', infoData);
+        console.log('==================================================================================', response)
         console.log('Info logged successfully');
     } catch (logErr) {
         console.error('Failed to log info:', logErr);
@@ -563,7 +567,7 @@ const deleteSVEmail = async (email) => {
     }
 };
 
- const updateSVEmails = async (emailList) => {
+const updateSVEmails = async (emailList) => {
     let user = await getUser();
     const accountNumber = user.userInfo?.accountNumber || null;
     const config = {
@@ -600,9 +604,11 @@ const addSVEmailMktFlag = async (email) => {
         throw error;
     }
 };
-export { logError,logInfo,fetchUserList, getProfileDetails, 
-    fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, 
-    fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, 
-    postEmailNotification, postTermsAndConditions,postTermsAndConditionsv2, postPushNotifications,
-     unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,
-    resendEmailVerification,addUserAction,removeUser,editUserAction ,fetchAllSvEmails,addSVEmailNoFlags, deleteSVEmail,updateSVEmails,addSVEmailMktFlag}
+export {
+    logError, logInfo, fetchUserList, getProfileDetails,
+    fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo,
+    fetchBillingStatus, fetchPaperLessDetails, putEmailNotification,
+    postEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications,
+    unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,
+    resendEmailVerification, addUserAction, removeUser, editUserAction, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, addSVEmailMktFlag
+}
