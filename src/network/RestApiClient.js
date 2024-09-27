@@ -20,6 +20,7 @@ const _axios = axios.create({
 
 let isRefreshing = false;
 let failedQueue = [];
+let navigationPending = false; // Flag to prevent multiple navigations
 
 const processQueue = (error, token = null) => {
     failedQueue.forEach(prom => {
@@ -63,7 +64,6 @@ const AxiosInterceptorProvider = ({ children }) => {
                     isRefreshing = true;
 
                     try {
-
                         const refreshedData = await RefreshToken();
                         console.log("Token refreshed successfully:", refreshedData);
                         const user = await getUser();
@@ -78,8 +78,15 @@ const AxiosInterceptorProvider = ({ children }) => {
                         console.error("Refresh token error:", tokenRefreshError);
                         processQueue(tokenRefreshError, null);
                         isRefreshing = false;
-                        console.log("Redirecting to login due to token refresh error.");
-                        await redirectToLogin();
+
+                        if (!navigationPending) {
+                            console.log("Redirecting to login due to token refresh error.");
+                            navigationPending = true; // Set flag to prevent further navigations
+                            setTimeout(async () => {
+                                await redirectToLogin();
+                                navigationPending = false; // Reset flag after navigation
+                            }, 500); // Delay to ensure error handling completes
+                        }
                         return Promise.reject(tokenRefreshError);
                     }
                 }

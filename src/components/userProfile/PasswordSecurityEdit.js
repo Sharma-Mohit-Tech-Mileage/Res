@@ -138,6 +138,7 @@ const PasswordSecurityEdit = () => {
   useEffect(() => {
     if (route.params?.updateFailed) {
       setShowErrorAlert(true);
+      setLoading(false)
       scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
       navigation.setParams({ updateFailed: undefined });
     }
