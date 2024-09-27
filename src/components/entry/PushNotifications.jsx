@@ -153,6 +153,9 @@ const PushNotifications = ({ navigation }) => {
                 </View>
                 <View style={styles.bottomBar}>
                     <Pressable
+                        accessibilityLabel="Allow Notifications Button"
+                        accessibilityRole="button"
+                        accessibilityHint="Allow Notifications"
                         style={[styles.button, styles.buttonsLayout]}
                         onPress={enableNotifications}
                     >
