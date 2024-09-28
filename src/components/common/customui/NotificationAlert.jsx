@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, AccessibilityInfo } from 'react-native';
 import { Color, FontSize, FontFamily } from '../../../../GlobalStyles';
 import { useNavigation } from "@react-navigation/native";
-import {  resentEmailVerifiction } from '../../../redux/actions/ProfileActionSuite';
-import { useDispatch } from 'react-redux';
 import RenderText from '../RenderText';
 
-const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true, isVisible = true, resentemail = false }) => {
+const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true, isVisible = true }) => {
     if (!isVisible) return null;
-    const dispatch = useDispatch();
     const typeStyles = {
         info: { color: Color.sparklightBrightPurple, image: require('../../../../assets/info.png') },
         error: { color: Color.sparkLightRed, image: require('../../../../assets/error.png') },
@@ -21,10 +18,7 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
 
     const handleClose = () => {
         onClose && onClose(); // Call the onClose prop function if it exists
-    };
 
-    const handleResendEmail = () => {
-         dispatch(resentEmailVerifiction(navigation));
     };
 
     const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
@@ -88,15 +82,41 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                             });
                         }}
                     />
+                    // <Text style={!title ? styles.messageOnEmpty : styles.message}>
+                    //     {message.split("Please contact us").map((part, index, arr) => index < arr.length - 1 ? (
+                    //         <React.Fragment key={index}>
+                    //             <Text style={!title ? styles.messageOnEmpty : styles.message}>{part}</Text>
+                    //             <Text style={!title ? styles.messageOnEmpty : styles.message}>
+                    //                 {'\nPlease '}
+                    //                 <Text
+                    //                     accessible={true}
+                    //                     accessibilityLabel="Contact us"
+                    //                     accessibilityRole="button"
+                    //                     accessibilityHint="Navigates to the support screen"
+                    //                     style={styles.contactUsText}
+                    //                     onPress={() => {
+                    //                         navigation.reset({
+                    //                             index: 0,
+                    //                             routes: [
+                    //                                 {
+                    //                                     name: 'Support',
+                    //                                     params: { isContactUs: true }
+                    //                                 },
+                    //                             ],
+                    //                         });
+                    //                     }}
+                    //                 >
+                    //                     contact us
+                    //                 </Text>
+                    //             </Text>
+                    //         </React.Fragment>
+                    //     ) : (
+                    //         <Text style={!title ? styles.messageOnEmpty : styles.message} key={index}>{part}</Text>
+                    //     ))}
+                    // </Text>
                 ) : null}
-                {resentemail && (
-                    <Text
-                        style={[styles.resendText]}
-                        onPress={handleResendEmail}
-                    >
-                        Resend Email Confirmation
-                    </Text>
-                )}
+
+
             </View>
             {showCloseIcon && (
                 <TouchableOpacity
@@ -104,7 +124,7 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
                     style={styles.closeButton}
                     accessibilityLabel="Close"
                     accessibilityRole="button"
-                    accessibilityHint="Closes the Notification window"
+                    accessibilityHint="Closes the Notifiction window"
                 >
                     <Image
                         source={require('../../../../assets/right-actionable7.png')}
@@ -177,15 +197,6 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         paddingLeft: 5,
         flexWrap: 'wrap'
-    },
-    resendText: {
-        color: Color.colorMidnightblue,
-        fontFamily: FontFamily.openSansSemiBold,
-        fontSize: 16,
-        fontStyle: "normal",
-        fontWeight: "700",
-        paddingTop: 8,
-        textDecorationLine: 'underline',
     },
 });
 

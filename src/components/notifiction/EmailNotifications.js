@@ -1,498 +1,369 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, Pressable, View, FlatList, Image, ScrollView, Alert } from "react-native";
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState, useEffect, useRef } from "react";
+import { StyleSheet, Text, Pressable, View, ScrollView, Image } from "react-native";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../GlobalStyles";
 import Toggle from '../common/Toggle';
+import SparkLightInput from "../common/customui/SparkLightInput";
+import { useDispatch, useSelector } from 'react-redux';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
-import CustomerErrorPage from "../utility/SystemErrorPopup";
-import { deleteSVEmailRequest, fetchSvEmailAssociation, updateEmailAssociations ,fetchBillingPaper} from '../../redux/actions/ProfileActionSuite';
-import LoadingOverlay from '../common/LoadingOverlay';
-import  {extractAcknowledgementEmail } from '../../components/utility/constant';
+import { updateEmailNotification, updateFreshEmail, unsubscribePaperless } from '../../redux/actions/ProfileActionSuite';
+
+const validationSchema = yup.object().shape({
+  email: yup.string().email('Invalid email address').required('Email is required'),
+  paperlessBilling: yup.boolean(),
+});
 
 const EmailNotifications = () => {
   const scrollViewRef = useRef(null);
   const isSubmittingRef = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
-  const [deleteSVEmail, setDeleteSVEmail] = useState(false);
-  const [emailToDelete, setEmailToDelete] = useState(null);
-  const [toggleStates, setToggleStates] = useState({});
-  const initialToggleStatesRef = useRef({});
   const route = useRoute();
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetailsfromStore = profile.profileDetails || {};
+  const paperlessdata = route.params?.additionalData;
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const profile = useSelector(state => state.combinedReducers.profile || {});
-  const { allSvEmailAssociated = [] } = profile;
-  const paperLessInfo = profile.paperLessInfo || {};
-  const acknowledgement = extractAcknowledgementEmail(paperLessInfo);
-  const paperlessEmails = allSvEmailAssociated.filter(email => email.invoice);
-  const marketingEmails = allSvEmailAssociated.filter(email => email.marketing);
-  const sparklightTvEmails = allSvEmailAssociated.filter(email => email.iptv);
-  const additionalEmails = allSvEmailAssociated.filter(email => !email.marketing && !email.invoice && !email.iptv && !email.collection && !email.tiVo);
-  const emailsWithOnSettings = [];
-  allSvEmailAssociated.forEach(setting => {
-    if (setting.invoice || setting.marketing || setting.iptv) {
-      setting.emailAddress && emailsWithOnSettings.push(setting.emailAddress);
-    }
+
+  const { control, handleSubmit, formState: { errors } } = useForm({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      email: paperlessdata?.email || '',
+      paperlessBilling: paperlessdata?.status || false,
+      critNotif: paperlessdata?.critNotif || false
+    },
   });
 
-  useEffect(() => {
-    const initializeToggleStates = () => {
-      const initialStates = {};
-      allSvEmailAssociated.forEach(email => {
-        initialStates[email.emailAddress] = {
-          paperless: email.invoice,
-          marketing: email.marketing,
-          iptv: email.iptv,
-        };
-      });
-      console.log('initialStates>>>>>>>>>>>>>', initialStates);
-      setToggleStates(initialStates);
-      initialToggleStatesRef.current = initialStates;
-    };
-    initializeToggleStates();
-  }, [allSvEmailAssociated]);
-
-  const handleToggleChange = (event, section) => {
-    const { name, value } = event.target;
-    setToggleStates(prevState => ({
-      ...prevState,
-      [name]: {
-        ...prevState[name],
-        [section]: value
-      }
-    }));
-  };
-
-  const hasChanges = useCallback(() => (
-    Object.keys(toggleStates).some(email => {
-      const current = toggleStates[email];
-      const initial = initialToggleStatesRef.current[email];
-      return current.paperless !== initial.paperless || current.marketing !== initial.marketing;
-    })
-  ), [toggleStates]);
-
-  const saveChanges = useCallback(async () => {
-    if (!hasChanges()) {
-      setErrorMsg('No changes to update.');
-      setShowErrorAlert(true);
-      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-      return;
-    }
-
+  const handleSave = data => {
+    if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     setIsSubmitting(true);
-
-    try {
-      const paperlessPayload = paperlessEmails
-        .find(email => !toggleStates[email.emailAddress]?.paperless)?.emailAddress || null;
-
-      const marketingPayload = marketingEmails
-        .filter(email => !toggleStates[email.emailAddress]?.marketing)
-        .map(email => email.emailAddress);
-
-      await dispatch(updateEmailAssociations(paperlessPayload, marketingPayload, navigation));
-
-      setShowSuccessAlert(true);
-      setSuccessMsg('Changes updated successfully.');
-      await dispatch(fetchSvEmailAssociation());
-
-      const updatedInitialStates = {};
-      allSvEmailAssociated.forEach(email => {
-        updatedInitialStates[email.emailAddress] = {
-          paperless: toggleStates[email.emailAddress]?.paperless || false,
-          marketing: toggleStates[email.emailAddress]?.marketing || false,
-        };
-      });
-      initialToggleStatesRef.current = updatedInitialStates;
-
-    } catch (error) {
-      setShowErrorAlert(true);
-      setErrorMsg('Something went wrong. Please try again.');
+    const { email, paperlessBilling } = data;
+    const updatedProfileDetails = { ...profileDetailsfromStore };
+    const emailChanged = email?.toLowerCase() !== updatedProfileDetails.svEmailAddress?.toLowerCase();
+    if (emailChanged) {
+      updatedProfileDetails.email = updatedProfileDetails.svEmailAddress;
+      updatedProfileDetails.svEmailAddress = email;
     }
-  }, [dispatch, toggleStates, paperlessEmails, marketingEmails, navigation, hasChanges, allSvEmailAssociated]);
-
-  const handleSave = useCallback(async () => {
-    await saveChanges();
-  }, [saveChanges]);
-
-  const handleDelete = useCallback((email) => {
-    if (hasChanges()) {
-      Alert.alert(
-        'Unsaved Changes',
-        'You have unsaved changes. Do you want to save these changes before deleting the email?',
-        [
-          {
-            text: 'Save Changes',
-            onPress: async () => {
-              await saveChanges();
-              setEmailToDelete(email);
-              setDeleteSVEmail(true);
-            }
-          },
-          {
-            text: 'Don’t Save',
-            onPress: () => {
-              setEmailToDelete(email);
-              setDeleteSVEmail(true);
-            },
-            style: 'destructive'
-          },
-          {
-            text: 'Cancel',
-            onPress: () => { },
-            style: 'cancel'
-          }
-        ],
-        { cancelable: true }
-      );
+    if (paperlessBilling) {
+      if (paperlessdata?.isNew) {
+        dispatch(updateFreshEmail(email, emailChanged, updatedProfileDetails, navigation));
+      } else {
+        dispatch(updateEmailNotification(email, emailChanged, updatedProfileDetails, navigation));
+      }
     } else {
-      setEmailToDelete(email);
-      setDeleteSVEmail(true);
+      dispatch(unsubscribePaperless(navigation));
     }
-  }, [hasChanges, saveChanges]);
+  };
 
-  const confirmDelete = useCallback(() => {
-    setIsDeleting(true);
-    setDeleteSVEmail(false);
-    dispatch(deleteSVEmailRequest(emailToDelete, navigation));
-  }, [dispatch, emailToDelete, navigation]);
+
+
+
+  const handleValidationError = () => {
+    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+    setErrorMsg('Please enter valid information to continue.')
+    setShowErrorAlert(true);
+    isSubmittingRef.current = false;
+    setIsSubmitting(false);
+  };
 
   useEffect(() => {
-    if (route.params?.updateFailed || route.params?.updateSuccess) {
+    if (route.params?.updateFailed) {
       scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-      setIsSubmitting(false);
-      setIsDeleting(false);
+      setShowErrorAlert(true);
+      setErrorMsg('Something went wrong. Please try again.')
       isSubmittingRef.current = false;
-      if (route.params?.updateFailed) {
-        setShowSuccessAlert(false);
-        setShowErrorAlert(true);
-        setErrorMsg('Something went wrong. Please try again.');
-      } else if (route.params?.updateSuccess) {
-        setShowErrorAlert(false);
-        setShowSuccessAlert(true);
-        setSuccessMsg(route.params.successMessage || 'Operation completed successfully.');
-        dispatch(fetchSvEmailAssociation());
-        dispatch(fetchBillingPaper());
-      }
+      setIsSubmitting(false);
     }
-  }, [route.params, dispatch]);
-
-  const cancelDelete = () => {
-    setEmailToDelete(null);
-    setDeleteSVEmail(false);
-  };
-
-  const renderEmailItem = ({ item, section,disabled }) => (
-    <View key={item.emailAddress} style={styles.emailItem}>
-      <Text style={styles.infoTitle}>Email address</Text>
-      <View style={styles.emailAddressContainer}>
-        <Text style={styles.emailText}>{item.emailAddress.toLowerCase()}</Text>
-        <Toggle
-          name={item.emailAddress}
-          initialValue={toggleStates[item.emailAddress]?.[section] || false}
-          onToggle={(event) => handleToggleChange(event, section)}
-          disabled={disabled}
-          label={`${section} email`}
-        />
-      </View>
-    </View>
-  );
-
-  const renderEmailItemWithTrash = ({ item }) => (
-    <View key={item.emailAddress} style={styles.emailItem}>
-      <Text style={styles.infoTitle}>Email address</Text>
-      <View style={styles.emailAddressContainer}>
-        <Text style={styles.emailText}>{item.emailAddress.toLowerCase()}</Text>
-        <Pressable onPress={() => handleDelete(item.emailAddress)}>
-          <Image source={require("../../../assets/right-actionable6.png")} />
-        </Pressable>
-      </View>
-    </View>
-  );
-
-  const ListHeaderComponent = () => {
-    const maxEmails = 5;
-    const showAddButton = allSvEmailAssociated.length < maxEmails;
-
-    return (
-      <View style={styles.sectionContainer}>
-        <View style={styles.sectionBox}>
-          {showSuccessAlert && (
-            <NotificationAlert
-              type="success"
-              title="Success"
-              message={successMsg}
-              showCloseIcon={true}
-              onClose={() => setShowSuccessAlert(false)}
-            />
-          )}
-          {showErrorAlert && (
-            <NotificationAlert
-              type="error"
-              title="Error"
-              message={errorMsg}
-              showCloseIcon={true}
-              onClose={() => setShowErrorAlert(false)}
-            />
-          )}
-          {(showSuccessAlert || showErrorAlert) && <View style={{ marginBottom: Padding.p_base }} />}
-          {showAddButton && (
-            <Pressable
-              style={styles.addButton}
-              onPress={() => navigation.navigate('AddEmailNotification', { newEmail: paperlessEmails.length === 0 })}
-            >
-              <Text style={styles.addButtonText}>Add</Text>
-            </Pressable>
-          )}
-        </View>
-        <View style={styles.sectionBox_info}>
-        <View style={styles.emailItem}>
-            <Text style={[styles.emailText,{fontWeight:'600'}]}>Critical Notifications</Text>
-            {emailsWithOnSettings.length > 0 ? <Image
-              style={styles.icon}
-              resizeMode="contain"
-              source={require("../../../assets/checkcircle.png")}
-            /> : <Image
-              style={styles.icon}
-              resizeMode="contain"
-              source={require("../../../assets/checkcircle1.png")}
-            />}
-          </View>
-          <Text style={[styles.infoText,{color:Color.colorGray_200}]}>
-            We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications.
-          </Text>
-        </View>
-        {(paperlessEmails.length > 0||acknowledgement) &&
-          <View style={styles.sectionBox}>
-            <Text style={styles.infoTitle}>Paperless Billing</Text>
-            <Text style={styles.infoText}>Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information secure.</Text>
-            <FlatList
-              data={paperlessEmails}
-              renderItem={(item) => renderEmailItem({ ...item, section: 'paperless',disabled:acknowledgement })}
-              keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
-            />
-            {acknowledgement&& 
-            <View style={{marginVertical:8}}>
-            <NotificationAlert
-            type="warning"
-            title=""
-            resentemail={true}
-            showCloseIcon={false}
-            splitKey="Resend Confirmation Email"
-            nextRow={true}
-            message={`To continue with Paperless Billing, please confirm your email address (${acknowledgement}) with the verification link sent to your inbox.`}
-          />
-          </View>}
-          </View>}
-        {sparklightTvEmails.length > 0 &&
-          <View style={styles.sectionBox}>
-            <Text style={styles.infoTitle}>Sparklight TV</Text>
-            <Text style={styles.infoText}>This email address is tied to your TV service and can only be managed via the Sparklight TV Interface.</Text>
-            <FlatList
-              data={sparklightTvEmails}
-              //renderItem={renderEmailItem}
-              renderItem={(item) => renderEmailItem({ ...item, section: 'iptv' ,disabled:true})}
-              keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
-            />
-          </View>}
-        {marketingEmails.length > 0 &&
-          <View style={styles.sectionBox}>
-            <Text style={styles.infoTitle}>Marketing Communications</Text>
-            <Text style={styles.infoText}>
-              Be the first to know about our latest offers, promotions, and news.
-            </Text>
-            <FlatList
-              data={marketingEmails}
-              renderItem={(item) => renderEmailItem({ ...item, section: 'marketing' })}
-              keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
-            />
-          </View>}
-        {additionalEmails.length > 0 &&
-          <View style={styles.sectionBox}>
-            <Text style={styles.infoTitle}>Additional Email Addresses</Text>
-            <FlatList
-              data={[...new Set(additionalEmails)]}
-              renderItem={renderEmailItemWithTrash}
-              keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
-            />
-          </View>}
-      </View>
-    );
-  };
+  }, [route.params?.updateFailed]);
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
       <ProfileSettingsHeader
         title="Edit Email Notifications"
         onPressBack={() => navigation.goBack()}
         accessibilityLabel="Back to Account"
         accessibilityHint="Navigates back to the Notifications screen"
       />
-      <ScrollView ref={scrollViewRef}>
-        <FlatList
-          ListHeaderComponent={ListHeaderComponent}
-          ListFooterComponent={
-            <View style={styles.footer}>
-              <View style={styles.buttonsParent}>
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.submitButton,
-                    { opacity: pressed ? 0.7 : 1 }
-                  ]}
-                  onPress={handleSave}
-                  accessibilityRole="button"
-                  accessibilityLabel="Save"
-                >
-                  <Text style={styles.submitButtonText}>{isSubmitting ? 'Submitting...' : 'Save'}</Text>
-                </Pressable>
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.cancelButton,
-                    { opacity: pressed ? 0.7 : 1 }
-                  ]}
-                  onPress={() => navigation.navigate("Notifications")}
-                  accessibilityRole="button"
-                  accessibilityLabel="Cancel"
-                  accessibilityHint="Cancels the action and returns to Notifications screen"
-                >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
-                </Pressable>
+      <ScrollView>
+        <View style={styles.emailNotificationsInner}>
+          <View style={[styles.frameContainer, styles.navigationBorder]} >
+            <View style={styles.frameGroup}>
+              <View style={[styles.frameView, styles.frameFlexBox]}>
+                <View style={styles.frameParent1} >
+                  <NotificationAlert
+                    type="error"
+                    title="Failed"
+                    message={errorMsg}
+                    showCloseIcon={true}
+                    isVisible={showErrorAlert}
+                    onClose={() => setShowErrorAlert(false)}
+                  />
+                  <View style={[styles.paperlessBillingParent, styles.frameFlexBox]}>
+                    <View style={styles.frameViewArea}>
+                      <View style={styles.infoCircleWrapper}>
+                        <Image
+                          style={styles.infoCircleIcon}
+                          resizeMode="cover"
+                          source={require("../../../assets/infocircle.png")}
+                        />
+                      </View>
+                      <Text style={[styles.youAreSubscribedContainer, styles.containerTypo,]} >
+                        <Text
+                          style={{ lineHeight: 22 }}
+                        >{`Please enter your email address below to opt into email notifications and stay connected with us. `}</Text>
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={{ paddingVertical: Padding.p_base }}>
+                    <View style={styles.frameChild} />
+                  </View>
+                  <View style={[styles.paperlessBillingParent, styles.frameFlexBox]}>
+                    <Text style={styles.paperlessBilling}>
+                      Email
+                    </Text>
+                  </View>
+                  <View style={{ paddingHorizontal: Padding.p_5xl }} >
+                    <Controller
+                      control={control}
+                      name="email"
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <SparkLightInput
+                          placeholder="Email Address"
+                          onBlur={onBlur}
+                          onChangeText={onChange}
+                          value={value ? value.toLowerCase() : ''}
+                          error={errors.email?.message}
+                        />
+                      )}
+                    />
+                  </View>
+                  <View style={{ paddingVertical: Padding.p_base }}>
+                    <View style={styles.frameChild} />
+                  </View>
+                  <View style={[styles.paperlessBillingParent, styles.frameFlexBox,]}>
+                    <Text style={styles.paperlessBilling}>
+                      Critical notifications, Account Changes and Service Updates
+                    </Text>
+                    <Controller
+                      control={control}
+                      name="critNotif"
+                      render={({ field: { onChange, value } }) => (
+                        <Toggle
+                          onToggle={newValue => onChange(newValue)}
+                          initialValue={value}
+                          disabled={true}
+                          label="Critical notification"
+                        />
+                      )}
+                    />
+                  </View>
+                  <Text style={[styles.receiveBillingStatements, styles.receiveTypo]}>
+                    We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications only.
+                  </Text>
+                  <View style={{ paddingVertical: Padding.p_base }}>
+                    <View style={styles.frameChild} />
+                  </View>
+                  <View style={[styles.paperlessBillingParent, styles.frameFlexBox,]}>
+                    <Text style={styles.paperlessBilling}>
+                      Paperless Billing
+                    </Text>
+                    <Controller
+                      control={control}
+                      name="paperlessBilling"
+                      render={({ field: { onChange, value } }) => (
+                        <Toggle
+                          onToggle={newValue => onChange(newValue)}
+                          initialValue={value}
+                          label="Paperless Billing"
+                        />
+                      )}
+                    />
+                  </View>
+                  <Text style={[styles.receiveBillingStatements, styles.receiveTypo]}>
+                    Receive billing statements via email and no longer receive
+                    paper statements in the mail.
+                  </Text>
+                </View>
               </View>
             </View>
-          }
-          contentContainerStyle={styles.scrollContainer}
-        />
+          </View>
+          <View style={styles.buttonsParent} >
+            <Pressable
+              style={({ pressed }) => [
+                { backgroundColor: Color.colorMidnightblue },
+                styles.buttonsLayout,
+                { opacity: pressed ? .7 : 1 }
+              ]}
+              onPress={handleSubmit(handleSave, handleValidationError)}
+              accessibilityRole="button"
+              accessibilityLabel="Save"
+            >
+
+              <Text style={[styles.makePayment, styles.makeTypo]}>{isSubmitting ? 'Submitting...' : 'Save'}</Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                styles.buttons1, styles.buttonsLayout,
+                { opacity: pressed ? .7 : 1 }
+              ]}
+              onPress={() => navigation.navigate("Notifications")}
+              accessibilityRole="button"
+              accessibilityLabel="Cancel"
+              accessibilityHint="Cancels the action and returns to Notifications screen"
+            >
+              <Text style={[{ color: Color.colorMidnightblue }, styles.makeTypo]}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
       </ScrollView>
-      {(isSubmitting || isDeleting) && (
-        <LoadingOverlay isLoading={true} message={isDeleting ? "Deleting..." : "Saving..."} />
-      )}
-      <CustomerErrorPage
-        visible={deleteSVEmail}
-        message={`Do you want to continue deleting ${emailToDelete}?`}
-        title={"Delete Email Id"}
-        onActionTxt={"Yes"}
-        onAction={confirmDelete}
-        onClose={cancelDelete}
-      />
     </View>
   );
 };
 
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
+  containerTypo: {
+    textAlign: "left",
+    fontFamily: FontFamily.openSansRegular,
   },
-  scrollContainer: {
-    paddingVertical: Padding.p_xl,
-    paddingBottom: 100,
-  },
-  footer: {
-    backgroundColor: Color.colorWhitesmoke_200,
+  frameViewArea: {
+    borderRadius: 8,
+    backgroundColor: Color.colorWhitesmoke_100,
     paddingHorizontal: Padding.p_base,
-    borderTopWidth: 1,
-    borderTopColor: Color.colorWhitesmoke_300,
+    paddingVertical: 6,
+    flexDirection: "row",
   },
-  addButton: {
-    backgroundColor: Color.colorMidnightblue,
-    borderRadius: Border.br_11xs,
+  infoCircleIcon: {
+    width: 16,
+    height: 16,
+    overflow: "hidden",
+  },
+  infoCircleIcon: {
+    width: 16,
+    height: 16,
+    overflow: "hidden",
+  },
+  infoCircleWrapper: {
     paddingVertical: Padding.p_5xs,
-    paddingHorizontal: Padding.p_5xl,
-    alignSelf: 'flex-end',
-    marginBottom: Padding.p_base,
+    flexDirection: "row",
   },
-  addButtonText: {
-    color: Color.sparklightWhite,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    textAlign: "center",
-  },
-  sectionContainer: {
-    backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_11xs,
-    marginHorizontal: Padding.p_base,
-  },
-  sectionBox: {
-    borderBottomWidth: 1,
-    borderBottomColor: Color.colorWhitesmoke_200,
-    padding: Padding.p_base,
-  },
-  sectionBox_info: {
-    backgroundColor: Color.backgroundBlur,
-    padding: Padding.p_base,
-  },
-  emailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: Padding.p_5xs,
-    flexWrap: 'wrap',
-  },
-  emailAddressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  emailText: {
-    color: Color.colorMidnightblue,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    marginRight: 8,
-    flex: 1,
-    flexWrap: 'wrap',
-  },
-  infoTitle: {
-    fontWeight: "400",
+  youAreSubscribedContainer: {
+    marginLeft: 8,
     color: Color.colorGray_200,
-    fontSize: FontSize.size_base,
+    textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
-    marginVertical: 2,
-  },
-  infoText: {
     fontSize: FontSize.size_sm,
-    color: Color.sparklightDarkGray,
-    fontFamily: FontFamily.openSansRegular,
-    fontWeight: "400",
-    marginVertical: 2
+    flex: 1,
   },
-  submitButton: {
-    backgroundColor: Color.colorMidnightblue,
+  navigationBorder: {
+    borderColor: Color.sparklightGray,
+    justifyContent: "center",
+    alignItems: "center",
+    borderStyle: "solid",
+    backgroundColor: Color.sparklightWhite,
+  },
+  frameFlexBox: {
+    flexDirection: "row",
+    alignSelf: "stretch",
+  },
+
+  receiveTypo: {
+    fontSize: FontSize.textXsSemibold_size,
+    color: Color.sparklightaddGray,
+    textAlign: "left",
+    fontFamily: FontFamily.openSansRegular,
+    alignSelf: "stretch",
+  },
+  buttonsLayout: {
+    paddingHorizontal: 0,
+    width: '100%',
     paddingVertical: Padding.p_base,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: Border.br_11xs,
     height: 56,
-    marginBottom: Padding.p_base,
   },
-  submitButtonText: {
+  frameChild: {
+    height: 1,
+    backgroundColor: Color.sparklightGray,
+    alignSelf: "stretch",
+  },
+  makeTypo: {
+    width: 282,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_base,
+    textAlign: "center",
+  },
+  paperlessBilling: {
+    color: Color.colorGray_200,
+    textAlign: "left",
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_base,
+    lineHeight: 22,
+    flex: 1,
+  },
+  paperlessBillingParent: {
+    alignItems: "center",
+    paddingHorizontal: Padding.p_5xl,
+  },
+  receiveBillingStatements: {
+    color: Color.colorGray_100,
+    lineHeight: 22,
+    paddingHorizontal: Padding.p_5xl
+  },
+  frameParent1: {
+    paddingVertical: Padding.p_base,
+    justifyContent: "center",
+    flex: 1,
+  },
+  frameView: {
+    borderBottomWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    borderColor: Color.sparklightGray,
+    borderStyle: "solid",
+    borderTopWidth: 1,
+  },
+  frameGroup: {
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "stretch",
+  },
+  frameContainer: {
+    borderWidth: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: Border.br_11xs,
+    borderColor: Color.sparklightGray,
+    alignSelf: "stretch",
+    overflow: "hidden",
+  },
+  makePayment: {
     color: Color.sparklightWhite,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    textAlign: "center",
+    width: 282,
   },
-  cancelButton: {
+  buttons1: {
+    marginTop: Padding.p_base,
     backgroundColor: Color.colorWhitesmoke_200,
-    paddingVertical: Padding.p_base,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    height: 56,
-  },
-  cancelButtonText: {
-    color: Color.colorMidnightblue,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    textAlign: "center",
+    paddingHorizontal: 0,
+    width: 382,
   },
   buttonsParent: {
     marginTop: Padding.p_base,
+    alignSelf: "stretch",
+  },
+  emailNotificationsInner: {
+    marginTop: Padding.p_5xl,
+    paddingBottom: '20%',
+    paddingHorizontal: Padding.p_base,
+    width: '100%',
+    overflow: "hidden",
   },
 });
 

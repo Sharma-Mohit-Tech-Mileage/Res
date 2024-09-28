@@ -10,9 +10,7 @@ import {
     UPDATE_PUSH_NOTIFICATIONS, FETCH_PUSH_NOTIFICATIONS,
     SAVE_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
     SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
-    UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION,
-    SAVE_USER_ACCOUNT_SERVICE,ADD_NEW_USER,DELETE_USER,EDIT_USER,
-    ALLSVEMAILASSOCIATED,SAVEALLSVEMAILASSOCIATED,ADD_SV_EMAIL_NO_FLAGS_REQUEST,DELETE_SV_EMAIL_REQUEST,UPDATE_SV_EMAILS_REQUEST,MANAGE_EMAIL_REQUEST,UPDATE_EMAIL_ASSOCIATIONS
+    UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION,SAVE_USER_ACCOUNT_SERVICE,ADD_NEW_USER,DELETE_USER,EDIT_USER
 } from '../constants';
 export const fetchProfileSuccess = (response) => {
     return {
@@ -193,50 +191,9 @@ export const editNewUser = (data, navigation) => ({
     payload: data,
     navigation,
 });
-export const fetchSvEmailAssociation = () => {
-    return {
-        type: ALLSVEMAILASSOCIATED
-    };
-};
-export const saveSvEmailAssociation = (data) => {
-    return {
-        type: SAVEALLSVEMAILASSOCIATED,
-        payload: data
-    };
-};
 
-export const addSVEmailNoFlagsRequest = (email, navigation) => ({
-    type: ADD_SV_EMAIL_NO_FLAGS_REQUEST,
-    payload: { email },
-    navigation
-});
 
-export const deleteSVEmailRequest = (email, navigation) => ({
-    type: DELETE_SV_EMAIL_REQUEST,
-    payload: { email },
-    navigation
-});
-// actions/ProfileActionSuite.js
 
-export const updateSVEmailsRequest = (emailList, navigation) => ({
-    type: UPDATE_SV_EMAILS_REQUEST,
-    payload: { emailList },
-    navigation
-});
 
-// actions/ProfileActionSuite.js
 
-export const manageEmailRequest = (email, isPaperless, isMarketing,newEmail, navigation) => ({
-    type: MANAGE_EMAIL_REQUEST,
-    payload: { email, isPaperless, isMarketing ,newEmail},
-    navigation
-});
 
-export const updateEmailAssociations = (paperlessEmail, marketingEmails, navigation) => ({
-    type: UPDATE_EMAIL_ASSOCIATIONS,
-    payload: {
-        paperlessEmail,   // Single email for paperless
-        marketingEmails   // Array of emails for marketing
-    },
-    navigation,
-});

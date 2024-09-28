@@ -1,4 +1,4 @@
-import { _axios } from "../../RestApiClient";
+import { _axios, _axios_cableone } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import axios from 'axios'; // Make sure to import axios
 import moment from "moment";
@@ -506,105 +506,18 @@ const removeUser = async (data) => {
         throw error;
     }
 };
-const fetchAllSvEmails = async (data) => {
-    let user = await getUser();
-    const accountNumber = user.userInfo?.accountNumber || null;
-    const config = {
-        headers: {
-            Authorization: "Bearer " + user.token
-        }
-    };
-    console.log(`/mobile/api/email/${accountNumber}/GetAllSVEmails`);
-    try {
-        const response = await _axios.get(`/mobile/api/email/${accountNumber}/GetAllSVEmails`, config);
-        console.log('API Call Successful, Response:', response.data);
-        return response.data;
-    } catch (error) {
-        console.error('API Call Failed, Error:', error); // Log the error
-        throw error;
-    }
-};
 
-const addSVEmailNoFlags = async (email) => {
-    let user = await getUser();
-    const accountNumber = user.userInfo?.accountNumber || null;
-    const config = {
-        headers: {
-            Authorization: "Bearer " + user.token
-        }
-    };
 
-    try {
-        const response = await _axios.post(`Mobile/api/email/${accountNumber}/${email}/AddSVEmailNoFlags`, {}, config);
-        console.log(`API Call Successful to add SV email without flags: ${email}`, response.data);
-        return response.data;
-    } catch (error) {
-        console.error(`Error in API Call to add SV email without flags: ${email}`, error);
-        throw error;
-    }
-};
 
-const deleteSVEmail = async (email) => {
-    let user = await getUser();
-    const accountNumber = user.userInfo?.accountNumber || null;
-    const config = {
-        headers: {
-            Authorization: "Bearer " + user.token
-        }
-    };
 
-    try {
-        const response = await _axios.post(`mobile/api/email/${accountNumber}/${email}/DeleteSVEmail`, {}, config);
-        console.log(`API Call Successful to delete SV email: ${email}`, response.data);
-        return response.data;
-    } catch (error) {
-        console.error(`Error in API Call to delete SV email: ${email}`, error);
-        throw error;
-    }
-};
 
-const updateSVEmails = async (emailList) => {
-    let user = await getUser();
-    const accountNumber = user.userInfo?.accountNumber || null;
-    const config = {
-        headers: {
-            Authorization: `Bearer ${user.token}`
-        }
-    };
 
-    const body = emailList.map(email => ({ "EmailAddress": email }));
 
-    try {
-        const response = await _axios.post(`Mobile/api/email/${accountNumber}/UpdateSVEmails`, body, config);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
 
-const addSVEmailMktFlag = async (email) => {
-    let user = await getUser();
-    const accountNumber = user.userInfo?.accountNumber || null;
-    const config = {
-        headers: {
-            Authorization: "Bearer " + user.token
-        }
-    };
 
-    try {
-        const response = await _axios.post(`/Mobile/api/email/${accountNumber}/${email}/AddSVEmailMktFlag`, {}, config);
-        console.log(`API Call Successful to add SV email marketing flag: ${email}`, response.data);
-        return response.data;
-    } catch (error) {
-        console.error(`Error in API Call to add SV email marketing flag: ${email}`, error);
-        throw error;
-    }
-};
-export {
-    logError, logInfo, fetchUserList, getProfileDetails,
+export { logError,logInfo,fetchUserList, getProfileDetails, 
     fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo,
     fetchBillingStatus, fetchPaperLessDetails, putEmailNotification,
     postEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications,
     unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,
-    resendEmailVerification, addUserAction, removeUser, editUserAction, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, addSVEmailMktFlag
-}
+      resendEmailVerification,addUserAction,removeUser,editUserAction }
