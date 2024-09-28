@@ -13,8 +13,8 @@ export const config = {
     URL_EASYPAY_SETUP_V2 : 'https://payment.sparklight.com/portalsV2/setup-auto-pay',
     URL_EASYPAY_MANAGE_V2 : 'https://payment.sparklight.com/portalsV2/manage-auto-pay',
     PAYMENTURL_V3 : 'https://payment.sparklight.com/portalsV3-Demo/PortalsBiller',
-    URL_EASYPAY_SETUP_V3 : 'https://payment.sparklight.com/portalsV3-Demo/activate-autopay',
-    URL_EASYPAY_MANAGE_V3 : 'https://payment.sparklight.com/portalsV3-Demo/manage-autopay',
+    URL_EASYPAY_SETUP_V3 : 'https://payment.sparklight.com/portalsV3/activate-auto-pay',
+    URL_EASYPAY_MANAGE_V3 : 'https://payment.sparklight.com/portalsV3/manage-auto-pay',
     PAYMENTURLNEW: 'https://customer.sparklight.com/portals/app-secure/billing',
     encryptvalPassword: '1 0 7 2 8 3 3634',
     ZENDESK_FEEDBACK: {
