@@ -1,36 +1,13 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Image,
-  StyleSheet,
-  Text,
-  ActivityIndicator,
-  Linking,
-  TouchableOpacity,
-  Modal,
-  Platform,
-} from "react-native";
+import {View,Image,StyleSheet, Text, ActivityIndicator, Linking, TouchableOpacity, Modal, Platform, } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
-import {
-  saveUserInfo,
-  logError,
-  logInfo,
-} from "../../redux/actions/UserAction";
-import {
-  storeUser,
-  storeSsoToken,
-  getSsoToken,
-  getUser,
-  cleanUserData,
-} from "../../redux/utils/LocalStorage";
+import { saveUserInfo, logError, logInfo, } from "../../redux/actions/UserAction"; 
+import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import DeviceInfo from "react-native-device-info";
 import strings from "../../res/Strings";
@@ -38,13 +15,11 @@ import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from "react-native-version-check";
-import ReactNativeBiometrics, { BiometryTypes } from "react-native-biometrics";
 
 const config = {
   issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
-  redirectUrl:
-    "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
+  redirectUrl:"com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
   scopes: ["openid", "profile", "email", "phone", "address"],
   iosPrefersEphemeralSession: true,
 };
@@ -82,6 +57,8 @@ const SplashScreen = ({ navigation }) => {
 
   const handleLogin = async (res) => {
     if (res) {
+      console.log("[HANDLE_LOGIN] Received response:", JSON.stringify(res));
+  
       let token = res.jwtToken;
       let userInfo = res.userInfo;
       let user = {
@@ -90,86 +67,100 @@ const SplashScreen = ({ navigation }) => {
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken,
       };
+  
+      console.log("[HANDLE_LOGIN] Parsed user info:", JSON.stringify(user));
+  
+      // Check if the user is a normal residential user
       let isNormalUser =
         userInfo &&
         userInfo.accountNumber &&
         userInfo.accountNumber.toString().length === 9
           ? true
           : false;
-      console.log("Isnewbiller", isNormalUser);
-
+      console.log("[HANDLE_LOGIN] Is normal user:", isNormalUser);
+  
       setIsBusiness(false);
-
+  
       if (!isNormalUser) {
-        if (
-          res.userInfo.authLevel != "HeadOfHousehold"
-        ) {
+        console.log("[HANDLE_LOGIN] User is not a normal residential user.");
+        if (res.userInfo.authLevel != "HeadOfHousehold") {
+          console.log("[HANDLE_LOGIN] User is not HeadOfHousehold.");
           setErrorMessage(strings.nonAdminUserMsg);
           setErrorMessage1(" to view information.");
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
         } else if (res.userInfo.customerType === "COM") {
-          setIsBusiness(true)
+          console.log("[HANDLE_LOGIN] User is a Business user.");
+          setIsBusiness(true);
           setErrorMessage(strings.BusinessUserMsg);
           setErrorMessage1(" to manage your Sparklight Business services account.");
-          
           setTimeout(() => {
             setModalVisible(true);
           }, 500);
-      }else if (res.userInfo.acctStatus != "Normal" ) {
-        setTimeout(() => {
-          setDisconnected(true);
-        }, 500);
-      } else {
+        } else if (res.userInfo.acctStatus != "Normal") {
+          console.log("[HANDLE_LOGIN] User account status is not Normal:", res.userInfo.acctStatus);
+          setTimeout(() => {
+            setDisconnected(true);
+          }, 500);
+        } else {
+          console.log("[HANDLE_LOGIN] Normal user, proceeding to move after login.");
           moveAfterLogin(user);
         }
       } else if (res.userInfo.acctStatus === "Disconnect") {
+        console.log("[HANDLE_LOGIN] User account is disconnected.");
         setTimeout(() => {
           setDisconnected(true);
         }, 500);
       } else if (
-        (userInfo.authLevel !== "HeadOfHousehold" && userInfo.authLevel !== "Admin") || 
+        (userInfo.authLevel !== "HeadOfHousehold" && userInfo.authLevel !== "Admin") ||
         userInfo.acctStatus !== "Active"
-    )
-    
-    
-     {
+      ) {
+        console.log(
+          "[HANDLE_LOGIN] User does not have the required auth level or account is not active.",
+          "Auth Level:", userInfo.authLevel,
+          "Account Status:", userInfo.acctStatus
+        );
         setErrorMessage(strings.nonAdminUserMsg);
         setErrorMessage1(" to view information.");
         setTimeout(() => {
           setModalVisible(true);
         }, 100);
       } else if (userInfo.customerType != "Residential") {
+        console.log("[HANDLE_LOGIN] User is not Residential, customer type:", userInfo.customerType);
         setIsBusiness(true);
         setErrorMessage(strings.BusinessUserMsg);
-        setErrorMessage1(
-          " to manage your Sparklight Business services account"
-        );
+        setErrorMessage1(" to manage your Sparklight Business services account");
         setTimeout(() => {
           setModalVisible(true);
         }, 100);
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
+        console.log("[HANDLE_LOGIN] User has Limited or Restricted auth level:", userInfo.authLevel);
         setErrorMessage(strings.nonAdminUserMsg);
-        setErrorMessage1(' to view information.')
+        setErrorMessage1(' to view information.');
         setTimeout(() => {
           setModalVisible(true);
         }, 100);
-       } else if(userInfo.customerType === 'Business'){
+      } else if (userInfo.customerType === 'Business') {
+        console.log("[HANDLE_LOGIN] User is a Business user.");
         setErrorMessage(strings.BusinessUserMsg);
-        setErrorMessage1(' to view information.')
+        setErrorMessage1(' to view information.');
         setTimeout(() => {
           setModalVisible(true);
         }, 100);
-      }else if (res.custServices.internet == false) {
+      } else if (res.custServices.internet == false) {
+        console.log("[HANDLE_LOGIN] User does not have internet service.");
         setErrorMessage(strings.nonInternetUserMessage);
         setErrorMessage1(" to manage your service.");
         setTimeout(() => {
           setModalVisible(true);
         }, 100);
       } else {
+        console.log("[HANDLE_LOGIN] All checks passed, proceeding to move after login.");
         moveAfterLogin(user);
       }
+    } else {
+      console.log("[HANDLE_LOGIN] No response received.");
     }
   };
 
@@ -358,27 +349,8 @@ const SplashScreen = ({ navigation }) => {
     };
 
     fetchData();
-    //loginWithBiometrics();
   }, []);
 
-  const loginWithBiometrics = async () => {
-    const rnBiometrics = new ReactNativeBiometrics();
-
-    rnBiometrics
-      .simplePrompt({ promptMessage: "Confirm fingerprint" })
-      .then((resultObject) => {
-        const { success } = resultObject;
-
-        if (success) {
-          console.log("successful biometrics provided");
-        } else {
-          console.log("user cancelled biometric prompt");
-        }
-      })
-      .catch(() => {
-        console.log("biometrics failed");
-      });
-  };
 
   return (
     <LinearGradient
