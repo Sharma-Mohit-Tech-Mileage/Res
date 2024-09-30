@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   StyleSheet,
@@ -22,6 +22,7 @@ import { executeUserList } from "../../redux/actions/ProfileActionSuite";
 import { removeUser } from "../../redux/actions/ProfileActionSuite";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
+import { useFocusEffect } from "@react-navigation/native";
 
 const UserManagement = ({route}) => {
   const navigation = useNavigation();
@@ -35,22 +36,26 @@ const UserManagement = ({route}) => {
   const [isDeleteUser, setIsDeleteUser] = useState(false);
 
   //console.log('Back',JSON.stringify(route))
-  if(route?.params?.isSuccess){
-    dispatch(executeUserList(0));
-  }
+  // if(route?.params?.isSuccess ){
+  //   dispatch(executeUserList(0));
+  // }
   //const [isRefresh, setIsRefresh] = useState(false);
   
-  // useEffect(()=>{
-   //if(  route?.params?.isSuccess){
-  //dispatch(executeUserList(0));
-  //     setIsRefresh(true)
-  //   }
-  // },[])
+  //  useEffect(()=>{
+  //  if(  route?.params?.isSuccess && isRefresh){
+  // dispatch(executeUserList(0));
+  //      setIsRefresh(true)
+  //    }
+  //  },[])
 
-
-  useEffect(() => {
-    dispatch(executeUserList(0));
-  }, [dispatch]);
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(executeUserList(0));
+    }, [])
+  );
+  // useEffect(() => {
+  //   dispatch(executeUserList(0));
+  // }, [dispatch]);
 
   useEffect(() => {
     if (Object.keys(currentUser).length > 0) {
