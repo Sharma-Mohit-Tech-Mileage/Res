@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text,TouchableOpacity,Alert } from "react-native";
+import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text,TouchableOpacity,Alert,PermissionsAndroid } from "react-native";
 import { useSelector } from 'react-redux';
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 import PubSub from 'pubsub-js'
 import { Env } from "../../network/apis/account/Constants";
@@ -40,6 +41,48 @@ const Support = ({ route }) => {
         }, 1000)
 
     };
+
+  const requestCameraPermission = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: 'Camera Permission',
+            message: 'This app needs access to your camera.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('Camera permission granted');
+        } else {
+          console.log('Camera permission denied');
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    } else {
+        const result = await check(PERMISSIONS.IOS.CAMERA);
+        if (result !== RESULTS.GRANTED) {
+          const granted = await request(PERMISSIONS.IOS.CAMERA);
+          if (granted === RESULTS.GRANTED) {
+            Alert.alert('Camera permission granted');
+          } else {
+            Alert.alert('Camera permission denied');
+          }
+        } else {
+          Alert.alert('Camera permission already granted');
+        }
+    }
+  };
+
+  useEffect(() => {
+    requestCameraPermission();
+  }, []);
+
+  
 
     
 
