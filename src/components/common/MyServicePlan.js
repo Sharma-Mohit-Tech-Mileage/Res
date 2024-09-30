@@ -7,7 +7,7 @@ import { FontFamily } from "../../../GlobalStyles";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 
-const MyServicePlan = ({ plans, tvPlan, phonePlan, hasEeroDevice, networkId, navigation }) => {
+const MyServicePlan = ({ plans, hasEeroDevice, networkId, navigation }) => {
   const [tabIndex, setTabIndex] = useState(0);
 
   return (
