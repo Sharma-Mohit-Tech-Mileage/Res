@@ -277,9 +277,9 @@ export const PostruckRollApi = (endpoint, body, onSuccess, onError) => {
 const getBaseUrl = async () => {
     try {
         const user = await getUser();
-        
+        console.log("[getBaseUrl] User:", user);
         // If user exists and is not a normal user, return ACP base URL
-        if (user && !user.isNormalUser) {
+        if (user && user.isNormalUser===false) {
             console.log("[getBaseUrl] User is ACP user.");
             return API_ACP_BASEURL;
         }
