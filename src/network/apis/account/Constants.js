@@ -6,6 +6,7 @@ export const config = {
     URL: 'https://customer.sparklight.com/residential',
     SSO_LOGIN: 'https://login.cableone.net/auth/realms/external-sso-realm',
     API_BASEURL: 'https://publicservices.sparklight.com/portalservices/',
+    API_ACP_BASEURL: 'https://publicservices.sparklight.com/PortalSvc/',
     API_SHOPPING_CART_BASEURL: 'https://publicservices.sparklight.com/ShoppingCart',
     MODEM_BASE_URL: "https://mule-gateway.cableone.net/customer-api",
     TRUCK_ROLL_BASE_URL: 'https://adb-1771418802186593.13.azuredatabricks.net/model/lgb_model_fs_mobile/Production/invocations',
@@ -34,6 +35,7 @@ export const config = {
     SSO_LOGIN: 'https://login.uat.cableone.net/auth/realms/external-sso-realm',
     API_BASEURL: 'https://customer.uat.sparklight.com/apiWrapper/',
     API_SHOPPING_CART_BASEURL: 'https://secure.uat.cableone.net/ShoppingCartBackBoneAPIWrapperDemo',
+    API_ACP_BASEURL: 'https://publicservices.sparklight.com/Portalsvcdev/',
     //MODEM_BASE_URL: "https://mule-gateway.uat.cableone.net/customer-api",
     MODEM_BASE_URL: "https://mule-gateway.cableone.net/customer-api",
     TRUCK_ROLL_BASE_URL: 'https://adb-1771418802186593.13.azuredatabricks.net/model/lgb_model_fs/Staging/invocations',
@@ -62,6 +64,6 @@ export const config = {
 
 }
 
-export const ISUAT = true
+export const ISUAT = false
 
 export const Env = (ISUAT) ? config.UAT : config.PRODUCTION

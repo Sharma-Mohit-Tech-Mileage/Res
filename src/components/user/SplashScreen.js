@@ -57,7 +57,7 @@ const SplashScreen = ({ navigation }) => {
 
   const handleLogin = async (res) => {
     if (res) {
-      console.log("[HANDLE_LOGIN] Received response:", JSON.stringify(res));
+      console.log("[HANDLE_LOGIN] Received response:***********************************************************************", res.jwtToken);
   
       let token = res.jwtToken;
       let userInfo = res.userInfo;
@@ -78,7 +78,7 @@ const SplashScreen = ({ navigation }) => {
           ? true
           : false;
       console.log("[HANDLE_LOGIN] Is normal user:", isNormalUser);
-  
+      user['isNormalUser'] = isNormalUser;
       setIsBusiness(false);
   
       if (!isNormalUser) {

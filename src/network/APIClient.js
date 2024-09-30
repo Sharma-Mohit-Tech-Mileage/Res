@@ -6,6 +6,7 @@ import { navigationRef } from '../navigations/UserNavigations';
 
 // Base URLs with ensured trailing slashes
 const BASE_URL = Env.API_BASEURL.endsWith('/') ? Env.API_BASEURL : `${Env.API_BASEURL}/`;
+const API_ACP_BASEURL = Env.API_ACP_BASEURL.endsWith('/') ? Env.API_ACP_BASEURL : `${Env.API_ACP_BASEURL}/`;
 const SUPPORT_URL = "https://support.sparklight.com/api/v2/help_center/";
 const MODEM_BASE_URL = Env.MODEM_BASE_URL.endsWith('/') ? Env.MODEM_BASE_URL : `${Env.MODEM_BASE_URL}/`;
 
@@ -101,13 +102,13 @@ const handleAuthResponse = async (response, idTokenGuid, refreshToken, onSuccess
 };
 
 // Post request with authentication for specific endpoints
-export const PostAuthApiRequest = (endpoint, body, onSuccess, onError) => {
+export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => {
     const idTokenGuid = body.idTokenGuid;
     const refreshToken = body.refreshToken;
-
+    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
     delete body.idTokenGuid;
     delete body.refreshToken;
-
+    getBaseUrl
     const options = {
         method: 'POST',
         headers: {
@@ -117,7 +118,7 @@ export const PostAuthApiRequest = (endpoint, body, onSuccess, onError) => {
         body: JSON.stringify(body)
     };
 
-    fetch(`${BASE_URL}${endpoint}`, options)
+    fetch(`${baseUrl}${endpoint}`, options)
         .then(response => handleAuthResponse(response, idTokenGuid, refreshToken, onSuccess, onError))
         .catch(exception => onError(exception.message));
 };
@@ -125,7 +126,7 @@ export const PostAuthApiRequest = (endpoint, body, onSuccess, onError) => {
 // Generic POST API request function
 export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     const user = await getUser();
-
+    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
     const options = {
         method: 'POST',
         headers: {
@@ -136,14 +137,14 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     };
 
     console.log('PostApiRequest:', endpoint);
-    fetchWithTokenRefresh(fetch, `${BASE_URL}${endpoint}`, options, onSuccess, onError)
+    fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
         .then(response => handleFetchResponse(response, onSuccess, onError));
 };
 
 // Function to upload multipart data
 export const UploadMultipartData = async (endpoint, data, onSuccess, onError) => {
     const user = await getUser();
-
+    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
     const formData = new FormData();
     formData.append("file", {
         name: data.name,
@@ -162,8 +163,8 @@ export const UploadMultipartData = async (endpoint, data, onSuccess, onError) =>
 
     const fetchFunction = (url, opts) => axios.post(url, opts.data, { headers: opts.headers });
 
-    console.log('UploadMultipartData:', `${BASE_URL}${endpoint}`);
-    fetchWithTokenRefresh(fetchFunction, `${BASE_URL}${endpoint}`, options, onSuccess, onError)
+    console.log('UploadMultipartData:', `${baseUrl}${endpoint}`);
+    fetchWithTokenRefresh(fetchFunction, `${baseUrl}${endpoint}`, options, onSuccess, onError)
         .then(response => onSuccess(response.data))
         .catch(error => {
             console.error('UploadMultipartData error:', error.message);
@@ -174,7 +175,7 @@ export const UploadMultipartData = async (endpoint, data, onSuccess, onError) =>
 // Function for PUT API requests
 export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
     const user = await getUser();
-
+    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
     const options = {
         method: 'PUT',
         headers: {
@@ -185,14 +186,14 @@ export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
     };
 
     console.log('PutApiRequest:', endpoint, 'body:', body);
-    fetchWithTokenRefresh(fetch, `${BASE_URL}${endpoint}`, options, onSuccess, onError)
+    fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
         .then(response => handleFetchResponse(response, onSuccess, onError));
 };
 
 // Function for GET API requests
 export const GetApiRequest = async (endpoint, onSuccess, onError) => {
     const user = await getUser();
-
+    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
     const options = {
         method: 'GET',
         headers: {
@@ -203,7 +204,7 @@ export const GetApiRequest = async (endpoint, onSuccess, onError) => {
 
     console.log('GetApiRequest:', endpoint);
     console.log('request Token:', user.token);
-    fetchWithTokenRefresh(fetch, `${BASE_URL}${endpoint}`, options, onSuccess, onError)
+    fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
         .then(response => {
             if (response.status === 204) {
                 onError(response.status);
@@ -271,4 +272,25 @@ export const PostruckRollApi = (endpoint, body, onSuccess, onError) => {
             onSuccess(json);
         })
         .catch((exception) => onError(exception.message));
+};
+
+// Helper method to decide the base URL based on user type
+const getBaseUrl = async () => {
+    try {
+        const user = await getUser();
+        
+        // If user exists and is not a normal user, return ACP base URL
+        if (user && !user.isNormalUser) {
+            console.log("[getBaseUrl] User is ACP user.");
+            return API_ACP_BASEURL;
+        }
+
+        // Default case for normal user
+        console.log("[getBaseUrl] User is normal user:", user?.isNormalUser);
+        return BASE_URL;
+    } catch (error) {
+        // Log the error and return BASE_URL as a fallback
+        console.error("[getBaseUrl] Error determining base URL:", error);
+        return BASE_URL;
+    }
 };
