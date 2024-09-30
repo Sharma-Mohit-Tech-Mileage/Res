@@ -26,7 +26,14 @@ const onSuccess = async (res) => {
             tokenGuid: idTokenGuid,
             refreshToken,
         };
-
+        let isNormalUser =
+        userInfo &&
+        userInfo.accountNumber &&
+        userInfo.accountNumber.toString().length === 9
+          ? true
+          : false;
+      console.log("[HANDLE_LOGIN] Is normal user:", isNormalUser);
+      user['isNormalUser'] = isNormalUser;
         if (token) {
             await storeUser(user);
             console.log('User stored in local storage:', user);
