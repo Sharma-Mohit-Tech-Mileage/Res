@@ -14,7 +14,7 @@ const { height, width } = Dimensions.get('window');
 const AutoPayPCIConnector = ({ navigation, route }) => {
     const [initScript, setInitScript] = useState('');
     const [progress, setProgress] = useState(0);
-    const [url, setUrl] = useState(route.params?.url || 'https://customer.uat.sparklight.com/residential');
+    const [url, setUrl] = useState(route.params?.url || Env.URL);
     const [currentUser, setCurrentUser] = useState({});
     const [useNewPayment, setuseNewPayment] = useState(route.params?.useNewPayment || false);
     const [paymentDetails, setPaymentDetails] = useState(route.params?.paymentDetails || {});
@@ -180,7 +180,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         } else {
             setNavStateReloading(false);
             userUpdateScript(userLocal);
-            setUrl(route.params?.url || 'https://customer.uat.sparklight.com/residential');
+            setUrl(route.params?.url || Env.URL);
             setProgress(0);
             setCurrentUser(userLocal);
         }
