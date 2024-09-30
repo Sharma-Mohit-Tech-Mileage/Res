@@ -12,7 +12,7 @@ import RetrieveModemPassword from "../../components/support/RetrieveModemPasswor
 import SupportStackScreen from "./SupportStack";
 import ModemConnectivityGuide from "../../components/support/Troubleshooting/ModemConnectivityGuide";
 import PeriodicProblems from "../../components/support/Troubleshooting/PeriodicProblems";
-
+import ModemSpeedTest from "../../components/common/speedTest/ModemSpeedTest";
 const ModemStack = createNativeStackNavigator();
 
 function ModemStackScreen({route}) {
@@ -101,6 +101,15 @@ function ModemStackScreen({route}) {
       <ModemStack.Screen
         name="PeriodicProblems"
         component={PeriodicProblems}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+       <ModemStack.Screen
+        name="ModemSpeedTest"
+        component={ModemSpeedTest}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),

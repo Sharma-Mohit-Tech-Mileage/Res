@@ -64,11 +64,31 @@ const ManageEquipment = ({ route }) => {
     React.useState(false);
   const [wifiData, setwifiData] = React.useState([]);
   const [truckrollPrediction, setTruckrollPrediction] = React.useState(-1);  
+  const [hasEeroDevice, setHasEeroDevice] = React.useState(false);
+  const [networkId, setNetworkId] = React.useState(null);
   const getModemPassword = () => {
     setLoading(true);
     let re = getUser().then((res) => {
       const request = `internet/api/internet/${res.userInfo.accountNumber}/modemmobile`;
       GetApiRequest(request, onSuccessModemPassword, onErrorModemPassword);
+    });
+  };
+
+  const checkEeroDevice = () => {
+    getUser().then((res) => {
+      const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${res.userInfo.accountNumber}`;
+      GetApiRequest(request, (response) => {
+        const networkId = response.data.networks[0]?.split('/').pop();
+        if (networkId) {
+          setHasEeroDevice(true);
+          setNetworkId(networkId);
+        } else {
+          setHasEeroDevice(false);
+        }
+      }, (error) => {
+        console.log("error", error);
+        setHasEeroDevice(false);
+      });
     });
   };
 
@@ -227,6 +247,7 @@ const ManageEquipment = ({ route }) => {
     getInternetPlanDetails();
     getWifiPassword();
     getEuroAccountDetails();
+    checkEeroDevice()
   }, []);
 
   React.useEffect(() => {
@@ -833,7 +854,7 @@ const ManageEquipment = ({ route }) => {
     </View>
 
     <View style={[styles.frameFlexBox]}>
-      <MyServicePlan plans={plans} navigation={navigation} />
+    <MyServicePlan plans={plans}  hasEeroDevice={hasEeroDevice} networkId={networkId} navigation={navigation} />
     </View>
   </View>
 </ScrollView>
