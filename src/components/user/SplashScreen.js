@@ -258,9 +258,9 @@ const SplashScreen = ({ navigation }) => {
               onTextPress={() => {
                 onClose();
               }}
-              internalTextStyle={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: 'underline', }]}
-              splitKey={bussinessApp ? "download the MySparklight Business mobile app" : "Please log in to your online account"}
-              instruction={`${message} ${bussinessApp ? "download the MySparklight Business mobile app" : "Please log in to your online account"}${message2}`}
+              internalTextStyle={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: '', }]}
+              splitKey={bussinessApp ? "Please download the MySparklight Business mobile app" : "Please log in to your online account"}
+              instruction={`${message} ${bussinessApp ? "Please download the MySparklight Business mobile app" : "Please log in to your online account"}${message2}`}
             />
             {/* <Text style={styles.message}>{message}{" "}
               <Text style={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: 'underline', }]} onPress={onClose}>
