@@ -108,7 +108,6 @@ export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => 
     const baseUrl = await getBaseUrl(); // Dynamically get the base URL
     delete body.idTokenGuid;
     delete body.refreshToken;
-    getBaseUrl
     const options = {
         method: 'POST',
         headers: {
