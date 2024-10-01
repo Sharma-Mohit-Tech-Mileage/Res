@@ -86,12 +86,13 @@ const CreateTicket = () => {
         formData,
         (res) => {
           console.log('saved data',JSON.stringify(formData))
-          let data={...formData,ticketNumber:res, status:'Pending',isLocal:true}
+          let data=[{...formData,ticketNumber:res, status:'Pending',isLocal:true}];
           storeValue(data)
           console.log('Ticket:',res)
-          navigation.goBack();
+          
           setTimeout(() => {
             setLoading(false);
+            navigation.goBack();
           }, 500);
         },
         (error) => {}
