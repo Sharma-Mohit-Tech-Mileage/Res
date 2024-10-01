@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import {
   Image,
   StyleSheet,
@@ -19,7 +19,7 @@ import {
 } from "../../../../GlobalStyles";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightButton from "../../common/customui/SparkLightButton";
-import { useNavigation ,useIsFocused} from "@react-navigation/native";
+import { useNavigation ,useFocusEffect} from "@react-navigation/native";
 import { GetApiRequest } from "../../../network/APIClient";
 import { getUser, getPendingTicket } from "../../../redux/utils/LocalStorage";
 import TicketListIcon from "../../../res/svgIcons/TicketListIcon";
@@ -33,7 +33,7 @@ const SupportTicket = () => {
   const [loading, setLoading] = useState(false);
   const [searchTxt, setSearchTxt] = useState("");
   const [refreshing, setRefreshing] = useState(false);
-  const isFocused = useIsFocused();
+  
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -50,8 +50,8 @@ const SupportTicket = () => {
       GetApiRequest(
         request,
         (res) => {
-          console.log("getTicketList", res);
-          if (res) {
+          console.log("getTicketList1", res);
+          if (res.length>0) {
             setTicketList(res);
             setMainList(res);
             getPendingTicket().then((data) => {
@@ -70,7 +70,8 @@ const SupportTicket = () => {
             });
           }else{
             getPendingTicket().then((data) => {
-              if(data){   
+              console.log("Pending Data", data);
+              if(data){  
               setTicketList(data);
               setMainList(data);
               }
@@ -87,13 +88,18 @@ const SupportTicket = () => {
     });
   };
 
-  useEffect(() => {
-    getTicketList();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getTicketList();
+    }, [])
+  );
+  // useEffect(() => {
+  //   getTicketList();
+  // }, []);
 
-  useEffect(() => {
-    isFocused && getTicketList()
-  },[isFocused]);
+  // useEffect(() => {
+  //   isFocused && getTicketList()
+  // },[isFocused]);
 
   const capitalizeFirstLetter = (string) => {
     return (
