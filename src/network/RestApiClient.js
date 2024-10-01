@@ -6,9 +6,10 @@ import { RefreshToken } from '../components/user/Session';
 import { useAuthInterceptor } from '../network/useAuthInterceptor';
 
 const BASE_URL = Env.API_BASEURL;
+const API_ACP_BASEURL = Env.API_ACP_BASEURL;
 
 const _axios = axios.create({
-    baseURL: BASE_URL,
+    baseURL: BASE_URL, // Default base URL
     withCredentials: false,
     crossDomain: true,
     timeout: 10000,
@@ -38,18 +39,34 @@ const AxiosInterceptorProvider = ({ children }) => {
     const { redirectToLogin } = useAuthInterceptor();
 
     useEffect(() => {
-        const interceptor = _axios.interceptors.response.use(
+        const interceptor = _axios.interceptors.request.use(
+            async config => {
+                // Dynamically switch the baseURL based on user type
+                try {
+                    const user = await getUser();
+                    if (user && user.isNormalUser === false) {
+                        config.baseURL = API_ACP_BASEURL; // Set ACP base URL for ACP users
+                    } else {
+                        config.baseURL = BASE_URL; // Set default base URL for normal users
+                    }
+                } catch (error) {
+                    console.error("[Interceptor] Error determining baseURL:", error);
+                    config.baseURL = BASE_URL; // Default to BASE_URL in case of any error
+                }
+                return config;
+            },
+            error => {
+                return Promise.reject(error);
+            }
+        );
+
+        const responseInterceptor = _axios.interceptors.response.use(
             response => response,
             async error => {
                 const originalRequest = error.config;
 
-                console.log("Interceptor caught an error:", error);
-
                 if (error.response && error.response.status === 401 && !originalRequest._retry) {
-                    console.log("401 error and not a retry:", originalRequest.url);
-
                     if (isRefreshing) {
-                        console.log("Token is currently being refreshed, adding request to queue.");
                         return new Promise((resolve, reject) => {
                             failedQueue.push({ resolve, reject });
                         }).then(token => {
@@ -65,9 +82,7 @@ const AxiosInterceptorProvider = ({ children }) => {
 
                     try {
                         const refreshedData = await RefreshToken();
-                        console.log("Token refreshed successfully:", refreshedData);
                         const user = await getUser();
-                        console.log("Retrieved user for token refresh:", user);
                         await storeUser(user);
                         _axios.defaults.headers.common['Authorization'] = 'Bearer ' + user.token;
                         originalRequest.headers['Authorization'] = 'Bearer ' + user.token;
@@ -75,17 +90,15 @@ const AxiosInterceptorProvider = ({ children }) => {
                         isRefreshing = false;
                         return _axios(originalRequest);
                     } catch (tokenRefreshError) {
-                        console.error("Refresh token error:", tokenRefreshError);
                         processQueue(tokenRefreshError, null);
                         isRefreshing = false;
 
                         if (!navigationPending) {
-                            console.log("Redirecting to login due to token refresh error.");
-                            navigationPending = true; // Set flag to prevent further navigations
+                            navigationPending = true;
                             setTimeout(async () => {
                                 await redirectToLogin();
-                                navigationPending = false; // Reset flag after navigation
-                            }, 500); // Delay to ensure error handling completes
+                                navigationPending = false;
+                            }, 500);
                         }
                         return Promise.reject(tokenRefreshError);
                     }
@@ -96,7 +109,8 @@ const AxiosInterceptorProvider = ({ children }) => {
         );
 
         return () => {
-            _axios.interceptors.response.eject(interceptor);
+            _axios.interceptors.request.eject(interceptor);
+            _axios.interceptors.response.eject(responseInterceptor);
         };
     }, [redirectToLogin]);
 

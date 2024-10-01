@@ -85,7 +85,7 @@ const NewBillerHome = ({ navigation }) => {
 
   const getEasyPlanStatus = () => {
     getUser().then((res) => {
-      const request = `AccountSvc/api/Accounts/${res.userInfo.accountNumber}/easypay`;
+      const request = `accountsvc/api/Accounts/${res.userInfo.accountNumber}/easypay`;
       GetApiRequest(request, (res) => {
         if (res) {
           console.log('getEasyPlanStatus', res)
@@ -304,7 +304,7 @@ const NewBillerHome = ({ navigation }) => {
   const getUserAccountDetails = () => {
     setBillAmt(undefined)
     getUser().then((res) => {
-      const request = `AccountSvc/api/Accounts/GetAccountDetailsByAccountNumber?accountNumber=${res.userInfo.accountNumber}`;
+      const request = `accountsvc/api/Accounts/GetAccountDetailsByAccountNumber?accountNumber=${res.userInfo.accountNumber}`;
       GetApiRequest(
         request,
         (res) => {

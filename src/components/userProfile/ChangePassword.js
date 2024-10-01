@@ -61,7 +61,7 @@ const ChangePassword = () => {
 
 
   const getSecurityQuestions=()=>{
-    const request = `usersvc/api/securityquestions/`;
+    const request = `userssvc/api/securityquestions/`;
     GetApiRequest(
       request,
       (res) => {
