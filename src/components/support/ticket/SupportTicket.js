@@ -135,7 +135,7 @@ const SupportTicket = () => {
 
   const getStatusColor = (status) => {
     let color = "#067647";
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "new":
         color = "#F88700";
         break;
