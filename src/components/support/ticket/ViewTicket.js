@@ -130,9 +130,15 @@ const ViewTicket = ({ route }) => {
       });
   };
 
-  useEffect(() => {
-    getTicketDetails();
-  }, []);
+  // useEffect(() => {
+  //   getTicketDetails();
+  // }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getTicketDetails();
+    }, [])
+  );
 
   const uploadFiles = (data) => {
     setLoadingTxt("File Uploading...");
