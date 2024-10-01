@@ -126,9 +126,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         try {
             const userLocal = await getUser();
             const accountNumber = userLocal.userInfo.accountNumber;
-
+            let isAcp = accountNumber.toString().length >= 16
             GetApiRequest(
-                `account/api/account/${accountNumber}/easypay`,
+                isAcp?`accountsvc/api/accounts/${accountNumber}/easypay`:`account/api/account/${accountNumber}/easypay`,
                 (res) => {
                     console.log("Payment details fetched successfully:", res);
                     const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.isEasyPay, res?.easyPayId);

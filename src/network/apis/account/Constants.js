@@ -36,7 +36,6 @@ export const config = {
     API_BASEURL: 'https://customer.uat.sparklight.com/apiWrapper/',
     API_SHOPPING_CART_BASEURL: 'https://secure.uat.cableone.net/ShoppingCartBackBoneAPIWrapperDemo',
     API_ACP_BASEURL: 'https://customer.uat.sparklight.com/apiWrapper/',
-    //MODEM_BASE_URL: "https://mule-gateway.uat.cableone.net/customer-api",
     MODEM_BASE_URL: "https://mule-gateway.cableone.net/customer-api",
     TRUCK_ROLL_BASE_URL: 'https://adb-1771418802186593.13.azuredatabricks.net/model/lgb_model_fs/Staging/invocations',
     PAYMENTURL_V2 : 'https://payment.uat.sparklight.com/PortalsV2/PortalsPayment',

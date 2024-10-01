@@ -1,4 +1,4 @@
-import { _axios, _axios_cableone } from "../../RestApiClient";
+import { _axios } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import axios from 'axios'; // Make sure to import axios
 import moment from "moment";
@@ -16,7 +16,7 @@ const getProfileDetails = async () => {
     };
     let ApiMethod = ''
     if (accountNumber.toString().length >= 16) {
-        ApiMethod = `/usersvc/api/profile/${accountNumber}`
+        ApiMethod = `/userssvc/api/profile/${accountNumber}`
     } else {
         ApiMethod = `/users/api/profile/${accountNumber}`
     }
@@ -187,7 +187,7 @@ const postProfileInfo = async (data) => {
         }
 
         const isEnterpriseAccount = accountNumber.toString().length >= 16;
-        const apiEndpoint = isEnterpriseAccount ? '/usersvc/api/profile/' : '/users/api/profile/';
+        const apiEndpoint = isEnterpriseAccount ? '/userssvc/api/profile/' : '/users/api/profile/';
         console.log(`Making API Call to ${apiEndpoint} with data:`, data);
 
         const response = await _axios.put(apiEndpoint, data, config);
