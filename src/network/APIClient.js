@@ -19,16 +19,32 @@ export const isUserAuthorized = (authorize) => {
     UserAuthorized = authorize;
 };
 
-// Helper to handle response processing
 const handleFetchResponse = async (response, onSuccess, onError) => {
     try {
-        const json = await response.json();
-        if (response.ok) {
-            onSuccess(json);
-        } else {
-            onError(`Response status ${response.status} (${response.statusText}): ${json.message}`);
+        const rawResponse = await response.text(); // Read response as plain text
+        console.log("Raw Response:", rawResponse); // Log the raw response
+
+        if (response.status === 204 || !rawResponse) {
+            // Handle no content
+            onSuccess({ message: 'No content' }); // Pass a success message for no content
+            return;
+        }
+
+        // Try parsing the response as JSON if not empty
+        try {
+            const json = JSON.parse(rawResponse);
+            if (response.ok) {
+                onSuccess(json);
+            } else {
+                onError(`Response status ${response.status} (${response.statusText}): ${json.message}`);
+            }
+        } catch (jsonParseError) {
+            // Log and handle JSON parse error if response is not valid JSON
+            console.error('JSON Parse error:', jsonParseError);
+            onError(`Failed to parse response: ${jsonParseError.message}`);
         }
     } catch (error) {
+        // Handle any other errors in processing the response
         onError(`Error processing response: ${error.message}`);
     }
 };
@@ -185,6 +201,7 @@ export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
     };
 
     console.log('PutApiRequest:', endpoint, 'body:', body);
+    console.log('PutApiRequest:', endpoint, 'body:', user.token);
     fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
         .then(response => handleFetchResponse(response, onSuccess, onError));
 };
