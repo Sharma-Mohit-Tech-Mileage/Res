@@ -99,26 +99,30 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     const setDynamicCookie = () => {
-        user.userInfo['customerType']= "Residential";
-        const script = `(function() {
-            var cookieValue = "MobileApp";
-            var customerType = "Residential";
-            var domain = document.location.hostname; 
-            var expirationDate = new Date();
-            expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
-            document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-            document.cookie = "CustomerType=" + customerType + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-            
-            localStorage.setItem('jwt_token', '${currentUser.token}');
-            localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo)}');
-            var upgradeToken = '${currentUser.upgradeToken}';
-            localStorage.setItem('upgrades_token', upgradeToken);
-        })();`;
-
-        if (webViewRef.current) {
-            webViewRef.current.injectJavaScript(script);
+        if (user && user.userInfo) {
+            user.userInfo['customerType'] = "Residential"; // Safely set the customerType
+            const script = `(function() {
+                var cookieValue = "MobileApp";
+                var customerType = "Residential";
+                var domain = document.location.hostname; 
+                var expirationDate = new Date();
+                expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+                document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+                document.cookie = "CustomerType=" + customerType + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+    
+                localStorage.setItem('jwt_token', '${currentUser.token}');
+                localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo)}');
+                var upgradeToken = '${currentUser.upgradeToken}';
+                localStorage.setItem('upgrades_token', upgradeToken);
+            })();`;
+    
+            if (webViewRef.current) {
+                webViewRef.current.injectJavaScript(script);
+            } else {
+                console.warn('WebView reference is not available to inject JavaScript.');
+            }
         } else {
-            console.warn('WebView reference is not available to inject JavaScript.');
+            console.error('user.userInfo is undefined, unable to set customerType');
         }
     };
 
