@@ -151,7 +151,7 @@ const SupportTicket = () => {
     return color;
   };
 
-  const RenderTicketList = ({ item }) => {
+  const RenderTicketList = ({ item,index }) => {
     return (
       <View
         key={item.id}
@@ -160,7 +160,8 @@ const SupportTicket = () => {
           borderColor: Color.Gray300,
           borderWidth: 1,
           marginHorizontal: Padding.p_base,
-          marginBottom: Padding.p_5xl,
+          //marginBottom: Padding.p_5xl,
+          marginBottom:(ticketList.length-1==index) ? 200:Padding.p_5xl
         }}
       >
         <Pressable
@@ -301,11 +302,11 @@ const SupportTicket = () => {
             </Text>
           </View>
           {ticketList.length > 0 ? (
-            <View style={{ paddingBottom: hp("48%") }}>
+            <View style={{ paddingBottom: hp('50%'), flexDirection:'column' }}>
               <FlatList
                 data={ticketList}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={RenderTicketList}
+                renderItem={(item,index)=>RenderTicketList(item,index)}
                 refreshControl={
                   <RefreshControl
                     refreshing={refreshing}
@@ -314,7 +315,7 @@ const SupportTicket = () => {
                 }
                 //onEndReached={onEndReached}
                 //onEndReachedThreshold={0.1}
-                //ListFooterComponent={Footer}
+                //ListFooterComponent={<></>}
               />
             </View>
           ) : loading ? (
