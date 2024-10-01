@@ -79,28 +79,46 @@ const ChangePassword = () => {
   }
   //usersvc/api/profile/password/8160210010000010
 
-  const updateUserPassword=(newPassword)=>{
-    let re = getUser().then((res) => {
-    const request = isNewBiller ? `users/api/profile/passwordACP/${res.userInfo.accountNumber}/${res.userInfo.userName}`:`users/api/profile/password/${res.userInfo.accountNumber}`;
-    let body={"newPassword":newPassword}
-    PutApiRequest(
-      request,
-      body,
-      (res) => {
-        setLoading(false)
-        console.log("update pass", res);
-      },
-      (error) => {
-        setLoading(false)
-        console.log("Error on updateUserPassword ",JSON.stringify(error));
-        if(error.includes('204')){
-          
-            navigation.navigate('PasswordSecurity', { updateSuccess: true, isPassword:true });
-        }
-      }
-    );
-   });
-  }
+  const updateUserPassword = async (newPassword) => {
+    try {
+        const user = await getUser();
+
+        // Construct the request URL based on the user's billing type
+        const request = isNewBiller
+            ? `users/api/profile/passwordACP/${user.userInfo.accountNumber}/${user.userInfo.userName}`
+            : `users/api/profile/password/${user.userInfo.accountNumber}`;
+
+        const body = { newPassword };
+
+        setLoading(true);
+
+        // Call the PUT API request
+        PutApiRequest(
+            request,
+            body,
+            (res) => {
+                setLoading(false);
+                console.log("Password updated successfully", res);
+                navigation.navigate('PasswordSecurity', { updateSuccess: true, isPassword: true });
+            },
+            (error) => {
+                setLoading(false);
+                console.error("Error updating password", error);
+
+                // Handle specific errors, such as '204 No Content' or others
+                if (error.includes('204')) {
+                    navigation.navigate('PasswordSecurity', { updateSuccess: true, isPassword: true });
+                } else {
+                    setShowErrorAlert(true);  // Show an error alert for other errors
+                }
+            }
+        );
+    } catch (err) {
+        setLoading(false);
+        console.error("Error retrieving user information", err);
+        setShowErrorAlert(true);  // Show an error alert if getUser fails
+    }
+};
 
   useEffect(() => {
     // Reset the form with the updated profile details
