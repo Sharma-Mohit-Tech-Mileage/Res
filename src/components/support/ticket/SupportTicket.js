@@ -72,8 +72,8 @@ const SupportTicket = () => {
             getPendingTicket().then((data) => {
               console.log("Pending Data", data);
               if(data){  
-              setTicketList(data);
-              setMainList(data);
+              setTicketList([data]);
+              setMainList([data]);
               }
             });
           }
@@ -215,7 +215,7 @@ const SupportTicket = () => {
               alignSelf: "flex-start",
               borderRadius: 2,
               padding: 0,
-              backgroundColor: getStatusColor(item?.status.toLowerCase()),
+              backgroundColor: getStatusColor(item?.status?.toLowerCase()),
             }}
           >
             <Text

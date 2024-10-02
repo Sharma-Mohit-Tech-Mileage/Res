@@ -86,7 +86,7 @@ const CreateTicket = () => {
         formData,
         (res) => {
           console.log('saved data',JSON.stringify(formData))
-          let data=[{...formData,ticketNumber:res, status:'Pending',isLocal:true}];
+          let data={...formData,ticketNumber:res, status:'Pending',isLocal:true};
           storeValue(data)
           console.log('Ticket:',res)
           
