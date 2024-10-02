@@ -37,7 +37,6 @@ const SupportTicket = () => {
 
   const onRefresh = () => {
     setRefreshing(true);
-
     setTimeout(() => {
       //setRefreshing(false);
       getTicketList();

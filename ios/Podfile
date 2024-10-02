@@ -1,14 +1,14 @@
 
 # Resolve react_native_pods.rb with node to allow for hoisting
 
-require Pod::Executable.execute_command('node', ['-p',
-  'require.resolve(
-    "react-native/scripts/react_native_pods.rb",
-    {paths: [process.argv[1]]},
-  )', __dir__]).strip
+#require Pod::Executable.execute_command('node', ['-p',
+#  'require.resolve(
+#    "react-native/scripts/react_native_pods.rb",
+#    {paths: [process.argv[1]]},
+#  )', __dir__]).strip
 
 platform :ios, '13.0'
-prepare_react_native_project!
+#prepare_react_native_project!
 
 # If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
 # because `react-native-flipper` depends on (FlipperKit,...) that will be excluded
@@ -27,14 +27,55 @@ prepare_react_native_project!
 #  use_frameworks! :linkage => linkage.to_sym
 #end
 
+ def node_require(script)
+   # Resolve script with node to allow for hoisting
+   require Pod::Executable.execute_command('node', ['-p',
+     "require.resolve(
+       '#{script}',
+       {paths: [process.argv[1]]},
+     )", __dir__]).strip
+ end
+
+# Use it to require both react-native's and this package's scripts:
+ node_require('react-native/scripts/react_native_pods.rb')
+ node_require('react-native-permissions/scripts/setup.rb')
+
+# …
+
+
+
+# ⬇️ uncomment the permissions you need
+setup_permissions([
+  # 'AppTrackingTransparency',
+  # 'Bluetooth',
+  # 'Calendars',
+  # 'CalendarsWriteOnly',
+   'Camera',
+  # 'Contacts',
+  # 'FaceID',
+  # 'LocationAccuracy',
+  # 'LocationAlways',
+  # 'LocationWhenInUse',
+  # 'MediaLibrary',
+  # 'Microphone',
+  # 'Motion',
+  # 'Notifications',
+  # 'PhotoLibrary',
+  # 'PhotoLibraryAddOnly',
+  # 'Reminders',
+  # 'Siri',
+  # 'SpeechRecognition',
+  # 'StoreKit',
+])
+
+# …
+
 target 'My Sparklight' do
   
   config = use_native_modules!
   use_frameworks! :linkage => :static
   # Flags change depending on the env values.
   flags = get_default_flags()
-  permissions_path = '../node_modules/react-native-permissions/ios'
-    pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
     pod 'Firebase', :modular_headers => true
     pod 'FirebaseCoreInternal', :modular_headers => true
     pod 'GoogleUtilities', :modular_headers => true

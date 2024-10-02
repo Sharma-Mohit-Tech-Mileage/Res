@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState,useCallback } from "react";
 import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text,TouchableOpacity,Alert,PermissionsAndroid } from "react-native";
 import { useSelector } from 'react-redux';
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation,useFocusEffect } from "@react-navigation/native";
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-
+import { Linking } from 'react-native';
 import PubSub from 'pubsub-js'
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
@@ -70,7 +70,9 @@ const Support = ({ route }) => {
           if (granted === RESULTS.GRANTED) {
             Alert.alert('Camera permission granted');
           } else {
+            Linking.openSettings();
             Alert.alert('Camera permission denied');
+            
           }
         } else {
           Alert.alert('Camera permission already granted');
@@ -78,10 +80,12 @@ const Support = ({ route }) => {
     }
   };
 
-  useEffect(() => {
-    requestCameraPermission();
-  }, []);
-
+ 
+  useFocusEffect(
+    useCallback(() => {
+        requestCameraPermission();
+    }, [])
+  );
   
 
     
