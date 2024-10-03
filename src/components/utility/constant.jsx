@@ -329,5 +329,21 @@ export const checkForMinorUpdate = async () => {
     };
 };
 
+export const updateEmailList = (emailList, type) => {
+    console.log('emailList print =========================', emailList);
+    return emailList.map(email => {
+      const marketingFlag = type === 'add' ? true : false;
+  
+      return {
+        emailAddress:email,
+        marketing: marketingFlag, 
+        invoice: false,
+        collection: false,
+        iptv: false,
+        tiVo: false,
+        function: type || 'add'
+      };
+    });
+  };
 
 

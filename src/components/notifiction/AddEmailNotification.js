@@ -53,6 +53,25 @@ const AddEmailNotification = () => {
         setFormState((prevState) => ({ ...prevState, [name]: value }));
     }, 200), []);
 
+    const checkEmailAssociation = (email, associations) => {
+        const emailToCheck = email.toLowerCase();
+        const associatedWithPaperless = associations.some(setting =>
+            setting.emailAddress?.toLowerCase() === emailToCheck && setting.invoice
+        );
+        const associatedWithMarketing = associations.some(setting =>
+            setting.emailAddress?.toLowerCase() === emailToCheck && setting.marketing
+        );
+        const associatedWithNoFlags = associations.some(setting =>
+            setting.emailAddress?.toLowerCase() === emailToCheck && !setting.invoice && !setting.marketing
+        );
+    
+        return {
+            associatedWithPaperless,
+            associatedWithMarketing,
+            associatedWithNoFlags
+        };
+    };
+    
     const handleSave = useCallback(async (data) => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
@@ -61,58 +80,30 @@ const AddEmailNotification = () => {
         const { email } = data;
         const { paperlessBilling, marketing } = formState;
     
-        // Check if the email already exists with the selected associations
-        const associatedWithPaperless = allSvEmailAssociated.find(setting =>
-            setting.emailAddress?.toLowerCase() === email.toLowerCase() && setting.invoice
-        );
+        // Get the email association status
+        const { associatedWithPaperless, associatedWithMarketing, associatedWithNoFlags } = checkEmailAssociation(email, allSvEmailAssociated);
     
-        const associatedWithMarketing = allSvEmailAssociated.find(setting =>
-            setting.emailAddress?.toLowerCase() === email.toLowerCase() && setting.marketing
-        );
-    
-        // Check if trying to add to Marketing but it's already in Marketing
+        // Centralized condition checks
         if (marketing && associatedWithMarketing) {
-            setErrorMsg('This email is already subscribed to Marketing Updates. Please choose another email or update the current subscription.');
-            setShowErrorAlert(true);
-            isSubmittingRef.current = false;
-            setIsSubmitting(false);
-            return;
+            setErrorMsg('This email is already subscribed to marketing communications. Please choose another email or update the current subscription.');
+        } else if (paperlessBilling && associatedWithPaperless) {
+            setErrorMsg('This email is already subscribed to paperless billing. You can update the subscription if needed.');
+        } else if (associatedWithPaperless && associatedWithMarketing) {
+            setErrorMsg('This email is already subscribed to both paperless billing and marketing communications. Please edit the existing settings to make changes');
+        } else if (associatedWithNoFlags && !paperlessBilling && !marketing) {
+            setErrorMsg('This email is already present with no subscriptions. Please select at least one subscription option.');
+        } else if ((associatedWithPaperless || associatedWithMarketing) && !paperlessBilling && !marketing) {
+            setErrorMsg('This email address is already being used for other notifications. Please select what notifications you would like to receive to this email address.');
+        } else {
+            try {
+                await dispatch(manageEmailRequest(email, paperlessBilling, marketing, newEmail, navigation));
+                return;
+            } catch (error) {
+                setErrorMsg('We encountered an issue while saving your settings. Please try again.');
+            }
         }
     
-        // Check if trying to add to Paperless Billing but it's already in Paperless Billing
-        if (paperlessBilling && associatedWithPaperless) {
-            setErrorMsg('This email is already subscribed to Paperless Billing. You can update the subscription if needed.');
-            setShowErrorAlert(true);
-            isSubmittingRef.current = false;
-            setIsSubmitting(false);
-            return;
-        }
-    
-        // Restrict adding if it's already associated with both
-        if (associatedWithPaperless && associatedWithMarketing) {
-            setErrorMsg('This email is already subscribed to both Paperless Billing and Marketing Updates. Please edit the existing settings to make changes.');
-            setShowErrorAlert(true);
-            isSubmittingRef.current = false;
-            setIsSubmitting(false);
-            return;
-        }
-    
-        // NEW CONDITION: Check if the email is associated with any flag but trying to save with no flag
-        if ((associatedWithPaperless || associatedWithMarketing) && !paperlessBilling && !marketing) {
-            setErrorMsg('This email is currently associated with notifications. Please select at least one subscription option.');
-            setShowErrorAlert(true);
-            isSubmittingRef.current = false;
-            setIsSubmitting(false);
-            return;
-        }
-    
-        try {
-            await dispatch(manageEmailRequest(email, paperlessBilling, marketing, newEmail, navigation));
-        } catch (error) {
-            setErrorMsg('We encountered an issue while saving your settings. Please try again.');
-            setShowErrorAlert(true);
-        }
-    
+        setShowErrorAlert(true);
         isSubmittingRef.current = false;
         setIsSubmitting(false);
     }, [dispatch, navigation, formState, allSvEmailAssociated]);

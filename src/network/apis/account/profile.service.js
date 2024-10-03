@@ -582,6 +582,42 @@ const updateSVEmails = async (emailList) => {
     }
 };
 
+
+const manageSVEmails = async (emailList) => {
+    try {
+        // Fetch the user details
+        let user = await getUser();
+        console.log('User Details:', user);
+
+        // Extract the account number
+        const accountNumber = user.userInfo?.accountNumber || null;
+        console.log('Account Number:', accountNumber);
+
+        // Config for the request
+        const config = {
+            headers: {
+                Authorization: `Bearer ${user.token}`
+            }
+        };
+        console.log('Request Config:', config);
+
+        // Log the email list being sent
+        console.log('Email List:', emailList);
+
+        // Make the API request
+        const response = await _axios.post(`Mobile/api/email/${accountNumber}/UpdateSVEmails`, emailList, config);
+
+        // Log the response data
+        console.log('Response Data:', response.data);
+
+        return response.data;
+    } catch (error) {
+        // Log any error that occurs during the process
+        console.error('Error managing SV emails:', error);
+        throw error;
+    }
+};
+
 const addSVEmailMktFlag = async (email) => {
     let user = await getUser();
     const accountNumber = user.userInfo?.accountNumber || null;
@@ -605,6 +641,6 @@ export {
     fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo,
     fetchBillingStatus, fetchPaperLessDetails, putEmailNotification,
     postEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications,
-    unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,
+    unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,manageSVEmails,
     resendEmailVerification, addUserAction, removeUser, editUserAction, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, addSVEmailMktFlag
 }
