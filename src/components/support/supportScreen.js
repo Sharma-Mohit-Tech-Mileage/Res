@@ -6,7 +6,6 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation,useFocusEffect } from "@react-navigation/native";
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import { Linking } from 'react-native';
 import PubSub from 'pubsub-js'
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
@@ -70,22 +69,38 @@ const Support = ({ route }) => {
           if (granted === RESULTS.GRANTED) {
             Alert.alert('Camera permission granted');
           } else {
-            Linking.openSettings();
-            Alert.alert('Camera permission denied');
+            Alert.alert(
+                'Camera Permission',
+                'This app requires access to the camera to take photos for chat support.',
+                [
+                  {
+                    text: 'Cancel',
+                    onPress: () => null,
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Open Settings',
+                    onPress: () => {
+                        Linking.openSettings();
+                    },
+                  },
+                ],
+                { cancelable: true }
+              );
             
           }
         } else {
-          Alert.alert('Camera permission already granted');
+         // Alert.alert('Camera permission already granted');
         }
     }
   };
 
  
-  useFocusEffect(
-    useCallback(() => {
-        requestCameraPermission();
-    }, [])
-  );
+//   useFocusEffect(
+//     useCallback(() => {
+//         requestCameraPermission();
+//     }, [])
+//   );
   
 
     
@@ -201,7 +216,7 @@ const Support = ({ route }) => {
         }else{
             startChatWithConfig(data)
         }
-
+        requestCameraPermission();
     };
     
     return (
