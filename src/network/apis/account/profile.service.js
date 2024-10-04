@@ -187,9 +187,9 @@ const postProfileInfo = async (data) => {
         }
         let ApiMethod = ''
         if (accountNumber.toString().length >= 16) {
-            ApiMethod = `/userssvc/api/profile/${accountNumber}`
+            ApiMethod = `/userssvc/api/profile`
         } else {
-            ApiMethod = `/users/api/profile/${accountNumber}`
+            ApiMethod = `/users/api/profile`
         }
         console.log(`Making API Call to ${ApiMethod} with data:`, data);
 
