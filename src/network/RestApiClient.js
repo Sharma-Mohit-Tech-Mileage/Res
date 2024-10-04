@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { Env } from "./apis/account/Constants";
-import { getUser, storeUser, cleanUserData } from "../redux/utils/LocalStorage";
+import { getUser, storeUser } from "../redux/utils/LocalStorage";
 import { RefreshToken } from '../components/user/Session';
 import { useAuthInterceptor } from '../network/useAuthInterceptor';
 
@@ -44,7 +44,8 @@ const AxiosInterceptorProvider = ({ children }) => {
                 // Dynamically switch the baseURL based on user type
                 try {
                     const user = await getUser();
-                    if (user && user.isNormalUser === false) {
+
+                    if (config.url.includes('/userssvc/api/profile')) {
                         config.baseURL = API_ACP_BASEURL; // Set ACP base URL for ACP users
                     } else {
                         config.baseURL = BASE_URL; // Set default base URL for normal users

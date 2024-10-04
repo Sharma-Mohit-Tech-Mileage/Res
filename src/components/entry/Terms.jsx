@@ -43,13 +43,14 @@ const Terms = ({ navigation }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
+               
+                if(userData?.userInfo.accountNumber.toString().length==9){
+                dispatch(fetchPushNotifications());
                 dispatch(fetchBillingStatus());
                 dispatch(fetchBillingPaper());
                 dispatch(fetchSMSSelection());
-                if(userData?.userInfo.accountNumber.toString().length==9){
-                dispatch(fetchPushNotifications());
-                }
                 dispatch(fetchProfileDetails());
+                }
             } catch (error) {
                 console.error("Error fetching data", error);
             }

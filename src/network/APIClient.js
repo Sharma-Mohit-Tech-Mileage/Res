@@ -121,7 +121,6 @@ const handleAuthResponse = async (response, idTokenGuid, refreshToken, onSuccess
 export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => {
     const idTokenGuid = body.idTokenGuid;
     const refreshToken = body.refreshToken;
-    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
     delete body.idTokenGuid;
     delete body.refreshToken;
     const options = {
@@ -133,7 +132,7 @@ export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => 
         body: JSON.stringify(body)
     };
 
-    fetch(`${baseUrl}${endpoint}`, options)
+    fetch(`${BASE_URL}${endpoint}`, options)
         .then(response => handleAuthResponse(response, idTokenGuid, refreshToken, onSuccess, onError))
         .catch(exception => onError(exception.message));
 };

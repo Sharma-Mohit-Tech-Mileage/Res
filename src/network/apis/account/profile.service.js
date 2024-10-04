@@ -185,9 +185,12 @@ const postProfileInfo = async (data) => {
         if (!accountNumber) {
             throw new Error("Account number is missing");
         }
-
-        const isEnterpriseAccount = accountNumber.toString().length >= 16;
-        const apiEndpoint = isEnterpriseAccount ? '/userssvc/api/profile/' : '/users/api/profile/';
+        let ApiMethod = ''
+        if (accountNumber.toString().length >= 16) {
+            ApiMethod = `/userssvc/api/profile/${accountNumber}`
+        } else {
+            ApiMethod = `/users/api/profile/${accountNumber}`
+        }
         console.log(`Making API Call to ${apiEndpoint} with data:`, data);
 
         const response = await _axios.put(apiEndpoint, data, config);
@@ -515,9 +518,11 @@ const removeUser = async (data) => {
 
 
 
-export { logError,logInfo,fetchUserList, getProfileDetails, 
+export {
+    logError, logInfo, fetchUserList, getProfileDetails,
     fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo,
     fetchBillingStatus, fetchPaperLessDetails, putEmailNotification,
     postEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications,
     unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,
-      resendEmailVerification,addUserAction,removeUser,editUserAction }
+    resendEmailVerification, addUserAction, removeUser, editUserAction
+}
