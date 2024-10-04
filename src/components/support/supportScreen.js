@@ -21,6 +21,7 @@ const Support = ({ route }) => {
     const [department, setDepartment] = useState('');
     const userData = useSelector(state => state.combinedReducers.user.userData);
     const scrollViewRef = useRef(null);
+    const [isChatDisabled, setIsChatDisabled] = useState(false);
     const makeCall = (number) => {
         let phoneNumber = '';
 
@@ -48,7 +49,8 @@ const Support = ({ route }) => {
           PermissionsAndroid.PERMISSIONS.CAMERA,
           {
             title: 'Camera Permission',
-            message: 'This app needs access to your camera.',
+            message: `This app requires access to the camera to take photos for chat support.
+                If you deny camera access to MySparklight, you can enable it later in Settings.`,
             buttonNeutral: 'Ask Me Later',
             buttonNegative: 'Cancel',
             buttonPositive: 'OK',
@@ -67,11 +69,12 @@ const Support = ({ route }) => {
         if (result !== RESULTS.GRANTED) {
           const granted = await request(PERMISSIONS.IOS.CAMERA);
           if (granted === RESULTS.GRANTED) {
-            Alert.alert('Camera permission granted');
+            //Alert.alert('Camera permission granted');
           } else {
             Alert.alert(
                 'Camera Permission',
-                'This app requires access to the camera to take photos for chat support.',
+                `This app requires access to the camera to take photos for chat support.
+                If you deny camera access to MySparklight, you can enable it later in Settings.`,
                 [
                   {
                     text: 'Cancel',
@@ -96,11 +99,11 @@ const Support = ({ route }) => {
   };
 
  
-//   useFocusEffect(
-//     useCallback(() => {
-//         requestCameraPermission();
-//     }, [])
-//   );
+  useFocusEffect(
+    useCallback(() => {
+        checkChatAvailability()
+    }, [])
+  );
   
 
     
@@ -119,6 +122,21 @@ const Support = ({ route }) => {
         return unsubscribe;
     }, [navigation]);
 
+    const checkChatAvailability = () => {
+        const currentTime = new Date();
+        const currentHour = currentTime.getHours();
+        
+        // Define the time range when chat should be disabled (e.g., 10 PM to 6 AM)
+        const disableStart = 23;  // 10:00 PM
+        const disableEnd = 8;     // 6:00 AM
+    
+        // Check if the current time is within the disabled range
+        if (currentHour >= disableStart || currentHour < disableEnd) {
+          setIsChatDisabled(true);
+        } else {
+          setIsChatDisabled(false);
+        }
+    }
 
     const items = [
         {
@@ -515,10 +533,12 @@ const Support = ({ route }) => {
                                                 }}
                                                 onPress={() => {
                                                     //toggleModal("tech");
+                                                    if(!isChatDisabled){
                                                     handlePressOpenButton("SPK TCC Residential", ['Resi_TechSupport'])
+                                                    }
                                                 }}
                                             >
-                                                <ChatIcon />
+                                                 <ChatIcon isEnable={!isChatDisabled}/>
                                                 <Text
                                                     style={[styles.headingTypo, { marginLeft: 10, fontSize: 16 }]}
                                                 >
@@ -600,10 +620,12 @@ const Support = ({ route }) => {
                                                     }}
                                                     onPress={() => {
                                                         //toggleModal("Bill");
+                                                        if(!isChatDisabled){
                                                         handlePressOpenButton("mobiletest", ['Resi_BillSupport'])
+                                                        }
                                                     }}
                                                 >
-                                                    <ChatIcon />
+                                                    <ChatIcon isEnable={!isChatDisabled}/>
                                                     <Text
                                                         style={[styles.headingTypo, { marginLeft: 10, fontSize: 16 }]}
                                                     >

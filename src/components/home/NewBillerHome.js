@@ -335,7 +335,8 @@ const NewBillerHome = ({ navigation }) => {
 
              let dueDate = moment(res.payment_due_date).format("ll");
              setDueDate(dueDate);
-             setBillAmt(res.payment_due_amount);
+             let billAmnt=(Math.round(res.payment_due_amount * 100) / 100).toFixed(2);
+             setBillAmt(billAmnt);
           }
         },
         onErrorBill
