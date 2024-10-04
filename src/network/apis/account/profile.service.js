@@ -191,9 +191,9 @@ const postProfileInfo = async (data) => {
         } else {
             ApiMethod = `/users/api/profile/${accountNumber}`
         }
-        console.log(`Making API Call to ${apiEndpoint} with data:`, data);
+        console.log(`Making API Call to ${ApiMethod} with data:`, data);
 
-        const response = await _axios.put(apiEndpoint, data, config);
+        const response = await _axios.put(ApiMethod, data, config);
         console.log('API Call Successful, Response:', response.data);
 
         return response.data;

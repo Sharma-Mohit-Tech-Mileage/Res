@@ -62,7 +62,7 @@ const App = () => {
     console.log("Checking for updates...", currentMajor, latestMajor);
     if (latestMajor > currentMajor) {
       console.log("Major update available.");
-      setMajorUpdateVisible(true);
+      setMajorUpdateVisible(false);
     }
   }
 
