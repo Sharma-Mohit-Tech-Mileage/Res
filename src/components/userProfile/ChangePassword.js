@@ -85,7 +85,7 @@ const ChangePassword = () => {
 
         // Construct the request URL based on the user's billing type
         const request = isNewBiller
-            ? `users/api/profile/passwordACP/${user.userInfo.accountNumber}/${user.userInfo.userName}`
+            ? `userssvc/api/profile/password/${user.userInfo.accountNumber}/${user.userInfo.userName}`
             : `users/api/profile/password/${user.userInfo.accountNumber}`;
 
         const body = { newPassword };
