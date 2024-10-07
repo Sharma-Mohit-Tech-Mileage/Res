@@ -453,7 +453,7 @@ const ManageEquipment = ({ route }) => {
       <ProfileSettingsHeader
         title="Manage Equipment "
         onPressBack={() => {
-          navigation.goBack();
+          navigation.navigate("support");
         }}
       />
      <ScrollView automaticallyAdjustContentInsets={false}>

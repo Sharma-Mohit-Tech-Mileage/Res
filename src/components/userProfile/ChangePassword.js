@@ -56,7 +56,7 @@ const ChangePassword = () => {
 
   const handleValidationError = () => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-    setShowValidationAlert(true);
+    //setShowValidationAlert(true);
   };
 
 

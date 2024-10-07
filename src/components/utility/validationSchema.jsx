@@ -134,7 +134,7 @@ export const passwordSchema = (isCustomQuestionSelected) => yup.object({
     securityAnswer: yup.string()
         .required('Security answer is required'),
     newPassword: yup.string()
-        .nullable()  // Allows null values
+        .required('Password is required')
         .test(
             'newPassword-conditional-validation',
             'Password must meet the requirements',
