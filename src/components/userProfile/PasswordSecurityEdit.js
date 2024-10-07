@@ -14,7 +14,7 @@ import NotificationAlert from '../common/customui/NotificationAlert';
 import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
 import { GetApiRequest,PutApiRequest } from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
-import { passwordSchema } from '../utility/validationSchema'; // Update the path as necessary
+import { securitySchema } from '../utility/validationSchema'; // Update the path as necessary
 import colors from "../../res/Colors";
 const PasswordSecurityEdit = () => {
 
@@ -57,7 +57,7 @@ const PasswordSecurityEdit = () => {
 
 
   const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
-    resolver: yupResolver(passwordSchema(isCustomQuestionSelected)),
+    resolver: yupResolver(securitySchema(isCustomQuestionSelected)),
     defaultValues: profileDetails
   });
 
