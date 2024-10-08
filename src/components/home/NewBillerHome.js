@@ -32,6 +32,7 @@ import {
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
+import YoutubePlayer from "react-native-youtube-iframe";
 import {
   getFcmToken,
   requestUserPermission,
@@ -49,6 +50,7 @@ import MyInternetDetialsBiller from "../common/MyInternetDetailsBiller";
 import { useFocusEffect } from "@react-navigation/native";
 const tabWidth = Number(Dimensions.get("window").width / 4);
 const NewBillerHome = ({ navigation }) => {
+   const [playing, setPlaying] = useState(false);
   const [isImageDispaly, setIsImageDispaly] = useState(true);
   const user = useSelector((state) => state.combinedReducers.user.userData);
   const home = useSelector((state) => state.combinedReducers.home);
@@ -781,7 +783,14 @@ const NewBillerHome = ({ navigation }) => {
 
 
                 {isImageDispaly ? (
-                  <Image style={{ width: wp('80%'), borderRadius: 5, alignSelf: 'center', marginTop: 10 }} source={require('../../../assets/newbiller.png')} />
+                  <View style={{ width: wp('80%'), borderRadius: 5, alignSelf: 'center', marginTop: 10 }} >
+                  <YoutubePlayer
+                  height={200}
+                  play={playing}
+                  videoId={"C3cMQoWxv6I"}
+                  
+                />
+                </View>
                 ) : (
                   <></>
                 )}

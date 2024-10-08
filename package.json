@@ -73,6 +73,7 @@
     "react-native-version-check": "^3.4.7",
     "react-native-view-shot": "^3.8.0",
     "react-native-webview": "^13.6.3",
+    "react-native-youtube-iframe": "^2.3.0",
     "react-redux": "^8.1.2",
     "redux": "^4.2.1",
     "redux-saga": "^1.2.3",
