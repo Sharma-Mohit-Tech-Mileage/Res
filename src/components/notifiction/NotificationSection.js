@@ -3,7 +3,6 @@ import { View, Text, Pressable, Image, StyleSheet } from "react-native";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { useNavigation } from "@react-navigation/native";
 import { Padding, Color, FontSize, FontFamily, Border } from "../../../GlobalStyles";
-import { resentEmailVerifiction } from '../../redux/actions/ProfileActionSuite';
 
 const NotificationSection = ({
   title,
@@ -24,9 +23,12 @@ const NotificationSection = ({
   dispatch,
   acknowledgement,
   isPrimary,
-  isLastSection // Prop to indicate if this is the last section
+  isLastSection
 }) => {
   const navigation = useNavigation();
+
+  // Check if any additional setting has its status set to "On"
+  const isAnySettingActive = additionalSettings.some(setting => setting.warn === true);
 
   const handleClose = () => {
     setShowSuccessAlert(false);
@@ -53,54 +55,47 @@ const NotificationSection = ({
             accessible={true}
             accessibilityRole="button"
             accessibilityLabel="Edit"
-            style={({ pressed }) => [
-              styles.editButton,
-              { opacity: pressed ? 0.7 : 1.0 }
-            ]}
-            onPress={() =>  navigation.navigate(navigationTarget, { additionalData: transformedData ,acknowledgement:acknowledgement})}
+            style={({ pressed }) => [styles.editButton, { opacity: pressed ? 0.7 : 1.0 }]}
+            onPress={() => navigation.navigate(navigationTarget, { additionalData: transformedData, acknowledgement: acknowledgement })}
           >
             <Text style={styles.buttonText}>Edit</Text>
           </Pressable>
         )}
       </View>
-      <View >
-        <View style={styles.contentWrapper}>
-        {isDisabled && (
-          <NotificationAlert
-            type="warning"
-            title={notificationsTitle}
-            showCloseIcon={false}
-            message={infoText}
-          />
-        )}
-        {isAdmin && (
-          <NotificationAlert
-            type="warning"
-            title=""
-            showCloseIcon={false}
-            message="Only Primary Admin can make changes"
-          />
-        )}
-        {!isDisabled && infoText && (
-          <View style={styles.infoContainer}>
-            <View style={styles.iconWrapper}>
-              <Image
-                style={styles.icon}
-                resizeMode="contain"
-                source={require("../../../assets/infocircle.png")}
-              />
+      <View>
+        {isAdmin && <View style={styles.infoContainerAdmin}>
+          <Text style={[styles.infoText, {textAlign: 'center'}]}>{'Only Primary Admin can make changes'}</Text>
+        </View>}
+        <View style={{ paddingHorizontal: Padding.p_base }}>
+          {(isDisabled || isAnySettingActive) && (
+            <NotificationAlert
+              type={!isAnySettingActive ? "warning" : "error"}
+              title={notificationsTitle}
+              showCloseIcon={false}
+              message={infoText}
+            />
+          )}
+          {!isDisabled && infoText && !isAnySettingActive && (
+            <View style={styles.infoContainer}>
+              <View style={styles.iconWrapper}>
+                <Image
+                  style={styles.icon}
+                  resizeMode="contain"
+                  source={require("../../../assets/infocircle.png")}
+                />
+              </View>
+              <Text style={styles.infoText}>{infoText}</Text>
             </View>
-            <Text style={styles.infoText}>{infoText}</Text>
-          </View>
-        )}
+          )}
+
         </View>
         {additionalSettings.map((setting, index) => (
-          <NotificationType 
-            key={index} 
-            type={setting.type} 
-            status={setting.status} 
+          <NotificationType
+            key={index}
+            type={setting.type}
+            status={setting.status}
             warn={setting.warn}
-            isLastItem={index === additionalSettings.length - 1} // Handle last item in the section
+            isLastItem={index === additionalSettings.length - 1}
           />
         ))}
       </View>
@@ -108,60 +103,7 @@ const NotificationSection = ({
   );
 };
 
-const renderInfoText = ({ title, infoText, screenReaderEnabled, isEmailVerified, acknowledgement, isPrimary, dispatch, navigation }) => {
-  if (!isEmailVerified && title === 'Email Notifications') {
-    if (screenReaderEnabled) {
-      return (
-        <Text
-          accessible={true}
-          accessibilityLabel={`${acknowledgement} is pending confirmation. Check your inbox for our verification link. Resend Confirmation Email link`}
-          onPress={() => dispatch(resentEmailVerifiction(navigation))}
-          style={styles.infoText}
-        >
-          <Text style={styles.linkText}>{acknowledgement}</Text> is pending confirmation.
-          {isPrimary && (
-            <>
-              {' Check your inbox for our verification link.'}
-              <Text> {"\n"}</Text>
-              <Text
-                style={styles.linkText}
-                hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-                onPress={() => dispatch(resentEmailVerifiction(navigation))}
-              >
-                Resend Confirmation Email
-              </Text>
-            </>
-          )}
-        </Text>
-      );
-    }
-    return (
-      <Text style={styles.infoText}>
-       <Text style={styles.linkText}>{acknowledgement}</Text> is pending confirmation.
-        {isPrimary && (
-          <>
-            {' Check your inbox for our verification link.'}
-            <Text> {"\n"}</Text>
-            <Text
-              accessible={true}
-              accessibilityRole="link"
-              accessibilityLabel="Resend Confirmation Email"
-              accessibilityHint="Activates the email verification process again"
-              style={styles.linkText}
-              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-              onPress={() => dispatch(resentEmailVerifiction(navigation))}
-            >
-              Resend Confirmation Email
-            </Text>
-          </>
-        )}
-      </Text>
-    );
-  }
-  return <Text style={styles.infoText}>{infoText}</Text>;
-};
-
-const NotificationType = ({ type, status,warn, isLastItem }) => {
+const NotificationType = ({ type, status, warn, isLastItem }) => {
   let displayStatus;
   let imageSource;
   switch (status) {
@@ -182,7 +124,7 @@ const NotificationType = ({ type, status,warn, isLastItem }) => {
   }
 
   return (
-    <View style={[styles.settingRow, !isLastItem && styles.settingRowBorder,warn&& {backgroundColor:Color.colorlightRed}]}>
+    <View style={[styles.settingRow, !isLastItem && styles.settingRowBorder, warn && { backgroundColor: Color.colorlightRed }]}>
       <Text style={styles.settingText}>{type}</Text>
       <View style={styles.statusWrapper}>
         <Image style={styles.icon} resizeMode="cover" source={imageSource} />
@@ -205,7 +147,7 @@ const styles = StyleSheet.create({
     marginBottom: Padding.p_base,
   },
   noBottomBorder: {
-    borderBottomWidth: 0, // Remove the bottom border for the last section
+    borderBottomWidth: 0,
   },
   headerRow: {
     paddingVertical: Padding.p_base,
@@ -228,25 +170,11 @@ const styles = StyleSheet.create({
     borderRadius: Border.br_11xs,
     backgroundColor: Color.colorMidnightblue
   },
-  buttonDisabled: {
-    backgroundColor: Color.colorWhitesmoke_300,
-    color: Color.colorGray_200
-  },
   buttonText: {
     fontSize: FontSize.size_xs,
     color: Color.sparklightWhite,
     fontFamily: FontFamily.openSansRegular,
     textAlign: "center"
-  },
-  disabledButtonText: {
-    fontSize: FontSize.size_xs,
-    color: Color.colorGray_200,
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "center"
-  },
-  contentWrapper: {
-    paddingHorizontal: Padding.p_base,
-    //paddingBottom: Padding.p_base
   },
   infoWrapper: {
     paddingHorizontal: Padding.p_5xl,
@@ -271,6 +199,14 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     marginTop: Padding.p_7xs
   },
+  infoContainerAdmin: {
+    backgroundColor: Color.colorWhitesmoke_100,
+    paddingHorizontal: Padding.p_base,
+    paddingVertical: Padding.p_7xs,
+    flexDirection: "row",
+    alignSelf: "stretch",
+    marginVertical: Padding.p_base
+  },
   infoText: {
     color: Color.colorGray_200,
     fontSize: FontSize.textXsSemibold_size,
@@ -279,17 +215,10 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: FontFamily.openSansRegular
   },
-  linkText: {
-    color: Color.colorMidnightblue,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_base,
-    fontWeight: "700"
-  },
   settingRow: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: Padding.p_base,
-    // Removed paddingHorizontal here to allow the border to stretch edge-to-edge
   },
   settingRowBorder: {
     borderBottomWidth: 1,
@@ -316,10 +245,6 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     marginLeft: 10
   },
-  icon: {
-    width: 18,
-    height: 18,
-  }
 });
 
 export default NotificationSection;
