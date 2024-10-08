@@ -21,7 +21,7 @@ import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightButton from "../../common/customui/SparkLightButton";
 import { useNavigation ,useFocusEffect} from "@react-navigation/native";
 import { GetApiRequest } from "../../../network/APIClient";
-import { getUser, getPendingTicket } from "../../../redux/utils/LocalStorage";
+import { getUser, getPendingTicket,storeValue } from "../../../redux/utils/LocalStorage";
 import TicketListIcon from "../../../res/svgIcons/TicketListIcon";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -44,6 +44,7 @@ const SupportTicket = () => {
     }, 500);
   };
   const getTicketList = () => {
+    
     setLoading(true);
     let re = getUser().then((res) => {
       const request = `support/api/tickets/account/${res.userInfo.accountNumber}/created_at/dsc/1/100`;
@@ -56,12 +57,15 @@ const SupportTicket = () => {
             setMainList(res);
             getPendingTicket().then((data) => {
               // let pendingList=[]
-              if (res.length > 0 && data) {
+              if (res.length > 0 && Object.keys(data).length!=0) {
                 if (
                   res.filter((item) => item.ticketNumber == data.ticketNumber)
                     .length == 0
                 ) {
                   res.unshift(data);
+                  
+                }else{
+                  storeValue({})
                 }
               }
 
@@ -71,7 +75,7 @@ const SupportTicket = () => {
           }else{
             getPendingTicket().then((data) => {
               console.log("Pending Data", data);
-              if(data){  
+              if(Object.keys(data).length!=0){  
               setTicketList([data]);
               setMainList([data]);
               }
