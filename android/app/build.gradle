@@ -86,7 +86,7 @@ android {
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
         versionCode 126
-        versionName "4.1.2"
+        versionName "5.1.2"
     }
 
     

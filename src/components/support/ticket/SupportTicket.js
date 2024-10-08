@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import {
   Image,
   StyleSheet,
@@ -19,7 +19,7 @@ import {
 } from "../../../../GlobalStyles";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightButton from "../../common/customui/SparkLightButton";
-import { useNavigation ,useIsFocused} from "@react-navigation/native";
+import { useNavigation ,useFocusEffect} from "@react-navigation/native";
 import { GetApiRequest } from "../../../network/APIClient";
 import { getUser, getPendingTicket } from "../../../redux/utils/LocalStorage";
 import TicketListIcon from "../../../res/svgIcons/TicketListIcon";
@@ -33,10 +33,11 @@ const SupportTicket = () => {
   const [loading, setLoading] = useState(false);
   const [searchTxt, setSearchTxt] = useState("");
   const [refreshing, setRefreshing] = useState(false);
-  const isFocused = useIsFocused();
+  
 
   const onRefresh = () => {
     setRefreshing(true);
+
     setTimeout(() => {
       //setRefreshing(false);
       getTicketList();
@@ -49,8 +50,8 @@ const SupportTicket = () => {
       GetApiRequest(
         request,
         (res) => {
-          console.log("getTicketList", res);
-          if (res) {
+          console.log("getTicketList1", res);
+          if (res.length>0) {
             setTicketList(res);
             setMainList(res);
             getPendingTicket().then((data) => {
@@ -69,9 +70,10 @@ const SupportTicket = () => {
             });
           }else{
             getPendingTicket().then((data) => {
-              if(data){   
-              setTicketList(data);
-              setMainList(data);
+              console.log("Pending Data", data);
+              if(data){  
+              setTicketList([data]);
+              setMainList([data]);
               }
             });
           }
@@ -86,13 +88,18 @@ const SupportTicket = () => {
     });
   };
 
-  useEffect(() => {
-    getTicketList();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getTicketList();
+    }, [])
+  );
+  // useEffect(() => {
+  //   getTicketList();
+  // }, []);
 
-  useEffect(() => {
-    isFocused && getTicketList()
-  },[isFocused]);
+  // useEffect(() => {
+  //   isFocused && getTicketList()
+  // },[isFocused]);
 
   const capitalizeFirstLetter = (string) => {
     return (
@@ -128,7 +135,7 @@ const SupportTicket = () => {
 
   const getStatusColor = (status) => {
     let color = "#067647";
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "new":
         color = "#F88700";
         break;
@@ -150,7 +157,7 @@ const SupportTicket = () => {
     return color;
   };
 
-  const RenderTicketList = ({ item }) => {
+  const RenderTicketList = ({ item,index }) => {
     return (
       <View
         key={item.id}
@@ -159,7 +166,8 @@ const SupportTicket = () => {
           borderColor: Color.Gray300,
           borderWidth: 1,
           marginHorizontal: Padding.p_base,
-          marginBottom: Padding.p_5xl,
+          //marginBottom: Padding.p_5xl,
+          marginBottom:(ticketList.length-1==index) ? 200:Padding.p_5xl
         }}
       >
         <Pressable
@@ -300,11 +308,11 @@ const SupportTicket = () => {
             </Text>
           </View>
           {ticketList.length > 0 ? (
-            <View style={{ paddingBottom: hp("42%") }}>
+            <View style={{ paddingBottom: hp('50%'), flexDirection:'column' }}>
               <FlatList
                 data={ticketList}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={RenderTicketList}
+                renderItem={(item,index)=>RenderTicketList(item,index)}
                 refreshControl={
                   <RefreshControl
                     refreshing={refreshing}
@@ -313,7 +321,7 @@ const SupportTicket = () => {
                 }
                 //onEndReached={onEndReached}
                 //onEndReachedThreshold={0.1}
-                //ListFooterComponent={Footer}
+                //ListFooterComponent={<></>}
               />
             </View>
           ) : loading ? (
