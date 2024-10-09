@@ -123,7 +123,17 @@ const Support = ({ route }) => {
     }, [navigation]);
 
     const checkChatAvailability = () => {
-        const currentTime = new Date();
+           var d = new Date();
+            localTime = d.getTime();
+            localOffset = d.getTimezoneOffset() * 60000;
+
+            // obtain UTC time in msec
+            utc = localTime + localOffset;
+            // create new Date object for different city
+            // using supplied offset
+            //var nd = new Date(utc + (3600000*7.0));
+            //nd = 3600000 + nd;
+        const currentTime = new Date(utc);
         const currentHour = currentTime.getHours();
         
         // Define the time range when chat should be disabled (e.g., 10 PM to 6 AM)
