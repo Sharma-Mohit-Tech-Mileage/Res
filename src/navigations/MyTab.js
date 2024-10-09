@@ -25,12 +25,15 @@ const MyTabs = ({ route, navigation }) => {
   const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
   const [shadowStyle, setShadowStyle] = useState(styles.shadowTabs);
   const { tabBarVisible } = useTabBarVisibility();
-  const [isBillerUser,setIsBillerUser]= useState(true)
+  const [isBillerUser,setIsBillerUser]= useState(false)
   const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector(state => state.combinedReducers.home);
 
   useEffect(() => {
-    console.log('MyTabHome: ', home);
+    if(user?.userInfo.accountNumber.toString().length>=16){
+      setIsBillerUser(true)
+  }
+    if(user?.userInfo.accountNumber.toString().length==9){
     if (home.walkThroughStep === 0) {
       setShadowStyle(styles.shadowTabs);
       setShadowStyleLeft(styles.shadowTabsLeft);
@@ -41,14 +44,13 @@ const MyTabs = ({ route, navigation }) => {
       setShadowStyle([styles.shadowTabs, styles.shadowTabsStep3]);
       setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left]);
     }
-    if(user?.userInfo.accountNumber.toString().length>=16){
-        setIsBillerUser(true)
-    }
+  }
+    
   }, [home]);
 
   return (
     <>
-    { home.walkThroughStep !== null && home.walkThroughStep !== undefined &&
+    { !isBillerUser && home.walkThroughStep !== null && home.walkThroughStep !== undefined &&
       (
         <>
           <View style={shadowStyleLeft}>
@@ -121,7 +123,7 @@ const MyTabs = ({ route, navigation }) => {
         options={{
           tabBarLabel: 'Shop',
           headerShown: false,
-          tabBarLabelStyle:{color: isBillerUser ? '#c8c8c8':''},
+          //tabBarLabelStyle:{color: isBillerUser ? '#c8c8c8':''},
           tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected isNewBillerUser={isBillerUser}/> : <ShopIcon isNewBillerUser={isBillerUser} />)
         }}
       />
@@ -133,12 +135,11 @@ const MyTabs = ({ route, navigation }) => {
           tabPress: (e) => {
             e.preventDefault();
             if(!isBillerUser){ 
-            navigation.reset({
+             navigation.reset({
               index: 0,
               routes: [
                 {
                   name: 'Support',
-                  //params: { triggerEvent: true }
                 },
               ],
             });
@@ -149,7 +150,7 @@ const MyTabs = ({ route, navigation }) => {
         options={{
           headerShown: false,
           tabBarLabel: 'Support',
-          tabBarLabelStyle:{color: isBillerUser ? '#c8c8c8':''},
+         // tabBarLabelStyle:{color: isBillerUser ? '#c8c8c8':''},
           tabBarIcon: ({ focused }) => {
             return (
               <View style={styles.tabItem}>

@@ -14,11 +14,18 @@ const getProfileDetails = async () => {
             Authorization: "Bearer " + data.token
         }
     };
+    let ApiMethod=''
+    if(accountNumber.toString().length>=16){
+     ApiMethod=`/usersvc/api/profile/${accountNumber}`
+    }else{
+        ApiMethod=`/users/api/profile/${accountNumber}`
+    }
 
-    return _axios.get(`/users/api/profile/${accountNumber}`, { ...config })
+
+    return _axios.get(ApiMethod, { ...config })
         .then(res => res.data)
         .catch(error => {
-            console.error(`Error fetching /users/api/profile/${accountNumber}`, error);            
+            console.error(`Error fetching /${ApiMethod}`, error);            
             if (error.toString().includes('AxiosError: timeout of') && getProfileDetailsCount < 2) {
                 getProfileDetails();
             } else {
@@ -162,17 +169,25 @@ const fetchPushNotifications = async () => {
 
 const postProfileInfo = async (data) => {
     let user = await getUser();
-
+   
     const config = {
         headers: {
             Authorization: "Bearer " + user.token
         }
     };
-
-    console.log('Making API Call to /users/api/profile with data:', data); // Log the request data
+    console.log('Account config',config)
+    let accountNumber = user.userInfo?.accountNumber || null
+    console.log('Account Number',accountNumber)
+    let ApiMethod=''
+    if(accountNumber.toString().length>=16){
+         ApiMethod=`/usersvc/api/profile/`
+    }else{
+        ApiMethod=`/users/api/profile/`
+    }
+    console.log(`Making API Call to ${ApiMethod} with data:`, data); // Log the request data
 
     try {
-        const response = await _axios.put(`/users/api/profile`, data, config);
+        const response = await _axios.put(ApiMethod, data, config);
         console.log('API Call Successful, Response:', response.data); // Log the successful response
         return response.data;
     } catch (error) {
@@ -491,10 +506,103 @@ const removeUser = async (data) => {
         throw error;
     }
 };
+const fetchAllSvEmails = async (data) => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+        headers: {
+            Authorization: "Bearer " + user.token
+        }
+    };
+    console.log(`/mobile/api/email/${accountNumber}/GetAllSVEmails`); // Log the request data
+    try {
+        const response = await _axios.get(`/mobile/api/email/${accountNumber}/GetAllSVEmails`, config);
+        console.log('API Call Successful, Response:', response.data); // Log the successful response
+        return response.data;
+    } catch (error) {
+        console.error('API Call Failed, Error:', error); // Log the error
+        throw error;
+    }
+};
 
+const addSVEmailNoFlags = async (email) => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+        headers: {
+            Authorization: "Bearer " + user.token
+        }
+    };
+
+    try {
+        const response = await _axios.post(`Mobile/api/email/${accountNumber}/${email}/AddSVEmailNoFlags`, {}, config);
+        console.log(`API Call Successful to add SV email without flags: ${email}`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error in API Call to add SV email without flags: ${email}`, error);
+        throw error;
+    }
+};
+
+const deleteSVEmail = async (email) => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+        headers: {
+            Authorization: "Bearer " + user.token
+        }
+    };
+
+    try {
+        const response = await _axios.post(`mobile/api/email/${accountNumber}/${email}/DeleteSVEmail`, {}, config);
+        console.log(`API Call Successful to delete SV email: ${email}`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error in API Call to delete SV email: ${email}`, error);
+        throw error;
+    }
+};
+
+ const updateSVEmails = async (emailList) => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+        headers: {
+            Authorization: `Bearer ${user.token}`
+        }
+    };
+
+    const body = emailList.map(email => ({ "EmailAddress": email }));
+
+    try {
+        const response = await _axios.post(`Mobile/api/email/${accountNumber}/UpdateSVEmails`, body, config);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const addSVEmailMktFlag = async (email) => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const config = {
+        headers: {
+            Authorization: "Bearer " + user.token
+        }
+    };
+
+    try {
+        const response = await _axios.post(`/Mobile/api/email/${accountNumber}/${email}/AddSVEmailMktFlag`, {}, config);
+        console.log(`API Call Successful to add SV email marketing flag: ${email}`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error in API Call to add SV email marketing flag: ${email}`, error);
+        throw error;
+    }
+};
 export { logError,logInfo,fetchUserList, getProfileDetails, 
     fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, 
     fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, 
     postEmailNotification, postTermsAndConditions,postTermsAndConditionsv2, postPushNotifications,
      unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,
-      resendEmailVerification,addUserAction,removeUser,editUserAction }
+    resendEmailVerification,addUserAction,removeUser,editUserAction ,fetchAllSvEmails,addSVEmailNoFlags, deleteSVEmail,updateSVEmails,addSVEmailMktFlag}

@@ -496,7 +496,7 @@ const ViewTicket = ({ route }) => {
                                 <Text style={styles.fileTxt}>
                                   {fileResponse.length > 0
                                     ? `Upload File: ${fileResponse[0].name}`
-                                    : "Upload File(Optional)"}
+                                    : "Upload File (Optional)"}
                                 </Text>
                               </View>
                               <Text style={styles.fileTxtSub}>

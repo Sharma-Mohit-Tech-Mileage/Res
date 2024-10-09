@@ -78,6 +78,7 @@ const UserManagementEdit = ({ route }) => {
   const [profileDetails, setProfileDetails] = useState(user);
   const [loading, setLoading] = useState(false);
   const [pass,setPass]=useState('')
+  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   const scrollViewRef = useRef(null);
   // Handler for when the security question dropdown value changes
   const handleSecurityQuestionChange = (itemValue,onChange) => {
@@ -86,6 +87,7 @@ const UserManagementEdit = ({ route }) => {
       securityQuestion: itemValue === "Add your own question" ? "" : itemValue,
     });
     setCustomSecurityQuestion(itemValue);
+    setIsDropDownOpen(false)
     setIsCustomQuestionSelected(itemValue === "Add your own question");
     //onChange(itemValue)
   };
@@ -221,6 +223,8 @@ const UserManagementEdit = ({ route }) => {
         accessibilityLabel="Go back to User Management"
         accessibilityRole="button"
         accessibilityHint="Navigates back to the User Management screen"
+        accessibilityElementsHidden={isDropDownOpen}
+                 importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
       />
       <ScrollView ref={scrollViewRef}>
         <View style={[styles.userManagementEditInner]}>
@@ -233,10 +237,14 @@ const UserManagementEdit = ({ route }) => {
             onClose={() => {
               setShowError(false);
             }}
+            accessibilityElementsHidden={isDropDownOpen}
+            importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
           /> 
           {isnewUser && (
             <>
               <Text
+              accessibilityElementsHidden={isDropDownOpen}
+              importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
                 style={[
                   styles.yourSavedCard,
                   styles.taylorTypo,
@@ -246,6 +254,8 @@ const UserManagementEdit = ({ route }) => {
                 Admin
               </Text>
               <Text
+              accessibilityElementsHidden={isDropDownOpen}
+              importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
                 style={[
                   styles.yourSavedCard,
                   styles.taylorTypo,
@@ -261,7 +271,10 @@ const UserManagementEdit = ({ route }) => {
             <View
               style={[styles.frameGroup, styles.textinputWrapperSpaceBlock]}
             >
-              <View style={styles.generalInformationWrapper}>
+              <View 
+              accessibilityElementsHidden={isDropDownOpen}
+              importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+              style={styles.generalInformationWrapper}>
                 <Text style={[styles.generalInformation, styles.firstClr]}>
                   General Information
                 </Text>
@@ -342,7 +355,7 @@ const UserManagementEdit = ({ route }) => {
                             <SparkLightInput
                               onBlur={onBlur}
                               label={"User Name"}
-                              placeholder={"Enter your User Name"}
+                              placeholder={!isnewUser ? `` : "Enter your User Name"}
                               onChangeText={onChange}
                               editable={isnewUser}
                               value={value}
@@ -352,7 +365,8 @@ const UserManagementEdit = ({ route }) => {
                         )}
                       />
                     </View>
-                    <Text style={styles.bulletPoint}>
+                    <Text 
+                    style={styles.bulletPoint}>
                     *User Name can not contain any special characters.
                         </Text>
                   </View>
@@ -364,7 +378,10 @@ const UserManagementEdit = ({ route }) => {
                       ]}
                     >
                       <View style={styles.textinput}>
-                        <Text style={[styles.firstName, styles.firstClr]}>
+                        <Text 
+                        accessibilityElementsHidden={isDropDownOpen}
+                        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                        style={[styles.firstName, styles.firstClr]}>
                           Member Type
                         </Text>
                         <View style={styles.notifications}>
@@ -384,10 +401,15 @@ const UserManagementEdit = ({ route }) => {
                               <View
                                 style={styles.creditCardWillExpireSoonParent}
                               >
-                                <Text style={styles.creditCardWill}>
+                                <Text 
+                                accessibilityElementsHidden={isDropDownOpen}
+                                importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                                style={styles.creditCardWill}>
                                   {getUserType(profileDetails?.memberType)}
                                 </Text>
                                 <Text
+                                accessibilityElementsHidden={isDropDownOpen}
+                                importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
                                   style={[
                                     styles.yourSavedCard,
                                     styles.taylorTypo,
@@ -398,7 +420,10 @@ const UserManagementEdit = ({ route }) => {
                                     ? "As the primary admin, you are the main contact and have full control over this account."
                                     : "As an admin, you can manage this account, but you are not the primary contact for this account."}
                                 </Text>
-                                <View style={styles.buttons}>
+                                <View 
+                                accessibilityElementsHidden={isDropDownOpen}
+                                importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                                style={styles.buttons}>
                                   <Text style={styles.makePayment}>
                                     Change Primary Admin
                                   </Text>
@@ -421,7 +446,10 @@ const UserManagementEdit = ({ route }) => {
                 </View>
 
                 <View style={styles.frameParent1}>
-                  <View style={styles.contactInformationWrapper}>
+                  <View 
+                  accessibilityElementsHidden={isDropDownOpen}
+                  importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                  style={styles.contactInformationWrapper}>
                     <Text style={[styles.generalInformation, styles.firstClr]}>
                       Password
                     </Text>
@@ -455,6 +483,8 @@ const UserManagementEdit = ({ route }) => {
                               error={error?.message}
                             />
                             <View
+                            accessibilityElementsHidden={isDropDownOpen}
+                            importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
                               style={[
                                 styles.passwordFlexBox,
                                 { marginTop: Padding.p_base },
@@ -493,7 +523,10 @@ const UserManagementEdit = ({ route }) => {
                   </View>
 
                   <View style={styles.frameParent1}>
-                    <View style={styles.securityQuestionWrapper}>
+                    <View 
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                    style={styles.securityQuestionWrapper}>
                       <Text
                         style={[styles.generalInformation, styles.firstClr]}
                       >
@@ -515,7 +548,9 @@ const UserManagementEdit = ({ route }) => {
                           items={securityQuestions}
                           selectedValue={customSecurityQuestion}
                           onValueChange={(value)=>{handleSecurityQuestionChange(value)}}
-                          
+                          isDropDownOpen={(value) => {
+                            setIsDropDownOpen(true)
+                          }}
                         />
                       </View>
                     </View>
@@ -581,6 +616,8 @@ const UserManagementEdit = ({ route }) => {
           <View style={styles.frameChild1SpaceBlock}>
             <View style={[styles.buttons1, styles.buttonsLayout]}>
               <Pressable
+              accessibilityElementsHidden={isDropDownOpen}
+              importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
               accessibilityLabel="Save"
               accessibilityRole="button"
               accessible={true}
@@ -591,6 +628,8 @@ const UserManagementEdit = ({ route }) => {
               </Pressable>
             </View>
             <Pressable
+            accessibilityElementsHidden={isDropDownOpen}
+            importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
             accessibilityLabel="Cancel"
             accessibilityRole="button"
             accessible={true}

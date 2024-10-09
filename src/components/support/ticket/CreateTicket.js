@@ -31,7 +31,7 @@ import {
   UploadMultipartData,
   PostApiRequest,
 } from "../../../network/APIClient";
-import { getUser } from "../../../redux/utils/LocalStorage";
+import { getUser,storeValue } from "../../../redux/utils/LocalStorage";
 import DocumentPicker, { types } from "react-native-document-picker";
 import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
 import LoadingOverlay from "../../common/customui/CustomLoading";
@@ -48,6 +48,7 @@ const CreateTicket = () => {
   const [upoadFileKey, setUploadFileKey] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingTxt, setLoadingTxt] = useState("Creating Ticket...");
+  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   var Data = {
     subject: "",
     comment: "",
@@ -55,7 +56,8 @@ const CreateTicket = () => {
     accountNumber: "",
     category: "",
     uploads: [],
-    PhoneNumber: ''
+    PhoneNumber: '',
+    IsMobile:true
   };
 
   const {
@@ -83,9 +85,14 @@ const CreateTicket = () => {
         request,
         formData,
         (res) => {
-          navigation.goBack();
+          console.log('saved data',JSON.stringify(formData))
+          let data={...formData,ticketNumber:res, status:'Pending',isLocal:true};
+          storeValue(data)
+          console.log('Ticket:',res)
+          
           setTimeout(() => {
             setLoading(false);
+            navigation.goBack();
           }, 500);
         },
         (error) => {}
@@ -139,6 +146,8 @@ const CreateTicket = () => {
     <View style={{ backgroundColor: colors.backgound_blue, flex: 1 }}>
       <View style={styles.ticketSupportNone}>
         <ProfileSettingsHeader
+        accessibilityElementsHidden={isDropDownOpen}
+        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
           title="Create Ticket"
           onPressBack={() => navigation.goBack()}
         />
@@ -148,11 +157,17 @@ const CreateTicket = () => {
             <View style={[styles.innerContainer]}>
               <View style={[styles.frameParent]}>
                 <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
-                  <View style={styles.ticketsParent}>
-                    <Text style={styles.tickets}>Tickets Details</Text>
+                  <View 
+                  // accessibilityElementsHidden={isDropDownOpen}
+                  // importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                  style={styles.ticketsParent}>
+                    <Text  style={styles.tickets}>Tickets Details</Text>
                   </View>
                   <View style={styles.frameWrapper}>
-                    <View style={styles.textView}>
+                    <View 
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                    style={styles.textView}>
                       <Text style={[styles.text,{paddingBottom:8}]}>Subject</Text>
                     </View>
                     <Controller
@@ -176,7 +191,10 @@ const CreateTicket = () => {
                   </View>
 
                   <View style={styles.frameWrapper}>
-                    <View style={styles.textView}>
+                    <View 
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                    style={styles.textView}>
                       <Text style={styles.text}>Category</Text>
                       </View>
                       <Controller
@@ -190,12 +208,21 @@ const CreateTicket = () => {
                             <SparkLightDropdown
                               items={categories}
                               selectedValue={selectedItem}
-                              onValueChange={onChange}
+                              onValueChange={(value) => {
+                                setIsDropDownOpen(true)
+                                onChange(value)
+                              }}
                               error={error?.message}
+                              isDropDownOpen={(value) => {
+                                setIsDropDownOpen(true)
+                              }}
                             />
 
                             {error && (
-                              <View style={styles.errorContainer}>
+                              <View 
+                              accessibilityElementsHidden={isDropDownOpen}
+                              importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                              style={styles.errorContainer}>
                                 <Image
                                   source={WarningIcon}
                                   style={styles.errorIcon}
@@ -210,7 +237,10 @@ const CreateTicket = () => {
                       />
                   </View>
                   <View style={styles.frameWrapper}>
-                    <View style={styles.textView}>
+                    <View 
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                    style={styles.textView}>
                       <Text style={styles.text}>Issue Description</Text>
                     </View>
                     
@@ -221,7 +251,10 @@ const CreateTicket = () => {
                           field: { onChange, onBlur, value },
                           fieldState: { error },
                         }) => (
-                          <View style={[ { marginTop: 10 }]}>
+                          <View 
+                          accessibilityElementsHidden={isDropDownOpen}
+                          importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                          style={[ { marginTop: 10 }]}>
                             <TextInput
                               placeholder="Issue Description"
                               onChangeText={onChange}
@@ -246,7 +279,10 @@ const CreateTicket = () => {
                   </View>
 
                   <View style={styles.frameWrapper}>
-                    <View style={styles.textView}>
+                    <View 
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                    style={styles.textView}>
                       <Text style={[styles.text,{paddingBottom:8}]}>Email</Text>
                     </View>
                     <Controller
@@ -268,7 +304,10 @@ const CreateTicket = () => {
                   </View>
 
                   <View style={styles.frameWrapper}>
-                    <View style={styles.textView}>
+                    <View 
+                    accessibilityElementsHidden={isDropDownOpen}
+                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                    style={styles.textView}>
                       <Text style={[styles.text,{paddingBottom:8}]}>Phone Number (Optional)</Text>
                     </View>
                     <Controller
@@ -279,6 +318,8 @@ const CreateTicket = () => {
                         fieldState: { error },
                       }) => (
                         <SparkLightMobileInputField
+                        accessibilityElementsHidden={isDropDownOpen}
+                        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
                           placeholder="Phone Number"
                           onBlur={onBlur}
                           onChangeText={onChange}
@@ -303,15 +344,21 @@ const CreateTicket = () => {
                         justifyContent: "center",
                       }}
                     >
-                      <View style={{ flexDirection: "row" }}>
+                      <View 
+                      accessibilityElementsHidden={isDropDownOpen}
+                      importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                      style={{ flexDirection: "row" }}>
                         <AttachmentIcon />
                         <Text style={styles.fileTxt}>
                           {fileResponse.length > 0
                             ? `Upload File: ${fileResponse[0].name}`
-                            : "Upload File(Optional)"}
+                            : "Upload File (Optional)"}
                         </Text>
                       </View>
-                      <Text style={styles.fileTxtSub}>
+                      <Text 
+                      accessibilityElementsHidden={isDropDownOpen}
+                      importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                      style={styles.fileTxtSub}>
                         Acceptable formats:.pdf,.png, .jpeg, .gif, .txt
                       </Text>
                     </View>
@@ -327,7 +374,10 @@ const CreateTicket = () => {
               />
             </View>
 
-            <View style={{ width: "90%", alignSelf: "center" }}>
+            <View 
+            accessibilityElementsHidden={isDropDownOpen}
+            importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+            style={{ width: "90%", alignSelf: "center" }}>
               <PrimaryButtom
                 title="Submit"
                 onPress={handleSubmit(handleSave)}
@@ -336,6 +386,8 @@ const CreateTicket = () => {
             </View>
             <View>
               <Pressable
+              accessibilityElementsHidden={isDropDownOpen}
+              importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
                 style={[styles.buttons2, styles.buttonsLayout]}
                 onPress={() => navigation.goBack()}
               >

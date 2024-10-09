@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView } from 'react-native';
+import React,{useRef , useEffect} from 'react';
+import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView , findNodeHandle , AccessibilityInfo } from 'react-native';
 import { Color, Padding, Border, FontSize, FontFamily } from "../../../../GlobalStyles";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import OutageAreaIcon from '../../../res/svgIcons/troubleshooting/OutageAreaIcon';
@@ -9,7 +9,15 @@ const windowWidth = Dimensions.get('window').width;
 const TroubleshootComponent = ({
     step, title, description, success, pageCount
 }) => {
+    const textRef = useRef(null);
+    useEffect(() => {
+        const announceText = () => {
+              const reactTag = findNodeHandle(textRef.current);
+              AccessibilityInfo.setAccessibilityFocus(reactTag);
+        };
+        setTimeout(announceText, 100)
 
+    }, []);
     return (
         <View style={styles.container}>
             {pageCount ? <Text style={styles.topLeftText}>1/3</Text> : null}
@@ -17,7 +25,11 @@ const TroubleshootComponent = ({
                 <View style={styles.circle}>
                     <OutageAreaIcon />
                 </View>
-                <View style={styles.spinnerContainer}>
+                <View 
+                ref={textRef}
+                accessable={true}
+                accessibilityLiveRegion="assertive"
+                style={styles.spinnerContainer}>
                     <NotificationAlert
                         type="warning"
                         title={(<Text style={{flexDirection:'column'}}><Text style={styles.textStyle}>Uh oh. You may be experiencing an outage in your area.</Text>

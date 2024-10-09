@@ -19,6 +19,8 @@ import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
 import { Env } from "../../network/apis/account/Constants";
 
+import { clearChatData } from "../utility/RNZendeskChat";
+
 const config = {
   issuer: Env.SSO_LOGIN,
   iosPrefersEphemeralSession: true,
@@ -27,7 +29,7 @@ const config = {
 const logoutConfirmationPopup = (dispatch, navigation) => {
   Alert.alert(
     'Confirm Logout',
-    'Are you sure you want to Logout the app?',
+    'Are you sure you want to log out of the app?',
     [
       {
         text: 'Cancel',
@@ -60,6 +62,7 @@ const logoutAction = (dispatch, navigation) => {
        dispatch(saveUserInfo({}));
        dispatch(logoutApp());
       cleanUserData();
+      clearChatData();
       //SetClearTimer();
       navigation.reset({
         index: 0,
@@ -73,13 +76,12 @@ const AccountOverview = () => {
   const navigation = useNavigation();
   const [fullName, setFullName] = useState('');
   const [initials, setInitials] = useState('');
-  const [isBiller, setIsBiller] = useState(true);
   const [menues, setMenues] = useState([]);
   const dispatch = useDispatch();
   const user = useSelector(state => state.combinedReducers.user.userData);
   useEffect(() => {
     dispatch(fetchProfileDetails());
-    if(isBiller){
+    if(user?.userInfo.accountNumber.toString().length>=16){
       setMenues(menuItems1)
     }else{
       setMenues(menuItems)

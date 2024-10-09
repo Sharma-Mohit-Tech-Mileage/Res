@@ -26,7 +26,6 @@ const SparkLightInput = ({
     const handleInputChange = (text) => {
         if (onChangeText) {
             onChangeText(text)
-            // onChangeText({ target: { name, value: text } });
         }
     };
 
@@ -77,6 +76,8 @@ const SparkLightInput = ({
                         !isFocused && !error && { borderColor: Color.sparklightDarkGray }
                     ]}
                     accessibilityLabel={accessibilityLabel || placeholder}
+                    returnKeyType="done" // Set the return key type to "done"
+                    keyboardAppearance="default" // Ensures the default keyboard appearance
                     maxFontSizeMultiplier={1.25}
                     {...props}
                 />
@@ -182,7 +183,7 @@ const styles = StyleSheet.create({
         width: 20,
         height: 20,
         resizeMode: "contain",
-        marginRight: 10
+        marginHorizontal: 10
     }
 });
 

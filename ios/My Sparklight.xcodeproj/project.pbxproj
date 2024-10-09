@@ -20,6 +20,7 @@
 		918501722B30B78E0048F5A3 /* OpenSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 918501712B30B78E0048F5A3 /* OpenSans-Bold.ttf */; };
 		918501742B30B8A60048F5A3 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 918501732B30B8A60048F5A3 /* Inter-Bold.ttf */; };
 		918501762B30B8C70048F5A3 /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 918501752B30B8C70048F5A3 /* Inter-SemiBold.ttf */; };
+		9189489F2C5BFD0D00B11F3B /* RNZendeskChatModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 9189489E2C5BFD0D00B11F3B /* RNZendeskChatModule.m */; };
 		F84EF25C0615014D8DBBB823 /* Pods_My_Sparklight_My_SparklightTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B7DA79E4D51D8CD31E27B89 /* Pods_My_Sparklight_My_SparklightTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -62,6 +63,8 @@
 		918501712B30B78E0048F5A3 /* OpenSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Bold.ttf"; path = "../assets/fonts/OpenSans-Bold.ttf"; sourceTree = "<group>"; };
 		918501732B30B8A60048F5A3 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-Bold.ttf"; path = "../assets/fonts/Inter-Bold.ttf"; sourceTree = "<group>"; };
 		918501752B30B8C70048F5A3 /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Inter-SemiBold.ttf"; path = "../assets/fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; };
+		9189489E2C5BFD0D00B11F3B /* RNZendeskChatModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNZendeskChatModule.m; sourceTree = "<group>"; };
+		918948A02C5C79E900B11F3B /* RNZendeskChatModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNZendeskChatModule.h; sourceTree = "<group>"; };
 		C9F209CFC7418B870974590E /* Pods-My Sparklight.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-My Sparklight.debug.xcconfig"; path = "Target Support Files/Pods-My Sparklight/Pods-My Sparklight.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -119,6 +122,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				9189489E2C5BFD0D00B11F3B /* RNZendeskChatModule.m */,
+				918948A02C5C79E900B11F3B /* RNZendeskChatModule.h */,
 			);
 			name = Sparklight;
 			sourceTree = "<group>";
@@ -201,7 +206,7 @@
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
 				C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */,
-				F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */,
+				65BBC793E0101856933CF8D6 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -224,9 +229,9 @@
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
-				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
 				7338EEDFC833C891D21C7FA4 /* [CP-User] [RNFB] Core Configuration */,
 				E7AE5F7C6A3B684191FD6916 /* [CP-User] [RNFB] Crashlytics Configuration */,
+				C75E031293D8D072962851D0 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -333,6 +338,23 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-My Sparklight/Pods-My Sparklight-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		65BBC793E0101856933CF8D6 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		7338EEDFC833C891D21C7FA4 /* [CP-User] [RNFB] Core Configuration */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -407,7 +429,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
+		C75E031293D8D072962851D0 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -437,23 +459,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "#!/usr/bin/env bash\n#\n# Copyright (c) 2016-present Invertase Limited & Contributors\n#\n# Licensed under the Apache License, Version 2.0 (the \"License\");\n# you may not use this library except in compliance with the License.\n# You may obtain a copy of the License at\n#\n#   http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n#\nset -e\n\nif [[ ${PODS_ROOT} ]]; then\n  echo \"info: Exec FirebaseCrashlytics Run from Pods\"\n  \"${PODS_ROOT}/FirebaseCrashlytics/run\"\nelse\n  echo \"info: Exec FirebaseCrashlytics Run from framework\"\n  \"${PROJECT_DIR}/FirebaseCrashlytics.framework/run\"\nfi\n";
-		};
-		F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-My Sparklight-My SparklightTests/Pods-My Sparklight-My SparklightTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -491,6 +496,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				9189489F2C5BFD0D00B11F3B /* RNZendeskChatModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -566,7 +572,7 @@
 				CODE_SIGN_ENTITLEMENTS = Sparklight/Sparklight.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 01;
+				CURRENT_PROJECT_VERSION = 02;
 				DEVELOPMENT_TEAM = W486HD85BD;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Sparklight/Info.plist;
@@ -576,7 +582,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.8;
+				MARKETING_VERSION = 5.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -604,7 +610,7 @@
 				CODE_SIGN_ENTITLEMENTS = Sparklight/Sparklight.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 01;
+				CURRENT_PROJECT_VERSION = 02;
 				DEVELOPMENT_TEAM = W486HD85BD;
 				INFOPLIST_FILE = Sparklight/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Sparklight;
@@ -613,7 +619,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.8;
+				MARKETING_VERSION = 5.0.1;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

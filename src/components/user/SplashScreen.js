@@ -66,8 +66,10 @@ const SplashScreen = ({ navigation }) => {
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken
       };
+      let isNormalUser = (userInfo && userInfo.accountNumber && userInfo.accountNumber.toString().length ===9) ? true : false;
+      console.log('Isnewbiller',isNormalUser)
       setIsBusiness(false);
-      if (res.userInfo.acctStatus === 'Disconnect') {
+      if (res.userInfo.acctStatus === 'Disconnect' || ( !isNormalUser && res.userInfo.acctStatus!='Normal')) {
         setTimeout(() => { setDisconnected(true) }, 500)
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
         setErrorMessage(strings.nonAdminUserMsg);
@@ -78,13 +80,14 @@ const SplashScreen = ({ navigation }) => {
         setErrorMessage(strings.BusinessUserMsg);
         setErrorMessage1(' to manage your Sparklight Business services account');
         setTimeout(() => { setModalVisible(true); }, 100);
-      } else if (res.custServices.internet == false) {
+      } else if (isNormalUser && res.custServices.internet == false ) {
         setErrorMessage(strings.nonInternetUserMessage);
         setErrorMessage1(' to manage your service.')
         setTimeout(() => { setModalVisible(true); }, 100);
       } else {
         storeUser(user);
         dispatch(saveUserInfo(user));
+        console.log('IsUserAcceptedTermandCondition',user.userInfo.mobileTCAcceptanceFlag)
         if (user.userInfo.mobileTCAcceptanceFlag) {
           navigation.reset({
             index: 0,
@@ -165,8 +168,8 @@ const SplashScreen = ({ navigation }) => {
                 onClose()
               }}
               internalTextStyle={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: 'underline', }]}
-              splitKey={bussinessApp ? "download the MySparklight Business mobile app" : "login to your online account"}
-              instruction={`${message} ${bussinessApp ? "download the MySparklight Business mobile app" : "login to your online account"}${message2}`}
+              splitKey={bussinessApp ? "download the MySparklight Business mobile app" : "Please log in to your online account"}
+              instruction={`${message} ${bussinessApp ? "download the MySparklight Business mobile app" : "Please log in to your online account"}${message2}`}
             />
             {/* <Text style={styles.message}>{message}{" "}
               <Text style={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: 'underline', }]} onPress={onClose}>

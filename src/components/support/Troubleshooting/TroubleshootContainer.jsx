@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { AccessibilityInfo } from "react-native";  // Import AccessibilityInfo
 import AccountOutages from "./AccountOutages";
 import OutagesAlert from "./OutagesAlert";
 import TroubleshootComponent from "./TroubleshootComponent";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
-import { View, SafeAreaView, StyleSheet, ScrollView } from "react-native";
-import {Color, Padding} from "../../../../GlobalStyles";
-import {GetApiRequest,GetModemStatusApiRequest,} from "../../../network/APIClient";
+import { View, SafeAreaView } from "react-native";
+import { Color, Padding } from "../../../../GlobalStyles";
+import { GetApiRequest, GetModemStatusApiRequest } from "../../../network/APIClient";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import { useIsFocused } from '@react-navigation/native';
+
 const stepsData = [
   {
     title: "Let's resolve your issues.",
@@ -20,8 +22,8 @@ const stepsData = [
     pageCount: 0,
   },
   {
-    title: "Checking for outages in your area...",
-    resultMsg: "No outages were detected in your area...",
+    title: "Checking for outage in your area...",
+    resultMsg: "No outage were detected in your area...",
     errorMsg: "Uh oh. Looks like there is a server error.",
     description: null,
     success: false,
@@ -50,28 +52,44 @@ const TroubleshootContainer = () => {
   const isFocused = useIsFocused();
   const user = useSelector((state) => state.combinedReducers.user.userData);
   const [currentStep, setCurrentStep] = useState(0);
-  const [networkStatus, setNetworkStatus] = useState([
-    false,
-    false,
-    false,
-    false,
-  ]);
-
-  const [networkError, setNetworkError] = useState([
-    false,
-    false,
-    false,
-    false,
-  ]);
+  const [networkStatus, setNetworkStatus] = useState([false, false, false, false]);
+  const [networkError, setNetworkError] = useState([false, false, false, false]);
   const [outageIssueDetected, setOutageIssueDetected] = useState(false);
   const [billIssueDetected, setBillIssueDetected] = useState(false);
-  const [modemsIsueDetected, setModemIssueDetected] = useState(false);
   const [issueDetected, setIssueDetected] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
-
   const [loading, setLoading] = useState(true);
   const [key, setKey] = useState(1);
-  const [macAddress, setMacAddress] = useState("");
+  const [isReadingComplete, setIsReadingComplete] = useState(false);
+  const [standardtimeout, setStandardTimeout] = useState(2000);
+
+  /**
+   * useEffect to increase standardtimeout to 20 seconds if accessibility is turned on
+   */
+  useEffect(() => {
+    const checkAccessibility = async () => {
+      const isScreenReaderEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+      if (isScreenReaderEnabled) {
+        setStandardTimeout(15000);
+      }
+    };
+    checkAccessibility();
+
+    const accessibilityChangeListener = AccessibilityInfo.addEventListener(
+      'change',
+      (isScreenReaderEnabled) => {
+        if (isScreenReaderEnabled) {
+          setStandardTimeout(15000);
+        } else {
+          setStandardTimeout(2000);
+        }
+      }
+    );
+
+    return () => {
+      accessibilityChangeListener.remove();
+    };
+  }, []);
 
   /**
    * check Modem Outage status
@@ -94,7 +112,7 @@ const TroubleshootContainer = () => {
             setKey(2);
             setTimeout(() => {
               setCurrentStep(2);
-            }, 2000);
+            }, standardtimeout);
           }
           setLoading(false);
         }
@@ -109,7 +127,7 @@ const TroubleshootContainer = () => {
         setKey(2);
         setTimeout(() => {
           setCurrentStep(2);
-        }, 2000);
+        }, standardtimeout);
         setLoading(false);
       }
     );
@@ -126,15 +144,11 @@ const TroubleshootContainer = () => {
       (res) => {
         console.log("checkBillPaid", res);
         if (res) {
-          // if(res.currentCollectionStep=='Soft Disconnect'){
-          //     // Soft disconnect
-
-          //   }
           if(moment(res.paymentDueDate).isAfter()){
             networkStatus[currentStep] = true;
             setTimeout(() => {
               setCurrentStep(3);
-            }, 2000);
+            }, standardtimeout);
 
             setKey(3);
           }else
@@ -143,7 +157,7 @@ const TroubleshootContainer = () => {
             networkStatus[currentStep] = true;
             setTimeout(() => {
               setCurrentStep(3);
-            }, 2000);
+            }, standardtimeout);
 
             setKey(3);
           } else {
@@ -160,7 +174,7 @@ const TroubleshootContainer = () => {
         setKey(3);
         setTimeout(() => {
           setCurrentStep(3);
-        }, 2000);
+        }, standardtimeout);
         setLoading(false);
       }
     );
@@ -242,15 +256,11 @@ const TroubleshootContainer = () => {
       const checkYellow = temt.includes("Yellow");
       const checkRed = temt.includes("Red");
       if (checkRed || checkYellow) {
-        // stepsData[currentStep].success = false;
-        //setModemIssueDetected(true);
         setIssueDetected(true);
         if(isFocused){
         navigation.navigate("ManageEquipment",{isError:true});;
         }
       } else {
-        //stepsData[currentStep].success = false;
-        //setModemIssueDetected(true);
         setIssueDetected(true);
         if(isFocused){
         navigation.navigate("ManageEquipment",{isError:true});
@@ -280,15 +290,13 @@ const TroubleshootContainer = () => {
           let macAddress = response[0].macAddress;
           var mac = macAddress;
           if (user.userInfo.accountNumber === "128387263") {
-            mac = "3c:75:4a:ef:a1:00";
-          } else if (user.userInfo.accountNumber === "133370775") {
-            mac = "3c:75:4a:ef:a1:00";
-          }
-          else if(user.userInfo.accountNumber==='133437285'){
-            mac="60:19:71:27:61:b2"
-          }
-          else if(user.userInfo.accountNumber==='131684698'){
-            mac="28:7a:ee:97:4d:cc"
+            mac = "bc:3e:07:38:56:d0";
+          }else if (user.userInfo.accountNumber === "902880244") {
+            mac = "bc:3e:07:38:56:d0";  
+          }else if (user.userInfo.accountNumber === "902880236") {
+            mac = "28:7a:ee:8e:cf:8c";
+          } else if (user.userInfo.accountNumber === "902880079") {
+            mac = "00:40:36:5f:cc:7f";
           }
           else if(user.userInfo.accountNumber==='136885142'){
             mac="20:73:55:89:c7:00"
@@ -308,7 +316,7 @@ const TroubleshootContainer = () => {
   const startTroubleShooting = () => {
     setTimeout(() => {
       setCurrentStep(1);
-    }, 4000);
+    }, standardtimeout);
   };
 
   useEffect(() => {
@@ -318,19 +326,22 @@ const TroubleshootContainer = () => {
     if (currentStep === 2) {
       checkBillPaid(user.userInfo.accountNumber);
     }
-
     if (currentStep === 3) {
       getInternetPlanDetails();
     }
   }, [currentStep]);
-  useEffect(() => {
-    // const interval = setInterval(() => {
-    //     setCurrentStep((prevStep) => (prevStep === 6 ? 1 : prevStep + 1));
-    // }, 4000);
 
-    // return () => clearInterval(interval);
-    startTroubleShooting();
+  useEffect(() => {
+    setTimeout(() => {
+      startTroubleShooting();
+    }, 4000);
   }, []);
+
+  useEffect(() => {
+    if (isReadingComplete) {
+      console.log('Screen readout complete');
+    }
+  }, [isReadingComplete]);
 
   const step = stepsData[currentStep];
 
@@ -361,9 +372,9 @@ const TroubleshootContainer = () => {
               pageCount={step.pageCount}
               loading={loading}
               isError={networkError[currentStep]}
+              setIsReadingComplete={setIsReadingComplete}
             />
           )}
-
           {outageIssueDetected && (
             <OutagesAlert
               step={currentStep}
@@ -373,7 +384,6 @@ const TroubleshootContainer = () => {
               pageCount={step.pageCount}
             />
           )}
-
           {billIssueDetected && (
             <AccountOutages
               step={currentStep}

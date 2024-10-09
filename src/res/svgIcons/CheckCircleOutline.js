@@ -1,0 +1,23 @@
+import React from 'react';
+import Svg, { Path } from 'react-native-svg';
+
+const CheckCircleOutline = () => (
+  <Svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <Path
+      d="M14.1 24L20.7 30.6L33.9 17.4"
+      stroke="#2BA948"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M46 24C46 36.1503 36.1503 46 24 46C11.8497 46 2 36.1503 2 24C2 11.8497 11.8497 2 24 2C36.1503 2 46 11.8497 46 24Z"
+      stroke="#2BA948"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+export default CheckCircleOutline;

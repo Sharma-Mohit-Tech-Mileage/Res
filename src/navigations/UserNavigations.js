@@ -4,7 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import analytics from '@react-native-firebase/analytics';
 import SplashScreen from "../components/user/SplashScreen";
-import ArticalWindowUtility from '../components/utility/ArticalWindowUtility'
+import ArticalWindowUtility from '../components/utility/ArticalWindowUtility';
 import EmailNotifications from '../components/entry/EmailNotifications';
 import PushNotifications from '../components/entry/PushNotifications';
 import TextNotifications from '../components/entry/TextNotifications';
@@ -14,8 +14,10 @@ import { AxiosInterceptorProvider } from '../network/RestApiClient';
 
 const Stack = createNativeStackNavigator();
 
+// Export the navigation reference for global use
+export const navigationRef = React.createRef();
+
 const UserNavigations = (props) => {
-  const navigationRef = useRef();
   const routeNameRef = useRef();
 
   const onReady = () => {

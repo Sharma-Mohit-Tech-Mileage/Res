@@ -94,13 +94,17 @@ const Feedback = () => {
                     </View>}
                     <View style={styles.howWouldYourRateYourExperWrapper}>
                         <Text style={[styles.howWouldYour]}>
-                            How would your rate your experience using the Sparklight app?
+                           How would you rate your experience using the MySparklight app?
+                            
                         </Text>
                     </View>
                     <View style={[styles.frameContainer]}>
                         <View style={[styles.frameGroup, styles.frameFlexBox]}>
                             {feedbackOptions.map((option) => (
                                 <Pressable
+                                accessibilityLabel={option.text}
+                                accessibilityRole="button"
+                                accessible={true}
                                     key={option.name}
                                     style={[
                                         styles.faceSadParent, 
@@ -188,11 +192,13 @@ const Feedback = () => {
                         </Pressable>
 
                     </View>
-                    <View style={styles.buttonContainer}>
+                    <View
+                    accessibilityLabel="Cancel"
+                    accessibilityRole="button"
+                    accessible={true} 
+                    style={styles.buttonContainer}
+                    >
                         <Pressable 
-                        accessibilityLabel="Cancel"
-                        accessibilityRole="button"
-                        accessible={true}
                         onPress={() => navigation.navigate('Account')} >
                             <Text style={[styles.textStyle, { color: Color.colorMidnightblue }]}>Cancel</Text>
                         </Pressable>

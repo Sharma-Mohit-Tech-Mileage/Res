@@ -11,7 +11,7 @@ pool:
 
 variables:
   - group: AndroidBuildConfig
-  
+
 steps:
 - task: NodeTool@0
   displayName: 'Install Node'
@@ -20,11 +20,15 @@ steps:
 
 - script: npm cache clean --force 
   workingDirectory: src
-  displayName: 'Cleaning npm modules '
+  displayName: 'Cleaning npm modules'
 
 - script: npm install --legacy-peer-deps
   workingDirectory: src
   displayName: 'Install node dependencies'
+
+- script: ./gradlew clean build --refresh-dependencies
+  workingDirectory: 'android'
+  displayName: 'Clean and Refresh Gradle Dependencies'
 
 - task: Gradle@2
   inputs:
@@ -37,6 +41,7 @@ steps:
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'assembleRelease'
+
 - task: AndroidSigning@2
   inputs:
     apkFiles: '**/*.apk'

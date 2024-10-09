@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import {
   Image,
   StyleSheet,
@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Pressable,
   Platform,
-  RefreshControl
+  RefreshControl,
 } from "react-native";
 import {
   Padding,
@@ -19,9 +19,9 @@ import {
 } from "../../../../GlobalStyles";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightButton from "../../common/customui/SparkLightButton";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation ,useFocusEffect} from "@react-navigation/native";
 import { GetApiRequest } from "../../../network/APIClient";
-import { getUser } from "../../../redux/utils/LocalStorage";
+import { getUser, getPendingTicket,storeValue } from "../../../redux/utils/LocalStorage";
 import TicketListIcon from "../../../res/svgIcons/TicketListIcon";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -33,29 +33,56 @@ const SupportTicket = () => {
   const [loading, setLoading] = useState(false);
   const [searchTxt, setSearchTxt] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  
 
   const onRefresh = () => {
     setRefreshing(true);
-  
+
     setTimeout(() => {
-        //setRefreshing(false);
-        getTicketList();
-    }, 500); 
-};
+      //setRefreshing(false);
+      getTicketList();
+    }, 500);
+  };
   const getTicketList = () => {
+    
     setLoading(true);
     let re = getUser().then((res) => {
       const request = `support/api/tickets/account/${res.userInfo.accountNumber}/created_at/dsc/1/100`;
       GetApiRequest(
         request,
         (res) => {
-          console.log("getTicketList", res);
-          if (res) {
+          console.log("getTicketList1", res);
+          if (res.length>0) {
             setTicketList(res);
             setMainList(res);
+            getPendingTicket().then((data) => {
+              // let pendingList=[]
+              if (res.length > 0 && Object.keys(data).length!=0) {
+                if (
+                  res.filter((item) => item.ticketNumber == data.ticketNumber)
+                    .length == 0
+                ) {
+                  res.unshift(data);
+                  
+                }else{
+                  storeValue({})
+                }
+              }
+
+              setTicketList(res);
+              setMainList(res);
+            });
+          }else{
+            getPendingTicket().then((data) => {
+              console.log("Pending Data", data);
+              if(Object.keys(data).length!=0){  
+              setTicketList([data]);
+              setMainList([data]);
+              }
+            });
           }
           setLoading(false);
-          setRefreshing(false)
+          setRefreshing(false);
         },
         (error) => {
           setLoading(false);
@@ -65,9 +92,18 @@ const SupportTicket = () => {
     });
   };
 
-  useEffect(() => {
-    getTicketList();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getTicketList();
+    }, [])
+  );
+  // useEffect(() => {
+  //   getTicketList();
+  // }, []);
+
+  // useEffect(() => {
+  //   isFocused && getTicketList()
+  // },[isFocused]);
 
   const capitalizeFirstLetter = (string) => {
     return (
@@ -103,7 +139,7 @@ const SupportTicket = () => {
 
   const getStatusColor = (status) => {
     let color = "#067647";
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "new":
         color = "#F88700";
         break;
@@ -125,7 +161,7 @@ const SupportTicket = () => {
     return color;
   };
 
-  const RenderTicketList = ({ item }) => {
+  const RenderTicketList = ({ item,index }) => {
     return (
       <View
         key={item.id}
@@ -134,13 +170,16 @@ const SupportTicket = () => {
           borderColor: Color.Gray300,
           borderWidth: 1,
           marginHorizontal: Padding.p_base,
-          marginBottom: Padding.p_5xl,
+          //marginBottom: Padding.p_5xl,
+          marginBottom:(ticketList.length-1==index) ? 200:Padding.p_5xl
         }}
       >
         <Pressable
           style={styles.ticketParent}
           onPress={() => {
+            if(!item?.isLocal){
             navigation.navigate("ViewTicket", { ticketId: item.ticketNumber });
+            }
           }}
         >
           <View
@@ -159,11 +198,13 @@ const SupportTicket = () => {
               Ticket #{item.ticketNumber}{" "}
             </Text>
           </View>
+          { !item?.isLocal && (
           <Image
             style={styles.chevronIconLayout}
             resizeMode="stretch"
             source={require("../../../../assets/chevronright.png")}
           />
+          )}
         </Pressable>
         <View
           style={{
@@ -267,25 +308,24 @@ const SupportTicket = () => {
                 },
               ]}
             >
-              Newly submitted tickets may take some time to appear in the ticket
-              log.
+              New tickets may take up to 15 minutes to appear. If not, please submit a new ticket or contact support via chat.
             </Text>
           </View>
           {ticketList.length > 0 ? (
-            <View style={{ paddingBottom: hp("50%") }}>
+            <View style={{ paddingBottom: hp('50%'), flexDirection:'column' }}>
               <FlatList
                 data={ticketList}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={RenderTicketList}
+                renderItem={(item,index)=>RenderTicketList(item,index)}
                 refreshControl={
                   <RefreshControl
-                      refreshing={refreshing}
-                      onRefresh={onRefresh}
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
                   />
-              }
+                }
                 //onEndReached={onEndReached}
                 //onEndReachedThreshold={0.1}
-                //ListFooterComponent={Footer}
+                //ListFooterComponent={<></>}
               />
             </View>
           ) : loading ? (
@@ -417,11 +457,12 @@ const styles = StyleSheet.create({
     color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 28,
-  },supportingTypo1: {
+  },
+  supportingTypo1: {
     lineHeight: 20,
     fontSize: FontSize.textXsSemibold_size,
     textAlign: "left",
-},
+  },
   badge: {
     borderColor: Color.colorAquamarine,
     paddingHorizontal: Padding.p_5xs,
@@ -449,7 +490,7 @@ const styles = StyleSheet.create({
   activityIndicator: {
     transform: [{ scale: 2 }],
     marginVertical: 10,
-    paddingVertical:5
+    paddingVertical: 5,
   },
 });
 

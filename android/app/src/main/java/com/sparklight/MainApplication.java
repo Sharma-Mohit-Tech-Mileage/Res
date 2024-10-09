@@ -8,10 +8,17 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
+
+import java.io.IOException;
 import java.util.List;
 
-public class MainApplication extends Application implements ReactApplication {
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
+public class MainApplication extends Application implements ReactApplication {
+    private static final String ZENDESK_API_URL = "https://cableone.zendesk.com/api/v2/chat/agents";
+    private static final String AUTH_TOKEN = "DDiQVbQmQuz5pH8bwfgg3EfYY40shPtIu7lcKeJS";
   private final ReactNativeHost mReactNativeHost =
       new DefaultReactNativeHost(this) {
         @Override
@@ -25,6 +32,7 @@ public class MainApplication extends Application implements ReactApplication {
           List<ReactPackage> packages = new PackageList(this).getPackages();
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
+            packages.add(new RNZendeskChatPackage());
           return packages;
         }
 
@@ -58,5 +66,30 @@ public class MainApplication extends Application implements ReactApplication {
       DefaultNewArchitectureEntryPoint.load();
     }
     ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+
+
+//      OkHttpClient client = new OkHttpClient();
+//
+//      new Thread(new Runnable() {
+//          @Override
+//          public void run() {
+//              Request request = new Request.Builder()
+//                      .url(ZENDESK_API_URL)
+//                      .header("Authorization", "Bearer " + AUTH_TOKEN)
+//                      .build();
+//
+//              try (Response response = client.newCall(request).execute()) {
+//                  if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+//
+//                  System.out.println(response.body().string());
+//              } catch (IOException e) {
+//                  throw new RuntimeException(e);
+//              }
+//          }
+//      }).start();
+
+
   }
+
+
 }

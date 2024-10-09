@@ -1,16 +1,31 @@
 // HomeStack.js
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import HomeScreen from "../../components/home/NewBillerHome";
+import HomeScreen from "../../components/home/Home";
+import NewBillerHome from "../../components/home/NewBillerHome";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemStackScreen from "./ManageEquepmentStack";
+import ModemSpeedTest from "../../components/common/speedTest/ModemSpeedTest";
+import AutoPayPCIConnector from '../../components/utility/AutoPayPCIConnector'
+import { useSelector } from 'react-redux';
 
 const HomeStack = createNativeStackNavigator();
 
 function HomeStackScreen() {
   const { setTabBarVisible } = useTabBarVisibility();
+  const user = useSelector(state => state.combinedReducers.user.userData);
+  const [isBillerUser,setIsBillerUser]= useState(false)
+
+  useEffect(() => {
+    if(user?.userInfo.accountNumber.toString().length>=16){
+      setIsBillerUser(true)
+  }
+  }, []);
+
+
+
   return (
     <HomeStack.Navigator
       initialRouteName="Dashboard"
@@ -18,7 +33,7 @@ function HomeStackScreen() {
     >
       <HomeStack.Screen
         name="Dashboard"
-        component={HomeScreen}
+        component={isBillerUser? NewBillerHome : HomeScreen}
         options={{ headerShown: false }}
       />
 
@@ -37,6 +52,24 @@ function HomeStackScreen() {
       <HomeStack.Screen
         name="ManageEquipment"
         component={ModemStackScreen}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+      <HomeStack.Screen
+            name="AutoPayPCIConnector"
+            component={AutoPayPCIConnector}
+            options={{ headerShown: false }}
+            listeners={{
+              focus: () => setTabBarVisible(true),
+              blur: () => setTabBarVisible(true),
+            }}
+          />
+      <HomeStack.Screen
+        name="ModemSpeedTest"
+        component={ModemSpeedTest}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),

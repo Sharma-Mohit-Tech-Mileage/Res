@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Platform,Image, Pressable } from 'react-native';
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader'
+import { View, Text, StyleSheet, Dimensions, Platform, AppState } from 'react-native';
+import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
 import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
-import { isUserAuthorized } from "../../network/APIClient";
 import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
-import LinearGradient from "react-native-linear-gradient";
-import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
+import { navigationRef } from '../../navigations/UserNavigations';
 const { width, height } = Dimensions.get('window');
+
 const ArticalWindowUtility = ({ navigation, route }) => {
     const [initScript, setInitScript] = useState('');
     const [progress, setProgress] = useState(0);
@@ -23,6 +22,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [navStateReloading, setNavStateReloading] = useState(false);
     const [showPDFModal, setShowPDFModal] = useState(false);
     const [showPDFUrl, setShowPDFUrl] = useState('');
+    const [appState, setAppState] = useState(AppState.currentState);
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
 
@@ -30,20 +30,53 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         setShowPDFModal(!showPDFModal);
     };
 
+    const setDynamicCookie = () => {
+        if (webViewRef?.current) {
+            const script = `(function() {
+                var cookieValue = "MobileApp";
+                var domain = document.location.hostname; 
+                var expirationDate = new Date();
+                expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+                
+                document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+                
+                localStorage.setItem('jwt_token', '${currentUser.token}');
+                localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo)}');
+                var upgradeToken = '${currentUser.upgradeToken}';
+                localStorage.setItem('upgrades_token', upgradeToken);
+            })();`;
+            webViewRef.current.injectJavaScript(script);
+        } else {
+            console.warn('WebView ref is not available for injecting JavaScript. Navigating back to Dashboard.');
+            // Navigate back to the Dashboard
+            if (navigationRef.current) {
+                navigationRef.current.navigate('Dashboard'); // Replace 'Dashboard' with your dashboard route name
+            }
+        }
+    };
+    
+
     const navigationChange = async (navState) => {
-        if (navState.url.includes('/postlogout')
-            || navState.url.includes(Env.SSO_LOGIN)) {
+        setDynamicCookie();  
+        if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
                 setModalOpen(false);
                 setProgress(1);
                 setNavStateReloading(true);
-                await RefreshToken();
-                setTimeout(async () => {
-                    await userUpdate();
-                }, 1000);
+                try {
+                    await RefreshToken();  // Attempt to refresh the token
+                    setTimeout(async () => {
+                        await userUpdate();
+                    }, 1000);
+                } catch (error) {
+                    console.error("Error during navigation change token refresh", error);
+                    if (navigationRef.current) {
+                        navigationRef.current.navigate('Splash');
+                    }
+                }
             }
         }
-    }
+    };
 
     const onMessage = (event) => {
         try {
@@ -56,7 +89,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         } catch (error) {
             console.log('onMessageError: ', error);
         }
-    }
+    };
 
     const userUpdate = async () => {
         const userLocal = await getUser();
@@ -74,7 +107,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             setProgress(0);
             setCurrentUser(userLocal);
         }
-    }
+    };
 
     const userUpdateScript = async (user) => {
         const upgradeToken = await getUpgradeToken();
@@ -85,6 +118,11 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
                 localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
+                var cookieValue = "MobileApp";
+            var domain = document.location.hostname; 
+            var expirationDate = new Date();
+            expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+            document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
                 var open = XMLHttpRequest.prototype.open;
                 XMLHttpRequest.prototype.open = function() {
                     this.addEventListener("load", function(event) {
@@ -99,7 +137,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
             setInitScript(SAVE_FROM_RN);
         }
-    }
+    };
 
     // Reset progress and error states when URL changes or modal closes
     useEffect(() => {
@@ -118,15 +156,52 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     useEffect(() => {
         setCurrentUser(user);
         userUpdateScript(user);
-    }, []);
+        setDynamicCookie();  // Set cookie when user is updated
+    }, [user]);
+
+    useEffect(() => {
+        const handleAppStateChange = nextAppState => {
+            if (appState?.match(/inactive|background/) && nextAppState === 'active') {
+                setTimeout(() => {
+                    if (webViewRef?.current) {
+                        webViewRef.current.reload();
+                    } else {
+                        console.warn('WebView ref is not available for reload. Navigating back to Dashboard.');
+                        // Navigate back to the Dashboard
+                        if (navigationRef.current) {
+                            navigationRef.current.navigate('Dashboard'); 
+                        }
+                    }
+                }, 500);
+            }
+            setAppState(nextAppState);
+        };
+    
+        const subscription = AppState.addEventListener('change', handleAppStateChange);
+    
+        return () => {
+            if (subscription) {
+                subscription.remove();
+            } else {
+                console.warn('AppState subscription is not available for removal.');
+            }
+        };
+    }, [appState]);
+    
+    
+
+    useEffect(() => {
+        setDynamicCookie();  // Push cookie when component is first mounted
+    }, [url, modalOpen, appState]);
 
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />
             {progress < 1 ? (
-                <View style={{ ...styles.progressBar }}>
-                    <View style={{ ...styles.progress, width: `${progress * 100}%` }} />
-                </View>) : (<View />)}
+                <View style={styles.progressBar}>
+                    <View style={[styles.progress, { width: `${progress * 100}%` }]} />
+                </View>
+            ) : null}
             {modalOpen && (
                 <WebView
                     ref={webViewRef}
@@ -136,10 +211,8 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     sharedCookiesEnabled={true}
                     injectedJavaScriptBeforeContentLoaded={initScript}
                     onNavigationStateChange={navigationChange}
-                    //onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
-                    originWhitelist={['http://*', 'https://*', 'data:*']}
-                    //setSupportMultipleWindows={false}
                     onMessage={onMessage}
+                    originWhitelist={['http://*', 'https://*', 'data:*']}
                     incognito={true}
                 />
             )}
@@ -173,63 +246,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: width * 0.05, // 5% of screen width
     },
-    circleImage: {
-        width: 32, 
-        height: 32, 
-    },
     errorText: {
         fontSize: width * 0.04, // 4% of screen width
         marginBottom: height * 0.02, // 2% of screen height
-    },
-    closeButton: {
-        position: 'absolute',
-        bottom: height * 0.02, // 2% of screen height
-        right: width * 0.05, // 5% of screen width
-        padding: 10,
-        backgroundColor: 'blue',
-        borderRadius: 5,
-    },
-    closeButtonText: {
-        color: 'white',
-        fontSize: width * 0.04, // 4% of screen width
-    },
-    container: {
-        //flex: 1,
-      //  marginBottom: (Platform.OS == 'ios') ? 90 : 60,
-        alignItems: 'center', // Center children horizontally
-    },
-    linearGradientStyle: {
-        width: '100%',
-        height: 150, // Adjust the height as needed
-    },
-    circle: {
-        position: 'absolute',
-        top: 150 - 36, // Half of the circle's height (72 / 2)
-        width: 72,
-        height: 72,
-        borderRadius: 36,
-        backgroundColor: Color.colorMidnightblue,
-        borderColor: Color.colorWhitesmoke_200,
-        borderWidth: 4,
-        zIndex:9,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    header: {
-        height: 100, // Adjust as needed
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    title: {
-        flex: 1,
-        textAlign: 'center',
-        color: 'white', // Adjust as needed
-        // Other styling for the title
-    },
-    closeButton: {
-        marginRight: 10,
-        // Other styling for the close button
     },
 });
 

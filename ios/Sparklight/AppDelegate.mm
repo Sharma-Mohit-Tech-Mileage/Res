@@ -2,6 +2,7 @@
 #import <React/RCTLinkingManager.h>
 #import <React/RCTBundleURLProvider.h>
 #import <Firebase.h>
+#import "RNZendeskChatModule.h"
 
 @implementation AppDelegate
 
@@ -13,6 +14,7 @@
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
   [FIRApp configure];
+  [RNZendeskChatModule init];
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 

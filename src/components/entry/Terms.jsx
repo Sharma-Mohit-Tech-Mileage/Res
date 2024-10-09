@@ -46,7 +46,9 @@ const Terms = ({ navigation }) => {
                 dispatch(fetchBillingStatus());
                 dispatch(fetchBillingPaper());
                 dispatch(fetchSMSSelection());
+                if(userData?.userInfo.accountNumber.toString().length==9){
                 dispatch(fetchPushNotifications());
+                }
                 dispatch(fetchProfileDetails());
             } catch (error) {
                 console.error("Error fetching data", error);
@@ -62,7 +64,7 @@ const Terms = ({ navigation }) => {
         let goToPushNotificationScreen = false;
         let optOutCountPushNotification = 0;
 
-        
+        if(userData?.userInfo.accountNumber.toString().length==9){
         if (profile?.pushNotifications?.length > 0) {
             const messageTypes = profile.pushNotifications[0].pushMessageType;
             messageTypes.forEach((messageType) => {
@@ -76,6 +78,7 @@ const Terms = ({ navigation }) => {
         } else {
             goToPushNotificationScreen = true;
         }
+    }
         
         if (profile?.smsSubscription?.length > 0) {
             const firstSubscription = profile.smsSubscription[0];
@@ -105,7 +108,6 @@ const Terms = ({ navigation }) => {
             }
         }
 
-        
         if (profile?.profileDetails?.memberType === "Admin") {
             if (goToPushNotificationScreen) {
                 setNextScreen('EntryPushNotifications'); 
@@ -130,11 +132,18 @@ const Terms = ({ navigation }) => {
     const termsAccepted = async () => {
         await dispatch(updateTermsAndConditions(true, null));
         await dispatch(updateWalkThroughStep(0));
+        if(userData?.userInfo.accountNumber.toString().length==9){
         console.log('termsAccepted: ', nextScreen);
         navigation.reset({
             index: 0,
             routes: [{ name: nextScreen }],
         });
+    }else{
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'MyTab' }],
+        }); 
+    }
 
     };
 

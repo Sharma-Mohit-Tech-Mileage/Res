@@ -98,7 +98,7 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
 
       <TouchableOpacity
        accessible={true}
-       accessibilityLabel={`Upgrade Plan`}
+       accessibilityLabel={`Historical Data Usage`}
        accessibilityRole="button"
         onPress={() => {
           navigation.navigate("ArticalWindowUtility", {
@@ -117,6 +117,7 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
         plans={plans}
         tvPlan={tvPlan}
         phonePlan={phonePlan}
+        accessible={true}
       />
     </View>
   );

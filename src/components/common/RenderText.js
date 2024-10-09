@@ -6,6 +6,32 @@ import {
 } from "react-native";
 import { FontFamily, Color } from "../../../GlobalStyles";
 
+// Utility function to process text and make emails bold
+const processText = (text) => {
+  const emailRegex = /[\w.-]+@[\w.-]+\.\w+/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = emailRegex.exec(text)) !== null) {
+    // Text before the email
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+    // Email in bold
+    parts.push(
+      <Text style={{ fontWeight: 'bold',color:Color.colorMidnightblue }} key={`email-${match.index}`}>
+        {match[0]}
+      </Text>
+    );
+    lastIndex = emailRegex.lastIndex;
+  }
+  // Remaining text after the last email
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+  return parts;
+};
 
 export default RenderText = ({
   instruction,
@@ -26,7 +52,6 @@ export default RenderText = ({
     instructionSecondPart = instruction.split(splitKey)[1];
   }
 
-
   useEffect(() => {
     async function getAccessibility() {
       try {
@@ -37,7 +62,7 @@ export default RenderText = ({
           "There has been a problem with AccessibilityInfo.isScreenReaderEnabled(): " +
           error.message
         );
-        setIsScreenReaderEnabled(false); // Setting a default value in case of error
+        setIsScreenReaderEnabled(false);
       }
     }
     getAccessibility();
@@ -62,7 +87,7 @@ export default RenderText = ({
           accessibilityLabel={`${instructionFirstPart} ${splitKey} link ${instructionSecondPart}`}
           onPress={() => onTextPress()}
         >
-          {isFromNotification ? instructionFirstPart.replace('Please', '\nPlease') : instructionFirstPart}
+          {processText(isFromNotification ? instructionFirstPart.replace('Please', '\nPlease') : instructionFirstPart)}
           <Text
             accessibilityLabel="Contact us for more information"
             hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
@@ -70,11 +95,11 @@ export default RenderText = ({
           >
             {`${splitKey}`}
           </Text>
-          {instructionSecondPart}
+          {processText(instructionSecondPart)}
         </Text>
         :
         <Text style={[styles.instructionText, style]}>
-          {instruction}
+          {processText(instruction)}
         </Text>
     )
   }
@@ -82,7 +107,7 @@ export default RenderText = ({
     return (
       instruction.includes(splitKey) ?
         <Text style={[styles.instructionText, style]}>
-          {isFromNotification ? instructionFirstPart.replace('Please', '\nPlease') : instructionFirstPart}
+          {processText(isFromNotification ? instructionFirstPart.replace('Please', '\nPlease') : instructionFirstPart)}
           <Text
             accessible={true}
             accessibilityRole="link"
@@ -95,20 +120,18 @@ export default RenderText = ({
           >
             {`${splitKey}`}
           </Text>
-          {instructionSecondPart?.length > 0 ? `${instructionSecondPart}` : null}
+          {instructionSecondPart?.length > 0 ? processText(instructionSecondPart) : null}
         </Text>
         :
         <Text style={[styles.instructionText, style]}>
-          {instruction}
+          {processText(instruction)}
         </Text>
     )
   }
 };
 
-
 const styles = StyleSheet.create({
   instructionText: {
-    // flex: 1,
     paddingLeft: 10,
     paddingRight: 6,
     color: Color.sparklightGray1,

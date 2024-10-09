@@ -12,7 +12,10 @@ const colors = {
     grey:'#E1E1E1',
     dark_grey:'#767676',
     darkest_grey:'#001321',
-    splash_bg:'#8D3B90'
+    splash_bg:'#8D3B90',
+    sp_black:'#292929',
+    gray600: "#475467",
+    backgroundGR: '#2BA948'
 
   }
   

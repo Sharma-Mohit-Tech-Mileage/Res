@@ -30,7 +30,6 @@ const App = () => {
   useEffect(() => {
     const subscription = AppState.addEventListener("change", nextAppState => {
       if (appState.match(/inactive|background/) && nextAppState === "active") {
-        console.log("App has come to the foreground!");
         checkForUpdates();
       }
       setAppState(nextAppState);
@@ -44,9 +43,8 @@ const App = () => {
 
   useEffect(() => {
     async function init() {
-      const uuid = await initializeApp();
-      console.log("UUID initialized:-=------------------*************************************************************************************", uuid);
-    }
+      await initializeApp();
+      }
     init();
   }, []);
 

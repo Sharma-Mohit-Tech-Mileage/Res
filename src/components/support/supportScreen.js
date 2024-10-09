@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text,TouchableOpacity,Alert } from "react-native";
+import React, { useEffect, useRef, useState,useCallback } from "react";
+import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text,TouchableOpacity,Alert,PermissionsAndroid } from "react-native";
 import { useSelector } from 'react-redux';
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import LinearGradient from 'react-native-linear-gradient';
-import { useNavigation } from "@react-navigation/native";
-import ZendeskChat from "react-native-zendesk-chat";
+import { useNavigation,useFocusEffect } from "@react-navigation/native";
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import PubSub from 'pubsub-js'
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
@@ -13,7 +13,7 @@ import ChatIcon from "../../res/svgIcons/ChatIcon";
 import { GetApiRequest } from "../../network/APIClient";
 import CreateTicket from "./ticket/CreateTicket";
 //import ZendDesk from '@pagopa/io-react-native-zendesk';
-ZendeskChat.init(Env.ZENDESK_CHAT_KEY);
+import { startChatWithConfig,setVisitorInfo,startChat , clearChatData} from "../utility/RNZendeskChat";
 
 const Support = ({ route }) => {
     const navigation = useNavigation();
@@ -21,6 +21,7 @@ const Support = ({ route }) => {
     const [department, setDepartment] = useState('');
     const userData = useSelector(state => state.combinedReducers.user.userData);
     const scrollViewRef = useRef(null);
+    const [isChatDisabled, setIsChatDisabled] = useState(false);
     const makeCall = (number) => {
         let phoneNumber = '';
 
@@ -41,6 +42,70 @@ const Support = ({ route }) => {
 
     };
 
+  const requestCameraPermission = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: 'Camera Permission',
+            message: `This app requires access to the camera to take photos for chat support.
+                If you deny camera access to MySparklight, you can enable it later in Settings.`,
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          }
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('Camera permission granted');
+        } else {
+          console.log('Camera permission denied');
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    } else {
+        const result = await check(PERMISSIONS.IOS.CAMERA);
+        if (result !== RESULTS.GRANTED) {
+          const granted = await request(PERMISSIONS.IOS.CAMERA);
+          if (granted === RESULTS.GRANTED) {
+            //Alert.alert('Camera permission granted');
+          } else {
+            Alert.alert(
+                'Camera Permission',
+                `This app requires access to the camera to take photos for chat support.
+                If you deny camera access to MySparklight, you can enable it later in Settings.`,
+                [
+                  {
+                    text: 'Cancel',
+                    onPress: () => null,
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Open Settings',
+                    onPress: () => {
+                        Linking.openSettings();
+                    },
+                  },
+                ],
+                { cancelable: true }
+              );
+            
+          }
+        } else {
+         // Alert.alert('Camera permission already granted');
+        }
+    }
+  };
+
+ 
+  useFocusEffect(
+    useCallback(() => {
+        checkChatAvailability()
+    }, [])
+  );
+  
+
     
 
     React.useEffect(() => {
@@ -57,6 +122,31 @@ const Support = ({ route }) => {
         return unsubscribe;
     }, [navigation]);
 
+    const checkChatAvailability = () => {
+           var d = new Date();
+            localTime = d.getTime();
+            localOffset = d.getTimezoneOffset() * 60000;
+
+            // obtain UTC time in msec
+            utc = localTime + localOffset;
+            // create new Date object for different city
+            // using supplied offset
+            //var nd = new Date(utc + (3600000*7.0));
+            //nd = 3600000 + nd;
+        const currentTime = new Date(utc);
+        const currentHour = currentTime.getHours();
+        
+        // Define the time range when chat should be disabled (e.g., 10 PM to 6 AM)
+        const disableStart = 23;  // 10:00 PM
+        const disableEnd = 8;     // 6:00 AM
+    
+        // Check if the current time is within the disabled range
+        if (currentHour >= disableStart || currentHour < disableEnd) {
+          setIsChatDisabled(true);
+        } else {
+          setIsChatDisabled(false);
+        }
+    }
 
     const items = [
         {
@@ -124,6 +214,8 @@ const Support = ({ route }) => {
         return () => {
             PubSub.unsubscribe(token);
         };
+      
+       
     }, []);
 
     const exitConfirmation=()=>{
@@ -140,39 +232,21 @@ const Support = ({ route }) => {
 
 
     const handlePressOpenButton = (department, tags) => {
-        const user = {
-            full_name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
+        const data= {
+            name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
             email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
             phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
+            tags:['pid:_' + userData.userInfo.accountNumber,...tags],
+            department: department
         };
-
-        tags.push('pid:_' + userData.userInfo.accountNumber);
-
-        ZendeskChat.startChat({
-            name: user.full_name,
-            email: user.email,
-            phone: user.phone,
-            department: department,
-            tags: tags,
-            behaviorFlags: {
-                showAgentAvailability: true,
-                showChatTranscriptPrompt: false,
-                showPreChatForm: true,
-                showOfflineForm: true,
-            },
-            preChatFormOptions: {
-                name: "optional",
-                email: "optional",
-            },
-            messagingOptions: {
-                botName: 'Sparklight',
-                botAvatarName: 'chatIcon'
-            },
-            localizedDismissButtonTitle: "Dismiss",
-        });
+        if(Platform.OS==='ios'){
+            startChat(data);
+        }else{
+            startChatWithConfig(data)
+        }
+        requestCameraPermission();
     };
-
-
+    
     return (
         <View style={styles.support}>
             <ProfileSettingsHeader title="Support" iconAlignment="right" showIcon={false}  />
@@ -269,7 +343,7 @@ const Support = ({ route }) => {
                                                 />
                                             </View>
                                             <Text style={[styles.supportingText, styles.supportingTypo1,]} >
-                                            Instant Troubleshooting & Outage Check.
+                                            Instant troubleshooting & outage check.
                                             </Text>
                                         </View>
                                     </View>
@@ -468,10 +542,13 @@ const Support = ({ route }) => {
                                                     alignItems: "center",
                                                 }}
                                                 onPress={() => {
-                                                    toggleModal("tech");
+                                                    //toggleModal("tech");
+                                                    if(!isChatDisabled){
+                                                    handlePressOpenButton("SPK TCC Residential", ['Resi_TechSupport'])
+                                                    }
                                                 }}
                                             >
-                                                <ChatIcon />
+                                                 <ChatIcon isEnable={!isChatDisabled}/>
                                                 <Text
                                                     style={[styles.headingTypo, { marginLeft: 10, fontSize: 16 }]}
                                                 >
@@ -516,6 +593,7 @@ const Support = ({ route }) => {
                                                     onPress={() => {
                                                         //toggleModal("Bill");
                                                         //ZendDesk.initChat('ad791f41-3c05-490b-8bb3-55afe1751f92d')
+                                                       
                                                     }}
                                                     accessibilityLabel="Chat Support"
                                                     accessibilityRole="button"
@@ -551,10 +629,13 @@ const Support = ({ route }) => {
                                                         alignItems: "center",
                                                     }}
                                                     onPress={() => {
-                                                        toggleModal("Bill");
+                                                        //toggleModal("Bill");
+                                                        if(!isChatDisabled){
+                                                        handlePressOpenButton("mobiletest", ['Resi_BillSupport'])
+                                                        }
                                                     }}
                                                 >
-                                                    <ChatIcon />
+                                                    <ChatIcon isEnable={!isChatDisabled}/>
                                                     <Text
                                                         style={[styles.headingTypo, { marginLeft: 10, fontSize: 16 }]}
                                                     >
