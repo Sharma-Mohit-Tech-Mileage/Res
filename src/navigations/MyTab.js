@@ -27,10 +27,9 @@ const MyTabs = ({ route }) => {
   const { tabBarVisible } = useTabBarVisibility();
   const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector(state => state.combinedReducers.home);
-  const isNormalUser = useSelector(state => state.combinedReducers.user.isNormalUser);
-
+  console.log('user*********************************************************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&', user);
   useEffect(() => {
-    if (isNormalUser) {
+    if (user?.isNormalUser) {
       if (home.walkThroughStep === 0) {
         setShadowStyle(styles.shadowTabs);
         setShadowStyleLeft(styles.shadowTabsLeft);
@@ -47,7 +46,7 @@ const MyTabs = ({ route }) => {
 
   return (
     <>
-      {isNormalUser && home.walkThroughStep !== null && home.walkThroughStep !== undefined &&
+      {user?.isNormalUser && home.walkThroughStep !== null && home.walkThroughStep !== undefined &&
         (
           <>
             <View style={shadowStyleLeft}>
@@ -71,7 +70,7 @@ const MyTabs = ({ route }) => {
         <Tab.Screen
           name="Home"
           component={HomeStackScreen}
-          initialParams={{ data: route }}
+          initialParams={{ data: route ,isNormalUser: user?.isNormalUser }}
           options={{
             headerShown: false,
             swipeEnabled: false,
@@ -91,7 +90,7 @@ const MyTabs = ({ route }) => {
           listeners={({ navigation }) => ({
             tabPress: (e) => {
               e.preventDefault();
-              if (isNormalUser) {
+              if (user?.isNormalUser) {
                 navigation.reset({
                   index: 0,
                   routes: [
@@ -120,7 +119,7 @@ const MyTabs = ({ route }) => {
           options={{
             tabBarLabel: 'Shop',
             headerShown: false,
-            tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected isNewBillerUser={!isNormalUser} /> : <ShopIcon isNewBillerUser={!isNormalUser} />)
+            tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected isNewBillerUser={!user?.isNormalUser} /> : <ShopIcon isNewBillerUser={!user?.isNormalUser} />)
           }}
         />
 
@@ -130,7 +129,7 @@ const MyTabs = ({ route }) => {
           listeners={({ navigation }) => ({
             tabPress: (e) => {
               e.preventDefault();
-              if (isNormalUser) {
+              if (user?.isNormalUser) {
                 navigation.reset({
                   index: 0,
                   routes: [
@@ -149,7 +148,7 @@ const MyTabs = ({ route }) => {
             tabBarIcon: ({ focused }) => {
               return (
                 <View style={styles.tabItem}>
-                  {focused ? <SupportIconSelected /> : <SupportIcon isNewBillerUser={!isNormalUser} />}
+                  {focused ? <SupportIconSelected /> : <SupportIcon isNewBillerUser={!user?.isNormalUser} />}
                 </View>
               );
             }
