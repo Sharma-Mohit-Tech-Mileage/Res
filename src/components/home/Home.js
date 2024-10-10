@@ -38,7 +38,7 @@ const HomeScreen = ({ navigation }) => {
   const [plans, setPlans] = useState([]);
   const [tvPlan, setTVPlan] = useState('');
   const [phonePlan, setPhonePlan] = useState([]);
-  const [billAmt, setBillAmt] = useState(0);
+  const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
   const [currentHealth, setCurrentHealth] = useState("Optimal");
   const [billPaid, setBillPaid] = useState(false);

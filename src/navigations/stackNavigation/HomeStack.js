@@ -1,6 +1,6 @@
 // HomeStack.js
 
-import React, { Suspense } from "react";
+import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../../components/home/Home";
 import NewBillerHome from "../../components/home/NewBillerHome";
@@ -9,15 +9,24 @@ import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemStackScreen from "./ManageEquepmentStack";
 import ModemSpeedTest from "../../components/common/speedTest/ModemSpeedTest";
 import AutoPayPCIConnector from '../../components/utility/AutoPayPCIConnector'
-import { useRoute } from "@react-navigation/native";
-import { ActivityIndicator } from "react-native";
+import { useSelector } from 'react-redux';
+
 
 const HomeStack = createNativeStackNavigator();
+
 function HomeStackScreen() {
   const { setTabBarVisible } = useTabBarVisibility();
-  const route = useRoute();
-  const isNormalUser = route.params?.isNormalUser; 
-console.log('isNormalUser*************************************************************************',isNormalUser)
+  const user = useSelector(state => state.combinedReducers.user.userData);
+  const [isBillerUser,setIsBillerUser]= useState(false)
+
+  useEffect(() => {
+    if(user?.userInfo.accountNumber.toString().length>=16){
+      setIsBillerUser(true)
+  }
+  }, []);
+
+
+
   return (
     <HomeStack.Navigator
       initialRouteName="Dashboard"
@@ -25,14 +34,9 @@ console.log('isNormalUser*******************************************************
     >
       <HomeStack.Screen
         name="Dashboard"
+        component={isBillerUser? NewBillerHome : HomeScreen}
         options={{ headerShown: false }}
-      >
-        {() => (
-          <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-            {isNormalUser ? <HomeScreen /> : <NewBillerHome />}
-          </Suspense>
-        )}
-      </HomeStack.Screen>
+      />
 
       <HomeStack.Screen
         name="ArticalWindowUtility"

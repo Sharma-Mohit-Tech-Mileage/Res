@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useCallback } from "react";
 import { View, StyleSheet, Dimensions, ScrollView } from "react-native";
 import Carousel from 'react-native-snap-carousel';
 import Card from "./billerCards/BillerSummary";
@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchBillingPaper, fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { Padding } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
+import { useFocusEffect } from "@react-navigation/native";
 
 const { width: viewportWidth } = Dimensions.get('window');
 
@@ -46,6 +47,14 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, paymentDetails,navigation 
   const onError = (error) => {
     console.log("error", error);
   };
+  useFocusEffect(
+    useCallback(() => {
+      getStatus();
+      console.log('Refresh Auto pay Data')
+      return () => {
+      };
+    }, [])
+  );
 
   useEffect(() => {
     getStatus();

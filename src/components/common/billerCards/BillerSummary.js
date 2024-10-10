@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image,ActivityIndicator } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import WalletIcon from "../../../res/svgIcons/WalletIcon";
@@ -20,7 +20,14 @@ const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation,s
                     <Text style={styles.leftTitle}>Bill Summary</Text>
                 </View>
                 <View style={styles.cardContent}>
+                {billAmt == undefined ? (
+            <ActivityIndicator
+              size="large"
+              color={colors.sparklight_bright_purple}
+            />
+          ) : (
                     <Text style={styles.amount}>${billAmt}</Text>
+                )}
                     <Text style={styles.dueDate}>{dueDate ? 'Due on ' : ''}<Text style={[styles.dueDate, { fontWeight: '400' }]}>{dueDate}</Text></Text>
                     <View style={{ marginVertical: Padding.p_base }}>
                         <View style={styles.statusRow}>
