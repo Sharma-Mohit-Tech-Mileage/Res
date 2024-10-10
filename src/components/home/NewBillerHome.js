@@ -50,7 +50,7 @@ import MyInternetDetialsBiller from "../common/MyInternetDetailsBiller";
 import { useFocusEffect } from "@react-navigation/native";
 const tabWidth = Number(Dimensions.get("window").width / 4);
 const NewBillerHome = ({ navigation }) => {
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false);
   const [isImageDispaly, setIsImageDispaly] = useState(true);
   const user = useSelector((state) => state.combinedReducers.user.userData);
   const home = useSelector((state) => state.combinedReducers.home);
