@@ -133,8 +133,8 @@ const Support = ({ route }) => {
         console.log('Current UTC time',utcDate.toTimeString())
         
         // Define the time range when chat should be disabled (e.g., 10 PM to 6 AM)
-        const disableStart = 17;  // 10:00 PM
-        const disableEnd = 10;     // 6:00 AM
+        const disableStart = 18;  // 10:00 PM
+        const disableEnd = 5;     // 6:00 AM
     
         // Check if the current time is within the disabled range
         if (currentHour >= disableStart || currentHour < disableEnd) {
@@ -528,6 +528,7 @@ const Support = ({ route }) => {
                                             <Text style={[styles.supportingText7, styles.supportingTypo,]}>
                                                 24h/7 days a week
                                             </Text>
+                                            { !isChatDisabled &&(
                                             <TouchableOpacity
                                              accessibilityLabel="Chat"
                                              accessibilityRole="button"
@@ -551,6 +552,7 @@ const Support = ({ route }) => {
                                                     Chat
                                                 </Text>
                                             </TouchableOpacity>
+                                            )}
                                         </View>
                                     </View>
                                 </View>
