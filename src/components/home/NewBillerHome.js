@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useCallback, useRef } from "react";
+import React, { useState, useEffect,useCallback } from "react";
 import {
   View,
   Text,
@@ -8,8 +8,6 @@ import {
   ScrollView,
   Platform,
   Dimensions,
-  Pressable,
-  ActivityIndicator,
   Linking,
 } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
@@ -18,30 +16,13 @@ import colors from "../../res/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DownArrow from "../../res/svgIcons/DownArrow";
 import UpArrow from "../../res/svgIcons/UpArrow";
-import MyServicePlan from "../common/MyServicePlan";
-import {
-  getUser,
-  getPushNotificationStatus,
-  storePushNotificationStatus,
-  storeUpgradeToken,
-} from "../../redux/utils/LocalStorage";
-import {
-  GetApiRequest,
-  GetModemStatusApiRequest,
-} from "../../network/APIClient";
+import {getUser,storeUpgradeToken} from "../../redux/utils/LocalStorage";
+import {GetApiRequest} from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import YoutubePlayer from "react-native-youtube-iframe";
-import {
-  getFcmToken,
-  requestUserPermission,
-} from "../../firebase/FirebaseUtils";
-import {
-  updatePushNotifications,
-  fetchPushNotifications,
-  saveAccountServices,
-} from "../../redux/actions/ProfileActionSuite";
+import {saveAccountServices} from "../../redux/actions/ProfileActionSuite";
 import { useSelector, useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
@@ -56,15 +37,11 @@ const NewBillerHome = ({ navigation }) => {
   const home = useSelector((state) => state.combinedReducers.home);
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const dispatch = useDispatch();
-  const [plans, setPlans] = useState([]);
-  const [tvPlan, setTVPlan] = useState("");
   const [phonePlan, setPhonePlan] = useState([]);
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
   const [pastPaymentDue, setPastPaymentDue] = useState(0.0);
-  const [currentHealth, setCurrentHealth] = useState("Optimal");
   const [payStatus, setPayStatus] = useState({});
-  const [accountStatus, setAccountStatus] = useState("Active");
   const [hasOutage, setHasOutage] = useState(false);
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [checkModemStatus, setCheckModemStatus] = useState(false);
@@ -80,46 +57,6 @@ const NewBillerHome = ({ navigation }) => {
     latestVersion: "",
   });
 
-  const getInternetHealth = (type) => {
-    var currentHealth = { Offline: 20, Poor: 50, Optimal: 80, default: 80 };
-    return currentHealth[type] || currentHealth["default"];
-  };
-
-  function getPhoneServiceDetails() {
-    getUser().then((res) => {
-      const request = `phone/api/phones/${res.userInfo.accountNumber}/phonelines`;
-      GetApiRequest(request, onSuccessPhonePlan, onError);
-    });
-  }
-  function getPhoneServicePlans(tgcCode) {
-    getUser().then((res) => {
-      const request = `phone/api/Plans/${tgcCode}`;
-      GetApiRequest(request, onFetchedPlan, onError);
-    });
-  }
-  const onFetchedPlan = (res) => {
-    setPhonePlan(res);
-  };
-  const onSuccessPhonePlan = (res) => {
-    if (res.length && res[0].tcgCode) {
-      getPhoneServicePlans(res[0].tcgCode);
-    }
-  };
-
-  const getTVServiceDetails = () => {
-    getUser().then((res) => {
-      const request = `sparklighttv/api/sparklighttv/${res.userInfo.accountNumber}/plan`;
-      GetApiRequest(request, onSuccessTVPlan, onErrorInPlanTV);
-    });
-  };
-
-  const onSuccessTVPlan = (res) => {
-    setTVPlan(res || "");
-  };
-
-  const onErrorInPlanTV = (error) => {
-    console.log("onErrorInPlanTV", error);
-  };
 
   const getUpgradeToken = async () => {
     const url = Env.API_SHOPPING_CART_BASEURL + "/api/UpgradeOrder/token";
@@ -144,150 +81,6 @@ const NewBillerHome = ({ navigation }) => {
     return json;
   };
 
-  const checkModemOutagStatus = () => {
-    getUser().then((res) => {
-      const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${res.userInfo.accountNumber}`;
-      GetApiRequest(
-        request,
-        (response) => {
-          console.log("checkModemOutagStatus", response);
-          if (response != undefined) {
-            if (response.hasOutage === true) {
-              let time = moment(response.estimatedTimeOfResolution).format(
-                "LT"
-              );
-              setEstimatedRestoreTime(time);
-              setAccountStatus("Disconnect");
-              // setIsInternetDetails(true);
-              setHasOutage(true);
-              setIsOutageAlert(true);
-              setInternetHealths((oldArray) => [...oldArray, "Red"]);
-            } else {
-              setInternetHealths((oldArray) => [...oldArray, "Green"]);
-            }
-          }
-        },
-        (errorCode) => {
-          console.log("checkModemOutagStatus erro", errorCode);
-          if (errorCode == 204) {
-            setInternetHealths((oldArray) => [...oldArray, "Green"]);
-          }
-        }
-      );
-    });
-  };
-
-  const onSuccessPlan = (res) => {
-    console.log("getInternetPlanDetails", res);
-    if (res) {
-      setPlans(res);
-      if (res.length > 0) {
-        let macAddress = res[0].macAddress;
-        var mac = macAddress;
-        if (user.userInfo.accountNumber === "128387263") {
-          mac = "bc:3e:07:38:56:d0";
-        } else if (user.userInfo.accountNumber === "902880244") {
-          mac = "bc:3e:07:38:56:d0";
-        } else if (user.userInfo.accountNumber === "902880236") {
-          mac = "28:7a:ee:8e:cf:8c";
-        } else if (user.userInfo.accountNumber === "902880079") {
-          mac = "00:40:36:5f:cc:7f";
-        } else if (user.userInfo.accountNumber === "136885142") {
-          mac = "00:40:36:59:00:00";
-        }
-        checkModemDetails(mac);
-      }
-    }
-  };
-  const onError = (error) => {
-    console.log("error", error);
-  };
-
-  const checkModemDetails = (macAddress) => {
-    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
-    GetModemStatusApiRequest(
-      request,
-      (res) => {
-        console.log("checkModemDetails", res);
-        if (res) {
-          if (res?.status) {
-            if (res.status === 408) {
-              setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
-              return;
-            }
-          }
-
-          let temt = [];
-          if (res.EquipmentType === "DOCSIS") {
-            temt.push(res.UTxP_State);
-            temt.push(res.URxL_State);
-            temt.push(res.USNR_State);
-            temt.push(res.DSNR_State);
-            temt.push(res.DRxL_State);
-            updateModemStatus(temt);
-          } else if (res.EquipmentType === "ONU") {
-            temt.push(res.ONUTP_State);
-            temt.push(res.OLTRP_State);
-            temt.push(res.ONURP_State);
-            updateModemStatus(temt);
-          }
-        }
-      },
-      (errorCode) => {
-        console.log("Modem details on Error", errorCode);
-        if (errorCode === 404) {
-          setInternetHealths((oldArray) => [...oldArray, "Red"]);
-        } else if (
-          errorCode === 400 ||
-          errorCode === 500 ||
-          errorCode === 504
-        ) {
-          setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
-        } else {
-          setInternetHealths((oldArray) => [...oldArray, "Red"]);
-        }
-      }
-    );
-  };
-
-  const updateModemStatus = (temt) => {
-    const allGreen = temt.every((v) => v === "Green");
-    console.log("modem status", allGreen);
-    if (!allGreen) {
-      const checkYellow = temt.includes("Yellow");
-      const checkRed = temt.includes("Red");
-      if (checkRed) {
-        console.log("modem status", "Red");
-        setInternetHealths((oldArray) => [...oldArray, "Red"]);
-      } else if (checkYellow) {
-        console.log("modem status", "Yellow");
-        setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
-      } else {
-        setInternetHealths((oldArray) => [...oldArray, "Red"]);
-      }
-    } else {
-      setInternetHealths((oldArray) => [...oldArray, "Green"]);
-    }
-  };
-
-  const refreshInternetHealth = () => {
-    const checkYellow = internetHealths.includes("Yellow");
-    const checkRed = internetHealths.includes("Red");
-    const checkGreen = internetHealths.includes("Green");
-    if (checkRed) {
-      console.log("Internet Health is Red");
-      setCurrentHealth("Offline");
-      //setIsInternetDetails(true);
-    } else if (checkYellow) {
-      console.log("Internet Health is Yellow");
-      setCurrentHealth("Poor");
-      //setIsInternetDetails(true);
-    } else {
-      console.log("Internet Health is Green");
-      setCurrentHealth("Optimal");
-      //setIsInternetDetails(false);
-    }
-  };
 
   const getUserAccountDetails = () => {
     setBillAmt(undefined)
@@ -325,118 +118,9 @@ const NewBillerHome = ({ navigation }) => {
     });
   };
 
-  const updateInternetHealth = (dueAmount, dueDate) => {
-    if (moment(dueDate).isAfter()) {
-      setBillPaid(true);
-      setInternetHealths((oldArray) => [...oldArray, "Green"]);
-    } else if (dueAmount <= 0) {
-      setBillPaid(true);
-      setInternetHealths((oldArray) => [...oldArray, "Green"]);
-    } else {
-      setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
-    }
-  };
 
   const onErrorBill = (error) => {
     console.log("error", error);
-  };
-
-  const checkNotifications = async () => {
-    const pushNotification = await getPushNotificationStatus();
-    let askNotification = false;
-    if (pushNotification === null) {
-      askNotification = true;
-    } else {
-      if (pushNotification.permanentSkip) {
-        askNotification = false;
-      } else {
-        if (pushNotification.status === "skip") {
-          const now = moment();
-          const days = now.diff(pushNotification.date, "days");
-
-          if (days >= 15) {
-            askNotification = true;
-          } else {
-            askNotification = false;
-          }
-        }
-      }
-    }
-
-    if (askNotification) {
-      let optOut = false;
-      let outageOptOut = false;
-      let billingOptOutStatus = false;
-
-      let enabledNotification = false;
-
-      if (profile?.pushNotifications?.length > 0) {
-        let optOutCountPushNotification = 0;
-        enabledNotification = true;
-        const messageTypes = profile.pushNotifications[0].pushMessageType;
-        messageTypes.forEach((messageType) => {
-          switch (messageType.messageType) {
-            case "appointment":
-              optOut = messageType.optOutFlag;
-              break;
-            case "outage":
-              outageOptOut = messageType.optOutFlag;
-              break;
-            case "billing":
-              billingOptOutStatus = messageType.optOutFlag;
-              break;
-          }
-          if (messageType.optOutFlag) {
-            optOutCountPushNotification += 1;
-          }
-        });
-      }
-
-      if (enabledNotification) {
-        const enabledPermission = await requestUserPermission();
-
-        if (enabledPermission) {
-          const token = await getFcmToken();
-          console.log("FCM HOME WITH PERMISSION", token);
-          const data = {
-            accountNumber: user.userInfo.accountNumber,
-            deviceToken: token,
-            deviceTokenTimestamp: moment().format(),
-            optOut: optOut,
-            outageOptOut: outageOptOut,
-            billingOptOutStatus: billingOptOutStatus,
-            userName: user.userInfo.userName,
-            isAndroid: Platform.OS == "android",
-          };
-          const localData = {
-            status: "accepted",
-            date: new Date(),
-          };
-          storePushNotificationStatus(localData);
-          await dispatch(updatePushNotifications(data, null));
-        } else {
-          const token = await getFcmToken();
-          console.log("FCM HOME WITHOUT PERMISSION", token);
-          const data = {
-            accountNumber: user.userInfo.accountNumber,
-            deviceToken: token,
-            deviceTokenTimestamp: moment().format(),
-            optOut: optOut,
-            outageOptOut: outageOptOut,
-            billingOptOutStatus: billingOptOutStatus,
-            userName: user.userInfo.userName,
-            isAndroid: Platform.OS == "android",
-          };
-          const localData = {
-            status: "skip",
-            date: new Date(),
-            permanentSkip: true,
-          };
-          await dispatch(updatePushNotifications(data, null));
-          storePushNotificationStatus(localData);
-        }
-      }
-    }
   };
 
   useEffect(() => {
@@ -451,13 +135,10 @@ const NewBillerHome = ({ navigation }) => {
   useEffect(() => {
     if (internetHealths.length >= 3) {
       setCheckModemStatus(true);
-      //refreshInternetHealth();
     }
   }, [internetHealths]);
 
   useEffect(() => {
-    //checkModemOutagStatus();
-    //getUserAccountDetails();
 
     const fetchData = async () => {
       try {
@@ -468,7 +149,6 @@ const NewBillerHome = ({ navigation }) => {
         console.error("Error fetching data", error);
       }
       if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
-        //setShowWalkThrough(true);
       }
     };
     fetchData();
@@ -483,7 +163,6 @@ const NewBillerHome = ({ navigation }) => {
   
       fetchUpdateStatus();
       getUserAccountDetails();
-      checkModemOutagStatus();
     }, [])
   );
   const changeWalkThroughStep = (step) => {
@@ -496,114 +175,6 @@ const NewBillerHome = ({ navigation }) => {
     }
   };
 
-  const walkthroughModal = () => {
-    const walkThroughScreens = [
-      {
-        title: "Home",
-        description:
-          "View information related to your internet health, billing, service and more.",
-        buttonText: "Next",
-      },
-      {
-        title: "Support",
-        description:
-          "View our FAQ, check in on your modem or troubleshoot your issues.",
-        buttonText: "Next",
-      },
-      {
-        title: "Account",
-        description:
-          "Manage your profile settings, notifications, users and more.",
-        buttonText: "Let's Go!",
-      },
-    ];
-
-    const walkThrough = walkThroughScreens[walkThroughStep];
-    const bottomCarotStyles = [styles.bottomCarot];
-
-    if (walkThroughStep === 1) {
-      bottomCarotStyles.push(styles.bottomCarotStep2);
-    } else if (walkThroughStep === 2) {
-      bottomCarotStyles.push(styles.bottomCarotStep3);
-    }
-
-    return (
-      <>
-        <View style={styles.walkThroughBubble}>
-          <View>
-            <View style={styles.title}>
-              <Text style={styles.titleText}>{walkThrough.title}</Text>
-            </View>
-            <View style={styles.description}>
-              <Text style={styles.descriptionText}>
-                {walkThrough.description}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.walkThroughBottomArea}>
-            <View style={styles.circlePaging}>
-              <View style={styles.circle}></View>
-              <View
-                style={
-                  walkThroughStep < 1
-                    ? [styles.circle, styles.circleUnselected]
-                    : styles.circle
-                }
-              ></View>
-              <View
-                style={
-                  walkThroughStep < 2
-                    ? [styles.circle, styles.circleUnselected]
-                    : styles.circle
-                }
-              ></View>
-            </View>
-            <View style={styles.walkThroughButtons}>
-              <View style={styles.walkThroughSubButtons}>
-                {walkThroughStep > 0 && (
-                  <Pressable
-                    style={[
-                      styles.button,
-                      styles.buttonsLayout,
-                      styles.buttonPrevious,
-                    ]}
-                    onPress={() => changeWalkThroughStep(walkThroughStep - 1)}
-                    accessibilityLabel="Previous Step"
-                    accessibilityRole="button"
-                  >
-                    <Text style={styles.decline}>Previous</Text>
-                  </Pressable>
-                )}
-                <Pressable
-                  style={[
-                    styles.button,
-                    styles.buttonsLayout,
-                    styles.buttonNext,
-                  ]}
-                  onPress={() => changeWalkThroughStep(walkThroughStep + 1)}
-                  accessibilityLabel={
-                    walkThroughStep < walkThroughScreens.length - 1
-                      ? "Next Step"
-                      : "Finish Walkthrough"
-                  }
-                  accessibilityRole="button"
-                >
-                  <Text style={styles.accept}>{walkThrough.buttonText}</Text>
-                </Pressable>
-              </View>
-            </View>
-          </View>
-          <View>
-            <Image
-              style={bottomCarotStyles}
-              tintColor={"#FFF"}
-              source={require("../../../assets/polygon.png")}
-            />
-          </View>
-        </View>
-      </>
-    );
-  };
 
   const OutageAlert = ({ estimatedTime }) => {
     return (

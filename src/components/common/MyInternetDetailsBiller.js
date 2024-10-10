@@ -28,11 +28,6 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
         },
         onError
       );
-      GetApiRequest(
-        `account/api/account/${accountNumber}/paperless/status`,
-        setPaperlessStatus,
-        onError
-      );
     });
   };
 

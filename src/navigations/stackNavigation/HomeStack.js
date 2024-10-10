@@ -15,16 +15,7 @@ const HomeStack = createNativeStackNavigator();
 
 function HomeStackScreen() {
   const { setTabBarVisible } = useTabBarVisibility();
-  const user = useSelector(state => state.combinedReducers.user.userData);
-  const [isBillerUser,setIsBillerUser]= useState(false)
-
-  useEffect(() => {
-    if(user?.userInfo.accountNumber.toString().length>=16){
-      setIsBillerUser(true)
-  }
-  }, []);
-
-
+  const isNormalUser = useSelector(state => state.combinedReducers.user.isNormalUser);
 
   return (
     <HomeStack.Navigator
@@ -33,7 +24,7 @@ function HomeStackScreen() {
     >
       <HomeStack.Screen
         name="Dashboard"
-        component={isBillerUser? NewBillerHome : HomeScreen}
+        component={!isNormalUser? NewBillerHome : HomeScreen}
         options={{ headerShown: false }}
       />
 
