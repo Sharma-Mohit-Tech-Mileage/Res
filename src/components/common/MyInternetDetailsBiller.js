@@ -16,11 +16,13 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
 
   const getStatus = () => {
+    console.log('Get Status********************************************************************************************************************************')
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
       GetApiRequest(
-        `account/api/account/${accountNumber}/easypay`,
+        `accountsvc/api/accounts/${accountNumber}/easypay`,
         (res) => {
+          console.log('Get Status resonse********************************************************************************************************************************',res)
           setIsAutoPayStatus(res?.isEasyPay);
           setCardDigit(res?.epLastfour);
         },

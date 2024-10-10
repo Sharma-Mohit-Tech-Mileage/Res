@@ -19,13 +19,13 @@ export const isUserAuthorized = (authorize) => {
     UserAuthorized = authorize;
 };
 
-const handleFetchResponse = async (response, onSuccess, onError) => {
+const handleFetchResponse = async (response, url, onSuccess, onError) => {
     try {
         const rawResponse = await response.text(); // Read response as plain text
-        console.log("Raw Response:", rawResponse); // Log the raw response
+        console.log("Request URL:", url); // Log the full URL being accessed
+        console.log("Raw Response:", response.status); // Log the raw response
 
         if (response.status === 204 || !rawResponse) {
-            // Handle no content
             onSuccess({ message: 'No content' }); // Pass a success message for no content
             return;
         }
@@ -39,12 +39,10 @@ const handleFetchResponse = async (response, onSuccess, onError) => {
                 onError(`Response status ${response.status} (${response.statusText}): ${json.message}`);
             }
         } catch (jsonParseError) {
-            // Log and handle JSON parse error if response is not valid JSON
             console.error('JSON Parse error:', jsonParseError);
             onError(`Failed to parse response: ${jsonParseError.message}`);
         }
     } catch (error) {
-        // Handle any other errors in processing the response
         onError(`Error processing response: ${error.message}`);
     }
 };
@@ -150,9 +148,8 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
         body: JSON.stringify(body)
     };
 
-    console.log('PostApiRequest:', endpoint);
     fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, onSuccess, onError));
+        .then(response => handleFetchResponse(response,`${baseUrl}${endpoint}`,  onSuccess, onError));
 };
 
 // Function to upload multipart data
@@ -224,7 +221,7 @@ export const GetApiRequest = async (endpoint, onSuccess, onError) => {
             if (response.status === 204) {
                 onError(response.status);
             } else {
-                return handleFetchResponse(response, onSuccess, onError);
+                return handleFetchResponse(response,`${baseUrl}${endpoint}`, onSuccess, onError);
             }
         });
 };
@@ -241,9 +238,8 @@ export const GetApiRequestSearch = async (endpoint, onSuccess, onError) => {
         }
     };
 
-    console.log('GetApiRequestSearch:', `${SUPPORT_URL}${endpoint}`);
     fetchWithTokenRefresh(fetch, `${SUPPORT_URL}${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, onSuccess, onError));
+        .then(response => handleFetchResponse(response, `${SUPPORT_URL}${endpoint}`,onSuccess, onError));
 };
 
 // Function for modem status API requests

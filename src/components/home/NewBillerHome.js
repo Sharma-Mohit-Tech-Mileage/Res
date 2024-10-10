@@ -85,20 +85,6 @@ const NewBillerHome = ({ navigation }) => {
     return currentHealth[type] || currentHealth["default"];
   };
 
-  const getEasyPlanStatus = () => {
-    getUser().then((res) => {
-      const request = `accountsvc/api/Accounts/${res.userInfo.accountNumber}/easypay`;
-      GetApiRequest(request, (res) => {
-        if (res) {
-          console.log('getEasyPlanStatus', res)
-          setPayStatus(res)
-        }
-      }, (error) => {
-        console.log('getEasyPlanStatus error', error)
-      });
-    });
-  };
-
   function getPhoneServiceDetails() {
     getUser().then((res) => {
       const request = `phone/api/phones/${res.userInfo.accountNumber}/phonelines`;
@@ -460,7 +446,6 @@ const NewBillerHome = ({ navigation }) => {
     };
 
     fetchUpdateStatus();
-   // getEasyPlanStatus();
   }, []);
 
   useEffect(() => {
@@ -497,7 +482,6 @@ const NewBillerHome = ({ navigation }) => {
       };
   
       fetchUpdateStatus();
-      getEasyPlanStatus();
       getUserAccountDetails();
       checkModemOutagStatus();
     }, [])
