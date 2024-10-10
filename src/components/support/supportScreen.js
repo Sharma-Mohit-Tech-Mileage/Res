@@ -123,13 +123,18 @@ const Support = ({ route }) => {
     }, [navigation]);
 
     const checkChatAvailability = () => {
+
+        
         const currentTime = new Date();
+        let utcDate = new Date(Date.UTC(currentTime.getFullYear(), currentTime.getMonth(), currentTime.getDay(), currentTime.getHours(), currentTime.getSeconds(), currentTime.getMilliseconds())); 
         const currentHour = currentTime.getHours();
-        console.log('Current Hour',currentTime.getHours())
+        console.log('Current Hour',currentTime.getFullYear())
+
+        console.log('Current UTC time',utcDate.toTimeString())
         
         // Define the time range when chat should be disabled (e.g., 10 PM to 6 AM)
         const disableStart = 17;  // 10:00 PM
-        const disableEnd = 8;     // 6:00 AM
+        const disableEnd = 10;     // 6:00 AM
     
         // Check if the current time is within the disabled range
         if (currentHour >= disableStart || currentHour < disableEnd) {
@@ -235,7 +240,7 @@ const Support = ({ route }) => {
         }else{
             startChatWithConfig(data)
         }
-        requestCameraPermission();
+        //requestCameraPermission();
     };
     
     return (
