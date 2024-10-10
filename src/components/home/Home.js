@@ -508,6 +508,18 @@ const HomeScreen = ({ navigation }) => {
     fetchData();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUpdateStatus = async () => {
+        const status = await checkForMinorUpdate();
+        setUpdateStatus(status);
+      };
+  
+      fetchUpdateStatus();
+      getUserAccountDetails();
+      checkModemOutagStatus();
+    }, [])
+  );
   useEffect(() => {
     const fetchData = async () => {
       try {
