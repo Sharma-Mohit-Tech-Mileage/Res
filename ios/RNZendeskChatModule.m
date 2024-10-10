@@ -64,7 +64,7 @@ RCT_EXPORT_METHOD(setVisitorInfo:(NSDictionary *)options) {
      config.isAgentAvailabilityEnabled = NO;
      config.isPreChatFormEnabled = YES;
      config.preChatFormConfiguration = [[ZDKChatFormConfiguration alloc] initWithName:ZDKFormFieldStatusRequired
-                                                                                           email:ZDKFormFieldStatusOptional
+                                                                                           email:ZDKFormFieldStatusRequired
                                                                                     phoneNumber:ZDKFormFieldStatusOptional
                                                                                       department:ZDKFormFieldStatusHidden];
     return config;

@@ -123,21 +123,12 @@ const Support = ({ route }) => {
     }, [navigation]);
 
     const checkChatAvailability = () => {
-           var d = new Date();
-            localTime = d.getTime();
-            localOffset = d.getTimezoneOffset() * 60000;
-
-            // obtain UTC time in msec
-            utc = localTime + localOffset;
-            // create new Date object for different city
-            // using supplied offset
-            //var nd = new Date(utc + (3600000*7.0));
-            //nd = 3600000 + nd;
-        const currentTime = new Date(utc);
+        const currentTime = new Date();
         const currentHour = currentTime.getHours();
+        console.log('Current Hour',currentTime.getHours())
         
         // Define the time range when chat should be disabled (e.g., 10 PM to 6 AM)
-        const disableStart = 23;  // 10:00 PM
+        const disableStart = 17;  // 10:00 PM
         const disableEnd = 8;     // 6:00 AM
     
         // Check if the current time is within the disabled range
@@ -619,6 +610,7 @@ const Support = ({ route }) => {
                                                 <Text style={[styles.supportingText7, styles.supportingTypo,]} >
                                                     M-F 8:00 AM-5:00 PM MST
                                                 </Text>
+                                                { !isChatDisabled &&(
                                                 <TouchableOpacity
                                                 accessibilityLabel="Chat"
                                                 accessibilityRole="button"
@@ -642,6 +634,7 @@ const Support = ({ route }) => {
                                                         Chat
                                                     </Text>
                                                 </TouchableOpacity>
+                                                )}
                                             </View>
                                         </View>
                                     </View>
