@@ -15,9 +15,7 @@ const HomeStack = createNativeStackNavigator();
 function HomeStackScreen() {
   const { setTabBarVisible } = useTabBarVisibility();
   const route = useRoute();
-  const isNormalUser = route.params?.isNormalUser ?? true; // Default to true if not provided
-
-  console.log('isNormalUser*************************************************************************', isNormalUser);
+  const isNormalUser = route.params?.isNormalUser ?? true;
 
   return (
     <HomeStack.Navigator

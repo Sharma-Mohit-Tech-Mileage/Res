@@ -220,6 +220,9 @@ const Terms = ({ navigation }) => {
                             <Pressable
                                 style={[styles.buttons, styles.buttonsLayout]}
                                 onPress={termsAccepted}
+                                accessibilityRole="button"  // Indicates this is a button
+                                accessibilityLabel="Accept terms and conditions"  // Describes the button's function
+                                accessibilityHint="tap to accept the terms and conditions"  
                             >
                                 <Text style={styles.accept}>Accept</Text>
                             </Pressable>
