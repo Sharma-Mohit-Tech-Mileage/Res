@@ -299,6 +299,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const getUserAccountDetails = () => {
+    setBillAmt(undefined)
     getUser().then((res) => {
       const request = `account/api/account/${res.userInfo.accountNumber}`;
       GetApiRequest(
@@ -471,6 +472,7 @@ const HomeScreen = ({ navigation }) => {
   };
   useFocusEffect(
     useCallback(() => {
+      
       getUserAccountDetails();
     }, [])
   );
