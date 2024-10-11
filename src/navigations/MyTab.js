@@ -1,3 +1,6 @@
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, Dimensions, Platform } from "react-native";
+import { useSelector, useDispatch } from 'react-redux';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTabBarVisibility } from './TabBarVisibilityContext';
 import AccountStackScreen from '../navigations/stackNavigation/AccountStack';
@@ -11,23 +14,30 @@ import ShopIconSelected from '../res/svgIcons/ShopIconSelected';
 import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
-import { useSelector } from 'react-redux';
 import { FontFamily } from '../../GlobalStyles';
 import { Env } from '../network/apis/account/Constants';
+import { fetchProfileDetails } from '../redux/actions/ProfileActionSuite';
+
 const { width } = Dimensions.get('window');
 const tabWidth = Number(width / 4);
-
 const Tab = createBottomTabNavigator();
 
 const MyTabs = ({ route }) => {
+  const dispatch = useDispatch();
   const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
   const [shadowStyle, setShadowStyle] = useState(styles.shadowTabs);
   const { tabBarVisible } = useTabBarVisibility();
   const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector(state => state.combinedReducers.home);
-  console.log('user*********************************************************&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&', user);
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {};
+  console.log('Profile details...........................................................................................................', JSON.stringify(profileDetails));
+
+  useEffect(() => {
+    // Fetch user profile details once when the component is initialized
+    dispatch(fetchProfileDetails());
+  }, [dispatch]);
+
   useEffect(() => {
     if (user?.isNormalUser) {
       if (home.walkThroughStep === 0) {
@@ -41,7 +51,6 @@ const MyTabs = ({ route }) => {
         setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left]);
       }
     }
-
   }, [home]);
 
   return (
@@ -49,10 +58,8 @@ const MyTabs = ({ route }) => {
       {user?.isNormalUser && home.walkThroughStep !== null && home.walkThroughStep !== undefined &&
         (
           <>
-            <View style={shadowStyleLeft}>
-            </View>
-            <View style={shadowStyle}>
-            </View>
+            <View style={shadowStyleLeft}></View>
+            <View style={shadowStyle}></View>
           </>
         )
       }
@@ -64,9 +71,10 @@ const MyTabs = ({ route }) => {
           tabBarActiveTintColor: '#353091',
           tabBarInactiveTintColor: '#767676',
           tabBarLabelStyle: { fontSize: 12, fontFamily: FontFamily.openSansRegular, fontWeight: '600' },
-
         }}
       >
+        {/* Tab Screens */}
+        {/* Home Screen */}
         <Tab.Screen
           name="Home"
           component={HomeStackScreen}
@@ -75,15 +83,14 @@ const MyTabs = ({ route }) => {
             headerShown: false,
             swipeEnabled: false,
             tabBarLabel: 'Home',
-            tabBarIcon: ({ focused }) => {
-              return (
-                <View style={styles.tabItem}>
-                  {focused ? <HomeIconSelected /> : <HomeIcon />}
-                </View>
-              );
-            }
+            tabBarIcon: ({ focused }) => (
+              <View style={styles.tabItem}>
+                {focused ? <HomeIconSelected /> : <HomeIcon />}
+              </View>
+            ),
           }}
         />
+        {/* Shop Screen */}
         <Tab.Screen
           name="Shop"
           component={ShopStack}
@@ -103,7 +110,7 @@ const MyTabs = ({ route }) => {
                             params: {
                               url: `${Env.URL}/services/upgrade`,
                               name: 'Shop',
-                              isExpandable: true
+                              isExpandable: true,
                             },
                           },
                         ],
@@ -112,17 +119,15 @@ const MyTabs = ({ route }) => {
                   ],
                 });
               }
-
             },
           })}
-
           options={{
             tabBarLabel: 'Shop',
             headerShown: false,
             tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected isNewBillerUser={!user?.isNormalUser} /> : <ShopIcon isNewBillerUser={!user?.isNormalUser} />)
           }}
         />
-
+        {/* Support Screen */}
         <Tab.Screen
           name="Support"
           component={SupportStack}
@@ -132,57 +137,45 @@ const MyTabs = ({ route }) => {
               if (user?.isNormalUser) {
                 navigation.reset({
                   index: 0,
-                  routes: [
-                    {
-                      name: 'Support',
-                    },
-                  ],
+                  routes: [{ name: 'Support' }],
                 });
               }
             },
           })}
-
           options={{
             headerShown: false,
             tabBarLabel: 'Support',
-            tabBarIcon: ({ focused }) => {
-              return (
-                <View style={styles.tabItem}>
-                  {focused ? <SupportIconSelected /> : <SupportIcon isNewBillerUser={!user?.isNormalUser} />}
-                </View>
-              );
-            }
+            tabBarIcon: ({ focused }) => (
+              <View style={styles.tabItem}>
+                {focused ? <SupportIconSelected /> : <SupportIcon isNewBillerUser={!user?.isNormalUser} />}
+              </View>
+            ),
           }}
         />
-
-
+        {/* Account Screen */}
         <Tab.Screen
           name="account"
           component={AccountStackScreen}
           listeners={({ navigation }) => ({
             tabPress: (e) => {
               e.preventDefault();
-              navigation.navigate('account', {
-                screen: 'Account',
-              });
+              navigation.navigate('account', { screen: 'Account' });
             },
           })}
           options={{
             headerShown: false,
             tabBarLabel: 'Account',
-            tabBarIcon: ({ focused }) => {
-              return (
-                <View style={styles.tabItem}>
-                  <AccountIcon focused={focused} data={user?.userInfo} />
-                </View>
-              );
-            }
+            tabBarIcon: ({ focused }) => (
+              <View style={styles.tabItem}>
+                <AccountIcon focused={focused} />
+              </View>
+            ),
           }}
         />
       </Tab.Navigator>
     </>
   );
-}
+};
 
 const styles = StyleSheet.create({
   tabItem: {
@@ -195,9 +188,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     zIndex: 5,
-    bottom: 0,
     opacity: .7,
-    left: 100
+    left: 100,
   },
   shadowTabsStep2: {
     left: tabWidth * 3,
@@ -205,16 +197,14 @@ const styles = StyleSheet.create({
   shadowTabsStep3: {
     left: tabWidth * 4,
   },
-  shadowTabsLeft: {
-
-  },
+  shadowTabsLeft: {},
   shadowTabsStep2Left: {
     width: tabWidth * 2,
-    left: 0
+    left: 0,
   },
   shadowTabsStep3Left: {
     width: tabWidth * 3,
-    left: 0
+    left: 0,
   },
 });
 

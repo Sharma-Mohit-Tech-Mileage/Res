@@ -14,7 +14,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
- //import * as Zendesk from 'react-native-zendesk-messaging';
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
 import { Env } from "../../network/apis/account/Constants";
@@ -76,6 +75,8 @@ const AccountOverview = () => {
   const [menues, setMenues] = useState([]);
   const dispatch = useDispatch();
   const user = useSelector(state => state.combinedReducers.user.userData);
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {};
   useEffect(() => {
     dispatch(fetchProfileDetails());
     if(user?.userInfo.accountNumber.toString().length>=16){
@@ -151,8 +152,8 @@ const AccountOverview = () => {
 
   useFocusEffect(
     useCallback(() => {
-      const firstName = user.userInfo?.firstName || '';
-      const lastName = user.userInfo?.lastName || '';
+      const firstName = profileDetails?.firstName || '';
+      const lastName = profileDetails?.lastName || '';
 
       let initials = '';
       if (firstName.length > 0) {

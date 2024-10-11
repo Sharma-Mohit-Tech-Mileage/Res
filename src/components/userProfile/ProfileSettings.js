@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Pressable, ScrollView } from "react-native";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from 'react-redux';
-import { getUser } from "../../redux/utils/LocalStorage";
-import { getUserType, isPrimaryAdmin, convertToSpecialCase, getRoleBasedMessage } from '../utility/constant';
+import { getUserType, convertToSpecialCase, getRoleBasedMessage } from '../utility/constant';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
 import { RefreshToken } from '../user/Session';
@@ -14,17 +13,14 @@ const ProfileSettings = () => {
   const route = useRoute();
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [accountObj, setAccountObj] = useState({});
   const [isNewBiller, setIsNewBiller] = useState(false);
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
-  const isPrimary = isPrimaryAdmin(profileDetails.memberType);
   const convertedRole = getUserType(profileDetails.memberType || '');
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || '');
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
-      //put RefreshToken in try catch block
       try {
         RefreshToken();
       } catch (error) {
@@ -40,27 +36,17 @@ const ProfileSettings = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const data = await getUser();
-      if (data) { setAccountObj(data?.userInfo) }
-    };
-    fetchUserData();
-  }, []);
-  
-  useEffect(() => {
-   
-    //console.log('Profile details',JSON.stringify(profileDetails))
-    if(profileDetails?.accountNumber?.toString().length>=16){
+    if (profileDetails?.accountNumber?.toString().length >= 16) {
       setIsNewBiller(true)
     }
-    
+
   }, [profileDetails]);
-    
+
 
 
   return (
     <View style={{ zIndex: 1 }}>
-      <ProfileSettingsHeader title="Profile Settings" onPressBack={() => navigation.navigate('Account')} />
+      <ProfileSettingsHeader title="Profile Settings" onPressBack={() => navigation.goBack()} />
       <ScrollView accessibilityLabel="Profile settings page.">
         <View style={styles.frameParent}>
           <View style={[styles.frameGroup]}>
@@ -86,16 +72,16 @@ const ProfileSettings = () => {
             </View>
             <View style={styles.frameContainer}>
               <View style={styles.firstNameParent} accessible={true} >
-                <Text style={styles.firstName}>{isNewBiller?'Customer Name':'First Name'}</Text>
+                <Text style={styles.firstName}>{isNewBiller ? 'Customer Name' : 'First Name'}</Text>
                 <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {isNewBiller? profileDetails.fullName:isPrimary ? accountObj.firstName : profileDetails.firstName}
+                  {isNewBiller ? profileDetails.fullName : profileDetails.firstName}
                 </Text>
               </View>
               {!isNewBiller && (
-              <View style={styles.firstNameParent} accessible={true} >
-                <Text style={styles.firstName}>Last Name</Text>
-                <Text style={[styles.melissa, styles.melissaTypo]}>{isPrimary ? accountObj.lastName : profileDetails.lastName}</Text>
-              </View>
+                <View style={styles.firstNameParent} accessible={true} >
+                  <Text style={styles.firstName}>Last Name</Text>
+                  <Text style={[styles.melissa, styles.melissaTypo]}>{profileDetails.lastName}</Text>
+                </View>
               )}
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Username</Text>

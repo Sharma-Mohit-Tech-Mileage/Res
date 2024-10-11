@@ -70,7 +70,6 @@ const SplashScreen = ({ navigation }) => {
   
       console.log("[HANDLE_LOGIN] Parsed user info:", JSON.stringify(user));
   
-      // Check if the user is a normal residential user
       let isNormalUser =
         userInfo &&
         userInfo.accountNumber &&

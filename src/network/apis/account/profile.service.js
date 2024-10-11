@@ -20,8 +20,6 @@ const getProfileDetails = async () => {
     } else {
         ApiMethod = `/users/api/profile/${accountNumber}`
     }
-
-
     return _axios.get(ApiMethod, { ...config })
         .then(res => res.data)
         .catch(error => {

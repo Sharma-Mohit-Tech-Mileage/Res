@@ -1,9 +1,11 @@
 import * as React from "react";
 import { View, Text } from "react-native";
-
+import { useSelector } from 'react-redux';
 const AccountIcon = (props) => {
-  const Fname = props.data && props.data.firstName ? props.data.firstName.charAt(0) : '';
-  const Lname = props.data && props.data.lastName ? props.data.lastName.charAt(0) : '';
+  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {};
+  const Fname = profileDetails&&profileDetails.firstName ? profileDetails.firstName.charAt(0) : '';
+  const Lname = profileDetails && profileDetails.lastName ? profileDetails.lastName.charAt(0) : '';
 
   return (
     <View
