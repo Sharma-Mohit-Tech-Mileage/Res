@@ -1,6 +1,4 @@
-// HomeStack.js
-
-import React, { useEffect, useState } from "react";
+import React, { Suspense } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "../../components/home/Home";
 import NewBillerHome from "../../components/home/NewBillerHome";
@@ -9,35 +7,40 @@ import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemStackScreen from "./ManageEquepmentStack";
 import ModemSpeedTest from "../../components/common/speedTest/ModemSpeedTest";
 import AutoPayPCIConnector from '../../components/utility/AutoPayPCIConnector'
-import { useSelector } from 'react-redux';
-
+import { useRoute } from "@react-navigation/native";
+import { ActivityIndicator } from "react-native";
 
 const HomeStack = createNativeStackNavigator();
 
 function HomeStackScreen() {
   const { setTabBarVisible } = useTabBarVisibility();
-  const user = useSelector(state => state.combinedReducers.user.userData);
-  const [isBillerUser,setIsBillerUser]= useState(false)
+  const route = useRoute();
+  const isNormalUser = route.params?.isNormalUser ?? true; // Default to true if not provided
 
-  useEffect(() => {
-    if(user?.userInfo.accountNumber.toString().length>=16){
-      setIsBillerUser(true)
-  }
-  }, []);
-
-
+  console.log('isNormalUser*************************************************************************', isNormalUser);
 
   return (
     <HomeStack.Navigator
       initialRouteName="Dashboard"
       defaultNavigationOptions={{ gestureEnabled: true }}
     >
+      {/* Dashboard Screen */}
       <HomeStack.Screen
         name="Dashboard"
-        component={isBillerUser? NewBillerHome : HomeScreen}
         options={{ headerShown: false }}
-      />
+      >
+        {({ navigation }) => (
+          <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+            {isNormalUser ? (
+              <HomeScreen navigation={navigation} />
+            ) : (
+              <NewBillerHome navigation={navigation} />
+            )}
+          </Suspense>
+        )}
+      </HomeStack.Screen>
 
+      {/* ArticalWindowUtility Screen */}
       <HomeStack.Screen
         name="ArticalWindowUtility"
         component={ArticalWindowUtility}
@@ -50,6 +53,8 @@ function HomeStackScreen() {
           blur: () => setTabBarVisible(true),
         }}
       />
+
+      {/* Manage Equipment Screen */}
       <HomeStack.Screen
         name="ManageEquipment"
         component={ModemStackScreen}
@@ -59,15 +64,19 @@ function HomeStackScreen() {
           blur: () => setTabBarVisible(true),
         }}
       />
+
+      {/* AutoPayPCIConnector Screen */}
       <HomeStack.Screen
-            name="AutoPayPCIConnector"
-            component={AutoPayPCIConnector}
-            options={{ headerShown: false }}
-            listeners={{
-              focus: () => setTabBarVisible(true),
-              blur: () => setTabBarVisible(true),
-            }}
-          />
+        name="AutoPayPCIConnector"
+        component={AutoPayPCIConnector}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+
+      {/* Modem Speed Test Screen */}
       <HomeStack.Screen
         name="ModemSpeedTest"
         component={ModemSpeedTest}
@@ -77,7 +86,6 @@ function HomeStackScreen() {
           blur: () => setTabBarVisible(true),
         }}
       />
-
     </HomeStack.Navigator>
   );
 }
