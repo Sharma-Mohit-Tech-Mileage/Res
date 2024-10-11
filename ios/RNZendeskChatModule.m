@@ -65,7 +65,7 @@ RCT_EXPORT_METHOD(setVisitorInfo:(NSDictionary *)options) {
      config.isPreChatFormEnabled = YES;
      config.preChatFormConfiguration = [[ZDKChatFormConfiguration alloc] initWithName:ZDKFormFieldStatusRequired
                                                                                            email:ZDKFormFieldStatusRequired
-                                                                                    phoneNumber:ZDKFormFieldStatusOptional
+                                                                                    phoneNumber:ZDKFormFieldStatusRequired
                                                                                       department:ZDKFormFieldStatusHidden];
     return config;
 }

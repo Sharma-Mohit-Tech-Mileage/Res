@@ -7,6 +7,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation,useFocusEffect } from "@react-navigation/native";
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import PubSub from 'pubsub-js'
+import moment from 'moment-timezone';
 import { Env } from "../../network/apis/account/Constants";
 import ChatSupportModal from "./ChatSupportModal";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
@@ -124,13 +125,13 @@ const Support = ({ route }) => {
 
     const checkChatAvailability = () => {
 
+        const now = moment();
+        const nowUTC = now.tz('MST');
+       
         
-        const currentTime = new Date();
-        let utcDate = new Date(Date.UTC(currentTime.getFullYear(), currentTime.getMonth(), currentTime.getDay(), currentTime.getHours(), currentTime.getSeconds(), currentTime.getMilliseconds())); 
-        const currentHour = currentTime.getHours();
-        console.log('Current Hour',currentTime.getFullYear())
-
-        console.log('Current UTC time',utcDate.toTimeString())
+        const currentHour = nowUTC.hour();
+    
+        console.log('Current UTC Hour',currentHour)
         
         // Define the time range when chat should be disabled (e.g., 10 PM to 6 AM)
         const disableStart = 18;  // 10:00 PM
@@ -541,7 +542,7 @@ const Support = ({ route }) => {
                                                 onPress={() => {
                                                     //toggleModal("tech");
                                                     if(!isChatDisabled){
-                                                    handlePressOpenButton("SPK TCC Residential", ['Resi_TechSupport'])
+                                                    handlePressOpenButton("SPK TCC Residential", ['Resi_TechSupport','Resimobileapp'])
                                                     }
                                                 }}
                                             >
@@ -630,7 +631,7 @@ const Support = ({ route }) => {
                                                     onPress={() => {
                                                         //toggleModal("Bill");
                                                         if(!isChatDisabled){
-                                                        handlePressOpenButton("mobiletest", ['Resi_BillSupport'])
+                                                        handlePressOpenButton("mobiletest", ['Resi_BillSupport','Resimobileapp'])
                                                         }
                                                     }}
                                                 >
