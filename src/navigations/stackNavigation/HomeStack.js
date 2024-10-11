@@ -40,7 +40,7 @@ function HomeStackScreen() {
         )}
       </HomeStack.Screen>
 
-      {/* ArticalWindowUtility Screen */}
+   
       <HomeStack.Screen
         name="ArticalWindowUtility"
         component={ArticalWindowUtility}
@@ -54,7 +54,7 @@ function HomeStackScreen() {
         }}
       />
 
-      {/* Manage Equipment Screen */}
+  
       <HomeStack.Screen
         name="ManageEquipment"
         component={ModemStackScreen}
@@ -65,7 +65,7 @@ function HomeStackScreen() {
         }}
       />
 
-      {/* AutoPayPCIConnector Screen */}
+  
       <HomeStack.Screen
         name="AutoPayPCIConnector"
         component={AutoPayPCIConnector}
@@ -76,7 +76,7 @@ function HomeStackScreen() {
         }}
       />
 
-      {/* Modem Speed Test Screen */}
+    
       <HomeStack.Screen
         name="ModemSpeedTest"
         component={ModemSpeedTest}
