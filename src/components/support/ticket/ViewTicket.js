@@ -409,6 +409,9 @@ const ViewTicket = ({ route }) => {
                   onPress={() => {
                     closeTicket();
                   }}
+                  accessibilityLabel="Close Ticket button"
+                  //accessibilityHint="Double-tap to close this ticket"
+                  accessibilityRole="button"
                 >
                   <Text
                     style={[
