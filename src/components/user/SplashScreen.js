@@ -364,6 +364,9 @@ const SplashScreen = ({ navigation }) => {
           resizeMode="contain"
           source={require("../../res/images/Logo.png")}
           style={styles.logo}
+          accessibilityRole="image"
+          accessibilityLabel="SparkLight"
+          accessible={true}
         />
       </View>
       {!loading && loginEnable && (
@@ -373,6 +376,10 @@ const SplashScreen = ({ navigation }) => {
             onPress={() => {
               loginAuth();
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Login button"
+            accessibilityHint="Double tap to log in"
+            accessible={true}
           >
             <Text style={styles.SSoBtn}>{"Login"}</Text>
           </TouchableOpacity>

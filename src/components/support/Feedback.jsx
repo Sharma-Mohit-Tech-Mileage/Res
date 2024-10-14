@@ -150,7 +150,11 @@ const Feedback = () => {
                                         height={130}
                                         error={errors.feedbackText?.message}
                                     />
-                                    <Text style={styles.footerWrapper}>
+                                    <Text
+                                        style={styles.footerWrapper}
+                                        accessibilityRole="text"
+                                        accessibilityLabel={`Character count: ${value.length} out of 500`}
+                                    >
                                         {`${value.length}/500`}
                                     </Text>
                                 </>
@@ -299,6 +303,9 @@ const styles = StyleSheet.create({
     footerWrapper: {
         textAlign: 'right',
         alignSelf: "stretch",
+        fontFamily: FontFamily.openSansRegular,
+        fontWeight: '400',
+        fontSize: FontSize.size_xs,
     },
 });
 export default Feedback;
