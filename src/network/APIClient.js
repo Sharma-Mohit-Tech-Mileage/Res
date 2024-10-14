@@ -26,7 +26,7 @@ const handleFetchResponse = async (response, url, onSuccess, onError) => {
         console.log("Raw Response:", response.status); // Log the raw response
 
         if (response.status === 204 || !rawResponse) {
-            onSuccess({ message: 'No content' }); // Pass a success message for no content
+            onSuccess({ message: 'No content',code:response.status }); // Pass a success message for no content
             return;
         }
 
@@ -40,7 +40,7 @@ const handleFetchResponse = async (response, url, onSuccess, onError) => {
             }
         } catch (jsonParseError) {
             console.error('JSON Parse error:', jsonParseError);
-            onError(`Failed to parse response: ${jsonParseError.message}`);
+            onError(`Failed to parse response: ${jsonParseError.message} code: ${response.status}`);
         }
     } catch (error) {
         onError(`Error processing response: ${error.message}`);

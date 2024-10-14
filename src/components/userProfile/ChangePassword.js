@@ -103,10 +103,10 @@ const ChangePassword = () => {
             },
             (error) => {
                 setLoading(false);
-                console.error("Error updating password", error);
+               // console.error("Error updating password", error);
 
                 // Handle specific errors, such as '204 No Content' or others
-                if (error.includes('204')) {
+                if (error.code=='204') {
                     navigation.navigate('PasswordSecurity', { updateSuccess: true, isPassword: true });
                 } else {
                     setShowErrorAlert(true);  // Show an error alert for other errors
