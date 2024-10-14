@@ -17,6 +17,9 @@ import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
 import { FontFamily } from '../../GlobalStyles';
 import { Env } from '../network/apis/account/Constants';
 import { fetchProfileDetails } from '../redux/actions/ProfileActionSuite';
+import BillingScreen from "../components/billing/BillingScreen";
+import BillingIcon from "../res/svgIcons/BillingIcon";
+
 
 const { width } = Dimensions.get('window');
 const tabWidth = Number(width / 4);
@@ -90,6 +93,24 @@ const MyTabs = ({ route }) => {
             ),
           }}
         />
+        
+        {/* Billing Screen */}
+         <Tab.Screen
+          name="Billing"
+          component={BillingScreen}
+          options={{
+            headerShown: false,
+            swipeEnabled: false,
+            tabBarLabel: 'Billing',
+            tabBarIcon: ({ focused }) => (
+              <View style={styles.tabItem}>
+               <BillingIcon isSelected={focused} />
+              </View>
+            ),
+          }}
+        />
+        {/* Billing Screen */}
+
         {/* Shop Screen */}
         <Tab.Screen
           name="Shop"
