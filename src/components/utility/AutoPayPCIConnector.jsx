@@ -286,7 +286,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             ) : (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="rgba(141, 59, 144, 1)" />
-                    <Text style={styles.loadingText}>Preparing content...</Text>
+                    <Text style={styles.loadingText}>Loading...</Text>
                 </View>
             )}
         </View>
