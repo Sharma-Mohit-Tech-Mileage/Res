@@ -5,7 +5,7 @@ import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalSty
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 
-const AccountOverview = () => {
+const BillingScreen = () => {
   const [initials,setInitials]=useState('')
   useFocusEffect(
     useCallback(() => {
@@ -189,4 +189,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default AccountOverview;
+export default BillingScreen;

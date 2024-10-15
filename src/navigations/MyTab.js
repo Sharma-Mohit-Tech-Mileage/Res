@@ -17,8 +17,8 @@ import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
 import { FontFamily } from '../../GlobalStyles';
 import { Env } from '../network/apis/account/Constants';
 import { fetchProfileDetails } from '../redux/actions/ProfileActionSuite';
-import BillingScreen from "../components/billing/BillingScreen";
 import BillingIcon from "../res/svgIcons/BillingIcon";
+import BillingStackScreen from "./stackNavigation/BillingStack";
 
 
 const { width } = Dimensions.get('window');
@@ -97,7 +97,35 @@ const MyTabs = ({ route }) => {
         {/* Billing Screen */}
          <Tab.Screen
           name="Billing"
-          component={BillingScreen}
+          component={BillingStackScreen}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              
+              console.log('IsNormal user',user?.isNormalUser)
+              if (!user?.isNormalUser) {
+                navigation.reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: 'Billing',
+                      state: {
+                        routes: [
+                          {
+                            name: 'ArticalWindowUtility',
+                            params: {
+                              url: `${Env.PAYMENTURLNEW}`,
+                              name: 'Billing Details',
+                              isExpandable: true,
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                });
+              }
+            },
+          })}
           options={{
             headerShown: false,
             swipeEnabled: false,
