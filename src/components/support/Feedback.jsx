@@ -50,7 +50,7 @@ const Feedback = () => {
     const onSubmit = data => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
-        setIsSubmitting(true); 
+        setIsSubmitting(true);
 
         dispatch(saveUserFeedback(data, navigation));
     };
@@ -94,22 +94,22 @@ const Feedback = () => {
                     </View>}
                     <View style={styles.howWouldYourRateYourExperWrapper}>
                         <Text style={[styles.howWouldYour]}>
-                        How would you rate your experience using the MySparklight app?
+                            How would you rate your experience using the MySparklight app?
                         </Text>
                     </View>
                     <View style={[styles.frameContainer]}>
                         <View style={[styles.frameGroup, styles.frameFlexBox]}>
                             {feedbackOptions.map((option) => (
                                 <Pressable
-                                accessibilityLabel={option.text}
-                                accessibilityRole="button"
-                                accessible={true}
+                                    accessibilityLabel={option.text}
+                                    accessibilityRole="button"
+                                    accessible={true}
                                     key={option.name}
                                     style={[
-                                        styles.faceSadParent, 
+                                        styles.faceSadParent,
                                         { flex: 1 },
                                         selectedFeedback === option.name && { backgroundColor: Color.colorMidnightblue }
-                                    ]} 
+                                    ]}
                                     onPress={() => handleIconPress(option)}
                                 >
                                     <Image
@@ -120,7 +120,7 @@ const Feedback = () => {
                                     <Text
                                         allowFontScaling={false}
                                         style={[
-                                            styles.terrible, 
+                                            styles.terrible,
                                             styles.greatTypo,
                                             selectedFeedback === option.name && { color: Color.sparklightWhite }
                                         ]}
@@ -141,8 +141,8 @@ const Feedback = () => {
                                 <>
                                     <SparkLightInput
                                         label="Additional Feedback"
-                                        textAlignVertical='top'
-                                        onChangeText={onChange}
+                                        textAlignVertical="top"
+                                        onChangeText={onChange} // Directly updates value
                                         onBlur={onBlur}
                                         value={value}
                                         multiline={true}
@@ -153,9 +153,9 @@ const Feedback = () => {
                                     <Text
                                         style={styles.footerWrapper}
                                         accessibilityRole="text"
-                                        accessibilityLabel={`Character count: ${value.length} out of 500`}
+                                        accessibilityLabel={`Character count: ${value?.length || 0} out of 500`}
                                     >
-                                        {`${value.length}/500`}
+                                        {`${value?.length || 0}/500`}
                                     </Text>
                                 </>
                             )}
@@ -195,7 +195,7 @@ const Feedback = () => {
                         </Pressable>
 
                     </View>
-                    <View style={{paddingHorizontal:Padding.p_base}}>
+                    <View style={{ paddingHorizontal: Padding.p_base }}>
                         <Pressable
                             accessibilityLabel="Cancel"
                             accessibilityRole="button"
@@ -304,6 +304,7 @@ const styles = StyleSheet.create({
         alignSelf: "stretch",
         fontFamily: FontFamily.openSansRegular,
         fontWeight: '400',
+        color: Color.sparklightDarkGray,
         fontSize: FontSize.size_xs,
     },
 });
