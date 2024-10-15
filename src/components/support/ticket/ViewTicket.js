@@ -551,6 +551,9 @@ const ViewTicket = ({ route }) => {
                                   setIsNoComment(true);
                                 }
                               }}
+
+                              accessibilityLabel="Add Note button"
+                              accessibilityRole="button"
                             >
                               <Text
                                 style={[

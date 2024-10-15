@@ -175,7 +175,14 @@ const SupportTicket = () => {
           <View
             style={{ paddingHorizontal: Padding.p_base, flexDirection: "row" }}
           >
+            <View 
+              accessibilityLabel="View Ticket Details"
+              accessibilityRole="button"
+              >
             <TicketListIcon />
+            </View>
+            
+
             <Text
               style={{
                 fontFamily: FontFamily.interBold,
@@ -183,8 +190,7 @@ const SupportTicket = () => {
                 textAlignVertical: "center",
                 color: Color.sparklightGray1,
               }}
-              //accessibilityLabel="View Ticket Details"
-              accessibilityRole="button"
+              
             >
               {" "}
               Ticket #{item.ticketNumber}{" "}
