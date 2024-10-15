@@ -36,6 +36,8 @@ import {
   passwordTerms,
 } from "../utility/constant";
 import NotificationError from "../common/customui/NotificationError";
+import WarningIcon from "../../../assets/alert-triangle.png";
+import colors from "../../res/Colors";
 
 const UserManagementEdit = ({ route }) => {
   const navigation = useNavigation();
@@ -106,10 +108,8 @@ const UserManagementEdit = ({ route }) => {
  // console.log('Password',(isnewUser || pass?.target?.value.length>0 ))
   //setValue('newPassword', 'value', { shouldValidate: false })
   const handleSave = (formData) => {
-    //console.log('Request',formData)
     setLoading(true);
     if (route.params?.User != undefined) {
-
       formData['securityQuestion']= isCustomQuestionSelected ? formData.securityQuestion :customSecurityQuestion
       dispatch(
         editNewUser(formData, (isSuccess) => {
@@ -163,6 +163,7 @@ const UserManagementEdit = ({ route }) => {
   const handleValidationError = () => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setShowValidationAlert(true);
+    console.log('Request',customSecurityQuestion)
   };
 
   useEffect(() => {
@@ -540,10 +541,11 @@ const UserManagementEdit = ({ route }) => {
                       ]}
                     >
                       <View style={styles.textinput}>
-                        <Text style={[styles.firstName1, styles.firstTypo]}>
+                        <Text style={[styles.firstName1, styles.firstTypo,{color:(showValidationAlert && customSecurityQuestion.length==0)?colors.sparklight_red:Color.sparklightGray1,fontWeight:(showValidationAlert && customSecurityQuestion.length==0)?'700':'400'}]}>
                           {" "}
                           Password Reset Question
                         </Text>
+                        <>
                         <SparkLightDropdown
                           items={securityQuestions}
                           selectedValue={customSecurityQuestion}
@@ -551,7 +553,22 @@ const UserManagementEdit = ({ route }) => {
                           isDropDownOpen={(value) => {
                             setIsDropDownOpen(true)
                           }}
+                          
                         />
+                        {(showValidationAlert && customSecurityQuestion.length==0) && (
+                              <View 
+                              
+                              style={styles.errorContainer}>
+                                <Image
+                                  source={WarningIcon}
+                                  style={styles.errorIcon}
+                                />
+                                <Text style={styles.errorText}>
+                                  {'Password Reset Question is required'}
+                                </Text>
+                              </View>
+                            )}
+                        </>
                       </View>
                     </View>
                     {isCustomQuestionSelected && (
@@ -945,6 +962,20 @@ const styles = StyleSheet.create({
     height: 7,
     borderRadius: 3.5,
     marginRight: 10,
+  }, errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4, // Space between the input and the error message
+  },
+  errorIcon: {
+    width: 20,
+    height: 20,
+    marginRight: Padding.p_xs,
+  },
+  errorText: {
+    color: "red",
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.openSansRegular,
   },
 });
 
