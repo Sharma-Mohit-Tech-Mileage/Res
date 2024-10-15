@@ -171,13 +171,15 @@ const SupportTicket = () => {
             navigation.navigate("ViewTicket", { ticketId: item.ticketNumber });
             }
           }}
+          accessibilityLabel={`Ticket: ${item.ticketNumber}`}
+          accessibilityRole="button"
+          accessible={true}
         >
           <View
             style={{ paddingHorizontal: Padding.p_base, flexDirection: "row" }}
           >
             <View 
-              accessibilityLabel="View Ticket Details"
-              accessibilityRole="button"
+
               >
             <TicketListIcon />
             </View>
