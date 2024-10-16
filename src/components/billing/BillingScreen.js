@@ -92,7 +92,7 @@ const BillingScreen = ({ billAmt, dueDate,paymentDetails, navigation }) => {
           <Text style={styles.melissaSmith}>{"Billing Services"}</Text>
         </View>
         <ScrollView style={{ marginHorizontal: 20 }}>
-          <View>
+          <View style={{paddingBottom:100}}>
             <Card
               billAmt={billAmt}
               dueDate={dueDate}
@@ -259,6 +259,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },card: {
     height: 230,  // Set the height for the cards
+    marginVertical:10
   },
 });
 

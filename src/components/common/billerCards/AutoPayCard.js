@@ -22,12 +22,12 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, paymentDetails,navigation ,st
   return (
     <View style={styles.shadowContainer}>
       <View style={[styles.card,style]}>
-        <View style={styles.leftSection}>
+        {/* <View style={styles.leftSection}>
           <View style={styles.circleContainerShadow}></View>
           <View style={styles.circleContainer}></View>
           <View style={styles.icon}><DollerIconBg /></View>
           <Text style={styles.leftTitle}>Auto Pay</Text>
-        </View>
+        </View> */}
         <View style={styles.cardContent}>
           {isAutoPayStatus ? (
             <>
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignSelf: "center",
     overflow: 'hidden',
-    width: wp('85%'),
+    width: wp('92%'),
   },
   leftSection: {
     paddingHorizontal: Padding.p_5xl,
