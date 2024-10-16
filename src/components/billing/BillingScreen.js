@@ -1,16 +1,70 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Image, StyleSheet, Text, View, Pressable, Alert, ScrollView } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  Alert,
+  ScrollView,
+} from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
+import {
+  Color,
+  FontFamily,
+  FontSize,
+  Padding,
+  Border,
+} from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import BillingIconWhite from "../../res/svgIcons/BillingIconWhite";
+import { getUser } from "../../redux/utils/LocalStorage";
+import { GetApiRequest } from "../../network/APIClient";
+import Card from "../common/billerCards/BillerSummary";
+import { useDispatch, useSelector } from "react-redux";
+import AutoPayCard from "../common/billerCards/AutoPayCard";
+import PeperLessCard from "../common/billerCards/PeperLessCard";
+import { fetchBillingPaper, fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 
-const BillingScreen = () => {
-  const [initials,setInitials]=useState('')
+const BillingScreen = ({ billAmt, dueDate,paymentDetails, navigation }) => {
+    const dispatch = useDispatch();
+  const [initials, setInitials] = useState("");
+  const [paperlessStatus, setPaperlessStatus] = useState(false);
+  const [cardDigit, setCardDigit] = useState("");
+  const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
+  const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const paperLessInfo = profile.paperLessInfo || {};
+
+  const getStatus = () => {
+    getUser().then((res) => {
+      const accountNumber = res.userInfo.accountNumber;
+      GetApiRequest(
+        `account/api/account/${accountNumber}/easypay`,
+        (res) => {
+          setIsAutoPayStatus(res?.isEasyPay);
+          setCardDigit(res?.epLastfour);
+        },
+        onError
+      );
+      GetApiRequest(
+        `account/api/account/${accountNumber}/paperless/status`,
+        setPaperlessStatus,
+        onError
+      );
+    });
+  };
+
+  const onError = (error) => {
+    console.log("error", error);
+  };
+
   useFocusEffect(
     useCallback(() => {
-      
-    }, []) 
+      getStatus();
+      dispatch(fetchBillingPaper());
+      dispatch(fetchProfileDetails());
+    }, [])
   );
 
   return (
@@ -18,7 +72,7 @@ const BillingScreen = () => {
       <ProfileSettingsHeader
         title="Account"
         iconAlignment="right"
-        showIcon={false} 
+        showIcon={false}
       />
       <LinearGradient
         style={styles.linearGradientStyle}
@@ -31,15 +85,51 @@ const BillingScreen = () => {
         <View style={styles.rightActionableParent}>
           <View style={styles.rightActionable}>
             <Text style={styles.text}>
-              {initials}
+              <BillingIconWhite isSelected={false} />
             </Text>
           </View>
           {/* Full name for profile */}
-          <Text style={styles.melissaSmith} >
-            {'Billing'}
-          </Text>
+          <Text style={styles.melissaSmith}>{"Billing Services"}</Text>
         </View>
-       
+        <ScrollView style={{ marginHorizontal: 20 }}>
+          <View>
+            <Card
+              billAmt={billAmt}
+              dueDate={dueDate}
+              isAutoPayStatus={isAutoPayStatus}
+              paperlessStatus={paperlessStatus}
+              navigation={navigation}
+              style={styles.card}
+              accessible={true}
+              accessibilityLabel="Billing Summary Card"
+              
+            />
+            <AutoPayCard
+              billAmt={billAmt}
+              cardDigit={cardDigit}
+              isAutoPayStatus={isAutoPayStatus}
+              paperlessStatus={paperlessStatus}
+              paymentDetails={paymentDetails}
+              navigation={navigation}
+              style={styles.card}
+              accessible={true}
+              accessibilityLabel="Auto Pay Card"
+             
+            />
+
+            <PeperLessCard
+              billAmt={billAmt}
+              paperLessInfo={paperLessInfo}
+              isAutoPayStatus={isAutoPayStatus}
+              paperlessStatus={paperlessStatus}
+              navigation={navigation}
+              style={styles.card}
+              accessible={true}
+              accessibilityLabel="Paperless Billing Card"
+              
+            />
+          </View>
+        </ScrollView>
       </View>
     </View>
   );
@@ -47,7 +137,7 @@ const BillingScreen = () => {
 
 const styles = StyleSheet.create({
   linearGradientStyle: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     top: 0,
@@ -63,36 +153,18 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     justifyContent: "center",
   },
-  accept: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "center",
-    color: Color.sparklightWhite,
-  },
-  tabsFlexBox: {
-    flexDirection: "row",
-    alignSelf: "stretch",
-  },
-  linkStyle: {
-    color: Color.colorMidnightblue,
-    alignSelf: 'center',
-    fontWeight: '600'
-  },
-  makePaymentTypo: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
-  },
+
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    width: '100%', 
+    flexDirection: "row",
+    justifyContent: "center",
+    width: "100%",
     paddingTop: Padding.p_5xl,
   },
 
   rightIconLayout: {
     height: 24,
     width: 24,
-    marginRight: 5
+    marginRight: 5,
   },
   title: {
     marginLeft: -35,
@@ -100,7 +172,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: Color.colorMidnightblue,
-    width: '100%',
+    width: "100%",
   },
   buttonsLayout: {
     paddingVertical: Padding.p_base,
@@ -108,7 +180,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: Border.br_11xs,
-    minHeight: 50
+    minHeight: 50,
   },
   rightActionable: {
     borderColor: Color.colorWhitesmoke_200,
@@ -117,8 +189,8 @@ const styles = StyleSheet.create({
     height: 72,
     backgroundColor: Color.colorMidnightblue,
     borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   text: {
@@ -140,7 +212,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "stretch",
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   profileSettings: {
     textAlign: "left",
@@ -166,7 +238,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   buttons: {
-    width: '100%',
+    width: "100%",
     paddingHorizontal: 0,
     justifyContent: "center",
     paddingVertical: Padding.p_base,
@@ -179,14 +251,15 @@ const styles = StyleSheet.create({
   frameParent: {
     flex: 1,
     paddingVertical: Padding.p_base,
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
   },
   account: {
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
     width: "100%",
+  },card: {
+    height: 230,  // Set the height for the cards
   },
-
 });
 
 export default BillingScreen;

@@ -35,31 +35,31 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
     console.log("error", error);
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      getStatus();
-      console.log('Refresh Auto pay Data')
-      return () => {
-      };
-    }, [])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     getStatus();
+  //     console.log('Refresh Auto pay Data')
+  //     return () => {
+  //     };
+  //   }, [])
+  // );
 
   const renderCard = ({ item, index }) => {
-    if (index === 1) {
-      return (
-        <AutoPayCard
-          billAmt={billAmt}
-          dueDate={dueDate}
-          pastPaymentDue={pastPaymentDue}
-          cardDigit={cardDigit}
-          isAutoPayStatus={isAutoPayStatus}
-          paperlessStatus={paperlessStatus}
-          paymentDetails={paymentDetails}
-          navigation={navigation}
-          style={styles.card}
-        />
-      );
-    }
+    // if (index === 1) {
+    //   return (
+    //     <AutoPayCard
+    //       billAmt={billAmt}
+    //       dueDate={dueDate}
+    //       pastPaymentDue={pastPaymentDue}
+    //       cardDigit={cardDigit}
+    //       isAutoPayStatus={isAutoPayStatus}
+    //       paperlessStatus={paperlessStatus}
+    //       paymentDetails={paymentDetails}
+    //       navigation={navigation}
+    //       style={styles.card}
+    //     />
+    //   );
+    // }
     
     return (
       <Card
@@ -74,9 +74,9 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollView} style={{ marginStart: -24 }}>
+    
       <View style={styles.container}>
-        <Carousel
+        {/* <Carousel
           data={[{}, {}]}
           renderItem={renderCard}
           sliderWidth={viewportWidth}
@@ -85,9 +85,18 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
           inactiveSlideOpacity={0.7}
           containerCustomStyle={styles.carousel}
           contentContainerCustomStyle={styles.carouselContentContainer}
-        />
+        /> */}
+
+       <Card
+        billAmt={billAmt}
+        dueDate={dueDate}
+        isAutoPayStatus={isAutoPayStatus}
+        paperlessStatus={paperlessStatus}
+        navigation={navigation}
+        style={styles.card}
+      />
       </View>
-    </ScrollView>
+    
   );
 };
 

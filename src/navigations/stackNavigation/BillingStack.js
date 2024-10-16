@@ -12,19 +12,6 @@ function BillingStackScreen() {
     const { setTabBarVisible } = useTabBarVisibility();
     return (
         <BillingStack.Navigator defaultNavigationOptions={{ gestureEnabled: true }}>
-            
-            <BillingStack.Screen
-                name="ArticalWindowUtility"
-                component={ArticalWindowUtility}
-                options={{
-                    headerBackVisible: false,
-                    headerShown: false,
-                }}
-                listeners={{
-                    focus: () => setTabBarVisible(true),
-                    blur: () => setTabBarVisible(true),
-                }}
-            />
             <BillingStack.Screen
                 name="Billing"
                 component={BillingScreen}
@@ -37,6 +24,8 @@ function BillingStackScreen() {
                     blur: () => setTabBarVisible(true),
                 }}
             />
+
+
             
         </BillingStack.Navigator>
     );

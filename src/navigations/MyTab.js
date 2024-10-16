@@ -103,6 +103,7 @@ const MyTabs = ({ route }) => {
               
               console.log('IsNormal user',user?.isNormalUser)
               if (!user?.isNormalUser) {
+                e.preventDefault();
                 navigation.reset({
                   index: 0,
                   routes: [

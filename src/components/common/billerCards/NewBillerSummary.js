@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignSelf: "center",
     overflow: "hidden",
-    width: wp("85%"),
+    width: wp("92%"),
   },
   leftSection: {
     paddingHorizontal: Padding.p_3xs,
