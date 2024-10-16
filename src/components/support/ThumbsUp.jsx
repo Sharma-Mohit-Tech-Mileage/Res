@@ -11,29 +11,48 @@ const ThumbsUp = () => {
             <ProfileSettingsHeader
                 title="Feedback"
                 onPressBack={() => navigation.navigate('Account')}
+                accessibilityRole="header"
+                accessibilityLabel="Feedback header"
             />
             <ScrollView contentContainerStyle={styles.scrollViewContent}>
                 <View style={styles.content}>
                     <View style={styles.frameParent}>
-                        <View style={styles.containerImage}>
+                        <View style={styles.containerImage}
+                            accessible={true}
+                            accessibilityLabel="Thumbs up icon indicating successful feedback submission"
+                            accessibilityRole="image"
+                        >
                             <Image
+                                accessible={true}
                                 style={styles.image}
                                 resizeMode="cover"
                                 source={require("../../../assets/thumbsup.png")}
                             />
                         </View>
                         <View style={styles.textContainer}>
-                            <Text style={styles.thankYouFor}>
+                            <Text
+                                style={styles.thankYouFor}
+                                accessibilityRole="header"
+                                accessibilityLabel="Thank you for your feedback!"
+                            >
                                 Thank you for your feedback!
                             </Text>
-                            <Text style={styles.yourFeedbackMeans}>
+                            <Text
+                                style={styles.yourFeedbackMeans}
+                                accessibilityLabel="Your feedback means a lot to us. We will use it to improve our services for you and the communities we serve."
+                            >
                                 Your feedback means a lot to us! We will use it
                                 to continue improving our services for both you and
                                 the communities we serve.
                             </Text>
                         </View>
                     </View>
-                    <Pressable style={styles.button} onPress={() => { navigation.navigate('Account') }}>
+                    <Pressable
+                        style={styles.button}
+                        onPress={() => navigation.navigate('Account')}
+                        accessibilityRole="button"
+                        accessibilityLabel="Done button. Return to Account screen"
+                    >
                         <Text style={styles.buttonText}>Done</Text>
                     </Pressable>
                 </View>

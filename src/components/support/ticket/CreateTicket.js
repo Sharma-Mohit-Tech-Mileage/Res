@@ -381,6 +381,9 @@ const CreateTicket = () => {
                 title="Submit"
                 onPress={handleSubmit(handleSave)}
                 buttonType="submit"
+                accessibilityLabel="Submit button"
+                //accessibilityHint="Saves the form and submits your request"
+                accessibilityRole="button"
               />
             </View>
             <View>
