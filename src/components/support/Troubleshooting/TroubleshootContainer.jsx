@@ -14,8 +14,8 @@ import { useIsFocused } from '@react-navigation/native';
 
 const stepsData = [
   {
-    title: "Checking for outage in your area...",
-    resultMsg: "No outage were detected in your area...",
+    title: "Let's resolve your issues.",
+    resultMsg: "Performing a system check...",
     resultMsg: "",
     errorMsg: "Uh oh. Looks like there is a server error.",
     success: false,
