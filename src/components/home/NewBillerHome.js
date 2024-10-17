@@ -339,7 +339,10 @@ const NewBillerHome = ({ navigation }) => {
                 </Text>
 
                 {isImageDispaly ? (
-                  <View style={{ width: wp('80%'), borderRadius: 5, alignSelf: 'center', marginTop: 10 }} >
+                  <View 
+                  accessible={isImageDispaly}
+                  accessibilityLabel={`SparkLight Video`}
+                  style={styles.videoContainer} >
                   <YoutubePlayer
                   height={185}
                   play={playing}
@@ -616,7 +619,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: wp("15%"),
     marginTop: wp("-10%"),
-  },
+  },videoContainer:
+    { 
+    width: wp('80%'),
+     borderRadius: 5,
+      alignSelf: 'center',
+       marginTop: 10
+       }
 });
 
 export default NewBillerHome;
