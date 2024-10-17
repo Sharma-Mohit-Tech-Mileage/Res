@@ -171,7 +171,7 @@ const AccountOverview = () => {
       setInitials(initials);
       return () => {
       };
-    }, [user?.userInfo]) 
+    }, [profileDetails]) 
   );
 
   return (
