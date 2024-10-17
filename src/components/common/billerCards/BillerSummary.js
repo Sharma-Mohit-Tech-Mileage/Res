@@ -29,69 +29,61 @@ const Card = ({
   return (
     <View style={styles.shadowContainer}>
       <View style={[styles.card, style]}>
-        {/* <View style={styles.leftSection}>
-                    <View style={styles.circleContainerShadow}></View>
-                    <View style={styles.circleContainer}></View>
-                    <View style={[styles.icon,{paddingRight:24}]}><WalletIcon /></View>
-                    <Text style={styles.leftTitle}>Bill Summary</Text>
-                </View> */}
-
         <View style={styles.cardContent}>
+          <View style={styles.cardHreader}>
+            <View
+              style={{
+                marginLeft: 20,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <WalletSummaryIcon />
+              <Text style={styles.leftTitle}>Bill Summary</Text>
+            </View>
+          </View>
+
           <View
             style={{
               flexDirection: "row",
-              backgroundColor: "#F8F8F8",
-              width: "100%",
-              height: 40,
+              width: "70%",
+              marginHorizontal: 20,
+              marginVertical: 10,
+              justifyContent: "space-between",
+              alignItems: "center",
+            
+              flex:0.5
             }}
           >
-            <View style={{marginLeft:20,flexDirection:'row', alignItems:'center'}}>
-            <WalletSummaryIcon />
-            <Text style={styles.leftTitle}>Bill Summary</Text>
+            <View
+              style={{
+                flexDirection: "column",
+                flex: 1,
+                justifyContent: "flex-start",
+              }}
+            >
+              <Text style={[styles.label, { fontWeight: "600" }]}>
+                Account Number
+              </Text>
+              <Text style={styles.label}>{"736837888374347"}</Text>
             </View>
-            
-          </View>
-          <Text style={styles.amount}>${billAmt}</Text>
-
-          <Text style={styles.dueDate}>
-            {dueDate ? "Due on " : ""}
+            <View style={{flex: 1,flexDirection:'column'}}>
+            <Text style={styles.amount}>${67.89}</Text>
+            <Text style={styles.dueDate}>
+            {dueDate ? "Due on " : "Bal due"}
             <Text style={[styles.dueDate, { fontWeight: "400" }]}>
               {dueDate}
             </Text>
           </Text>
-          <View style={{ marginVertical: Padding.p_base }}>
-            <View style={styles.statusRow}>
-              <Text style={styles.label}>Auto Pay : </Text>
-              <View style={styles.status}>
-                <Image
-                  resizeMode="cover"
-                  source={isAutoPayStatus ? check : uncheck}
-                  style={styles.statusIcon}
-                />
-                <Text
-                  style={isAutoPayStatus ? styles.labelActive : styles.label}
-                >
-                  {isAutoPayStatus ? "On" : "Off"}
-                </Text>
-              </View>
             </View>
-            <View style={styles.statusRow}>
-              <Text style={styles.label}>Paperless Billing : </Text>
-              <View style={styles.status}>
-                <Image
-                  resizeMode="cover"
-                  source={paperlessStatus ? check : uncheck}
-                  style={styles.statusIcon}
-                />
-                <Text
-                  style={paperlessStatus ? styles.labelActive : styles.label}
-                >
-                  {paperlessStatus ? "On" : "Off"}
-                </Text>
-              </View>
-            </View>
+            
           </View>
-          <View style={styles.statusRow}>
+
+          
+
+          
+          <View style={styles.cardFooter}>
+         
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("ArticalWindowUtility", {
@@ -109,7 +101,8 @@ const Card = ({
                 <RightArrow color={colors.snow_white} />
               </View>
             </TouchableOpacity>
-          </View>
+            </View>
+          
         </View>
       </View>
     </View>
@@ -175,20 +168,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "400",
     textAlign: "center",
-    marginLeft:20,
+    marginLeft: 10,
     alignContent: "flex-start",
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   cardContent: {
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   amount: {
     fontSize: 28,
     fontWeight: "bold",
     color: colors.sp_black,
-    alignSelf: "flex-end",
-    marginVertical: Padding.p_8xs,
     fontWeight: "700",
+    
   },
   dueDate: {
     fontSize: 14,
@@ -197,7 +189,7 @@ const styles = StyleSheet.create({
     alignContent: "center",
     fontFamily: FontFamily.openSansRegular,
     color: colors.sparklight_purple_blue,
-    alignSelf: "flex-end",
+    
   },
   statusRow: {
     flexDirection: "row",
@@ -207,12 +199,10 @@ const styles = StyleSheet.create({
     marginVertical: Padding.p_8xs,
   },
   label: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: FontFamily.openSansRegular,
     fontWeight: "400",
     color: colors.gray600,
-    alignItems: "flex-end",
-    alignContent: "flex-end",
   },
   labelActive: {
     fontSize: 14,
@@ -233,11 +223,12 @@ const styles = StyleSheet.create({
   },
   paymentButton: {
     flexDirection: "row",
-    alignItems: "center",
     backgroundColor: colors.sparklight_purple_blue,
     paddingLeft: 8,
     paddingVertical: 5,
     borderRadius: 5,
+    alignSelf:'center',
+    marginLeft:wp("28%")
   },
   paymentButtonText: {
     color: colors.snow_white,
@@ -247,6 +238,25 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignItems: "flex-end",
     fontFamily: FontFamily.openSansRegular,
+  },
+  cardHreader: {
+    flexDirection: "row",
+    backgroundColor: "#F8F8F8",
+    width: "92%",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    padding: 10,
+  },cardFooter: {
+    flexDirection: "row",
+    backgroundColor: "#F8F8F8",
+    width: "92%",
+    borderBottomEndRadius: 10,
+    borderBottomStartRadius: 10,
+    padding: 10,
+    position: 'absolute',
+    bottom:0,
+    left:0,
+    
   },
 });
 
