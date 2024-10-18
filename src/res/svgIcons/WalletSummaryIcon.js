@@ -9,7 +9,7 @@ const WalletSummaryIcon = (props) => (
     {...props}
   >
     <Path
-      stroke="#0060AE"
+      stroke="#8D3B90"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}

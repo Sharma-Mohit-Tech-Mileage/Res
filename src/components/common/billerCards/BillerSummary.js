@@ -22,6 +22,7 @@ const Card = ({
   paperlessStatus,
   navigation,
   style,
+  acno
 }) => {
   const uncheck = require("../../../../assets/checkcircle1.png");
   const check = require("../../../../assets/checkcircle.png");
@@ -33,12 +34,15 @@ const Card = ({
           <View style={styles.cardHreader}>
             <View
               style={{
-                marginLeft: 20,
+                marginLeft: 10,
                 flexDirection: "row",
                 alignItems: "center",
               }}
             >
-              <WalletSummaryIcon />
+              <View style={{ alignSelf: "center" }}>
+                <WalletSummaryIcon />
+              </View>
+
               <Text style={styles.leftTitle}>Bill Summary</Text>
             </View>
           </View>
@@ -51,8 +55,7 @@ const Card = ({
               marginVertical: 10,
               justifyContent: "space-between",
               alignItems: "center",
-            
-              flex:0.5
+              flex: 0.5,
             }}
           >
             <View
@@ -65,25 +68,28 @@ const Card = ({
               <Text style={[styles.label, { fontWeight: "600" }]}>
                 Account Number
               </Text>
-              <Text style={styles.label}>{"736837888374347"}</Text>
+              <Text style={styles.label}>{acno}</Text>
             </View>
-            <View style={{flex: 1,flexDirection:'column'}}>
-            <Text style={styles.amount}>${67.89}</Text>
-            <Text style={styles.dueDate}>
-            {dueDate ? "Due on " : "Bal due"}
-            <Text style={[styles.dueDate, { fontWeight: "400" }]}>
-              {dueDate}
-            </Text>
-          </Text>
+            <View style={{ flexDirection: "column", flex: 1,
+                justifyContent: 'flex-end', marginEnd:40}}>
+            {billAmt == undefined ? (
+            <ActivityIndicator
+              size="large"
+              color={colors.sparklight_bright_purple}
+            />
+          ) : (
+                    <Text style={styles.amount}>${billAmt}</Text>
+                )}
+              <Text style={styles.dueDate}>
+                {dueDate ? "Due on " : "Bal due"}
+                <Text style={[styles.dueDate, { fontWeight: "400" }]}>
+                  {dueDate}
+                </Text>
+              </Text>
             </View>
-            
           </View>
 
-          
-
-          
           <View style={styles.cardFooter}>
-         
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("ArticalWindowUtility", {
@@ -97,12 +103,11 @@ const Card = ({
               style={styles.paymentButton}
             >
               <Text style={styles.paymentButtonText}>Make a Payment</Text>
-              <View style={{ marginLeft: 2 }}>
+              <View style={{ marginLeft: 2, alignSelf: "center" }}>
                 <RightArrow color={colors.snow_white} />
               </View>
             </TouchableOpacity>
-            </View>
-          
+          </View>
         </View>
       </View>
     </View>
@@ -178,6 +183,7 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: 28,
     fontWeight: "bold",
+    alignSelf:'flex-end',
     color: colors.sp_black,
     fontWeight: "700",
     
@@ -186,10 +192,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: colors.dark_grey,
-    alignContent: "center",
+    alignSelf:'flex-end',
     fontFamily: FontFamily.openSansRegular,
     color: colors.sparklight_purple_blue,
-    
   },
   statusRow: {
     flexDirection: "row",
@@ -224,15 +229,15 @@ const styles = StyleSheet.create({
   paymentButton: {
     flexDirection: "row",
     backgroundColor: colors.sparklight_purple_blue,
-    paddingLeft: 8,
+    paddingHorizontal: wp("20%"),
     paddingVertical: 5,
     borderRadius: 5,
-    alignSelf:'center',
-    marginLeft:wp("28%")
+    alignSelf: "center",
+    marginLeft: wp("4%"),
   },
   paymentButtonText: {
     color: colors.snow_white,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "600",
     flexDirection: "row",
     justifyContent: "flex-end",
@@ -246,17 +251,17 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     padding: 10,
-  },cardFooter: {
+  },
+  cardFooter: {
     flexDirection: "row",
     backgroundColor: "#F8F8F8",
     width: "92%",
     borderBottomEndRadius: 10,
     borderBottomStartRadius: 10,
     padding: 10,
-    position: 'absolute',
-    bottom:0,
-    left:0,
-    
+    position: "absolute",
+    bottom: 0,
+    left: 0,
   },
 });
 

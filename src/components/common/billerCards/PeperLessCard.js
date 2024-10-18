@@ -18,6 +18,22 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
           <Text style={styles.leftTitle}>Paperless Billing</Text>
         </View> */}
         <View style={styles.cardContent}>
+
+        <View style={styles.cardHreader}>
+            <View
+              style={{
+                marginLeft: 10,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <View style={{ alignSelf: "center" }}>
+              <PaperIconBg />
+              </View>
+
+              <Text style={styles.leftTitle}>Paperless Billing</Text>
+            </View>
+          </View>
           {paperlessStatus ? (
             <>
               <Text style={[styles.dueDate, { fontWeight: '400', color: colors.gray600 }]}>Email Associated: </Text>
@@ -33,7 +49,7 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
               </View>
             </>
           )}
-          <View style={styles.statusRow}>
+          <View style={styles.cardFooter}>
             <TouchableOpacity
              onPress={() => {
               navigation.dispatch(
@@ -118,19 +134,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   leftTitle: {
-    color: colors.snow_white,
+    color: colors.sp_black,
     fontSize: 18,
     fontWeight: "400",
-    textAlign: 'center',
-    alignContent: 'flex-start',
-    alignSelf: 'flex-start',
+    textAlign: "center",
+    marginLeft: 10,
+    alignContent: "flex-start",
+    alignSelf: "center",
   },
   cardContent: {
-    flex: 1,
-    paddingVertical: Padding.p_base,
-    paddingRight: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems:"center",
   },
   statusRow: {
     flexDirection: "row",
@@ -146,6 +159,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: colors.sparklight_purple_blue,
     textAlign: 'center',
+    marginHorizontal:20,
   },
   thankYouText: {
     fontSize: 14,
@@ -175,6 +189,7 @@ const styles = StyleSheet.create({
     padding: 5,
     marginTop: 13,
     marginBottom: 12,
+    marginHorizontal:20,
   },
   autoPayStatusTextInActive: {
     fontSize: 14,
@@ -186,25 +201,44 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
+    marginHorizontal:20,
     marginVertical: Padding.p_base,
   },
   paymentButton: {
     flexDirection: "row",
-    alignItems: "center",
     backgroundColor: colors.sparklight_purple_blue,
-    paddingLeft: 8,
+    paddingHorizontal: wp("20%"),
     paddingVertical: 5,
     borderRadius: 5,
+    alignSelf: "center",
+    marginLeft: wp("4%"),
   },
   paymentButtonText: {
     color: colors.snow_white,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "600",
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "flex-end",
     fontFamily: FontFamily.openSansRegular,
-  },
+  },cardHreader: {
+    flexDirection: "row",
+    backgroundColor: "#F8F8F8",
+    width:wp("92%"),
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    padding: 10,
+  },cardFooter: {
+    flexDirection: "row",
+    backgroundColor: "#F8F8F8",
+    width:wp("92%"),
+    borderBottomEndRadius: 10,
+    borderBottomStartRadius: 10,
+    padding: 10,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+  }
 });
 
 export default PeperLessCard;

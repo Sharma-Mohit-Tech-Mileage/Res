@@ -26,15 +26,57 @@ import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
 import { fetchBillingPaper, fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
+import moment from "moment";
 
-const BillingScreen = ({ billAmt, dueDate,paymentDetails, navigation }) => {
+const BillingScreen = ({navigation }) => {
     const dispatch = useDispatch();
-  const [initials, setInitials] = useState("");
+  const [billAmt, setBillAmt] = useState(undefined);
+  const [dueDate,setDueDate] = useState();
+  const [accountNo,setAccountNo]=useState('')
   const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [cardDigit, setCardDigit] = useState("");
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
+  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null });
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const paperLessInfo = profile.paperLessInfo || {};
+
+
+  const getUserAccountDetails = () => {
+    setBillAmt(undefined)
+    getUser().then((res) => {
+      setAccountNo(res.userInfo.accountNumber)
+      const request = `account/api/account/${res.userInfo.accountNumber}`;
+      GetApiRequest(
+        request,
+        (res) => {
+          console.log("getUserAccountDetails for normal user :::::::::::::::::::::::::::::::::::::::", res);
+          if (res) {
+            //dispatch(saveAccountServices(res.services))
+            function getFirstEmail(emailArray) {
+              return (emailArray && emailArray.length > 0 && emailArray[0])
+                ? emailArray[0]
+                : null;
+            }
+            let dueDate = moment(res.paymentDueDate).format("ll");
+            setDueDate(dueDate);
+            setBillAmt((Math.round(res.currentBalance * 100) / 100).toFixed(2));
+            let paymentDetails = { ...defaultPaymentDetails };
+            paymentDetails.dueDate = res.paymentDueDate;
+            paymentDetails.billAmount = (Math.round(res.currentBalance * 100) / 100).toFixed(2);
+            paymentDetails.pastPaymentDue = res.pastDueAmount;
+            paymentDetails.email = getFirstEmail(res.email);
+            setDefaultPaymentDetails(paymentDetails);
+          }
+        },
+        onErrorBill
+      );
+    });
+  };
+
+
+  const onErrorBill = (error) => {
+    console.log("error", error);
+  };
 
   const getStatus = () => {
     getUser().then((res) => {
@@ -62,10 +104,14 @@ const BillingScreen = ({ billAmt, dueDate,paymentDetails, navigation }) => {
   useFocusEffect(
     useCallback(() => {
       getStatus();
+      getUserAccountDetails()
       dispatch(fetchBillingPaper());
       dispatch(fetchProfileDetails());
     }, [])
   );
+  useEffect(()=>{
+   console.log('Bill Amount',billAmt)
+  },[billAmt])
 
   return (
     <View style={styles.account} accessibilityLabel="Account screen">
@@ -91,11 +137,12 @@ const BillingScreen = ({ billAmt, dueDate,paymentDetails, navigation }) => {
           {/* Full name for profile */}
           <Text style={styles.melissaSmith}>{"Billing Services"}</Text>
         </View>
-        <ScrollView style={{ marginHorizontal: 20 }}>
+        <ScrollView showsVerticalScrollIndicator={false}style={{ marginHorizontal: 20 }}>
           <View style={{paddingBottom:100}}>
             <Card
               billAmt={billAmt}
               dueDate={dueDate}
+              acno={accountNo}
               isAutoPayStatus={isAutoPayStatus}
               paperlessStatus={paperlessStatus}
               navigation={navigation}
@@ -109,7 +156,7 @@ const BillingScreen = ({ billAmt, dueDate,paymentDetails, navigation }) => {
               cardDigit={cardDigit}
               isAutoPayStatus={isAutoPayStatus}
               paperlessStatus={paperlessStatus}
-              paymentDetails={paymentDetails}
+              paymentDetails={defaultPaymentDetails}
               navigation={navigation}
               style={styles.card}
               accessible={true}
