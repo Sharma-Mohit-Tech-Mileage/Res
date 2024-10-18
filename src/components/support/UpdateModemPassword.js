@@ -91,6 +91,7 @@ const UpdateModemPassword = (props) => {
   });
 
   const _onSuccess = (res) => {
+    console.log("updateModemPassword", res);
     reset()
     setLoading(false)
     if (res) {
@@ -115,6 +116,7 @@ const UpdateModemPassword = (props) => {
   };
 
   const _onError = () => {
+    console.log("updateModemPassword error");
     reset();
     setLoading(false)
     setShowValidationAlert(true)

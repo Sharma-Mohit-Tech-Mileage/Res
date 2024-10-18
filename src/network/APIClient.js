@@ -196,10 +196,8 @@ export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
         body: JSON.stringify(body)
     };
 
-    console.log('PutApiRequest:', endpoint, 'body:', body);
-    console.log('PutApiRequest:', endpoint, 'body:', user.token);
     fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, onSuccess, onError));
+        .then(response => handleFetchResponse(response,`${baseUrl}${endpoint}`, onSuccess, onError));
 };
 
 // Function for GET API requests
