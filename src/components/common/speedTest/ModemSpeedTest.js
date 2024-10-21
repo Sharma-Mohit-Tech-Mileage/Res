@@ -4,8 +4,8 @@ import ProfileSettingsHeader from '../../common/ProfileSettingsHeader';
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import moment from 'moment';
 import { getUser } from "../../../redux/utils/LocalStorage";
-import { GetApiRequest ,PostApiRequest} from "../../../network/APIClient";
-import { Color, Padding, FontSize ,FontFamily} from '../../../../GlobalStyles';
+import { GetApiRequest, PostApiRequest } from "../../../network/APIClient";
+import { Color, Padding, FontSize, FontFamily } from '../../../../GlobalStyles';
 import CheckCircleOutline from "../../../res/svgIcons/CheckCircleOutline";
 import DownloadSpeed from "../../../res/svgIcons/DownloadSpeed";
 import UploadSpeed from "../../../res/svgIcons/UploadSpeed";
@@ -55,7 +55,7 @@ const ModemSpeedTest = ({ navigation, route }) => {
           const downloadSpeed = latestResult.down_Mbps.toFixed(2); // Limit to two decimal places
           const uploadSpeed = latestResult.up_Mbps.toFixed(2); // Limit to two decimal places
           const date = latestResult.date;
-    
+
           console.log("Speed Test Results:", { downloadSpeed, uploadSpeed, date });
           setDownload(downloadSpeed);
           setUpload(uploadSpeed);
@@ -87,7 +87,7 @@ const ModemSpeedTest = ({ navigation, route }) => {
     console.log("An error occurred:", error);
     setLoading(false);
   };
-  
+
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader
@@ -125,7 +125,7 @@ const ModemSpeedTest = ({ navigation, route }) => {
                     <CheckCircleOutline />
                   </View>
                   <Text style={styles.topSectionText}>
-                    <Text style={{fontWeight:'700',color:Color.sparklightGreen}}>Speed test complete.</Text> Thank you for your patience.
+                    <Text style={{ fontWeight: '700', color: Color.sparklightGreen }}>Speed test complete.</Text> Thank you for your patience.
                   </Text>
                 </View>
               ) : (
@@ -154,7 +154,7 @@ const ModemSpeedTest = ({ navigation, route }) => {
             <View style={styles.resultBox}>
               <Text style={styles.resultTitle}>Upload</Text>
               <View style={styles.resultIconContainer}>
-                <UploadSpeed/>
+                <UploadSpeed />
                 {(loading || refreshing) ? (
                   <SkeletonPlaceholder>
                     <SkeletonPlaceholder.Item width={80} height={20} borderRadius={4} />
@@ -182,25 +182,33 @@ const ModemSpeedTest = ({ navigation, route }) => {
               )}
             </View>
           </View>
-            <View style={[styles.resultIconContainer,{marginTop:8}]}>
-                <Text style={styles.updatedValue}><Text style={{fontWeight:'600',color:'#000000'}}>Tip:</Text> Pull screen down to update content.</Text>
-            </View>
+          <View style={[styles.resultIconContainer, { marginTop: 8 }]}>
+            <Text style={styles.updatedValue}><Text style={{ fontWeight: '600', color: '#000000' }}>Tip:</Text> Pull screen down to update content.</Text>
+          </View>
         </View>
 
-        {/* Buttons */}
+        {/* Run Speed Test Button */}
         <TouchableOpacity
           style={[styles.runButton, loading && styles.disabledButton]}
           onPress={handleTestSpeed}
           disabled={loading || refreshing}
+          accessibilityRole="button"
+          accessibilityLabel={testCompleted ? "Run Speed Test Again button" : "Run Speed Test button"}
+          accessibilityHint="Starts or restarts the speed test"
         >
-          { (
-            <Text style={styles.runButtonText}>
-              {testCompleted ? "Run Speed Test Again" : "Run Speed Test"}
-            </Text>
-          )}
+          <Text style={styles.runButtonText}>
+            {testCompleted ? "Run Speed Test Again" : "Run Speed Test"}
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
+        {/* Cancel Button */}
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel="Cancel button"
+          accessibilityHint="Goes back to the previous screen"
+        >
           <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -283,7 +291,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     alignItems: 'center',// Gray background for the top section
     padding: Padding.p_base,
-    backgroundColor: Color.colorWhitesmoke_100, 
+    backgroundColor: Color.colorWhitesmoke_100,
     borderRadius: 8,
     width: '100%',
   },
@@ -316,7 +324,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   cancelButton: {
-   paddingVertical: Padding.p_base,
+    paddingVertical: Padding.p_base,
     alignItems: 'center',
     margin: Padding.p_base,
     borderRadius: 1,
