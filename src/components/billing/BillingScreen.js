@@ -5,7 +5,7 @@ import {
   Text,
   View,
   Pressable,
-  Alert,
+  TouchableOpacity,
   ScrollView,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -25,35 +25,45 @@ import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
-import { fetchBillingPaper, fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
+import {
+  fetchBillingPaper,
+  fetchProfileDetails,
+} from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 
-const BillingScreen = ({navigation }) => {
-    const dispatch = useDispatch();
+const BillingScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [billAmt, setBillAmt] = useState(undefined);
-  const [dueDate,setDueDate] = useState();
-  const [accountNo,setAccountNo]=useState('')
+  const [dueDate, setDueDate] = useState();
+  const [accountNo, setAccountNo] = useState("");
   const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [cardDigit, setCardDigit] = useState("");
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
-  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null });
+  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
+    dueDate: null,
+    billAmount: 0,
+    pastPaymentDue: 0,
+    email: null,
+  });
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const paperLessInfo = profile.paperLessInfo || {};
 
-
   const getUserAccountDetails = () => {
-    setBillAmt(undefined)
+    setBillAmt(undefined);
     getUser().then((res) => {
-      setAccountNo(res.userInfo.accountNumber)
+      setAccountNo(res.userInfo.accountNumber);
       const request = `account/api/account/${res.userInfo.accountNumber}`;
       GetApiRequest(
         request,
         (res) => {
-          console.log("getUserAccountDetails for normal user :::::::::::::::::::::::::::::::::::::::", res);
+          console.log(
+            "getUserAccountDetails for normal user :::::::::::::::::::::::::::::::::::::::",
+            res
+          );
           if (res) {
             //dispatch(saveAccountServices(res.services))
             function getFirstEmail(emailArray) {
-              return (emailArray && emailArray.length > 0 && emailArray[0])
+              return emailArray && emailArray.length > 0 && emailArray[0]
                 ? emailArray[0]
                 : null;
             }
@@ -62,7 +72,9 @@ const BillingScreen = ({navigation }) => {
             setBillAmt((Math.round(res.currentBalance * 100) / 100).toFixed(2));
             let paymentDetails = { ...defaultPaymentDetails };
             paymentDetails.dueDate = res.paymentDueDate;
-            paymentDetails.billAmount = (Math.round(res.currentBalance * 100) / 100).toFixed(2);
+            paymentDetails.billAmount = (
+              Math.round(res.currentBalance * 100) / 100
+            ).toFixed(2);
             paymentDetails.pastPaymentDue = res.pastDueAmount;
             paymentDetails.email = getFirstEmail(res.email);
             setDefaultPaymentDetails(paymentDetails);
@@ -72,7 +84,6 @@ const BillingScreen = ({navigation }) => {
       );
     });
   };
-
 
   const onErrorBill = (error) => {
     console.log("error", error);
@@ -104,14 +115,14 @@ const BillingScreen = ({navigation }) => {
   useFocusEffect(
     useCallback(() => {
       getStatus();
-      getUserAccountDetails()
+      getUserAccountDetails();
       dispatch(fetchBillingPaper());
       dispatch(fetchProfileDetails());
     }, [])
   );
-  useEffect(()=>{
-   console.log('Bill Amount',billAmt)
-  },[billAmt])
+  useEffect(() => {
+    console.log("Bill Amount", billAmt);
+  }, [billAmt]);
 
   return (
     <View style={styles.account} accessibilityLabel="Account screen">
@@ -137,8 +148,11 @@ const BillingScreen = ({navigation }) => {
           {/* Full name for profile */}
           <Text style={styles.melissaSmith}>{"Billing Services"}</Text>
         </View>
-        <ScrollView showsVerticalScrollIndicator={false}style={{ marginHorizontal: 20 }}>
-          <View style={{paddingBottom:100}}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{ marginHorizontal: 20 }}
+        >
+          <View style={{ paddingBottom: 100 }}>
             <Card
               billAmt={billAmt}
               dueDate={dueDate}
@@ -149,7 +163,6 @@ const BillingScreen = ({navigation }) => {
               style={styles.card}
               accessible={true}
               accessibilityLabel="Billing Summary Card"
-              
             />
             <AutoPayCard
               billAmt={billAmt}
@@ -161,7 +174,6 @@ const BillingScreen = ({navigation }) => {
               style={styles.card}
               accessible={true}
               accessibilityLabel="Auto Pay Card"
-             
             />
 
             <PeperLessCard
@@ -173,8 +185,99 @@ const BillingScreen = ({navigation }) => {
               style={styles.card}
               accessible={true}
               accessibilityLabel="Paperless Billing Card"
-              
             />
+
+            <View
+              style={[
+                styles.myModem,
+                styles.myModemSpaceBlock,
+                { marginTop: 20 },
+              ]}
+            >
+              <View
+                style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
+              >
+                <Text style={[styles.myModem1, styles.myModem1Typo]}>
+                  Quick Links
+                </Text>
+              </View>
+              <View
+                style={[
+                  styles.supportAccordionParent,
+                  styles.supportParentFlexBox,
+                ]}
+              >
+                <View style={[styles.frameLayout]} />
+
+                <TouchableOpacity
+                  style={[styles.frame9defaultSpaceBlock]}
+                  onPress={() => {
+                    navigation.navigate("ArticalWindowUtility", {
+                      url: "https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues",
+                      name: "View Billing Details",
+                    });
+                  }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="View Billing Details"
+                >
+                 
+                  <Text style={styles.modemHealthSupport}>
+                    View Billing Details
+                  </Text>
+                  <Image
+                    style={styles.rightIconStyle}
+                    source={require("../../../assets/chevronright.png")}
+                  />
+                </TouchableOpacity>
+
+                <View style={[styles.frameLayout]} />
+                <TouchableOpacity
+                  style={[styles.frame9defaultSpaceBlock]}
+                  onPress={() => {
+                    navigation.navigate("ArticalWindowUtility", {
+                      url: "https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email",
+                      name: "View Payment History",
+                    });
+                  }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="View Payment History"
+                >
+                  
+                  <Text style={styles.modemHealthSupport}>
+                    View Payment History
+                  </Text>
+                  <Image
+                    style={styles.rightIconStyle}
+                    source={require("../../../assets/chevronright.png")}
+                  />
+                </TouchableOpacity>
+
+                <View style={[styles.frameLayout]} />
+                <TouchableOpacity
+                  style={[styles.frame9defaultSpaceBlock]}
+                  onPress={() => {
+                    navigation.navigate("ArticalWindowUtility", {
+                      url: "https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email",
+                      name: "View Billing Hitory",
+                    });
+                  }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="View Billing Hitory"
+                >
+                  
+                  <Text style={styles.modemHealthSupport}>
+                    View Billing History
+                  </Text>
+                  <Image
+                    style={styles.rightIconStyle}
+                    source={require("../../../assets/chevronright.png")}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </ScrollView>
       </View>
@@ -304,9 +407,84 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
     width: "100%",
-  },card: {
-    height: 230,  // Set the height for the cards
-    marginVertical:10
+  },
+  card: {
+    height: 230, // Set the height for the cards
+    marginVertical: 10,
+  },
+  myModem: {
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: Color.sparklightWhite,
+    backgroundColor: Color.sparklightWhite,
+    borderRadius: Border.br_11xs,
+    overflow: "hidden",
+  },
+  myModemSpaceBlock: {
+    paddingTop: Padding.p_base,
+    alignSelf: "stretch",
+  },
+  myModem1: {
+    textAlign: "left",
+    fontSize: FontSize.size_3xl,
+    flex: 1,
+  },
+  myModemWrapper: {
+    paddingTop: Padding.p_5xs,
+    alignItems: "center",
+    flexDirection: "row",
+    paddingHorizontal: Padding.p_5xl,
+  },
+  frameParentSpaceBlock1: {
+    paddingBottom: Padding.p_5xl,
+    alignSelf: "stretch",
+  },
+  myModem1Typo: {
+    color: Color.colorGray_100,
+    textAlign: "left",
+    fontFamily: FontFamily.openSansRegular,
+    lineHeight: 28,
+  },
+  frame9defaultSpaceBlock: {
+    paddingVertical: Padding.p_base,
+    alignItems: "center",
+    flexDirection: "row",
+    paddingHorizontal: Padding.p_5xl,
+  },
+  supportParentFlexBox: {
+    alignItems: "flex-end",
+    justifyContent: "center",
+  },
+  frame9defaultSpaceBlock: {
+    paddingVertical: Padding.p_base,
+    alignItems: "center",
+    flexDirection: "row",
+    paddingHorizontal: Padding.p_5xl,
+  },
+  frameLayout: {
+    width: "100%",
+    height: 1,
+    backgroundColor: Color.sparklightGray,
+  },
+  supportAccordionParent: {
+    backgroundColor: Color.sparklightWhite,
+    borderRadius: Border.br_11xs,
+    alignSelf: "stretch",
+    overflow: "hidden",
+  },
+  modemHealthSupport: {
+    marginLeft: 10,
+    color: Color.colorGray_100,
+    fontSize: FontSize.size_base,
+    textAlign: "left",
+    fontFamily: FontFamily.openSansRegular,
+    lineHeight: 28,
+    flex: 1,
+  },
+  rightIconStyle: {
+    width: 20,
+    height: 20,
+    resizeMode: "contain",
   },
 });
 

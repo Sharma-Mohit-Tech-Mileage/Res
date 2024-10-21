@@ -181,11 +181,20 @@ const styles = StyleSheet.create({
   paymentButton: {
     flexDirection: "row",
     backgroundColor: colors.sparklight_purple_blue,
-    paddingHorizontal: wp("20%"),
-    paddingVertical: 5,
+    width:wp("80%"),
+    paddingVertical: 8,
+    alignItems:'center',
+    justifyContent:'center',
     borderRadius: 5,
     alignSelf: "center",
     marginLeft: wp("4%"),
+  },
+  paymentButtonText: {
+    color: colors.snow_white,
+    fontSize: 16,
+    fontWeight: "600",
+    alignSelf:'center',
+    fontFamily: FontFamily.openSansRegular,
   },
   statusRow: {
     flexDirection: "row",
@@ -193,15 +202,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     marginVertical: 5,
-  },
-  paymentButtonText: {
-    color: colors.snow_white,
-    fontSize: 16,
-    fontWeight: "600",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
-    fontFamily: FontFamily.openSansRegular,
   },cardHreader: {
     flexDirection: "row",
     backgroundColor: "#F8F8F8",

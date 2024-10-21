@@ -64,7 +64,7 @@ const Card = ({
                 justifyContent: "flex-start",
               }}
             >
-              <Text style={[styles.label, { fontWeight: "600" }]}>
+              <Text style={[styles.label, { fontWeight: "600",color:colors.sparklight_purple_blue }]}>
                 Account Number
               </Text>
               <Text style={styles.label}>{acno}</Text>
@@ -80,11 +80,12 @@ const Card = ({
                   <Text style={styles.amount}>${billAmt}</Text>
                 )}
               <Text style={styles.dueDate}>
-                {dueDate ? "Due on " : "Balance due"}
-                <Text style={[styles.dueDate, { fontWeight: "400" }]}>
+                {dueDate ? "Balance due :" : ""}
+               
+              </Text>
+              <Text style={[styles.dueDate, { fontWeight: "400" }]}>
                   {dueDate}
                 </Text>
-              </Text>
             </View>
           </View>
 
@@ -188,6 +189,7 @@ const styles = StyleSheet.create({
     
   },
   dueDate: {
+
     fontSize: 14,
     fontWeight: "700",
     color: colors.dark_grey,
@@ -228,8 +230,10 @@ const styles = StyleSheet.create({
   paymentButton: {
     flexDirection: "row",
     backgroundColor: colors.sparklight_purple_blue,
-    paddingHorizontal: wp("20%"),
-    paddingVertical: 5,
+    width:wp("80%"),
+    paddingVertical: 8,
+    alignItems:'center',
+    justifyContent:'center',
     borderRadius: 5,
     alignSelf: "center",
     marginLeft: wp("4%"),
@@ -238,9 +242,7 @@ const styles = StyleSheet.create({
     color: colors.snow_white,
     fontSize: 16,
     fontWeight: "600",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
+    alignSelf:'center',
     fontFamily: FontFamily.openSansRegular,
   },
   cardHreader: {
