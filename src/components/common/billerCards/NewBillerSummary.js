@@ -13,6 +13,7 @@ import WalletIcon from "../../../res/svgIcons/WalletIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { Color, FontFamily, Padding } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
+import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 const CardNewBiller = ({
   billAmt,
   dueDate,
@@ -23,6 +24,18 @@ const CardNewBiller = ({
 }) => {
   const uncheck = require("../../../../assets/checkcircle1.png");
   const check = require("../../../../assets/checkcircle.png");
+
+  const NotAvailable=()=>{
+    return(
+        <>
+        <View>
+        <Text style={[styles.dueDate, {textDecorationLine:'underline'}]}>Not Available</Text>
+        <InfoIcon1/>
+        </View>
+        
+        </>
+    )
+  }
 
   return (
     <View style={styles.shadowContainer}>
@@ -46,7 +59,7 @@ const CardNewBiller = ({
           )}
           {dueDate != "Invalid date" && (
             <Text style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
-              {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": ""}
+              {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": <NotAvailable/>}
               <Text style={[styles.dueDate, { fontWeight: "400",color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue }]}>
                 {' '+dueDate}
               </Text>
