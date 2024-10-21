@@ -9,9 +9,10 @@ import { useDispatch } from 'react-redux';
 import { GetApiRequest, PutApiRequest } from "../../network/APIClient";
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import SparkLightInput from "../common/customui/SparkLightInput";
+import SparkLightButton from "../common/customui/PrimaryButton";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import Loader from "../utility/Loader";
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const UpdateModemPassword = (props) => {
 
@@ -283,6 +284,13 @@ const UpdateModemPassword = (props) => {
               {isEEroDevice ? `Update Wifi Password` : `Update Modem Password`}
             </Text>
           </Pressable>
+        </View>
+        <View style={{ paddingHorizontal: Padding.p_5xl }} accessibilityElementsHidden={isDropDownOpen} importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}>
+          <SparkLightButton title='Cancel' onPress={() => navigation.goBack()} 
+             accessibilityLabel="Cancel button" 
+             accessibilityHint="Goes back to the previous screen" 
+             accessibilityRole="button"
+             />
         </View>
       </KeyboardAwareScrollView>
       {loading ? <Loader /> : null}
