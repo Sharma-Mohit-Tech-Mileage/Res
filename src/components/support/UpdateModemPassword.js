@@ -1,39 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  Button,
-  Alert,
-  Image,
-  Pressable
-} from "react-native";
-import {
-  FontFamily,
-  Padding,
-  Color,
-  FontSize,
-  Border,
-} from "../../../GlobalStyles";
+import { View, Text, StyleSheet, Image, Pressable } from "react-native";
+import { FontFamily, Padding, Color, FontSize, Border, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
-import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm, Controller } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { GetApiRequest, PutApiRequest } from "../../network/APIClient";
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import SparkLightInput from "../common/customui/SparkLightInput";
-import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
-import { FlatList } from "native-base";
-import { color } from "native-base/lib/typescript/theme/styled-system";
-import { updatePasswordSchema, passwordSchema } from '../utility/validationSchema'; // Update the path as necessary
 import NotificationAlert from "../common/customui/NotificationAlert";
 import Loader from "../utility/Loader";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
-
 
 const UpdateModemPassword = (props) => {
 
@@ -43,12 +21,10 @@ const UpdateModemPassword = (props) => {
   const parts = networkPath?.split('/');
   const networkId = parts?.length > 0 ? parts[parts.length - 1] : null;
   const navigation = useNavigation();
-  const dispatch = useDispatch();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordList, setPasswordList] = useState([]);
   const [slectedPasword, setSelectedPassword] = useState("")
-  const [isFocused, setTextFocused] = useState(false)
   const [showValidationAlert, setShowValidationAlert] = useState(false);
   const [showValidationSuccessAlert, setShowValidationSuccessAlert] = useState(false);
   const [modemPasswordData, setModemPasswordData] = useState([])
@@ -61,8 +37,8 @@ const UpdateModemPassword = (props) => {
 
 
   useEffect(() => {
-    if(!isEEroDevice){
-    getModemPassword();
+    if (!isEEroDevice) {
+      getModemPassword();
     }
   }, [])
 
@@ -83,7 +59,6 @@ const UpdateModemPassword = (props) => {
   };
 
   const { control, handleSubmit, setValue, reset, formState: { errors }, getValues } = useForm({
-    // resolver: yupResolver(passwordSchema()),
     defaultValues: {
       newPassword: newPassword?.target?.value,
       confirmPassword: confirmPassword?.target?.value
@@ -91,23 +66,19 @@ const UpdateModemPassword = (props) => {
   });
 
   const _onSuccess = (res) => {
-    console.log("updateModemPassword", res);
     reset()
     setLoading(false)
     if (res) {
+      setShowValidationAlert(false)
       setShowValidationSuccessAlert(true)
     }
   }
   const onSuccess = (res) => {
     setLoading(false)
-    console.log("updateModemPassword", res);
     if (res) {
-      console.log("sccess ")
-      console.log({ res })
       setModemPasswordData(res)
       const list = res.map((value) => value.ssid)
       setPasswordList(list);
-      console.log(list)
       setSelectedPassword(list[0])
     }
   };
@@ -116,15 +87,15 @@ const UpdateModemPassword = (props) => {
   };
 
   const _onError = () => {
-    console.log("updateModemPassword error");
     reset();
-    setLoading(false)
-    setShowValidationAlert(true)
+    setLoading(false);
+    setShowValidationSuccessAlert(false);
+    setShowValidationAlert(true);
   };
 
   const handlePasswordSelection = (value) => {
-    setIsDropDownOpen(false)
-    setSelectedPassword(value)
+    setIsDropDownOpen(false);
+    setSelectedPassword(value);
   }
 
   useEffect(() => {
@@ -133,11 +104,10 @@ const UpdateModemPassword = (props) => {
   }, [newPasswordLength, confirmPasswordLength])
 
   const onSubmit = data => {
-    if(getValues('newPassword')?.length == 0 || getValues('newPassword')?.length == undefined) {
+    if (getValues('newPassword')?.length == 0 || getValues('newPassword')?.length == undefined) {
       setShowError(true)
       return
     }
-    console.log(`getValues('newPassword')?.length > 0`,getValues('newPassword')?.length);
     if (showError) {
       return
     }
