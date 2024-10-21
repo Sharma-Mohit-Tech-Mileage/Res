@@ -24,8 +24,7 @@ const Card = ({
   style,
   acno
 }) => {
-  const uncheck = require("../../../../assets/checkcircle1.png");
-  const check = require("../../../../assets/checkcircle.png");
+ 
 
   return (
     <View style={styles.shadowContainer}>
@@ -78,10 +77,10 @@ const Card = ({
               color={colors.sparklight_bright_purple}
             />
           ) : (
-                    <Text style={styles.amount}>${billAmt}</Text>
+                  <Text style={styles.amount}>${billAmt}</Text>
                 )}
               <Text style={styles.dueDate}>
-                {dueDate ? "Due on " : "Bal due"}
+                {dueDate ? "Due on " : "Balance due"}
                 <Text style={[styles.dueDate, { fontWeight: "400" }]}>
                   {dueDate}
                 </Text>

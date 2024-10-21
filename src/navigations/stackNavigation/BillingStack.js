@@ -25,6 +25,19 @@ function BillingStackScreen() {
                 }}
             />
 
+      <BillingStack.Screen
+        name="ArticalWindowUtility"
+        component={ArticalWindowUtility}
+        options={{
+          headerBackVisible: false,
+          headerShown: false,
+        }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+
 
             
         </BillingStack.Navigator>
