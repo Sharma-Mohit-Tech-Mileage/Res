@@ -1,5 +1,5 @@
 import * as React from "react"
-import {Svg,Path,Defs,ClipPath} from 'react-native-svg';
+import {Svg,Path,Defs,ClipPath,G} from 'react-native-svg';
 const InfoIcon1 = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
@@ -17,7 +17,7 @@ const InfoIcon1 = (props) => (
     </G>
     <Defs>
       <ClipPath id="a">
-        <path fill="#fff" d="M0 0h14v14H0z" />
+        <Path fill="#fff" d="M0 0h14v14H0z" />
       </ClipPath>
     </Defs>
   </Svg>

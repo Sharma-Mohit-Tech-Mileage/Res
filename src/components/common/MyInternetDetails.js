@@ -99,7 +99,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, paymentDetails,navigation 
     return (
       <Card
         billAmt={billAmt}
-        dueDate={dueDate}
+        dueDate={''}
         isAutoPayStatus={isAutoPayStatus}
         paperlessStatus={paperlessStatus}
         navigation={navigation}
