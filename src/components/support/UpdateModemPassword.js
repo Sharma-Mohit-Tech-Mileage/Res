@@ -287,9 +287,9 @@ const UpdateModemPassword = (props) => {
         </View> 
         <View style={{ paddingHorizontal: Padding.p_5xl }} accessibilityElementsHidden={isDropDownOpen} importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'yes'}>
           <SparkLightButton title='Cancel' onPress={() => navigation.goBack()} 
+           accessibilityRole="button"
              accessibilityLabel="Cancel button" 
              accessibilityHint="Goes back to the previous screen" 
-             accessibilityRole="button"
              />
         </View>
        
