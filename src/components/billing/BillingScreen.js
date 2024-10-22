@@ -30,6 +30,7 @@ import {
   fetchProfileDetails,
 } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
+import { Env } from "../../network/apis/account/Constants";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -198,7 +199,7 @@ const BillingScreen = ({ navigation }) => {
                 style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
               >
                 <Text style={[styles.myModem1, styles.myModem1Typo]}>
-                  Quick Links
+                  Billing Options
                 </Text>
               </View>
               <View
@@ -213,7 +214,7 @@ const BillingScreen = ({ navigation }) => {
                   style={[styles.frame9defaultSpaceBlock]}
                   onPress={() => {
                     navigation.navigate("ArticalWindowUtility", {
-                      url: "https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues",
+                      url: Env.VIEW_BILLINGS,
                       name: "View Billing Details",
                     });
                   }}
@@ -236,7 +237,7 @@ const BillingScreen = ({ navigation }) => {
                   style={[styles.frame9defaultSpaceBlock]}
                   onPress={() => {
                     navigation.navigate("ArticalWindowUtility", {
-                      url: "https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email",
+                      url: Env.VIEW_PAYMENT,
                       name: "View Payment History",
                     });
                   }}
@@ -259,7 +260,7 @@ const BillingScreen = ({ navigation }) => {
                   style={[styles.frame9defaultSpaceBlock]}
                   onPress={() => {
                     navigation.navigate("ArticalWindowUtility", {
-                      url: "https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email",
+                      url: Env.BILLING_HISTORY,
                       name: "View Billing Hitory",
                     });
                   }}
@@ -473,10 +474,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   modemHealthSupport: {
-    marginLeft: 10,
-    color: Color.colorGray_100,
+    color: Color.colorMidnightblue,
     fontSize: FontSize.size_base,
     textAlign: "left",
+    fontWeight:'400',
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 28,
     flex: 1,
