@@ -284,14 +284,15 @@ const UpdateModemPassword = (props) => {
               {isEEroDevice ? `Update Wifi Password` : `Update Modem Password`}
             </Text>
           </Pressable>
-        </View>
-        <View style={{ paddingHorizontal: Padding.p_5xl }} accessibilityElementsHidden={isDropDownOpen} importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}>
+        </View> 
+        <View style={{ paddingHorizontal: Padding.p_5xl }} accessibilityElementsHidden={isDropDownOpen} importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'yes'}>
           <SparkLightButton title='Cancel' onPress={() => navigation.goBack()} 
              accessibilityLabel="Cancel button" 
              accessibilityHint="Goes back to the previous screen" 
              accessibilityRole="button"
              />
         </View>
+       
       </KeyboardAwareScrollView>
       {loading ? <Loader /> : null}
     </View>
