@@ -32,7 +32,17 @@ console.log("Due Date",dueDate)
   const NotAvailable = () => {
     return (
       <>
-       
+       <Tooltip
+          backgroundColor="#4C5458"
+          width={180}
+          height={100}
+          popover={
+            <Text style={{ color: "#FFF" }}>
+              Your due date takes 10 business days to generate. Please check
+              back later.
+            </Text>
+          }
+        > 
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text style={styles.dueDate}>{"Due "}</Text>
             <Text
@@ -49,27 +59,13 @@ console.log("Due Date",dueDate)
                 { textDecorationLine: "underline", marginRight: 5 },
               ]}
             >
-              Not Available
+              {'Not Available'}
             </Text>
-            <Tooltip
-          backgroundColor="#4C5458"
-          width={200}
-          height={100}
-          popover={
-            <Text style={{ color: "#FFF" }}>
-              Your due date takes 10 business days to generate. Please check
-              back later.
-            </Text>
-          }
-        >
-            <Image
-                  resizeMode="cover"
-                  source={info}
-                  style={styles.statusIcon}
-                />
-                </Tooltip>
+            
+            <InfoIcon1/>
+            
           </View>
-        
+          </Tooltip>
       </>
     );
   };

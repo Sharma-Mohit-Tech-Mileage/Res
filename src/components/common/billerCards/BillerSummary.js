@@ -31,7 +31,9 @@ const Card = ({
   return (
     <View style={styles.shadowContainer}>
       <View style={[styles.card, style]}>
-        <View style={styles.leftSection}>
+
+        <View 
+          style={styles.leftSection}>
           <View style={styles.circleContainerShadow}></View>
           <View style={styles.circleContainer}></View>
           <View style={[styles.icon, { paddingRight: 24 }]}>
