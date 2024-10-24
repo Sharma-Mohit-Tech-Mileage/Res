@@ -33,16 +33,20 @@ steps:
     tasks: 'assembleRelease'  # or bundleRelease for AAB
     publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'
-
-- task: AndroidSigning@2
+- task: Gradle@3
   inputs:
-    apkFiles: '**/*.apk'
-    jarsign: true
-    jarsignerKeystoreFile: 'Sparklight.keystore'
-    jarsignerKeystorePassword: '$(jarsignerKeystorePassword)'
-    jarsignerKeystoreAlias: 'sparklight'
-    jarsignerKeyPassword: '$(jarsignerKeyPassword)'
-    zipalign: true
+    gradleWrapperFile: 'android/gradlew'
+    workingDirectory: 'android'
+    options: '-Pandroid.injected.signing.store.file=$(keystoreFile) -Pandroid.injected.signing.store.password=$(keystorePassword) -Pandroid.injected.signing.key.alias=$(keystoreAlias) -Pandroid.injected.signing.key.password=$(keyPassword)'
+    tasks: 'assembleRelease'
+    publishJUnitResults: true
+    testResultsFiles: '**/TEST-*.xml'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.11'
+    gradleOptions: '-Xmx3072m'
+    sonarQubeRunAnalysis: false
+    spotBugsAnalysis: false
+
 - task: CopyFiles@2
   inputs:
     Contents: '**/*.apk'
