@@ -75,10 +75,12 @@ const CardNewBiller = ({
           <View style={[styles.statusRow,{marginTop:26}]}>
             <TouchableOpacity
               onPress={() => {
+
                 navigation.navigate("ArticalWindowUtility", {
                   url: `${Env.PAYMENTURLNEW}`,
                   name: "Billing Details",
                 });
+               
               }}
               accessible={true}
               accessibilityLabel="Make a Payment"

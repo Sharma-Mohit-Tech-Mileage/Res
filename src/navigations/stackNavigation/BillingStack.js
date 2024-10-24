@@ -10,21 +10,21 @@ import AutoPayPCIConnector from "../../components/utility/AutoPayPCIConnector";
 const BillingStack = createNativeStackNavigator();
 
 function BillingStackScreen() {
-  const { setTabBarVisible } = useTabBarVisibility();
-  return (
-    <BillingStack.Navigator defaultNavigationOptions={{ gestureEnabled: true }}>
-      <BillingStack.Screen
-        name="Billing"
-        component={BillingScreen}
-        options={{
-          headerBackVisible: false,
-          headerShown: false,
-        }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
+    const { setTabBarVisible } = useTabBarVisibility();
+    return (
+        <BillingStack.Navigator defaultNavigationOptions={{ gestureEnabled: true }}>
+            <BillingStack.Screen
+                name="Billing"
+                component={BillingScreen}
+                options={{
+                    headerBackVisible: false,
+                    headerShown: false,
+                }}
+                listeners={{
+                    focus: () => setTabBarVisible(true),
+                    blur: () => setTabBarVisible(true),
+                }}
+            />
 
       <BillingStack.Screen
         name="ArticalWindowUtility"
@@ -39,7 +39,7 @@ function BillingStackScreen() {
         }}
       />
 
-      <BillingStack.Screen
+     <BillingStack.Screen
         name="AutoPayPCIConnector"
         component={AutoPayPCIConnector}
         options={{ headerShown: false }}
@@ -48,8 +48,11 @@ function BillingStackScreen() {
           blur: () => setTabBarVisible(true),
         }}
       />
-    </BillingStack.Navigator>
-  );
+
+
+            
+        </BillingStack.Navigator>
+    );
 }
 
 export default BillingStackScreen;

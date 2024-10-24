@@ -96,7 +96,7 @@ const MyTabs = ({ route }) => {
         
         {/* Billing Screen */}
          <Tab.Screen
-          name="Billing"
+          name="BillingTab"
           component={BillingStackScreen}
           listeners={({ navigation }) => ({
             tabPress: (e) => {
@@ -108,7 +108,7 @@ const MyTabs = ({ route }) => {
                   index: 0,
                   routes: [
                     {
-                      name: 'Billing',
+                      name: 'BillingTab',
                       state: {
                         routes: [
                           {
