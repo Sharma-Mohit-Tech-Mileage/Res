@@ -160,7 +160,7 @@ const UpdateModemPassword = (props) => {
         <NotificationAlert
           type="error"
           title="Error"
-          message="An error occurred. Please try again later with a different password."
+          message="An error occurred. Please try again later with a different password"
           showCloseIcon={true}
           isVisible={showValidationAlert}
           onClose={() => setShowValidationAlert(false)}
@@ -168,7 +168,7 @@ const UpdateModemPassword = (props) => {
         <NotificationAlert
           type="success"
           title="Success"
-          message="Your password has been saved successfully."
+          message="Your password has been saved successfully"
           showCloseIcon={true}
           isVisible={showValidationSuccessAlert}
           onClose={() => setShowValidationSuccessAlert(false)}

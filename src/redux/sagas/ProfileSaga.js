@@ -214,11 +214,11 @@ function* updatePushNotificationsV2(action) {
     try {
         yield call(postPushNotifications, action.payload);
         if (action.navigation !== null) {
-            action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'App' });
+            action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'In-app' });
         }
     } catch (error) {
         if (action.navigation !== null) {
-            action.navigation.navigate('InAppNotifications', { updateFailed: true, updatedType: 'App' });
+            action.navigation.navigate('InAppNotifications', { updateFailed: true, updatedType: 'In-app' });
         }
     }
 }

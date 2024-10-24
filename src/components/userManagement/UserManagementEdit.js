@@ -1,40 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  Image,
-  StyleSheet,
-  Text,
-  Pressable,
-  View,
-  ScrollView,
-  Modal,
-  ActivityIndicator,
-} from "react-native";
+import { Image, StyleSheet, Text, Pressable, View, ScrollView, Modal, ActivityIndicator, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import {
-  FontFamily,
-  Padding,
-  Color,
-  Border,
-  FontSize,
-} from "../../../GlobalStyles";
+import { FontFamily, Padding, Color, Border, FontSize, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
 import { useDispatch } from "react-redux";
 import { getUserType } from "../utility/constant";
 import { userSchema,userSchemaNoPass } from "../utility/validationSchema";
-
-import {
-  addNewUser,
-  editNewUser,
-} from "../../redux/actions/ProfileActionSuite";
-import {
-  validatePassword,
-  securityQuestions,
-  passwordTerms,
-} from "../utility/constant";
+import { addNewUser, editNewUser, } from "../../redux/actions/ProfileActionSuite";
+import { validatePassword, securityQuestions, passwordTerms, } from "../utility/constant";
 import NotificationError from "../common/customui/NotificationError";
 import WarningIcon from "../../../assets/alert-triangle.png";
 import colors from "../../res/Colors";
@@ -355,7 +332,7 @@ const UserManagementEdit = ({ route }) => {
                           <>
                             <SparkLightInput
                               onBlur={onBlur}
-                              label={"User Name"}
+                              label={"Username"}
                               placeholder={!isnewUser ? `` : "Enter your User Name"}
                               onChangeText={onChange}
                               editable={isnewUser}

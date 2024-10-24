@@ -34,8 +34,6 @@ const Feedback = () => {
     const scrollViewRef = useRef(null);
 
     const handleValidationError = () => {
-        setErrormsg('Please enter valid information to continue.')
-        setShowErrorAlert(true);
         isSubmittingRef.current = false;
         setIsSubmitting(false); // Also update the state for UI feedback
     };
