@@ -7,7 +7,7 @@ trigger:
 - Dev-B
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: windows-latest
 
 variables:
   - group: AndroidBuildConfig
