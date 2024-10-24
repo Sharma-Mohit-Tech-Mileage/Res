@@ -9,7 +9,7 @@ trigger:
       - Dev-B
 
 pool:
-  vmImage: windows-latest
+  vmImage: ubuntu-latest
 
 variables:
   group: AndroidBuildConfig
@@ -23,16 +23,6 @@ steps:
 - task: DownloadSecureFile@1
   inputs:
     secureFile: 'Sparklight.keystore'
-
-- task: AndroidBuild@1
-  inputs:
-    workingDirectory: ''
-    gradleWrapperFile: 'gradlew'
-    options: '-Pandroid.injected.signing.store.file=$(keystoreFile) -Pandroid.injected.signing.store.password=$(keystorePassword) -Pandroid.injected.signing.key.alias=$(keystoreAlias) -Pandroid.injected.signing.key.password=$(keyPassword)'
-    gradleOptions: ''
-    tasks: 'assembleRelease'  # or bundleRelease for AAB
-    publishJUnitResults: true
-    testResultsFiles: '**/TEST-*.xml'
 - task: Gradle@3
   inputs:
     gradleWrapperFile: 'android/gradlew'
