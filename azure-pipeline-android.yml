@@ -23,6 +23,10 @@ steps:
 - task: DownloadSecureFile@1
   inputs:
     secureFile: 'Sparklight.keystore'
+
+- script: ./gradlew clean build --refresh-dependencies
+  workingDirectory: 'android'
+  displayName: 'Clean and Refresh Gradle Dependencies'
 - task: Gradle@3
   inputs:
     gradleWrapperFile: 'android/gradlew'
