@@ -17,6 +17,9 @@ export const config = {
     URL_EASYPAY_SETUP_V3 : 'https://payment.sparklight.com/portalsV3/activate-autopay',
     URL_EASYPAY_MANAGE_V3 : 'https://payment.sparklight.com/portalsV3/manage-autopay',
     PAYMENTURLNEW: 'https://customer.sparklight.com/portals/app-secure/billing',
+    VIEW_BILLINGS :'https://customer.sparklight.com/residential/billing',
+    VIEW_PAYMENT :'https://customer.sparklight.com/residential/billing/all-payments',
+    BILLING_HISTORY:'https://customer.sparklight.com/residential/billing/statement',
     encryptvalPassword: '1 0 7 2 8 3 3634',
     ZENDESK_FEEDBACK: {
       Url: 'https://cableone.zendesk.com/api/v2/requests.json',
@@ -45,6 +48,9 @@ export const config = {
     PAYMENTURL_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/PortalsBiller',
     URL_EASYPAY_SETUP_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/activate-autopay',
     URL_EASYPAY_MANAGE_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/manage-autopay',
+    VIEW_BILLINGS :'https://customer.uat.sparklight.com/residential/billing',
+    VIEW_PAYMENT :'https://customer.uat.sparklight.com/residential/billing/all-payments',
+     BILLING_HISTORY:'https://customer.uat.sparklight.com/residential/billing/statement',
 
     encryptvalPassword: '1 0 7 2 8 3 3634',
     PAYMENTURLNEW: 'https://customer.uat.sparklight.com/portals/app-secure/billing',

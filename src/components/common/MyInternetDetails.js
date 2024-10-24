@@ -1,7 +1,7 @@
 import React, { useState, useEffect,useCallback } from "react";
 import { View, StyleSheet, Dimensions, ScrollView } from "react-native";
 import Carousel from 'react-native-snap-carousel';
-import Card from "./billerCards/BillerSummary";
+import Card from "./billerCards/BillerSummaryCard";
 import AutoPayCard from "./billerCards/AutoPayCard";
 import PeperLessCard from "./billerCards/PeperLessCard";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
@@ -65,37 +65,37 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, paymentDetails,navigation 
   const renderCard = ({ item, index }) => {
     const isActive = index === activeSlide;
   
-    if (index === 1) {
-      return (
-        <AutoPayCard
-          billAmt={billAmt}
-          cardDigit={cardDigit}
-          isAutoPayStatus={isAutoPayStatus}
-          paperlessStatus={paperlessStatus}
-          paymentDetails={paymentDetails}
-          navigation={navigation}
-          style={styles.card}
-          accessible={true}
-          accessibilityLabel="Auto Pay Card"
-          accessibilityState={{ selected: isActive }}
-        />
-      );
-    }
-    if (index === 2) {
-      return (
-        <PeperLessCard
-          billAmt={billAmt}
-          paperLessInfo={paperLessInfo}
-          isAutoPayStatus={isAutoPayStatus}
-          paperlessStatus={paperlessStatus}
-          navigation={navigation}
-          style={styles.card}
-          accessible={true}
-          accessibilityLabel="Paperless Billing Card"
-          accessibilityState={{ selected: isActive }}
-        />
-      );
-    }
+    // if (index === 1) {
+    //   return (
+    //     <AutoPayCard
+    //       billAmt={billAmt}
+    //       cardDigit={cardDigit}
+    //       isAutoPayStatus={isAutoPayStatus}
+    //       paperlessStatus={paperlessStatus}
+    //       paymentDetails={paymentDetails}
+    //       navigation={navigation}
+    //       style={styles.card}
+    //       accessible={true}
+    //       accessibilityLabel="Auto Pay Card"
+    //       accessibilityState={{ selected: isActive }}
+    //     />
+    //   );
+    // }
+    // if (index === 2) {
+    //   return (
+    //     <PeperLessCard
+    //       billAmt={billAmt}
+    //       paperLessInfo={paperLessInfo}
+    //       isAutoPayStatus={isAutoPayStatus}
+    //       paperlessStatus={paperlessStatus}
+    //       navigation={navigation}
+    //       style={styles.card}
+    //       accessible={true}
+    //       accessibilityLabel="Paperless Billing Card"
+    //       accessibilityState={{ selected: isActive }}
+    //     />
+    //   );
+    // }
     return (
       <Card
         billAmt={billAmt}
@@ -113,9 +113,9 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, paymentDetails,navigation 
   
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollView} style={{ marginStart: -24 }}>
+    <ScrollView  showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollView}>
       <View style={styles.container}>
-        <Carousel
+        {/* <Carousel
           data={[{}, {}, {}]}
           renderItem={renderCard}
           sliderWidth={viewportWidth}
@@ -125,7 +125,18 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, paymentDetails,navigation 
           containerCustomStyle={[styles.carousel, { marginRight: 0 }]} // Ensure no margin on right
           contentContainerCustomStyle={[styles.carouselContentContainer, { paddingEnd: 0 }]} // Ensure no padding at the end
           onSnapToItem={(index) => setActiveSlide(index)}
-        />
+        /> */}
+        <Card
+        billAmt={billAmt}
+        dueDate={dueDate}
+        isAutoPayStatus={isAutoPayStatus}
+        paperlessStatus={paperlessStatus}
+        navigation={navigation}
+        style={styles.card}
+        accessible={true}
+        accessibilityLabel="Billing Summary Card"
+       
+      />
       </View>
     </ScrollView>
   );

@@ -121,10 +121,12 @@ console.log("Due Date",dueDate)
           <View style={[styles.statusRow,{marginTop:26}]}>
             <TouchableOpacity
               onPress={() => {
+
                 navigation.navigate("ArticalWindowUtility", {
                   url: `${Env.PAYMENTURLNEW}`,
                   name: "Billing Details",
                 });
+               
               }}
               accessible={true}
               accessibilityLabel="Make a Payment"
@@ -156,7 +158,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignSelf: "center",
     overflow: "hidden",
-    width: wp("85%"),
+    width: wp("92%"),
   },
   leftSection: {
     paddingHorizontal: Padding.p_3xs,
