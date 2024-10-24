@@ -24,17 +24,15 @@ steps:
   inputs:
     secureFile: 'Sparklight.keystore'
 
-- task: Gradle@3
+- task: AndroidBuild@1
   inputs:
+    workingDirectory: ''
     gradleWrapperFile: 'gradlew'
-    workingDirectory: 'android'
     options: '-Pandroid.injected.signing.store.file=$(keystoreFile) -Pandroid.injected.signing.store.password=$(keystorePassword) -Pandroid.injected.signing.key.alias=$(keystoreAlias) -Pandroid.injected.signing.key.password=$(keyPassword)'
-    tasks: 'assembleRelease'
+    gradleOptions: ''
+    tasks: 'assembleRelease'  # or bundleRelease for AAB
     publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'
-    javaHomeOption: 'JDKVersion'
-    sonarQubeRunAnalysis: false
-    spotBugsAnalysis: false
 
 - task: AndroidSigning@2
   inputs:
