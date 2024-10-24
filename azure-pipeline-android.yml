@@ -25,6 +25,7 @@ steps:
     secureFile: 'Sparklight.keystore'
 - task: Gradle@3
   inputs:
+    workingDirectory: 'android'
     gradleWrapperFile: 'gradlew'
     options: '-Pandroid.injected.signing.store.file=$(keystoreFile) -Pandroid.injected.signing.store.password=$(keystorePassword) -Pandroid.injected.signing.key.alias=$(keystoreAlias) -Pandroid.injected.signing.key.password=$(keyPassword)'
     tasks: 'assembleRelease'
