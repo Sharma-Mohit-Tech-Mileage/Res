@@ -23,7 +23,19 @@ steps:
 - task: DownloadSecureFile@1
   inputs:
     secureFile: 'Sparklight.keystore'
+- task: NodeTool@0
+  displayName: 'Install Node'
+  inputs:
+    versionSpec: '20.6.1'
 
+- script: npm cache clean --force 
+  workingDirectory: src
+  displayName: 'Cleaning npm modules'
+
+- script: npm install --legacy-peer-deps
+  workingDirectory: src
+  displayName: 'Install node dependencies'
+  
 - script: ./gradlew clean build --refresh-dependencies
   workingDirectory: 'android'
   displayName: 'Clean and Refresh Gradle Dependencies'
