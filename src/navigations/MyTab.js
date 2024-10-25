@@ -19,6 +19,7 @@ import { Env } from '../network/apis/account/Constants';
 import { fetchProfileDetails } from '../redux/actions/ProfileActionSuite';
 import BillingIcon from "../res/svgIcons/BillingIcon";
 import BillingStackScreen from "./stackNavigation/BillingStack";
+import ArticalWindowUtility from "../components/utility/ArticalWindowUtility";
 
 
 const { width } = Dimensions.get('window');
@@ -97,36 +98,41 @@ const MyTabs = ({ route }) => {
         {/* Billing Screen */}
          <Tab.Screen
           name="BillingTab"
-          component={BillingStackScreen}
-          listeners={({ navigation }) => ({
-            tabPress: (e) => {
+          initialParams={{
+                                url: `${Env.PAYMENTURLNEW}`,
+                                name: 'Billing Details',
+                                isExpandable: true,
+                              }}
+          component={user?.isNormalUser? BillingStackScreen : ArticalWindowUtility}
+          // listeners={({ navigation }) => ({
+          //   tabPress: (e) => {
               
-              console.log('IsNormal user',user?.isNormalUser)
-              if (!user?.isNormalUser) {
-                e.preventDefault();
-                navigation.reset({
-                  index: 0,
-                  routes: [
-                    {
-                      name: 'BillingTab',
-                      state: {
-                        routes: [
-                          {
-                            name: 'ArticalWindowUtility',
-                            params: {
-                              url: `${Env.PAYMENTURLNEW}`,
-                              name: 'Billing Details',
-                              isExpandable: true,
-                            },
-                          },
-                        ],
-                      },
-                    },
-                  ],
-                });
-              }
-            },
-          })}
+          //     console.log('IsNormal user',user?.isNormalUser)
+          //     if (!user?.isNormalUser) {
+          //       e.preventDefault();
+          //       navigation.reset({
+          //         index: 0,
+          //         routes: [
+          //           {
+          //             name: 'BillingTab',
+          //             state: {
+          //               routes: [
+          //                 {
+          //                   name: 'ArticalWindowUtility',
+          //                   params: {
+          //                     url: `${Env.PAYMENTURLNEW}`,
+          //                     name: 'Billing Details',
+          //                     isExpandable: true,
+          //                   },
+          //                 },
+          //               ],
+          //             },
+          //           },
+          //         ],
+          //       });
+          //     }
+          //   },
+          // })}
           options={{
             headerShown: false,
             swipeEnabled: false,

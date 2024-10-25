@@ -125,8 +125,8 @@ console.log("Due Date",dueDate)
                 navigation.navigate("ArticalWindowUtility", {
                   url: `${Env.PAYMENTURLNEW}`,
                   name: "Billing Details",
+                  isWeb:true
                 });
-               
               }}
               accessible={true}
               accessibilityLabel="Make a Payment"

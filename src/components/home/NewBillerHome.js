@@ -91,7 +91,7 @@ const NewBillerHome = ({ navigation }) => {
           if (res) {
             dispatch(saveAccountServices(res.services));
             console.log("getUserAccountDetails **************************************************", res);
-            let userBillAmt=(res.past_due_amount==0) ? res.current_balance: res.past_due_amount
+            let userBillAmt=(res.past_due_amount<=0) ? res.current_balance: res.past_due_amount
             setBillAmt(userBillAmt?.toFixed(2));
 
             let dueDate =(res.past_due_amount!=0)? 'Immediately': moment(res.payment_due_date).format("ll");
@@ -109,7 +109,7 @@ const NewBillerHome = ({ navigation }) => {
             paymentDetails.email = getFirstEmail(res.email_details);
             setDefaultPaymentDetails(paymentDetails);
             //let billAmnt=(Math.round(res.payment_due_amount * 100) / 100).toFixed(2);
-            setBillAmt(res.payment_due_amount.toFixed(2));
+            //setBillAmt(res.payment_due_amount.toFixed(2));
           }
         },
         onErrorBill

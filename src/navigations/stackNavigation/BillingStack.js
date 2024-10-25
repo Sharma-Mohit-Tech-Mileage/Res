@@ -9,12 +9,13 @@ import AutoPayPCIConnector from "../../components/utility/AutoPayPCIConnector";
 
 const BillingStack = createNativeStackNavigator();
 
-function BillingStackScreen() {
+function BillingStackScreen({route}) {
     const { setTabBarVisible } = useTabBarVisibility();
     return (
         <BillingStack.Navigator defaultNavigationOptions={{ gestureEnabled: true }}>
             <BillingStack.Screen
                 name="Billing"
+                initialParams={{ isWeb:route?.params?.isWeb }}
                 component={BillingScreen}
                 options={{
                     headerBackVisible: false,

@@ -48,6 +48,7 @@ const BillingScreen = ({ navigation }) => {
   });
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const paperLessInfo = profile.paperLessInfo || {};
+  
 
   const getUserAccountDetails = () => {
     setBillAmt(undefined);
@@ -114,7 +115,7 @@ const BillingScreen = ({ navigation }) => {
   };
 
   useFocusEffect(
-    useCallback(() => {
+    useCallback(() => { 
       getStatus();
       getUserAccountDetails();
       dispatch(fetchBillingPaper());

@@ -197,7 +197,15 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
-            <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />
+            <ProfileSettingsHeader onPressBack={() => { 
+                if(route.params?.isBilling){
+                    navigation.navigate('Dashboard')
+                }else{
+                navigation.goBack();
+                }
+                 setModalOpen(false);
+                  }} 
+                  title={name} />
             {progress < 1 ? (
                 <View style={styles.progressBar}>
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
