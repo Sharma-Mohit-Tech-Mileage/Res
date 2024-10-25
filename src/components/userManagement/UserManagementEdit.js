@@ -333,7 +333,7 @@ const UserManagementEdit = ({ route }) => {
                             <SparkLightInput
                               onBlur={onBlur}
                               label={"Username"}
-                              placeholder={!isnewUser ? `` : "Enter your User Name"}
+                              placeholder={!isnewUser ? `` : "Enter your Username"}
                               onChangeText={onChange}
                               editable={isnewUser}
                               value={value}
@@ -345,7 +345,7 @@ const UserManagementEdit = ({ route }) => {
                     </View>
                     <Text 
                     style={styles.bulletPoint}>
-                    *User Name can not contain any special characters.
+                    *Username can not contain any special characters.
                         </Text>
                   </View>
                   {!isnewUser && (
