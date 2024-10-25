@@ -315,17 +315,24 @@ const HomeScreen = ({ navigation }) => {
             } else {
               updateInternetHealth(res.currentBalance, res.paymentDueDate);
             }
+
+            let userBillAmt=(res.pastDueAmount<=0) ? res.currentBalance: res.pastDueAmount
+            setBillAmt(userBillAmt?.toFixed(2));
+            
+
+            let dueDate = moment(res.paymentDueDate).format("ll");
+            setDueDate(dueDate);
+            
             function getFirstEmail(emailArray) {
               return (emailArray && emailArray.length > 0 && emailArray[0])
                 ? emailArray[0]
                 : null;
             }
-            let dueDate = moment(res.paymentDueDate).format("ll");
-            setDueDate(dueDate);
-            setBillAmt((Math.round(res.currentBalance * 100) / 100).toFixed(2));
+            
+            
             let paymentDetails = { ...defaultPaymentDetails };
             paymentDetails.dueDate = res.paymentDueDate;
-            paymentDetails.billAmount = (Math.round(res.currentBalance * 100) / 100).toFixed(2);
+            paymentDetails.billAmount = (Math.round(userBillAmt * 100) / 100).toFixed(2);
             paymentDetails.pastPaymentDue = res.pastDueAmount;
             paymentDetails.email = getFirstEmail(res.email);
             setDefaultPaymentDetails(paymentDetails);

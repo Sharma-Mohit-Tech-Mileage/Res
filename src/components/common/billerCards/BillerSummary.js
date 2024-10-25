@@ -25,6 +25,7 @@ const Card = ({
   acno
 }) => {
  
+  console.log('BillAmnt',billAmt)
 
   return (
     <View style={styles.shadowContainer}>
@@ -75,6 +76,7 @@ const Card = ({
             <ActivityIndicator
               size="large"
               color={colors.sparklight_bright_purple}
+              style={{marginLeft:wp("15%")}}
             />
           ) : (
                   <Text style={styles.amount}>${billAmt}</Text>

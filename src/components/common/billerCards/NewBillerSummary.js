@@ -86,6 +86,7 @@ console.log("Due Date",dueDate)
             <ActivityIndicator
               size="large"
               color={Color.sparklightBrightPurple}
+              style={{marginLeft:wp("15%")}}
             />
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>
@@ -122,7 +123,7 @@ console.log("Due Date",dueDate)
             <TouchableOpacity
               onPress={() => {
 
-                navigation.navigate("ArticalWindowUtility", {
+                navigation.navigate("BillingTab", {
                   url: `${Env.PAYMENTURLNEW}`,
                   name: "Billing Details",
                   isWeb:true

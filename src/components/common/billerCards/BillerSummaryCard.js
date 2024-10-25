@@ -48,7 +48,7 @@ const BillerSummaryCard = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus,
                     <View style={styles.statusRow}>
                         <TouchableOpacity
                             onPress={() => {
-                                navigation.navigate("Billing");
+                                navigation.navigate("BillingTab");
                             }}
                             accessible={true}
                             accessibilityLabel="View Billing Services"
