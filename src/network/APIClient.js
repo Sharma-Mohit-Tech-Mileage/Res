@@ -26,7 +26,7 @@ const handleFetchResponse = async (response, url, onSuccess, onError) => {
         console.log("Raw Response:", response.status); // Log the raw response
 
         if (response.status === 204 || !rawResponse) {
-            onSuccess({ message: 'No content',code:response.status }); // Pass a success message for no content
+            onSuccess({ message: 'No content', code: response.status }); // Pass a success message for no content
             return;
         }
 
@@ -149,7 +149,7 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     };
 
     fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response,`${baseUrl}${endpoint}`,  onSuccess, onError));
+        .then(response => handleFetchResponse(response, `${baseUrl}${endpoint}`, onSuccess, onError));
 };
 
 // Function to upload multipart data
@@ -196,10 +196,8 @@ export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
         body: JSON.stringify(body)
     };
 
-    console.log('PutApiRequest:', endpoint, 'body:', body);
-    console.log('PutApiRequest:', endpoint, 'body:', user.token);
     fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, onSuccess, onError));
+        .then(response => handleFetchResponse(response, `${baseUrl}${endpoint}`, onSuccess, onError));
 };
 
 // Function for GET API requests
@@ -221,7 +219,7 @@ export const GetApiRequest = async (endpoint, onSuccess, onError) => {
             if (response.status === 204) {
                 onError(response.status);
             } else {
-                return handleFetchResponse(response,`${baseUrl}${endpoint}`, onSuccess, onError);
+                return handleFetchResponse(response, `${baseUrl}${endpoint}`, onSuccess, onError);
             }
         });
 };
@@ -239,7 +237,7 @@ export const GetApiRequestSearch = async (endpoint, onSuccess, onError) => {
     };
 
     fetchWithTokenRefresh(fetch, `${SUPPORT_URL}${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, `${SUPPORT_URL}${endpoint}`,onSuccess, onError));
+        .then(response => handleFetchResponse(response, `${SUPPORT_URL}${endpoint}`, onSuccess, onError));
 };
 
 // Function for modem status API requests
@@ -291,7 +289,7 @@ const getBaseUrl = async () => {
         const user = await getUser();
         console.log("[getBaseUrl] User:", user);
         // If user exists and is not a normal user, return ACP base URL
-        if (user && user.isNormalUser===false) {
+        if (user && user.isNormalUser === false) {
             console.log("[getBaseUrl] User is ACP user.");
             return API_ACP_BASEURL;
         }

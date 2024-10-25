@@ -54,11 +54,11 @@ export const userSchema = (isCustomQuestionSelected) => yup.object({
     firstName: yup.string().required('First Name is required'),
     lastName: yup.string().required('Last Name is required'),
     //userName: yup.string().required('User Name is required').matches(/^[a-zA-Z ]{2,30}$/,'User Name can not contain any special characters'),
-    userName: yup.string().required('User Name is required').matches(/$/,'User Name can not contain any special characters'),
+    userName: yup.string().required('Username is required').matches(/$/,'Username can not contain any special characters'),
     securityAnswer: yup.string()
-        .required('Security answer is required'), 
+        .required('Password Reset Answer is required'), 
     newPassword: yup.string()
-        .nullable()  // Allows null values
+        .required('Password is required')  // Password must be enteredz
         .test(
             'newPassword-conditional-validation',
             'Password must meet the requirements',
@@ -102,7 +102,7 @@ export const userSchemaNoPass = (isCustomQuestionSelected) => yup.object({
     lastName: yup.string().required('Last Name is required'),
     userName: yup.string().required('User Name is required'),
     securityAnswer: yup.string()
-        .required('Security answer is required'),
+        .required('Password Reset Answer is required'),
         
     securityQuestion: isCustomQuestionSelected
         ? yup.string().required('Custom security question is required')
@@ -122,17 +122,17 @@ export const phoneSchema = yup.object({
 });
 
 export const feedbackSchema = yup.object({
-    feedbackText: yup.string().required('Comment is required.'),
+    feedbackText: yup.string().required('Comment is required'),
     feedbackEmail: yup
         .string()
-        .email('Please enter a valid email address.')
-        .required('Email is required.')
+        .email('Please enter a valid email address')
+        .required('Email is required')
 });
 
 
 export const passwordSchema = (isCustomQuestionSelected) => yup.object({
     securityAnswer: yup.string()
-        .required('Security answer is required'),
+        .required('Password Reset Answer is required'),
     newPassword: yup.string()
         .required('Password is required')  // Allows null values
         .test(
@@ -176,8 +176,8 @@ export const userTicketSchema = () => yup.object({
     comment: yup.string().required('Issue Description is required'),
     email: yup
     .string()
-    .email('Please enter a valid email address.')
-    .required('Email is required.'),
+    .email('Please enter a valid email address')
+    .required('Email is required'),
     PhoneNumber: yup.string().notRequired()
     
     
@@ -186,9 +186,9 @@ export const userTicketSchema = () => yup.object({
 
 export const securitySchema = (isCustomQuestionSelected) => yup.object({
     securityAnswer: yup.string()
-        .required('Security answer is required'),
+        .required('Password Reset Answer is required'),
     securityQuestion: isCustomQuestionSelected
-        ? yup.string().required('Custom security question is required')
+        ? yup.string().required('Custom Security Question is required')
         : yup.string().nullable(),
     // ... other fields
 });

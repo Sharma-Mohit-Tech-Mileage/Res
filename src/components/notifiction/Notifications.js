@@ -134,7 +134,7 @@ const Notifications = () => {
         case 'Text':
           dispatch(fetchSMSSelection());
           break;
-        case 'App':
+        case 'In-app':
           dispatch(fetchPushNotifications());
           break;
         default:
@@ -144,7 +144,7 @@ const Notifications = () => {
           dispatch(fetchPushNotifications());
       }
       setUpdatedSection(updatedType);
-      setSuccessMessage(`${updatedType} settings have been updated successfully.`);
+      setSuccessMessage(`${updatedType} notification settings have been updated successfully.`);
       setShowSuccessAlert(true);
       navigation.setParams({ updateSuccess: undefined, updatedType: undefined });
     }
@@ -220,7 +220,7 @@ const Notifications = () => {
           <NotificationSection
             title="In-App Notifications"
             successMessage={successMessage}
-            showNotification={updatedSection === 'App'}
+            showNotification={updatedSection === 'In-app'}
             showSuccessAlert={showSuccessAlert}
             setShowSuccessAlert={() => setShowSuccessAlert(false)}
             isDisabled={false}
@@ -285,9 +285,9 @@ const NotificationSection = ({
       <View style={{ ...styles.parentSpaceBlock, alignSelf: "stretch" }}>
         <Text style={styles.textNotifications}>{title}</Text>
         {!isAdmin && <Pressable
-        accessible={true}
-        accessibilityRole="button"
-        accessibilityLabel="Edit"
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Edit"
           style={({ pressed }) => [
             styles.buttons,
             styles.buttonsBg,
@@ -368,7 +368,7 @@ const NotificationSection = ({
             : <Text style={[styles.notificationsSentFrom, styles.notificationsSentFromTypo]}>
               {infoText}
               {number != null && (
-               <Text style={[styles.text]}>
+                <Text style={[styles.text]}>
                   {String(number)}
                 </Text>
               )}

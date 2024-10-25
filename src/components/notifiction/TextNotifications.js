@@ -16,7 +16,7 @@ import Toggle from '../common/Toggle';
 // Define your validation schema
 const validationSchema = yup.object().shape({
     phoneNumber: yup.string()
-        .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number.')
+        .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number')
         .required('Phone number is required'),
     optOut: yup.boolean(),
     outageOptOut: yup.boolean(),
@@ -42,7 +42,7 @@ const TextNotifications = ({ navigation }) => {
 
     useEffect(() => {
         if (route.params?.updateFailed) {
-            setErrorText('Something went wrong. Please try again.')
+            setErrorText('Something went wrong. Please try again')
             setShowErrorAlert(true);
             scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
             navigation.setParams({ updateFailed: undefined });
@@ -51,8 +51,6 @@ const TextNotifications = ({ navigation }) => {
 
     const handleValidationError = () => {
         scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-        setErrorText('Please enter valid information to continue.')
-        setShowErrorAlert(true);
     };
 
     const onSubmit = data => {

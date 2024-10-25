@@ -1,33 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  Button,
-  Alert,
-  Image,
-  Pressable,
-  Platform,
-  Linking
-} from "react-native";
-import {
-  FontFamily,
-  Padding,
-  Color,
-  FontSize,
-  Border,
-} from "../../../GlobalStyles";
+import React from "react";
+import { View, Text, TextInput, StyleSheet, Image, Pressable, Platform, Linking } from "react-native";
+import { FontFamily, Padding, Color, FontSize, Border, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useDispatch, useSelector } from 'react-redux';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import WifiScheduling from "../../res/svgIcons/WifiScheduling";
-import EEroDevice from "../../res/svgIcons/EEroDevice";
 import AdvanceSecurity from "../../res/svgIcons/AdvanceSecurity";
-import InternetBackUp from "../../res/svgIcons/InternetBackUp";
 import MultiAdmin from "../../res/svgIcons/MultiAdmin";
-
+import SparkLightButton from "../common/customui/PrimaryButton";
 
 const EEroFeatures = (props) => {
 
@@ -128,6 +109,12 @@ const EEroFeatures = (props) => {
               {`Open the eero App`}
             </Text>
           </Pressable>
+        </View>
+        <View style={{ paddingHorizontal: Padding.p_5xl }} >
+          <SparkLightButton title='Cancel' onPress={() => navigation.goBack()} 
+            accessibilityLabel="Cancel button" 
+            accessibilityHint="Goes back to the previous screen" 
+            accessibilityRole="button" />
         </View>
       </KeyboardAwareScrollView>
     </View>

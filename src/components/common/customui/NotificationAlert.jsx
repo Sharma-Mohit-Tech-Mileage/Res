@@ -150,22 +150,25 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderBottomColor: '#E1E1E1',
         borderEndColor: '#E1E1E1',
-        borderTopColor: '#E1E1E1'
+        borderTopColor: '#E1E1E1',
+        position: 'relative',  // Add relative positioning to manage absolute close button
     },
     textContentContainer: {
-        flex: 1,
+        flex: 1, // Allow text content to take up available space
         marginLeft: 8,
+        marginRight: 40, // Provide sufficient space for the close button to avoid overlap
     },
     iconStyle: {
         height: 18,
         width: 18,
     },
     closeButton: {
-        position: 'absolute', // Position the button absolutely
-        top: '50%',           // Position halfway down the container
-        justifyContent: 'center',
-        alignItems: 'center',
-        right: 10,
+        position: 'absolute',  // Absolute positioning to place the close button
+        top: '50%',            // Vertically center the close button
+        transform: [{ translateY: -10 }], // Adjust vertical positioning
+        right: 10,             // Keep it close to the right edge
+        padding: 5,            // Add padding around the close button
+        zIndex: 1,             // Ensure the close button stays on top of other elements
     },
     title: {
         fontSize: FontSize.size_base,
