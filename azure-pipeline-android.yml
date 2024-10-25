@@ -36,22 +36,21 @@ steps:
   workingDirectory: src
   displayName: 'Install node dependencies'
   
-- script: ./gradlew clean build --refresh-dependencies
-  workingDirectory: 'android'
-  displayName: 'Clean and Refresh Gradle Dependencies'
 - task: Gradle@3
   inputs:
-    gradleWrapperFile: 'android/gradlew'
+    
     workingDirectory: 'android'
+    versionSpec: '11'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'
+    gradleWrapperFile: 'android/gradlew'
     options: '-Pandroid.injected.signing.store.file=$(keystoreFile) -Pandroid.injected.signing.store.password=$(keystorePassword) -Pandroid.injected.signing.key.alias=$(keystoreAlias) -Pandroid.injected.signing.key.password=$(keyPassword)'
-    tasks: 'assembleRelease'
-    publishJUnitResults: true
+    publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
     gradleOptions: '-Xmx3072m'
     sonarQubeRunAnalysis: false
     spotBugsAnalysis: false
+    tasks: 'assembleRelease'
 
 - task: CopyFiles@2
   inputs:
