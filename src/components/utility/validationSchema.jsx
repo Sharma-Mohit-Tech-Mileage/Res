@@ -100,7 +100,7 @@ export const userSchemaNoPass = (isCustomQuestionSelected) => yup.object({
     
     firstName: yup.string().required('First Name is required'),
     lastName: yup.string().required('Last Name is required'),
-    userName: yup.string().required('User Name is required'),
+    userName: yup.string().required('Username is required'),
     securityAnswer: yup.string()
         .required('Password Reset Answer is required'),
         
