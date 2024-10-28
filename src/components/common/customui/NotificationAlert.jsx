@@ -50,18 +50,8 @@ const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true
 
     return (
         <View style={[styles.notificationContainer, { borderLeftColor: currentTypeStyle.color }]}>
-            <Image
-                source={currentTypeStyle.image}
-                resizeMode="contain"
-                style={[
-                    styles.iconStyle,
-                    { marginTop: !title ? 1 : 1 }
-                ]}
-            />
-            <View style={[
-                styles.textContentContainer,
-                showCloseIcon ? { marginRight: 30 } : { marginRight: 10 }
-            ]}>
+            <Image source={currentTypeStyle.image} resizeMode="contain" style={[ styles.iconStyle, { marginTop: !title ? 1 : 1 } ]} />
+            <View style={[ styles.textContentContainer, showCloseIcon ? { marginRight: 30 } : { marginRight: 10 } ]}>
                 {title && <Text style={[styles.title, { color: currentTypeStyle.color }]}>{title}</Text>}
                 {message ? (
                     <RenderText
@@ -163,9 +153,8 @@ const styles = StyleSheet.create({
         width: 18,
     },
     closeButton: {
-        position: 'absolute',  // Absolute positioning to place the close button
-        top: '50%',            // Vertically center the close button
-        transform: [{ translateY: -10 }], // Adjust vertical positioning
+        position: 'absolute', 
+        top: 5,               // Keep it close to the top edge
         right: 10,             // Keep it close to the right edge
         padding: 5,            // Add padding around the close button
         zIndex: 1,             // Ensure the close button stays on top of other elements
