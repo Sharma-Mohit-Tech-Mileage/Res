@@ -41,7 +41,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
                 
                 localStorage.setItem('jwt_token', '${currentUser.token}');
-                localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo)}');
+                localStorage.setItem('user_info', '${JSON.stringify(currentUser?.userInfo)}');
                 var upgradeToken = '${currentUser.upgradeToken}';
                 localStorage.setItem('upgrades_token', upgradeToken);
             })();`;
@@ -198,10 +198,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => { 
-                if(route.params?.isBilling){
-                    navigation.navigate('Dashboard')
+                if(route.params?.isBilling){   
+                    navigation.reset({
+                        index: 0,
+                        routes: [{ name: "MyTab" }],
+                      });
+                     //navigation.goBack();
                 }else{
-                navigation.goBack();
+                     navigation.goBack();
                 }
                  setModalOpen(false);
                   }} 

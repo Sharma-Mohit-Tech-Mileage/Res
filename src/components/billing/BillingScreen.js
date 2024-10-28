@@ -34,6 +34,7 @@ import { Env } from "../../network/apis/account/Constants";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
+  const user = useSelector(state => state.combinedReducers.user.userData);
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState();
   const [accountNo, setAccountNo] = useState("");
@@ -116,10 +117,24 @@ const BillingScreen = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => { 
+      // getStatus();
+      // getUserAccountDetails();
+      // dispatch(fetchBillingPaper());
+      // dispatch(fetchProfileDetails());
+   if(user?.isNormalUser){
       getStatus();
       getUserAccountDetails();
       dispatch(fetchBillingPaper());
       dispatch(fetchProfileDetails());
+   }else{
+    navigation.navigate("ArticalWindowUtility", {
+      url: `${Env.PAYMENTURLNEW}`,
+      name: "Billing Details",
+      isBilling:true
+    });
+  
+   }
+
     }, [])
   );
   useEffect(() => {
@@ -127,9 +142,9 @@ const BillingScreen = ({ navigation }) => {
   }, [billAmt]);
 
   return (
-    <View style={styles.account} accessibilityLabel="Account screen">
+    <View style={styles.account} accessibilityLabel="Billing Services screen">
       <ProfileSettingsHeader
-        title="Account"
+        title="Billing Services"
         iconAlignment="right"
         showIcon={false}
       />
@@ -262,12 +277,12 @@ const BillingScreen = ({ navigation }) => {
                   onPress={() => {
                     navigation.navigate("ArticalWindowUtility", {
                       url: Env.BILLING_HISTORY,
-                      name: "View Billing Hitory",
+                      name: "View Billing History",
                     });
                   }}
                   accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel="View Billing Hitory"
+                  accessibilityLabel="View Billing History"
                 >
                   
                   <Text style={styles.modemHealthSupport}>

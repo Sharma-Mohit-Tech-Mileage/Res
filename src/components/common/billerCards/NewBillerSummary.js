@@ -91,7 +91,7 @@ console.log("Due Date",dueDate)
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>
           )}
-          {dueDate != "Invalid date" && (
+          {(dueDate != "Invalid date" && billAmt!=undefined) && (
             <Text style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
               {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": <NotAvailable/>}
               <Text style={[styles.dueDate, { fontWeight: "400",color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue }]}>
@@ -122,11 +122,14 @@ console.log("Due Date",dueDate)
           <View style={[styles.statusRow,{marginTop:26}]}>
             <TouchableOpacity
               onPress={() => {
-
-                navigation.navigate("BillingTab", {
-                  url: `${Env.PAYMENTURLNEW}`,
-                  name: "Billing Details",
-                  isWeb:true
+                // navigation.navigate("BillingTab", {
+                //   url: `${Env.PAYMENTURLNEW}`,
+                //   name: "Billing Details",
+                //   isBilling:true
+                // });
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "BillingTab" }],
                 });
               }}
               accessible={true}

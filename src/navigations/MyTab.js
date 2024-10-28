@@ -98,41 +98,34 @@ const MyTabs = ({ route }) => {
         {/* Billing Screen */}
          <Tab.Screen
           name="BillingTab"
-          initialParams={{
-                                url: `${Env.PAYMENTURLNEW}`,
-                                name: 'Billing Details',
-                                isExpandable: true,
-                              }}
-          component={user?.isNormalUser? BillingStackScreen : ArticalWindowUtility}
-          // listeners={({ navigation }) => ({
-          //   tabPress: (e) => {
-              
-          //     console.log('IsNormal user',user?.isNormalUser)
-          //     if (!user?.isNormalUser) {
-          //       e.preventDefault();
-          //       navigation.reset({
-          //         index: 0,
-          //         routes: [
-          //           {
-          //             name: 'BillingTab',
-          //             state: {
-          //               routes: [
-          //                 {
-          //                   name: 'ArticalWindowUtility',
-          //                   params: {
-          //                     url: `${Env.PAYMENTURLNEW}`,
-          //                     name: 'Billing Details',
-          //                     isExpandable: true,
-          //                   },
-          //                 },
-          //               ],
-          //             },
-          //           },
-          //         ],
-          //       });
-          //     }
-          //   },
-          // })}
+          component={BillingStackScreen }
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              if (!user?.isNormalUser) {
+                e.preventDefault();
+                navigation.reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: 'BillingTab',
+                      state: {
+                        routes: [
+                          {
+                            name: 'ArticalWindowUtility',
+                            params: {
+                              url: `${Env.PAYMENTURLNEW}`,
+                              name: 'Billing Details',
+                              isExpandable: true,
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                });
+              }
+            },
+          })}
           options={{
             headerShown: false,
             swipeEnabled: false,
