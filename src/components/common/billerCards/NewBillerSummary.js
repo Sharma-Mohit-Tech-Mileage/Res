@@ -34,6 +34,7 @@ console.log("Due Date",dueDate)
       <>
        <Tooltip
           backgroundColor="#4C5458"
+          overlayColor="#00000000"
           width={180}
           height={100}
           popover={

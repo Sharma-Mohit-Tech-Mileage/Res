@@ -37,14 +37,14 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
     console.log("error", error);
   };
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     getStatus();
-  //     console.log('Refresh Auto pay Data')
-  //     return () => {
-  //     };
-  //   }, [])
-  // );
+  useFocusEffect(
+    useCallback(() => {
+      getStatus();
+      console.log('Refresh Auto pay Data')
+      return () => {
+      };
+    }, [])
+  );
 
   const renderCard = ({ item, index }) => {
     // if (index === 1) {
@@ -66,7 +66,7 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
     return (
       <Card
         billAmt={billAmt}
-        dueDate={(accountNumber=='8160360050011425')? '': dueDate}
+        dueDate={(accountNumber=='8160360050005096')? '': dueDate}
         isAutoPayStatus={isAutoPayStatus}
         paperlessStatus={paperlessStatus}
         navigation={navigation}
@@ -91,7 +91,7 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
 
        <Card
         billAmt={billAmt}
-        dueDate={dueDate}
+        dueDate={(accountNumber=='8160360050005096')? '': dueDate}
         isAutoPayStatus={isAutoPayStatus}
         paperlessStatus={paperlessStatus}
         navigation={navigation}
