@@ -1,24 +1,7 @@
 import React, { useState, useEffect } from "react";
 
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  Button,
-  Alert,
-  Image,
-  Pressable,
-  TouchableOpacity,
-  Linking
-} from "react-native";
-import {
-  FontFamily,
-  Padding,
-  Color,
-  FontSize,
-  Border,
-} from "../../../GlobalStyles";
+import { View, Text, TextInput, StyleSheet, Button, Alert, Image, Pressable, TouchableOpacity, Linking } from "react-native";
+import { FontFamily, Padding, Color, FontSize, Border, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
@@ -28,7 +11,6 @@ import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import SparkLightInput from "../common/customui/SparkLightInput";
 import PlugIcon from "../../res/svgIcons/plug";
 import Loader from "../utility/Loader";
-import WebView from 'react-native-webview';
 
 const RetrieveModemPassword = () => {
 

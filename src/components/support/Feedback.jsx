@@ -34,8 +34,6 @@ const Feedback = () => {
     const scrollViewRef = useRef(null);
 
     const handleValidationError = () => {
-        setErrormsg('Please enter valid information to continue.')
-        setShowErrorAlert(true);
         isSubmittingRef.current = false;
         setIsSubmitting(false); // Also update the state for UI feedback
     };
@@ -201,8 +199,14 @@ const Feedback = () => {
                             accessibilityRole="button"
                             accessible={true}
                             style={styles.buttonContainer}
-                            onPress={() => navigation.navigate('Account')} >
-                            <Text style={[styles.textStyle, { color: Color.colorMidnightblue }]}>Cancel</Text>
+                            onPress={() => navigation.navigate('Account')}
+                        >
+                            <Text
+                                style={[styles.textStyle, { color: Color.colorMidnightblue }]}
+                                accessible={false} // Ensure the text itself is not an accessible element
+                            >
+                                Cancel
+                            </Text>
                         </Pressable>
                     </View>
                 </View>

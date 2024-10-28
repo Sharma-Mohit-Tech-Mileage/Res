@@ -194,7 +194,7 @@ const Support = ({ route }) => {
                         <Text style={styles.wereHereTo}>We’re Here to Help</Text>
                     </View>
                 </View>
-                <ScrollView ref={scrollViewRef}>
+                <ScrollView ref={scrollViewRef} style={{paddingHorizontal:Padding.p_base}}>
                     <View style={styles.issuesFlexBox}>
                         <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
                             <Text style={[styles.heading, styles.headingTypo]}>
@@ -840,7 +840,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     mainContainer: {
-        padding: Padding.p_base,
+        paddingVertical: Padding.p_base,
         alignSelf: 'stretch',
         marginBottom: 280
     },

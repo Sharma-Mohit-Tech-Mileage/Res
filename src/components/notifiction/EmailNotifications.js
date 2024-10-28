@@ -66,8 +66,6 @@ const EmailNotifications = () => {
 
   const handleValidationError = () => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-    setErrorMsg('Please enter valid information to continue.')
-    setShowErrorAlert(true);
     isSubmittingRef.current = false;
     setIsSubmitting(false);
   };
