@@ -14,7 +14,7 @@ pool:
 variables:
   group: AndroidBuildConfig
   buildConfiguration: 'Release'
-  keystoreFile: 'Sparklight.keystore'
+  keystoreFile: 'android/Sparklight.keystore'
   keystoreAlias: 'sparklight'
   keystorePassword: $(jarsignerKeystorePassword)  
   keyPassword: $(jarsignerKeyPassword)            
