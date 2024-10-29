@@ -249,8 +249,8 @@ const UserManagement = ({route}) => {
           <CustomerErrorPage
             visible={isDeleteUser}
             message={
-              `Do you want to continue?.
-Deleted user will no longer be able to login.`
+              `Do you want to continue?
+              Deleted user will no longer be able to login`
             }
             title={"Delete User Account"}
             onActionTxt={"Yes"}
