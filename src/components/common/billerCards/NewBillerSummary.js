@@ -134,11 +134,11 @@ console.log("Due Date",dueDate)
                 });
               }}
               accessible={true}
-              accessibilityLabel="Make a Payment"
+              accessibilityLabel="View Billing Services"
               accessibilityRole="button"
               style={styles.paymentButton}
             >
-              <Text style={styles.paymentButtonText}>Make a Payment</Text>
+              <Text style={styles.paymentButtonText}>View Billing Services</Text>
               <View style={{ marginLeft: 2 }}>
                 <RightArrow color={colors.snow_white} />
               </View>
