@@ -26,7 +26,7 @@ const config = {
 const logoutConfirmationPopup = (dispatch, navigation) => {
   Alert.alert(
     'Confirm Logout',
-    'Are you sure you want to Log out ?',
+    'Are you sure you want to logout?',
     [
       {
         text: 'Cancel',
