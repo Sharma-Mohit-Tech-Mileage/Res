@@ -42,7 +42,6 @@ steps:
     workingDirectory: 'android'
     jdkArchitectureOption: 'x64'
     gradleWrapperFile: 'android/gradlew'
-    options: '-Pandroid.injected.signing.store.file=$(keystoreFile) -Pandroid.injected.signing.store.password=$(keystorePassword) -Pandroid.injected.signing.key.alias=$(keystoreAlias) -Pandroid.injected.signing.key.password=$(keyPassword)'
     publishJUnitResults: false
     testResultsFiles: '**/TEST-*.xml'
     gradleOptions: '-Xmx3072m'
