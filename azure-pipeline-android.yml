@@ -40,9 +40,7 @@ steps:
   inputs:
     
     workingDirectory: 'android'
-    versionSpec: '11'
     jdkArchitectureOption: 'x64'
-    jdkSourceOption: 'PreInstalled'
     gradleWrapperFile: 'android/gradlew'
     options: '-Pandroid.injected.signing.store.file=$(keystoreFile) -Pandroid.injected.signing.store.password=$(keystorePassword) -Pandroid.injected.signing.key.alias=$(keystoreAlias) -Pandroid.injected.signing.key.password=$(keyPassword)'
     publishJUnitResults: false
