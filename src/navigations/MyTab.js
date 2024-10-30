@@ -239,21 +239,21 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 5,
     opacity: .7,
-    left: 100,
+    left: 80,
   },
   shadowTabsStep2: {
-    left: tabWidth * 3,
+    left: tabWidth * 3.2,
   },
   shadowTabsStep3: {
     left: tabWidth * 4,
   },
   shadowTabsLeft: {},
   shadowTabsStep2Left: {
-    width: tabWidth * 2,
+    width: tabWidth * 2.3,
     left: 0,
   },
   shadowTabsStep3Left: {
-    width: tabWidth * 3,
+    width: tabWidth * 3.1,
     left: 0,
   },
 });
