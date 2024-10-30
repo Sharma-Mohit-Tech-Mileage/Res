@@ -52,9 +52,8 @@ const Card = ({
               flexDirection: "row",
               width: "70%",
               marginHorizontal: 20,
-              marginVertical: 10,
               justifyContent: "space-between",
-              alignItems: "center",
+              
               flex: 0.5,
             }}
           >
@@ -62,13 +61,14 @@ const Card = ({
               style={{
                 flexDirection: "column",
                 flex: 1,
+                marginVertical:24,
                 justifyContent: "flex-start",
               }}
             >
-              <Text style={[styles.label, { fontWeight: "600",color:colors.sparklight_purple_blue }]}>
+              <Text style={[styles.label, { fontWeight: "600",color:colors.sparklight_purple_blue,fontSize:14 }]}>
                 Account Number
               </Text>
-              <Text style={styles.label}>{acno}</Text>
+              <Text style={[styles.label,{fontSize:14}]}>{acno}</Text>
             </View>
             <View style={{ flexDirection: "column", flex: 1,
                 justifyContent: 'flex-end', marginEnd:40}}>
@@ -232,13 +232,13 @@ const styles = StyleSheet.create({
   paymentButton: {
     flexDirection: "row",
     backgroundColor: colors.sparklight_purple_blue,
-    width:wp("80%"),
+    width:wp("70%"),
     paddingVertical: 8,
     alignItems:'center',
     justifyContent:'center',
     borderRadius: 5,
     alignSelf: "center",
-    marginLeft: wp("4%"),
+    marginLeft: wp("9%"),
   },
   paymentButtonText: {
     color: colors.snow_white,
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   cardFooter: {
     flexDirection: "row",
     backgroundColor: "#F8F8F8",
-    width: "92%",
+    width: "100%",
     borderBottomEndRadius: 10,
     borderBottomStartRadius: 10,
     padding: 10,

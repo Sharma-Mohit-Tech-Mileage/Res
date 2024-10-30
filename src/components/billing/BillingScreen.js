@@ -31,6 +31,7 @@ import {
 } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import { Env } from "../../network/apis/account/Constants";
+import colors from "../../res/Colors";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -158,8 +159,8 @@ const BillingScreen = ({ navigation }) => {
       <View style={[styles.frameParent]}>
         <View style={styles.rightActionableParent}>
           <View style={styles.rightActionable}>
-            <Text style={styles.text}>
-              <BillingIconWhite isSelected={false} />
+          <Text style={[styles.text,{alignSelf:'center',marginLeft:5,marginTop:5}]}>
+              <BillingIconWhite isSelected={false} /> 
             </Text>
           </View>
           {/* Full name for profile */}
@@ -490,11 +491,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   modemHealthSupport: {
-    color: Color.colorMidnightblue,
-    fontSize: FontSize.size_base,
-    textAlign: "left",
-    fontWeight:'400',
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.sparklight_purple_blue,
     fontFamily: FontFamily.openSansRegular,
+    textAlign: "left",
     lineHeight: 28,
     flex: 1,
   },

@@ -45,7 +45,10 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
             <>
               <Text style={styles.autoPayStatusTextInActive}>Paperless Billing Off</Text>
               <View style={styles.headerContainer}>
-                <Text style={[styles.dueDate]}>Turn on Paperless Billing today! <Text style={styles.subText}>Statements delivered via email.</Text></Text>
+                <View style={{flexDirection:'column'}}>
+                <Text style={[styles.dueDate]}>Turn on Paperless Billing today! </Text>
+                <Text style={styles.subText}>Statements delivered via email.</Text>
+                </View>
               </View>
             </>
           )}
@@ -62,11 +65,11 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
               );
             }}
               accessible={true}
-              accessibilityLabel="Manage Paperless"
+              accessibilityLabel="Manage Paperless Billing"
               accessibilityRole="button"
               style={styles.paymentButton}
             >
-              <Text style={styles.paymentButtonText}>Manage Paperless</Text>
+              <Text style={styles.paymentButtonText}>Manage Paperless Billing</Text>
               <View style={{ marginLeft: 2 }}>
                 <RightArrow color={colors.snow_white} />
               </View>
@@ -207,13 +210,13 @@ const styles = StyleSheet.create({
   paymentButton: {
     flexDirection: "row",
     backgroundColor: colors.sparklight_purple_blue,
-    width:wp("80%"),
+    width:wp("70%"),
     paddingVertical: 8,
     alignItems:'center',
     justifyContent:'center',
     borderRadius: 5,
     alignSelf: "center",
-    marginLeft: wp("4%"),
+    marginLeft: wp("9%"),
   },
   paymentButtonText: {
     color: colors.snow_white,
@@ -231,7 +234,7 @@ const styles = StyleSheet.create({
   },cardFooter: {
     flexDirection: "row",
     backgroundColor: "#F8F8F8",
-    width:wp("92%"),
+    width:wp("100%"),
     borderBottomEndRadius: 10,
     borderBottomStartRadius: 10,
     padding: 10,
