@@ -209,7 +209,7 @@ const BillingScreen = ({ navigation }) => {
               style={[
                 styles.myModem,
                 styles.myModemSpaceBlock,
-                { marginTop: 20 },
+                { marginTop: 10 },
               ]}
             >
               <View
