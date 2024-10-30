@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Platform, AppState } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Platform, AppState, ActivityIndicator } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -8,6 +8,7 @@ import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
+import colors from '../../res/Colors';
 const { width, height } = Dimensions.get('window');
 
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -195,6 +196,12 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         setDynamicCookie();  // Push cookie when component is first mounted
     }, [url, modalOpen, appState]);
 
+
+    const Spinner = () => (
+        <View style={styles.activityContainer}>
+          <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
+        </View>
+    );
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => { 
@@ -212,7 +219,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                   title={name} />
             {progress < 1 ? (
                 <View style={styles.progressBar}>
-                    <View style={[styles.progress, { width: `${progress * 100}%` }]} />
+                    <View style={[styles.progress, { width: `${progress * 100}%` }]} /> 
                 </View>
             ) : null}
             {modalOpen && (
@@ -226,6 +233,8 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     onNavigationStateChange={navigationChange}
                     onMessage={onMessage}
                     originWhitelist={['http://*', 'https://*', 'data:*']}
+                    startInLoadingState={true}
+                    renderLoading={Spinner}
                     incognito={true}
                 />
             )}
@@ -262,7 +271,16 @@ const styles = StyleSheet.create({
     errorText: {
         fontSize: width * 0.04, // 4% of screen width
         marginBottom: height * 0.02, // 2% of screen height
-    },
+    },activityContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        backgroundColor: '#00000000',
+        height: '100%',
+        width: '100%'
+      }
 });
 
 export default ArticalWindowUtility;
