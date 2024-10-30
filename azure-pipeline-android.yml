@@ -52,7 +52,7 @@ steps:
   inputs:
     apkFiles: '**/*.apk'
     apksignerKeystoreFile: 'Sparklight.keystore'
-    apksignerKeystorePassword: '$(keystorePassword)'
+    apksignerKeystorePassword: 'sparklight_123'
     apksignerKeystoreAlias: 'sparklight'
     apksignerKeyPassword: '$(keyPassword)'
 - task: CopyFiles@2
