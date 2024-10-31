@@ -1,15 +1,5 @@
 import React, { useState, useEffect,useCallback } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Platform,
-  Dimensions,
-  Linking,
-} from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Linking, } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
@@ -22,6 +12,7 @@ import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import YoutubePlayer from "react-native-youtube-iframe";
+import AccessibleYoutubePlayer from "../common/AccessibleYoutubePlayer";
 import {saveAccountServices} from "../../redux/actions/ProfileActionSuite";
 import { useSelector, useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
@@ -340,16 +331,17 @@ const NewBillerHome = ({ navigation }) => {
 
                 {isImageDispaly ? (
                   <View 
-                  accessible={isImageDispaly}
-                  accessibilityLabel={`SparkLight Video`}
                   style={styles.videoContainer} >
-                  <YoutubePlayer
-                  height={185}
-                  play={playing}
-                  videoId={"C3cMQoWxv6I"}
-                  
-                />
+                 <AccessibleYoutubePlayer
+                videoId="R8SrD7NFJaA"
+                height={230}
+                play={playing}
+                videoTitle="SparkLight Video"
+                onPlaybackStateChange={(playState) => setPlaying(playState)}
+              />
+              
                 </View>
+                
                 ) : (
                   <></>
                 )}
