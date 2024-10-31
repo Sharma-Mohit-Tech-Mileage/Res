@@ -104,5 +104,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+  <key>NSCameraUsageDescription</key>
+  <string>This app needs access to your camera to take photos for chat support.If you don’t allow access now, you can enable it later in Settings.</string>
 </dict>
 </plist>

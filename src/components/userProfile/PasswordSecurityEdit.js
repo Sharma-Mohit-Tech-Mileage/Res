@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { StyleSheet,TouchableOpacity, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
-import { validatePassword, passwordTerms,securityQuestions } from "../utility/constant";
+import { securityQuestions } from "../utility/constant";
 import SparkLightInput from '../common/customui/SparkLightInput';
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';

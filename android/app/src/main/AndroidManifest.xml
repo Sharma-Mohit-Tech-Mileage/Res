@@ -22,7 +22,7 @@ xmlns:tools="http://schemas.android.com/tools">
     android:name="google_analytics_automatic_screen_reporting_enabled"
     android:value="false"
     tools:replace="android:value"/>
-      <activity android:name="zendesk.messaging.MessagingActivity"
+      <activity android:name="zendesk.classic.messaging.MessagingActivity"
             android:theme="@style/CustomCallTheme" />
       <activity
         android:name=".MainActivity"

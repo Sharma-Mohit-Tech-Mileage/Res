@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import {
   Image,
   StyleSheet,
@@ -19,9 +19,9 @@ import {
 } from "../../../../GlobalStyles";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightButton from "../../common/customui/SparkLightButton";
-import { useNavigation ,useIsFocused} from "@react-navigation/native";
+import { useNavigation ,useFocusEffect} from "@react-navigation/native";
 import { GetApiRequest } from "../../../network/APIClient";
-import { getUser, getPendingTicket } from "../../../redux/utils/LocalStorage";
+import { getUser, getPendingTicket,storeValue } from "../../../redux/utils/LocalStorage";
 import TicketListIcon from "../../../res/svgIcons/TicketListIcon";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -33,7 +33,7 @@ const SupportTicket = () => {
   const [loading, setLoading] = useState(false);
   const [searchTxt, setSearchTxt] = useState("");
   const [refreshing, setRefreshing] = useState(false);
-  const isFocused = useIsFocused();
+  
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -44,24 +44,28 @@ const SupportTicket = () => {
     }, 500);
   };
   const getTicketList = () => {
+    
     setLoading(true);
     let re = getUser().then((res) => {
       const request = `support/api/tickets/account/${res.userInfo.accountNumber}/created_at/dsc/1/100`;
       GetApiRequest(
         request,
         (res) => {
-          console.log("getTicketList", res);
-          if (res) {
+          console.log("getTicketList1", res);
+          if (res.length>0) {
             setTicketList(res);
             setMainList(res);
             getPendingTicket().then((data) => {
               // let pendingList=[]
-              if (res.length > 0 && data) {
+              if (res.length > 0 && Object.keys(data).length!=0) {
                 if (
                   res.filter((item) => item.ticketNumber == data.ticketNumber)
                     .length == 0
                 ) {
                   res.unshift(data);
+                  
+                }else{
+                  storeValue({})
                 }
               }
 
@@ -70,9 +74,10 @@ const SupportTicket = () => {
             });
           }else{
             getPendingTicket().then((data) => {
-              if(data){   
-              setTicketList(data);
-              setMainList(data);
+              console.log("Pending Data", data);
+              if(Object.keys(data).length!=0){  
+              setTicketList([data]);
+              setMainList([data]);
               }
             });
           }
@@ -87,13 +92,18 @@ const SupportTicket = () => {
     });
   };
 
-  useEffect(() => {
-    getTicketList();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getTicketList();
+    }, [])
+  );
+  // useEffect(() => {
+  //   getTicketList();
+  // }, []);
 
-  useEffect(() => {
-    isFocused && getTicketList()
-  },[isFocused]);
+  // useEffect(() => {
+  //   isFocused && getTicketList()
+  // },[isFocused]);
 
   const capitalizeFirstLetter = (string) => {
     return (
@@ -129,7 +139,7 @@ const SupportTicket = () => {
 
   const getStatusColor = (status) => {
     let color = "#067647";
-    switch (status) {
+    switch (status.toLowerCase()) {
       case "new":
         color = "#F88700";
         break;
