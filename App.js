@@ -62,7 +62,7 @@ const App = () => {
     console.log("Checking for updates...", currentMajor, latestMajor);
     if (latestMajor > currentMajor) {
       console.log("Major update available.");
-      setMajorUpdateVisible(false);
+      setMajorUpdateVisible(true);
     }
   }
 
@@ -74,7 +74,7 @@ const App = () => {
             <UserNavigations />
             <AppUpdateAlert
               visible={majorUpdateVisible}
-              onClose={() => setMajorUpdateVisible(false)}
+              onClose={() => setMajorUpdateVisible(true)}
             />
           </AnalyticsContext.Provider>
         </TabBarVisibilityProvider>
