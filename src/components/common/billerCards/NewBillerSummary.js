@@ -31,7 +31,7 @@ console.log("Due Date",dueDate)
 
   const NotAvailable = () => {
     return (
-      <>
+      <View style={{flexDirection:'column'}}>
        <Tooltip
           backgroundColor="#4C5458"
           overlayColor="#00000000"
@@ -67,7 +67,7 @@ console.log("Due Date",dueDate)
             
           </View>
           </Tooltip>
-      </>
+      </View>
     );
   };
 

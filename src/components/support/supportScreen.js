@@ -13,6 +13,7 @@ import ChatSupportModal from "./ChatSupportModal";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
 import { GetApiRequest } from "../../network/APIClient";
 import CreateTicket from "./ticket/CreateTicket";
+import base64 from 'react-native-base64'
 //import ZendDesk from '@pagopa/io-react-native-zendesk';
 import { startChatWithConfig,setVisitorInfo,startChat , clearChatData} from "../utility/RNZendeskChat";
 
@@ -22,7 +23,8 @@ const Support = ({ route }) => {
     const [department, setDepartment] = useState('');
     const userData = useSelector(state => state.combinedReducers.user.userData);
     const scrollViewRef = useRef(null);
-    const [isChatDisabled, setIsChatDisabled] = useState(false);
+    const [isAgentAvailable, setisAgentAvailable] = useState(false);
+    const [istechAgentAvailable,setIstechAgentAvailable]=useState(false)
     const makeCall = (number) => {
         let phoneNumber = '';
 
@@ -99,10 +101,47 @@ const Support = ({ route }) => {
     }
   };
 
+ const checkAgentAvailibilty=()=>{
+
+ }
  
   useFocusEffect(
     useCallback(() => {
-        checkChatAvailability()
+        
+        const fetchData = async (group_id) => {
+            const username = 'mohit.sharma@cableone.biz/token';
+            const password = 'ek20PJEI1zZd4sm1LJr3JuYw7ujt1F1ic82b4Jjc';
+            const auth = base64.encode(`${username}:${password}`);
+      
+            try {
+              const response = await fetch(`https://cableone.zendesk.com/api/v2/account_groups/availability/${group_id}`, {
+                method: 'GET',
+                headers: {
+                  'Authorization': `Basic ${auth}`
+                }
+              });
+      
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+      
+              const json = await response.json();
+              console.log('Agent is availibility',json.channel_group_statuses.chat.state_counts.online)
+              if(json.channel_group_statuses.chat.state_counts.online>0){
+                if(group_id=='22567718430615'){
+                    setisAgentAvailable(true)
+                }else{
+                    setIstechAgentAvailable(true)
+                }
+               
+              }
+            } catch (error) {
+              console.error('Error fetching data:', error);
+            }
+          };
+      
+          fetchData('1500003304341');
+          fetchData('22567718430615');
     }, [])
   );
   
@@ -123,27 +162,29 @@ const Support = ({ route }) => {
         return unsubscribe;
     }, [navigation]);
 
-    const checkChatAvailability = () => {
+    //const checkChatAvailability = () => {
 
-        const now = moment();
-        const nowUTC = now.tz('MST');
+        // const now = moment();
+        // const nowUTC = now.tz('MST');
        
         
-        const currentHour = nowUTC.hour();
+        // const currentHour = nowUTC.hour();
     
-        console.log('Current UTC Hour',currentHour)
+        // console.log('Current UTC Hour',currentHour)
         
-        // Define the time range when chat should be disabled (e.g., 10 PM to 6 AM)
-        const disableStart = 18;  // 10:00 PM
-        const disableEnd = 5;     // 6:00 AM
+        // // Define the time range when chat should be disabled (e.g., 10 PM to 6 AM)
+        // const disableStart = 18;  // 10:00 PM
+        // const disableEnd = 5;     // 6:00 AM
     
-        // Check if the current time is within the disabled range
-        if (currentHour >= disableStart || currentHour < disableEnd) {
-          setIsChatDisabled(true);
-        } else {
-          setIsChatDisabled(false);
-        }
-    }
+        // // Check if the current time is within the disabled range
+        // if (currentHour >= disableStart || currentHour < disableEnd) {
+        //   setisAgentAvailable(true);
+        // } else {
+        //   setisAgentAvailable(false);
+        // }
+
+        
+   // }
 
     const items = [
         {
@@ -529,7 +570,7 @@ const Support = ({ route }) => {
                                             <Text style={[styles.supportingText7, styles.supportingTypo,]}>
                                                 24h/7 days a week
                                             </Text>
-                                            { !isChatDisabled &&(
+                                            { istechAgentAvailable &&(
                                             <TouchableOpacity
                                              accessibilityLabel="Chat"
                                              accessibilityRole="button"
@@ -541,12 +582,12 @@ const Support = ({ route }) => {
                                                 }}
                                                 onPress={() => {
                                                     //toggleModal("tech");
-                                                    if(!isChatDisabled){
+                                                    if(istechAgentAvailable){
                                                     handlePressOpenButton("SPK TCC Residential", ['Resi_TechSupport','Resimobileapp'])
                                                     }
                                                 }}
                                             >
-                                                 <ChatIcon isEnable={!isChatDisabled}/>
+                                                 <ChatIcon isEnable={istechAgentAvailable}/>
                                                 <Text
                                                     style={[styles.headingTypo, { marginLeft: 10, fontSize: 16 }]}
                                                 >
@@ -618,7 +659,7 @@ const Support = ({ route }) => {
                                                 <Text style={[styles.supportingText7, styles.supportingTypo,]} >
                                                     M-F 8:00 AM-5:00 PM MST
                                                 </Text>
-                                                { !isChatDisabled &&(
+                                                { isAgentAvailable &&(
                                                 <TouchableOpacity
                                                 accessibilityLabel="Chat"
                                                 accessibilityRole="button"
@@ -630,12 +671,12 @@ const Support = ({ route }) => {
                                                     }}
                                                     onPress={() => {
                                                         //toggleModal("Bill");
-                                                        if(!isChatDisabled){
+                                                        if(isAgentAvailable){
                                                         handlePressOpenButton("mobiletest", ['Resi_BillSupport','Resimobileapp'])
                                                         }
                                                     }}
                                                 >
-                                                    <ChatIcon isEnable={!isChatDisabled}/>
+                                                    <ChatIcon isEnable={isAgentAvailable}/>
                                                     <Text
                                                         style={[styles.headingTypo, { marginLeft: 10, fontSize: 16 }]}
                                                     >

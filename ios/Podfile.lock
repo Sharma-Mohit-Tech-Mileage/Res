@@ -712,7 +712,7 @@ PODS:
     - ZendeskChatProvidersSDK (~> 5.0.3)
     - ZendeskMessagingSDK (~> 6.0.1)
   - ZendeskCommonUISDK (9.0.2)
-  - ZendeskCoreSDK (5.0.3)
+  - ZendeskCoreSDK (5.0.5)
   - ZendeskMessagingAPISDK (6.0.1):
     - ZendeskSDKConfigurationsSDK (~> 4.0.0)
   - ZendeskMessagingSDK (6.0.2):
@@ -1087,7 +1087,7 @@ SPEC CHECKSUMS:
   ZendeskChatProvidersSDK: 80485584b6b5af1b3e15ea54ba93600c225290b2
   ZendeskChatSDK: 5f64abb74eb3bd4e52250b8984f0408f6e703490
   ZendeskCommonUISDK: 34c069ad52d8b350eb6af7d535a027f58a50b432
-  ZendeskCoreSDK: 04db322c3e087d21984ff80118a890305fab2533
+  ZendeskCoreSDK: c542b3f82abc3ee52e1291c6fb3436515e098806
   ZendeskMessagingAPISDK: c8ca98dc931a5b68a622aba65d63673cfe40af88
   ZendeskMessagingSDK: a5e3850e40dce481c24b05ce89bcd8dfc12d8500
   ZendeskSDKConfigurationsSDK: 79c444da987390456ec05657ffa2f5ca0eb54aef
