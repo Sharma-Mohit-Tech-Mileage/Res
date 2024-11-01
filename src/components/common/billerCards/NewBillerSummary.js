@@ -93,7 +93,11 @@ console.log("Due Date",dueDate)
             <Text style={styles.amount}>${billAmt}</Text>
           )}
           {(dueDate != "Invalid date" && billAmt!=undefined) && (
-            <Text style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
+            <Text 
+              accessible={true}
+              accessibilityLabel={`${dueDate ? (dueDate=='Immediately')?"Due Immediately"  :"Due on": "Due on Not Available"}`}
+              accessibilityRole={`${(dueDate!='Immediately')?'button':'none'}`}
+             style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
               {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": <NotAvailable/>}
               <Text style={[styles.dueDate, { fontWeight: "400",color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue }]}>
                 {' '+dueDate}
