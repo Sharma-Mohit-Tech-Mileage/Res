@@ -74,7 +74,7 @@ const App = () => {
             <UserNavigations />
             <AppUpdateAlert
               visible={majorUpdateVisible}
-              onClose={() => setMajorUpdateVisible(true)}
+              onClose={() => setMajorUpdateVisible(false)}
             />
           </AnalyticsContext.Provider>
         </TabBarVisibilityProvider>
