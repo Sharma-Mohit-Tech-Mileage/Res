@@ -330,17 +330,23 @@ const NewBillerHome = ({ navigation }) => {
                 </Text>
 
                 {isImageDispaly ? (
-                  <View 
-                  style={styles.videoContainer} >
-                 <AccessibleYoutubePlayer
-                videoId="R8SrD7NFJaA"
-                height={230}
-                play={playing}
-                videoTitle="SparkLight Video"
-                onPlaybackStateChange={(playState) => setPlaying(playState)}
-              />
-              
-                </View>
+                  
+              //    <AccessibleYoutubePlayer
+              //   videoId="R8SrD7NFJaA"
+              //   height={230}
+              //   play={playing}
+              //   videoTitle="SparkLight Video"
+              //   onPlaybackStateChange={(playState) => setPlaying(playState)}
+              // />
+              // 
+              <AccessibleYoutubePlayer
+  videoId="R8SrD7NFJaA"
+  videoTitle="SparkLight Video"
+  height={230}
+  play={false}
+  onError={(e) => console.log(e)}
+  onPlaybackStateChange={(isPlaying) => console.log('Playing:', isPlaying)}
+/>
                 
                 ) : (
                   <></>
