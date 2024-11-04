@@ -320,8 +320,11 @@ const HomeScreen = ({ navigation }) => {
             setBillAmt(userBillAmt?.toFixed(2));
             
 
-            let dueDate = moment(res.paymentDueDate).format("ll");
+            // let dueDate = moment(res.paymentDueDate).format("ll");
+            // setDueDate(dueDate);
+            let dueDate =(res.pastDueAmount!=0)? 'Immediately': moment(res.paymentDueDate).format("ll");
             setDueDate(dueDate);
+           
             
             function getFirstEmail(emailArray) {
               return (emailArray && emailArray.length > 0 && emailArray[0])

@@ -25,7 +25,7 @@ const Card = ({
   acno
 }) => {
  
-  console.log('BillAmnt',billAmt)
+  console.log('BillAmnt',dueDate)
 
   return (
     <View style={styles.shadowContainer}>
@@ -81,13 +81,20 @@ const Card = ({
           ) : (
                   <Text style={styles.amount}>${billAmt}</Text>
                 )}
-              <Text style={styles.dueDate}>
-                {dueDate ? "Balance due :" : ""}
-               
+              
+              {(dueDate != "Invalid date" && billAmt!=undefined) && (
+            <Text 
+              accessible={true}
+              accessibilityLabel={`${dueDate ? (dueDate=='Immediately')?"Due Immediately"  :"Due on": "Due on Not Available"}`}
+              accessibilityRole={`${(dueDate!='Immediately')?'button':'none'}`}
+             style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
+              {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": <NotAvailable/>}
+              <Text style={[styles.dueDate, { fontWeight: "400",color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue }]}>
+                {' '+dueDate}
               </Text>
-              <Text style={[styles.dueDate, { fontWeight: "400" }]}>
-                  {dueDate}
-                </Text>
+             </Text>
+            )}
+              
             </View>
           </View>
 
