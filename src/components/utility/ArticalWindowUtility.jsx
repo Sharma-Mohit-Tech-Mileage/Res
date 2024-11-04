@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Platform, AppState } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Platform, AppState, ActivityIndicator } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -8,6 +8,8 @@ import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
+import colors from '../../res/Colors';
+
 const { width, height } = Dimensions.get('window');
 
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -41,30 +43,28 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
                 
                 localStorage.setItem('jwt_token', '${currentUser.token}');
-                localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo)}');
+                localStorage.setItem('user_info', '${JSON.stringify(currentUser?.userInfo)}');
                 var upgradeToken = '${currentUser.upgradeToken}';
                 localStorage.setItem('upgrades_token', upgradeToken);
             })();`;
             webViewRef.current.injectJavaScript(script);
         } else {
             console.warn('WebView ref is not available for injecting JavaScript. Navigating back to Dashboard.');
-            // Navigate back to the Dashboard
             if (navigationRef.current) {
-                navigationRef.current.navigate('Dashboard'); // Replace 'Dashboard' with your dashboard route name
+                navigationRef.current.navigate('Dashboard');
             }
         }
     };
-    
 
     const navigationChange = async (navState) => {
-       // setDynamicCookie();  
+        console.log('Navigation state changed:', navState.url);
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
                 setModalOpen(false);
                 setProgress(1);
                 setNavStateReloading(true);
                 try {
-                    await RefreshToken();  // Attempt to refresh the token
+                    await RefreshToken();
                     setTimeout(async () => {
                         await userUpdate();
                     }, 1000);
@@ -75,7 +75,13 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     }
                 }
             }
+        } else if (navState.url.startsWith('data:application/octet-stream;base64,')) {
+            console.log('PDF data URL detected in navigation change');
+            const base64Data = navState.url.replace('data:application/octet-stream;base64,', '');
+            setShowPDFUrl(base64Data);
+            setShowPDFModal(true);  // Open the PDF modal to display the content
         }
+        
     };
 
     const onMessage = (event) => {
@@ -93,9 +99,8 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     const userUpdate = async () => {
         const userLocal = await getUser();
-
         if (userLocal.token === currentUser.token) {
-            console.log('tokens equal each other');
+            console.log('Tokens match, retrying user update');
             setTimeout(async () => {
                 await userUpdate();
             }, 1000);
@@ -111,19 +116,17 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     const userUpdateScript = async (user) => {
         const upgradeToken = await getUpgradeToken();
-        console.log('userUpdateScript: ', user);
-        console.log('upgradeToken.access_token: ', upgradeToken.access_token);
-        user.userInfo['customerType']= "Residential";
+        user.userInfo['customerType'] = "Residential";
         if (user.token !== undefined) {
             const SAVE_FROM_RN = `(function() {
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
                 localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
                 var cookieValue = "MobileApp";
-            var domain = document.location.hostname; 
-            var expirationDate = new Date();
-            expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
-            document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+                var domain = document.location.hostname; 
+                var expirationDate = new Date();
+                expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+                document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
                 var open = XMLHttpRequest.prototype.open;
                 XMLHttpRequest.prototype.open = function() {
                     this.addEventListener("load", function(event) {
@@ -140,7 +143,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         }
     };
 
-    // Reset progress and error states when URL changes or modal closes
     useEffect(() => {
         setProgress(0);
         setIsError(false);
@@ -157,7 +159,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     useEffect(() => {
         setCurrentUser(user);
         userUpdateScript(user);
-        setDynamicCookie();  // Set cookie when user is updated
+        setDynamicCookie();
     }, [user]);
 
     useEffect(() => {
@@ -167,10 +169,8 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     if (webViewRef?.current) {
                         webViewRef.current.reload();
                     } else {
-                        console.warn('WebView ref is not available for reload. Navigating back to Dashboard.');
-                        // Navigate back to the Dashboard
                         if (navigationRef.current) {
-                            navigationRef.current.navigate('Dashboard'); 
+                            navigationRef.current.navigate('Dashboard');
                         }
                     }
                 }, 500);
@@ -183,24 +183,36 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         return () => {
             if (subscription) {
                 subscription.remove();
-            } else {
-                console.warn('AppState subscription is not available for removal.');
             }
         };
     }, [appState]);
     
-    
-
     useEffect(() => {
-        setDynamicCookie();  // Push cookie when component is first mounted
+        setDynamicCookie();
     }, [url, modalOpen, appState]);
+
+    const Spinner = () => (
+        <View style={styles.activityContainer}>
+          <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
+        </View>
+    );
 
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
-            <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); setModalOpen(false); }} title={name} />
+            <ProfileSettingsHeader onPressBack={() => { 
+                if(route.params?.isBilling){   
+                    navigation.reset({
+                        index: 0,
+                        routes: [{ name: "MyTab" }],
+                      });
+                }else{
+                     navigation.goBack();
+                }
+                 setModalOpen(false);
+            }} title={name} />
             {progress < 1 ? (
                 <View style={styles.progressBar}>
-                    <View style={[styles.progress, { width: `${progress * 100}%` }]} />
+                    <View style={[styles.progress, { width: `${progress * 100}%` }]} /> 
                 </View>
             ) : null}
             {modalOpen && (
@@ -214,6 +226,8 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     onNavigationStateChange={navigationChange}
                     onMessage={onMessage}
                     originWhitelist={['http://*', 'https://*', 'data:*']}
+                    startInLoadingState={true}
+                    renderLoading={Spinner}
                     incognito={true}
                 />
             )}
@@ -234,7 +248,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
     progressBar: {
-        height: height * 0.004, // 0.4% of screen height
+        height: height * 0.004,
         backgroundColor: 'lightgrey',
     },
     progress: {
@@ -245,12 +259,22 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: width * 0.05, // 5% of screen width
+        padding: width * 0.05,
     },
     errorText: {
-        fontSize: width * 0.04, // 4% of screen width
-        marginBottom: height * 0.02, // 2% of screen height
+        fontSize: width * 0.04,
+        marginBottom: height * 0.02,
     },
+    activityContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        backgroundColor: '#00000000',
+        height: '100%',
+        width: '100%',
+    }
 });
 
 export default ArticalWindowUtility;
