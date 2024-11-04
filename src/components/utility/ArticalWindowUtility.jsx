@@ -76,6 +76,11 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     }
                 }
             }
+        }else if (navState.url.startsWith('data:application/octet-stream;base64,')) {
+            console.log('PDF data URL detected in navigation change');
+            const base64Data = navState.url.replace('data:application/octet-stream;base64,', '');
+            setShowPDFUrl(base64Data);
+            setShowPDFModal(true);  // Open the PDF modal to display the content
         }
     };
 
@@ -195,13 +200,12 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     useEffect(() => {
         setDynamicCookie();  // Push cookie when component is first mounted
     }, [url, modalOpen, appState]);
-
-
     const Spinner = () => (
         <View style={styles.activityContainer}>
           <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
         </View>
     );
+
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => { 
