@@ -76,7 +76,7 @@ const BillerSummaryCard = ({
                   "Due on"
                 )
               ) : (
-                <NotAvailable />
+                <Text style={styles.label}>Not Available</Text>
               )}
               <Text
                 style={[
