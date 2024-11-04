@@ -1,140 +1,63 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, AccessibilityInfo, TouchableWithoutFeedback, Platform } from 'react-native';
-import YoutubePlayer from "react-native-youtube-iframe";
+// import React from 'react';
+// import { Platform } from 'react-native';
+// import { WebView } from 'react-native-webview';
 
-const AccessibleYoutubePlayer = ({
-  height = 185,
-  videoId,
-  play: initialPlayState = false,
-  videoTitle = 'YouTube video',
-  onError,
-  onPlaybackStateChange,
-}) => {
-  const [playing, setPlaying] = useState(initialPlayState);
-  const [playerReady, setPlayerReady] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const playerRef = useRef(null);
+// const AccessibleYoutubePlayer = ({ videoId }) => (
+//   <WebView
+//     style={{ height: 200 }}
+//     source={{
+//       html: `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/R8SrD7NFJaA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
+//     }}
+//     allowsInlineMediaPlayback={true}
+//     javaScriptEnabled={true}
+//     domStorageEnabled={true}
+//     mixedContentMode="always"
+//     androidHardwareAccelerationDisabled={false}
+//     originWhitelist={['*']}
+//   />
+// );
 
-  useEffect(() => {
-    setPlaying(initialPlayState);
-  }, [initialPlayState]);
+// export default AccessibleYoutubePlayer;
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { WebView } from 'react-native-webview';
 
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
-  const announcePlaybackState = useCallback(() => {
-    const stateAnnouncement = playing ? 'Playing' : 'Paused';
-    const timeAnnouncement = duration > 0 ? 
-      `Time: ${formatTime(currentTime)} of ${formatTime(duration)}` : '';
-    AccessibilityInfo.announceForAccessibility(
-      `${videoTitle}. ${stateAnnouncement}. ${timeAnnouncement}`
-    );
-  }, [playing, currentTime, duration, videoTitle]);
-
-  const handlePlayPauseToggle = useCallback(() => {
-    setPlaying(prev => !prev);
-    if (onPlaybackStateChange) {
-      onPlaybackStateChange(!playing);
-    }
-  }, [playing, onPlaybackStateChange]);
-
-  const onStateChange = useCallback((state) => {
-    switch (state) {
-      case 'playing':
-        setPlaying(true);
-        AccessibilityInfo.announceForAccessibility(`${videoTitle} playing`);
-        break;
-      case 'paused':
-        setPlaying(false);
-        AccessibilityInfo.announceForAccessibility(`${videoTitle} paused`);
-        break;
-      case 'ended':
-        setPlaying(false);
-        AccessibilityInfo.announceForAccessibility(`${videoTitle} ended`);
-        break;
-    }
-  }, [videoTitle]);
-
-  const onReady = useCallback(() => {
-    setPlayerReady(true);
-    playerRef.current?.getDuration().then(duration => {
-      setDuration(duration);
-      AccessibilityInfo.announceForAccessibility(
-        `${videoTitle} ready. Duration: ${formatTime(duration)}`
-      );
-    });
-  }, [videoTitle]);
-
-  useEffect(() => {
-    let interval;
-    if (playing) {
-      interval = setInterval(() => {
-        playerRef.current?.getCurrentTime().then(time => {
-          setCurrentTime(time);
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [playing]);
-
-  return (
-    <TouchableWithoutFeedback
-      onPress={handlePlayPauseToggle}
-      accessible={true}
-      accessibilityRole="button"
-      accessibilityLabel={`${videoTitle}. ${playing ? 'Playing' : 'Paused'}`}
-      accessibilityHint="Double tap to play or pause"
-      accessibilityState={{
-        busy: !playerReady,
-        disabled: !playerReady
+const AccessibleYoutubePlayer = ({ videoId }) => (
+  <View style={styles.videoContainer}>
+    <WebView
+      style={{ height: 200 }}
+      source={{
+        html: `
+          <style>
+            /* Scale YouTube controls for better accessibility */
+            .ytp-chrome-bottom {
+              transform: scale(1.3); /* Adjust scaling as needed */
+              transform-origin: center;
+            }
+          </style>
+          <iframe
+            width="100%"
+            height="100%"
+            src="https://www.youtube.com/embed/R8SrD7NFJaA"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>`
       }}
-      accessibilityActions={[
-        { name: 'activate', label: 'Toggle play/pause' },
-        { name: 'longpress', label: 'Show current position' },
-      ]}
-      onAccessibilityAction={({ nativeEvent: { actionName }}) => {
-        switch (actionName) {
-          case 'activate':
-            handlePlayPauseToggle();
-            break;
-          case 'longpress':
-            announcePlaybackState();
-            break;
-        }
-      }}
-      importantForAccessibility="yes"
-    >
-      <View
-        style={{
-          height,
-          backgroundColor: '#000',
-        }}
-      >
-        <YoutubePlayer
-          ref={playerRef}
-          height={height}
-          play={playing}
-          videoId={videoId}
-          onChangeState={onStateChange}
-          onReady={onReady}
-          onError={(error) => {
-            if (onError) onError(error);
-            AccessibilityInfo.announceForAccessibility('Error playing video');
-          }}
-          webViewProps={{
-            accessible: true,
-            accessibilityLabel: videoTitle,
-            accessibilityRole: "none",
-            importantForAccessibility: "no",
-          }}
-        />
-      </View>
-    </TouchableWithoutFeedback>
-  );
-};
+      allowsInlineMediaPlayback={true}
+      javaScriptEnabled={true}
+      domStorageEnabled={true}
+      mixedContentMode="always"
+      androidHardwareAccelerationDisabled={false}
+      originWhitelist={['*']}
+    />
+  </View>
+);
+
+const styles = StyleSheet.create({
+  videoContainer: {
+    paddingHorizontal: 16,
+  },
+});
 
 export default AccessibleYoutubePlayer;
