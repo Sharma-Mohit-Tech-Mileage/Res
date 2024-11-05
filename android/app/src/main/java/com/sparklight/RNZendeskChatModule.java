@@ -10,19 +10,16 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.zendesk.logger.Logger;
-import com.zendesk.service.ErrorResponse;
-import com.zendesk.service.ZendeskCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-
-import zendesk.chat.Account;
 import zendesk.chat.Chat;
 import zendesk.chat.ChatConfiguration;
 import zendesk.chat.ChatEngine;
 import zendesk.chat.ChatProvidersConfiguration;
+import zendesk.chat.PreChatFormFieldStatus;
 import zendesk.chat.ProfileProvider;
 import zendesk.chat.VisitorInfo;
 import zendesk.classic.messaging.MessagingActivity;
@@ -66,6 +63,7 @@ private ChatConfiguration chatConfiguration;
 
     @ReactMethod
     public void startChatWithConfig(ReadableMap config) {
+
         VisitorInfo.Builder visitorInfoBuilder = VisitorInfo.builder();
         ProfileProvider profileProvider = Chat.INSTANCE.providers().profileProvider();
 
@@ -107,12 +105,18 @@ private ChatConfiguration chatConfiguration;
         Chat.INSTANCE.setChatProvidersConfiguration(chatProvidersConfiguration);
 
         ChatConfiguration chatConfiguration = ChatConfiguration.builder().
-                withOfflineFormEnabled(true).
-                withAgentAvailabilityEnabled(true)
+                withOfflineFormEnabled(true)
+                .withNameFieldStatus(PreChatFormFieldStatus.REQUIRED)
+                .withEmailFieldStatus(PreChatFormFieldStatus.REQUIRED)
+                .withPhoneFieldStatus(PreChatFormFieldStatus.REQUIRED)
+                .withDepartmentFieldStatus(PreChatFormFieldStatus.OPTIONAL)
+                .withAgentAvailabilityEnabled(true)
                 .build();
+
         
        // profileProvider.setVisitorInfo(visitorInfoBuilder.build(), null);
         //chatProvider.setDepartment(Objects.requireNonNull(config.getString("department")), null);
+
 
 
 
