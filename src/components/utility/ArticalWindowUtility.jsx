@@ -132,7 +132,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 var expirationDate = new Date();
                 expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
                 document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-    
+                 document.cookie = "CustomerType=" + customerType + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
                 // Override XMLHttpRequest to handle both /statements/ and Statement URLs
                 var originalOpen = XMLHttpRequest.prototype.open;
                 XMLHttpRequest.prototype.open = function(method, url) {
