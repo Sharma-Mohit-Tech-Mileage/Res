@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState,useCallback } from "react";
-import { StyleSheet, View, Image, Pressable, ScrollView, Linking, Platform, Text,TouchableOpacity,Alert,PermissionsAndroid } from "react-native";
+import { StyleSheet, View, Image, Pressable, ScrollView, Linking,RefreshControl,ActivityIndicator, Platform, Text,TouchableOpacity,Alert,PermissionsAndroid } from "react-native";
 import { useSelector } from 'react-redux';
 import { Border, Padding, Color, FontSize, FontFamily } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
@@ -16,6 +16,7 @@ import CreateTicket from "./ticket/CreateTicket";
 import base64 from 'react-native-base64'
 //import ZendDesk from '@pagopa/io-react-native-zendesk';
 import { startChatWithConfig,setVisitorInfo,startChat , clearChatData} from "../utility/RNZendeskChat";
+import TicketListIcon from "../../res/svgIcons/TicketListIcon";
 
 const Support = ({ route }) => {
     const navigation = useNavigation();
@@ -25,6 +26,7 @@ const Support = ({ route }) => {
     const scrollViewRef = useRef(null);
     const [isAgentAvailable, setisAgentAvailable] = useState(false);
     const [istechAgentAvailable,setIstechAgentAvailable]=useState(false)
+    const [refreshing, setRefreshing] = useState(false);
     const makeCall = (number) => {
         let phoneNumber = '';
 
@@ -101,47 +103,51 @@ const Support = ({ route }) => {
     }
   };
 
- const checkAgentAvailibilty=()=>{
+ 
+ const checkAgentAvailibilty = async (group_id) => {
+    const username = 'mohit.sharma@cableone.biz/token';
+    const password = 'ek20PJEI1zZd4sm1LJr3JuYw7ujt1F1ic82b4Jjc';
+    const auth = base64.encode(`${username}:${password}`);
 
- }
+    try {
+      const response = await fetch(`https://cableone.zendesk.com/api/v2/account_groups/availability/${group_id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Basic ${auth}`
+        }
+      });
+      setRefreshing(false)
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const json = await response.json();
+      console.log('Agent is availibility',json.channel_group_statuses.chat.state_counts.online)
+      if(json.channel_group_statuses.chat.state_counts.online>0){
+        if(group_id=='22567718430615'){
+            setisAgentAvailable(true)
+        }else{
+            setIstechAgentAvailable(true)
+        }
+      }else{
+        if(group_id=='22567718430615'){
+            setisAgentAvailable(false)
+        }else{
+            setIstechAgentAvailable(false)
+        }
+      }
+      setRefreshing(false)
+    } catch (error) {
+        setRefreshing(false)
+      console.error('Error fetching data:', error);
+    }
+  };
+
  
   useFocusEffect(
     useCallback(() => {
-        
-        const fetchData = async (group_id) => {
-            const username = 'mohit.sharma@cableone.biz/token';
-            const password = 'ek20PJEI1zZd4sm1LJr3JuYw7ujt1F1ic82b4Jjc';
-            const auth = base64.encode(`${username}:${password}`);
-      
-            try {
-              const response = await fetch(`https://cableone.zendesk.com/api/v2/account_groups/availability/${group_id}`, {
-                method: 'GET',
-                headers: {
-                  'Authorization': `Basic ${auth}`
-                }
-              });
-      
-              if (!response.ok) {
-                throw new Error('Network response was not ok');
-              }
-      
-              const json = await response.json();
-              console.log('Agent is availibility',json.channel_group_statuses.chat.state_counts.online)
-              if(json.channel_group_statuses.chat.state_counts.online>0){
-                if(group_id=='22567718430615'){
-                    setisAgentAvailable(true)
-                }else{
-                    setIstechAgentAvailable(true)
-                }
-               
-              }
-            } catch (error) {
-              console.error('Error fetching data:', error);
-            }
-          };
-      
-          fetchData('1500003304341');
-          fetchData('22567718430615');
+        checkAgentAvailibilty('1500003304341');
+        checkAgentAvailibilty('22567718430615');
     }, [])
   );
   
@@ -256,27 +262,23 @@ const Support = ({ route }) => {
        
     }, []);
 
-    const exitConfirmation=()=>{
-        console.log('Wait exit')
-        Alert.alert("Wait!", "Are you sure to go back?", [
-            {
-              text: "Cancel",
-              onPress: () => null,
-              style: "cancel"
-            },
-            { text: "YES", onPress: () => navigation.goBack() }
-          ]);
-    }
+    const onRefresh = () => {
+        setRefreshing(true);
+        checkAgentAvailibilty('1500003304341');
+        checkAgentAvailibilty('22567718430615');
+        
+      };
 
 
     const handlePressOpenButton = (department, tags) => {
         const data= {
-            name: userData.userInfo.fullName !== undefined && userData.userInfo.fullName !== null ? userData.userInfo.fullName : '',
+            name: '',
             email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
             phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
             tags:['pid:_' + userData.userInfo.accountNumber,...tags],
             department: department
         };
+        console.log("Data",data)
         if(Platform.OS==='ios'){
             startChat(data);
         }else{
@@ -306,9 +308,21 @@ const Support = ({ route }) => {
                     </View>
                     <View style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}>
                         <Text style={styles.wereHereTo}>We’re Here to Help</Text>
+                       
                     </View>
                 </View>
-                <ScrollView ref={scrollViewRef} style={{paddingHorizontal:Padding.p_base}}>
+                <ScrollView ref={scrollViewRef} style={{paddingHorizontal:Padding.p_base}}
+                contentContainerStyle={{flexGrow:1}}
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                    title="Pull to refresh"
+                    tintColor={Color.sparklightBrightPurple}
+                    titleColor={Color.colorMidnightblue}
+                  />
+                }
+                >
                     <View style={styles.issuesFlexBox}>
                         <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
                             <Text style={[styles.heading, styles.headingTypo]}>
@@ -481,11 +495,7 @@ const Support = ({ route }) => {
                                             navigation.navigate('TicketStackScreen')
                                     }}>
                                         <View style={[styles.icon]}>
-                                            <Image
-                                                style={styles.supportIcon}
-                                                resizeMode="stretch"
-                                                source={require("../../../assets/tool-02.png")}
-                                            />
+                                        <TicketListIcon isGrey={false} />
                                         </View>
                                         <View style={styles.frameParent}>
                                             <View style={styles.headingAndToggle}>
