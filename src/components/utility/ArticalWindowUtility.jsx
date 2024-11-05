@@ -75,11 +75,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     }
                 }
             }
-        } else if (navState.url.startsWith('data:application/octet-stream;base64,')) {
-            console.log('PDF data URL detected in navigation change');
-            const base64Data = navState.url.replace('data:application/octet-stream;base64,', '');
-            setShowPDFUrl(base64Data);
-            setShowPDFModal(true);  // Open the PDF modal to display the content
         }
         
     };
@@ -87,10 +82,17 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const onMessage = (event) => {
         try {
             const data = JSON.parse(event.nativeEvent.data);
-            if (data !== undefined && data.responseURL !== undefined && data.responseURL.includes('/statements/')) {
-                const responseData = JSON.parse(data.response);
-                setShowPDFUrl(responseData.fileBinary);
-                setShowPDFModal(true);
+            if (data.type === "XMLHttpRequest" && data.status === 200) {
+                if ((data.responseURL.includes("/statements/") || data.responseURL.includes("/AccountSvc/api/Statement/"))) {
+                    const responseData = JSON.parse(data.response);
+                    if (responseData.fileBinary) {
+                        const base64Data = responseData.fileBinary;
+                        setShowPDFUrl(base64Data);
+                        setShowPDFModal(true);
+                    } else {
+                        console.log('fileBinary is missing, modal will not open');
+                    }
+                }
             }
         } catch (error) {
             console.log('onMessageError: ', error);
@@ -119,27 +121,56 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         user.userInfo['customerType'] = "Residential";
         if (user.token !== undefined) {
             const SAVE_FROM_RN = `(function() {
+                // Store tokens and user info in local storage
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
                 localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
+                
+                // Set cookie for "Source" as MobileApp
                 var cookieValue = "MobileApp";
                 var domain = document.location.hostname; 
                 var expirationDate = new Date();
                 expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
                 document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-                var open = XMLHttpRequest.prototype.open;
-                XMLHttpRequest.prototype.open = function() {
+    
+                // Override XMLHttpRequest to handle both /statements/ and Statement URLs
+                var originalOpen = XMLHttpRequest.prototype.open;
+                XMLHttpRequest.prototype.open = function(method, url) {
                     this.addEventListener("load", function(event) {
-                        if (this.responseURL.match('/account/.*/statements/') !== null) {
-                            var message = {"status" : this.status, "responseURL" : this.responseURL, "response" : this.response}
+                        if (url.match('/account/.*/statements/') || url.includes('Statement')) {
+                            var message = {
+                                "type": "XMLHttpRequest",
+                                "status": this.status,
+                                "responseURL": this.responseURL,
+                                "response": this.response
+                            };
                             window.ReactNativeWebView.postMessage(JSON.stringify(message));
                         }
-                    }); 
-                    open.apply(this, arguments);
-                };                
-              })();`;
-
-            setInitScript(SAVE_FROM_RN);
+                    });
+                    originalOpen.apply(this, arguments);
+                };
+    
+                // Override fetch to handle both /statements/ and Statement URLs
+                var originalFetch = window.fetch;
+                window.fetch = function() {
+                    return originalFetch.apply(this, arguments).then(function(response) {
+                        if (response.url.match('/account/.*/statements/') || response.url.includes('Statement')) {
+                            response.clone().text().then(function(responseText) {
+                                var message = {
+                                    "type": "fetch",
+                                    "status": response.status,
+                                    "responseURL": response.url,
+                                    "response": responseText
+                                };
+                                window.ReactNativeWebView.postMessage(JSON.stringify(message));
+                            });
+                        }
+                        return response;
+                    });
+                };
+            })();`;
+    
+            setInitScript(prevScript => `${prevScript}\n${SAVE_FROM_RN}`);
         }
     };
 
