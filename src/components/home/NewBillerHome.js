@@ -330,8 +330,6 @@ const NewBillerHome = ({ navigation }) => {
                 </Text>
 
                 {isImageDispaly ? (
-                  <View
-                    style={styles.videoContainer} >
                     <AccessibleYoutubePlayer
                       videoId="R8SrD7NFJaA"
                       videoTitle="SparkLight Video"
@@ -341,11 +339,8 @@ const NewBillerHome = ({ navigation }) => {
                       onPlaybackStateChange={(isPlaying) => console.log('Playing:', isPlaying)}
                     />
 
-                  </View>
 
-                ) : (
-                  <></>
-                )}
+                ) :null}
 
                 <TouchableOpacity
                   accessible={true}
