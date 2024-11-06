@@ -74,7 +74,8 @@ private ChatConfiguration chatConfiguration;
             visitorInfoBuilder = visitorInfoBuilder.withEmail(config.getString("email"));
         }
         if (config.hasKey("phone")) {
-            visitorInfoBuilder = visitorInfoBuilder.withPhoneNumber(config.getString("phone"));
+            visitorInfoBuilder = visitorInfoBuilder.withPhoneNumber("1234567890");
+            //visitorInfoBuilder = visitorInfoBuilder.withPhoneNumber(config.getString("phone"));
         }
 
 
