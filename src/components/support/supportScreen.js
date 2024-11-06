@@ -269,16 +269,32 @@ const Support = ({ route }) => {
         
       };
 
+      const PromptForAgentOffline=()=>{
+        Alert.alert(
+            'Our agents are currently unavailable.',
+            'Please reach out during our business hours, and we’ll be happy to assist you.Thank you for your understanding!',
+            [
+              {
+                text: 'Ok',
+                onPress: () => null,
+                style: 'cancel',
+              }
+            ],
+            { cancelable: true }
+          );
+
+      }
+
 
     const handlePressOpenButton = (department, tags) => {
         const data= {
             name: '',
             email: userData.userInfo.email !== undefined && userData.userInfo.email !== null ? userData.userInfo.email : '',
-            phone: userData.userInfo.phone !== undefined && userData.userInfo.phone !== null ? userData.userInfo.phone : '',
+            phone: '2312345678',
             tags:['pid:_' + userData.userInfo.accountNumber,...tags],
             department: department
         };
-        console.log("Data",data)
+        
         if(Platform.OS==='ios'){
             startChat(data);
         }else{
