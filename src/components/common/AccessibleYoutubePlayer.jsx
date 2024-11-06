@@ -5,7 +5,7 @@ import { WebView } from 'react-native-webview';
 const AccessibleYoutubePlayer = ({ videoId }) => (
   <WebView
     style={styles.webView}
-    accessibilityLabel="Accessible YouTube Video Player"
+    accessibilityLabel=" YouTube Video Player"
     source={{
       html: `
       <!DOCTYPE html>
