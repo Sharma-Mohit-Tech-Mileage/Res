@@ -329,23 +329,16 @@ const NewBillerHome = ({ navigation }) => {
                   patience and understanding during this transition period.
                 </Text>
 
-                {isImageDispaly ? (
-                  <View
-                    style={styles.videoContainer} >
-                    <AccessibleYoutubePlayer
-                      videoId="R8SrD7NFJaA"
-                      videoTitle="SparkLight Video"
-                      height={230}
-                      play={false}
-                      onError={(e) => console.log(e)}
-                      onPlaybackStateChange={(isPlaying) => console.log('Playing:', isPlaying)}
-                    />
-
-                  </View>
-
-                ) : (
-                  <></>
-                )}
+                {isImageDispaly ?
+                  <AccessibleYoutubePlayer
+                    videoId="R8SrD7NFJaA"
+                    videoTitle="SparkLight Video"
+                    height={230}
+                    play={false}
+                    onError={(e) => console.log(e)}
+                    onPlaybackStateChange={(isPlaying) => console.log('Playing:', isPlaying)}
+                  />
+                  : null}
 
                 <TouchableOpacity
                   accessible={true}
