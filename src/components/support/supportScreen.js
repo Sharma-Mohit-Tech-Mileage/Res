@@ -104,7 +104,7 @@ const Support = ({ route }) => {
   };
 
  
- const checkAgentAvailibilty = async (group_id) => {
+ const checkAgentAvailibilty = async (group_id,data) => {
     const username = 'mohit.sharma@cableone.biz/token';
     const password = 'ek20PJEI1zZd4sm1LJr3JuYw7ujt1F1ic82b4Jjc';
     const auth = base64.encode(`${username}:${password}`);
@@ -122,18 +122,40 @@ const Support = ({ route }) => {
       }
 
       const json = await response.json();
-      console.log('Agent is availibility',json.channel_group_statuses.chat.state_counts.online)
+      console.log('Agent is availibility',data?.department,"Count="+json.channel_group_statuses.chat.state_counts.online)
+      console.log('Agent group_id',group_id)
       if(json.channel_group_statuses.chat.state_counts.online>0){
         if(group_id=='22567718430615'){
             setisAgentAvailable(true)
-        }else{
+            if(data){
+            if(Platform.OS==='ios'){
+                startChat(data);
+            }else{
+                startChatWithConfig(data)
+            }
+        }
+
+        }else if(group_id=='1500003304341'){
             setIstechAgentAvailable(true)
+            if(data){
+                if(Platform.OS==='ios'){
+                    startChat(data);
+                }else{
+                    startChatWithConfig(data)
+                }
+            }
         }
       }else{
         if(group_id=='22567718430615'){
             setisAgentAvailable(false)
-        }else{
+            if(data){
+            PromptForAgentOffline()
+            }
+        }else if(group_id=='1500003304341'){
             setIstechAgentAvailable(false)
+            if(data){
+              PromptForAgentOffline()
+            }
         }
       }
       setRefreshing(false)
@@ -294,11 +316,10 @@ const Support = ({ route }) => {
             tags:['pid:_' + userData.userInfo.accountNumber,...tags],
             department: department
         };
-        
-        if(Platform.OS==='ios'){
-            startChat(data);
-        }else{
-            startChatWithConfig(data)
+        if(department=='mobiletest'){
+          checkAgentAvailibilty('22567718430615',data);
+        }else if(department=='SPK TCC Residential'){
+            checkAgentAvailibilty('1500003304341',data);
         }
         //requestCameraPermission();
     };
