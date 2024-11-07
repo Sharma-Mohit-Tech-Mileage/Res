@@ -79,7 +79,7 @@ const AccountOverview = () => {
   const profileDetails = profile.profileDetails || {};
   useEffect(() => {
     dispatch(fetchProfileDetails());
-    if(user?.userInfo.accountNumber.toString().length>=16){
+    if(user?.userInfo?.accountNumber.toString().length>=16){
       setMenues(menuItems1)
     }else{
       setMenues(menuItems)

@@ -100,8 +100,7 @@ const NewBillerHome = ({ navigation }) => {
             paymentDetails.pastPaymentDue = res.past_due_amount;
             paymentDetails.email = getFirstEmail(res.email_details);
             setDefaultPaymentDetails(paymentDetails);
-            //let billAmnt=(Math.round(res.payment_due_amount * 100) / 100).toFixed(2);
-            setBillAmt(res.payment_due_amount.toFixed(2));
+          
           }
         },
         onErrorBill
