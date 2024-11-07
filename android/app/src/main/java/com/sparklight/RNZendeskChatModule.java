@@ -9,7 +9,6 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
-import com.zendesk.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +73,7 @@ private ChatConfiguration chatConfiguration;
             visitorInfoBuilder = visitorInfoBuilder.withEmail(config.getString("email"));
         }
         if (config.hasKey("phone")) {
-            visitorInfoBuilder = visitorInfoBuilder.withPhoneNumber(config.getString("phone"));
+            visitorInfoBuilder = visitorInfoBuilder.withPhoneNumber("7645239867");
         }
 
 
@@ -89,7 +88,8 @@ private ChatConfiguration chatConfiguration;
                 }
             }
         }
-        Logger.d("Tag","pro",tags);
+
+        //Logger.d("Tag","pro",tags);
         if (config.hasKey("tags")) {
             profileProvider.addVisitorTags(tags,null);
         }

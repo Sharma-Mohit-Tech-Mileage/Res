@@ -66,7 +66,7 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
     return (
       <Card
         billAmt={billAmt}
-        dueDate={(accountNumber=='8160360050005096')? '': dueDate}
+        dueDate={dueDate}
         isAutoPayStatus={isAutoPayStatus}
         paperlessStatus={paperlessStatus}
         navigation={navigation}
