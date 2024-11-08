@@ -53,6 +53,9 @@ const MyTabs = ({ route }) => {
       } else if (home.walkThroughStep === 2) {
         setShadowStyle([styles.shadowTabs, styles.shadowTabsStep3]);
         setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left]);
+      }else if (home.walkThroughStep === 3) {
+        setShadowStyle([styles.shadowTabs, styles.shadowTabsStep4]);
+        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep4Left]);
       }
     }
   }, [home]);
@@ -246,12 +249,18 @@ const styles = StyleSheet.create({
   shadowTabsStep3: {
     left: tabWidth * 4,
   },
+  shadowTabsStep4: {
+    left: tabWidth * 5,
+  },
   shadowTabsLeft: {},
   shadowTabsStep2Left: {
     width: tabWidth * 2.3,
     left: 0,
   },
   shadowTabsStep3Left: {
+    width: tabWidth * 3.1,
+    left: 0,
+  },shadowTabsStep4Left: {
     width: tabWidth * 3.1,
     left: 0,
   },

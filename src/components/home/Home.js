@@ -48,7 +48,7 @@ const HomeScreen = ({ navigation }) => {
   const [checkModemStatus, setCheckModemStatus] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [walkThroughStep, setWalkThroughStep] = useState(0);
-  const [showWalkThrough, setShowWalkThrough] = useState(false);
+  const [showWalkThrough, setShowWalkThrough] = useState(true);
   const [internetHealths, setInternetHealths] = useState([]);
   const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: '', latestVersion: '' });
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null });
@@ -549,7 +549,7 @@ const HomeScreen = ({ navigation }) => {
   }, [profile, user]);
 
   const changeWalkThroughStep = (step) => {
-    if (step > 2) {
+    if (step > 3) {
       dispatch(updateWalkThroughStep(null));
       setShowWalkThrough(false);
     } else {
@@ -565,6 +565,11 @@ const HomeScreen = ({ navigation }) => {
         title: "Home",
         description:
           "View information related to your internet health, billing, service and more.",
+        buttonText: "Next",
+      },{
+        title: "Billing",
+        description:
+          "Billing Descriptions ?",
         buttonText: "Next",
       },
       {
@@ -588,6 +593,8 @@ const HomeScreen = ({ navigation }) => {
       bottomCarotStyles.push(styles.bottomCarotStep2);
     } else if (walkThroughStep === 2) {
       bottomCarotStyles.push(styles.bottomCarotStep3);
+    }else if (walkThroughStep === 3) {
+      bottomCarotStyles.push(styles.bottomCarotStep4);
     }
 
     return (
@@ -625,6 +632,20 @@ const HomeScreen = ({ navigation }) => {
               <View
                 style={
                   walkThroughStep < 2
+                    ? [styles.circle, styles.circleUnselected]
+                    : styles.circle
+                }
+              ></View>
+               <View
+                style={
+                  walkThroughStep < 3
+                    ? [styles.circle, styles.circleUnselected]
+                    : styles.circle
+                }
+              ></View>
+              <View
+                style={
+                  walkThroughStep < 4
                     ? [styles.circle, styles.circleUnselected]
                     : styles.circle
                 }
@@ -932,10 +953,12 @@ const styles = StyleSheet.create({
     top: 20,
   },
   bottomCarotStep2: {
-    left: tabWidth * 2,
+    left: tabWidth * 0.5,
   },
   bottomCarotStep3: {
-    left: tabWidth * 3,
+    left: tabWidth * 1.5,
+  },bottomCarotStep4: {
+    left: tabWidth * 2.5,
   },
   circle: {
     width: 8,

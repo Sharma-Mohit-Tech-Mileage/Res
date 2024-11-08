@@ -59,7 +59,7 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
                {onActionTxt}
               </Text>
             </TouchableOpacity> 
-
+           {onClose!=undefined && (
             <TouchableOpacity
               style={styles.closeBtn}
               onPress={onClose}
@@ -73,6 +73,7 @@ const CustomerErrorPage = ({ visible, message,title ,onAction,onActionTxt, onClo
                 Cancel
               </Text>
             </TouchableOpacity>
+           )}
           </View>
         </View>
       </Modal>

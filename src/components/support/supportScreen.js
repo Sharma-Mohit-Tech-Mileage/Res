@@ -17,6 +17,7 @@ import base64 from 'react-native-base64'
 //import ZendDesk from '@pagopa/io-react-native-zendesk';
 import { startChatWithConfig,setVisitorInfo,startChat , clearChatData} from "../utility/RNZendeskChat";
 import TicketListIcon from "../../res/svgIcons/TicketListIcon";
+import CustomerErrorPage from "../utility/SystemErrorPopup";
 
 const Support = ({ route }) => {
     const navigation = useNavigation();
@@ -27,6 +28,7 @@ const Support = ({ route }) => {
     const [isAgentAvailable, setisAgentAvailable] = useState(false);
     const [istechAgentAvailable,setIstechAgentAvailable]=useState(false)
     const [refreshing, setRefreshing] = useState(false);
+    const [isAgentNotAvailable,setIsAgentNotAvailable]=useState(false)
     const makeCall = (number) => {
         let phoneNumber = '';
 
@@ -149,12 +151,14 @@ const Support = ({ route }) => {
         if(group_id=='22567718430615'){
             setisAgentAvailable(false)
             if(data){
-            PromptForAgentOffline()
+            //PromptForAgentOffline()
+            setIsAgentNotAvailable(true)
             }
         }else if(group_id=='1500003304341'){
             setIstechAgentAvailable(false)
             if(data){
-              PromptForAgentOffline()
+              //PromptForAgentOffline()
+              setIsAgentNotAvailable(true)
             }
         }
       }
@@ -294,7 +298,7 @@ const Support = ({ route }) => {
       const PromptForAgentOffline=()=>{
         Alert.alert(
             'Our agents are currently unavailable.',
-            'Please reach out during our business hours, and we’ll be happy to assist you.Thank you for your understanding!',
+            'Our agents are currently unavailable. Please reach out during our business hours, and we’ll be happy to assist you.Thank you for your understanding!',
             [
               {
                 text: 'Ok',
@@ -740,12 +744,17 @@ const Support = ({ route }) => {
                     </View>
                     <View style={[styles.issuesFlexBox]} />
 
-                    {showModal && (
-                        <ChatSupportModal
-                            department={department}
-                            onClose={() => toggleModal()}
-                        />
-                    )}
+        <CustomerErrorPage
+            visible={isAgentNotAvailable}
+            message={'Our agents are currently unavailable. Please reach out during our business hours, and we’ll be happy to assist you.Thank you for your understanding!'}
+            title={"Agent Unavailibity"}
+            onActionTxt={"OK"}
+            onAction={() => {
+                setIsAgentNotAvailable(false);
+              
+            }}
+            onClose={undefined}
+          />
                 </ScrollView>
             </View>
         </View>
