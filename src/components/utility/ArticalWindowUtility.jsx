@@ -79,12 +79,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     };
 
     const onMessage = (event) => {
-        console.log('fileBinary is missing, modal will not open');
+       
         try {
             const data = JSON.parse(event.nativeEvent.data);
+            console.log('File Data',JSON.stringify(data))
             if (data.type === "XMLHttpRequest" && data.status === 200) {
-                if ((data.responseURL.includes("/statements/") || data.responseURL.includes("/AccountSvc/api/Statement/"))) {
+                if ((data.responseURL.includes("/statements/") || data.responseURL.includes("/AccountSvc/api/Statement")|| data.responseURL.includes("/accountsvc/api/Statement"))) {
                 const responseData = JSON.parse(data.response);
+                
                     if (responseData.fileBinary) {
                         const base64Data = responseData.fileBinary;
                         setShowPDFUrl(base64Data);
