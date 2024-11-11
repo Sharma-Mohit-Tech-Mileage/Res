@@ -9,7 +9,6 @@ import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
 import colors from '../../res/Colors';
-
 const { width, height } = Dimensions.get('window');
 
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -50,21 +49,23 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             webViewRef.current.injectJavaScript(script);
         } else {
             console.warn('WebView ref is not available for injecting JavaScript. Navigating back to Dashboard.');
+            // Navigate back to the Dashboard
             if (navigationRef.current) {
-                navigationRef.current.navigate('Dashboard');
+                navigationRef.current.navigate('Dashboard'); // Replace 'Dashboard' with your dashboard route name
             }
         }
     };
+    
 
     const navigationChange = async (navState) => {
-        console.log('Navigation state changed:', navState.url);
+       // setDynamicCookie();  
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
                 setModalOpen(false);
                 setProgress(1);
                 setNavStateReloading(true);
                 try {
-                    await RefreshToken();
+                    await RefreshToken();  // Attempt to refresh the token
                     setTimeout(async () => {
                         await userUpdate();
                     }, 1000);
@@ -76,23 +77,15 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 }
             }
         }
-        
     };
 
     const onMessage = (event) => {
         try {
             const data = JSON.parse(event.nativeEvent.data);
-            if (data.type === "XMLHttpRequest" && data.status === 200) {
-                if ((data.responseURL.includes("/statements/") || data.responseURL.includes("/AccountSvc/api/Statement/"))) {
-                    const responseData = JSON.parse(data.response);
-                    if (responseData.fileBinary) {
-                        const base64Data = responseData.fileBinary;
-                        setShowPDFUrl(base64Data);
-                        setShowPDFModal(true);
-                    } else {
-                        console.log('fileBinary is missing, modal will not open');
-                    }
-                }
+            if (data !== undefined && data.responseURL !== undefined && data.responseURL.includes('/statements/')) {
+                const responseData = JSON.parse(data.response);
+                setShowPDFUrl(responseData.fileBinary);
+                setShowPDFModal(true);
             }
         } catch (error) {
             console.log('onMessageError: ', error);
@@ -101,8 +94,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     const userUpdate = async () => {
         const userLocal = await getUser();
+
         if (userLocal.token === currentUser.token) {
-            console.log('Tokens match, retrying user update');
+            console.log('tokens equal each other');
             setTimeout(async () => {
                 await userUpdate();
             }, 1000);
@@ -118,62 +112,36 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     const userUpdateScript = async (user) => {
         const upgradeToken = await getUpgradeToken();
-        user.userInfo['customerType'] = "Residential";
+        console.log('userUpdateScript: ', user);
+        console.log('upgradeToken.access_token: ', upgradeToken.access_token);
+        user.userInfo['customerType']= "Residential";
         if (user.token !== undefined) {
             const SAVE_FROM_RN = `(function() {
-                // Store tokens and user info in local storage
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
                 localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
-                
-                // Set cookie for "Source" as MobileApp
                 var cookieValue = "MobileApp";
-                var domain = document.location.hostname; 
-                var expirationDate = new Date();
-                expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
-                document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-                 document.cookie = "CustomerType=" + customerType + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-                // Override XMLHttpRequest to handle both /statements/ and Statement URLs
-                var originalOpen = XMLHttpRequest.prototype.open;
-                XMLHttpRequest.prototype.open = function(method, url) {
+            var domain = document.location.hostname; 
+            var expirationDate = new Date();
+            expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+            document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+                var open = XMLHttpRequest.prototype.open;
+                XMLHttpRequest.prototype.open = function() {
                     this.addEventListener("load", function(event) {
-                        if (url.match('/account/.*/statements/') || url.includes('Statement')) {
-                            var message = {
-                                "type": "XMLHttpRequest",
-                                "status": this.status,
-                                "responseURL": this.responseURL,
-                                "response": this.response
-                            };
+                        if (this.responseURL.match('/account/.*/statements/') !== null) {
+                            var message = {"status" : this.status, "responseURL" : this.responseURL, "response" : this.response}
                             window.ReactNativeWebView.postMessage(JSON.stringify(message));
                         }
-                    });
-                    originalOpen.apply(this, arguments);
-                };
-    
-                // Override fetch to handle both /statements/ and Statement URLs
-                var originalFetch = window.fetch;
-                window.fetch = function() {
-                    return originalFetch.apply(this, arguments).then(function(response) {
-                        if (response.url.match('/account/.*/statements/') || response.url.includes('Statement')) {
-                            response.clone().text().then(function(responseText) {
-                                var message = {
-                                    "type": "fetch",
-                                    "status": response.status,
-                                    "responseURL": response.url,
-                                    "response": responseText
-                                };
-                                window.ReactNativeWebView.postMessage(JSON.stringify(message));
-                            });
-                        }
-                        return response;
-                    });
-                };
-            })();`;
-    
-            setInitScript(prevScript => `${prevScript}\n${SAVE_FROM_RN}`);
+                    }); 
+                    open.apply(this, arguments);
+                };                
+              })();`;
+
+            setInitScript(SAVE_FROM_RN);
         }
     };
 
+    // Reset progress and error states when URL changes or modal closes
     useEffect(() => {
         setProgress(0);
         setIsError(false);
@@ -190,7 +158,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     useEffect(() => {
         setCurrentUser(user);
         userUpdateScript(user);
-        setDynamicCookie();
+        setDynamicCookie();  // Set cookie when user is updated
     }, [user]);
 
     useEffect(() => {
@@ -200,8 +168,10 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     if (webViewRef?.current) {
                         webViewRef.current.reload();
                     } else {
+                        console.warn('WebView ref is not available for reload. Navigating back to Dashboard.');
+                        // Navigate back to the Dashboard
                         if (navigationRef.current) {
-                            navigationRef.current.navigate('Dashboard');
+                            navigationRef.current.navigate('Dashboard'); 
                         }
                     }
                 }, 500);
@@ -214,20 +184,24 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         return () => {
             if (subscription) {
                 subscription.remove();
+            } else {
+                console.warn('AppState subscription is not available for removal.');
             }
         };
     }, [appState]);
     
+    
+
     useEffect(() => {
-        setDynamicCookie();
+        setDynamicCookie();  // Push cookie when component is first mounted
     }, [url, modalOpen, appState]);
+
 
     const Spinner = () => (
         <View style={styles.activityContainer}>
           <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
         </View>
     );
-
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => { 
@@ -236,11 +210,13 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                         index: 0,
                         routes: [{ name: "MyTab" }],
                       });
+                     //navigation.goBack();
                 }else{
                      navigation.goBack();
                 }
                  setModalOpen(false);
-            }} title={name} />
+                  }} 
+                  title={name} />
             {progress < 1 ? (
                 <View style={styles.progressBar}>
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} /> 
@@ -279,7 +255,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
     progressBar: {
-        height: height * 0.004,
+        height: height * 0.004, // 0.4% of screen height
         backgroundColor: 'lightgrey',
     },
     progress: {
@@ -290,13 +266,12 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: width * 0.05,
+        padding: width * 0.05, // 5% of screen width
     },
     errorText: {
-        fontSize: width * 0.04,
-        marginBottom: height * 0.02,
-    },
-    activityContainer: {
+        fontSize: width * 0.04, // 4% of screen width
+        marginBottom: height * 0.02, // 2% of screen height
+    },activityContainer: {
         alignItems: 'center',
         justifyContent: 'center',
         position: 'absolute',
@@ -304,8 +279,8 @@ const styles = StyleSheet.create({
         left: 0,
         backgroundColor: '#00000000',
         height: '100%',
-        width: '100%',
-    }
+        width: '100%'
+      }
 });
 
 export default ArticalWindowUtility;

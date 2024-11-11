@@ -1,19 +1,28 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Linking, } from "react-native";
+import React, { useState, useEffect,useCallback } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Platform,
+  Dimensions,
+  Linking,
+} from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DownArrow from "../../res/svgIcons/DownArrow";
 import UpArrow from "../../res/svgIcons/UpArrow";
-import { getUser, storeUpgradeToken } from "../../redux/utils/LocalStorage";
-import { GetApiRequest } from "../../network/APIClient";
+import {getUser,storeUpgradeToken} from "../../redux/utils/LocalStorage";
+import {GetApiRequest} from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import YoutubePlayer from "react-native-youtube-iframe";
-import AccessibleYoutubePlayer from "../common/AccessibleYoutubePlayer";
-import { saveAccountServices } from "../../redux/actions/ProfileActionSuite";
+import {saveAccountServices} from "../../redux/actions/ProfileActionSuite";
 import { useSelector, useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
@@ -24,9 +33,8 @@ const tabWidth = Number(Dimensions.get("window").width / 4);
 const NewBillerHome = ({ navigation }) => {
   const [playing, setPlaying] = useState(false);
   const [isImageDispaly, setIsImageDispaly] = useState(true);
-  const user = useSelector((state) => state.combinedReducers.user.userData);
   const home = useSelector((state) => state.combinedReducers.home);
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
+ 
   const dispatch = useDispatch();
   const [phonePlan, setPhonePlan] = useState([]);
   const [billAmt, setBillAmt] = useState(undefined);
@@ -83,10 +91,10 @@ const NewBillerHome = ({ navigation }) => {
           if (res) {
             dispatch(saveAccountServices(res.services));
             console.log("getUserAccountDetails **************************************************", res);
-            let userBillAmt = (res.past_due_amount == 0) ? res.current_balance : res.past_due_amount
+            let userBillAmt=(res.past_due_amount<=0) ? res.current_balance: res.past_due_amount
             setBillAmt(userBillAmt?.toFixed(2));
 
-            let dueDate = (res.past_due_amount != 0) ? 'Immediately' : moment(res.payment_due_date).format("ll");
+            let dueDate =(res.past_due_amount!=0)? 'Immediately': moment(res.payment_due_date).format("ll");
             setDueDate(dueDate);
 
             function getFirstEmail(emailArray) {
@@ -101,7 +109,7 @@ const NewBillerHome = ({ navigation }) => {
             paymentDetails.email = getFirstEmail(res.email_details);
             setDefaultPaymentDetails(paymentDetails);
             //let billAmnt=(Math.round(res.payment_due_amount * 100) / 100).toFixed(2);
-            setBillAmt(res.payment_due_amount.toFixed(2));
+            //setBillAmt(res.payment_due_amount.toFixed(2));
           }
         },
         onErrorBill
@@ -151,7 +159,7 @@ const NewBillerHome = ({ navigation }) => {
         const status = await checkForMinorUpdate();
         setUpdateStatus(status);
       };
-
+  
       fetchUpdateStatus();
       getUserAccountDetails();
     }, [])
@@ -314,7 +322,7 @@ const NewBillerHome = ({ navigation }) => {
             )}
             <Text style={[styles.descriptionText, { fontSize: FontSize.size_3xl, fontWeight: '400', zIndex: 100, width: wp("92%"), }]}>Welcome to Sparklight</Text>
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
-              <View />
+              <View/>
               <Text style={[styles.descriptionText, { fontSize: FontSize.size_3xl, fontWeight: '400', marginBottom: 20 }]}></Text>
               <View style={{ flexDirection: 'column' }}>
                 <Text style={styles.descriptionText}>
@@ -330,16 +338,23 @@ const NewBillerHome = ({ navigation }) => {
                 </Text>
 
                 {isImageDispaly ? (
-                    <AccessibleYoutubePlayer
-                      videoId="R8SrD7NFJaA"
-                      videoTitle="SparkLight Video"
-                      height={230}
-                      play={false}
-                      onError={(e) => console.log(e)}
-                      onPlaybackStateChange={(isPlaying) => console.log('Playing:', isPlaying)}
-                    />
-
-                ) :null}
+                  <View 
+                  accessible={isImageDispaly}
+                  accessibilityLabel={`SparkLight Video`}
+                  style={styles.videoContainer} >
+                  <YoutubePlayer
+                  accessibilityLabel="Watch our SparkLight Video                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             bghv"
+                  accessibilityHint="Double-tap to play/pause"
+                  accessibilityRole="video"
+                  height={185}
+                  play={playing}
+                  videoId={"C3cMQoWxv6I"}
+                  
+                />
+                </View>
+                ) : (
+                  <></>
+                )}
 
                 <TouchableOpacity
                   accessible={true}
@@ -606,13 +621,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: wp("15%"),
     marginTop: wp("-10%"),
-  }, videoContainer:
-  {
+  },videoContainer:
+    { 
     width: wp('80%'),
-    borderRadius: 5,
-    alignSelf: 'center',
-    marginTop: 10
-  }
+     borderRadius: 5,
+      alignSelf: 'center',
+       marginTop: 10
+       }
 });
 
 export default NewBillerHome;
