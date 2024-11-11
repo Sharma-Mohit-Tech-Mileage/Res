@@ -244,21 +244,21 @@ const styles = StyleSheet.create({
     left: 80,
   },
   shadowTabsStep2: {
-    left: tabWidth * 1.8,
+    left: tabWidth * 1.99,
   },
   shadowTabsStep3: {
-    left: tabWidth * 4,
+    left: tabWidth * 4.0,
   },
   shadowTabsStep4: {
     left: tabWidth * 5,
   },
   shadowTabsLeft: {},
   shadowTabsStep2Left: {
-    width: tabWidth * 0.99,
+    width: tabWidth * 0.88,
     left: 0,
   },
   shadowTabsStep3Left: {
-    width: tabWidth * 3.1,
+    width: tabWidth * 2.99,
     left: 0,
   },shadowTabsStep4Left: {
     width: tabWidth * 4.1,

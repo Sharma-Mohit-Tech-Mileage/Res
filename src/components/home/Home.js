@@ -48,7 +48,7 @@ const HomeScreen = ({ navigation }) => {
   const [checkModemStatus, setCheckModemStatus] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [walkThroughStep, setWalkThroughStep] = useState(0);
-  const [showWalkThrough, setShowWalkThrough] = useState(true);
+  const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
   const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: '', latestVersion: '' });
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null });
