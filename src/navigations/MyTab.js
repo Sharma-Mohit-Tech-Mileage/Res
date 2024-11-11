@@ -23,7 +23,7 @@ import ArticalWindowUtility from "../components/utility/ArticalWindowUtility";
 
 
 const { width } = Dimensions.get('window');
-const tabWidth = Number(width / 4);
+const tabWidth = Number(width / 5);
 const Tab = createBottomTabNavigator();
 
 const MyTabs = ({ route }) => {
@@ -44,7 +44,7 @@ const MyTabs = ({ route }) => {
 
   useEffect(() => {
     if (user?.isNormalUser) {
-      if (home.walkThroughStep === 0) {
+      if (home.walkThroughStep === 0) {          
         setShadowStyle(styles.shadowTabs);
         setShadowStyleLeft(styles.shadowTabsLeft);
       } else if (home.walkThroughStep === 1) {
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     left: 80,
   },
   shadowTabsStep2: {
-    left: tabWidth * 3.2,
+    left: tabWidth * 1.8,
   },
   shadowTabsStep3: {
     left: tabWidth * 4,
@@ -254,14 +254,14 @@ const styles = StyleSheet.create({
   },
   shadowTabsLeft: {},
   shadowTabsStep2Left: {
-    width: tabWidth * 2.3,
+    width: tabWidth * 0.99,
     left: 0,
   },
   shadowTabsStep3Left: {
     width: tabWidth * 3.1,
     left: 0,
   },shadowTabsStep4Left: {
-    width: tabWidth * 3.1,
+    width: tabWidth * 4.1,
     left: 0,
   },
 });

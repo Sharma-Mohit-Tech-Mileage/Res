@@ -569,7 +569,7 @@ const HomeScreen = ({ navigation }) => {
       },{
         title: "Billing",
         description:
-          "Billing Descriptions ?",
+          "Make payments, set up Auto Pay and view statements.",
         buttonText: "Next",
       },
       {
@@ -643,13 +643,7 @@ const HomeScreen = ({ navigation }) => {
                     : styles.circle
                 }
               ></View>
-              <View
-                style={
-                  walkThroughStep < 4
-                    ? [styles.circle, styles.circleUnselected]
-                    : styles.circle
-                }
-              ></View>
+              
             </View>
             <View style={styles.walkThroughButtons}>
               <View style={styles.walkThroughSubButtons}>
