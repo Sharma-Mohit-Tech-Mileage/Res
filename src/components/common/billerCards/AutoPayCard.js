@@ -58,7 +58,10 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, paymentDetails,navigation ,st
           ) : (
             <>
               <Text style={styles.autoPayStatusTextInActive}>Auto Pay Off</Text>
-              <Text style={[styles.infoAuto]}>Turn on Auto Pay today!  <Text style={styles.subText}>Never miss a payment with peace of mind.</Text></Text>
+              <View style={{flexDirection:'column'}}>
+              <Text style={[styles.infoAuto]}>Turn on Auto Pay today!</Text>
+              <Text style={styles.subText}>Never miss a payment with peace of mind.</Text>
+              </View>
             </>
           )}
           <View style={styles.cardFooter}>
@@ -135,7 +138,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: Padding.p_xs,
     marginHorizontal:Padding.p_xs,
-    marginBottom: 23,
+  
   },
   thankYouText: {
     fontSize: 14,
@@ -181,13 +184,13 @@ const styles = StyleSheet.create({
   paymentButton: {
     flexDirection: "row",
     backgroundColor: colors.sparklight_purple_blue,
-    width:wp("80%"),
+    width:wp("70%"),
     paddingVertical: 8,
     alignItems:'center',
     justifyContent:'center',
     borderRadius: 5,
     alignSelf: "center",
-    marginLeft: wp("4%"),
+    marginLeft: wp("9%"),
   },
   paymentButtonText: {
     color: colors.snow_white,
@@ -212,7 +215,7 @@ const styles = StyleSheet.create({
   },cardFooter: {
     flexDirection: "row",
     backgroundColor: "#F8F8F8",
-    width:wp("92%"),
+    width:wp("100%"),
     borderBottomEndRadius: 10,
     borderBottomStartRadius: 10,
     padding: 10,

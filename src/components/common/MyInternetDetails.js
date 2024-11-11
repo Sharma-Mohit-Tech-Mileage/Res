@@ -25,6 +25,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, paymentDetails,navigation 
   const paperLessInfo = profile.paperLessInfo || {};
   const profileDetails = profile.profileDetails || {};
 
+  console.log('BillAmnt',billAmt)
   const getStatus = () => {
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;

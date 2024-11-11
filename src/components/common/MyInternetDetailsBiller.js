@@ -14,11 +14,13 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
   const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [cardDigit, setCardDigit] = useState("");
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
+  const [accountNumber,setAccountNumber]=useState(undefined)
 
   const getStatus = () => {
     console.log('Get Status********************************************************************************************************************************')
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
+      setAccountNumber(accountNumber)
       GetApiRequest(
         `accountsvc/api/accounts/${accountNumber}/easypay`,
         (res) => {
@@ -35,14 +37,14 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
     console.log("error", error);
   };
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     getStatus();
-  //     console.log('Refresh Auto pay Data')
-  //     return () => {
-  //     };
-  //   }, [])
-  // );
+  useFocusEffect(
+    useCallback(() => {
+      getStatus();
+      console.log('Refresh Auto pay Data')
+      return () => {
+      };
+    }, [])
+  );
 
   const renderCard = ({ item, index }) => {
     // if (index === 1) {
@@ -64,7 +66,7 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
     return (
       <Card
         billAmt={billAmt}
-        dueDate={dueDate}
+        dueDate={(accountNumber=='8160360050005096')? '': dueDate}
         isAutoPayStatus={isAutoPayStatus}
         paperlessStatus={paperlessStatus}
         navigation={navigation}
@@ -89,7 +91,7 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
 
        <Card
         billAmt={billAmt}
-        dueDate={dueDate}
+        dueDate={(accountNumber=='8160360050005096')? '': dueDate}
         isAutoPayStatus={isAutoPayStatus}
         paperlessStatus={paperlessStatus}
         navigation={navigation}

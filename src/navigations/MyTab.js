@@ -19,6 +19,7 @@ import { Env } from '../network/apis/account/Constants';
 import { fetchProfileDetails } from '../redux/actions/ProfileActionSuite';
 import BillingIcon from "../res/svgIcons/BillingIcon";
 import BillingStackScreen from "./stackNavigation/BillingStack";
+import ArticalWindowUtility from "../components/utility/ArticalWindowUtility";
 
 
 const { width } = Dimensions.get('window');
@@ -97,11 +98,9 @@ const MyTabs = ({ route }) => {
         {/* Billing Screen */}
          <Tab.Screen
           name="BillingTab"
-          component={BillingStackScreen}
+          component={BillingStackScreen }
           listeners={({ navigation }) => ({
             tabPress: (e) => {
-              
-              console.log('IsNormal user',user?.isNormalUser)
               if (!user?.isNormalUser) {
                 e.preventDefault();
                 navigation.reset({

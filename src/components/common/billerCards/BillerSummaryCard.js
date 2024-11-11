@@ -48,7 +48,7 @@ const BillerSummaryCard = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus,
                     <View style={styles.statusRow}>
                         <TouchableOpacity
                             onPress={() => {
-                                navigation.navigate("Billing");
+                                navigation.navigate("BillingTab");
                             }}
                             accessible={true}
                             accessibilityLabel="View Billing Services"
@@ -189,13 +189,13 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: colors.sparklight_purple_blue,
-        paddingLeft: 8,
+        paddingHorizontal: 8,
         paddingVertical: 5,
         borderRadius: 5,
     },
     paymentButtonText: {
         color: colors.snow_white,
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "600",
         flexDirection: "row",
         justifyContent: "flex-end",

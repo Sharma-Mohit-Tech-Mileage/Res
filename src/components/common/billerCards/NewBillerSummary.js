@@ -13,6 +13,8 @@ import WalletIcon from "../../../res/svgIcons/WalletIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { Color, FontFamily, Padding } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
+import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
+import Tooltip from "rn-tooltip";
 const CardNewBiller = ({
   billAmt,
   dueDate,
@@ -23,6 +25,51 @@ const CardNewBiller = ({
 }) => {
   const uncheck = require("../../../../assets/checkcircle1.png");
   const check = require("../../../../assets/checkcircle.png");
+  const info = require("../../../../assets/info_icon.png");
+
+console.log("Due Date",dueDate)
+
+  const NotAvailable = () => {
+    return (
+      <>
+       <Tooltip
+          backgroundColor="#4C5458"
+          overlayColor="#00000000"
+          width={180}
+          height={100}
+          popover={
+            <Text style={{ color: "#FFF" }}>
+              Your due date takes 10 business days to generate. Please check
+              back later.
+            </Text>
+          }
+        > 
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={styles.dueDate}>{"Due "}</Text>
+            <Text
+              style={[
+                styles.dueDate,
+                { fontWeight: "400", color: colors.dark_grey },
+              ]}
+            >
+              {"on: "}
+            </Text>
+            <Text
+              style={[
+                styles.dueDate,
+                { textDecorationLine: "underline", marginRight: 5 },
+              ]}
+            >
+              {'Not Available'}
+            </Text>
+            
+            <InfoIcon1/>
+            
+          </View>
+          </Tooltip>
+      </>
+    );
+  };
 
   return (
     <View style={styles.shadowContainer}>
@@ -40,13 +87,14 @@ const CardNewBiller = ({
             <ActivityIndicator
               size="large"
               color={Color.sparklightBrightPurple}
+              style={{marginLeft:wp("15%")}}
             />
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>
           )}
-          {dueDate != "Invalid date" && (
+          {(dueDate != "Invalid date" && billAmt!=undefined) && (
             <Text style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
-              {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": ""}
+              {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": <NotAvailable/>}
               <Text style={[styles.dueDate, { fontWeight: "400",color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue }]}>
                 {' '+dueDate}
               </Text>
@@ -75,19 +123,22 @@ const CardNewBiller = ({
           <View style={[styles.statusRow,{marginTop:26}]}>
             <TouchableOpacity
               onPress={() => {
-
-                navigation.navigate("ArticalWindowUtility", {
-                  url: `${Env.PAYMENTURLNEW}`,
-                  name: "Billing Details",
+                // navigation.navigate("BillingTab", {
+                //   url: `${Env.PAYMENTURLNEW}`,
+                //   name: "Billing Details",
+                //   isBilling:true
+                // });
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: "BillingTab" }],
                 });
-               
               }}
               accessible={true}
-              accessibilityLabel="Make a Payment"
+              accessibilityLabel="View Billing Services"
               accessibilityRole="button"
               style={styles.paymentButton}
             >
-              <Text style={styles.paymentButtonText}>Make a Payment</Text>
+              <Text style={styles.paymentButtonText}>View Billing Services</Text>
               <View style={{ marginLeft: 2 }}>
                 <RightArrow color={colors.snow_white} />
               </View>

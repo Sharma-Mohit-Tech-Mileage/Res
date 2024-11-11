@@ -9,7 +9,6 @@ import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
 import colors from '../../res/Colors';
-
 const { width, height } = Dimensions.get('window');
 
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -55,9 +54,10 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             }
         }
     };
+    
 
     const navigationChange = async (navState) => {
-        console.log('Navigation state changed:', navState.url);
+       
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
                 setModalOpen(false);
@@ -76,19 +76,21 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 }
             }
         }
-        
     };
 
     const onMessage = (event) => {
+       
         try {
             const data = JSON.parse(event.nativeEvent.data);
+            console.log('File Data',JSON.stringify(data))
             if (data.type === "XMLHttpRequest" && data.status === 200) {
-                if ((data.responseURL.includes("/statements/") || data.responseURL.includes("/AccountSvc/api/Statement/"))) {
-                    const responseData = JSON.parse(data.response);
+                if ((data.responseURL.includes("/statements/") || data.responseURL.includes("/AccountSvc/api/Statement")|| data.responseURL.includes("/accountsvc/api/Statement"))) {
+                const responseData = JSON.parse(data.response);
+                
                     if (responseData.fileBinary) {
                         const base64Data = responseData.fileBinary;
                         setShowPDFUrl(base64Data);
-                        setShowPDFModal(true);
+                setShowPDFModal(true);
                     } else {
                         console.log('fileBinary is missing, modal will not open');
                     }
@@ -101,6 +103,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     const userUpdate = async () => {
         const userLocal = await getUser();
+
         if (userLocal.token === currentUser.token) {
             console.log('Tokens match, retrying user update');
             setTimeout(async () => {
@@ -119,42 +122,42 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const userUpdateScript = async (user) => {
         const upgradeToken = await getUpgradeToken();
         user.userInfo['customerType'] = "Residential";
+    
         if (user.token !== undefined) {
             const SAVE_FROM_RN = `(function() {
-                // Store tokens and user info in local storage
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
                 localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
-                
-                // Set cookie for "Source" as MobileApp
+    
                 var cookieValue = "MobileApp";
                 var domain = document.location.hostname; 
                 var expirationDate = new Date();
-                expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+                expirationDate.setTime(expirationDate.getTime() + (365 * 24 * 60 * 60 * 1000)); 
                 document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-                 document.cookie = "CustomerType=" + customerType + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-                // Override XMLHttpRequest to handle both /statements/ and Statement URLs
+    
                 var originalOpen = XMLHttpRequest.prototype.open;
                 XMLHttpRequest.prototype.open = function(method, url) {
                     this.addEventListener("load", function(event) {
-                        if (url.match('/account/.*/statements/') || url.includes('Statement')) {
+                        console.log('Intercepted URL:', url); // Log for debugging
+                        if (url.includes("/statements/") || url.includes("Statement")) {
                             var message = {
                                 "type": "XMLHttpRequest",
                                 "status": this.status,
                                 "responseURL": this.responseURL,
                                 "response": this.response
                             };
+                            console.log('Sending message:', message); // Debug log
                             window.ReactNativeWebView.postMessage(JSON.stringify(message));
                         }
-                    });
+                    }); 
                     originalOpen.apply(this, arguments);
                 };
     
-                // Override fetch to handle both /statements/ and Statement URLs
                 var originalFetch = window.fetch;
                 window.fetch = function() {
                     return originalFetch.apply(this, arguments).then(function(response) {
-                        if (response.url.match('/account/.*/statements/') || response.url.includes('Statement')) {
+                        console.log('Intercepted fetch URL:', response.url); // Log for debugging
+                        if (response.url.includes("/statements/") || response.url.includes("Statement")) {
                             response.clone().text().then(function(responseText) {
                                 var message = {
                                     "type": "fetch",
@@ -162,6 +165,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                                     "responseURL": response.url,
                                     "response": responseText
                                 };
+                                console.log('Sending fetch message:', message); // Debug log
                                 window.ReactNativeWebView.postMessage(JSON.stringify(message));
                             });
                         }
@@ -201,7 +205,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                         webViewRef.current.reload();
                     } else {
                         if (navigationRef.current) {
-                            navigationRef.current.navigate('Dashboard');
+                            navigationRef.current.navigate('Dashboard'); 
                         }
                     }
                 }, 500);
@@ -218,16 +222,18 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         };
     }, [appState]);
     
+    
+
     useEffect(() => {
         setDynamicCookie();
     }, [url, modalOpen, appState]);
+
 
     const Spinner = () => (
         <View style={styles.activityContainer}>
           <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
         </View>
     );
-
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => { 
@@ -305,7 +311,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#00000000',
         height: '100%',
         width: '100%',
-    }
+      }
 });
 
 export default ArticalWindowUtility;

@@ -31,9 +31,11 @@ import {
 } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import { Env } from "../../network/apis/account/Constants";
+import colors from "../../res/Colors";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
+  const user = useSelector(state => state.combinedReducers.user.userData);
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState();
   const [accountNo, setAccountNo] = useState("");
@@ -48,6 +50,7 @@ const BillingScreen = ({ navigation }) => {
   });
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const paperLessInfo = profile.paperLessInfo || {};
+  
 
   const getUserAccountDetails = () => {
     setBillAmt(undefined);
@@ -114,11 +117,25 @@ const BillingScreen = ({ navigation }) => {
   };
 
   useFocusEffect(
-    useCallback(() => {
+    useCallback(() => { 
+      // getStatus();
+      // getUserAccountDetails();
+      // dispatch(fetchBillingPaper());
+      // dispatch(fetchProfileDetails());
+   if(user?.isNormalUser){
       getStatus();
       getUserAccountDetails();
       dispatch(fetchBillingPaper());
       dispatch(fetchProfileDetails());
+   }else{
+    navigation.navigate("ArticalWindowUtility", {
+      url: `${Env.PAYMENTURLNEW}`,
+      name: "Billing Details",
+      isBilling:true
+    });
+  
+   }
+
     }, [])
   );
   useEffect(() => {
@@ -126,9 +143,9 @@ const BillingScreen = ({ navigation }) => {
   }, [billAmt]);
 
   return (
-    <View style={styles.account} accessibilityLabel="Account screen">
+    <View style={styles.account} accessibilityLabel="Billing Services screen">
       <ProfileSettingsHeader
-        title="Account"
+        title="Billing Services"
         iconAlignment="right"
         showIcon={false}
       />
@@ -142,8 +159,8 @@ const BillingScreen = ({ navigation }) => {
       <View style={[styles.frameParent]}>
         <View style={styles.rightActionableParent}>
           <View style={styles.rightActionable}>
-            <Text style={styles.text}>
-              <BillingIconWhite isSelected={false} />
+          <Text style={[styles.text,{alignSelf:'center',marginLeft:5,marginTop:5}]}>
+              <BillingIconWhite isSelected={false} /> 
             </Text>
           </View>
           {/* Full name for profile */}
@@ -192,7 +209,7 @@ const BillingScreen = ({ navigation }) => {
               style={[
                 styles.myModem,
                 styles.myModemSpaceBlock,
-                { marginTop: 20 },
+                { marginTop: 10 },
               ]}
             >
               <View
@@ -261,12 +278,12 @@ const BillingScreen = ({ navigation }) => {
                   onPress={() => {
                     navigation.navigate("ArticalWindowUtility", {
                       url: Env.BILLING_HISTORY,
-                      name: "View Billing Hitory",
+                      name: "View Billing History",
                     });
                   }}
                   accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel="View Billing Hitory"
+                  accessibilityLabel="View Billing History"
                 >
                   
                   <Text style={styles.modemHealthSupport}>
@@ -474,11 +491,11 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   modemHealthSupport: {
-    color: Color.colorMidnightblue,
-    fontSize: FontSize.size_base,
-    textAlign: "left",
-    fontWeight:'400',
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.sparklight_purple_blue,
     fontFamily: FontFamily.openSansRegular,
+    textAlign: "left",
     lineHeight: 28,
     flex: 1,
   },
