@@ -171,11 +171,20 @@ const SupportTicket = () => {
             navigation.navigate("ViewTicket", { ticketId: item.ticketNumber });
             }
           }}
+          accessibilityLabel={`Ticket: ${item.ticketNumber}`}
+          accessibilityRole="button"
+          accessible={true}
         >
           <View
             style={{ paddingHorizontal: Padding.p_base, flexDirection: "row" }}
           >
+            <View 
+
+              >
             <TicketListIcon />
+            </View>
+            
+
             <Text
               style={{
                 fontFamily: FontFamily.interBold,
@@ -183,6 +192,7 @@ const SupportTicket = () => {
                 textAlignVertical: "center",
                 color: Color.sparklightGray1,
               }}
+              
             >
               {" "}
               Ticket #{item.ticketNumber}{" "}

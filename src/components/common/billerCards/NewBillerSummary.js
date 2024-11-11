@@ -45,9 +45,9 @@ const CardNewBiller = ({
             <Text style={styles.amount}>${billAmt}</Text>
           )}
           {dueDate != "Invalid date" && (
-            <Text style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.dark_grey,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
+            <Text style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
               {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": ""}
-              <Text style={[styles.dueDate, { fontWeight: "400",color:(dueDate=='Immediately')?colors.sparklight_red:colors.dark_grey }]}>
+              <Text style={[styles.dueDate, { fontWeight: "400",color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue }]}>
                 {' '+dueDate}
               </Text>
             </Text>
@@ -75,10 +75,12 @@ const CardNewBiller = ({
           <View style={[styles.statusRow,{marginTop:26}]}>
             <TouchableOpacity
               onPress={() => {
+
                 navigation.navigate("ArticalWindowUtility", {
                   url: `${Env.PAYMENTURLNEW}`,
                   name: "Billing Details",
                 });
+               
               }}
               accessible={true}
               accessibilityLabel="Make a Payment"
@@ -110,7 +112,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignSelf: "center",
     overflow: "hidden",
-    width: wp("85%"),
+    width: wp("92%"),
   },
   leftSection: {
     paddingHorizontal: Padding.p_3xs,
@@ -176,7 +178,7 @@ const styles = StyleSheet.create({
   dueDate: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.dark_grey,
+    color: colors.sparklight_purple_blue,
     alignSelf: 'flex-end',
     fontFamily: FontFamily.openSansRegular,
     color: colors.sparklight_purple_blue,

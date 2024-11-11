@@ -164,19 +164,11 @@ const PasswordSecurityEdit = () => {
               <NotificationAlert
                 type="error"
                 title="Failed"
-                message="Password and security update failed."
+                message="Password and security question update failed."
                 showCloseIcon={true}
                 isVisible={showErrorAlert}
                 onClose={() => setShowErrorAlert(false)}
               />
-                <NotificationAlert
-                  type="error"
-                  title="Error"
-                  message="Please enter valid information to continue."
-                  showCloseIcon={true}
-                  isVisible={showValidationAlert}
-                  onClose={() => setShowValidationAlert(false)}
-                />
               </View>
               <View style={styles.frameParent1}>
                 <View 

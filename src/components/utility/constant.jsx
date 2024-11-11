@@ -69,7 +69,7 @@ export const securityQuestions = [
 ];
 
 export const passwordTerms = [
-    "It must be different than your user name.",
+    "It must be different than your username.",
     "It must contain 8 to 20 characters.",
     "It must include an upper and lower case letter and a number.",
     "It must include at least one special character such as %, &, _, ?, #, =, -",

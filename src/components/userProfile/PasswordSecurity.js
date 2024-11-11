@@ -45,7 +45,7 @@ const PasswordSecurity = () => {
             <NotificationAlert
               type="success"
               title="Update Successful"
-              message={(route.params?.isPassword)?"Your password has been updated successfully.":"Your Security Questions has been updated successfully."}
+              message={(route.params?.isPassword)?"Your password has been updated successfully.":"Your security question has been updated successfully."}
               showCloseIcon={true}
               isVisible={showSuccessAlert}
               onClose={() => setShowSuccessAlert(false)}

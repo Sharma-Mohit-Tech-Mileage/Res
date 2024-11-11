@@ -26,7 +26,7 @@ const config = {
 const logoutConfirmationPopup = (dispatch, navigation) => {
   Alert.alert(
     'Confirm Logout',
-    'Are you sure you want to Log out of the app?',
+    'Are you sure you want to logout?',
     [
       {
         text: 'Cancel',
@@ -34,7 +34,7 @@ const logoutConfirmationPopup = (dispatch, navigation) => {
         style: 'cancel',
       },
       {
-        text: 'Logout',
+        text: 'Ok',
         onPress: () => {
           logoutAction(dispatch, navigation);
         },
@@ -171,7 +171,7 @@ const AccountOverview = () => {
       setInitials(initials);
       return () => {
       };
-    }, [user?.userInfo]) 
+    }, [profileDetails]) 
   );
 
   return (

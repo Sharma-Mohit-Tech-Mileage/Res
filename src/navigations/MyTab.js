@@ -17,6 +17,9 @@ import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
 import { FontFamily } from '../../GlobalStyles';
 import { Env } from '../network/apis/account/Constants';
 import { fetchProfileDetails } from '../redux/actions/ProfileActionSuite';
+import BillingIcon from "../res/svgIcons/BillingIcon";
+import BillingStackScreen from "./stackNavigation/BillingStack";
+
 
 const { width } = Dimensions.get('window');
 const tabWidth = Number(width / 4);
@@ -90,6 +93,53 @@ const MyTabs = ({ route }) => {
             ),
           }}
         />
+        
+        {/* Billing Screen */}
+         <Tab.Screen
+          name="BillingTab"
+          component={BillingStackScreen}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              
+              console.log('IsNormal user',user?.isNormalUser)
+              if (!user?.isNormalUser) {
+                e.preventDefault();
+                navigation.reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: 'BillingTab',
+                      state: {
+                        routes: [
+                          {
+                            name: 'ArticalWindowUtility',
+                            params: {
+                              url: `${Env.PAYMENTURLNEW}`,
+                              name: 'Billing Details',
+                              isExpandable: true,
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                });
+              }
+            },
+          })}
+          options={{
+            headerShown: false,
+            swipeEnabled: false,
+            tabBarLabel: 'Billing',
+            tabBarIcon: ({ focused }) => (
+              <View style={styles.tabItem}>
+               <BillingIcon isSelected={focused} />
+              </View>
+            ),
+          }}
+        />
+        {/* Billing Screen */}
+
         {/* Shop Screen */}
         <Tab.Screen
           name="Shop"
@@ -189,21 +239,21 @@ const styles = StyleSheet.create({
     bottom: 0,
     zIndex: 5,
     opacity: .7,
-    left: 100,
+    left: 80,
   },
   shadowTabsStep2: {
-    left: tabWidth * 3,
+    left: tabWidth * 3.2,
   },
   shadowTabsStep3: {
     left: tabWidth * 4,
   },
   shadowTabsLeft: {},
   shadowTabsStep2Left: {
-    width: tabWidth * 2,
+    width: tabWidth * 2.3,
     left: 0,
   },
   shadowTabsStep3Left: {
-    width: tabWidth * 3,
+    width: tabWidth * 3.1,
     left: 0,
   },
 });
