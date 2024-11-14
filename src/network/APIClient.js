@@ -4,9 +4,8 @@ import axios from "axios";
 import { RefreshToken } from '../components/user/Session';
 import { navigationRef } from '../navigations/UserNavigations';
 
-// Base URLs with ensured trailing slashes
 const BASE_URL = Env.API_BASEURL.endsWith('/') ? Env.API_BASEURL : `${Env.API_BASEURL}/`;
-const API_ACP_BASEURL = Env.API_ACP_BASEURL.endsWith('/') ? Env.API_ACP_BASEURL : `${Env.API_ACP_BASEURL}/`;
+const API_ACP_BASEURL = Env.API_ACP_BASEURL.endsWith('/') ? Env.API_ACP_BASEURL : `${API_ACP_BASEURL}/`;
 const SUPPORT_URL = "https://support.sparklight.com/api/v2/help_center/";
 const MODEM_BASE_URL = Env.MODEM_BASE_URL.endsWith('/') ? Env.MODEM_BASE_URL : `${Env.MODEM_BASE_URL}/`;
 
@@ -21,16 +20,15 @@ export const isUserAuthorized = (authorize) => {
 
 const handleFetchResponse = async (response, url, onSuccess, onError) => {
     try {
-        const rawResponse = await response.text(); // Read response as plain text
-        console.log("Request URL:", url); // Log the full URL being accessed
-        console.log("Raw Response:", response.status); // Log the raw response
+        const rawResponse = await response.text();
+        console.log("Request URL:", url);
+        console.log("Raw Response:", response.status);
 
         if (response.status === 204 || !rawResponse) {
-            onSuccess({ message: 'No content', code: response.status }); // Pass a success message for no content
+            onSuccess({ message: 'No content', code: response.status });
             return;
         }
 
-        // Try parsing the response as JSON if not empty
         try {
             const json = JSON.parse(rawResponse);
             if (response.ok) {
@@ -40,61 +38,69 @@ const handleFetchResponse = async (response, url, onSuccess, onError) => {
             }
         } catch (jsonParseError) {
             console.error('JSON Parse error:', jsonParseError);
-            onError(`Failed to parse response: ${jsonParseError.message} code: ${response.status}`);
+            onError(`Failed to parse response: ${jsonParseError.message}, code: ${response.status}`);
         }
     } catch (error) {
         onError(`Error processing response: ${error.message}`);
     }
 };
 
-// Function to process the queue of requests during token refresh
 const processQueue = (error, token = null) => {
-    failedQueue.forEach(prom => {
+    failedQueue.forEach(({ resolve, reject }, index) => {
         if (error) {
-            prom.reject(error);
+            console.error(`Queue item ${index} failed with error:`, error.message);
+            reject(error);
         } else {
-            prom.resolve(token);
+            console.log(`Queue item ${index} retrying with new token.`);
+            resolve(token);
         }
     });
     failedQueue = [];
 };
 
-// Function to handle API calls with token refresh logic
+
 const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess, onError) => {
     try {
         console.log('Attempting API call:', endpoint);
         let response = await fetchFunction(endpoint, options);
-        if (response.status === 401) {
-            console.log('401 Unauthorized, attempting to refresh token...');
-            if (!isRefreshing) {
-                isRefreshing = true;
-                try {
-                    await RefreshToken();
-                    const user = await getUser();
-                    options.headers['Authorization'] = `Bearer ${user.token}`;
-                    console.log('Token refreshed successfully');
-                    processQueue(null, user.token);
-                } catch (refreshError) {
-                    console.error('Token refresh failed:', refreshError);
-                    processQueue(refreshError, null);
-                    if (navigationRef.current) {
-                        navigationRef.current.navigate('Splash');
-                    }
-                } finally {
-                    isRefreshing = false;
-                }
-            }
 
+        if (response.status === 401) {
+            console.log('401 Unauthorized, queuing request and refreshing token...');
+            
+            // Add current request to queue and wait for token refresh
             return new Promise((resolve, reject) => {
-                console.log('Adding request to queue');
                 failedQueue.push({ resolve, reject });
-            }).then(token => {
-                console.log('Retrying request with new token:', token);
+                
+                if (!isRefreshing) {
+                    isRefreshing = true;
+
+                    RefreshToken()
+                        .then(async () => {
+                            const user = await getUser();
+                            options.headers['Authorization'] = `Bearer ${user.token}`;
+                            console.log('Token refreshed successfully');
+
+                            processQueue(null, user.token); // Resolve queued requests
+                        })
+                        .catch((refreshError) => {
+                            console.error('Token refresh failed:', refreshError);
+                            processQueue(refreshError, null); // Reject queued requests
+                            if (navigationRef.current) {
+                                navigationRef.current.navigate('Splash');
+                            }
+                        })
+                        .finally(() => {
+                            isRefreshing = false;
+                        });
+                }
+            }).then((token) => {
                 options.headers['Authorization'] = `Bearer ${token}`;
+                console.log('Retrying request with new token for:', endpoint);
                 return fetchFunction(endpoint, options);
             });
         }
-        return response;
+
+        return response; // Return success response directly if no 401
     } catch (error) {
         console.error('API call failed:', error.message);
         onError(error.message);

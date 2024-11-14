@@ -1,8 +1,9 @@
-import React,{useRef , useEffect} from 'react';
-import { View, Text, StyleSheet, Pressable, Dimensions, ScrollView , findNodeHandle , AccessibilityInfo } from 'react-native';
-import { Color, Padding, Border, FontSize, FontFamily } from "../../../../GlobalStyles";
+import React, { useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, Dimensions, findNodeHandle, AccessibilityInfo } from 'react-native';
+import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import OutageAreaIcon from '../../../res/svgIcons/troubleshooting/OutageAreaIcon';
+import WaveAnimation from '../../common/WaveIcon';
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
@@ -12,8 +13,8 @@ const TroubleshootComponent = ({
     const textRef = useRef(null);
     useEffect(() => {
         const announceText = () => {
-              const reactTag = findNodeHandle(textRef.current);
-              AccessibilityInfo.setAccessibilityFocus(reactTag);
+            const reactTag = findNodeHandle(textRef.current);
+            AccessibilityInfo.setAccessibilityFocus(reactTag);
         };
         setTimeout(announceText, 100)
 
@@ -22,24 +23,27 @@ const TroubleshootComponent = ({
         <View style={styles.container}>
             {pageCount ? <Text style={styles.topLeftText}>1/3</Text> : null}
             <View style={styles.content}>
-                <View style={styles.circle}>
+            <WaveAnimation loading={false} isIssueDetected={true}>
+          <OutageAreaIcon width={80} height={80} />
+        </WaveAnimation>
+                {/* <View style={styles.circle}>
                     <OutageAreaIcon />
-                </View>
-                <View 
-                ref={textRef}
-                accessable={true}
-                accessibilityLiveRegion="assertive"
-                style={styles.spinnerContainer}>
+                </View> */}
+                <View
+                    ref={textRef}
+                    accessable={true}
+                    accessibilityLiveRegion="assertive"
+                    style={styles.spinnerContainer}>
                     <NotificationAlert
                         type="warning"
-                        title={(<Text style={{flexDirection:'column'}}><Text style={styles.textStyle}>Uh oh. You may be experiencing an outage in your area.</Text>
-                        <Text style={styles.textStyle1} >{'Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. '}<Text style={styles.textStyle}> Estimated Time to Restore: {description}</Text></Text>
+                        title={(<Text style={{ flexDirection: 'column' }}><Text style={styles.textStyle}>Uh oh. You may be experiencing an outage in your area.</Text>
+                            <Text style={styles.textStyle1} >{'Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. '}<Text style={styles.textStyle}> Estimated Time to Restore: {description}</Text></Text>
                         </Text>)}
                         showCloseIcon={false}
-                        //message={(<Text >{'Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. '}<Text style={styles.textStyle}> Estimated Time to Restore: {description}</Text></Text>)}
+                    //message={(<Text >{'Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. '}<Text style={styles.textStyle}> Estimated Time to Restore: {description}</Text></Text>)}
                     />
                 </View>
-                
+
             </View>
         </View>
     );
@@ -115,14 +119,14 @@ const styles = StyleSheet.create({
         fontFamily: FontFamily.interBold, // Make sure 'Inter' font is linked in your project
         fontSize: 15,
         fontStyle: 'normal',
-        fontWeight: 'bold', 
+        fontWeight: 'bold',
     },
     textStyle1: {
         color: '#292929',
         fontFamily: FontFamily.openSansRegular, // Make sure 'Inter' font is linked in your project
         fontSize: 15,
         fontStyle: 'normal',
-        fontWeight: 'normal', 
+        fontWeight: 'normal',
     },
     topLeftText: {
         position: 'absolute',

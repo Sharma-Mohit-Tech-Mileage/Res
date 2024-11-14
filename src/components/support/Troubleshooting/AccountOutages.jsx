@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Dimensions, AccessibilityInfo, findNodeHandle } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Dimensions, AccessibilityInfo } from 'react-native';
 import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import WalletIcon from '../../../res/svgIcons/troubleshooting/WalletIcon';
 import { Env } from '../../../network/apis/account/Constants';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
-
+import WaveAnimation from '../../common/WaveIcon';
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
@@ -44,9 +44,9 @@ const TroubleshootComponent = ({ pageCount }) => {
         <View style={styles.container}>
             {pageCount ? <Text style={styles.topLeftText}>2 of 3</Text> : null}
             <View style={styles.content}>
-                <View style={styles.circle}>
-                    <WalletIcon />
-                </View>
+                    <WaveAnimation loading={false} isIssueDetected={true}>
+          <WalletIcon width={80} height={80} />
+        </WaveAnimation>
                 <View
                     ref={alertRef}
                     accessibilityLiveRegion="assertive"
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'space-between',
-        paddingTop: windowHeight * 0.05,
+        paddingTop: windowHeight * 0.00,
         backgroundColor: Color.sparklightWhite,
     },
     content: {
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         width: '100%',
-        paddingHorizontal: Padding.p_base
+        padding: Padding.p_base
     },
     btnContainer: {
         flex: 1,
@@ -129,10 +129,10 @@ const styles = StyleSheet.create({
     button: {
         backgroundColor: Color.colorMidnightblue,
         marginBottom: hp('15%'),
-        width:'90%',
+        width: '90%',
         paddingVertical: Padding.p_3xs,
     },
-    
+
     accept: {
         fontSize: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,
