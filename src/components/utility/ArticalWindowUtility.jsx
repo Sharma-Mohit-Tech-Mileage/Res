@@ -49,23 +49,22 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             webViewRef.current.injectJavaScript(script);
         } else {
             console.warn('WebView ref is not available for injecting JavaScript. Navigating back to Dashboard.');
-            // Navigate back to the Dashboard
             if (navigationRef.current) {
-                navigationRef.current.navigate('Dashboard'); // Replace 'Dashboard' with your dashboard route name
+                navigationRef.current.navigate('Dashboard');
             }
         }
     };
     
 
     const navigationChange = async (navState) => {
-       // setDynamicCookie();  
+       
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
                 setModalOpen(false);
                 setProgress(1);
                 setNavStateReloading(true);
                 try {
-                    await RefreshToken();  // Attempt to refresh the token
+                    await RefreshToken();
                     setTimeout(async () => {
                         await userUpdate();
                     }, 1000);
@@ -80,12 +79,22 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     };
 
     const onMessage = (event) => {
+       
         try {
             const data = JSON.parse(event.nativeEvent.data);
-            if (data !== undefined && data.responseURL !== undefined && data.responseURL.includes('/statements/')) {
+            console.log('File Data',JSON.stringify(data))
+            if (data.type === "XMLHttpRequest" && data.status === 200) {
+                if ((data.responseURL.includes("/statements/") || data.responseURL.includes("/AccountSvc/api/Statement")|| data.responseURL.includes("/accountsvc/api/Statement"))) {
                 const responseData = JSON.parse(data.response);
-                setShowPDFUrl(responseData.fileBinary);
+                
+                    if (responseData.fileBinary) {
+                        const base64Data = responseData.fileBinary;
+                        setShowPDFUrl(base64Data);
                 setShowPDFModal(true);
+                    } else {
+                        console.log('fileBinary is missing, modal will not open');
+                    }
+                }
             }
         } catch (error) {
             console.log('onMessageError: ', error);
@@ -96,7 +105,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         const userLocal = await getUser();
 
         if (userLocal.token === currentUser.token) {
-            console.log('tokens equal each other');
+            console.log('Tokens match, retrying user update');
             setTimeout(async () => {
                 await userUpdate();
             }, 1000);
@@ -112,36 +121,63 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     const userUpdateScript = async (user) => {
         const upgradeToken = await getUpgradeToken();
-        console.log('userUpdateScript: ', user);
-        console.log('upgradeToken.access_token: ', upgradeToken.access_token);
-        user.userInfo['customerType']= "Residential";
+        user.userInfo['customerType'] = "Residential";
+    
         if (user.token !== undefined) {
             const SAVE_FROM_RN = `(function() {
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
                 localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
+    
                 var cookieValue = "MobileApp";
-            var domain = document.location.hostname; 
-            var expirationDate = new Date();
-            expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
-            document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-                var open = XMLHttpRequest.prototype.open;
-                XMLHttpRequest.prototype.open = function() {
+                var domain = document.location.hostname; 
+                var expirationDate = new Date();
+                expirationDate.setTime(expirationDate.getTime() + (365 * 24 * 60 * 60 * 1000)); 
+                document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+    
+                var originalOpen = XMLHttpRequest.prototype.open;
+                XMLHttpRequest.prototype.open = function(method, url) {
                     this.addEventListener("load", function(event) {
-                        if (this.responseURL.match('/account/.*/statements/') !== null) {
-                            var message = {"status" : this.status, "responseURL" : this.responseURL, "response" : this.response}
+                        console.log('Intercepted URL:', url); // Log for debugging
+                        if (url.includes("/statements/") || url.includes("Statement")) {
+                            var message = {
+                                "type": "XMLHttpRequest",
+                                "status": this.status,
+                                "responseURL": this.responseURL,
+                                "response": this.response
+                            };
+                            console.log('Sending message:', message); // Debug log
                             window.ReactNativeWebView.postMessage(JSON.stringify(message));
                         }
                     }); 
-                    open.apply(this, arguments);
-                };                
-              })();`;
-
-            setInitScript(SAVE_FROM_RN);
+                    originalOpen.apply(this, arguments);
+                };
+    
+                var originalFetch = window.fetch;
+                window.fetch = function() {
+                    return originalFetch.apply(this, arguments).then(function(response) {
+                        console.log('Intercepted fetch URL:', response.url); // Log for debugging
+                        if (response.url.includes("/statements/") || response.url.includes("Statement")) {
+                            response.clone().text().then(function(responseText) {
+                                var message = {
+                                    "type": "fetch",
+                                    "status": response.status,
+                                    "responseURL": response.url,
+                                    "response": responseText
+                                };
+                                console.log('Sending fetch message:', message); // Debug log
+                                window.ReactNativeWebView.postMessage(JSON.stringify(message));
+                            });
+                        }
+                        return response;
+                    });
+                };
+            })();`;
+    
+            setInitScript(prevScript => `${prevScript}\n${SAVE_FROM_RN}`);
         }
     };
 
-    // Reset progress and error states when URL changes or modal closes
     useEffect(() => {
         setProgress(0);
         setIsError(false);
@@ -158,7 +194,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     useEffect(() => {
         setCurrentUser(user);
         userUpdateScript(user);
-        setDynamicCookie();  // Set cookie when user is updated
+        setDynamicCookie();
     }, [user]);
 
     useEffect(() => {
@@ -168,8 +204,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     if (webViewRef?.current) {
                         webViewRef.current.reload();
                     } else {
-                        console.warn('WebView ref is not available for reload. Navigating back to Dashboard.');
-                        // Navigate back to the Dashboard
                         if (navigationRef.current) {
                             navigationRef.current.navigate('Dashboard'); 
                         }
@@ -184,8 +218,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         return () => {
             if (subscription) {
                 subscription.remove();
-            } else {
-                console.warn('AppState subscription is not available for removal.');
             }
         };
     }, [appState]);
@@ -193,7 +225,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     
 
     useEffect(() => {
-        setDynamicCookie();  // Push cookie when component is first mounted
+        setDynamicCookie();
     }, [url, modalOpen, appState]);
 
 
@@ -210,13 +242,11 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                         index: 0,
                         routes: [{ name: "MyTab" }],
                       });
-                     //navigation.goBack();
                 }else{
                      navigation.goBack();
                 }
                  setModalOpen(false);
-                  }} 
-                  title={name} />
+            }} title={name} />
             {progress < 1 ? (
                 <View style={styles.progressBar}>
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} /> 
@@ -255,7 +285,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
     progressBar: {
-        height: height * 0.004, // 0.4% of screen height
+        height: height * 0.004,
         backgroundColor: 'lightgrey',
     },
     progress: {
@@ -266,12 +296,13 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: width * 0.05, // 5% of screen width
+        padding: width * 0.05,
     },
     errorText: {
-        fontSize: width * 0.04, // 4% of screen width
-        marginBottom: height * 0.02, // 2% of screen height
-    },activityContainer: {
+        fontSize: width * 0.04,
+        marginBottom: height * 0.02,
+    },
+    activityContainer: {
         alignItems: 'center',
         justifyContent: 'center',
         position: 'absolute',
@@ -279,7 +310,7 @@ const styles = StyleSheet.create({
         left: 0,
         backgroundColor: '#00000000',
         height: '100%',
-        width: '100%'
+        width: '100%',
       }
 });
 
