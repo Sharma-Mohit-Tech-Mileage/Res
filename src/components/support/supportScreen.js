@@ -402,6 +402,8 @@ const Support = ({ route }) => {
                             </React.Fragment>
                         ))}
                     </View>
+                    { userData?.isNormalUser && (
+                        <>
                     <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
                         <View style={[styles.headingContainer, styles.headingContainerSpaceBlock]}>
                             <Text style={[styles.heading, styles.headingTypo]}>
@@ -741,9 +743,12 @@ const Support = ({ route }) => {
                                 </View>
                             </View>
                         </View>
+                        
                     </View>
+                    
                     <View style={[styles.issuesFlexBox]} />
-
+                    </>
+                    )}              
         <CustomerErrorPage
             visible={isAgentNotAvailable}
             message={'Our agents are currently unavailable. Please reach out during our business hours, and we’ll be happy to assist you.Thank you for your understanding!'}

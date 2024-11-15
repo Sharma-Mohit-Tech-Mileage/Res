@@ -186,12 +186,12 @@ const MyTabs = ({ route }) => {
           listeners={({ navigation }) => ({
             tabPress: (e) => {
               e.preventDefault();
-              if (user?.isNormalUser) {
+              //if (user?.isNormalUser) {
                 navigation.reset({
                   index: 0,
                   routes: [{ name: 'Support' }],
                 });
-              }
+              //}
             },
           })}
           options={{
@@ -199,7 +199,7 @@ const MyTabs = ({ route }) => {
             tabBarLabel: 'Support',
             tabBarIcon: ({ focused }) => (
               <View style={styles.tabItem}>
-                {focused ? <SupportIconSelected /> : <SupportIcon isNewBillerUser={!user?.isNormalUser} />}
+                {focused ? <SupportIconSelected /> : <SupportIcon  />}
               </View>
             ),
           }}
