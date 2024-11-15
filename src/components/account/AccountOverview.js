@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
 import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
 import { logout } from 'react-native-app-auth';
+import { getUser } from "../../redux/utils/LocalStorage";
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
 import { Env } from "../../network/apis/account/Constants";
@@ -54,16 +55,17 @@ const logoutAction = (dispatch, navigation) => {
       postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
     }).then((result) => {
       console.log('Logout', result);
-      storeUser({});
-      storeSsoToken({});
-       dispatch(saveUserInfo({}));
-       dispatch(logoutApp());
-      cleanUserData();
+      
       //SetClearTimer();
       navigation.reset({
         index: 0,
         routes: [{ name: 'Splash' }],
       });
+      storeUser({});
+      storeSsoToken({});
+       dispatch(saveUserInfo({}));
+       dispatch(logoutApp());
+      cleanUserData();
     });
   });
 };
@@ -74,16 +76,20 @@ const AccountOverview = () => {
   const [initials, setInitials] = useState('');
   const [menues, setMenues] = useState([]);
   const dispatch = useDispatch();
-  const user = useSelector(state => state.combinedReducers.user.userData);
+  //const user = useSelector(state => state.combinedReducers.user.userData);
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
   useEffect(() => {
     dispatch(fetchProfileDetails());
-    if(user?.userInfo?.accountNumber.toString().length>=16){
-      setMenues(menuItems1)
-    }else{
-      setMenues(menuItems)
-    }
+
+    getUser().then((res) => {
+      if(res.userInfo?.accountNumber.toString().length>=16){
+        setMenues(menuItems1)
+      }else{
+        setMenues(menuItems)
+      }
+    });
+    
   }, []);
 
   const menuItems = [
