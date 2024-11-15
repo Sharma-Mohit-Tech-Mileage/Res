@@ -947,12 +947,13 @@ const styles = StyleSheet.create({
     top: 20,
   },
   bottomCarotStep2: {
-    left: tabWidth * 0.5,
+    left: (tabWidth-20) * 1
   },
   bottomCarotStep3: {
-    left: tabWidth * 1.5,
-  },bottomCarotStep4: {
-    left: tabWidth * 2.5,
+    left: (tabWidth+10) * 2
+  },
+  bottomCarotStep4: {
+    left: tabWidth * 3
   },
   circle: {
     width: 8,
