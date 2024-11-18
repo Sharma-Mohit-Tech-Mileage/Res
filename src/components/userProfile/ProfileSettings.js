@@ -89,6 +89,14 @@ const ProfileSettings = () => {
                   {profileDetails.userName}
                 </Text>
               </View>
+
+              <View style={styles.firstNameParent} accessible={true} >
+                <Text style={styles.firstName}>Account Number</Text>
+                <Text style={[styles.melissa, styles.melissaTypo]}>
+                  {profileDetails.accountNumber}
+                </Text>
+              </View>
+
               <View style={styles.firstNameParent} accessible={true} >
                 <Text style={styles.firstName}>Member Type</Text>
                 <View style={styles.badgeWrapper}>
