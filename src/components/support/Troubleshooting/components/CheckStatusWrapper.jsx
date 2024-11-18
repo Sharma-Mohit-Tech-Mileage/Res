@@ -7,13 +7,13 @@ import WalletIcon from '../../../../res/svgIcons/troubleshooting/WalletIcon';
 import TroubleshootIcon from '../../../../res/svgIcons/troubleshooting/TroubleshootIcon';
 
 const ICON_MAP = {
-  OutageAreaIcon: OutageAreaIcon,
-  ServiceIcon: ServiceIcon,
-  WalletIcon: WalletIcon,
-  TroubleshootIcon: TroubleshootIcon,
+  OutageAreaIcon,
+  ServiceIcon,
+  WalletIcon,
+  TroubleshootIcon,
 };
 
-const CheckStatusWrapper = ({ loading, result, icon, isIssueDetected, description, step }) => {
+const CheckStatusWrapper = ({ loading, result, icon, isIssueDetected, description, step, onComplete ,onMount,isFinished}) => {
   const IconComponent = ICON_MAP[icon];
   const screenHeight = Dimensions.get('window').height;
   
@@ -22,53 +22,90 @@ const CheckStatusWrapper = ({ loading, result, icon, isIssueDetected, descriptio
   const resultRef = useRef(null);
   const descriptionRef = useRef(null);
 
-  useEffect(() => {
-    let timeoutId;
-    
-    const moveFocus = async () => {
-      const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
-      if (!isEnabled) return;
 
-      // Focus step number
-      const stepNode = findNodeHandle(stepRef.current);
-      if (stepNode) {
-        AccessibilityInfo.setAccessibilityFocus(stepNode);
-        
-        // Wait and announce icon status
-        timeoutId = setTimeout(() => {
-          const iconNode = findNodeHandle(iconRef.current);
-          if (iconNode) {
-            AccessibilityInfo.setAccessibilityFocus(iconNode);
-            
-            // If we have a result, focus it after icon
-            if (result) {
-              setTimeout(() => {
-                const resultNode = findNodeHandle(resultRef.current);
-                if (resultNode) {
-                  AccessibilityInfo.setAccessibilityFocus(resultNode);
-                  
-                  // If we have a description, focus it last
-                  if (description && description.trim()) {
-                    setTimeout(() => {
-                      const descriptionNode = findNodeHandle(descriptionRef.current);
-                      if (descriptionNode) {
-                        AccessibilityInfo.setAccessibilityFocus(descriptionNode);
-                      }
-                    }, 1500);
-                  }
-                }
-              }, 1500);
-            }
-          }
-        }, 1500);
+  const calculateDelay = (message) => {
+    const wordCount = message.trim().split(/\s+/).length;
+    const wordsPerMinute = 150; // Slower speaking rate
+    const millisecondsPerWord = (60 / wordsPerMinute) * 1000;
+    const baseDelay = wordCount * millisecondsPerWord;
+    const buffer = 2000; // Fixed 2-second buffer
+    const totalDelay = baseDelay + buffer;
+  
+    return totalDelay;
+  };
+
+  const focusAndAnnounce = async (ref, text) => {
+    const node = findNodeHandle(ref.current);
+    if (node) {
+      AccessibilityInfo.setAccessibilityFocus(node);
+      await new Promise(resolve => setTimeout(resolve, calculateDelay(text)));
+    }
+  };
+
+  useEffect(() => {
+    if (onMount) {
+      const init = async () => {
+        const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+        if (!isEnabled) {
+          onMount();
+        }
+      };
+      init();
+    }
+  }, []); // Empty dependency array for initialization
+  useEffect(() => {
+    const init = async () => {
+      const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+      (isFinished && !isEnabled) && setTimeout(onComplete, 3000);
+    };
+    init();
+  }, [isFinished]);
+
+  useEffect(() => {
+    let isActive = true;
+    
+    const manageFocus = async () => {
+      const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+      if (!isEnabled) {
+        return;
+      }
+
+      try {
+        // Step announcement
+        await focusAndAnnounce(stepRef, `Step ${step} of 3`);
+        if (!isActive) return;
+
+        // Icon status
+        await focusAndAnnounce(iconRef, loading ? 'Check in progress' : isIssueDetected ? 'Issue detected' : 'Check complete');
+        if (!isActive) return;
+
+        // Result
+        if (result) {
+          await focusAndAnnounce(resultRef, result);
+          if (!isActive) return;
+        }
+
+        // Description
+        if (description?.trim()) {
+          await focusAndAnnounce(descriptionRef, description);
+          if (!isActive) return;
+        }
+
+        if (isFinished) {
+          onComplete();
+        }else{
+          onMount(true);
+        }
+      } catch (error) {
+        onComplete?.();
       }
     };
 
-    moveFocus();
+    manageFocus();
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
+      isActive = false;
     };
-  }, [step, loading, result, description]);
+  }, [step, loading, result, description, isIssueDetected, onComplete,isFinished]);
 
   return (
     <View style={styles.container}>
@@ -126,7 +163,6 @@ const CheckStatusWrapper = ({ loading, result, icon, isIssueDetected, descriptio
 };
 
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -144,7 +180,6 @@ const styles = StyleSheet.create({
   resultText: {
     textAlign: 'center',
     fontSize: 22,
-    fontWeight: 'bold',
     color: '#292929',
     lineHeight: 28,
     fontWeight: '400',

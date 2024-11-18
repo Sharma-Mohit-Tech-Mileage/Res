@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {View,Image,StyleSheet, Text, ActivityIndicator, Linking, TouchableOpacity, Modal, Platform, } from "react-native";
+import { View, Image, StyleSheet, Text, ActivityIndicator, Linking, TouchableOpacity, Modal, Platform, } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
-import { saveUserInfo, logError, logInfo, } from "../../redux/actions/UserAction"; 
+import { saveUserInfo, logError, logInfo, } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
@@ -19,7 +19,7 @@ import VersionCheck from "react-native-version-check";
 const config = {
   issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
-  redirectUrl:"com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
+  redirectUrl: "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
   scopes: ["openid", "profile", "email", "phone", "address"],
   iosPrefersEphemeralSession: true,
 };
@@ -57,7 +57,7 @@ const SplashScreen = ({ navigation }) => {
 
   const handleLogin = async (res) => {
     if (res) {
-  
+
       let token = res.jwtToken;
       let userInfo = res.userInfo;
       let user = {
@@ -66,16 +66,16 @@ const SplashScreen = ({ navigation }) => {
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken,
       };
-  
+
       let isNormalUser =
         userInfo &&
-        userInfo.accountNumber &&
-        userInfo.accountNumber.toString().length === 9
+          userInfo.accountNumber &&
+          userInfo.accountNumber.toString().length === 9
           ? true
           : false;
       user['isNormalUser'] = isNormalUser;
       setIsBusiness(false);
-  
+
       if (!isNormalUser) {
         if (res.userInfo.authLevel != "HeadOfHousehold") {
           setErrorMessage(strings.nonAdminUserMsg);
@@ -189,7 +189,6 @@ const SplashScreen = ({ navigation }) => {
       });
   };
   const onError = (error) => {
-    console.log("#################################################Error execute with info ************************************************", error);
     setLoading(false);
     setDisconnected(true);
     dispatch(
@@ -283,8 +282,8 @@ const SplashScreen = ({ navigation }) => {
     try {
       const result = await authorize(config);
       const data = {
-        idToken: null,
-        accessToken: result.accessToken+1,
+        idToken: result.idToken,
+        accessToken: result.accessToken,
         idTokenGuid: result.authorizeAdditionalParameters.session_state,
         refreshToken: result.refreshToken,
       };

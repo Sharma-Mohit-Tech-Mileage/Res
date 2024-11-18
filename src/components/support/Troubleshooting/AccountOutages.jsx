@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Dimensions, AccessibilityInfo } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Dimensions, AccessibilityInfo, findNodeHandle } from 'react-native';
 import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import NotificationAlert from "../../common/customui/NotificationAlert";
@@ -7,68 +7,134 @@ import WalletIcon from '../../../res/svgIcons/troubleshooting/WalletIcon';
 import { Env } from '../../../network/apis/account/Constants';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import WaveAnimation from '../../common/WaveIcon';
+
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
-const TroubleshootComponent = ({ pageCount }) => {
+const TroubleshootComponent = ({ pageCount = 2 }) => {
     const navigation = useNavigation();
+    const stepRef = useRef(null);
+    const iconRef = useRef(null);
     const alertRef = useRef(null);
-    const [isAccessibilityOn, setIsAccessibilityOn] = useState(false);
+    const buttonRef = useRef(null);
+    const [isAnnouncing, setIsAnnouncing] = useState(true);
+
+    const calculateDelay = (text) => {
+        const wordCount = text.trim().split(/\s+/).length;
+        const wordsPerMinute = 150;
+        const millisecondsPerWord = (60 / wordsPerMinute) * 1000;
+        return Math.max(1500, wordCount * millisecondsPerWord);
+    };
+
+    const focusAndAnnounce = async (ref, text) => {
+        const node = findNodeHandle(ref.current);
+        if (node) {
+            AccessibilityInfo.setAccessibilityFocus(node);
+            await new Promise(resolve => setTimeout(resolve, calculateDelay(text)));
+        }
+    };
 
     useEffect(() => {
-        // Check if accessibility is enabled
-        AccessibilityInfo.isScreenReaderEnabled().then((enabled) => {
-            setIsAccessibilityOn(enabled);
-        });
+        let isActive = true;
 
-        // Announce the message if accessibility is on
-        if (isAccessibilityOn) {
-            AccessibilityInfo.announceForAccessibility(
-                " Please click the 'Pay Bill' button below to settle the amount as soon as possible."
-            );
-        }
-    }, [isAccessibilityOn]);
+        const manageFocus = async () => {
+            const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+            if (!isEnabled) {
+                setIsAnnouncing(false);
+                return;
+            }
+
+            try {
+                setIsAnnouncing(true);
+
+                await focusAndAnnounce(stepRef, `Step ${pageCount} of 3`);
+                if (!isActive) return;
+
+                await focusAndAnnounce(iconRef, 'Issue detected');
+                if (!isActive) return;
+
+                await focusAndAnnounce(alertRef, 
+                    "Uh oh! It looks like there's a Past Due balance on your account."
+                );
+                if (!isActive) return;
+
+                await focusAndAnnounce(buttonRef, 'Pay Bill button');
+                
+                setIsAnnouncing(false);
+
+            } catch (error) {
+                console.error('Focus management error:', error);
+                setIsAnnouncing(false);
+            }
+        };
+
+        manageFocus();
+        return () => {
+            isActive = false;
+        };
+    }, [pageCount]);
 
     const handlePress = () => {
-        // Annulment logic if VoiceOver or TalkBack is enabled
-        if (isAccessibilityOn) {
-            return; // Prevent the action if accessibility is on
+        if (!isAnnouncing) {
+            navigation.navigate("ArticalWindowUtility", {
+                url: `${Env.URL}/billing`,
+                name: "Billing Details",
+            });
         }
-        navigation.navigate("ArticalWindowUtility", {
-            url: `${Env.URL}/billing`,
-            name: "Billing Details",
-        });
     };
 
     return (
         <View style={styles.container}>
-            {pageCount ? <Text style={styles.topLeftText}>2 of 3</Text> : null}
+            <Text 
+                ref={stepRef}
+                style={styles.topLeftText}
+                accessible={true}
+                accessibilityRole="text"
+                accessibilityLabel={`Step ${pageCount} of 3`}
+            >
+                {pageCount} of 3
+            </Text>
+            
             <View style={styles.content}>
+                <View 
+                    ref={iconRef}
+                    accessible={true}
+                    accessibilityRole="image"
+                    accessibilityLabel="Issue detected"
+                >
                     <WaveAnimation loading={false} isIssueDetected={true}>
-          <WalletIcon width={80} height={80} />
-        </WaveAnimation>
+                        <WalletIcon width={80} height={80} />
+                    </WaveAnimation>
+                </View>
+
                 <View
                     ref={alertRef}
-                    accessibilityLiveRegion="assertive"
-                    accessibility={true}
                     style={styles.spinnerContainer}
+                    accessible={true}
+                    accessibilityRole="alert"
                 >
                     <NotificationAlert
                         type="warning"
-                        title={
-                            <Text style={styles.textStyle}>
-                                Uh oh. Looks like there is a past due balance on your account.
-                            </Text>
-                        }
+                        title="Uh oh. Looks like there is a past due balance on your account."
                         showCloseIcon={false}
-                        accessibilityLabel="Uh oh! It looks like there’s a Past Due balance on your account. Please click the 'Pay Bill' button below to settle the amount as soon as possible."
                     />
                 </View>
-                <View style={[styles.button]}>
-                    <Pressable onPress={handlePress}>
-                        <Text style={[styles.accept]}>Pay Bill</Text>
-                    </Pressable>
-                </View>
+
+                <Pressable 
+                    ref={buttonRef}
+                    onPress={handlePress}
+                    style={[
+                        styles.button,
+                        isAnnouncing && styles.buttonDisabled
+                    ]}
+                    accessible={true}
+                    accessibilityRole="button"
+                    accessibilityLabel="Pay Bill"
+                    accessibilityHint="Navigates to billing details"
+                    disabled={isAnnouncing}
+                >
+                    <Text style={styles.accept}>Pay Bill</Text>
+                </Pressable>
             </View>
         </View>
     );
@@ -78,7 +144,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'space-between',
-        paddingTop: windowHeight * 0.00,
+        paddingTop: windowHeight * 0.05,
         backgroundColor: Color.sparklightWhite,
     },
     content: {
@@ -87,44 +153,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     spinnerContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        width: '100%',
-        padding: Padding.p_base
-    },
-    btnContainer: {
-        flex: 1,
         justifyContent: 'center',
         width: '90%',
-    },
-    circle: {
-        width: windowWidth * 0.5,
-        height: windowWidth * 0.5,
-        borderRadius: (windowWidth * 0.5) / 2,
-        backgroundColor: '#FFFFFF',
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        marginBottom: 20,
-    },
-    title: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#292929',
-        textAlign: 'center',
-        lineHeight: 28,
-        fontWeight: '400',
-    },
-    description: {
-        lineHeight: 28,
-        fontWeight: '400',
-        fontSize: 16,
-        color: '#4C5458',
-        textAlign: 'center',
+        marginVertical: Padding.p_base,
     },
     button: {
         backgroundColor: Color.colorMidnightblue,
@@ -132,7 +163,9 @@ const styles = StyleSheet.create({
         width: '90%',
         paddingVertical: Padding.p_3xs,
     },
-
+    buttonDisabled: {
+        opacity: 0.7,
+    },
     accept: {
         fontSize: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,
@@ -141,22 +174,23 @@ const styles = StyleSheet.create({
     },
     textStyle: {
         color: '#292929',
-        fontFamily: FontFamily.interBold, // Make sure 'Inter' font is linked in your project
+        fontFamily: FontFamily.interBold,
         fontSize: 15,
         fontStyle: 'normal',
-        fontWeight: 'bold', // '700' is equivalent to 'bold' in React Native
-        lineHeight: 18, // React Native requires a numeric value for lineHeight
+        fontWeight: 'bold',
+        lineHeight: 18,
     },
     topLeftText: {
         position: 'absolute',
-        top: 0,
-        left: 0,
+        top: 16,
+        left: 16,
         color: '#292929',
         fontFamily: 'Open Sans',
         fontSize: 16,
         fontWeight: '700',
         lineHeight: 28,
-        padding: 10, // Add some padding around the text
+        padding: 10,
+        zIndex: 1,
     },
 });
 

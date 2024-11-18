@@ -18,7 +18,30 @@ const windowWidth = Dimensions.get("window").width;
 
 const ModemHealthy = () => {
   const navigation = useNavigation();
+
+  const stepRef = useRef(null);
+  const iconRef = useRef(null);
   const alertRef = useRef(null);
+
+  const focusElement = (ref) => {
+    const node = findNodeHandle(ref?.current);
+    if (node) {
+      AccessibilityInfo.setAccessibilityFocus(node);
+    }
+  };
+
+  useEffect(() => {
+    const manageFocus = async () => {
+      const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+      if (!isEnabled) return;
+
+      focusElement(stepRef);
+      focusElement(iconRef);
+      focusElement(alertRef);
+    };
+
+    manageFocus();
+  }, []);
 
   useEffect(() => {
     const announceText = () => {
@@ -48,24 +71,37 @@ const ModemHealthy = () => {
       >
         <ScrollView style={{ marginBottom: 20 }}>
           <View style={styles.container}>
-            <Text style={styles.topLeftText}>3 of 3</Text>
+          <Text 
+              ref={stepRef}
+              style={styles.topLeftText}
+              accessible={true}
+              accessibilityRole="header"
+              importantForAccessibility="yes"
+              accessibilityLabel="Step 3 of 3"
+            >
+              3 of 3
+            </Text>
             <View style={styles.content}>
-            <WaveAnimation loading={false} isIssueDetected={false}>
-          <ServiceIcon width={80} height={80} />
-        </WaveAnimation>
-              {/* <View style={styles.circle}>
-                <ServiceIcon />
-              </View> */}
-{/* 
-              <View style={{ justifyContent: "center", paddingVertical: 8 }}>
-                <SuccessIcon />
-              </View> */}
+              <View 
+                ref={iconRef}
+                accessible={true}
+                accessibilityRole="image"
+                importantForAccessibility="yes"
+                accessibilityLabel="Service check complete, no issues detected"
+              >
+                <WaveAnimation loading={false} isIssueDetected={false}>
+                  <ServiceIcon width={80} height={80} />
+                </WaveAnimation>
+              </View>
 
               <View
                 ref={alertRef}
-                accessibilityLiveRegion="assertive"
-                accessibility={true}
-                style={{ justifyContent: "center", paddingVertical: 8 }}>
+                accessible={true}
+                accessibilityRole="alert"
+                importantForAccessibility="yes"
+                accessibilityLabel="No service issues were detected"
+                style={{ justifyContent: "center", paddingVertical: 8 }}
+              >
                 <Text style={styles.title}>
                   {"No service issues were detected."}
                 </Text>

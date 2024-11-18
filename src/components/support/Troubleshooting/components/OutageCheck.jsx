@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { AccessibilityInfo } from 'react-native';
-import CheckStatusWrapper from './CheckStatusWrapper';
+import React, { useState } from 'react';
 import { GetApiRequest } from "../../../../network/APIClient";
 import moment from "moment";
+import CheckStatusWrapper from './CheckStatusWrapper';
+
 const OutageCheck = ({
   accountNumber,
   onComplete,
@@ -12,61 +12,60 @@ const OutageCheck = ({
   step,
 }) => {
   const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState("Checking for outage in your area..."); // Initial message
+  const [result, setResult] = useState("Checking for outage in your area...");
   const [issueDetected, setIsIssueDetected] = useState(false);
-  useEffect(() => {
-    const initialDelay = setTimeout(() => {
-      AccessibilityInfo.isScreenReaderEnabled().then((isEnabled) => {
-        if (isEnabled) {
-          AccessibilityInfo.announceForAccessibility(result);
-          performOutageCheck(isEnabled);
-        } else {
-          performOutageCheck(false); // Normal flow
-        }
-      });
-    }, 3000); // Wait 3 seconds to display initial message
+  const [description, setDescription] = useState("");
+  const [isFinished, setIsFinished] = useState(false);
 
-    return () => clearTimeout(initialDelay); // Cleanup on unmount
-  }, []);
-
-  const performOutageCheck = async (isAccessibilityEnabled) => {
-    const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${accountNumber}`;
-    GetApiRequest(
-      request,
-      (response) => {
-        if (response?.hasOutage) {
-          let time = moment(response.estimatedTimeOfResolution).format("LT");
-          setResult("Outage detected in your area.");
-          setEstimatedRestoreTime(time);
-          setOutageIssueDetected(true);
-          setIssueDetected(true);
-          setIsIssueDetected(true);
-        } else {
-          setResult("No outage were detected in your area...");
-        }
-        setLoading(false);
-        handlePostResult(isAccessibilityEnabled);
-      },
-      () => {
-        setResult("Error fetching outage status.");
-        setLoading(false);
-        handlePostResult(false); // Error still moves forward after 5s
+  const handleOutageCheck = (response, startTime, isAccessibilityEnabled) => {
+    const updateState = () => {
+      if (response?.hasOutage) {
+        const time = moment(response.estimatedTimeOfResolution).format("LT");
+        setResult("Outage detected in your area.");
+        setDescription(`Estimated restore time: ${time}`);
+        setEstimatedRestoreTime(time);
+        setOutageIssueDetected(true);
+        setIssueDetected(true);
+        setIsIssueDetected(true);
+      } else {
+        setResult("No outage were detected in your area...");
       }
-    );
+      setLoading(false);
+      setIsFinished(true);
+    };
+
+    if (!isAccessibilityEnabled) {
+      const elapsedTime = Date.now() - startTime;
+      setTimeout(updateState, Math.max(5000 - elapsedTime, 0));
+    } else {
+      updateState();
+    }
   };
 
-  const handlePostResult = (isAccessibilityEnabled) => {
-    if (isAccessibilityEnabled) {
-      const finishListener = AccessibilityInfo.addEventListener(
-        'announcementFinished',
-        () => {
-          setTimeout(onComplete, 5000); // 5 seconds after announcement
-          finishListener.remove();
-        }
-      );
+  const handleError = (startTime, isAccessibilityEnabled) => {
+    const updateState = () => {
+      setResult("Error fetching outage status.");
+      setLoading(false);
+      setIsFinished(true);
+    };
+
+    if (!isAccessibilityEnabled) {
+      const elapsedTime = Date.now() - startTime;
+      setTimeout(updateState, Math.max(5000 - elapsedTime, 0));
     } else {
-      setTimeout(onComplete, 5000); // Standard 5-second wait in normal flow
+      updateState();
     }
+  };
+
+  const performOutageCheck = async (isAccessibilityEnabled) => {
+    const startTime = Date.now();
+    const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${accountNumber}`;
+
+    GetApiRequest(
+      request,
+      (response) => handleOutageCheck(response, startTime, isAccessibilityEnabled),
+      () => handleError(startTime, isAccessibilityEnabled)
+    );
   };
 
   return (
@@ -75,7 +74,11 @@ const OutageCheck = ({
       result={result}
       icon="OutageAreaIcon"
       isIssueDetected={issueDetected}
+      description={description}
       step={step}
+      onComplete={onComplete}
+      onMount={performOutageCheck}
+      isFinished={isFinished}
     />
   );
 };

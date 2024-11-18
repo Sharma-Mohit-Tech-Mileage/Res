@@ -1,116 +1,71 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { AccessibilityInfo } from 'react-native';
+import React, { useState } from 'react';
+import { GetApiRequest, GetModemStatusApiRequest } from "../../../../network/APIClient";
 import { useNavigation } from "@react-navigation/native";
 import CheckStatusWrapper from './CheckStatusWrapper';
-import { GetApiRequest, GetModemStatusApiRequest } from "../../../../network/APIClient";
-
-const calculateDelay = (message) => {
-  const wordCount = message.trim().split(/\s+/).length;
-  const wordsPerMinute = 150; // Slower speaking rate
-  const millisecondsPerWord = (60 / wordsPerMinute) * 1000;
-  const baseDelay = wordCount * millisecondsPerWord;
-  const buffer = 2000; // Fixed 2-second buffer
-  const totalDelay = baseDelay + buffer;
-
-  console.log(`
-    Message: "${message}"
-    Words: ${wordCount}
-    Delay: ${totalDelay}ms
-  `);
-
-  return totalDelay;
-};
 
 const ServiceCheck = ({ accountNumber, onComplete, step }) => {
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState("Checking for service issues...");
   const [issueDetected, setIssueDetected] = useState(false);
-  const isAnnouncingRef = useRef(false);
-  const navigation = useNavigation();
+  const [description, setDescription] = useState("");
+  const [isFinished, setIsFinished] = useState(false);
 
-  const handleAnnouncement = async (message, nextAction) => {
-    const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
-    if (!isEnabled) {
-      nextAction();
-      return;
-    }
+  const updateUIState = (data, startTime, isAccessibilityEnabled) => {
+    const {
+      resultText,
+      descriptionText,
+      hasIssue,
+      navigateTo
+    } = data;
 
-    isAnnouncingRef.current = true;
-    console.log('Announcing:', message);
-    AccessibilityInfo.announceForAccessibility(message);
-    
-    const delay = calculateDelay(message);
-    setTimeout(() => {
-      isAnnouncingRef.current = false;
-      nextAction();
-    }, delay);
-  };
-
-  useEffect(() => {
-    let mounted = true;
-
-    const startCheck = async () => {
-      await handleAnnouncement(`Step ${step} of 3`, () => {
-        handleAnnouncement("Starting service check", () => {
-          handleAnnouncement(result, () => {
-            if (mounted && !isAnnouncingRef.current) {
-              fetchInternetPlanDetails();
-            }
-          });
-        });
-      });
+    const updateState = () => {
+      setResult(resultText);
+      setDescription(descriptionText || "");
+      setIssueDetected(hasIssue);
+      setLoading(false);
+      setIsFinished(true);
+      setTimeout(() => {
+        navigation.navigate(navigateTo, hasIssue ? { isError: true } : undefined);
+      }, 3000);
     };
 
-    startCheck();
-    return () => { mounted = false; };
-  }, []);
-
-  // All API-related functions remain exactly the same
-  const fetchInternetPlanDetails = () => {
-    const request = `internet/api/internet/${accountNumber}/plan`;
-
-    GetApiRequest(
-      request,
-      (response) => {
-        if (response?.length > 0) {
-          let macAddress = response[0].macAddress;
-
-          if (accountNumber === "128387263") macAddress = "bc:3e:07:38:56:d0";
-          else if (accountNumber === "902880244") macAddress = "bc:3e:07:38:56:d0";
-          else if (accountNumber === "902880236") macAddress = "28:7a:ee:8e:cf:8c";
-          else if (accountNumber === "902880079") macAddress = "00:40:36:5f:cc:7f";
-          else if (accountNumber === "136885142") macAddress = "20:73:55:89:c7:00";
-
-          checkModemHealth(macAddress);
-        } else {
-          handleErrorResult();
-        }
-      },
-      () => {
-        handleErrorResult();
-      }
-    );
+    if (!isAccessibilityEnabled) {
+      const elapsedTime = Date.now() - startTime;
+      setTimeout(updateState, Math.max(5000 - elapsedTime, 0));
+    } else {
+      updateState();
+    }
   };
 
-  const checkModemHealth = (macAddress) => {
-    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
-
-    GetModemStatusApiRequest(
-      request,
-      (response) => {
-        if (response?.Modem_State === "Online") {
-          analyzeAndUpdateModemStatus(response);
-        } else {
-          handleServiceIssueResult();
-        }
-      },
-      () => {
-        handleErrorResult();
-      }
-    );
+  const handleSuccessResult = (startTime, isAccessibilityEnabled) => {
+    updateUIState({
+      resultText: "No service issues were detected.",
+      descriptionText: "Your equipment is working properly.",
+      hasIssue: false,
+      navigateTo: "ModemHealthy"
+    }, startTime, isAccessibilityEnabled);
   };
 
-  const analyzeAndUpdateModemStatus = (response) => {
+  const handleServiceIssueResult = (startTime, isAccessibilityEnabled) => {
+    updateUIState({
+      resultText: "Service issues were detected.",
+      descriptionText: "Your equipment needs attention.",
+      hasIssue: true,
+      navigateTo: "ManageEquipment"
+    }, startTime, isAccessibilityEnabled);
+  };
+
+  const handleErrorResult = (startTime, isAccessibilityEnabled) => {
+    updateUIState({
+      resultText: "Error checking service status.",
+      descriptionText: "Unable to verify equipment status.",
+      hasIssue: true,
+      navigateTo: "ManageEquipment"
+    }, startTime, isAccessibilityEnabled);
+  };
+
+  const analyzeAndUpdateModemStatus = (response, startTime, isAccessibilityEnabled) => {
     const statusMetrics = response.EquipmentType === "DOCSIS"
       ? [response.UTxP_State, response.URxL_State, response.USNR_State, response.DSNR_State, response.DRxL_State]
       : [response.ONUTP_State, response.OLTRP_State, response.ONURP_State];
@@ -118,49 +73,50 @@ const ServiceCheck = ({ accountNumber, onComplete, step }) => {
     const hasIssues = statusMetrics.some((state) => state === "Red" || state === "Yellow");
 
     if (hasIssues) {
-      handleServiceIssueResult();
+      handleServiceIssueResult(startTime, isAccessibilityEnabled);
     } else {
-      handleSuccessResult();
+      handleSuccessResult(startTime, isAccessibilityEnabled);
     }
   };
 
-  const handleSuccessResult = () => {
-    setResult("No service issues were detected.");
-    setIssueDetected(false);
-    setLoading(false);
+  const checkModemHealth = (macAddress, startTime, isAccessibilityEnabled) => {
+    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
 
-    handleAnnouncement("No service issues were detected", () => {
-      handleAnnouncement("Check complete. Proceeding to healthy status", () => {
-        navigation.navigate("ModemHealthy");
-        onComplete();
-      });
-    });
+    GetModemStatusApiRequest(
+      request,
+      (response) => {
+        if (response?.Modem_State === "Online") {
+          analyzeAndUpdateModemStatus(response, startTime, isAccessibilityEnabled);
+        } else {
+          handleServiceIssueResult(startTime, isAccessibilityEnabled);
+        }
+      },
+      () => handleErrorResult(startTime, isAccessibilityEnabled)
+    );
   };
 
-  const handleServiceIssueResult = () => {
-    setResult("Service issues were detected.");
-    setIssueDetected(true);
-    setLoading(false);
+  const fetchInternetPlanDetails = (isAccessibilityEnabled) => {
+    const startTime = Date.now();
+    const request = `internet/api/internet/${accountNumber}/plan`;
 
-    handleAnnouncement("Service issues were detected", () => {
-      handleAnnouncement("Check complete. Proceeding to equipment management", () => {
-        navigation.navigate("ManageEquipment", { isError: true });
-        onComplete();
-      });
-    });
-  };
-
-  const handleErrorResult = () => {
-    setResult("Error checking service status.");
-    setIssueDetected(true);
-    setLoading(false);
-
-    handleAnnouncement("Error checking service status", () => {
-      handleAnnouncement("Check complete. Proceeding to equipment management", () => {
-        navigation.navigate("ManageEquipment", { isError: true });
-        onComplete();
-      });
-    });
+    GetApiRequest(
+      request,
+      (response) => {
+        if (response?.length > 0) {
+          let macAddress = response[0].macAddress;
+          if (accountNumber === "128387263") macAddress = "bc:3e:07:38:56:d0";
+          else if (accountNumber === "902880244") macAddress = "bc:3e:07:38:56:d0";
+          else if (accountNumber === "902880236") macAddress = "28:7a:ee:8e:cf:8c";
+          else if (accountNumber === "902880079") macAddress = "00:40:36:5f:cc:7f";
+          else if (accountNumber === "136885142") macAddress = "20:73:55:89:c7:00";
+          
+          checkModemHealth(macAddress, startTime, isAccessibilityEnabled);
+        } else {
+          handleErrorResult(startTime, isAccessibilityEnabled);
+        }
+      },
+      () => handleErrorResult(startTime, isAccessibilityEnabled)
+    );
   };
 
   return (
@@ -169,7 +125,11 @@ const ServiceCheck = ({ accountNumber, onComplete, step }) => {
       result={result}
       icon="ServiceIcon"
       isIssueDetected={issueDetected}
+      description={description}
       step={step}
+      onComplete={onComplete}
+      onMount={fetchInternetPlanDetails}
+      isFinished={isFinished}
     />
   );
 };

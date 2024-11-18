@@ -4,46 +4,95 @@ import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import OutageAreaIcon from '../../../res/svgIcons/troubleshooting/OutageAreaIcon';
 import WaveAnimation from '../../common/WaveIcon';
+
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
 const TroubleshootComponent = ({
-    step, title, description, success, pageCount
+    step = 1,
+    title,
+    description,
+    success,
+    pageCount
 }) => {
-    const textRef = useRef(null);
-    useEffect(() => {
-        const announceText = () => {
-            const reactTag = findNodeHandle(textRef.current);
-            AccessibilityInfo.setAccessibilityFocus(reactTag);
-        };
-        setTimeout(announceText, 100)
+    const stepRef = useRef(null);
+    const iconRef = useRef(null);
+    const alertRef = useRef(null);
 
-    }, []);
+    const focusAndAnnounce = async (ref, text) => {
+        const node = findNodeHandle(ref.current);
+        if (node) {
+            AccessibilityInfo.setAccessibilityFocus(node);
+            AccessibilityInfo.announceForAccessibility(text);
+        }
+    };
+
+    useEffect(() => {
+        const manageFocus = async () => {
+            const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+            if (!isEnabled) return;
+
+            try {
+                // Step announcement
+                await focusAndAnnounce(stepRef, `Step ${step} of 3`);
+                
+                // Icon status
+                await focusAndAnnounce(iconRef, 'Outage detected in your area');
+
+                // Alert message
+                await focusAndAnnounce(alertRef, 
+                    `Uh oh. You may be experiencing an outage in your area. Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. Estimated Time to Restore: ${description}`
+                );
+            } catch (error) {
+                console.error('Focus management error:', error);
+            }
+        };
+
+        manageFocus();
+    }, [step, description]);
+
     return (
         <View style={styles.container}>
-            {pageCount ? <Text style={styles.topLeftText}>1/3</Text> : null}
+            <Text 
+                ref={stepRef}
+                style={styles.topLeftText}
+                accessible={true}
+                accessibilityRole="header"
+                importantForAccessibility="yes"
+                accessibilityLabel={`Step ${step} of 3`}
+            >
+                {step}/3
+            </Text>
+
             <View style={styles.content}>
-            <WaveAnimation loading={false} isIssueDetected={true}>
-          <OutageAreaIcon width={80} height={80} />
-        </WaveAnimation>
-                {/* <View style={styles.circle}>
-                    <OutageAreaIcon />
-                </View> */}
                 <View
-                    ref={textRef}
-                    accessable={true}
-                    accessibilityLiveRegion="assertive"
-                    style={styles.spinnerContainer}>
+                    ref={iconRef}
+                    accessible={true}
+                    accessibilityRole="image"
+                    importantForAccessibility="yes"
+                    accessibilityLabel="Outage detected in your area"
+                >
+                    <WaveAnimation loading={false} isIssueDetected={true}>
+                        <OutageAreaIcon width={80} height={80} />
+                    </WaveAnimation>
+                </View>
+
+                <View
+                    ref={alertRef}
+                    style={styles.spinnerContainer}
+                    accessible={true}
+                    accessibilityRole="alert"
+                    importantForAccessibility="yes"
+                >
+                   
                     <NotificationAlert
                         type="warning"
                         title={(<Text style={{ flexDirection: 'column' }}><Text style={styles.textStyle}>Uh oh. You may be experiencing an outage in your area.</Text>
                             <Text style={styles.textStyle1} >{'Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. '}<Text style={styles.textStyle}> Estimated Time to Restore: {description}</Text></Text>
                         </Text>)}
                         showCloseIcon={false}
-                    //message={(<Text >{'Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. '}<Text style={styles.textStyle}> Estimated Time to Restore: {description}</Text></Text>)}
                     />
                 </View>
-
             </View>
         </View>
     );
@@ -67,66 +116,20 @@ const styles = StyleSheet.create({
         width: '100%',
         paddingHorizontal: Padding.p_base
     },
-    btnContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        width: '50%',
-    },
-    circle: {
-        width: windowWidth * 0.5,
-        height: windowWidth * 0.5,
-        borderRadius: (windowWidth * 0.5) / 2,
-        backgroundColor: '#FFFFFF',
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        marginBottom: 20,
-        overflow: 'hidden',
-    },
-    title: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#292929',
-        textAlign: 'center',
-        lineHeight: 28,
-        fontWeight: '400',
-    },
-    description: {
-        lineHeight: 28,
-        fontWeight: '400',
-        fontSize: 16,
-        color: '#4C5458',
-        textAlign: 'center',
-    },
-    button: {
-        backgroundColor: Color.colorMidnightblue,
-        marginBottom: 20,
-        paddingVertical: Padding.p_base,
-    },
-
-    accept: {
-        fontSize: FontSize.size_base,
-        fontFamily: FontFamily.openSansRegular,
-        textAlign: "center",
-        color: Color.sparklightWhite,
-    },
     textStyle: {
         color: '#292929',
-        fontFamily: FontFamily.interBold, // Make sure 'Inter' font is linked in your project
+        fontFamily: FontFamily.interBold,
         fontSize: 15,
         fontStyle: 'normal',
         fontWeight: 'bold',
     },
     textStyle1: {
         color: '#292929',
-        fontFamily: FontFamily.openSansRegular, // Make sure 'Inter' font is linked in your project
+        fontFamily: FontFamily.openSansRegular,
         fontSize: 15,
         fontStyle: 'normal',
         fontWeight: 'normal',
+        marginTop: 8,
     },
     topLeftText: {
         position: 'absolute',
@@ -137,7 +140,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '700',
         lineHeight: 28,
-        padding: 10, // Add some padding around the text
+        padding: 10,
     },
 });
 

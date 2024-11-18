@@ -51,9 +51,9 @@ const TroubleshootContainer = () => {
       <ProfileSettingsHeader title="Troubleshooting" />
       <SafeAreaView style={styles.safeArea}>
         {outageIssueDetected ? (
-          <OutagesAlert ref={focusRef} description={estimatedRestoreTime} />
+          <OutagesAlert description={estimatedRestoreTime} />
         ) : billIssueDetected ? (
-          <AccountOutages ref={focusRef} />
+          <AccountOutages  />
         ) : (
           <Animated.View
             key={currentStep}
