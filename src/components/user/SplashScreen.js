@@ -57,7 +57,6 @@ const SplashScreen = ({ navigation }) => {
 
   const handleLogin = async (res) => {
     if (res) {
-      console.log("[HANDLE_LOGIN] Received response:***********************************************************************", res.jwtToken);
   
       let token = res.jwtToken;
       let userInfo = res.userInfo;
@@ -68,29 +67,23 @@ const SplashScreen = ({ navigation }) => {
         refreshToken: res.refreshToken,
       };
   
-      console.log("[HANDLE_LOGIN] Parsed user info:", JSON.stringify(user));
-  
       let isNormalUser =
         userInfo &&
         userInfo.accountNumber &&
         userInfo.accountNumber.toString().length === 9
           ? true
           : false;
-      console.log("[HANDLE_LOGIN] Is normal user:", isNormalUser);
       user['isNormalUser'] = isNormalUser;
       setIsBusiness(false);
   
       if (!isNormalUser) {
-        console.log("[HANDLE_LOGIN] User is not a normal residential user.");
         if (res.userInfo.authLevel != "HeadOfHousehold") {
-          console.log("[HANDLE_LOGIN] User is not HeadOfHousehold.");
           setErrorMessage(strings.nonAdminUserMsg);
           setErrorMessage1(" to view information.");
           setTimeout(() => {
             setModalVisible(true);
           }, 100);
         } else if (res.userInfo.customerType === "COM") {
-          console.log("[HANDLE_LOGIN] User is a Business user.");
           setIsBusiness(true);
           setErrorMessage(strings.BusinessUserMsg);
           setErrorMessage1(" to manage your Sparklight Business services account.");
@@ -98,16 +91,13 @@ const SplashScreen = ({ navigation }) => {
             setModalVisible(true);
           }, 500);
         } else if (res.userInfo.acctStatus != "Normal") {
-          console.log("[HANDLE_LOGIN] User account status is not Normal:", res.userInfo.acctStatus);
           setTimeout(() => {
             setDisconnected(true);
           }, 500);
         } else {
-          console.log("[HANDLE_LOGIN] Normal user, proceeding to move after login.");
           moveAfterLogin(user);
         }
       } else if (res.userInfo.acctStatus === "Disconnect") {
-        console.log("[HANDLE_LOGIN] User account is disconnected.");
         setTimeout(() => {
           setDisconnected(true);
         }, 500);
@@ -115,18 +105,12 @@ const SplashScreen = ({ navigation }) => {
         (userInfo.authLevel !== "HeadOfHousehold" && userInfo.authLevel !== "Admin") ||
         userInfo.acctStatus !== "Active"
       ) {
-        console.log(
-          "[HANDLE_LOGIN] User does not have the required auth level or account is not active.",
-          "Auth Level:", userInfo.authLevel,
-          "Account Status:", userInfo.acctStatus
-        );
         setErrorMessage(strings.nonAdminUserMsg);
         setErrorMessage1(" to view information.");
         setTimeout(() => {
           setModalVisible(true);
         }, 100);
       } else if (userInfo.customerType != "Residential") {
-        console.log("[HANDLE_LOGIN] User is not Residential, customer type:", userInfo.customerType);
         setIsBusiness(true);
         setErrorMessage(strings.BusinessUserMsg);
         setErrorMessage1(" to manage your Sparklight Business services account");
@@ -134,28 +118,24 @@ const SplashScreen = ({ navigation }) => {
           setModalVisible(true);
         }, 100);
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
-        console.log("[HANDLE_LOGIN] User has Limited or Restricted auth level:", userInfo.authLevel);
         setErrorMessage(strings.nonAdminUserMsg);
         setErrorMessage1(' to view information.');
         setTimeout(() => {
           setModalVisible(true);
         }, 100);
       } else if (userInfo.customerType === 'Business') {
-        console.log("[HANDLE_LOGIN] User is a Business user.");
         setErrorMessage(strings.BusinessUserMsg);
         setErrorMessage1(' to view information.');
         setTimeout(() => {
           setModalVisible(true);
         }, 100);
       } else if (res.custServices.internet == false) {
-        console.log("[HANDLE_LOGIN] User does not have internet service.");
         setErrorMessage(strings.nonInternetUserMessage);
         setErrorMessage1(" to manage your service.");
         setTimeout(() => {
           setModalVisible(true);
         }, 100);
       } else {
-        console.log("[HANDLE_LOGIN] All checks passed, proceeding to move after login.");
         moveAfterLogin(user);
       }
     } else {
@@ -197,20 +177,19 @@ const SplashScreen = ({ navigation }) => {
             }
           })
           .catch((error) => {
-            console.error("Logout error:", error);
             if (postLogoutCallback) {
               postLogoutCallback();
             }
           });
       })
       .catch((error) => {
-        console.error("Error getting SSO token:", error);
         if (postLogoutCallback) {
           postLogoutCallback();
         }
       });
   };
   const onError = (error) => {
+    console.log("#################################################Error execute with info ************************************************", error);
     setLoading(false);
     setDisconnected(true);
     dispatch(
@@ -304,8 +283,8 @@ const SplashScreen = ({ navigation }) => {
     try {
       const result = await authorize(config);
       const data = {
-        idToken: result.idToken,
-        accessToken: result.accessToken,
+        idToken: null,
+        accessToken: result.accessToken+1,
         idTokenGuid: result.authorizeAdditionalParameters.session_state,
         refreshToken: result.refreshToken,
       };
@@ -315,7 +294,6 @@ const SplashScreen = ({ navigation }) => {
       callSSOLoginApi(data);
     } catch (error) {
       setLoginEnable(true);
-      console.log(error);
       setLoginEnable(true);
     }
   };
@@ -343,7 +321,6 @@ const SplashScreen = ({ navigation }) => {
         }
       } catch (error) {
         setLoginEnable(true);
-        console.error("Error fetching data", error);
       }
     };
 

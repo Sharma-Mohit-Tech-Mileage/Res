@@ -1,8 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { AccessibilityInfo } from 'react-native';
 import CheckStatusWrapper from './CheckStatusWrapper';
 import { GetApiRequest } from "../../../../network/APIClient";
 import moment from "moment";
+
+// Keep existing calculateDelay for accessibility
+const calculateDelay = (message) => {
+  const wordCount = message.trim().split(/\s+/).length;
+  const wordsPerMinute = 150;
+  const millisecondsPerWord = (60 / wordsPerMinute) * 1000;
+  const baseDelay = wordCount * millisecondsPerWord;
+  const minimumBuffer = 2000;
+  const wordBuffer = wordCount * 200;
+  const totalBuffer = Math.max(minimumBuffer, wordBuffer);
+  const totalDelay = Math.round(baseDelay + totalBuffer);
+  
+  console.log(`
+    Announcement: "${message}"
+    Word Count: ${wordCount}
+    Base Delay: ${baseDelay}ms
+    Buffer Added: ${totalBuffer}ms
+    Total Delay: ${totalDelay}ms
+  `);
+
+  return totalDelay;
+};
+
 const AccountCheck = ({
   accountNumber,
   onComplete,
@@ -11,65 +34,163 @@ const AccountCheck = ({
   step,
 }) => {
   const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState("Checking for account issues..."); // Initial message
+  const [result, setResult] = useState("Checking for account issues...");
   const [issueDetected, setIsIssueDetected] = useState(false);
-  useEffect(() => {
-    const initialDelay = setTimeout(() => {
-      AccessibilityInfo.isScreenReaderEnabled().then((isEnabled) => {
-        if (isEnabled) {
-          AccessibilityInfo.announceForAccessibility(result);
-          performAccountCheck(isEnabled);
-        } else {
-          performAccountCheck(false); // Normal flow
-        }
-      });
-    }, 3000); // Wait for 3 seconds before starting the API call
+  const isAnnouncingRef = useRef(false);
+  const apiStartTimeRef = useRef(0);
 
-    return () => clearTimeout(initialDelay); // Cleanup on unmount
+  const handleAnnouncement = async (message, nextAction) => {
+    const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+    if (!isEnabled) {
+      nextAction();
+      return;
+    }
+
+    isAnnouncingRef.current = true;
+    console.log(`Starting announcement: "${message}"`);
+    AccessibilityInfo.announceForAccessibility(message);
+    
+    const delay = calculateDelay(message);
+    setTimeout(() => {
+      console.log(`Completed announcement: "${message}"`);
+      isAnnouncingRef.current = false;
+      nextAction();
+    }, delay);
+  };
+
+  useEffect(() => {
+    let mounted = true;
+
+    const startCheck = async () => {
+      const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+      
+      if (isEnabled) {
+        // Keep existing accessibility flow
+        await handleAnnouncement(`Step ${step} of 3. Account verification starting.`, () => {
+          handleAnnouncement("Beginning account status check", () => {
+            handleAnnouncement(result, () => {
+              if (mounted && !isAnnouncingRef.current) {
+                performAccountCheck();
+              }
+            });
+          });
+        });
+      } else {
+        // Non-accessibility flow with fixed timing
+        apiStartTimeRef.current = Date.now();
+        performAccountCheck();
+      }
+    };
+
+    startCheck();
+    return () => { mounted = false; };
   }, []);
 
-  const performAccountCheck = async (isAccessibilityEnabled) => {
+  const performAccountCheck = () => {
     const request = `account/api/account/${accountNumber}`;
+    
     GetApiRequest(
       request,
-      (response) => {
-        if (moment(response.paymentDueDate).isAfter() || response.currentBalance <= 0) {
-          // No account issues detected: either payment is not due yet or balance is zero
-          setResult("No account issues were detected.");
-          setIsIssueDetected(false); // Green wave
+      async (response) => {
+        const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+        if (!isEnabled) {
+          // Calculate remaining time to maintain 5-second total for API call
+          const elapsedTime = Date.now() - apiStartTimeRef.current;
+          const remainingTime = Math.max(0, 5000 - elapsedTime);
+
+          setTimeout(() => {
+            handleNonAccessibilityResult(response);
+          }, remainingTime);
         } else {
-          // Pending balance detected
-          setResult("Pending balance detected.");
-          setBillIssueDetected(true);
-          setIssueDetected(true);
-          setIsIssueDetected(true); // Red wave
+          // Keep existing accessibility flow
+          handleAccessibilityResult(response);
         }
-        setLoading(false);
-        handlePostResult(isAccessibilityEnabled);
       },
-      () => {
-        setResult("Error fetching account status.");
-        setLoading(false);
-        handlePostResult(false); // Proceed even on error
+      async (error) => {
+        const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
+        if (!isEnabled) {
+          const elapsedTime = Date.now() - apiStartTimeRef.current;
+          const remainingTime = Math.max(0, 5000 - elapsedTime);
+
+          setTimeout(() => {
+            handleNonAccessibilityError();
+          }, remainingTime);
+        } else {
+          handleAccessibilityError();
+        }
       }
     );
   };
 
-  const handlePostResult = (isAccessibilityEnabled) => {
-    if (isAccessibilityEnabled) {
-      const finishListener = AccessibilityInfo.addEventListener(
-        'announcementFinished',
-        () => {
-          setTimeout(onComplete, 5000); // Wait 5 seconds after announcement
-          finishListener.remove();
-        }
-      );
+  const handleNonAccessibilityResult = (response) => {
+    if (moment(response.paymentDueDate).isAfter() || response.currentBalance <= 0) {
+      setResult("No account issues were detected.");
+      setIsIssueDetected(false);
+      setLoading(false);
+      setTimeout(onComplete, 3000); // Show success for 3 seconds
     } else {
-      setTimeout(onComplete, 5000); // Standard 5-second wait in normal flow
+      setResult("Pending balance detected.");
+      setBillIssueDetected(true);
+      setIssueDetected(true);
+      setIsIssueDetected(true);
+      setLoading(false);
+      setTimeout(onComplete, 3000); // Show result for 3 seconds
     }
   };
 
-  return <CheckStatusWrapper loading={loading} result={result} icon="WalletIcon" isIssueDetected={issueDetected} step={step}/>;
+  const handleNonAccessibilityError = () => {
+    setResult("Error checking account status.");
+    setLoading(false);
+    setTimeout(onComplete, 3000); // Show error for 3 seconds
+  };
+
+  // Keep existing accessibility handlers
+  const handleAccessibilityResult = (response) => {
+    if (moment(response.paymentDueDate).isAfter() || response.currentBalance <= 0) {
+      const resultMessage = "No account issues were detected.";
+      setResult(resultMessage);
+      setIsIssueDetected(false);
+      setLoading(false);
+      
+      handleAnnouncement(resultMessage, () => {
+        handleAnnouncement("Account check complete. Moving to next step", onComplete);
+      });
+    } else {
+      const resultMessage = "Pending balance detected on your account.";
+      setResult(resultMessage);
+      setBillIssueDetected(true);
+      setIssueDetected(true);
+      setIsIssueDetected(true);
+      setLoading(false);
+      
+      handleAnnouncement(resultMessage, () => {
+        handleAnnouncement("Account check complete. Moving to next step", onComplete);
+      });
+    }
+  };
+
+  const handleAccessibilityError = () => {
+    const errorMessage = "Error checking account status. Please try again later.";
+    setResult(errorMessage);
+    setLoading(false);
+    
+    handleAnnouncement(errorMessage, () => {
+      handleAnnouncement("Moving to next check due to error", onComplete);
+    });
+  };
+
+  return (
+    <CheckStatusWrapper
+      loading={loading}
+      result={result}
+      icon="WalletIcon"
+      isIssueDetected={issueDetected}
+      step={step}
+      accessible={true}
+      accessibilityLabel={result}
+      accessibilityRole="alert"
+    />
+  );
 };
 
 export default AccountCheck;

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { View, SafeAreaView, StyleSheet } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, SafeAreaView, StyleSheet, AccessibilityInfo, findNodeHandle } from "react-native";
 import { useSelector } from "react-redux";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import DefaultCheck from "../Troubleshooting/components/DefaultCheck";
 import OutageCheck from "../Troubleshooting/components/OutageCheck";
@@ -11,6 +11,7 @@ import OutagesAlert from "./OutagesAlert";
 import AccountOutages from "./AccountOutages";
 import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
 import { Color } from "../../../../GlobalStyles";
+
 const steps = [
   { component: DefaultCheck, title: "Default Check" },
   { component: OutageCheck, title: "Outage Check" },
@@ -24,12 +25,20 @@ const TroubleshootContainer = () => {
   const [outageIssueDetected, setOutageIssueDetected] = useState(false);
   const [billIssueDetected, setBillIssueDetected] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
+  const focusRef = useRef(null);
 
   const user = useSelector((state) => state.combinedReducers.user.userData);
   const CurrentComponent = steps[currentStep].component;
 
+  useEffect(() => {
+    if (focusRef.current) {
+      const node = findNodeHandle(focusRef.current);
+      AccessibilityInfo.setAccessibilityFocus(node);
+    }
+  }, [outageIssueDetected, billIssueDetected]);
+
   const handleNextStep = () => {
-    if (issueDetected) return; // Stop if any issue is detected
+    if (issueDetected) return;
     if (currentStep < steps.length - 1) {
       setCurrentStep((prev) => prev + 1);
     } else {
@@ -42,12 +51,12 @@ const TroubleshootContainer = () => {
       <ProfileSettingsHeader title="Troubleshooting" />
       <SafeAreaView style={styles.safeArea}>
         {outageIssueDetected ? (
-          <OutagesAlert description={estimatedRestoreTime} />
+          <OutagesAlert ref={focusRef} description={estimatedRestoreTime} />
         ) : billIssueDetected ? (
-          <AccountOutages />
+          <AccountOutages ref={focusRef} />
         ) : (
           <Animated.View
-            key={currentStep} // Ensures a new Animated.View for each step
+            key={currentStep}
             entering={SlideInRight.duration(500)}
             exiting={SlideOutLeft.duration(500)}
             style={styles.animatedContainer}
@@ -77,7 +86,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 16,
     marginTop: 16,
-    marginBottom: hp('12.5%'),
+    marginBottom: hp("12.5%"),
     backgroundColor: Color.sparklightWhite,
   },
   animatedContainer: {

@@ -11,8 +11,8 @@ const WaveAnimation = ({ loading, isIssueDetected, children }) => {
   const waveColor = loading
     ? 'rgba(110, 1, 239, 0.8)' // Default wave color during loading
     : isIssueDetected
-    ? 'rgba(255, 0, 0, 0.8)' // Red for issue detected
-    : 'rgba(0, 255, 0, 0.8)'; // Green for no issue detected
+      ? 'rgba(255, 0, 0, 0.8)' // Red for issue detected
+      : 'rgba(0, 255, 0, 0.8)'; // Green for no issue detected
 
   return (
     <View style={[styles.animationContainer, { width: containerSize, height: containerSize }]}>
@@ -22,7 +22,7 @@ const WaveAnimation = ({ loading, isIssueDetected, children }) => {
           <MotiView
             key={index}
             from={{ opacity: 0.5, scale: waveStartRadius / (containerSize / 2) }}
-            animate={{ opacity: 0, scale: 1 }}
+            animate={{ opacity: 0, scale: .8 }}
             transition={{
               type: 'timing',
               duration: 2000,

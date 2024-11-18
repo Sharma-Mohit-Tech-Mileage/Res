@@ -107,26 +107,40 @@ const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess
     }
 };
 
-// Function to handle authentication responses
 const handleAuthResponse = async (response, idTokenGuid, refreshToken, onSuccess, onError) => {
-    const json = await response.json();
+    console.log('Handling authentication response...'); // Start log
+
+    let json;
+    try {
+        json = await response.json();
+        console.log('Parsed JSON:', json); // Log parsed JSON
+    } catch (parseError) {
+        console.error('Error parsing JSON response:', parseError); // Log JSON parse errors
+        onError(`Failed to parse response: ${parseError.message}`);
+        return;
+    }
+
     if (response.ok) {
         if (idTokenGuid && refreshToken) {
             json.idTokenGuid = idTokenGuid;
             json.refreshToken = refreshToken;
         }
+        console.log('Response OK, invoking onSuccess'); // Success log
         onSuccess(json);
     } else {
-        onError(`Response status ${response.status} (${response.statusText}): ${json.message}`);
+        const errorMsg = `Response status ${response.status} (${response.statusText}): ${json?.message || 'No error message provided'}`;
+        console.error(errorMsg); // Log detailed error with fallback
+        onError(errorMsg);
     }
 };
 
-// Post request with authentication for specific endpoints
 export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => {
+    console.log(`Initiating POST request to ${endpoint}...`); // Start log
     const idTokenGuid = body.idTokenGuid;
     const refreshToken = body.refreshToken;
     delete body.idTokenGuid;
     delete body.refreshToken;
+
     const options = {
         method: 'POST',
         headers: {
@@ -136,9 +150,15 @@ export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => 
         body: JSON.stringify(body)
     };
 
+    console.log('Request options:', options); // Log request options
+
     fetch(`${BASE_URL}${endpoint}`, options)
         .then(response => handleAuthResponse(response, idTokenGuid, refreshToken, onSuccess, onError))
-        .catch(exception => onError(exception.message));
+        .catch(exception => {
+            const errorLog = `Fetch error: ${exception.message || 'Unknown error'}`;
+            console.error(errorLog); // Log fetch error
+            onError(errorLog);
+        });
 };
 
 // Generic POST API request function
