@@ -46,6 +46,7 @@ export const Color = {
     Gray300: '#EAEAEA',
     colorlightRed: '#EF4E3E33',
     backgroundBlur: "#F8F8F8",
+    sparklight_yellow:'#FFCE51',
 };
 export const Padding = {
     p_5xs: 8,

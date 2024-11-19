@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, Linking, TouchableOpacity, Modal, Platform, } from "react-native";
+import React, { useEffect, useState,useRef } from "react";
+import { View, Image, StyleSheet, Text, ActivityIndicator, Linking, Modal, Platform,Animated,Easing } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
@@ -15,6 +15,9 @@ import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from "react-native-version-check";
+import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
+import PrimaryButtom from "../common/customui/PrimaryButton";
+import RenderText from "../common/RenderText";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -33,6 +36,13 @@ const SplashScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessage1, setErrorMessage1] = useState("");
+  const backgroundFade = useRef(new Animated.Value(0)).current;
+  const logoFade = useRef(new Animated.Value(0)).current;
+  const logoMovement = useRef(new Animated.Value(250)).current;
+  const [isVisible,setIsVisible] =useState(false)
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
@@ -57,7 +67,6 @@ const SplashScreen = ({ navigation }) => {
 
   const handleLogin = async (res) => {
     if (res) {
-
       let token = res.jwtToken;
       let userInfo = res.userInfo;
       let user = {
@@ -245,9 +254,7 @@ const SplashScreen = ({ navigation }) => {
               </Text>
               {message2}
             </Text> */}
-            <TouchableOpacity style={styles.closeBtn} onPress={closeModal}>
-              <Text style={styles.closeAlertTxt}>Close</Text>
-            </TouchableOpacity>
+            <PrimaryButtom onPress={closeModal} buttonType={"Cancel"} title={"Close"}/>
           </View>
         </View>
       </Modal>
@@ -324,7 +331,44 @@ const SplashScreen = ({ navigation }) => {
     };
 
     fetchData();
+
+    Animated.timing(backgroundFade, {
+      toValue: 1,
+      duration: 2000,
+      useNativeDriver: true,
+   }).start();
+   Animated.timing(logoFade, {
+      toValue: 1,
+      duration: 2000,
+      useNativeDriver: true,
+   }).start();
+   setTimeout(() => {
+      Animated.timing(logoMovement, {
+            toValue:  0,
+            duration: 2000,
+            easing: Easing.inOut(Easing.exp),
+            useNativeDriver: true,
+      }).start();
+      setIsVisible(true)
+   }, 2250);
+
   }, []);
+
+  useEffect(() => {
+    if (isVisible) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [isVisible]);
 
 
   return (
@@ -336,30 +380,34 @@ const SplashScreen = ({ navigation }) => {
     >
       <View style={styles.splashContainer}>
         {loading ? <ActivityIndicator size="large" color={"white"} /> : <></>}
-        <Image
+        <Animated.View style={{ flex: 1,
+         alignItems: 'center',
+         justifyContent: 'center',
+         opacity: backgroundFade}}>
+        <Animated.Image
           resizeMode="contain"
           source={require("../../res/images/Logo.png")}
-          style={styles.logo}
+          style={[styles.logo,{ opacity: logoFade,
+            transform: [{translateY: logoMovement}]
+          }]}
           accessibilityRole="image"
           accessibilityLabel="SparkLight"
           accessible={true}
         />
+        </Animated.View>
       </View>
       {!loading && loginEnable && (
-        <>
-          <TouchableOpacity
-            style={[styles.SSoBtnContainer, { marginTop: hp("35%") }]}
+        <Animated.View style={{marginTop: hp("35%"), opacity: fadeAnim }}>
+          <SparkLightLoginButton
+          customStyle={styles.SSoBtnContainer}
+            //style={[styles.SSoBtnContainer, { marginTop: hp("35%") }]}
             onPress={() => {
               loginAuth();
             }}
-            accessibilityRole="button"
-            accessibilityLabel="Login button"
-            accessibilityHint="Double tap to log in"
-            accessible={true}
+            buttonText={"Login"}
           >
-            <Text style={styles.SSoBtn}>{"Login"}</Text>
-          </TouchableOpacity>
-        </>
+          </SparkLightLoginButton>
+        </Animated.View>
       )}
       <Text
         style={{
@@ -420,10 +468,8 @@ const styles = StyleSheet.create({
     color: colors.snow_white,
   },
   SSoBtnContainer: {
-    backgroundColor: colors.sparklight_yellow,
     borderRadius: 5,
     justifyContent: "center",
-    marginTop: hp("25%"),
     marginHorizontal: wp("10%"),
   },
   SSoBtn: {
