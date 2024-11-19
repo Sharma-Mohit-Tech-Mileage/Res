@@ -71,7 +71,7 @@ const ModemHealthy = () => {
       >
         <ScrollView style={{ marginBottom: 20 }}>
           <View style={styles.container}>
-          <Text 
+            <Text
               ref={stepRef}
               style={styles.topLeftText}
               accessible={true}
@@ -82,7 +82,7 @@ const ModemHealthy = () => {
               3 of 3
             </Text>
             <View style={styles.content}>
-              <View 
+              <View
                 ref={iconRef}
                 accessible={true}
                 accessibilityRole="image"
@@ -115,6 +115,8 @@ const ModemHealthy = () => {
                     onPress={() => {
                       navigation.navigate('ManageEquipment', { isFromTroubleshooting: true })
                     }}
+                    accessible={true}
+                    accessibilityRole="button"
                   >
                     <View style={styles.menuWrap}>
                       <Modemicon />
@@ -129,6 +131,8 @@ const ModemHealthy = () => {
                     onPress={() => {
                       navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues', name: 'Wi-Fi Issues' })
                     }}
+                    accessible={true}
+                    accessibilityRole="button"
                   >
                     <View style={styles.menuWrap}>
                       <WifiIssueIcon />
@@ -143,6 +147,8 @@ const ModemHealthy = () => {
                     onPress={() => {
                       navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email', name: 'Surfing Issues' })
                     }}
+                    accessible={true}
+                    accessibilityRole="button"
                   >
                     <View style={styles.menuWrap}>
                       <Surfingissue />
@@ -156,6 +162,8 @@ const ModemHealthy = () => {
                     onPress={() => {
                       navigation.navigate("PeriodicProblems");
                     }}
+                    accessible={true}
+                    accessibilityRole="button"
                   >
                     <View style={styles.menuWrap}>
                       <IntermittentIssues />
@@ -169,6 +177,8 @@ const ModemHealthy = () => {
                     onPress={() => {
                       navigation.navigate('ModemConnectivityGuide', { isSuccess: true })
                     }}
+                    accessible={true}
+                    accessibilityRole="button"
                   >
                     <View style={styles.menuWrap}>
                       <Noconnection />

@@ -12,7 +12,7 @@ const OutageCheck = ({
   step,
 }) => {
   const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState("Checking for outage in your area...");
+  const [result, setResult] = useState("Checking for outage in your area");
   const [issueDetected, setIsIssueDetected] = useState(false);
   const [description, setDescription] = useState("");
   const [isFinished, setIsFinished] = useState(false);
@@ -28,7 +28,7 @@ const OutageCheck = ({
         setIssueDetected(true);
         setIsIssueDetected(true);
       } else {
-        setResult("No outage were detected in your area...");
+        setResult("No outage were detected in your area");
       }
       setLoading(false);
       setIsFinished(true);

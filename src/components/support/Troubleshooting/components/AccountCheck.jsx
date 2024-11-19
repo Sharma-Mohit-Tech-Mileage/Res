@@ -11,7 +11,7 @@ const AccountCheck = ({
   step,
 }) => {
   const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState("Checking for account issues...");
+  const [result, setResult] = useState("Checking for account issues");
   const [issueDetected, setIsIssueDetected] = useState(false);
   const [description, setDescription] = useState("");
   const [isFinished, setIsFinished] = useState(false);

@@ -11,7 +11,7 @@ const DefaultCheck = ({ onComplete, step }) => {
       loading={loading}
       result={result}
       icon="TroubleshootIcon"
-      description="Performing a system check..."
+      description="Performing a system check"
       step={step}
       onComplete={onComplete}
       isFinished={true}

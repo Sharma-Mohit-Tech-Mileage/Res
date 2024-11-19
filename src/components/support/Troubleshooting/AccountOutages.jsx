@@ -124,14 +124,12 @@ const TroubleshootComponent = ({ pageCount = 2 }) => {
                     ref={buttonRef}
                     onPress={handlePress}
                     style={[
-                        styles.button,
-                        isAnnouncing && styles.buttonDisabled
+                        styles.button
                     ]}
                     accessible={true}
                     accessibilityRole="button"
                     accessibilityLabel="Pay Bill"
                     accessibilityHint="Navigates to billing details"
-                    disabled={isAnnouncing}
                 >
                     <Text style={styles.accept}>Pay Bill</Text>
                 </Pressable>

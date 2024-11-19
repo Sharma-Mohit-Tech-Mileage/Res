@@ -6,7 +6,7 @@ import CheckStatusWrapper from './CheckStatusWrapper';
 const ServiceCheck = ({ accountNumber, onComplete, step }) => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState("Checking for service issues...");
+  const [result, setResult] = useState("Checking for service issues");
   const [issueDetected, setIssueDetected] = useState(false);
   const [description, setDescription] = useState("");
   const [isFinished, setIsFinished] = useState(false);
@@ -30,6 +30,8 @@ const ServiceCheck = ({ accountNumber, onComplete, step }) => {
       }, 3000);
     };
 
+
+
     if (!isAccessibilityEnabled) {
       const elapsedTime = Date.now() - startTime;
       setTimeout(updateState, Math.max(5000 - elapsedTime, 0));
@@ -37,32 +39,22 @@ const ServiceCheck = ({ accountNumber, onComplete, step }) => {
       updateState();
     }
   };
-
+  const navigateToResult = (navigateTo, hasIssue) => {
+   // setLoading(false);
+    setTimeout(() => {
+      navigation.navigate(navigateTo, hasIssue ? { isError: true } : undefined);
+    }, 3000); // Adjust delay if needed
+  };
   const handleSuccessResult = (startTime, isAccessibilityEnabled) => {
-    updateUIState({
-      resultText: "No service issues were detected.",
-      descriptionText: "Your equipment is working properly.",
-      hasIssue: false,
-      navigateTo: "ModemHealthy"
-    }, startTime, isAccessibilityEnabled);
+    navigateToResult("ModemHealthy", false);
   };
 
   const handleServiceIssueResult = (startTime, isAccessibilityEnabled) => {
-    updateUIState({
-      resultText: "Service issues were detected.",
-      descriptionText: "Your equipment needs attention.",
-      hasIssue: true,
-      navigateTo: "ManageEquipment"
-    }, startTime, isAccessibilityEnabled);
+    navigateToResult("ManageEquipment", true);
   };
 
   const handleErrorResult = (startTime, isAccessibilityEnabled) => {
-    updateUIState({
-      resultText: "Error checking service status.",
-      descriptionText: "Unable to verify equipment status.",
-      hasIssue: true,
-      navigateTo: "ManageEquipment"
-    }, startTime, isAccessibilityEnabled);
+    navigateToResult("ManageEquipment", true);
   };
 
   const analyzeAndUpdateModemStatus = (response, startTime, isAccessibilityEnabled) => {

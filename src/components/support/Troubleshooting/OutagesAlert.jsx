@@ -35,12 +35,12 @@ const TroubleshootComponent = ({
             try {
                 // Step announcement
                 await focusAndAnnounce(stepRef, `Step ${step} of 3`);
-                
+
                 // Icon status
                 await focusAndAnnounce(iconRef, 'Outage detected in your area');
 
                 // Alert message
-                await focusAndAnnounce(alertRef, 
+                await focusAndAnnounce(alertRef,
                     `Uh oh. You may be experiencing an outage in your area. Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. Estimated Time to Restore: ${description}`
                 );
             } catch (error) {
@@ -53,7 +53,7 @@ const TroubleshootComponent = ({
 
     return (
         <View style={styles.container}>
-            <Text 
+            <Text
                 ref={stepRef}
                 style={styles.topLeftText}
                 accessible={true}
@@ -84,7 +84,7 @@ const TroubleshootComponent = ({
                     accessibilityRole="alert"
                     importantForAccessibility="yes"
                 >
-                   
+
                     <NotificationAlert
                         type="warning"
                         title={(<Text style={{ flexDirection: 'column' }}><Text style={styles.textStyle}>Uh oh. You may be experiencing an outage in your area.</Text>
