@@ -22,7 +22,7 @@ const steps = [
 
 const TroubleshootContainer = () => {
   const navigation = useNavigation();
-  const [currentStep, setCurrentStep] = useState(3);
+  const [currentStep, setCurrentStep] = useState(0);
   const [issueDetected, setIssueDetected] = useState(false);
   const [outageIssueDetected, setOutageIssueDetected] = useState(false);
   const [billIssueDetected, setBillIssueDetected] = useState(false);
@@ -67,9 +67,7 @@ const TroubleshootContainer = () => {
   };
 
   const handleBackPress = () => {
-    setShowExitModal(true);
-    setIsCheckingFrozen(true);
-    AccessibilityInfo.announceForAccessibility('Exit Smart Check? Your progress will be lost.');
+    navigation.goBack();
   };
 
   return (
@@ -102,22 +100,6 @@ const TroubleshootContainer = () => {
             />
           </Animated.View>
         )}
-
-        <CustomerErrorPage
-          visible={showExitModal}
-          message="Are you sure you want to exit? Your progress will be lost."
-          title={"Exit Smart Check?"}
-          onActionTxt={"Exit"}
-          onAction={() => {
-            setShowExitModal(false);
-            setIsCheckingFrozen(false);
-            navigation.goBack();
-          }}
-          onClose={() => {
-            setShowExitModal(false);
-            setIsCheckingFrozen(false);
-          }}
-        />
       </SafeAreaView>
     </View>
   );
