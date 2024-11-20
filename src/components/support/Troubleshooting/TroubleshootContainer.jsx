@@ -12,7 +12,6 @@ import OutagesAlert from "./OutagesAlert";
 import AccountOutages from "./AccountOutages";
 import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
 import { Color } from "../../../../GlobalStyles";
-import CustomerErrorPage from "../../utility/SystemErrorPopup";
 const steps = [
   { component: DefaultCheck, title: "Default Check" },
   { component: OutageCheck, title: "Outage Check" },

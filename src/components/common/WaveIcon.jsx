@@ -55,7 +55,7 @@ const WaveAnimation = ({ loading, isIssueDetected, children }) => {
           ]}
         />
       )}
-      <View style={[styles.iconContainer, { width: iconSize, height: iconSize }]}>
+      <View style={[styles.iconContainer, {backgroundColor:"#8D3890", width: iconSize, height: iconSize }]}>
         {children}
       </View>
     </View>
