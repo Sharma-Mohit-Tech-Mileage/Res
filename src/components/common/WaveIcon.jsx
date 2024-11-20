@@ -1,27 +1,41 @@
 import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { MotiView } from 'moti';
+import { Color } from '../../../GlobalStyles';
 
 const WaveAnimation = ({ loading, isIssueDetected, children }) => {
-  const iconSize = Dimensions.get('window').width * 0.38; // Icon size
-  const waveStartRadius = iconSize / 2; // Start wave just outside the icon's boundary
-  const containerSize = Dimensions.get('window').width * .95; // Outer wave boundary
+  const iconSize = Dimensions.get('window').width * 0.30;
+  const waveStartRadius = iconSize / 2;
+  const containerSize = Dimensions.get('window').width * .95;
 
-  // Determine the wave color based on detection status
-  const waveColor = loading
-    ? 'rgba(110, 1, 239, 0.8)' // Default wave color during loading
-    : isIssueDetected
-      ? 'rgba(255, 0, 0, 0.8)' // Red for issue detected
-      : 'rgba(0, 255, 0, 0.8)'; // Green for no issue detected
+  // Purple palette from design for loading state
+  const purpleWaveColors = [
+    '#F1E7F1', // Outermost wave
+    '#E8D7E9',
+    '#BB89BC',
+    '#8D3890'  // Innermost wave
+  ];
+
+  // Get wave color based on state
+  const getWaveColor = (index) => {
+    if (loading) {
+      return purpleWaveColors[index];
+    }
+    return isIssueDetected ? 'rgba(255, 0, 0, 0.8)': Color.sparklightGreen;
+  };
+
+  // Get background color for icon container
+  const getIconBackgroundColor = () => {
+    return "#8D3890";
+  };
 
   return (
     <View style={[styles.animationContainer, { width: containerSize, height: containerSize }]}>
       {loading ? (
-        // Animated waves during loading phase
         [...Array(4).keys()].map((index) => (
           <MotiView
             key={index}
-            from={{ opacity: 0.5, scale: waveStartRadius / (containerSize / 2) }}
+            from={{ opacity: 0.7, scale: waveStartRadius / (containerSize / 2) }}
             animate={{ opacity: 0, scale: .8 }}
             transition={{
               type: 'timing',
@@ -35,27 +49,35 @@ const WaveAnimation = ({ loading, isIssueDetected, children }) => {
               {
                 width: containerSize,
                 height: containerSize,
-                backgroundColor: waveColor,
+                backgroundColor: getWaveColor(index),
               },
             ]}
           />
         ))
       ) : (
-        // Static Full-Sized Wave when loading is false
         <View
           style={[
             styles.filledWave,
             {
               width: containerSize,
               height: containerSize,
-              backgroundColor: waveColor,
+              backgroundColor: getWaveColor(0),
               opacity: 0.3,
-              transform: [{ scale: .8 }], // Static wave scaled to maximum size
+              transform: [{ scale: .8 }],
             },
           ]}
         />
       )}
-      <View style={[styles.iconContainer, {backgroundColor:"#8D3890", width: iconSize, height: iconSize }]}>
+      <View 
+        style={[
+          styles.iconContainer, 
+          { 
+            backgroundColor: getIconBackgroundColor(),
+            width: iconSize, 
+            height: iconSize,
+          }
+        ]}
+      >
         {children}
       </View>
     </View>
@@ -66,21 +88,20 @@ const styles = StyleSheet.create({
   animationContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden', // Keeps waves inside bounds
+    overflow: 'hidden',
     position: 'relative',
-    borderRadius: 9999, // Ensures container remains circular
+    borderRadius: 9999,
   },
   filledWave: {
     position: 'absolute',
-    borderRadius: 9999, // Makes each wave circular
+    borderRadius: 9999,
   },
   iconContainer: {
-    zIndex: 1, // Ensures icon stays above waves
+    zIndex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white', // Icon's area remains unaffected visually
-    borderRadius: 9999, // Ensure icon remains circular
-    overflow: 'hidden', // Ensures icon remains within bounds
+    borderRadius: 9999,
+    overflow: 'hidden',
   },
 });
 

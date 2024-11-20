@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, findNodeHandle, AccessibilityInfo } from 'react-native';
 import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import NotificationAlert from "../../common/customui/NotificationAlert";
-import OutageAreaIcon from '../../../res/svgIcons/troubleshooting/OutageAreaIcon';
+import OutageAreaIcon from '../../../res/svgIcons/troubleshooting/icon-marker';
 import WaveAnimation from '../../common/WaveIcon';
 
 const windowHeight = Dimensions.get('window').height;
