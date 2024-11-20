@@ -24,9 +24,13 @@ const WaveAnimation = ({ loading, isIssueDetected, children }) => {
     return isIssueDetected ? 'rgba(255, 0, 0, 0.8)': Color.sparklightGreen;
   };
 
-  // Get background color for icon container
+  // // Get background color for icon container
+  // const getIconBackgroundColor = () => {
+  //   return "#8D3890";
+  // };
   const getIconBackgroundColor = () => {
-    return "#8D3890";
+    if (loading) return "#8D3890";
+    return isIssueDetected ? '#DF2600' : '#2BA948';
   };
 
   return (
