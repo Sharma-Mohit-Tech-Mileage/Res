@@ -1,15 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  Dimensions, 
-  SafeAreaView, 
-  ScrollView, 
-  AccessibilityInfo, 
-  findNodeHandle 
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView, ScrollView, AccessibilityInfo, findNodeHandle } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
@@ -76,7 +66,7 @@ const ModemHealthy = () => {
         accessibilityLabel="Back to Support"
         accessibilityHint="Navigates back to the Support screen"
       />
-      
+
       <SafeAreaView style={styles.safeAreaContainer}>
         <ScrollView style={styles.scrollView}>
           <View style={styles.container}>
@@ -88,7 +78,7 @@ const ModemHealthy = () => {
             >
               3 of 3
             </Text>
-            
+
             <View style={styles.content}>
               <View
                 accessible={true}
@@ -120,41 +110,41 @@ const ModemHealthy = () => {
                     onPress={() => navigation.navigate('ManageEquipment', { isFromTroubleshooting: true })}
                     testID="manage-equipment-button"
                   />
-                  
+
                   <MenuButton
                     icon={WifiIssueIcon}
                     text="Wi-Fi Issues"
-                    onPress={() => navigation.navigate('ArticalWindowUtility', { 
-                      url: 'https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues', 
-                      name: 'Wi-Fi Issues' 
+                    onPress={() => navigation.navigate('ArticalWindowUtility', {
+                      url: 'https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues',
+                      name: 'Wi-Fi Issues'
                     })}
                     testID="wifi-issues-button"
                   />
-                  
+
                   <MenuButton
                     icon={Surfingissue}
                     text="Surfing Issues"
-                    onPress={() => navigation.navigate('ArticalWindowUtility', { 
-                      url: 'https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email', 
-                      name: 'Surfing Issues' 
+                    onPress={() => navigation.navigate('ArticalWindowUtility', {
+                      url: 'https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email',
+                      name: 'Surfing Issues'
                     })}
                     testID="surfing-issues-button"
                   />
-                  
+
                   <MenuButton
                     icon={IntermittentIssues}
                     text="Intermittent Issues"
                     onPress={() => navigation.navigate("PeriodicProblems")}
                     testID="intermittent-issues-button"
                   />
-                  
+
                   <MenuButton
                     icon={Noconnection}
                     text="No Connection"
                     onPress={() => navigation.navigate('ModemConnectivityGuide', { isSuccess: true })}
                     testID="no-connection-button"
                   />
-                  
+
                   <View style={styles.borderSec} />
                 </View>
               </View>
@@ -174,12 +164,12 @@ const styles = StyleSheet.create({
   safeAreaContainer: {
     flex: 1,
     justifyContent: "center",
-    paddingHorizontal: Padding.p_base,
     paddingVertical: Padding.p_5xl,
     marginBottom: "15%",
   },
   scrollView: {
-    marginBottom: 20
+    marginBottom: 20,
+    paddingHorizontal: Padding.p_base,
   },
   container: {
     flex: 1,
@@ -243,7 +233,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   card: {
-    paddingVertical: Padding.p_base,
+    marginTop: Padding.p_base,
     width: wp("92%"),
   },
 });

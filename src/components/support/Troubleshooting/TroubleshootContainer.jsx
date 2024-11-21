@@ -21,7 +21,7 @@ const steps = [
 
 const TroubleshootContainer = () => {
   const navigation = useNavigation();
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(1);
   const [issueDetected, setIssueDetected] = useState(false);
   const [outageIssueDetected, setOutageIssueDetected] = useState(false);
   const [billIssueDetected, setBillIssueDetected] = useState(false);
