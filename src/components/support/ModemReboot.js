@@ -27,6 +27,7 @@ import VideoIcon from "../../res/svgIcons/VideoIcon";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
+import PrimaryButtom from "../common/customui/PrimaryButton";
 
 // LoadingOverlay Component
 const LoadingOverlay = ({ loading }) => {
@@ -155,29 +156,30 @@ const ModemReboot = ({ route }) => {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
+          <PrimaryButtom
             style={[styles.BtnContainer, { marginTop: 20 }]}
             onPress={rebootModemAction}
             accessible={true}
             accessibilityRole="button"
             accessibilityLabel="Reboot Modem"
             accessibilityHint="Press to reboot the modem"
-          >
-            <Text style={styles.Btn}>Reboot Modem</Text>
-          </TouchableOpacity>
+            title={"Reboot Modem"}
+            buttonType={"submit"}
+          />
+            
+          
 
-          <TouchableOpacity
+          <PrimaryButtom
             style={[styles.BtnContainer, { marginTop: 20, backgroundColor: "#00000000" }]}
             onPress={goBackAction}
             accessible={true}
             accessibilityRole="button"
             accessibilityLabel="Cancel"
             accessibilityHint="Press to cancel the modem reboot and go back"
-          >
-            <Text style={[styles.Btn, { color: colors.sparklight_purple_blue }]}>
-              Cancel
-            </Text>
-          </TouchableOpacity>
+            buttonType={'Cancel'}
+            title={'Cancel'}
+          />
+            
 
           <LoadingOverlay loading={loading} />
           <CustomerErrorPage

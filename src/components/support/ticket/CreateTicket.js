@@ -388,16 +388,14 @@ const CreateTicket = () => {
               />
             </View>
             <View>
-              <Pressable
+              <PrimaryButtom
               accessibilityElementsHidden={isDropDownOpen}
+              buttonType={'Cancel'}
               importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                style={[styles.buttons2, styles.buttonsLayout]}
-                onPress={() => navigation.goBack()}
-              >
-                <Text style={[styles.makePayment2, styles.makeTypo]}>
-                  Cancel
-                </Text>
-              </Pressable>
+              style={[styles.buttons2, styles.buttonsLayout]}
+              onPress={() => navigation.goBack()}
+              title={'Close'}
+              />
             </View>
           </View>
         </ScrollView>
