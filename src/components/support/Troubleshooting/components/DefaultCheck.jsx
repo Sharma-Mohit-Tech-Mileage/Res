@@ -12,7 +12,7 @@ const DefaultCheck = ({ onComplete, step }) => {
       result={result}
       icon="TroubleshootIcon"
       description="Performing a system check"
-      step={step}
+      step={null}
       onComplete={onComplete}
       isFinished={true}
     />

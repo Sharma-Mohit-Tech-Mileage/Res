@@ -113,7 +113,7 @@ const CheckStatusWrapper = ({ loading, result, icon, isIssueDetected, descriptio
 
   return (
     <View style={styles.container}>
-      <Text 
+     {step && <Text 
         ref={stepRef}
         style={styles.topLeftText}
         accessible={true}
@@ -122,7 +122,7 @@ const CheckStatusWrapper = ({ loading, result, icon, isIssueDetected, descriptio
         accessibilityLabel={`Step ${step} of 3`}
       >
         {step} of 3
-      </Text>
+      </Text>}
 
       <View 
         ref={iconRef}
