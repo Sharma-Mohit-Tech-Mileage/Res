@@ -15,6 +15,9 @@ import { FontFamily, Padding } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
 import Wallet2icon from "../../../res/svgIcons/Wallet2icon";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
+import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
+import Tooltip from "rn-tooltip";
+
 const Card = ({
   billAmt,
   dueDate,
@@ -26,6 +29,50 @@ const Card = ({
 }) => {
  
   console.log('BillAmnt',dueDate)
+
+  const NotAvailable = () => {
+    return (
+      <View style={{flexDirection:'column'}}>
+       <Tooltip
+          backgroundColor="#4C5458"
+          overlayColor="#00000000"
+          width={180}
+          height={100}
+          popover={
+            <Text style={{ color: "#FFF" }}>
+              Your due date takes 10 business days to generate. Please check
+              back later.
+            </Text>
+          }
+        > 
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={styles.dueDate}>{"Due "}</Text>
+            <Text
+              style={[
+                styles.dueDate,
+                { fontWeight: "400", color: colors.dark_grey },
+              ]}
+            >
+              {"on: "}
+            </Text>
+            <Text
+              style={[
+                styles.dueDate,
+                { textDecorationLine: "underline", marginRight: 5 },
+              ]}
+            >
+              {'Not Available'}
+            </Text>
+            
+            <InfoIcon1/>
+            
+          </View>
+          </Tooltip>
+      </View>
+    );
+  };
+
+
 
   return (
     <View style={styles.shadowContainer}>

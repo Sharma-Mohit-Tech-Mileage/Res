@@ -13,6 +13,9 @@ import WalletIcon from "../../../res/svgIcons/WalletIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
+import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
+import Tooltip from "rn-tooltip";
+
 const BillerSummaryCard = ({
   billAmt,
   dueDate,
@@ -23,6 +26,49 @@ const BillerSummaryCard = ({
 }) => {
   const uncheck = require("../../../../assets/checkcircle1.png");
   const check = require("../../../../assets/checkcircle.png");
+
+  const NotAvailable = () => {
+    return (
+      <View style={{flexDirection:'column'}}>
+       <Tooltip
+          backgroundColor="#4C5458"
+          overlayColor="#00000000"
+          width={180}
+          height={100}
+          popover={
+            <Text style={{ color: "#FFF" }}>
+              Your due date takes 10 business days to generate. Please check
+              back later.
+            </Text>
+          }
+        > 
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={styles.dueDate}>{"Due "}</Text>
+            <Text
+              style={[
+                styles.dueDate,
+                { fontWeight: "400", color: colors.dark_grey },
+              ]}
+            >
+              {"on: "}
+            </Text>
+            <Text
+              style={[
+                styles.dueDate,
+                { textDecorationLine: "underline", marginRight: 5 },
+              ]}
+            >
+              {'Not Available'}
+            </Text>
+            
+            <InfoIcon1/>
+            
+          </View>
+          </Tooltip>
+      </View>
+    );
+  };
+
 
   return (
     <View style={styles.shadowContainer}>
@@ -45,52 +91,15 @@ const BillerSummaryCard = ({
             <Text style={styles.amount}>${billAmt}</Text>
           )}
 
-          {dueDate != "Invalid date" && billAmt != undefined && (
-            <Text
+{(dueDate != "Invalid date" && billAmt!=undefined) && (
+            <Text 
               accessible={true}
-              accessibilityLabel={`${
-                dueDate
-                  ? dueDate == "Immediately"
-                    ? "Due Immediately"
-                    : "Due on"
-                  : "Due on Not Available"
-              }`}
-              accessibilityRole={`${
-                dueDate != "Immediately" ? "button" : "none"
-              }`}
-              style={[
-                styles.dueDate,
-                {
-                  color:
-                    dueDate == "Immediately"
-                      ? colors.sparklight_red
-                      : colors.sparklight_purple_blue,
-                  fontWeight: dueDate == "Immediately" ? "400" : "700",
-                },
-              ]}
-            >
-              {dueDate ? (
-                dueDate == "Immediately" ? (
-                  "Due"
-                ) : (
-                  "Due on"
-                )
-              ) : (
-                <Text style={styles.label}>Not Available</Text>
-              )}
-              <Text
-                style={[
-                  styles.dueDate,
-                  {
-                    fontWeight: "400",
-                    color:
-                      dueDate == "Immediately"
-                        ? colors.sparklight_red
-                        : colors.sparklight_purple_blue,
-                  },
-                ]}
-              >
-                {" " + dueDate}
+              accessibilityLabel={`${dueDate ? (dueDate=='Immediately')?"Due Immediately"  :"Due on": "Due on Not Available"}`}
+              accessibilityRole={`${(dueDate!='Immediately')?'button':'none'}`}
+             style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
+              {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": <NotAvailable/>}
+              <Text style={[styles.dueDate, { fontWeight: "400",color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue }]}>
+                {' '+dueDate}
               </Text>
             </Text>
           )}
