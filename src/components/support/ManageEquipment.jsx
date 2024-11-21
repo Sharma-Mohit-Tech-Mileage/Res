@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, ScrollView, } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, ScrollView, findNodeHandle, AccessibilityInfo } from "react-native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { FontFamily, Padding, Color, FontSize, Border, } from "../../../GlobalStyles";
 import MyServicePlan from "../common/MyServicePlan";
@@ -48,6 +48,42 @@ const ManageEquipment = ({ route }) => {
   const [hasEeroDevice, setHasEeroDevice] = React.useState(false);
   const [networkId, setNetworkId] = React.useState(null);
   const [modemSupported, setModemSupported] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState("");
+ 
+  const alertRef = React.useRef(null);
+
+React.useEffect(() => {
+  // Clear any existing focus first 
+  //AccessibilityInfo.setAccessibilityFocus(null);
+
+  if (currentHealth !== "Optimal" || isOffline || isContactUs) {
+    // Give time for view to mount and state to update
+    const timer = setTimeout(() => {
+      const node = findNodeHandle(alertRef?.current);
+      if (node) {
+        AccessibilityInfo.setAccessibilityFocus(node);
+        
+        // Force announcement of full message
+        AccessibilityInfo.announceForAccessibility(
+          `${truckrollPrediction === 1
+            ? 'Schedule a Service Appointment. '
+            : isOffline
+              ? "Modem is Offline. "
+              : isContactUs
+                ? "Please try again later. "
+                : "An issue has been detected. "}
+           ${truckrollPrediction === 1
+            ? "We've noticed that your modem has been experiencing repeated issues..."
+            : isContactUs  
+              ? "Sorry, we're having trouble completing the modem system check..."
+              : "Try one of the highlighted options below to resolve"}`
+        );
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }
+}, [currentHealth, isOffline, isContactUs, truckrollPrediction]);
   // Step 1: Check if user has Eero device
   const checkDeviceSupport = () => {
     setLoading(true);
@@ -62,7 +98,7 @@ const ManageEquipment = ({ route }) => {
         if (erosSupported) {
           fetchNetworkId();
           getEuroAccountDetails();
-        } else if(modemSupported) {
+        } else if (modemSupported) {
           getModemPassword();
           getWifiPassword();
         }
@@ -552,14 +588,14 @@ const ManageEquipment = ({ route }) => {
                     />
                     <View style={styles.bannerWarning}>
                       <View style={styles.rightActionableParent}>
-                        <View style={styles.creditCardWillExpireSoonParent}>
+                        <View ref={alertRef}
+                         accessible={true}
+                         importantForAccessibility="yes"
+                         accessibilityViewIsModal={true}
+                         accessibilityRole="alert"
+                          style={styles.creditCardWillExpireSoonParent}>
                           <View style={{ flexDirection: "row" }}>
-                            <Image
-                              style={{
-                                alignSelf: "center",
-                                width: 24,
-                                height: 24,
-                              }}
+                            <Image style={{ alignSelf: "center", width: 24, height: 24, }}
                               resizeMode="cover"
                               tintColor={
                                 isOffline
@@ -765,7 +801,7 @@ const ManageEquipment = ({ route }) => {
           {/* WiFi Password */}
           {(wifiPasswordCanChange || isEEroDevice) && (
             <View
-              style={[ styles.myModem, styles.myModemSpaceBlock, { marginTop: 20 }, ]}
+              style={[styles.myModem, styles.myModemSpaceBlock, { marginTop: 20 },]}
             >
               <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
                 <Text style={[styles.myModem1, styles.myModem1Typo]}>

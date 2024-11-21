@@ -1,402 +1,173 @@
-import React, { useState, useEffect } from "react";
-import { AccessibilityInfo } from "react-native";  // Import AccessibilityInfo
-import AccountOutages from "./AccountOutages";
-import OutagesAlert from "./OutagesAlert";
-import TroubleshootComponent from "./TroubleshootComponent";
+import React, { useState, useEffect, useRef } from "react";
+import { View, SafeAreaView, StyleSheet, AccessibilityInfo, findNodeHandle, BackHandler, Modal, Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
-import { View, SafeAreaView } from "react-native";
-import { Color, Padding } from "../../../../GlobalStyles";
-import { GetApiRequest, GetModemStatusApiRequest } from "../../../network/APIClient";
 import { useSelector } from "react-redux";
-import moment from "moment";
-import { useIsFocused } from '@react-navigation/native';
-
-const stepsData = [
-  {
-    title: "Let's resolve your issues.",
-    description: "Performing a system check...",
-    resultMsg: "",
-    errorMsg: "Uh oh. Looks like there is a server error.",
-    success: false,
-    pageCount: 0,
-  },
-  {
-    title: "Checking for outage in your area...",
-    resultMsg: "No outage were detected in your area...",
-    errorMsg: "Uh oh. Looks like there is a server error.",
-    description: null,
-    success: false,
-    pageCount: 1,
-  },
-  {
-    title: "Checking for account issues...",
-    resultMsg: "No account issues were detected.",
-    errorMsg: "Uh oh. Looks like there is a server error.",
-    description: null,
-    success: false,
-    pageCount: 2,
-  },
-  {
-    title: "Checking for service issues...",
-    resultMsg: "No service issues were detected.",
-    errorMsg: "Uh oh. Looks like there is a server error.",
-    description: null,
-    success: false,
-    pageCount: 3,
-  },
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
+import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
+import DefaultCheck from "../Troubleshooting/components/DefaultCheck";
+import OutageCheck from "../Troubleshooting/components/OutageCheck";
+import AccountCheck from "../Troubleshooting/components/AccountCheck";
+import ServiceCheck from "../Troubleshooting/components/ServiceCheck";
+import OutagesAlert from "./OutagesAlert";
+import AccountOutages from "./AccountOutages";
+import Animated, { SlideInRight, SlideOutLeft } from "react-native-reanimated";
+import { Color } from "../../../../GlobalStyles";
+const steps = [
+  { component: DefaultCheck, title: "Default Check" },
+  { component: OutageCheck, title: "Outage Check" },
+  { component: AccountCheck, title: "Account Check" },
+  { component: ServiceCheck, title: "Service Check" },
 ];
 
 const TroubleshootContainer = () => {
   const navigation = useNavigation();
-  const isFocused = useIsFocused();
-  const user = useSelector((state) => state.combinedReducers.user.userData);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [networkStatus, setNetworkStatus] = useState([false, false, false, false]);
-  const [networkError, setNetworkError] = useState([false, false, false, false]);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [issueDetected, setIssueDetected] = useState(false);
   const [outageIssueDetected, setOutageIssueDetected] = useState(false);
   const [billIssueDetected, setBillIssueDetected] = useState(false);
-  const [issueDetected, setIssueDetected] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [key, setKey] = useState(1);
-  const [isReadingComplete, setIsReadingComplete] = useState(false);
-  const [standardtimeout, setStandardTimeout] = useState(2000);
+  const [showExitModal, setShowExitModal] = useState(false);
+  const [isCheckingFrozen, setIsCheckingFrozen] = useState(false);
+  const focusRef = useRef(null);
+  const user = useSelector((state) => state.combinedReducers.user.userData);
+  const CurrentComponent = steps[currentStep].component;
 
-  /**
-   * useEffect to increase standardtimeout to 20 seconds if accessibility is turned on
-   */
   useEffect(() => {
-    const checkAccessibility = async () => {
-      const isScreenReaderEnabled = await AccessibilityInfo.isScreenReaderEnabled();
-      if (isScreenReaderEnabled) {
-        setStandardTimeout(15000);
+    const backAction = () => {
+      if (!showExitModal) {
+        handleBackPress();
+        return true;
       }
+      return true;
     };
-    checkAccessibility();
 
-    const accessibilityChangeListener = AccessibilityInfo.addEventListener(
-      'change',
-      (isScreenReaderEnabled) => {
-        if (isScreenReaderEnabled) {
-          setStandardTimeout(15000);
-        } else {
-          setStandardTimeout(2000);
-        }
-      }
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction
     );
 
-    return () => {
-      accessibilityChangeListener.remove();
-    };
-  }, []);
+    return () => backHandler.remove();
+  }, [showExitModal]);
 
-  /**
-   * check Modem Outage status
-   */
-  const checkModemOutagStatus = () => {
-    setLoading(true);
-    const request = `mobile/api/Outage/GetOutageStatus?accountnumber=${user.userInfo.accountNumber}`;
-    GetApiRequest(
-      request,
-      (response) => {
-        if (response) {
-          console.log("checkModemOutagStatus", response);
-          if (response.hasOutage === true) {
-            let time = moment(response.estimatedTimeOfResolution).format("LT");
-            setEstimatedRestoreTime(time);
-            setOutageIssueDetected(true);
-            setIssueDetected(true);
-          } else {
-            networkStatus[currentStep] = true;
-            setKey(2);
-            setTimeout(() => {
-              setCurrentStep(2);
-            }, standardtimeout);
-          }
-          setLoading(false);
-        }
-      },
-      (error) => {
-        console.log(error);
-        if (error === 204) {
-          networkStatus[currentStep] = true;
-        } else {
-          networkError[currentStep] = true;
-        }
-        setKey(2);
-        setTimeout(() => {
-          setCurrentStep(2);
-        }, standardtimeout);
-        setLoading(false);
-      }
-    );
-  };
+  useEffect(() => {
+    if (focusRef.current) {
+      const node = findNodeHandle(focusRef.current);
+      AccessibilityInfo.setAccessibilityFocus(node);
+    }
+  }, [outageIssueDetected, billIssueDetected]);
 
-  /**
-   *  Check Bill paid status
-   */
-  const checkBillPaid = (accountNumber) => {
-    setLoading(true);
-    const request = `account/api/account/${accountNumber}`;
-    GetApiRequest(
-      request,
-      (res) => {
-        console.log("checkBillPaid", res);
-        if (res) {
-          if(moment(res.paymentDueDate).isAfter()){
-            networkStatus[currentStep] = true;
-            setTimeout(() => {
-              setCurrentStep(3);
-            }, standardtimeout);
-
-            setKey(3);
-          }else
-          if (res.currentBalance <= 0) {
-            // Bill paide
-            networkStatus[currentStep] = true;
-            setTimeout(() => {
-              setCurrentStep(3);
-            }, standardtimeout);
-
-            setKey(3);
-          } else {
-            // Bill Pending
-            setIssueDetected(true);
-            setBillIssueDetected(true);
-          }
-        }
-        setLoading(false);
-      },
-      (Error) => {
-        console.log("checkBillPaid error", Error);
-        networkError[currentStep] = true;
-        setKey(3);
-        setTimeout(() => {
-          setCurrentStep(3);
-        }, standardtimeout);
-        setLoading(false);
-      }
-    );
-  };
-
-  const checkModemHealth = (macAddress) => {
-    setLoading(true);
-    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
-    GetModemStatusApiRequest(
-      request,
-      (res) => {
-        console.log("checkModemHealth", res);
-        if (res) {
-          if(res?.status){
-            if(res.status===408){
-              setIssueDetected(true);
-              if(isFocused){
-              navigation.navigate("ManageEquipment",{isError:true})
-              }
-              return
-            }
-          }
-          let temt = [];
-          console.log("checkModemHealth", res.EquipmentType);
-          if (res.EquipmentType === "DOCSIS") {
-            temt.push(res.UTxP_State);
-            temt.push(res.URxL_State);
-            temt.push(res.USNR_State);
-            temt.push(res.DSNR_State);
-            temt.push(res.DRxL_State);
-            if (res.Modem_State === "Online") {
-              console.log("checkModemHealth online", temt);
-              updateModemStatus(temt);
-            } else {
-              if(isFocused){
-              navigation.navigate("ManageEquipment");
-              }
-            }
-          } else if (res.EquipmentType === "ONU") {
-            temt.push(res.ONUTP_State);
-            temt.push(res.OLTRP_State);
-            temt.push(res.ONURP_State);
-            if (res.ONU_State === "Online") {
-              updateModemStatus(temt);
-            } else {
-              if(isFocused){
-              navigation.navigate("ManageEquipment");
-              }
-            }
-          }
-          setLoading(false);
-        }else{
-          if(isFocused){
-          navigation.navigate("ManageEquipment");
-          }
-        }
-      },
-      (error) => {
-        console.log("Modem details Error1", error);
-        console.log("Modem details Error", error);
-        setIssueDetected(true);
-        if(isFocused){
-        navigation.navigate("ManageEquipment",{isError:true});;
-        }
-        
-        //networkError[currentStep] = true;
-        setKey(3);
-        setLoading(false);
-        
-      }
-    );
-  };
-
-  const updateModemStatus = (temt) => {
-    console.log("checkModemHealth", temt);
-    const allGreen = temt.every((v) => v === "Green");
-    console.log("modem status", allGreen);
-    if (!allGreen) {
-      const checkYellow = temt.includes("Yellow");
-      const checkRed = temt.includes("Red");
-      if (checkRed || checkYellow) {
-        setIssueDetected(true);
-        if(isFocused){
-        navigation.navigate("ManageEquipment",{isError:true});;
-        }
-      } else {
-        setIssueDetected(true);
-        if(isFocused){
-        navigation.navigate("ManageEquipment",{isError:true});
-        }
-      }
+  const handleNextStep = () => {
+    if (issueDetected) return;
+    if (currentStep < steps.length - 1) {
+      setCurrentStep((prev) => prev + 1);
     } else {
-      // modem health is good
-      setIssueDetected(true);
-      networkStatus[currentStep] = true;
-      setKey(5);
-      if(isFocused){
-      navigation.navigate("ModemHealthy");
-      }
+      console.log("All checks completed.");
     }
   };
 
-  /**
-   * check plan details
-   */
-  const getInternetPlanDetails = () => {
-    setLoading(true)
-    const request = `internet/api/internet/${user.userInfo.accountNumber}/plan`;
-    GetApiRequest(
-      request,
-      (response) => {
-        if (response.length > 0) {
-          let macAddress = response[0].macAddress;
-          var mac = macAddress;
-          if (user.userInfo.accountNumber === "128387263") {
-            mac = "bc:3e:07:38:56:d0";
-          }else if (user.userInfo.accountNumber === "902880244") {
-            mac = "bc:3e:07:38:56:d0";  
-          }else if (user.userInfo.accountNumber === "902880236") {
-            mac = "28:7a:ee:8e:cf:8c";
-          } else if (user.userInfo.accountNumber === "902880079") {
-            mac = "00:40:36:5f:cc:7f";
-          }
-          else if(user.userInfo.accountNumber==='136885142'){
-            mac="20:73:55:89:c7:00"
-          }
-          checkModemHealth(mac);
-        }
-      },
-      (error) => {
-        console.log("error", error);
-        networkError[currentStep] = true;
-        setKey(3);
-        setLoading(false);
-      }
-    );
+  const handleBackPress = () => {
+    navigation.goBack();
   };
-
-  const startTroubleShooting = () => {
-    setTimeout(() => {
-      setCurrentStep(1);
-    }, standardtimeout);
-  };
-
-  useEffect(() => {
-    if (currentStep === 1) {
-      checkModemOutagStatus();
-    }
-    if (currentStep === 2) {
-      checkBillPaid(user.userInfo.accountNumber);
-    }
-    if (currentStep === 3) {
-      getInternetPlanDetails();
-    }
-  }, [currentStep]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      startTroubleShooting();
-    }, 4000);
-  }, []);
-
-  useEffect(() => {
-    if (isReadingComplete) {
-      console.log('Screen readout complete');
-    }
-  }, [isReadingComplete]);
-
-  const step = stepsData[currentStep];
 
   return (
-    <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
+    <View style={styles.container}>
       <ProfileSettingsHeader
         title="Troubleshooting"
-        onPressBack={() => navigation.goBack()}
-        accessibilityLabel="Back to Account"
-        accessibilityHint="Navigates back to the Notifications screen"
+        onPressBack={handleBackPress}
       />
-      <SafeAreaView
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          paddingHorizontal: Padding.p_base,
-          paddingVertical: Padding.p_5xl,
-          marginBottom: "15%",
-        }}
-      >
-        <>
-          {!issueDetected && (
-            <TroubleshootComponent
-              key={key}
+      <SafeAreaView style={styles.safeArea}>
+        {outageIssueDetected ? (
+          <OutagesAlert description={estimatedRestoreTime} />
+        ) : billIssueDetected ? (
+          <AccountOutages />
+        ) : (
+          <Animated.View
+            key={currentStep}
+            entering={SlideInRight.duration(500)}
+            exiting={SlideOutLeft.duration(500)}
+            style={styles.animatedContainer}
+            pointerEvents={isCheckingFrozen ? 'none' : 'auto'}
+          >
+            <CurrentComponent
+              accountNumber={user?.userInfo?.accountNumber}
+              onComplete={handleNextStep}
+              setIssueDetected={setIssueDetected}
+              setOutageIssueDetected={setOutageIssueDetected}
+              setBillIssueDetected={setBillIssueDetected}
+              setEstimatedRestoreTime={setEstimatedRestoreTime}
               step={currentStep}
-              item={step}
-              success={networkStatus[currentStep]}
-              pageCount={step.pageCount}
-              loading={loading}
-              isError={networkError[currentStep]}
-              setIsReadingComplete={setIsReadingComplete}
             />
-          )}
-          {outageIssueDetected && (
-            <OutagesAlert
-              step={currentStep}
-              title={""}
-              description={estimatedRestoreTime}
-              success={true}
-              pageCount={step.pageCount}
-            />
-          )}
-          {billIssueDetected && (
-            <AccountOutages
-              step={currentStep}
-              title={""}
-              description={estimatedRestoreTime}
-              success={true}
-              pageCount={step.pageCount}
-            />
-          )}
-        </>
+          </Animated.View>
+        )}
       </SafeAreaView>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Color.colorWhitesmoke_200,
+  },
+  safeArea: {
+    flex: 1,
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: hp("12.5%"),
+    backgroundColor: Color.sparklightWhite,
+  },
+  animatedContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: Color.sparklightWhite,
+    borderRadius: 8,
+    padding: 24,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: Color.colorGray_200,
+  },
+  modalText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 24,
+    color: Color.colorGray_100,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 4,
+    marginHorizontal: 8,
+  },
+  continueButton: {
+    backgroundColor: Color.colorMidnightblue,
+  },
+  exitButton: {
+    backgroundColor: Color.sparkLightRed,
+  },
+  buttonText: {
+    color: Color.sparklightWhite,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+});
 
 export default TroubleshootContainer;

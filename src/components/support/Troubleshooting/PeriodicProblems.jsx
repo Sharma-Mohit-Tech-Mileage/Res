@@ -1,33 +1,16 @@
 import * as React from "react";
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { Image, StyleSheet, Text, View, ScrollView, TouchableOpacity, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import {
-  Color,
-  Padding,
-  Border,
-  FontSize,
-  FontFamily,
-} from "../../../../GlobalStyles";
+import { Color, Padding, FontFamily, } from "../../../../GlobalStyles";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import RightArrow from "../../../res/svgIcons/RightArrow";
-import SettingsIcon from "../../../res/svgIcons/SettingsIcon";
 import WifiIssueIcon from "../../../res/svgIcons/WifiIssueIcon";
 import RefreshIcon from "../../../res/svgIcons/RefreshIcon";
 import { GetApiRequest } from "../../../network/APIClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
-const PeriodicProblems = ({route}) => {
-  console.log('Intermi',JSON.stringify(route))
+const PeriodicProblems = ({ route }) => {
+  console.log('Intermi', JSON.stringify(route))
   const navigation = useNavigation();
   const [manufacturer, setManufacturer] = React.useState("");
   const instructions1 = [
@@ -36,9 +19,9 @@ const PeriodicProblems = ({route}) => {
     "Proximity to other wireless networks, such as in apartments, can also cause intermittent issues.",
   ];
 
-  React.useEffect(()=>{
+  React.useEffect(() => {
     getModemDetails();
-  },[])
+  }, [])
 
   const getModemDetails = () => {
     let re = getUser().then((res) => {
@@ -51,7 +34,7 @@ const PeriodicProblems = ({route}) => {
     console.log("getModemDetails", res);
     if (res) {
       setManufacturer(res.manufacturer);
-     
+
     }
   };
   const onError = (error) => {
@@ -70,7 +53,7 @@ const PeriodicProblems = ({route}) => {
         title="Troubleshooting"
         onPressBack={() => navigation.goBack()}
       />
-      <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom:80}}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ marginBottom: 80 }}>
         <View style={{ flexDirection: "column", flex: 1 }}>
           <View style={[styles.card, styles.shadowProp]}>
             <Image
@@ -90,24 +73,24 @@ const PeriodicProblems = ({route}) => {
             <View style={{ paddingTop: 32 }}>
               <View style={styles.borderSec} />
               {manufacturer != "Calix" && (
-              <TouchableOpacity
-                style={styles.pressableStyle}
-                onPress={() => {
-                  navigation.navigate("ModemRebootScreen", {
-                    isError: (route.params?.isError)?true:false,
-                    isFromT: true,
-                  });
-                }}
-              >
-                <View style={styles.menuWrap}>
-                  <RefreshIcon />
-                  <Text style={styles.menuText}>Reboot Modem</Text>
-                </View>
-                <RightArrow />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.pressableStyle}
+                  onPress={() => {
+                    navigation.navigate("ModemRebootScreen", {
+                      isError: (route.params?.isError) ? true : false,
+                      isFromT: true,
+                    });
+                  }}
+                >
+                  <View style={styles.menuWrap}>
+                    <RefreshIcon />
+                    <Text style={styles.menuText}>Reboot Modem</Text>
+                  </View>
+                  <RightArrow />
+                </TouchableOpacity>
               )}
               <View style={styles.borderSec} />
-              
+
 
               <TouchableOpacity
                 style={styles.pressableStyle}

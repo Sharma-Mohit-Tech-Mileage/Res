@@ -5,8 +5,8 @@ import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { FontFamily, Color } from "../../../../GlobalStyles";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
-const ModemConnectivityGuide = ({route}) => {
-    console.log('No Connection',JSON.stringify(route))
+const ModemConnectivityGuide = ({ route }) => {
+    console.log('No Connection', JSON.stringify(route))
     const navigation = useNavigation();
 
     const instructions1 = [
@@ -18,7 +18,7 @@ const ModemConnectivityGuide = ({route}) => {
         "Ensure one end of the coax cable is connected to the outlet for your Sparklight service.You might need to try different outlets to find the one enabled with Sparklight service.",
         "Next, locate the input port for the coax cable on the back of your modem and connect the other end of the coax cable.Ensure it's hand-tight and snug – no tools required."
     ]
-    
+
     const renderInstruction = (instruction, index) => (
         <View key={index} style={styles.instructionContainer}>
             <View style={styles.bulletPoint} />
@@ -31,10 +31,10 @@ const ModemConnectivityGuide = ({route}) => {
             <ProfileSettingsHeader
                 title="Troubleshooting"
                 onPressBack={() => {
-                    if(route.params?.isSuccess){
+                    if (route.params?.isSuccess) {
                         navigation.goBack()
-                    }else{
-                    navigation.navigate('SupportStack')
+                    } else {
+                        navigation.navigate('SupportStack')
                     }
                 }
                 }
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
         height: 6,
         borderRadius: 3,
         backgroundColor: Color.sparklightGray1,
-        marginTop: 8, 
+        marginTop: 8,
         marginRight: 8,
     },
     instructionText: {
