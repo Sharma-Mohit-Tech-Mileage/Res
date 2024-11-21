@@ -71,7 +71,9 @@ const BillingScreen = ({ navigation }) => {
                 ? emailArray[0]
                 : null;
             }
-            let dueDate = moment(res.paymentDueDate).format("ll");
+            // let dueDate = moment(res.paymentDueDate).format("ll");
+            // setDueDate(dueDate);
+            let dueDate =(res.pastDueAmount!=0)? 'Immediately': moment(res.paymentDueDate).format("ll");
             setDueDate(dueDate);
             setBillAmt((Math.round(res.currentBalance * 100) / 100).toFixed(2));
             let paymentDetails = { ...defaultPaymentDetails };
