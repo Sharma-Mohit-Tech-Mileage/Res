@@ -49,12 +49,12 @@ const TroubleshootContainer = () => {
     return () => backHandler.remove();
   }, [showExitModal]);
 
-  useEffect(() => {
-    if (focusRef.current) {
-      const node = findNodeHandle(focusRef.current);
-      AccessibilityInfo.setAccessibilityFocus(node);
-    }
-  }, [outageIssueDetected, billIssueDetected]);
+  // useEffect(() => {
+  //   if (focusRef.current) {
+  //     const node = findNodeHandle(focusRef.current);
+  //     AccessibilityInfo.setAccessibilityFocus(node);
+  //   }
+  // }, [outageIssueDetected, billIssueDetected]);
 
   const handleNextStep = () => {
     if (issueDetected) return;
@@ -76,18 +76,19 @@ const TroubleshootContainer = () => {
         onPressBack={handleBackPress}
       />
       <SafeAreaView style={styles.safeArea}>
-        {outageIssueDetected ? (
-          <OutagesAlert description={estimatedRestoreTime} />
-        ) : billIssueDetected ? (
-          <AccountOutages />
-        ) : (
-          <Animated.View
-            key={currentStep}
-            entering={SlideInRight.duration(500)}
-            exiting={SlideOutLeft.duration(500)}
-            style={styles.animatedContainer}
-            pointerEvents={isCheckingFrozen ? 'none' : 'auto'}
-          >
+
+        <Animated.View
+          key={currentStep}
+          entering={SlideInRight.duration(500)}
+          exiting={SlideOutLeft.duration(500)}
+          style={styles.animatedContainer}
+          pointerEvents={isCheckingFrozen ? 'none' : 'auto'}
+        >
+          {outageIssueDetected ? (
+            <OutagesAlert description={estimatedRestoreTime} />
+          ) : billIssueDetected ? (
+            <AccountOutages />
+          ) : (
             <CurrentComponent
               accountNumber={user?.userInfo?.accountNumber}
               onComplete={handleNextStep}
@@ -96,9 +97,8 @@ const TroubleshootContainer = () => {
               setBillIssueDetected={setBillIssueDetected}
               setEstimatedRestoreTime={setEstimatedRestoreTime}
               step={currentStep}
-            />
-          </Animated.View>
-        )}
+            />)}
+        </Animated.View>
       </SafeAreaView>
     </View>
   );
