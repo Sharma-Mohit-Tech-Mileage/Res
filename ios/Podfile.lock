@@ -707,18 +707,18 @@ PODS:
     - SDWebImage/Core (~> 5.10)
   - SocketRocket (0.6.1)
   - Yoga (1.14.0)
-  - ZendeskChatProvidersSDK (5.0.3)
-  - ZendeskChatSDK (5.0.3):
-    - ZendeskChatProvidersSDK (~> 5.0.3)
-    - ZendeskMessagingSDK (~> 6.0.1)
-  - ZendeskCommonUISDK (9.0.2)
+  - ZendeskChatProvidersSDK (5.0.5)
+  - ZendeskChatSDK (5.0.5):
+    - ZendeskChatProvidersSDK (~> 5.0.5)
+    - ZendeskMessagingSDK (~> 6.0.3)
+  - ZendeskCommonUISDK (9.0.3)
   - ZendeskCoreSDK (5.0.5)
-  - ZendeskMessagingAPISDK (6.0.1):
-    - ZendeskSDKConfigurationsSDK (~> 4.0.0)
-  - ZendeskMessagingSDK (6.0.2):
-    - ZendeskCommonUISDK (~> 9.0.2)
-    - ZendeskMessagingAPISDK (~> 6.0.1)
-  - ZendeskSDKConfigurationsSDK (4.0.0)
+  - ZendeskMessagingAPISDK (6.0.2):
+    - ZendeskSDKConfigurationsSDK (~> 4.0.1)
+  - ZendeskMessagingSDK (6.0.3):
+    - ZendeskCommonUISDK (~> 9.0.3)
+    - ZendeskMessagingAPISDK (~> 6.0.2)
+  - ZendeskSDKConfigurationsSDK (4.0.1)
 
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
@@ -1084,13 +1084,13 @@ SPEC CHECKSUMS:
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 3efc43e0d48686ce2e8c60f99d4e6bd349aff981
-  ZendeskChatProvidersSDK: 80485584b6b5af1b3e15ea54ba93600c225290b2
-  ZendeskChatSDK: 5f64abb74eb3bd4e52250b8984f0408f6e703490
-  ZendeskCommonUISDK: 34c069ad52d8b350eb6af7d535a027f58a50b432
+  ZendeskChatProvidersSDK: 5cfc4a3dee03317ba54920e3258edda52ff9a329
+  ZendeskChatSDK: 8e0041101a89c8fed51dadb14697bbb4bb4700fd
+  ZendeskCommonUISDK: f3ce3e7a1bd7762550a78dbaff57509f3112c22b
   ZendeskCoreSDK: c542b3f82abc3ee52e1291c6fb3436515e098806
-  ZendeskMessagingAPISDK: c8ca98dc931a5b68a622aba65d63673cfe40af88
-  ZendeskMessagingSDK: a5e3850e40dce481c24b05ce89bcd8dfc12d8500
-  ZendeskSDKConfigurationsSDK: 79c444da987390456ec05657ffa2f5ca0eb54aef
+  ZendeskMessagingAPISDK: 5b3a9d16f2f4d8b3c07b4ca0451a7cf9bfd8107d
+  ZendeskMessagingSDK: 3915f0647246f079dd20bf2fd85084f495598fde
+  ZendeskSDKConfigurationsSDK: d0b28eeb9c3d88191cfd2c7f246b2522c8c357f4
 
 PODFILE CHECKSUM: 08a3b82b4f2ea9f038c5b7f1aa1ebe5a928c714a
 
