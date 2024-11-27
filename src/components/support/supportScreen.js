@@ -127,7 +127,7 @@ const Support = ({ route }) => {
       console.log('Agent is availibility',data?.department,"Count="+json.channel_group_statuses.chat.state_counts.online)
       console.log('Agent group_id',group_id)
       if(json.channel_group_statuses.chat.state_counts.online>0){
-        if(group_id=='22567718430615'){
+        if(group_id=='1500003312422'){
             setisAgentAvailable(true)
             if(data){
             if(Platform.OS==='ios'){
@@ -148,7 +148,7 @@ const Support = ({ route }) => {
             }
         }
       }else{
-        if(group_id=='22567718430615'){
+        if(group_id=='1500003312422'){
             setisAgentAvailable(false)
             if(data){
             //PromptForAgentOffline()
@@ -173,7 +173,7 @@ const Support = ({ route }) => {
   useFocusEffect(
     useCallback(() => {
         checkAgentAvailibilty('1500003304341');
-        checkAgentAvailibilty('22567718430615');
+        checkAgentAvailibilty('1500003312422');
     }, [])
   );
   
@@ -291,7 +291,7 @@ const Support = ({ route }) => {
     const onRefresh = () => {
         setRefreshing(true);
         checkAgentAvailibilty('1500003304341');
-        checkAgentAvailibilty('22567718430615');
+        checkAgentAvailibilty('1500003312422');
         
       };
 
