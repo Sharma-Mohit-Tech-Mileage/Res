@@ -320,8 +320,8 @@ const Support = ({ route }) => {
             tags:['pid:_' + userData.userInfo.accountNumber,...tags],
             department: department
         };
-        if(department=='mobiletest'){
-          checkAgentAvailibilty('22567718430615',data);
+        if(department=='SPK Virtual Call Center'){
+          checkAgentAvailibilty('1500003312422',data);
         }else if(department=='SPK TCC Residential'){
             checkAgentAvailibilty('1500003304341',data);
         }
@@ -725,7 +725,7 @@ const Support = ({ route }) => {
                                                     onPress={() => {
                                                         //toggleModal("Bill");
                                                         if(isAgentAvailable){
-                                                        handlePressOpenButton("mobiletest", ['Resi_BillSupport','Resimobileapp'])
+                                                        handlePressOpenButton("SPK Virtual Call Center", ['Resi_BillSupport','Resimobileapp'])
                                                         }
                                                     }}
                                                 >
