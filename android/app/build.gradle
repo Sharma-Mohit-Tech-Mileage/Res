@@ -24,15 +24,12 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 
 android {
     // Ensure these variables are defined correctly in rootProject or replace with explicit values
-    ndkVersion "25.2.9519653"
-    buildToolsVersion "33.0.2"
-    compileSdkVersion 35
-
+    compileSdk 35// Specify the SDK version you want to use
     namespace "com.sparklight"
 
     defaultConfig {
         applicationId "com.sparklight"
-        minSdkVersion 21
+        minSdkVersion 24
         //noinspection EditedTargetSdkVersion
         targetSdkVersion 35
         versionCode 187
