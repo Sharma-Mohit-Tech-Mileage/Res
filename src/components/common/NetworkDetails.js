@@ -110,10 +110,12 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
           accessibilityRole={!billPaid ? "button" : null }
           onPress={() => {
             if (!billPaid) {
-              navigation.navigate("ArticalWindowUtility", {
-                url: `${Env.URL}/billing`,
-                name: "Billing Details",
-              });
+              // navigation.navigate("ArticalWindowUtility", {
+              //   url: `${Env.URL}/billing`,
+              //   name: "Billing Details",
+              // });
+
+              navigation.navigate("BillingTab");
             }
           }}
         >
