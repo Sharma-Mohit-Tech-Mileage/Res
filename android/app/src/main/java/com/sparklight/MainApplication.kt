@@ -20,7 +20,7 @@ class MainApplication : Application(), ReactApplication {
                 PackageList(this).packages.apply {
                     // Packages that cannot be autolinked yet can be added manually here, for example:
                     // add(MyReactNativePackage())
-                    packages.add(new RNZendeskChatPackage());
+                    add(RNZendeskChatPackage());
                 }
 
             override fun getJSMainModuleName(): String = "index"
