@@ -105,28 +105,54 @@ const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess
     }
 };
 
-// Function to handle authentication responses
 const handleAuthResponse = async (response, idTokenGuid, refreshToken, onSuccess, onError) => {
-    console.log('Handling authentication response...'); // Start log
     let json;
     try {
-        json = await response.json();
-        console.log('Parsed JSON:', json); // Log parsed JSON
-    } catch (parseError) {
-        console.error('Error parsing JSON response:', parseError); // Log JSON parse errors
-        onError(`Failed to parse response: ${parseError.message}`);
-        return;
-    }
-    if (response.ok) {
-        if (idTokenGuid && refreshToken) {
-            json.idTokenGuid = idTokenGuid;
-            json.refreshToken = refreshToken;
+        const rawResponse = await response.text();
+        console.log('Raw response:', rawResponse);
+        
+        // Handle empty responses
+        if (!rawResponse) {
+            const error = {
+                status: response.status,
+                message: 'Empty response received'
+            };
+            throw error;
         }
-        console.log('Response OK, invoking onSuccess'); // Success log
-        onSuccess(json);
-    } else {
-        const errorMsg = `Response status ${response.status} (${response.statusText}): ${json?.message || 'No error message provided'}`;
-        console.error(errorMsg); // Log detailed error with fallback
+
+        json = JSON.parse(rawResponse);
+        
+        if (response.ok) {
+            if (idTokenGuid && refreshToken) {
+                json.idTokenGuid = idTokenGuid;
+                json.refreshToken = refreshToken;
+            }
+            onSuccess(json);
+            return;
+        }
+
+        // Handle error responses
+        const error = {
+            status: response.status,
+            statusText: response.statusText,
+            message: json?.message || 'Unknown error occurred',
+            details: json
+        };
+        throw error;
+
+    } catch (error) {
+        // Log error details
+        console.error('Auth Response Error:', {
+            status: error.status || response.status,
+            message: error.message,
+            details: error.details || null
+        });
+
+        // Format user-friendly error message
+        const errorMsg = error.status ? 
+            `Authentication failed (${error.status}): ${error.message}` :
+            'Unable to complete authentication. Please try again.';
+
         onError(errorMsg);
     }
 };
