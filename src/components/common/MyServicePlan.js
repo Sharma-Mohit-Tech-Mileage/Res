@@ -52,7 +52,7 @@ const MyServicePlan = ({ plans, hasEeroDevice, networkId, navigation }) => {
             }
           ]}
           onPress={() => setTabIndex(0)}>
-          <Text style={{ color: tabIndex == 0 ? colors.sparklight_purple_blue : "#4C5458", ...styles.usage }} >{" WiFi Speed"}
+          <Text style={{ color: tabIndex == 0 ? '#8D3B90' : "#4C5458", ...styles.usage }} >{" WiFi Speed"}
           </Text>
         </TouchableOpacity>
         {hasEeroDevice && (
@@ -63,7 +63,7 @@ const MyServicePlan = ({ plans, hasEeroDevice, networkId, navigation }) => {
             style={[tabIndex == 1 ? styles.selectedTab : styles.defaultTab, { borderWidth: 1 }]}
             onPress={() => setTabIndex(1)}
           >
-            <Text style={{ color: tabIndex == 1 ? colors.sparklight_purple_blue : "#4C5458", ...styles.usage }}>
+            <Text style={{ color: tabIndex == 1 ? '#8D3B90' : "#4C5458", ...styles.usage }}>
               {" Modem Speed"}
             </Text>
           </TouchableOpacity>
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     marginHorizontal: wp('5%')
   },
   selectedTab: {
-    backgroundColor: colors.backgound_blue,
+    backgroundColor: 'white',
     borderRadius: 0.5,
     borderColor: colors.grey,
     paddingVertical: 10,
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     width: wp("40%"),
   },
   defaultTab: {
-    backgroundColor: "white",
+    backgroundColor: colors.backgound_blue,
     borderRadius: 0.5,
     borderColor: colors.grey,
     paddingVertical: 10,
