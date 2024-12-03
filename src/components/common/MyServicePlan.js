@@ -48,7 +48,7 @@ const MyServicePlan = ({ plans, hasEeroDevice, networkId, navigation }) => {
             tabIndex == 0 ? styles.selectedTab : styles.defaultTab,
             {
               borderWidth: 1,
-              ...(!hasEeroDevice ? { width: wp('80%') } : {})
+              ...(!hasEeroDevice ? { width: wp('80%'),borderBottomWidth:1 } : {})
             }
           ]}
           onPress={() => setTabIndex(0)}>
