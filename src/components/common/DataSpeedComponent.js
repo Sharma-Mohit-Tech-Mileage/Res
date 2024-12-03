@@ -352,6 +352,7 @@ const styles = StyleSheet.create({
   testSpeedResultContainer: {
     borderColor: colors.grey,
     borderWidth: 1,
+    borderTopWidth:0,
     borderRadius: 0, // Optional: Rounded corners
     marginHorizontal: wp("6%"),
   },

@@ -148,11 +148,15 @@ const styles = StyleSheet.create({
   },
   selectedTab: {
     backgroundColor: 'white',
-    borderRadius: 0.5,
+    borderRadius: 0,
     borderColor: colors.grey,
     paddingVertical: 10,
     paddingHorizontal: 5,
     width: wp("40%"),
+    borderBottomWidth: 0,  // Remove bottom border
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1
   },
   defaultTab: {
     backgroundColor: colors.backgound_blue,
@@ -161,6 +165,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 5,
     width: wp("40%"),
+    borderWidth: 1
   },
 });
 
