@@ -89,6 +89,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 187
         versionName "7.1.0"
+        
         manifestPlaceholders = [
                 appAuthRedirectScheme: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/android/com.sparklight.customer.app/callback'
         ]
@@ -128,22 +129,6 @@ repositories {
     mavenCentral()
     maven {
         url = uri( "https://zendesk.jfrog.io/artifactory/repo")
-    }
-}
-
-allprojects {
-    repositories {
-        exclusiveContent {
-            filter {
-                includeGroup "com.facebook.react"
-            }
-            forRepository {
-                maven {
-                    url "$rootDir/../node_modules/react-native/android"
-                }
-            }
-        }
-        // ...
     }
 }
 
