@@ -57,8 +57,6 @@ const SplashScreen = ({ navigation }) => {
 
   const handleLogin = async (res) => {
     if (res) {
-      console.log("[HANDLE_LOGIN] Received response:***********************************************************************", res.jwtToken);
-  
       let token = res.jwtToken;
       let userInfo = res.userInfo;
       let user = {
@@ -67,9 +65,7 @@ const SplashScreen = ({ navigation }) => {
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken,
       };
-  
-      console.log("[HANDLE_LOGIN] Parsed user info:", JSON.stringify(user));
-  
+
       let isNormalUser =
         userInfo &&
         userInfo.accountNumber &&
@@ -210,21 +206,20 @@ const SplashScreen = ({ navigation }) => {
         }
       });
   };
-  const onError = (error) => {
-    setLoading(false);
-    setDisconnected(true);
-    dispatch(
-      logError({
-        host: DeviceInfo.getSystemName(),
-        application: "Sparklight Residential Mobile App",
-        className: "AuthenticationService",
-        methodName: "callSSOLoginApi",
-        errorDate: new Date().toISOString().split("T")[0],
-        errorData: error,
-        errorCode: 30800,
-      })
-    );
-  };
+  const onError = (error) => { 
+    setLoading(false); 
+    setDisconnected(true); 
+    dispatch( 
+      logError({ 
+        host: DeviceInfo.getSystemName(), 
+        application: "Sparklight Residential Mobile App", 
+        className: "AuthenticationService", 
+        methodName: "callSSOLoginApi", 
+        errorDate: new Date().toISOString().split("T")[0], 
+        errorData: error||"Error fetching data", 
+        errorCode: 30800, 
+      }) ); 
+    };
 
   const CustomAlertModal = ({
     visible,
@@ -309,7 +304,6 @@ const SplashScreen = ({ navigation }) => {
         idTokenGuid: result.authorizeAdditionalParameters.session_state,
         refreshToken: result.refreshToken,
       };
-
       setLoading(true);
       storeSsoToken(data);
       callSSOLoginApi(data);
