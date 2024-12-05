@@ -108,7 +108,8 @@ export const transformResponse = (responseArray) => {
     const subscriptionDetails = smsMessageType.map(msgType => {
         return {
             type: msgType.messageType,
-            status: !msgType.optOutFlag ? 'On' : 'Off'
+            status: !msgType.optOutFlag ? 'On' : 'Off',
+            warn:false
         };
     });
 
@@ -224,9 +225,9 @@ export const getRoleBasedMessage = (input) => {
 export const transformNotificationPreferences = (response) => {
     // console.log('Default structure for when data is missing or in an unexpected format', JSON.stringify(response));
     const defaultStructure = [
-        { type: 'Appointments', status: 'Off' },
-        { type: 'Outage', status: 'Off' },
-        { type: 'Billing', status: 'Off' }
+        { type: 'Appointments', status: 'Off', warn: false },
+        { type: 'Outage', status: 'Off' , warn: false},
+        { type: 'Billing', status: 'Off' ,  warn: false }
     ];
 
     if (!response || !Array.isArray(response) || response.length === 0) {
@@ -328,5 +329,20 @@ export const checkForMinorUpdate = async () => {
     };
 };
 
+export const updateEmailList = (emailList, type) => {
+    console.log('emailList print =========================', emailList);
+    return emailList.map(email => {
+      const marketingFlag = type === 'add' ? true : false;
+      return {
+        emailAddress:email,
+        marketing: marketingFlag, 
+        invoice: false,
+        collection: false,
+        iptv: false,
+        tiVo: false,
+        function: type || 'add'
+      };
+    });
+  };
 
 
