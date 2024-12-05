@@ -104,86 +104,50 @@ const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess
         onError(error.message);
     }
 };
-
-const handleAuthResponse = async (response, idTokenGuid, refreshToken, onSuccess, onError) => {
-    let json;
-    try {
-        const rawResponse = await response.text();
-        console.log('Raw response:', rawResponse);
-        
-        // Handle empty responses
-        if (!rawResponse) {
-            const error = {
-                status: response.status,
-                message: 'Empty response received'
-            };
-            throw error;
-        }
-
-        json = JSON.parse(rawResponse);
-        
-        if (response.ok) {
-            if (idTokenGuid && refreshToken) {
-                json.idTokenGuid = idTokenGuid;
-                json.refreshToken = refreshToken;
-            }
-            onSuccess(json);
-            return;
-        }
-
-        // Handle error responses
-        const error = {
-            status: response.status,
-            statusText: response.statusText,
-            message: json?.message || 'Unknown error occurred',
-            details: json
-        };
-        throw error;
-
-    } catch (error) {
-        // Log error details
-        console.error('Auth Response Error:', {
-            status: error.status || response.status,
-            message: error.message,
-            details: error.details || null
-        });
-
-        // Format user-friendly error message
-        const errorMsg = error.status ? 
-            `Authentication failed (${error.status}): ${error.message}` :
-            'Unable to complete authentication. Please try again.';
-
-        onError(errorMsg);
-    }
-};
-
-// Post request with authentication for specific endpoints
+  
 export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => {
-    console.log(`Initiating POST request to ${endpoint}...`); // Start log
-    const idTokenGuid = body.idTokenGuid;
-    const refreshToken = body.refreshToken;
-    delete body.idTokenGuid;
-    delete body.refreshToken;
-    const options = {
-        method: 'POST',
+    const idTokenGuid = body?.idTokenGuid;
+    const refreshToken = body?.refreshToken;
+    
+    try {
+      const requestBody = { ...body };
+      delete requestBody.idTokenGuid;
+      delete requestBody.refreshToken;
+      const res = await axios.post(`${BASE_URL}${endpoint}`, requestBody, {
         headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(body)
-    };
+        timeout: 30000,
+        validateStatus: (status) => status >= 200 && status < 300
+      });
+      const responseData = { ...res.data };
+      if (idTokenGuid) {
+        responseData.idTokenGuid = idTokenGuid;
+      }
+      if (refreshToken) {
+        responseData.refreshToken = refreshToken;
+      }
+      console.debug(`API call to ${endpoint} successful`);
+      onSuccess(responseData);
+    } catch (err) {
+      const errorResponse = {
+        err,
+        status: err.response?.status,
+        message: err.response?.data?.message || err.message || 'Request failed',
+        endpoint,
+        timestamp: new Date().toISOString()
+      };
 
-    console.log('Request options:', options); // Log request options
-    fetch(`${BASE_URL}${endpoint}`, options)
-        .then(response => handleAuthResponse(response, idTokenGuid, refreshToken, onSuccess, onError))
-        .catch(exception => {
-            const errorLog = `Fetch error: ${exception.message || 'Unknown error'}`;
-            console.error(errorLog); // Log fetch error
-            onError(errorLog);
-        });
-};
-
-// Generic POST API request function
+      console.error('PostAuthApiRequest error:', {
+        err,
+        endpoint,
+        status: errorResponse.status,
+        message: errorResponse.message
+      });
+      onError(errorResponse);
+    }
+  };
 export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     const user = await getUser();
     const baseUrl = await getBaseUrl(); // Dynamically get the base URL
@@ -200,7 +164,6 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
         .then(response => handleFetchResponse(response, `${baseUrl}${endpoint}`, onSuccess, onError));
 };
 
-// Function to upload multipart data
 export const UploadMultipartData = async (endpoint, data, onSuccess, onError) => {
     const user = await getUser();
     const baseUrl = await getBaseUrl(); // Dynamically get the base URL

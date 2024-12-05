@@ -8,6 +8,7 @@ import PasswordSecurity from '../../components/userProfile/PasswordSecurity';
 import PasswordSecurityEdit from '../../components/userProfile/PasswordSecurityEdit';
 import Notifications from '../../components/notifiction/Notifications';
 import EmailNotifications from '../../components/notifiction/EmailNotifications'
+import AddEmailNotification from '../../components/notifiction/AddEmailNotification'
 import InAppNotifications from '../../components/notifiction/InAppNotifications'
 import TextNotifications from '../../components/notifiction/TextNotifications'
 import UserManagement from '../../components/userManagement/UserManagement';
@@ -166,6 +167,15 @@ function AccountStackScreen() {
             <AccountStack.Screen
                 name="ThumbsUp"
                 component={ThumbsUp}
+                options={{ headerShown: false }}
+                listeners={{
+                    focus: () => setTabBarVisible(true),
+                    blur: () => setTabBarVisible(true)
+                }}
+            />
+            <AccountStack.Screen
+                name="AddEmailNotification"
+                component={AddEmailNotification}
                 options={{ headerShown: false }}
                 listeners={{
                     focus: () => setTabBarVisible(true),
