@@ -181,7 +181,7 @@ const AddEmailNotification = () => {
                         Opt for email statements and say goodbye to paper clutter. It’s convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you’ll also receive occasional updates and offers via email
                         </Text>
                     </View>
-                    <View style={styles.divider} />
+                    {/* <View style={styles.divider} /> */}
                     {/* <View style={styles.section}>
                         <View style={styles.toggleContainer}>
                             <Text style={styles.sectionLabel}>Marketing Communications</Text>

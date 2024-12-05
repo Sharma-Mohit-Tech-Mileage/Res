@@ -272,7 +272,7 @@ const EmailNotifications = () => {
         {(paperlessEmails.length > 0||acknowledgement) &&
           <View style={styles.sectionBox}>
             <Text style={styles.infoTitle}>Paperless Billing</Text>
-            <Text style={styles.infoText}>Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information secure.</Text>
+            <Text style={styles.infoText}> Opt for email statements and say goodbye to paper clutter. It’s convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you’ll also receive occasional updates and offers via email.</Text>
             <FlatList
               data={paperlessEmails}
               renderItem={(item) => renderEmailItem({ ...item, section: 'paperless',disabled:acknowledgement })}
