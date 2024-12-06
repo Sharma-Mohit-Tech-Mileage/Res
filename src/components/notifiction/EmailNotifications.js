@@ -328,7 +328,7 @@ const renderEmailItemWithTrash = ({ item }) => (
           </Text>
         </View>
 
-        {(paperlessEmails.length > 0 || acknowledgement) && (
+        {(paperlessEmails.length > 0 || (allSvEmailAssociated.length >0 && acknowledgement)) && (
           <View 
             style={styles.sectionBox}
             accessible={true}
