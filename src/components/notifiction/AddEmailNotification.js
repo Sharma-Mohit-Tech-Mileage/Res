@@ -181,7 +181,7 @@ const AddEmailNotification = () => {
                             Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips.
                         </Text>
                     </View>
-                    <View style={styles.divider} />
+                    {/* <View style={styles.divider} />
                     <View style={styles.section}>
                         <View style={styles.toggleContainer}>
                             <Text style={styles.sectionLabel}>Marketing Communications</Text>
@@ -195,7 +195,7 @@ const AddEmailNotification = () => {
                         <Text style={styles.description}>
                             Be the first to know about exciting updates like plan upgrades and new features!
                         </Text>
-                    </View>
+                    </View> */}
                 </View>
                 <View style={styles.buttonContainer}>
                 <SecondaryButton
