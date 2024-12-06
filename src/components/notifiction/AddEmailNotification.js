@@ -178,11 +178,11 @@ const AddEmailNotification = () => {
                             />
                         </View>
                         <Text style={styles.description}>
-                        Opt for email statements and say goodbye to paper clutter. It’s convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you’ll also receive occasional updates and offers via email
+                            Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips.
                         </Text>
                     </View>
-                    {/* <View style={styles.divider} /> */}
-                    {/* <View style={styles.section}>
+                    <View style={styles.divider} />
+                    <View style={styles.section}>
                         <View style={styles.toggleContainer}>
                             <Text style={styles.sectionLabel}>Marketing Communications</Text>
                             <Toggle
@@ -195,12 +195,25 @@ const AddEmailNotification = () => {
                         <Text style={styles.description}>
                             Be the first to know about exciting updates like plan upgrades and new features!
                         </Text>
-                    </View> */}
+                    </View>
                 </View>
                 <View style={styles.buttonContainer}>
-                    <SecondaryButton title={"Save"} buttonType="submit" onPress={handleSubmit(handleSave, handleValidationError)} />
-                    <SecondaryButton title={"Cancel"} onPress={() => navigation.navigate("Notifications")} />
-                </View>
+                <SecondaryButton
+                    accessibilityLabel="Save email notifications settings"
+                    accessibilityHint="Tap to save your email notifications settings"
+                    accessibilityRole="button"
+                    title={"Save"}
+                    buttonType="submit"
+                    onPress={handleSubmit(handleSave, handleValidationError)}
+                />
+                <SecondaryButton
+                    accessibilityLabel="Cancel email notifications settings"
+                    accessibilityHint="Tap to cancel your email notifications settings"
+                    accessibilityRole="button"
+                    title={"Cancel"}
+                    onPress={() => navigation.navigate("Notifications")}
+                />
+            </View>
             </ScrollView>
         </View>
     );
