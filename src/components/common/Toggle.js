@@ -2,7 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Animated, TouchableWithoutFeedback, View, StyleSheet, Easing } from 'react-native';
 import { Color } from "../../../GlobalStyles";
 
-const Toggle = ({ name, onToggle, initialValue = false, disabled = false, label = '' }) => {
+const Toggle = ({ 
+    name, 
+    onToggle, 
+    initialValue = false, 
+    disabled = false, 
+    label = '', 
+    section = ''
+}) => {
     const [isActive, setIsActive] = useState(initialValue);
     const translateX = useRef(new Animated.Value(isActive ? 8 : -8)).current;
 
@@ -38,23 +45,28 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false, label 
         }).start();
     };
 
-    const accessibilityProps = {
-        accessible: true,
-        accessibilityRole: "switch",
-        accessibilityState: { 
-            checked: isActive || false,
-            disabled: disabled || false
-        },
-        accessibilityLabel: label,
-        accessibilityHint: disabled ? "" : "Double tap to toggle"
-     };
-    
+    const getAccessibilityLabel = () => {
+        const status = isActive ? 'enabled' : 'disabled';
+        const sectionLabel = {
+            paperless: `Paperless billing notifications ${status} for ${name}`,
+            marketing: `Marketing communications ${status} for ${name}`,
+            iptv: `Sparklight TV notifications ${status} for ${name}`
+        }[section] || label;
+
+        return `${sectionLabel}${disabled ? '. This setting cannot be changed' : ''}`;
+    };
 
     return (
         <TouchableWithoutFeedback
             onPress={handleToggle}
-            {...accessibilityProps}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            accessible={true}
+            accessibilityLabel={getAccessibilityLabel()}
+            accessibilityState={{ 
+                checked: isActive,
+                disabled
+            }}
+            accessibilityHint={disabled ? undefined : 'Toggle setting'}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
             <View style={styles.toggleWrapper}>
                 <View style={styles.toggle}>
@@ -75,11 +87,14 @@ const Toggle = ({ name, onToggle, initialValue = false, disabled = false, label 
         </TouchableWithoutFeedback>
     );
 };
+
 const styles = StyleSheet.create({
     toggleWrapper: {
         padding: 8,
         justifyContent: 'center',
         alignItems: 'center',
+        minWidth: 44,
+        minHeight: 44,
     },
     toggleBase: {
         borderRadius: 20,
