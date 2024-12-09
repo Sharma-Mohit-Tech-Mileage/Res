@@ -338,7 +338,7 @@ const EmailNotifications = () => {
               Paperless Billing
             </Text>
             <Text style={styles.infoText}>
-              Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information secure.
+            Opt for email statements and say goodbye to paper clutter. It’s convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you’ll also receive occasional updates and offers via email.
             </Text>
             <FlatList
               data={paperlessEmails}
@@ -448,7 +448,7 @@ const EmailNotifications = () => {
 
       <ScrollView
         ref={scrollViewRef}
-       
+
       >
         <FlatList
           ListHeaderComponent={ListHeaderComponent}

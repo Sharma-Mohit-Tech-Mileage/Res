@@ -2,12 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Animated, TouchableWithoutFeedback, View, StyleSheet, Easing } from 'react-native';
 import { Color } from "../../../GlobalStyles";
 
-const Toggle = ({ 
-    name, 
-    onToggle, 
-    initialValue = false, 
-    disabled = false, 
-    label = '', 
+const Toggle = ({
+    name,
+    onToggle,
+    initialValue = false,
+    disabled = false,
+    label = '',
     section = ''
 }) => {
     const [isActive, setIsActive] = useState(initialValue);
@@ -61,19 +61,15 @@ const Toggle = ({
             onPress={handleToggle}
             accessible={true}
             accessibilityLabel={getAccessibilityLabel()}
-            accessibilityState={{ 
-                checked: isActive,
-                disabled
-            }}
             accessibilityHint={disabled ? undefined : 'Toggle setting'}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
             <View style={styles.toggleWrapper}>
                 <View style={styles.toggle}>
-                    <View style={[styles.toggleBase, { 
-                        backgroundColor: isActive ? 
-                            (disabled ? Color.Gray300 : Color.sparklightGreen) : 
-                            (disabled ? Color.Gray300 : Color.sparklightDarkGray) 
+                    <View style={[styles.toggleBase, {
+                        backgroundColor: isActive ?
+                            (disabled ? Color.Gray300 : Color.sparklightGreen) :
+                            (disabled ? Color.Gray300 : Color.sparklightDarkGray)
                     }]}>
                         <Animated.View
                             style={[styles.circle, {
