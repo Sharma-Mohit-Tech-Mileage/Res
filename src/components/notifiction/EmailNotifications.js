@@ -213,7 +213,7 @@ const EmailNotifications = () => {
           name={item.emailAddress}
           initialValue={toggleStates[item.emailAddress]?.[section] || false}
           onToggle={(event) => handleToggleChange(event, section)}
-          disabled={true}
+          disabled={disabled}
           section={section}
         />
       </View>
@@ -355,7 +355,7 @@ const EmailNotifications = () => {
                   showCloseIcon={false}
                   splitKey="Resend Confirmation Email"
                   nextRow={true}
-                  message={`To continue with Paperless Billing, please confirm your email address (${acknowledgement}) with the verification link sent to your inbox cotact us.`}
+                  message={`To continue with Paperless Billing, please confirm your email address (${acknowledgement}) with the verification link sent to your inbox.`}
                   accessibilityLabel={`Email confirmation needed for ${acknowledgement}`}
                   accessibilityLiveRegion="polite"
                 />
@@ -448,7 +448,7 @@ const EmailNotifications = () => {
 
       <ScrollView
         ref={scrollViewRef}
-        
+       
       >
         <FlatList
           ListHeaderComponent={ListHeaderComponent}
