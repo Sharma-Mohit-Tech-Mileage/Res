@@ -494,6 +494,21 @@ React.useEffect(() => {
     )
   }
 
+  const RenderPasswordErrorMsg=()=>{
+    return(
+    <View
+       style={{paddingHorizontal:10}}
+      >
+        <Text style={[styles.modemHealthSupport]}>
+        {`We’re sorry! We Can only update the WiFi password for the supported modem models.
+
+To add a Sparklight Modem to your account, please contact our support team.
+        `}
+          </Text>
+      </View>
+    )
+  }
+
   return (
     <View style={styles.manageEquipment}>
       <ProfileSettingsHeader
@@ -799,6 +814,7 @@ React.useEffect(() => {
           </View>
 
           {/* WiFi Password */}
+          
           {(wifiPasswordCanChange || isEEroDevice) && (
             <View
               style={[styles.myModem, styles.myModemSpaceBlock, { marginTop: 20 },]}
@@ -808,8 +824,24 @@ React.useEffect(() => {
                   WiFi Password
                 </Text>
               </View>
+             
               {isEEroDevice ? renderEEroDeviceOptions() : renderOtherDeviceOptions()}
+              
             </View>
+          )}
+
+          {(!modemSupported && !loading)  && (
+            <View
+              style={[styles.myModem, styles.myModemSpaceBlock, { marginTop: 20 },]}
+            >
+              <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
+                <Text style={[styles.myModem1, styles.myModem1Typo]}>
+                  WiFi Password
+                </Text>
+                
+              </View>
+                 <RenderPasswordErrorMsg/>
+                  </View>
           )}
 
           {/* Quick Link section */}
