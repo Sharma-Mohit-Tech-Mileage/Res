@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Alert, TouchableWithoutFeedback, Keyboard  } from "react-native";
+import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Alert, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
@@ -11,7 +11,7 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 const EmailNotifications = ({ navigation }) => {
     const dispatch = useDispatch();
     const [input, setInput] = useState('');
-    const profile = useSelector(state => state.combinedReducers.profile || {});    
+    const profile = useSelector(state => state.combinedReducers.profile || {});
     const [enableButton, setEnableButton] = useState(false);
     const [keyboardHidden, setKeyboardHidden] = useState(true);
     const [textInputLayout, setTextInputLayout] = useState({});
@@ -31,19 +31,19 @@ const EmailNotifications = ({ navigation }) => {
         };
     }, []);
 
-    useEffect(() => {     
+    useEffect(() => {
 
         if (profile.profileDetails !== undefined
             && profile.profileDetails.svEmailAddress !== undefined
             && profile.profileDetails.svEmailAddress !== null
             && profile.profileDetails.svEmailAddress !== "Multiple Emails"
             && profile.profileDetails.svEmailAddress.length > 0) {
-                setInput(profile.profileDetails.svEmailAddress);
-                setEnableButton(true);
+            setInput(profile.profileDetails.svEmailAddress);
+            setEnableButton(true);
         }
 
-    }, []);    
-  
+    }, []);
+
     useEffect(() => {
         if (!keyboardHidden) {
             scrollRef.current?.scrollTo({
@@ -51,7 +51,7 @@ const EmailNotifications = ({ navigation }) => {
                 animated: true,
             });
         }
-    }, [keyboardHidden]); 
+    }, [keyboardHidden]);
 
     const onChangeText = (text) => {
         setInput(text);
@@ -59,8 +59,8 @@ const EmailNotifications = ({ navigation }) => {
             setEnableButton(true);
         } else {
             setEnableButton(false);
-        }        
-    };    
+        }
+    };
 
     const keyboardDismiss = () => {
         Keyboard.dismiss();
@@ -74,82 +74,123 @@ const EmailNotifications = ({ navigation }) => {
         console.log('enableEmailNotifications: ', data);
         dispatch(updateEntryEmailNotification(data, navigation));
     };
-    
+
     return (
-        <View style={styles.container}  accessibilityLabel="Notifications Page">
-            <ScrollView 
+        <View style={styles.container} accessibilityLabel="Notifications Page">
+            <ScrollView
                 style={styles.inner}
                 contentContainerStyle={styles.innerContent}
                 accessibilityLabel="Scrollable content for notification settings"
-            >          
-                <ProfileSettingsHeader 
+            >
+                <ProfileSettingsHeader
                     showIcon={false}
                     title={'Notifications'}
                     accessibilityLabel="Notifications Header"
                 />
-                <View style={styles.headerTabView}  accessibilityLabel="Notification Categories">
+                <View style={styles.headerTabView} accessibilityLabel="Notification Categories">
                     <View style={styles.headerTabOne} />
                     <View style={styles.headerTabTwo} />
                     <View style={styles.headerTabThree} />
                 </View>
-                <View style={styles.viewContainer}>
-                    <View  accessibilityLabel="Email Notification Section">
-                        <View style={styles.headerIconViewContainer}>
-                            <View style={styles.headerIconView}  accessibilityLabel="Email Notification Icon">
+                <View
+                    style={styles.viewContainer}
+                    accessible={true}
+                    accessibilityRole="none"
+                    accessibilityLabel="Email notification setup section"
+                >
+                    <View
+                        accessible={true}
+                        accessibilityRole="none"
+                        accessibilityLabel="Email notification options"
+                    >
+                        <View
+                            style={styles.headerIconViewContainer}
+                            accessible={true}
+                            accessibilityRole="none"
+                        >
+                            <View
+                                style={styles.headerIconView}
+                                accessible={true}
+                                accessibilityRole="image"
+                                accessibilityLabel="Email notification icon"
+                            >
                                 <MailRingingIcon />
                             </View>
                         </View>
-                        <View style={styles.header}>
-                            <Text style={styles.headerText}  accessibilityLabel="Turn on Email Notifications">Turn on Email Notifications</Text>
-                        </View>         
-                        <View style={styles.subHeader}>
-                            <Text style={styles.subHeaderText}  accessibilityLabel="Notification Description">Receive email alerts related to your account, updates and more from Sparklight.</Text>
-                        </View>   
+                        <View
+                            style={styles.header}
+                            accessible={true}
+                            accessibilityRole="header"
+                        >
+                            <Text
+                                style={styles.headerText}
+                                accessible={true}
+                                accessibilityRole="text"
+                                accessibilityLabel="Turn on Email Notifications"
+                            >
+                                Turn on Email Notifications
+                            </Text>
+                        </View>
+                        <View
+                            style={styles.subHeader}
+                            accessible={true}
+                            accessibilityRole="none"
+                        >
+                            <Text
+                                style={styles.subHeaderText}
+                                accessible={true}
+                                accessibilityRole="text"
+                                accessibilityLabel="Receive email alerts related to your account, updates and more from Sparklight"
+                            >
+                                Receive email alerts related to your account, updates and more from Sparklight.
+                            </Text>
+                        </View>
                     </View>
                     <>
-                    {
-                        profile.profileDetails !== undefined
-                        && profile.profileDetails.multipleEmails ?
-                        (
-                            <View 
+                        {profile.profileDetails !== undefined && profile.profileDetails.multipleEmails ? (
+                            <View
                                 style={styles.notificationAlert}
-                                 accessibilityLabel="Email Retrieval Error"
+                                accessible={true}
+                                accessibilityRole="alert"
+                                accessibilityLabel="Warning: Unable to retrieve email address"
                             >
                                 <NotificationAlert
                                     type={"warning"}
-                                    title={"There is a problem retrieving your email address"}
+                                    title={"Multiple Email Addresses Detected"}
                                     showCloseIcon={false}
-                                    message={"We are not able to retrieve the email address for your account. Please contact us for assistance"}
-                                />                                                 
-                            </View>   
-                        )
-                        :
-                        (
-                            <View 
+                                    message='We found multiple emails linked to your account. Visit the Accountscreen to set your preferred email.'
+                                    accessible={true}
+                                    accessibilityLabel="We found multiple emails linked to your account. Visit the Account screen to set your preferred email."
+                                />
+                            </View>
+                        ) : (
+                            <View
                                 style={styles.subInput}
                                 onLayout={(event) => {
                                     setTextInputLayout(event.nativeEvent.layout);
                                 }}
-                            
-                                accessibilityLabel="Email Input"
+                                accessible={true}
+                                accessibilityRole="none"
+                                accessibilityLabel="Email address input section"
                             >
-                            <EntryInput
-                                iconImage={require('../../../assets/mail.png')}
-                                placeholder="Email Address"
-                                input={input}
-                                onChangeText={onChangeText}
-                                onSubmitText={keyboardDismiss}
-                                keyboardType="email-address"
-                                accessibilityLabel="Enter your email address"
-                                accessibilityHint="Double tap to edit your email address"
-                            />                
-                            </View>   
-                        )
-                    } 
-                    </>                     
+                                <EntryInput
+                                    iconImage={require('../../../assets/mail.png')}
+                                    placeholder="Email Address"
+                                    input={input}
+                                    onChangeText={onChangeText}
+                                    onSubmitText={keyboardDismiss}
+                                    keyboardType="email-address"
+                                    accessible={true}
+                                    accessibilityRole="search"
+                                    accessibilityLabel="Email address input field"
+                                    accessibilityHint="Double tap to enter your email address for notifications"
+                                />
+                            </View>
+                        )}
+                    </>
                 </View>
                 <View style={styles.bottomContainer}>
-                </View>                                    
+                </View>
                 <View style={styles.bottomBar}>
                     <Pressable
                         disabled={!enableButton}
@@ -157,10 +198,10 @@ const EmailNotifications = ({ navigation }) => {
                         onPress={enableEmailNotifications}
                         accessibilityRole="button"
                         accessibilityLabel={enableButton ? "Enable Email Notifications" : "Enable Email Notifications (disabled)"}
-                    >                      
-                        <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]}  accessibilityLabel="Enable Button Text">Enable Email Notifications</Text>
-                    </Pressable>                
-                    <View style={styles.buttonsParent}  accessibilityLabel="Skip for now Button">
+                    >
+                        <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]} accessibilityLabel="Enable Button Text">Enable Email Notifications</Text>
+                    </Pressable>
+                    <View style={styles.buttonsParent} accessibilityLabel="Skip for now Button">
                         <Pressable
                             style={[styles.buttonDecline, styles.buttonsLayout]}
                             onPress={() => {
@@ -169,35 +210,35 @@ const EmailNotifications = ({ navigation }) => {
                                     routes: [{ name: 'MyTab' }],
                                 });
                             }}
-                            
+
                             accessibilityRole="button"
                             accessibilityLabel="Skip for now"
                         >
-                            <Text style={styles.decline}  accessibilityLabel="Skip for now Text">Skip for now</Text>
+                            <Text style={styles.decline} accessibilityLabel="Skip for now Text">Skip for now</Text>
                         </Pressable>
-                    </View>    
+                    </View>
                 </View>
                 {
                     !keyboardHidden &&
                     (
                         <View style={styles.textBottomHeight} />
                     )
-                }                    
+                }
             </ScrollView>
         </View>
     );
-    
+
 };
 
 const styles = StyleSheet.create({
     bottomBar: {
         backgroundColor: '#FFF',
         justifyContent: 'center',
-        alignItems: 'center',  
+        alignItems: 'center',
     },
     buttonDecline: {
         marginBottom: 50
-    },    
+    },
     button: {
         backgroundColor: Color.colorMidnightblue,
         marginBottom: 20,
@@ -210,17 +251,17 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRadius: Border.br_11xs,
         minHeight: 50,
-    },    
+    },
     buttonDisabled: {
         backgroundColor: Color.colorWhitesmoke_300,
         color: Color.colorGray_200
     },
     buttonDisabledText: {
         color: Color.sparklightaddGray
-    },    
+    },
     buttonsParent: {
         width: '90%',
-    },    
+    },
     accept: {
         fontSize: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,
@@ -230,7 +271,7 @@ const styles = StyleSheet.create({
     decline: {
         color: Color.colorMidnightblue,
         textAlign: "center",
-    },    
+    },
     inner: {
         flex: 1,
     },
@@ -262,7 +303,7 @@ const styles = StyleSheet.create({
         tintColor: '#CCC',
         width: '100%',
         height: '100%'
-    },  
+    },
     headerIconViewContainer: {
         alignItems: 'center',
     },
@@ -275,8 +316,8 @@ const styles = StyleSheet.create({
         shadowColor: "#171717",
         shadowOffset: { width: -2, height: 1 },
         shadowOpacity: 0.2,
-        shadowRadius: 10,  
-        marginBottom: 10,    
+        shadowRadius: 10,
+        marginBottom: 10,
     },
     headerTabView: {
         flexDirection: 'row',
@@ -300,10 +341,10 @@ const styles = StyleSheet.create({
         width: 100,
         height: 5,
         marginLeft: 10
-    },            
+    },
     header: {
         paddingTop: 10,
-    },    
+    },
     headerText: {
         fontFamily: FontFamily.openSansRegular,
         fontSize: 22,
@@ -321,11 +362,11 @@ const styles = StyleSheet.create({
         color: Color.colorGray_100,
         paddingHorizontal: 20,
         marginTop: 10
-    }, 
+    },
     subInput: {
         marginTop: 20,
         marginBottom: 20
-    },    
+    },
     viewContainer: {
         flex: 1,
         width: '100%',
@@ -337,11 +378,11 @@ const styles = StyleSheet.create({
     },
     bottomContainer: {
         height: 170,
-    },    
+    },
     notificationAlert: {
         paddingTop: Padding.p_base,
         paddingHorizontal: Padding.p_5xl,
-        alignSelf: "stretch",        
+        alignSelf: "stretch",
     }
 });
 
