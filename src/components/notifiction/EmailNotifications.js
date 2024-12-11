@@ -194,18 +194,13 @@ const EmailNotifications = () => {
       key={item.emailAddress}
       style={styles.emailItem}
       accessible={true}
-      accessibilityLabel={`Email settings for ${item.emailAddress}`}
+      accessibilityLabel={`${section === 'paperless' ? 'Paperless billing' : section === 'marketing' ? 'Marketing' : 'Sparklight TV'} email: ${item.emailAddress.toLowerCase()}. ${disabled ? 'Settings cannot be modified.' : 'Toggle switch available to modify settings.'}`}
     >
-      <Text
-        style={styles.infoTitle}
-        accessible={true}
-      >
-        Email address
-      </Text>
+
       <View style={styles.emailAddressContainer}>
         <Text
           style={styles.emailText}
-          accessibilityLabel={`Email: ${item.emailAddress.toLowerCase()}`}
+          accessibilityLabel={item.emailAddress.toLowerCase()}
         >
           {item.emailAddress.toLowerCase()}
         </Text>
@@ -225,11 +220,8 @@ const EmailNotifications = () => {
       key={item.emailAddress}
       style={styles.emailItem}
       accessible={true}
-      accessibilityLabel={`Additional email ${item.emailAddress}`}
+      accessibilityLabel={`Additional email address: ${item.emailAddress.toLowerCase()}. Double tap delete button to remove this email.`}
     >
-      <Text style={styles.infoTitle}>
-        Email address
-      </Text>
       <View style={styles.emailAddressContainer}>
         <Text
           style={styles.emailText}
@@ -240,8 +232,9 @@ const EmailNotifications = () => {
         <Pressable
           onPress={() => handleDelete(item.emailAddress)}
           accessible={true}
-          accessibilityLabel={`Delete email ${item.emailAddress}`}
+          accessibilityLabel={`Delete ${item.emailAddress}`}
           accessibilityHint="Double tap to delete this email address"
+          accessibilityRole="button"
           style={styles.deleteButton}
         >
           <Image
@@ -293,6 +286,7 @@ const EmailNotifications = () => {
               style={styles.addButton}
               onPress={() => navigation.navigate('AddEmailNotification', { newEmail: paperlessEmails.length === 0 })}
               accessible={true}
+              accessibilityRole="button"
               accessibilityLabel="Add new email notification"
               accessibilityHint="Double tap to add a new email address"
             >
@@ -304,7 +298,8 @@ const EmailNotifications = () => {
         <View
           style={styles.sectionBox_info}
           accessible={true}
-          accessibilityLabel="Critical Notifications Information"
+          accessibilityLabel="Critical Notifications Section. We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications."
+          accessibilityRole="header"
         >
           <View style={styles.emailItem}>
             <Text style={[styles.emailText, { fontWeight: '600' }]}>
@@ -323,7 +318,10 @@ const EmailNotifications = () => {
               }
             />
           </View>
-          <Text style={[styles.infoText, { color: Color.colorGray_200 }]}>
+          <Text
+            style={[styles.infoText, { color: Color.colorGray_200 }]}
+            accessibilityRole="text"
+          >
             We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications.
           </Text>
         </View>
@@ -332,19 +330,26 @@ const EmailNotifications = () => {
           <View
             style={styles.sectionBox}
             accessible={true}
-            accessibilityLabel="Paperless Billing section"
+            accessibilityLabel="Paperless Billing Section. Opt for email statements and say goodbye to paper clutter. It’s convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you’ll also receive occasional updates and offers via email."
+            accessibilityRole="header"
           >
             <Text style={styles.infoTitle}>
               Paperless Billing
             </Text>
-            <Text style={styles.infoText}>
-            Opt for email statements and say goodbye to paper clutter. It’s convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you’ll also receive occasional updates and offers via email.
+            <Text
+              style={styles.infoText}
+              accessibilityRole="text"
+            >
+              Opt for email statements and say goodbye to paper clutter. It’s convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you’ll also receive occasional updates and offers via email.
             </Text>
+            {paperlessEmails.length > 0 && <Text style={styles.infoTitle}>
+              Email address
+            </Text>}
             <FlatList
               data={paperlessEmails}
               renderItem={(item) => renderEmailItem({ ...item, section: 'paperless', disabled: acknowledgement })}
               keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
-              accessibilityLabel="List of paperless billing emails"
+              accessibilityLabel="List of paperless billing email addresses"
             />
             {acknowledgement && (
               <View style={{ marginVertical: 8 }}>
@@ -368,22 +373,26 @@ const EmailNotifications = () => {
           <View
             style={styles.sectionBox}
             accessible={true}
-            accessibilityLabel="Sparklight TV section"
+            accessibilityLabel="Sparklight TV Section. This email address is tied to your TV service and can only be managed via the Sparklight TV Interface."
+            accessibilityRole="header"
           >
-            <Text
-              style={styles.infoTitle}
-              accessibilityRole="text"
-            >
+            <Text style={styles.infoTitle}>
               Sparklight TV
             </Text>
-            <Text style={styles.infoText}>
+            <Text
+              style={styles.infoText}
+              accessibilityRole="text"
+            >
               This email address is tied to your TV service and can only be managed via the Sparklight TV Interface.
+            </Text>
+            <Text style={styles.infoTitle}>
+              Email address
             </Text>
             <FlatList
               data={sparklightTvEmails}
               renderItem={(item) => renderEmailItem({ ...item, section: 'iptv', disabled: true })}
               keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
-              accessibilityLabel="Sparklight TV email list"
+              accessibilityLabel="List of Sparklight TV email addresses"
             />
           </View>
         )}
@@ -392,22 +401,26 @@ const EmailNotifications = () => {
           <View
             style={styles.sectionBox}
             accessible={true}
-            accessibilityLabel="Marketing Communications section"
+            accessibilityLabel="Marketing Communications Section. Be the first to know about our latest offers, promotions, and news."
+            accessibilityRole="header"
           >
-            <Text
-              style={styles.infoTitle}
-              accessibilityRole="text"
-            >
+            <Text style={styles.infoTitle}>
               Marketing Communications
             </Text>
-            <Text style={styles.infoText}>
+            <Text
+              style={styles.infoText}
+              accessibilityRole="text"
+            >
               Be the first to know about our latest offers, promotions, and news.
+            </Text>
+            <Text style={styles.infoTitle}>
+              Email address
             </Text>
             <FlatList
               data={marketingEmails}
               renderItem={(item) => renderEmailItem({ ...item, section: 'marketing' })}
               keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
-              accessibilityLabel="Marketing emails list"
+              accessibilityLabel="List of marketing email addresses"
             />
           </View>
         )}
@@ -416,19 +429,20 @@ const EmailNotifications = () => {
           <View
             style={styles.sectionBox}
             accessible={true}
-            accessibilityLabel="Additional Email Addresses section"
+            accessibilityLabel="Additional Email Addresses Section. Manage supplementary email addresses associated with your account."
+            accessibilityRole="header"
           >
-            <Text
-              style={styles.infoTitle}
-              accessibilityRole="text"
-            >
+            <Text style={styles.infoTitle}>
               Additional Email Addresses
+            </Text>
+            <Text style={styles.infoTitle}>
+              Email address
             </Text>
             <FlatList
               data={[...new Set(additionalEmails)]}
               renderItem={renderEmailItemWithTrash}
               keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
-              accessibilityLabel="Additional emails list"
+              accessibilityLabel="List of additional email addresses"
             />
           </View>
         )}
@@ -462,6 +476,7 @@ const EmailNotifications = () => {
                   ]}
                   onPress={handleSave}
                   accessible={true}
+                  accessibilityRole="button"
                   accessibilityLabel={isSubmitting ? "Saving changes" : "Save changes"}
                   accessibilityState={{ disabled: isSubmitting }}
                   accessibilityHint="Double tap to save all changes"
@@ -477,6 +492,7 @@ const EmailNotifications = () => {
                   ]}
                   onPress={() => navigation.navigate("Notifications")}
                   accessible={true}
+                  accessibilityRole="button"
                   accessibilityLabel="Cancel changes"
                   accessibilityHint="Double tap to discard changes and return to notifications"
                 >
@@ -580,7 +596,7 @@ const styles = StyleSheet.create({
     color: Color.colorGray_200,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
-    marginVertical: 2,
+    marginTop: 16,
   },
   infoText: {
     fontSize: FontSize.size_sm,

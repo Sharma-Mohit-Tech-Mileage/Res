@@ -105,6 +105,7 @@ const NotificationAlert = ({
                     <TouchableOpacity
                         onPress={handleResendEmail}
                         accessible={true}
+                        accessibilityRole='link'
                         accessibilityLabel="Resend Email Confirmation"
                         accessibilityHint="Double tap to resend the confirmation email"
                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
