@@ -369,33 +369,7 @@ const EmailNotifications = () => {
           </View>
         )}
 
-        {sparklightTvEmails.length > 0 && (
-          <View
-            style={styles.sectionBox}
-            accessible={true}
-            accessibilityLabel="Sparklight TV Section. This email address is tied to your TV service and can only be managed via the Sparklight TV Interface."
-            accessibilityRole="header"
-          >
-            <Text style={styles.infoTitle}>
-              Sparklight TV
-            </Text>
-            <Text
-              style={styles.infoText}
-              accessibilityRole="text"
-            >
-              This email address is tied to your TV service and can only be managed via the Sparklight TV Interface.
-            </Text>
-            <Text style={styles.infoTitle}>
-              Email address
-            </Text>
-            <FlatList
-              data={sparklightTvEmails}
-              renderItem={(item) => renderEmailItem({ ...item, section: 'iptv', disabled: true })}
-              keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
-              accessibilityLabel="List of Sparklight TV email addresses"
-            />
-          </View>
-        )}
+       
 
         {marketingEmails.length > 0 && (
           <View
@@ -425,6 +399,33 @@ const EmailNotifications = () => {
           </View>
         )}
 
+{sparklightTvEmails.length > 0 && (
+          <View
+            style={styles.sectionBox}
+            accessible={true}
+            accessibilityLabel="Sparklight TV Section. This email address is tied to your TV service and can only be managed via the Sparklight TV Interface."
+            accessibilityRole="header"
+          >
+            <Text style={styles.infoTitle}>
+              Sparklight TV
+            </Text>
+            <Text
+              style={styles.infoText}
+              accessibilityRole="text"
+            >
+              This email address is tied to your TV service and can only be managed via the Sparklight TV Interface.
+            </Text>
+            <Text style={styles.infoTitle}>
+              Email address
+            </Text>
+            <FlatList
+              data={sparklightTvEmails}
+              renderItem={(item) => renderEmailItem({ ...item, section: 'iptv', disabled: true })}
+              keyExtractor={(item, index) => `${item.emailAddress}-${index}`}
+              accessibilityLabel="List of Sparklight TV email addresses"
+            />
+          </View>
+        )}
         {additionalEmails.length > 0 && (
           <View
             style={styles.sectionBox}
