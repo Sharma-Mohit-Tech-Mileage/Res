@@ -193,7 +193,6 @@ const EmailNotifications = () => {
     <View
       key={item.emailAddress}
       style={styles.emailItem}
-      accessible={true}
       accessibilityLabel={`${section === 'paperless' ? 'Paperless billing' : section === 'marketing' ? 'Marketing' : 'Sparklight TV'} email: ${item.emailAddress.toLowerCase()}. ${disabled ? 'Settings cannot be modified.' : 'Toggle switch available to modify settings.'}`}
     >
 
@@ -219,7 +218,6 @@ const EmailNotifications = () => {
     <View
       key={item.emailAddress}
       style={styles.emailItem}
-      accessible={true}
       accessibilityLabel={`Additional email address: ${item.emailAddress.toLowerCase()}. Double tap delete button to remove this email.`}
     >
       <View style={styles.emailAddressContainer}>
@@ -231,7 +229,6 @@ const EmailNotifications = () => {
         </Text>
         <Pressable
           onPress={() => handleDelete(item.emailAddress)}
-          accessible={true}
           accessibilityLabel={`Delete ${item.emailAddress}`}
           accessibilityHint="Double tap to delete this email address"
           accessibilityRole="button"
@@ -253,7 +250,6 @@ const EmailNotifications = () => {
     return (
       <View
         style={styles.sectionContainer}
-        accessible={true}
         accessibilityLabel="Email notifications settings sections"
       >
         <View style={styles.sectionBox}>
@@ -264,7 +260,6 @@ const EmailNotifications = () => {
               message={successMsg}
               showCloseIcon={true}
               onClose={() => setShowSuccessAlert(false)}
-              accessible={true}
               accessibilityLabel={`Success: ${successMsg}`}
               accessibilityLiveRegion="polite"
             />
@@ -276,7 +271,6 @@ const EmailNotifications = () => {
               message={errorMsg}
               showCloseIcon={true}
               onClose={() => setShowErrorAlert(false)}
-              accessible={true}
               accessibilityLabel={`Error: ${errorMsg}`}
               accessibilityLiveRegion="assertive"
             />
@@ -285,7 +279,6 @@ const EmailNotifications = () => {
             <Pressable
               style={styles.addButton}
               onPress={() => navigation.navigate('AddEmailNotification', { newEmail: paperlessEmails.length === 0 })}
-              accessible={true}
               accessibilityRole="button"
               accessibilityLabel="Add new email notification"
               accessibilityHint="Double tap to add a new email address"
@@ -297,7 +290,6 @@ const EmailNotifications = () => {
 
         <View
           style={styles.sectionBox_info}
-          accessible={true}
           accessibilityLabel="Critical Notifications Section. We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications."
           accessibilityRole="header"
         >
@@ -329,7 +321,6 @@ const EmailNotifications = () => {
         {(paperlessEmails.length > 0 || (allSvEmailAssociated.length > 0 && acknowledgement)) && (
           <View
             style={styles.sectionBox}
-            accessible={true}
             accessibilityLabel="Paperless Billing Section. Opt for email statements and say goodbye to paper clutter. It’s convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you’ll also receive occasional updates and offers via email."
             accessibilityRole="header"
           >
@@ -374,7 +365,6 @@ const EmailNotifications = () => {
         {marketingEmails.length > 0 && (
           <View
             style={styles.sectionBox}
-            accessible={true}
             accessibilityLabel="Marketing Communications Section. Be the first to know about our latest offers, promotions, and news."
             accessibilityRole="header"
           >
@@ -402,7 +392,6 @@ const EmailNotifications = () => {
 {sparklightTvEmails.length > 0 && (
           <View
             style={styles.sectionBox}
-            accessible={true}
             accessibilityLabel="Sparklight TV Section. This email address is tied to your TV service and can only be managed via the Sparklight TV Interface."
             accessibilityRole="header"
           >
@@ -429,7 +418,6 @@ const EmailNotifications = () => {
         {additionalEmails.length > 0 && (
           <View
             style={styles.sectionBox}
-            accessible={true}
             accessibilityLabel="Additional Email Addresses Section. Manage supplementary email addresses associated with your account."
             accessibilityRole="header"
           >
@@ -466,7 +454,6 @@ const EmailNotifications = () => {
                     { opacity: pressed ? 0.7 : 1 }
                   ]}
                   onPress={handleSave}
-                  accessible={true}
                   accessibilityRole="button"
                   accessibilityLabel={isSubmitting ? "Saving changes" : "Save changes"}
                   accessibilityState={{ disabled: isSubmitting }}
@@ -482,7 +469,6 @@ const EmailNotifications = () => {
                     { opacity: pressed ? 0.7 : 1 }
                   ]}
                   onPress={() => navigation.navigate("Notifications")}
-                  accessible={true}
                   accessibilityRole="button"
                   accessibilityLabel="Cancel changes"
                   accessibilityHint="Double tap to discard changes and return to notifications"
@@ -499,7 +485,6 @@ const EmailNotifications = () => {
       <LoadingOverlay
         isLoading={isSubmitting || isDeleting}
         message={isDeleting ? "Deleting..." : "Saving..."}
-        accessible={true}
         accessibilityLabel={isDeleting ? "Deleting email address" : "Saving changes"}
         accessibilityLiveRegion="polite"
       />
@@ -511,7 +496,6 @@ const EmailNotifications = () => {
         onActionTxt="Yes"
         onAction={confirmDelete}
         onClose={cancelDelete}
-        accessible={true}
         accessibilityLabel={`Confirm deletion of ${emailToDelete}`}
         accessibilityLiveRegion="assertive"
       />
