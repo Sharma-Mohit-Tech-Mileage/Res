@@ -451,19 +451,9 @@ const EmailNotifications = () => {
   };
 
   return (
-    <View
-      style={styles.container}
-    >
-      <ProfileSettingsHeader
-        title="Edit Email Notifications"
-        onPressBack={() => navigation.goBack()}
-        accessibilityLabel="Edit Email Notifications Screen Header"
-      />
-
-      <ScrollView
-        ref={scrollViewRef}
-
-      >
+    <View style={styles.container} >
+      <ProfileSettingsHeader title="Edit Email Notifications" onPressBack={() => navigation.goBack()} />
+      <ScrollView ref={scrollViewRef} >
         <FlatList
           ListHeaderComponent={ListHeaderComponent}
           ListFooterComponent={
@@ -547,9 +537,9 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorMidnightblue,
     borderRadius: Border.br_11xs,
     paddingVertical: Padding.p_5xs,
+    marginVertical: 12,
     paddingHorizontal: Padding.p_5xl,
     alignSelf: 'flex-end',
-    marginBottom: Padding.p_base,
   },
   addButtonText: {
     color: Color.sparklightWhite,

@@ -76,16 +76,14 @@ const EmailNotifications = ({ navigation }) => {
     };
 
     return (
-        <View style={styles.container} accessibilityLabel="Notifications Page">
+        <View style={styles.container} >
             <ScrollView
                 style={styles.inner}
                 contentContainerStyle={styles.innerContent}
-                accessibilityLabel="Scrollable content for notification settings"
             >
                 <ProfileSettingsHeader
                     showIcon={false}
                     title={'Notifications'}
-                    accessibilityLabel="Notifications Header"
                 />
                 <View style={styles.headerTabView} accessibilityLabel="Notification Categories">
                     <View style={styles.headerTabOne} />
@@ -147,20 +145,19 @@ const EmailNotifications = ({ navigation }) => {
                         </View>
                     </View>
                     <>
-                        {profile.profileDetails !== undefined && profile.profileDetails.multipleEmails ? (
+                        {true? (
                             <View
                                 style={styles.notificationAlert}
-                                accessible={true}
-                                accessibilityRole="alert"
-                                accessibilityLabel="Warning: Unable to retrieve email address"
                             >
                                 <NotificationAlert
                                     type={"warning"}
                                     title={"Multiple Email Addresses Detected"}
                                     showCloseIcon={false}
-                                    message='We found multiple emails linked to your account. Visit the Accountscreen to set your preferred email.'
+                                    message='We found multiple emails linked to your account. Visit the Account screen to set your preferred email.'
                                     accessible={true}
-                                    accessibilityLabel="We found multiple emails linked to your account. Visit the Account screen to set your preferred email."
+                                    accessibilityRole="alert"
+                                    accessibilityLabel="Multiple Email Addresses Detected. We found multiple emails linked to your account. Visit the Account screen to set your preferred email."
+                                    splitKey="Account"
                                 />
                             </View>
                         ) : (
@@ -199,9 +196,9 @@ const EmailNotifications = ({ navigation }) => {
                         accessibilityRole="button"
                         accessibilityLabel={enableButton ? "Enable Email Notifications" : "Enable Email Notifications (disabled)"}
                     >
-                        <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]} accessibilityLabel="Enable Button Text">Enable Email Notifications</Text>
+                        <Text style={enableButton ? styles.accept : [styles.accept, styles.buttonDisabledText]} >Enable Email Notifications</Text>
                     </Pressable>
-                    <View style={styles.buttonsParent} accessibilityLabel="Skip for now Button">
+                    <View style={styles.buttonsParent} >
                         <Pressable
                             style={[styles.buttonDecline, styles.buttonsLayout]}
                             onPress={() => {
@@ -214,7 +211,7 @@ const EmailNotifications = ({ navigation }) => {
                             accessibilityRole="button"
                             accessibilityLabel="Skip for now"
                         >
-                            <Text style={styles.decline} accessibilityLabel="Skip for now Text">Skip for now</Text>
+                            <Text style={styles.decline} >Skip for now</Text>
                         </Pressable>
                     </View>
                 </View>

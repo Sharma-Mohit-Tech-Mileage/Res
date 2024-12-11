@@ -89,8 +89,6 @@ const styles = StyleSheet.create({
         padding: 8,
         justifyContent: 'center',
         alignItems: 'center',
-        minWidth: 44,
-        minHeight: 44,
     },
     toggleBase: {
         borderRadius: 20,
