@@ -500,7 +500,7 @@ React.useEffect(() => {
        style={{paddingHorizontal:10}}
       >
         <Text style={[styles.modemHealthSupport]}>
-        {`We’re sorry! We Can only update the WiFi password for the supported modem models.
+        {`We’re sorry! We Can only update the Wifi password for the supported modem models.
 
 To add a Sparklight Modem to your account, please contact our support team.
         `}
