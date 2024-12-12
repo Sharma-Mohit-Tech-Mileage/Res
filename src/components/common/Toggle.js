@@ -68,7 +68,7 @@ const Toggle = ({
                 <View style={styles.toggle}>
                     <View style={[styles.toggleBase, {
                         backgroundColor: isActive ?
-                            (disabled ? Color.Gray300 : Color.sparklightGreen) :
+                            (disabled ? '#7AC5A5' : Color.sparklightGreen) :
                             (disabled ? Color.Gray300 : Color.sparklightDarkGray)
                     }]}>
                         <Animated.View
