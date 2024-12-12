@@ -119,7 +119,7 @@ const AddEmailNotification = () => {
     return (
         <View
             style={styles.container}
-            accessible={true}
+            
             accessibilityLabel="Add Email Notifications screen"
         >
             <ProfileSettingsHeader
@@ -132,7 +132,7 @@ const AddEmailNotification = () => {
             <LoadingOverlay
                 isLoading={isSubmitting}
                 message="Saving..."
-                accessible={true}
+                
                 accessibilityLabel={isSubmitting ? "Saving email notification settings" : ""}
                 accessibilityLiveRegion="polite"
             />
@@ -144,7 +144,7 @@ const AddEmailNotification = () => {
                 <View style={styles.frameContainer}>
                     <View
                         style={styles.section}
-                        accessible={true}
+                        
                         accessibilityLabel="Email entry section Please enter your email address below and stay connected with us."
                     >
                         {showErrorAlert && (
@@ -155,7 +155,7 @@ const AddEmailNotification = () => {
                                     message={errorMsg}
                                     showCloseIcon={true}
                                     onClose={() => setShowErrorAlert(false)}
-                                    accessible={true}
+                                    
                                     accessibilityLabel={`Error: ${errorMsg}`}
                                     accessibilityLiveRegion="assertive"
                                 />
@@ -163,7 +163,7 @@ const AddEmailNotification = () => {
                         )}
                         <Text
                             style={styles.label}
-                            accessible={true}
+                            
                             accessibilityLabel="Instructions: Please enter your email address below and stay connected with us"
                         >
                             Please enter your email address below and stay connected with us.
@@ -182,7 +182,7 @@ const AddEmailNotification = () => {
                                         label="Email Address"
                                         accessibilityLabel="Email address input field"
                                         accessibilityHint="Enter your email address"
-                                        accessible={true}
+                                        
                                     />
                                 )}
                             />
@@ -193,7 +193,7 @@ const AddEmailNotification = () => {
                             message="We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications."
                             showCloseIcon={false}
                             isVisible={true}
-                            accessible={true}
+                            
                             accessibilityLabel="Critical notifications information: We'll keep you informed without overwhelming your inbox"
                             accessibilityLiveRegion="polite"
                         />
@@ -201,17 +201,17 @@ const AddEmailNotification = () => {
                     <View style={styles.divider} />
                     <View
                         style={styles.section}
-                        accessible={true}
+                        
                         accessibilityLabel="Paperless billing section,Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you'll also receive occasional updates and offers via email."
                     >
                         <View
                             style={styles.toggleContainer}
-                            accessible={true}
+                            
                             accessibilityLabel={`Paperless billing option, currently ${formState.paperlessBilling ? 'enabled' : 'disabled'}`}
                         >
                             <Text
                                 style={styles.sectionLabel}
-                                accessible={true}
+                                
                                 accessibilityLabel="Paperless Billing"
                             >
                                 Paperless Billing
@@ -227,7 +227,7 @@ const AddEmailNotification = () => {
                         </View>
                         <Text
                             style={styles.description}
-                            accessible={true}
+                            
                             accessibilityLabel="Paperless billing description: Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips"
                         >
                             Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you'll also receive occasional updates and offers via email.
@@ -236,7 +236,7 @@ const AddEmailNotification = () => {
                 </View>
                 <View
                     style={styles.buttonContainer}
-                    accessible={true}
+                    
                     accessibilityLabel="Form action buttons"
                 >
                     <SecondaryButton
