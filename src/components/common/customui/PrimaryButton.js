@@ -8,7 +8,7 @@ const PrimaryButtom = ({ title, onPress, buttonType }) => {
 
   return (
     <View style={styles.margin}>
-    <Pressable style={buttonStyles} onPress={onPress}>
+    <Pressable accessibilityRole='button' style={buttonStyles} onPress={onPress}>
       <Text style={textStyles}>{title}</Text>
     </Pressable>
     </View>

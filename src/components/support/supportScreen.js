@@ -107,7 +107,7 @@ const Support = ({ route }) => {
 
  
  const checkAgentAvailibilty = async (group_id,data) => {
-    const username = 'mohit.sharma@cableone.biz/token';
+    const username = 'mobile-support@sparklight.biz/token';
     const password = 'ek20PJEI1zZd4sm1LJr3JuYw7ujt1F1ic82b4Jjc';
     const auth = base64.encode(`${username}:${password}`);
 
@@ -127,7 +127,7 @@ const Support = ({ route }) => {
       console.log('Agent is availibility',data?.department,"Count="+json.channel_group_statuses.chat.state_counts.online)
       console.log('Agent group_id',group_id)
       if(json.channel_group_statuses.chat.state_counts.online>0){
-        if(group_id=='22567718430615'){
+        if(group_id=='1500003312422'){
             setisAgentAvailable(true)
             if(data){
             if(Platform.OS==='ios'){
@@ -148,7 +148,7 @@ const Support = ({ route }) => {
             }
         }
       }else{
-        if(group_id=='22567718430615'){
+        if(group_id=='1500003312422'){
             setisAgentAvailable(false)
             if(data){
             //PromptForAgentOffline()
@@ -173,7 +173,7 @@ const Support = ({ route }) => {
   useFocusEffect(
     useCallback(() => {
         checkAgentAvailibilty('1500003304341');
-        checkAgentAvailibilty('22567718430615');
+        checkAgentAvailibilty('1500003312422');
     }, [])
   );
   
@@ -291,7 +291,7 @@ const Support = ({ route }) => {
     const onRefresh = () => {
         setRefreshing(true);
         checkAgentAvailibilty('1500003304341');
-        checkAgentAvailibilty('22567718430615');
+        checkAgentAvailibilty('1500003312422');
         
       };
 
@@ -320,8 +320,8 @@ const Support = ({ route }) => {
             tags:['pid:_' + userData.userInfo.accountNumber,...tags],
             department: department
         };
-        if(department=='mobiletest'){
-          checkAgentAvailibilty('22567718430615',data);
+        if(department=='SPK Virtual Call Center'){
+          checkAgentAvailibilty('1500003312422',data);
         }else if(department=='SPK TCC Residential'){
             checkAgentAvailibilty('1500003304341',data);
         }
@@ -725,7 +725,7 @@ const Support = ({ route }) => {
                                                     onPress={() => {
                                                         //toggleModal("Bill");
                                                         if(isAgentAvailable){
-                                                        handlePressOpenButton("mobiletest", ['Resi_BillSupport','Resimobileapp'])
+                                                        handlePressOpenButton("SPK Virtual Call Center", ['Resi_BillSupport','Resimobileapp'])
                                                         }
                                                     }}
                                                 >

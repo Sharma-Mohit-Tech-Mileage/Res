@@ -1,10 +1,14 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, findNodeHandle, AccessibilityInfo } from 'react-native';
 import WaveAnimation from '../../../common/WaveIcon';
-import OutageAreaIcon from '../../../../res/svgIcons/troubleshooting/OutageAreaIcon';
-import ServiceIcon from '../../../../res/svgIcons/troubleshooting/ServiceIcon';
-import WalletIcon from '../../../../res/svgIcons/troubleshooting/WalletIcon';
-import TroubleshootIcon from '../../../../res/svgIcons/troubleshooting/TroubleshootIcon';
+// import OutageAreaIcon from '../../../../res/svgIcons/troubleshooting/OutageAreaIcon';
+// import ServiceIcon from '../../../../res/svgIcons/troubleshooting/ServiceIcon';
+// import WalletIcon from '../../../../res/svgIcons/troubleshooting/WalletIcon';
+// import TroubleshootIcon from '../../../../res/svgIcons/troubleshooting/TroubleshootIcon';
+import OutageAreaIcon from '../../../../res/svgIcons/troubleshooting/icon-marker';
+import ServiceIcon from '../../../../res/svgIcons/troubleshooting/icon-globe';
+import WalletIcon from '../../../../res/svgIcons/troubleshooting/icon-wallet';
+import TroubleshootIcon from '../../../../res/svgIcons/troubleshooting/icon-tool';
 
 const ICON_MAP = {
   OutageAreaIcon,
@@ -109,7 +113,7 @@ const CheckStatusWrapper = ({ loading, result, icon, isIssueDetected, descriptio
 
   return (
     <View style={styles.container}>
-      <Text 
+     {step && <Text 
         ref={stepRef}
         style={styles.topLeftText}
         accessible={true}
@@ -118,7 +122,7 @@ const CheckStatusWrapper = ({ loading, result, icon, isIssueDetected, descriptio
         accessibilityLabel={`Step ${step} of 3`}
       >
         {step} of 3
-      </Text>
+      </Text>}
 
       <View 
         ref={iconRef}
@@ -129,7 +133,7 @@ const CheckStatusWrapper = ({ loading, result, icon, isIssueDetected, descriptio
         accessibilityLabel={loading ? 'Check in progress' : isIssueDetected ? 'Issue detected' : 'Check complete'}
       >
         <WaveAnimation loading={loading} isIssueDetected={isIssueDetected}>
-          <IconComponent width={80} height={80} />
+          <IconComponent  />
         </WaveAnimation>
       </View>
 

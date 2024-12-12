@@ -4,6 +4,7 @@ import axios from "axios";
 import { RefreshToken } from '../components/user/Session';
 import { navigationRef } from '../navigations/UserNavigations';
 
+// Base URLs with ensured trailing slashes
 const BASE_URL = Env.API_BASEURL.endsWith('/') ? Env.API_BASEURL : `${Env.API_BASEURL}/`;
 const API_ACP_BASEURL = Env.API_ACP_BASEURL.endsWith('/') ? Env.API_ACP_BASEURL : `${API_ACP_BASEURL}/`;
 const SUPPORT_URL = "https://support.sparklight.com/api/v2/help_center/";
@@ -20,15 +21,16 @@ export const isUserAuthorized = (authorize) => {
 
 const handleFetchResponse = async (response, url, onSuccess, onError) => {
     try {
-        const rawResponse = await response.text();
-        console.log("Request URL:", url);
-        console.log("Raw Response:", response.status);
+        const rawResponse = await response.text(); // Read response as plain text
+        console.log("Request URL:", url); // Log the full URL being accessed
+        console.log("Raw Response:", response.status); // Log the raw response
 
         if (response.status === 204 || !rawResponse) {
-            onSuccess({ message: 'No content', code: response.status });
+            onSuccess({ message: 'No content', code: response.status }); // Pass a success message for no content
             return;
         }
 
+        // Try parsing the response as JSON if not empty
         try {
             const json = JSON.parse(rawResponse);
             if (response.ok) {
@@ -45,6 +47,7 @@ const handleFetchResponse = async (response, url, onSuccess, onError) => {
     }
 };
 
+// Function to process the queue of requests during token refresh
 const processQueue = (error, token = null) => {
     failedQueue.forEach(({ resolve, reject }, index) => {
         if (error) {
@@ -58,110 +61,93 @@ const processQueue = (error, token = null) => {
     failedQueue = [];
 };
 
-
+// Function to handle API calls with token refresh logic
 const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess, onError) => {
     try {
         console.log('Attempting API call:', endpoint);
         let response = await fetchFunction(endpoint, options);
-
         if (response.status === 401) {
             console.log('401 Unauthorized, queuing request and refreshing token...');
-            
-            // Add current request to queue and wait for token refresh
             return new Promise((resolve, reject) => {
                 failedQueue.push({ resolve, reject });
-                
-                if (!isRefreshing) {
-                    isRefreshing = true;
+            if (!isRefreshing) {
+                isRefreshing = true;
 
                     RefreshToken()
                         .then(async () => {
-                            const user = await getUser();
-                            options.headers['Authorization'] = `Bearer ${user.token}`;
-                            console.log('Token refreshed successfully');
-
-                            processQueue(null, user.token); // Resolve queued requests
+                    const user = await getUser();
+                    options.headers['Authorization'] = `Bearer ${user.token}`;
+                    console.log('Token refreshed successfully');
+                    processQueue(null, user.token);
                         })
                         .catch((refreshError) => {
-                            console.error('Token refresh failed:', refreshError);
-                            processQueue(refreshError, null); // Reject queued requests
-                            if (navigationRef.current) {
-                                navigationRef.current.navigate('Splash');
-                            }
+                    console.error('Token refresh failed:', refreshError);
+                    processQueue(refreshError, null);
+                    if (navigationRef.current) {
+                        navigationRef.current.navigate('Splash');
+                    }
                         })
                         .finally(() => {
-                            isRefreshing = false;
+                    isRefreshing = false;
                         });
-                }
+            }
+
             }).then((token) => {
                 options.headers['Authorization'] = `Bearer ${token}`;
                 console.log('Retrying request with new token for:', endpoint);
                 return fetchFunction(endpoint, options);
             });
         }
-
-        return response; // Return success response directly if no 401
+        return response;
     } catch (error) {
         console.error('API call failed:', error.message);
         onError(error.message);
     }
 };
-
-const handleAuthResponse = async (response, idTokenGuid, refreshToken, onSuccess, onError) => {
-    console.log('Handling authentication response...'); // Start log
-
-    let json;
-    try {
-        json = await response.json();
-        console.log('Parsed JSON:', json); // Log parsed JSON
-    } catch (parseError) {
-        console.error('Error parsing JSON response:', parseError); // Log JSON parse errors
-        onError(`Failed to parse response: ${parseError.message}`);
-        return;
-    }
-
-    if (response.ok) {
-        if (idTokenGuid && refreshToken) {
-            json.idTokenGuid = idTokenGuid;
-            json.refreshToken = refreshToken;
-        }
-        console.log('Response OK, invoking onSuccess'); // Success log
-        onSuccess(json);
-    } else {
-        const errorMsg = `Response status ${response.status} (${response.statusText}): ${json?.message || 'No error message provided'}`;
-        console.error(errorMsg); // Log detailed error with fallback
-        onError(errorMsg);
-    }
-};
-
+  
 export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => {
-    console.log(`Initiating POST request to ${endpoint}...`); // Start log
-    const idTokenGuid = body.idTokenGuid;
-    const refreshToken = body.refreshToken;
-    delete body.idTokenGuid;
-    delete body.refreshToken;
-
-    const options = {
-        method: 'POST',
+    const idTokenGuid = body?.idTokenGuid;
+    const refreshToken = body?.refreshToken;
+    
+    try {
+      const requestBody = { ...body };
+      delete requestBody.idTokenGuid;
+      delete requestBody.refreshToken;
+      const res = await axios.post(`${BASE_URL}${endpoint}`, requestBody, {
         headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(body)
-    };
+        timeout: 30000,
+        validateStatus: (status) => status >= 200 && status < 300
+      });
+      const responseData = { ...res.data };
+      if (idTokenGuid) {
+        responseData.idTokenGuid = idTokenGuid;
+      }
+      if (refreshToken) {
+        responseData.refreshToken = refreshToken;
+      }
+      console.debug(`API call to ${endpoint} successful`);
+      onSuccess(responseData);
+    } catch (err) {
+      const errorResponse = {
+        err,
+        status: err.response?.status,
+        message: err.response?.data?.message || err.message || 'Request failed',
+        endpoint,
+        timestamp: new Date().toISOString()
+      };
 
-    console.log('Request options:', options); // Log request options
-
-    fetch(`${BASE_URL}${endpoint}`, options)
-        .then(response => handleAuthResponse(response, idTokenGuid, refreshToken, onSuccess, onError))
-        .catch(exception => {
-            const errorLog = `Fetch error: ${exception.message || 'Unknown error'}`;
-            console.error(errorLog); // Log fetch error
-            onError(errorLog);
-        });
-};
-
-// Generic POST API request function
+      console.error('PostAuthApiRequest error:', {
+        err,
+        endpoint,
+        status: errorResponse.status,
+        message: errorResponse.message
+      });
+      onError(errorResponse);
+    }
+  };
 export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     const user = await getUser();
     const baseUrl = await getBaseUrl(); // Dynamically get the base URL
@@ -178,7 +164,6 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
         .then(response => handleFetchResponse(response, `${baseUrl}${endpoint}`, onSuccess, onError));
 };
 
-// Function to upload multipart data
 export const UploadMultipartData = async (endpoint, data, onSuccess, onError) => {
     const user = await getUser();
     const baseUrl = await getBaseUrl(); // Dynamically get the base URL

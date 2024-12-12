@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Dimensions, Platform } from "react-native";
+import { View, StyleSheet, Dimensions, Platform,Alert,Pressable } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTabBarVisibility } from './TabBarVisibilityContext';
@@ -26,7 +26,7 @@ const { width } = Dimensions.get('window');
 const tabWidth = Number(width / 5);
 const Tab = createBottomTabNavigator();
 
-const MyTabs = ({ route }) => {
+const MyTabs = ({ navigation,route }) => {
   const dispatch = useDispatch();
   const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
   const [shadowStyle, setShadowStyle] = useState(styles.shadowTabs);
@@ -41,6 +41,23 @@ const MyTabs = ({ route }) => {
     // Fetch user profile details once when the component is initialized
     dispatch(fetchProfileDetails());
   }, [dispatch]);
+
+  function CustomTabBarButton({ onPress, isDisabled, children }) {
+    const handlePress = () => {
+      if (isDisabled) {
+        Alert.alert('Coming Soon', 'We are still working on it.');
+      } else {
+        onPress();
+      }
+    };
+  
+    return (
+      <Pressable onPress={handlePress} style={styles.tabButton}>
+        <ShopIcon isNewBillerUser={!user?.isNormalUser}/>
+        {children}
+      </Pressable>
+    );
+  }
 
   useEffect(() => {
     if (user?.isNormalUser) {
@@ -176,7 +193,32 @@ const MyTabs = ({ route }) => {
           options={{
             tabBarLabel: 'Shop',
             headerShown: false,
-            tabBarIcon: ({ focused }) => (focused ? <ShopIconSelected isNewBillerUser={!user?.isNormalUser} /> : <ShopIcon isNewBillerUser={!user?.isNormalUser} />)
+            tabBarIcon: (props) => (
+              <CustomTabBarButton {...props} isDisabled={!user?.isNormalUser} onPress={()=>{
+                navigation.reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: 'Shop',
+                      state: {
+                        routes: [
+                          {
+                            name: 'ArticalWindowUtility',
+                            params: {
+                              url: `${Env.URL}/services/upgrade`,
+                              name: 'Shop',
+                              isExpandable: true,
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                });
+              }} />
+            ),
+          //}}
+            //tabBarIcon: ({ focused }) => ( <CustomTabBarButton {...props} isDisabled={true} />)
           }}
         />
         {/* Support Screen */}
@@ -242,6 +284,10 @@ const styles = StyleSheet.create({
     zIndex: 5,
     opacity: .7,
     left: 80,
+  },tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   shadowTabsStep2: {
     left: tabWidth * 1.99,

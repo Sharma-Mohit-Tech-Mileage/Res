@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable, Dimensions, AccessibilityInfo, findN
 import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import NotificationAlert from "../../common/customui/NotificationAlert";
-import WalletIcon from '../../../res/svgIcons/troubleshooting/WalletIcon';
+import WalletIcon from '../../../res/svgIcons/troubleshooting/icon-wallet';
 import { Env } from '../../../network/apis/account/Constants';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import WaveAnimation from '../../common/WaveIcon';
@@ -124,14 +124,12 @@ const TroubleshootComponent = ({ pageCount = 2 }) => {
                     ref={buttonRef}
                     onPress={handlePress}
                     style={[
-                        styles.button,
-                        isAnnouncing && styles.buttonDisabled
+                        styles.button
                     ]}
                     accessible={true}
                     accessibilityRole="button"
                     accessibilityLabel="Pay Bill"
                     accessibilityHint="Navigates to billing details"
-                    disabled={isAnnouncing}
                 >
                     <Text style={styles.accept}>Pay Bill</Text>
                 </Pressable>

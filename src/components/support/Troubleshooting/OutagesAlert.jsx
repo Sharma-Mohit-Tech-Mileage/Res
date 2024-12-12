@@ -2,13 +2,12 @@ import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, findNodeHandle, AccessibilityInfo } from 'react-native';
 import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import NotificationAlert from "../../common/customui/NotificationAlert";
-import OutageAreaIcon from '../../../res/svgIcons/troubleshooting/OutageAreaIcon';
+import OutageAreaIcon from '../../../res/svgIcons/troubleshooting/icon-marker';
 import WaveAnimation from '../../common/WaveIcon';
 
 const windowHeight = Dimensions.get('window').height;
-const windowWidth = Dimensions.get('window').width;
 
-const TroubleshootComponent = ({
+const OutagesAlert = ({
     step = 1,
     title,
     description,
@@ -19,41 +18,55 @@ const TroubleshootComponent = ({
     const iconRef = useRef(null);
     const alertRef = useRef(null);
 
+    const calculateDelay = (message) => {
+        const wordCount = message.trim().split(/\s+/).length;
+        const wordsPerMinute = 150;
+        const millisecondsPerWord = (60 / wordsPerMinute) * 1000;
+        return (wordCount * millisecondsPerWord) + 1000;
+    };
+
     const focusAndAnnounce = async (ref, text) => {
         const node = findNodeHandle(ref.current);
         if (node) {
             AccessibilityInfo.setAccessibilityFocus(node);
             AccessibilityInfo.announceForAccessibility(text);
+            await new Promise(resolve => setTimeout(resolve, calculateDelay(text)));
         }
     };
 
     useEffect(() => {
+        let isActive = true;
+        
         const manageFocus = async () => {
             const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
             if (!isEnabled) return;
 
             try {
-                // Step announcement
+                if (!isActive) return;
                 await focusAndAnnounce(stepRef, `Step ${step} of 3`);
-                
-                // Icon status
-                await focusAndAnnounce(iconRef, 'Outage detected in your area');
+                await new Promise(resolve => setTimeout(resolve, 1000));
 
-                // Alert message
-                await focusAndAnnounce(alertRef, 
-                    `Uh oh. You may be experiencing an outage in your area. Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. Estimated Time to Restore: ${description}`
-                );
+                if (!isActive) return;
+                await focusAndAnnounce(iconRef, 'Outage detected in your area');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                if (!isActive) return;
+                const alertText = `Uh oh. You may be experiencing an outage in your area. Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. Estimated Time to Restore: ${description}`;
+                await focusAndAnnounce(alertRef, alertText);
             } catch (error) {
                 console.error('Focus management error:', error);
             }
         };
 
         manageFocus();
+        return () => {
+            isActive = false;
+        };
     }, [step, description]);
 
     return (
         <View style={styles.container}>
-            <Text 
+            <Text
                 ref={stepRef}
                 style={styles.topLeftText}
                 accessible={true}
@@ -84,11 +97,18 @@ const TroubleshootComponent = ({
                     accessibilityRole="alert"
                     importantForAccessibility="yes"
                 >
-                   
                     <NotificationAlert
                         type="warning"
-                        title={(<Text style={{ flexDirection: 'column' }}><Text style={styles.textStyle}>Uh oh. You may be experiencing an outage in your area.</Text>
-                            <Text style={styles.textStyle1} >{'Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. '}<Text style={styles.textStyle}> Estimated Time to Restore: {description}</Text></Text>
+                        title={(<Text style={{ flexDirection: 'column' }}>
+                            <Text style={styles.textStyle}>
+                                Uh oh. You may be experiencing an outage in your area.
+                            </Text>
+                            <Text style={styles.textStyle1}>
+                                {'Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible. '}
+                                <Text style={styles.textStyle}>
+                                    Estimated Time to Restore: {description}
+                                </Text>
+                            </Text>
                         </Text>)}
                         showCloseIcon={false}
                     />
@@ -144,4 +164,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default TroubleshootComponent;
+export default OutagesAlert;

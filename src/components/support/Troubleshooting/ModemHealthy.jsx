@@ -1,10 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, SafeAreaView, ScrollView, AccessibilityInfo, findNodeHandle } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Color, Padding, FontSize, FontFamily, } from "../../../../GlobalStyles";
-import ServiceIcon from "../../../res/svgIcons/troubleshooting/ServiceIcon";
-import SuccessIcon from "../../../res/svgIcons/troubleshooting/SuccessIcon";
+import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import ServiceIcon from "../../../res/svgIcons/troubleshooting/icon-globe";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import WifiIssueIcon from "../../../res/svgIcons/WifiIssueIcon";
@@ -13,80 +12,77 @@ import IntermittentIssues from "../../../res/svgIcons/IntermittentIssues";
 import Noconnection from "../../../res/svgIcons/Noconnection";
 import Modemicon from "../../../res/svgIcons/Modemicon";
 import WaveAnimation from '../../common/WaveIcon';
+
 const windowHeight = Dimensions.get("window").height;
 const windowWidth = Dimensions.get("window").width;
 
 const ModemHealthy = () => {
   const navigation = useNavigation();
-
-  const stepRef = useRef(null);
-  const iconRef = useRef(null);
   const alertRef = useRef(null);
-
-  const focusElement = (ref) => {
-    const node = findNodeHandle(ref?.current);
-    if (node) {
-      AccessibilityInfo.setAccessibilityFocus(node);
-    }
-  };
 
   useEffect(() => {
     const manageFocus = async () => {
       const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
       if (!isEnabled) return;
 
-      focusElement(stepRef);
-      focusElement(iconRef);
-      focusElement(alertRef);
+      // Focus on main alert message after component mount
+      setTimeout(() => {
+        const reactTag = findNodeHandle(alertRef?.current);
+        if (reactTag) {
+          AccessibilityInfo.setAccessibilityFocus(reactTag);
+        }
+      }, 500);
     };
 
     manageFocus();
   }, []);
 
-  useEffect(() => {
-    const announceText = () => {
-      const reactTag = findNodeHandle(alertRef?.current);
-      AccessibilityInfo.setAccessibilityFocus(reactTag);
-    };
-    setTimeout(announceText, 100);
-  }, []);
-
+  const MenuButton = ({ icon: Icon, text, onPress, testID }) => (
+    <>
+      <View style={styles.borderSec} />
+      <TouchableOpacity
+        style={styles.pressableStyle}
+        onPress={onPress}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={text}
+        accessibilityHint={`Navigate to ${text} section`}
+        testID={testID}
+      >
+        <View style={styles.menuWrap}>
+          <Icon />
+          <Text style={styles.menuText}>{text}</Text>
+        </View>
+        <RightArrow />
+      </TouchableOpacity>
+    </>
+  );
 
   return (
-    <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
+    <View style={styles.mainContainer}>
       <ProfileSettingsHeader
         title="Troubleshooting"
         onPressBack={() => navigation.navigate('SupportStack')}
         accessibilityLabel="Back to Support"
         accessibilityHint="Navigates back to the Support screen"
       />
-      <SafeAreaView
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          paddingHorizontal: Padding.p_base,
-          paddingVertical: Padding.p_5xl,
-          marginBottom: "15%",
-        }}
-      >
-        <ScrollView style={{ marginBottom: 20 }}>
+
+      <SafeAreaView style={styles.safeAreaContainer}>
+        <ScrollView style={styles.scrollView}>
           <View style={styles.container}>
-          <Text 
-              ref={stepRef}
+            <Text
               style={styles.topLeftText}
               accessible={true}
               accessibilityRole="header"
-              importantForAccessibility="yes"
               accessibilityLabel="Step 3 of 3"
             >
               3 of 3
             </Text>
+
             <View style={styles.content}>
-              <View 
-                ref={iconRef}
+              <View
                 accessible={true}
                 accessibilityRole="image"
-                importantForAccessibility="yes"
                 accessibilityLabel="Service check complete, no issues detected"
               >
                 <WaveAnimation loading={false} isIssueDetected={false}>
@@ -98,85 +94,58 @@ const ModemHealthy = () => {
                 ref={alertRef}
                 accessible={true}
                 accessibilityRole="alert"
-                importantForAccessibility="yes"
                 accessibilityLabel="No service issues were detected"
-                style={{ justifyContent: "center", paddingVertical: 8 }}
+                style={styles.titleContainer}
               >
                 <Text style={styles.title}>
-                  {"No service issues were detected."}
+                  No service issues were detected.
                 </Text>
               </View>
 
-              <View style={{ flexDirection: "column", flex: 1 }}>
+              <View style={styles.cardContainer}>
                 <View style={styles.card}>
-                  <View style={styles.borderSec} />
-                  <TouchableOpacity
-                    style={styles.pressableStyle}
-                    onPress={() => {
-                      navigation.navigate('ManageEquipment', { isFromTroubleshooting: true })
-                    }}
-                  >
-                    <View style={styles.menuWrap}>
-                      <Modemicon />
-                      <Text style={styles.menuText}>Manage Equipment</Text>
-                    </View>
-                    <RightArrow />
-                  </TouchableOpacity>
+                  <MenuButton
+                    icon={Modemicon}
+                    text="Manage Equipment"
+                    onPress={() => navigation.navigate('ManageEquipment', { isFromTroubleshooting: true })}
+                    testID="manage-equipment-button"
+                  />
+
+                  <MenuButton
+                    icon={WifiIssueIcon}
+                    text="Wi-Fi Issues"
+                    onPress={() => navigation.navigate('ArticalWindowUtility', {
+                      url: 'https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues',
+                      name: 'Wi-Fi Issues'
+                    })}
+                    testID="wifi-issues-button"
+                  />
+
+                  <MenuButton
+                    icon={Surfingissue}
+                    text="Surfing Issues"
+                    onPress={() => navigation.navigate('ArticalWindowUtility', {
+                      url: 'https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email',
+                      name: 'Surfing Issues'
+                    })}
+                    testID="surfing-issues-button"
+                  />
+
+                  <MenuButton
+                    icon={IntermittentIssues}
+                    text="Intermittent Issues"
+                    onPress={() => navigation.navigate("PeriodicProblems")}
+                    testID="intermittent-issues-button"
+                  />
+
+                  <MenuButton
+                    icon={Noconnection}
+                    text="No Connection"
+                    onPress={() => navigation.navigate('ModemConnectivityGuide', { isSuccess: true })}
+                    testID="no-connection-button"
+                  />
 
                   <View style={styles.borderSec} />
-                  <TouchableOpacity
-                    style={styles.pressableStyle}
-                    onPress={() => {
-                      navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues', name: 'Wi-Fi Issues' })
-                    }}
-                  >
-                    <View style={styles.menuWrap}>
-                      <WifiIssueIcon />
-                      <Text style={styles.menuText}>Wi-Fi Issues</Text>
-                    </View>
-                    <RightArrow />
-                  </TouchableOpacity>
-                  <View style={styles.borderSec} />
-
-                  <TouchableOpacity
-                    style={styles.pressableStyle}
-                    onPress={() => {
-                      navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email', name: 'Surfing Issues' })
-                    }}
-                  >
-                    <View style={styles.menuWrap}>
-                      <Surfingissue />
-                      <Text style={styles.menuText}>Surfing Issues</Text>
-                    </View>
-                    <RightArrow />
-                  </TouchableOpacity>
-                  <View style={styles.borderSec} />
-                  <TouchableOpacity
-                    style={styles.pressableStyle}
-                    onPress={() => {
-                      navigation.navigate("PeriodicProblems");
-                    }}
-                  >
-                    <View style={styles.menuWrap}>
-                      <IntermittentIssues />
-                      <Text style={styles.menuText}>Intermittent Issues</Text>
-                    </View>
-                    <RightArrow />
-                  </TouchableOpacity>
-                  <View style={styles.borderSec} />
-                  <TouchableOpacity
-                    style={styles.pressableStyle}
-                    onPress={() => {
-                      navigation.navigate('ModemConnectivityGuide', { isSuccess: true })
-                    }}
-                  >
-                    <View style={styles.menuWrap}>
-                      <Noconnection />
-                      <Text style={styles.menuText}>No Connection</Text>
-                    </View>
-                    <RightArrow />
-                  </TouchableOpacity>
-
                 </View>
               </View>
             </View>
@@ -188,18 +157,38 @@ const ModemHealthy = () => {
 };
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: Color.colorWhitesmoke_200
+  },
+  safeAreaContainer: {
+    flex: 1,
+    justifyContent: "center",
+    paddingVertical: Padding.p_5xl,
+    marginBottom: "15%",
+  },
+  scrollView: {
+    marginBottom: 20,
+    paddingHorizontal: Padding.p_base,
+  },
   container: {
     flex: 1,
     justifyContent: "space-between",
     paddingTop: windowHeight * 0.00,
     backgroundColor: Color.sparklightWhite,
-
   },
   content: {
-    flexGrow: 1, // This allows the content to expand
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
-
+  },
+  titleContainer: {
+    justifyContent: "center",
+    paddingVertical: 8
+  },
+  cardContainer: {
+    flexDirection: "column",
+    flex: 1
   },
   pressableStyle: {
     flexDirection: "row",
@@ -207,24 +196,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     alignItems: "center",
     paddingVertical: 20,
-  },
-  circle: {
-    width: windowWidth * 0.5,
-    height: windowWidth * 0.5,
-    borderRadius: (windowWidth * 0.5) / 2,
-    backgroundColor: "#FFFFFF",
-    justifyContent: "center",
-    alignItems: "center",
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    marginBottom: 20,
-  },
-  spinnerContainer: {
-    flex: 1,
-    justifyContent: "center",
   },
   menuText: {
     color: Color.colorGray_200,
@@ -245,7 +216,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontWeight: "bold",
     color: "#292929",
     textAlign: "center",
     lineHeight: 28,
@@ -263,10 +233,9 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   card: {
-    paddingVertical: Padding.p_base,
+    marginTop: Padding.p_base,
     width: wp("92%"),
   },
 });
 
 export default ModemHealthy;
-
