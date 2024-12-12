@@ -25,6 +25,7 @@ import PasswordRetrieve from "../../res/svgIcons/PasswordRetrieve";
 import PasswordShare from "../../res/svgIcons/PasswordShare";
 import Loader from "../utility/Loader";
 import { useSelector } from "react-redux";
+import RenderText from "../common/RenderText";
 
 const ManageEquipment = ({ route }) => {
   const navigation = useNavigation();
@@ -48,7 +49,7 @@ const ManageEquipment = ({ route }) => {
   const [hasEeroDevice, setHasEeroDevice] = React.useState(false);
   const [networkId, setNetworkId] = React.useState(null);
   const [modemSupported, setModemSupported] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState("");
+  const [errorMessage, setErrorMessage] = React.useState("We’re sorry! We Can only update the Wifi password for the supported modem models.To add a Sparklight Modem to your account, please contact our support team");
  
   const alertRef = React.useRef(null);
 
@@ -496,16 +497,21 @@ React.useEffect(() => {
 
   const RenderPasswordErrorMsg=()=>{
     return(
-    <View
-       style={{paddingHorizontal:10}}
-      >
-        <Text style={[styles.modemHealthSupport]}>
-        {`We’re sorry! We Can only update the Wifi password for the supported modem models.
-
-To add a Sparklight Modem to your account, please contact our support team.
-        `}
-          </Text>
-      </View>
+    
+        <RenderText
+                      navigation={navigation}
+                      splitKey={`contact`}
+                      instruction={errorMessage}
+                      style={[styles.wifiError]}
+                      onTextPress={() => {
+                        navigation.navigate("SupportStack", {
+                          isContactUs: true,
+                        });
+                        console.log('On press back')
+                      }}
+                    />
+        
+      
     )
   }
 
@@ -840,6 +846,7 @@ To add a Sparklight Modem to your account, please contact our support team.
                 </Text>
                 
               </View>
+              <View style={[styles.frameLayout]} />
                  <RenderPasswordErrorMsg/>
                   </View>
           )}
@@ -1122,6 +1129,17 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 28,
     flex: 1,
+  },
+  wifiError: {
+    color: Color.sparklightGray1,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 16,
+    fontStyle: "normal",
+    textAlign: "left",
+    fontWeight: "400",
+    padding: 16,
+    marginHorizontal:8,
+    alignSelf: "center",
   },
   supportAccordionParent: {
     backgroundColor: Color.sparklightWhite,
