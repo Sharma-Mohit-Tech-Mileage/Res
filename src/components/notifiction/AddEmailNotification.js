@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { StyleSheet, Text, View, ScrollView } from "react-native";
-import { Color, Padding, FontSize ,FontFamily} from "../../../GlobalStyles";
+import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -24,7 +24,7 @@ const AddEmailNotification = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showErrorAlert, setShowErrorAlert] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
-    const [formState, setFormState] = useState({ paperlessBilling: false, marketing: false });
+    const [formState, setFormState] = useState({ paperlessBilling: true, marketing: false });
     const route = useRoute();
     const dispatch = useDispatch();
     const navigation = useNavigation();
@@ -119,7 +119,7 @@ const AddEmailNotification = () => {
     return (
         <View
             style={styles.container}
-            
+
             accessibilityLabel="Add Email Notifications screen"
         >
             <ProfileSettingsHeader
@@ -143,7 +143,7 @@ const AddEmailNotification = () => {
                 <View style={styles.frameContainer}>
                     <View
                         style={styles.section}
-                        
+
                         accessibilityLabel="Email entry section Please enter your email address below and stay connected with us."
                     >
                         {showErrorAlert && (
@@ -154,7 +154,7 @@ const AddEmailNotification = () => {
                                     message={errorMsg}
                                     showCloseIcon={true}
                                     onClose={() => setShowErrorAlert(false)}
-                                    
+
                                     accessibilityLabel={`Error: ${errorMsg}`}
                                     accessibilityLiveRegion="assertive"
                                 />
@@ -162,7 +162,7 @@ const AddEmailNotification = () => {
                         )}
                         <Text
                             style={styles.label}
-                            
+
                             accessibilityLabel="Instructions: Please enter your email address below and stay connected with us"
                         >
                             Please enter your email address below and stay connected with us.
@@ -181,7 +181,7 @@ const AddEmailNotification = () => {
                                         label="Email Address"
                                         accessibilityLabel="Email address input field"
                                         accessibilityHint="Enter your email address"
-                                        
+
                                     />
                                 )}
                             />
@@ -192,7 +192,7 @@ const AddEmailNotification = () => {
                             message="We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications."
                             showCloseIcon={false}
                             isVisible={true}
-                            
+
                             accessibilityLabel="Critical notifications information: We'll keep you informed without overwhelming your inbox"
                             accessibilityLiveRegion="polite"
                         />
@@ -200,33 +200,34 @@ const AddEmailNotification = () => {
                     <View style={styles.divider} />
                     <View
                         style={styles.section}
-                        
+
                         accessibilityLabel="Paperless billing section,Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you'll also receive occasional updates and offers via email."
                     >
                         <View
                             style={styles.toggleContainer}
-                            
+
                             accessibilityLabel={`Paperless billing option, currently ${formState.paperlessBilling ? 'enabled' : 'disabled'}`}
                         >
                             <Text
                                 style={styles.sectionLabel}
-                                
+
                                 accessibilityLabel="Paperless Billing"
                             >
                                 Paperless Billing
                             </Text>
                             <Toggle
                                 key={formState.paperlessBilling ? 'on' : 'off'}
-                                onToggle={handleToggleChange}
+                                //onToggle={handleToggleChange}
                                 name={'paperlessBilling'}
                                 initialValue={formState.paperlessBilling}
                                 section={"paperless"}
                                 label="paperless"
+                                disabled={true}
                             />
                         </View>
                         <Text
                             style={styles.description}
-                            
+
                             accessibilityLabel="Paperless billing description: Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips"
                         >
                             Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you'll also receive occasional updates and offers via email.
@@ -235,7 +236,7 @@ const AddEmailNotification = () => {
                 </View>
                 <View
                     style={styles.buttonContainer}
-                    
+
                     accessibilityLabel="Form action buttons"
                 >
                     <SecondaryButton
@@ -271,21 +272,21 @@ const styles = StyleSheet.create({
     },
     section: {
         marginHorizontal: Padding.p_base,
-        fontFamily:FontFamily.openSansRegular
+        fontFamily: FontFamily.openSansRegular
     },
     label: {
-        fontFamily:FontFamily.openSansRegular,
+        fontFamily: FontFamily.openSansRegular,
         fontSize: FontSize.size_base,
         color: Color.colorGray_200,
         marginBottom: Padding.p_base,
     },
     sectionLabel: {
-        fontFamily:FontFamily.openSansRegular,
+        fontFamily: FontFamily.openSansRegular,
         fontSize: FontSize.size_base,
         color: Color.colorGray_200,
     },
     description: {
-        fontFamily:FontFamily.openSansRegular,
+        fontFamily: FontFamily.openSansRegular,
         fontSize: FontSize.size_sm,
         color: Color.sparklightDarkGray,
         marginTop: Padding.p_5xs,
