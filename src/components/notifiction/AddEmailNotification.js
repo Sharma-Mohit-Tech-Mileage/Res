@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { StyleSheet, Text, View, ScrollView } from "react-native";
-import { Color, Padding, FontSize } from "../../../GlobalStyles";
+import { Color, Padding, FontSize ,FontFamily} from "../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -132,7 +132,6 @@ const AddEmailNotification = () => {
             <LoadingOverlay
                 isLoading={isSubmitting}
                 message="Saving..."
-                
                 accessibilityLabel={isSubmitting ? "Saving email notification settings" : ""}
                 accessibilityLiveRegion="polite"
             />
@@ -272,17 +271,21 @@ const styles = StyleSheet.create({
     },
     section: {
         marginHorizontal: Padding.p_base,
+        fontFamily:FontFamily.openSansRegular
     },
     label: {
+        fontFamily:FontFamily.openSansRegular,
         fontSize: FontSize.size_base,
         color: Color.colorGray_200,
         marginBottom: Padding.p_base,
     },
     sectionLabel: {
+        fontFamily:FontFamily.openSansRegular,
         fontSize: FontSize.size_base,
         color: Color.colorGray_200,
     },
     description: {
+        fontFamily:FontFamily.openSansRegular,
         fontSize: FontSize.size_sm,
         color: Color.sparklightDarkGray,
         marginTop: Padding.p_5xs,
