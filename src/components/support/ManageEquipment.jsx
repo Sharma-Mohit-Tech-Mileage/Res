@@ -49,7 +49,9 @@ const ManageEquipment = ({ route }) => {
   const [hasEeroDevice, setHasEeroDevice] = React.useState(false);
   const [networkId, setNetworkId] = React.useState(null);
   const [modemSupported, setModemSupported] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState("We’re sorry! We Can only update the Wifi password for the supported modem models.To add a Sparklight Modem to your account, please contact our support team");
+  const [errorMessage, setErrorMessage] = React.useState(`We’re sorry! We Can only update the Wifi password for the supported modem models.
+
+To add a Sparklight Modem to your account, please contact our support team`);
  
   const alertRef = React.useRef(null);
 
@@ -842,7 +844,7 @@ React.useEffect(() => {
             >
               <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
                 <Text style={[styles.myModem1, styles.myModem1Typo]}>
-                  WiFi Password
+                  Wifi Password
                 </Text>
                 
               </View>
