@@ -842,13 +842,13 @@ React.useEffect(() => {
             <View
               style={[styles.myModem, styles.myModemSpaceBlock, { marginTop: 20 },]}
             >
-              <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
+              <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1,{paddingBottom:Padding.p_8xs}]}>
                 <Text style={[styles.myModem1, styles.myModem1Typo]}>
                   Wifi Password
                 </Text>
                 
               </View>
-              <View style={[styles.frameLayout]} />
+        
                  <RenderPasswordErrorMsg/>
                   </View>
           )}
@@ -936,9 +936,7 @@ React.useEffect(() => {
             </View>
           </View>
 
-          <View style={[styles.frameFlexBox]}>
-            <MyServicePlan plans={plans} hasEeroDevice={hasEeroDevice} networkId={networkId} navigation={navigation} />
-          </View>
+          
         </View>
       </ScrollView>
       {loading ? <Loader /> : null}
@@ -1139,9 +1137,9 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     textAlign: "left",
     fontWeight: "400",
-    padding: 16,
-    marginHorizontal:8,
-    alignSelf: "center",
+    marginHorizontal:16,
+    paddingBottom:16,
+    
   },
   supportAccordionParent: {
     backgroundColor: Color.sparklightWhite,

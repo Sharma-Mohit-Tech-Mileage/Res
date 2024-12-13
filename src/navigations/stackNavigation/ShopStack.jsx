@@ -5,17 +5,18 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ShopScreen from '../../components/home/ShopScreen';
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
+import MyServices from "../../components/services/MyServices";
 
 const ShopStack = createNativeStackNavigator();
 
-function ShopStackScreen() {
+function ServiceStackScreen() {
     const { setTabBarVisible } = useTabBarVisibility();
     return (
         <ShopStack.Navigator defaultNavigationOptions={{ gestureEnabled: true }}>
             
             <ShopStack.Screen
-                name="ArticalWindowUtility"
-                component={ArticalWindowUtility}
+                name="MyServices"
+                component={MyServices}
                 options={{
                     headerBackVisible: false,
                     headerShown: false,
@@ -42,4 +43,4 @@ function ShopStackScreen() {
     );
 }
 
-export default ShopStackScreen;
+export default ServiceStackScreen;

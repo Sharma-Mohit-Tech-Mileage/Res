@@ -161,60 +161,22 @@ const MyTabs = ({ navigation,route }) => {
 
         {/* Shop Screen */}
         <Tab.Screen
-          name="Shop"
+          name="MyServices"
           component={ShopStack}
           listeners={({ navigation }) => ({
             tabPress: (e) => {
               e.preventDefault();
               if (user?.isNormalUser) {
-                navigation.reset({
-                  index: 0,
-                  routes: [
-                    {
-                      name: 'Shop',
-                      state: {
-                        routes: [
-                          {
-                            name: 'ArticalWindowUtility',
-                            params: {
-                              url: `${Env.URL}/services/upgrade`,
-                              name: 'Shop',
-                              isExpandable: true,
-                            },
-                          },
-                        ],
-                      },
-                    },
-                  ],
-                });
+                navigation.navigate('MyServices')
               }
             },
           })}
           options={{
-            tabBarLabel: 'Shop',
+            tabBarLabel: 'Service',
             headerShown: false,
             tabBarIcon: (props) => (
               <CustomTabBarButton {...props} isDisabled={!user?.isNormalUser} onPress={()=>{
-                navigation.reset({
-                  index: 0,
-                  routes: [
-                    {
-                      name: 'Shop',
-                      state: {
-                        routes: [
-                          {
-                            name: 'ArticalWindowUtility',
-                            params: {
-                              url: `${Env.URL}/services/upgrade`,
-                              name: 'Shop',
-                              isExpandable: true,
-                            },
-                          },
-                        ],
-                      },
-                    },
-                  ],
-                });
+                navigation.navigate('MyServices')
               }} />
             ),
           //}}
