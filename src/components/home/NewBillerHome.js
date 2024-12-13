@@ -110,7 +110,7 @@ const NewBillerHome = ({ navigation }) => {
 
 
   const onErrorBill = (error) => {
-    console.log("error", error);
+    console.log("error==", error);
   };
 
   useEffect(() => {

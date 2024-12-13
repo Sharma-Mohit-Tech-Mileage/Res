@@ -25,7 +25,7 @@ const Card = ({
   acno
 }) => {
  
-  console.log('BillAmnt',dueDate)
+  console.log('BillAmnt================',billAmt)
 
   return (
     <View style={styles.shadowContainer}>

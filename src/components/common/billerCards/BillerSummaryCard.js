@@ -27,6 +27,8 @@ const BillerSummaryCard = ({
   const uncheck = require("../../../../assets/checkcircle1.png");
   const check = require("../../../../assets/checkcircle.png");
 
+
+  console.log('Amount====================',billAmt)
   const NotAvailable = () => {
     return (
       <View style={{flexDirection:'column'}}>
