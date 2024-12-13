@@ -484,7 +484,7 @@ function* handleUpdateEmailAssociations(action) {
             if (paperlessEmail) {
                 console.log('Updating paperless email:', paperlessEmail);
                 paperlessResponse = yield call(unsubscribPaperLess);
-                successMessage = 'Your paperless email preferences have been successfully updated ';
+                successMessage = 'Your paperless email preferences have been successfully updated. ';
                 console.log('Paperless email updated successfully');
             }
 
@@ -492,7 +492,7 @@ function* handleUpdateEmailAssociations(action) {
             if (marketingEmails && marketingEmails.length > 0) {
                 console.log('Updating marketing emails:', marketingEmails);
                 marketingResponse = yield call(manageSVEmails, updatedList);
-                successMessage += 'Your marketing email preferences have been successfully updated';
+                successMessage += 'Your marketing email preferences have been successfully updated.';
                 console.log('Marketing emails updated successfully');
             }
         }

@@ -120,7 +120,7 @@ const NotificationAlert = ({
                            onPress={handleResendEmail}
                            accessible={true}
                            accessibilityRole='link'
-                           accessibilityLabel="Resend Email Confirmation"
+                           accessibilityLabel="Resend Confirmation Email"
                            accessibilityHint="Double tap to resend the confirmation email"
                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                        >
