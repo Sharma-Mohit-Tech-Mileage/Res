@@ -137,7 +137,10 @@ const EmailNotifications = ({ navigation }) => {
                         </View>
                     </View>
                     <>
-                        {true? (
+                    {
+                        profile.profileDetails !== undefined
+                        && profile.profileDetails.multipleEmails ?
+                        (
                             <View
                                 style={styles.notificationAlert}
                             >
