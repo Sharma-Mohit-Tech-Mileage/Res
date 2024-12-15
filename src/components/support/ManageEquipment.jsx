@@ -848,9 +848,8 @@ React.useEffect(() => {
                 </Text>
                 
               </View>
-        
-                 <RenderPasswordErrorMsg/>
-                  </View>
+                <RenderPasswordErrorMsg/>
+              </View>
           )}
 
           {/* Quick Link section */}
@@ -858,7 +857,7 @@ React.useEffect(() => {
             style={[
               styles.myModem,
               styles.myModemSpaceBlock,
-              { marginTop: 20 },
+              { marginVertical: 20 },
             ]}
           >
             <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
