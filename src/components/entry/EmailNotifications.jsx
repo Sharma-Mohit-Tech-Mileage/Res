@@ -92,44 +92,34 @@ const EmailNotifications = ({ navigation }) => {
                 </View>
                 <View
                     style={styles.viewContainer}
-                    accessibilityRole="none"
                     accessibilityLabel="Email notification setup section"
                 >
-                    <View
-                        accessibilityRole="none"
-                        accessibilityLabel="Email notification options"
-                    >
-                        <View
-                            style={styles.headerIconViewContainer}
-                            accessibilityRole="none"
-                        >
+                    <View accessibilityRole="none" accessibilityLabel="Email notification options" >
+                        <View style={styles.headerIconViewContainer} accessibilityRole="none" >
                             <View
                                 style={styles.headerIconView}
                                 accessibilityRole="image"
                                 accessibilityLabel="Email notification icon"
+                                accessible={true}
                             >
                                 <MailRingingIcon />
                             </View>
                         </View>
-                        <View
-                            style={styles.header}
-                            accessibilityRole="header"
-                        >
+                        <View style={styles.header}  accessible={true} accessibilityRole="header" >
                             <Text
                                 style={styles.headerText}
                                 accessibilityRole="text"
                                 accessibilityLabel="Turn on Email Notifications"
+                               
                             >
                                 Turn on Email Notifications
                             </Text>
                         </View>
-                        <View
-                            style={styles.subHeader}
-                            accessibilityRole="none"
-                        >
+                        <View style={styles.subHeader}  accessible={true} accessibilityRole="none" >
                             <Text
                                 style={styles.subHeaderText}
                                 accessibilityRole="text"
+                                accessible={true}
                                 accessibilityLabel="Receive email alerts related to your account, updates and more from Sparklight"
                             >
                                 Receive email alerts related to your account, updates and more from Sparklight.
