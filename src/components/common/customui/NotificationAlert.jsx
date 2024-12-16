@@ -90,7 +90,6 @@ const NotificationAlert = ({
        <View style={styles.outerContainer}>
            <View 
                style={[styles.notificationContainer, { borderLeftColor: currentTypeStyle.color }]}
-               accessible={true}
                accessibilityLabel={`${type} notification: ${title || ''} ${message || ''}`}
                accessibilityLiveRegion="polite"
            >
