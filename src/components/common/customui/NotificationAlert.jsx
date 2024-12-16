@@ -125,7 +125,7 @@ const NotificationAlert = ({
                            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                        >
                            <Text style={styles.resendText}>
-                               Resend Email Confirmation
+                           Resend Confirmation Email
                            </Text>
                        </TouchableOpacity>
                    )}
@@ -138,6 +138,7 @@ const NotificationAlert = ({
                        accessible={true}
                        accessibilityLabel="Close notification"
                        accessibilityHint="Double tap to close"
+                       accessibilityRole='button'
                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                    >
                        <Image
