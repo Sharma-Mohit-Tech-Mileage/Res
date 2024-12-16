@@ -192,8 +192,6 @@ const EmailNotifications = () => {
   const renderEmailItem = ({ item, section, disabled }) => (
     <View
       style={styles.emailItem}
-      accessible={true}
-      accessibilityRole="button"
       accessibilityLabel={`${section === 'paperless' ? 'Paperless billing' : section === 'marketing' ? 'Marketing' : 'Sparklight TV'} email: ${item.emailAddress.toLowerCase()}. ${disabled ? 'Settings cannot be modified.' : 'Toggle switch available to modify settings.'}`}
     >
       <View style={styles.emailAddressContainer}>
@@ -214,8 +212,6 @@ const EmailNotifications = () => {
   const renderEmailItemWithTrash = ({ item }) => (
     <View
       style={styles.emailItem}
-      accessible={true}
-      accessibilityRole="button"
       accessibilityLabel={`Additional email address: ${item.emailAddress.toLowerCase()}. Double tap delete button to remove this email.`}
     >
       <View style={styles.emailAddressContainer}>
