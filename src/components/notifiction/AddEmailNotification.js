@@ -117,35 +117,24 @@ const AddEmailNotification = () => {
     }, []);
 
     return (
-        <View
-            style={styles.container}
-
-            accessibilityLabel="Add Email Notifications screen"
-        >
+        <View style={styles.container}>
             <ProfileSettingsHeader
                 title="Add Email Notifications"
                 onPressBack={() => navigation.goBack()}
-                accessibilityLabel="Add Email Notifications header"
-                accessibilityHint="Navigate back to previous screen"
+                accessibilityLabel="Add Email Notifications"
             />
 
             <LoadingOverlay
                 isLoading={isSubmitting}
                 message="Saving..."
-                accessibilityLabel={isSubmitting ? "Saving email notification settings" : ""}
                 accessibilityLiveRegion="polite"
             />
 
-            <ScrollView
-                ref={scrollViewRef}
-                accessibilityLabel="Email notification settings form"
-            >
+            <ScrollView ref={scrollViewRef}>
                 <View style={styles.frameContainer}>
-                    <View
-                        style={styles.section}
-
-                        accessibilityLabel="Email entry section Please enter your email address below and stay connected with us."
-                    >
+                    {/* Email Entry Section */}
+                    <View style={styles.section}>
+                        {/* Error Alert */}
                         {showErrorAlert && (
                             <View style={styles.spaceBottom}>
                                 <NotificationAlert
@@ -154,19 +143,23 @@ const AddEmailNotification = () => {
                                     message={errorMsg}
                                     showCloseIcon={true}
                                     onClose={() => setShowErrorAlert(false)}
-
-                                    accessibilityLabel={`Error: ${errorMsg}`}
                                     accessibilityLiveRegion="assertive"
+                                    accessibilityLabel={errorMsg}
                                 />
                             </View>
                         )}
-                        <Text
-                            style={styles.label}
 
-                            accessibilityLabel="Instructions: Please enter your email address below and stay connected with us"
-                        >
-                            Please enter your email address below and stay connected with us.
-                        </Text>
+                        {/* Instructions */}
+                        <View style={styles.textGroup}>
+                            <Text 
+                                style={styles.label}
+                                accessibilityLabel="Please enter your email address below and stay connected with us"
+                            >
+                                Please enter your email address below and stay connected with us.
+                            </Text>
+                        </View>
+
+                        {/* Email Input */}
                         <View style={styles.spaceBottom}>
                             <Controller
                                 control={control}
@@ -179,78 +172,72 @@ const AddEmailNotification = () => {
                                         value={value ? value.toLowerCase() : ''}
                                         error={errors.email?.message}
                                         label="Email Address"
-                                        accessibilityLabel="Email address input field"
-                                        accessibilityHint="Enter your email address"
-
+                                        accessibilityLabel={errors.email ? 
+                                            `Email address input. Error: ${errors.email.message}` : 
+                                            "Email address input"
+                                        }
                                     />
                                 )}
                             />
                         </View>
+
+                        {/* Critical Notifications Alert */}
                         <NotificationAlert
                             type="warning"
                             title="Critical Notifications"
                             message="We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications."
                             showCloseIcon={false}
                             isVisible={true}
-
-                            accessibilityLabel="Critical notifications information: We'll keep you informed without overwhelming your inbox"
+                            accessibilityLabel="Important: We'll keep you informed without overwhelming your inbox. By providing your email address, you're signing up for critical notifications."
                             accessibilityLiveRegion="polite"
                         />
                     </View>
-                    <View style={styles.divider} />
-                    <View
-                        style={styles.section}
 
-                        accessibilityLabel="Paperless billing section,Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you'll also receive occasional updates and offers via email."
-                    >
-                        <View
-                            style={styles.toggleContainer}
+                    <View style={styles.divider} importantForAccessibility="no" />
 
-                            accessibilityLabel={`Paperless billing option, currently ${formState.paperlessBilling ? 'enabled' : 'disabled'}`}
-                        >
-                            <Text
+                    {/* Paperless Billing Section */}
+                    <View style={styles.section}>
+                        <View style={styles.toggleContainer}>
+                            <Text 
                                 style={styles.sectionLabel}
-
                                 accessibilityLabel="Paperless Billing"
                             >
                                 Paperless Billing
                             </Text>
                             <Toggle
                                 key={formState.paperlessBilling ? 'on' : 'off'}
-                                //onToggle={handleToggleChange}
                                 name={'paperlessBilling'}
                                 initialValue={formState.paperlessBilling}
                                 section={"paperless"}
                                 label="paperless"
                                 disabled={true}
+                                accessibilityLabel={`Paperless billing ${formState.paperlessBilling ? 'enabled' : 'disabled'}`}
                             />
                         </View>
-                        <Text
+                        
+                        <Text 
                             style={styles.description}
-
-                            accessibilityLabel="Paperless billing description: Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips"
+                            accessibilityLabel="Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips."
                         >
                             Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you'll also receive occasional updates and offers via email.
                         </Text>
                     </View>
                 </View>
-                <View
-                    style={styles.buttonContainer}
 
-                    accessibilityLabel="Form action buttons"
-                >
+                {/* Action Buttons */}
+                <View style={styles.buttonContainer}>
                     <SecondaryButton
-                        accessibilityLabel={isSubmitting ? "Saving settings" : "Save settings"}
-                        accessibilityHint="Double tap to save your email notification settings"
-                        title={"Save"}
+                        title="Save"
                         buttonType="submit"
                         onPress={handleSubmit(handleSave, handleValidationError)}
+                        accessibilityLabel={isSubmitting ? "Saving settings" : "Save settings"}
+                        accessibilityHint="Double tap to save email notification settings"
                     />
                     <SecondaryButton
-                        accessibilityLabel="Cancel"
-                        accessibilityHint="Double tap to discard changes and return to notifications screen"
-                        title={"Cancel"}
+                        title="Cancel"
                         onPress={() => navigation.navigate("Notifications")}
+                        accessibilityLabel="Cancel"
+                        accessibilityHint="Double tap to return to notifications screen"
                     />
                 </View>
             </ScrollView>

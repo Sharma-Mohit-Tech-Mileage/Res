@@ -133,6 +133,7 @@ const EmailNotifications = ({ navigation }) => {
                         (
                             <View
                                 style={styles.notificationAlert}
+                                accessible={true}
                             >
                                 <NotificationAlert
                                     type={"warning"}
