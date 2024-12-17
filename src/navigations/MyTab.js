@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Dimensions, Platform,Alert,Pressable } from "react-native";
+import { View, StyleSheet, Dimensions, Platform,Alert,Pressable,Image } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTabBarVisibility } from './TabBarVisibilityContext';
@@ -42,7 +42,7 @@ const MyTabs = ({ navigation,route }) => {
     dispatch(fetchProfileDetails());
   }, [dispatch]);
 
-  function CustomTabBarButton({ onPress, isDisabled, children }) {
+  function CustomTabBarButton({ onPress, isDisabled,focused, children }) {
     const handlePress = () => {
       if (isDisabled) {
         Alert.alert('Coming Soon', 'We are still working on it.');
@@ -53,7 +53,9 @@ const MyTabs = ({ navigation,route }) => {
   
     return (
       <Pressable onPress={handlePress} style={styles.tabButton}>
-        <ShopIcon isNewBillerUser={!user?.isNormalUser}/>
+        {
+          focused ? <SupportIconSelected/> :<SupportIcon isNewBillerUser={!user?.isNormalUser}/>
+        }
         {children}
       </Pressable>
     );
@@ -175,7 +177,7 @@ const MyTabs = ({ navigation,route }) => {
             tabBarLabel: 'Service',
             headerShown: false,
             tabBarIcon: (props) => (
-              <CustomTabBarButton {...props} isDisabled={!user?.isNormalUser} onPress={()=>{
+              <CustomTabBarButton {...props} isDisabled={!user?.isNormalUser} focused={props.focused} onPress={()=>{
                 navigation.navigate('MyServices')
               }} />
             ),
@@ -201,11 +203,12 @@ const MyTabs = ({ navigation,route }) => {
           options={{
             headerShown: false,
             tabBarLabel: 'Support',
-            tabBarIcon: ({ focused }) => (
-              <View style={styles.tabItem}>
-                {focused ? <SupportIconSelected /> : <SupportIcon  />}
-              </View>
-            ),
+            tabBarIcon: ({ focused }) => (<Image
+              style={{width:33,height:28}}
+              resizeMode='contain'
+              tintColor={focused?'#353091':'#767676'}
+              source={require("../../assets/phone-outgoing-03.png")}
+            /> )
           }}
         />
         {/* Account Screen */}

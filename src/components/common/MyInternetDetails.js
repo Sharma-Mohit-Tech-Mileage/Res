@@ -1,16 +1,11 @@
 import React, { useState, useEffect,useCallback } from "react";
 import { View, StyleSheet, Dimensions, ScrollView } from "react-native";
-import Carousel from 'react-native-snap-carousel';
-import Card from "./billerCards/BillerSummaryCard";
-import AutoPayCard from "./billerCards/AutoPayCard";
-import PeperLessCard from "./billerCards/PeperLessCard";
+import Card from "./billerCards/BillerSummaryCard";;
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBillingPaper, fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
-import { Padding } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
 import { useFocusEffect } from "@react-navigation/native";
 
 const { width: viewportWidth } = Dimensions.get('window');

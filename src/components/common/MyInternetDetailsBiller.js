@@ -1,8 +1,6 @@
 import React, { useState, useEffect,useCallback } from "react";
 import { View, StyleSheet, Dimensions, ScrollView } from "react-native";
-import Carousel from 'react-native-snap-carousel';
 import Card from "./billerCards/NewBillerSummary";
-import AutoPayCard from "./billerCards/AutoPayCardNewBiller";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
