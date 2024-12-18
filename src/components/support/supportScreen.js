@@ -7,17 +7,13 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation,useFocusEffect } from "@react-navigation/native";
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import PubSub from 'pubsub-js'
-import moment from 'moment-timezone';
-import { Env } from "../../network/apis/account/Constants";
-import ChatSupportModal from "./ChatSupportModal";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
-import { GetApiRequest } from "../../network/APIClient";
-import CreateTicket from "./ticket/CreateTicket";
 import base64 from 'react-native-base64'
 //import ZendDesk from '@pagopa/io-react-native-zendesk';
 import { startChatWithConfig,setVisitorInfo,startChat , clearChatData} from "../utility/RNZendeskChat";
 import TicketListIcon from "../../res/svgIcons/TicketListIcon";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
+import BillingSupportIcon from "../../res/svgIcons/BillingSupportIcon";
 
 const Support = ({ route }) => {
     const navigation = useNavigation();
@@ -29,6 +25,8 @@ const Support = ({ route }) => {
     const [istechAgentAvailable,setIstechAgentAvailable]=useState(false)
     const [refreshing, setRefreshing] = useState(false);
     const [isAgentNotAvailable,setIsAgentNotAvailable]=useState(false)
+
+    const rightIcon=require("../../../assets/chevronright.png")
     const makeCall = (number) => {
         let phoneNumber = '';
 
@@ -402,7 +400,7 @@ const Support = ({ route }) => {
                             </React.Fragment>
                         ))}
                     </View>
-                    { userData?.isNormalUser && (
+                    { userData?.isNormalUser ? (
                         <>
                     
 
@@ -547,11 +545,8 @@ const Support = ({ route }) => {
                                     <View style={styles.headingAndToggle}>
                                         <View style={styles.headingAndIcon4}>
                                             <View style={[styles.icon]}>
-                                                <Image
-                                                    style={styles.supportIcon}
-                                                    resizeMode="stretch"
-                                                    source={require("../../../assets/wallet-03.png")}
-                                                /></View>
+                                                <BillingSupportIcon/>
+                                                </View>
                                             <View style={styles.frameParent}>
                                                 <View style={styles.headingAndToggle}>
                                                     <Text style={[styles.headingTypo]}>
@@ -636,7 +631,40 @@ const Support = ({ route }) => {
                     
                     <View style={[styles.issuesFlexBox]} />
                     </>
-                    )}              
+                    ):<>
+                    <View style={[styles.additionalSupport, styles.integrationCardBorder]}>
+                        <View style={[styles.headingContainer, styles.headingContainerSpaceBlock,{flexDirection:'column'}]} >
+                            <Text style={[styles.heading, styles.headingTypo]}>
+                                Contact Us
+                            </Text>
+
+                            <Pressable
+                            accessibilityLabel="Sparklight Customer Support"
+                            accessibilityRole="button"
+                            onPress={()=>{
+                                navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/26787209205911-SPARKLIGHT-CUSTOMER-SUPPORT', name: 'Sparklight Customer Support' })
+                            }}
+                         >
+                                <View style={{flexDirection:'row-reverse',justifyContent:'space-between',width:'100%'}}>
+                                <Image
+                                    source={rightIcon}
+                                    style={[{width: 20,
+                                        height: 20,
+                                        alignSelf:'center',
+                                        resizeMode: 'contain'}]}
+                                    />
+                                <Text style={[styles.textTypoRight,{paddingVertical:Padding.p_xs,marginTop:10}]}>
+                                    {'Sparklight Customer Support'}
+                                </Text>
+                                      
+                                </View>
+                                
+                            </Pressable>
+        
+                        </View>
+                        
+                        </View>
+                     </>}              
         <CustomerErrorPage
             visible={isAgentNotAvailable}
             message={'Our agents are currently unavailable. Please reach out during our business hours, and we’ll be happy to assist you.Thank you for your understanding!'}
