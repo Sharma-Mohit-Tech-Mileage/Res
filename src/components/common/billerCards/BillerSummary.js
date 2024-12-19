@@ -50,7 +50,7 @@ const Card = ({
           <View
             style={{
               flexDirection: "row",
-              width: "70%",
+              width: "92%",
               marginHorizontal: 20,
               justifyContent: "space-between",
               
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   cardHreader: {
     flexDirection: "row",
     backgroundColor: "#F8F8F8",
-    width: "92%",
+    width: "100%",
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     padding: 10,
