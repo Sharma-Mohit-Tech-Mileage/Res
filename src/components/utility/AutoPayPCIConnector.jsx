@@ -9,6 +9,7 @@ import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import { GetApiRequest } from '../../network/APIClient';
 import { navigationRef } from '../../navigations/UserNavigations';
+import analytics from '@react-native-firebase/analytics';
 const { height, width } = Dimensions.get('window');
 
 const AutoPayPCIConnector = ({ navigation, route }) => {
@@ -25,6 +26,8 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const webViewRef = useRef();
     const [html, setHtml] = useState('');
     const [appState, setAppState] = useState(AppState.currentState);
+    const [hasTrackedInitialScreen, setHasTrackedInitialScreen] = useState(false);
+
     console.log('AutoPayPCIConnector', paymentDetails);
     const generateGuid = () => {
         const p8 = (s) => {
@@ -252,6 +255,43 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         setDynamicCookie();  // Push cookie when component is first mounted
     }, [url, appState]);
 
+    useEffect(() => {
+        console.log('PCI Screen Tracking useEffect triggered');
+        console.log('Current PCI screen name:', name);
+        console.log('PCI hasTrackedInitialScreen:', hasTrackedInitialScreen);
+
+        const trackScreen = async () => {
+            if (name && !hasTrackedInitialScreen) {
+                console.log('Attempting to track PCI screen with name:', name);
+                try {
+                    await analytics().logEvent('screen_view', {
+                        screen_name: name,
+                        screen_class: 'AutoPayPCIConnector'
+                    });
+                    console.log('Successfully tracked PCI screen_view event:', {
+                        screen_name: name,
+                        screen_class: 'AutoPayPCIConnector'
+                    });
+                    setHasTrackedInitialScreen(true);
+                    console.log('Set PCI hasTrackedInitialScreen to true');
+                } catch (error) {
+                    console.error('PCI Analytics error details:', {
+                        error: error.message,
+                        name: name,
+                        stack: error.stack
+                    });
+                }
+            } else {
+                console.log('Skipped PCI tracking because:', {
+                    hasName: !!name,
+                    name: name,
+                    hasTrackedInitialScreen: hasTrackedInitialScreen
+                });
+            }
+        };
+
+        trackScreen();
+    }, [name]);
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS === 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); }} title={name} />

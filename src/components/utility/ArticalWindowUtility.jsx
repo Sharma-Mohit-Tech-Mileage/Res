@@ -9,6 +9,7 @@ import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
 import colors from '../../res/Colors';
+import analytics from '@react-native-firebase/analytics';
 const { width, height } = Dimensions.get('window');
 
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -26,6 +27,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [appState, setAppState] = useState(AppState.currentState);
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
+    const [hasTrackedInitialScreen, setHasTrackedInitialScreen] = useState(false);
 
     const toggleModal = () => {
         setShowPDFModal(!showPDFModal);
@@ -178,6 +180,44 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         }
     };
 
+    useEffect(() => {
+        console.log('Screen Tracking useEffect triggered');
+        console.log('Current name:', name);
+        console.log('hasTrackedInitialScreen:', hasTrackedInitialScreen);
+    
+        const trackScreen = async () => {
+            if (name && !hasTrackedInitialScreen) {
+                console.log('Attempting to track screen with name:', name);
+                try {
+                    await analytics().logEvent('screen_view', {
+                        screen_name: name,
+                        screen_class: 'ArticalWindowUtility'
+                    });
+                    console.log('Successfully tracked screen_view event:', {
+                        screen_name: name,
+                        screen_class: 'ArticalWindowUtility'
+                    });
+                    setHasTrackedInitialScreen(true);
+                    console.log('Set hasTrackedInitialScreen to true');
+                } catch (error) {
+                    console.error('Analytics error details:', {
+                        error: error.message,
+                        name: name,
+                        stack: error.stack
+                    });
+                }
+            } else {
+                console.log('Skipped tracking because:', {
+                    hasName: !!name,
+                    name: name,
+                    hasTrackedInitialScreen: hasTrackedInitialScreen
+                });
+            }
+        };
+    
+        trackScreen();
+    }, [name]);
+    
     useEffect(() => {
         setProgress(0);
         setIsError(false);
