@@ -1,21 +1,5 @@
 import React, { useState, useCallback } from "react";
-import {
-  Image,
-  StyleSheet,
-  TextInput,
-  Text,
-  View,
-  Keyboard,
-  ScrollView,
-  Pressable,
-} from "react-native";
-import {
-  Padding,
-  FontFamily,
-  FontSize,
-  Color,
-  Border,
-} from "../../../../GlobalStyles";
+import { Image, StyleSheet, TextInput, Text, View, Keyboard, ScrollView, Pressable, } from "react-native"; import { Padding, FontFamily, FontSize, Color, Border, } from "../../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
@@ -27,11 +11,8 @@ import { useNavigation } from "@react-navigation/native";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import { userTicketSchema } from "../../utility/validationSchema";
 import WarningIcon from "../../../../assets/alert-triangle.png";
-import {
-  UploadMultipartData,
-  PostApiRequest,
-} from "../../../network/APIClient";
-import { getUser,storeValue } from "../../../redux/utils/LocalStorage";
+import { UploadMultipartData, PostApiRequest, } from "../../../network/APIClient";
+import { getUser, storeValue } from "../../../redux/utils/LocalStorage";
 import DocumentPicker, { types } from "react-native-document-picker";
 import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
 import LoadingOverlay from "../../common/customui/CustomLoading";
@@ -49,33 +30,14 @@ const CreateTicket = () => {
   const [loading, setLoading] = useState(false);
   const [loadingTxt, setLoadingTxt] = useState("Creating Ticket...");
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
-  var Data = {
-    subject: "",
-    comment: "",
-    email: profileDetails.multipleEmails ? '' : profileDetails.svEmailAddress,
-    accountNumber: "",
-    category: "",
-    uploads: [],
-    PhoneNumber: '',
-    IsMobile:true
-  };
+  var Data = { subject: "", comment: "", email: profileDetails.multipleEmails ? '' : profileDetails.svEmailAddress, accountNumber: "", category: "", uploads: [], PhoneNumber: '', IsMobile: true };
 
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    setError,
-    reset,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(userTicketSchema()),
-    defaultValues: Data,
-  });
+  const { control, handleSubmit, setValue, setError, reset, formState: { errors }, } = useForm({ resolver: yupResolver(userTicketSchema()), defaultValues: Data, });
 
   const handleSave = (formData) => {
     setLoadingTxt("Creating Ticket...")
     setLoading(true);
-    if (upoadFileKey.length>0) {
+    if (upoadFileKey.length > 0) {
       formData?.uploads.splice(0, 0, upoadFileKey);
     }
     getUser().then((res) => {
@@ -85,17 +47,17 @@ const CreateTicket = () => {
         request,
         formData,
         (res) => {
-          console.log('saved data',JSON.stringify(formData))
-          let data={...formData,ticketNumber:res, status:'Pending',isLocal:true};
+          console.log('saved data', JSON.stringify(formData))
+          let data = { ...formData, ticketNumber: res, status: 'Pending', isLocal: true };
           storeValue(data)
-          console.log('Ticket:',res)
-          
+          console.log('Ticket:', res)
+
           setTimeout(() => {
             setLoading(false);
             navigation.goBack();
           }, 500);
         },
-        (error) => {}
+        (error) => { }
       );
     });
   };
@@ -137,17 +99,13 @@ const CreateTicket = () => {
     }
   }, []);
 
-  const handleValidationError = () => {
-    //scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-    // setShowValidationAlert(true);
-  };
 
   return (
     <View style={{ backgroundColor: colors.backgound_blue, flex: 1 }}>
       <View style={styles.ticketSupportNone}>
         <ProfileSettingsHeader
-        accessibilityElementsHidden={isDropDownOpen}
-        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+          accessibilityElementsHidden={isDropDownOpen}
+          importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
           title="Create Ticket"
           onPressBack={() => navigation.goBack()}
         />
@@ -157,18 +115,18 @@ const CreateTicket = () => {
             <View style={[styles.innerContainer]}>
               <View style={[styles.frameParent]}>
                 <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
-                  <View 
-                  // accessibilityElementsHidden={isDropDownOpen}
-                  // importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                  style={styles.ticketsParent}>
-                    <Text  style={styles.tickets}>Tickets Details</Text>
+                  <View
+                    // accessibilityElementsHidden={isDropDownOpen}
+                    // importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                    style={styles.ticketsParent}>
+                    <Text style={styles.tickets}>Tickets Details</Text>
                   </View>
                   <View style={styles.frameWrapper}>
-                    <View 
-                    accessibilityElementsHidden={isDropDownOpen}
-                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                    style={styles.textView}>
-                      <Text style={[styles.text,{paddingBottom:8}]}>Subject</Text>
+                    <View
+                      accessibilityElementsHidden={isDropDownOpen}
+                      importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+                      style={styles.textView}>
+                      <Text style={[styles.text, { paddingBottom: 8 }]}>Subject</Text>
                     </View>
                     <Controller
                       control={control}
@@ -191,99 +149,110 @@ const CreateTicket = () => {
                   </View>
 
                   <View style={styles.frameWrapper}>
-                    <View 
-                    accessibilityElementsHidden={isDropDownOpen}
-                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                    style={styles.textView}>
+                    <View
+                      accessibilityElementsHidden={isDropDownOpen}
+                      importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+                      style={styles.textView}>
                       <Text style={styles.text}>Category</Text>
-                      </View>
-                      <Controller
-                        control={control}
-                        name="category"
-                        render={({
-                          field: { onChange, onBlur, value },
-                          fieldState: { error },
-                        }) => (
-                          <>
-                            <SparkLightDropdown
-                              items={categories}
-                              selectedValue={selectedItem}
-                              onValueChange={(value) => {
-                                setIsDropDownOpen(true)
-                                onChange(value)
-                              }}
-                              error={error?.message}
-                              isDropDownOpen={(value) => {
-                                setIsDropDownOpen(true)
-                              }}
-                            />
+                    </View>
+                    <Controller
+                      control={control}
+                      name="category"
+                      render={({
+                        field: { onChange, onBlur, value },
+                        fieldState: { error },
+                      }) => (
+                        <>
+                          {/* <SparkLightDropdown
+                            items={categories}
+                            selectedValue={selectedItem}
+                            onValueChange={(value) => {
+                              setIsDropDownOpen(true)
+                              onChange(value)
+                            }}
+                            error={error?.message}
+                            isDropDownOpen={(value) => {
+                              setIsDropDownOpen(true)
+                            }}
+                          /> */}
+                          <SparkLightDropdown
+                            accessibilityElementsHidden={isDropDownOpen}
+                            importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+                            items={categories}
+                            selectedValue={selectedItem}
+                            onValueChange={setSelectedItem}
+                            error={error?.message}
+                            isDropDownOpen={(value) => {
+                              setIsDropDownOpen(true)
+                            }}
+                          />
 
-                            {error && (
-                              <View 
+                          {error && (
+                            <View
                               accessibilityElementsHidden={isDropDownOpen}
-                              importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                              importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
                               style={styles.errorContainer}>
-                                <Image
-                                  source={WarningIcon}
-                                  style={styles.errorIcon}
-                                />
-                                <Text style={styles.errorText}>
-                                  {error?.message}
-                                </Text>
-                              </View>
-                            )}
-                          </>
-                        )}
-                      />
+                              <Image
+                                source={WarningIcon}
+                                style={styles.errorIcon}
+                              />
+                              <Text style={styles.errorText}>
+                                {error?.message}
+                              </Text>
+                            </View>
+                          )}
+                        </>
+                      )}
+                    />
                   </View>
                   <View style={styles.frameWrapper}>
-                    <View 
-                    accessibilityElementsHidden={isDropDownOpen}
-                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                    style={styles.textView}>
+                    <View
+                      accessibilityElementsHidden={isDropDownOpen}
+                      importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+                      style={styles.textView}>
                       <Text style={styles.text}>Issue Description</Text>
                     </View>
-                    
-                      <Controller
-                        control={control}
-                        name="comment"
-                        render={({
-                          field: { onChange, onBlur, value },
-                          fieldState: { error },
-                        }) => (
-                          <View 
-                          accessibilityElementsHidden={isDropDownOpen}
-                          importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                          style={[ { marginTop: 10 }]}>
-                            <TextInput
-                              placeholder="Issue Description"
-                              onChangeText={onChange}
-                              multiline
-                              numberOfLines={5}
-                              style={[styles.textArea,styles.frameBorder]}
-                            />
 
-                            {error && (
-                              <View style={styles.errorContainer}>
-                                <Image
-                                  source={WarningIcon}
-                                  style={styles.errorIcon}
-                                />
-                                <Text style={styles.errorText}>{error.message}</Text>
-                              </View>
-                            )}
-                         </View>
-                        )}
-                      />
-                    
+                    <Controller
+                      control={control}
+                      name="comment"
+                      render={({
+                        field: { onChange, onBlur, value },
+                        fieldState: { error },
+                      }) => (
+                        <View
+                          accessibilityElementsHidden={isDropDownOpen}
+                          importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+                          style={[{ marginTop: 10 }]}>
+                          <TextInput
+                            placeholder="Issue Description"
+                            onChangeText={onChange}
+                            multiline
+                            numberOfLines={5}
+                            style={[styles.textArea, styles.frameBorder]}
+                          />
+
+                          {error && (
+                            <View style={styles.errorContainer}>
+                              <Image
+                                source={WarningIcon}
+                                style={styles.errorIcon}
+                              />
+                              <Text style={styles.errorText}>{error.message}</Text>
+                            </View>
+                          )}
+                        </View>
+                      )}
+                    />
+
                   </View>
 
                   <View style={styles.frameWrapper}>
-                    <View 
-                    accessibilityElementsHidden={isDropDownOpen}
-                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                    style={styles.textView}>
-                      <Text style={[styles.text,{paddingBottom:8}]}>Email</Text>
+                    <View
+                      accessibilityElementsHidden={isDropDownOpen}
+                      importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+                      style={styles.textView}>
+                      <Text style={[styles.text, { paddingBottom: 8 }]}>Email</Text>
                     </View>
                     <Controller
                       control={control}
@@ -304,11 +273,11 @@ const CreateTicket = () => {
                   </View>
 
                   <View style={styles.frameWrapper}>
-                    <View 
-                    accessibilityElementsHidden={isDropDownOpen}
-                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                    style={styles.textView}>
-                      <Text style={[styles.text,{paddingBottom:8}]}>Phone Number (Optional)</Text>
+                    <View
+                      accessibilityElementsHidden={isDropDownOpen}
+                      importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+                      style={styles.textView}>
+                      <Text style={[styles.text, { paddingBottom: 8 }]}>Phone Number (Optional)</Text>
                     </View>
                     <Controller
                       control={control}
@@ -318,13 +287,13 @@ const CreateTicket = () => {
                         fieldState: { error },
                       }) => (
                         <SparkLightMobileInputField
-                        accessibilityElementsHidden={isDropDownOpen}
-                        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                          accessibilityElementsHidden={isDropDownOpen}
+                          importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
                           placeholder="Phone Number"
                           onBlur={onBlur}
                           onChangeText={onChange}
                           value={value}
-                          
+
                           error={error?.message}
                         />
                       )}
@@ -344,10 +313,10 @@ const CreateTicket = () => {
                         justifyContent: "center",
                       }}
                     >
-                      <View 
-                      accessibilityElementsHidden={isDropDownOpen}
-                      importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                      style={{ flexDirection: "row" }}>
+                      <View
+                        accessibilityElementsHidden={isDropDownOpen}
+                        importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+                        style={{ flexDirection: "row" }}>
                         <AttachmentIcon />
                         <Text style={styles.fileTxt}>
                           {fileResponse.length > 0
@@ -355,10 +324,10 @@ const CreateTicket = () => {
                             : "Upload File (Optional)"}
                         </Text>
                       </View>
-                      <Text 
-                      accessibilityElementsHidden={isDropDownOpen}
-                      importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                      style={styles.fileTxtSub}>
+                      <Text
+                        accessibilityElementsHidden={isDropDownOpen}
+                        importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+                        style={styles.fileTxtSub}>
                         Acceptable formats:.pdf,.png, .jpeg, .gif, .txt
                       </Text>
                     </View>
@@ -374,10 +343,10 @@ const CreateTicket = () => {
               />
             </View>
 
-            <View 
-            accessibilityElementsHidden={isDropDownOpen}
-            importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-            style={{ width: "90%", alignSelf: "center" }}>
+            <View
+              accessibilityElementsHidden={isDropDownOpen}
+              importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+              style={{ width: "90%", alignSelf: "center" }}>
               <PrimaryButtom
                 title="Submit"
                 onPress={handleSubmit(handleSave)}
@@ -389,8 +358,8 @@ const CreateTicket = () => {
             </View>
             <View>
               <Pressable
-              accessibilityElementsHidden={isDropDownOpen}
-              importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+                accessibilityElementsHidden={isDropDownOpen}
+                importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
                 style={[styles.buttons2, styles.buttonsLayout]}
                 onPress={() => navigation.goBack()}
               >
