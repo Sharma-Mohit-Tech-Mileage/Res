@@ -87,75 +87,75 @@ const NotificationAlert = ({
    };
 
    return (
-       <View 
-           style={[styles.notificationContainer, { borderLeftColor: currentTypeStyle.color }]}
-           accessible={true}
-           accessibilityLabel={`${type} notification: ${title || ''} ${message || ''}`}
-           accessibilityLiveRegion="polite"
-       >
-           <Image
-               source={currentTypeStyle.image}
-               resizeMode="contain"
-               style={[styles.iconStyle, { marginTop: !title ? 1 : 1 }]}
-               accessible={false}
-               importantForAccessibility="no"
-           />
-           
+       <View style={styles.outerContainer}>
            <View 
-               style={[
-                   styles.textContentContainer,
-                   showCloseIcon ? { marginRight: 30 } : { marginRight: 10 }
-               ]}
+               style={[styles.notificationContainer, { borderLeftColor: currentTypeStyle.color }]}
+               accessibilityLabel={`${type} notification: ${title || ''} ${message || ''}`}
+               accessibilityLiveRegion="polite"
            >
-               {title && (
-                   <Text 
-                       style={[styles.title, { color: currentTypeStyle.color }]}
-                       accessible={true}
-                       accessibilityRole="text"
-                   >
-                       {title}
-                   </Text>
-               )}
+               <Image
+                   source={currentTypeStyle.image}
+                   resizeMode="contain"
+                   style={[styles.iconStyle, { marginTop: !title ? 1 : 1 }]}
+                   accessible={false}
+                   importantForAccessibility="no"
+               />
                
-               {message && renderMessageWithBoldAccount(message)}
-               
-               {resentemail && (
+               <View style={styles.textContentContainer}>
+                   {title && (
+                       <Text 
+                           style={[styles.title, { color: currentTypeStyle.color }]}
+                           accessible={true}
+                           accessibilityRole="text"
+                       >
+                           {title}
+                       </Text>
+                   )}
+                   
+                   {message && renderMessageWithBoldAccount(message)}
+                   
+                   {resentemail && (
+                       <TouchableOpacity
+                           onPress={handleResendEmail}
+                           accessible={true}
+                           accessibilityRole='link'
+                           accessibilityLabel="Resend Confirmation Email"
+                           accessibilityHint="Double tap to resend the confirmation email"
+                           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                       >
+                           <Text style={styles.resendText}>
+                           Resend Confirmation Email
+                           </Text>
+                       </TouchableOpacity>
+                   )}
+               </View>
+
+               {showCloseIcon && (
                    <TouchableOpacity
-                       onPress={handleResendEmail}
+                       onPress={handleClose}
+                       style={styles.closeButton}
                        accessible={true}
-                       accessibilityRole='link'
-                       accessibilityLabel="Resend Email Confirmation"
-                       accessibilityHint="Double tap to resend the confirmation email"
+                       accessibilityLabel="Close notification"
+                       accessibilityHint="Double tap to close"
+                       accessibilityRole='button'
                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                    >
-                       <Text style={styles.resendText}>
-                           Resend Email Confirmation
-                       </Text>
+                       <Image
+                           source={require('../../../../assets/right-actionable7.png')}
+                           accessible={false}
+                           importantForAccessibility="no"
+                       />
                    </TouchableOpacity>
                )}
            </View>
-
-           {showCloseIcon && (
-               <TouchableOpacity
-                   onPress={handleClose}
-                   style={[styles.closeButton, { minWidth: 44, minHeight: 44 }]}
-                   accessible={true}
-                   accessibilityLabel="Close notification"
-                   accessibilityHint="Double tap to close"
-                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-               >
-                   <Image
-                       source={require('../../../../assets/right-actionable7.png')}
-                       accessible={false}
-                       importantForAccessibility="no"
-                   />
-               </TouchableOpacity>
-           )}
        </View>
    );
 };
 
 const styles = StyleSheet.create({
+   outerContainer: {
+       position: 'relative',
+   },
    notificationContainer: {
        backgroundColor: '#fff',
        flexDirection: 'row',
@@ -174,6 +174,7 @@ const styles = StyleSheet.create({
    textContentContainer: {
        flex: 1,
        marginLeft: 8,
+       paddingRight: 35, // Just enough space for the close button
    },
    iconStyle: {
        height: 18,
@@ -181,9 +182,10 @@ const styles = StyleSheet.create({
    },
    closeButton: {
        position: 'absolute',
-       top: '50%',
-       transform: [{ translateY: -22 }],
-       right: 10,
+       top: 0,
+       right: 0,
+       width: 44,
+       height: 44,
        justifyContent: 'center',
        alignItems: 'center',
    },

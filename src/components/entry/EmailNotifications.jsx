@@ -92,52 +92,34 @@ const EmailNotifications = ({ navigation }) => {
                 </View>
                 <View
                     style={styles.viewContainer}
-                    accessible={true}
-                    accessibilityRole="none"
                     accessibilityLabel="Email notification setup section"
                 >
-                    <View
-                        accessible={true}
-                        accessibilityRole="none"
-                        accessibilityLabel="Email notification options"
-                    >
-                        <View
-                            style={styles.headerIconViewContainer}
-                            accessible={true}
-                            accessibilityRole="none"
-                        >
+                    <View accessibilityRole="none" accessibilityLabel="Email notification options" >
+                        <View style={styles.headerIconViewContainer} accessibilityRole="none" >
                             <View
                                 style={styles.headerIconView}
-                                accessible={true}
                                 accessibilityRole="image"
                                 accessibilityLabel="Email notification icon"
+                                accessible={true}
                             >
                                 <MailRingingIcon />
                             </View>
                         </View>
-                        <View
-                            style={styles.header}
-                            accessible={true}
-                            accessibilityRole="header"
-                        >
+                        <View style={styles.header}  accessible={true} accessibilityRole="header" >
                             <Text
                                 style={styles.headerText}
-                                accessible={true}
                                 accessibilityRole="text"
                                 accessibilityLabel="Turn on Email Notifications"
+                               
                             >
                                 Turn on Email Notifications
                             </Text>
                         </View>
-                        <View
-                            style={styles.subHeader}
-                            accessible={true}
-                            accessibilityRole="none"
-                        >
+                        <View style={styles.subHeader}  accessible={true} accessibilityRole="none" >
                             <Text
                                 style={styles.subHeaderText}
-                                accessible={true}
                                 accessibilityRole="text"
+                                accessible={true}
                                 accessibilityLabel="Receive email alerts related to your account, updates and more from Sparklight"
                             >
                                 Receive email alerts related to your account, updates and more from Sparklight.
@@ -145,16 +127,19 @@ const EmailNotifications = ({ navigation }) => {
                         </View>
                     </View>
                     <>
-                        {true? (
+                    {
+                        profile.profileDetails !== undefined
+                        && profile.profileDetails.multipleEmails ?
+                        (
                             <View
                                 style={styles.notificationAlert}
+                                accessible={true}
                             >
                                 <NotificationAlert
                                     type={"warning"}
                                     title={"Multiple Email Addresses Detected"}
                                     showCloseIcon={false}
                                     message='We found multiple emails linked to your account. Visit the Account screen to set your preferred email.'
-                                    accessible={true}
                                     accessibilityRole="alert"
                                     accessibilityLabel="Multiple Email Addresses Detected. We found multiple emails linked to your account. Visit the Account screen to set your preferred email."
                                     splitKey="Account"
@@ -166,7 +151,6 @@ const EmailNotifications = ({ navigation }) => {
                                 onLayout={(event) => {
                                     setTextInputLayout(event.nativeEvent.layout);
                                 }}
-                                accessible={true}
                                 accessibilityRole="none"
                                 accessibilityLabel="Email address input section"
                             >
@@ -177,7 +161,6 @@ const EmailNotifications = ({ navigation }) => {
                                     onChangeText={onChangeText}
                                     onSubmitText={keyboardDismiss}
                                     keyboardType="email-address"
-                                    accessible={true}
                                     accessibilityRole="search"
                                     accessibilityLabel="Email address input field"
                                     accessibilityHint="Double tap to enter your email address for notifications"
