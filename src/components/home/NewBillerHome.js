@@ -7,11 +7,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import DownArrow from "../../res/svgIcons/DownArrow";
 import UpArrow from "../../res/svgIcons/UpArrow";
 import {getUser,storeUpgradeToken} from "../../redux/utils/LocalStorage";
-import {GetApiRequest} from "../../network/APIClient";
+import {GetApiRequest,PostApiRequest} from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
-import YoutubePlayer from "react-native-youtube-iframe";
 import AccessibleYoutubePlayer from "../common/AccessibleYoutubePlayer";
 import {saveAccountServices} from "../../redux/actions/ProfileActionSuite";
 import { useSelector, useDispatch } from "react-redux";
@@ -74,10 +73,13 @@ const NewBillerHome = ({ navigation }) => {
 
   const getUserAccountDetails = () => {
     setBillAmt(undefined)
+   
     getUser().then((res) => {
-      const request = `accountsvc/api/Accounts/GetAccountDetailsByAccountNumber?accountNumber=${res.userInfo.accountNumber}`;
-      GetApiRequest(
+      const request = `accountsvc/api/Accounts/GetAccountDetails`;
+      const data={"accountNumber": res.userInfo.accountNumber}
+      PostApiRequest(
         request,
+        data,
         (res) => {
           if (res) {
             dispatch(saveAccountServices(res.services));
