@@ -29,7 +29,9 @@ import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions";
 import PubSub from "pubsub-js";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
 import base64 from "react-native-base64";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 //import ZendDesk from '@pagopa/io-react-native-zendesk';
+
 import {
   startChatWithConfig,
   setVisitorInfo,
@@ -39,6 +41,7 @@ import {
 import TicketListIcon from "../../res/svgIcons/TicketListIcon";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 import BillingSupportIcon from "../../res/svgIcons/BillingSupportIcon";
+import PrimaryButtom from "../common/customui/PrimaryButton";
 
 const Support = ({ route }) => {
   const navigation = useNavigation();
@@ -46,8 +49,8 @@ const Support = ({ route }) => {
   const [department, setDepartment] = useState("");
   const userData = useSelector((state) => state.combinedReducers.user.userData);
   const scrollViewRef = useRef(null);
-  const [isAgentAvailable, setisAgentAvailable] = useState(false);
-  const [istechAgentAvailable, setIstechAgentAvailable] = useState(false);
+  const [isAgentAvailable, setisAgentAvailable] = useState(true);
+  const [istechAgentAvailable, setIstechAgentAvailable] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [isAgentNotAvailable, setIsAgentNotAvailable] = useState(false);
 
@@ -535,30 +538,27 @@ const Support = ({ route }) => {
                     style={[
                       styles.integrationCardMobile1,
                       styles.integrationCardBorder,
+                      { borderTopLeftRadius: 10, borderTopRightRadius: 10 },
                     ]}
                   >
-                    <View style={[styles.content, styles.contentSpaceBlock]}>
-                      <View style={styles.headingAndIcon4}>
-                        {/* <View style={[styles.icon]}>
-                          <Image
-                            style={styles.supportIcon}
-                            resizeMode="stretch"
-                            source={require("../../../assets/tool-02.png")}
-                          />
-                        </View> */}
-<View style={[styles.cardHreader,{flexDirection: "row",
-    backgroundColor: "#F8F8F8",
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    padding: 10,}]}>
-            <View
-              style={{
-                marginLeft: 10,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <View style={[styles.icon]}>
+                    <View
+                      style={[
+                        styles.cardHreader,
+                        {
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          width: "100%",
+                        },
+                      ]}
+                    >
+                      <View
+                        style={{
+                          marginLeft: 10,
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
+                      >
+                        <View style={[styles.icon]}>
                           <Image
                             style={styles.supportIcon}
                             resizeMode="stretch"
@@ -566,30 +566,30 @@ const Support = ({ route }) => {
                           />
                         </View>
 
-              <Text style={[styles.headingTypo]}>
-                              Tech Support
-                            </Text>
-            </View>
-          </View>
+                        <Text style={[styles.headingText]}>Tech Support</Text>
+                      </View>
 
+                      <View
+                        style={[styles.headingAndToggle, { marginRight: 10 }]}
+                      >
+                        <Pressable
+                          onPress={() => makeCall("877-692-2253")}
+                          accessibilityLabel="Call Tech Support"
+                          accessibilityRole="button"
+                          accessibilityHint="Dials the tech support number on your phone"
+                        >
+                          <Image
+                            style={styles.chevronIconLayout}
+                            resizeMode="stretch"
+                            source={require("../../../assets/phone-outgoing-01.png")}
+                          />
+                        </Pressable>
+                      </View>
+                    </View>
+
+                    <View style={[styles.content, styles.contentSpaceBlock]}>
+                      <View style={styles.headingAndIcon4}>
                         <View style={styles.frameParent}>
-                          <View style={styles.headingAndToggle}>
-                            <Text style={[styles.headingTypo]}>
-                              Tech Support
-                            </Text>
-                            <Pressable
-                              onPress={() => makeCall("877-692-2253")}
-                              accessibilityLabel="Call Tech Support"
-                              accessibilityRole="button"
-                              accessibilityHint="Dials the tech support number on your phone"
-                            >
-                              <Image
-                                style={styles.chevronIconLayout}
-                                resizeMode="stretch"
-                                source={require("../../../assets/phone-outgoing-01.png")}
-                              />
-                            </Pressable>
-                          </View>
                           <Pressable
                             onPress={() => {
                               toggleModal("tech");
@@ -639,6 +639,7 @@ const Support = ({ route }) => {
                             24h/7 days a week
                           </Text>
                           {istechAgentAvailable && (
+                            <View style={styles.cardFooter}>
                             <TouchableOpacity
                               accessibilityLabel="Chat"
                               accessibilityRole="button"
@@ -668,6 +669,7 @@ const Support = ({ route }) => {
                                 Chat
                               </Text>
                             </TouchableOpacity>
+                            </View>
                           )}
                         </View>
                       </View>
@@ -951,6 +953,13 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     flex: 1,
   },
+  headingText: {
+    textAlign: "auto",
+    color: Color.colorGray_100,
+    lineHeight: 18,
+    fontSize: FontSize.size_lg,
+    fontFamily: FontFamily.openSansRegular,
+  },
   headingTypo1: {
     textAlign: "auto",
     color: Color.sparklightaddGray,
@@ -1151,6 +1160,25 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     height: 150,
+  },
+  cardHreader: {
+    flexDirection: "row",
+    backgroundColor: "#F8F8F8",
+    width: wp("92%"),
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    padding: 10,
+  },
+  cardFooter: {
+    flexDirection: "row",
+    backgroundColor: "#F8F8F8",
+    width: wp("100%"),
+    borderBottomEndRadius: 10,
+    borderBottomStartRadius: 10,
+    padding: 10,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
   },
 });
 
