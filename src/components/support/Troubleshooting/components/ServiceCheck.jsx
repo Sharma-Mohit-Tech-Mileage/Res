@@ -72,12 +72,12 @@ const ServiceCheck = ({ accountNumber, onComplete, step }) => {
   };
 
   const checkModemHealth = (macAddress, startTime, isAccessibilityEnabled) => {
-    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
+    const request = `Mobile/api/modem/getmodemdetails?macId=${macAddress}`;
 
     GetModemStatusApiRequest(
       request,
       (response) => {
-        if (response?.Modem_State === "Online") {
+        if (response?.modem_State === "Online") {
           analyzeAndUpdateModemStatus(response, startTime, isAccessibilityEnabled);
         } else {
           handleServiceIssueResult(startTime, isAccessibilityEnabled);
@@ -97,8 +97,8 @@ const ServiceCheck = ({ accountNumber, onComplete, step }) => {
         if (response?.length > 0) {
           let macAddress = response[0].macAddress;
           if (accountNumber === "128387263") macAddress = "bc:3e:07:38:56:d0";
-          else if (accountNumber === "902880244") macAddress = "bc:3e:07:38:56:d0";
-          else if (accountNumber === "902880236") macAddress = "28:7a:ee:8e:cf:8c";
+          else if (accountNumber === "900678962") macAddress = "dc:36:0c:ee:7c:a2";
+          else if (accountNumber === "900690538") macAddress = "dc:36:0c:ee:7c:a2";
           else if (accountNumber === "902880079") macAddress = "00:40:36:5f:cc:7f";
           else if (accountNumber === "136885142") macAddress = "20:73:55:89:c7:00";
           

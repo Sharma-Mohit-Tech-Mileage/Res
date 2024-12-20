@@ -211,10 +211,10 @@ React.useEffect(() => {
             var mac = macAddress;
             if (res.userInfo.accountNumber === "128387263") {
               mac = "bc:3e:07:38:56:d0";
-            } else if (user.userInfo.accountNumber === "902880244") {
-              mac = "bc:3e:07:38:56:d0";
-            } else if (user.userInfo.accountNumber === "902880236") {
-              mac = "28:7a:ee:8e:cf:8c";
+            } else if (user.userInfo.accountNumber === "900678962") {
+              mac = "dc:36:0c:ee:7c:a2";
+            } else if (user.userInfo.accountNumber === "900690538") {
+              mac = "dc:36:0c:ee:7c:a2";
             } else if (user.userInfo.accountNumber === "902880079") {
               mac = "00:40:36:5f:cc:7f";
             } else if (res.userInfo.accountNumber === "136885142") {
@@ -233,7 +233,7 @@ React.useEffect(() => {
   };
 
   const checkModemDetails = (macAddress) => {
-    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
+    const request = `Mobile/api/modem/getmodemdetails?macId=${macAddress}`;
     GetModemStatusApiRequest(
       request,
       (res) => {
@@ -245,18 +245,20 @@ React.useEffect(() => {
             return;
           }
           let temt = [];
-          if (res.EquipmentType === "DOCSIS") {
-            temt.push(res.UTxP_State);
-            temt.push(res.URxL_State);
-            temt.push(res.USNR_State);
-            temt.push(res.DSNR_State);
-            temt.push(res.DRxL_State);
+          if (res.equipmentType === "DOCSIS") {
+            temt.push(res.uTxP_State);
+            temt.push(res.uRxL_State);
+            temt.push(res.usnR_State);
+            temt.push(res.dsnR_State);
+            temt.push(res.dRxL_State);
             updateModemStatus(temt);
-          } else if (res.EquipmentType === "ONU") {
-            temt.push(res.ONUTP_State);
-            temt.push(res.OLTRP_State);
-            temt.push(res.ONURP_State);
+          } else if (res.equipmentType === "ONU") {
+            temt.push(res.onutP_State);
+            temt.push(res.oltrP_State);
+            temt.push(res.onurP_State);
             updateModemStatus(temt);
+          }else{
+            setCurrentHealth("Offline");
           }
           setLoadingHealth(false);
         }
