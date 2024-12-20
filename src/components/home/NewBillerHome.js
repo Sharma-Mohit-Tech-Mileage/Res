@@ -76,7 +76,7 @@ const NewBillerHome = ({ navigation }) => {
    
     getUser().then((res) => {
       const request = `accountsvc/api/Accounts/GetAccountDetails`;
-      const data={"accountNumber": res.userInfo.accountNumber}
+      const data={"accountNumber": res.userInfo.accountNumber,"fieldList":["first_name","last_name","accountNumber","current_balance","past_due_amount","payment_due_date","customer_type","email_details"]}
       PostApiRequest(
         request,
         data,
