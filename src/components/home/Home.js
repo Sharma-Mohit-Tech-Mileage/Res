@@ -219,11 +219,21 @@ const HomeScreen = ({ navigation }) => {
       (res) => {
        
         if (res) {
-          if (res?.status) {
-            if (res.status === 408) {
+          if (res?.statusCode) {
+            if (res.statusCode === 408) {
               setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
               return;
-            }
+            }if (res.statusCode && res.statusCode === 404) {
+              setIsOffline(true);
+              return;
+            } else if (
+              res.statusCode && res.statusCode === 400 ||
+              (res.statusCode && res.statusCode === 500) | (res.statusCode && res.statusCode === 504)
+            ) {
+              setCurrentHealth("Poor");
+              setIsContactUs(true);
+              return;
+            } 
           }
           
           let temt = [];
@@ -240,9 +250,8 @@ const HomeScreen = ({ navigation }) => {
             temt.push(res.oltrP_State);
             temt.push(res.onurP_State);
             updateModemStatus(temt);
-          }else{
-            setInternetHealths((oldArray) => [...oldArray, "Red"]);
           }
+          
         }
       },
       (errorCode) => {

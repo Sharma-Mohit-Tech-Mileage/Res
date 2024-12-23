@@ -239,11 +239,21 @@ React.useEffect(() => {
       (res) => {
         if (res) {
           console.log("checkModemDetails", res);
-          if (res.status && res.status === 408) {
+          if (res.statusCode && res.statusCode === 408) {
             setLoadingHealth(false);
             setCurrentHealth("Poor");
             return;
-          }
+          }if (res.statusCode && res.statusCode === 404) {
+            setIsOffline(true);
+            return;
+          } else if (
+            res.statusCode && res.statusCode === 400 ||
+            (res.statusCode && res.statusCode === 500) | (res.statusCode && res.statusCode === 504)
+          ) {
+            setCurrentHealth("Poor");
+            setIsContactUs(true);
+            return;
+          } 
           let temt = [];
           if (res.equipmentType === "DOCSIS") {
             temt.push(res.uTxP_State);
@@ -257,8 +267,6 @@ React.useEffect(() => {
             temt.push(res.oltrP_State);
             temt.push(res.onurP_State);
             updateModemStatus(temt);
-          }else{
-            setCurrentHealth("Offline");
           }
           setLoadingHealth(false);
         }
