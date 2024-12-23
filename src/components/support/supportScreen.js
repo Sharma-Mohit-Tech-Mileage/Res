@@ -49,8 +49,8 @@ const Support = ({ route }) => {
   const [department, setDepartment] = useState("");
   const userData = useSelector((state) => state.combinedReducers.user.userData);
   const scrollViewRef = useRef(null);
-  const [isAgentAvailable, setisAgentAvailable] = useState(true);
-  const [istechAgentAvailable, setIstechAgentAvailable] = useState(true);
+  const [isAgentAvailable, setisAgentAvailable] = useState(false);
+  const [istechAgentAvailable, setIstechAgentAvailable] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [isAgentNotAvailable, setIsAgentNotAvailable] = useState(false);
 
@@ -598,7 +598,18 @@ const Support = ({ route }) => {
                             accessibilityRole="button"
                             accessibilityHint="Chat with Tech Support"
                           >
-                            <View style={styles.supportChatText}></View>
+                            <View style={styles.supportChatText}>
+                            <Text
+                            style={[
+                              styles.supportingText5,
+                              styles.supportingTypo1,
+                            ]}
+                          >
+                            Need a little help with your Sparklight® service?
+                            We're here 24 hours a day, seven days a week to
+                            support you.
+                          </Text>
+                            </View>
                           </Pressable>
                           <Pressable onPress={() => makeCall("877-692-2253")}>
                             <View style={styles.supportingTextWrapper}>
@@ -612,16 +623,7 @@ const Support = ({ route }) => {
                               </Text>
                             </View>
                           </Pressable>
-                          <Text
-                            style={[
-                              styles.supportingText5,
-                              styles.supportingTypo1,
-                            ]}
-                          >
-                            Need a little help with your Sparklight® service?
-                            We're here 24 hours a day, seven days a week to
-                            support you.
-                          </Text>
+                         
                           <Text
                             style={[
                               { fontFamily: FontFamily.openSansRegular },
@@ -638,17 +640,17 @@ const Support = ({ route }) => {
                           >
                             24h/7 days a week
                           </Text>
-                          {istechAgentAvailable && (
-                            <View style={styles.cardFooter}>
+                          
+                        </View>
+                      </View>
+                    </View>
+                    {istechAgentAvailable && (
+                            <View style={[styles.cardFooter,{width: "100%", paddingHorizontal:wp('5%'), paddingVertical: 10}]}>
                             <TouchableOpacity
                               accessibilityLabel="Chat"
                               accessibilityRole="button"
                               accessible={true}
-                              style={{
-                                flexDirection: "row",
-                                marginTop: 16,
-                                alignItems: "center",
-                              }}
+                              style={styles.chatbuttonBg}
                               onPress={() => {
                                 //toggleModal("tech");
                                 if (istechAgentAvailable) {
@@ -659,22 +661,20 @@ const Support = ({ route }) => {
                                 }
                               }}
                             >
-                              <ChatIcon isEnable={istechAgentAvailable} />
+                             <View style={{flexDirection:'row',alignSelf:'center', alignItems:'center'}}>
+                             <ChatIcon isEnable={istechAgentAvailable} />
+                             
                               <Text
-                                style={[
-                                  styles.headingTypo,
-                                  { marginLeft: 10, fontSize: 16 },
-                                ]}
+                                style={styles.chatButtonText}
                               >
-                                Chat
+                                Chat Available
                               </Text>
+                              </View>
                             </TouchableOpacity>
                             </View>
                           )}
-                        </View>
-                      </View>
-                    </View>
                   </View>
+                  
                 </View>
                 <View
                   style={[
@@ -691,6 +691,7 @@ const Support = ({ route }) => {
                     <View style={[styles.content, styles.contentSpaceBlock]}>
                       <View style={styles.headingAndToggle}>
                         <View style={styles.headingAndIcon4}>
+                          
                           <View style={[styles.icon]}>
                             <BillingSupportIcon />
                           </View>
@@ -940,6 +941,20 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     marginRight: 8,
   },
+  chatbuttonBg:{
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    backgroundColor: Color.colorMidnightblue,
+    padding: 8,
+    borderRadius: 5,
+  },chatButtonText:{
+     marginLeft: 10, 
+     color:Color.sparklightWhite,
+     fontSize: FontSize.size_lg,
+    fontFamily: FontFamily.openSansRegular 
+  },
   headingContainerSpaceBlock: {
     paddingBottom: Padding.p_base,
     backgroundColor: Color.sparklightWhite,
@@ -1131,7 +1146,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   supportingText5: {
-    marginTop: 10,
     color: Color.sparklightaddGray,
     fontFamily: FontFamily.openSansRegular,
     alignSelf: "stretch",
@@ -1172,13 +1186,11 @@ const styles = StyleSheet.create({
   cardFooter: {
     flexDirection: "row",
     backgroundColor: "#F8F8F8",
-    width: wp("100%"),
     borderBottomEndRadius: 10,
     borderBottomStartRadius: 10,
     padding: 10,
-    position: "absolute",
-    bottom: 0,
-    left: 0,
+    alignItems: "center",
+    
   },
 });
 
