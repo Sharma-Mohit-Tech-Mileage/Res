@@ -599,16 +599,16 @@ const Support = ({ route }) => {
                             accessibilityHint="Chat with Tech Support"
                           >
                             <View style={styles.supportChatText}>
-                            <Text
-                            style={[
-                              styles.supportingText5,
-                              styles.supportingTypo1,
-                            ]}
-                          >
-                            Need a little help with your Sparklight® service?
-                            We're here 24 hours a day, seven days a week to
-                            support you.
-                          </Text>
+                              <Text
+                                style={[
+                                  styles.supportingText5,
+                                  styles.supportingTypo1,
+                                ]}
+                              >
+                                Need a little help with your Sparklight®
+                                service? We're here 24 hours a day, seven days a
+                                week to support you.
+                              </Text>
                             </View>
                           </Pressable>
                           <Pressable onPress={() => makeCall("877-692-2253")}>
@@ -623,7 +623,7 @@ const Support = ({ route }) => {
                               </Text>
                             </View>
                           </Pressable>
-                         
+
                           <Text
                             style={[
                               { fontFamily: FontFamily.openSansRegular },
@@ -640,41 +640,54 @@ const Support = ({ route }) => {
                           >
                             24h/7 days a week
                           </Text>
-                          
                         </View>
                       </View>
                     </View>
                     {istechAgentAvailable && (
-                            <View style={[styles.cardFooter,{width: "100%", paddingHorizontal:wp('5%'), paddingVertical: 10}]}>
-                            <TouchableOpacity
-                              accessibilityLabel="Chat"
-                              accessibilityRole="button"
-                              accessible={true}
-                              style={styles.chatbuttonBg}
-                              onPress={() => {
-                                //toggleModal("tech");
-                                if (istechAgentAvailable) {
-                                  handlePressOpenButton("SPK TCC Residential", [
-                                    "Resi_TechSupport",
-                                    "Resimobileapp",
-                                  ]);
-                                }
-                              }}
-                            >
-                             <View style={{flexDirection:'row',alignSelf:'center', alignItems:'center'}}>
-                             <ChatIcon isEnable={istechAgentAvailable} />
-                             
-                              <Text
-                                style={styles.chatButtonText}
-                              >
-                                Chat Available
-                              </Text>
-                              </View>
-                            </TouchableOpacity>
-                            </View>
-                          )}
+                      <View
+                        style={[
+                          styles.cardFooter,
+                          {
+                            width: "100%",
+                            paddingHorizontal: wp("5%"),
+                            paddingVertical: 10,
+                            borderBottomLeftRadius: 10,
+                            borderBottomRightRadius: 10 ,
+                          },
+                        ]}
+                      >
+                        <TouchableOpacity
+                          accessibilityLabel="Chat"
+                          accessibilityRole="button"
+                          accessible={true}
+                          style={styles.chatbuttonBg}
+                          onPress={() => {
+                            //toggleModal("tech");
+                            if (istechAgentAvailable) {
+                              handlePressOpenButton("SPK TCC Residential", [
+                                "Resi_TechSupport",
+                                "Resimobileapp",
+                              ]);
+                            }
+                          }}
+                        >
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignSelf: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            <ChatIcon isEnable={istechAgentAvailable} />
+
+                            <Text style={styles.chatButtonText}>
+                              Chat Available
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      </View>
+                    )}
                   </View>
-                  
                 </View>
                 <View
                   style={[
@@ -686,33 +699,54 @@ const Support = ({ route }) => {
                     style={[
                       styles.integrationCardMobile1,
                       styles.integrationCardBorder,
+                      { borderTopLeftRadius: 10, borderTopRightRadius: 10 },
                     ]}
                   >
+                    <View
+                      style={[
+                        styles.cardHreader,
+                        {
+                          flexDirection: "row",
+                          justifyContent: "space-between",
+                          width: "100%",
+                        },
+                      ]}
+                    >
+                      <View
+                        style={{
+                          marginLeft: 10,
+                          flexDirection: "row",
+                          alignItems: "center",
+                        }}
+                      >
+                        <View style={[styles.icon]}>
+                          <BillingSupportIcon />
+                        </View>
+
+                        <Text style={[styles.headingText]}>Tech Support</Text>
+                      </View>
+
+                      <View
+                        style={[styles.headingAndToggle, { marginRight: 10 }]}
+                      >
+                        <Pressable
+                          onPress={() => makeCall("877-692-2253")}
+                          accessibilityLabel="Call Billing Support"
+                          accessibilityRole="button"
+                          accessibilityHint="Dials the billing support number on your phone"
+                        >
+                          <Image
+                            style={styles.chevronIconLayout}
+                            resizeMode="stretch"
+                            source={require("../../../assets/phone-outgoing-01.png")}
+                          />
+                        </Pressable>
+                      </View>
+                    </View>
                     <View style={[styles.content, styles.contentSpaceBlock]}>
                       <View style={styles.headingAndToggle}>
                         <View style={styles.headingAndIcon4}>
-                          
-                          <View style={[styles.icon]}>
-                            <BillingSupportIcon />
-                          </View>
                           <View style={styles.frameParent}>
-                            <View style={styles.headingAndToggle}>
-                              <Text style={[styles.headingTypo]}>
-                                Billing Support
-                              </Text>
-                              <Pressable
-                                onPress={() => makeCall("877-692-2253")}
-                                accessibilityLabel="Call Billing Support"
-                                accessibilityRole="button"
-                                accessibilityHint="Dials the billing support number on your phone"
-                              >
-                                <Image
-                                  style={styles.chevronIconLayout}
-                                  resizeMode="stretch"
-                                  source={require("../../../assets/phone-outgoing-01.png")}
-                                />
-                              </Pressable>
-                            </View>
                             <Pressable
                               //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
                               onPress={() => {
@@ -723,7 +757,19 @@ const Support = ({ route }) => {
                               accessibilityRole="button"
                               accessibilityHint="Chat with Billing Support"
                             >
-                              <View style={styles.supportChatText}></View>
+                              <View style={styles.supportChatText}>
+
+                              <Text
+                              style={[
+                                styles.supportingText5,
+                                styles.supportingTypo1,
+                              ]}
+                            >
+                              Want to upgrade your service, make a change, or
+                              have a billing question? Give us a call for
+                              assistance.
+                            </Text>
+                              </View>
                             </Pressable>
                             <Pressable onPress={() => makeCall("877-692-2253")}>
                               <View style={styles.supportingTextWrapper}>
@@ -737,16 +783,7 @@ const Support = ({ route }) => {
                                 </Text>
                               </View>
                             </Pressable>
-                            <Text
-                              style={[
-                                styles.supportingText5,
-                                styles.supportingTypo1,
-                              ]}
-                            >
-                              Want to upgrade your service, make a change, or
-                              have a billing question? Give us a call for
-                              assistance.
-                            </Text>
+                            
                             <Text
                               style={[
                                 { fontFamily: FontFamily.openSansRegular },
@@ -763,41 +800,53 @@ const Support = ({ route }) => {
                             >
                               M-F 8:00 AM-5:00 PM MST
                             </Text>
-                            {isAgentAvailable && (
-                              <TouchableOpacity
-                                accessibilityLabel="Chat"
-                                accessibilityRole="button"
-                                accessible={true}
-                                style={{
-                                  flexDirection: "row",
-                                  marginTop: 16,
-                                  alignItems: "center",
-                                }}
-                                onPress={() => {
-                                  //toggleModal("Bill");
-                                  if (isAgentAvailable) {
-                                    handlePressOpenButton(
-                                      "SPK Virtual Call Center",
-                                      ["Resi_BillSupport", "Resimobileapp"]
-                                    );
-                                  }
-                                }}
-                              >
-                                <ChatIcon isEnable={isAgentAvailable} />
-                                <Text
-                                  style={[
-                                    styles.headingTypo,
-                                    { marginLeft: 10, fontSize: 16 },
-                                  ]}
-                                >
-                                  Chat
-                                </Text>
-                              </TouchableOpacity>
-                            )}
                           </View>
                         </View>
                       </View>
                     </View>
+                    {isAgentAvailable && (
+                      <View
+                        style={[
+                          styles.cardFooter,
+                          {
+                            width: "100%",
+                            paddingHorizontal: wp("5%"),
+                            paddingVertical: 10,
+                            borderBottomLeftRadius: 10,
+                            borderBottomRightRadius: 10 ,
+                          },
+                        ]}
+                      >
+                        <TouchableOpacity
+                          accessibilityLabel="Chat"
+                          accessibilityRole="button"
+                          accessible={true}
+                          style={styles.chatbuttonBg}
+                          onPress={() => {
+                            //toggleModal("Bill");
+                            if (isAgentAvailable) {
+                              handlePressOpenButton("SPK Virtual Call Center", [
+                                "Resi_BillSupport",
+                                "Resimobileapp",
+                              ]);
+                            }
+                          }}
+                        >
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              alignSelf: "center",
+                              alignItems: "center",
+                            }}
+                          >
+                            <ChatIcon isEnable={isAgentAvailable} />
+                            <Text style={styles.chatButtonText}>
+                              Chat Available
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      </View>
+                    )}
                   </View>
                 </View>
               </View>
@@ -941,7 +990,7 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     marginRight: 8,
   },
-  chatbuttonBg:{
+  chatbuttonBg: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -949,11 +998,12 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorMidnightblue,
     padding: 8,
     borderRadius: 5,
-  },chatButtonText:{
-     marginLeft: 10, 
-     color:Color.sparklightWhite,
-     fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.openSansRegular 
+  },
+  chatButtonText: {
+    marginLeft: 10,
+    color: Color.sparklightWhite,
+    fontSize: FontSize.size_lg,
+    fontFamily: FontFamily.openSansRegular,
   },
   headingContainerSpaceBlock: {
     paddingBottom: Padding.p_base,
@@ -1146,8 +1196,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   supportingText5: {
-    color: Color.sparklightaddGray,
+    color: Color.sparklightDarkGray,
     fontFamily: FontFamily.openSansRegular,
+    fontWeight: "400",
     alignSelf: "stretch",
   },
   supportingText7: {
@@ -1190,7 +1241,6 @@ const styles = StyleSheet.create({
     borderBottomStartRadius: 10,
     padding: 10,
     alignItems: "center",
-    
   },
 });
 
