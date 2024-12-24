@@ -221,17 +221,17 @@ const HomeScreen = ({ navigation }) => {
         if (res) {
           if (res?.statusCode) {
             if (res.statusCode === 408) {
-              setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
+              //setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
               return;
             }if (res.statusCode && res.statusCode === 404) {
-              setIsOffline(true);
+              setInternetHealths((oldArray) => [...oldArray, "Red"]);
               return;
             } else if (
               res.statusCode && res.statusCode === 400 ||
               (res.statusCode && res.statusCode === 500) | (res.statusCode && res.statusCode === 504)
             ) {
-              setCurrentHealth("Poor");
-              setIsContactUs(true);
+             //setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
+             
               return;
             } 
           }
@@ -263,7 +263,7 @@ const HomeScreen = ({ navigation }) => {
           errorCode === 500 ||
           errorCode === 504
         ) {
-          setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
+          //setInternetHealths((oldArray) => [...oldArray, "Yellow"]);
         } else {
           setInternetHealths((oldArray) => [...oldArray, "Red"]);
         }
@@ -295,6 +295,7 @@ const HomeScreen = ({ navigation }) => {
   const refreshInternetHealth = () => {
     const checkYellow = internetHealths.includes("Yellow");
     const checkRed = internetHealths.includes("Red");
+
     const checkGreen = internetHealths.includes("Green");
     if (checkRed) {
       console.log("Internet Health is Red");
@@ -509,7 +510,8 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-    if (internetHealths.length >= 3) {
+    if (internetHealths.length == 3) {
+      console.log("Internet Health is Red");
       setCheckModemStatus(true);
       refreshInternetHealth();
     }
