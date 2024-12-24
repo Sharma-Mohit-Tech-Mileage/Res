@@ -58,9 +58,9 @@ const ServiceCheck = ({ accountNumber, onComplete, step }) => {
   };
 
   const analyzeAndUpdateModemStatus = (response, startTime, isAccessibilityEnabled) => {
-    const statusMetrics = response.EquipmentType === "DOCSIS"
-      ? [response.UTxP_State, response.URxL_State, response.USNR_State, response.DSNR_State, response.DRxL_State]
-      : [response.ONUTP_State, response.OLTRP_State, response.ONURP_State];
+    const statusMetrics = response.equipmentType === "DOCSIS"
+      ? [response.uTxP_State, response.uRxL_State, response.usnR_State, response.dsnR_State, response.dRxL_State]
+      : [response.onutP_State, response.oltrP_State, response.onurP_State];
 
     const hasIssues = statusMetrics.some((state) => state === "Red" || state === "Yellow");
 
@@ -77,6 +77,7 @@ const ServiceCheck = ({ accountNumber, onComplete, step }) => {
     GetModemStatusApiRequest(
       request,
       (response) => {
+        console.log("Modem Status Response: ", response);
         if (response?.modem_State === "Online") {
           analyzeAndUpdateModemStatus(response, startTime, isAccessibilityEnabled);
         } else {
