@@ -723,7 +723,7 @@ const Support = ({ route }) => {
                           <BillingSupportIcon />
                         </View>
 
-                        <Text style={[styles.headingText]}>Tech Support</Text>
+                        <Text style={[styles.headingText]}>Billing Support</Text>
                       </View>
 
                       <View
@@ -747,18 +747,6 @@ const Support = ({ route }) => {
                       <View style={styles.headingAndToggle}>
                         <View style={styles.headingAndIcon4}>
                           <View style={styles.frameParent}>
-                            <Pressable
-                              //onPress={() => handlePressOpenButton("1500003312402", ['Residential', 'ContactUs'])}
-                              onPress={() => {
-                                //toggleModal("Bill");
-                                //ZendDesk.initChat('ad791f41-3c05-490b-8bb3-55afe1751f92d')
-                              }}
-                              accessibilityLabel="Chat Support"
-                              accessibilityRole="button"
-                              accessibilityHint="Chat with Billing Support"
-                            >
-                              <View style={styles.supportChatText}>
-
                               <Text
                               style={[
                                 styles.supportingText5,
@@ -769,8 +757,8 @@ const Support = ({ route }) => {
                               have a billing question? Give us a call for
                               assistance.
                             </Text>
-                              </View>
-                            </Pressable>
+                             
+                           
                             <Pressable onPress={() => makeCall("877-692-2253")}>
                               <View style={styles.supportingTextWrapper}>
                                 <Text
@@ -1052,7 +1040,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   supportingTypo1: {
-    lineHeight: 20,
+    lineHeight: 22,
     fontSize: FontSize.textXsSemibold_size,
     textAlign: "left",
   },
@@ -1180,8 +1168,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   supportChatText: {
-    paddingTop: 5,
-    paddingBottom: 5,
+    paddingTop: 2,
+    paddingBottom: 2,
   },
   supportingText4: {
     lineHeight: 20,
@@ -1190,7 +1178,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   supportingTextWrapper: {
-    marginTop: 10,
+    marginVertical: 15,
     flexDirection: "row",
     alignSelf: "stretch",
     alignItems: "center",
