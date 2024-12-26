@@ -195,10 +195,10 @@ const HomeScreen = ({ navigation }) => {
         var mac = macAddress;
         if (user.userInfo.accountNumber === "128387263") {
           mac = "bc:3e:07:38:56:d0";
-        } else if (user.userInfo.accountNumber === "902880244") {
-          mac = "bc:3e:07:38:56:d0";
-        } else if (user.userInfo.accountNumber === "902880236") {
-          mac = "28:7a:ee:8e:cf:8c";
+        } else if (user.userInfo.accountNumber === "131684698") {
+          mac = "00:40:36:7b:29:5a";
+        } else if (user.userInfo.accountNumber === "133777029") {
+          mac = "74:9b:e8:33:47:40";
         } else if (user.userInfo.accountNumber === "902880079") {
           mac = "00:40:36:5f:cc:7f";
         } else if (user.userInfo.accountNumber === "136885142") {
@@ -213,11 +213,11 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const checkModemDetails = (macAddress) => {
-    const request = `api/modem/GetModemInfoAsync?mac=${macAddress}`;
+    const request = `Mobile/api/modem/getmodemdetails?macId=${macAddress}`;
     GetModemStatusApiRequest(
       request,
       (res) => {
-        console.log("checkModemDetails", res);
+       
         if (res) {
           if (res?.status) {
             if (res.status === 408) {
@@ -225,20 +225,23 @@ const HomeScreen = ({ navigation }) => {
               return;
             }
           }
-
+          
           let temt = [];
-          if (res.EquipmentType === "DOCSIS") {
-            temt.push(res.UTxP_State);
-            temt.push(res.URxL_State);
-            temt.push(res.USNR_State);
-            temt.push(res.DSNR_State);
-            temt.push(res.DRxL_State);
+          console.log("checkModemDetails==", res);
+          if (res.equipmentType == "DOCSIS") {
+            temt.push(res.uTxP_State);
+            temt.push(res.uRxL_State);
+            temt.push(res.usnR_State);
+            temt.push(res.dsnR_State);
+            temt.push(res.dRxL_State);
             updateModemStatus(temt);
-          } else if (res.EquipmentType === "ONU") {
-            temt.push(res.ONUTP_State);
-            temt.push(res.OLTRP_State);
-            temt.push(res.ONURP_State);
+          } else if (res.equipmentType === "ONU") {
+            temt.push(res.onutP_State);
+            temt.push(res.oltrP_State);
+            temt.push(res.onurP_State);
             updateModemStatus(temt);
+          }else{
+            setInternetHealths((oldArray) => [...oldArray, "Red"]);
           }
         }
       },
@@ -260,6 +263,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const updateModemStatus = (temt) => {
+    console.log("modem status before check", temt);
     const allGreen = temt.every((v) => v === "Green");
     console.log("modem status", allGreen);
     if (!allGreen) {

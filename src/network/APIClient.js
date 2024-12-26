@@ -262,8 +262,8 @@ export const GetModemStatusApiRequest = async (endpoint, onSuccess, onError) => 
         }
     };
 
-    console.log('GetModemStatusApiRequest:', `${MODEM_BASE_URL}${endpoint}`);
-    fetch(`${MODEM_BASE_URL}${endpoint}`, options)
+    console.log('GetModemStatusApiRequest:', `${BASE_URL}${endpoint}`);
+    fetch(`${BASE_URL}${endpoint}`, options)
         .then(response => {
             if (response.status >= 400 && response.status < 600) {
                 onError(response.status);
