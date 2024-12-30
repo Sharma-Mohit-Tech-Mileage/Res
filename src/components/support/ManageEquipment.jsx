@@ -1,7 +1,23 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator, ScrollView, findNodeHandle, AccessibilityInfo } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+  ScrollView,
+  findNodeHandle,
+  AccessibilityInfo,
+} from "react-native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { FontFamily, Padding, Color, FontSize, Border, } from "../../../GlobalStyles";
+import {
+  FontFamily,
+  Padding,
+  Color,
+  FontSize,
+  Border,
+} from "../../../GlobalStyles";
 import MyServicePlan from "../common/MyServicePlan";
 import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
@@ -13,7 +29,10 @@ import {
 } from "../../network/APIClient";
 import ModemIcon1 from "../../res/svgIcons/ModemIcon1";
 import colors from "../../res/Colors";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import CheckConnection from "../../res/svgIcons/CheckConnection";
 import RefreshIcon from "../../res/svgIcons/RefreshIcon";
 import PubSub from "pubsub-js";
@@ -43,50 +62,56 @@ const ManageEquipment = ({ route }) => {
   const [loading, setLoading] = React.useState(false);
   const [isEEroDevice, setIsEEroDevice] = React.useState(false);
   const [eeroDeviceData, setEEroDeviceData] = React.useState(null);
-  const [wifiPasswordCanChange, setwifiPasswordCanChange] = React.useState(false);
+  const [wifiPasswordCanChange, setwifiPasswordCanChange] =
+    React.useState(false);
   const [wifiData, setwifiData] = React.useState([]);
   const [truckrollPrediction, setTruckrollPrediction] = React.useState(-1);
   const [hasEeroDevice, setHasEeroDevice] = React.useState(false);
   const [networkId, setNetworkId] = React.useState(null);
   const [modemSupported, setModemSupported] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState(`We’re sorry! We Can only update the Wifi password for the supported modem models.
+  const [errorMessage, setErrorMessage] =
+    React.useState(`We’re sorry! We Can only update the Wifi password for the supported modem models.
 
 To add a Sparklight Modem to your account, please contact our support team`);
- 
+
   const alertRef = React.useRef(null);
 
-React.useEffect(() => {
-  // Clear any existing focus first 
-  //AccessibilityInfo.setAccessibilityFocus(null);
+  React.useEffect(() => {
+    // Clear any existing focus first
+    //AccessibilityInfo.setAccessibilityFocus(null);
 
-  if (currentHealth !== "Optimal" || isOffline || isContactUs) {
-    // Give time for view to mount and state to update
-    const timer = setTimeout(() => {
-      const node = findNodeHandle(alertRef?.current);
-      if (node) {
-        AccessibilityInfo.setAccessibilityFocus(node);
-        
-        // Force announcement of full message
-        AccessibilityInfo.announceForAccessibility(
-          `${truckrollPrediction === 1
-            ? 'Schedule a Service Appointment. '
-            : isOffline
-              ? "Modem is Offline. "
-              : isContactUs
+    if (currentHealth !== "Optimal" || isOffline || isContactUs) {
+      // Give time for view to mount and state to update
+      const timer = setTimeout(() => {
+        const node = findNodeHandle(alertRef?.current);
+        if (node) {
+          AccessibilityInfo.setAccessibilityFocus(node);
+
+          // Force announcement of full message
+          AccessibilityInfo.announceForAccessibility(
+            `${
+              truckrollPrediction === 1
+                ? "Schedule a Service Appointment. "
+                : isOffline
+                ? "Modem is Offline. "
+                : isContactUs
                 ? "Please try again later. "
-                : "An issue has been detected. "}
-           ${truckrollPrediction === 1
-            ? "We've noticed that your modem has been experiencing repeated issues..."
-            : isContactUs  
-              ? "Sorry, we're having trouble completing the modem system check..."
-              : "Try one of the highlighted options below to resolve"}`
-        );
-      }
-    }, 1500);
+                : "An issue has been detected. "
+            }
+           ${
+             truckrollPrediction === 1
+               ? "We've noticed that your modem has been experiencing repeated issues..."
+               : isContactUs
+               ? "Sorry, we're having trouble completing the modem system check..."
+               : "Try one of the highlighted options below to resolve"
+           }`
+          );
+        }
+      }, 1500);
 
-    return () => clearTimeout(timer);
-  }
-}, [currentHealth, isOffline, isContactUs, truckrollPrediction]);
+      return () => clearTimeout(timer);
+    }
+  }, [currentHealth, isOffline, isContactUs, truckrollPrediction]);
   // Step 1: Check if user has Eero device
   const checkDeviceSupport = () => {
     setLoading(true);
@@ -132,7 +157,7 @@ React.useEffect(() => {
         (response) => {
           const networks = response?.data?.networks;
           if (networks && networks.length > 0) {
-            const networkId = networks[0].split('/').pop();
+            const networkId = networks[0].split("/").pop();
             setHasEeroDevice(!!networkId);
             setNetworkId(networkId || null);
           } else {
@@ -156,7 +181,7 @@ React.useEffect(() => {
       (res) => {
         setLoading(false);
         if (res?.data !== null) {
-          setEEroDeviceData(res.data)
+          setEEroDeviceData(res.data);
           setwifiPasswordCanChange(false);
         } else {
           getModemPassword();
@@ -172,10 +197,9 @@ React.useEffect(() => {
   const onSuccessModemPassword = (res) => {
     setLoading(false);
     if (res) {
-      setwifiPasswordCanChange(true)
-    }
-    else {
-      setwifiPasswordCanChange(false)
+      setwifiPasswordCanChange(true);
+    } else {
+      setwifiPasswordCanChange(false);
     }
   };
   const onErrorModemPassword = (error) => {
@@ -225,7 +249,7 @@ React.useEffect(() => {
             }
 
             checkModemDetails(mac);
-            setMacAddress(mac)
+            setMacAddress(mac);
           }
         },
         (error) => {
@@ -328,8 +352,11 @@ React.useEffect(() => {
   }, []);
 
   React.useEffect(() => {
-    if (currentHealth == 'Poor') {
-      getTruckRollPostApiRequets(macAddress.replaceAll(':', ''), user?.userInfo?.accountNumber)
+    if (currentHealth == "Poor") {
+      getTruckRollPostApiRequets(
+        macAddress.replaceAll(":", ""),
+        user?.userInfo?.accountNumber
+      );
     }
   }, [currentHealth]);
 
@@ -349,7 +376,6 @@ React.useEffect(() => {
     );
   };
 
-
   const getTruckRollPostApiRequets = (macAddress, accountNumber) => {
     setLoadingHealth(true);
     let request = {
@@ -363,10 +389,10 @@ React.useEffect(() => {
       request,
       (res) => {
         if (res) {
-          console.log('isLoading', res.predictions[0])
+          console.log("isLoading", res.predictions[0]);
 
           if (res.predictions.length > 0 && res.predictions[0] == 1) {
-            console.log('getTruckRollPostApiRequets', JSON.stringify(res))
+            console.log("getTruckRollPostApiRequets", JSON.stringify(res));
             setTruckrollPrediction(res.predictions[0]);
           }
         }
@@ -382,10 +408,7 @@ React.useEffect(() => {
   const renderOtherDeviceOptions = () => {
     return (
       <View
-        style={[
-          styles.supportAccordionParent,
-          styles.supportParentFlexBox,
-        ]}
+        style={[styles.supportAccordionParent, styles.supportParentFlexBox]}
       >
         <View style={[styles.frameLayout]} />
 
@@ -417,9 +440,7 @@ React.useEffect(() => {
           accessibilityLabel="Retrieve your WiFi password"
         >
           <PasswordRetrieve />
-          <Text style={styles.modemHealthSupport}>
-            Retrieve Password
-          </Text>
+          <Text style={styles.modemHealthSupport}>Retrieve Password</Text>
           <Image
             style={styles.rightIconStyle}
             source={require("../../../assets/chevronright.png")}
@@ -446,23 +467,23 @@ React.useEffect(() => {
           />
         </TouchableOpacity>
       </View>
-    )
-  }
+    );
+  };
 
   const renderEEroDeviceOptions = () => {
     return (
       <View
-        style={[
-          styles.supportAccordionParent,
-          styles.supportParentFlexBox,
-        ]}
+        style={[styles.supportAccordionParent, styles.supportParentFlexBox]}
       >
         <View style={[styles.frameLayout]} />
 
         <TouchableOpacity
           style={[styles.frame9defaultSpaceBlock]}
           onPress={() => {
-            navigation.navigate("UpdateModemPassword", { isEEroDevice: true, eeroDeviceData: eeroDeviceData });
+            navigation.navigate("UpdateModemPassword", {
+              isEEroDevice: true,
+              eeroDeviceData: eeroDeviceData,
+            });
           }}
           accessible={true}
           accessibilityRole="button"
@@ -487,50 +508,47 @@ React.useEffect(() => {
           accessibilityLabel="Open the eero app for more features"
         >
           <PasswordRetrieve />
-          <Text style={styles.modemHealthSupport}>
-            Open eero App
-          </Text>
+          <Text style={styles.modemHealthSupport}>Open eero App</Text>
           <Image
             style={styles.rightIconStyle}
             source={require("../../../assets/chevronright.png")}
           />
         </TouchableOpacity>
       </View>
-    )
-  }
+    );
+  };
 
-  const RenderPasswordErrorMsg=()=>{
-    return(
-    
-        <RenderText
-                      navigation={navigation}
-                      splitKey={`contact`}
-                      instruction={errorMessage}
-                      style={[styles.wifiError]}
-                      onTextPress={() => {
-                        navigation.navigate("SupportStack", {
-                          isContactUs: true,
-                        });
-                        console.log('On press back')
-                      }}
-                    />
-        
-      
-    )
-  }
+  const RenderPasswordErrorMsg = () => {
+    return (
+      <RenderText
+        navigation={navigation}
+        splitKey={`contact`}
+        instruction={errorMessage}
+        style={[styles.wifiError]}
+        onTextPress={() => {
+          navigation.navigate("SupportStack", {
+            isContactUs: true,
+          });
+          console.log("On press back");
+        }}
+      />
+    );
+  };
 
   return (
     <View style={styles.manageEquipment}>
       <ProfileSettingsHeader
         title="Manage Equipment "
         onPressBack={() => {
-          navigation.navigate("support");
+          navigation.navigate("MyServices");
         }}
       />
       <ScrollView automaticallyAdjustContentInsets={false}>
         <View style={styles.myModemParent}>
           <View style={[styles.myModem, styles.myModemSpaceBlock]}>
-            <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
+            <View
+              style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
+            >
               <Text style={[styles.myModem1, styles.myModem1Typo]}>
                 My Modem
               </Text>
@@ -554,10 +572,10 @@ React.useEffect(() => {
                             {isOffline
                               ? "Offline"
                               : currentHealth === "Poor"
-                                ? "Issue Detected"
-                                : currentHealth == "Offline"
-                                  ? "Issue Detected"
-                                  : "Optimal Health"}
+                              ? "Issue Detected"
+                              : currentHealth == "Offline"
+                              ? "Issue Detected"
+                              : "Optimal Health"}
                           </Text>
                           <Image
                             style={styles.frameChild}
@@ -565,10 +583,10 @@ React.useEffect(() => {
                               isOffline
                                 ? colors.sparklight_red
                                 : currentHealth === "Optimal"
-                                  ? colors.sparklight_green
-                                  : currentHealth === "Offline"
-                                    ? colors.sparklight_red
-                                    : colors.sparklight_yellow
+                                ? colors.sparklight_green
+                                : currentHealth === "Offline"
+                                ? colors.sparklight_red
+                                : colors.sparklight_yellow
                             }
                             resizeMode="cover"
                             source={require("../../../assets/Ellipse.png")}
@@ -606,30 +624,37 @@ React.useEffect(() => {
                         backgroundColor: isOffline
                           ? colors.sparklight_red
                           : currentHealth === "Offline"
-                            ? colors.sparklight_red
-                            : colors.sparklight_yellow,
+                          ? colors.sparklight_red
+                          : colors.sparklight_yellow,
                         width: 4,
                       }}
                     />
                     <View style={styles.bannerWarning}>
                       <View style={styles.rightActionableParent}>
-                        <View ref={alertRef}
-                         accessible={true}
-                         importantForAccessibility="yes"
-                         accessibilityViewIsModal={true}
-                         accessibilityRole="alert"
-                          style={styles.creditCardWillExpireSoonParent}>
+                        <View
+                          ref={alertRef}
+                          accessible={true}
+                          importantForAccessibility="yes"
+                          accessibilityViewIsModal={true}
+                          accessibilityRole="alert"
+                          style={styles.creditCardWillExpireSoonParent}
+                        >
                           <View style={{ flexDirection: "row" }}>
-                            <Image style={{ alignSelf: "center", width: 24, height: 24, }}
+                            <Image
+                              style={{
+                                alignSelf: "center",
+                                width: 24,
+                                height: 24,
+                              }}
                               resizeMode="cover"
                               tintColor={
                                 isOffline
                                   ? colors.sparklight_red
                                   : currentHealth === "Optimal"
-                                    ? colors.sparklight_green
-                                    : currentHealth === "Offline"
-                                      ? colors.sparklight_red
-                                      : colors.sparklight_yellow
+                                  ? colors.sparklight_green
+                                  : currentHealth === "Offline"
+                                  ? colors.sparklight_red
+                                  : colors.sparklight_yellow
                               }
                               source={require("../../../assets/infocircle.png")}
                             />
@@ -646,12 +671,12 @@ React.useEffect(() => {
                               ]}
                             >
                               {truckrollPrediction === 1
-                                ? 'Schedule a Service Appointment'
+                                ? "Schedule a Service Appointment"
                                 : isOffline
-                                  ? "Modem is Offline"
-                                  : isContactUs
-                                    ? "Please try again later"
-                                    : "An issue has been detected"}
+                                ? "Modem is Offline"
+                                : isContactUs
+                                ? "Please try again later"
+                                : "An issue has been detected"}
                             </Text>
                           </View>
                           <Text
@@ -663,8 +688,8 @@ React.useEffect(() => {
                             {truckrollPrediction === 1
                               ? "We've noticed that your modem has been experiencing repeated issues, which may be affecting your internet service quality. We recommend you contact us to schedule a service appointment."
                               : isContactUs
-                                ? "Sorry, we're having trouble completing the modem system check right now. This seems to be an issue on our end. Please try again later. If the problem persists, please contact our support team for assistance."
-                                : "Try one of the highlighted options below to resolve"}
+                              ? "Sorry, we're having trouble completing the modem system check right now. This seems to be an issue on our end. Please try again later. If the problem persists, please contact our support team for assistance."
+                              : "Try one of the highlighted options below to resolve"}
                           </Text>
                         </View>
                       </View>
@@ -690,8 +715,8 @@ React.useEffect(() => {
                         : currentHealth === "Offline" ||
                           isOffline ||
                           currentHealth === "Poor"
-                          ? "#EF4E3E10"
-                          : "white",
+                        ? "#EF4E3E10"
+                        : "white",
                   },
                 ]}
                 onPress={() => {
@@ -721,8 +746,8 @@ React.useEffect(() => {
                           ? "white"
                           : currentHealth === "Offline" ||
                             currentHealth === "Poor"
-                            ? "#EF4E3E10"
-                            : "white",
+                          ? "#EF4E3E10"
+                          : "white",
                     },
                   ]}
                   onPress={() => {
@@ -758,8 +783,8 @@ React.useEffect(() => {
                       isContactUs || truckrollPrediction == 1 || loadingHealth
                         ? "white"
                         : currentHealth === "Offline"
-                          ? "#EF4E3E10"
-                          : "white",
+                        ? "#EF4E3E10"
+                        : "white",
                   },
                 ]}
                 onPress={() => {
@@ -788,8 +813,8 @@ React.useEffect(() => {
                   {
                     backgroundColor:
                       currentHealth === "Offline" ||
-                        isContactUs ||
-                        (!loadingHealth && truckrollPrediction == 1)
+                      isContactUs ||
+                      (!loadingHealth && truckrollPrediction == 1)
                         ? "#EF4E3E10"
                         : "white",
                   },
@@ -824,34 +849,50 @@ React.useEffect(() => {
           </View>
 
           {/* WiFi Password */}
-          
+
           {(wifiPasswordCanChange || isEEroDevice) && (
             <View
-              style={[styles.myModem, styles.myModemSpaceBlock, { marginTop: 20 },]}
+              style={[
+                styles.myModem,
+                styles.myModemSpaceBlock,
+                { marginTop: 20 },
+              ]}
             >
-              <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
+              <View
+                style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
+              >
                 <Text style={[styles.myModem1, styles.myModem1Typo]}>
                   WiFi Password
                 </Text>
               </View>
-             
-              {isEEroDevice ? renderEEroDeviceOptions() : renderOtherDeviceOptions()}
-              
+
+              {isEEroDevice
+                ? renderEEroDeviceOptions()
+                : renderOtherDeviceOptions()}
             </View>
           )}
 
-          {(!modemSupported && !loading)  && (
+          {!modemSupported && !loading && (
             <View
-              style={[styles.myModem, styles.myModemSpaceBlock, { marginTop: 20 },]}
+              style={[
+                styles.myModem,
+                styles.myModemSpaceBlock,
+                { marginTop: 20 },
+              ]}
             >
-              <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1,{paddingBottom:Padding.p_8xs}]}>
+              <View
+                style={[
+                  styles.myModemWrapper,
+                  styles.frameParentSpaceBlock1,
+                  { paddingBottom: Padding.p_8xs },
+                ]}
+              >
                 <Text style={[styles.myModem1, styles.myModem1Typo]}>
                   Wifi Password
                 </Text>
-                
               </View>
-                <RenderPasswordErrorMsg/>
-              </View>
+              <RenderPasswordErrorMsg />
+            </View>
           )}
 
           {/* Quick Link section */}
@@ -862,12 +903,19 @@ React.useEffect(() => {
               { marginVertical: 20 },
             ]}
           >
-            <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
+            <View
+              style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
+            >
               <Text style={[styles.myModem1, styles.myModem1Typo]}>
                 Quick Links
               </Text>
             </View>
-            <View style={[styles.supportAccordionParent, styles.supportParentFlexBox]}>
+            <View
+              style={[
+                styles.supportAccordionParent,
+                styles.supportParentFlexBox,
+              ]}
+            >
               <View style={[styles.frameLayout]} />
 
               <TouchableOpacity
@@ -936,8 +984,6 @@ React.useEffect(() => {
               </TouchableOpacity>
             </View>
           </View>
-
-          
         </View>
       </ScrollView>
       {loading ? <Loader /> : null}
@@ -1138,9 +1184,8 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     textAlign: "left",
     fontWeight: "400",
-    marginHorizontal:16,
-    paddingBottom:16,
-    
+    marginHorizontal: 16,
+    paddingBottom: 16,
   },
   supportAccordionParent: {
     backgroundColor: Color.sparklightWhite,

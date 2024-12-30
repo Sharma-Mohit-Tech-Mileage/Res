@@ -27,7 +27,11 @@ const config = {
   iosPrefersEphemeralSession: true,
 };
 
-const SplashScreen = ({ navigation }) => {
+const SplashScreen = ({ navigation,route }) => {
+  const { isLogout} = route?.params?.isLogout ? route.params : { isLogout: false };
+
+  console.log("isLogout",isLogout);
+
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [bussinessApp, setIsBusiness] = useState(false);
@@ -38,7 +42,7 @@ const SplashScreen = ({ navigation }) => {
   const [errorMessage1, setErrorMessage1] = useState("");
   const backgroundFade = useRef(new Animated.Value(0)).current;
   const logoFade = useRef(new Animated.Value(0)).current;
-  const logoMovement = useRef(new Animated.Value(250)).current;
+  const logoMovement = useRef(new Animated.Value(350)).current;
   const [isVisible,setIsVisible] =useState(false)
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -303,6 +307,7 @@ const SplashScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
+
     const fetchData = async () => {
       try {
         const user = await getUser();
@@ -327,8 +332,11 @@ const SplashScreen = ({ navigation }) => {
         setLoginEnable(true);
       }
     };
-
+ if(!isLogout){
     fetchData();
+ }else{
+  setLoginEnable(true);
+ }
 
     Animated.timing(backgroundFade, {
       toValue: 1,
@@ -377,8 +385,8 @@ const SplashScreen = ({ navigation }) => {
       style={styles.container}
     >
       <View style={styles.splashContainer}>
-        {loading ? <ActivityIndicator size="large" color={"white"} /> : <></>}
-        <Animated.View style={{ flex: 1,
+        {loading ? <ActivityIndicator style={{marginTop:-100}}size="large" color={"white"} /> : <></>}
+       <Animated.View style={{ flex: 1,
          alignItems: 'center',
          justifyContent: 'center',
          opacity: backgroundFade}}>
@@ -393,6 +401,7 @@ const SplashScreen = ({ navigation }) => {
           accessible={true}
         />
         </Animated.View>
+       
       </View>
       {!loading && loginEnable && (
         <Animated.View style={{marginTop: hp("35%"), opacity: fadeAnim }}>

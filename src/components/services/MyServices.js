@@ -41,6 +41,7 @@ import CustomerErrorPage from "../utility/SystemErrorPopup";
 import MyServicePlan from "../common/MyServicePlan";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
+import MyDataUsage from "../common/MyDataUsage";
 
 const MyServices = ({ route }) => {
   const navigation = useNavigation();
@@ -606,6 +607,7 @@ const MyServices = ({ route }) => {
                   networkId={networkId}
                   navigation={navigation}
                 />
+                <MyDataUsage plans={plans}  navigation={navigation} />
               </View>
 
               <View style={[styles.issuesFlexBox]} />

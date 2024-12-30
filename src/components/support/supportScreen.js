@@ -652,7 +652,7 @@ const Support = ({ route }) => {
                             paddingHorizontal: wp("5%"),
                             paddingVertical: 10,
                             borderBottomLeftRadius: 10,
-                            borderBottomRightRadius: 10 ,
+                            borderBottomRightRadius: 10,
                           },
                         ]}
                       >
@@ -723,7 +723,9 @@ const Support = ({ route }) => {
                           <BillingSupportIcon />
                         </View>
 
-                        <Text style={[styles.headingText]}>Billing Support</Text>
+                        <Text style={[styles.headingText]}>
+                          Billing Support
+                        </Text>
                       </View>
 
                       <View
@@ -747,7 +749,7 @@ const Support = ({ route }) => {
                       <View style={styles.headingAndToggle}>
                         <View style={styles.headingAndIcon4}>
                           <View style={styles.frameParent}>
-                              <Text
+                            <Text
                               style={[
                                 styles.supportingText5,
                                 styles.supportingTypo1,
@@ -757,8 +759,7 @@ const Support = ({ route }) => {
                               have a billing question? Give us a call for
                               assistance.
                             </Text>
-                             
-                           
+
                             <Pressable onPress={() => makeCall("877-692-2253")}>
                               <View style={styles.supportingTextWrapper}>
                                 <Text
@@ -771,7 +772,7 @@ const Support = ({ route }) => {
                                 </Text>
                               </View>
                             </Pressable>
-                            
+
                             <Text
                               style={[
                                 { fontFamily: FontFamily.openSansRegular },
@@ -800,8 +801,6 @@ const Support = ({ route }) => {
                             width: "100%",
                             paddingHorizontal: wp("5%"),
                             paddingVertical: 10,
-                            borderBottomLeftRadius: 10,
-                            borderBottomRightRadius: 10 ,
                           },
                         ]}
                       >
@@ -1225,8 +1224,6 @@ const styles = StyleSheet.create({
   cardFooter: {
     flexDirection: "row",
     backgroundColor: "#F8F8F8",
-    borderBottomEndRadius: 10,
-    borderBottomStartRadius: 10,
     padding: 10,
     alignItems: "center",
   },

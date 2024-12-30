@@ -840,6 +840,7 @@ const HomeScreen = ({ navigation }) => {
               flex: 2,
               alignItems: "center",
               marginTop: 50,
+              paddingBottom: 50,
             }}
           >
             {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert /> : null}
@@ -928,8 +929,8 @@ const HomeScreen = ({ navigation }) => {
             </View>
             <PromotionCard />
             <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} paymentDetails={defaultPaymentDetails} navigation={navigation}/>
-            <MyServicePlan plans={plans}  hasEeroDevice={hasEeroDevice} networkId={networkId} navigation={navigation} />
-            <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
+            {/* <MyServicePlan plans={plans}  hasEeroDevice={hasEeroDevice} networkId={networkId} navigation={navigation} />
+            <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} /> */}
           </View>
         </ScrollView>
       </SafeAreaView>

@@ -59,12 +59,12 @@ const logoutAction = (dispatch, navigation) => {
       //SetClearTimer();
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Splash' }],
+        routes: [{ name: 'Splash', params: { isLogout: true } }],
       });
       storeUser({});
       storeSsoToken({});
-       dispatch(saveUserInfo({}));
-       dispatch(logoutApp());
+      dispatch(saveUserInfo({}));
+      dispatch(logoutApp());
       cleanUserData();
     });
   });
