@@ -1,14 +1,5 @@
 import React, { useState, useCallback, useRef } from "react";
-import { 
-  Image, 
-  StyleSheet, 
-  TextInput, 
-  Text, 
-  View, 
-  ScrollView, 
-  Pressable,
-  AccessibilityInfo 
-} from "react-native";
+import { Image, StyleSheet, TextInput, Text, View, ScrollView, Pressable, AccessibilityInfo } from "react-native";
 import { Padding, FontFamily, FontSize, Color, Border } from "../../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -36,7 +27,7 @@ const announceForAccessibility = (message) => {
 const CreateTicket = () => {
   const navigation = useNavigation();
   const mainContentRef = useRef(null);
-  
+
   const [selectedItem, setSelectedItem] = useState();
   const [fileResponse, setFileResponse] = useState([]);
   const [upoadFileKey, setUploadFileKey] = useState([]);
@@ -44,7 +35,7 @@ const CreateTicket = () => {
   const [loadingTxt, setLoadingTxt] = useState("Creating Ticket...");
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   const [dropdownFocused, setDropdownFocused] = useState(false);
-  
+
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
   const categories = ["Bill", "Support"];
@@ -68,7 +59,7 @@ const CreateTicket = () => {
   const handleDropdownStateChange = (isOpen) => {
     setIsDropDownOpen(isOpen);
     setDropdownFocused(isOpen);
-    announceForAccessibility(isOpen ? 
+    announceForAccessibility(isOpen ?
       "Category dropdown opened" : "Category dropdown closed"
     );
   };
@@ -84,11 +75,11 @@ const CreateTicket = () => {
   const handleSave = (formData) => {
     setLoadingTxt("Creating Ticket...");
     setLoading(true);
-    
+
     if (upoadFileKey.length > 0) {
       formData?.uploads.splice(0, 0, upoadFileKey);
     }
-    
+
     getUser().then((res) => {
       formData.accountNumber = res.userInfo.accountNumber;
       PostApiRequest(
@@ -113,7 +104,7 @@ const CreateTicket = () => {
   const uploadFiles = (data) => {
     setLoadingTxt("File Uploading...");
     setLoading(true);
-    
+
     UploadMultipartData(
       'support/api/Attachments',
       data,
@@ -147,7 +138,7 @@ const CreateTicket = () => {
   }, []);
 
   return (
-    <View 
+    <View
       style={{ backgroundColor: colors.backgound_blue, flex: 1 }}
       ref={mainContentRef}
       accessibilityLabel="Create Ticket Screen"
@@ -169,7 +160,7 @@ const CreateTicket = () => {
               <View style={styles.frameParent}>
                 <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
                   <View style={styles.ticketsParent}>
-                    <Text 
+                    <Text
                       style={styles.tickets}
                       accessible={!dropdownFocused}
                       accessibilityElementsHidden={dropdownFocused}
@@ -181,7 +172,7 @@ const CreateTicket = () => {
                   {/* Subject Input */}
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
-                      <Text 
+                      <Text
                         style={[styles.text, { paddingBottom: 8 }]}
                         accessible={!dropdownFocused}
                         accessibilityElementsHidden={dropdownFocused}
@@ -213,7 +204,7 @@ const CreateTicket = () => {
                   {/* Category Dropdown */}
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
-                      <Text 
+                      <Text
                         style={styles.text}
                         accessible={!dropdownFocused}
                         accessibilityElementsHidden={dropdownFocused}
@@ -242,7 +233,7 @@ const CreateTicket = () => {
                             error={error?.message}
                           />
                           {error && (
-                            <View 
+                            <View
                               style={styles.errorContainer}
                               accessible={!dropdownFocused}
                               accessibilityElementsHidden={dropdownFocused}
@@ -259,7 +250,7 @@ const CreateTicket = () => {
                   {/* Issue Description */}
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
-                      <Text 
+                      <Text
                         style={styles.text}
                         accessible={!dropdownFocused}
                         accessibilityElementsHidden={dropdownFocused}
@@ -286,7 +277,7 @@ const CreateTicket = () => {
                             accessibilityLabel="Issue description input"
                           />
                           {error && (
-                            <View 
+                            <View
                               style={styles.errorContainer}
                               accessible={!dropdownFocused}
                               accessibilityElementsHidden={dropdownFocused}
@@ -303,7 +294,7 @@ const CreateTicket = () => {
                   {/* Email Input */}
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
-                      <Text 
+                      <Text
                         style={[styles.text, { paddingBottom: 8 }]}
                         accessible={!dropdownFocused}
                         accessibilityElementsHidden={dropdownFocused}
@@ -335,7 +326,7 @@ const CreateTicket = () => {
                   {/* Phone Number Input */}
                   <View style={styles.frameWrapper}>
                     <View style={styles.textView}>
-                      <Text 
+                      <Text
                         style={[styles.text, { paddingBottom: 8 }]}
                         accessible={!dropdownFocused}
                         accessibilityElementsHidden={dropdownFocused}
@@ -392,7 +383,7 @@ const CreateTicket = () => {
                   </Pressable>
                 </View>
               </View>
-              
+
               <LoadingOverlay
                 loading={loading}
                 loadingTxt={loadingTxt}
@@ -401,7 +392,7 @@ const CreateTicket = () => {
             </View>
 
             {/* Submit Button */}
-            <View 
+            <View
               style={{ width: "90%", alignSelf: "center" }}
               accessible={!dropdownFocused}
               accessibilityElementsHidden={dropdownFocused}
@@ -428,7 +419,8 @@ const CreateTicket = () => {
                 accessibilityElementsHidden={dropdownFocused}
               >
                 <Text style={[styles.makePayment2, styles.makeTypo]}>
-                  Cancel                </Text>
+                  Cancel
+                </Text>
               </Pressable>
             </View>
           </View>
