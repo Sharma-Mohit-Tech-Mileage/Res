@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { StyleSheet,TouchableOpacity, Text, Pressable, View, ScrollView } from "react-native";
+import { StyleSheet, TouchableOpacity, Text, Pressable, View, ScrollView, AccessibilityInfo } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
 import { securityQuestions } from "../utility/constant";
@@ -12,263 +12,280 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
-import { GetApiRequest,PutApiRequest } from "../../network/APIClient";
+import { GetApiRequest, PutApiRequest } from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
-import { securitySchema } from '../utility/validationSchema'; // Update the path as necessary
+import { securitySchema } from '../utility/validationSchema';
 import colors from "../../res/Colors";
-const PasswordSecurityEdit = () => {
 
+const announceForAccessibility = (message) => {
+  AccessibilityInfo.announceForAccessibility(message);
+};
+
+const PasswordSecurityEdit = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const dispatch = useDispatch();
+  const scrollViewRef = useRef(null);
+  const mainContentRef = useRef(null);
+
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
   const [isNewBiller, setIsNewBiller] = useState(false);
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
-  const [mySecurityQuestion, setMySecurityQuestion] = useState('');
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingTxt, setLoadingTxt] = useState("Please wait...");
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
-  const [securityQuestionsNew,setSecurityQuestionsNew] =useState(securityQuestions)
-  const route = useRoute(); // Use the useRoute hook
-  const dispatch = useDispatch();
+  const [dropdownFocused, setDropdownFocused] = useState(false);
+  const [securityQuestionsNew, setSecurityQuestionsNew] = useState(securityQuestions);
+
   const profile = useSelector(state => state.combinedReducers.profile || {});
-  const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
+  const profileDetailsfromStore = profile.profileDetails || {};
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
-  const scrollViewRef = useRef(null);
-
-  // Handler for when the security question dropdown value changes
-  const handleSecurityQuestionChange = (itemValue) => {
-    setLocalProfile({ ...profileDetails, securityQuestion: itemValue === "Add your own question" ? '' : itemValue });
-    setCustomSecurityQuestion(itemValue);
-    setIsDropDownOpen(false)
-    setIsCustomQuestionSelected(itemValue === "Add your own question");
-  };
-
-
-  const handleSave = (formData) => {
-    console.log("request save data",JSON.stringify(formData))
-    setLoading(true)
-    formData.securityQuestion=(isCustomQuestionSelected)? formData.securityQuestion : customSecurityQuestion
-    dispatch(updateProfileSecurity(formData, navigation)); // Dispatch with formData
-   
-  };
-
-  
-
 
   const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
     resolver: yupResolver(securitySchema(isCustomQuestionSelected)),
     defaultValues: profileDetails
   });
 
+  const handleDropdownStateChange = (isOpen) => {
+    setIsDropDownOpen(isOpen);
+    setDropdownFocused(isOpen);
+    
+    announceForAccessibility(isOpen ? 
+      "Security question dropdown opened. Select a question." : 
+      "Security question dropdown closed."
+    );
+  };
+
+  const handleSecurityQuestionChange = (itemValue) => {
+    setLocalProfile({ 
+      ...profileDetails, 
+      securityQuestion: itemValue === "Add your own question" ? '' : itemValue 
+    });
+    setCustomSecurityQuestion(itemValue);
+    setIsDropDownOpen(false);
+    setDropdownFocused(false);
+    setIsCustomQuestionSelected(itemValue === "Add your own question");
+    
+    announceForAccessibility(`Selected security question: ${itemValue}`);
+    
+    if (mainContentRef.current) {
+      mainContentRef.current.setNativeProps({ 
+        accessibilityElementsHidden: false,
+        importantForAccessibility: 'yes'
+      });
+    }
+  };
+
+  const handleSave = (formData) => {
+    setLoading(true);
+    formData.securityQuestion = isCustomQuestionSelected ? 
+      formData.securityQuestion : 
+      customSecurityQuestion;
+    dispatch(updateProfileSecurity(formData, navigation));
+    announceForAccessibility("Saving security question changes");
+  };
+
   const handleValidationError = () => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setShowValidationAlert(true);
+    announceForAccessibility("Please fix validation errors before saving");
   };
 
-
-  const getSecurityQuestions=()=>{
-    const request = `userssvc/api/securityquestions/`;
+  const getSecurityQuestions = () => {
+    const request = 'userssvc/api/securityquestions/';
     GetApiRequest(
       request,
       (res) => {
-        console.log("getSecurityQuestions", res);
         if (res) {
-          setSecurityQuestionsNew(res)
-          checkCustomSecurityQuestion(res)
+          setSecurityQuestionsNew(res);
+          checkCustomSecurityQuestion(res);
         }
-        
       },
-      (error) => {
-        console.log(error);
-      }
+      (error) => console.log(error)
     );
-  }
-  //usersvc/api/profile/password/8160210010000010
+  };
 
-  
-
-  useEffect(() => {
-    // Reset the form with the updated profile details
-    //reset(profileDetails);
-    setLoading(false)
-  }, [profileDetails, reset]);
-
-
-  const checkCustomSecurityQuestion=(securityQuestions)=>{
-      console.log('Profile Details',profileDetails)
-    const storedSecurityQuestion = profileDetails.securityQuestion;
-    const isCustomQuestion = storedSecurityQuestion && !securityQuestionsNew.includes(storedSecurityQuestion);
-    setIsCustomQuestionSelected(isCustomQuestion);
-    if (isCustomQuestion) {
-      setCustomSecurityQuestion("Add your own question");
-    } else {
-      setCustomSecurityQuestion(storedSecurityQuestion);
-    }
-  }
-
-  useEffect(()=>{
-    const storedSecurityQuestion = profileDetails.securityQuestion;
-    const isCustomQuestion = storedSecurityQuestion && !securityQuestionsNew.includes(storedSecurityQuestion);
-    setIsCustomQuestionSelected(isCustomQuestion);
-    if (isCustomQuestion) {
-      setCustomSecurityQuestion("Add your own question");
-    } else {
-      setCustomSecurityQuestion(storedSecurityQuestion);
-    }
-
-  },[])
+  const checkCustomSecurityQuestion = (questions) => {
+    const storedQuestion = profileDetails.securityQuestion;
+    const isCustom = storedQuestion && !questions.includes(storedQuestion);
+    setIsCustomQuestionSelected(isCustom);
+    setCustomSecurityQuestion(isCustom ? "Add your own question" : storedQuestion);
+  };
 
   useEffect(() => {
-    let re = getUser().then((res) => {
-      if(res.userInfo.accountNumber.toString().length>=16){
-        setIsNewBiller(true)
+    setLoading(false);
+  }, [profileDetails]);
+
+  useEffect(() => {
+    const storedQuestion = profileDetails.securityQuestion;
+    const isCustom = storedQuestion && !securityQuestionsNew.includes(storedQuestion);
+    setIsCustomQuestionSelected(isCustom);
+    setCustomSecurityQuestion(isCustom ? "Add your own question" : storedQuestion);
+  }, []);
+
+  useEffect(() => {
+    getUser().then((res) => {
+      const isNew = res.userInfo.accountNumber.toString().length >= 16;
+      setIsNewBiller(isNew);
+      if (isNew) {
+        getSecurityQuestions();
       }
     });
-   
-    if(isNewBiller){
-      getSecurityQuestions();
-    }else{
-      
-     
-
-    }
-  }, [isNewBiller]);
+  }, []);
 
   useEffect(() => {
     if (route.params?.updateFailed) {
       setShowErrorAlert(true);
-      setLoading(false)
+      setLoading(false);
       scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
       navigation.setParams({ updateFailed: undefined });
     }
-  }, [route.params?.updateFailed, navigation, dispatch]);
-
+  }, [route.params?.updateFailed]);
 
   return (
-    <View style={styles.passwordSecurityEdit}
-    accessibilityElementsHidden={isDropDownOpen}
-    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+    <View 
+      style={styles.passwordSecurityEdit}
+      ref={mainContentRef}
+      accessibilityLabel="Password Security Edit Screen"
     >
       <ProfileSettingsHeader
-        accessibilityElementsHidden={isDropDownOpen}
-        importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
+        accessible={!dropdownFocused}
+        accessibilityElementsHidden={dropdownFocused}
+        importantForAccessibility={dropdownFocused ? 'no-hide-descendants' : 'yes'}
         title="Edit Security Question"
         onPressBack={() => navigation.navigate('PasswordSecurity')}
       />
-      <ScrollView ref={scrollViewRef} >
+      
+      <ScrollView ref={scrollViewRef}>
         <View style={styles.passwordSecurityEditInner}>
           <View style={styles.frameParent}>
             <View style={[styles.frameGroup, styles.wrapperSpaceBlock1]}>
               <View style={styles.infoWrapper}>
-              <NotificationAlert
-                type="error"
-                title="Failed"
-                message="Password and security question update failed."
-                showCloseIcon={true}
-                isVisible={showErrorAlert}
-                onClose={() => setShowErrorAlert(false)}
-              />
+                <NotificationAlert
+                  type="error"
+                  title="Failed"
+                  message="Password and security question update failed."
+                  showCloseIcon={true}
+                  isVisible={showErrorAlert}
+                  onClose={() => setShowErrorAlert(false)}
+                  accessible={!dropdownFocused}
+                />
               </View>
+
               <View style={styles.frameParent1}>
                 <View 
-                accessibilityElementsHidden={isDropDownOpen}
-                importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                style={styles.securityQuestionWrapper}>
-                  <Text style={[styles.password, styles.passwordFlexBox]} >Security Question</Text>
+                  style={styles.securityQuestionWrapper}
+                  accessible={!dropdownFocused}
+                  accessibilityElementsHidden={dropdownFocused}
+                >
+                  <Text 
+                    style={[styles.password, styles.passwordFlexBox]}
+                    accessibilityRole="header"
+                  >
+                    Security Question
+                  </Text>
                 </View>
-                <View 
-                style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+
+                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
                   <View style={styles.textinput}>
-                    <Text 
-                    accessibilityElementsHidden={isDropDownOpen}
-                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                     style={[styles.firstName1, styles.firstTypo]} > Password Reset Question</Text>
+                    <Text
+                      style={[styles.firstName1, styles.firstTypo]}
+                      accessible={!dropdownFocused}
+                    >
+                      Password Reset Question
+                    </Text>
                     <SparkLightDropdown
-                    accessibilityElementsHidden={isDropDownOpen}
-                    importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
                       items={securityQuestionsNew}
                       selectedValue={customSecurityQuestion}
                       onValueChange={handleSecurityQuestionChange}
-                      isDropDownOpen={(value) => {
-                        setIsDropDownOpen(true)
-                      }}
+                      isDropDownOpen={handleDropdownStateChange}
+                      accessibilityLabel="Select security question"
+                      accessibilityHint="Double tap to open dropdown"
+                      accessibilityRole="button"
                     />
                   </View>
                 </View>
+
                 {isCustomQuestionSelected && (
                   <View 
-                 accessibilityElementsHidden={isDropDownOpen}
-                 importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                  style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                    style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}
+                    accessible={!dropdownFocused}
+                    accessibilityElementsHidden={dropdownFocused}
+                  >
                     <View style={styles.textinput}>
                       <Controller
                         control={control}
                         name="securityQuestion"
                         render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                          <>
-                            <SparkLightInput
-                              onBlur={onBlur}
-                              label={'Type your Question'}
-                              onChangeText={onChange}
-                              value={value}
-                              error={error?.message}
-                            />
-                          </>
-                          
+                          <SparkLightInput
+                            onBlur={onBlur}
+                            label="Type your Question"
+                            onChangeText={onChange}
+                            value={value}
+                            error={error?.message}
+                            accessibilityLabel="Custom security question input"
+                            accessibilityHint="Enter your custom security question"
+                          />
                         )}
                       />
                     </View>
                   </View>
                 )}
+
                 <View 
-                accessibilityElementsHidden={isDropDownOpen}
-                importantForAccessibility= {isDropDownOpen ? "no-hide-descendants" : 'no'}
-                style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
-                    <Controller
-                      control={control}
-                      name="securityAnswer"
-                      render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-                        <>
-                          <SparkLightInput
-                            onBlur={onBlur}
-                            onChangeText={onChange}
-                            label={"Password Reset Answer"}
-                            value={value}
-                            error={error?.message}
-                          />
-                        </>
-                      )}
-                    />
+                  style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}
+                >
+                  <Controller
+                    control={control}
+                    name="securityAnswer"
+                    render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                      <SparkLightInput
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        label="Password Reset Answer"
+                        value={value}
+                        error={error?.message}
+                        accessibilityLabel="Security question answer input"
+                        accessibilityHint="Enter your answer to the security question"
+                      />
+                    )}
+                  />
                 </View>
               </View>
             </View>
           </View>
-          <View style={styles.frameParent1}>
+
+          <View 
+            style={styles.frameParent1}
+          >
             <Pressable 
-             accessibilityLabel={'Save'}
-             accessibilityRole="button"
-             accessible={true}
-            style={[styles.buttons, styles.buttonsLayout]}
-              onPress={handleSubmit(handleSave, handleValidationError)}>
-              <Text style={[styles.makePayment, styles.makeTypo]}> Save </Text>
+              style={[styles.buttons, styles.buttonsLayout]}
+              onPress={handleSubmit(handleSave, handleValidationError)}
+              accessibilityLabel="Save changes"
+              accessibilityRole="button"
+              accessible={!dropdownFocused}
+            >
+              <Text style={[styles.makePayment, styles.makeTypo]}>Save</Text>
             </Pressable>
+
             <Pressable 
-             accessibilityLabel={`Cancel`}
-             accessibilityRole="button"
-             accessible={true}
-            style={[styles.buttons1, styles.buttonsLayout]} onPress={() => navigation.navigate("PasswordSecurity")}>
-              <Text style={[styles.makePayment1, styles.makeTypo]}> Cancel</Text>
+              style={[styles.buttons1, styles.buttonsLayout]}
+              onPress={() => navigation.navigate("PasswordSecurity")}
+              accessibilityLabel="Cancel and return"
+              accessibilityRole="button"
+              accessible={!dropdownFocused}
+            >
+              <Text style={[styles.makePayment1, styles.makeTypo]}>Cancel</Text>
             </Pressable>
           </View>
 
           <LoadingOverlay
-                loading={loading}
-                loadingTxt={loadingTxt}
-                onRequestClose={() => {
-                  setLoading(false);
-                }}
-              />
+            loading={loading}
+            loadingTxt={loadingTxt}
+            onRequestClose={() => setLoading(false)}
+          />
         </View>
       </ScrollView>
     </View>

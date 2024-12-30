@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 import { StyleSheet, View, TouchableOpacity, Text, Modal, SafeAreaView, Pressable } from 'react-native';
 import { Box } from 'native-base';
 import { Padding, Color, FontFamily, FontSize } from "../../../../GlobalStyles";
-import { useIsFocused } from "@react-navigation/native";
 
 const SparkLightDropdown = ({ items, selectedValue, onValueChange, style, dropDownStyle, isDropDownOpen = () => {} }) => {
     const validItems = Array.isArray(items) ? items : [];

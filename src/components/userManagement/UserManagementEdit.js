@@ -1,24 +1,31 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Image, StyleSheet, Text, Pressable, View, ScrollView, Modal, ActivityIndicator, } from "react-native";
+import { Image, StyleSheet, Text, Pressable, View, ScrollView, Modal, ActivityIndicator, AccessibilityInfo } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FontFamily, Padding, Color, Border, FontSize, } from "../../../GlobalStyles";
+import { FontFamily, Padding, Color, Border, FontSize } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
 import { useDispatch } from "react-redux";
 import { getUserType } from "../utility/constant";
 import { userSchema, userSchemaNoPass } from "../utility/validationSchema";
-import { addNewUser, editNewUser, } from "../../redux/actions/ProfileActionSuite";
-import { validatePassword, securityQuestions, passwordTerms, } from "../utility/constant";
+import { addNewUser, editNewUser } from "../../redux/actions/ProfileActionSuite";
+import { validatePassword, securityQuestions, passwordTerms } from "../utility/constant";
 import NotificationError from "../common/customui/NotificationError";
 import WarningIcon from "../../../assets/alert-triangle.png";
 import colors from "../../res/Colors";
 
+const announceForAccessibility = (message) => {
+  AccessibilityInfo.announceForAccessibility(message);
+};
+
 const UserManagementEdit = ({ route }) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const scrollViewRef = useRef(null);
+  const mainContentRef = useRef(null);
+
   var user = route.params?.User;
   var isnewUser = false;
 
@@ -38,15 +45,10 @@ const UserManagementEdit = ({ route }) => {
       securityQuestion: "",
     };
     isnewUser = true;
-  } else {
-    isnewUser = false;
   }
 
-  //console.log('NN',(user?.securityQuestion === "Add your own question"))
-
   const [firstName, setFirstName] = useState(user?.firstName || "");
-  const [isCustomQuestionSelected, setIsCustomQuestionSelected] =
-    useState(false);
+  const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState("");
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [userName, setUserName] = useState(user?.userName || "");
@@ -56,81 +58,74 @@ const UserManagementEdit = ({ route }) => {
   const [errorMsg, setErrorMsg] = useState("");
   const [profileDetails, setProfileDetails] = useState(user);
   const [loading, setLoading] = useState(false);
-  const [pass, setPass] = useState('')
+  const [pass, setPass] = useState('');
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
-  const scrollViewRef = useRef(null);
-  const handleSecurityQuestionChange = (itemValue, onChange) => {
+  const [dropdownFocused, setDropdownFocused] = useState(false);
+
+  const { control, handleSubmit, formState: { errors } } = useForm({
+    resolver: yupResolver((isnewUser || pass?.target?.value.length > 0) ? 
+      userSchema(isCustomQuestionSelected) : 
+      userSchemaNoPass(isCustomQuestionSelected)),
+    defaultValues: profileDetails,
+  });
+
+  const handleSecurityQuestionChange = (itemValue) => {
     setProfileDetails({
       ...profileDetails,
       securityQuestion: itemValue === "Add your own question" ? "" : itemValue,
     });
     setCustomSecurityQuestion(itemValue);
-    setIsDropDownOpen(false)
+    setIsDropDownOpen(false);
+    setDropdownFocused(false);
     setIsCustomQuestionSelected(itemValue === "Add your own question");
+    
+    announceForAccessibility(`Selected security question: ${itemValue}`);
   };
 
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    setError,
-    reset,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver((isnewUser || pass?.target?.value.length > 0) ? userSchema(isCustomQuestionSelected) : userSchemaNoPass(isCustomQuestionSelected)),
-    defaultValues: profileDetails,
-  });
-  // console.log('Password',(isnewUser || pass?.target?.value.length>0 ))
-  //setValue('newPassword', 'value', { shouldValidate: false })
-  const handleSave = (formData) => {
-    setLoading(true);
-    if (route.params?.User != undefined) {
-      formData['securityQuestion'] = isCustomQuestionSelected ? formData.securityQuestion : customSecurityQuestion
-      dispatch(
-        editNewUser(formData, (isSuccess) => {
-          if (!isSuccess) {
-            setLoading(false);
-          } else {
-            setLoading(false);
-            setTimeout(() => {
-              navigation.navigate('UserManagement', { isSuccess: true });
-              //navigation.reset({
-              //index: 0,
-              //routes: [{ name: "UserManagement" }],
-              //});
-            }, 1000)
-          }
-        })
-      ); // Dispatch with formData// Dispatch with formData
-    } else {
-      formData['securityQuestion'] = isCustomQuestionSelected ? formData.securityQuestion : customSecurityQuestion
+  const handleDropdownStateChange = (isOpen) => {
+    setIsDropDownOpen(isOpen);
+    setDropdownFocused(isOpen);
+    
+    announceForAccessibility(isOpen ? 
+      "Security question dropdown opened" : "Security question dropdown closed"
+    );
 
-      console.log('request', formData)
-      dispatch(
-        addNewUser(formData, (isSuccess, msg) => {
-          if (!isSuccess) {
-            setLoading(false);
-            setErrorMsg(msg?.error);
-            scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: false });
-          } else {
-            setLoading(false);
-            setTimeout(() => {
-              navigation.navigate('UserManagement', { isSuccess: true });
-              //navigation.reset({
-              //index: 0,
-              //routes: [{ name: "UserManagement" }],
-              //});
-            }, 1000)
-          }
-        })
-      );
+    if (mainContentRef.current) {
+      mainContentRef.current.setNativeProps({
+        accessibilityElementsHidden: isOpen,
+        importantForAccessibility: isOpen ? 'no-hide-descendants' : 'yes'
+      });
     }
   };
 
-  const handleOnChangeText = (
-    value,
-    onChange
-  ) => {
+  const handleSave = (formData) => {
+    setLoading(true);
+    formData.securityQuestion = isCustomQuestionSelected ? 
+      formData.securityQuestion : 
+      customSecurityQuestion;
+
+    const saveCallback = (isSuccess, msg) => {
+      setLoading(false);
+      if (!isSuccess) {
+        setErrorMsg(msg?.error);
+        scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: false });
+        announceForAccessibility("Save failed. Please check the error message.");
+      } else {
+        announceForAccessibility("Changes saved successfully");
+        setTimeout(() => {
+          navigation.navigate('UserManagement', { isSuccess: true });
+        }, 1000);
+      }
+    };
+
+    if (route.params?.User) {
+      dispatch(editNewUser(formData, saveCallback));
+    } else {
+      dispatch(addNewUser(formData, saveCallback));
+    }
+  };
+
+  const handleOnChangeText = (value, onChange) => {
     onChange(value);
     setPass(value);
   };
@@ -138,495 +133,343 @@ const UserManagementEdit = ({ route }) => {
   const handleValidationError = () => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setShowValidationAlert(true);
-    console.log('Request', customSecurityQuestion)
+    announceForAccessibility("Please fix the validation errors before saving");
   };
 
   useEffect(() => {
-    // Reset the form with the updated profile details
-    // reset(profileDetails);
-    //console.log(profileDetails);
-  }, [profileDetails, reset]);
-
-  useEffect(() => {
-    if (errorMsg != "") {
+    if (errorMsg) {
       setShowError(true);
     }
   }, [errorMsg]);
 
   useEffect(() => {
-
     if (!isnewUser) {
       const storedSecurityQuestion = profileDetails?.securityQuestion;
-      console.log('custom Question', storedSecurityQuestion)
       const isCustomQuestion = securityQuestions.includes(storedSecurityQuestion);
-      console.log('iscutom', isCustomQuestion),
-        setIsCustomQuestionSelected(!isCustomQuestion);
-      if (!isCustomQuestion) {
-        setCustomSecurityQuestion("Add your own question");
-
-      } else {
-        setCustomSecurityQuestion(storedSecurityQuestion);
-      }
+      setIsCustomQuestionSelected(!isCustomQuestion);
+      setCustomSecurityQuestion(!isCustomQuestion ? "Add your own question" : storedSecurityQuestion);
     }
-
   }, []);
 
-  const LoadingOverlay = () => {
-    return (
-      <Modal
-        visible={loading}
-        transparent
-        animationType="fade"
-        onRequestClose={() => {
-          setLoading(false);
-        }}
-      >
-        <View style={styles.overlay}>
-          <View style={styles.alertContainer}>
-            <ActivityIndicator size="large" color={Color.colorGainsboro_200} />
-            <Text style={styles.loadingTxt}>Saving Data..</Text>
-          </View>
+  const LoadingOverlay = () => (
+    <Modal
+      visible={loading}
+      transparent
+      animationType="fade"
+      onRequestClose={() => setLoading(false)}
+      accessible={true}
+      accessibilityLabel="Loading overlay"
+    >
+      <View style={styles.overlay}>
+        <View style={styles.alertContainer}>
+          <ActivityIndicator size="large" color={Color.colorGainsboro_200} />
+          <Text style={styles.loadingTxt}>Saving Data..</Text>
         </View>
-      </Modal>
-    );
-  };
+      </View>
+    </Modal>
+  );
 
   return (
-    <View style={styles.userManagementEdit}>
+    <View 
+      style={styles.userManagementEdit}
+      ref={mainContentRef}
+      accessibilityLabel="User Management Edit Screen"
+    >
       <ProfileSettingsHeader
         title={isnewUser ? "Add Admin User" : "Edit User"}
         onPressBack={() => navigation.navigate("UserManagement")}
-        accessibilityLabel="Go back to User Management"
+        accessibilityLabel="Return to User Management"
         accessibilityRole="button"
-        accessibilityHint="Navigates back to the User Management screen"
-        accessibilityElementsHidden={isDropDownOpen}
-        importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+        accessibilityHint="Navigates back to User Management screen"
+        accessible={!dropdownFocused}
+        accessibilityElementsHidden={dropdownFocused}
+        importantForAccessibility={dropdownFocused ? 'no-hide-descendants' : 'yes'}
       />
+
       <ScrollView ref={scrollViewRef}>
-        <View style={[styles.userManagementEditInner]}>
+        <View style={styles.userManagementEditInner}>
           <NotificationError
             type="error"
-            title={"Error"}
+            title="Error"
             message={errorMsg}
             showCloseIcon={true}
             isVisible={showError}
-            onClose={() => {
-              setShowError(false);
-            }}
-            accessibilityElementsHidden={isDropDownOpen}
-            importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
+            onClose={() => setShowError(false)}
+            accessible={!dropdownFocused}
+            accessibilityElementsHidden={dropdownFocused}
           />
+
           {isnewUser && (
             <>
               <Text
-                accessibilityElementsHidden={isDropDownOpen}
-                importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
-                style={[
-                  styles.yourSavedCard,
-                  styles.taylorTypo,
-                  { fontWeight: "800" },
-                ]}
+                style={[styles.yourSavedCard, styles.taylorTypo, { fontWeight: "800" }]}
+                accessible={!dropdownFocused}
+                accessibilityElementsHidden={dropdownFocused}
               >
                 Admin
               </Text>
               <Text
-                accessibilityElementsHidden={isDropDownOpen}
-                importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
-                style={[
-                  styles.yourSavedCard,
-                  styles.taylorTypo,
-                  { paddingBottom: 15 },
-                ]}
+                style={[styles.yourSavedCard, styles.taylorTypo, { paddingBottom: 15 }]}
+                accessible={!dropdownFocused}
+                accessibilityElementsHidden={dropdownFocused}
               >
-                An admin can manage this account but is not the primary contact
-                for this account.
+                An admin can manage this account but is not the primary contact for this account.
               </Text>
             </>
           )}
+
           <View style={styles.frameWrapper}>
-            <View
-              style={[styles.frameGroup, styles.textinputWrapperSpaceBlock]}
-            >
-              <View
-                accessibilityElementsHidden={isDropDownOpen}
-                importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
-                style={styles.generalInformationWrapper}>
+            <View style={[styles.frameGroup, styles.textinputWrapperSpaceBlock]}>
+              <View style={styles.generalInformationWrapper}>
                 <Text style={[styles.generalInformation, styles.firstClr]}>
                   General Information
                 </Text>
               </View>
+
               <View style={styles.frameWrapper}>
                 <View style={styles.frameWrapper}>
-                  <View
-                    style={[
-                      styles.textinputWrapper,
-                      styles.textinputWrapperSpaceBlock,
-                    ]}
-                  >
+                  {/* Name Inputs */}
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock]}>
                     <View style={styles.textinput}>
                       <Controller
                         control={control}
                         name="firstName"
-                        render={({
-                          field: { onChange, onBlur, value },
-                          fieldState: { error },
-                        }) => (
-                          <>
-                            <SparkLightInput
-                              onBlur={onBlur}
-                              label={"First Name"}
-                              placeholder={"Enter your First Name"}
-                              onChangeText={onChange}
-                              value={value}
-                              error={error?.message}
-                            />
-                          </>
+                        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                          <SparkLightInput
+                            onBlur={onBlur}
+                            label="First Name"
+                            placeholder="Enter your First Name"
+                            onChangeText={onChange}
+                            value={value}
+                            error={error?.message}
+                            accessibilityLabel="First name input"
+                            accessible={!dropdownFocused}
+                            accessibilityElementsHidden={dropdownFocused}
+                          />
                         )}
                       />
                     </View>
                   </View>
-                  <View
-                    style={[
-                      styles.textinputWrapper,
-                      styles.textinputWrapperSpaceBlock,
-                    ]}
-                  >
+
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock]}>
                     <View style={styles.textinput}>
                       <Controller
                         control={control}
                         name="lastName"
-                        render={({
-                          field: { onChange, onBlur, value },
-                          fieldState: { error },
-                        }) => (
-                          <>
-                            <SparkLightInput
-                              onBlur={onBlur}
-                              label={"Last Name"}
-                              placeholder={"Enter your Last Name"}
-                              onChangeText={onChange}
-                              value={value}
-                              error={error?.message}
-                            />
-                          </>
+                        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                          <SparkLightInput
+                            onBlur={onBlur}
+                            label="Last Name"
+                            placeholder="Enter your Last Name"
+                            onChangeText={onChange}
+                            value={value}
+                            error={error?.message}
+                            accessibilityLabel="Last name input"
+                            accessible={!dropdownFocused}
+                            accessibilityElementsHidden={dropdownFocused}
+                          />
                         )}
                       />
                     </View>
                   </View>
-                  <View
-                    style={[
-                      styles.textinputWrapper,
-                      styles.textinputWrapperSpaceBlock,
-                    ]}
-                  >
+
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock]}>
                     <View style={styles.textinput}>
                       <Controller
                         control={control}
                         name="userName"
-                        render={({
-                          field: { onChange, onBlur, value },
-                          fieldState: { error },
-                        }) => (
-                          <>
-                            <SparkLightInput
-                              onBlur={onBlur}
-                              label={"Username"}
-                              placeholder={!isnewUser ? `` : "Enter your Username"}
-                              onChangeText={onChange}
-                              editable={isnewUser}
-                              value={value}
-                              error={error?.message}
-                            />
-                          </>
-                        )}
-                      />
-                    </View>
-                    <Text
-                      style={styles.bulletPoint}>
-                      *Username can't contain any special characters.
-                    </Text>
-                  </View>
-                  {!isnewUser && (
-                    <View
-                      style={[
-                        styles.textinputWrapper,
-                        styles.textinputWrapperSpaceBlock,
-                      ]}
-                    >
-                      <View style={styles.textinput}>
-                        <Text
-                          accessibilityElementsHidden={isDropDownOpen}
-                          importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
-                          style={[styles.firstName, styles.firstClr]}>
-                          Member Type
-                        </Text>
-                        <View style={styles.notifications}>
-                          <Image
-                            style={{ height: "100%" }}
-                            resizeMode="stretch"
-                            source={require("../../../assets/rectangle-5281.png")}
+                        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                          <SparkLightInput
+                            onBlur={onBlur}
+                            label="Username"
+                            placeholder={!isnewUser ? "" : "Enter your Username"}
+                            onChangeText={onChange}
+                            editable={isnewUser}
+                            value={value}
+                            error={error?.message}
+                            accessibilityLabel="Username input"
+                            accessible={!dropdownFocused}
+                            accessibilityElementsHidden={dropdownFocused}
                           />
-                          <View style={styles.bannerWarning}>
-                            <View style={styles.rightActionableParent}>
-                              <Image
-                                style={styles.rightIconLayout}
-                                resizeMode="stretch"
-                                source={require("../../../assets/right-actionable3.png")}
-                              />
-
-                              <View
-                                style={styles.creditCardWillExpireSoonParent}
-                              >
-                                <Text
-                                  accessibilityElementsHidden={isDropDownOpen}
-                                  importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
-                                  style={styles.creditCardWill}>
-                                  {getUserType(profileDetails?.memberType)}
-                                </Text>
-                                <Text
-                                  accessibilityElementsHidden={isDropDownOpen}
-                                  importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
-                                  style={[
-                                    styles.yourSavedCard,
-                                    styles.taylorTypo,
-                                  ]}
-                                >
-                                  {getUserType(profileDetails?.memberType) ==
-                                    "PRIMARY ADMIN"
-                                    ? "As the primary admin, you are the main contact and have full control over this account."
-                                    : "As an admin, you can manage this account, but you are not the primary contact for this account."}
-                                </Text>
-                                <View
-                                  accessibilityElementsHidden={isDropDownOpen}
-                                  importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
-                                  style={styles.buttons}>
-                                  <Text style={styles.makePayment}>
-                                    Change Primary Admin
-                                  </Text>
-                                </View>
-                              </View>
-                            </View>
-                            <Image
-                              style={[
-                                styles.rightActionableIcon1,
-                                styles.rightIconLayout,
-                              ]}
-                              resizeMode="stretch"
-                              source={require("../../../assets/right-actionable4.png")}
-                            />
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                  )}
-                </View>
-
-                <View style={styles.frameParent1}>
-                  <View
-                    accessibilityElementsHidden={isDropDownOpen}
-                    importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
-                    style={styles.contactInformationWrapper}>
-                    <Text style={[styles.generalInformation, styles.firstClr]}>
-                      Password
-                    </Text>
-                  </View>
-
-                  <View style={styles.frameParent}>
-                    <View
-                      style={[
-                        styles.textinputWrapper,
-                        styles.wrapperSpaceBlock1,
-                      ]}
-                    >
-                      <Controller
-                        control={control}
-
-                        name="newPassword"
-
-                        render={({
-                          field: { onChange, onBlur, value },
-                          fieldState: { error },
-                        }) => (
-                          <>
-                            <SparkLightInput
-                              placeholder="New Password"
-                              onBlur={onBlur}
-                              label={isnewUser ? "New Password" : "New Password(Optional)"}
-                              //onChangeText={onChange}
-                              onChangeText={(value) => { handleOnChangeText(value, onChange) }}
-                              value={value}
-                              secure={true}
-                              error={error?.message}
-                            />
-                            <View
-                              accessibilityElementsHidden={isDropDownOpen}
-                              importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
-                              style={[
-                                styles.passwordFlexBox,
-                                { marginTop: Padding.p_base },
-                              ]}
-                            >
-                              {validatePassword(
-                                value,
-                                profileDetails.userName
-                              ).map((isValid, index) => (
-                                <View
-                                  key={`point-${index}`}
-                                  style={styles.bulletPointContainer}
-                                >
-                                  <View style={{ marginTop: 7 }}>
-                                    <View
-                                      style={[
-                                        styles.bullet,
-                                        {
-                                          backgroundColor: isValid
-                                            ? Color.sparklightGreen
-                                            : Color.colorGray_200,
-                                        },
-                                      ]}
-                                    />
-                                  </View>
-                                  <Text style={styles.bulletPoint}>
-                                    {passwordTerms[index]}
-                                  </Text>
-                                </View>
-                              ))}
-                            </View>
-                          </>
                         )}
                       />
                     </View>
                   </View>
 
+                  {/* Password Section */}
                   <View style={styles.frameParent1}>
-                    <View
-                      accessibilityElementsHidden={isDropDownOpen}
-                      importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
-                      style={styles.securityQuestionWrapper}>
-                      <Text
-                        style={[styles.generalInformation, styles.firstClr]}
-                      >
-                        Security Question
+                    <View style={styles.contactInformationWrapper}>
+                      <Text style={[styles.generalInformation, styles.firstClr]}>
+                        Password
                       </Text>
                     </View>
-                    <View
-                      style={[
-                        styles.textinputWrapper,
-                        styles.wrapperSpaceBlock1,
-                      ]}
-                    >
-                      <View style={styles.textinput}>
-                        <Text style={[styles.firstName1, styles.firstTypo, { color: (showValidationAlert && customSecurityQuestion.length == 0) ? colors.sparklight_red : Color.sparklightGray1, fontWeight: (showValidationAlert && customSecurityQuestion.length == 0) ? '700' : '400' }]}>
-                          {" "}
-                          Password Reset Question
+
+                    <View style={styles.frameParent}>
+                      <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                        <Controller
+                          control={control}
+                          name="newPassword"
+                          render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                            <>
+                              <SparkLightInput
+                                placeholder="New Password"
+                                onBlur={onBlur}
+                                label={isnewUser ? "New Password" : "New Password (Optional)"}
+                                onChangeText={(value) => handleOnChangeText(value, onChange)}
+                                value={value}
+                                secure={true}
+                                error={error?.message}
+                                accessibilityLabel="Password input"
+                                accessible={!dropdownFocused}
+                                accessibilityElementsHidden={dropdownFocused}
+                              />
+                              <View style={[styles.passwordFlexBox, { marginTop: Padding.p_base }]}>
+                                {validatePassword(value, profileDetails.userName).map((isValid, index) => (
+                                  <View key={`point-${index}`} style={styles.bulletPointContainer}>
+                                    <View style={{ marginTop: 7 }}>
+                                      <View
+                                        style={[styles.bullet, {
+                                          backgroundColor: isValid ? 
+                                            Color.sparklightGreen : 
+                                            Color.colorGray_200,
+                                        }]}
+                                      />
+                                    </View>
+                                    <Text style={styles.bulletPoint}>
+                                      {passwordTerms[index]}
+                                    </Text>
+                                  </View>
+                                ))}
+                              </View>
+                            </>
+                          )}
+                        />
+                      </View>
+                    </View>
+
+                    {/* Security Question Section */}
+                    <View style={styles.frameParent1}>
+                      <View style={styles.securityQuestionWrapper}>
+                        <Text
+                          style={[styles.generalInformation, styles.firstClr]}
+                          accessible={!dropdownFocused}
+                          accessibilityElementsHidden={dropdownFocused}
+                        >
+                          Security Question
                         </Text>
-                        <>
+                      </View>
+
+                      <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                        <View style={styles.textinput}>
+                          <Text 
+                            style={[styles.firstName1, styles.firstTypo, { 
+                              color: (showValidationAlert && customSecurityQuestion.length == 0) ? 
+                                colors.sparklight_red : Color.sparklightGray1,
+                              fontWeight: (showValidationAlert && customSecurityQuestion.length == 0) ? 
+                                '700' : '400' 
+                            }]}
+                            accessible={!dropdownFocused}
+                          >
+                            Password Reset Question
+                          </Text>
                           <SparkLightDropdown
                             items={securityQuestions}
                             selectedValue={customSecurityQuestion}
-                            onValueChange={(value) => { handleSecurityQuestionChange(value) }}
-                            isDropDownOpen={(value) => {
-                              setIsDropDownOpen(true)
-                            }}
-
+                            onValueChange={handleSecurityQuestionChange}
+                            isDropDownOpen={handleDropdownStateChange}
+                            accessibilityLabel="Select security question"
+                            accessibilityHint="Double tap to open dropdown"
+                            accessibilityRole="button"
+                            accessible={true}
+                            importantForAccessibility="yes"
                           />
                           {(showValidationAlert && customSecurityQuestion.length == 0) && (
-                            <View
-
-                              style={styles.errorContainer}>
-                              <Image
-                                source={WarningIcon}
-                                style={styles.errorIcon}
-                              />
+                            <View style={styles.errorContainer}>
+                              <Image source={WarningIcon} style={styles.errorIcon} />
                               <Text style={styles.errorText}>
-                                {'Password Reset Question is required'}
+                                Password Reset Question is required
                               </Text>
                             </View>
                           )}
-                        </>
+                        </View>
                       </View>
-                    </View>
-                    {isCustomQuestionSelected && (
-                      <View
-                        style={[
-                          styles.textinputWrapper,
-                          styles.wrapperSpaceBlock1,
-                        ]}
-                      >
-                        <View style={styles.textinput}>
-                          <Controller
-                            control={control}
-                            name="securityQuestion"
-                            render={({
-                              field: { onChange, onBlur, value },
-                              fieldState: { error },
-                            }) => (
-                              <>
+
+                      {isCustomQuestionSelected && (
+                        <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                          <View style={styles.textinput}>
+                            <Controller
+                              control={control}
+                              name="securityQuestion"
+                              render={({
+                                field: { onChange, onBlur, value },
+                                fieldState: { error },
+                              }) => (
                                 <SparkLightInput
                                   onBlur={onBlur}
-                                  label={"Type your Question"}
+                                  label="Type your Question"
                                   onChangeText={onChange}
                                   value={value}
                                   error={error?.message}
+                                  accessibilityLabel="Custom security question input"
+                                  accessibilityHint="Enter your custom security question"
+                                  accessible={!dropdownFocused}
+                                  accessibilityElementsHidden={dropdownFocused}
                                 />
-                              </>
-                            )}
-                          />
+                              )}
+                            />
+                          </View>
                         </View>
-                      </View>
-                    )}
-                    <View
-                      style={[
-                        styles.textinputWrapper,
-                        styles.wrapperSpaceBlock1,
-                      ]}
-                    >
-                      <Controller
-                        control={control}
-                        name="securityAnswer"
-                        render={({
-                          field: { onChange, onBlur, value },
-                          fieldState: { error },
-                        }) => (
-                          <>
+                      )}
+
+                      <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                        <Controller
+                          control={control}
+                          name="securityAnswer"
+                          render={({
+                            field: { onChange, onBlur, value },
+                            fieldState: { error },
+                          }) => (
                             <SparkLightInput
                               onBlur={onBlur}
                               onChangeText={onChange}
-                              label={"Password Reset Answer"}
+                              label="Password Reset Answer"
                               value={value}
                               error={error?.message}
+                              accessibilityLabel="Security answer input"
+                              accessibilityHint="Enter your answer to the security question"
+                              accessible={!dropdownFocused}
+                              accessibilityElementsHidden={dropdownFocused}
                             />
-                          </>
-                        )}
-                      />
+                          )}
+                        />
+                      </View>
                     </View>
                   </View>
                 </View>
               </View>
             </View>
           </View>
+
+          {/* Save/Cancel Buttons */}
           <View style={styles.frameChild1SpaceBlock}>
-            <View style={[styles.buttons1, styles.buttonsLayout]}>
-              <Pressable
-                accessibilityElementsHidden={isDropDownOpen}
-                importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
-                accessibilityLabel="Save"
-                accessibilityRole="button"
-                accessible={true}
-                style={[styles.buttons1, styles.buttonsLayout]}
-                onPress={handleSubmit(handleSave, handleValidationError)}
-              >
-                <Text style={[styles.makePayment1, styles.makeTypo]}>Save</Text>
-              </Pressable>
-            </View>
             <Pressable
-              accessibilityElementsHidden={isDropDownOpen}
-              importantForAccessibility={isDropDownOpen ? "no-hide-descendants" : 'no'}
-              accessibilityLabel="Cancel"
+              style={[styles.buttons1, styles.buttonsLayout]}
+              onPress={handleSubmit(handleSave, handleValidationError)}
+              accessibilityLabel="Save changes"
               accessibilityRole="button"
-              accessible={true}
+              accessible={!dropdownFocused}
+              accessibilityElementsHidden={dropdownFocused}
+            >
+              <Text style={[styles.makePayment1, styles.makeTypo]}>Save</Text>
+            </Pressable>
+
+            <Pressable
               style={[styles.buttons2, styles.buttonsLayout]}
               onPress={() => navigation.navigate("UserManagement")}
+              accessibilityLabel="Cancel"
+              accessibilityRole="button"
+              accessible={!dropdownFocused}
+              accessibilityElementsHidden={dropdownFocused}
             >
               <Text style={[styles.makePayment2, styles.makeTypo]}>Cancel</Text>
             </Pressable>
