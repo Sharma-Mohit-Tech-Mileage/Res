@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Dimensions, Platform,Alert,Pressable,Image } from "react-native";
+import { View, StyleSheet, Dimensions, Platform, Alert, Pressable, Image, AccessibilityInfo } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTabBarVisibility } from './TabBarVisibilityContext';
@@ -21,12 +21,11 @@ import BillingIcon from "../res/svgIcons/BillingIcon";
 import BillingStackScreen from "./stackNavigation/BillingStack";
 import ArticalWindowUtility from "../components/utility/ArticalWindowUtility";
 
-
 const { width } = Dimensions.get('window');
 const tabWidth = Number(width / 5);
 const Tab = createBottomTabNavigator();
 
-const MyTabs = ({ navigation,route }) => {
+const MyTabs = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
   const [shadowStyle, setShadowStyle] = useState(styles.shadowTabs);
@@ -35,14 +34,20 @@ const MyTabs = ({ navigation,route }) => {
   const home = useSelector(state => state.combinedReducers.home);
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
-  console.log('Profile details...........................................................................................................', JSON.stringify(profileDetails));
 
   useEffect(() => {
-    // Fetch user profile details once when the component is initialized
     dispatch(fetchProfileDetails());
   }, [dispatch]);
 
-  function CustomTabBarButton({ onPress, isDisabled,focused, children }) {
+  // Helper function to determine if a tab should be accessible during walkthrough
+  const isTabAccessibleDuringWalkthrough = (tabIndex) => {
+    if (!user?.isNormalUser || home.walkThroughStep === null || home.walkThroughStep === undefined) {
+      return true;
+    }
+    return home.walkThroughStep === tabIndex;
+  };
+
+  function CustomTabBarButton({ onPress, isDisabled, focused, children, tabIndex }) {
     const handlePress = () => {
       if (isDisabled) {
         Alert.alert('Coming Soon', 'We are still working on it.');
@@ -50,12 +55,26 @@ const MyTabs = ({ navigation,route }) => {
         onPress();
       }
     };
+    
+    const isAccessible = isTabAccessibleDuringWalkthrough(tabIndex);
   
     return (
-      <Pressable onPress={handlePress} style={styles.tabButton}>
-        {
-          focused ? <SupportIconSelected/> :<SupportIcon isNewBillerUser={!user?.isNormalUser}/>
-        }
+      <Pressable 
+        onPress={handlePress} 
+        style={[
+          styles.tabButton,
+          !isAccessible && { pointerEvents: 'none' }
+        ]}
+        accessible={isAccessible}
+        accessibilityElementsHidden={!isAccessible}
+        importantForAccessibility={isAccessible ? 'yes' : 'no-hide-descendants'}
+        accessibilityRole="tab"
+        accessibilityState={{ 
+          disabled: isDisabled || !isAccessible,
+          selected: focused 
+        }}
+      >
+        {focused ? <SupportIconSelected/> : <SupportIcon isNewBillerUser={!user?.isNormalUser}/>}
         {children}
       </Pressable>
     );
@@ -72,55 +91,100 @@ const MyTabs = ({ navigation,route }) => {
       } else if (home.walkThroughStep === 2) {
         setShadowStyle([styles.shadowTabs, styles.shadowTabsStep3]);
         setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left]);
-      }else if (home.walkThroughStep === 3) {
+      } else if (home.walkThroughStep === 3) {
         setShadowStyle([styles.shadowTabs, styles.shadowTabsStep4]);
         setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep4Left]);
       }
     }
   }, [home]);
 
+  const getTabBarIconWrapper = (IconComponent, focused, tabIndex) => {
+    const isAccessible = isTabAccessibleDuringWalkthrough(tabIndex);
+    return (
+      <View 
+        style={[
+          styles.tabItem,
+          // Add pointerEvents none to completely disable interaction when not accessible
+          !isAccessible && { pointerEvents: 'none' }
+        ]}
+        accessible={isAccessible}
+        accessibilityElementsHidden={!isAccessible}
+        importantForAccessibility={isAccessible ? 'yes' : 'no-hide-descendants'}
+        accessibilityRole="tab"
+        accessibilityState={{ 
+          selected: focused,
+          disabled: !isAccessible 
+        }}
+      >
+        <IconComponent focused={focused} />
+      </View>
+    );
+  };
+
   return (
     <>
-      {user?.isNormalUser && home.walkThroughStep !== null && home.walkThroughStep !== undefined &&
-        (
-          <>
-            <View style={shadowStyleLeft}></View>
-            <View style={shadowStyle}></View>
-          </>
-        )
-      }
+      {user?.isNormalUser && home.walkThroughStep !== null && home.walkThroughStep !== undefined && (
+        <>
+          <View style={shadowStyleLeft}></View>
+          <View style={shadowStyle}></View>
+        </>
+      )}
       <Tab.Navigator
         name='MyTab'
         initialRouteName="Home"
-        screenOptions={{
-          tabBarStyle: { paddingVertical: 5, position: 'absolute', height: (Platform.OS == 'ios') ? 90 : 60, display: tabBarVisible ? 'flex' : 'none', },
+        screenOptions={({ route }) => ({
+          tabBarStyle: { 
+            paddingVertical: 5, 
+            position: 'absolute', 
+            height: (Platform.OS == 'ios') ? 90 : 60, 
+            display: tabBarVisible ? 'flex' : 'none' 
+          },
           tabBarActiveTintColor: '#353091',
           tabBarInactiveTintColor: '#767676',
-          tabBarLabelStyle: { fontSize: 12, fontFamily: FontFamily.openSansRegular, fontWeight: '600' },
-        }}
+          tabBarLabelStyle: { 
+            fontSize: 12, 
+            fontFamily: FontFamily.openSansRegular, 
+            fontWeight: '600' 
+          },
+          tabBarButton: (props) => {
+            const tabIndex = ["Home", "BillingTab", "MyServices", "Support", "account"].indexOf(route.name);
+            const isAccessible = isTabAccessibleDuringWalkthrough(tabIndex);
+            
+            return (
+              <Pressable
+                {...props}
+                accessible={isAccessible}
+                accessibilityElementsHidden={!isAccessible}
+                importantForAccessibility={isAccessible ? 'yes' : 'no-hide-descendants'}
+                style={[
+                  props.style,
+                  !isAccessible && { pointerEvents: 'none' }
+                ]}
+              />
+            );
+          },
+        })}
       >
-        {/* Tab Screens */}
-        {/* Home Screen */}
         <Tab.Screen
           name="Home"
           component={HomeStackScreen}
-          initialParams={{ data: route ,isNormalUser: user?.isNormalUser }}
+          initialParams={{ data: route, isNormalUser: user?.isNormalUser }}
           options={{
             headerShown: false,
             swipeEnabled: false,
             tabBarLabel: 'Home',
-            tabBarIcon: ({ focused }) => (
-              <View style={styles.tabItem}>
-                {focused ? <HomeIconSelected /> : <HomeIcon />}
-              </View>
+            tabBarAccessibilityLabel: isTabAccessibleDuringWalkthrough(0) ? 'Home tab' : undefined,
+            tabBarIcon: ({ focused }) => getTabBarIconWrapper(
+              focused ? HomeIconSelected : HomeIcon,
+              focused,
+              0
             ),
           }}
         />
         
-        {/* Billing Screen */}
-         <Tab.Screen
+        <Tab.Screen
           name="BillingTab"
-          component={BillingStackScreen }
+          component={BillingStackScreen}
           listeners={({ navigation }) => ({
             tabPress: (e) => {
               if (!user?.isNormalUser) {
@@ -152,16 +216,15 @@ const MyTabs = ({ navigation,route }) => {
             headerShown: false,
             swipeEnabled: false,
             tabBarLabel: 'Billing',
-            tabBarIcon: ({ focused }) => (
-              <View style={styles.tabItem}>
-               <BillingIcon isSelected={focused} />
-              </View>
+            tabBarAccessibilityLabel: isTabAccessibleDuringWalkthrough(1) ? 'Billing tab' : undefined,
+            tabBarIcon: ({ focused }) => getTabBarIconWrapper(
+              BillingIcon,
+              focused,
+              1
             ),
           }}
         />
-        {/* Billing Screen */}
 
-        {/* Shop Screen */}
         <Tab.Screen
           name="MyServices"
           component={ShopStack}
@@ -177,41 +240,50 @@ const MyTabs = ({ navigation,route }) => {
             tabBarLabel: 'Service',
             headerShown: false,
             tabBarIcon: (props) => (
-              <CustomTabBarButton {...props} isDisabled={!user?.isNormalUser} focused={props.focused} onPress={()=>{
-                navigation.navigate('MyServices')
-              }} />
+              <CustomTabBarButton 
+                {...props} 
+                isDisabled={!user?.isNormalUser} 
+                focused={props.focused} 
+                tabIndex={2}
+                onPress={() => navigation.navigate('MyServices')} 
+              />
             ),
-          //}}
-            //tabBarIcon: ({ focused }) => ( <CustomTabBarButton {...props} isDisabled={true} />)
           }}
         />
-        {/* Support Screen */}
+
         <Tab.Screen
           name="Support"
           component={SupportStack}
           listeners={({ navigation }) => ({
             tabPress: (e) => {
               e.preventDefault();
-              //if (user?.isNormalUser) {
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: 'Support' }],
-                });
-              //}
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Support' }],
+              });
             },
           })}
           options={{
             headerShown: false,
             tabBarLabel: 'Support',
-            tabBarIcon: ({ focused }) => (<Image
-              style={{width:33,height:28}}
-              resizeMode='contain'
-              tintColor={focused?'#353091':'#767676'}
-              source={require("../../assets/phone-outgoing-03.png")}
-            /> )
+            tabBarIcon: ({ focused }) => (
+              <View 
+                style={styles.tabItem}
+                accessible={isTabAccessibleDuringWalkthrough(3)}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: focused }}
+              >
+                <Image
+                  style={{width:33, height:28}}
+                  resizeMode='contain'
+                  tintColor={focused ? '#353091' : '#767676'}
+                  source={require("../../assets/phone-outgoing-03.png")}
+                />
+              </View>
+            ),
           }}
         />
-        {/* Account Screen */}
+
         <Tab.Screen
           name="account"
           component={AccountStackScreen}
@@ -224,10 +296,10 @@ const MyTabs = ({ navigation,route }) => {
           options={{
             headerShown: false,
             tabBarLabel: 'Account',
-            tabBarIcon: ({ focused }) => (
-              <View style={styles.tabItem}>
-                <AccountIcon focused={focused} />
-              </View>
+            tabBarIcon: ({ focused }) => getTabBarIconWrapper(
+              AccountIcon,
+              focused,
+              4
             ),
           }}
         />
@@ -249,7 +321,8 @@ const styles = StyleSheet.create({
     zIndex: 5,
     opacity: .7,
     left: 80,
-  },tabButton: {
+  },
+  tabButton: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -271,7 +344,8 @@ const styles = StyleSheet.create({
   shadowTabsStep3Left: {
     width: tabWidth * 2.99,
     left: 0,
-  },shadowTabsStep4Left: {
+  },
+  shadowTabsStep4Left: {
     width: tabWidth * 4.1,
     left: 0,
   },

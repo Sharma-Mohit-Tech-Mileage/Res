@@ -1,5 +1,5 @@
-import React, { useEffect, useState,useRef } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, Linking, Modal, Platform,Animated,Easing } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { View, StyleSheet, Text, ActivityIndicator, Linking, Modal, Platform, Animated, Easing } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { saveUserInfo, logError, logInfo, } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import DeviceInfo from "react-native-device-info";
 import strings from "../../res/Strings";
@@ -27,10 +27,8 @@ const config = {
   iosPrefersEphemeralSession: true,
 };
 
-const SplashScreen = ({ navigation,route }) => {
-  const { isLogout} = route?.params?.isLogout ? route.params : { isLogout: false };
-
-  console.log("isLogout",isLogout);
+const SplashScreen = ({ navigation, route }) => {
+  const { isLogout } = route?.params?.isLogout ? route.params : { isLogout: false };
 
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
@@ -43,7 +41,7 @@ const SplashScreen = ({ navigation,route }) => {
   const backgroundFade = useRef(new Animated.Value(0)).current;
   const logoFade = useRef(new Animated.Value(0)).current;
   const logoMovement = useRef(new Animated.Value(350)).current;
-  const [isVisible,setIsVisible] =useState(false)
+  const [isVisible, setIsVisible] = useState(false)
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
 
@@ -80,74 +78,50 @@ const SplashScreen = ({ navigation,route }) => {
         refreshToken: res.refreshToken,
       };
 
-      let isNormalUser =
-        userInfo &&
-          userInfo.accountNumber &&
-          userInfo.accountNumber.toString().length === 9
-          ? true
-          : false;
+      let isNormalUser = userInfo && userInfo.accountNumber && userInfo.accountNumber.toString().length === 9 ? true : false;
       user['isNormalUser'] = isNormalUser;
       setIsBusiness(false);
-
       if (!isNormalUser) {
         if (res.userInfo.authLevel != "HeadOfHousehold") {
           setErrorMessage(strings.nonAdminUserMsg);
           setErrorMessage1(" to view information.");
-          setTimeout(() => {
-            setModalVisible(true);
-          }, 100);
+          setTimeout(() => { setModalVisible(true); }, 100);
         } else if (res.userInfo.customerType === "COM") {
           setIsBusiness(true);
           setErrorMessage(strings.BusinessUserMsg);
           setErrorMessage1(" to manage your Sparklight Business services account.");
-          setTimeout(() => {
-            setModalVisible(true);
-          }, 500);
+          setTimeout(() => { setModalVisible(true); }, 500);
         } else if (res.userInfo.acctStatus != "Normal") {
-          setTimeout(() => {
-            setDisconnected(true);
-          }, 500);
+          setTimeout(() => { setDisconnected(true); }, 500);
         } else {
           moveAfterLogin(user);
         }
       } else if (res.userInfo.acctStatus === "Disconnect") {
-        setTimeout(() => {
-          setDisconnected(true);
-        }, 500);
+        setTimeout(() => { setDisconnected(true); }, 500);
       } else if (
         (userInfo.authLevel !== "HeadOfHousehold" && userInfo.authLevel !== "Admin") ||
         userInfo.acctStatus !== "Active"
       ) {
         setErrorMessage(strings.nonAdminUserMsg);
         setErrorMessage1(" to view information.");
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
+        setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.customerType != "Residential") {
         setIsBusiness(true);
         setErrorMessage(strings.BusinessUserMsg);
         setErrorMessage1(" to manage your Sparklight Business services account");
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
+        setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
         setErrorMessage(strings.nonAdminUserMsg);
         setErrorMessage1(' to view information.');
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
+        setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.customerType === 'Business') {
         setErrorMessage(strings.BusinessUserMsg);
         setErrorMessage1(' to view information.');
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
+        setTimeout(() => { setModalVisible(true); }, 100);
       } else if (res.custServices.internet == false) {
         setErrorMessage(strings.nonInternetUserMessage);
         setErrorMessage1(" to manage your service.");
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 100);
+        setTimeout(() => { setModalVisible(true); }, 100);
       } else {
         moveAfterLogin(user);
       }
@@ -160,15 +134,9 @@ const SplashScreen = ({ navigation,route }) => {
     storeUser(user);
     dispatch(saveUserInfo(user));
     if (user.userInfo.mobileTCAcceptanceFlag) {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "MyTab" }],
-      });
+      navigation.reset({ index: 0, routes: [{ name: "MyTab" }], });
     } else {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Terms" }],
-      });
+      navigation.reset({ index: 0, routes: [{ name: "Terms" }], });
     }
   };
 
@@ -201,20 +169,20 @@ const SplashScreen = ({ navigation,route }) => {
         }
       });
   };
-  const onError = (error) => { 
-    setLoading(false); 
-    setDisconnected(true); 
-    dispatch( 
-      logError({ 
-        host: DeviceInfo.getSystemName(), 
-        application: "Sparklight Residential Mobile App", 
-        className: "AuthenticationService", 
-        methodName: "callSSOLoginApi", 
-        errorDate: new Date().toISOString().split("T")[0], 
-        message: error||"Error fetching data", 
-        errorCode: 30800, 
-      }) ); 
-    };
+  const onError = (error) => {
+    setLoading(false);
+    setDisconnected(true);
+    dispatch(
+      logError({
+        host: DeviceInfo.getSystemName(),
+        application: "Sparklight Residential Mobile App",
+        className: "AuthenticationService",
+        methodName: "callSSOLoginApi",
+        errorDate: new Date().toISOString().split("T")[0],
+        message: error || "Error fetching data",
+        errorCode: 30800,
+      }));
+  };
 
   const CustomAlertModal = ({
     visible,
@@ -251,13 +219,7 @@ const SplashScreen = ({ navigation,route }) => {
               splitKey={bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}
               instruction={`${message} ${bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}${message2}`}
             />
-            {/* <Text style={styles.message}>{message}{" "}
-              <Text style={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: 'underline', }]} onPress={onClose}>
-                {bussinessApp ? "download the MySparklight Business mobile app" : "login to your online account"}
-              </Text>
-              {message2}
-            </Text> */}
-            <PrimaryButtom onPress={closeModal} buttonType={"Cancel"} title={"Close"}/>
+            <PrimaryButtom onPress={closeModal} buttonType={"Cancel"} title={"Close"} />
           </View>
         </View>
       </Modal>
@@ -332,31 +294,31 @@ const SplashScreen = ({ navigation,route }) => {
         setLoginEnable(true);
       }
     };
- if(!isLogout){
-    fetchData();
- }else{
-  setLoginEnable(true);
- }
+    if (!isLogout) {
+      fetchData();
+    } else {
+      setLoginEnable(true);
+    }
 
     Animated.timing(backgroundFade, {
       toValue: 1,
       duration: 2000,
       useNativeDriver: true,
-   }).start();
-   Animated.timing(logoFade, {
+    }).start();
+    Animated.timing(logoFade, {
       toValue: 1,
       duration: 2000,
       useNativeDriver: true,
-   }).start();
-   setTimeout(() => {
+    }).start();
+    setTimeout(() => {
       Animated.timing(logoMovement, {
-            toValue:  0,
-            duration: 2000,
-            easing: Easing.inOut(Easing.exp),
-            useNativeDriver: true,
+        toValue: 0,
+        duration: 2000,
+        easing: Easing.inOut(Easing.exp),
+        useNativeDriver: true,
       }).start();
       setIsVisible(true)
-   }, 2250);
+    }, 2250);
 
   }, []);
 
@@ -385,29 +347,31 @@ const SplashScreen = ({ navigation,route }) => {
       style={styles.container}
     >
       <View style={styles.splashContainer}>
-        {loading ? <ActivityIndicator style={{marginTop:-100}}size="large" color={"white"} /> : <></>}
-       <Animated.View style={{ flex: 1,
-         alignItems: 'center',
-         justifyContent: 'center',
-         opacity: backgroundFade}}>
-        <Animated.Image
-          resizeMode="contain"
-          source={require("../../res/images/Logo.png")}
-          style={[styles.logo,{ opacity: logoFade,
-            transform: [{translateY: logoMovement}]
-          }]}
-          accessibilityRole="image"
-          accessibilityLabel="SparkLight"
-          accessible={true}
-        />
+        {loading ? <ActivityIndicator style={{ marginTop: -100 }} size="large" color={"white"} /> : <></>}
+        <Animated.View style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: backgroundFade
+        }}>
+          <Animated.Image
+            resizeMode="contain"
+            source={require("../../res/images/Logo.png")}
+            style={[styles.logo, {
+              opacity: logoFade,
+              transform: [{ translateY: logoMovement }]
+            }]}
+            accessibilityRole="image"
+            accessibilityLabel="SparkLight"
+            accessible={true}
+          />
         </Animated.View>
-       
+
       </View>
       {!loading && loginEnable && (
-        <Animated.View style={{marginTop: hp("35%"), opacity: fadeAnim }}>
+        <Animated.View style={{ marginTop: hp("35%"), opacity: fadeAnim }}>
           <SparkLightLoginButton
-          customStyle={styles.SSoBtnContainer}
-            //style={[styles.SSoBtnContainer, { marginTop: hp("35%") }]}
+            customStyle={styles.SSoBtnContainer}
             onPress={() => {
               loginAuth();
             }}
@@ -416,14 +380,7 @@ const SplashScreen = ({ navigation,route }) => {
           </SparkLightLoginButton>
         </Animated.View>
       )}
-      <Text
-        style={{
-          color: "white",
-          alignSelf: "center",
-          marginTop: 45,
-          fontSize: 16,
-        }}
-      >
+      <Text style={{ color: "white", alignSelf: "center", marginTop: 45, fontSize: 16, }} >
         {" "}
         {ISUAT ? "UAT" : ""} Version:{VersionCheck.getCurrentVersion()}
       </Text>

@@ -189,10 +189,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             if (name && !hasTrackedInitialScreen) {
                 console.log('Attempting to track screen with name:', name);
                 try {
-                    await analytics().logEvent('screen_view', {
+                    // await analytics().logEvent('screen_view', {
+                    //     screen_name: name,
+                    //     screen_class: 'ArticalWindowUtility'
+                    // });
+                    await analytics().logScreenView({
                         screen_name: name,
-                        screen_class: 'ArticalWindowUtility'
-                    });
+                        screen_class: name,
+                      });
                     console.log('Successfully tracked screen_view event:', {
                         screen_name: name,
                         screen_class: 'ArticalWindowUtility'
