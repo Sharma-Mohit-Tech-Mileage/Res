@@ -147,10 +147,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   shadowProp: {
-    shadowColor: "#171717",
-    shadowOffset: { width: -1, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
+    shadowColor: '#171717',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   pressableStyle: {
     flexDirection: "row",

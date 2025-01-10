@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "white",
-    borderRadius: 2,
     width: wp("92%"),
     marginTop: wp("8%"),
     paddingVertical: 20,
@@ -80,10 +79,11 @@ const styles = StyleSheet.create({
     marginBottom: "20%",
   },
   shadowProp: {
-    shadowColor: "#171717",
-    shadowOffset: { width: -1, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
+    shadowColor: '#171717',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   frameChild: {
     alignSelf: "center",

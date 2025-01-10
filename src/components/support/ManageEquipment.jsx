@@ -45,6 +45,7 @@ import PasswordShare from "../../res/svgIcons/PasswordShare";
 import Loader from "../utility/Loader";
 import { useSelector } from "react-redux";
 import RenderText from "../common/RenderText";
+import AppStyles from "../common/styles/AppStyles";
 
 const ManageEquipment = ({ route }) => {
   const navigation = useNavigation();
@@ -545,7 +546,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
       />
       <ScrollView automaticallyAdjustContentInsets={false}>
         <View style={styles.myModemParent}>
-          <View style={[styles.myModem, styles.myModemSpaceBlock]}>
+          <View style={[AppStyles.card, styles.myModemSpaceBlock]}>
             <View
               style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
             >
@@ -853,7 +854,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
           {(wifiPasswordCanChange || isEEroDevice) && (
             <View
               style={[
-                styles.myModem,
+                AppStyles.card,
                 styles.myModemSpaceBlock,
                 { marginTop: 20 },
               ]}
@@ -875,7 +876,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
           {!modemSupported && !loading && (
             <View
               style={[
-                styles.myModem,
+                AppStyles.card,
                 styles.myModemSpaceBlock,
                 { marginTop: 20 },
               ]}
@@ -898,7 +899,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
           {/* Quick Link section */}
           <View
             style={[
-              styles.myModem,
+              AppStyles.card,
               styles.myModemSpaceBlock,
               { marginVertical: 20 },
             ]}

@@ -19,7 +19,7 @@ import { Env } from '../network/apis/account/Constants';
 import { fetchProfileDetails } from '../redux/actions/ProfileActionSuite';
 import BillingIcon from "../res/svgIcons/BillingIcon";
 import BillingStackScreen from "./stackNavigation/BillingStack";
-import ArticalWindowUtility from "../components/utility/ArticalWindowUtility";
+import MyServicesStack from "./stackNavigation/MyServicesStack";
 
 const { width } = Dimensions.get('window');
 const tabWidth = Number(width / 5);
@@ -116,7 +116,7 @@ const MyTabs = ({ navigation, route }) => {
           disabled: !isAccessible 
         }}
       >
-        <IconComponent focused={focused} />
+        <IconComponent isSelected={focused} />
       </View>
     );
   };
@@ -227,7 +227,7 @@ const MyTabs = ({ navigation, route }) => {
 
         <Tab.Screen
           name="MyServices"
-          component={ShopStack}
+          component={MyServicesStack}
           listeners={({ navigation }) => ({
             tabPress: (e) => {
               e.preventDefault();

@@ -18,6 +18,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
 import { Env } from "../../network/apis/account/Constants";
+import AppStyles from "../common/styles/AppStyles";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -209,7 +210,7 @@ const AccountOverview = () => {
         <ScrollView style={{ flex: 1 }}>
           <View style={{ marginBottom: '30%' }}>
             <View style={styles.frameGroup}>
-              <View style={styles.navigationBorder}>
+              <View style={AppStyles.card}>
                 {/* Mapping through menu items */}
                 {menues.map((item, index) => (
                   item.includeInMenu && (<React.Fragment key={item.name}>

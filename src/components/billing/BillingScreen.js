@@ -32,6 +32,7 @@ import {
 import moment from "moment";
 import { Env } from "../../network/apis/account/Constants";
 import colors from "../../res/Colors";
+import AppStyles from "../common/styles/AppStyles";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -209,7 +210,7 @@ const BillingScreen = ({ navigation }) => {
 
             <View
               style={[
-                styles.myModem,
+                AppStyles.card,
                 styles.myModemSpaceBlock,
                 { marginTop: 10 },
               ]}
@@ -430,7 +431,7 @@ const styles = StyleSheet.create({
   },
   card: {
     height: 230, // Set the height for the cards
-    marginVertical: 10,
+    marginVertical: 15,
   },
   myModem: {
     borderWidth: 1,

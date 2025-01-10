@@ -41,7 +41,7 @@ import {
 import TicketListIcon from "../../res/svgIcons/TicketListIcon";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 import BillingSupportIcon from "../../res/svgIcons/BillingSupportIcon";
-import PrimaryButtom from "../common/customui/PrimaryButton";
+import AppStyles from "../common/styles/AppStyles";
 
 const Support = ({ route }) => {
   const navigation = useNavigation();
@@ -388,7 +388,7 @@ const Support = ({ route }) => {
             />
           }
         >
-          <View style={styles.issuesFlexBox}>
+          <View style={AppStyles.card}>
             <View
               style={[
                 styles.headingContainer,
@@ -464,7 +464,7 @@ const Support = ({ route }) => {
           {userData?.isNormalUser ? (
             <>
               <View
-                style={[styles.additionalSupport, styles.integrationCardBorder]}
+                style={[AppStyles.card]}
               >
                 <View
                   style={[

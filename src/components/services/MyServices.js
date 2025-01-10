@@ -42,6 +42,7 @@ import MyServicePlan from "../common/MyServicePlan";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import MyDataUsage from "../common/MyDataUsage";
+import AppStyles from "../common/styles/AppStyles";
 
 const MyServices = ({ route }) => {
   const navigation = useNavigation();
@@ -436,7 +437,7 @@ const MyServices = ({ route }) => {
           {userData?.isNormalUser && (
             <>
               <View
-                style={[styles.additionalSupport, styles.integrationCardBorder]}
+                style={[AppStyles.card]}
               >
                 <View
                   style={[

@@ -15,6 +15,7 @@ import { FontFamily, Padding } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
 import Wallet2icon from "../../../res/svgIcons/Wallet2icon";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
+import AppStyles from "../styles/AppStyles";
 const Card = ({
   billAmt,
   dueDate,
@@ -28,9 +29,9 @@ const Card = ({
   console.log('BillAmnt================',billAmt)
 
   return (
-    <View style={styles.shadowContainer}>
-      <View style={[styles.card, style]}>
-        <View style={styles.cardContent}>
+    
+      <View style={[AppStyles.card, style]}>
+        
           <View style={styles.cardHreader}>
             <View
               style={{
@@ -117,9 +118,8 @@ const Card = ({
               </View>
             </TouchableOpacity>
           </View>
-        </View>
       </View>
-    </View>
+    
   );
 };
 

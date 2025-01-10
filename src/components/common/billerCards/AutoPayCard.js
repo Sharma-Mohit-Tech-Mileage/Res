@@ -8,6 +8,7 @@ import { FontFamily, Padding ,Color} from "../../../../GlobalStyles";
 import { Env }  from "../../../network/apis/account/Constants";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
+import AppStyles from "../styles/AppStyles";
 const AutoPayCard = ({ cardDigit, isAutoPayStatus, paymentDetails,navigation ,style}) => {
   const [useNewPayment, setUseNewPayment] = useState(false);
   const getStatus = () => {
@@ -21,16 +22,7 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, paymentDetails,navigation ,st
   }, []);
 
   return (
-    <View style={styles.shadowContainer}>
-      <View style={[styles.card,style]}>
-        {/* <View style={styles.leftSection}>
-          <View style={styles.circleContainerShadow}></View>
-          <View style={styles.circleContainer}></View>
-          <View style={styles.icon}><DollerIconBg /></View>
-          <Text style={styles.leftTitle}>Auto Pay</Text>
-        </View> */}
-        <View style={styles.cardContent}>
-
+      <View style={[AppStyles.card, style]}>
         <View style={styles.cardHreader}>
             <View
               style={{
@@ -86,9 +78,9 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, paymentDetails,navigation ,st
               </View>
           </TouchableOpacity>
           </View>
-        </View>
+     
       </View>
-    </View>
+    
   );
 };
 
@@ -158,9 +150,11 @@ const styles = StyleSheet.create({
   autoPayStatusText: {
     fontSize: 14,
     fontWeight: "700",
+    marginVertical: 5,
     color: colors.sparklight_green,
     backgroundColor: Color.success50,
-    textAlign: 'center',
+    alignSelf: 'center',
+    width: wp("27%"),
     borderColor: colors.sparklight_green,
     borderWidth: 1,
     borderRadius: 5,
@@ -171,9 +165,11 @@ const styles = StyleSheet.create({
   autoPayStatusTextInActive: {
     fontSize: 14,
     fontWeight: "700",
+    marginVertical: 5,
     color: colors.dark_grey,
     backgroundColor: Color.sparklightGray,
-    textAlign: 'center',
+    alignSelf: 'center',
+    width: wp("27%"),
     borderColor: colors.dark_grey,
     borderWidth: 1,
     borderRadius: 5,

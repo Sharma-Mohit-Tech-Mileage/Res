@@ -6,19 +6,11 @@ import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
 import { CommonActions } from '@react-navigation/native';
+import AppStyles from "../styles/AppStyles";
 const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatus, navigation, style }) => {
 
   return (
-    <View style={styles.shadowContainer}>
-      <View style={[styles.card, style]}>
-        {/* <View style={styles.leftSection}>
-          <View style={styles.circleContainerShadow}></View>
-          <View style={styles.circleContainer}></View>
-          <View style={styles.icon}><PaperIconBg /></View>
-          <Text style={styles.leftTitle}>Paperless Billing</Text>
-        </View> */}
-        <View style={styles.cardContent}>
-
+      <View style={[AppStyles.card, style]}>
         <View style={styles.cardHreader}>
             <View
               style={{
@@ -44,7 +36,7 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
           ) : (
             <>
               <Text style={styles.autoPayStatusTextInActive}>Paperless Billing Off</Text>
-              <View style={styles.headerContainer}>
+              <View style={[styles.headerContainer,{alignItems:'center',justifyContent:'center'}]}>
                 <View style={{flexDirection:'column'}}>
                 <Text style={[styles.dueDate]}>Turn on Paperless Billing today! </Text>
                 <Text style={styles.subText}>Statements delivered via email.</Text>
@@ -75,9 +67,8 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
               </View>
             </TouchableOpacity>
           </View>
-        </View>
       </View>
-    </View>
+   
   );
 };
 
@@ -176,7 +167,8 @@ const styles = StyleSheet.create({
   subText: {
     fontSize: 14,
     color: colors.gray600,
-    textAlign: 'center',
+    alignSelf: 'center',
+    
     fontFamily: FontFamily.openSansRegular,
     fontWeight: "400",
   },
@@ -185,7 +177,8 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.sparklight_green,
     backgroundColor: Color.success50,
-    textAlign: 'center',
+    alignSelf: 'center',
+    width: wp("40%"),
     borderColor: colors.sparklight_green,
     borderWidth: 1,
     borderRadius: 5,
@@ -199,9 +192,10 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.dark_grey,
     backgroundColor: Color.sparklightGray,
-    textAlign: 'center',
+    alignSelf: 'center',
     borderColor: colors.dark_grey,
     borderWidth: 1,
+    width: wp("40%"),
     borderRadius: 5,
     padding: 5,
     marginHorizontal:20,
