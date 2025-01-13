@@ -7,6 +7,11 @@ import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility"
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import SupportScreen from "../../components/support/supportScreen";
 import MyServices from "../../components/services/MyServices";
+import ModemStackScreen from "./ManageEquepmentStack";
+import ModemConnectivityGuide from '../../components/support/Troubleshooting/ModemConnectivityGuide';
+import ShareWifiScreen from "../../components/support/ShareWifiScreen";
+
+import TroubleShootStack from "./TroubleShootStack";  
 const ServiceStack = createNativeStackNavigator();
 
 function MyServicesStack({route}) {
@@ -15,7 +20,7 @@ function MyServicesStack({route}) {
   return (
     <ServiceStack.Navigator defaultNavigationOptions={{ gestureEnabled: true }}>
         <ServiceStack.Screen
-        name="MySerives"
+        name="MyService"
         component={MyServices}
         initialParams={route.params}
         options={{ headerShown: false }}
@@ -25,10 +30,12 @@ function MyServicesStack({route}) {
         }}
       />
       <ServiceStack.Screen
-        name="support"
-        component={SupportScreen}
-        initialParams={route.params}
-        options={{ headerShown: false }}
+        name="ArticalWindowUtility"
+        component={ArticalWindowUtility}
+        options={{
+          headerBackVisible: false,
+          headerShown: false,
+        }}
         listeners={{
           focus: () => setTabBarVisible(true),
           blur: () => setTabBarVisible(true),
@@ -45,18 +52,47 @@ function MyServicesStack({route}) {
         }}
       />
       
-      <ServiceStack.Screen
-        name="ArticleWindowUtility"
-        component={ArticalWindowUtility}
-        options={{
-          headerBackVisible: false,
-          headerShown: false,
-        }}
+      
+
+<ServiceStack.Screen
+        name="ManageEquipment"
+        component={ModemStackScreen}
+        options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),
           blur: () => setTabBarVisible(true),
         }}
       />
+      
+      <ServiceStack.Screen
+        name="DiagnosticFlow"
+        component={TroubleShootStack}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+      <ServiceStack.Screen
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+        name="ModemConnectivityGuide"
+        component={ModemConnectivityGuide}
+      />
+
+      <ServiceStack.Screen
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+        name="ShareWifiScreen"
+        component={ShareWifiScreen}
+      />
+
 
     </ServiceStack.Navigator>
   );

@@ -6,11 +6,9 @@ import supportScreen from "../../components/support/supportScreen";
 import Search from "../../components/support/Search";
 import TicketStackScreen from "./TicketStack";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
-import TroubleShootStack from "./TroubleShootStack";  
+
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
-import ModemStackScreen from "./ManageEquepmentStack";
-import ModemConnectivityGuide from '../../components/support/Troubleshooting/ModemConnectivityGuide';
-import ShareWifiScreen from "../../components/support/ShareWifiScreen";
+
 const SupportStack = createNativeStackNavigator();
 
 function SupportStackScreen({route}) {
@@ -46,15 +44,7 @@ function SupportStackScreen({route}) {
           blur: () => setTabBarVisible(true),
         }}
       />
-      <SupportStack.Screen
-        name="ManageEquipment"
-        component={ModemStackScreen}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
+     
       
       <SupportStack.Screen
         name="ArticalWindowUtility"
@@ -68,35 +58,7 @@ function SupportStackScreen({route}) {
           blur: () => setTabBarVisible(true),
         }}
       />
-      
-      <SupportStack.Screen
-        name="DiagnosticFlow"
-        component={TroubleShootStack}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
-      <SupportStack.Screen
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-        name="ModemConnectivityGuide"
-        component={ModemConnectivityGuide}
-      />
 
-      <SupportStack.Screen
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-        name="ShareWifiScreen"
-        component={ShareWifiScreen}
-      />
     </SupportStack.Navigator>
   );
 }

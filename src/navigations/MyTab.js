@@ -116,7 +116,7 @@ const MyTabs = ({ navigation, route }) => {
           disabled: !isAccessible 
         }}
       >
-        <IconComponent isSelected={focused} />
+        <IconComponent focused={focused} />
       </View>
     );
   };

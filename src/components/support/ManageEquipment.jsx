@@ -541,7 +541,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
       <ProfileSettingsHeader
         title="Manage Equipment "
         onPressBack={() => {
-          navigation.navigate("MyServices");
+          navigation.navigate("MyService");
         }}
       />
       <ScrollView automaticallyAdjustContentInsets={false}>

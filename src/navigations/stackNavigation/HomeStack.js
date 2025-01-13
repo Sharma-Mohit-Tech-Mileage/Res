@@ -9,7 +9,6 @@ import ModemSpeedTest from "../../components/common/speedTest/ModemSpeedTest";
 import AutoPayPCIConnector from '../../components/utility/AutoPayPCIConnector'
 import { useRoute } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native";
-import MyServices from "../../components/services/MyServices";
 
 const HomeStack = createNativeStackNavigator();
 
