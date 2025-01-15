@@ -322,7 +322,7 @@ const SupportTicket = () => {
             </Text>
           </View>
           {ticketList.length > 0 ? (
-            <View style={{ paddingBottom: hp('50%'), flexDirection:'column' }}>
+            <View style={{ paddingBottom: hp('30%'), flexDirection:'column' }}>
               <FlatList
                 data={ticketList}
                 keyExtractor={(item, index) => index.toString()}

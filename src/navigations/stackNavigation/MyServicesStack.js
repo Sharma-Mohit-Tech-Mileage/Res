@@ -18,7 +18,7 @@ function MyServicesStack({route}) {
   console.log('Support',JSON.stringify(route))
   const { setTabBarVisible } = useTabBarVisibility();
   return (
-    <ServiceStack.Navigator defaultNavigationOptions={{ gestureEnabled: true }}>
+    <ServiceStack.Navigator initialRouteName={(route.params?.isManagementEquipment)?"ManageEquipment":"MyService"}  defaultNavigationOptions={{ gestureEnabled: true }}>
         <ServiceStack.Screen
         name="MyService"
         component={MyServices}

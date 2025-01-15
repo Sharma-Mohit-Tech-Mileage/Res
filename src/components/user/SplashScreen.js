@@ -16,8 +16,8 @@ import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
-import PrimaryButtom from "../common/customui/PrimaryButton";
 import RenderText from "../common/RenderText";
+import SecondaryButton from "../common/customui/SecondaryButton";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -43,6 +43,7 @@ const SplashScreen = ({ navigation, route }) => {
   const logoMovement = useRef(new Animated.Value(350)).current;
   const [isVisible, setIsVisible] = useState(false)
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  
 
 
 
@@ -219,7 +220,9 @@ const SplashScreen = ({ navigation, route }) => {
               splitKey={bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}
               instruction={`${message} ${bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}${message2}`}
             />
-            <PrimaryButtom onPress={closeModal} buttonType={"Cancel"} title={"Close"} />
+            <View style={{marginTop:20}}>
+            <SecondaryButton onPress={closeModal} buttonType={"Cancel"} text={"  Close  "} />
+            </View>
           </View>
         </View>
       </Modal>
@@ -304,21 +307,26 @@ const SplashScreen = ({ navigation, route }) => {
       toValue: 1,
       duration: 2000,
       useNativeDriver: true,
-    }).start();
-    Animated.timing(logoFade, {
+   }).start();
+   Animated.timing(logoFade, {
       toValue: 1,
       duration: 2000,
       useNativeDriver: true,
-    }).start();
-    setTimeout(() => {
+   }).start();
+   setTimeout(() => {
       Animated.timing(logoMovement, {
-        toValue: 0,
-        duration: 2000,
-        easing: Easing.inOut(Easing.exp),
-        useNativeDriver: true,
-      }).start();
-      setIsVisible(true)
-    }, 2250);
+            toValue:  0,
+            duration: 2000,
+            easing: Easing.inOut(Easing.exp),
+            useNativeDriver: true,
+      }).start(({finished}) => {
+        /* completion callback */
+        if(finished){
+          setIsVisible(true)
+        }
+      });
+      
+   }, 1500);
 
   }, []);
 
@@ -347,7 +355,7 @@ const SplashScreen = ({ navigation, route }) => {
       style={styles.container}
     >
       <View style={styles.splashContainer}>
-        {loading ? <ActivityIndicator style={{ marginTop: -100 }} size="large" color={"white"} /> : <></>}
+       
         <Animated.View style={{
           flex: 1,
           alignItems: 'center',
@@ -368,7 +376,9 @@ const SplashScreen = ({ navigation, route }) => {
         </Animated.View>
 
       </View>
-      {!loading && loginEnable && (
+
+      {loading ? <ActivityIndicator style={{ flexDirection:'column', justifyContent:'center', position:'absolute', top:hp('45%'),right:wp('50%') }} size="large" color={"white"} /> : <></>}
+      {!loading && isVisible && (
         <Animated.View style={{ marginTop: hp("35%"), opacity: fadeAnim }}>
           <SparkLightLoginButton
             customStyle={styles.SSoBtnContainer}
@@ -380,10 +390,12 @@ const SplashScreen = ({ navigation, route }) => {
           </SparkLightLoginButton>
         </Animated.View>
       )}
+      {isVisible && (
       <Text style={{ color: "white", alignSelf: "center", marginTop: 45, fontSize: 16, }} >
         {" "}
         {ISUAT ? "UAT" : ""} Version:{VersionCheck.getCurrentVersion()}
       </Text>
+      )}
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}

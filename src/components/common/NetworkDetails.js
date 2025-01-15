@@ -8,8 +8,7 @@ import strings from "../../res/Strings";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
-import { Env } from "../../network/apis/account/Constants";
-import PubSub from "pubsub-js";
+
 import { CommonActions } from '@react-navigation/native';
 const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
 
@@ -63,7 +62,7 @@ const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
             if (currentHealth != 'Optimal') {
               navigation.reset({
                 index: 0,
-                routes: [{ name: 'Support', params: { isManagementEquipment: true }, }],
+                routes: [{ name: 'MyServices', params: { isManagementEquipment: true }, }],
               });
             }
             // navigation.navigate('Support',{isManagementEquipment:true});

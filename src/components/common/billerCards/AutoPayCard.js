@@ -40,7 +40,7 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, paymentDetails,navigation ,st
           </View>
           {isAutoPayStatus ? (
             <>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View style={{ flexDirection: "row", alignSelf: "center" }}>
               <Text style={[styles.dueDate, { fontWeight: '400' , color: colors.gray600 }]}>Account ending in  </Text>
               <Text style={[styles.dueDate]}>{cardDigit}</Text>
               </View>
@@ -205,15 +205,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#F8F8F8",
     width:wp("92%"),
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
     padding: 10,
   },cardFooter: {
     flexDirection: "row",
     backgroundColor: "#F8F8F8",
     width:wp("100%"),
-    borderBottomEndRadius: 10,
-    borderBottomStartRadius: 10,
     padding: 10,
     position: "absolute",
     bottom: 0,

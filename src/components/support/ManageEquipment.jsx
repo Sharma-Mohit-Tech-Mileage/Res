@@ -121,6 +121,8 @@ To add a Sparklight Modem to your account, please contact our support team`);
     GetApiRequest(
       requestUrl,
       (response) => {
+        console.log("checkDeviceSupport", response);
+        
         const { erosSupported, modemSupported } = response;
         setIsEEroDevice(erosSupported);
         setModemSupported(modemSupported);

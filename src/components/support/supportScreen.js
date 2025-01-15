@@ -538,7 +538,7 @@ const Support = ({ route }) => {
                     style={[
                       styles.integrationCardMobile1,
                       styles.integrationCardBorder,
-                      { borderTopLeftRadius: 10, borderTopRightRadius: 10 },
+                      
                     ]}
                   >
                     <View
@@ -651,8 +651,7 @@ const Support = ({ route }) => {
                             width: "100%",
                             paddingHorizontal: wp("5%"),
                             paddingVertical: 10,
-                            borderBottomLeftRadius: 10,
-                            borderBottomRightRadius: 10,
+                           
                           },
                         ]}
                       >
@@ -699,7 +698,7 @@ const Support = ({ route }) => {
                     style={[
                       styles.integrationCardMobile1,
                       styles.integrationCardBorder,
-                      { borderTopLeftRadius: 10, borderTopRightRadius: 10 },
+                     
                     ]}
                   >
                     <View
@@ -1217,8 +1216,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#F8F8F8",
     width: wp("92%"),
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
     padding: 10,
   },
   cardFooter: {

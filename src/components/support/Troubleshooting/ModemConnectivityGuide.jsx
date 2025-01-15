@@ -52,6 +52,7 @@ const ModemConnectivityGuide = ({ route }) => {
                         <Text style={styles.heading}>Is your modem connected to an outlet?</Text>
                         <View style={{ backgroundColor: "#F4F4F5", height: 1, marginVertical: 20 }} />
                         {instructions2.map(renderInstruction)}
+                        
                     </View>
                 </View>
             </ScrollView>
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
         borderRadius: 2,
         width: wp("92%"),
         marginTop: wp("8%"),
-        padding: 20,
+       paddingBottom:20
     },
     shadowProp: {
     shadowColor: '#171717',
@@ -98,6 +99,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'flex-start',
         marginBottom: 10,
+        paddingHorizontal: 20,
+       
     },
     bulletPoint: {
         width: 6,

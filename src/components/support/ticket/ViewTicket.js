@@ -177,6 +177,9 @@ const ViewTicket = ({ route }) => {
       (res) => {
         console.log("Add Note", res);
         getTicketCommnets(ticketNo);
+        setMyCommnet("");
+        setFileResponse([]);
+        scrollViewRef.current?.scrollToEnd({ animated: true });
       },
       (error) => {
         console.log("add note error", error);

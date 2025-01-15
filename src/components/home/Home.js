@@ -840,7 +840,7 @@ const HomeScreen = ({ navigation }) => {
               flex: 2,
               alignItems: "center",
               marginTop: 50,
-              paddingBottom: 50,
+              paddingBottom: 150,
             }}
           >
             {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert /> : null}

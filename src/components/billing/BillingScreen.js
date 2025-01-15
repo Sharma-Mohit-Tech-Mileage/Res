@@ -173,7 +173,7 @@ const BillingScreen = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
           style={{ marginHorizontal: 20 }}
         >
-          <View style={{ paddingBottom: 100 }}>
+          <View style={{ paddingBottom: 100,marginTop:Padding.p_base }}>
             <Card
               billAmt={billAmt}
               dueDate={dueDate}
@@ -212,7 +212,7 @@ const BillingScreen = ({ navigation }) => {
               style={[
                 AppStyles.card,
                 styles.myModemSpaceBlock,
-                { marginTop: 10 },
+               
               ]}
             >
               <View
@@ -431,7 +431,6 @@ const styles = StyleSheet.create({
   },
   card: {
     height: 230, // Set the height for the cards
-    marginVertical: 15,
   },
   myModem: {
     borderWidth: 1,
