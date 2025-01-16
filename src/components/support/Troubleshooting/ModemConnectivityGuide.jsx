@@ -34,7 +34,7 @@ const ModemConnectivityGuide = ({ route }) => {
                     if (route.params?.isSuccess) {
                         navigation.goBack()
                     } else {
-                        navigation.navigate('SupportStack')
+                        navigation.navigate('Support')
                     }
                 }
                 }

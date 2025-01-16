@@ -1,4 +1,4 @@
-// SupportStack.js
+// Support.js
 
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -9,10 +9,10 @@ import ModemExchangeInstructions from "../../components/support/ModemExchangeIns
 import UpdateModemPassword from "../../components/support/UpdateModemPassword";
 import EEroFeatures from "../../components/support/EEroFeatures";
 import RetrieveModemPassword from "../../components/support/RetrieveModemPassword";
-import SupportStackScreen from "./SupportStack";
 import ModemConnectivityGuide from "../../components/support/Troubleshooting/ModemConnectivityGuide";
 import PeriodicProblems from "../../components/support/Troubleshooting/PeriodicProblems";
 import ModemSpeedTest from "../../components/common/speedTest/ModemSpeedTest";
+import SupportStack from "../../components/support/supportScreen";
 const ModemStack = createNativeStackNavigator();
 
 function ModemStackScreen({route}) {
@@ -81,7 +81,7 @@ function ModemStackScreen({route}) {
       
       <ModemStack.Screen
         name="SupportStack"
-        component={SupportStackScreen}
+        component={SupportStack}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),

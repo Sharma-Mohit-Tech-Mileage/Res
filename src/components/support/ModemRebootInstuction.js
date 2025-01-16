@@ -136,7 +136,7 @@ During the reboot, your internet service will be temporarily unavailable, and th
               instruction={inst3}
               style={[styles.text, { width: wp('75%') }]}
               onTextPress={() => {
-                navigation.navigate("SupportStack", {
+                navigation.navigate("Support", {
                   isContactUs: true,
                 });
               }}
@@ -161,7 +161,7 @@ const TextWithLinkVoiceOverEnabled = ({ instruction }) => {
     <Text
       style={[styles.text, { width: wp('75%') }]}
       accessibilityLabel="If neither option fixes your issue, please don't hesitate to contact us Link for further assistance."
-      onPress={() => navigation.navigate("SupportStack", { isContactUs: true })}
+      onPress={() => navigation.navigate("Support", { isContactUs: true })}
     >
       {instruction.split("contact us")[0]}
       <Text
@@ -192,7 +192,7 @@ const TextWithLinkVoiceOverDisabled = ({ instruction }) => {
             hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
             style={styles.linkText}
             onPress={() => {
-              navigation.navigate("SupportStack", {
+              navigation.navigate("Support", {
                 isContactUs: true,
               });
             }}

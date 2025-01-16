@@ -20,7 +20,7 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
       const accountNumber = res.userInfo.accountNumber;
       setAccountNumber(accountNumber)
       GetApiRequest(
-        `accountsvc/api/accounts/${accountNumber}/easypay`,
+        `api/accounts/${accountNumber}/easypay`,
         (res) => {
           console.log('Get Status resonse********************************************************************************************************************************',res)
           setIsAutoPayStatus(res?.isEasyPay);

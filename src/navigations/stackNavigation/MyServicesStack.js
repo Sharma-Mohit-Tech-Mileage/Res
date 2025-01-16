@@ -12,6 +12,7 @@ import ModemConnectivityGuide from '../../components/support/Troubleshooting/Mod
 import ShareWifiScreen from "../../components/support/ShareWifiScreen";
 
 import TroubleShootStack from "./TroubleShootStack";  
+import ModemSpeedTest from "../../components/common/speedTest/ModemSpeedTest";
 const ServiceStack = createNativeStackNavigator();
 
 function MyServicesStack({route}) {
@@ -92,7 +93,15 @@ function MyServicesStack({route}) {
         name="ShareWifiScreen"
         component={ShareWifiScreen}
       />
-
+      <ServiceStack.Screen
+        name="ModemSpeedTest"
+        component={ModemSpeedTest}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
 
     </ServiceStack.Navigator>
   );

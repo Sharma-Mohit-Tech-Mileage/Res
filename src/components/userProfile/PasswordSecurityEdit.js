@@ -92,8 +92,8 @@ const PasswordSecurityEdit = () => {
   };
 
 
-  const getSecurityQuestions = () => {
-    const request = 'userssvc/api/securityquestions/';
+  const getSecurityQuestions=()=>{
+    const request = 'api/securityquestions/';
     GetApiRequest(
       request,
       (res) => {

@@ -50,7 +50,7 @@ const ModemExchangeInstructions = () => {
                 instruction={instruction}
                 style={[styles.text, { width: wp('75%') }]}
                 onTextPress={() => {
-                  navigation.navigate("SupportStack", {
+                  navigation.navigate("Support", {
                     isContactUs: true,
                   });
                 }}

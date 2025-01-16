@@ -1,18 +1,36 @@
 import React, { useState, useCallback, useRef } from "react";
-import { Image, StyleSheet, TextInput, Text, View, ScrollView, Pressable, AccessibilityInfo } from "react-native";
-import { Padding, FontFamily, FontSize, Color, Border } from "../../../../GlobalStyles";
+import {
+  Image,
+  StyleSheet,
+  TextInput,
+  Text,
+  View,
+  ScrollView,
+  Pressable,
+  AccessibilityInfo,
+} from "react-native";
+import {
+  Padding,
+  FontFamily,
+  FontSize,
+  Color,
+  Border,
+} from "../../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import SparkLightDropdown from "../../../components/common/customui/SparkLightDropdown";
 import PrimaryButtom from "../../common/customui/PrimaryButton";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 import colors from "../../../res/Colors";
 import { useNavigation } from "@react-navigation/native";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import { userTicketSchema } from "../../utility/validationSchema";
 import WarningIcon from "../../../../assets/alert-triangle.png";
-import { UploadMultipartData, PostApiRequest } from "../../../network/APIClient";
+import {
+  UploadMultipartData,
+  PostApiRequest,
+} from "../../../network/APIClient";
 import { getUser, storeValue } from "../../../redux/utils/LocalStorage";
 import DocumentPicker, { types } from "react-native-document-picker";
 import AttachmentIcon from "../../../res/svgIcons/AttachmentIcon";
@@ -36,22 +54,26 @@ const CreateTicket = () => {
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   const [dropdownFocused, setDropdownFocused] = useState(false);
 
-  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profile = useSelector((state) => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
   const categories = ["Bill", "Support"];
 
   const defaultData = {
     subject: "",
     comment: "",
-    email: profileDetails.multipleEmails ? '' : profileDetails.svEmailAddress,
+    email: profileDetails.multipleEmails ? "" : profileDetails.svEmailAddress,
     accountNumber: "",
     category: "",
     uploads: [],
-    PhoneNumber: '',
-    IsMobile: true
+    PhoneNumber: "",
+    IsMobile: true,
   };
 
-  const { control, handleSubmit, formState: { errors } } = useForm({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     resolver: yupResolver(userTicketSchema()),
     defaultValues: defaultData,
   });
@@ -59,8 +81,8 @@ const CreateTicket = () => {
   const handleDropdownStateChange = (isOpen) => {
     setIsDropDownOpen(isOpen);
     setDropdownFocused(isOpen);
-    announceForAccessibility(isOpen ?
-      "Category dropdown opened" : "Category dropdown closed"
+    announceForAccessibility(
+      isOpen ? "Category dropdown opened" : "Category dropdown closed"
     );
   };
 
@@ -83,10 +105,15 @@ const CreateTicket = () => {
     getUser().then((res) => {
       formData.accountNumber = res.userInfo.accountNumber;
       PostApiRequest(
-        'support/api/Tickets',
+        "support/api/Tickets",
         formData,
         (res) => {
-          const data = { ...formData, ticketNumber: res, status: 'Pending', isLocal: true };
+          const data = {
+            ...formData,
+            ticketNumber: res,
+            status: "Pending",
+            isLocal: true,
+          };
           storeValue(data);
           setTimeout(() => {
             setLoading(false);
@@ -106,7 +133,7 @@ const CreateTicket = () => {
     setLoading(true);
 
     UploadMultipartData(
-      'support/api/Attachments',
+      "support/api/Attachments",
       data,
       (res) => {
         if (res) {
@@ -151,7 +178,9 @@ const CreateTicket = () => {
           accessibilityRole="button"
           accessible={!dropdownFocused}
           accessibilityElementsHidden={dropdownFocused}
-          importantForAccessibility={dropdownFocused ? 'no-hide-descendants' : 'yes'}
+          importantForAccessibility={
+            dropdownFocused ? "no-hide-descendants" : "yes"
+          }
         />
 
         <ScrollView>
@@ -171,15 +200,6 @@ const CreateTicket = () => {
 
                   {/* Subject Input */}
                   <View style={styles.frameWrapper}>
-                    <View style={styles.textView}>
-                      <Text
-                        style={[styles.text, { paddingBottom: 8 }]}
-                        accessible={!dropdownFocused}
-                        accessibilityElementsHidden={dropdownFocused}
-                      >
-                        Subject
-                      </Text>
-                    </View>
                     <Controller
                       control={control}
                       name="subject"
@@ -187,31 +207,42 @@ const CreateTicket = () => {
                         field: { onChange, onBlur, value },
                         fieldState: { error },
                       }) => (
-                        <SparkLightInput
-                          onBlur={onBlur}
-                          placeholder="Subject"
-                          onChangeText={onChange}
-                          value={value}
-                          error={error?.message}
-                          accessibilityLabel="Subject input"
-                          accessible={!dropdownFocused}
-                          accessibilityElementsHidden={dropdownFocused}
-                        />
+                        <>
+                          <View style={styles.textView}>
+                            <Text
+                              style={[
+                                styles.text,
+                                {
+                                  color: error?.message
+                                    ? "red"
+                                    : Color.sparklightGray1,
+                                  paddingBottom: 8,
+                                },
+                              ]}
+                              accessible={!dropdownFocused}
+                              accessibilityElementsHidden={dropdownFocused}
+                            >
+                              Subject
+                            </Text>
+                          </View>
+
+                          <SparkLightInput
+                            onBlur={onBlur}
+                            placeholder="Subject"
+                            onChangeText={onChange}
+                            value={value}
+                            error={error?.message}
+                            accessibilityLabel="Subject input"
+                            accessible={!dropdownFocused}
+                            accessibilityElementsHidden={dropdownFocused}
+                          />
+                        </>
                       )}
                     />
                   </View>
 
                   {/* Category Dropdown */}
                   <View style={styles.frameWrapper}>
-                    <View style={styles.textView}>
-                      <Text
-                        style={styles.text}
-                        accessible={!dropdownFocused}
-                        accessibilityElementsHidden={dropdownFocused}
-                      >
-                        Category
-                      </Text>
-                    </View>
                     <Controller
                       control={control}
                       name="category"
@@ -220,10 +251,28 @@ const CreateTicket = () => {
                         fieldState: { error },
                       }) => (
                         <>
+                          <View style={styles.textView}>
+                            <Text
+                              style={[
+                                styles.text,
+                                {
+                                  color: error?.message
+                                    ? "red"
+                                    : Color.sparklightGray1,
+                                },
+                              ]}
+                              accessible={!dropdownFocused}
+                              accessibilityElementsHidden={dropdownFocused}
+                            >
+                              Category
+                            </Text>
+                          </View>
                           <SparkLightDropdown
                             items={categories}
                             selectedValue={selectedItem}
-                            onValueChange={(value) => handleCategoryChange(value, onChange)}
+                            onValueChange={(value) =>
+                              handleCategoryChange(value, onChange)
+                            }
                             isDropDownOpen={handleDropdownStateChange}
                             accessibilityLabel="Select ticket category"
                             accessibilityHint="Double tap to open category dropdown"
@@ -238,8 +287,13 @@ const CreateTicket = () => {
                               accessible={!dropdownFocused}
                               accessibilityElementsHidden={dropdownFocused}
                             >
-                              <Image source={WarningIcon} style={styles.errorIcon} />
-                              <Text style={styles.errorText}>{error?.message}</Text>
+                              <Image
+                                source={WarningIcon}
+                                style={styles.errorIcon}
+                              />
+                              <Text style={styles.errorText}>
+                                {error?.message}
+                              </Text>
                             </View>
                           )}
                         </>
@@ -249,15 +303,6 @@ const CreateTicket = () => {
 
                   {/* Issue Description */}
                   <View style={styles.frameWrapper}>
-                    <View style={styles.textView}>
-                      <Text
-                        style={styles.text}
-                        accessible={!dropdownFocused}
-                        accessibilityElementsHidden={dropdownFocused}
-                      >
-                        Issue Description
-                      </Text>
-                    </View>
                     <Controller
                       control={control}
                       name="comment"
@@ -265,43 +310,58 @@ const CreateTicket = () => {
                         field: { onChange, onBlur, value },
                         fieldState: { error },
                       }) => (
-                        <View style={{ marginTop: 10 }}>
-                          <TextInput
-                            placeholder="Issue Description"
-                            onChangeText={onChange}
-                            multiline
-                            numberOfLines={5}
-                            style={[styles.textArea, styles.frameBorder]}
-                            accessible={!dropdownFocused}
-                            accessibilityElementsHidden={dropdownFocused}
-                            accessibilityLabel="Issue description input"
-                          />
-                          {error && (
-                            <View
-                              style={styles.errorContainer}
+                        <>
+                          <View style={styles.textView}>
+                            <Text
+                              style={[
+                                styles.text,
+                                {
+                                  color: error?.message
+                                    ? "red"
+                                    : Color.sparklightGray1,
+                                },
+                              ]}
                               accessible={!dropdownFocused}
                               accessibilityElementsHidden={dropdownFocused}
                             >
-                              <Image source={WarningIcon} style={styles.errorIcon} />
-                              <Text style={styles.errorText}>{error.message}</Text>
-                            </View>
-                          )}
-                        </View>
+                              Issue Description
+                            </Text>
+                          </View>
+                          <View style={{ marginTop: 10 }}>
+                            <TextInput
+                              placeholder="Issue Description"
+                              onChangeText={onChange}
+                              multiline
+                              numberOfLines={5}
+                              style={[styles.textArea, styles.frameBorder]}
+                              accessible={!dropdownFocused}
+                              accessibilityElementsHidden={dropdownFocused}
+                              accessibilityLabel="Issue description input"
+                              error={error?.message}
+                            />
+                            {error && (
+                              <View
+                                style={styles.errorContainer}
+                                accessible={!dropdownFocused}
+                                accessibilityElementsHidden={dropdownFocused}
+                              >
+                                <Image
+                                  source={WarningIcon}
+                                  style={styles.errorIcon}
+                                />
+                                <Text style={styles.errorText}>
+                                  {error.message}
+                                </Text>
+                              </View>
+                            )}
+                          </View>
+                        </>
                       )}
                     />
                   </View>
 
                   {/* Email Input */}
                   <View style={styles.frameWrapper}>
-                    <View style={styles.textView}>
-                      <Text
-                        style={[styles.text, { paddingBottom: 8 }]}
-                        accessible={!dropdownFocused}
-                        accessibilityElementsHidden={dropdownFocused}
-                      >
-                        Email
-                      </Text>
-                    </View>
                     <Controller
                       control={control}
                       name="email"
@@ -309,16 +369,29 @@ const CreateTicket = () => {
                         field: { onChange, onBlur, value },
                         fieldState: { error },
                       }) => (
-                        <SparkLightInput
-                          placeholder="Email Address"
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value ? value.toLowerCase() : ""}
-                          error={error?.message}
-                          accessibilityLabel="Email input"
-                          accessible={!dropdownFocused}
-                          accessibilityElementsHidden={dropdownFocused}
-                        />
+                        <>
+                          <View style={styles.textView}>
+                            <Text
+                              style={[styles.text, {color: error?.message
+                                ? "red"
+                                : Color.sparklightGray1, paddingBottom: 8 }]}
+                              accessible={!dropdownFocused}
+                              accessibilityElementsHidden={dropdownFocused}
+                            >
+                              Email
+                            </Text>
+                          </View>
+                          <SparkLightInput
+                            placeholder="Email Address"
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value ? value.toLowerCase() : ""}
+                            error={error?.message}
+                            accessibilityLabel="Email input"
+                            accessible={!dropdownFocused}
+                            accessibilityElementsHidden={dropdownFocused}
+                          />
+                        </>
                       )}
                     />
                   </View>
@@ -367,7 +440,13 @@ const CreateTicket = () => {
                     accessibilityLabel="Upload file"
                     accessibilityHint="Opens file picker to upload documents"
                   >
-                    <View style={{ padding: 10, alignItems: "center", justifyContent: "center" }}>
+                    <View
+                      style={{
+                        padding: 10,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
                       <View style={{ flexDirection: "row" }}>
                         <AttachmentIcon />
                         <Text style={styles.fileTxt}>

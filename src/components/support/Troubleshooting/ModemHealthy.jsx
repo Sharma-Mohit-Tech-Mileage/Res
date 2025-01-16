@@ -62,7 +62,7 @@ const ModemHealthy = () => {
     <View style={styles.mainContainer}>
       <ProfileSettingsHeader
         title="Troubleshooting"
-        onPressBack={() => navigation.navigate('SupportStack')}
+        onPressBack={() => navigation.navigate('Support')}
         accessibilityLabel="Back to Support"
         accessibilityHint="Navigates back to the Support screen"
       />

@@ -51,6 +51,7 @@ const logoutAction = (dispatch, navigation) => {
   getSsoToken().then((res) => {
     console.log('token', res);
     let token = res.idToken;
+    console.log('idToken', token);
     logout(config, {
       idToken: token,
       postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',

@@ -529,7 +529,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
         instruction={errorMessage}
         style={[styles.wifiError]}
         onTextPress={() => {
-          navigation.navigate("SupportStack", {
+          navigation.navigate("Support", {
             isContactUs: true,
           });
           console.log("On press back");
@@ -826,7 +826,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
                   PubSub.publish("event.contactUsEvent", {});
                   setTimeout(
                     () =>
-                      navigation.navigate("SupportStack", {
+                      navigation.navigate("Support", {
                         isContactUs: true,
                       }),
                     500
@@ -853,7 +853,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
 
           {/* WiFi Password */}
 
-          {(wifiPasswordCanChange || isEEroDevice) && (
+          {(modemSupported || isEEroDevice) && (
             <View
               style={[
                 AppStyles.card,

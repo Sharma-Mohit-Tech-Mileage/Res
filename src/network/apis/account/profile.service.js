@@ -16,7 +16,7 @@ const getProfileDetails = async () => {
     };
     let ApiMethod = ''
     if (accountNumber.toString().length >= 16) {
-        ApiMethod = `/userssvc/api/profile/${accountNumber}`
+        ApiMethod = `/api/profile/${accountNumber}`
     } else {
         ApiMethod = `/users/api/profile/${accountNumber}`
     }
@@ -185,7 +185,7 @@ const postProfileInfo = async (data) => {
         }
         let ApiMethod = ''
         if (accountNumber.toString().length >= 16) {
-            ApiMethod = `/userssvc/api/profile`
+            ApiMethod = `/api/profile`
         } else {
             ApiMethod = `/users/api/profile`
         }

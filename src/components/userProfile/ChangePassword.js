@@ -61,7 +61,7 @@ const ChangePassword = () => {
 
 
   const getSecurityQuestions=()=>{
-    const request = `userssvc/api/securityquestions/`;
+    const request = `api/securityquestions/`;
     GetApiRequest(
       request,
       (res) => {
@@ -85,7 +85,7 @@ const ChangePassword = () => {
 
         // Construct the request URL based on the user's billing type
         const request = isNewBiller
-            ? `userssvc/api/profile/password/${user.userInfo.accountNumber}`
+            ? `api/profile/password/${user.userInfo.accountNumber}`
             : `users/api/profile/password/${user.userInfo.accountNumber}`;
 
         const body = { newPassword };

@@ -45,7 +45,7 @@ const AxiosInterceptorProvider = ({ children }) => {
                 try {
                     const user = await getUser();
 
-                    if (config.url.includes('/userssvc/api/profile')) {
+                    if (config.url.includes('/api/profile')) {
                         config.baseURL = API_ACP_BASEURL; // Set ACP base URL for ACP users
                     } else {
                         config.baseURL = BASE_URL; // Set default base URL for normal users
