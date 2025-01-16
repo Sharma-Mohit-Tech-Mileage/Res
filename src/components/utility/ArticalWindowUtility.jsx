@@ -56,10 +56,10 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             }
         }
     };
-    
+
 
     const navigationChange = async (navState) => {
-       
+
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
                 setModalOpen(false);
@@ -81,18 +81,18 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     };
 
     const onMessage = (event) => {
-       
+
         try {
             const data = JSON.parse(event.nativeEvent.data);
-            console.log('File Data',JSON.stringify(data))
+            console.log('File Data', JSON.stringify(data))
             if (data.type === "XMLHttpRequest" && data.status === 200) {
-                if ((data.responseURL.includes("/statements/") || data.responseURL.includes("/api/Statement")|| data.responseURL.includes("/api/Statement"))) {
-                const responseData = JSON.parse(data.response);
-                
+                if ((data.responseURL.includes("/statements/") || data.responseURL.includes("/api/Statement") || data.responseURL.includes("/api/Statement"))) {
+                    const responseData = JSON.parse(data.response);
+
                     if (responseData.fileBinary) {
                         const base64Data = responseData.fileBinary;
                         setShowPDFUrl(base64Data);
-                setShowPDFModal(true);
+                        setShowPDFModal(true);
                     } else {
                         console.log('fileBinary is missing, modal will not open');
                     }
@@ -124,7 +124,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const userUpdateScript = async (user) => {
         const upgradeToken = await getUpgradeToken();
         user.userInfo['customerType'] = "Residential";
-    
+
         if (user.token !== undefined) {
             const SAVE_FROM_RN = `(function() {
                 localStorage.setItem('jwt_token', '${user.token}');
@@ -175,7 +175,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     });
                 };
             })();`;
-    
+
             setInitScript(prevScript => `${prevScript}\n${SAVE_FROM_RN}`);
         }
     };
@@ -184,19 +184,15 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         console.log('Screen Tracking useEffect triggered');
         console.log('Current name:', name);
         console.log('hasTrackedInitialScreen:', hasTrackedInitialScreen);
-    
+
         const trackScreen = async () => {
             if (name && !hasTrackedInitialScreen) {
                 console.log('Attempting to track screen with name:', name);
                 try {
-                    // await analytics().logEvent('screen_view', {
-                    //     screen_name: name,
-                    //     screen_class: 'ArticalWindowUtility'
-                    // });
-                    await analytics().logScreenView({
+                    await analytics().logEvent('screen_view', {
                         screen_name: name,
-                        screen_class: name,
-                      });
+                        screen_class: name
+                    });
                     console.log('Successfully tracked screen_view event:', {
                         screen_name: name,
                         screen_class: 'ArticalWindowUtility'
@@ -218,10 +214,10 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 });
             }
         };
-    
+
         trackScreen();
     }, [name]);
-    
+
     useEffect(() => {
         setProgress(0);
         setIsError(false);
@@ -249,24 +245,24 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                         webViewRef.current.reload();
                     } else {
                         if (navigationRef.current) {
-                            navigationRef.current.navigate('Dashboard'); 
+                            navigationRef.current.navigate('Dashboard');
                         }
                     }
                 }, 500);
             }
             setAppState(nextAppState);
         };
-    
+
         const subscription = AppState.addEventListener('change', handleAppStateChange);
-    
+
         return () => {
             if (subscription) {
                 subscription.remove();
             }
         };
     }, [appState]);
-    
-    
+
+
 
     useEffect(() => {
         setDynamicCookie();
@@ -275,25 +271,25 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     const Spinner = () => (
         <View style={styles.activityContainer}>
-          <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
+            <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
         </View>
     );
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
-            <ProfileSettingsHeader onPressBack={() => { 
-                if(route.params?.isBilling){   
+            <ProfileSettingsHeader onPressBack={() => {
+                if (route.params?.isBilling) {
                     navigation.reset({
                         index: 0,
                         routes: [{ name: "MyTab" }],
-                      });
-                }else{
-                     navigation.goBack();
+                    });
+                } else {
+                    navigation.goBack();
                 }
-                 setModalOpen(false);
+                setModalOpen(false);
             }} title={name} />
             {progress < 1 ? (
                 <View style={styles.progressBar}>
-                    <View style={[styles.progress, { width: `${progress * 100}%` }]} /> 
+                    <View style={[styles.progress, { width: `${progress * 100}%` }]} />
                 </View>
             ) : null}
             {modalOpen && (
@@ -355,7 +351,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#00000000',
         height: '100%',
         width: '100%',
-      }
+    }
 });
 
 export default ArticalWindowUtility;

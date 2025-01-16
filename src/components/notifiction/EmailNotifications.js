@@ -52,7 +52,6 @@ const EmailNotifications = () => {
           iptv: email.iptv,
         };
       });
-      console.log('initialStates>>>>>>>>>>>>>', initialStates);
       setToggleStates(initialStates);
       initialToggleStatesRef.current = initialStates;
     };
@@ -306,29 +305,15 @@ const EmailNotifications = () => {
 
         {(paperlessEmails.length > 0 || (allSvEmailAssociated.length > 0 && acknowledgement)) && (
           <View style={styles.sectionBox}>
-            <View 
-              accessible={true}
-              accessibilityRole="header"
-            >
-              <Text style={styles.infoTitle}>
-                Paperless Billing
-              </Text>
+            <View accessible={true} accessibilityRole="header" >
+              <Text style={styles.infoTitle}> Paperless Billing </Text>
             </View>
-            <Text
-              style={styles.infoText}
-              accessible={true}
-              accessibilityRole="text"
-            >
+            <Text style={styles.infoText} accessible={true} accessibilityRole="text" >
               Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you'll also receive occasional updates and offers via email.
             </Text>
             {paperlessEmails.length > 0 && (
-              <View 
-                accessible={true}
-                accessibilityRole="header"
-              >
-                <Text style={styles.infoTitle}>
-                  Email address
-                </Text>
+              <View accessible={true} accessibilityRole="header" >
+                <Text style={styles.infoTitle}> Email address </Text>
               </View>
             )}
             <FlatList
