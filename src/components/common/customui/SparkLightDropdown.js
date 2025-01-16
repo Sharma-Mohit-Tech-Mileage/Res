@@ -1,11 +1,12 @@
-import React, { useRef } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text, Modal, SafeAreaView, Pressable } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { StyleSheet, View, TouchableOpacity, Text, Modal, SafeAreaView, Pressable, findNodeHandle, AccessibilityInfo } from 'react-native';
 import { Box } from 'native-base';
 import { Padding, Color, FontFamily, FontSize } from "../../../../GlobalStyles";
 
 const SparkLightDropdown = ({ items, selectedValue, onValueChange, style, dropDownStyle, isDropDownOpen = () => {} }) => {
     const validItems = Array.isArray(items) ? items : [];
     const [visible, setVisible] = React.useState(false);
+    const dropdownRef = useRef(null);
 
     const getAccessibilityLabel = () => {
         return selectedValue 
@@ -16,29 +17,56 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style, dropDo
     const openPicker = () => {
         setVisible(true);
         isDropDownOpen(true);
+        AccessibilityInfo.announceForAccessibility("Security question dropdown opened");
     };
 
     const closePicker = () => {
         setVisible(false);
         isDropDownOpen(false);
+        
+        // Return focus to dropdown after modal closes
+        setTimeout(() => {
+            if (dropdownRef.current) {
+                const handle = findNodeHandle(dropdownRef.current);
+                if (handle) {
+                    AccessibilityInfo.setAccessibilityFocus(handle);
+                    AccessibilityInfo.announceForAccessibility("Security question dropdown closed");
+                }
+            }
+        }, 100);
     };
 
     const handleSelect = (value) => {
         onValueChange(value);
-        closePicker();
+        
+        // Delay closing modal slightly to allow announcement
+        setTimeout(() => {
+            closePicker();
+            if (dropdownRef.current) {
+                const handle = findNodeHandle(dropdownRef.current);
+                if (handle) {
+                    AccessibilityInfo.setAccessibilityFocus(handle);
+                    AccessibilityInfo.announceForAccessibility(`Selected ${value}`);
+                }
+            }
+        }, 50);
     };
 
     return (
         <Box style={[styles.container, style]}>
             <TouchableOpacity
+                ref={dropdownRef}
                 style={[styles.dropdown, dropDownStyle]}
                 onPress={openPicker}
                 accessible={true}
-                accessibilityRole="menu"
+                accessibilityRole="button"
                 accessibilityLabel={getAccessibilityLabel()}
-                accessibilityHint="Tap to open selection menu"
+                accessibilityHint="Double tap to open security question options"
+                accessibilityState={{
+                    expanded: visible
+                }}
             >
-                <Text style={styles.dropdownText} numberOfLines={1}>
+                <Text style={styles.dropdownText} numberOfLines={1} accessible={false}>
                     {selectedValue || "Select an option"}
                 </Text>
                 <Text style={styles.chevron} accessible={false}>▼</Text>
@@ -49,6 +77,7 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style, dropDo
                 transparent={true}
                 animationType="slide"
                 onRequestClose={closePicker}
+                onDismiss={closePicker}
             >
                 <View style={styles.modalContainer}>
                     <Pressable 
@@ -56,11 +85,12 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style, dropDo
                         onPress={closePicker}
                         accessible={true}
                         accessibilityRole="button"
-                        accessibilityLabel="Dismiss"
+                        accessibilityLabel="Close dropdown"
                     />
                     <View 
                         style={styles.pickerContainer}
                         accessibilityViewIsModal={true}
+                        importantForAccessibility="yes"
                     >
                         <View style={styles.header}>
                             <View style={styles.grabber} accessible={false} />
@@ -69,9 +99,8 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style, dropDo
                                     style={styles.headerTitle}
                                     accessible={true}
                                     accessibilityRole="header"
-                                    accessibilityLabel="Select an option"
                                 >
-                                    Select Option
+                                    Select Security Question
                                 </Text>
                                 <TouchableOpacity 
                                     onPress={closePicker}
@@ -79,16 +108,13 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style, dropDo
                                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                                     accessible={true}
                                     accessibilityRole="button"
-                                    accessibilityLabel="Dismiss"
+                                    accessibilityLabel="Close dropdown"
                                 >
                                     <Text style={styles.closeButtonText} accessible={false}>✕</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
-                        <SafeAreaView 
-                            style={styles.optionsList}
-                            accessibilityRole="menu"
-                        >
+                        <SafeAreaView style={styles.optionsList}>
                             {validItems.map((item, index) => (
                                 <TouchableOpacity
                                     key={index}
@@ -100,16 +126,20 @@ const SparkLightDropdown = ({ items, selectedValue, onValueChange, style, dropDo
                                     ]}
                                     onPress={() => handleSelect(item)}
                                     accessible={true}
-                                    accessibilityRole="menuitem"
-                                    accessibilityLabel={item}
+                                    accessibilityRole="button"
+                                    accessibilityLabel={`${item}${selectedValue === item ? ', selected' : ''}`}
+                                    accessibilityHint="Double tap to select this security question"
                                     accessibilityState={{ 
                                         selected: selectedValue === item
                                     }}
                                 >
-                                    <Text style={[
-                                        styles.optionText,
-                                        selectedValue === item && styles.selectedOptionText
-                                    ]}>
+                                    <Text 
+                                        style={[
+                                            styles.optionText,
+                                            selectedValue === item && styles.selectedOptionText
+                                        ]} 
+                                        accessible={false}
+                                    >
                                         {item}
                                     </Text>
                                     {selectedValue === item && (
