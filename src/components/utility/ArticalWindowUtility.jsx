@@ -86,7 +86,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             const data = JSON.parse(event.nativeEvent.data);
             console.log('File Data',JSON.stringify(data))
             if (data.type === "XMLHttpRequest" && data.status === 200) {
-                if ((data.responseURL.includes("/statements/") || data.responseURL.includes("/AccountSvc/api/Statement")|| data.responseURL.includes("/accountsvc/api/Statement"))) {
+                if ((data.responseURL.includes("/statements/") || data.responseURL.includes("/api/Statement")|| data.responseURL.includes("/api/Statement"))) {
                 const responseData = JSON.parse(data.response);
                 
                     if (responseData.fileBinary) {

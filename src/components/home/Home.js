@@ -553,7 +553,7 @@ const HomeScreen = ({ navigation }) => {
   }, [profile, user]);
 
   const changeWalkThroughStep = (step) => {
-    if (step > 3) {
+    if (step > 4) { // Changed from 3 to 4 since we have 5 steps (0-4)
       dispatch(updateWalkThroughStep(null));
       setShowWalkThrough(false);
     } else {
@@ -570,10 +570,17 @@ const HomeScreen = ({ navigation }) => {
         description:
           "View information related to your internet health, billing, service and more.",
         buttonText: "Next",
-      },{
+      },
+      {
         title: "Billing",
         description:
           "Make payments, set up Auto Pay and view statements.",
+        buttonText: "Next",
+      },
+      {
+        title: "Service",
+        description:
+          "Manage your internet plans, explore upgrades and view available services.",
         buttonText: "Next",
       },
       {
@@ -599,6 +606,8 @@ const HomeScreen = ({ navigation }) => {
       bottomCarotStyles.push(styles.bottomCarotStep3);
     }else if (walkThroughStep === 3) {
       bottomCarotStyles.push(styles.bottomCarotStep4);
+    } else if (walkThroughStep === 4) {
+      bottomCarotStyles.push(styles.bottomCarotStep5);
     }
 
     return (
@@ -606,18 +615,21 @@ const HomeScreen = ({ navigation }) => {
         <View 
                 accessibilityElementsHidden={!showWalkThrough}
                 importantForAccessibility={showWalkThrough ? "yes" : "no-hide-descendants"}
-        style={styles.walkThroughBubble} >
+          style={styles.walkThroughBubble}
+        >
           <View >
             <View 
              accessible={true} 
              accessibilityLabel={walkThrough.title}     
-            style={styles.title}>
+              style={styles.title}
+            >
               <Text style={styles.titleText}>{walkThrough.title}</Text>
             </View>
             <View 
              accessible={true} 
              accessibilityLabel={walkThrough.description}
-            style={styles.description}>
+              style={styles.description}
+            >
               <Text style={styles.descriptionText}>
                 {walkThrough.description}
               </Text>
@@ -626,34 +638,17 @@ const HomeScreen = ({ navigation }) => {
           <View style={styles.walkThroughBottomArea} >
             <View style={styles.circlePaging}>
               <View style={styles.circle}></View>
-              <View
-                style={
-                  walkThroughStep < 1
-                    ? [styles.circle, styles.circleUnselected]
-                    : styles.circle
-                }
-              ></View>
-              <View
-                style={
-                  walkThroughStep < 2
-                    ? [styles.circle, styles.circleUnselected]
-                    : styles.circle
-                }
-              ></View>
-               <View
-                style={
-                  walkThroughStep < 3
-                    ? [styles.circle, styles.circleUnselected]
-                    : styles.circle
-                }
-              ></View>
+              <View style={walkThroughStep < 1 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
+              <View style={walkThroughStep < 2 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
+              <View style={walkThroughStep < 3 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
+              <View style={walkThroughStep < 4 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
               
             </View>
             <View style={styles.walkThroughButtons}>
               <View style={styles.walkThroughSubButtons}>
                 {walkThroughStep > 0 && (
                   <Pressable
-                    style={[styles.button, styles.buttonsLayout, styles.buttonPrevious,]}
+                    style={[styles.button, styles.buttonsLayout, styles.buttonPrevious]}
                     onPress={() => changeWalkThroughStep(walkThroughStep - 1)}
                     accessibilityLabel="Previous Step"
                     accessibilityRole="button"
@@ -662,7 +657,7 @@ const HomeScreen = ({ navigation }) => {
                   </Pressable>
                 )}
                 <Pressable
-                  style={[styles.button, styles.buttonsLayout, styles.buttonNext,]}
+                  style={[styles.button, styles.buttonsLayout, styles.buttonNext]}
                   onPress={() => changeWalkThroughStep(walkThroughStep + 1)}
                   accessibilityLabel={walkThroughStep < walkThroughScreens.length - 1 ? "Next Step" : "Finish Walkthrough"}
                   accessibilityRole="button"
@@ -840,7 +835,7 @@ const HomeScreen = ({ navigation }) => {
               flex: 2,
               alignItems: "center",
               marginTop: 50,
-              paddingBottom: 150,
+              paddingBottom: 50,
             }}
           >
             {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert /> : null}
@@ -952,13 +947,16 @@ const styles = StyleSheet.create({
     top: 20,
   },
   bottomCarotStep2: {
-    left: (tabWidth-20) * 1
+    left: (tabWidth-30) * 1
   },
   bottomCarotStep3: {
-    left: (tabWidth+10) * 2
+    left: (tabWidth-25) * 2
   },
   bottomCarotStep4: {
-    left: tabWidth * 3
+    left: (tabWidth-25) * 3
+  },
+  bottomCarotStep5: {
+    left: (tabWidth-22) * 4
   },
   circle: {
     width: 8,
