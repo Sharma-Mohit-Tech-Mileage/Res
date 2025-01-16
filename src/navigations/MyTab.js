@@ -9,8 +9,6 @@ import HomeStackScreen from './stackNavigation/HomeStack';
 import ShopStack from '../navigations/stackNavigation/ShopStack';
 import HomeIconSelected from '../res/svgIcons/HomeIconSelected';
 import HomeIcon from '../res/svgIcons/HomeIcon';
-import ShopIcon from '../res/svgIcons/ShopIcon';
-import ShopIconSelected from '../res/svgIcons/ShopIconSelected';
 import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
@@ -19,7 +17,6 @@ import { Env } from '../network/apis/account/Constants';
 import { fetchProfileDetails } from '../redux/actions/ProfileActionSuite';
 import BillingIcon from "../res/svgIcons/BillingIcon";
 import BillingStackScreen from "./stackNavigation/BillingStack";
-import ArticalWindowUtility from "../components/utility/ArticalWindowUtility";
 
 const { width } = Dimensions.get('window');
 const tabWidth = Number(width / 5);
@@ -60,6 +57,9 @@ const MyTabs = ({ navigation, route }) => {
       return true;
     }
     return home.walkThroughStep === tabIndex;
+  };
+  const isWalkthroughActive = () => {
+    return user?.isNormalUser && home.walkThroughStep !== null && home.walkThroughStep !== undefined;
   };
 
   function CustomTabBarButton({ onPress, isDisabled, focused, children, tabIndex }) {
@@ -188,7 +188,7 @@ const MyTabs = ({ navigation, route }) => {
                   !isAccessible && styles.disabledTab
                 ]}
                 onPress={(e) => {
-                  if (!isAccessible && isScreenReaderEnabled) {
+                  if ((!isAccessible && isScreenReaderEnabled)||isWalkthroughActive()) {
                     return;
                   }
                   props.onPress(e);

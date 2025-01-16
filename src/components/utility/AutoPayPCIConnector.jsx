@@ -264,17 +264,13 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             if (name && !hasTrackedInitialScreen) {
                 console.log('Attempting to track PCI screen with name:', name);
                 try {
-                    // await analytics().logEvent('screen_view', {
-                    //     screen_name: name,
-                    //     screen_class: 'AutoPayPCIConnector'
-                    // });
-                    await analytics().logScreenView({
+                    await analytics().logEvent('screen_view', {
                         screen_name: name,
-                        screen_class: name,
+                        screen_class: 'AutoPayPCIConnector'
                       });
                     console.log('Successfully tracked PCI screen_view event:', {
                         screen_name: name,
-                        screen_class: 'AutoPayPCIConnector'
+                        screen_class: name
                     });
                     setHasTrackedInitialScreen(true);
                     console.log('Set PCI hasTrackedInitialScreen to true');

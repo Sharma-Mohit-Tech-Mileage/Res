@@ -25,10 +25,8 @@ import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
-import {
-  fetchBillingPaper,
-  fetchProfileDetails,
-} from "../../redux/actions/ProfileActionSuite";
+import { fetchBillingPaper, fetchProfileDetails, fetchSvEmailAssociation} from "../../redux/actions/ProfileActionSuite";
+
 import moment from "moment";
 import { Env } from "../../network/apis/account/Constants";
 import colors from "../../res/Colors";
@@ -43,16 +41,11 @@ const BillingScreen = ({ navigation }) => {
   const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [cardDigit, setCardDigit] = useState("");
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
-  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
-    dueDate: null,
-    billAmount: 0,
-    pastPaymentDue: 0,
-    email: null,
-  });
+  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const paperLessInfo = profile.paperLessInfo || {};
-  
-
+  const { allSvEmailAssociated = [] } = profile;
+  const paperlessEmails = allSvEmailAssociated.filter(email => email.invoice);
   const getUserAccountDetails = () => {
     setBillAmt(undefined);
     getUser().then((res) => {
@@ -130,6 +123,7 @@ const BillingScreen = ({ navigation }) => {
       getUserAccountDetails();
       dispatch(fetchBillingPaper());
       dispatch(fetchProfileDetails());
+      dispatch(fetchSvEmailAssociation());
    }else{
     navigation.navigate("ArticalWindowUtility", {
       url: `${Env.PAYMENTURLNEW}`,
@@ -199,7 +193,7 @@ const BillingScreen = ({ navigation }) => {
 
             <PeperLessCard
               billAmt={billAmt}
-              paperLessInfo={paperLessInfo}
+              paperLessInfo={paperlessEmails}
               isAutoPayStatus={isAutoPayStatus}
               paperlessStatus={paperlessStatus}
               navigation={navigation}

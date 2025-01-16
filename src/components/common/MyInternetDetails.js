@@ -5,7 +5,7 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBillingPaper, fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
+import { fetchBillingPaper, fetchProfileDetails ,fetchSvEmailAssociation} from "../../redux/actions/ProfileActionSuite";
 import { useFocusEffect } from "@react-navigation/native";
 
 const { width: viewportWidth } = Dimensions.get('window');
@@ -17,8 +17,8 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, paymentDetails,navigation 
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
   const profile = useSelector((state) => state.combinedReducers.profile || {});
-  const paperLessInfo = profile.paperLessInfo || {};
-  const profileDetails = profile.profileDetails || {};
+  const { allSvEmailAssociated = [] } = profile;
+    const paperlessEmails = allSvEmailAssociated.filter(email => email.invoice);
 
   console.log('due datw',billAmt)
   const getStatus = () => {
@@ -32,11 +32,11 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, paymentDetails,navigation 
         },
         onError
       );
-      GetApiRequest(
-        `account/api/account/${accountNumber}/paperless/status`,
-        setPaperlessStatus,
-        onError
-      );
+      // GetApiRequest(
+      //   `account/api/account/${accountNumber}/paperless/status`,
+      //   setPaperlessStatus,
+      //   onError
+      // );
     });
   };
 
@@ -56,6 +56,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, paymentDetails,navigation 
     getStatus();
     dispatch(fetchBillingPaper());
     dispatch(fetchProfileDetails());
+    dispatch(fetchSvEmailAssociation());
   }, []);
 
   const renderCard = ({ item, index }) => {
@@ -126,7 +127,7 @@ const MyInternetDetails = ({ plans, billAmt, dueDate, paymentDetails,navigation 
         billAmt={billAmt}
         dueDate={dueDate}
         isAutoPayStatus={isAutoPayStatus}
-        paperlessStatus={paperlessStatus}
+        paperlessStatus={paperlessEmails.length>0}
         navigation={navigation}
         style={styles.card}
         accessible={true}
