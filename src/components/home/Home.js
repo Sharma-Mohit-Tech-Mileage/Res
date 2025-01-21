@@ -66,7 +66,7 @@ const HomeScreen = ({ navigation }) => {
           "There has been a problem with AccessibilityInfo.isScreenReaderEnabled(): " +
           error.message
         );
-        setIsScreenReaderEnabled(false); 
+        setIsScreenReaderEnabled(false);
       }
     }
     getAccessibility();
@@ -217,7 +217,7 @@ const HomeScreen = ({ navigation }) => {
     GetModemStatusApiRequest(
       request,
       (res) => {
-       
+
         if (res) {
           if (res?.status) {
             if (res.status === 408) {
@@ -225,7 +225,7 @@ const HomeScreen = ({ navigation }) => {
               return;
             }
           }
-          
+
           let temt = [];
           console.log("checkModemDetails==", res);
           if (res.equipmentType == "DOCSIS") {
@@ -240,7 +240,7 @@ const HomeScreen = ({ navigation }) => {
             temt.push(res.oltrP_State);
             temt.push(res.onurP_State);
             updateModemStatus(temt);
-          }else{
+          } else {
             setInternetHealths((oldArray) => [...oldArray, "Red"]);
           }
         }
@@ -326,17 +326,17 @@ const HomeScreen = ({ navigation }) => {
 
             // let dueDate = moment(res.paymentDueDate).format("ll");
             // setDueDate(dueDate);
-            let dueDate =(res.pastDueAmount!=0)? 'Immediately': moment(res.paymentDueDate).format("ll");
+            let dueDate = (res.pastDueAmount != 0) ? 'Immediately' : moment(res.paymentDueDate).format("ll");
             setDueDate(dueDate);
-           
-            
+
+
             function getFirstEmail(emailArray) {
               return (emailArray && emailArray.length > 0 && emailArray[0])
                 ? emailArray[0]
                 : null;
             }
-            
-            
+
+
             let paymentDetails = { ...defaultPaymentDetails };
             paymentDetails.dueDate = res.paymentDueDate;
             paymentDetails.billAmount = (Math.round(res.currentBalance * 100) / 100).toFixed(2);
@@ -486,7 +486,7 @@ const HomeScreen = ({ navigation }) => {
   };
   useFocusEffect(
     useCallback(() => {
-      
+
       getUserAccountDetails();
     }, [])
   );
@@ -530,7 +530,7 @@ const HomeScreen = ({ navigation }) => {
         const status = await checkForMinorUpdate();
         setUpdateStatus(status);
       };
-  
+
       fetchUpdateStatus();
       getUserAccountDetails();
       checkModemOutagStatus();
@@ -604,7 +604,7 @@ const HomeScreen = ({ navigation }) => {
       bottomCarotStyles.push(styles.bottomCarotStep2);
     } else if (walkThroughStep === 2) {
       bottomCarotStyles.push(styles.bottomCarotStep3);
-    }else if (walkThroughStep === 3) {
+    } else if (walkThroughStep === 3) {
       bottomCarotStyles.push(styles.bottomCarotStep4);
     } else if (walkThroughStep === 4) {
       bottomCarotStyles.push(styles.bottomCarotStep5);
@@ -612,22 +612,22 @@ const HomeScreen = ({ navigation }) => {
 
     return (
       <>
-        <View 
-                accessibilityElementsHidden={!showWalkThrough}
-                importantForAccessibility={showWalkThrough ? "yes" : "no-hide-descendants"}
+        <View
+          accessibilityElementsHidden={!showWalkThrough}
+          importantForAccessibility={showWalkThrough ? "yes" : "no-hide-descendants"}
           style={styles.walkThroughBubble}
         >
           <View >
-            <View 
-             accessible={true} 
-             accessibilityLabel={walkThrough.title}     
+            <View
+              accessible={true}
+              accessibilityLabel={walkThrough.title}
               style={styles.title}
             >
               <Text style={styles.titleText}>{walkThrough.title}</Text>
             </View>
-            <View 
-             accessible={true} 
-             accessibilityLabel={walkThrough.description}
+            <View
+              accessible={true}
+              accessibilityLabel={walkThrough.description}
               style={styles.description}
             >
               <Text style={styles.descriptionText}>
@@ -642,7 +642,7 @@ const HomeScreen = ({ navigation }) => {
               <View style={walkThroughStep < 2 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
               <View style={walkThroughStep < 3 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
               <View style={walkThroughStep < 4 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
-              
+
             </View>
             <View style={styles.walkThroughButtons}>
               <View style={styles.walkThroughSubButtons}>
@@ -682,20 +682,20 @@ const HomeScreen = ({ navigation }) => {
 
   const OutageAlert = ({ estimatedTime }) => {
     return (
-      <View 
-      accessibilityElementsHidden={showWalkThrough}
-      importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
-      style={styles.errorBox}>
-        <View 
-         accessibilityElementsHidden={showWalkThrough}
-         importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
-        style={{ flexDirection: "row", width: "90%" }}>
+      <View
+        accessibilityElementsHidden={showWalkThrough}
+        importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
+        style={styles.errorBox}>
+        <View
+          accessibilityElementsHidden={showWalkThrough}
+          importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
+          style={{ flexDirection: "row", width: "90%" }}>
           <View style={{ backgroundColor: "#F88700", width: 4 }} />
           <View style={{ flexDirection: "column", padding: 10 }}>
-            <View 
-             accessibilityElementsHidden={showWalkThrough}
-             importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
-            style={{ flexDirection: "row" }}>
+            <View
+              accessibilityElementsHidden={showWalkThrough}
+              importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
+              style={{ flexDirection: "row" }}>
               <Image
                 style={{ alignSelf: "center" }}
                 resizeMode="contain"
@@ -704,10 +704,10 @@ const HomeScreen = ({ navigation }) => {
               />
               <Text style={styles.modemError1}>Outage Alert</Text>
             </View>
-            <Text 
-             accessibilityElementsHidden={showWalkThrough}
-             importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
-            style={styles.modemError2}>
+            <Text
+              accessibilityElementsHidden={showWalkThrough}
+              importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
+              style={styles.modemError2}>
               Our systems show that you may be experiencing an outage related to
               your Internet service. We are working to restore service as soon
               as possible.
@@ -750,13 +750,13 @@ const HomeScreen = ({ navigation }) => {
               </Text>
             </View>
             <Text
-            accessible={!showWalkThrough}
-            accessibilityElementsHidden={showWalkThrough}
-            importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
-            style={styles.modemError2}>
+              accessible={!showWalkThrough}
+              accessibilityElementsHidden={showWalkThrough}
+              importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
+              style={styles.modemError2}>
               Enhance your app experience with the latest version.
               <Text
-              accessible={!showWalkThrough}
+                accessible={!showWalkThrough}
                 style={styles.updateNow}
                 onPress={() => {
                   if (Platform.OS === "android") {
@@ -804,13 +804,13 @@ const HomeScreen = ({ navigation }) => {
       {showWalkThrough && <View style={styles.shadowFullScreen} />}
       {showWalkThrough && walkthroughModal()}
 
-      <SafeAreaView 
-      accessibilityElementsHidden={showWalkThrough}
-      importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
-      style={{ flex: 1 }}>
+      <SafeAreaView
+        accessibilityElementsHidden={showWalkThrough}
+        importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
+        style={{ flex: 1 }}>
         <View
-         accessibilityElementsHidden={showWalkThrough}
-         importantForAccessibility= {showWalkThrough ? "no-hide-descendants" : 'no'}
+          accessibilityElementsHidden={showWalkThrough}
+          importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
           accessibilityLabel={`SparkLight`}
           style={{
             height: Platform.OS == "ios" ? 60 : 50,
@@ -860,13 +860,13 @@ const HomeScreen = ({ navigation }) => {
                   color={Color.colorGainsboro_200}
                 />
               )}
-              <View 
-              style={styles.internetStatusSection}
+              <View
+                style={styles.internetStatusSection}
                 accessible={true}
                 accessibilityRole="text"
                 accessibilityLabel={currentHealth != "Optimal"
-                ? strings.internetStatusIssue
-                : strings.internetStatus}
+                  ? strings.internetStatusIssue
+                  : strings.internetStatus}
               >
                 <View style={{ marginTop: 5 }}>
                   <InfoIcon />
@@ -923,7 +923,7 @@ const HomeScreen = ({ navigation }) => {
               )}
             </View>
             <PromotionCard />
-            <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} paymentDetails={defaultPaymentDetails} navigation={navigation}/>
+            <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} paymentDetails={defaultPaymentDetails} navigation={navigation} />
             {/* <MyServicePlan plans={plans}  hasEeroDevice={hasEeroDevice} networkId={networkId} navigation={navigation} />
             <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} /> */}
           </View>
@@ -947,16 +947,16 @@ const styles = StyleSheet.create({
     top: 20,
   },
   bottomCarotStep2: {
-    left: (tabWidth-30) * 1
+    left: (tabWidth - 30) * 1
   },
   bottomCarotStep3: {
-    left: (tabWidth-25) * 2
+    left: (tabWidth - 25) * 2
   },
   bottomCarotStep4: {
-    left: (tabWidth-25) * 3
+    left: (tabWidth - 25) * 3
   },
   bottomCarotStep5: {
-    left: (tabWidth-22) * 4
+    left: (tabWidth - 22) * 4
   },
   circle: {
     width: 8,

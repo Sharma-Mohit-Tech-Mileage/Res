@@ -85,7 +85,11 @@ const RetrieveModemPassword = () => {
               selectedValue={slectedPasword}
               onValueChange={handlePasswordSelection}
               isDropDownOpen={(value) => {
-                setIsDropDownOpen(true)
+                if (value) {
+                  setIsDropDownOpen(true);
+                } else {
+                  setIsDropDownOpen(false);
+                }
               }}
             />
           </View>

@@ -186,7 +186,11 @@ const ShareWifiScreen = ({ route }) => {
             onValueChange={handlePasswordSelection}
             dropDownStyle={{ color: Color.sparklightDarkGray }}
             isDropDownOpen={(value) => {
-              setIsDropDownOpen(true)
+              if (value) {
+                setIsDropDownOpen(true);
+              } else {
+                setIsDropDownOpen(false);
+              }
             }}
           />
           </View>
