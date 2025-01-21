@@ -331,7 +331,7 @@ const MyTabs = ({ navigation, route }) => {
         />
 
         <Tab.Screen
-          name="account"x
+          name="account"
           component={AccountStackScreen}
           listeners={({ navigation }) => ({
             tabPress: (e) => {
