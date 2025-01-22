@@ -51,15 +51,27 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
             <Text style={styles.dataText}>{totalUsed}</Text>
             <Text style={[styles.dataText, styles.dataTextSmall]}>GB used</Text>
           </View>
-          <Text style={styles.dateText}>{''}</Text>
-          <Text style={styles.dateText}>{''}</Text>
+          <Text
+            style={styles.dateText}
+            accessible={false}
+            importantForAccessibility="no"
+          >
+            {''}
+          </Text>
+          <Text
+            style={styles.dateText}
+            accessible={false}
+            importantForAccessibility="no"
+          >
+            {''}
+          </Text>
         </View>
       </ProgressCircle>
 
       <TouchableOpacity
-       accessible={true}
-       accessibilityLabel={`Plan Details`}
-       accessibilityRole="button"
+        accessible={true}
+        accessibilityLabel={`Plan Details`}
+        accessibilityRole="button"
         onPress={() => {
           setShowComment(true);
         }}
@@ -70,7 +82,7 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
             top: '50%',
             left: '50%',
             transform: [
-              { translateX: -55 }, 
+              { translateX: -55 },
               { translateY: -45 },
             ],
           },
@@ -97,9 +109,9 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
       <View style={styles.separator} />
 
       <TouchableOpacity
-       accessible={true}
-       accessibilityLabel={`Historical Data Usage`}
-       accessibilityRole="button"
+        accessible={true}
+        accessibilityLabel={`Historical Data Usage`}
+        accessibilityRole="button"
         onPress={() => {
           navigation.navigate("ArticalWindowUtility", {
             url: `${Env.URL}/services/internet/internet-usage`,
@@ -163,11 +175,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   dataPlanBorder: {
-    borderWidth:1,
+    borderWidth: 1,
     borderColor: colors.sparklight_bright_purple,
     padding: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    zIndex: 1,  
+    zIndex: 1,
     elevation: 1,
   },
   dataPlanTxt: {

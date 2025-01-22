@@ -62,13 +62,7 @@ const PeriodicProblems = ({ route }) => {
               source={require("../../../../assets/modem-reboot-inst.png")}
             />
             <Text style={styles.heading}>Intermittent Issues </Text>
-            <View
-              style={{
-                backgroundColor: "#F4F4F5",
-                height: 1,
-                marginVertical: 20,
-              }}
-            />
+            <View style={{ backgroundColor: "#F4F4F5", height: 1, marginVertical: 20, }} />
             {instructions1.map(renderInstruction)}
             <View style={{ paddingTop: 32 }}>
               <View style={styles.borderSec} />
@@ -81,34 +75,43 @@ const PeriodicProblems = ({ route }) => {
                       isFromT: true,
                     });
                   }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Reboot Modem"
+                  accessibilityHint="Navigates to modem reboot screen"
                 >
                   <View style={styles.menuWrap}>
-                    <RefreshIcon />
+                    <RefreshIcon accessibilityElementsHidden={true} />
                     <Text style={styles.menuText}>Reboot Modem</Text>
                   </View>
-                  <RightArrow />
+                  <RightArrow accessibilityElementsHidden={true} />
                 </TouchableOpacity>
               )}
               <View style={styles.borderSec} />
-
 
               <TouchableOpacity
                 style={styles.pressableStyle}
                 onPress={() => {
                   navigation.navigate("ModemExchange");
                 }}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Exchange Modem"
+                accessibilityHint="Navigates to modem exchange screen"
               >
                 <View style={styles.menuWrap}>
                   <Image
                     style={{ width: 20, height: 20, flexShrink: 0 }}
                     resizeMode="contain"
                     source={require("../../../../assets/repeat-01.png")}
+                    accessibilityElementsHidden={true}
                   />
                   <Text style={styles.menuText}>Exchange Modem</Text>
                 </View>
-                <RightArrow />
+                <RightArrow accessibilityElementsHidden={true} />
               </TouchableOpacity>
               <View style={styles.borderSec} />
+
               <TouchableOpacity
                 style={styles.pressableStyle}
                 onPress={() => {
@@ -117,12 +120,16 @@ const PeriodicProblems = ({ route }) => {
                     name: "Wi-Fi Issues",
                   });
                 }}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Wi-Fi Issues"
+                accessibilityHint="Opens article about Wi-Fi troubleshooting"
               >
                 <View style={styles.menuWrap}>
-                  <WifiIssueIcon />
+                  <WifiIssueIcon accessibilityElementsHidden={true} />
                   <Text style={styles.menuText}>Wi-Fi Issues</Text>
                 </View>
-                <RightArrow />
+                <RightArrow accessibilityElementsHidden={true} />
               </TouchableOpacity>
             </View>
           </View>
@@ -158,7 +165,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 15,
-    marginHorizontal: 20,
   },
   frameChild: {
     alignSelf: "center",
@@ -205,6 +211,7 @@ const styles = StyleSheet.create({
   menuWrap: {
     flexDirection: "row",
     alignContent: "center",
+    paddingHorizontal: 20,
   },
   borderSec: {
     width: "100%",

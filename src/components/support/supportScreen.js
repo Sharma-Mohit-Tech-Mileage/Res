@@ -594,9 +594,7 @@ const Support = ({ route }) => {
                             onPress={() => {
                               toggleModal("tech");
                             }}
-                            accessibilityLabel="Chat Support"
-                            accessibilityRole="button"
-                            accessibilityHint="Chat with Tech Support"
+                           
                           >
                             <View style={styles.supportChatText}>
                               <Text
