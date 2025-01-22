@@ -76,7 +76,7 @@ const NewBillerHome = ({ navigation }) => {
    
     getUser().then((res) => {
       const request = `api/Accounts/GetAccountDetails`;
-      const data={"accountNumber": res.userInfo.accountNumber,"fieldList":["first_name","last_name","accountNumber","current_balance","past_due_amount","payment_due_date","customer_type","email_details"]}
+      const data={"accountNumber": res.userInfo.accountNumber,"fieldList":["first_name","last_name","accountNumber","current_balance","past_due_amount","payment_due_date","customer_type","email_details","email"]}
       PostApiRequest(
         request,
         data,

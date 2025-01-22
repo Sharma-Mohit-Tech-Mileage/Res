@@ -17,6 +17,7 @@ import { Env } from '../network/apis/account/Constants';
 import { fetchProfileDetails } from '../redux/actions/ProfileActionSuite';
 import BillingIcon from "../res/svgIcons/BillingIcon";
 import BillingStackScreen from "./stackNavigation/BillingStack";
+import MyServicesStack from "./stackNavigation/MyServicesStack";
 
 const { width } = Dimensions.get('window');
 const tabWidth = Number(width / 5);
@@ -264,7 +265,7 @@ const MyTabs = ({ navigation, route }) => {
 
         <Tab.Screen
           name="MyServices"
-          component={ShopStack}
+          component={MyServicesStack}
           listeners={({ navigation }) => ({
             tabPress: (e) => {
               e.preventDefault();
@@ -272,7 +273,10 @@ const MyTabs = ({ navigation, route }) => {
                 return;
               }
               if (user?.isNormalUser) {
-                navigation.navigate('MyServices');
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'MyServices' }],
+                });
               }
             },
           })}
@@ -285,7 +289,10 @@ const MyTabs = ({ navigation, route }) => {
                 isDisabled={!user?.isNormalUser} 
                 focused={props.focused} 
                 tabIndex={2}
-                onPress={() => navigation.navigate('MyServices')} 
+                onPress={() => navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'MyServices' }],
+                })} 
               />
             ),
           }}

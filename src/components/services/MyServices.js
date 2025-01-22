@@ -596,12 +596,7 @@ const MyServices = ({ route }) => {
                 </View>
               </View>
 
-              {/*
-                        Speed section
-                    */}
-              <View
-                style={[styles.additionalSupport, styles.integrationCardBorder]}
-              >
+              
                 <MyServicePlan
                   plans={plans}
                   hasEeroDevice={hasEeroDevice}
@@ -609,9 +604,9 @@ const MyServices = ({ route }) => {
                   navigation={navigation}
                 />
                 <MyDataUsage plans={plans}  navigation={navigation} />
-              </View>
+              
 
-              <View style={[styles.issuesFlexBox]} />
+              
             </>
           )}
           <CustomerErrorPage

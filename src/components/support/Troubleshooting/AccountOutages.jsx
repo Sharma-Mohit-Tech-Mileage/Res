@@ -79,6 +79,7 @@ const TroubleshootComponent = ({ pageCount = 2 }) => {
             navigation.navigate("ArticalWindowUtility", {
                 url: `${Env.URL}/billing`,
                 name: "Billing Details",
+                isPayBill: true,
             });
         }
     };

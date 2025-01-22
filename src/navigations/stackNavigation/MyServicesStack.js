@@ -55,7 +55,7 @@ function MyServicesStack({route}) {
       
       
 
-<ServiceStack.Screen
+         <ServiceStack.Screen
         name="ManageEquipment"
         component={ModemStackScreen}
         options={{ headerShown: false }}

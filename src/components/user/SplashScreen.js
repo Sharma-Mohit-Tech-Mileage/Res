@@ -377,7 +377,7 @@ const SplashScreen = ({ navigation, route }) => {
 
       </View>
 
-      {loading ? <ActivityIndicator style={{ flexDirection:'column', justifyContent:'center', position:'absolute', top:hp('45%'),right:wp('50%') }} size="large" color={"white"} /> : <></>}
+      {loading ? <ActivityIndicator style={{ flexDirection:'column', justifyContent:'center', position:'absolute', top:hp('50%'),right:wp('50%') }} size="large" color={"white"} /> : <></>}
       {!loading && isVisible && (
         <Animated.View style={{ marginTop: hp("35%"), opacity: fadeAnim }}>
           <SparkLightLoginButton

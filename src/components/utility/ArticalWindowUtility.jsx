@@ -282,7 +282,13 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                         index: 0,
                         routes: [{ name: "MyTab" }],
                     });
-                } else {
+                }else if (route.params?.isPayBill) {
+                    navigation.reset({
+                        index: 0,
+                        routes: [{ name: "MyServices" }],
+                    });
+                }
+                 else {
                     navigation.goBack();
                 }
                 setModalOpen(false);
