@@ -89,13 +89,6 @@ const UserManagementEdit = ({ route }) => {
     announceForAccessibility(isOpen ? 
       "Security question dropdown opened" : "Security question dropdown closed"
     );
-
-    if (mainContentRef.current) {
-      mainContentRef.current.setNativeProps({
-        accessibilityElementsHidden: isOpen,
-        importantForAccessibility: isOpen ? 'no-hide-descendants' : 'yes'
-      });
-    }
   };
 
   const handleSave = (formData) => {
@@ -173,21 +166,21 @@ const UserManagementEdit = ({ route }) => {
     <View 
       style={styles.userManagementEdit}
       ref={mainContentRef}
-      accessibilityLabel="User Management Edit Screen"
+      accessible={false}
     >
-      <ProfileSettingsHeader
-        title={isnewUser ? "Add Admin User" : "Edit User"}
-        onPressBack={() => navigation.navigate("UserManagement")}
-        accessibilityLabel="Return to User Management"
-        accessibilityRole="button"
-        accessibilityHint="Navigates back to User Management screen"
-        accessible={!dropdownFocused}
-        accessibilityElementsHidden={dropdownFocused}
-        importantForAccessibility={dropdownFocused ? 'no-hide-descendants' : 'yes'}
-      />
+      <View accessibilityRole="header" accessible={true}>
+        <ProfileSettingsHeader
+          title={isnewUser ? "Add Admin User" : "Edit User"}
+          onPressBack={() => navigation.navigate("UserManagement")}
+          accessibilityLabel={`${isnewUser ? "Add Admin User" : "Edit User"} screen header`}
+          accessibilityRole="header"
+          accessible={true}
+          importantForAccessibility="yes"
+        />
+      </View>
 
       <ScrollView ref={scrollViewRef}>
-        <View style={styles.userManagementEditInner}>
+        <View style={styles.userManagementEditInner} accessible={false}>
           <NotificationError
             type="error"
             title="Error"
@@ -195,42 +188,45 @@ const UserManagementEdit = ({ route }) => {
             showCloseIcon={true}
             isVisible={showError}
             onClose={() => setShowError(false)}
-            accessible={!dropdownFocused}
-            accessibilityElementsHidden={dropdownFocused}
+            accessible={true}
           />
 
-          {isnewUser && (
-            <>
+          {false && (
+            <View accessible={false}>
               <Text
                 style={[styles.yourSavedCard, styles.taylorTypo, { fontWeight: "800" }]}
-                accessible={!dropdownFocused}
-                accessibilityElementsHidden={dropdownFocused}
+                accessible={true}
+                accessibilityRole="header"
+                accessibilityLabel="Admin"
               >
                 Admin
               </Text>
               <Text
                 style={[styles.yourSavedCard, styles.taylorTypo, { paddingBottom: 15 }]}
-                accessible={!dropdownFocused}
-                accessibilityElementsHidden={dropdownFocused}
+                accessible={true}
+                accessibilityLabel="Admin role description: An admin can manage this account but is not the primary contact for this account."
               >
                 An admin can manage this account but is not the primary contact for this account.
               </Text>
-            </>
+            </View>
           )}
 
-          <View style={styles.frameWrapper}>
-            <View style={[styles.frameGroup, styles.textinputWrapperSpaceBlock]}>
-              <View style={styles.generalInformationWrapper}>
-                <Text style={[styles.generalInformation, styles.firstClr]}>
+          <View style={styles.frameWrapper} accessible={false}>
+            <View style={[styles.frameGroup, styles.textinputWrapperSpaceBlock]} accessible={false}>
+              <View style={styles.generalInformationWrapper} accessible={false}>
+                <Text 
+                  style={[styles.generalInformation, styles.firstClr]}
+                  accessible={true}
+                  accessibilityRole="header"
+                >
                   General Information
                 </Text>
               </View>
 
-              <View style={styles.frameWrapper}>
-                <View style={styles.frameWrapper}>
-                  {/* Name Inputs */}
-                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock]}>
-                    <View style={styles.textinput}>
+              <View style={styles.frameWrapper} accessible={false}>
+                <View style={styles.frameWrapper} accessible={false}>
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock]} accessible={false}>
+                    <View style={styles.textinput} accessible={false}>
                       <Controller
                         control={control}
                         name="firstName"
@@ -243,16 +239,15 @@ const UserManagementEdit = ({ route }) => {
                             value={value}
                             error={error?.message}
                             accessibilityLabel="First name input"
-                            accessible={!dropdownFocused}
-                            accessibilityElementsHidden={dropdownFocused}
+                            accessible={true}
                           />
                         )}
                       />
                     </View>
                   </View>
 
-                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock]}>
-                    <View style={styles.textinput}>
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock]} accessible={false}>
+                    <View style={styles.textinput} accessible={false}>
                       <Controller
                         control={control}
                         name="lastName"
@@ -265,16 +260,15 @@ const UserManagementEdit = ({ route }) => {
                             value={value}
                             error={error?.message}
                             accessibilityLabel="Last name input"
-                            accessible={!dropdownFocused}
-                            accessibilityElementsHidden={dropdownFocused}
+                            accessible={true}
                           />
                         )}
                       />
                     </View>
                   </View>
 
-                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock]}>
-                    <View style={styles.textinput}>
+                  <View style={[styles.textinputWrapper, styles.textinputWrapperSpaceBlock]} accessible={false}>
+                    <View style={styles.textinput} accessible={false}>
                       <Controller
                         control={control}
                         name="userName"
@@ -288,24 +282,26 @@ const UserManagementEdit = ({ route }) => {
                             value={value}
                             error={error?.message}
                             accessibilityLabel="Username input"
-                            accessible={!dropdownFocused}
-                            accessibilityElementsHidden={dropdownFocused}
+                            accessible={true}
                           />
                         )}
                       />
                     </View>
                   </View>
 
-                  {/* Password Section */}
-                  <View style={styles.frameParent1}>
-                    <View style={styles.contactInformationWrapper}>
-                      <Text style={[styles.generalInformation, styles.firstClr]}>
+                  <View style={styles.frameParent1} accessible={false}>
+                    <View style={styles.contactInformationWrapper} accessible={false}>
+                      <Text 
+                        style={[styles.generalInformation, styles.firstClr]}
+                        accessible={true}
+                        accessibilityRole="header"
+                      >
                         Password
                       </Text>
                     </View>
 
-                    <View style={styles.frameParent}>
-                      <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                    <View style={styles.frameParent} accessible={false}>
+                      <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]} accessible={false}>
                         <Controller
                           control={control}
                           name="newPassword"
@@ -320,13 +316,15 @@ const UserManagementEdit = ({ route }) => {
                                 secure={true}
                                 error={error?.message}
                                 accessibilityLabel="Password input"
-                                accessible={!dropdownFocused}
-                                accessibilityElementsHidden={dropdownFocused}
+                                accessible={true}
                               />
-                              <View style={[styles.passwordFlexBox, { marginTop: Padding.p_base }]}>
+                              <View 
+                                style={[styles.passwordFlexBox, { marginTop: Padding.p_base }]}
+                                accessibilityLabel="Password requirements"
+                              >
                                 {validatePassword(value, profileDetails.userName).map((isValid, index) => (
-                                  <View key={`point-${index}`} style={styles.bulletPointContainer}>
-                                    <View style={{ marginTop: 7 }}>
+                                  <View key={`point-${index}`} style={styles.bulletPointContainer} accessible={true}>
+                                    <View style={{ marginTop: 7 }} >
                                       <View
                                         style={[styles.bullet, {
                                           backgroundColor: isValid ? 
@@ -335,7 +333,10 @@ const UserManagementEdit = ({ route }) => {
                                         }]}
                                       />
                                     </View>
-                                    <Text style={styles.bulletPoint}>
+                                    <Text 
+                                      style={styles.bulletPoint}
+                                      accessibilityLabel={`${passwordTerms[index]} ${isValid ? 'met' : 'not met'}`}
+                                    >
                                       {passwordTerms[index]}
                                     </Text>
                                   </View>
@@ -347,20 +348,19 @@ const UserManagementEdit = ({ route }) => {
                       </View>
                     </View>
 
-                    {/* Security Question Section */}
-                    <View style={styles.frameParent1}>
-                      <View style={styles.securityQuestionWrapper}>
+                    <View style={styles.frameParent1} accessible={false}>
+                      <View style={styles.securityQuestionWrapper} accessible={false}>
                         <Text
                           style={[styles.generalInformation, styles.firstClr]}
-                          accessible={!dropdownFocused}
-                          accessibilityElementsHidden={dropdownFocused}
+                          accessible={true}
+                          accessibilityRole="header"
                         >
                           Security Question
                         </Text>
                       </View>
 
-                      <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
-                        <View style={styles.textinput}>
+                      <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]} accessible={false}>
+                        <View style={styles.textinput} accessible={false}>
                           <Text 
                             style={[styles.firstName1, styles.firstTypo, { 
                               color: (showValidationAlert && customSecurityQuestion.length == 0) ? 
@@ -368,7 +368,7 @@ const UserManagementEdit = ({ route }) => {
                               fontWeight: (showValidationAlert && customSecurityQuestion.length == 0) ? 
                                 '700' : '400' 
                             }]}
-                            accessible={!dropdownFocused}
+                            accessible={true}
                           >
                             Password Reset Question
                           </Text>
@@ -384,65 +384,68 @@ const UserManagementEdit = ({ route }) => {
                             importantForAccessibility="yes"
                           />
                           {(showValidationAlert && customSecurityQuestion.length == 0) && (
-                            <View style={styles.errorContainer}>
-                              <Image source={WarningIcon} style={styles.errorIcon} />
-                              <Text style={styles.errorText}>
-                                Password Reset Question is required
-                              </Text>
-                            </View>
-                          )}
-                        </View>
-                      </View>
-
-                      {isCustomQuestionSelected && (
-                        <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
-                          <View style={styles.textinput}>
-                            <Controller
-                              control={control}
-                              name="securityQuestion"
-                              render={({
-                                field: { onChange, onBlur, value },
-                                fieldState: { error },
-                              }) => (
-                                <SparkLightInput
-                                  onBlur={onBlur}
-                                  label="Type your Question"
-                                  onChangeText={onChange}
-                                  value={value}
-                                  error={error?.message}
-                                  accessibilityLabel="Custom security question input"
-                                  accessibilityHint="Enter your custom security question"
-                                  accessible={!dropdownFocused}
-                                  accessibilityElementsHidden={dropdownFocused}
-                                />
-                              )}
+                            <View 
+                              style={styles.errorContainer}
+                              accessible={true}
+                              accessibilityLabel="Error: Password Reset Question is required"
+                            >
+                              <Image source={WarningIcon}style={styles.errorIcon} 
+                              accessible={false}
                             />
+                            <Text style={styles.errorText}>
+                              Password Reset Question is required
+                            </Text>
                           </View>
-                        </View>
-                      )}
-
-                      <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
-                        <Controller
-                          control={control}
-                          name="securityAnswer"
-                          render={({
-                            field: { onChange, onBlur, value },
-                            fieldState: { error },
-                          }) => (
-                            <SparkLightInput
-                              onBlur={onBlur}
-                              onChangeText={onChange}
-                              label="Password Reset Answer"
-                              value={value}
-                              error={error?.message}
-                              accessibilityLabel="Security answer input"
-                              accessibilityHint="Enter your answer to the security question"
-                              accessible={!dropdownFocused}
-                              accessibilityElementsHidden={dropdownFocused}
-                            />
-                          )}
-                        />
+                        )}
                       </View>
+                    </View>
+
+                    {isCustomQuestionSelected && (
+                      <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]} accessible={false}>
+                        <View style={styles.textinput} accessible={false}>
+                          <Controller
+                            control={control}
+                            name="securityQuestion"
+                            render={({
+                              field: { onChange, onBlur, value },
+                              fieldState: { error },
+                            }) => (
+                              <SparkLightInput
+                                onBlur={onBlur}
+                                label="Type your Question"
+                                onChangeText={onChange}
+                                value={value}
+                                error={error?.message}
+                                accessibilityLabel="Custom security question input"
+                                accessibilityHint="Enter your custom security question"
+                                accessible={true}
+                              />
+                            )}
+                          />
+                        </View>
+                      </View>
+                    )}
+
+                    <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]} accessible={false}>
+                      <Controller
+                        control={control}
+                        name="securityAnswer"
+                        render={({
+                          field: { onChange, onBlur, value },
+                          fieldState: { error },
+                        }) => (
+                          <SparkLightInput
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            label="Password Reset Answer"
+                            value={value}
+                            error={error?.message}
+                            accessibilityLabel="Security answer input"
+                            accessibilityHint="Enter your answer to the security question"
+                            accessible={true}
+                          />
+                        )}
+                      />
                     </View>
                   </View>
                 </View>
@@ -450,31 +453,31 @@ const UserManagementEdit = ({ route }) => {
             </View>
           </View>
 
-          {/* Save/Cancel Buttons */}
-          <View style={styles.frameChild1SpaceBlock}>
+          <View style={styles.frameChild1SpaceBlock} accessible={false}>
             <Pressable
               style={[styles.buttons1, styles.buttonsLayout]}
               onPress={handleSubmit(handleSave, handleValidationError)}
               accessibilityLabel="Save changes"
               accessibilityRole="button"
-              accessible={!dropdownFocused}
-              accessibilityElementsHidden={dropdownFocused}
+              accessible={true}
+              importantForAccessibility="yes"
             >
-              <Text style={[styles.makePayment1, styles.makeTypo]}>Save</Text>
+              <Text style={[styles.makePayment1, styles.makeTypo]} accessibilityElementsHidden={true}>Save</Text>
             </Pressable>
 
             <Pressable
               style={[styles.buttons2, styles.buttonsLayout]}
               onPress={() => navigation.navigate("UserManagement")}
-              accessibilityLabel="Cancel"
+              accessibilityLabel="Cancel changes"
               accessibilityRole="button"
-              accessible={!dropdownFocused}
-              accessibilityElementsHidden={dropdownFocused}
+              accessible={true}
+              importantForAccessibility="yes"
             >
-              <Text style={[styles.makePayment2, styles.makeTypo]}>Cancel</Text>
+              <Text style={[styles.makePayment2, styles.makeTypo]} accessibilityElementsHidden={true}>Cancel</Text>
             </Pressable>
           </View>
           <LoadingOverlay />
+        </View>
         </View>
       </ScrollView>
     </View>
@@ -496,12 +499,12 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   bulletPointContainer: {
-    flexDirection: "row", // Align bullet and text horizontally
-    alignItems: "flex-start", // Align items to the start of the flex container
-    marginBottom: 5, // Space between bullet points
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 5,
   },
   bulletPoint: {
-    marginRight: 10, // Space between bullet and text
+    marginRight: 10,
     color: Color.sparklightGray1,
     fontWeight: "400",
   },
@@ -591,7 +594,6 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontWeight: "400",
   },
-
   generalInformation: {
     fontSize: FontSize.size_3xl,
     textAlign: "left",
@@ -708,7 +710,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
   },
-
   itMustBe: {
     lineHeight: 19,
     fontSize: FontSize.textXsSemibold_size,
@@ -780,10 +781,11 @@ const styles = StyleSheet.create({
     height: 7,
     borderRadius: 3.5,
     marginRight: 10,
-  }, errorContainer: {
+  },
+  errorContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 4, // Space between the input and the error message
+    marginTop: 4,
   },
   errorIcon: {
     width: 20,
