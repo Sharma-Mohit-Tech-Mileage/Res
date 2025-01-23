@@ -858,7 +858,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
               style={[
                 AppStyles.card,
                 styles.myModemSpaceBlock,
-                { marginTop: 20 },
+                
               ]}
             >
               <View
@@ -880,7 +880,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
               style={[
                 AppStyles.card,
                 styles.myModemSpaceBlock,
-                { marginTop: 20 },
+              
               ]}
             >
               <View
@@ -903,7 +903,6 @@ To add a Sparklight Modem to your account, please contact our support team`);
             style={[
               AppStyles.card,
               styles.myModemSpaceBlock,
-              { marginVertical: 20 },
             ]}
           >
             <View

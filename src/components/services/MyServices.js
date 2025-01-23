@@ -287,7 +287,7 @@ const MyServices = ({ route }) => {
   const items = [
     {
       key: "searchIssues",
-      text: "Search issues",
+      text: "Search",
       icon: require("../../../assets/search-md.png"),
       iconAlignment: "left", // Icon to the left of the text
       navigateTo: "searchArticals",

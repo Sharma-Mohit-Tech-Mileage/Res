@@ -66,13 +66,14 @@ const MyTabs = ({ navigation, route }) => {
   function CustomTabBarButton({ onPress, isDisabled, focused, children, tabIndex }) {
     const isAccessible = isTabAccessibleDuringWalkthrough(tabIndex);
     const handlePress = () => {
-      if ((!isAccessible && isScreenReaderEnabled) || isWalkthroughActive()) {
-        return;
-      }
       if (isDisabled) {
         Alert.alert('Coming Soon', 'We are still working on it.');
         return;
       }
+      if ((!isAccessible && isScreenReaderEnabled) || isWalkthroughActive()) {
+        return;
+      }
+     
       onPress();
     };
     

@@ -114,7 +114,7 @@ const Search = ({ navigation }) => {
       />
       <View style={styles.content}>
         <SearchSuggestions
-          placeholder="Search issues"
+          placeholder="Search"
           input={input}
           onChangeInput={onChangeInput}
           suggestions={filteredSuggestions}

@@ -42,6 +42,7 @@ import TicketListIcon from "../../res/svgIcons/TicketListIcon";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 import BillingSupportIcon from "../../res/svgIcons/BillingSupportIcon";
 import AppStyles from "../common/styles/AppStyles";
+import { color } from "native-base/lib/typescript/theme/styled-system";
 
 const Support = ({ route }) => {
   const navigation = useNavigation();
@@ -241,7 +242,7 @@ const Support = ({ route }) => {
   const items = [
     {
       key: "searchIssues",
-      text: "Search issues",
+      text: "Search",
       icon: require("../../../assets/search-md.png"),
       iconAlignment: "left", // Icon to the left of the text
       navigateTo: "searchArticals",
@@ -846,12 +847,14 @@ const Support = ({ route }) => {
                   style={[
                     styles.headingContainer,
                     styles.headingContainerSpaceBlock,
-                    { flexDirection: "column" },
+                    { flexDirection: "column", paddingHorizontal:0 },
                   ]}
                 >
-                  <Text style={[styles.heading, styles.headingTypo]}>
+                  <Text style={[styles.heading, styles.headingTypo,{ paddingHorizontal: Padding.p_base}]}>
                     Contact Us
                   </Text>
+
+                  <View style={styles.separator} />
 
                   <Pressable
                     accessibilityLabel="Sparklight Customer Support"
@@ -868,6 +871,7 @@ const Support = ({ route }) => {
                         flexDirection: "row-reverse",
                         justifyContent: "space-between",
                         width: "100%",
+                        paddingHorizontal: Padding.p_base,
                       }}
                     >
                       <Image
@@ -878,6 +882,7 @@ const Support = ({ route }) => {
                             height: 20,
                             alignSelf: "center",
                             resizeMode: "contain",
+                            marginTop:10
                           },
                         ]}
                       />
@@ -939,6 +944,12 @@ const styles = StyleSheet.create({
   },
   iconLeft: {
     marginLeft: Padding.p_xs,
+  },
+  separator: {
+    backgroundColor: Color.sparklightGray,
+    height: 1,
+    width: '100%',
+    marginTop: 16,
   },
   iconRight: {
     marginRight: Padding.p_xs,
