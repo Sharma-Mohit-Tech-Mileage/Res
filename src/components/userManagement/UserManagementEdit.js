@@ -168,7 +168,7 @@ const UserManagementEdit = ({ route }) => {
       ref={mainContentRef}
       accessible={false}
     >
-      <View accessibilityRole="header" accessible={true}>
+      <View accessibilityRole="header" >
         <ProfileSettingsHeader
           title={isnewUser ? "Add Admin User" : "Edit User"}
           onPressBack={() => navigation.navigate("UserManagement")}
