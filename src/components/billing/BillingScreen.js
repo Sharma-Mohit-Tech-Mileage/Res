@@ -167,7 +167,7 @@ const BillingScreen = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
           style={{ marginHorizontal: 20 }}
         >
-          <View style={{ paddingBottom: 100,marginTop:Padding.p_base }}>
+          <View style={{ paddingBottom: 100,marginTop:Padding.p_5xl }}>
             <Card
               billAmt={billAmt}
               dueDate={dueDate}
@@ -212,7 +212,7 @@ const BillingScreen = ({ navigation }) => {
               <View
                 style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
               >
-                <Text style={[styles.myModem1, styles.myModem1Typo]}>
+                <Text style={[styles.leftTitle]}>
                   Billing Options
                 </Text>
               </View>
@@ -307,6 +307,14 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     height: 150,
+  },
+  leftTitle: {
+    color: colors.sp_black,
+    fontSize: 18,
+    fontWeight: "400",
+    textAlign: "center",
+    alignContent: "flex-start",
+    alignSelf: "center",
   },
   buttonsSpaceBlock: {
     paddingVertical: Padding.p_base,

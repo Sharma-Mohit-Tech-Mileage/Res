@@ -57,7 +57,7 @@ const PeriodicProblems = ({ route }) => {
         <View style={{ flexDirection: "column", flex: 1 }}>
           <View style={[styles.card, styles.shadowProp]}>
             <Image
-              style={styles.frameChild}
+              style={[styles.frameChild,{marginTop:Padding.p_xl}]}
               resizeMode="cover"
               source={require("../../../../assets/modem-reboot-inst.png")}
             />

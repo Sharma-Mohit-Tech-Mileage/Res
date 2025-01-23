@@ -389,7 +389,7 @@ const Support = ({ route }) => {
             />
           }
         >
-          <View style={AppStyles.card}>
+          <View style={[AppStyles.card,{marginTop:Padding.p_5xs}]}>
             <View
               style={[
                 styles.headingContainer,
@@ -465,7 +465,7 @@ const Support = ({ route }) => {
           {userData?.isNormalUser ? (
             <>
               <View
-                style={[AppStyles.card]}
+                style={[AppStyles.card,{marginBottom:150}]}
               >
                 <View
                   style={[
@@ -691,6 +691,7 @@ const Support = ({ route }) => {
                   style={[
                     styles.integrationCardMobileContainer,
                     styles.contentSpaceBlock,
+                    
                   ]}
                 >
                   <View
@@ -835,13 +836,11 @@ const Support = ({ route }) => {
                   </View>
                 </View>
               </View>
-
-              <View style={[styles.issuesFlexBox]} />
             </>
           ) : (
             <>
               <View
-                style={[styles.additionalSupport, styles.integrationCardBorder]}
+                style={[AppStyles.card,{marginBottom:150}]}
               >
                 <View
                   style={[

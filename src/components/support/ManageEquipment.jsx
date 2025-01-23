@@ -903,6 +903,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
             style={[
               AppStyles.card,
               styles.myModemSpaceBlock,
+              { marginBottom: 120 },
             ]}
           >
             <View

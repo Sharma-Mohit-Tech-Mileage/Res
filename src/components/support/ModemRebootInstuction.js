@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 2,
     width: wp("92%"),
-    marginTop: wp("8%"),
+    marginTop: 16,
     paddingTop: 20,
     paddingBottom: 20,
   },

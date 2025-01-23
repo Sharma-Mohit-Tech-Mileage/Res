@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import colors from "../../res/Colors";
 import DataUsageComponent from "./DataUsageComponent";
-import { FontFamily, FontSize } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { View, Text, StyleSheet } from "react-native";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import { GetApiRequest } from "../../network/APIClient";
 
 const MyDataUsage = ({ plans, tvPlan, phonePlan, navigation }) => {
@@ -13,9 +16,17 @@ const MyDataUsage = ({ plans, tvPlan, phonePlan, navigation }) => {
   const getDataUsage = () => {
     getUser().then((res) => {
       const reqauest = `internet/api/internet/${res.userInfo.accountNumber}/usage/current`;
-      GetApiRequest(reqauest, (res) => {
-        if (res) { setData(res); }
-      }, (error) => { console.log(error) });
+      GetApiRequest(
+        reqauest,
+        (res) => {
+          if (res) {
+            setData(res);
+          }
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
     });
   };
   useEffect(() => {
@@ -24,18 +35,38 @@ const MyDataUsage = ({ plans, tvPlan, phonePlan, navigation }) => {
 
   useEffect(() => {
     if (data) {
-      const planData = typeof data.dataPlanGB === "number" ? Math.round(data.dataPlanGB) : 0;
+      const planData =
+        typeof data.dataPlanGB === "number" ? Math.round(data.dataPlanGB) : 0;
       setIsUnlimitedPlan(planData === 15000);
-    } 
+    }
   }, [data]);
   return (
-    <View style={{ ...styles.card, ...styles.shadowProp, flexDirection: "column", marginBottom: hp("10%") }}>
-      <View style={{ ...styles.subSec, flexDirection: "row", alignItems: "center" }}>
-        <Text style={styles.subTitle}>{'My Data'}</Text>
-        <Text style={styles.date}>{plans[0]?.unlimited?'UNLIMITED':(plans[0]?.dataQuotaGB||0)+' GB'} </Text>
+    <View
+      style={{
+        ...styles.card,
+        ...styles.shadowProp,
+        flexDirection: "column",
+        marginBottom: hp("10%"),
+      }}
+    >
+      <View
+        style={{ ...styles.subSec, flexDirection: "row", alignItems: "center" }}
+      >
+        <Text style={styles.heading}>{"My Data"}</Text>
+        <Text style={styles.date}>
+          {plans[0]?.unlimited
+            ? "UNLIMITED"
+            : (plans[0]?.dataQuotaGB || 0) + " GB"}{" "}
+        </Text>
       </View>
       <View style={styles.subSec} />
-      <DataUsageComponent navigation={navigation} data={data} plans={plans} tvPlan={tvPlan} phonePlan={phonePlan}/>
+      <DataUsageComponent
+        navigation={navigation}
+        data={data}
+        plans={plans}
+        tvPlan={tvPlan}
+        phonePlan={phonePlan}
+      />
     </View>
   );
 };
@@ -60,6 +91,13 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontFamily: FontFamily.openSansRegular,
   },
+  heading: {
+    color: Color.colorGray_100,
+    textAlign: "left",
+    lineHeight: 18,
+    fontSize: FontSize.size_lg,
+    fontFamily: FontFamily.openSansRegular,
+  },
   date: {
     fontSize: 16,
     color: colors.sparklight_purple_blue,
@@ -71,7 +109,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingRight: 5,
-    marginHorizontal: wp('5%')
+    marginHorizontal: wp("5%"),
   },
 });
 

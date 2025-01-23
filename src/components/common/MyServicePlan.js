@@ -3,7 +3,7 @@ import colors from "../../res/Colors";
 import strings from "../../res/Strings";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import DataSpeedComponent from "./DataSpeedComponent";
-import { FontFamily } from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 
@@ -13,7 +13,7 @@ const MyServicePlan = ({ plans, hasEeroDevice, networkId, navigation }) => {
   return (
     <View style={{ ...styles.card, ...styles.shadowProp, flexDirection: "column", marginBottom: 20 }}>
       <View style={{ ...styles.subSec, flexDirection: "row", alignItems: "center" }}>
-        <Text style={styles.subTitle}>{'My Speed'}</Text>
+        <Text style={styles.heading}>{'My Speed'}</Text>
         <Text style={styles.date}>{plans[0]?.downloadSpeed ?? 0} Mbps</Text>
       </View>
       <View style={styles.subSec} />
@@ -166,7 +166,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
     width: wp("40%"),
     borderWidth: 1
-  },
+  },heading: {
+      color: Color.colorGray_100,
+      textAlign: "left",
+      lineHeight: 18,
+      fontSize: FontSize.size_lg,
+      fontFamily: FontFamily.openSansRegular,
+    },
 });
 
 export default MyServicePlan;

@@ -2,7 +2,7 @@ import * as React from "react";
 import { Image, StyleSheet, Text, View, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
-import { FontFamily, Color } from "../../../../GlobalStyles";
+import { FontFamily, Color, Padding } from "../../../../GlobalStyles";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 
 const ModemConnectivityGuide = ({ route }) => {
@@ -40,15 +40,15 @@ const ModemConnectivityGuide = ({ route }) => {
                 }
             />
             <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={{ flexDirection: "column", paddingBottom: hp('15%') }}>
+                <View style={{ flexDirection: "column",  }}>
                     <View style={[styles.card, styles.shadowProp]}>
-                        <Image style={styles.frameChild} resizeMode="cover" source={require("../../../../assets/modem-reboot-inst.png")} />
+                        <Image style={[styles.frameChild,{marginTop:Padding.p_xl}]} resizeMode="cover" source={require("../../../../assets/modem-reboot-inst.png")} />
                         <Text style={styles.heading}>Is there power to the modem?</Text>
                         <View style={{ backgroundColor: "#F4F4F5", height: 1, marginVertical: 20 }} />
                         {instructions1.map(renderInstruction)}
                     </View>
                     <View style={[styles.card, styles.shadowProp]}>
-                        <Image style={styles.frameChild} resizeMode="cover" source={require("../../../../assets/modem-reboot-inst1.png")} />
+                        <Image style={[styles.frameChild,{marginTop:Padding.p_xl}]} resizeMode="cover" source={require("../../../../assets/modem-reboot-inst1.png")} />
                         <Text style={styles.heading}>Is your modem connected to an outlet?</Text>
                         <View style={{ backgroundColor: "#F4F4F5", height: 1, marginVertical: 20 }} />
                         {instructions2.map(renderInstruction)}
@@ -71,8 +71,8 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         borderRadius: 2,
         width: wp("92%"),
-        marginTop: wp("8%"),
-       paddingBottom:20
+        marginTop: 16,
+        paddingBottom:20
     },
     shadowProp: {
     shadowColor: '#171717',

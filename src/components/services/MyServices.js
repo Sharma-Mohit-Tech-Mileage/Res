@@ -437,7 +437,7 @@ const MyServices = ({ route }) => {
           {userData?.isNormalUser && (
             <>
               <View
-                style={[AppStyles.card]}
+                style={[AppStyles.card,{marginTop:Padding.p_5xs}]}
               >
                 <View
                   style={[

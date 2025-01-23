@@ -49,7 +49,7 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
         <View style={styles.centeredView}>
           <View style={styles.rowCenteredView}>
             <Text style={styles.dataText}>{totalUsed}</Text>
-            <Text style={[styles.dataText, styles.dataTextSmall]}>GB used</Text>
+            <Text style={[styles.dataText, styles.dataTextSmall]}> GB used</Text>
           </View>
           <Text
             style={styles.dateText}
