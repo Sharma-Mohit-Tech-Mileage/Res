@@ -203,7 +203,7 @@ const MyTabs = ({ navigation, route }) => {
             headerShown: false,
             swipeEnabled: false,
             tabBarLabel: 'Home',
-            tabBarAccessibilityLabel: isTabAccessibleDuringWalkthrough(0) ? 'Home tab' : undefined,
+            tabBarAccessibilityLabel: isTabAccessibleDuringWalkthrough(0) ? 'Home' : undefined,
             tabBarIcon: ({ focused }) => getTabBarIconWrapper(
               focused ? HomeIconSelected : HomeIcon,
               focused,
@@ -250,7 +250,7 @@ const MyTabs = ({ navigation, route }) => {
             headerShown: false,
             swipeEnabled: false,
             tabBarLabel: 'Billing',
-            tabBarAccessibilityLabel: isTabAccessibleDuringWalkthrough(1) ? 'Billing tab' : undefined,
+            tabBarAccessibilityLabel: isTabAccessibleDuringWalkthrough(1) ? 'Billing' : undefined,
             tabBarIcon: ({ focused }) => getTabBarIconWrapper(
               BillingIcon,
               focused,
@@ -281,7 +281,7 @@ const MyTabs = ({ navigation, route }) => {
           options={{
             headerShown: false,
             tabBarLabel: 'Service',
-            tabBarAccessibilityLabel: isTabAccessibleDuringWalkthrough(2) ? 'Service tab' : undefined,
+            tabBarAccessibilityLabel: isTabAccessibleDuringWalkthrough(2) ? 'Service' : undefined,
             tabBarIcon: ({ focused }) => (
               <View 
                 style={[
