@@ -36,6 +36,11 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
 
   return (
     <View style={styles.container}>
+      <View
+        accessible={true}
+        accessibilityRole="progressbar"
+        accessibilityLabel={`Data Usage Progress: ${progress * 100}%`}
+      ></View>
       <ProgressCircle
         style={styles.progressCircle}
         progress={progress}
@@ -46,28 +51,36 @@ const DataUsageComponent = ({ navigation, data, plans, tvPlan, phonePlan }) => {
         startAngle={-Math.PI * 0.85}
         endAngle={Math.PI * 0.85}
       >
-        <View style={styles.centeredView}>
-          <View style={styles.rowCenteredView}>
-            <Text style={styles.dataText}>{totalUsed}</Text>
-            <Text style={[styles.dataText, styles.dataTextSmall]}> GB used</Text>
-          </View>
-          <Text
-            style={styles.dateText}
-            accessible={false}
-            importantForAccessibility="no"
-          >
-            {''}
-          </Text>
-          <Text
-            style={styles.dateText}
-            accessible={false}
-            importantForAccessibility="no"
-          >
-            {''}
-          </Text>
-        </View>
-      </ProgressCircle>
 
+      </ProgressCircle>
+      <View style={[styles.centeredView, {
+        position: 'absolute',
+        top: '35%',
+        left: '50%',
+        transform: [
+          { translateX: -50 },
+          { translateY: -45 },
+        ],
+      },]}>
+        <View style={styles.rowCenteredView}>
+          <Text style={styles.dataText}>{totalUsed}</Text>
+          <Text style={[styles.dataText, styles.dataTextSmall]}> GB used</Text>
+        </View>
+        <Text
+          style={styles.dateText}
+          accessible={false}
+          importantForAccessibility="no"
+        >
+          {''}
+        </Text>
+        <Text
+          style={styles.dateText}
+          accessible={false}
+          importantForAccessibility="no"
+        >
+          {''}
+        </Text>
+      </View>
       <TouchableOpacity
         accessible={true}
         accessibilityLabel={`Plan Details`}
