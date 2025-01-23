@@ -36,7 +36,6 @@ const MyTabs = ({ navigation, route }) => {
     dispatch(fetchProfileDetails());
   }, [dispatch]);
 
-  // Helper function to determine if a tab should be accessible during walkthrough
   useEffect(() => {
     const checkScreenReader = async () => {
       const screenReaderEnabled = await AccessibilityInfo.isScreenReaderEnabled();
@@ -53,14 +52,32 @@ const MyTabs = ({ navigation, route }) => {
       subscription.remove();
     };
   }, []);
+
   const isTabAccessibleDuringWalkthrough = (tabIndex) => {
     if (!user?.isNormalUser || home.walkThroughStep === null || home.walkThroughStep === undefined) {
       return true;
     }
     return home.walkThroughStep === tabIndex;
   };
+
   const isWalkthroughActive = () => {
     return user?.isNormalUser && home.walkThroughStep !== null && home.walkThroughStep !== undefined;
+  };
+
+  const getTabBarIconWrapper = (IconComponent, focused, tabIndex) => {
+    const isAccessible = isTabAccessibleDuringWalkthrough(tabIndex);
+    return (
+      <View 
+        style={[
+          styles.tabItem,
+          !isAccessible && styles.disabledTab
+        ]}
+        accessible={false}
+        importantForAccessibility="no"
+      >
+        <IconComponent focused={focused} />
+      </View>
+    );
   };
 
   function CustomTabBarButton({ onPress, isDisabled, focused, children, tabIndex }) {
@@ -73,11 +90,9 @@ const MyTabs = ({ navigation, route }) => {
       if ((!isAccessible && isScreenReaderEnabled) || isWalkthroughActive()) {
         return;
       }
-     
       onPress();
     };
-    
-  
+
     return (
       <Pressable 
         onPress={handlePress} 
@@ -93,10 +108,12 @@ const MyTabs = ({ navigation, route }) => {
           disabled: !isAccessible || isDisabled,
           selected: focused 
         }}
-        accessibilityLabel={isDisabled ? 'Coming soon' : undefined}
+        accessibilityLabel={`${isDisabled ? 'Coming soon' : children?.props?.accessibilityLabel || ''}`}
       >
-        {focused ? <SupportIconSelected/> : <SupportIcon isNewBillerUser={!user?.isNormalUser}/>}
-        {children}
+        <View accessible={false} importantForAccessibility="no">
+          {focused ? <SupportIconSelected/> : <SupportIcon isNewBillerUser={!user?.isNormalUser}/>}
+          {children}
+        </View>
       </Pressable>
     );
   }
@@ -105,50 +122,28 @@ const MyTabs = ({ navigation, route }) => {
     if (user?.isNormalUser) {
       switch(home.walkThroughStep) {
         case 0:
-        setShadowStyle(styles.shadowTabs);
-        setShadowStyleLeft(styles.shadowTabsLeft);
+          setShadowStyle(styles.shadowTabs);
+          setShadowStyleLeft(styles.shadowTabsLeft);
           break;
         case 1:
-        setShadowStyle([styles.shadowTabs, styles.shadowTabsStep2]);
-        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep2Left]);
+          setShadowStyle([styles.shadowTabs, styles.shadowTabsStep2]);
+          setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep2Left]);
           break;
         case 2:
           setShadowStyle([styles.shadowTabs, styles.shadowTabsStep32]);
           setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep31Left]);
           break;
         case 3:
-        setShadowStyle([styles.shadowTabs, styles.shadowTabsStep3]);
-        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left]);
+          setShadowStyle([styles.shadowTabs, styles.shadowTabsStep3]);
+          setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left]);
           break;
         case 4:
-        setShadowStyle([styles.shadowTabs, styles.shadowTabsStep4]);
-        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep4Left]);
+          setShadowStyle([styles.shadowTabs, styles.shadowTabsStep4]);
+          setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep4Left]);
           break;
       }
     }
   }, [home, user?.isNormalUser]);
-
-  const getTabBarIconWrapper = (IconComponent, focused, tabIndex) => {
-    const isAccessible = isTabAccessibleDuringWalkthrough(tabIndex);
-    return (
-      <View 
-        style={[
-          styles.tabItem,
-          !isAccessible && styles.disabledTab
-        ]}
-        accessible={isAccessible}
-        accessibilityElementsHidden={!isAccessible}
-        importantForAccessibility={isAccessible ? 'yes' : 'no-hide-descendants'}
-        accessibilityRole="tab"
-        accessibilityState={{ 
-          selected: focused,
-          disabled: !isAccessible 
-        }}
-      >
-        <IconComponent focused={focused} />
-      </View>
-    );
-  };
 
   return (
     <>
@@ -190,7 +185,7 @@ const MyTabs = ({ navigation, route }) => {
                   !isAccessible && styles.disabledTab
                 ]}
                 onPress={(e) => {
-                  if ((!isAccessible && isScreenReaderEnabled)||isWalkthroughActive()) {
+                  if ((!isAccessible && isScreenReaderEnabled) || isWalkthroughActive()) {
                     return;
                   }
                   props.onPress(e);
@@ -273,28 +268,31 @@ const MyTabs = ({ navigation, route }) => {
               if (!isTabAccessibleDuringWalkthrough(2) && isScreenReaderEnabled) {
                 return;
               }
-              if (user?.isNormalUser) {
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: 'MyServices' }],
-                });
+              if (!user?.isNormalUser) {
+                Alert.alert('Coming Soon', 'We are still working on it.');
+                return;
               }
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'MyServices' }],
+              });
             },
           })}
           options={{
-            tabBarLabel: 'Service',
             headerShown: false,
-            tabBarIcon: (props) => (
-              <CustomTabBarButton 
-                {...props} 
-                isDisabled={!user?.isNormalUser} 
-                focused={props.focused} 
-                tabIndex={2}
-                onPress={() => navigation.reset({
-                  index: 0,
-                  routes: [{ name: 'MyServices' }],
-                })} 
-              />
+            tabBarLabel: 'Service',
+            tabBarAccessibilityLabel: isTabAccessibleDuringWalkthrough(2) ? 'Service tab' : undefined,
+            tabBarIcon: ({ focused }) => (
+              <View 
+                style={[
+                  styles.tabItem,
+                  !isTabAccessibleDuringWalkthrough(2) && styles.disabledTab
+                ]}
+                accessible={false}
+                importantForAccessibility="no"
+              >
+                {focused ? <SupportIconSelected/> : <SupportIcon isNewBillerUser={!user?.isNormalUser}/>}
+              </View>
             ),
           }}
         />
@@ -305,7 +303,7 @@ const MyTabs = ({ navigation, route }) => {
           listeners={({ navigation }) => ({
             tabPress: (e) => {
               e.preventDefault();
-              if (!isTabAccessibleDuringWalkthrough(3)&& isScreenReaderEnabled) {
+              if (!isTabAccessibleDuringWalkthrough(3) && isScreenReaderEnabled) {
                 return;
               }
               navigation.reset({
@@ -323,15 +321,16 @@ const MyTabs = ({ navigation, route }) => {
                   styles.tabItem,
                   !isTabAccessibleDuringWalkthrough(3) && styles.disabledTab
                 ]}
-                accessible={isTabAccessibleDuringWalkthrough(3)}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: focused }}
+                accessible={false}
+                importantForAccessibility="no"
               >
                 <Image
                   style={{width:33, height:28}}
                   resizeMode='contain'
                   tintColor={focused ? '#353091' : '#767676'}
                   source={require("../../assets/phone-outgoing-03.png")}
+                  accessible={false}
+                  importantForAccessibility="no"
                 />
               </View>
             ),
