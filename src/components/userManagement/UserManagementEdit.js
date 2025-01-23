@@ -191,7 +191,7 @@ const UserManagementEdit = ({ route }) => {
             accessible={true}
           />
 
-          {false && (
+          {isnewUser && (
             <View accessible={false}>
               <Text
                 style={[styles.yourSavedCard, styles.taylorTypo, { fontWeight: "800" }]}
