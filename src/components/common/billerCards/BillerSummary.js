@@ -86,7 +86,7 @@ const Card = ({
               {(dueDate != "Invalid date" && billAmt!=undefined) && (
             <Text 
               accessible={true}
-              accessibilityLabel={`${dueDate ? (dueDate=='Immediately')?"Due Immediately"  :"Due on": "Due on Not Available"}`}
+              accessibilityLabel={`${dueDate ? (dueDate=='Immediately')?"Due Immediately"  :`Due on ${dueDate}`: "Due on Not Available"}`}
               //accessibilityRole={`${(dueDate!='Immediately')?'button':'none'}`}
              style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
               {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": <NotAvailable/>}
