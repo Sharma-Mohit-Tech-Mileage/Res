@@ -25,7 +25,7 @@ import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
-import { fetchBillingPaper, fetchProfileDetails, fetchSvEmailAssociation} from "../../redux/actions/ProfileActionSuite";
+import { fetchBillingPaper, fetchProfileDetails, fetchSvEmailAssociation } from "../../redux/actions/ProfileActionSuite";
 
 import moment from "moment";
 import { Env } from "../../network/apis/account/Constants";
@@ -67,7 +67,7 @@ const BillingScreen = ({ navigation }) => {
             }
             // let dueDate = moment(res.paymentDueDate).format("ll");
             // setDueDate(dueDate);
-            let dueDate =(res.pastDueAmount!=0)? 'Immediately': moment(res.paymentDueDate).format("ll");
+            let dueDate = (res.pastDueAmount != 0) ? 'Immediately' : moment(res.paymentDueDate).format("ll");
             setDueDate(dueDate);
             setBillAmt((Math.round(res.currentBalance * 100) / 100).toFixed(2));
             let paymentDetails = { ...defaultPaymentDetails };
@@ -113,25 +113,25 @@ const BillingScreen = ({ navigation }) => {
   };
 
   useFocusEffect(
-    useCallback(() => { 
+    useCallback(() => {
       // getStatus();
       // getUserAccountDetails();
       // dispatch(fetchBillingPaper());
       // dispatch(fetchProfileDetails());
-   if(user?.isNormalUser){
-      getStatus();
-      getUserAccountDetails();
-      dispatch(fetchBillingPaper());
-      dispatch(fetchProfileDetails());
-      dispatch(fetchSvEmailAssociation());
-   }else{
-    navigation.navigate("ArticalWindowUtility", {
-      url: `${Env.PAYMENTURLNEW}`,
-      name: "Billing Details",
-      isBilling:true
-    });
-  
-   }
+      if (user?.isNormalUser) {
+        getStatus();
+        getUserAccountDetails();
+        dispatch(fetchBillingPaper());
+        dispatch(fetchProfileDetails());
+        dispatch(fetchSvEmailAssociation());
+      } else {
+        navigation.navigate("ArticalWindowUtility", {
+          url: `${Env.PAYMENTURLNEW}`,
+          name: "Billing Details",
+          isBilling: true
+        });
+
+      }
 
     }, [])
   );
@@ -156,9 +156,14 @@ const BillingScreen = ({ navigation }) => {
       <View style={[styles.frameParent]}>
         <View style={styles.rightActionableParent}>
           <View style={styles.rightActionable}>
-          <Text style={[styles.text,{alignSelf:'center',marginLeft:5,marginTop:5}]}>
-              <BillingIconWhite isSelected={false} /> 
+            <Text
+              accessibilityLabel="Billing services icon"
+              style={[styles.text, { alignSelf: 'center', marginLeft: 5, marginTop: 5 }]}>
+              <BillingIconWhite isSelected={false} />
             </Text>
+            {/* <Text style={[styles.text,{alignSelf:'center',marginLeft:5,marginTop:5}]}>
+              <BillingIconWhite isSelected={false} /> 
+            </Text> */}
           </View>
           {/* Full name for profile */}
           <Text style={styles.melissaSmith}>{"Billing Services"}</Text>
@@ -167,7 +172,7 @@ const BillingScreen = ({ navigation }) => {
           showsVerticalScrollIndicator={false}
           style={{ marginHorizontal: 20 }}
         >
-          <View style={{ paddingBottom: 100,marginTop:Padding.p_5xl }}>
+          <View style={{ paddingBottom: 100, marginTop: Padding.p_5xl }}>
             <Card
               billAmt={billAmt}
               dueDate={dueDate}
@@ -206,7 +211,7 @@ const BillingScreen = ({ navigation }) => {
               style={[
                 AppStyles.card,
                 styles.myModemSpaceBlock,
-               
+
               ]}
             >
               <View
@@ -236,7 +241,7 @@ const BillingScreen = ({ navigation }) => {
                   accessibilityRole="button"
                   accessibilityLabel="View Billing Details"
                 >
-                 
+
                   <Text style={styles.modemHealthSupport}>
                     View Billing Details
                   </Text>
@@ -259,7 +264,7 @@ const BillingScreen = ({ navigation }) => {
                   accessibilityRole="button"
                   accessibilityLabel="View Payment History"
                 >
-                  
+
                   <Text style={styles.modemHealthSupport}>
                     View Payment History
                   </Text>
@@ -282,7 +287,7 @@ const BillingScreen = ({ navigation }) => {
                   accessibilityRole="button"
                   accessibilityLabel="View Billing History"
                 >
-                  
+
                   <Text style={styles.modemHealthSupport}>
                     View Billing History
                   </Text>
