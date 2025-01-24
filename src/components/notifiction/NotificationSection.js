@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorMidnightblue
   },
   buttonText: {
-    fontSize: FontSize.size_xs,
+    fontSize: FontSize.size_sm,
     color: Color.sparklightWhite,
     fontFamily: FontFamily.openSansRegular,
     textAlign: "center"

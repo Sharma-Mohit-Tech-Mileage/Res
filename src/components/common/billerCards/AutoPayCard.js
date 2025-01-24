@@ -45,7 +45,7 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, paymentDetails,navigation ,st
               <Text style={[styles.dueDate]}>{cardDigit}</Text>
               </View>
               <Text style={styles.autoPayStatusText}>Auto Pay On</Text>
-              <Text style={styles.thankYouText}>Thank you for choosing Auto Pay!</Text>
+              <Text style={[styles.thankYouText,{marginTop:5}]}>Thank you for choosing Auto Pay!</Text>
             </>
           ) : (
             <>
@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
     borderColor: colors.sparklight_green,
     borderWidth: 1,
     borderRadius: 5,
+    textAlign: 'center',
     padding: 5,
     marginTop:13,
     marginBottom: Padding.p_base,
@@ -170,6 +171,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightGray,
     alignSelf: 'center',
     width: wp("27%"),
+    textAlign: 'center',
     borderColor: colors.dark_grey,
     borderWidth: 1,
     borderRadius: 5,

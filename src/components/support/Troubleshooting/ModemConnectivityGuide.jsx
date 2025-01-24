@@ -39,8 +39,8 @@ const ModemConnectivityGuide = ({ route }) => {
                 }
                 }
             />
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={{ flexDirection: "column",  }}>
+            <ScrollView showsVerticalScrollIndicator={false} >
+                <View style={{ flexDirection: "column", paddingBottom:80 }}>
                     <View style={[styles.card, styles.shadowProp]}>
                         <Image style={[styles.frameChild,{marginTop:Padding.p_xl}]} resizeMode="cover" source={require("../../../../assets/modem-reboot-inst.png")} />
                         <Text style={styles.heading}>Is there power to the modem?</Text>

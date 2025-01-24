@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, StyleSheet, Text, ActivityIndicator, Linking, Modal, Platform, Animated, Easing } from "react-native";
+import { View, StyleSheet, Text, ActivityIndicator, Linking, Modal, Platform, Animated, Easing,TouchableOpacity } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
@@ -220,9 +220,14 @@ const SplashScreen = ({ navigation, route }) => {
               splitKey={bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}
               instruction={`${message} ${bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}${message2}`}
             />
-            <View style={{marginTop:20}}>
-            <SecondaryButton onPress={closeModal} buttonType={"Cancel"} text={"  Close  "} />
-            </View>
+             
+            
+            <TouchableOpacity style={[styles.closeBtn,{marginTop:20}]} onPress={closeModal}>
+              <Text style={styles.closeAlertTxt}>Close</Text>
+            </TouchableOpacity>
+           
+               
+
           </View>
         </View>
       </Modal>
@@ -377,7 +382,7 @@ const SplashScreen = ({ navigation, route }) => {
 
       </View>
 
-      {loading ? <ActivityIndicator style={{ flexDirection:'column', justifyContent:'center', position:'absolute', top:hp('50%'),right:wp('50%') }} size="large" color={"white"} /> : <></>}
+      {loading ? <ActivityIndicator style={styles.loadingStyle} size="large" color={"white"} /> : <></>}
       {!loading && isVisible && (
         <Animated.View style={{ marginTop: hp("35%"), opacity: fadeAnim }}>
           <SparkLightLoginButton
@@ -539,7 +544,15 @@ const styles = StyleSheet.create({
     padding: 8,
     fontSize: 16,
     fontFamily: FontFamily.openSansRegular,
-  },
+  },loadingStyle:
+  {position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
 });
 
 export default SplashScreen;

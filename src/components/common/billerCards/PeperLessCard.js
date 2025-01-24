@@ -31,7 +31,7 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
               <Text style={[styles.dueDate, { fontWeight: '400', color: colors.gray600 }]}>Email Associated: </Text>
               <Text style={[styles.dueDate]}>{paperLessInfo?.[0].emailAddress}</Text>
               <Text style={styles.autoPayStatusText}>Paperless Billing On</Text>
-              <Text style={styles.thankYouText}>Thank you for choosing Paperless Billing!</Text>
+              <Text style={[styles.thankYouText,{marginTop:5}]}>Thank you for choosing Paperless Billing!</Text>
             </>
           ) : (
             <>
@@ -179,6 +179,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.success50,
     alignSelf: 'center',
     width: wp("40%"),
+    textAlign: 'center',
     borderColor: colors.sparklight_green,
     borderWidth: 1,
     borderRadius: 5,
@@ -195,6 +196,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     borderColor: colors.dark_grey,
     borderWidth: 1,
+    textAlign: 'center',
     width: wp("40%"),
     borderRadius: 5,
     padding: 5,
