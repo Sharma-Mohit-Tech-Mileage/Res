@@ -51,7 +51,7 @@ const Notifications = () => {
 
   return (
     <View style={styles.notifications}>
-      <ProfileSettingsHeader title="Notifications" onPressBack={() => navigation.goBack()} />
+      <ProfileSettingsHeader title="Notifications" onPressBack={() =>  navigation.navigate('account', { screen: 'Account' })} />
       <ScrollView>
         <View style={styles.notificationsInner}>
           <NotificationSection

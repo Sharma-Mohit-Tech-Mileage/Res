@@ -221,29 +221,29 @@ const MyTabs = ({ navigation, route }) => {
                 e.preventDefault();
                 return;
               }
-              if (!user?.isNormalUser) {
-                e.preventDefault();
-                navigation.reset({
-                  index: 0,
-                  routes: [
-                    {
-                      name: 'BillingTab',
-                      state: {
-                        routes: [
-                          {
-                            name: 'ArticalWindowUtility',
-                            params: {
-                              url: `${Env.PAYMENTURLNEW}`,
-                              name: 'Billing Details',
-                              isExpandable: true,
-                            },
-                          },
-                        ],
-                      },
-                    },
-                  ],
-                });
-              }
+              // if (!user?.isNormalUser) {
+              //   e.preventDefault();
+              //   navigation.reset({
+              //     index: 0,
+              //     routes: [
+              //       {
+              //         name: 'BillingTab',
+              //         state: {
+              //           routes: [
+              //             {
+              //               name: 'ArticalWindowUtility',
+              //               params: {
+              //                 url: `${Env.PAYMENTURLNEW}`,
+              //                 name: 'Billing Details',
+              //                 isExpandable: true,
+              //               },
+              //             },
+              //           ],
+              //         },
+              //       },
+              //     ],
+              //   });
+              // }
             },
           })}
           options={{
