@@ -167,7 +167,7 @@ const Support = ({ route }) => {
               startChatWithConfig(data);
             }
           }
-        } else if (group_id == "22567718430615") {
+        } else if (group_id == "1500003304341") {
           setIstechAgentAvailable(true);
           if (data) {
             if (Platform.OS === "ios") {
@@ -184,7 +184,7 @@ const Support = ({ route }) => {
             //PromptForAgentOffline()
             setIsAgentNotAvailable(true);
           }
-        } else if (group_id == "22567718430615") {
+        } else if (group_id == "1500003304341") {
           setIstechAgentAvailable(false);
           if (data) {
             //PromptForAgentOffline()
@@ -201,7 +201,7 @@ const Support = ({ route }) => {
 
   useFocusEffect(
     useCallback(() => {
-      checkAgentAvailibilty("22567718430615");
+      checkAgentAvailibilty("1500003304341");
       checkAgentAvailibilty("1500003312422");
     }, [])
   );
@@ -309,7 +309,7 @@ const Support = ({ route }) => {
 
   const onRefresh = () => {
     setRefreshing(true);
-    checkAgentAvailibilty("22567718430615");
+    checkAgentAvailibilty("1500003304341");
     checkAgentAvailibilty("1500003312422");
   };
 
@@ -342,8 +342,8 @@ const Support = ({ route }) => {
     };
     if (department == "SPK Virtual Call Center") {
       checkAgentAvailibilty("1500003312422", data);
-    } else if (department == "mobiletest") {
-      checkAgentAvailibilty("22567718430615", data);
+    } else if (department == "SPK TCC Residential") {
+      checkAgentAvailibilty("1500003304341", data);
     }
     //requestCameraPermission();
   };
@@ -662,7 +662,7 @@ const Support = ({ route }) => {
                           onPress={() => {
                             //toggleModal("tech");
                             if (istechAgentAvailable) {
-                              handlePressOpenButton("mobiletest", [
+                              handlePressOpenButton("SPK TCC Residential", [
                                 "Resi_TechSupport",
                                 "Resimobileapp",
                               ]);

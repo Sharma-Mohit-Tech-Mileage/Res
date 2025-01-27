@@ -168,7 +168,7 @@ const MyServices = ({ route }) => {
               startChatWithConfig(data);
             }
           }
-        } else if (group_id == "22567718430615") {
+        } else if (group_id == "1500003304341") {
           setIstechAgentAvailable(true);
           if (data) {
             if (Platform.OS === "ios") {
@@ -185,7 +185,7 @@ const MyServices = ({ route }) => {
             //PromptForAgentOffline()
             setIsAgentNotAvailable(true);
           }
-        } else if (group_id == "22567718430615") {
+        } else if (group_id == "1500003304341") {
           setIstechAgentAvailable(false);
           if (data) {
             //PromptForAgentOffline()
@@ -244,7 +244,7 @@ const MyServices = ({ route }) => {
 
   useFocusEffect(
     useCallback(() => {
-      checkAgentAvailibilty("22567718430615");
+      checkAgentAvailibilty("1500003304341");
       checkAgentAvailibilty("1500003312422");
       fetchNetworkId();
       getInternetPlanDetails();
@@ -354,7 +354,7 @@ const MyServices = ({ route }) => {
 
   const onRefresh = () => {
     setRefreshing(true);
-    checkAgentAvailibilty("22567718430615");
+    checkAgentAvailibilty("1500003304341");
     checkAgentAvailibilty("1500003312422");
   };
 
@@ -387,8 +387,8 @@ const MyServices = ({ route }) => {
     };
     if (department == "SPK Virtual Call Center") {
       checkAgentAvailibilty("1500003312422", data);
-    } else if (department == "mobiletest") {
-      checkAgentAvailibilty("22567718430615", data);
+    } else if (department == "SPK TCC Residential") {
+      checkAgentAvailibilty("1500003304341", data);
     }
     //requestCameraPermission();
   };
