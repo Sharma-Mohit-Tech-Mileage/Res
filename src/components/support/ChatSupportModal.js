@@ -59,9 +59,9 @@ const ChatSupportModal = ({ department, onClose }) => {
         chat: {
           departments: {
             //  enabled: []
-              enabled: ['SPK TCC Residential'],
+              enabled: ['mobiletest'],
   
-              select: ['SPK TCC Residential'],
+              select: ['mobiletest'],
             },
           tags: ${tagsString},
         
