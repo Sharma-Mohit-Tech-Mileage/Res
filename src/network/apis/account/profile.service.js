@@ -18,7 +18,7 @@ const getProfileDetails = async () => {
     if (accountNumber.toString().length >= 16) {
         ApiMethod = `/api/profile/${accountNumber}`
     } else {
-        ApiMethod = `/api/profile/${accountNumber}`
+        ApiMethod = `/users/api/profile/${accountNumber}`
     }
     return _axios.get(ApiMethod, { ...config })
         .then(res => res.data)
@@ -187,7 +187,7 @@ const postProfileInfo = async (data) => {
         if (accountNumber.toString().length >= 16) {
             ApiMethod = `/api/profile`
         } else {
-            ApiMethod = `/api/profile`
+            ApiMethod = `/users/api/profile`
         }
         console.log(`Making API Call to ${ApiMethod} with data:`, data);
 
