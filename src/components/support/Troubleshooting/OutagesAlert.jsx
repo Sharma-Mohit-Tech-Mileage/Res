@@ -93,7 +93,6 @@ const OutagesAlert = ({
                 <View
                     ref={alertRef}
                     style={styles.spinnerContainer}
-                    accessible={true}
                     accessibilityRole="alert"
                     importantForAccessibility="yes"
                 >
