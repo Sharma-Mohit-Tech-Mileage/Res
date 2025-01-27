@@ -118,20 +118,20 @@ const BillingScreen = ({ navigation }) => {
       // getUserAccountDetails();
       // dispatch(fetchBillingPaper());
       // dispatch(fetchProfileDetails());
-      if (user?.isNormalUser) {
+      //if (user?.isNormalUser) {
         getStatus();
         getUserAccountDetails();
         dispatch(fetchBillingPaper());
         dispatch(fetchProfileDetails());
         dispatch(fetchSvEmailAssociation());
-      } else {
-        navigation.navigate("ArticalWindowUtility", {
-          url: `${Env.PAYMENTURLNEW}`,
-          name: "Billing Details",
-          isBilling: true
-        });
+      //} else {
+        // navigation.navigate("ArticalWindowUtility", {
+        //   url: `${Env.PAYMENTURLNEW}`,
+        //   name: "Billing Details",
+        //   isBilling: true
+        // });
 
-      }
+      //}
 
     }, [])
   );
