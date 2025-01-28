@@ -287,6 +287,7 @@ const UserManagementEdit = ({ route }) => {
                         )}
                       />
                     </View>
+                    <Text style={[styles.yourSavedCard, styles.taylorTypo,{fontSize:12}]}>*Username can't contain any special characters</Text>
                   </View>
 
                   <View style={styles.frameParent1} accessible={false}>

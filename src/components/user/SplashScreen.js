@@ -222,7 +222,7 @@ const SplashScreen = ({ navigation, route }) => {
             />
              
             
-            <TouchableOpacity style={[styles.closeBtn,{marginTop:20}]} onPress={closeModal}>
+            <TouchableOpacity accessibilityRole="button" style={[styles.closeBtn,{marginTop:20}]} onPress={closeModal}>
               <Text style={styles.closeAlertTxt}>Close</Text>
             </TouchableOpacity>
            

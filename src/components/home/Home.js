@@ -681,33 +681,41 @@ const HomeScreen = ({ navigation }) => {
 
 
   const OutageAlert = ({ estimatedTime }) => {
+    const alertMessage = `Our systems show that you may be experiencing an outage related to your Internet service. We are working to restore service as soon as possible. Estimated Time to Restore: ${estimatedTime}`;
     return (
       <View
+        style={styles.errorBox}
         accessibilityElementsHidden={showWalkThrough}
-        importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
-        style={styles.errorBox}>
+        importantForAccessibility={showWalkThrough ? "no-hide-descendants" : "yes"}
+      >
+        <View style={{ flexDirection: "row", width: "90%" }}>
         <View
-          accessibilityElementsHidden={showWalkThrough}
-          importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
-          style={{ flexDirection: "row", width: "90%" }}>
-          <View style={{ backgroundColor: "#F88700", width: 4 }} />
+            accessible={false}
+            style={{ backgroundColor: "#F88700", width: 4 }} 
+          />
           <View style={{ flexDirection: "column", padding: 10 }}>
-            <View
-              accessibilityElementsHidden={showWalkThrough}
-              importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
-              style={{ flexDirection: "row" }}>
+            <View style={{ flexDirection: "row" }}>
               <Image
+                accessible={false}
                 style={{ alignSelf: "center" }}
                 resizeMode="contain"
                 tintColor={"#F88700"}
                 source={require("../../../assets/info-circle.png")}
               />
-              <Text style={styles.modemError1}>Outage Alert</Text>
+              <Text 
+                accessible={true}
+                accessibilityRole="header"
+                style={styles.modemError1}
+              >
+                Outage Alert
+              </Text>
             </View>
             <Text
-              accessibilityElementsHidden={showWalkThrough}
-              importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
-              style={styles.modemError2}>
+              accessible={true}
+              accessibilityRole="text"
+              accessibilityLabel={alertMessage}
+              style={styles.modemError2}
+            >
               Our systems show that you may be experiencing an outage related to
               your Internet service. We are working to restore service as soon
               as possible.
@@ -718,6 +726,9 @@ const HomeScreen = ({ navigation }) => {
           </View>
 
           <TouchableOpacity
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Close outage alert"
             style={{ marginTop: 10 }}
             onPress={() => {
               setIsOutageAlert(false);
