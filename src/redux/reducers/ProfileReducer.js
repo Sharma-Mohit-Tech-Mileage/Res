@@ -1,8 +1,4 @@
-import {
-    LOGOUT,ALLSVEMAILASSOCIATED,SAVEALLSVEMAILASSOCIATED,
-    USER_PROFILE_DETAILS, SAVE_USER_LIST,
-    SAVE_SMS_SELECTION, SAVE_EMAIL_SELECTION,
-    SAVE_PAPERLESS_DETAILS, SAVE_PUSH_NOTIFICATIONS,SAVE_USER_ACCOUNT_SERVICE
+import { LOGOUT,ALLSVEMAILASSOCIATED,SAVEALLSVEMAILASSOCIATED, USER_PROFILE_DETAILS, SAVE_USER_LIST, SAVE_SMS_SELECTION, SAVE_EMAIL_SELECTION, SAVE_PAPERLESS_DETAILS, SAVE_PUSH_NOTIFICATIONS,SAVE_USER_ACCOUNT_SERVICE,SET_PAPERLESS_STATUS
 } from '../constants/index';
 
 const initialState = {
@@ -14,6 +10,7 @@ const initialState = {
     paperLessInfo: {},
     pushNotifications: [],
     allSvEmailAssociated:[],
+    paperlessStatusAcp: false,
     erro: ""
 }
 
@@ -65,6 +62,11 @@ const ProfileReducer = (state = initialState, action) => {
                 ...state,
                 allSvEmailAssociated: action.payload,
             };
+        case SET_PAPERLESS_STATUS:
+                return {
+                    ...state,
+                    paperlessStatusAcp: action.payload
+                };
         case LOGOUT:
             return {
                 initialState

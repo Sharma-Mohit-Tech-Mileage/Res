@@ -345,4 +345,26 @@ export const updateEmailList = (emailList, type) => {
     });
   };
 
+export const getPrimaryEmail = (data) => {
+    try {
+        if (!data || typeof data !== "object") {
+            return null;
+        }
 
+        if (!Array.isArray(data.email) || data.email.length === 0) {
+            return null;
+        }
+
+        const primaryEmail = data.email.find(
+            email => email && typeof email === "object" && email.is_primary === true
+        );
+
+        if (primaryEmail && typeof primaryEmail.email_address === "string") {
+            return primaryEmail.email_address;
+        }
+
+        return null;
+    } catch (error) {
+        return null;
+    }
+};

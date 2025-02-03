@@ -1,28 +1,26 @@
-import React, { useState, useEffect,useCallback } from "react";
-import { View, StyleSheet, Dimensions, ScrollView } from "react-native";
+import React, { useState,useCallback,useEffect } from "react";
+import { View, StyleSheet} from "react-native";
 import Card from "./billerCards/NewBillerSummary";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import { useFocusEffect } from "@react-navigation/native";
-
-const { width: viewportWidth } = Dimensions.get('window');
-
+import { useSelector, useDispatch } from "react-redux";
+import { getPaperlessStatus } from "../../redux/actions/ProfileActionSuite";
 const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymentDetails, navigation }) => {
+  const dispatch = useDispatch();
   const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [cardDigit, setCardDigit] = useState("");
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [accountNumber,setAccountNumber]=useState(undefined)
-
+  const paperlessStatusAcp  = useSelector(state => state.combinedReducers.profile?.paperlessStatusAcp);
   const getStatus = () => {
-    console.log('Get Status********************************************************************************************************************************')
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
       setAccountNumber(accountNumber)
       GetApiRequest(
         `api/accounts/${accountNumber}/easypay`,
         (res) => {
-          console.log('Get Status resonse********************************************************************************************************************************',res)
           setIsAutoPayStatus(res?.isEasyPay);
           setCardDigit(res?.epLastfour);
         },
@@ -43,6 +41,13 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
       };
     }, [])
   );
+
+  useEffect(() => {
+    console.log('Refresh Auto pay Data',paymentDetails);
+    if (paymentDetails?.email) {
+        dispatch(getPaperlessStatus(paymentDetails.email));
+    }
+}, [paymentDetails?.email, dispatch]);
 
   const renderCard = ({ item, index }) => {
     // if (index === 1) {
@@ -91,7 +96,7 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
         billAmt={billAmt}
         dueDate={(accountNumber=='8160360050005096')? '': dueDate}
         isAutoPayStatus={isAutoPayStatus}
-        paperlessStatus={paperlessStatus}
+        paperlessStatus={paperlessStatusAcp}
         navigation={navigation}
         style={styles.card}
       />

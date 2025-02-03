@@ -622,11 +622,14 @@ const addSVEmailMktFlag = async (email) => {
         throw error;
     }
 };
-export {
-    logError, logInfo, fetchUserList, getProfileDetails,
-    fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo,
-    fetchBillingStatus, fetchPaperLessDetails, putEmailNotification,
-    postEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications,
-    unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,manageSVEmails,
-    resendEmailVerification, addUserAction, removeUser, editUserAction, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, addSVEmailMktFlag
-}
+
+const isPaperlessEnabled = async (email) => {
+    const user = await getUser();
+    const response = await _axios.get(
+        `/api/Paperless/IsPaperless?account=${user.userInfo.accountNumber}&email=${email}`,
+        { headers: { Authorization: `Bearer ${user.token}` } }
+    );
+    return response.data;
+};
+
+export { logError, logInfo, fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,manageSVEmails,isPaperlessEnabled, resendEmailVerification, addUserAction, removeUser, editUserAction, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, addSVEmailMktFlag }

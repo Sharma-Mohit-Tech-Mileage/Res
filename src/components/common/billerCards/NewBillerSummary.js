@@ -120,6 +120,21 @@ console.log("Due Date",dueDate)
                 </Text>
               </View>
             </View>
+            <View style={[styles.statusRow]}>
+              <Text style={styles.label}>Paperless : </Text>
+              <View style={styles.status}>
+                <Image
+                  resizeMode="cover"
+                  source={isAutoPayStatus ? check : uncheck}
+                  style={styles.statusIcon}
+                />
+                <Text
+                  style={isAutoPayStatus ? styles.labelActive : styles.label}
+                >
+                  {isAutoPayStatus ? "On" : "Off"}
+                </Text>
+              </View>
+            </View>
       
                                
             
