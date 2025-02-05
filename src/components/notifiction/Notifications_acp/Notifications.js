@@ -38,8 +38,8 @@ const Notifications = () => {
       title: 'Text Notifications',
       isComingSoon: true,
       infoMessage: phoneNumber ? 
-        `Text alerts are sent to ${phoneNumber}` : 
-        'No mobile phone number on file'
+        "" : 
+        ""
     },
     {
       id: 'email',
@@ -51,7 +51,7 @@ const Notifications = () => {
       id: 'app',
       title: 'In-App Notifications',
       isComingSoon: true,
-      infoMessage: 'Notifications sent from your application'
+      infoMessage: ''
     }
   ];
 
