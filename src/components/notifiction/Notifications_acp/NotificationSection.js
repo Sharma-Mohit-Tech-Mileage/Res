@@ -1,0 +1,239 @@
+// NotificationSection.js
+import React from 'react';
+import { View, Text, Pressable, Image, StyleSheet } from 'react-native';
+import { Color, Padding, FontSize, FontFamily, Border } from '../../../../GlobalStyles';
+
+// Sub-components
+const StatusIcon = ({ status }) => (
+  <Image
+    style={styles.icon}
+    resizeMode="cover"
+    source={status === 'On' ? 
+      require('../../../../assets/checkcircle.png') : 
+      require('../../../../assets/checkcircle1.png')
+    }
+  />
+);
+
+const InfoIcon = () => (
+  <Image
+    style={styles.icon}
+    resizeMode="contain"
+    source={require('../../../../assets/infocircle.png')}
+  />
+);
+
+const EditButton = ({ onPress }) => (
+  <Pressable
+    style={({ pressed }) => [
+      styles.editButton,
+      pressed && styles.editButtonPressed
+    ]}
+    accessible={true}
+    accessibilityRole="button"
+    accessibilityLabel="Edit notifications"
+    onPress={onPress}
+  >
+    <Text style={styles.editButtonText}>Edit</Text>
+  </Pressable>
+);
+
+const ComingSoonBadge = () => (
+  <View style={styles.comingSoonBadge}>
+    <Text style={styles.comingSoonText}>Coming Soon</Text>
+  </View>
+);
+
+const NotificationToggle = ({ type, status, isLast, warn }) => (
+  <View style={[
+    styles.toggleContainer,
+    !isLast && styles.bottomBorder,
+    warn && styles.warnBackground
+  ]}>
+    <Text style={styles.toggleText}>{type}</Text>
+    <View style={styles.statusContainer}>
+      <StatusIcon status={status} />
+      <Text style={styles.statusText}>{status}</Text>
+    </View>
+  </View>
+);
+
+const InfoMessage = ({ message }) => (
+  <View style={styles.infoMessage}>
+    <InfoIcon />
+    <Text style={styles.infoText}>{message}</Text>
+  </View>
+);
+
+const AdminMessage = () => (
+  <View style={styles.adminMessage}>
+    <Text style={styles.adminText}>
+      Only Primary Admin can make changes
+    </Text>
+  </View>
+);
+
+// Main component
+const NotificationSection = ({
+  title,
+  infoMessage,
+  settings = [],
+  isComingSoon = false,
+  isAdmin = false,
+  onEdit
+}) => {
+  return (
+    <View style={styles.sectionContainer}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>{title}</Text>
+        {isComingSoon ? (
+          <ComingSoonBadge />
+        ) : !isAdmin && (
+          <EditButton onPress={onEdit} />
+        )}
+      </View>
+
+      {/* Admin Message */}
+      {isAdmin && <AdminMessage />}
+
+      {/* Info Message */}
+      {infoMessage && <InfoMessage message={infoMessage} />}
+
+      {/* Settings List */}
+      {settings.map((setting, index) => (
+        <NotificationToggle
+          key={setting.id}
+          {...setting}
+          isLast={index === settings.length - 1}
+        />
+      ))}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  // Section Container
+  sectionContainer: {
+    backgroundColor: Color.sparklightWhite,
+    borderRadius: Border.br_5xs,
+    borderWidth: 1,
+    borderColor: Color.sparklightGray,
+    marginBottom: Padding.p_base,
+    overflow: 'hidden'
+  },
+
+  // Header
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Padding.p_base
+  },
+  title: {
+    fontSize: FontSize.size_3xl,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.sparklightGray1
+  },
+
+  // Edit Button
+  editButton: {
+    backgroundColor: Color.colorMidnightblue,
+    paddingVertical: Padding.p_7xs,
+    paddingHorizontal: Padding.p_base,
+    borderRadius: Border.br_11xs,
+    minWidth: 70,
+    alignItems: 'center'
+  },
+  editButtonPressed: {
+    opacity: 0.8
+  },
+  editButtonText: {
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.sparklightWhite
+  },
+
+  // Coming Soon Badge
+  comingSoonBadge: {
+    backgroundColor: Color.sparklightGray,
+    paddingVertical: Padding.p_9xs,
+    paddingHorizontal: Padding.p_base,
+    borderWidth: 1,
+  },
+  comingSoonText: {
+    fontSize: FontSize.textXsSemibold_size,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.sparklightGray1
+  },
+
+  // Info Message
+  infoMessage: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Color.colorWhitesmoke_100,
+    padding: Padding.p_base,
+    marginHorizontal: Padding.p_base,
+    marginBottom: Padding.p_base,
+    borderRadius: Border.br_5xs
+  },
+  infoText: {
+    flex: 1,
+    marginLeft: Padding.p_5xs,
+    fontSize: FontSize.textXsSemibold_size,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorGray_200
+  },
+
+  // Toggle
+  toggleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Padding.p_base
+  },
+  bottomBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: Color.sparklightGray
+  },
+  toggleText: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorGray_200
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  statusText: {
+    marginLeft: Padding.p_5xs,
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorGray_200
+  },
+
+  icon: {
+    width: 18,
+    height: 18
+  },
+
+  // Admin Message
+  adminMessage: {
+    backgroundColor: Color.colorWhitesmoke_100,
+    padding: Padding.p_base,
+    marginBottom: Padding.p_base
+  },
+  adminText: {
+    textAlign: 'center',
+    fontSize: FontSize.textXsSemibold_size,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorGray_200
+  },
+
+  // Warning state
+  warnBackground: {
+    backgroundColor: Color.colorlightRed
+  }
+});
+
+export default NotificationSection;

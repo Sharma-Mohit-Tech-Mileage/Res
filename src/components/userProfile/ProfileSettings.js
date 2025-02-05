@@ -46,7 +46,7 @@ const ProfileSettings = () => {
 
   return (
     <View style={{ zIndex: 1 }}>
-      <ProfileSettingsHeader title="Profile Settings" onPressBack={() => navigation.goBack()} />
+      <ProfileSettingsHeader title="Profile" onPressBack={() => navigation.goBack()} />
       <ScrollView accessibilityLabel="Profile settings page.">
         <View style={styles.frameParent}>
           <View style={[styles.frameGroup]}>

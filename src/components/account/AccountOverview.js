@@ -96,10 +96,10 @@ const AccountOverview = () => {
 
   const menuItems = [
     {
-      name: 'Profile Settings',
+      name: 'Profile',
       onPress: () => navigation.navigate('ProfileSettings'),
       icon: profileSettingsIcon,
-      accessibilityLabel: 'Navigate to profile settings',
+      accessibilityLabel: 'Navigate to profile',
       includeInMenu: true,
     },
     {
@@ -134,10 +134,18 @@ const AccountOverview = () => {
 
   const menuItems1 = [
     {
-      name: 'Profile Settings',
+      name: 'Profile',
       onPress: () => navigation.navigate('ProfileSettings'),
       icon: profileSettingsIcon,
-      accessibilityLabel: 'Navigate to profile settings',
+      accessibilityLabel: 'Navigate to profile',
+      includeInMenu: true,
+    },
+
+    {
+      name: 'Notifications',
+      onPress: () => navigation.navigate('Notifications'),
+      icon: notificationsIcon,
+      accessibilityLabel: 'Navigate to notifications settings',
       includeInMenu: true,
     },
     {
@@ -147,6 +155,7 @@ const AccountOverview = () => {
       accessibilityLabel: 'Navigate to password and security settings',
       includeInMenu: true,
     },
+
     
     {
       name: 'App Feedback',
