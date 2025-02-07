@@ -4,10 +4,7 @@ import DataUsageComponent from "./DataUsageComponent";
 import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { View, Text, StyleSheet } from "react-native";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { GetApiRequest } from "../../network/APIClient";
 
 const MyDataUsage = ({ plans, tvPlan, phonePlan, navigation }) => {

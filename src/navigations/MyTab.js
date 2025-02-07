@@ -6,14 +6,12 @@ import { useTabBarVisibility } from './TabBarVisibilityContext';
 import AccountStackScreen from '../navigations/stackNavigation/AccountStack';
 import SupportStack from '../navigations/stackNavigation/SupportStack';
 import HomeStackScreen from './stackNavigation/HomeStack';
-import ShopStack from '../navigations/stackNavigation/ShopStack';
 import HomeIconSelected from '../res/svgIcons/HomeIconSelected';
 import HomeIcon from '../res/svgIcons/HomeIcon';
 import SupportIcon from '../res/svgIcons/SupportIcon';
 import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
 import { FontFamily } from '../../GlobalStyles';
-import { Env } from '../network/apis/account/Constants';
 import { fetchProfileDetails } from '../redux/actions/ProfileActionSuite';
 import BillingIcon from "../res/svgIcons/BillingIcon";
 import BillingStackScreen from "./stackNavigation/BillingStack";
@@ -54,14 +52,14 @@ const MyTabs = ({ navigation, route }) => {
   }, []);
 
   const isTabAccessibleDuringWalkthrough = (tabIndex) => {
-    if (!user?.isNormalUser || home.walkThroughStep === null || home.walkThroughStep === undefined) {
+    if ( home.walkThroughStep === null || home.walkThroughStep === undefined) {
       return true;
     }
     return home.walkThroughStep === tabIndex;
   };
 
   const isWalkthroughActive = () => {
-    return user?.isNormalUser && home.walkThroughStep !== null && home.walkThroughStep !== undefined;
+    return  home.walkThroughStep !== null && home.walkThroughStep !== undefined;
   };
 
   const getTabBarIconWrapper = (IconComponent, focused, tabIndex) => {
@@ -80,46 +78,7 @@ const MyTabs = ({ navigation, route }) => {
     );
   };
 
-  function CustomTabBarButton({ onPress, isDisabled, focused, children, tabIndex }) {
-    const isAccessible = isTabAccessibleDuringWalkthrough(tabIndex);
-    const handlePress = () => {
-      if (isDisabled) {
-        Alert.alert('Coming Soon', 'We are still working on it.');
-        return;
-      }
-      if ((!isAccessible && isScreenReaderEnabled) || isWalkthroughActive()) {
-        return;
-      }
-      onPress();
-    };
-
-    return (
-      <Pressable 
-        onPress={handlePress} 
-        style={[
-          styles.tabButton,
-          !isAccessible && styles.disabledTab
-        ]}
-        accessible={isAccessible}
-        accessibilityElementsHidden={!isAccessible}
-        importantForAccessibility={isAccessible ? 'yes' : 'no-hide-descendants'}
-        accessibilityRole="tab"
-        accessibilityState={{ 
-          disabled: !isAccessible || isDisabled,
-          selected: focused 
-        }}
-        accessibilityLabel={`${isDisabled ? 'Coming soon' : children?.props?.accessibilityLabel || ''}`}
-      >
-        <View accessible={false} importantForAccessibility="no">
-          {focused ? <SupportIconSelected/> : <SupportIcon isNewBillerUser={!user?.isNormalUser}/>}
-          {children}
-        </View>
-      </Pressable>
-    );
-  }
-
   useEffect(() => {
-    if (user?.isNormalUser) {
       switch(home.walkThroughStep) {
         case 0:
           setShadowStyle(styles.shadowTabs);
@@ -142,12 +101,11 @@ const MyTabs = ({ navigation, route }) => {
           setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep4Left]);
           break;
       }
-    }
-  }, [home, user?.isNormalUser]);
+  }, [home]);
 
   return (
     <>
-      {user?.isNormalUser && home.walkThroughStep !== null && home.walkThroughStep !== undefined && (
+      { home.walkThroughStep !== null && home.walkThroughStep !== undefined && (
         <>
           <View style={shadowStyleLeft} />
           <View style={shadowStyle} />
@@ -221,29 +179,6 @@ const MyTabs = ({ navigation, route }) => {
                 e.preventDefault();
                 return;
               }
-              // if (!user?.isNormalUser) {
-              //   e.preventDefault();
-              //   navigation.reset({
-              //     index: 0,
-              //     routes: [
-              //       {
-              //         name: 'BillingTab',
-              //         state: {
-              //           routes: [
-              //             {
-              //               name: 'ArticalWindowUtility',
-              //               params: {
-              //                 url: `${Env.PAYMENTURLNEW}`,
-              //                 name: 'Billing Details',
-              //                 isExpandable: true,
-              //               },
-              //             },
-              //           ],
-              //         },
-              //       },
-              //     ],
-              //   });
-              // }
             },
           })}
           options={{

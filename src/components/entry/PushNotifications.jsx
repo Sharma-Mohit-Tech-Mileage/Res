@@ -24,7 +24,7 @@ const PushNotifications = ({ navigation }) => {
         let optOutCount = 0;
         const isValidStatus = ['approved', 'active'].includes(profile.paperLessInfo?.paperlessStatus?.toLowerCase());
         
-        if (profile?.smsSubscription.length > 0) {
+        if (profile?.smsSubscription?.length > 0) {
             const firstSubscription = profile?.smsSubscription[0];
             firstSubscription.smsMessageType.forEach((messageType) => {
                 if (messageType.optOutFlag) {

@@ -11,8 +11,6 @@ import UpArrow from "../../res/svgIcons/UpArrow";
 import NetworkDetails from "../common/NetworkDetails";
 import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
-import MyServicePlan from "../common/MyServicePlan";
-import MyDataUsage from "../common/MyDataUsage";
 import { getUser, getPushNotificationStatus, storePushNotificationStatus, storeUpgradeToken, } from "../../redux/utils/LocalStorage";
 import { GetApiRequest, GetModemStatusApiRequest, } from "../../network/APIClient";
 import moment from "moment";
@@ -21,11 +19,11 @@ import CloseIcon from "../../res/svgIcons/CloseIcon";
 import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
 import { updatePushNotifications, fetchPushNotifications, saveAccountServices } from "../../redux/actions/ProfileActionSuite";
 import { useSelector, useDispatch } from "react-redux";
-import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
 import { checkForMinorUpdate } from "../utility/constant";
 import PromotionCard from "../common/PromotionCard/PromotionCard";
 import { useFocusEffect } from "@react-navigation/native";
+import WalkthroughOverlay from "../common/WalkthroughOverlay";
 
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
@@ -47,7 +45,6 @@ const HomeScreen = ({ navigation }) => {
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [checkModemStatus, setCheckModemStatus] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
-  const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
   const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: '', latestVersion: '' });
@@ -80,8 +77,6 @@ const HomeScreen = ({ navigation }) => {
       reduceMotionChangedSubscription.remove();
     };
   }, [screenReaderEnabled]);
-
-
   const getInternetHealth = (type) => {
     var currentHealth = { Offline: 20, Poor: 50, Optimal: 80, default: 80 };
     return currentHealth[type] || currentHealth["default"];
@@ -309,7 +304,6 @@ const HomeScreen = ({ navigation }) => {
       GetApiRequest(
         request,
         (res) => {
-          console.log("getUserAccountDetails for normal user :::::::::::::::::::::::::::::::::::::::", res);
           if (res) {
             dispatch(saveAccountServices(res.services))
             if (res.currentCollectionStep == "Soft Disconnect") {
@@ -319,24 +313,14 @@ const HomeScreen = ({ navigation }) => {
             } else {
               updateInternetHealth(res.currentBalance, res.paymentDueDate);
             }
-
-            //let userBillAmt=(res.pastDueAmount<=0) ? res.currentBalance: res.pastDueAmount
-            //setBillAmt(userBillAmt?.toFixed(2));
             setBillAmt((Math.round(res.currentBalance * 100) / 100).toFixed(2));
-
-            // let dueDate = moment(res.paymentDueDate).format("ll");
-            // setDueDate(dueDate);
             let dueDate = (res.pastDueAmount != 0) ? 'Immediately' : moment(res.paymentDueDate).format("ll");
             setDueDate(dueDate);
-
-
             function getFirstEmail(emailArray) {
               return (emailArray && emailArray.length > 0 && emailArray[0])
                 ? emailArray[0]
                 : null;
             }
-
-
             let paymentDetails = { ...defaultPaymentDetails };
             paymentDetails.dueDate = res.paymentDueDate;
             paymentDetails.billAmount = (Math.round(res.currentBalance * 100) / 100).toFixed(2);
@@ -552,147 +536,12 @@ const HomeScreen = ({ navigation }) => {
     }
   }, [profile, user]);
 
-  const changeWalkThroughStep = (step) => {
-    if (step > 4) { // Changed from 3 to 4 since we have 5 steps (0-4)
-      dispatch(updateWalkThroughStep(null));
-      setShowWalkThrough(false);
-    } else {
-      dispatch(updateWalkThroughStep(step));
-      setWalkThroughStep(step);
-    }
-  };
-
-
-  const walkthroughModal = () => {
-    const walkThroughScreens = [
-      {
-        title: "Home",
-        description:
-          "View information related to your internet health, billing, service and more.",
-        buttonText: "Next",
-      },
-      {
-        title: "Billing",
-        description:
-          "Make payments, set up Auto Pay and view statements.",
-        buttonText: "Next",
-      },
-      {
-        title: "Service",
-        description:
-          "Manage your internet plans, explore upgrades and view available services.",
-        buttonText: "Next",
-      },
-      {
-        title: "Support",
-        description:
-          "View our FAQ, check in on your modem or troubleshoot your issues.",
-        buttonText: "Next",
-      },
-      {
-        title: "Account",
-        description:
-          "Manage your profile settings, notifications, users and more.",
-        buttonText: "Let's Go!",
-      },
-    ];
-
-    const walkThrough = walkThroughScreens[walkThroughStep];
-    const bottomCarotStyles = [styles.bottomCarot];
-
-    if (walkThroughStep === 1) {
-      bottomCarotStyles.push(styles.bottomCarotStep2);
-    } else if (walkThroughStep === 2) {
-      bottomCarotStyles.push(styles.bottomCarotStep3);
-    } else if (walkThroughStep === 3) {
-      bottomCarotStyles.push(styles.bottomCarotStep4);
-    } else if (walkThroughStep === 4) {
-      bottomCarotStyles.push(styles.bottomCarotStep5);
-    }
-
-    return (
-      <>
-        <View
-          accessibilityElementsHidden={!showWalkThrough}
-          importantForAccessibility={showWalkThrough ? "yes" : "no-hide-descendants"}
-          style={styles.walkThroughBubble}
-        >
-          <View >
-            <View
-              accessible={true}
-              accessibilityLabel={walkThrough.title}
-              style={styles.title}
-            >
-              <Text style={styles.titleText}>{walkThrough.title}</Text>
-            </View>
-            <View
-              accessible={true}
-              accessibilityLabel={walkThrough.description}
-              style={styles.description}
-            >
-              <Text style={styles.descriptionText}>
-                {walkThrough.description}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.walkThroughBottomArea} >
-            <View style={styles.circlePaging}>
-              <View style={styles.circle}></View>
-              <View style={walkThroughStep < 1 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
-              <View style={walkThroughStep < 2 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
-              <View style={walkThroughStep < 3 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
-              <View style={walkThroughStep < 4 ? [styles.circle, styles.circleUnselected] : styles.circle}></View>
-
-            </View>
-            <View style={styles.walkThroughButtons}>
-              <View style={styles.walkThroughSubButtons}>
-                {walkThroughStep > 0 && (
-                  <Pressable
-                    style={[styles.button, styles.buttonsLayout, styles.buttonPrevious]}
-                    onPress={() => changeWalkThroughStep(walkThroughStep - 1)}
-                    accessibilityLabel="Previous Step"
-                    accessibilityRole="button"
-                  >
-                    <Text style={styles.decline}>Previous</Text>
-                  </Pressable>
-                )}
-                <Pressable
-                  style={[styles.button, styles.buttonsLayout, styles.buttonNext]}
-                  onPress={() => changeWalkThroughStep(walkThroughStep + 1)}
-                  accessibilityLabel={walkThroughStep < walkThroughScreens.length - 1 ? "Next Step" : "Finish Walkthrough"}
-                  accessibilityRole="button"
-                >
-                  <Text style={styles.accept}>{walkThrough.buttonText}</Text>
-                </Pressable>
-              </View>
-            </View>
-          </View>
-          <View>
-            <Image
-              style={bottomCarotStyles}
-              tintColor={"#FFF"}
-              source={require("../../../assets/polygon.png")}
-            />
-          </View>
-        </View>
-      </>
-    );
-  };
-
-
   const OutageAlert = ({ estimatedTime }) => {
     const alertMessage = `Our systems show that you may be experiencing an outage related to your Internet service. We are working to restore service as soon as possible. Estimated Time to Restore: ${estimatedTime}`;
     return (
-      <View
-        style={styles.errorBox}
-        accessibilityElementsHidden={showWalkThrough}
-        importantForAccessibility={showWalkThrough ? "no-hide-descendants" : "yes"}
-      >
+      <View style={styles.errorBox} accessibilityElementsHidden={showWalkThrough} importantForAccessibility={showWalkThrough ? "no-hide-descendants" : "yes"} >
         <View style={{ flexDirection: "row", width: "90%" }}>
-        <View
-            accessible={false}
-            style={{ backgroundColor: "#F88700", width: 4 }} 
-          />
+          <View accessible={false} style={{ backgroundColor: "#F88700", width: 4 }} />
           <View style={{ flexDirection: "column", padding: 10 }}>
             <View style={{ flexDirection: "row" }}>
               <Image
@@ -702,7 +551,7 @@ const HomeScreen = ({ navigation }) => {
                 tintColor={"#F88700"}
                 source={require("../../../assets/info-circle.png")}
               />
-              <Text 
+              <Text
                 accessible={true}
                 accessibilityRole="header"
                 style={styles.modemError1}
@@ -813,7 +662,11 @@ const HomeScreen = ({ navigation }) => {
       style={styles.container}
     >
       {showWalkThrough && <View style={styles.shadowFullScreen} />}
-      {showWalkThrough && walkthroughModal()}
+      {showWalkThrough && (
+        <WalkthroughOverlay
+          onFinish={() => setShowWalkThrough(false)}
+        />
+      )}
 
       <SafeAreaView
         accessibilityElementsHidden={showWalkThrough}
@@ -823,13 +676,7 @@ const HomeScreen = ({ navigation }) => {
           accessibilityElementsHidden={showWalkThrough}
           importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
           accessibilityLabel={`SparkLight`}
-          style={{
-            height: Platform.OS == "ios" ? 60 : 50,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginHorizontal: 20,
-            marginTop: Platform.OS == "ios" ? 0 : 20,
-          }}
+          style={{ height: Platform.OS == "ios" ? 60 : 50, flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: Platform.OS == "ios" ? 0 : 20, }}
         >
           <Image
             accessible={!showWalkThrough}
@@ -840,14 +687,7 @@ const HomeScreen = ({ navigation }) => {
           />
         </View>
         <ScrollView style={{ height: "100%", paddingBottom: 100 }}>
-          <View
-            style={{
-              backgroundColor: colors.backgound_blue,
-              flex: 2,
-              alignItems: "center",
-              marginTop: 50,
-              paddingBottom: 50,
-            }}
+          <View style={{ backgroundColor: colors.backgound_blue, flex: 2, alignItems: "center", marginTop: 50, paddingBottom: 50, }}
           >
             {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert /> : null}
             {isOutageAlert ? (
@@ -935,8 +775,6 @@ const HomeScreen = ({ navigation }) => {
             </View>
             <PromotionCard />
             <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} paymentDetails={defaultPaymentDetails} navigation={navigation} />
-            {/* <MyServicePlan plans={plans}  hasEeroDevice={hasEeroDevice} networkId={networkId} navigation={navigation} />
-            <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} /> */}
           </View>
         </ScrollView>
       </SafeAreaView>

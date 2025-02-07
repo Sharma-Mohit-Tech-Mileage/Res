@@ -7,36 +7,32 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import DownArrow from "../../res/svgIcons/DownArrow";
 import UpArrow from "../../res/svgIcons/UpArrow";
 import { getUser, storeUpgradeToken } from "../../redux/utils/LocalStorage";
-import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
+import {  PostApiRequest } from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import AccessibleYoutubePlayer from "../common/AccessibleYoutubePlayer";
 import { saveAccountServices } from "../../redux/actions/ProfileActionSuite";
 import { useSelector, useDispatch } from "react-redux";
-import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
 import { checkForMinorUpdate ,getPrimaryEmail} from "../utility/constant";
 import MyInternetDetialsBiller from "../common/MyInternetDetailsBiller";
+import WalkthroughOverlay from '../common/WalkthroughOverlay';
 import { useFocusEffect } from "@react-navigation/native";
 const tabWidth = Number(Dimensions.get("window").width / 4);
 const NewBillerHome = ({ navigation }) => {
-  const [playing, setPlaying] = useState(false);
   const [isImageDispaly, setIsImageDispaly] = useState(true);
   const home = useSelector((state) => state.combinedReducers.home);
 
   const dispatch = useDispatch();
-  const [phonePlan, setPhonePlan] = useState([]);
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
   const [pastPaymentDue, setPastPaymentDue] = useState(0.0);
   const [payStatus, setPayStatus] = useState({});
-  const [hasOutage, setHasOutage] = useState(false);
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [checkModemStatus, setCheckModemStatus] = useState(false);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null });
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
-  const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
   const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: "", latestVersion: "", });
@@ -124,6 +120,7 @@ const NewBillerHome = ({ navigation }) => {
         console.error("Error fetching data", error);
       }
       if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
+        setShowWalkThrough(true);
       }
     };
     fetchData();
@@ -140,15 +137,6 @@ const NewBillerHome = ({ navigation }) => {
       getUserAccountDetails();
     }, [])
   );
-  const changeWalkThroughStep = (step) => {
-    if (step > 2) {
-      dispatch(updateWalkThroughStep(null));
-      setShowWalkThrough(false);
-    } else {
-      dispatch(updateWalkThroughStep(step));
-      setWalkThroughStep(step);
-    }
-  };
 
 
   const OutageAlert = ({ estimatedTime }) => {
@@ -255,7 +243,12 @@ const NewBillerHome = ({ navigation }) => {
       colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
       style={styles.container}
     >
-
+     {showWalkThrough && <View style={styles.shadowFullScreen} />}
+      {showWalkThrough && (
+        <WalkthroughOverlay
+          onFinish={() => setShowWalkThrough(false)}
+        />
+      )}
       <SafeAreaView style={{ flex: 1 }}>
         <View
           accessibilityElementsHidden={showWalkThrough}

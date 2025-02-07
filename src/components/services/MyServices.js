@@ -1,42 +1,13 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import {
-  StyleSheet,
-  View,
-  Image,
-  Pressable,
-  ScrollView,
-  Linking,
-  RefreshControl,
-  ActivityIndicator,
-  Platform,
-  Text,
-  TouchableOpacity,
-  Alert,
-  PermissionsAndroid,
-} from "react-native";
+import { StyleSheet, View, Image, Pressable, ScrollView, Linking, RefreshControl, ActivityIndicator, Platform, Text, TouchableOpacity, Alert, PermissionsAndroid, } from "react-native";
 import { useSelector } from "react-redux";
-import {
-  Border,
-  Padding,
-  Color,
-  FontSize,
-  FontFamily,
-} from "../../../GlobalStyles";
+import { Border, Padding, Color, FontSize, FontFamily, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions";
 import PubSub from "pubsub-js";
-import ChatIcon from "../../res/svgIcons/ChatIcon";
 import base64 from "react-native-base64";
-//import ZendDesk from '@pagopa/io-react-native-zendesk';
-import {
-  startChatWithConfig,
-  setVisitorInfo,
-  startChat,
-  clearChatData,
-} from "../utility/RNZendeskChat";
-import TicketListIcon from "../../res/svgIcons/TicketListIcon";
+import { startChatWithConfig, startChat, } from "../utility/RNZendeskChat";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 import MyServicePlan from "../common/MyServicePlan";
 import { getUser } from "../../redux/utils/LocalStorage";
@@ -46,8 +17,6 @@ import AppStyles from "../common/styles/AppStyles";
 
 const MyServices = ({ route }) => {
   const navigation = useNavigation();
-  const [showModal, setShowModal] = useState(false);
-  const [department, setDepartment] = useState("");
   const userData = useSelector((state) => state.combinedReducers.user.userData);
   const scrollViewRef = useRef(null);
   const [isAgentAvailable, setisAgentAvailable] = useState(false);
@@ -57,80 +26,40 @@ const MyServices = ({ route }) => {
   const [plans, setPlans] = React.useState([]);
   const [hasEeroDevice, setHasEeroDevice] = React.useState(false);
   const [networkId, setNetworkId] = React.useState(null);
-  const makeCall = (number) => {
-    let phoneNumber = "";
-
-    if (Platform.OS === "android") {
-      phoneNumber = `tel:${number}`;
-    } else {
-      phoneNumber = `telprompt:${number}`;
-    }
-
-    Linking.openURL(phoneNumber);
-  };
-
-  const toggleModal = (department) => {
-    setDepartment(department);
-    setTimeout(() => {
-      setShowModal(!showModal);
-    }, 1000);
-  };
-
-  const requestCameraPermission = async () => {
-    if (Platform.OS === "android") {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-          {
-            title: "Camera Permission",
-            message: `This app requires access to the camera to take photos for chat support.
-                If you deny camera access to MySparklight, you can enable it later in Settings.`,
-            buttonNeutral: "Ask Me Later",
-            buttonNegative: "Cancel",
-            buttonPositive: "OK",
-          }
-        );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log("Camera permission granted");
-        } else {
-          console.log("Camera permission denied");
-        }
-      } catch (err) {
-        console.warn(err);
-      }
-    } else {
-      const result = await check(PERMISSIONS.IOS.CAMERA);
-      if (result !== RESULTS.GRANTED) {
-        const granted = await request(PERMISSIONS.IOS.CAMERA);
-        if (granted === RESULTS.GRANTED) {
-          //Alert.alert('Camera permission granted');
-        } else {
-          Alert.alert(
-            "Camera Permission",
-            `This app requires access to the camera to take photos for chat support.
-                If you deny camera access to MySparklight, you can enable it later in Settings.`,
-            [
-              {
-                text: "Cancel",
-                onPress: () => null,
-                style: "cancel",
-              },
-              {
-                text: "Open Settings",
-                onPress: () => {
-                  Linking.openSettings();
-                },
-              },
-            ],
-            { cancelable: true }
-          );
-        }
-      } else {
-        // Alert.alert('Camera permission already granted');
-      }
+  const [tvPlan, setTVPlan] = useState('');
+  const [phonePlan, setPhonePlan] = useState([]);
+  function getPhoneServiceDetails() {
+    getUser().then((res) => {
+      const request = `phone/api/phones/${res.userInfo.accountNumber}/phonelines`;
+      GetApiRequest(request, onSuccessPhonePlan, onError);
+    });
+  }
+  function getPhoneServicePlans(tgcCode) {
+    getUser().then((res) => {
+      const request = `phone/api/Plans/${tgcCode}`;
+      GetApiRequest(request, onFetchedPlan, onError);
+    });
+  }
+  const onFetchedPlan = (res) => {
+    setPhonePlan(res);
+  }
+  const onSuccessPhonePlan = (res) => {
+    if (res.length && res[0].tcgCode) {
+      getPhoneServicePlans(res[0].tcgCode);
     }
   };
-
+ const getTVServiceDetails = () => {
+    getUser().then((res) => {
+      const request = `sparklighttv/api/sparklighttv/${res.userInfo.accountNumber}/plan`;
+      GetApiRequest(request, onSuccessTVPlan, onError);
+    });
+  };
+  const onSuccessTVPlan = (res) => {
+    setTVPlan(res || '');
+  };
+  const onError = (error) => {
+    console.log("error", error);
+  };
   const checkAgentAvailibilty = async (group_id, data) => {
     const username = "mobile-support@sparklight.biz/token";
     const password = "ek20PJEI1zZd4sm1LJr3JuYw7ujt1F1ic82b4Jjc";
@@ -248,6 +177,8 @@ const MyServices = ({ route }) => {
       checkAgentAvailibilty("1500003312422");
       fetchNetworkId();
       getInternetPlanDetails();
+      getPhoneServiceDetails();
+      getTVServiceDetails();
     }, [])
   );
 
@@ -262,77 +193,6 @@ const MyServices = ({ route }) => {
     return unsubscribe;
   }, [navigation]);
 
-  //const checkChatAvailability = () => {
-
-  // const now = moment();
-  // const nowUTC = now.tz('MST');
-
-  // const currentHour = nowUTC.hour();
-
-  // console.log('Current UTC Hour',currentHour)
-
-  // // Define the time range when chat should be disabled (e.g., 10 PM to 6 AM)
-  // const disableStart = 18;  // 10:00 PM
-  // const disableEnd = 5;     // 6:00 AM
-
-  // // Check if the current time is within the disabled range
-  // if (currentHour >= disableStart || currentHour < disableEnd) {
-  //   setisAgentAvailable(true);
-  // } else {
-  //   setisAgentAvailable(false);
-  // }
-
-  // }
-
-  const items = [
-    {
-      key: "searchIssues",
-      text: "Search",
-      icon: require("../../../assets/search-md.png"),
-      iconAlignment: "left", // Icon to the left of the text
-      navigateTo: "searchArticals",
-    },
-    {
-      key: "Faqs",
-      text: "FAQs",
-      icon: require("../../../assets/chevronright.png"),
-      iconAlignment: "right", // Icon to the left of the text
-      navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us/articles/18929657224855",
-    },
-    {
-      key: "moreOptions",
-      text: "Billing & Payments",
-      icon: require("../../../assets/chevronright.png"),
-      iconAlignment: "right", // Icon to the right of the text
-      navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us/categories/15840476056727-Billing-Payments",
-    },
-    {
-      key: "moreOptions",
-      text: "Internet Service",
-      icon: require("../../../assets/chevronright.png"),
-      iconAlignment: "right", // Icon to the right of the text
-      navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us/categories/115000833068-Internet",
-    },
-    {
-      key: "moreOptions",
-      text: "WiFi",
-      icon: require("../../../assets/chevronright.png"),
-      iconAlignment: "right", // Icon to the right of the text
-      navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us/categories/115001419607-WiFi",
-    },
-    {
-      key: "moreOptions",
-      text: "More...",
-      icon: require("../../../assets/chevronright.png"),
-      iconAlignment: "right", // Icon to the right of the text
-      navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us",
-    },
-  ];
 
   var mySubscriber = function (msg, data) {
     console.log(msg, data);
@@ -356,41 +216,6 @@ const MyServices = ({ route }) => {
     setRefreshing(true);
     checkAgentAvailibilty("1500003304341");
     checkAgentAvailibilty("1500003312422");
-  };
-
-  const PromptForAgentOffline = () => {
-    Alert.alert(
-      "Our agents are currently unavailable.",
-      "Our agents are currently unavailable. Please reach out during our business hours, and we’ll be happy to assist you.Thank you for your understanding!",
-      [
-        {
-          text: "Ok",
-          onPress: () => null,
-          style: "cancel",
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  const handlePressOpenButton = (department, tags) => {
-    const data = {
-      name: "",
-      email:
-        userData.userInfo.email !== undefined &&
-        userData.userInfo.email !== null
-          ? userData.userInfo.email
-          : "",
-      phone: "2312345678",
-      tags: ["pid:_" + userData.userInfo.accountNumber, ...tags],
-      department: department,
-    };
-    if (department == "SPK Virtual Call Center") {
-      checkAgentAvailibilty("1500003312422", data);
-    } else if (department == "SPK TCC Residential") {
-      checkAgentAvailibilty("1500003304341", data);
-    }
-    //requestCameraPermission();
   };
 
   return (
@@ -437,7 +262,7 @@ const MyServices = ({ route }) => {
           {userData?.isNormalUser && (
             <>
               <View
-                style={[AppStyles.card,{marginTop:Padding.p_5xs}]}
+                style={[AppStyles.card, { marginTop: Padding.p_5xs }]}
               >
                 <View
                   style={[
@@ -509,40 +334,6 @@ const MyServices = ({ route }) => {
                   </Pressable>
                 }
 
-                {/* <View style={[styles.integrationCardMobileContainer, styles.contentSpaceBlock]} >
-                                    <Pressable
-                                        style={[styles.integrationCardMobile1, styles.integrationCardBorder,]}
-                                        onPress={() => { navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/18929657224855', name: 'FAQ' }) }}
-                                    >
-                                        <View style={[styles.content, styles.contentSpaceBlock]}>
-                                            <View style={styles.headingAndIcon}>
-                                                <View style={[]}>
-                                                    <Image
-                                                        style={styles.icon}
-                                                        resizeMode="stretch"
-                                                        source={require("../../../assets/icon-faq.png")}
-                                                    /></View>
-                                                <View style={styles.frameParent}>
-                                                    <View style={styles.headingAndToggle}>
-                                                        <Text style={[styles.headingTypo]}>
-                                                            FAQ
-                                                        </Text>
-                                                        <Image
-                                                            style={styles.chevronIconLayout}
-                                                            resizeMode="stretch"
-                                                            source={require("../../../assets/chevronright.png")}
-                                                        />
-                                                    </View>
-                                                    <Text style={[styles.supportingText, styles.supportingTypo1]}>
-                                                        Review common questions.
-                                                    </Text>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </Pressable>
-                                </View>
-
-                                */}
                 <View
                   style={[
                     styles.integrationCardMobileContainer,
@@ -596,17 +387,14 @@ const MyServices = ({ route }) => {
                 </View>
               </View>
 
-              
-                <MyServicePlan
-                  plans={plans}
-                  hasEeroDevice={hasEeroDevice}
-                  networkId={networkId}
-                  navigation={navigation}
-                />
-                <MyDataUsage plans={plans}  navigation={navigation} />
-              
 
-              
+              <MyServicePlan
+                plans={plans}
+                hasEeroDevice={hasEeroDevice}
+                networkId={networkId}
+                navigation={navigation}
+              />
+              <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
             </>
           )}
           <CustomerErrorPage
