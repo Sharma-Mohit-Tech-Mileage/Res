@@ -30,10 +30,7 @@ function BillingStackScreen({route}) {
       <BillingStack.Screen
         name="ArticalWindowUtility"
         component={ArticalWindowUtility}
-        options={{
-          headerBackVisible: false,
-          headerShown: false,
-        }}
+        options={{ headerBackVisible: false, headerShown: false, }}
         listeners={{
           focus: () => setTabBarVisible(true),
           blur: () => setTabBarVisible(true),

@@ -1,28 +1,14 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import WalletIcon from "../../../res/svgIcons/WalletIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { Color, FontFamily, Padding } from "../../../../GlobalStyles";
-import { Env } from "../../../network/apis/account/Constants";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
-const CardNewBiller = ({
-  billAmt,
-  dueDate,
-  isAutoPayStatus,
-  paperlessStatus,
-  navigation,
-  style,
-}) => {
+const CardNewBiller = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, style}) => {
+
   const uncheck = require("../../../../assets/checkcircle1.png");
   const check = require("../../../../assets/checkcircle.png");
   const info = require("../../../../assets/info_icon.png");
@@ -37,34 +23,19 @@ console.log("Due Date",dueDate)
           overlayColor="#00000000"
           width={180}
           height={100}
-          popover={
-            <Text style={{ color: "#FFF" }}>
-              Your due date takes 10 business days to generate. Please check
-              back later.
-            </Text>
-          }
+          popover={ <Text style={{ color: "#FFF" }}> Your due date takes 10 business days to generate. Please check back later. </Text> }
         > 
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text style={styles.dueDate}>{"Due "}</Text>
             <Text
-              style={[
-                styles.dueDate,
-                { fontWeight: "400", color: colors.dark_grey },
-              ]}
+              style={[ styles.dueDate, { fontWeight: "400", color: colors.dark_grey }, ]}
             >
               {"on: "}
             </Text>
-            <Text
-              style={[
-                styles.dueDate,
-                { textDecorationLine: "underline", marginRight: 5 },
-              ]}
-            >
+            <Text style={[ styles.dueDate, { textDecorationLine: "underline", marginRight: 5 }, ]} >
               {'Not Available'}
             </Text>
-            
             <InfoIcon1/>
-            
           </View>
           </Tooltip>
       </View>
@@ -84,11 +55,7 @@ console.log("Due Date",dueDate)
         </View>
         <View style={styles.cardContent}>
           {billAmt == undefined ? (
-            <ActivityIndicator
-              size="large"
-              color={Color.sparklightBrightPurple}
-              style={{marginLeft:wp("15%")}}
-            />
+            <ActivityIndicator size="large" color={Color.sparklightBrightPurple} style={{marginLeft:wp("15%")}} />
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>
           )}
@@ -96,7 +63,6 @@ console.log("Due Date",dueDate)
             <Text 
               accessible={true}
               accessibilityLabel={`${dueDate ? (dueDate=='Immediately')?"Due Immediately"  :"Due on": "Due on Not Available"}`}
-              //accessibilityRole={`${(dueDate!='Immediately')?'button':'none'}`}
              style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
               {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": <NotAvailable/>}
               <Text style={[styles.dueDate, { fontWeight: "400",color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue }]}>
@@ -134,24 +100,11 @@ console.log("Due Date",dueDate)
                   {isAutoPayStatus ? "On" : "Off"}
                 </Text>
               </View>
-            </View>
-      
-                               
-            
+            </View>   
           </View>
-          <View style={[styles.statusRow,{marginTop:26}]}>
+          <View style={[styles.statusRow]}>
             <TouchableOpacity
-              onPress={() => {
-                // navigation.navigate("BillingTab", {
-                //   url: `${Env.PAYMENTURLNEW}`,
-                //   name: "Billing Details",
-                //   isBilling:true
-                // });
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: "BillingTab" }],
-                });
-              }}
+              onPress={() => { navigation.reset({ index: 0, routes: [{ name: "BillingTab" }], }); }}
               accessible={true}
               accessibilityLabel="View Billing Services"
               accessibilityRole="button"

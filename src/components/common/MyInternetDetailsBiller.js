@@ -20,10 +20,7 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
       setAccountNumber(accountNumber)
       GetApiRequest(
         `api/accounts/${accountNumber}/easypay`,
-        (res) => {
-          setIsAutoPayStatus(res?.isEasyPay);
-          setCardDigit(res?.epLastfour);
-        },
+        (res) => { setIsAutoPayStatus(res?.isEasyPay); setCardDigit(res?.epLastfour); },
         onError
       );
     });
@@ -33,65 +30,19 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
     console.log("error", error);
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      getStatus();
-      console.log('Refresh Auto pay Data')
-      return () => {
-      };
-    }, [])
-  );
-
+  useFocusEffect( useCallback(() => { getStatus(); return () => { }; }, []) );
+  
   useEffect(() => {
     console.log('Refresh Auto pay Data',paymentDetails);
     if (paymentDetails?.email) {
-        dispatch(getPaperlessStatus(paymentDetails.email));
+        //dispatch(getPaperlessStatus(paymentDetails.email));
     }
 }, [paymentDetails?.email, dispatch]);
 
-  const renderCard = ({ item, index }) => {
-    // if (index === 1) {
-    //   return (
-    //     <AutoPayCard
-    //       billAmt={billAmt}
-    //       dueDate={dueDate}
-    //       pastPaymentDue={pastPaymentDue}
-    //       cardDigit={cardDigit}
-    //       isAutoPayStatus={isAutoPayStatus}
-    //       paperlessStatus={paperlessStatus}
-    //       paymentDetails={paymentDetails}
-    //       navigation={navigation}
-    //       style={styles.card}
-    //     />
-    //   );
-    // }
-    
-    return (
-      <Card
-        billAmt={billAmt}
-        dueDate={dueDate}
-        isAutoPayStatus={isAutoPayStatus}
-        paperlessStatus={paperlessStatus}
-        navigation={navigation}
-        style={styles.card}
-      />
-    );
-  };
 
   return (
     
       <View style={styles.container}>
-        {/* <Carousel
-          data={[{}, {}]}
-          renderItem={renderCard}
-          sliderWidth={viewportWidth}
-          itemWidth={wp('85%')}
-          inactiveSlideScale={0.94}
-          inactiveSlideOpacity={0.7}
-          containerCustomStyle={styles.carousel}
-          contentContainerCustomStyle={styles.carouselContentContainer}
-        /> */}
-
        <Card
         billAmt={billAmt}
         dueDate={(accountNumber=='8160360050005096')? '': dueDate}
@@ -106,22 +57,10 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
 };
 
 const styles = StyleSheet.create({
-  scrollView: {
-    flexGrow: 1,
-  },
-  container: {
-    paddingVertical: 16,
-    flex: 1, // Ensure the container takes up full height
-  },
-  carousel: {
-    overflow: 'visible',
-  },
-  carouselContentContainer: {
-    paddingHorizontal: wp('2.5%'),
-  },
-  card: {
-    height: 230,  // Set the height for the cards
-  },
+  scrollView: { flexGrow: 1, },
+  container: { paddingVertical: 16, flex: 1 },
+  carousel: { overflow: 'visible', },
+  carouselContentContainer: { paddingHorizontal: wp('2.5%'), },
+  card: { height: 230, },
 });
-
 export default MyInternetDetailsBiller;

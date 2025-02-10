@@ -1,5 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Linking, } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Platform,
+  Dimensions,
+  Linking,
+  LayoutAnimation,        // <-- Added LayoutAnimation
+  UIManager                // <-- Added UIManager
+} from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
@@ -7,7 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import DownArrow from "../../res/svgIcons/DownArrow";
 import UpArrow from "../../res/svgIcons/UpArrow";
 import { getUser, storeUpgradeToken } from "../../redux/utils/LocalStorage";
-import {  PostApiRequest } from "../../network/APIClient";
+import { PostApiRequest } from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
@@ -15,15 +27,16 @@ import AccessibleYoutubePlayer from "../common/AccessibleYoutubePlayer";
 import { saveAccountServices } from "../../redux/actions/ProfileActionSuite";
 import { useSelector, useDispatch } from "react-redux";
 import { Env } from "../../network/apis/account/Constants";
-import { checkForMinorUpdate ,getPrimaryEmail} from "../utility/constant";
+import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import MyInternetDetialsBiller from "../common/MyInternetDetailsBiller";
 import WalkthroughOverlay from '../common/WalkthroughOverlay';
 import { useFocusEffect } from "@react-navigation/native";
+
 const tabWidth = Number(Dimensions.get("window").width / 4);
+
 const NewBillerHome = ({ navigation }) => {
   const [isImageDispaly, setIsImageDispaly] = useState(true);
   const home = useSelector((state) => state.combinedReducers.home);
-
   const dispatch = useDispatch();
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
@@ -35,8 +48,14 @@ const NewBillerHome = ({ navigation }) => {
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
-  const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: "", latestVersion: "", });
+  const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: "", latestVersion: "" });
 
+  // Enable LayoutAnimation for Android
+  useEffect(() => {
+    if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }, []);
 
   const getUpgradeToken = async () => {
     const url = Env.API_SHOPPING_CART_BASEURL + "/api/UpgradeOrder/token";
@@ -53,28 +72,29 @@ const NewBillerHome = ({ navigation }) => {
     });
 
     let json = {};
-
     if (response !== undefined) {
       json = response.json();
     }
     return json;
   };
 
-
   const getUserAccountDetails = () => {
-    setBillAmt(undefined)
+    setBillAmt(undefined);
     getUser().then((res) => {
       const request = `api/Accounts/GetAccountDetails`;
-      const data = { "accountNumber": res.userInfo.accountNumber, "fieldList": ["first_name", "last_name", "accountNumber", "current_balance", "past_due_amount", "payment_due_date", "customer_type", "email_details", "email"] }
+      const data = {
+        "accountNumber": res.userInfo.accountNumber,
+        "fieldList": ["first_name", "last_name", "accountNumber", "current_balance", "past_due_amount", "payment_due_date", "customer_type", "email_details", "email"]
+      };
       PostApiRequest(
         request,
         data,
         (res) => {
           if (res) {
             dispatch(saveAccountServices(res.services));
-            let userBillAmt = (res.past_due_amount <= 0) ? res.current_balance : res.past_due_amount
+            let userBillAmt = (res.past_due_amount <= 0) ? res.current_balance : res.past_due_amount;
             setBillAmt(userBillAmt?.toFixed(2));
-            let dueDate = (res.past_due_amount != 0) ? 'Immediately' : moment(res.payment_due_date).format("ll");
+            let dueDate = (res.past_due_amount !== 0) ? 'Immediately' : moment(res.payment_due_date).format("ll");
             setDueDate(dueDate);
             let paymentDetails = { ...defaultPaymentDetails };
             paymentDetails.dueDate = res.payment_due_date;
@@ -89,7 +109,6 @@ const NewBillerHome = ({ navigation }) => {
     });
   };
 
-
   const onErrorBill = (error) => {
     console.log("error==", error);
   };
@@ -99,7 +118,6 @@ const NewBillerHome = ({ navigation }) => {
       const status = await checkForMinorUpdate();
       setUpdateStatus(status);
     };
-
     fetchUpdateStatus();
   }, []);
 
@@ -110,7 +128,6 @@ const NewBillerHome = ({ navigation }) => {
   }, [internetHealths]);
 
   useEffect(() => {
-
     const fetchData = async () => {
       try {
         const result = await getUpgradeToken();
@@ -138,7 +155,6 @@ const NewBillerHome = ({ navigation }) => {
     }, [])
   );
 
-
   const OutageAlert = ({ estimatedTime }) => {
     return (
       <View style={styles.errorBox}>
@@ -163,7 +179,6 @@ const NewBillerHome = ({ navigation }) => {
               </Text>
             </Text>
           </View>
-
           <TouchableOpacity
             style={{ marginTop: 10 }}
             onPress={() => {
@@ -218,7 +233,6 @@ const NewBillerHome = ({ navigation }) => {
               and keep your app running smoothly.
             </Text>
           </View>
-
           <TouchableOpacity
             style={{ marginTop: 10 }}
             onPress={() => {
@@ -243,16 +257,14 @@ const NewBillerHome = ({ navigation }) => {
       colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
       style={styles.container}
     >
-     {showWalkThrough && <View style={styles.shadowFullScreen} />}
+      {showWalkThrough && <View style={styles.shadowFullScreen} />}
       {showWalkThrough && (
-        <WalkthroughOverlay
-          onFinish={() => setShowWalkThrough(false)}
-        />
+        <WalkthroughOverlay onFinish={() => setShowWalkThrough(false)} />
       )}
       <SafeAreaView style={{ flex: 1 }}>
         <View
           accessibilityElementsHidden={showWalkThrough}
-          importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
+          importantForAccessibility={showWalkThrough ? "no-hide-descendants" : "no"}
           accessibilityLabel={`SparkLight`}
           style={{
             height: Platform.OS == "ios" ? 60 : 50,
@@ -269,9 +281,6 @@ const NewBillerHome = ({ navigation }) => {
             style={{ width: 120, height: 30.324, flexShrink: 0 }}
             source={require("../../../assets/SparklightEntryLogo.png")}
           />
-          {/* <View>
-            <BellIcon />
-          </View> */}
         </View>
         <ScrollView style={{ height: "100%", paddingBottom: 100 }}>
           <View
@@ -280,7 +289,7 @@ const NewBillerHome = ({ navigation }) => {
               flex: 2,
               alignItems: "center",
               marginTop: 50,
-              paddingBottom: 50
+              paddingBottom: 50,
             }}
           >
             {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert /> : null}
@@ -289,11 +298,28 @@ const NewBillerHome = ({ navigation }) => {
             ) : (
               <></>
             )}
-            <Text style={[styles.descriptionText, { fontSize: FontSize.size_3xl, fontWeight: '400', zIndex: 100, width: wp("92%"), }]}>Welcome to Sparklight</Text>
+            <Text
+              style={[
+                styles.descriptionText,
+                {
+                  fontSize: FontSize.size_3xl,
+                  fontWeight: "400",
+                  zIndex: 100,
+                  width: wp("92%"),
+                },
+              ]}
+            >
+              Welcome to Sparklight
+            </Text>
             <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
               <View />
-              <Text style={[styles.descriptionText, { fontSize: FontSize.size_3xl, fontWeight: '400', marginBottom: 20 }]}></Text>
-              <View style={{ flexDirection: 'column' }}>
+              <Text
+                style={[
+                  styles.descriptionText,
+                  { fontSize: FontSize.size_3xl, fontWeight: "400", marginBottom: 20 },
+                ]}
+              ></Text>
+              <View style={{ flexDirection: "column" }}>
                 <Text style={styles.descriptionText}>
                   We’re excited to connect with you!
                   Sparklight is dedicated to offering our customers a variety of
@@ -306,34 +332,32 @@ const NewBillerHome = ({ navigation }) => {
                   patience and understanding during this transition period.
                 </Text>
 
-                {isImageDispaly ?
+                {isImageDispaly ? (
                   <AccessibleYoutubePlayer
                     videoId="C3cMQoWxv6I"
                     videoTitle="SparkLight Video"
                     height={230}
                     play={false}
                     onError={(e) => console.log(e)}
-                    onPlaybackStateChange={(isPlaying) => console.log('Playing:', isPlaying)}
+                    onPlaybackStateChange={(isPlaying) =>
+                      console.log("Playing:", isPlaying)
+                    }
                   />
-                  : null}
+                ) : null}
 
                 <TouchableOpacity
                   accessible={true}
-                  accessibilityLabel={isImageDispaly ? 'Collapse' : 'Expand'}
+                  accessibilityLabel={isImageDispaly ? "Collapse" : "Expand"}
                   accessibilityRole="button"
                   onPress={() => {
+                    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
                     setIsImageDispaly(!isImageDispaly);
                   }}
-                  style={{
-                    flexDirection: "row",
-                    alignSelf: 'center',
-                    padding: 5,
-                    marginVertical: 5,
-                    marginHorizontal: 25,
-                  }}
+                  style={{ flexDirection: "row", alignSelf: "center", padding: 5, marginVertical: 5, marginHorizontal: 25, }}
                 >
                   <Text style={styles.hideShowDetails}>
-                    {isImageDispaly ? 'Collapse' : 'Expand'}
+                    {" "}
+                    {isImageDispaly ? "Collapse" : "Expand"}{" "}
                   </Text>
                   <View style={{ marginTop: 5 }}>
                     {isImageDispaly ? (
@@ -432,7 +456,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 24,
-    paddingHorizontal: 24
+    paddingHorizontal: 24,
   },
   decline: {
     fontSize: FontSize.size_sm,
@@ -582,13 +606,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: wp("15%"),
     marginTop: wp("-10%"),
-  }, videoContainer:
-  {
-    width: wp('80%'),
+  },
+  videoContainer: {
+    width: wp("80%"),
     borderRadius: 5,
-    alignSelf: 'center',
-    marginTop: 10
-  }
+    alignSelf: "center",
+    marginTop: 10,
+  },
 });
 
 export default NewBillerHome;

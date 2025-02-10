@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import WalletIcon from "../../../res/svgIcons/WalletIcon";
@@ -16,30 +9,13 @@ import { Env } from "../../../network/apis/account/Constants";
 import Wallet2icon from "../../../res/svgIcons/Wallet2icon";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
 import AppStyles from "../styles/AppStyles";
-const Card = ({
-  billAmt,
-  dueDate,
-  isAutoPayStatus,
-  paperlessStatus,
-  navigation,
-  style,
-  acno
-}) => {
+const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, style, acno }) => {
  
-  console.log('BillAmnt================',billAmt)
-
   return (
     
       <View style={[AppStyles.card, style]}>
-        
           <View style={styles.cardHreader}>
-            <View
-              style={{
-                marginLeft: 10,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
+            <View style={{ marginLeft: 10, flexDirection: "row", alignItems: "center", }} >
               <View style={{ alignSelf: "center" }}>
                 <WalletSummaryIcon />
               </View>
@@ -49,22 +25,10 @@ const Card = ({
           </View>
 
           <View
-            style={{
-              flexDirection: "row",
-              width: "92%",
-              marginHorizontal: 20,
-              justifyContent: "space-between",
-              
-              flex: 0.5,
-            }}
+            style={{ flexDirection: "row", width: "92%", marginHorizontal: 20, justifyContent: "space-between", flex: 0.5, }}
           >
             <View
-              style={{
-                flexDirection: "column",
-                flex: 1,
-                marginVertical:24,
-                justifyContent: "flex-start",
-              }}
+              style={{ flexDirection: "column", flex: 1, marginVertical:24, justifyContent: "flex-start", }}
             >
               <Text style={[styles.label, { fontWeight: "600",color:colors.sparklight_purple_blue,fontSize:14 }]}>
                 Account Number
@@ -80,14 +44,13 @@ const Card = ({
               style={{marginLeft:wp("15%")}}
             />
           ) : (
-                  <Text style={styles.amount}>${billAmt}</Text>
+                  <Text style={styles.amount}>${billAmt||0.0}</Text>
                 )}
               
               {(dueDate != "Invalid date" && billAmt!=undefined) && (
             <Text 
               accessible={true}
               accessibilityLabel={`${dueDate ? (dueDate=='Immediately')?"Due Immediately"  :`Due on ${dueDate}`: "Due on Not Available"}`}
-              //accessibilityRole={`${(dueDate!='Immediately')?'button':'none'}`}
              style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
               {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": <NotAvailable/>}
               <Text style={[styles.dueDate, { fontWeight: "400",color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue }]}>

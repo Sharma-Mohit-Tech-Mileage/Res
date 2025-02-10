@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, Pressable, Dimensions } from "react-native";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { FontSize, FontFamily, Color, Border } from "../../../GlobalStyles";
 
@@ -42,34 +42,35 @@ const WalkthroughOverlay = ({ onFinish }) => {
       buttonText: "Let's Go!",
     },
   ];
-  const changeWalkThroughStep = (step) => {
-    // If the user is not normal and a request is made for step 3, skip to step 4.
-    if (user && !user.isNormalUser && step === 2) {
-      step = 3;
+
+  const changeWalkThroughStep = (requestedStep) => {
+    // Assume walkThroughStep holds the current step (0–4)
+    let newStep = requestedStep;
+    
+    // For non-normal users, skip step 2.
+    if (user && !user.isNormalUser) {
+      // Determine direction by comparing current step and the requested step.
+      // If moving forward (current < requested) and requested is 2, jump to 3.
+      if (walkThroughStep < requestedStep && requestedStep === 2) {
+        newStep = 3;
+      }
+      // If moving backward (current > requested) and requested is 2, go back to 1.
+      else if (walkThroughStep > requestedStep && requestedStep === 2) {
+        newStep = 1;
+      }
     }
-    if (step > 4) { // We have 5 steps (0–4)
+  
+    if (newStep > 4) { // We have 5 steps (0–4)
       dispatch(updateWalkThroughStep(null));
       setShowWalkThrough(false);
       if (onFinish) {
         onFinish(); // Notify parent that walkthrough is finished.
       }
     } else {
-      dispatch(updateWalkThroughStep(step));
-      setWalkThroughStep(step);
+      dispatch(updateWalkThroughStep(newStep));
+      setWalkThroughStep(newStep);
     }
   };
-//   const changeWalkThroughStep = (step) => {
-//     if (step > 4) { // We have 5 steps (0–4)
-//       dispatch(updateWalkThroughStep(null));
-//       setShowWalkThrough(false);
-//       if (onFinish) {
-//         onFinish(); // Notify parent that walkthrough is finished.
-//       }
-//     } else {
-//       dispatch(updateWalkThroughStep(step));
-//       setWalkThroughStep(step);
-//     }
-//   };
 
   const bottomCarotStyles = [styles.bottomCarot];
   if (walkThroughStep === 1) {
@@ -89,7 +90,11 @@ const WalkthroughOverlay = ({ onFinish }) => {
   }
 
   return (
-    <View style={styles.walkThroughBubble}>
+    // Mark the overlay container as modal so that screen readers ignore the background.
+    <View 
+      style={styles.walkThroughBubble} 
+      accessibilityViewIsModal={true} 
+    >
       <View>
         <View
           accessible={true}
