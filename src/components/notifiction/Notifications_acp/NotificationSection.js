@@ -58,10 +58,26 @@ const NotificationToggle = ({ type, status, isLast, warn }) => (
   </View>
 );
 
+const BoldEmailText = ({ message }) => {
+  const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/;
+  const parts = message.split(emailRegex);
+  const emails = message.match(emailRegex);
+ console.log(emails);
+ return (
+  <Text>
+    {parts.map((part, index) => (
+      <React.Fragment key={index}>
+        {part}
+        {emails && emails[index] && <Text style={[styles.infoText,{fontWeight:'600',color:Color.colorGray_200}]}>{emails[index]}</Text>}
+      </React.Fragment>
+    ))}
+  </Text>
+);
+};
 const InfoMessage = ({ message }) => (
   <View style={styles.infoMessage}>
     <InfoIcon />
-    <Text style={styles.infoText}>{message}</Text>
+    <Text style={styles.infoText}>{<BoldEmailText message={message}/>}</Text>
   </View>
 );
 
@@ -99,6 +115,7 @@ const NotificationSection = ({
 
       {/* Info Message */}
       {infoMessage && <InfoMessage message={infoMessage} />}
+      <View style={styles.bottomBorder} />
 
       {/* Settings List */}
       {settings.map((setting, index) => (
@@ -159,6 +176,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightGray,
     paddingVertical: Padding.p_9xs,
     paddingHorizontal: Padding.p_base,
+    borderColor: Color.sparklightDarkGray,
     borderWidth: 1,
   },
   comingSoonText: {
