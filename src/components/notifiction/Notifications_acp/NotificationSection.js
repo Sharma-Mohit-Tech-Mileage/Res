@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightGray,
     paddingVertical: Padding.p_9xs,
     paddingHorizontal: Padding.p_base,
-    borderColor: Color.sparklightDarkGray,
+    borderColor: Color.sparklightGray1,
     borderWidth: 1,
   },
   comingSoonText: {

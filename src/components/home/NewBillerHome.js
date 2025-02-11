@@ -1,17 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Platform,
-  Dimensions,
-  Linking,
-  LayoutAnimation,        // <-- Added LayoutAnimation
-  UIManager                // <-- Added UIManager
-} from "react-native";
+import React, { useState, useEffect, useCallback ,useRef} from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity,AppState, ScrollView, Platform, Dimensions, Linking, LayoutAnimation, UIManager } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
@@ -50,13 +38,36 @@ const NewBillerHome = ({ navigation }) => {
   const [internetHealths, setInternetHealths] = useState([]);
   const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: "", latestVersion: "" });
 
-  // Enable LayoutAnimation for Android
+  
   useEffect(() => {
     if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
       UIManager.setLayoutAnimationEnabledExperimental(true);
     }
   }, []);
-
+  const appState = useRef(AppState.currentState);
+  
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState) => {
+      if (appState.current.match(/active/) && nextAppState.match(/inactive|background/)) {
+        setIsImageDispaly(false); // Collapse video when app is inactive or backgrounded
+      }
+      appState.current = nextAppState;
+    };
+  
+    const subscription = AppState.addEventListener("change", handleAppStateChange);
+  
+    return () => {
+      subscription.remove(); // Cleanup on unmount
+    };
+  }, []);
+  
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setIsImageDispaly(false); // Collapse video when switching tabs
+      };
+    }, [])
+  );
   const getUpgradeToken = async () => {
     const url = Env.API_SHOPPING_CART_BASEURL + "/api/UpgradeOrder/token";
     const response = await fetch(url, {
@@ -191,7 +202,7 @@ const NewBillerHome = ({ navigation }) => {
       </View>
     );
   };
-
+ 
   const AppUpdateAlert = () => {
     return (
       <View style={styles.errorBox}>

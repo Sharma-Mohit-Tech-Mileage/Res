@@ -351,7 +351,7 @@ const AddEmailNotification = () => {
                 <Text style={styles.checkBoxAreaViewText}>
                 I agree to {" "}
                   <Text
-                    style={[ styles.checkBoxAreaViewText, { color:Color.sparkLightRed, textDecorationLine:'underline' } ]}
+                    style={[ styles.checkBoxAreaViewText, { color:Color.sparklightBrightPurple, textDecorationLine:'underline' } ]}
                    onPress={() => {
                    }}
                   >

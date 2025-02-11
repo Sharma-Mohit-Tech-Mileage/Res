@@ -241,10 +241,7 @@ const MyTabs = ({ navigation, route }) => {
               if (!isTabAccessibleDuringWalkthrough(3) && isScreenReaderEnabled) {
                 return;
               }
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'Support' }],
-              });
+              navigation.navigate('Support');
             },
           })}
           options={{
