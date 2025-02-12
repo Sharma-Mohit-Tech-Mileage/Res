@@ -20,7 +20,7 @@ import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import BillingIconWhite from "../../res/svgIcons/BillingIconWhite";
 import { getUser } from "../../redux/utils/LocalStorage";
-import { GetApiRequest } from "../../network/APIClient";
+import { GetApiRequest,PostApiRequest } from "../../network/APIClient";
 import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
@@ -40,6 +40,7 @@ const BillingScreen = ({ navigation }) => {
   const [accountNo, setAccountNo] = useState("");
   const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [cardDigit, setCardDigit] = useState("");
+  const [isNewBiller, setIsNewBiller] = useState(false);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
   const profile = useSelector((state) => state.combinedReducers.profile || {});
@@ -112,6 +113,45 @@ const BillingScreen = ({ navigation }) => {
     console.log("error", error);
   };
 
+  const getUserAccountDetailsForACP = () => {
+    setBillAmt(undefined)
+    getUser().then((res) => {
+      const request = `api/Accounts/GetAccountDetails`;
+      const data={"accountNumber": res.userInfo.accountNumber,"fieldList":["first_name","last_name","accountNumber","current_balance","past_due_amount","payment_due_date","customer_type","email_details","email"]}
+      PostApiRequest(
+        request,
+        data,
+        (res) => {
+          console.log("getUserAccountDetailsForACP", res);
+          if (res) {
+           // dispatch(saveAccountServices(res.services));
+            let userBillAmt=(res.past_due_amount==0) ? res.current_balance: res.past_due_amount
+            //let amt=Math.round(userBillAmt * 100) / 100).toFixed(2))
+             setBillAmt(userBillAmt.toFixed(2))
+
+             let dueDate =(res.past_due_amount!=0)? 'Immediately': moment(res.payment_due_date).format("ll");
+             setDueDate(dueDate);
+
+             function getFirstEmail(emailArray) {
+              return (emailArray && emailArray.length > 0 && emailArray[0].email_address)
+                ? emailArray[0].email_address
+                : null;
+            }
+            let paymentDetails = { ...defaultPaymentDetails };
+            paymentDetails.dueDate = res.payment_due_date;
+            paymentDetails.billAmount = res.payment_due_amount;
+            paymentDetails.pastPaymentDue = res.past_due_amount;
+            paymentDetails.email = getFirstEmail(res.email_details);
+            setDefaultPaymentDetails(paymentDetails);
+            //getInternetPlanDetails();
+            //getPhoneServiceDetails();
+          }
+        },
+        onErrorBill
+      );
+    });
+  };
+
   useFocusEffect(
     useCallback(() => {
       // getStatus();
@@ -120,7 +160,13 @@ const BillingScreen = ({ navigation }) => {
       // dispatch(fetchProfileDetails());
       //if (user?.isNormalUser) {
         getStatus();
-        getUserAccountDetails();
+        if (user && user?.isNormalUser) {
+          getUserAccountDetails();
+          setIsNewBiller(false);
+        }else{
+          getUserAccountDetailsForACP();
+          setIsNewBiller(true);
+        }
         dispatch(fetchBillingPaper());
         dispatch(fetchProfileDetails());
         dispatch(fetchSvEmailAssociation());
@@ -180,6 +226,7 @@ const BillingScreen = ({ navigation }) => {
               isAutoPayStatus={isAutoPayStatus}
               paperlessStatus={paperlessStatus}
               navigation={navigation}
+              isNewBiller={isNewBiller} // Pass the isNewBiller prop
               style={styles.card}
               accessible={true}
               accessibilityLabel="Billing Summary Card"
@@ -232,10 +279,12 @@ const BillingScreen = ({ navigation }) => {
                 <TouchableOpacity
                   style={[styles.frame9defaultSpaceBlock]}
                   onPress={() => {
-                    navigation.navigate("ArticalWindowUtility", {
-                      url: Env.VIEW_BILLINGS,
-                      name: "View Billing Details",
-                    });
+                    let billingURL = (isNewBiller) ? `${Env.ACP_BILLING}/billing` : `${Env.URL}/billing`;
+                                
+                      navigation.navigate("ArticalWindowUtility", {
+                        url: billingURL,
+                        name: "View Billing Details",
+                      });
                   }}
                   accessible={true}
                   accessibilityRole="button"
@@ -255,10 +304,11 @@ const BillingScreen = ({ navigation }) => {
                 <TouchableOpacity
                   style={[styles.frame9defaultSpaceBlock]}
                   onPress={() => {
-                    navigation.navigate("ArticalWindowUtility", {
-                      url: Env.VIEW_PAYMENT,
-                      name: "View Payment History",
-                    });
+                    let paymentHistory = (isNewBiller) ? `${Env.ACP_BILLING}/payment-history` : Env.VIEW_PAYMENT;
+                      navigation.navigate("ArticalWindowUtility", {
+                        url: paymentHistory,
+                        name: "View Payment History",
+                      });
                   }}
                   accessible={true}
                   accessibilityRole="button"
@@ -278,10 +328,11 @@ const BillingScreen = ({ navigation }) => {
                 <TouchableOpacity
                   style={[styles.frame9defaultSpaceBlock]}
                   onPress={() => {
-                    navigation.navigate("ArticalWindowUtility", {
-                      url: Env.BILLING_HISTORY,
-                      name: "View Billing History",
-                    });
+                    let billingHistory = (isNewBiller) ? `${Env.ACP_BILLING}/billing-statement` : Env.BILLING_HISTORY;
+                      navigation.navigate("ArticalWindowUtility", {
+                        url: billingHistory,
+                        name: "View Billing History",
+                      });
                   }}
                   accessible={true}
                   accessibilityRole="button"

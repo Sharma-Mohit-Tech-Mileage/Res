@@ -9,8 +9,51 @@ import { Env } from "../../../network/apis/account/Constants";
 import Wallet2icon from "../../../res/svgIcons/Wallet2icon";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
 import AppStyles from "../styles/AppStyles";
-const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, style, acno }) => {
+import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
+import Tooltip from "rn-tooltip";
+const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, style, acno,isNewBiller }) => {
  
+
+  const NotAvailable = () => {
+    return (
+      <View style={{ flexDirection: "column" }}>
+        <Tooltip
+          backgroundColor="#4C5458"
+          overlayColor="#00000000"
+          width={180}
+          height={100}
+          popover={
+            <Text style={{ color: "#FFF" }}>
+              Your due date takes 10 business days to generate. Please check
+              back later.
+            </Text>
+          }
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={styles.dueDate}>{"Due "}</Text>
+            <Text
+              style={[
+                styles.dueDate,
+                { fontWeight: "400", color: colors.dark_grey },
+              ]}
+            >
+              {"on: "}
+            </Text>
+            <Text
+              style={[
+                styles.dueDate,
+                { textDecorationLine: "underline", marginRight: 5 },
+              ]}
+            >
+              {"Not Available"}
+            </Text>
+            <InfoIcon1 />
+          </View>
+        </Tooltip>
+      </View>
+    );
+  };
+
   return (
     
       <View style={[AppStyles.card, style]}>
@@ -65,10 +108,12 @@ const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, 
           <View style={styles.cardFooter}>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("ArticalWindowUtility", {
-                  url: `${Env.URL}/billing`,
-                  name: "Billing Details",
-                });
+                let billingURL = (isNewBiller) ? `${Env.ACP_BILLING}/billing` : `${Env.URL}/billing`;
+                console.log("Billing URL", billingURL);
+          navigation.navigate("ArticalWindowUtility", {
+            url: billingURL,
+            name: "Billing Details",
+          });
               }}
               accessible={true}
               accessibilityLabel="Make a Payment"
