@@ -632,4 +632,36 @@ const isPaperlessEnabled = async (email) => {
     return response.data;
 };
 
-export { logError, logInfo, fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback,manageSVEmails,isPaperlessEnabled, resendEmailVerification, addUserAction, removeUser, editUserAction, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, addSVEmailMktFlag }
+ const fetchACPUserAccountDetails = async () => {
+    let user = await getUser();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    
+    const config = {
+        headers: {
+            Authorization: "Bearer " + user.token
+        }
+    };
+
+    const requestUrl = `/api/Accounts/GetAccountDetails`;
+    const data = {
+        accountNumber: accountNumber,
+        fieldList: [
+            "first_name", "last_name", "accountNumber",
+            "current_balance", "past_due_amount",
+            "payment_due_date", "customer_type",
+            "email_details", "email"
+        ],
+    };
+
+    try {
+        const response = await _axios.post(requestUrl, data, config);
+        console.log("API Call Successful:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error in API Call:", error);
+        throw error;
+    }
+};
+
+
+export { fetchACPUserAccountDetails,logError, logInfo, fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, manageSVEmails, isPaperlessEnabled, resendEmailVerification, addUserAction, removeUser, editUserAction, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, addSVEmailMktFlag }

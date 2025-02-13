@@ -48,7 +48,7 @@ const Toggle = ({
     const getAccessibilityLabel = () => {
         const status = isActive ? 'enabled' : 'disabled';
         const sectionLabel = {
-            paperless: `Paperless billing notifications ${status} for ${name}`,
+            paperless: `Paperless billing notifications ${status}${name && name.trim() !== '' ? ` for ${name}` : ''}`,
             marketing: `Marketing communications ${status} for ${name}`,
             iptv: `Sparklight TV notifications ${status} for ${name}`
         }[section] || label;

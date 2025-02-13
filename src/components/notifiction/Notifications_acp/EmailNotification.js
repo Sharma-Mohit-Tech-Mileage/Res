@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, View, ScrollView, Image, Animated, Platform, TouchableOpacity, } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Image, Animated, Platform, TouchableOpacity, AccessibilityInfo, } from "react-native";
 import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -34,6 +34,8 @@ const AddEmailNotification = () => {
     paperlessBilling: true,
     criticalNotifications: true,
   });
+  const [reduceMotionEnabled, setReduceMotionEnabled] = useState(false);
+  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
 
   const route = useRoute();
   const dispatch = useDispatch();
@@ -42,6 +44,19 @@ const AddEmailNotification = () => {
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const { allSvEmailAssociated = [] } = profile;
   const animatedValue = useRef(new Animated.Value(0)).current;
+
+  // Check for accessibility preferences
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotionEnabled);
+    AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
+  }, []);
+
+  // Announce error message if screen reader is enabled
+  useEffect(() => {
+    if (showErrorAlert && errorMsg && screenReaderEnabled) {
+      AccessibilityInfo.announceForAccessibility(errorMsg);
+    }
+  }, [showErrorAlert, errorMsg, screenReaderEnabled]);
 
   const {
     control,
@@ -58,6 +73,20 @@ const AddEmailNotification = () => {
     inputRange: [0, 1],
     outputRange: [-50, 0],
   });
+
+  // Helper to trigger error animation (skips animation if reduce motion is enabled)
+  const triggerErrorAnimation = () => {
+    animatedValue.setValue(0);
+    if (!reduceMotionEnabled) {
+      Animated.timing(animatedValue, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      animatedValue.setValue(1);
+    }
+  };
 
   const handleToggleChange = useCallback(
     debounce((e) => {
@@ -117,7 +146,7 @@ const AddEmailNotification = () => {
         );
       } else if (associatedWithPaperless && associatedWithMarketing) {
         setErrorMsg(
-          "This email is already subscribed to both paperless billing and marketing communications. Please edit the existing settings to make changes"
+          "This email is already subscribed to both paperless billing and marketing communications. Please edit the existing settings to make changes."
         );
       } else if (
         associatedWithNoFlags &&
@@ -154,12 +183,7 @@ const AddEmailNotification = () => {
         }
       }
 
-      animatedValue.resetAnimation();
-      Animated.timing(animatedValue, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }).start();
+      triggerErrorAnimation();
       setShowErrorAlert(true);
       isSubmittingRef.current = false;
       setIsSubmitting(false);
@@ -173,12 +197,7 @@ const AddEmailNotification = () => {
     setShowErrorAlert(true);
     isSubmittingRef.current = false;
     setIsSubmitting(false);
-    animatedValue.resetAnimation();
-    Animated.timing(animatedValue, {
-      toValue: 1,
-      duration: 1000,
-      useNativeDriver: true,
-    }).start();
+    triggerErrorAnimation();
   }, []);
 
   return (
@@ -209,14 +228,12 @@ const AddEmailNotification = () => {
               >
                 <View style={styles.spaceBottom}>
                   <NotificationAlert
-                    type="success"
-                    title="success"
-                    message={
-                      "Your email address has been successfully added to our notification list."
-                    }
+                    type="error"
+                    title="Error"
+                    message={errorMsg}
                     showCloseIcon={true}
                     onClose={() => {
-                      animatedValue.resetAnimation();
+                      triggerErrorAnimation();
                       setShowErrorAlert(false);
                     }}
                     accessibilityLiveRegion="assertive"
@@ -260,6 +277,8 @@ const AddEmailNotification = () => {
                     label="Email Address"
                     accessibilityLabel="Email address input"
                     keyboardType="email-address"
+                    autoCapitalize="none"
+                    textContentType="emailAddress"
                     style={styles.emailInput}
                   />
                 )}
@@ -272,9 +291,8 @@ const AddEmailNotification = () => {
             <View
               style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
               accessible={true}
-              accessibilityLabel={`Critical Notifications: ${
-                formState.criticalNotifications ? "On" : "Off"
-              }`}
+              accessibilityLabel={`Critical Notifications: ${formState.criticalNotifications ? "On" : "Off"
+                }`}
             >
               <View style={styles.toggleHeader}>
                 <Text style={styles.toggleTitle}>Critical Notifications</Text>
@@ -303,21 +321,16 @@ const AddEmailNotification = () => {
 
             {/* Paperless Billing Group with Toggle */}
             <View
-              style={{
-                paddingTop: Padding.p_base,
-                paddingBottom: 8,
-                paddingHorizontal: Padding.p_5xl,
-              }}
+              style={{ paddingTop: Padding.p_base, paddingBottom: 8, paddingHorizontal: Padding.p_5xl, }}
             >
               <View style={styles.toggleHeader}>
                 <Text style={styles.toggleTitle}>Paperless Billing</Text>
                 <Toggle
-                  name="paperlessBilling"
-                  initialValue={formState.paperlessBilling}
+                  name={""}
+                  initialValue={formState.paperlessBilling || false}
                   onChange={(e) => handleToggleChange(e)}
-                  accessibilityLabel="Paperless billing toggle"
-                  accessibilityRole="switch"
-                  accessibilityState={{ checked: formState.paperlessBilling }}
+                  disabled={false}
+                  section="paperless"
                 />
               </View>
               <Text style={styles.toggleDescription}>
@@ -343,7 +356,7 @@ const AddEmailNotification = () => {
                 }
               >
                 <CheckBox
-                  disabled={true} // Disabled because the parent TouchableOpacity handles presses
+                  disabled={true} // Parent TouchableOpacity handles presses
                   value={toggleCheckBoxTerm}
                   style={
                     Platform.OS === "ios"

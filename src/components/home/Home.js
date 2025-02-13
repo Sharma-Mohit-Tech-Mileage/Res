@@ -455,7 +455,7 @@ const HomeScreen = ({ navigation }) => {
     getUser().then((res) => {
       const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${res.userInfo.accountNumber}`;
       GetApiRequest(request, (response) => {
-        const networkId = response.data.networks[0]?.split('/').pop();
+        const networkId = response.data?.networks[0]?.split('/').pop();
         if (networkId) {
           setHasEeroDevice(true);
           setNetworkId(networkId);

@@ -1,93 +1,76 @@
 import React, { useEffect, useState, useCallback } from "react";
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import { Image, StyleSheet, Text, View, TouchableOpacity, ScrollView, } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import {
-  Color,
-  FontFamily,
-  FontSize,
-  Padding,
-  Border,
-} from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import BillingIconWhite from "../../res/svgIcons/BillingIconWhite";
 import { getUser } from "../../redux/utils/LocalStorage";
-import { GetApiRequest,PostApiRequest } from "../../network/APIClient";
+import { GetApiRequest } from "../../network/APIClient";
 import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
-import { fetchBillingPaper, fetchProfileDetails, fetchSvEmailAssociation } from "../../redux/actions/ProfileActionSuite";
-
+import { fetchBillingPaper, fetchProfileDetails, fetchSvEmailAssociation, fetchACPUserAccountDetails, } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import { Env } from "../../network/apis/account/Constants";
 import colors from "../../res/Colors";
 import AppStyles from "../common/styles/AppStyles";
-
+import { getPrimaryEmail } from "../utility/constant";
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-  const user = useSelector(state => state.combinedReducers.user.userData);
-  const [billAmt, setBillAmt] = useState(undefined);
+  const user = useSelector((state) => state.combinedReducers.user.userData);
+  const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const accountDetails = useSelector(
+    (state) => state.combinedReducers.profile?.accountDetails
+  );
+  const { allSvEmailAssociated = [] } = profile;
+  const { paperlessStatusAcp = false } = profile;
+  const paperlessEmails = allSvEmailAssociated.filter((email) => email.invoice);
+  const [billAmt, setBillAmt] = useState(0);
   const [dueDate, setDueDate] = useState();
   const [accountNo, setAccountNo] = useState("");
   const [paperlessStatus, setPaperlessStatus] = useState(false);
+  const [paperlessEmail, setPaperlessEmail] = useState(null);
   const [cardDigit, setCardDigit] = useState("");
   const [isNewBiller, setIsNewBiller] = useState(false);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
-  const paperLessInfo = profile.paperLessInfo || {};
-  const { allSvEmailAssociated = [] } = profile;
-  const paperlessEmails = allSvEmailAssociated.filter(email => email.invoice);
+
+  // Consolidated error handler for API requests.
+  const handleError = (error) => { console.log("error", error); };
+
   const getUserAccountDetails = () => {
-    setBillAmt(undefined);
+    setBillAmt(0);
     getUser().then((res) => {
-      setAccountNo(res.userInfo.accountNumber);
-      const request = `account/api/account/${res.userInfo.accountNumber}`;
+      const accountNumber = res.userInfo.accountNumber;
+      setAccountNo(accountNumber);
+      const request = `account/api/account/${accountNumber}`;
       GetApiRequest(
         request,
         (res) => {
-          console.log(
-            "getUserAccountDetails for normal user :::::::::::::::::::::::::::::::::::::::",
-            res
-          );
+          console.log("getUserAccountDetails for normal user:", res);
           if (res) {
-            //dispatch(saveAccountServices(res.services))
-            function getFirstEmail(emailArray) {
-              return emailArray && emailArray.length > 0 && emailArray[0]
-                ? emailArray[0]
-                : null;
-            }
-            // let dueDate = moment(res.paymentDueDate).format("ll");
-            // setDueDate(dueDate);
-            let dueDate = (res.pastDueAmount != 0) ? 'Immediately' : moment(res.paymentDueDate).format("ll");
-            setDueDate(dueDate);
-            setBillAmt((Math.round(res.currentBalance||0 * 100) / 100).toFixed(2));
-            let paymentDetails = { ...defaultPaymentDetails };
-            paymentDetails.dueDate = res.paymentDueDate;
-            paymentDetails.billAmount = (
-              Math.round(res.currentBalance * 100) / 100
+            const formattedDueDate =
+              res.pastDueAmount !== 0
+                ? "Immediately"
+                : moment(res.paymentDueDate).format("ll");
+            setDueDate(formattedDueDate);
+            const formattedBalance = (
+              Math.round((res.currentBalance || 0) * 100) / 100
             ).toFixed(2);
-            paymentDetails.pastPaymentDue = res.pastDueAmount;
-            paymentDetails.email = getFirstEmail(res.email);
-            setDefaultPaymentDetails(paymentDetails);
+            setBillAmt(formattedBalance||0);
+            setDefaultPaymentDetails({
+              dueDate: res.paymentDueDate,
+              billAmount: formattedBalance,
+              pastPaymentDue: res.pastDueAmount,
+              email: getPrimaryEmail(res),
+            });
           }
         },
-        onErrorBill
+        handleError
       );
     });
-  };
-
-  const onErrorBill = (error) => {
-    console.log("error", error);
   };
 
   const getStatus = () => {
@@ -99,91 +82,66 @@ const BillingScreen = ({ navigation }) => {
           setIsAutoPayStatus(res?.isEasyPay);
           setCardDigit(res?.epLastfour);
         },
-        onError
+        handleError
       );
       GetApiRequest(
         `account/api/account/${accountNumber}/paperless/status`,
         setPaperlessStatus,
-        onError
-      );
-    });
-  };
-
-  const onError = (error) => {
-    console.log("error", error);
-  };
-
-  const getUserAccountDetailsForACP = () => {
-    setBillAmt(undefined)
-    getUser().then((res) => {
-      const request = `api/Accounts/GetAccountDetails`;
-      const data={"accountNumber": res.userInfo.accountNumber,"fieldList":["first_name","last_name","accountNumber","current_balance","past_due_amount","payment_due_date","customer_type","email_details","email"]}
-      PostApiRequest(
-        request,
-        data,
-        (res) => {
-          console.log("getUserAccountDetailsForACP", res);
-          if (res) {
-           // dispatch(saveAccountServices(res.services));
-            let userBillAmt=(res.past_due_amount==0) ? res.current_balance: res.past_due_amount
-            //let amt=Math.round(userBillAmt * 100) / 100).toFixed(2))
-             setBillAmt(userBillAmt.toFixed(2))
-
-             let dueDate =(res.past_due_amount!=0)? 'Immediately': moment(res.payment_due_date).format("ll");
-             setDueDate(dueDate);
-
-             function getFirstEmail(emailArray) {
-              return (emailArray && emailArray.length > 0 && emailArray[0].email_address)
-                ? emailArray[0].email_address
-                : null;
-            }
-            let paymentDetails = { ...defaultPaymentDetails };
-            paymentDetails.dueDate = res.payment_due_date;
-            paymentDetails.billAmount = res.payment_due_amount;
-            paymentDetails.pastPaymentDue = res.past_due_amount;
-            paymentDetails.email = getFirstEmail(res.email_details);
-            setDefaultPaymentDetails(paymentDetails);
-            //getInternetPlanDetails();
-            //getPhoneServiceDetails();
-          }
-        },
-        onErrorBill
+        handleError
       );
     });
   };
 
   useFocusEffect(
     useCallback(() => {
-      // getStatus();
-      // getUserAccountDetails();
-      // dispatch(fetchBillingPaper());
-      // dispatch(fetchProfileDetails());
-      //if (user?.isNormalUser) {
-        getStatus();
-        if (user && user?.isNormalUser) {
-          getUserAccountDetails();
-          setIsNewBiller(false);
-        }else{
-          getUserAccountDetailsForACP();
-          setIsNewBiller(true);
-        }
+      getStatus();
+      if (user && user.isNormalUser) {
+        getUserAccountDetails();
         dispatch(fetchBillingPaper());
         dispatch(fetchProfileDetails());
         dispatch(fetchSvEmailAssociation());
-      //} else {
-        // navigation.navigate("ArticalWindowUtility", {
-        //   url: `${Env.PAYMENTURLNEW}`,
-        //   name: "Billing Details",
-        //   isBilling: true
-        // });
-
-      //}
-
+        setIsNewBiller(false);
+      } else {
+        // For ACP users, dispatch the Redux action to fetch account details.
+        dispatch(fetchACPUserAccountDetails());
+        setIsNewBiller(true);
+      }
     }, [])
   );
+
+  // When Redux accountDetails is updated for ACP users, update local state.
+  useEffect(() => {
+    console.log("When Redux accountDetails is updated for ACP users, update local state.", accountDetails);
+    if (!user?.isNormalUser && accountDetails) {
+      const p_email = getPrimaryEmail(accountDetails);
+      const userBillAmt =
+        accountDetails.past_due_amount === 0
+          ? accountDetails.current_balance
+          : accountDetails.past_due_amount;
+      setBillAmt(userBillAmt?.toFixed(2));
+      const formattedDueDate =
+        accountDetails.past_due_amount !== 0
+          ? "Immediately"
+          : moment(accountDetails.payment_due_date).format("ll");
+      setDueDate(formattedDueDate);
+      setAccountNo(accountDetails.accountNumber);
+      setDefaultPaymentDetails({
+        dueDate: accountDetails.payment_due_date,
+        billAmount: accountDetails.past_due_amount,
+        pastPaymentDue: accountDetails.past_due_amount,
+        email: p_email,
+      });
+      setPaperlessEmail(p_email);
+    }
+  }, [accountDetails, user]);
+
   useEffect(() => {
     console.log("Bill Amount", billAmt);
   }, [billAmt]);
+
+  const handleNavigation = (url, name) => {
+    navigation.navigate("ArticalWindowUtility", { url, name });
+  };
 
   return (
     <View style={styles.account} accessibilityLabel="Billing Services screen">
@@ -199,25 +157,19 @@ const BillingScreen = ({ navigation }) => {
         useAngle={true}
         angle={90}
       />
-      <View style={[styles.frameParent]}>
+      <View style={styles.frameParent}>
         <View style={styles.rightActionableParent}>
           <View style={styles.rightActionable}>
             <Text
               accessibilityLabel="Billing services icon"
-              style={[styles.text, { alignSelf: 'center', marginLeft: 5, marginTop: 5 }]}>
+              style={[styles.text, { alignSelf: "center", marginLeft: 5, marginTop: 5 }]}
+            >
               <BillingIconWhite isSelected={false} />
             </Text>
-            {/* <Text style={[styles.text,{alignSelf:'center',marginLeft:5,marginTop:5}]}>
-              <BillingIconWhite isSelected={false} /> 
-            </Text> */}
           </View>
-          {/* Full name for profile */}
-          <Text style={styles.melissaSmith}>{"Billing Services"}</Text>
+          <Text style={styles.melissaSmith}>Billing Services</Text>
         </View>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{ marginHorizontal: 20 }}
-        >
+        <ScrollView showsVerticalScrollIndicator={false} style={{ marginHorizontal: 20 }}>
           <View style={{ paddingBottom: 100, marginTop: Padding.p_5xl }}>
             <Card
               billAmt={billAmt}
@@ -226,7 +178,7 @@ const BillingScreen = ({ navigation }) => {
               isAutoPayStatus={isAutoPayStatus}
               paperlessStatus={paperlessStatus}
               navigation={navigation}
-              isNewBiller={isNewBiller} // Pass the isNewBiller prop
+              isNewBiller={isNewBiller}
               style={styles.card}
               accessible={true}
               accessibilityLabel="Billing Summary Card"
@@ -242,106 +194,73 @@ const BillingScreen = ({ navigation }) => {
               accessible={true}
               accessibilityLabel="Auto Pay Card"
             />
-
             <PeperLessCard
               billAmt={billAmt}
-              paperLessInfo={paperlessEmails}
+              paperLessInfo={isNewBiller ?paperlessEmails?.[0]?.emailAddress:paperlessEmail}
               isAutoPayStatus={isAutoPayStatus}
-              paperlessStatus={paperlessStatus}
+              paperlessStatus={isNewBiller ? paperlessStatusAcp : paperlessStatus}
               navigation={navigation}
               style={styles.card}
               accessible={true}
               accessibilityLabel="Paperless Billing Card"
             />
-
-            <View
-              style={[
-                AppStyles.card,
-                styles.myModemSpaceBlock,
-
-              ]}
-            >
-              <View
-                style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
-              >
-                <Text style={[styles.leftTitle]}>
-                  Billing Options
-                </Text>
+            <View style={[AppStyles.card, styles.myModemSpaceBlock]}>
+              <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
+                <Text style={styles.leftTitle}>Billing Options</Text>
               </View>
-              <View
-                style={[
-                  styles.supportAccordionParent,
-                  styles.supportParentFlexBox,
-                ]}
-              >
-                <View style={[styles.frameLayout]} />
-
+              <View style={[styles.supportAccordionParent, styles.supportParentFlexBox]}>
+                <View style={styles.frameLayout} />
                 <TouchableOpacity
-                  style={[styles.frame9defaultSpaceBlock]}
+                  style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
-                    let billingURL = (isNewBiller) ? `${Env.ACP_BILLING}/billing` : `${Env.URL}/billing`;
-                                
-                      navigation.navigate("ArticalWindowUtility", {
-                        url: billingURL,
-                        name: "View Billing Details",
-                      });
+                    const billingURL = isNewBiller
+                      ? `${Env.ACP_BILLING}/billing`
+                      : `${Env.URL}/billing`;
+                    handleNavigation(billingURL, "View Billing Details");
                   }}
                   accessible={true}
                   accessibilityRole="button"
                   accessibilityLabel="View Billing Details"
                 >
-
-                  <Text style={styles.modemHealthSupport}>
-                    View Billing Details
-                  </Text>
+                  <Text style={styles.modemHealthSupport}>View Billing Details</Text>
                   <Image
                     style={styles.rightIconStyle}
                     source={require("../../../assets/chevronright.png")}
                   />
                 </TouchableOpacity>
-
-                <View style={[styles.frameLayout]} />
+                <View style={styles.frameLayout} />
                 <TouchableOpacity
-                  style={[styles.frame9defaultSpaceBlock]}
+                  style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
-                    let paymentHistory = (isNewBiller) ? `${Env.ACP_BILLING}/payment-history` : Env.VIEW_PAYMENT;
-                      navigation.navigate("ArticalWindowUtility", {
-                        url: paymentHistory,
-                        name: "View Payment History",
-                      });
+                    const paymentHistory = isNewBiller
+                      ? `${Env.ACP_BILLING}/payment-history`
+                      : Env.VIEW_PAYMENT;
+                    handleNavigation(paymentHistory, "View Payment History");
                   }}
                   accessible={true}
                   accessibilityRole="button"
                   accessibilityLabel="View Payment History"
                 >
-
-                  <Text style={styles.modemHealthSupport}>
-                    View Payment History
-                  </Text>
+                  <Text style={styles.modemHealthSupport}>View Payment History</Text>
                   <Image
                     style={styles.rightIconStyle}
                     source={require("../../../assets/chevronright.png")}
                   />
                 </TouchableOpacity>
-
-                <View style={[styles.frameLayout]} />
+                <View style={styles.frameLayout} />
                 <TouchableOpacity
-                  style={[styles.frame9defaultSpaceBlock]}
+                  style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
-                    let billingHistory = (isNewBiller) ? `${Env.ACP_BILLING}/billing-statement` : Env.BILLING_HISTORY;
-                      navigation.navigate("ArticalWindowUtility", {
-                        url: billingHistory,
-                        name: "View Billing History",
-                      });
+                    const billingHistory = isNewBiller
+                      ? `${Env.ACP_BILLING}/billing-statement`
+                      : Env.BILLING_HISTORY;
+                    handleNavigation(billingHistory, "View Billing History");
                   }}
                   accessible={true}
                   accessibilityRole="button"
                   accessibilityLabel="View Billing History"
                 >
-
-                  <Text style={styles.modemHealthSupport}>
-                    View Billing History
-                  </Text>
+                  <Text style={styles.modemHealthSupport}>View Billing History</Text>
                   <Image
                     style={styles.rightIconStyle}
                     source={require("../../../assets/chevronright.png")}
@@ -382,14 +301,12 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     justifyContent: "center",
   },
-
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "center",
     width: "100%",
     paddingTop: Padding.p_5xl,
   },
-
   rightIconLayout: {
     height: 24,
     width: 24,
@@ -421,14 +338,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-
   text: {
     fontSize: 24,
     fontWeight: "600",
     color: Color.sparklightWhite,
     fontFamily: FontFamily.openSansSemiBold,
   },
-
   melissaSmith: {
     fontSize: FontSize.size_3xl,
     width: 210,
@@ -488,7 +403,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   card: {
-    height: 230, // Set the height for the cards
+    height: 230,
   },
   myModem: {
     borderWidth: 1,
@@ -532,12 +447,6 @@ const styles = StyleSheet.create({
   supportParentFlexBox: {
     alignItems: "flex-end",
     justifyContent: "center",
-  },
-  frame9defaultSpaceBlock: {
-    paddingVertical: Padding.p_base,
-    alignItems: "center",
-    flexDirection: "row",
-    paddingHorizontal: Padding.p_5xl,
   },
   frameLayout: {
     width: "100%",

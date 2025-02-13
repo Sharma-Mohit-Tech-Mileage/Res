@@ -1,19 +1,16 @@
-import React, { useState,useCallback,useEffect } from "react";
-import { View, StyleSheet} from "react-native";
+import React, { useState, useCallback, useEffect } from "react";
+import { View, StyleSheet } from "react-native";
 import Card from "./billerCards/NewBillerSummary";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import { useFocusEffect } from "@react-navigation/native";
-import { useSelector, useDispatch } from "react-redux";
-import { getPaperlessStatus } from "../../redux/actions/ProfileActionSuite";
-const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymentDetails, navigation }) => {
-  const dispatch = useDispatch();
-  const [paperlessStatus, setPaperlessStatus] = useState(false);
+import { useSelector } from "react-redux";
+const MyInternetDetailsBiller = ({ plans, billAmt, dueDate, pastPaymentDue, paymentDetails, navigation }) => {
   const [cardDigit, setCardDigit] = useState("");
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
-  const [accountNumber,setAccountNumber]=useState(undefined)
-  const paperlessStatusAcp  = useSelector(state => state.combinedReducers.profile?.paperlessStatusAcp);
+  const [accountNumber, setAccountNumber] = useState(undefined)
+  const paperlessStatusAcp = useSelector(state => state.combinedReducers.profile?.paperlessStatusAcp);
   const getStatus = () => {
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
@@ -26,33 +23,23 @@ const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,pastPaymentDue,paymen
     });
   };
 
-  const onError = (error) => {
-    console.log("error", error);
-  };
+  const onError = (error) => { console.log("error", error); };
 
-  useFocusEffect( useCallback(() => { getStatus(); return () => { }; }, []) );
-  
-  useEffect(() => {
-    console.log('Refresh Auto pay Data',paymentDetails);
-    if (paymentDetails?.email) {
-        //dispatch(getPaperlessStatus(paymentDetails.email));
-    }
-}, [paymentDetails?.email, dispatch]);
-
+  useFocusEffect(useCallback(() => { getStatus(); return () => { }; }, []));
 
   return (
-    
-      <View style={styles.container}>
-       <Card
+
+    <View style={styles.container}>
+      <Card
         billAmt={billAmt}
-        dueDate={(accountNumber=='8160360050005096')? '': dueDate}
+        dueDate={dueDate}
         isAutoPayStatus={isAutoPayStatus}
         paperlessStatus={paperlessStatusAcp}
         navigation={navigation}
         style={styles.card}
       />
-      </View>
-    
+    </View>
+
   );
 };
 

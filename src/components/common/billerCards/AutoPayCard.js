@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
-import DollerIconBg from "../../../res/svgIcons/DollerIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding ,Color} from "../../../../GlobalStyles";
 import { Env }  from "../../../network/apis/account/Constants";

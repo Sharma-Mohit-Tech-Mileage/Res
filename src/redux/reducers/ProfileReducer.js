@@ -1,4 +1,5 @@
-import { LOGOUT,ALLSVEMAILASSOCIATED,SAVEALLSVEMAILASSOCIATED, USER_PROFILE_DETAILS, SAVE_USER_LIST, SAVE_SMS_SELECTION, SAVE_EMAIL_SELECTION, SAVE_PAPERLESS_DETAILS, SAVE_PUSH_NOTIFICATIONS,SAVE_USER_ACCOUNT_SERVICE,SET_PAPERLESS_STATUS
+import {
+    LOGOUT, ALLSVEMAILASSOCIATED,SAVE_ACP_USER_ACCOUNT_DETAILS, SAVEALLSVEMAILASSOCIATED, USER_PROFILE_DETAILS, SAVE_USER_LIST, SAVE_SMS_SELECTION, SAVE_EMAIL_SELECTION, SAVE_PAPERLESS_DETAILS, SAVE_PUSH_NOTIFICATIONS, SAVE_USER_ACCOUNT_SERVICE, SET_PAPERLESS_STATUS
 } from '../constants/index';
 
 const initialState = {
@@ -9,8 +10,9 @@ const initialState = {
     paperlessStatus: false,
     paperLessInfo: {},
     pushNotifications: [],
-    allSvEmailAssociated:[],
+    allSvEmailAssociated: [],
     paperlessStatusAcp: false,
+    accountDetails: {},
     erro: ""
 }
 
@@ -34,12 +36,12 @@ const ProfileReducer = (state = initialState, action) => {
                 isLoading: false,
                 smsSubscription: action.payload,
             };
-            case SAVE_USER_ACCOUNT_SERVICE:
-                return {
-                    ...state,
-                    isLoading: false,
-                    services: action.payload,
-                };
+        case SAVE_USER_ACCOUNT_SERVICE:
+            return {
+                ...state,
+                isLoading: false,
+                services: action.payload,
+            };
         case SAVE_EMAIL_SELECTION:
             return {
                 ...state,
@@ -63,14 +65,16 @@ const ProfileReducer = (state = initialState, action) => {
                 allSvEmailAssociated: action.payload,
             };
         case SET_PAPERLESS_STATUS:
-                return {
-                    ...state,
-                    paperlessStatusAcp: action.payload
-                };
+            return {
+                ...state,
+                paperlessStatusAcp: action.payload
+            };
+        case SAVE_ACP_USER_ACCOUNT_DETAILS:
+            return { ...state, accountDetails: action.payload };
         case LOGOUT:
             return {
                 initialState
-            }                    
+            }
         default:
             return state;
     }

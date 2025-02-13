@@ -11,25 +11,14 @@ const CardNewBiller = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, nav
 
   const uncheck = require("../../../../assets/checkcircle1.png");
   const check = require("../../../../assets/checkcircle.png");
-  const info = require("../../../../assets/info_icon.png");
-
-console.log("Due Date",dueDate)
 
   const NotAvailable = () => {
     return (
       <View style={{flexDirection:'column'}}>
-       <Tooltip
-          backgroundColor="#4C5458"
-          overlayColor="#00000000"
-          width={180}
-          height={100}
-          popover={ <Text style={{ color: "#FFF" }}> Your due date takes 10 business days to generate. Please check back later. </Text> }
-        > 
+       <Tooltip backgroundColor="#4C5458" overlayColor="#00000000" width={180} height={100} popover={ <Text style={{ color: "#FFF" }}> Your due date takes 10 business days to generate. Please check back later. </Text> } > 
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text style={styles.dueDate}>{"Due "}</Text>
-            <Text
-              style={[ styles.dueDate, { fontWeight: "400", color: colors.dark_grey }, ]}
-            >
+            <Text style={[ styles.dueDate, { fontWeight: "400", color: colors.dark_grey }, ]} >
               {"on: "}
             </Text>
             <Text style={[ styles.dueDate, { textDecorationLine: "underline", marginRight: 5 }, ]} >
@@ -91,13 +80,13 @@ console.log("Due Date",dueDate)
               <View style={styles.status}>
                 <Image
                   resizeMode="cover"
-                  source={isAutoPayStatus ? check : uncheck}
+                  source={paperlessStatus ? check : uncheck}
                   style={styles.statusIcon}
                 />
                 <Text
-                  style={isAutoPayStatus ? styles.labelActive : styles.label}
+                  style={paperlessStatus ? styles.labelActive : styles.label}
                 >
-                  {isAutoPayStatus ? "On" : "Off"}
+                  {paperlessStatus ? "On" : "Off"}
                 </Text>
               </View>
             </View>   

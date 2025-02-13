@@ -5,19 +5,14 @@ import RightArrow from "../../../res/svgIcons/RightArrow";
 import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
-import { CommonActions } from '@react-navigation/native';
 import AppStyles from "../styles/AppStyles";
-const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatus, navigation, style }) => {
+const PeperLessCard = ({ billAmt, paperLessEmail, isAutoPayStatus, paperlessStatus, navigation, style }) => {
 
   return (
       <View style={[AppStyles.card, style]}>
         <View style={styles.cardHreader}>
             <View
-              style={{
-                marginLeft: 10,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
+              style={{ marginLeft: 10, flexDirection: "row", alignItems: "center", }}
             >
               <View style={{ alignSelf: "center" }}>
               <PaperIconBg />
@@ -26,10 +21,10 @@ const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatu
               <Text style={styles.leftTitle}>Paperless Billing</Text>
             </View>
           </View>
-          {paperLessInfo.length>0 ? (
+          {paperLessEmail ? (
             <>
               <Text style={[styles.dueDate, { fontWeight: '400', color: colors.gray600 }]}>Email Associated: </Text>
-              <Text style={[styles.dueDate]}>{paperLessInfo?.[0].emailAddress}</Text>
+              <Text style={[styles.dueDate]}>{paperLessEmail}</Text>
               <Text style={styles.autoPayStatusText}>Paperless Billing On</Text>
               <Text style={[styles.thankYouText,{marginTop:5}]}>Thank you for choosing Paperless Billing!</Text>
             </>
