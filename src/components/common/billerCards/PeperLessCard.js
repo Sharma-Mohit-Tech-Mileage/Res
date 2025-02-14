@@ -6,8 +6,8 @@ import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
 import AppStyles from "../styles/AppStyles";
-const PeperLessCard = ({ billAmt, paperLessEmail, isAutoPayStatus, paperlessStatus, navigation, style }) => {
-
+const PeperLessCard = ({paperlessCardEmail, navigation, style }) => {
+console.log("paperlessCardEmailin card------------------------------------------------------",paperlessCardEmail)
   return (
       <View style={[AppStyles.card, style]}>
         <View style={styles.cardHreader}>
@@ -21,10 +21,10 @@ const PeperLessCard = ({ billAmt, paperLessEmail, isAutoPayStatus, paperlessStat
               <Text style={styles.leftTitle}>Paperless Billing</Text>
             </View>
           </View>
-          {paperLessEmail ? (
+          {paperlessCardEmail ? (
             <>
               <Text style={[styles.dueDate, { fontWeight: '400', color: colors.gray600 }]}>Email Associated: </Text>
-              <Text style={[styles.dueDate]}>{paperLessEmail}</Text>
+              <Text style={[styles.dueDate]}>{paperlessCardEmail}</Text>
               <Text style={styles.autoPayStatusText}>Paperless Billing On</Text>
               <Text style={[styles.thankYouText,{marginTop:5}]}>Thank you for choosing Paperless Billing!</Text>
             </>

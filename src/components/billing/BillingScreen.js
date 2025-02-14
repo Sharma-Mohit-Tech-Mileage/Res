@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Image, StyleSheet, Text, View, TouchableOpacity, ScrollView, } from "react-native";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -25,9 +25,8 @@ const BillingScreen = ({ navigation }) => {
     (state) => state.combinedReducers.profile?.accountDetails
   );
   const { allSvEmailAssociated = [] } = profile;
-  const { paperlessStatusAcp = false } = profile;
   const paperlessEmails = allSvEmailAssociated.filter((email) => email.invoice);
-  const [billAmt, setBillAmt] = useState(0);
+  const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState();
   const [accountNo, setAccountNo] = useState("");
   const [paperlessStatus, setPaperlessStatus] = useState(false);
@@ -37,11 +36,14 @@ const BillingScreen = ({ navigation }) => {
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
 
-  // Consolidated error handler for API requests.
+  const paperlessCardEmail = isNewBiller 
+    ? paperlessEmail 
+    : (Array.isArray(paperlessEmails) && paperlessEmails.length > 0 && paperlessEmails[0].emailAddress ? paperlessEmails[0].emailAddress : '');
+
   const handleError = (error) => { console.log("error", error); };
 
   const getUserAccountDetails = () => {
-    setBillAmt(0);
+    setBillAmt(undefined);
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
       setAccountNo(accountNumber);
@@ -49,7 +51,6 @@ const BillingScreen = ({ navigation }) => {
       GetApiRequest(
         request,
         (res) => {
-          console.log("getUserAccountDetails for normal user:", res);
           if (res) {
             const formattedDueDate =
               res.pastDueAmount !== 0
@@ -103,6 +104,7 @@ const BillingScreen = ({ navigation }) => {
         setIsNewBiller(false);
       } else {
         // For ACP users, dispatch the Redux action to fetch account details.
+        setBillAmt(undefined);
         dispatch(fetchACPUserAccountDetails());
         setIsNewBiller(true);
       }
@@ -180,29 +182,18 @@ const BillingScreen = ({ navigation }) => {
               navigation={navigation}
               isNewBiller={isNewBiller}
               style={styles.card}
-              accessible={true}
-              accessibilityLabel="Billing Summary Card"
             />
             <AutoPayCard
-              billAmt={billAmt}
               cardDigit={cardDigit}
               isAutoPayStatus={isAutoPayStatus}
-              paperlessStatus={paperlessStatus}
               paymentDetails={defaultPaymentDetails}
               navigation={navigation}
               style={styles.card}
-              accessible={true}
-              accessibilityLabel="Auto Pay Card"
             />
             <PeperLessCard
-              billAmt={billAmt}
-              paperLessInfo={isNewBiller ?paperlessEmails?.[0]?.emailAddress:paperlessEmail}
-              isAutoPayStatus={isAutoPayStatus}
-              paperlessStatus={isNewBiller ? paperlessStatusAcp : paperlessStatus}
+              paperlessCardEmail={paperlessCardEmail}
               navigation={navigation}
               style={styles.card}
-              accessible={true}
-              accessibilityLabel="Paperless Billing Card"
             />
             <View style={[AppStyles.card, styles.myModemSpaceBlock]}>
               <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
@@ -214,7 +205,7 @@ const BillingScreen = ({ navigation }) => {
                   style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
                     const billingURL = isNewBiller
-                      ? `${Env.ACP_BILLING}/billing`
+                      ? `${Env.URL}/billing`
                       : `${Env.URL}/billing`;
                     handleNavigation(billingURL, "View Billing Details");
                   }}
@@ -233,7 +224,7 @@ const BillingScreen = ({ navigation }) => {
                   style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
                     const paymentHistory = isNewBiller
-                      ? `${Env.ACP_BILLING}/payment-history`
+                      ? `${Env.VIEW_PAYMENT}/payment-history`
                       : Env.VIEW_PAYMENT;
                     handleNavigation(paymentHistory, "View Payment History");
                   }}
@@ -252,7 +243,7 @@ const BillingScreen = ({ navigation }) => {
                   style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
                     const billingHistory = isNewBiller
-                      ? `${Env.ACP_BILLING}/billing-statement`
+                      ? `${Env.BILLING_HISTORY}/billing-statement`
                       : Env.BILLING_HISTORY;
                     handleNavigation(billingHistory, "View Billing History");
                   }}

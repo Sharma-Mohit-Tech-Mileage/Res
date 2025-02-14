@@ -1,18 +1,16 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
-import WalletIcon from "../../../res/svgIcons/WalletIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
-import Wallet2icon from "../../../res/svgIcons/Wallet2icon";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
 import AppStyles from "../styles/AppStyles";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
-const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, style, acno,isNewBiller }) => {
- 
+const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, style, acno, isNewBiller }) => {
+
 
   const NotAvailable = () => {
     return (
@@ -55,79 +53,81 @@ const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, 
   };
 
   return (
-    
-      <View style={[AppStyles.card, style]}>
-          <View style={styles.cardHreader}>
-            <View style={{ marginLeft: 10, flexDirection: "row", alignItems: "center", }} >
-              <View style={{ alignSelf: "center" }}>
-                <WalletSummaryIcon />
-              </View>
 
-              <Text style={styles.leftTitle}>Bill Summary</Text>
-            </View>
+    <View style={[AppStyles.card, style]}>
+      <View style={styles.cardHreader}>
+        <View style={{ marginLeft: 10, flexDirection: "row", alignItems: "center", }} >
+          <View style={{ alignSelf: "center" }}>
+            <WalletSummaryIcon />
           </View>
 
-          <View
-            style={{ flexDirection: "row", width: "92%", marginHorizontal: 20, justifyContent: "space-between", flex: 0.5, }}
-          >
-            <View
-              style={{ flexDirection: "column", flex: 1, marginVertical:24, justifyContent: "flex-start", }}
-            >
-              <Text style={[styles.label, { fontWeight: "600",color:colors.sparklight_purple_blue,fontSize:14 }]}>
-                Account Number
-              </Text>
-              <Text style={[styles.label,{fontSize:14}]}>{acno}</Text>
-            </View>
-            <View style={{ flexDirection: "column", flex: 1,
-                justifyContent: 'flex-start',   marginVertical:20, marginEnd:40}}>
-            {billAmt == undefined ? (
+          <Text style={styles.leftTitle}>Bill Summary</Text>
+        </View>
+      </View>
+
+      <View
+        style={{ flexDirection: "row", width: "92%", marginHorizontal: 20, justifyContent: "space-between", flex: 0.5, }}
+      >
+        <View
+          style={{ flexDirection: "column", flex: 1, marginVertical: 24, justifyContent: "flex-start", }}
+        >
+          <Text style={[styles.label, { fontWeight: "600", color: colors.sparklight_purple_blue, fontSize: 14 }]}>
+            Account Number
+          </Text>
+          <Text style={[styles.label, { fontSize: 14 }]}>{acno}</Text>
+        </View>
+        <View style={{
+          flexDirection: "column", flex: 1,
+          justifyContent: 'flex-start', marginVertical: 20, marginEnd: 40
+        }}>
+          {billAmt == undefined ? (
             <ActivityIndicator
               size="large"
               color={colors.sparklight_bright_purple}
-              style={{marginLeft:wp("15%")}}
+              style={{ marginLeft: wp("15%") }}
             />
           ) : (
-                  <Text style={styles.amount}>${billAmt||0.0}</Text>
-                )}
-              
-              {(dueDate != "Invalid date" && billAmt!=undefined) && (
-            <Text 
-              accessible={true}
-              accessibilityLabel={`${dueDate ? (dueDate=='Immediately')?"Due Immediately"  :`Due on ${dueDate}`: "Due on Not Available"}`}
-             style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
-              {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": <NotAvailable/>}
-              <Text style={[styles.dueDate, { fontWeight: "400",color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue }]}>
-                {' '+dueDate}
-              </Text>
-             </Text>
-            )}
-              
-            </View>
-          </View>
+            <Text style={styles.amount}>${billAmt || 0.0}</Text>
+          )}
 
-          <View style={styles.cardFooter}>
-            <TouchableOpacity
-              onPress={() => {
-                let billingURL = (isNewBiller) ? `${Env.ACP_BILLING}/billing` : `${Env.URL}/billing`;
-                console.log("Billing URL", billingURL);
-          navigation.navigate("ArticalWindowUtility", {
-            url: billingURL,
-            name: "Billing Details",
-          });
-              }}
+          {(dueDate != "Invalid date" && billAmt != undefined) && (
+            <Text
               accessible={true}
-              accessibilityLabel="Make a Payment"
-              accessibilityRole="button"
-              style={styles.paymentButton}
-            >
-              <Text style={styles.paymentButtonText}>Make a Payment</Text>
-              <View style={{ marginLeft: 2, alignSelf: "center" }}>
-                <RightArrow color={colors.snow_white} />
-              </View>
-            </TouchableOpacity>
-          </View>
+              accessibilityLabel={`${dueDate ? (dueDate == 'Immediately') ? "Due Immediately" : `Due on ${dueDate}` : "Due on Not Available"}`}
+              style={[styles.dueDate, { color: (dueDate == 'Immediately') ? colors.sparklight_red : colors.sparklight_purple_blue, fontWeight: (dueDate == 'Immediately') ? "400" : '700' }]}>
+              {dueDate ? (dueDate == 'Immediately') ? "Due" : "Due on" : <NotAvailable />}
+              <Text style={[styles.dueDate, { fontWeight: "400", color: (dueDate == 'Immediately') ? colors.sparklight_red : colors.sparklight_purple_blue }]}>
+                {' ' + dueDate}
+              </Text>
+            </Text>
+          )}
+
+        </View>
       </View>
-    
+
+      <View style={styles.cardFooter}>
+        <TouchableOpacity
+          onPress={() => {
+            let billingURL = (isNewBiller) ? `${Env.ACP_BILLING}/billing` : `${Env.URL}/billing`;
+            console.log("Billing URL", billingURL);
+            navigation.navigate("ArticalWindowUtility", {
+              url: billingURL,
+              name: "Billing Details",
+            });
+          }}
+          accessible={true}
+          accessibilityLabel="Make a Payment"
+          accessibilityRole="button"
+          style={styles.paymentButton}
+        >
+          <Text style={styles.paymentButtonText}>Make a Payment</Text>
+          <View style={{ marginLeft: 2, alignSelf: "center" }}>
+            <RightArrow color={colors.snow_white} />
+          </View>
+        </TouchableOpacity>
+      </View>
+    </View>
+
   );
 };
 
@@ -200,17 +200,17 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: 28,
     fontWeight: "bold",
-    alignSelf:'flex-end',
+    alignSelf: 'flex-end',
     color: colors.sp_black,
     fontWeight: "700",
-    
+
   },
   dueDate: {
 
     fontSize: 14,
     fontWeight: "700",
     color: colors.dark_grey,
-    alignSelf:'flex-end',
+    alignSelf: 'flex-end',
     fontFamily: FontFamily.openSansRegular,
     color: colors.sparklight_purple_blue,
   },
@@ -247,10 +247,10 @@ const styles = StyleSheet.create({
   paymentButton: {
     flexDirection: "row",
     backgroundColor: colors.sparklight_purple_blue,
-    width:wp("70%"),
+    width: wp("70%"),
     paddingVertical: 8,
-    alignItems:'center',
-    justifyContent:'center',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 5,
     alignSelf: "center",
     marginLeft: wp("9%"),
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     color: colors.snow_white,
     fontSize: 16,
     fontWeight: "600",
-    alignSelf:'center',
+    alignSelf: 'center',
     fontFamily: FontFamily.openSansRegular,
   },
   cardHreader: {
