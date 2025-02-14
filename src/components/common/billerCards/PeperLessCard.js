@@ -7,7 +7,6 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
 import AppStyles from "../styles/AppStyles";
 const PeperLessCard = ({paperlessCardEmail, navigation, style }) => {
-console.log("paperlessCardEmailin card------------------------------------------------------",paperlessCardEmail)
   return (
       <View style={[AppStyles.card, style]}>
         <View style={styles.cardHreader}>
@@ -42,7 +41,7 @@ console.log("paperlessCardEmailin card------------------------------------------
           <View style={styles.cardFooter}>
             <TouchableOpacity
              onPress={() => {
-              navigation.navigate("account", {screen: "Notifications"}); 
+              navigation.navigate("account", {screen: "Notifications"});;
             }}
               accessible={true}
               accessibilityLabel="Manage Paperless Billing"

@@ -73,7 +73,7 @@ const Notifications = () => {
     navigation.navigate('EmailNotifications');
   };
 
-  const handleBackPress = () => navigation.goBack();
+  const handleBackPress = () => navigation.navigate('Account');
 
   return (
     <View style={styles.container}>

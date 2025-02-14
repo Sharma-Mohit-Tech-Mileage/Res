@@ -28,7 +28,6 @@ const BillingScreen = ({ navigation }) => {
   const paperlessEmails = allSvEmailAssociated.filter((email) => email.invoice);
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState();
-  const [accountNo, setAccountNo] = useState("");
   const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [paperlessEmail, setPaperlessEmail] = useState(null);
   const [cardDigit, setCardDigit] = useState("");
@@ -36,8 +35,8 @@ const BillingScreen = ({ navigation }) => {
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
 
-  const paperlessCardEmail = isNewBiller 
-    ? paperlessEmail 
+  const paperlessCardEmail = isNewBiller
+    ? paperlessEmail
     : (Array.isArray(paperlessEmails) && paperlessEmails.length > 0 && paperlessEmails[0].emailAddress ? paperlessEmails[0].emailAddress : '');
 
   const handleError = (error) => { console.log("error", error); };
@@ -46,7 +45,6 @@ const BillingScreen = ({ navigation }) => {
     setBillAmt(undefined);
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
-      setAccountNo(accountNumber);
       const request = `account/api/account/${accountNumber}`;
       GetApiRequest(
         request,
@@ -60,7 +58,7 @@ const BillingScreen = ({ navigation }) => {
             const formattedBalance = (
               Math.round((res.currentBalance || 0) * 100) / 100
             ).toFixed(2);
-            setBillAmt(formattedBalance||0);
+            setBillAmt(formattedBalance || 0);
             setDefaultPaymentDetails({
               dueDate: res.paymentDueDate,
               billAmount: formattedBalance,
@@ -126,7 +124,6 @@ const BillingScreen = ({ navigation }) => {
           ? "Immediately"
           : moment(accountDetails.payment_due_date).format("ll");
       setDueDate(formattedDueDate);
-      setAccountNo(accountDetails.accountNumber);
       setDefaultPaymentDetails({
         dueDate: accountDetails.payment_due_date,
         billAmount: accountDetails.past_due_amount,
@@ -138,8 +135,9 @@ const BillingScreen = ({ navigation }) => {
   }, [accountDetails, user]);
 
   useEffect(() => {
+    console.log("Paperless Email----------------------------------------------------------", user&& user.userInfo && user.userInfo.accountNumber);
     console.log("Bill Amount", billAmt);
-  }, [billAmt]);
+  }, []);
 
   const handleNavigation = (url, name) => {
     navigation.navigate("ArticalWindowUtility", { url, name });
@@ -176,7 +174,7 @@ const BillingScreen = ({ navigation }) => {
             <Card
               billAmt={billAmt}
               dueDate={dueDate}
-              acno={accountNo}
+              acno={user&& user.userInfo && user.userInfo.accountNumber}
               isAutoPayStatus={isAutoPayStatus}
               paperlessStatus={paperlessStatus}
               navigation={navigation}
@@ -205,7 +203,7 @@ const BillingScreen = ({ navigation }) => {
                   style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
                     const billingURL = isNewBiller
-                      ? `${Env.URL}/billing`
+                      ? `${Env.ACP_BILLING}/billing`
                       : `${Env.URL}/billing`;
                     handleNavigation(billingURL, "View Billing Details");
                   }}
@@ -224,7 +222,7 @@ const BillingScreen = ({ navigation }) => {
                   style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
                     const paymentHistory = isNewBiller
-                      ? `${Env.VIEW_PAYMENT}/payment-history`
+                      ? `${Env.ACP_BILLING}/payment-history`
                       : Env.VIEW_PAYMENT;
                     handleNavigation(paymentHistory, "View Payment History");
                   }}
@@ -243,7 +241,7 @@ const BillingScreen = ({ navigation }) => {
                   style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
                     const billingHistory = isNewBiller
-                      ? `${Env.BILLING_HISTORY}/billing-statement`
+                      ? `${Env.ACP_BILLING}/billing-statement`
                       : Env.BILLING_HISTORY;
                     handleNavigation(billingHistory, "View Billing History");
                   }}
