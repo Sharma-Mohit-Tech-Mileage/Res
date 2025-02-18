@@ -190,6 +190,7 @@ const BillingScreen = ({ navigation }) => {
             />
             <PeperLessCard
               paperlessCardEmail={paperlessCardEmail}
+              paperlessStatus={paperlessStatus}
               navigation={navigation}
               style={styles.card}
             />

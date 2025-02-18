@@ -50,7 +50,7 @@ const Notifications = () => {
       isComingSoon: true,
       infoMessage: profileData.phoneNumber
         ? 'Text notifications enabled'
-        : 'No phone number provided',
+        : '',
     },
     {
       id: 'email',
@@ -58,7 +58,7 @@ const Notifications = () => {
       settings: emailSettings,
       infoMessage: profileData.emailAddress
         ? `Emails are sent to ${profileData.emailAddress}`
-        : 'No email configured',
+        : 'You have not enabled email notifications.',
     },
     {
       id: 'app',

@@ -6,7 +6,7 @@ import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
 import AppStyles from "../styles/AppStyles";
-const PeperLessCard = ({paperlessCardEmail, navigation, style }) => {
+const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style }) => {
   return (
       <View style={[AppStyles.card, style]}>
         <View style={styles.cardHreader}>
@@ -20,7 +20,7 @@ const PeperLessCard = ({paperlessCardEmail, navigation, style }) => {
               <Text style={styles.leftTitle}>Paperless Billing</Text>
             </View>
           </View>
-          {paperlessCardEmail ? (
+          {paperlessStatus ? (
             <>
               <Text style={[styles.dueDate, { fontWeight: '400', color: colors.gray600 }]}>Email Associated: </Text>
               <Text style={[styles.dueDate]}>{paperlessCardEmail}</Text>
