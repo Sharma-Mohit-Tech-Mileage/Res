@@ -176,18 +176,6 @@ const AddNotificationScreen = () => {
     animateNotification();
   }, [animateNotification]);
 
-  if (!accountDetails || paperlessStatusAcp === undefined) {
-    return (
-      <View style={styles.container}>
-        <LoadingOverlay
-          loading={true}
-          loadingTxt="Loading account details..."
-          accessibilityLiveRegion="polite"
-        />
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader
@@ -196,7 +184,7 @@ const AddNotificationScreen = () => {
         accessibilityLabel="Add Email Notifications"
       />
       {isSubmitting && (
-        <LoadingOverlay loading={isSubmitting} loadingTxt="Saving..." accessibilityLiveRegion="polite" />
+        <LoadingOverlay loading={isSubmitting} loadingTxt="Saving" accessibilityLiveRegion="polite" />
       )}
       <ScrollView ref={scrollViewRef}>
         <View style={styles.frameContainer}>
