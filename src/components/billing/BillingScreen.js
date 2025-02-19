@@ -11,7 +11,7 @@ import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
-import { fetchBillingPaper, fetchProfileDetails, fetchSvEmailAssociation, fetchACPUserAccountDetails, } from "../../redux/actions/ProfileActionSuite";
+import { fetchBillingPaper, fetchProfileDetails, fetchSvEmailAssociation, fetchACPUserAccountDetails,getPaperlessStatus } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import { Env } from "../../network/apis/account/Constants";
 import colors from "../../res/Colors";
@@ -24,6 +24,9 @@ const BillingScreen = ({ navigation }) => {
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
   );
+   const paperlessStatusAcp = useSelector(
+      (state) => state.combinedReducers.profile?.paperlessStatusAcp
+    );
   const { allSvEmailAssociated = [] } = profile;
   const paperlessEmails = allSvEmailAssociated.filter((email) => email.invoice);
   const [billAmt, setBillAmt] = useState(undefined);
@@ -131,6 +134,7 @@ const BillingScreen = ({ navigation }) => {
         email: p_email,
       });
       setPaperlessEmail(p_email);
+      dispatch(getPaperlessStatus(p_email));
     }
   }, [accountDetails, user]);
 
@@ -190,7 +194,7 @@ const BillingScreen = ({ navigation }) => {
             />
             <PeperLessCard
               paperlessCardEmail={paperlessCardEmail}
-              paperlessStatus={paperlessStatus}
+              paperlessStatus={isNewBiller?paperlessStatusAcp:paperlessStatus}
               navigation={navigation}
               style={styles.card}
             />

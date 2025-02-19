@@ -74,18 +74,19 @@ export const enrollPaperless = async (emailAddress) => {
 };
 
 // Unenroll from paperless for an email
-export const unenrollPaperless = async (emailAddress) => {
+export const unenrollPaperless = async (data) => {
     try {
         const config = await getAuthConfig();
         const accountNumber = await getUserAccountNumber();
-        console.log('📨 Unenrolling from paperless:', { emailAddress, accountNumber });
-        
+        console.log('📨 emailtobeunenrolled from paperless:', data);
+        const { emailAddress } = data;
+        console.log('📨 Unenrolling from paperless:', emailAddress);
         const response = await _axios.post(
-            `/api/Paperless/PaperlessUnenroll?emailAddress=${emailAddress}&account=${accountNumber}`, 
-            null, 
-            {...config}
+            `/api/Paperless/PaperlessUnenroll?emailAddress=${emailAddress}&account=${accountNumber}`,
+            null,
+            { ...config }
         );
-        console.log('✅ Paperless unenrollment successful:', response.data);
+        console.log('✅ Paperless unenrollment successful:', response);
         return response.data;
     } catch (error) {
         console.error('❌ Error unenrolling from paperless:', error);
