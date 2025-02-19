@@ -2,15 +2,14 @@ import React, { useEffect, useState } from "react";
 import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Dimensions } from "react-native";
 import WebView from 'react-native-webview';
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useSelector, useDispatch } from 'react-redux';
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
-import { updateTermsAndConditions, fetchSMSSelection, fetchBillingStatus, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
+import { fetchACPUserAccountDetails, updateTermsAndConditions, fetchSMSSelection, fetchBillingStatus, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
 import { logout } from 'react-native-app-auth';
-//import { SetClearTimer } from '../user/Session';
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { Env } from "../../network/apis/account/Constants";
+import { getPrimaryEmail } from "../../components/utility/constant";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 
 const config = {
@@ -28,36 +27,38 @@ const Terms = ({ navigation }) => {
     const [profileLoadCount, setProfileLoadCount] = useState(0);
     const [isError, setIsError] = useState(false);
     const dispatch = useDispatch();
-    const stateData = useSelector(state => state);
-    const combinedReducers = useSelector(state => state.combinedReducers);
     const userData = useSelector(state => state.combinedReducers.user.userData);
     const profile = useSelector(state => state.combinedReducers.profile || {});
+    const [value, setValue] = useState(null);
     const url = 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions';
-
+    const accountDetails = useSelector(
+        (state) => state.combinedReducers.profile?.accountDetails
+    );
     useEffect(() => {
         setTimeout(() => {
             setLoading(false);
         }, 10000);
-    }, []); 
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-               
-                if(userData?.userInfo.accountNumber.toString().length==9){
-                dispatch(fetchPushNotifications());
-                dispatch(fetchBillingStatus());
-                dispatch(fetchBillingPaper());
-                dispatch(fetchSMSSelection());
-                dispatch(fetchProfileDetails());
+
+                if (userData?.isNormalUser) {
+                    dispatch(fetchPushNotifications());
+                    dispatch(fetchBillingStatus());
+                    dispatch(fetchBillingPaper());
+                    dispatch(fetchSMSSelection());
+                    dispatch(fetchProfileDetails());
+                } else {
+                    dispatch(fetchACPUserAccountDetails());
                 }
             } catch (error) {
                 console.error("Error fetching data", error);
             }
         };
-
         fetchData();
-    }, [dispatch]); 
+    }, [dispatch]);
 
     useEffect(() => {
         let goToPhoneScreen = false;
@@ -65,22 +66,22 @@ const Terms = ({ navigation }) => {
         let goToPushNotificationScreen = false;
         let optOutCountPushNotification = 0;
 
-        if(userData?.userInfo.accountNumber.toString().length==9){
-        if (profile?.pushNotifications?.length > 0) {
-            const messageTypes = profile.pushNotifications[0].pushMessageType;
-            messageTypes.forEach((messageType) => {
-                if (messageType.optOutFlag) {
-                    optOutCountPushNotification += 1;
+        if (userData?.isNormalUser) {
+            if (profile?.pushNotifications?.length > 0) {
+                const messageTypes = profile.pushNotifications[0].pushMessageType;
+                messageTypes.forEach((messageType) => {
+                    if (messageType.optOutFlag) {
+                        optOutCountPushNotification += 1;
+                    }
+                });
+                if (optOutCountPushNotification > 2) {
+                    goToPushNotificationScreen = true;
                 }
-            });
-            if (optOutCountPushNotification > 2) {
+            } else {
                 goToPushNotificationScreen = true;
             }
-        } else {
-            goToPushNotificationScreen = true;
         }
-    }
-        
+
         if (profile?.smsSubscription?.length > 0) {
             const firstSubscription = profile.smsSubscription[0];
             firstSubscription.smsMessageType.forEach((messageType) => {
@@ -96,9 +97,9 @@ const Terms = ({ navigation }) => {
         }
 
         if (goToPushNotificationScreen) {
-            setNextScreen('EntryPushNotifications'); 
+            setNextScreen('EntryPushNotifications');
         } else if (goToPhoneScreen) {
-            setNextScreen('EntryTextNotifications');  
+            setNextScreen('EntryTextNotifications');
         } else {
             const paperlessStatus = profile?.paperLessInfo?.paperlessStatus?.toLowerCase() ?? '';
             if (profile?.paperLessInfo?.accountNumber?.length > 0
@@ -111,7 +112,7 @@ const Terms = ({ navigation }) => {
 
         if (profile?.profileDetails?.memberType === "Admin") {
             if (goToPushNotificationScreen) {
-                setNextScreen('EntryPushNotifications'); 
+                setNextScreen('EntryPushNotifications');
             } else {
                 setNextScreen('MyTab');
             }
@@ -119,7 +120,7 @@ const Terms = ({ navigation }) => {
 
         setProfileLoadCount(profileLoadCount + 1);
     }, [profile]);
-    
+
 
     useEffect(() => {
         console.log('profileLoadCount: ', profileLoadCount);
@@ -128,23 +129,35 @@ const Terms = ({ navigation }) => {
             console.log('profileAfterLoad: ', JSON.stringify(profile));
         }
     }, [profileLoadCount]);
-    
+
+    useEffect(() => {
+        if (accountDetails) {
+            const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
+            setValue(updatedPrimaryEmail);
+        }
+    }, [accountDetails, dispatch]);
 
     const termsAccepted = async () => {
         await dispatch(updateTermsAndConditions(true, null));
         await dispatch(updateWalkThroughStep(0));
-        if(userData?.userInfo.accountNumber.toString().length==9){
-        console.log('termsAccepted: ', nextScreen);
-        navigation.reset({
-            index: 0,
-            routes: [{ name: nextScreen }],
-        });
-    }else{
-        navigation.reset({
-            index: 0,
-            routes: [{ name: 'MyTab' }],
-        }); 
-    }
+        if (userData?.isNormalUser) {
+            console.log('termsAccepted: ', nextScreen);
+            navigation.reset({
+                index: 0,
+                routes: [{ name: nextScreen }],
+            });
+        } else if (!userData?.isNormalUser && !value) {
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'EntryEmailNotifications' }],
+            });
+        }
+        else {
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'MyTab' }],
+            });
+        }
 
     };
 
@@ -153,49 +166,48 @@ const Terms = ({ navigation }) => {
             console.log('token', res)
             let token = res.idToken;
             logout(config, {
-              idToken: token,
-              postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
+                idToken: token,
+                postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
             }).then((result) => {
                 storeUser({});
                 storeSsoToken({});
                 saveUserInfo({});
                 cleanUserData();
-                //SetClearTimer();
                 navigation.reset({
                     index: 0,
                     routes: [{ name: 'Splash' }]
                 })
             });
         });
-    };    
+    };
 
-    return  (
+    return (
         <View style={styles.container}>
-            <ProfileSettingsHeader 
+            <ProfileSettingsHeader
                 showIcon={false}
                 title={'Terms'}
             />
             {
                 progress < 1 &&
                 (
-                    <View style={{...styles.progressBar}}>
-                        <View style={{...styles.progress, width: `${progress * 100}%` }} />
+                    <View style={{ ...styles.progressBar }}>
+                        <View style={{ ...styles.progress, width: `${progress * 100}%` }} />
                     </View>
                 )
-            }            
+            }
             <WebView
                 key={url}
                 source={{ uri: url }}
                 onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
                 onError={() => setIsError(true)}
-            />  
+            />
             {isError && (
                 <View style={[styles.errorContainer, { marginTop: '23%' }]}>
                     <Text style={styles.errorText}>Failed to load. Please try again later.</Text>
                 </View>
-            )}                           
+            )}
             <View style={styles.bottomBar}>
-                <View style={styles.buttonsParent} 
+                <View style={styles.buttonsParent}
                     accessibilityLabel="Buttons Section">
                     <Pressable
                         style={[styles.buttonDecline, styles.buttonsLayout]}
@@ -210,25 +222,25 @@ const Terms = ({ navigation }) => {
                     </Pressable>
                     {
                         loading ?
-                        (
-                            <View style={[styles.buttons, styles.buttonsLayout]}>
-                                <ActivityIndicator size="small" color={"white"} /> 
-                            </View>  
-                        )                      
-                        :
-                        (
-                            <Pressable
-                                style={[styles.buttons, styles.buttonsLayout]}
-                                onPress={termsAccepted}
-                                accessibilityRole="button"  // Indicates this is a button
-                                accessibilityLabel="Accept terms and conditions"  // Describes the button's function
-                                accessibilityHint="tap to accept the terms and conditions"  
-                            >
-                                <Text style={styles.accept}>Accept</Text>
-                            </Pressable>
-                        )
-                    }                
-                </View>    
+                            (
+                                <View style={[styles.buttons, styles.buttonsLayout]}>
+                                    <ActivityIndicator size="small" color={"white"} />
+                                </View>
+                            )
+                            :
+                            (
+                                <Pressable
+                                    style={[styles.buttons, styles.buttonsLayout]}
+                                    onPress={termsAccepted}
+                                    accessibilityRole="button"  // Indicates this is a button
+                                    accessibilityLabel="Accept terms and conditions"  // Describes the button's function
+                                    accessibilityHint="tap to accept the terms and conditions"
+                                >
+                                    <Text style={styles.accept}>Accept</Text>
+                                </Pressable>
+                            )
+                    }
+                </View>
             </View>
         </View>
     );
@@ -252,7 +264,7 @@ const styles = StyleSheet.create({
     errorText: {
         fontSize: width * 0.04, // 4% of screen width
         marginBottom: height * 0.02, // 2% of screen height
-    },    
+    },
     bottomBar: {
         height: 150,
         backgroundColor: '#FFF',
@@ -263,11 +275,11 @@ const styles = StyleSheet.create({
         shadowColor: "#171717",
         shadowOffset: { width: -2, height: 1 },
         shadowOpacity: 0.2,
-        shadowRadius: 3,     
+        shadowRadius: 3,
     },
     buttonDecline: {
         backgroundColor: Color.colorWhitesmoke_300,
-    },    
+    },
     buttons: {
         backgroundColor: Color.colorMidnightblue,
     },
@@ -279,12 +291,12 @@ const styles = StyleSheet.create({
         borderRadius: Border.br_11xs,
         minHeight: 50,
         width: '45%',
-    },    
+    },
     buttonsParent: {
         justifyContent: 'space-between',
         flexDirection: 'row',
         width: '90%',
-    },    
+    },
     accept: {
         fontSize: FontSize.size_base,
         fontFamily: FontFamily.openSansRegular,
@@ -293,10 +305,10 @@ const styles = StyleSheet.create({
     },
     decline: {
         fontSize: FontSize.size_base,
-        fontFamily: FontFamily.openSansRegular,        
+        fontFamily: FontFamily.openSansRegular,
         color: Color.colorMidnightblue,
         textAlign: "center",
-    },    
+    },
     container: {
         flex: 1,
     },
@@ -317,10 +329,10 @@ const styles = StyleSheet.create({
         tintColor: '#999',
         width: '100%',
         height: '100%'
-    },  
+    },
     termsHeader: {
         paddingTop: 10,
-    },    
+    },
     termsHeaderText: {
         fontFamily: FontFamily.openSansSemiBold,
         fontSize: 22,
@@ -328,12 +340,12 @@ const styles = StyleSheet.create({
     },
     termsTitle: {
         paddingTop: 10
-    },    
+    },
     termsTitleText: {
         fontFamily: FontFamily.openSansSemiBold,
         fontSize: 16,
-        color: Color.colorGray_100,  
-        marginVertical: 10              
+        color: Color.colorGray_100,
+        marginVertical: 10
     },
     termsDescription: {
         paddingTop: 10,
@@ -342,8 +354,8 @@ const styles = StyleSheet.create({
         fontFamily: FontFamily.openSansRegular,
         fontSize: 16,
         lineHeight: 25,
-        color: Color.colorGray_100,        
-    }, 
+        color: Color.colorGray_100,
+    },
 });
 
 export default Terms;
