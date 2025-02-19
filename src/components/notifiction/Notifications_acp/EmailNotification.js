@@ -1,15 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  Image,
-  Animated,
-  Platform,
-  TouchableOpacity,
-  AccessibilityInfo,
-} from "react-native";
+import { StyleSheet, Text, View, ScrollView, Image, Animated, Platform, TouchableOpacity, AccessibilityInfo, } from "react-native";
 import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -21,8 +11,8 @@ import SparkLightInput from "../../common/customui/SparkLightInput";
 import { useDispatch, useSelector } from "react-redux";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import NotificationAlert from "../../common/customui/NotificationAlert";
-import SecondaryButton from "../../common/customui/PrimaryButton";
-import LoadingOverlay from "../../common/LoadingOverlay";
+import SecondaryButton from "../../common/customui/PrimaryButton";   
+import LoadingOverlay from "../../common/customui/CustomLoading";
 import { updatePrimaryAndPaperlessRequest } from "../../../redux/actions/NotificationActionSuite";
 import { fetchACPUserAccountDetails, getPaperlessStatus } from "../../../redux/actions/ProfileActionSuite";
 import { getPrimaryEmail } from "../../utility/constant";
@@ -80,16 +70,15 @@ const AddNotificationScreen = () => {
     }
   }, [primaryEmail, setValue, dispatch]);
 
-  // Listen for route params that signal a successful or failed update
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setNotification({ message: route.params.successMessage, type: "success" });
       dispatch(fetchACPUserAccountDetails());
       dispatch(getPaperlessStatus(primaryEmail));
-      setIsSubmitting(false); // Hide overlay on success
+      setIsSubmitting(false); 
     } else if (route.params?.updateFailed) {
       setNotification({ message: route.params.failureMessage, type: "error" });
-      setIsSubmitting(false); // Hide overlay on failure
+      setIsSubmitting(false); 
     }
   }, [route.params]);
 
@@ -133,13 +122,12 @@ const AddNotificationScreen = () => {
         animateNotification();
         return;
       }
-      // Show the overlay while processing the update action
       setIsSubmitting(true);
       dispatch(
         updatePrimaryAndPaperlessRequest(
           {
             newEmail: email,
-            oldEmail: primaryEmail, // if empty, saga will add new.
+            oldEmail: primaryEmail,
             paperlessBilling,
             account: accountDetails?.accountNumber,
           },
@@ -163,8 +151,7 @@ const AddNotificationScreen = () => {
         onPressBack={() => navigation.goBack()}
         accessibilityLabel="Add Email Notifications"
       />
-      {/* Loading overlay appears when isSubmitting is true */}
-      <LoadingOverlay isLoading={isSubmitting} message="Saving..." accessibilityLiveRegion="polite" />
+      {isSubmitting&&<LoadingOverlay  loading={isSubmitting} loadingTxt="Saving..." accessibilityLiveRegion="polite" />}
       <ScrollView ref={scrollViewRef}>
         <View style={styles.frameContainer}>
           <View style={{ paddingVertical: 16 }}>
@@ -249,7 +236,7 @@ const AddNotificationScreen = () => {
                   name="paperlessBilling"
                   initialValue={paperlessStatusAcp || false}
                   onToggle={handleToggleChange}
-                  disabled={!toggleCheckBoxTerm && !formState.paperlessBilling}
+                  disabled={!toggleCheckBoxTerm && !paperlessStatusAcp}
                   section="paperless"
                 />
               </View>
@@ -258,7 +245,7 @@ const AddNotificationScreen = () => {
               </Text>
             </View>
 
-            {!formState.paperlessBilling&&<View style={[styles.checkBoxArea]}>
+            {!paperlessStatusAcp&&<View style={[styles.checkBoxArea]}>
               <TouchableOpacity
                 onPress={() => setToggleCheckBoxTerm(!toggleCheckBoxTerm)}
                 accessibilityRole="checkbox"
