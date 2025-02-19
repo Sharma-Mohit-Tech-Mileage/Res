@@ -17,6 +17,43 @@ import {
   unenrollPaperless,
 } from "../../network/notification/notification.service";
 
+const getNavigationConfig = (type, isSuccess, details = {}) => {
+  const baseConfig = {
+    screen: "EmailNotifications",
+    params: {
+      updatedType: "Primary",
+      updateSuccess: isSuccess,
+      updateFailed: !isSuccess,
+    }
+  };
+
+  if (isSuccess) {
+    let message = "Your email preferences have been updated successfully.";
+    
+    if (details.isNewPrimary) {
+      message = "Primary email has been set up successfully. ";
+      if (details.paperless) {
+        message += "Paperless billing has been enabled. ";
+      }
+      message += "Changes may take up to 24 hours to reflect.";
+    } else if (details.isPrimaryUpdate) {
+      message = "Primary email has been updated successfully. ";
+      if (details.paperless !== undefined) {
+        message += "Your paperless billing preference has been saved.";
+      }
+    } else if (details.paperlessOnly) {
+      message = "Your paperless billing preference has been updated successfully.";
+    }
+    
+    baseConfig.params.successMessage = message;
+  } else {
+    baseConfig.params.failureMessage = 
+      details.error || "Unable to update preferences. Please try again later.";
+  }
+
+  return baseConfig;
+};
+
 function* handleUpdatePrimaryAndPaperless(action) {
   const { newEmail, oldEmail, paperlessBilling, account } = action.payload;
   const { navigation } = action;
@@ -26,6 +63,7 @@ function* handleUpdatePrimaryAndPaperless(action) {
   try {
     yield put(setLoading());
     let result;
+
     // Case 1: No primary email exists – add new primary.
     if (!oldEmail) {
       console.log("No primary email exists – adding new primary:", newEmail);
@@ -34,13 +72,13 @@ function* handleUpdatePrimaryAndPaperless(action) {
         console.log("Enrolling new email in paperless:", newEmail);
         yield call(enrollPaperless, { account, emailAddress: newEmail });
       }
+      
       if (navigation) {
-        navigation.navigate("EmailNotifications", {
-          updateSuccess: true,
-          updatedType: "Primary",
-          successMessage:
-            "Primary email added. You are now enrolled in paperless billing. Changes may take up to 24 hours to reflect.",
+        const config = getNavigationConfig("Primary", true, {
+          isNewPrimary: true,
+          paperless: paperlessBilling
         });
+        navigation.navigate(config.screen, config.params);
       }
     }
     // Case 2: Primary email exists and new email is different – update primary.
@@ -48,20 +86,19 @@ function* handleUpdatePrimaryAndPaperless(action) {
       console.log("Updating primary email from", oldEmail, "to", newEmail);
       result = yield call(updatePrimaryEmail, { newEmail, oldEmail });
       if (paperlessBilling === true) {
-        console.log("Unenrolling old email from paperless:", oldEmail);
-        //yield call(unenrollPaperless, { account, emailAddress: oldEmail });
         console.log("Enrolling new email in paperless:", newEmail);
         yield call(enrollPaperless, { account, emailAddress: newEmail });
       } else if (paperlessBilling === false) {
-        console.log("Paperless toggle off – unenrolling old email:", oldEmail);
+        console.log("Paperless toggle off – unenrolling email:", newEmail);
         yield call(unenrollPaperless, { account, emailAddress: newEmail });
       }
+      
       if (navigation) {
-        navigation.navigate("EmailNotifications", {
-          updateSuccess: true,
-          updatedType: "Primary",
-          successMessage: "Primary email updated. Your paperless billing preference has been saved.",
+        const config = getNavigationConfig("Primary", true, {
+          isPrimaryUpdate: true,
+          paperless: paperlessBilling
         });
+        navigation.navigate(config.screen, config.params);
       }
     }
     // Case 3: Email unchanged – update paperless status.
@@ -74,24 +111,25 @@ function* handleUpdatePrimaryAndPaperless(action) {
         console.log("Unenrolling existing primary email from paperless:", newEmail);
         yield call(unenrollPaperless, { account, emailAddress: newEmail });
       }
+      
       if (navigation) {
-        navigation.navigate("EmailNotifications", {
-          updateSuccess: true,
-          updatedType: "Primary",
-          successMessage: "Your paperless billing preference has been updated.",
+        const config = getNavigationConfig("Primary", true, {
+          paperlessOnly: true
         });
+        navigation.navigate(config.screen, config.params);
       }
     }
+    
     yield put(updatePrimaryAndPaperlessSuccess(result));
   } catch (error) {
     console.error("Combined update failed:", error);
     yield put(updatePrimaryAndPaperlessFailure(error.message || "Update failed"));
+    
     if (navigation) {
-      navigation.navigate("EmailNotifications", {
-        updateFailed: true,
-        updatedType: "Primary",
-        failureMessage: error.message || "We couldn’t update your settings. Please try again later.",
+      const config = getNavigationConfig("Primary", false, {
+        error: error.message
       });
+      navigation.navigate(config.screen, config.params);
     }
   } finally {
     yield put(clearLoading());

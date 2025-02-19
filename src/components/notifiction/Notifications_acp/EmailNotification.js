@@ -40,7 +40,6 @@ const AddNotificationScreen = () => {
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
 
   const scrollViewRef = useRef(null);
-  // Initialize animatedValue to -100 so that the notification view is off-screen above.
   const animatedValue = useRef(new Animated.Value(-100)).current;
 
   const route = useRoute();
@@ -54,9 +53,6 @@ const AddNotificationScreen = () => {
     (state) => state.combinedReducers.profile?.paperlessStatusAcp
   );
   const primaryEmail = accountDetails ? getPrimaryEmail(accountDetails) : "";
-  const notificationState = useSelector(
-    (state) => state.combinedReducers.notification
-  );
 
   const { control, handleSubmit, setValue, formState: { errors } } = useForm({
     resolver: yupResolver(validationSchema),
@@ -65,7 +61,6 @@ const AddNotificationScreen = () => {
     },
   });
 
-  // Animate the notification view using animatedValue (translateY)
   const translateY = animatedValue;
 
   useEffect(() => {
@@ -73,32 +68,31 @@ const AddNotificationScreen = () => {
     AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
   }, []);
 
-  // Announce notification for screen readers.
   useEffect(() => {
     if (notification && screenReaderEnabled) {
       AccessibilityInfo.announceForAccessibility(notification.message);
     }
   }, [notification, screenReaderEnabled]);
 
-  // If a primary email exists, set it in the form.
   useEffect(() => {
     if (primaryEmail) {
       setValue("email", primaryEmail);
     }
   }, [primaryEmail, setValue, dispatch]);
 
-  // Also check navigation parameters (sent by saga via navigation.navigate) and set notification accordingly.
+  // Listen for route params that signal a successful or failed update
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setNotification({ message: route.params.successMessage, type: "success" });
       dispatch(fetchACPUserAccountDetails());
       dispatch(getPaperlessStatus(primaryEmail));
+      setIsSubmitting(false); // Hide overlay on success
     } else if (route.params?.updateFailed) {
       setNotification({ message: route.params.failureMessage, type: "error" });
+      setIsSubmitting(false); // Hide overlay on failure
     }
   }, [route.params]);
 
-  // Animate the notification: it will pop down from the top (from -100 to 0) and after 3 seconds, pop back up.
   const animateNotification = useCallback(() => {
     animatedValue.setValue(-100);
     Animated.timing(animatedValue, {
@@ -116,14 +110,12 @@ const AddNotificationScreen = () => {
     });
   }, [animatedValue]);
 
-  // Trigger the notification animation whenever notification changes.
   useEffect(() => {
     if (notification) {
       animateNotification();
     }
   }, [notification, animateNotification]);
 
-  // DO NOT change your toggle settings.
   const handleToggleChange = useCallback((newValue) => {
     console.log("Paperless Billing toggle:", newValue.target.value);
     setFormState(prevState => ({ ...prevState, paperlessBilling: newValue.target.value }));
@@ -133,7 +125,6 @@ const AddNotificationScreen = () => {
     (data) => {
       const { email } = data;
       const { paperlessBilling } = formState;
-      // Validate paperless terms if toggle is on.
       if (paperlessBilling && !toggleCheckBoxTerm) {
         setNotification({
           message: "Please accept the Paperless Billing Terms & Conditions to continue.",
@@ -142,7 +133,8 @@ const AddNotificationScreen = () => {
         animateNotification();
         return;
       }
-      // Dispatch the combined update action.
+      // Show the overlay while processing the update action
+      setIsSubmitting(true);
       dispatch(
         updatePrimaryAndPaperlessRequest(
           {
@@ -171,6 +163,7 @@ const AddNotificationScreen = () => {
         onPressBack={() => navigation.goBack()}
         accessibilityLabel="Add Email Notifications"
       />
+      {/* Loading overlay appears when isSubmitting is true */}
       <LoadingOverlay isLoading={isSubmitting} message="Saving..." accessibilityLiveRegion="polite" />
       <ScrollView ref={scrollViewRef}>
         <View style={styles.frameContainer}>
@@ -256,54 +249,54 @@ const AddNotificationScreen = () => {
                   name="paperlessBilling"
                   initialValue={paperlessStatusAcp || false}
                   onToggle={handleToggleChange}
-                  disabled={!toggleCheckBoxTerm}
+                  disabled={!toggleCheckBoxTerm && !formState.paperlessBilling}
                   section="paperless"
                 />
               </View>
               <Text style={styles.toggleDescription}>
                 Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips.
-                {paperlessStatusAcp && primaryEmail ? `\nCurrently using: ${primaryEmail}` : ""}
               </Text>
             </View>
 
+            {!formState.paperlessBilling&&<View style={[styles.checkBoxArea]}>
               <TouchableOpacity
                 onPress={() => setToggleCheckBoxTerm(!toggleCheckBoxTerm)}
-                style={[styles.checkBoxArea, { paddingHorizontal: Padding.p_5xl }]}
                 accessibilityRole="checkbox"
-                accessibilityLabel="Agree to Paperless Billing Terms and Conditions"
+                accessibilityLabel="Agree to Paperless Billing Terms and Conditions checkbox"
                 accessibilityState={{ checked: toggleCheckBoxTerm }}
               >
-                <View style={Platform.OS === "ios" ? styles.checkBoxView : styles.checkBoxViewAndroid}>
-                  <CheckBox
-                    disabled={true}
-                    value={toggleCheckBoxTerm}
-                    style={Platform.OS === "ios" ? styles.checkBox : styles.checkBoxAndroid}
-                    boxType="square"
-                    tintColors={{
-                      true: "#1B99FF",
-                      false: Platform.OS === "ios" ? Color.colorWhitesmoke_300 : "#D0D5DD",
-                    }}
-                    accessible={false}
-                  />
-                </View>
-                <View style={styles.checkBoxAreaView}>
-                  <Text style={styles.checkBoxAreaViewText}>
-                    I agree to{" "}
-                    <Text
-                      style={[styles.checkBoxAreaViewText, { color: Color.sparklightBrightPurple, textDecorationLine: "underline" }]}
-                      onPress={(event) => {
-                        event.stopPropagation();
-                      }}
-                      accessibilityRole="link"
-                      accessibilityHint="Opens Paperless Billing Terms & Conditions"
-                      accessible={true}
-                    >
-                      Paperless Billing Terms & Conditions
-                    </Text>
-                  </Text>
-                </View>
+                <CheckBox
+                  disabled={true}
+                  value={toggleCheckBoxTerm}
+                  style={styles.checkBox}
+                  boxType="square"
+                  tintColors={{
+                    true: "#1B99FF",
+                    false: Platform.OS === "ios" ? Color.colorWhitesmoke_300 : "#D0D5DD",
+                  }}
+                  accessible={false}
+                />
               </TouchableOpacity>
-            
+
+              <Text style={styles.checkBoxAreaViewText}>
+                I agree to
+              </Text>
+
+              <TouchableOpacity
+                onPress={(event) => {
+                  event.stopPropagation();
+                  // Add navigation or modal logic for terms here
+                }}
+                accessibilityRole="link"
+                accessibilityLabel="Paperless Billing Terms & Conditions"
+                accessibilityHint="Opens Paperless Billing Terms & Conditions"
+                style={{ marginLeft: 3 }}
+              >
+                <Text style={[styles.checkBoxAreaViewText, { color: Color.sparklightBrightPurple, textDecorationLine: "underline" }]}>
+                  Paperless Billing Terms & Conditions
+                </Text>
+              </TouchableOpacity>
+            </View>}
           </View>
         </View>
         <View style={styles.buttonContainer}>
@@ -410,32 +403,18 @@ const styles = StyleSheet.create({
   checkBox: {
     width: 12,
     height: 12,
-    backgroundColor: Color.colorWhitesmoke_100,
-  },
-  checkBoxView: {
-    width: 12,
-    height: 12,
     marginRight: Platform.OS === "ios" ? 20 : 30,
-    marginTop: 10,
     backgroundColor: Color.colorWhitesmoke_100,
-  },
-  checkBoxAndroid: {},
-  checkBoxViewAndroid: {
-    marginRight: 10,
-    marginLeft: 10,
   },
   checkBoxArea: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  checkBoxAreaView: {
-    marginRight: 5,
+    paddingHorizontal: Padding.p_5xl,
   },
   checkBoxAreaViewText: {
     fontSize: 14,
     fontFamily: FontFamily.openSansRegular,
     lineHeight: 30,
-    marginRight: 10,
     color: Color.colorGray_200,
   },
 });

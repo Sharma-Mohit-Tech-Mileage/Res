@@ -141,13 +141,7 @@ const AccountOverview = () => {
       includeInMenu: true,
     },
 
-    {
-      name: 'Notifications',
-      onPress: () => navigation.navigate('Notifications'),
-      icon: notificationsIcon,
-      accessibilityLabel: 'Navigate to notifications settings',
-      includeInMenu: true,
-    },
+   
     {
       name: 'Password & Security',
       onPress: () => navigation.navigate('PasswordSecurity'),
@@ -155,7 +149,13 @@ const AccountOverview = () => {
       accessibilityLabel: 'Navigate to password and security settings',
       includeInMenu: true,
     },
-
+    {
+      name: 'Notifications',
+      onPress: () => navigation.navigate('Notifications'),
+      icon: notificationsIcon,
+      accessibilityLabel: 'Navigate to notifications settings',
+      includeInMenu: true,
+    },
     
     {
       name: 'App Feedback',
