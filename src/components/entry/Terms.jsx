@@ -12,15 +12,11 @@ import { Env } from "../../network/apis/account/Constants";
 import { getPrimaryEmail } from "../../components/utility/constant";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 
-const config = {
-    issuer: Env.SSO_LOGIN,
-    iosPrefersEphemeralSession: true,
-};
+const config = { issuer: Env.SSO_LOGIN, iosPrefersEphemeralSession: true, };
 
 const { width, height } = Dimensions.get('window');
 
 const Terms = ({ navigation }) => {
-    const [initScript, setInitScript] = useState('');
     const [loading, setLoading] = useState(true);
     const [nextScreen, setNextScreen] = useState('EntryPushNotifications');
     const [progress, setProgress] = useState(0);

@@ -42,7 +42,37 @@ const WalkthroughOverlay = ({ onFinish }) => {
       buttonText: "Let's Go!",
     },
   ];
-
+  const walkThroughScreensACP = [
+    {
+      title: "Home",
+      description:
+        "Get a quick overview of your account.",
+      buttonText: "Next",
+    },
+    {
+      title: "Billing",
+      description: "Make payments, set up Auto Pay and view statements.",
+      buttonText: "Next",
+    },
+    {
+      title: "Service",
+      description:
+        "Manage your internet plans, explore upgrades and view available services.",
+      buttonText: "Next",
+    },
+    {
+      title: "Support",
+      description:
+        "View FAQs and contact our Support Team for assistance.",
+      buttonText: "Next",
+    },
+    {
+      title: "Account",
+      description:
+        "Manage your profile settings, notifications, users and more.",
+      buttonText: "Let's Go!",
+    },
+  ];
   const changeWalkThroughStep = (requestedStep) => {
     // Assume walkThroughStep holds the current step (0–4)
     let newStep = requestedStep;
@@ -83,7 +113,7 @@ const WalkthroughOverlay = ({ onFinish }) => {
     bottomCarotStyles.push(styles.bottomCarotStep5);
   }
 
-  const currentScreen = walkThroughScreens[walkThroughStep];
+  const currentScreen = user?.isNormalUser?walkThroughScreens[walkThroughStep]:walkThroughScreensACP[walkThroughStep];
 
   if (!showWalkThrough) {
     return null;
@@ -98,10 +128,10 @@ const WalkthroughOverlay = ({ onFinish }) => {
       <View>
         <View
           accessible={true}
-          accessibilityLabel={currentScreen.title}
+          accessibilityLabel={currentScreen?.title}
           style={styles.title}
         >
-          <Text style={styles.titleText}>{currentScreen.title}</Text>
+          <Text style={styles.titleText}>{currentScreen?.title}</Text>
         </View>
         <View
           accessible={true}
@@ -161,7 +191,7 @@ const WalkthroughOverlay = ({ onFinish }) => {
               style={[styles.button, styles.buttonsLayout, styles.buttonNext]}
               onPress={() => changeWalkThroughStep(walkThroughStep + 1)}
               accessibilityLabel={
-                walkThroughStep < walkThroughScreens.length - 1
+                walkThroughStep < (user?.isNormalUser?walkThroughStep:walkThroughScreensACP).length - 1
                   ? "Next Step"
                   : "Finish Walkthrough"
               }
