@@ -28,27 +28,27 @@ const getNavigationConfig = (type, isSuccess, details = {}) => {
   };
 
   if (isSuccess) {
-    let message = "Your email preferences have been updated successfully.";
+    let message = "Your email notification preferences have been updated. Changes may take up to 24 hours to reflect.";
     
-    if (details.isNewPrimary) {
-      message = "Primary email has been set up successfully. ";
-      if (details.paperless) {
-        message += "Paperless billing has been enabled. ";
-      }
-      message += "Changes may take up to 24 hours to reflect.";
-    } else if (details.isPrimaryUpdate) {
-      message = "Primary email has been updated successfully. ";
-      if (details.paperless !== undefined) {
-        message += "Your paperless billing preference has been saved.";
-      }
-    } else if (details.paperlessOnly) {
-      message = "Your paperless billing preference has been updated successfully.";
-    }
+    // if (details.isNewPrimary) {
+    //   message = "Primary email has been set up successfully. ";
+    //   if (details.paperless) {
+    //     message += "Paperless billing has been enabled. ";
+    //   }
+    //   message += "Changes may take up to 24 hours to reflect.";
+    // } else if (details.isPrimaryUpdate) {
+    //   message = "Primary email has been updated successfully. ";
+    //   if (details.paperless !== undefined) {
+    //     message += "Your paperless billing preference has been saved.";
+    //   }
+    // } else if (details.paperlessOnly) {
+    //   message = "Your paperless billing preference has been updated successfully.";
+    // }
     
     baseConfig.params.successMessage = message;
   } else {
     baseConfig.params.failureMessage = 
-      details.error || "Unable to update preferences. Please try again later.";
+     "Something went wrong. Please try again. If the problem persists, contact support.";
   }
 
   return baseConfig;
