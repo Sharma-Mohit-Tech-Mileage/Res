@@ -28,7 +28,7 @@ const AddNotificationScreen = () => {
   const [formState, setFormState] = useState({ paperlessBilling: false });
   const [reduceMotionEnabled, setReduceMotionEnabled] = useState(false);
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
-
+  const [isCheckboxVisible, setIsCheckboxVisible] = useState(null);
   const scrollViewRef = useRef(null);
   const animatedValue = useRef(new Animated.Value(-100)).current;
   const timeoutRef = useRef(null);
@@ -78,6 +78,12 @@ const AddNotificationScreen = () => {
       dispatch(getPaperlessStatus(updatedPrimaryEmail));
     }
   }, [accountDetails, setValue, dispatch]);
+
+  useEffect(() => {
+    if (isCheckboxVisible === null) {
+      setIsCheckboxVisible(!paperlessStatusAcp); // Show checkbox if paperlessStatusAcp is false
+    }
+  }, [paperlessStatusAcp, isCheckboxVisible]);
 
   useEffect(() => {
     if (route.params?.updateSuccess) {
@@ -136,8 +142,8 @@ const AddNotificationScreen = () => {
     (data) => {
       const { email } = data;
       const { paperlessBilling } = formState;
-      console.log("Only require acceptance of terms if paperless billing is enabled and hasn't been accepted before.", paperlessBilling,toggleCheckBoxTerm,paperlessStatusAcp);
-      if (paperlessBilling && !paperlessStatusAcp && !toggleCheckBoxTerm) {
+      console.log("Only require acceptance of terms if paperless billing is enabled and hasn't been accepted before.", paperlessBilling, toggleCheckBoxTerm, paperlessStatusAcp);
+      if (paperlessBilling && isCheckboxVisible && !toggleCheckBoxTerm) {
         setNotification({
           message: "Please accept the Paperless Billing Terms & Conditions to continue.",
           type: "error",
@@ -280,7 +286,7 @@ const AddNotificationScreen = () => {
             </View>
 
             {/* Only show the checkbox if the paperless status is not already accepted */}
-            {!paperlessStatusAcp && (
+            {isCheckboxVisible && (
               <View style={[styles.checkBoxArea]}>
                 <TouchableOpacity
                   onPress={() => setToggleCheckBoxTerm(!toggleCheckBoxTerm)}
@@ -306,6 +312,10 @@ const AddNotificationScreen = () => {
                 <TouchableOpacity
                   onPress={(event) => {
                     event.stopPropagation();
+                    navigation.navigate("ArticalWindowUtility", {
+                      url: "https://www.sparklight.com/legal/paperless-terms-and-conditions",
+                      name: "Terms & Conditions",
+                    });
                   }}
                   accessibilityRole="link"
                   accessibilityLabel="Paperless Billing Terms & Conditions"
