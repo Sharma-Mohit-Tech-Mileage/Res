@@ -11,11 +11,13 @@ const WalkthroughOverlay = ({ onFinish }) => {
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(true);
   const user = useSelector(state => state.combinedReducers.user.userData);
-  const walkThroughScreens = [
+
+  const walkThroughScreens =  [
     {
       title: "Home",
-      description:
-        "View information related to your internet health, billing, service and more.",
+      description: user?.isNormalUser
+        ? "View information related to your internet health, billing, service and more."
+        : "Get a quick overview of your account.",
       buttonText: "Next",
     },
     {
@@ -25,51 +27,19 @@ const WalkthroughOverlay = ({ onFinish }) => {
     },
     {
       title: "Service",
-      description:
-        "Manage your internet plans, explore upgrades and view available services.",
+      description: "Manage your internet plans, explore upgrades and view available services.",
       buttonText: "Next",
     },
     {
       title: "Support",
-      description:
-        "View our FAQ, check in on your modem or troubleshoot your issues.",
+      description: user?.isNormalUser
+        ? "View our FAQ, check in on your modem or troubleshoot your issues."
+        : "View FAQs and contact our Support Team for assistance.",
       buttonText: "Next",
     },
     {
       title: "Account",
-      description:
-        "Manage your profile settings, notifications, users and more.",
-      buttonText: "Let's Go!",
-    },
-  ];
-  const walkThroughScreensACP = [
-    {
-      title: "Home",
-      description:
-        "Get a quick overview of your account.",
-      buttonText: "Next",
-    },
-    {
-      title: "Billing",
-      description: "Make payments, set up Auto Pay and view statements.",
-      buttonText: "Next",
-    },
-    {
-      title: "Service",
-      description:
-        "Manage your internet plans, explore upgrades and view available services.",
-      buttonText: "Next",
-    },
-    {
-      title: "Support",
-      description:
-        "View FAQs and contact our Support Team for assistance.",
-      buttonText: "Next",
-    },
-    {
-      title: "Account",
-      description:
-        "Manage your profile settings, notifications, users and more.",
+      description: "Manage your profile settings, notifications, users and more.",
       buttonText: "Let's Go!",
     },
   ];
@@ -113,7 +83,7 @@ const WalkthroughOverlay = ({ onFinish }) => {
     bottomCarotStyles.push(styles.bottomCarotStep5);
   }
 
-  const currentScreen = user?.isNormalUser?walkThroughScreens[walkThroughStep]:walkThroughScreensACP[walkThroughStep];
+  const currentScreen = walkThroughScreens[walkThroughStep];
 
   if (!showWalkThrough) {
     return null;
@@ -191,7 +161,7 @@ const WalkthroughOverlay = ({ onFinish }) => {
               style={[styles.button, styles.buttonsLayout, styles.buttonNext]}
               onPress={() => changeWalkThroughStep(walkThroughStep + 1)}
               accessibilityLabel={
-                walkThroughStep < (user?.isNormalUser?walkThroughStep:walkThroughScreensACP).length - 1
+                walkThroughStep < (walkThroughStep).length - 1
                   ? "Next Step"
                   : "Finish Walkthrough"
               }
