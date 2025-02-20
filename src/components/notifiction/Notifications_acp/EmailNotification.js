@@ -36,7 +36,7 @@ const AddNotificationScreen = () => {
   const route = useRoute();
   const dispatch = useDispatch();
   const navigation = useNavigation();
-
+  const is_enrolled = route.params?.is_enrolled;
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
   );
@@ -185,7 +185,7 @@ const AddNotificationScreen = () => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader
-        title="Add Email Notifications"
+        title={is_enrolled?"Edit Email Notifications":"Add Email Notifications"}
         onPressBack={() => navigation.goBack()}
         accessibilityLabel="Add Email Notifications"
       />
@@ -213,7 +213,7 @@ const AddNotificationScreen = () => {
                 </View>
               </Animated.View>
             )}
-            <View style={{ paddingHorizontal: Padding.p_5xl }}>
+            <View style={{ paddingHorizontal: Padding.p_5xl }} >
               <NotificationAlert
                 type="warning"
                 title="Critical Notifications"
@@ -251,7 +251,7 @@ const AddNotificationScreen = () => {
               />
             </View>
             <View style={styles.divider} />
-            <View style={[styles.section, { paddingHorizontal: Padding.p_5xl }]} accessible={true}>
+            <View style={[styles.section, { paddingHorizontal: Padding.p_5xl }]} >
               <View style={styles.toggleHeader}>
                 <Text style={styles.toggleTitle}>Critical Notifications</Text>
                 <View style={styles.iconContainer}>
@@ -299,37 +299,29 @@ const AddNotificationScreen = () => {
                     value={toggleCheckBoxTerm}
                     style={styles.checkBox}
                     boxType="square"
-                    tintColors={{
-                      true: "#1B99FF",
-                      false: Platform.OS === "ios" ? Color.colorWhitesmoke_300 : "#D0D5DD",
-                    }}
+                    tintColors={{ true: "#1B99FF", false: Platform.OS === "ios" ? Color.colorWhitesmoke_300 : "#D0D5DD", }}
                     accessible={false}
                   />
                 </TouchableOpacity>
 
-                <Text style={styles.checkBoxAreaViewText}>I agree to</Text>
+
 
                 <TouchableOpacity
                   onPress={(event) => {
                     event.stopPropagation();
-                    navigation.navigate("ArticalWindowUtility", {
-                      url: "https://www.sparklight.com/legal/paperless-terms-and-conditions",
-                      name: "Terms & Conditions",
-                    });
+                    navigation.navigate("ArticalWindowUtility", { url: "https://www.sparklight.com/legal/paperless-terms-and-conditions", name: "Terms & Conditions", });
                   }}
                   accessibilityRole="link"
                   accessibilityLabel="Paperless Billing Terms & Conditions"
                   accessibilityHint="Opens Paperless Billing Terms & Conditions"
                   style={{ marginLeft: 3 }}
                 >
-                  <Text
-                    style={[
-                      styles.checkBoxAreaViewText,
-                      { color: Color.sparklightBrightPurple, textDecorationLine: "underline" },
-                    ]}
-                  >
-                    Paperless Billing Terms & Conditions
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <Text style={styles.checkBoxAreaViewText}>{"   I agree to "}</Text>
+                    <Text style={[styles.checkBoxAreaViewText, { color: Color.sparklightBrightPurple, textDecorationLine: "underline" }]}>
+                      Paperless Billing Terms & Conditions
+                    </Text>
+                  </View>
                 </TouchableOpacity>
               </View>
             )}
@@ -439,7 +431,7 @@ const styles = StyleSheet.create({
   checkBox: {
     width: 12,
     height: 12,
-    marginRight: Platform.OS === "ios" ? 20 : 30,
+    // marginRight: Platform.OS === "ios" ? 20 : 30,
     backgroundColor: Color.colorWhitesmoke_100,
   },
   checkBoxArea: {

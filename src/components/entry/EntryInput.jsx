@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
         borderColor: Color.sparklightGray, // Example border color
         borderRadius: 1, // Example border radius
         height: 56, // Example height
-        width: '80%'
+        width: '90%'
     },
     searchIcon: {
         marginLeft: Padding.p_xs, // Example padding

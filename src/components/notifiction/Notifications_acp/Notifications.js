@@ -17,7 +17,6 @@ const Notifications = () => {
     (state) => state.combinedReducers.profile?.paperlessStatusAcp
   );
 
-  // Memoize profile data extraction from Redux for ACP users.
   const profileData = useMemo(() => {
     return accountDetails
       ? {
@@ -28,7 +27,6 @@ const Notifications = () => {
       : {};
   }, [accountDetails]);
 
-  // Dynamically set email settings based on the extracted profile data.
   const emailSettings = useMemo(() => [
     {
       id: 'critical',
@@ -42,15 +40,12 @@ const Notifications = () => {
     },
   ], [profileData.emailAddress, paperlessStatusAcp]);
 
-  // Construct sections for notifications, memoized to prevent unnecessary recalculations.
   const sections = useMemo(() => [
     {
       id: 'text',
       title: 'Text Notifications',
       isComingSoon: true,
-      infoMessage: profileData.phoneNumber
-        ? 'Text notifications enabled'
-        : '',
+      infoMessage: '',
     },
     {
       id: 'email',
@@ -70,7 +65,7 @@ const Notifications = () => {
 
   const handleEdit = (section) => {
     console.log(`Editing ${section}`);
-    navigation.navigate('EmailNotifications');
+    navigation.navigate('EmailNotifications',{is_enrolled:profileData.emailAddress});
   };
 
   const handleBackPress = () => navigation.navigate('Account');

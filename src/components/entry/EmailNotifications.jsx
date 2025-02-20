@@ -84,12 +84,12 @@ const EmailNotifications = ({ navigation }) => {
         <View style={styles.container}>
             <ScrollView ref={scrollRef} style={styles.inner} contentContainerStyle={styles.innerContent} >
                 <ProfileSettingsHeader showIcon={false} title={'Notifications'} />
-                {isNormalUser && <View style={styles.headerTabView} accessibilityLabel="Notification Categories">
+                {isNormalUser && <View style={styles.headerTabView} accessibilityLabel="Notification Categories" >
                     <View style={styles.headerTabOne} />
                     <View style={styles.headerTabTwo} />
                     <View style={styles.headerTabThree} />
                 </View>}
-                <View style={styles.viewContainer} accessibilityLabel="Email notification setup section" >
+                <View style={[styles.viewContainer, !isNormalUser && { marginTop: 90 }]}  accessibilityLabel="Email notification setup section" >
                     <View accessibilityRole="none" accessibilityLabel="Email notification options">
                         <View style={styles.headerIconViewContainer}>
                             <View
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     header: {
-        paddingTop: 10,
+        paddingTop: 16,
     },
     headerText: {
         fontFamily: FontFamily.openSansRegular,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
         lineHeight: 25,
         textAlign: 'center',
         color: Color.colorGray_100,
-        paddingHorizontal: 20,
+        marginHorizontal: 20,
         marginTop: 10
     },
     subInput: {
