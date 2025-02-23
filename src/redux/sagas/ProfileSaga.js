@@ -497,9 +497,14 @@ function* handleUpdateEmailAssociations(action) {
 }
 
 function* checkPaperlessSaga(action) {
-    const status = yield call(isPaperlessEnabled, action.payload.email);
-    yield put(setPaperlessStatus(status));
+    try {
+        const status = yield call(isPaperlessEnabled, action.payload.email);
+        yield put(setPaperlessStatus(status));
+    } catch (error) {
+        console.error('Error fetching ACP user isPaperlessEnabled:', error);
+    }
 }
+
 function* fetchACPUserAccountDetailsSaga() {
     try {
       const response = yield call(fetchACPUserAccountDetails); // Calls API with no params
