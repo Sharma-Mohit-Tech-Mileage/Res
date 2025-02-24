@@ -324,9 +324,9 @@ const postTermsAndConditionsv2 = async (flag) => {
             Authorization: `Bearer ${user.token}`
         }
     };
-    console.log('********************Making API Call to /mobile/api/MobileUser/updateMobiletAspnuserDataSec with data:', payload); // Log the request data
     try {
-        const response = await _axios.put(`/mobile/api/MobileUser/updateMobiletAspnuserDataSec`, payload, config);
+        const response = await _axios.put(user.isNormalUser?`/mobile/api/MobileUser/updateMobiletAspnuserDataSec`:'/api/mobile/UpdateMobileAspnetUserData', payload, config);
+        console.log(`API Call Successful to /mobile/api/MobileUser/updateMobiletAspnuserDataSec, Response:`, response);
         return response;
     } catch (error) {
         console.error(`Error in API Call to /mobile/api/MobileUser/updateMobiletAspnuserDataSec:`, error);

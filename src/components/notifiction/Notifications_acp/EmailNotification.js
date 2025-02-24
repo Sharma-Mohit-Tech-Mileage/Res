@@ -311,7 +311,7 @@ const AddNotificationScreen = () => {
                 <CheckBox
                   disabled={true}
                   value={toggleCheckBoxTerm}
-                  style={styles.checkBox}
+                  style={[styles.checkBox,{ marginRight: Platform.OS === "ios"?1:16 }]}
                   boxType="square"
                   tintColors={{
                     true: "#1B99FF",
@@ -331,7 +331,6 @@ const AddNotificationScreen = () => {
                 accessibilityRole="link"
                 accessibilityLabel="Paperless Billing Terms & Conditions"
                 accessibilityHint="Opens Paperless Billing Terms & Conditions"
-                style={{ marginLeft: 1 }}
               >
                 <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', flexShrink: 1 }}>
                   <Text

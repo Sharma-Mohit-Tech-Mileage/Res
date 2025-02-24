@@ -99,7 +99,6 @@ const NewBillerHome = ({ navigation }) => {
   useEffect(() => {
    
     if (accountDetails) {
-      console.log("accountDetails==----------------------------------------------------------------------------", getPrimaryEmail(accountDetails));
       const userBillAmt =
         accountDetails.past_due_amount <= 0
           ? accountDetails.current_balance

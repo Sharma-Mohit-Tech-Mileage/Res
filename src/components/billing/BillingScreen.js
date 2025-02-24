@@ -114,7 +114,6 @@ const BillingScreen = ({ navigation }) => {
 
   // When Redux accountDetails is updated for ACP users, update local state.
   useEffect(() => {
-    console.log("When Redux accountDetails is updated for ACP users, update local state.", accountDetails);
     if (!user?.isNormalUser && accountDetails) {
       const p_email = getPrimaryEmail(accountDetails);
       const userBillAmt =
