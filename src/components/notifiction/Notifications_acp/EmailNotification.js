@@ -80,50 +80,59 @@ const AddNotificationScreen = () => {
   }, [accountDetails, setValue, dispatch]);
 
   useEffect(() => {
-      setIsCheckboxVisible(!paperlessStatusAcp);
+    setIsCheckboxVisible(!paperlessStatusAcp);
   }, [paperlessStatusAcp, isCheckboxVisible]);
 
   useEffect(() => {
-  const updateAccountDetails = async () => {
-    if (route.params?.updateSuccess) {
-      try {
-        await dispatch(fetchACPUserAccountDetails());
-        setNotification({ message: route.params.successMessage, type: "success" });
-      } catch (error) {
-        setNotification({ message: 'Error updating account details', type: "error" });
-      } finally {
+    const updateAccountDetails = async () => {
+      if (route.params?.updateSuccess) {
+        try {
+          await dispatch(fetchACPUserAccountDetails());
+          setNotification({ message: route.params.successMessage, type: "success" });
+        } catch (error) {
+          setNotification({ message: 'Error updating account details', type: "error" });
+        } finally {
+          setIsSubmitting(false);
+          setToggleCheckBoxTerm(false);
+        }
+      } else if (route.params?.updateFailed) {
+        setNotification({ message: route.params.failureMessage, type: "error" });
         setIsSubmitting(false);
         setToggleCheckBoxTerm(false);
       }
-    } else if (route.params?.updateFailed) {
-      setNotification({ message: route.params.failureMessage, type: "error" });
-      setIsSubmitting(false);
-      setToggleCheckBoxTerm(false);
-    }
-  };
+    };
 
-  updateAccountDetails();
-}, [route.params, dispatch]);
+    updateAccountDetails();
+  }, [route.params, dispatch]);
 
   const animateNotification = useCallback(() => {
+    // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
+
+    // Always animate in notification from off-screen
     animatedValue.setValue(-100);
+
     Animated.timing(animatedValue, {
       toValue: 0,
       duration: 500,
       useNativeDriver: true,
     }).start(() => {
-      timeoutRef.current = setTimeout(() => {
-        Animated.timing(animatedValue, {
-          toValue: -100,
-          duration: 500,
-          useNativeDriver: true,
-        }).start(() => setNotification(null));
-      }, 3000);
+      // Only auto-dismiss if notification is NOT an error type
+      if (notification && notification.type !== "error") {
+        timeoutRef.current = setTimeout(() => {
+          Animated.timing(animatedValue, {
+            toValue: -100,
+            duration: 500,
+            useNativeDriver: true,
+          }).start(() => setNotification(null));
+        }, 3000);
+      }
+      // For error notifications, do nothing - they stay on screen until manually dismissed
     });
-  }, [animatedValue]);
+  }, [animatedValue, notification]);
 
   useEffect(() => {
     return () => {
@@ -192,7 +201,7 @@ const AddNotificationScreen = () => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader
-        title={is_enrolled?"Edit Email Notifications":"Add Email Notifications"}
+        title={is_enrolled ? "Edit Email Notifications" : "Add Email Notifications"}
         onPressBack={() => navigation.goBack()}
         accessibilityLabel="Add Email Notifications"
       />
@@ -212,7 +221,8 @@ const AddNotificationScreen = () => {
                     type={notification.type}
                     title={notification.type === "error" ? "Error" : "Success"}
                     message={notification.message}
-                    showCloseIcon={false}
+                    showCloseIcon={notification.type === "error"}
+                    onClose={() => setNotification(null)}
                     accessibilityLiveRegion="assertive"
                     accessibilityRole="alert"
                     accessibilityLabel={notification.message}
@@ -291,59 +301,59 @@ const AddNotificationScreen = () => {
                 Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips.
               </Text>
             </View>
-            <View style={[styles.checkBoxArea, { flexDirection: 'row', alignItems: 'center' }]}>
-  <TouchableOpacity
-    onPress={() => setToggleCheckBoxTerm(!toggleCheckBoxTerm)}
-    accessibilityRole="checkbox"
-    accessibilityLabel="Agree to Paperless Billing Terms and Conditions checkbox"
-    accessibilityState={{ checked: toggleCheckBoxTerm }}
-  >
-    <CheckBox
-      disabled={true}
-      value={toggleCheckBoxTerm}
-      style={styles.checkBox}
-      boxType="square"
-      tintColors={{
-        true: "#1B99FF",
-        false: Platform.OS === "ios" ? Color.colorWhitesmoke_300 : "#D0D5DD",
-      }}
-      accessible={false}
-    />
-  </TouchableOpacity>
-  <TouchableOpacity
-    onPress={(event) => {
-      event.stopPropagation();
-      navigation.navigate("ArticalWindowUtility", {
-        url: "https://www.sparklight.com/legal/paperless-terms-and-conditions",
-        name: "Terms & Conditions",
-      });
-    }}
-    accessibilityRole="link"
-    accessibilityLabel="Paperless Billing Terms & Conditions"
-    accessibilityHint="Opens Paperless Billing Terms & Conditions"
-    style={{ marginLeft: 1 }}
-  >
-    <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', flexShrink: 1 }}>
-      <Text
-        style={[styles.checkBoxAreaViewText, { lineHeight: undefined }]}
-        allowFontScaling={true}
-        maxFontSizeMultiplier={1}
-      >
-        {" I agree to "}
-      </Text>
-      <Text
-        style={[
-          styles.checkBoxAreaViewText,
-          { color: Color.sparklightBrightPurple, textDecorationLine: "underline", lineHeight: undefined },
-        ]}
-        allowFontScaling={true}
-        maxFontSizeMultiplier={1}
-      >
-        Paperless Billing Terms & Conditions
-      </Text>
-    </View>
-  </TouchableOpacity>
-</View>
+            {isCheckboxVisible &&<View style={[styles.checkBoxArea, { flexDirection: 'row', alignItems: 'center' }]}>
+              <TouchableOpacity
+                onPress={() => setToggleCheckBoxTerm(!toggleCheckBoxTerm)}
+                accessibilityRole="checkbox"
+                accessibilityLabel="Agree to Paperless Billing Terms and Conditions checkbox"
+                accessibilityState={{ checked: toggleCheckBoxTerm }}
+              >
+                <CheckBox
+                  disabled={true}
+                  value={toggleCheckBoxTerm}
+                  style={styles.checkBox}
+                  boxType="square"
+                  tintColors={{
+                    true: "#1B99FF",
+                    false: Platform.OS === "ios" ? Color.colorWhitesmoke_300 : "#D0D5DD",
+                  }}
+                  accessible={false}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={(event) => {
+                  event.stopPropagation();
+                  navigation.navigate("ArticalWindowUtility", {
+                    url: "https://www.sparklight.com/legal/paperless-terms-and-conditions",
+                    name: "Terms & Conditions",
+                  });
+                }}
+                accessibilityRole="link"
+                accessibilityLabel="Paperless Billing Terms & Conditions"
+                accessibilityHint="Opens Paperless Billing Terms & Conditions"
+                style={{ marginLeft: 1 }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', flexShrink: 1 }}>
+                  <Text
+                    style={[styles.checkBoxAreaViewText, { lineHeight: undefined }]}
+                    allowFontScaling={true}
+                    maxFontSizeMultiplier={1}
+                  >
+                    {" I agree to "}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.checkBoxAreaViewText,
+                      { color: Color.sparklightBrightPurple, textDecorationLine: "underline", lineHeight: undefined },
+                    ]}
+                    allowFontScaling={true}
+                    maxFontSizeMultiplier={1}
+                  >
+                    Paperless Billing Terms & Conditions
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>}
           </View>
         </View>
         <View style={styles.buttonContainer}>
@@ -450,7 +460,7 @@ const styles = StyleSheet.create({
   checkBox: {
     width: 12,
     height: 12,
-    // marginRight: Platform.OS === "ios" ? 20 : 30,
+    marginRight: Platform.OS === "ios" ? 2 : 4,
     backgroundColor: Color.colorWhitesmoke_100,
   },
   checkBoxArea: {
