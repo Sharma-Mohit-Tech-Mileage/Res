@@ -39,7 +39,9 @@ const WalkthroughOverlay = ({ onFinish }) => {
     },
     {
       title: "Account",
-      description: "Manage your profile settings, notifications, users and more.",
+      description: user?.isNormalUser
+        ? "Manage your profile settings, notifications, users and more."
+        : "Manage your profile settings, notifications, and more.",
       buttonText: "Let's Go!",
     },
   ];
