@@ -129,7 +129,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             const SAVE_FROM_RN = `(function() {
                 localStorage.setItem('jwt_token', '${user.token}');
                 localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
-                localStorage.setItem('upgrades_token', '${upgradeToken.access_token}');
+                localStorage.setItem('upgrades_token', '${upgradeToken?.access_token}');
     
                 var cookieValue = "MobileApp";
                 var domain = document.location.hostname; 
