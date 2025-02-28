@@ -182,7 +182,7 @@ const NewBillerHome = ({ navigation }) => {
         {renderHeader()}
         <ScrollView style={styles.scrollContainer}>
           <View style={styles.mainContentContainer}>
-            {true && renderAppUpdateAlert()}
+            {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
             {isOutageAlert && renderOutageAlert()}
             {renderWelcomeCard()}
           </View>

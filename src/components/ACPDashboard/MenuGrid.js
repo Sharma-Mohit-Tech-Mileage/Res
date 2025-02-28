@@ -53,6 +53,7 @@ const MenuGrid = () => {
 const styles = StyleSheet.create({
   container: {
     marginBottom: Padding.p_base,
+    padding: Padding.p_5xl,
   },
   row: {
     flexDirection: 'row',
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    marginHorizontal: Padding.p_9xs,
+    marginHorizontal: Padding.p_5xs,
   },
 });
 
