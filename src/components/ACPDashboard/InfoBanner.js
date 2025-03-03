@@ -40,9 +40,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   message: {
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
-    color: Color.sparklightaddGray,
+    fontFamily: 'Effra',
+    fontSize: 20,
+    color: Color.sparklightGray1,
+    fontWeight: '700',
     flexShrink: 1,
     flexWrap: 'wrap',
   },

@@ -42,7 +42,7 @@ const FeatureCard = ({
         {features.map((feature, index) => (
           <View key={index} style={styles.featureRow}>
             <Icon 
-              name="check-circle" 
+              name="green-checkcircle" 
               size={16} 
               color={Color.sparklightGreen}
               style={styles.checkIcon}
@@ -70,10 +70,9 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_xs,
     marginBottom: Padding.p_base,
-    overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 2,
     elevation: 1,
   },
