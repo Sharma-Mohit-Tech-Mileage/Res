@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_xs,
-    marginBottom: Padding.p_base,
+    marginBottom: Padding.p_xl,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
@@ -81,11 +81,13 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_xs,
     borderBottomWidth: 1,
     borderBottomColor: Color.colorWhitesmoke_200,
+    backgroundColor: Color.colorWhitesmoke_100,
   },
   title: {
     fontFamily: FontFamily.openSansSemiBold,
     fontSize: FontSize.size_lg,
     color: Color.sparklightBrightPurple,
+    fontWeight: '700',
   },
   features: {
     paddingVertical: Padding.p_xs,
@@ -101,14 +103,15 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_lg,
     color: Color.colorGray_100,
+    fontWeight: '400',
   },
   button: {
     marginHorizontal: Padding.p_base,
     marginBottom: Padding.p_base,
     paddingVertical: Padding.p_xs,
-    borderRadius: Border.br_5xs,
+    borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -116,17 +119,20 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightBrightPurple,
   },
   buttonSuccess: {
-    backgroundColor: Color.colorAquamarine,
+    backgroundColor: '#C8E9D0',
+    borderWidth: 1,
+    borderColor: Color.sparklightGreen,
   },
   buttonText: {
     fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_base,
+    fontSize: FontSize.size_lg,
+    fontWeight: '400',
   },
   buttonTextPrimary: {
     color: Color.sparklightWhite,
   },
   buttonTextSuccess: {
-    color: Color.success700,
+    color: '#000'
   },
 });
 

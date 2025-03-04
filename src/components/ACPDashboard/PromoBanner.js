@@ -45,7 +45,7 @@ const PromoBanner = ({ title, showBonus = false }) => {
         {showBonus && (
           <View style={styles.secondLineContainer}>
             <Text style={styles.title} numberOfLines={1}>
-              {secondLineText}
+              {secondLineText+ ' '}
             </Text>
             <View style={styles.bonusContainer}>
               <Text style={styles.bonusText}>BONUS!</Text>
@@ -95,7 +95,6 @@ const styles = StyleSheet.create({
     borderColor: Color.sparklightGreen,
     paddingHorizontal: 4,
     paddingVertical: 2,
-    marginLeft: 4,
   },
   bonusText: {
     fontFamily: FontFamily.openSansSemiBold,

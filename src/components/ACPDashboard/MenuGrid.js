@@ -10,28 +10,28 @@ const MenuGrid = () => {
       id: 'billing',
       title: 'Billing',
       icon: 'credit-card',
-      screenName: 'BillingScreen',
+      screenName: 'BillingTab',
       color: Color.sparklightBrightPurple,
     },
     {
       id: 'service',
       title: 'Service',
       icon: 'wifi',
-      screenName: 'ServiceScreen',
+      screenName: 'MyServices',
       color: Color.sparklightDarkGray,
     },
     {
       id: 'support',
       title: 'Support',
       icon: 'help-circle',
-      screenName: 'SupportScreen',
+      screenName: 'Support',
       color: Color.sparklightBrightPurple,
     },
     {
       id: 'account',
       title: 'Account',
       icon: 'user',
-      screenName: 'AccountScreen',
+      screenName: 'account',
       color: Color.sparklightDarkGray,
     },
   ];
@@ -52,7 +52,6 @@ const MenuGrid = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: Padding.p_base,
     padding: Padding.p_5xl,
   },
   row: {

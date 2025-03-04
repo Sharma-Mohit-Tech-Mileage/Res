@@ -32,9 +32,9 @@ const MenuCard = ({ item, style }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Color.sparklightWhite,
+    backgroundColor: Color.colorWhitesmoke_100,
     borderRadius: Border.br_xs,
-    padding: Padding.p_5xl,
+    paddingVertical: Padding.p_5xl,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
   content: {
     alignItems: 'center',
     justifyContent: 'center',
+    width: '100%',
   },
   title: {
     fontFamily: FontFamily.openSansSemiBold,

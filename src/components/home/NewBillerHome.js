@@ -249,8 +249,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Color.sparklightWhite,
     paddingHorizontal: Padding.p_5xl,
-    paddingTop: 20,
-    paddingBottom: 30,
+    paddingTop: 8,
   },
 });
 

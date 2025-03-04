@@ -8,7 +8,7 @@ const InfoBanner = ({ message, icon = 'info' }) => {
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
-        <Icon name={icon} size={20} color={Color.sparklightWhite} />
+        <Icon name={icon} size={24} color={Color.sparklightWhite} />
       </View>
       
       <View style={styles.textContainer}>
@@ -24,8 +24,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_xs,
-    padding: Padding.p_xs,
-    marginBottom: Padding.p_base,
+    paddingVertical: Padding.p_xl,
+    marginBottom: Padding.p_xl,
   },
   iconContainer: {
     width: 40,

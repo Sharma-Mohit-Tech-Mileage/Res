@@ -23,7 +23,6 @@ const WelcomeCard = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Color.sparklightWhite,
-    paddingHorizontal: Padding.p_base,
     marginBottom: Padding.p_base,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -32,9 +31,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_3xl,
+    fontSize: FontSize.size_5xl,
     color: Color.colorGray_200,
-    marginBottom: Padding.p_base,
+    marginBottom: Padding.p_5xl,
     fontWeight: '700',
   },
   videoContainer: {
