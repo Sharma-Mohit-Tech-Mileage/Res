@@ -1,6 +1,3 @@
-// styles/globalStyles.js
-
-/* fonts */
 export const FontFamily = {
     openSansSemiBold: "OpenSans-SemiBold",
     textXsSemibold: "Inter-SemiBold",

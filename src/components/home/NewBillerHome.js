@@ -12,13 +12,14 @@ import WalkthroughOverlay from "../common/WalkthroughOverlay";
 import { fetchACPUserAccountDetails, getPaperlessStatus } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
-
+import { Env } from "../../network/apis/account/Constants";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
 import MenuGrid from "../ACPDashboard/MenuGrid";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
-
+import { GetApiRequest } from "../../network/APIClient";
+import { getUser } from "../../redux/utils/LocalStorage";
 const NewBillerHome = ({ navigation }) => {
   // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
@@ -28,6 +29,7 @@ const NewBillerHome = ({ navigation }) => {
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
+  const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
     billAmount: 0,
@@ -46,7 +48,23 @@ const NewBillerHome = ({ navigation }) => {
     (state) => state.combinedReducers.profile?.accountDetails
   );
   const dispatch = useDispatch();
+const paperlessStatusAcp = useSelector(
+      (state) => state.combinedReducers.profile?.paperlessStatusAcp
+    );
 
+    const getStatus = () => {
+        getUser().then((res) => {
+          const accountNumber = res.userInfo.accountNumber;
+          GetApiRequest(
+            `api/Accounts/${accountNumber}/easypay`,
+            (res) => {
+              console.log("res-------------------------------------------------------------------------------", res);
+              setIsAutoPayStatus(res?.isEasyPay);
+            },
+            (error) => { console.log("error", error);}
+          );
+        });
+      };
   // Refresh data when the screen is focused
   useFocusEffect(
     useCallback(() => {
@@ -55,6 +73,7 @@ const NewBillerHome = ({ navigation }) => {
           const status = await checkForMinorUpdate();
           setUpdateStatus(status);
           dispatch(fetchACPUserAccountDetails());
+          getStatus();
         } catch (error) {
           console.error("Error refreshing data on focus", error);
         }
@@ -106,8 +125,6 @@ const NewBillerHome = ({ navigation }) => {
     }
   }, [accountDetails]);
 
-  // Render functions
-
   const renderHeader = () => (
     <View
       accessibilityElementsHidden={showWalkThrough}
@@ -149,15 +166,26 @@ const NewBillerHome = ({ navigation }) => {
         <FeatureCard
           title="Auto Pay"
           features={["Convenient", "Timely Payments", "Peace of Mind"]}
-          buttonText="Active"
-          buttonVariant="success"
-          isActive={true}
+          buttonText={isAutoPayStatus ? "Active" : "Activate Auto Pay"}
+          buttonVariant={isAutoPayStatus ? "success" : "primary"}
+          isActive={isAutoPayStatus}
+          onButtonPress={() => {
+            navigation.navigate("AutoPayPCIConnector", {
+              url: `${Env.URL}/billing`,
+              name: isAutoPayStatus?"Manage Auto Pay":"Setup Auto Pay",
+              useNewPayment: true,
+              status: isAutoPayStatus,
+              paymentDetails: defaultPaymentDetails,
+            });
+          }}
         />
         <FeatureCard
           title="Paperless Billing"
           features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
-          buttonText="Go Paperless Today"
-          buttonVariant="primary"
+          buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}
+          buttonVariant={paperlessStatusAcp ? "success" : "primary"}
+          isActive={paperlessStatusAcp}
+          onButtonPress={() => navigation.navigate("account", {screen: "Notifications"})}
         />
         <InfoBanner
           message="We are working diligently to enhance your experience"

@@ -41,12 +41,7 @@ const FeatureCard = ({
       <View style={styles.features}>
         {features.map((feature, index) => (
           <View key={index} style={styles.featureRow}>
-            <Icon 
-              name="green-checkcircle" 
-              size={16} 
-              color={Color.sparklightGreen}
-              style={styles.checkIcon}
-            />
+            <Icon name="green-checkcircle" size={16} color={Color.sparklightGreen} style={styles.checkIcon} />
             <Text style={styles.featureText}>{feature}</Text>
           </View>
         ))}
@@ -57,7 +52,6 @@ const FeatureCard = ({
         onPress={onButtonPress}
         accessibilityRole="button"
         accessibilityLabel={buttonText}
-        accessibilityState={{ disabled: isActive && buttonVariant === 'success' }}
       >
         <Text style={[styles.buttonText, getButtonTextStyle()]}>{buttonText}</Text>
       </TouchableOpacity>

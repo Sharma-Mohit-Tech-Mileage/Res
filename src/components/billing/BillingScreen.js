@@ -34,13 +34,16 @@ const BillingScreen = ({ navigation }) => {
   const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [paperlessEmail, setPaperlessEmail] = useState(null);
   const [cardDigit, setCardDigit] = useState("");
-  const [isNewBiller, setIsNewBiller] = useState(false);
+  const [isNewBiller, setIsNewBiller] = useState(!user?.isNormalUser);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
 
-  const paperlessCardEmail = isNewBiller
-    ? paperlessEmail
-    : (Array.isArray(paperlessEmails) && paperlessEmails.length > 0 && paperlessEmails[0].emailAddress ? paperlessEmails[0].emailAddress : '');
+  let paperlessCardEmail = '';
+  if (isNewBiller) {
+    paperlessCardEmail = paperlessEmail;
+  } else if (Array.isArray(paperlessEmails) && paperlessEmails.length > 0 && paperlessEmails[0].emailAddress) {
+    paperlessCardEmail = paperlessEmails[0].emailAddress;
+  }
 
   const handleError = (error) => { console.log("error", error); };
 
@@ -79,7 +82,7 @@ const BillingScreen = ({ navigation }) => {
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
       GetApiRequest(
-        `account/api/account/${accountNumber}/easypay`,
+        user && user.isNormalUser?`account/api/account/${accountNumber}/easypay`:`api/Accounts/${accountNumber}/easypay`,
         (res) => {
           setIsAutoPayStatus(res?.isEasyPay);
           setCardDigit(res?.epLastfour);
@@ -88,7 +91,10 @@ const BillingScreen = ({ navigation }) => {
       );
       GetApiRequest(
         `account/api/account/${accountNumber}/paperless/status`,
-        setPaperlessStatus,
+        (res) => {
+         console.log("res---------------------------------------------------------------",res);
+          setPaperlessStatus(res?.isPaperless);
+        },
         handleError
       );
     });
@@ -136,11 +142,6 @@ const BillingScreen = ({ navigation }) => {
       dispatch(getPaperlessStatus(p_email));
     }
   }, [accountDetails, user]);
-
-  useEffect(() => {
-    console.log("Paperless Email----------------------------------------------------------", user&& user.userInfo && user.userInfo.accountNumber);
-    console.log("Bill Amount", billAmt);
-  }, []);
 
   const handleNavigation = (url, name) => {
     navigation.navigate("ArticalWindowUtility", { url, name });
@@ -193,7 +194,7 @@ const BillingScreen = ({ navigation }) => {
             />
             <PeperLessCard
               paperlessCardEmail={paperlessCardEmail}
-              paperlessStatus={isNewBiller?paperlessStatusAcp:paperlessStatus}
+              paperlessStatus={isNewBiller?paperlessStatusAcp:paperlessEmails}
               navigation={navigation}
               style={styles.card}
             />
