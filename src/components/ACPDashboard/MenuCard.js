@@ -1,6 +1,5 @@
-// components/MenuCard.js
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { FontFamily, FontSize, Color, Padding, Border } from '../../../GlobalStyles';
 import Icon from '../common/Icon';
 import { useNavigation } from '@react-navigation/native';
@@ -9,7 +8,10 @@ const MenuCard = ({ item, style }) => {
   const navigation = useNavigation();
 
   const handlePress = () => {
-    if (item.screenName) {
+    if (item.id === 'service') {
+      // Show an alert when clicking on "Service"
+      Alert.alert("Coming Soon", "This feature is not yet available.", [{ text: "Close", style: "cancel" }]);
+    } else if (item.screenName) {
       navigation.navigate(item.screenName);
     }
   };
@@ -23,8 +25,15 @@ const MenuCard = ({ item, style }) => {
       accessibilityHint={`Navigate to ${item.title} screen`}
     >
       <View style={styles.content}>
-        <Icon name={item.icon} size={24} color={item.color || Color.sparklightBrightPurple} />
-        <Text style={styles.title}>{item.title}</Text>
+        <Icon name={item.icon} size={30} color={item.color || Color.sparklightBrightPurple} />
+        <Text 
+          style={[
+            styles.title, 
+            item.id === 'service' && styles.disabledText // Grey out Service text
+          ]}
+        >
+          {item.title}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -49,10 +58,15 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_base,
+    fontSize: FontSize.size_lg,
     color: Color.sparklightBrightPurple,
     marginTop: Padding.p_5xs,
     textAlign: 'center',
+    fontWeight: '600',
+  },
+  disabledText: {
+    color: Color.sparklightDarkGray, // Grey out "Service"
+    opacity: 0.6, // Slightly fade it out
   },
 });
 
