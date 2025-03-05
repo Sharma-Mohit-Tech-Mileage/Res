@@ -62,13 +62,13 @@ const FeatureCard = ({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_xs,
+    borderRadius: 1,
     marginBottom: Padding.p_xl,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowColor: '#000000',
+  shadowOffset: { width: 0, height: 0 },
+  shadowOpacity: 0.25, // #00000040 is approximately 25% opacity
+  shadowRadius: 4,
+  elevation: 4, // for Android shadow effect
   },
   header: {
     paddingHorizontal: Padding.p_base,

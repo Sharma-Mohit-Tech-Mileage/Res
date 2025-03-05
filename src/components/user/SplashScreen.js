@@ -135,7 +135,7 @@ const SplashScreen = ({ navigation, route }) => {
     storeUser(user);
     dispatch(saveUserInfo(user));
     if (user.userInfo.mobileTCAcceptanceFlag) {
-      navigation.reset({ index: 0, routes: [{ name: "MyTab" }], });
+      navigation.reset({ index: 0, routes: [{ name: "Terms" }], });
     } else {
       navigation.reset({ index: 0, routes: [{ name: "Terms" }], });
     }

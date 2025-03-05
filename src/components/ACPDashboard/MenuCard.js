@@ -42,13 +42,13 @@ const MenuCard = ({ item, style }) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: Color.colorWhitesmoke_100,
-    borderRadius: Border.br_xs,
+    borderRadius: 10,
     paddingVertical: Padding.p_5xl,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 1,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 4,
     minHeight: 100,
   },
   content: {
