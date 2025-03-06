@@ -206,6 +206,11 @@ const paperlessStatusAcp = useSelector(
       {showWalkThrough && (
         <WalkthroughOverlay onFinish={() => setShowWalkThrough(false)} />
       )}
+      <View
+  accessibilityElementsHidden={showWalkThrough}
+  importantForAccessibility={showWalkThrough ? "no-hide-descendants" : "auto"}
+  style={{ flex: 1 }}
+>
       <SafeAreaView style={{ flex: 1 }}>
         {renderHeader()}
         <ScrollView style={styles.scrollContainer}>
@@ -216,6 +221,7 @@ const paperlessStatusAcp = useSelector(
           </View>
         </ScrollView>
       </SafeAreaView>
+    </View>
     </LinearGradient>
   );
 };

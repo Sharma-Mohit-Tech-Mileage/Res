@@ -296,7 +296,14 @@ const AccountOverview = () => {
               </View>
 
             </View>
-            <Text style={{ color: Color.colorMidnightblue, alignSelf: 'center' }}>Version:{VersionCheck.getCurrentVersion()}</Text>
+            <Pressable
+              onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/30298585161879-MySparklight-Business-App-Release-Notes', name: 'Version' })}
+              accessibilityLabel={'Version '+VersionCheck.getCurrentVersion()}
+            >
+              <Text style={{ color: Color.colorMidnightblue, alignSelf: 'center', textDecorationLine: 'underline' }}>
+                Version:{VersionCheck.getCurrentVersion()}
+              </Text>
+            </Pressable>
           </View>
         </ScrollView>
       </View>
@@ -335,7 +342,8 @@ const styles = StyleSheet.create({
   linkStyle: {
     color: Color.colorMidnightblue,
     alignSelf: 'center',
-    fontWeight: '600'
+    fontWeight: '600',
+    textDecorationLine: 'underline', // added underscore for linkStyle
   },
   makePaymentTypo: {
     fontSize: FontSize.size_base,

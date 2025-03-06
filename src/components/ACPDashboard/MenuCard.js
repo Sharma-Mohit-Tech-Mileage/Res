@@ -12,7 +12,10 @@ const MenuCard = ({ item, style }) => {
       // Show an alert when clicking on "Service"
       Alert.alert("Coming Soon", "This feature is not yet available.", [{ text: "Close", style: "cancel" }]);
     } else if (item.screenName) {
-      navigation.navigate(item.screenName);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: item.screenName }],
+      });
     }
   };
 
@@ -46,7 +49,7 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_5xl,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.10,
+    shadowOpacity: 0.20,
     shadowRadius: 4,
     elevation: 4,
     minHeight: 100,

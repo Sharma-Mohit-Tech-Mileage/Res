@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     marginBottom: Padding.p_xl,
     shadowColor: '#000000',
   shadowOffset: { width: 0, height: 0 },
-  shadowOpacity: 0.10, // #00000040 is approximately 25% opacity
+  shadowOpacity: 0.20, // #00000040 is approximately 25% opacity
   shadowRadius: 4,
   elevation: 4, // for Android shadow effect
   },

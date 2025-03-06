@@ -246,7 +246,7 @@ const AddNotificationScreen = () => {
               <NotificationAlert
                 type="warning"
                 title="Critical Notifications"
-                message="By providing your email address, you're signing up for critical notifications. We'll keep you informed without overwhelming your inbox."
+                message={!is_enrolled?"By providing your email address, you're signing up for critical notifications. We'll keep you informed without overwhelming your inbox.":"By updating your email, you agree that this change will apply to all Sparklight email customer communications sent to you, including, but not limited to, account notifications, order updates, marketing emails, and service-related messages."}
                 showCloseIcon={false}
                 isVisible={true}
                 accessibilityLabel="Important: By providing your email address, you're signing up for critical notifications"
@@ -256,8 +256,11 @@ const AddNotificationScreen = () => {
               />
             </View>
             <View style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}>
+            {is_enrolled &&<Text style={styles.instructions}>
+                {"Edit Email Address"}
+              </Text>}
               <Text style={styles.instructions}>
-                Please enter your email address below and stay connected with us.
+                {!is_enrolled?"Please enter your email address below and stay connected with us.":"Please enter the email address you would like to receive all future customer communications. You may opt out at any time."}
               </Text>
               <Controller
                 control={control}
