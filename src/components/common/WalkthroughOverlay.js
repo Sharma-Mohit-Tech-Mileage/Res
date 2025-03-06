@@ -163,7 +163,7 @@ const WalkthroughOverlay = ({ onFinish }) => {
               style={[styles.button, styles.buttonsLayout, styles.buttonNext]}
               onPress={() => changeWalkThroughStep(walkThroughStep + 1)}
               accessibilityLabel={
-                walkThroughStep < (walkThroughStep).length - 1
+                walkThroughStep < walkThroughScreens.length - 1
                   ? "Next Step"
                   : "Finish Walkthrough"
               }

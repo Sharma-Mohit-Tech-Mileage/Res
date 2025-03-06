@@ -180,7 +180,7 @@ const SplashScreen = ({ navigation, route }) => {
         className: "AuthenticationService",
         methodName: "callSSOLoginApi",
         errorDate: new Date().toISOString().split("T")[0],
-        message: error || "Error fetching data",
+         message: error.message,
         errorCode: 30800,
       }));
   };

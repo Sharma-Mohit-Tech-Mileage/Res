@@ -325,7 +325,7 @@ const postTermsAndConditionsv2 = async (flag) => {
         }
     };
     try {
-        const response = await _axios.put(user.isNormalUser?`/mobile/api/MobileUser/updateMobiletAspnuserDataSec`:'/api/mobile/UpdateMobileAspnetUserData', payload, config);
+        const response = await _axios.put(user.isNormalUser?`/mobile/api/MobileUser/updateMobiletAspnuserDataSec`:'/api/Mobile/UpdateMobileAspnetUserData', payload, config);
         console.log(`API Call Successful to /mobile/api/MobileUser/updateMobiletAspnuserDataSec, Response:`, response);
         return response;
     } catch (error) {

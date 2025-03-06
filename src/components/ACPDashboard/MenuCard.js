@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_5xl,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.10,
     shadowRadius: 4,
     elevation: 4,
     minHeight: 100,
