@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { FontFamily, FontSize, Color, Padding, Border } from '../../../GlobalStyles';
+import { FontFamily, FontSize, Color, Padding } from '../../../GlobalStyles';
 import Icon from '../common/Icon';
 import { useNavigation } from '@react-navigation/native';
 
@@ -9,7 +9,6 @@ const MenuCard = ({ item, style }) => {
 
   const handlePress = () => {
     if (item.id === 'service') {
-      // Show an alert when clicking on "Service"
       Alert.alert("Coming Soon", "This feature is not yet available.", [{ text: "Close", style: "cancel" }]);
     } else if (item.screenName) {
       navigation.reset({
@@ -68,8 +67,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   disabledText: {
-    color: Color.sparklightDarkGray, // Grey out "Service"
-    opacity: 0.6, // Slightly fade it out
+    color: Color.sparklightDarkGray, 
+    opacity: 0.6,
   },
 });
 

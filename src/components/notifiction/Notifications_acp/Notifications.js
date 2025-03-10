@@ -1,15 +1,17 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useSelector, useDispatch } from 'react-redux';
 import NotificationSection from './NotificationSection';
 import ProfileSettingsHeader from '../../common/ProfileSettingsHeader';
 import { Color, Padding } from '../../../../GlobalStyles';
-import { useNavigation } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
 import { getPrimaryEmail } from '../../utility/constant';
+import { fetchACPUserAccountDetails, getPaperlessStatus } from "../../../redux/actions/ProfileActionSuite";
 
 const Notifications = () => {
   const navigation = useNavigation();
-
+  const dispatch = useDispatch();
+  
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
   );
@@ -65,10 +67,25 @@ const Notifications = () => {
 
   const handleEdit = (section) => {
     console.log(`Editing ${section}`);
-    navigation.navigate('EmailNotifications',{is_enrolled:profileData.emailAddress});
+    navigation.navigate('EmailNotifications', { is_enrolled: profileData.emailAddress });
   };
 
   const handleBackPress = () => navigation.navigate('Account');
+
+  // Existing effect: when accountDetails change, update the paperless status using the new email.
+  useEffect(() => {
+    if (accountDetails) {
+      const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
+      dispatch(getPaperlessStatus(updatedPrimaryEmail));
+    }
+  }, [accountDetails, dispatch]);
+
+  // On focus, trigger the Redux Saga to refresh account details.
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchACPUserAccountDetails());
+    }, [dispatch])
+  );
 
   return (
     <View style={styles.container}>
@@ -94,9 +111,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
   },
-  content: {
-    flex: 1,
-  },
+  content: { flex: 1, },
+  
   sectionsContainer: {
     paddingHorizontal: Padding.p_base,
     paddingTop: Padding.p_5xl,
