@@ -20,7 +20,7 @@ import MyServicesStack from "./stackNavigation/MyServicesStack";
 const { width } = Dimensions.get('window');
 const tabWidth = Number(width / 5);
 const Tab = createBottomTabNavigator();
-
+import Icon from '../components/common/Icon';
 const MyTabs = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);

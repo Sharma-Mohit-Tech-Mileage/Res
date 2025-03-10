@@ -24,10 +24,6 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Color.sparklightWhite,
     marginBottom: Padding.p_base,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
   },
   title: {
     fontFamily: FontFamily.openSansSemiBold,

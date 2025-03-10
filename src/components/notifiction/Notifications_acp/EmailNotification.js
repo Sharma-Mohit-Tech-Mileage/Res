@@ -26,13 +26,11 @@ const AddNotificationScreen = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
   const [formState, setFormState] = useState({ paperlessBilling: false });
-  const [reduceMotionEnabled, setReduceMotionEnabled] = useState(false);
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
   const [isCheckboxVisible, setIsCheckboxVisible] = useState(null);
   const scrollViewRef = useRef(null);
   const animatedValue = useRef(new Animated.Value(-100)).current;
   const timeoutRef = useRef(null);
-
   const route = useRoute();
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -61,7 +59,6 @@ const AddNotificationScreen = () => {
   const translateY = animatedValue;
 
   useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotionEnabled);
     AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
   }, []);
 
@@ -130,7 +127,6 @@ const AddNotificationScreen = () => {
           }).start(() => setNotification(null));
         }, 3000);
       }
-      // For error notifications, do nothing - they stay on screen until manually dismissed
     });
   }, [animatedValue, notification]);
 
@@ -150,7 +146,6 @@ const AddNotificationScreen = () => {
   }, [notification, animateNotification]);
 
   const handleToggleChange = useCallback((newValue) => {
-    console.log("Paperless Billing toggle:", newValue.target.value);
     setFormState((prevState) => ({ ...prevState, paperlessBilling: newValue.target.value }));
   }, []);
 
@@ -158,8 +153,7 @@ const AddNotificationScreen = () => {
     (data) => {
       const { email } = data;
       const { paperlessBilling } = formState;
-      console.log("Only require acceptance of terms if paperless billing is enabled and hasn't been accepted before.", paperlessBilling, toggleCheckBoxTerm, paperlessStatusAcp);
-      if (paperlessBilling && isCheckboxVisible && !toggleCheckBoxTerm) {
+     if (paperlessBilling && isCheckboxVisible && !toggleCheckBoxTerm) {
         setNotification({
           message: "Please accept the Paperless Billing Terms & Conditions to continue.",
           type: "error",
@@ -471,7 +465,7 @@ const styles = StyleSheet.create({
   checkBox: {
     width: 12,
     height: 12,
-    marginRight: Platform.OS === "ios" ? 2 : 4,
+    marginRight: Platform.OS === "ios" ? 2 : 16,
     backgroundColor: Color.colorWhitesmoke_100,
   },
   checkBoxArea: {
