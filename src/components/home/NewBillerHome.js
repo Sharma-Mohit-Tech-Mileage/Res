@@ -1,103 +1,110 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Linking, LayoutAnimation, } from "react-native"; import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { View, StyleSheet, Image, ScrollView, Platform } from "react-native";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
-import colors from "../../res/Colors";
-import { SafeAreaView } from "react-native-safe-area-context";
-import DownArrow from "../../res/svgIcons/DownArrow";
-import UpArrow from "../../res/svgIcons/UpArrow";
-import {  storeUpgradeToken } from "../../redux/utils/LocalStorage";
 import moment from "moment";
-import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
-import CloseIcon from "../../res/svgIcons/CloseIcon";
-import AccessibleYoutubePlayer from "../common/AccessibleYoutubePlayer";
-import { fetchACPUserAccountDetails, getPaperlessStatus, } from "../../redux/actions/ProfileActionSuite";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector, useDispatch } from "react-redux";
-import { Env } from "../../network/apis/account/Constants";
-import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
-import MyInternetDetialsBiller from "../common/MyInternetDetailsBiller";
-import WalkthroughOverlay from "../common/WalkthroughOverlay";
 import { useFocusEffect } from "@react-navigation/native";
-
-const tabWidth = Number(Dimensions.get("window").width / 4);
-
+import colors from "../../res/Colors";
+import { Color, Padding } from "../../../GlobalStyles";
+import WalkthroughOverlay from "../common/WalkthroughOverlay";
+import { fetchACPUserAccountDetails, getPaperlessStatus } from "../../redux/actions/ProfileActionSuite";
+import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
+import { AlertUtils } from "../utility/AlertUtils";
+import { Env } from "../../network/apis/account/Constants";
+import WelcomeCard from "../ACPDashboard/WelcomeCard";
+import MenuGrid from "../ACPDashboard/MenuGrid";
+import PromoBanner from "../ACPDashboard/PromoBanner";
+import FeatureCard from "../ACPDashboard/FeatureCard";
+import InfoBanner from "../ACPDashboard/InfoBanner";
+import { GetApiRequest } from "../../network/APIClient";
+import { getUser } from "../../redux/utils/LocalStorage";
 const NewBillerHome = ({ navigation }) => {
-  const [isImageDispaly, setIsImageDispaly] = useState(true);
-  const home = useSelector((state) => state.combinedReducers.home);
-  const dispatch = useDispatch();
+  // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
-  const [pastPaymentDue, setPastPaymentDue] = useState(0.0);
-  const [payStatus, setPayStatus] = useState({});
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [checkModemStatus, setCheckModemStatus] = useState(false);
+  const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
+  const [showWalkThrough, setShowWalkThrough] = useState(false);
+  const [internetHealths, setInternetHealths] = useState([]);
+  const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
     billAmount: 0,
     pastPaymentDue: 0,
     email: null,
   });
-  const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
-  const [showWalkThrough, setShowWalkThrough] = useState(false);
-  const [internetHealths, setInternetHealths] = useState([]);
   const [updateStatus, setUpdateStatus] = useState({
     isMinorUpdateAvailable: false,
     currentVersion: "",
     latestVersion: "",
   });
+
+  // Redux selectors
+  const home = useSelector((state) => state.combinedReducers.home);
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
   );
+  const dispatch = useDispatch();
+const paperlessStatusAcp = useSelector(
+      (state) => state.combinedReducers.profile?.paperlessStatusAcp
+    );
 
-  // Combine refresh operations (update status and ACP details) with collapsing the video on blur.
+    const getStatus = () => {
+        getUser().then((res) => {
+          const accountNumber = res.userInfo.accountNumber;
+          GetApiRequest(
+            `api/Accounts/${accountNumber}/easypay`,
+            (res) => {
+              console.log("res-------------------------------------------------------------------------------", res);
+              setIsAutoPayStatus(res?.isEasyPay);
+            },
+            (error) => { console.log("error", error);}
+          );
+        });
+      };
+  // Refresh data when the screen is focused
   useFocusEffect(
     useCallback(() => {
       const refreshData = async () => {
         try {
-          // Refresh app update status.
           const status = await checkForMinorUpdate();
           setUpdateStatus(status);
-          // Refresh ACP user details.
           dispatch(fetchACPUserAccountDetails());
+          getStatus();
         } catch (error) {
           console.error("Error refreshing data on focus", error);
         }
       };
       refreshData();
-      return () => {
-        setIsImageDispaly(false);
-      };
     }, [dispatch])
   );
 
-  // Fetch upgrade token and display walkthrough (if applicable) on mount.
+  // Show walkthrough overlay if applicable
   useEffect(() => {
-    const fetchData = async () => {
-      const tokenResult = await getUpgradeToken();
-      storeUpgradeToken(tokenResult);
-      if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
-        setShowWalkThrough(true);
-      }
-    };
-    fetchData();
+    if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
+      setShowWalkThrough(true);
+    }
   }, [home.walkThroughStep]);
 
-  // Update paperless status whenever the email in payment details changes.
+  // Update paperless status whenever the email changes
   useEffect(() => {
     if (defaultPaymentDetails.email) {
       dispatch(getPaperlessStatus(defaultPaymentDetails.email));
     }
   }, [defaultPaymentDetails.email, dispatch]);
 
-  // Check modem status based on the number of internet health items.
+  // Check modem status based on internet health count
   useEffect(() => {
     if (internetHealths.length >= 3) {
       setCheckModemStatus(true);
     }
   }, [internetHealths]);
 
-  // --- New: Update local state using the Redux accountDetails ---
+  // Update local state when account details are received
   useEffect(() => {
-   
     if (accountDetails) {
       const userBillAmt =
         accountDetails.past_due_amount <= 0
@@ -117,118 +124,73 @@ const NewBillerHome = ({ navigation }) => {
       });
     }
   }, [accountDetails]);
-  // -------------------------------------------------------------------
 
-  // Optimized getUpgradeToken with error handling.
-  const getUpgradeToken = async () => {
-    try {
-      const url = `${Env.API_SHOPPING_CART_BASEURL}/api/UpgradeOrder/token`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          grant_type: "password",
-          username: "upgr4d3s0rd3rus3r",
-          password: "upgr4d3rp4ssw0rd",
-        }).toString(),
-      });
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching upgrade token", error);
-      return null;
-    }
-  };
-
-  const onErrorBill = (error) => {
-    console.log("error==", error);
-  };
-
-  const OutageAlert = ({ estimatedTime }) => (
-    <View style={styles.errorBox}>
-      <View style={{ flexDirection: "row", width: "90%" }}>
-        <View style={{ backgroundColor: "#F88700", width: 4 }} />
-        <View style={{ flexDirection: "column", padding: 10 }}>
-          <View style={{ flexDirection: "row" }}>
-            <Image
-              style={{ alignSelf: "center" }}
-              resizeMode="contain"
-              tintColor={"#F88700"}
-              source={require("../../../assets/info-circle.png")}
-            />
-            <Text style={styles.modemError1}>Outage Alert</Text>
-          </View>
-          <Text style={styles.modemError2}>
-            Our systems show that you may be experiencing an outage related to your
-            Internet service. We are working to restore service as soon as possible.
-            <Text style={[styles.modemError2, { fontWeight: "700" }]}>
-              {" "}
-              Estimated Time to Restore: {estimatedTime}{" "}
-            </Text>
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={{ marginTop: 10 }}
-          onPress={() => setIsOutageAlert(false)}
-        >
-          <CloseIcon />
-        </TouchableOpacity>
-      </View>
+  const renderHeader = () => (
+    <View
+      accessibilityElementsHidden={showWalkThrough}
+      importantForAccessibility={showWalkThrough ? "no-hide-descendants" : "no"}
+      accessibilityLabel="SparkLight"
+      style={styles.headerContainer}
+    >
+      <Image
+        accessible={!showWalkThrough}
+        accessibilityLabel="SparkLight"
+        resizeMode="contain"
+        style={styles.logoImage}
+        source={require("../../../assets/SparklightEntryLogo.png")}
+      />
     </View>
   );
 
-  const AppUpdateAlert = () => (
-    <View style={styles.errorBox}>
-      <View style={{ flexDirection: "row", width: "90%" }}>
-        <View style={{ backgroundColor: Color.sparklightGreen, width: 4 }} />
-        <View style={{ flexDirection: "column", padding: 10 }}>
-          <View style={{ flexDirection: "row" }}>
-            <Image
-              style={{ alignSelf: "center" }}
-              resizeMode="contain"
-              tintColor={Color.sparklightGreen}
-              source={require("../../../assets/info-circle.png")}
-            />
-            <Text style={[styles.modemError1, { color: Color.sparklightGreen }]}>
-              What's New
-            </Text>
-          </View>
-          <Text style={styles.modemError2}>
-            Enhance your app experience with the latest version.
-            <Text
-              style={styles.updateNow}
-              onPress={() => {
-                if (Platform.OS === "android") {
-                  Linking.openURL(
-                    "https://play.google.com/store/apps/details?id=com.sparklight"
-                  );
-                } else {
-                  Linking.openURL(
-                    "https://apps.apple.com/us/app/mysparklight/6469003880"
-                  );
-                }
-              }}
-            >
-              {" "}
-              Update Now{" "}
-            </Text>
-            and keep your app running smoothly.
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={{ marginTop: 10 }}
-          onPress={() =>
-            setUpdateStatus({
-              isMinorUpdateAvailable: false,
-              currentVersion: "",
-              latestVersion: "",
-            })
-          }
-        >
-          <CloseIcon />
-        </TouchableOpacity>
+  const renderOutageAlert = () =>
+    AlertUtils.createOutageAlert(estimatedRestoreTime, () => setIsOutageAlert(false));
+
+  const renderAppUpdateAlert = () =>
+    AlertUtils.createAppUpdateAlert(() =>
+      setUpdateStatus({
+        isMinorUpdateAvailable: false,
+        currentVersion: "",
+        latestVersion: "",
+      })
+    );
+
+  const renderWelcomeCard = () => (
+    <View style={[styles.card, styles.shadowProp, styles.welcomeCard]}>
+      <View style={styles.contentWrapper}>
+        <WelcomeCard />
+        <MenuGrid />
+        <PromoBanner
+          title="Auto Pay + Paperless is a Winning Combination!"
+          showBonus={true}
+        />
+        <FeatureCard
+          title="Auto Pay"
+          features={["Convenient", "Timely Payments", "Peace of Mind"]}
+          buttonText={isAutoPayStatus ? "Active" : "Activate Auto Pay"}
+          buttonVariant={isAutoPayStatus ? "success" : "primary"}
+          isActive={isAutoPayStatus}
+          onButtonPress={() => {
+            navigation.navigate("AutoPayPCIConnector", {
+              url: `${Env.URL}/billing`,
+              name: isAutoPayStatus?"Manage Auto Pay":"Setup Auto Pay",
+              useNewPayment: true,
+              status: isAutoPayStatus,
+              paymentDetails: defaultPaymentDetails,
+            });
+          }}
+        />
+        <FeatureCard
+          title="Paperless Billing"
+          features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
+          buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}
+          buttonVariant={paperlessStatusAcp ? "success" : "primary"}
+          isActive={paperlessStatusAcp}
+          onButtonPress={() => navigation.navigate("account", {screen: "Notifications"})}
+        />
+        <InfoBanner
+          message="We are working diligently to enhance your experience"
+          icon="megaphone"
+        />
       </View>
     </View>
   );
@@ -244,241 +206,63 @@ const NewBillerHome = ({ navigation }) => {
       {showWalkThrough && (
         <WalkthroughOverlay onFinish={() => setShowWalkThrough(false)} />
       )}
+      <View
+  accessibilityElementsHidden={showWalkThrough}
+  importantForAccessibility={showWalkThrough ? "no-hide-descendants" : "auto"}
+  style={{ flex: 1 }}
+>
       <SafeAreaView style={{ flex: 1 }}>
-        <View
-          accessibilityElementsHidden={showWalkThrough}
-          importantForAccessibility={
-            showWalkThrough ? "no-hide-descendants" : "no"
-          }
-          accessibilityLabel="SparkLight"
-          style={{
-            height: Platform.OS === "ios" ? 60 : 50,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginHorizontal: 20,
-            marginTop: Platform.OS === "ios" ? 0 : 20,
-          }}
-        >
-          <Image
-            accessible={!showWalkThrough}
-            accessibilityLabel="SparkLight"
-            resizeMode="contain"
-            style={{ width: 120, height: 30.324, flexShrink: 0 }}
-            source={require("../../../assets/SparklightEntryLogo.png")}
-          />
-        </View>
-        <ScrollView style={{ height: "100%", paddingBottom: 100 }}>
-          <View
-            style={{
-              backgroundColor: colors.backgound_blue,
-              flex: 2,
-              alignItems: "center",
-              marginTop: 50,
-              paddingBottom: 50,
-            }}
-          >
-            {updateStatus.isMinorUpdateAvailable && <AppUpdateAlert />}
-            {isOutageAlert ? (
-              <OutageAlert estimatedTime={estimatedRestoreTime} />
-            ) : null}
-            <Text
-              style={[
-                styles.descriptionText,
-                {
-                  fontSize: FontSize.size_3xl,
-                  fontWeight: "400",
-                  zIndex: 100,
-                  width: wp("92%"),
-                },
-              ]}
-            >
-              Welcome to Sparklight
-            </Text>
-            <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
-              <Text
-                style={[
-                  styles.descriptionText,
-                  { fontSize: FontSize.size_3xl, fontWeight: "400", marginBottom: 20 },
-                ]}
-              ></Text>
-              <View style={{ flexDirection: "column" }}>
-                <Text style={styles.descriptionText}>
-                  We’re excited to connect with you! Sparklight is dedicated to
-                  offering our customers a variety of enhanced self-service options
-                  including online pay and Auto Pay through the customer portal and
-                  MySparklight app.{"\n\n"}As you navigate, please be aware that select
-                  features available to current customers may not be immediately
-                  accessible to you. We are working diligently to add new options and
-                  features to enhance your Sparklight experience.
-                  Thank you for your patience and understanding during this transition
-                  period.
-                </Text>
-                {isImageDispaly && (
-                  <AccessibleYoutubePlayer
-                    videoId="C3cMQoWxv6I"
-                    videoTitle="SparkLight Video"
-                    height={230}
-                    play={false}
-                    onError={(e) => console.log(e)}
-                    onPlaybackStateChange={(isPlaying) =>
-                      console.log("Playing:", isPlaying)
-                    }
-                  />
-                )}
-                <TouchableOpacity
-                  accessible
-                  accessibilityLabel={isImageDispaly ? "Collapse" : "Expand"}
-                  accessibilityRole="button"
-                  onPress={() => {
-                    LayoutAnimation.configureNext(
-                      LayoutAnimation.Presets.easeInEaseOut
-                    );
-                    setIsImageDispaly(!isImageDispaly);
-                  }}
-                  style={{
-                    flexDirection: "row",
-                    alignSelf: "center",
-                    padding: 5,
-                    marginVertical: 5,
-                    marginHorizontal: 25,
-                  }}
-                >
-                  <Text style={styles.hideShowDetails}>
-                    {isImageDispaly ? "Collapse" : "Expand"}
-                  </Text>
-                  <View style={{ marginTop: isImageDispaly ? 2 : 7, marginLeft: 5 }}>
-                    {isImageDispaly ? <UpArrow /> : <DownArrow />}
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-            <ScrollView horizontal={false}>
-              <View>
-                <MyInternetDetialsBiller
-                  plans={payStatus}
-                  billAmt={billAmt}
-                  dueDate={dueDate}
-                  pastPaymentDue={pastPaymentDue}
-                  paymentDetails={defaultPaymentDetails}
-                  navigation={navigation}
-                />
-              </View>
-            </ScrollView>
+        {renderHeader()}
+        <ScrollView style={styles.scrollContainer}>
+          <View style={styles.mainContentContainer}>
+            {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
+            {isOutageAlert && renderOutageAlert()}
+            {renderWelcomeCard()}
           </View>
         </ScrollView>
       </SafeAreaView>
+    </View>
     </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  accept: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "center",
-    color: Color.sparklightWhite,
-  },
-  bottomCarot: {
-    width: 18,
-    height: 13,
-    position: "absolute",
-    top: 20,
-  },
-  bottomCarotStep2: {
-    left: tabWidth * 2,
-  },
-  bottomCarotStep3: {
-    left: tabWidth * 3,
-  },
-  circle: {
-    width: 8,
-    height: 8,
-    backgroundColor: Color.colorMidnightblue,
-    borderRadius: 8,
-    marginLeft: 10,
-  },
-  circleUnselected: {
-    backgroundColor: "#D9D9D9",
-  },
-  circlePaging: {
-    width: 100,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    marginBottom: 16,
-  },
-  walkThroughBottomArea: {
-    flexDirection: "row",
-    flex: 1,
-  },
-  walkThroughButtons: {
-    justifyContent: "space-between",
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "flex-end",
-  },
-  walkThroughSubButtons: {
-    width: 195,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-  },
-  title: {
-    marginBottom: 5,
-  },
-  titleText: {
-    color: Color.sparklightGray1,
-    fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.openSansSemiBold,
-  },
-  description: {},
-  descriptionText: {
-    color: Color.colorGray_200,
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
-    lineHeight: 24,
-    paddingHorizontal: 24,
-  },
-  decline: {
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorMidnightblue,
-    textAlign: "center",
-  },
-  button: {
-    backgroundColor: Color.colorMidnightblue,
-  },
-  buttonDisabled: {
-    backgroundColor: Color.colorWhitesmoke_300,
-    color: Color.colorGray_200,
-  },
-  buttonDisabledText: {
-    color: Color.sparklightaddGray,
-  },
-  buttonNext: {
-    justifyContent: "flex-end",
-    marginLeft: 10,
-  },
-  buttonPrevious: {
-    backgroundColor: Color.colorWhitesmoke_200,
-  },
-  buttonsLayout: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    minHeight: 32,
-    textAlign: "center",
-  },
   container: {
     flex: 1,
     backgroundColor: colors.splash_bg,
     marginBottom: 30,
+  },
+  headerContainer: {
+    height: Platform.OS === "ios" ? 60 : 50,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginHorizontal: 20,
+    marginTop: Platform.OS === "ios" ? 0 : 20,
+  },
+  logoImage: {
+    width: 120,
+    height: 30.324,
+    flexShrink: 0,
+  },
+  scrollContainer: {
+    height: "100%",
+    paddingBottom: 100,
+  },
+  mainContentContainer: {
+    backgroundColor: colors.backgound_blue,
+    flex: 2,
+    alignItems: "center",
+    marginTop: 50,
+    paddingBottom: 50,
   },
   card: {
     backgroundColor: "white",
     borderRadius: 2,
     paddingTop: 20,
     width: wp("92%"),
+  },
+  welcomeCard: {
+    marginTop: -40,
   },
   shadowProp: {
     shadowColor: "#171717",
@@ -495,102 +279,11 @@ const styles = StyleSheet.create({
     zIndex: 5,
     opacity: 0.7,
   },
-  walkThroughBubble: {
-    backgroundColor: "white",
-    position: "absolute",
-    bottom: 90,
-    height: 180,
-    width: Dimensions.get("window").width - 40,
-    left: 20,
-    opacity: 1,
-    zIndex: 10,
-    borderRadius: 10,
-    justifyContent: "space-between",
-    padding: 20,
-  },
-  internetHealth: {
-    color: colors.darkest_grey,
-    fontSize: 22,
-    marginTop: -20,
-    fontFamily: FontFamily.openSansRegular,
-    paddingHorizontal: 25,
-    fontStyle: "normal",
-    fontWeight: "400",
-    lineHeight: 22,
-  },
-  internetStatusSection: {
-    backgroundColor: "#EBEEF180",
-    borderRadius: 10,
-    padding: 10,
-    marginTop: 15,
-    flexDirection: "row",
-    justifyContent: "center",
-    marginHorizontal: 25,
-  },
-  internetStatusTxt: {
-    color: colors.darkest_grey,
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "center",
-    alignSelf: "center",
-    fontSize: 14,
-    fontStyle: "normal",
-    fontWeight: "400",
-    lineHeight: 28,
-    paddingHorizontal: 5,
-  },
-  hideShowDetails: {
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: 14,
-    marginVertical: 5,
-    color: colors.sparklight_purple_blue,
-    lineHeight: 20,
-    fontWeight: "400",
-  },
-  modemError1: {
-    color: "#000",
-    fontFamily: FontFamily.textXsSemibold,
-    fontSize: 15,
-    fontStyle: "normal",
-    fontWeight: "700",
-    marginLeft: 5,
-    marginRight: 5,
-  },
-  modemError2: {
-    color: Color.colorGray_200,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: 14,
-    fontStyle: "normal",
-    fontWeight: "400",
-    marginLeft: 20,
-    marginTop: 7,
-    marginRight: 5,
-  },
-  updateNow: {
-    color: Color.colorMidnightblue,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: 14,
-    fontStyle: "normal",
-    fontWeight: "700",
-    marginLeft: 20,
-    marginTop: 7,
-    marginRight: 5,
-  },
-  errorBox: {
-    flexDirection: "column",
-    marginHorizontal: 20,
-    marginVertical: 20,
-    borderColor: Color.sparklightGray,
+  contentWrapper: {
+    flex: 1,
     backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_11xs,
-    borderWidth: 1,
-    marginBottom: wp("15%"),
-    marginTop: wp("-10%"),
-  },
-  videoContainer: {
-    width: wp("80%"),
-    borderRadius: 5,
-    alignSelf: "center",
-    marginTop: 10,
+    paddingHorizontal: Padding.p_5xl,
+    paddingTop: 8,
   },
 });
 

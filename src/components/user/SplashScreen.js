@@ -135,7 +135,7 @@ const SplashScreen = ({ navigation, route }) => {
     storeUser(user);
     dispatch(saveUserInfo(user));
     if (user.userInfo.mobileTCAcceptanceFlag) {
-      navigation.reset({ index: 0, routes: [{ name: "MyTab" }], });
+      navigation.reset({ index: 0, routes: [{ name: "Terms" }], });
     } else {
       navigation.reset({ index: 0, routes: [{ name: "Terms" }], });
     }
@@ -180,7 +180,7 @@ const SplashScreen = ({ navigation, route }) => {
         className: "AuthenticationService",
         methodName: "callSSOLoginApi",
         errorDate: new Date().toISOString().split("T")[0],
-        message: error || "Error fetching data",
+         message: error.message,
         errorCode: 30800,
       }));
   };

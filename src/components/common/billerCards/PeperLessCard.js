@@ -41,7 +41,7 @@ const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style }
           <View style={styles.cardFooter}>
             <TouchableOpacity
              onPress={() => {
-              navigation.navigate("account", {screen: "Notifications"});;
+              navigation.navigate("account", {screen: "Notifications"});
             }}
               accessible={true}
               accessibilityLabel="Manage Paperless Billing"

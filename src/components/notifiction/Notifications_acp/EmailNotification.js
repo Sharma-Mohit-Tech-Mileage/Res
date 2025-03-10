@@ -198,6 +198,18 @@ const AddNotificationScreen = () => {
     animateNotification();
   }, [animateNotification]);
 
+  const handleCheckboxToggle = useCallback(() => {
+    setToggleCheckBoxTerm(!toggleCheckBoxTerm);
+  }, [toggleCheckBoxTerm]);
+
+  const handleTermsLinkPress = useCallback((event) => {
+    event.stopPropagation();
+    navigation.navigate("ArticalWindowUtility", {
+      url: "https://www.sparklight.com/legal/paperless-terms-and-conditions",
+      name: "Terms & Conditions",
+    });
+  }, [navigation]);
+
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader
@@ -234,7 +246,7 @@ const AddNotificationScreen = () => {
               <NotificationAlert
                 type="warning"
                 title="Critical Notifications"
-                message="By providing your email address, you're signing up for critical notifications. We'll keep you informed without overwhelming your inbox."
+                message={!is_enrolled?"By providing your email address, you're signing up for critical notifications. We'll keep you informed without overwhelming your inbox.":"By updating your email, you agree that this change will apply to all Sparklight email customer communications sent to you, including, but not limited to, account notifications, order updates, marketing emails, and service-related messages."}
                 showCloseIcon={false}
                 isVisible={true}
                 accessibilityLabel="Important: By providing your email address, you're signing up for critical notifications"
@@ -244,8 +256,11 @@ const AddNotificationScreen = () => {
               />
             </View>
             <View style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}>
+            {is_enrolled &&<Text style={styles.instructions}>
+                {"Edit Email Address"}
+              </Text>}
               <Text style={styles.instructions}>
-                Please enter your email address below and stay connected with us.
+                {!is_enrolled?"Please enter your email address below and stay connected with us.":"Please enter the email address you would like to receive all future customer communications. You may opt out at any time."}
               </Text>
               <Controller
                 control={control}
@@ -301,58 +316,55 @@ const AddNotificationScreen = () => {
                 Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips.
               </Text>
             </View>
-            {isCheckboxVisible &&<View style={[styles.checkBoxArea, { flexDirection: 'row', alignItems: 'center' }]}>
-              <TouchableOpacity
-                onPress={() => setToggleCheckBoxTerm(!toggleCheckBoxTerm)}
-                accessibilityRole="checkbox"
-                accessibilityLabel="Agree to Paperless Billing Terms and Conditions checkbox"
-                accessibilityState={{ checked: toggleCheckBoxTerm }}
-              >
-                <CheckBox
-                  disabled={true}
-                  value={toggleCheckBoxTerm}
-                  style={[styles.checkBox,{ marginRight: Platform.OS === "ios"?1:16 }]}
-                  boxType="square"
-                  tintColors={{
-                    true: "#1B99FF",
-                    false: Platform.OS === "ios" ? Color.colorWhitesmoke_300 : "#D0D5DD",
-                  }}
-                  accessible={false}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={(event) => {
-                  event.stopPropagation();
-                  navigation.navigate("ArticalWindowUtility", {
-                    url: "https://www.sparklight.com/legal/paperless-terms-and-conditions",
-                    name: "Terms & Conditions",
-                  });
-                }}
-                accessibilityRole="link"
-                accessibilityLabel="Paperless Billing Terms & Conditions"
-                accessibilityHint="Opens Paperless Billing Terms & Conditions"
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', flexShrink: 1 }}>
-                  <Text
-                    style={[styles.checkBoxAreaViewText, { lineHeight: undefined }]}
-                    allowFontScaling={true}
-                    maxFontSizeMultiplier={1}
-                  >
-                    {" I agree to "}
-                  </Text>
+            {isCheckboxVisible && (
+              <View style={styles.checkBoxArea}>
+                <TouchableOpacity
+                  style={styles.checkboxTouchable}
+                  onPress={handleCheckboxToggle}
+                  accessibilityRole="checkbox"
+                  accessibilityLabel="I agree to Paperless Billing Terms and Conditions"
+                  accessibilityState={{ checked: toggleCheckBoxTerm }}
+                >
+                  <View style={styles.checkboxContainer}>
+                    <CheckBox
+                      disabled={true}
+                      value={toggleCheckBoxTerm}
+                      style={styles.checkBox}
+                      boxType="square"
+                      tintColors={{
+                        true: "#1B99FF",
+                        false: Platform.OS === "ios" ? Color.colorWhitesmoke_300 : "#D0D5DD",
+                      }}
+                      accessible={false}
+                    />
+                    <Text
+                      style={[styles.checkBoxAreaViewText,{marginLeft: 4}]}
+                      allowFontScaling={true}
+                      maxFontSizeMultiplier={1}
+                    >
+                      I agree to{" "}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleTermsLinkPress}
+                  accessibilityRole="link"
+                  accessibilityLabel="View Paperless Billing Terms and Conditions"
+                  accessibilityHint="Opens Paperless Billing Terms and Conditions in a new window"
+                >
                   <Text
                     style={[
                       styles.checkBoxAreaViewText,
-                      { color: Color.sparklightBrightPurple, textDecorationLine: "underline", lineHeight: undefined },
+                      { color: Color.sparklightBrightPurple, textDecorationLine: "underline" },
                     ]}
                     allowFontScaling={true}
                     maxFontSizeMultiplier={1}
                   >
                     Paperless Billing Terms & Conditions
                   </Text>
-                </View>
-              </TouchableOpacity>
-            </View>}
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </View>
         <View style={styles.buttonContainer}>
@@ -465,12 +477,21 @@ const styles = StyleSheet.create({
   checkBoxArea: {
     flexDirection: "row",
     alignItems: "center",
+    flexWrap: "wrap",
     paddingHorizontal: Padding.p_5xl,
+  },
+  checkboxTouchable: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 0,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   checkBoxAreaViewText: {
     fontSize: 14,
     fontFamily: FontFamily.openSansRegular,
-    lineHeight: 30,
     color: Color.colorGray_200,
   },
 });

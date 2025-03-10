@@ -1,3 +1,4 @@
+// components/common/AccessibleYoutubePlayer.js
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
@@ -5,7 +6,7 @@ import { WebView } from 'react-native-webview';
 const AccessibleYoutubePlayer = ({ videoId }) => (
   <WebView
     style={styles.webView}
-    accessibilityLabel=" YouTube Video Player"
+    accessibilityLabel="YouTube Video Player"
     source={{
       html: `
       <!DOCTYPE html>
@@ -59,8 +60,9 @@ const AccessibleYoutubePlayer = ({ videoId }) => (
 
 const styles = StyleSheet.create({
   webView: {
-    height: 200, // Same as before
-    margin: 32,
+    flex: 1,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
 });
 
