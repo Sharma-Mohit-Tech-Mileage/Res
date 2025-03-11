@@ -16,6 +16,8 @@ import { fetchProfileDetails } from '../redux/actions/ProfileActionSuite';
 import BillingIcon from "../res/svgIcons/BillingIcon";
 import BillingStackScreen from "./stackNavigation/BillingStack";
 import MyServicesStack from "./stackNavigation/MyServicesStack";
+import NewSupportIcon from "../res/svgIcons/NewSupportIcon";
+import HomeAccountIcon from "../res/svgIcons/HomeAccountIcon";
 
 const { width } = Dimensions.get('window');
 const tabWidth = Number(width / 5);
@@ -73,7 +75,7 @@ const MyTabs = ({ navigation, route }) => {
         accessible={false}
         importantForAccessibility="no"
       >
-        <IconComponent focused={focused} />
+        <IconComponent focused={focused} isNewBiller={!user?.isNormalUser} />
       </View>
     );
   };
@@ -260,14 +262,19 @@ const MyTabs = ({ navigation, route }) => {
                 accessible={false}
                 importantForAccessibility="no"
               >
+
+            { user?.isNormalUser ? (
                 <Image
-                  style={{width:33, height:28}}
-                  resizeMode='contain'
-                  tintColor={focused ? '#353091' : '#767676'}
-                  source={require("../../assets/phone-outgoing-03.png")}
-                  accessible={false}
-                  importantForAccessibility="no"
-                />
+                style={{width:33, height:28}}
+                resizeMode='contain'
+                tintColor={focused ? '#353091' : '#767676'}
+                source={require("../../assets/phone-outgoing-03.png")}
+                accessible={false}
+                importantForAccessibility="no"
+              /> )
+                : <NewSupportIcon focused={focused} />
+                }
+                
               </View>
             ),
           }}
@@ -289,7 +296,7 @@ const MyTabs = ({ navigation, route }) => {
             headerShown: false,
             tabBarLabel: 'Account',
             tabBarIcon: ({ focused }) => getTabBarIconWrapper(
-              AccountIcon,
+              user?.isNormalUser? AccountIcon :HomeAccountIcon,
               focused,
               4
             ),
