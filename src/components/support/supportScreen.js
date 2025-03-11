@@ -42,7 +42,7 @@ import TicketListIcon from "../../res/svgIcons/TicketListIcon";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 import BillingSupportIcon from "../../res/svgIcons/BillingSupportIcon";
 import AppStyles from "../common/styles/AppStyles";
-import { color } from "native-base/lib/typescript/theme/styled-system";
+import SupportIcon from "../../res/svgIcons/NewSupportIcon";
 
 const Support = ({ route }) => {
   const navigation = useNavigation();
@@ -365,11 +365,17 @@ const Support = ({ route }) => {
       <View style={[styles.mainContainer]}>
         <View style={styles.header}>
           <View style={styles.featuredIcon}>
-            <Image
+            {/* <Image
               style={[styles.lifeBuoy02IconLayout]}
               resizeMode="stretch"
               source={require("../../../assets/right-actionable19.png")}
-            />
+            /> */}
+            {userData?.isNormalUser? <Image
+              style={[styles.lifeBuoy02IconLayout]}
+              resizeMode="stretch"
+              source={require("../../../assets/right-actionable19.png")}
+            /> :<SupportIcon white={'#fff'}/>}
+            
           </View>
           <View style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}>
             <Text style={styles.wereHereTo}>We’re Here to Help</Text>

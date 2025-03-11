@@ -19,6 +19,7 @@ import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
 import VersionCheck from 'react-native-version-check';
 import { Env } from "../../network/apis/account/Constants";
 import AppStyles from "../common/styles/AppStyles";
+import UserIconWhite from "../../res/svgIcons/UserIconWhite";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -78,7 +79,7 @@ const AccountOverview = () => {
   const [initials, setInitials] = useState('');
   const [menues, setMenues] = useState([]);
   const dispatch = useDispatch();
-  //const user = useSelector(state => state.combinedReducers.user.userData);
+  const user = useSelector(state => state.combinedReducers.user.userData);
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
   useEffect(() => {
@@ -208,9 +209,11 @@ const AccountOverview = () => {
       <View style={[styles.frameParent]}>
         <View style={styles.rightActionableParent}>
           <View style={styles.rightActionable}>
+          {!user?.isNormalUser ? <UserIconWhite width={28} height={26}/> :
             <Text style={styles.text}>
               {initials}
             </Text>
+            }
           </View>
           {/* Full name for profile */}
           <Text style={styles.melissaSmith} >
