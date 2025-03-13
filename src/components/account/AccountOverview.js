@@ -300,7 +300,7 @@ const AccountOverview = () => {
 
             </View>
             <Pressable
-              onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/30080605597079-MySparklight-App-Release-Notes', name: 'App Version' })}
+              onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/30080605597079-MySparklight-App-Release-Notes?isMobile=true', name: 'App Version' })}
               accessibilityLabel={'Version '+VersionCheck.getCurrentVersion()}
             >
               <Text style={{ color: Color.colorMidnightblue, alignSelf: 'center', textDecorationLine: 'underline' }}>
