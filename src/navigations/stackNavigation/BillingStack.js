@@ -4,7 +4,7 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
-import BillingScreen from "../../components/billing/BillingScreen";
+import BillingScreen from "../../components/billing/BillingStatements";
 import AutoPayPCIConnector from "../../components/utility/AutoPayPCIConnector";
 
 const BillingStack = createNativeStackNavigator();
