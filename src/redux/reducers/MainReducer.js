@@ -4,12 +4,14 @@ import userReducer from './UserReducer';
 import dashboardReducer from './DashboardReducer';
 import profileReducer from './ProfileReducer';
 import NotificationReducer from './NotificationReducer'; // Import the Notifications component
+import billingStatementReducer from './billingStatementReducer';  
 // Use combineReducers to create a combined reducer
 const appReducer = combineReducers({
   user: userReducer,
   home: dashboardReducer,
   profile: profileReducer,
   notification: NotificationReducer, // Add the Notifications reducer to the combined reducer
+  billingStatements: billingStatementReducer, // Add the billingStatement reducer to the combined reducer
 });
 
 // Wrap the combined reducer with a higher-order reducer to handle the LOGOUT action
