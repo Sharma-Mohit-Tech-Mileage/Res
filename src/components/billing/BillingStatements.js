@@ -156,7 +156,7 @@ const BillingStatementsScreen = ({ navigation }) => {
             ) : (
               <>
                 <Text style={styles.uploadText}>Download</Text>
-                <Icon name="upload" size={18} color={Color.sparklightBrightPurple} />
+                {/* <Icon name="upload" size={18} color={Color.sparklightBrightPurple} /> */}
               </>
             )}
           </TouchableOpacity>
