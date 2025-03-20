@@ -21,6 +21,7 @@ const billingStatementApi = {
      
       return response.data;
     } catch (error) {
+      console.error("Error fetching billing statements:", error);
       throw error;
     }
   },

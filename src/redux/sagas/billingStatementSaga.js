@@ -4,12 +4,18 @@ import * as actions from '../actions/billingStatementActions';
 import billingStatementApi from '../../network/apis/account/billings.service';
 import { selectAllStatements } from '../selectors/billingStatementSelectors';
 
-// Worker Saga: Fetch billing statements
 function* fetchBillingStatementsSaga() {
   try {
     // Call API
     const statements = yield call(billingStatementApi.fetchBillingStatements);
-    
+    console.log('Fetched statements:', statements);
+
+    // Check if statements is a valid array before proceeding
+    if (!Array.isArray(statements) || statements.length === 0) {
+      yield put(actions.fetchBillingStatementsSuccess([])); // Dispatch empty array
+      return;
+    }
+
     // Transform data if needed before dispatching success action
     const transformedStatements = statements.map(statement => ({
       id: statement.statement_id,
@@ -17,11 +23,11 @@ function* fetchBillingStatementsSaga() {
       date: statement.cycle_date,
       expirationDate: statement.statement_id_expiration
     }));
-    
-    // Dispatch success action
+
+    // Dispatch success action with transformed data
     yield put(actions.fetchBillingStatementsSuccess(transformedStatements));
   } catch (error) {
-    // Dispatch error action
+    // Dispatch error action only for actual API failures
     yield put(actions.fetchBillingStatementsFailure(error.message || 'Failed to fetch statements'));
   }
 }

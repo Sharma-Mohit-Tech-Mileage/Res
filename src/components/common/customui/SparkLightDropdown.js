@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   dropdownText: {
     flex: 1,
     color: Color.colorGray_200,
-    fontSize: FontSize.size_base,
+    fontSize: 17,
     fontFamily: FontFamily.openSansRegular,
   },
   chevron: {
@@ -268,8 +268,8 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 18,
-    color: '#007AFF',
-    fontWeight: '500',
+    color: '#000',
+    fontWeight: '800',
   },
   optionsList: {
     backgroundColor: '#F2F2F7',
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   optionText: {
-    fontSize: 17,
+    fontSize: 16,
     color: '#000000',
     flex: 1,
     fontFamily: FontFamily.openSansRegular,
