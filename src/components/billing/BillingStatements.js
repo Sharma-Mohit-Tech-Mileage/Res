@@ -277,14 +277,13 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    marginTop: Padding.p_base,
     paddingHorizontal: Padding.p_5xl,
   },
   notificationsContainer: {
     marginBottom: 16, // Add 16px spacing between notifications and Year label
   },
   yearSelectorContainer: {
-    marginBottom: 15,
+    marginBottom: 8,
   },
   yearLabel: {
     fontSize: FontSize.size_base,
@@ -295,11 +294,12 @@ const styles = StyleSheet.create({
   },
   controlsRow: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    marginRight: 20,
   },
   dropdownContainer: {
     flex: 1,
+    marginRight: 32,
   },
   yearDropdown: {
     borderColor: Color.colorGainsboro_200,
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    borderRadius: Border.br_5xs,
+    borderRadius: 4,
     height: 60,
     marginBottom: 20,
   },

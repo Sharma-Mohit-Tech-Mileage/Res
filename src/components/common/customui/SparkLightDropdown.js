@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   dropdownText: {
     flex: 1,
     color: Color.colorGray_200,
-    fontSize: 17,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
   },
   chevron: {
