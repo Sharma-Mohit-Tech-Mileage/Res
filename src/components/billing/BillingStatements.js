@@ -226,7 +226,7 @@ const BillingStatementsScreen = ({ navigation }) => {
               <Text style={styles.sortText}>Sort date</Text>
               <Icon 
                 name="double-arrow" 
-                size={26}
+                size={30}
                 style={{
                   transform: [{ rotate: sortDirection === "asc" ? "0deg" : "180deg" }]
                 }}
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    marginTop: Padding.p_5xl,
+    marginTop: Padding.p_base,
     paddingHorizontal: Padding.p_5xl,
   },
   notificationsContainer: {
@@ -296,6 +296,7 @@ const styles = StyleSheet.create({
   controlsRow: {
     flexDirection: "row",
     alignItems: "center",
+    marginRight: 20,
   },
   dropdownContainer: {
     flex: 1,
@@ -317,7 +318,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
-    marginRight: 5,
+    marginRight: 1,
   },
   statementsList: {
     flex: 1,
