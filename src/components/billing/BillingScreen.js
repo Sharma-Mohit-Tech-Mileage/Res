@@ -211,13 +211,43 @@ const BillingScreen = ({ navigation }) => {
                     const billingURL = isNewBiller
                       ? `${Env.ACP_BILLING}/billing`
                       : `${Env.URL}/billing`;
-                    handleNavigation(billingURL, "View Billing Details");
+                    handleNavigation(billingURL, "View Bill Breakdown");
                   }}
                   accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel="View Billing Details"
+                  accessibilityLabel="View Bill Breakdown"
                 >
-                  <Text style={styles.modemHealthSupport}>View Billing Details</Text>
+                  <Text style={styles.modemHealthSupport}>View Bill Breakdown</Text>
+                  <Image
+                    style={styles.rightIconStyle}
+                    source={require("../../../assets/chevronright.png")}
+                  />
+                </TouchableOpacity>
+                <View style={styles.frameLayout} />
+                <TouchableOpacity
+                  style={styles.frame9defaultSpaceBlock}
+                  onPress={() => {
+                    const billingURL = isNewBiller
+                      ? `${Env.ACP_BILLING}/billing-payment`
+                      : `${Env.URL}/billing`;
+                  
+                    if (isNewBiller) {
+                       navigation.navigate("AutoPayPCIConnector", {
+                                      url: `${Env.URL}/billing-payment`,
+                                      name: "Manage Payment Method",
+                                      useNewPayment: true ,
+                                      status: isAutoPayStatus,
+                                      paymentDetails:defaultPaymentDetails
+                                    });
+                    } else {
+                      handleNavigation(billingURL, "Manage Payment Method");
+                    }
+                  }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Manage Payment Method"
+                >
+                  <Text style={styles.modemHealthSupport}>Manage Payment Method</Text>
                   <Image
                     style={styles.rightIconStyle}
                     source={require("../../../assets/chevronright.png")}
@@ -246,16 +276,17 @@ const BillingScreen = ({ navigation }) => {
                 <TouchableOpacity
                   style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
-                    const billingHistory = isNewBiller
-                      ? `${Env.ACP_BILLING}/billing-statement`
-                      : Env.BILLING_HISTORY;
-                    handleNavigation(billingHistory, "View Billing History");
+                    if (isNewBiller) {
+                      navigation.navigate("BillingStatements"); // Direct navigation
+                    } else {
+                      handleNavigation(Env.BILLING_HISTORY, "View Billing Statement");
+                    }
                   }}
                   accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel="View Billing History"
+                  accessibilityLabel="View Billing Statement"
                 >
-                  <Text style={styles.modemHealthSupport}>View Billing History</Text>
+                  <Text style={styles.modemHealthSupport}>View Billing Statement</Text>
                   <Image
                     style={styles.rightIconStyle}
                     source={require("../../../assets/chevronright.png")}

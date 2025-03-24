@@ -1,17 +1,22 @@
 import React from 'react';
 import { View, Image } from 'react-native';
+import PropTypes from 'prop-types';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import DownArrow from '../../res/svgIcons/DownArrow';
-import UpArrow from '../../res/svgIcons/UpArrow';
+import UpArrow from '../../res/svgIcons/ModemInfo';
 import ServiceIconNew from '../../res/svgIcons/ServiceIconNew';
 import UserIcon from '../../res/svgIcons/UserIcon';
 import creditCard from '../../res/svgIcons/creditCard';
 import Support from '../../res/svgIcons/Support';
 import AutoPaperless from '../../res/svgIcons/AutoPaperless';
 import Announce from '../../res/svgIcons/Announce';
+import ArrowIconup from '../../res/svgIcons/ArrowIconup';
+import ArrowIcondown from '../../res/svgIcons/ArrowIcondown';
+import DoubleArrowIcon from '../../res/svgIcons/DoubleArrowIcon';
+import UploadIcon from '../../res/svgIcons/UploadIcon';
 const Icon = ({ name, size = 24, color = '#000', style }) => {
   const iconMap = {
     'credit-card': { library: 'SVG', source: creditCard },
@@ -23,13 +28,17 @@ const Icon = ({ name, size = 24, color = '#000', style }) => {
     'refresh-cw': { library: 'SVG', source: AutoPaperless },
     'info': { library: 'Feather', name: 'info' },
     'megaphone': { library: 'SVG', source: Announce },
-
+    'arrow-up': { library: 'SVG', source: ArrowIconup },
+    'arrow-down': { library: 'SVG', source: ArrowIcondown },
+    'double-arrow': { library: 'SVG', source: DoubleArrowIcon },
+    'upload': { library: 'SVG', source: UploadIcon },
     // Direct SVG icons
     'down-arrow': { library: 'SVG', source: DownArrow },
     'up-arrow': { library: 'SVG', source: UpArrow },
 
     // Image asset example
     'green-checkcircle': { library: 'Image', source: require('../../../assets/checkcircle.png') },
+    'down-chevron': { library: 'Image', source: require('../../../assets/chevrondown.png') },
   };
 
   // Fallback icon if the provided name isn't in the map
@@ -61,6 +70,12 @@ const Icon = ({ name, size = 24, color = '#000', style }) => {
   };
 
   return <View style={style}>{renderAsset()}</View>;
+};
+Icon.propTypes = {
+  name: PropTypes.string.isRequired,
+  size: PropTypes.number,
+  color: PropTypes.string,
+  style: PropTypes.oneOfType([PropTypes.object, PropTypes.array])
 };
 
 export default Icon;

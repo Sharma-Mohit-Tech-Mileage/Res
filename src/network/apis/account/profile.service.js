@@ -646,7 +646,7 @@ const isPaperlessEnabled = async (email) => {
     const data = {
         accountNumber: accountNumber,
         fieldList: [
-            "first_name", "last_name", "accountNumber",
+            "first_name", "last_name",
             "current_balance", "past_due_amount",
             "payment_due_date", "customer_type",
             "email_details", "email"

@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import BillingScreen from "../../components/billing/BillingScreen";
+import BillingStatements from "../../components/billing/BillingStatements";
 import AutoPayPCIConnector from "../../components/utility/AutoPayPCIConnector";
 
 const BillingStack = createNativeStackNavigator();
@@ -17,6 +18,18 @@ function BillingStackScreen({route}) {
                 name="Billing"
                 initialParams={{ isWeb:route?.params?.isWeb }}
                 component={BillingScreen}
+                options={{
+                    headerBackVisible: false,
+                    headerShown: false,
+                }}
+                listeners={{
+                    focus: () => setTabBarVisible(true),
+                    blur: () => setTabBarVisible(true),
+                }}
+            />
+             <BillingStack.Screen
+                name="BillingStatements"
+                component={BillingStatements}
                 options={{
                     headerBackVisible: false,
                     headerShown: false,

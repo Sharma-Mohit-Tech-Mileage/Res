@@ -102,16 +102,16 @@ const styles = StyleSheet.create({
         height: 56,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'center', // Center the content
         paddingHorizontal: 8,
     },
     buttonContainer: {
-        flex: 0.1,
+        position: 'absolute', // Position the button absolutely
+        left: 8, // Align to the left
         justifyContent: 'center',
         alignItems: 'center',
     },
     titleContainer: {
-        flex: 0.9,
         justifyContent: 'center',
         alignItems: 'center',
     },
