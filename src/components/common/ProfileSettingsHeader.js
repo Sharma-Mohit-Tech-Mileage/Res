@@ -6,20 +6,23 @@ import {
     Pressable,
     Image,
     StyleSheet,
-    AccessibilityInfo
+    AccessibilityInfo,
+    TouchableOpacity
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
+import ChatIcon from '../../res/svgIcons/ChatIcon';
+import * as Zendesk from 'react-native-zendesk-messaging';
 
 const ProfileSettingsHeader = ({
     title,
     onPressBack,
     iconAlignment = 'right',
     iconSource = require("../../../assets/chevronleft.png"),
-    showIcon = true
+    showIcon = true,
+    onPressChat
 }) => {
     const [iconPressed, setIconPressed] = useState(false);
-
     const handlePressIn = () => {
         setIconPressed(true);
         AccessibilityInfo.announceForAccessibility('Back button pressed');
@@ -33,23 +36,23 @@ const ProfileSettingsHeader = ({
         <View style={styles.perusable}>
             <StatusBar barStyle="light-content" translucent={true} backgroundColor="transparent" />
             <LinearGradient
-                style={[styles.profileSettingsChild]}
+                style={styles.profileSettingsChild}
                 locations={[0, 1]}
                 colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
                 useAngle={true}
                 angle={90}
             >
-                <View style={[styles.navBar]}>
+                <View style={styles.navBar}>
                     {showIcon && (
+                        <>
                         <View style={styles.buttonContainer}>
                             <Pressable
-                                style={[styles.pressable]}
+                                style={styles.pressable}
                                 onPress={onPressBack}
                                 accessible={true}
                                 accessibilityLabel="Back"
-                                accessibilityHint="Returns to the previous screen"
+                                accessibilityHint="Press to return to the previous screen"
                                 accessibilityRole="button"
-                                hitSlop={{ top: 60, bottom: 60, left: 60, right: 60 }}
                                 onPressIn={handlePressIn}
                                 onPressOut={handlePressOut}
                             >
@@ -60,9 +63,9 @@ const ProfileSettingsHeader = ({
                                 />
                             </Pressable>
                         </View>
-                    )}
+                   
                     <View style={styles.titleContainer}>
-                        <Text
+                        <Text 
                             style={styles.title}
                             accessible={true}
                             accessibilityRole="header"
@@ -71,6 +74,14 @@ const ProfileSettingsHeader = ({
                             {title}
                         </Text>
                     </View>
+                    </>
+                     )}
+                    <TouchableOpacity style={[styles.iconChat,{flex:showIcon?0.3:1}]} onPress={()=>{
+                        Zendesk.openMessagingView()
+                    }}>
+                    <ChatIcon />
+                    </TouchableOpacity>
+
                 </View>
             </LinearGradient>
         </View>
@@ -80,7 +91,7 @@ const ProfileSettingsHeader = ({
 const styles = StyleSheet.create({
     perusable: {
         //flex: 1,
-        width: '100%'
+        width:'100%'
     },
     profileSettingsChild: {
         overflow: "hidden",
@@ -122,7 +133,11 @@ const styles = StyleSheet.create({
     },
     iconPressed: {
         opacity: 0.5,
-    },
+    },iconChat:{
+        alignItems:'flex-end',
+        marginRight:10,
+        flex:1
+    }
 });
 
 export default ProfileSettingsHeader;

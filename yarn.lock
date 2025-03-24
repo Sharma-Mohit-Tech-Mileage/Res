@@ -8356,6 +8356,11 @@ react-native-youtube-iframe@^2.3.0:
   dependencies:
     events "^3.2.0"
 
+react-native-zendesk-messaging@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/react-native-zendesk-messaging/-/react-native-zendesk-messaging-0.3.2.tgz#022569a738c6512843f1f0969a164a8880a2865b"
+  integrity sha512-2tBotEUU/NnA0aPfMP48PlwQDjr3hXPvErbsEXNyFkvfUXOSazVEDlAheCNs754mBfov97BZpDInZA7m6K5pIw==
+
 react-native@0.75.4:
   version "0.75.4"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.75.4.tgz"

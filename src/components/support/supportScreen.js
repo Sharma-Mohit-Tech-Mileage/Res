@@ -350,17 +350,18 @@ const Support = ({ route }) => {
 
   return (
     <View style={styles.support}>
-      <ProfileSettingsHeader
-        title="Support"
-        iconAlignment="right"
-        showIcon={false}
-      />
+     
       <LinearGradient
         style={styles.linearGradientStyle}
         locations={[0, 1]}
         colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
         useAngle={true}
         angle={90}
+      />
+       <ProfileSettingsHeader
+        title="Support"
+        iconAlignment="right"
+        showIcon={false}
       />
       <View style={[styles.mainContainer]}>
         <View style={styles.header}>

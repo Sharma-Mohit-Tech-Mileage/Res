@@ -1443,6 +1443,9 @@ PODS:
     - React-Core
   - react-native-webview (13.6.3):
     - React-Core
+  - react-native-zendesk-messaging (0.3.2):
+    - React-Core
+    - ZendeskSDKMessaging (= 2.13.0)
   - React-nativeconfig (0.75.4)
   - React-NativeModulesApple (0.75.4):
     - glog
@@ -1889,18 +1892,31 @@ PODS:
     - SDWebImage/Core (~> 5.10)
   - SocketRocket (0.7.0)
   - Yoga (0.0.0)
-  - ZendeskChatProvidersSDK (5.0.5)
-  - ZendeskChatSDK (5.0.5):
-    - ZendeskChatProvidersSDK (~> 5.0.5)
-    - ZendeskMessagingSDK (~> 6.0.3)
-  - ZendeskCommonUISDK (9.0.3)
-  - ZendeskCoreSDK (5.0.5)
-  - ZendeskMessagingAPISDK (6.0.2):
-    - ZendeskSDKConfigurationsSDK (~> 4.0.1)
-  - ZendeskMessagingSDK (6.0.3):
-    - ZendeskCommonUISDK (~> 9.0.3)
-    - ZendeskMessagingAPISDK (~> 6.0.2)
-  - ZendeskSDKConfigurationsSDK (4.0.1)
+  - Zendesk (1.13.0):
+    - ZendeskSDKConversationKit (~> 1.10.0)
+    - ZendeskSDKCoreUtilities (~> 1.4.0)
+  - ZendeskSDKConversationKit (1.10.0):
+    - ZendeskSDKCoreUtilities (~> 1.4.0)
+    - ZendeskSDKFayeClient (~> 1.5.0)
+    - ZendeskSDKHTTPClient (~> 0.13.0)
+    - ZendeskSDKStorage (~> 0.8.0)
+  - ZendeskSDKCoreUtilities (1.4.0)
+  - ZendeskSDKFayeClient (1.5.0):
+    - ZendeskSDKLogger (~> 0.8.0)
+    - ZendeskSDKSocketClient (~> 1.5.0)
+  - ZendeskSDKHTTPClient (0.13.0):
+    - ZendeskSDKLogger (~> 0.8.0)
+  - ZendeskSDKLogger (0.8.0)
+  - ZendeskSDKMessaging (2.13.0):
+    - Zendesk (~> 1.13.0)
+    - ZendeskSDKConversationKit (~> 1.10.0)
+    - ZendeskSDKCoreUtilities (~> 1.4.0)
+    - ZendeskSDKUIComponents (~> 2.8.0)
+  - ZendeskSDKSocketClient (1.5.0):
+    - ZendeskSDKLogger (~> 0.8.0)
+  - ZendeskSDKStorage (0.8.0):
+    - ZendeskSDKLogger (~> 0.8.0)
+  - ZendeskSDKUIComponents (2.8.0)
 
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
@@ -1958,6 +1974,7 @@ DEPENDENCIES:
   - react-native-version-check (from `../node_modules/react-native-version-check`)
   - react-native-view-shot (from `../node_modules/react-native-view-shot`)
   - react-native-webview (from `../node_modules/react-native-webview`)
+  - react-native-zendesk-messaging (from `../node_modules/react-native-zendesk-messaging`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -2006,8 +2023,6 @@ DEPENDENCIES:
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
-  - ZendeskChatSDK
-  - ZendeskCoreSDK
 
 SPEC REPOS:
   trunk:
@@ -2033,13 +2048,16 @@ SPEC REPOS:
     - SDWebImage
     - SDWebImageWebPCoder
     - SocketRocket
-    - ZendeskChatProvidersSDK
-    - ZendeskChatSDK
-    - ZendeskCommonUISDK
-    - ZendeskCoreSDK
-    - ZendeskMessagingAPISDK
-    - ZendeskMessagingSDK
-    - ZendeskSDKConfigurationsSDK
+    - Zendesk
+    - ZendeskSDKConversationKit
+    - ZendeskSDKCoreUtilities
+    - ZendeskSDKFayeClient
+    - ZendeskSDKHTTPClient
+    - ZendeskSDKLogger
+    - ZendeskSDKMessaging
+    - ZendeskSDKSocketClient
+    - ZendeskSDKStorage
+    - ZendeskSDKUIComponents
 
 EXTERNAL SOURCES:
   boost:
@@ -2141,6 +2159,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-view-shot"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
+  react-native-zendesk-messaging:
+    :path: "../node_modules/react-native-zendesk-messaging"
   React-nativeconfig:
     :path: "../node_modules/react-native/ReactCommon"
   React-NativeModulesApple:
@@ -2307,6 +2327,7 @@ SPEC CHECKSUMS:
   react-native-version-check: 6cd36aad4e30b8e3216747e3b4ddeb09e0647af8
   react-native-view-shot: 6b7ed61d77d88580fed10954d45fad0eb2d47688
   react-native-webview: 88293a0f23eca8465c0433c023ec632930e644d0
+  react-native-zendesk-messaging: 0675e18625620ec63ac09fc1b9cc2ff71b9a180d
   React-nativeconfig: 31072ab0146e643594f6959c7f970a04b6c9ddd0
   React-NativeModulesApple: f49bb0befd8650ac3ff8fc2684072b16c09bf478
   React-perflogger: 59e1a3182dca2cee7b9f1f7aab204018d46d1914
@@ -2358,14 +2379,17 @@ SPEC CHECKSUMS:
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: a9ef4f5c2cd79ad812110525ef61048be6a582a4
-  ZendeskChatProvidersSDK: 5cfc4a3dee03317ba54920e3258edda52ff9a329
-  ZendeskChatSDK: 8e0041101a89c8fed51dadb14697bbb4bb4700fd
-  ZendeskCommonUISDK: f3ce3e7a1bd7762550a78dbaff57509f3112c22b
-  ZendeskCoreSDK: c542b3f82abc3ee52e1291c6fb3436515e098806
-  ZendeskMessagingAPISDK: 5b3a9d16f2f4d8b3c07b4ca0451a7cf9bfd8107d
-  ZendeskMessagingSDK: 3915f0647246f079dd20bf2fd85084f495598fde
-  ZendeskSDKConfigurationsSDK: d0b28eeb9c3d88191cfd2c7f246b2522c8c357f4
+  Zendesk: 5e382df2c0034a0df4e43174ecbd7e9bed54b929
+  ZendeskSDKConversationKit: a93d5826c299240fb7ef4fa88956bd99e6762cf4
+  ZendeskSDKCoreUtilities: b44c8d51dd90ece3ef140efffe3ff5f154cfaadf
+  ZendeskSDKFayeClient: a06c403c1c38adb9ae5a341a4d54632c78275a3e
+  ZendeskSDKHTTPClient: 79dfe6b5e75beccb435003051a081c71e7361770
+  ZendeskSDKLogger: e59c678c74a88838a0844423996cb15dd88825d5
+  ZendeskSDKMessaging: 62e057ac0e68fabeb88a84409fb8b57d2a11b7de
+  ZendeskSDKSocketClient: 33c0eb83b065409723559c798738bbc504b0a967
+  ZendeskSDKStorage: 00d6f78a39a42b71c3730b1c39cc0a5c12690685
+  ZendeskSDKUIComponents: 59fab9ac52f3ac5ef3136188da8dc38b06d100f7
 
-PODFILE CHECKSUM: 0bafe83ecb406b2688604485f66f99bcf7b36034
+PODFILE CHECKSUM: b175a8f3d12d30ab22fc436b0afe88a0f369145d
 
 COCOAPODS: 1.15.2

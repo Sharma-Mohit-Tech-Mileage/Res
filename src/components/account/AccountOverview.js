@@ -20,6 +20,7 @@ import VersionCheck from 'react-native-version-check';
 import { Env } from "../../network/apis/account/Constants";
 import AppStyles from "../common/styles/AppStyles";
 import UserIconWhite from "../../res/svgIcons/UserIconWhite";
+import * as Zendesk from 'react-native-zendesk-messaging';
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -69,6 +70,7 @@ const logoutAction = (dispatch, navigation) => {
       dispatch(saveUserInfo({}));
       dispatch(logoutApp());
       cleanUserData();
+      Zendesk.logout();
     });
   });
 };
@@ -194,17 +196,18 @@ const AccountOverview = () => {
 
   return (
     <View style={styles.account} accessibilityLabel="Account screen">
-      <ProfileSettingsHeader
-        title="Account"
-        iconAlignment="right"
-        showIcon={false} 
-      />
+      
       <LinearGradient
         style={styles.linearGradientStyle}
         locations={[0, 1]}
         colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
         useAngle={true}
         angle={90}
+      />
+      <ProfileSettingsHeader
+        title="Account"
+        iconAlignment="right"
+        showIcon={false} 
       />
       <View style={[styles.frameParent]}>
         <View style={styles.rightActionableParent}>

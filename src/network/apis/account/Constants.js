@@ -1,7 +1,8 @@
 
 
 export const config = {
-
+  CHANNEL_KEY : Platform.OS=='ios'?'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lLnplbmRlc2suY29tL21vYmlsZV9zZGtfYXBpL3NldHRpbmdzLzAxSlEwOTk0WUpERVpLMVdCWjlFVDdCRURYLmpzb24ifQ==': 'eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lLnplbmRlc2suY29tL21vYmlsZV9zZGtfYXBpL3NldHRpbmdzLzAxSlEwOUFBWDVDTjVaUloyMjNYTkFCSFFWLmpzb24ifQ==',
+  
   PRODUCTION: {
     URL: 'https://customer.sparklight.com/residential',
     SSO_LOGIN: 'https://login.cableone.net/auth/realms/external-sso-realm',

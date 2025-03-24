@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, StyleSheet, Image, ScrollView, Platform } from "react-native";
+import { View, StyleSheet, Image, ScrollView, Platform,TouchableOpacity } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
@@ -12,7 +12,7 @@ import WalkthroughOverlay from "../common/WalkthroughOverlay";
 import { fetchACPUserAccountDetails, getPaperlessStatus } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
-import { Env } from "../../network/apis/account/Constants";
+import { Env,config } from "../../network/apis/account/Constants";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
 import MenuGrid from "../ACPDashboard/MenuGrid";
 import PromoBanner from "../ACPDashboard/PromoBanner";
@@ -20,6 +20,12 @@ import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
 import { GetApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
+import ChatIcon from "../../res/svgIcons/ChatIcon";
+import * as Zendesk from 'react-native-zendesk-messaging';
+import { use } from "react";
+
+const CHANNEL_KEY = config.CHANNEL_KEY;
+
 const NewBillerHome = ({ navigation }) => {
   // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
@@ -78,6 +84,7 @@ const paperlessStatusAcp = useSelector(
           console.error("Error refreshing data on focus", error);
         }
       };
+
       refreshData();
     }, [dispatch])
   );
@@ -125,6 +132,30 @@ const paperlessStatusAcp = useSelector(
     }
   }, [accountDetails]);
 
+  useEffect(() => {
+    const zendeskInit = async () => {
+      const user = await getUser();
+      Zendesk.initialize({ channelKey: CHANNEL_KEY })
+        .then(() => {
+          console.log("Zendesk initialization successfull");
+          console.log('Zendesk login',user.token)
+          Zendesk.login(user.token).then(() => {
+            console.log("Zendesk login successful");
+            
+          }
+          ).catch((error) => {
+            console.log("Error on Zendesk login", error);
+          }
+          );
+        })
+        .catch((error) => {
+          console.log("Error on initialization Zendesk");
+        });
+    };
+
+    zendeskInit();
+  }, []);
+
   const renderHeader = () => (
     <View
       accessibilityElementsHidden={showWalkThrough}
@@ -139,6 +170,13 @@ const paperlessStatusAcp = useSelector(
         style={styles.logoImage}
         source={require("../../../assets/SparklightEntryLogo.png")}
       />
+      <TouchableOpacity
+              onPress={() => {
+                Zendesk.openMessagingView();
+              }}
+            >
+              <ChatIcon />
+            </TouchableOpacity>
     </View>
   );
 
@@ -202,6 +240,7 @@ const paperlessStatusAcp = useSelector(
       colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
       style={styles.container}
     >
+
       {showWalkThrough && <View style={styles.shadowFullScreen} />}
       {showWalkThrough && (
         <WalkthroughOverlay onFinish={() => setShowWalkThrough(false)} />

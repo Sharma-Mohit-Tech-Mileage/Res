@@ -149,17 +149,18 @@ const BillingScreen = ({ navigation }) => {
 
   return (
     <View style={styles.account} accessibilityLabel="Billing Services screen">
-      <ProfileSettingsHeader
-        title="Billing Services"
-        iconAlignment="right"
-        showIcon={false}
-      />
+      
       <LinearGradient
         style={styles.linearGradientStyle}
         locations={[0, 1]}
         colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
         useAngle={true}
         angle={90}
+      />
+      <ProfileSettingsHeader
+        title="Billing Services"
+        iconAlignment="right"
+        showIcon={false}
       />
       <View style={styles.frameParent}>
         <View style={styles.rightActionableParent}>
