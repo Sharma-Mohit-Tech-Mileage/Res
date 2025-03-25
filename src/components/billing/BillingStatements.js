@@ -121,7 +121,7 @@ const BillingStatementsScreen = ({ navigation }) => {
   // Render each billing statement item
   const renderStatementItem = ({ item, index }) => {
     // Alternate background color for rows
-    const backgroundColor = index % 2 === 0 ? "#FFFAF0" : "#FFFFFF";
+    const backgroundColor = index % 2 === 0 ? Color.sparklightWhite :  '#F8F8F8';
     const isDownloading = downloading && downloadingStatementId === item.id;
 
     return (

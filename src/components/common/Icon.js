@@ -37,6 +37,7 @@ const Icon = ({ name, size = 24, color = '#000', style }) => {
     'up-arrow': { library: 'SVG', source: UpArrow },
 
     // Image asset example
+    'search': { library: 'Image', source: require('../../../assets/searchsm.png') },
     'green-checkcircle': { library: 'Image', source: require('../../../assets/checkcircle.png') },
     'down-chevron': { library: 'Image', source: require('../../../assets/chevrondown.png') },
   };

@@ -7,7 +7,7 @@ import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import BillingScreen from "../../components/billing/BillingScreen";
 import BillingStatements from "../../components/billing/BillingStatements";
 import AutoPayPCIConnector from "../../components/utility/AutoPayPCIConnector";
-
+import PaymentHistoryScreen from "../../components/billing/PaymentHistory";
 const BillingStack = createNativeStackNavigator();
 
 function BillingStackScreen({route}) {
@@ -30,6 +30,18 @@ function BillingStackScreen({route}) {
              <BillingStack.Screen
                 name="BillingStatements"
                 component={BillingStatements}
+                options={{
+                    headerBackVisible: false,
+                    headerShown: false,
+                }}
+                listeners={{
+                    focus: () => setTabBarVisible(true),
+                    blur: () => setTabBarVisible(true),
+                }}
+            />
+            <BillingStack.Screen
+                name="PaymentHistory"
+                component={PaymentHistoryScreen}
                 options={{
                     headerBackVisible: false,
                     headerShown: false,

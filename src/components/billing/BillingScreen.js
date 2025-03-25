@@ -256,10 +256,11 @@ const BillingScreen = ({ navigation }) => {
                 <TouchableOpacity
                   style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
-                    const paymentHistory = isNewBiller
-                      ? `${Env.ACP_BILLING}/payment-history`
-                      : Env.VIEW_PAYMENT;
-                    handleNavigation(paymentHistory, "View Payment History");
+                    if (isNewBiller) {
+                      navigation.navigate("PaymentHistory"); 
+                    } else {
+                      handleNavigation(Env.VIEW_PAYMENT, "View Payment History");
+                    }
                   }}
                   accessible={true}
                   accessibilityRole="button"
