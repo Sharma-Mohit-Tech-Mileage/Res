@@ -189,8 +189,15 @@ const PaymentHistoryScreen = ({ navigation }) => {
         style={styles.loadMoreButton}
         onPress={handleLoadMore}
         disabled={loading}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Load more payments"
       >
-        <Text style={styles.loadMoreText}>Load more</Text>
+        {loading ? (
+          <ActivityIndicator size="small" color={Color.sparklightBrightPurple} />
+        ) : (
+          <Text style={styles.loadMoreText}>Load more</Text>
+        )}
       </TouchableOpacity>
     );
   };
@@ -277,7 +284,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
             style={styles.paymentsList}
             showsVerticalScrollIndicator={false}
             ListFooterComponent={renderFooter}
-            onEndReached={handleLoadMore}
+            onEndReached={null} // Remove automatic loading on end reach
             onEndReachedThreshold={0.5}
           />
         ) : (

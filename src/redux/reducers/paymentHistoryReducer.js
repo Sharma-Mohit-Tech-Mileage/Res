@@ -116,9 +116,9 @@ const paymentHistoryReducer = (state = initialState, action) => {
       
       return {
         ...state,
-        displayedPayments: displayedPayments,
+        displayedPayments,
         currentPage: nextPage,
-        hasMore: state.filteredPayments.length > state.pageSize * nextPage
+        hasMore: state.filteredPayments.length > displayedPayments.length
       };
     }
     
@@ -166,9 +166,8 @@ const filterPaymentsBySearchQuery = (payments, query) => {
 };
 
 const getDisplayedPayments = (payments, pageSize, page) => {
-  const start = 0;
-  const end = page * pageSize;
-  return payments.slice(start, end);
+  // Only return exactly pageSize * page items or fewer if there aren't enough
+  return payments.slice(0, pageSize * page);
 };
 
 export default paymentHistoryReducer;
