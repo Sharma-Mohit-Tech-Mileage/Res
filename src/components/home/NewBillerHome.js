@@ -139,6 +139,7 @@ const paperlessStatusAcp = useSelector(
         .then(() => {
           console.log("Zendesk initialization successfull");
           console.log('Zendesk login',user.token)
+          Zendesk.setConversationTags(["sparklightResidential"]);
           Zendesk.login(user.token).then(() => {
             console.log("Zendesk login successful");
             
