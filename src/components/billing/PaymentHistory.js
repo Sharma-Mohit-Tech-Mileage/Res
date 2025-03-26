@@ -148,7 +148,6 @@ const PaymentHistoryScreen = ({ navigation }) => {
       <View 
         style={[styles.paymentRow, { backgroundColor }]}
         accessible={true}
-        accessibilityRole="button"
       >
         <View style={styles.paymentDetails}>
           <View style={styles.detailRow}>
@@ -254,7 +253,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
               onPress={toggleSortDirection}
               accessible={true}
               accessibilityRole="button"
-              accessibilityLabel="Sort date"
+              accessibilityLabel="sort by payment date"
               accessibilityHint={`Currently sorted ${
                 sortDirection === "asc" ? "ascending" : "descending"
               }, tap to reverse sort order`}

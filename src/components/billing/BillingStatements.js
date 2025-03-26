@@ -204,7 +204,7 @@ const BillingStatementsScreen = ({ navigation }) => {
               onPress={toggleSortDirection}
               accessible={true}
               accessibilityRole="button"
-              accessibilityLabel="Sort date"
+              accessibilityLabel="Sort by payment date"
               accessibilityHint={`Currently sorted ${
                 sortDirection === "asc" ? "ascending" : "descending"
               }, tap to reverse sort order`}
@@ -246,6 +246,7 @@ const BillingStatementsScreen = ({ navigation }) => {
         <PDFViewModal
           url={pdfData}
           onClose={handleClosePDFModal}
+          title="Billing Statement"
         />
       )}
     </View>
