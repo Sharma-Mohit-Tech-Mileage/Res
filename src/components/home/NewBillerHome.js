@@ -22,7 +22,7 @@ import { GetApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
 import * as Zendesk from 'react-native-zendesk-messaging';
-import { use } from "react";
+import { jwtDecode } from "jwt-decode";
 
 const CHANNEL_KEY = config.CHANNEL_KEY;
 
@@ -138,9 +138,14 @@ const paperlessStatusAcp = useSelector(
       Zendesk.initialize({ channelKey: CHANNEL_KEY })
         .then(() => {
           console.log("Zendesk initialization successfull");
-          console.log('Zendesk login',user.token)
+          // console.log('Zendesk login1',user.token)
+          // const decoded = jwtDecode(user.token);
+          // console.log('Zendesk login2',decoded)
+
+          let zendeskJwt=`${user.token}`
+          console.log('Zendesk login2',zendeskJwt)
           Zendesk.setConversationTags(["sparklightResidential"]);
-          Zendesk.login(user.token).then(() => {
+          Zendesk.login(zendeskJwt).then(() => {
             console.log("Zendesk login successful");
             
           }
@@ -150,7 +155,7 @@ const paperlessStatusAcp = useSelector(
           );
         })
         .catch((error) => {
-          console.log("Error on initialization Zendesk");
+          console.log("Error on initialization Zendesk",error);
         });
     };
 

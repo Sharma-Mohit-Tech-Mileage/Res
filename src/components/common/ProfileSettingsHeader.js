@@ -76,7 +76,7 @@ const ProfileSettingsHeader = ({
                     </View>
                     </>
                      )}
-                    <TouchableOpacity style={[styles.iconChat,{flex:showIcon?0.3:1}]} onPress={()=>{
+                    <TouchableOpacity style={[styles.iconChat,{flex:showIcon?0.1:1}]} onPress={()=>{
                         Zendesk.openMessagingView()
                     }}>
                     <ChatIcon />
@@ -102,16 +102,16 @@ const styles = StyleSheet.create({
         height: 56,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center', // Center the content
+        justifyContent: 'space-between',
         paddingHorizontal: 8,
     },
     buttonContainer: {
-        position: 'absolute', // Position the button absolutely
-        left: 8, // Align to the left
+        flex: 0.1,
         justifyContent: 'center',
         alignItems: 'center',
     },
     titleContainer: {
+        flex: 0.9,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -135,7 +135,6 @@ const styles = StyleSheet.create({
         opacity: 0.5,
     },iconChat:{
         alignItems:'flex-end',
-        marginRight:10,
         flex:1
     }
 });
