@@ -204,7 +204,7 @@ const BillingStatementsScreen = ({ navigation }) => {
               onPress={toggleSortDirection}
               accessible={true}
               accessibilityRole="button"
-              accessibilityLabel="Sort by payment date"
+              accessibilityLabel="Sort by billing date"
               accessibilityHint={`Currently sorted ${
                 sortDirection === "asc" ? "ascending" : "descending"
               }, tap to reverse sort order`}

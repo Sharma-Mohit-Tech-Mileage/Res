@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import DownArrow from '../../res/svgIcons/DownArrow';
 import UpArrow from '../../res/svgIcons/ModemInfo';
 import ServiceIconNew from '../../res/svgIcons/ServiceIconNew';
@@ -17,6 +16,10 @@ import ArrowIconup from '../../res/svgIcons/ArrowIconup';
 import ArrowIcondown from '../../res/svgIcons/ArrowIcondown';
 import DoubleArrowIcon from '../../res/svgIcons/DoubleArrowIcon';
 import UploadIcon from '../../res/svgIcons/UploadIcon';
+import BillingdocIcon from '../../res/svgIcons/BillingdocIcon';
+import DocumentIcon from '../../res/svgIcons/DocumentIcon';
+import SearchBookIcon from '../../res/svgIcons/SearchBookIcon';
+
 const Icon = ({ name, size = 24, color = '#000', style }) => {
   const iconMap = {
     'credit-card': { library: 'SVG', source: creditCard },
@@ -35,11 +38,15 @@ const Icon = ({ name, size = 24, color = '#000', style }) => {
     // Direct SVG icons
     'down-arrow': { library: 'SVG', source: DownArrow },
     'up-arrow': { library: 'SVG', source: UpArrow },
+    'bill-paid': { library: 'SVG', source: BillingdocIcon },
+    'document': { library: 'SVG', source: DocumentIcon },
+    'search-book': { library: 'SVG', source: SearchBookIcon },
 
     // Image asset example
     'search': { library: 'Image', source: require('../../../assets/searchsm.png') },
     'green-checkcircle': { library: 'Image', source: require('../../../assets/checkcircle.png') },
     'down-chevron': { library: 'Image', source: require('../../../assets/chevrondown.png') },
+    'right-chevron': { library: 'Image', source: require('../../../assets/chevronright.png') },
   };
 
   // Fallback icon if the provided name isn't in the map
