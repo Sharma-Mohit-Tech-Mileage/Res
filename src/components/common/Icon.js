@@ -19,7 +19,7 @@ import UploadIcon from '../../res/svgIcons/UploadIcon';
 import BillingdocIcon from '../../res/svgIcons/BillingdocIcon';
 import DocumentIcon from '../../res/svgIcons/DocumentIcon';
 import SearchBookIcon from '../../res/svgIcons/SearchBookIcon';
-
+import BuildingDocIcon from '../../res/svgIcons/BuildingDocIcon';
 const Icon = ({ name, size = 24, color = '#000', style }) => {
   const iconMap = {
     'credit-card': { library: 'SVG', source: creditCard },
@@ -43,6 +43,7 @@ const Icon = ({ name, size = 24, color = '#000', style }) => {
     'search-book': { library: 'SVG', source: SearchBookIcon },
 
     // Image asset example
+    'building-doc': { library: 'SVG', source: BuildingDocIcon },
     'search': { library: 'Image', source: require('../../../assets/searchsm.png') },
     'green-checkcircle': { library: 'Image', source: require('../../../assets/checkcircle.png') },
     'down-chevron': { library: 'Image', source: require('../../../assets/chevrondown.png') },

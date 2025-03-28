@@ -2,14 +2,14 @@ import * as React from "react";
 import { Svg, Path } from "react-native-svg";
 
 const BillingdocIcon = ({ size = 20, color = "#8D3B90", ...props }) => {
-  const width = (15 / 20) * size;
+  const width = (19 / 20) * size;
   const height = size;
 
   return (
     <Svg
       width={width}
       height={height}
-      viewBox="0 0 15 20"
+      viewBox="0 0 19 20"
       fill="none"
       {...props}
     >

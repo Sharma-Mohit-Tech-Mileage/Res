@@ -229,6 +229,7 @@ const BillingScreen = ({ navigation }) => {
                   accessibilityRole="button"
                   accessibilityLabel="Manage Payment Method"
                 >
+                   {isNewBiller && <Icon name="building-doc" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
                   <Text style={styles.modemHealthSupport}>Manage Payment Method</Text>
                   <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
                 </TouchableOpacity>}
@@ -249,7 +250,6 @@ const BillingScreen = ({ navigation }) => {
                   <Text style={styles.modemHealthSupport}>{isNewBiller?"View Bill Breakdown":"View Billing Details"}</Text>
                   <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
                 </TouchableOpacity>
-                <View style={styles.frameLayout} />
                 <View style={styles.frameLayout} />
                 <TouchableOpacity
                   style={styles.frame9defaultSpaceBlock}
@@ -277,15 +277,15 @@ const BillingScreen = ({ navigation }) => {
                     if (isNewBiller) {
                       navigation.navigate("BillingStatements"); // Direct navigation
                     } else {
-                      handleNavigation(Env.BILLING_HISTORY, "View Billing Statement");
+                      handleNavigation(Env.BILLING_HISTORY, "View Billing Statements");
                     }
                   }}
                   accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel="View Billing Statement"
+                  accessibilityLabel="View Billing Statements"
                 >
                   {isNewBiller && <Icon name="bill-paid" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
-                  <Text style={styles.modemHealthSupport}>View Billing Statement</Text>
+                  <Text style={styles.modemHealthSupport}>View Billing Statements</Text>
                   <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
                 </TouchableOpacity>
               </View>
