@@ -14,7 +14,7 @@
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
   [FIRApp configure];
-  //[RNZendeskChatModule init];
+  [RNZendeskChatModule init];
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 

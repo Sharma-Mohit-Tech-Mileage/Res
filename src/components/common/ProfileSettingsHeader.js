@@ -7,12 +7,18 @@ import {
     Image,
     StyleSheet,
     AccessibilityInfo,
-    TouchableOpacity
+    TouchableOpacity,
+    Platform
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import ChatIcon from '../../res/svgIcons/ChatIcon';
-import * as Zendesk from 'react-native-zendesk-messaging';
+import {
+    startChatWithConfig,
+    initChat,
+    startChat,
+    clearChatData,
+  } from "../utility/RNZendeskChat";
 
 const ProfileSettingsHeader = ({
     title,
@@ -77,8 +83,12 @@ const ProfileSettingsHeader = ({
                     </>
                      )}
                     <TouchableOpacity style={[styles.iconChat,{flex:showIcon?0.1:1}]} onPress={()=>{
-                        Zendesk.openMessagingView()
-                    }}>
+                         if (Platform.OS === "ios") {
+                            startChat();
+                          } else {
+                            startChatWithConfig({});
+                          }
+                  }}>
                     <ChatIcon />
                     </TouchableOpacity>
 

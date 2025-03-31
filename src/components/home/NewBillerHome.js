@@ -21,8 +21,12 @@ import InfoBanner from "../ACPDashboard/InfoBanner";
 import { GetApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
-import * as Zendesk from 'react-native-zendesk-messaging';
-import { jwtDecode } from "jwt-decode";
+import {
+  startChatWithConfig,
+  initChat,
+  startChat,
+  clearChatData,
+} from "../utility/RNZendeskChat";
 
 const CHANNEL_KEY = config.CHANNEL_KEY;
 
@@ -132,35 +136,7 @@ const paperlessStatusAcp = useSelector(
     }
   }, [accountDetails]);
 
-  useEffect(() => {
-    const zendeskInit = async () => {
-      const user = await getUser();
-      Zendesk.initialize({ channelKey: CHANNEL_KEY })
-        .then(() => {
-          console.log("Zendesk initialization successfull");
-          // console.log('Zendesk login1',user.token)
-          // const decoded = jwtDecode(user.token);
-          // console.log('Zendesk login2',decoded)
-
-          let zendeskJwt=`${user.token}`
-          console.log('Zendesk login2',zendeskJwt)
-          Zendesk.setConversationTags(["sparklightResidential"]);
-          Zendesk.login(zendeskJwt).then(() => {
-            console.log("Zendesk login successful");
-            
-          }
-          ).catch((error) => {
-            console.log("Error on Zendesk login", error);
-          }
-          );
-        })
-        .catch((error) => {
-          console.log("Error on initialization Zendesk",error);
-        });
-    };
-
-    zendeskInit();
-  }, []);
+ 
 
   const renderHeader = () => (
     <View
@@ -178,7 +154,11 @@ const paperlessStatusAcp = useSelector(
       />
       <TouchableOpacity
               onPress={() => {
-                Zendesk.openMessagingView();
+                if (Platform.OS === "ios") {
+                  startChat();
+                } else {
+                  startChatWithConfig({});
+                }
               }}
             >
               <ChatIcon />

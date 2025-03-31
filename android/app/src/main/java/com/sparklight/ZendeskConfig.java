@@ -1,5 +1,5 @@
 package com.sparklight;
 
 public class ZendeskConfig {
-    public static final String CHAT_ACCOUNT_KEY = "4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC";
+    public static final String CHANNEL_KEY = "eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lLnplbmRlc2suY29tL21vYmlsZV9zZGtfYXBpL3NldHRpbmdzLzAxSlEwOUFBWDVDTjVaUloyMjNYTkFCSFFWLmpzb24ifQ==";
 }

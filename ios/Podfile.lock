@@ -2023,6 +2023,7 @@ DEPENDENCIES:
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
+  - ZendeskSDKMessaging
 
 SPEC REPOS:
   trunk:
@@ -2390,6 +2391,6 @@ SPEC CHECKSUMS:
   ZendeskSDKStorage: 00d6f78a39a42b71c3730b1c39cc0a5c12690685
   ZendeskSDKUIComponents: 59fab9ac52f3ac5ef3136188da8dc38b06d100f7
 
-PODFILE CHECKSUM: b175a8f3d12d30ab22fc436b0afe88a0f369145d
+PODFILE CHECKSUM: ee27b7740f6cdbc70dbc1da8796a78b049ac11e5
 
 COCOAPODS: 1.15.2
