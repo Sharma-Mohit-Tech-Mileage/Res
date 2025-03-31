@@ -170,7 +170,7 @@ const BillingScreen = ({ navigation }) => {
           <Text style={styles.melissaSmith}>Billing Services</Text>
         </View>
         <ScrollView showsVerticalScrollIndicator={false} style={{ marginHorizontal: 20 }}>
-          <View style={{ paddingBottom: 30, marginTop: Padding.p_5xl }}>
+          <View style={{ paddingBottom: 80, marginTop: Padding.p_5xl }}>
             <Card
               billAmt={billAmt}
               dueDate={dueDate}
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     height: 150,
   },
   leftTitle: {
-    color: colors.sp_black,
+    color: colors.darkest_grey,
     fontSize: 18,
     fontWeight: "400",
     textAlign: "center",
