@@ -164,18 +164,13 @@ const BillingScreen = ({ navigation }) => {
       />
       <View style={styles.frameParent}>
         <View style={styles.rightActionableParent}>
-          <View style={styles.rightActionable}>
-            <Text
-              accessibilityLabel="Billing services icon"
-              style={[styles.text, { alignSelf: "center", marginLeft: 5, marginTop: 5 }]}
-            >
-              <BillingIconWhite isSelected={false} />
-            </Text>
+          <View style={[styles.rightActionable, { justifyContent: 'center', alignItems: 'center' }]}>
+            <BillingIconWhite isSelected={false} />
           </View>
           <Text style={styles.melissaSmith}>Billing Services</Text>
         </View>
         <ScrollView showsVerticalScrollIndicator={false} style={{ marginHorizontal: 20 }}>
-          <View style={{ paddingBottom: 100, marginTop: Padding.p_5xl }}>
+          <View style={{ paddingBottom: 30, marginTop: Padding.p_5xl }}>
             <Card
               billAmt={billAmt}
               dueDate={dueDate}
