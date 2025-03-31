@@ -86,7 +86,7 @@ const SparkLightDropdown = ({
           expanded: visible
         }}
       >
-        <Text style={styles.dropdownText} numberOfLines={1} accessible={false}>
+        <Text style={styles.dropdownText} accessible={false}>
           {selectedValue || placeholder}
         </Text>
         <Text style={styles.chevron} accessible={false}><Icon name={'down-chevron'}/></Text>
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     paddingVertical: Padding.p_xs,
-    height: 48,
+    minHeight: 48, // Changed from fixed height to minHeight
     backgroundColor: '#FFFFFF',
     borderRadius: 4,
     borderColor:'#C7C7CC',
@@ -200,6 +200,8 @@ const styles = StyleSheet.create({
     color: Color.colorGray_200,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
+    flexWrap: 'wrap', // Allow text to wrap
+    paddingRight: 8, // Ensure space between text and icon
   },
   chevron: {
     fontSize: 12,
@@ -252,7 +254,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#C6C6C8',
   },
   headerTitle: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '600',
     color: '#000000',
     textAlign: 'center',

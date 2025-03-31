@@ -9,13 +9,9 @@ import moment from "moment";
 import Icon from "../common/Icon";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
-// Import actions
+import { heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { fetchBillingStatements, downloadStatement, setSelectedYear, setSortDirection, clearDownloadedStatement } from "../../redux/actions/billingStatementActions";
-
-// Import selectors
 import { selectFilteredAndSortedStatements, selectLoading, selectError, selectDownloading, selectDownloadError, selectSelectedYear, selectSortDirection, selectAllStatements, selectDownloadedStatement } from "../../redux/selectors/billingStatementSelectors";
-
-// Create clear error action constants
 const CLEAR_BILLING_ERROR = 'CLEAR_BILLING_ERROR';
 const CLEAR_DOWNLOAD_ERROR = 'CLEAR_DOWNLOAD_ERROR';
 
@@ -125,43 +121,33 @@ const BillingStatementsScreen = ({ navigation }) => {
   // Render each billing statement item
   const renderStatementItem = ({ item, index }) => {
     // Alternate background color for rows
-    const backgroundColor = index % 2 === 0 ? "#FFFAF0" : "#FFFFFF";
+    const backgroundColor = index % 2 === 0 ? Color.sparklightWhite :  '#F8F8F8';
+    const isDownloading = downloading && downloadingStatementId === item.id;
 
     return (
-      <View style={[styles.statementRow, { backgroundColor }]}>
+      <TouchableOpacity 
+        style={[styles.statementRow, { backgroundColor }]}
+        onPress={() => handleDownload(item)}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={`Billing statement from ${moment(item.date).format("YYYY-MM-DD")}, tap to download`}
+        disabled={isDownloading}
+      >
         <Text
           style={styles.statementDate}
-          accessibilityLabel={`Statement date ${moment(item.date).format(
-            "YYYY-MM-DD"
-          )}`}
         >
           {moment(item.date).format("YYYY-MM-DD")}
         </Text>
         <View style={styles.iconButtonsContainer}>
-          <TouchableOpacity
-            style={styles.uploadButton}
-            onPress={() => handleDownload(item)}
-            accessible={true}
-            accessibilityRole="button"
-            accessibilityLabel={`download statement from ${moment(
-              item.date
-            ).format("YYYY-MM-DD")}`}
-            accessibilityHint="download this billing statement"
-            disabled={downloading && downloadingStatementId === item.id}
-          >
-            {downloading && downloadingStatementId === item.id ? (
-              <View style={styles.downloadingContainer}>
-                <ActivityIndicator size="small" color={Color.sparklightBrightPurple} />
-              </View>
-            ) : (
-              <>
-                <Text style={styles.uploadText}>Download</Text>
-                {/* <Icon name="upload" size={18} color={Color.sparklightBrightPurple} /> */}
-              </>
-            )}
-          </TouchableOpacity>
+          {isDownloading ? (
+            <View style={styles.downloadingContainer}>
+              <ActivityIndicator size="small" color={Color.sparklightBrightPurple} />
+            </View>
+          ) : (
+            <Text style={styles.uploadText}>Download</Text>
+          )}
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -218,7 +204,7 @@ const BillingStatementsScreen = ({ navigation }) => {
               onPress={toggleSortDirection}
               accessible={true}
               accessibilityRole="button"
-              accessibilityLabel="Sort date"
+              accessibilityLabel="Sort by billing date"
               accessibilityHint={`Currently sorted ${
                 sortDirection === "asc" ? "ascending" : "descending"
               }, tap to reverse sort order`}
@@ -246,8 +232,6 @@ const BillingStatementsScreen = ({ navigation }) => {
             keyExtractor={(item) => item.id}
             style={styles.statementsList}
             showsVerticalScrollIndicator={false}
-            accessible={true}
-            accessibilityLabel="List of billing statements"
           />
         ) : (
           <View style={styles.emptyContainer}>
@@ -262,6 +246,7 @@ const BillingStatementsScreen = ({ navigation }) => {
         <PDFViewModal
           url={pdfData}
           onClose={handleClosePDFModal}
+          title="Billing Statement"
         />
       )}
     </View>
@@ -273,11 +258,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
     width: "100%",
-    marginBottom: "10%",
   },
   contentContainer: {
     flex: 1,
     paddingHorizontal: Padding.p_5xl,
+
+    marginBottom: hp("8%"),
   },
   notificationsContainer: {
     marginBottom: 16, // Add 16px spacing between notifications and Year label
@@ -355,6 +341,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansSemiBold,
     color: Color.sparklightBrightPurple,
     marginRight: 5,
+    textDecorationLine: 'underline', // Add underline to the text
   },
   loadingContainer: {
     flex: 1,

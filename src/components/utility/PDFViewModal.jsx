@@ -15,7 +15,7 @@ import Pdf from 'react-native-pdf';
 import sharePDF from 'react-native-share-pdf';
 import { Padding, Color, FontFamily, Border, FontSize } from '../../../GlobalStyles';
 
-const PDFViewModal = ({ url, onClose }) => {
+const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
   const [modalVisible, setModalVisible] = useState(true);
   const [iconPressed, setIconPressed] = useState(false);
   const convertUrl = 'data:application/pdf;base64,' + url;
@@ -75,7 +75,7 @@ const PDFViewModal = ({ url, onClose }) => {
                           accessible={false}
                       />
                     </Pressable>
-                    <Text style={styles.title}>Billing History</Text>
+                    <Text style={styles.title}>{title}</Text>
                     <Pressable
                         style={[styles.navIcon, styles.chevronLayout]}
                         onPress={loadAndSharePDF}

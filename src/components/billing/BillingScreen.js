@@ -13,6 +13,7 @@ import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
 import { fetchBillingPaper, fetchProfileDetails, fetchSvEmailAssociation, fetchACPUserAccountDetails,getPaperlessStatus } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
+import Icon from "../common/Icon";
 import { Env } from "../../network/apis/account/Constants";
 import colors from "../../res/Colors";
 import AppStyles from "../common/styles/AppStyles";
@@ -204,27 +205,9 @@ const BillingScreen = ({ navigation }) => {
                 <Text style={styles.leftTitle}>Billing Options</Text>
               </View>
               <View style={[styles.supportAccordionParent, styles.supportParentFlexBox]}>
+               
                 <View style={styles.frameLayout} />
-                <TouchableOpacity
-                  style={styles.frame9defaultSpaceBlock}
-                  onPress={() => {
-                    const billingURL = isNewBiller
-                      ? `${Env.ACP_BILLING}/billing`
-                      : `${Env.URL}/billing`;
-                    handleNavigation(billingURL, "View Bill Breakdown");
-                  }}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="View Bill Breakdown"
-                >
-                  <Text style={styles.modemHealthSupport}>View Bill Breakdown</Text>
-                  <Image
-                    style={styles.rightIconStyle}
-                    source={require("../../../assets/chevronright.png")}
-                  />
-                </TouchableOpacity>
-                <View style={styles.frameLayout} />
-                <TouchableOpacity
+                {isNewBiller &&<TouchableOpacity
                   style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
                     const billingURL = isNewBiller
@@ -247,50 +230,64 @@ const BillingScreen = ({ navigation }) => {
                   accessibilityRole="button"
                   accessibilityLabel="Manage Payment Method"
                 >
+                   {isNewBiller && <Icon name="building-doc" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
                   <Text style={styles.modemHealthSupport}>Manage Payment Method</Text>
-                  <Image
-                    style={styles.rightIconStyle}
-                    source={require("../../../assets/chevronright.png")}
-                  />
-                </TouchableOpacity>
+                  <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
+                </TouchableOpacity>}
                 <View style={styles.frameLayout} />
                 <TouchableOpacity
                   style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
-                    const paymentHistory = isNewBiller
-                      ? `${Env.ACP_BILLING}/payment-history`
-                      : Env.VIEW_PAYMENT;
-                    handleNavigation(paymentHistory, "View Payment History");
+                    const billingURL = isNewBiller
+                      ? `${Env.ACP_BILLING}/billing`
+                      : `${Env.URL}/billing`;
+                    handleNavigation(billingURL, isNewBiller?"View Bill Breakdown":"View Billing Details");
                   }}
                   accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel="View Payment History"
+                  accessibilityLabel="View Bill Breakdown"
                 >
-                  <Text style={styles.modemHealthSupport}>View Payment History</Text>
-                  <Image
-                    style={styles.rightIconStyle}
-                    source={require("../../../assets/chevronright.png")}
-                  />
+                  {isNewBiller && <Icon name="search-book" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
+                  <Text style={styles.modemHealthSupport}>{isNewBiller?"View Bill Breakdown":"View Billing Details"}</Text>
+                  <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
                 </TouchableOpacity>
                 <View style={styles.frameLayout} />
                 <TouchableOpacity
                   style={styles.frame9defaultSpaceBlock}
                   onPress={() => {
                     if (isNewBiller) {
-                      navigation.navigate("BillingStatements"); // Direct navigation
+                      navigation.navigate("PaymentHistory"); 
                     } else {
-                      handleNavigation(Env.BILLING_HISTORY, "View Billing Statement");
+                      handleNavigation(Env.VIEW_PAYMENT, "View Payment History");
                     }
                   }}
                   accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel="View Billing Statement"
+                  accessibilityLabel="View Payment History"
                 >
-                  <Text style={styles.modemHealthSupport}>View Billing Statement</Text>
-                  <Image
-                    style={styles.rightIconStyle}
-                    source={require("../../../assets/chevronright.png")}
-                  />
+                  {isNewBiller && <Icon name="document" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
+                  
+                  <Text style={styles.modemHealthSupport}>View Payment History</Text>
+               <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
+                </TouchableOpacity>
+                <View style={styles.frameLayout} />
+                
+                <TouchableOpacity
+                  style={styles.frame9defaultSpaceBlock}
+                  onPress={() => {
+                    if (isNewBiller) {
+                      navigation.navigate("BillingStatements"); // Direct navigation
+                    } else {
+                      handleNavigation(Env.BILLING_HISTORY, "View Billing Statements");
+                    }
+                  }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="View Billing Statements"
+                >
+                  {isNewBiller && <Icon name="bill-paid" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
+                  <Text style={styles.modemHealthSupport}>View Billing Statements</Text>
+                  <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
                 </TouchableOpacity>
               </View>
             </View>
