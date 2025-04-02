@@ -21,7 +21,7 @@ import InfoBanner from "../ACPDashboard/InfoBanner";
 import { GetApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
-//import {jwt} from 'jsonwebtoken';
+var jwt = require('jsonwebtoken');
 
 import {
   startChatWithConfig,
@@ -136,23 +136,21 @@ const paperlessStatusAcp = useSelector(
         email: getPrimaryEmail(accountDetails),
       });
       console.log('accountDetails', accountDetails);
-      //loginToZendesk();
+      loginToZendesk();
     }
   }, [accountDetails]);
 
  // zendesk chat login
 
  const loginToZendesk = async() => {
-  
   const payload = {
     sub: defaultPaymentDetails.email, // Unique identifier (email or user ID)
     name: 'John Doe',
   };
-
-
-  
-  //const token = jwt.sign(user.token, 'YT98N5WsTZbSAvs24O8jjtfeSx_B1AV70YpK62h_tepWExIp8y643H80BYmHNOC3qtgwfYvJrnvbuJcCuWrUXA', { algorithm: 'HS256' });
-  //const jwtToken = user.jwtToken;
+  const token = jwt.sign(payload, 'YT98N5WsTZbSAvs24O8jjtfeSx_B1AV70YpK62h_tepWExIp8y643H80BYmHNOC3qtgwfYvJrnvbuJcCuWrUXA', { algorithm: 'HS256' });
+   if(token){
+      loginWithJWT(token)
+   }
   
  }
 
