@@ -16,4 +16,24 @@ export const startChat = (config) => {
     //});
 };
 
+// Login using JWT
+export const loginWithJWT = async (jwtToken) => {
+    try {
+      const result = await RNZendeskChatModule.loginWithJWT(jwtToken);
+      console.log(result);
+    } catch (error) {
+      console.error('Zendesk Login Error:', error);
+    }
+  };
+  
+  // Logout
+  export const logoutZendesk = async () => {
+    try {
+      const result = await RNZendeskChatModule.logoutZendesk();
+      console.log(result);
+    } catch (error) {
+      console.error('Zendesk Logout Error:', error);
+    }
+  };
+
 

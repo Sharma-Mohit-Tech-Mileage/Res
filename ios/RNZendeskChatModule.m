@@ -2,7 +2,7 @@
 #import "RNZendeskChatModule.h"
 #import <ZendeskSDKMessaging/ZendeskSDKMessaging.h>
 #import <ZendeskSDKLogger/ZendeskSDKLogger.h>
-
+#import <ZendeskSDK/ZendeskSDK.h>
 
 #import <ZendeskSDK/ZendeskSDK.h>
 
@@ -58,18 +58,37 @@ RCT_EXPORT_METHOD(startChat:(RCTPromiseResolveBlock)resolve
 }
 
 
-RCT_EXPORT_METHOD(login:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject )
-{
+RCT_EXPORT_METHOD(loginWithJWT:(NSString *)jwtToken resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     @try {
-      
-        resolve(@(YES)); // Resolve the promise with a success value
-      
-    }@catch (NSException *exception) {
-           reject(@"start_error", @"Failed to start Zendesk messaging", nil); // Reject the promise with an error
-         }
-    
+      [[Zendesk instance] loginUserWith:jwtToken completionHandler:^(ZDKZendeskUser * _Nullable user, NSError * _Nullable error) {
+        if (error) {
+          reject(@"ZendeskLoginError", @"Login failed", error);
+        } else {
+          resolve(@"User logged in successfully");
+        }
+      }];
+    }
+    @catch (NSException *exception) {
+      reject(@"Exception", @"Exception occurred", nil);
+    }
+  });
+}
+
+RCT_EXPORT_METHOD(logoutZendesk:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    @try {
+      [[Zendesk instance] logoutUserWithCompletionHandler:^(NSError * _Nullable error) {
+        if (error) {
+          reject(@"ZendeskLogoutError", @"Logout failed", error);
+        } else {
+          resolve(@"User logged out successfully");
+        }
+      }];
+    }
+    @catch (NSException *exception) {
+      reject(@"Exception", @"Exception occurred", nil);
+    }
   });
 }
   

@@ -59,7 +59,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
 
     const navigationChange = async (navState) => {
-
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
                 setModalOpen(false);

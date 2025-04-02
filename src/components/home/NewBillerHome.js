@@ -21,11 +21,13 @@ import InfoBanner from "../ACPDashboard/InfoBanner";
 import { GetApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
+//import {jwt} from 'jsonwebtoken';
+
 import {
   startChatWithConfig,
   initChat,
   startChat,
-  clearChatData,
+  loginWithJWT,
 } from "../utility/RNZendeskChat";
 
 const CHANNEL_KEY = config.CHANNEL_KEY;
@@ -133,10 +135,26 @@ const paperlessStatusAcp = useSelector(
         pastPaymentDue: accountDetails.past_due_amount,
         email: getPrimaryEmail(accountDetails),
       });
+      console.log('accountDetails', accountDetails);
+      //loginToZendesk();
     }
   }, [accountDetails]);
 
- 
+ // zendesk chat login
+
+ const loginToZendesk = async() => {
+  
+  const payload = {
+    sub: defaultPaymentDetails.email, // Unique identifier (email or user ID)
+    name: 'John Doe',
+  };
+
+
+  
+  //const token = jwt.sign(user.token, 'YT98N5WsTZbSAvs24O8jjtfeSx_B1AV70YpK62h_tepWExIp8y643H80BYmHNOC3qtgwfYvJrnvbuJcCuWrUXA', { algorithm: 'HS256' });
+  //const jwtToken = user.jwtToken;
+  
+ }
 
   const renderHeader = () => (
     <View
