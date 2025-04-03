@@ -22,7 +22,7 @@ let strings = new LocalizedStrings({
    BusinessUserMsg:'Only customers with Sparklight home internet services can use the MySparklight mobile app for account management. Please',
    //nonAdminUserMsg:'Only customers with Sparklight home internet services can use the MySparklight mobile app for account management. Please',
    nonInternetUserMessage:'Currently, only a Sparklight account with Internet service can use the MySparklight mobile app for service management. Please',
-   AdminMsg:'To access the MySparklight app, your user profile must have the Primary Admin role.'
+   AdminMsg:'Please sign in as the Primary Admin to access your account.'
  },
  
 });
