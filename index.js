@@ -1,3 +1,4 @@
+//import "./shim";
 import 'react-native-gesture-handler';
 import 'react-native-url-polyfill/auto';
 import { AppRegistry } from 'react-native';
