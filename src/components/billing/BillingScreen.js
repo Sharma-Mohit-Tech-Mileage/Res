@@ -210,11 +210,12 @@ const BillingScreen = ({ navigation }) => {
                   
                     if (isNewBiller) {
                        navigation.navigate("AutoPayPCIConnector", {
-                                      url: `${Env.URL}/billing-payment`,
+                                      url: `https://payment.sparklight.com/portalsV3/billing-payment`,
                                       name: "Manage Payment Method",
                                       useNewPayment: true ,
                                       status: isAutoPayStatus,
-                                      paymentDetails:defaultPaymentDetails
+                                      paymentDetails:defaultPaymentDetails,
+                                      customPaymentUrl: 'https://payment.sparklight.com/portalsV3/billing-payment',
                                     });
                     } else {
                       handleNavigation(billingURL, "Manage Payment Method");
