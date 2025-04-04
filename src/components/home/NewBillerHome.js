@@ -21,7 +21,7 @@ import InfoBanner from "../ACPDashboard/InfoBanner";
 import { GetApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
-var jwt = require('jsonwebtoken');
+import { sign } from "react-native-pure-jwt";
 
 import {
   startChatWithConfig,
@@ -143,14 +143,30 @@ const paperlessStatusAcp = useSelector(
  // zendesk chat login
 
  const loginToZendesk = async() => {
-  const payload = {
-    sub: defaultPaymentDetails.email, // Unique identifier (email or user ID)
-    name: 'John Doe',
-  };
-  const token = jwt.sign(payload, 'YT98N5WsTZbSAvs24O8jjtfeSx_B1AV70YpK62h_tepWExIp8y643H80BYmHNOC3qtgwfYvJrnvbuJcCuWrUXA', { algorithm: 'HS256' });
-   if(token){
-      loginWithJWT(token)
-   }
+  const user = await getUser();
+  
+  //const token = jwt.sign(payload, '', { algorithm: 'HS256' });
+ const header={
+    "alg": "HS256",
+    "typ": "JWT",
+    "kid": "app_67ec131dcaaef888aa5376e4"
+}
+var payload = {
+  name: '#{customerName}',
+  email: defaultPaymentDetails.email,
+  email_verified: true,
+  exp: new Date().getTime() + 3600 * 1000, // expiration date, required, in ms, absolute to 1/1/1970
+  external_id: user?.userInfo.accountNumber,
+};
+
+  sign(user.token,'YT98N5WsTZbSAvs24O8jjtfeSx_B1AV70YpK62h_tepWExIp8y643H80BYmHNOC3qtgwfYvJrnvbuJcCuWrUXA', { header: { kid: 'app_67ec131dcaaef888aa5376e4' } }
+  )
+    .then((token)=>{
+        console.log("jwttoken", token);
+        loginWithJWT(token)
+    }) // token as the only argument
+    .catch(console.error); // possible errors
+
   
  }
 
