@@ -269,17 +269,23 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         refreshAndInitialize();
     }, []);
 
-    const navigationChange = async (navState) => {
-        if (!navState || !navState.url) return;
-        
-        console.log("Navigation change to:", navState.url);
-        
-        if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
-            if (!navStateReloading) {
-                navigation.navigate('Dashboard');
-            }
+  // Modify AutoPayPCIConnector.jsx where it handles the expiration
+
+const navigationChange = async (navState) => {
+    if (!navState || !navState.url) return;
+    
+    console.log("Navigation change to:", navState.url);
+    
+    if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
+        if (!navStateReloading) {
+            // Instead of navigating to Dashboard, navigate back to the Billing main screen
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Billing' }],
+            });
         }
-    };
+    }
+};
 
     const userUpdate = async () => {
         const userLocal = await getUser();
