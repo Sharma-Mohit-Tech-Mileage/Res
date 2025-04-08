@@ -457,13 +457,6 @@ const navigationChange = async (navState) => {
                             navigation.navigate('Dashboard');
                         }
                     }}
-                    renderLoading={() => (
-                        <View style={styles.loadingContainer}>
-                            <ActivityIndicator size="large" color="rgba(141, 59, 144, 1)" />
-                            <Text style={styles.loadingText}>Loading...</Text>
-                        </View>
-                    )}
-                    startInLoadingState={true}
                 />
             ) : (
                 <View style={styles.loadingContainer}>
