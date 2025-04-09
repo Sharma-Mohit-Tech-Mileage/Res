@@ -301,7 +301,7 @@ const BillingScreen = ({ navigation }) => {
                       </TouchableOpacity>
                     )}
                     <View style={styles.frameLayout} />
-                    <TouchableOpacity
+                    {!isNewBiller&&<TouchableOpacity
                       style={styles.frame9defaultSpaceBlock}
                       onPress={() => {
                         const billingURL = isNewBiller
@@ -316,7 +316,7 @@ const BillingScreen = ({ navigation }) => {
                       {isNewBiller && <Icon name="search-book" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
                       <Text style={styles.modemHealthSupport}>{isNewBiller ? "View Bill Breakdown" : "View Billing Details"}</Text>
                       <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
-                    </TouchableOpacity>
+                    </TouchableOpacity>}
                     <View style={styles.frameLayout} />
                     <TouchableOpacity
                       style={styles.frame9defaultSpaceBlock}

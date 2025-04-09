@@ -177,10 +177,14 @@ const MyTabs = ({ navigation, route }) => {
           component={BillingStackScreen}
           listeners={({ navigation }) => ({
             tabPress: (e) => {
+              e.preventDefault();
               if (!isTabAccessibleDuringWalkthrough(1) && isScreenReaderEnabled) {
-                e.preventDefault();
                 return;
               }
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'BillingTab' }],
+              });
             },
           })}
           options={{
