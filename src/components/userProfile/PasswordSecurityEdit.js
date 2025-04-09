@@ -110,7 +110,9 @@ const PasswordSecurityEdit = () => {
   const checkCustomSecurityQuestion = (questions) => {
     const storedQuestion = profileDetails.securityQuestion;
     const isCustom = storedQuestion && !questions.includes(storedQuestion);
+    if(!isNewBiller){
     setIsCustomQuestionSelected(isCustom);
+    }
     setCustomSecurityQuestion(isCustom ? "Add your own question" : storedQuestion);
   };
 
@@ -125,7 +127,9 @@ const PasswordSecurityEdit = () => {
   useEffect(() => {
     const storedQuestion = profileDetails.securityQuestion;
     const isCustom = storedQuestion && !securityQuestionsNew.includes(storedQuestion);
+    if(!isNewBiller){
     setIsCustomQuestionSelected(isCustom);
+    }
     setCustomSecurityQuestion(isCustom ? "Add your own question" : storedQuestion);
 
   }, []);
