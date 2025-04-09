@@ -152,18 +152,17 @@ const paperlessStatusAcp = useSelector(
     "kid": "app_67ec131dcaaef888aa5376e4"
 }
 var payload = {
-  name: '#{customerName}',
+  name: 'Test User',
   email: defaultPaymentDetails.email,
   email_verified: true,
   exp: new Date().getTime() + 3600 * 1000, // expiration date, required, in ms, absolute to 1/1/1970
   external_id: user?.userInfo.accountNumber,
 };
 
-  sign(user.token,'YT98N5WsTZbSAvs24O8jjtfeSx_B1AV70YpK62h_tepWExIp8y643H80BYmHNOC3qtgwfYvJrnvbuJcCuWrUXA', { header: { kid: 'app_67ec131dcaaef888aa5376e4' } }
-  )
+  sign(payload,'YT98N5WsTZbSAvs24O8jjtfeSx_B1AV70YpK62h_tepWExIp8y643H80BYmHNOC3qtgwfYvJrnvbuJcCuWrUXA',header)
     .then((token)=>{
         console.log("jwttoken", token);
-        loginWithJWT(token)
+        loginWithJWT(user?.token)
     }) // token as the only argument
     .catch(console.error); // possible errors
 
