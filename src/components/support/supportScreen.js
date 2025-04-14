@@ -253,7 +253,7 @@ const Support = ({ route }) => {
       icon: require("../../../assets/chevronright.png"),
       iconAlignment: "right", // Icon to the left of the text
       navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us/articles/18929657224855",
+      url: "https://support.sparklight.com/hc/en-us/articles/18929657224855?isMobile=true",
     },
     {
       key: "moreOptions",
@@ -261,7 +261,7 @@ const Support = ({ route }) => {
       icon: require("../../../assets/chevronright.png"),
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us/categories/15840476056727-Billing-Payments",
+      url: "https://support.sparklight.com/hc/en-us/categories/15840476056727-Billing-Payments?isMobile=true",
     },
     {
       key: "moreOptions",
@@ -269,7 +269,7 @@ const Support = ({ route }) => {
       icon: require("../../../assets/chevronright.png"),
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us/categories/115000833068-Internet",
+      url: "https://support.sparklight.com/hc/en-us/categories/115000833068-Internet?isMobile=true",
     },
     {
       key: "moreOptions",
@@ -277,7 +277,7 @@ const Support = ({ route }) => {
       icon: require("../../../assets/chevronright.png"),
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us/categories/115001419607-WiFi",
+      url: "https://support.sparklight.com/hc/en-us/categories/115001419607-WiFi?isMobile=true",
     },
     {
       key: "moreOptions",
@@ -285,7 +285,7 @@ const Support = ({ route }) => {
       icon: require("../../../assets/chevronright.png"),
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
-      url: "https://support.sparklight.com/hc/en-us",
+      url: "https://support.sparklight.com/hc/en-us?isMobile=true",
     },
   ];
 
@@ -866,7 +866,7 @@ const Support = ({ route }) => {
                     accessibilityRole="button"
                     onPress={() => {
                       navigation.navigate("ArticalWindowUtility", {
-                        url: "https://support.sparklight.com/hc/en-us/articles/26787209205911-SPARKLIGHT-CUSTOMER-SUPPORT",
+                        url: "https://support.sparklight.com/hc/en-us/articles/26787209205911-SPARKLIGHT-CUSTOMER-SUPPORT?isMobile=true",
                         name: "Sparklight Customer Support",
                       });
                     }}
