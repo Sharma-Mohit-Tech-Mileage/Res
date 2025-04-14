@@ -23,7 +23,7 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
         //setInput(suggestion.title);
         // Optionally close the keyboard
         if(suggestion.html_url!=''){
-          navigation.navigate('ArticalWindowUtility', { url: suggestion.html_url, name: 'Search Result' }) 
+          navigation.navigate('ArticalWindowUtility', { url: suggestion.html_url+'?isMobile=true', name: 'Search Result' }) 
         }
     };
 
