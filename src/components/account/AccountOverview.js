@@ -290,7 +290,7 @@ const AccountOverview = () => {
                 <Pressable
                   accessible={true}
                   accessibilityRole="link"
-                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions', name: 'Terms & Conditions' })}
+                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions?isMobile=true', name: 'Terms & Conditions' })}
                 >
                   <Text accessibilityLabel="Terms & Conditions" style={styles.linkStyle}>
                     Terms & Conditions
@@ -300,7 +300,7 @@ const AccountOverview = () => {
 
             </View>
             <Pressable
-              onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/30080605597079-MySparklight-App-Release-Notes?isMobile=true', name: 'App Version' })}
+              onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/30080605597079-MySparklight-App-Release-Notes?isMobile=true', name: 'App Release Notes' })}
               accessibilityLabel={'Version '+VersionCheck.getCurrentVersion()}
               accessibilityRole="link"
             >

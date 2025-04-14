@@ -162,7 +162,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             const userLocal = await getUser();
             if (!userLocal || !userLocal.userInfo || !userLocal.userInfo.accountNumber) {
                 console.error("Invalid user data");
-                navigation.navigate('Dashboard');
+                navigation.navigate('Billing');
                 return;
             }
 
@@ -249,7 +249,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             redirectToEBillpay(paymentObj, referralUrl);
         } catch (error) {
             console.error("Error initializing payment:", error);
-            navigation.navigate('Dashboard');
+            navigation.navigate('Billing');
         }
     };
 
@@ -279,10 +279,7 @@ const navigationChange = async (navState) => {
     if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
         if (!navStateReloading) {
             // Instead of navigating to Dashboard, navigate back to the Billing main screen
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'Billing' }],
-            });
+            navigation.navigate('Billing');
         }
     }
 };
@@ -453,9 +450,9 @@ const navigationChange = async (navState) => {
                     onHttpError={(syntheticEvent) => {
                         const { nativeEvent } = syntheticEvent;
                         console.error('WebView HTTP error: ', nativeEvent);
-                        if (!navStateReloading && nativeEvent.statusCode >= 400) {
-                            navigation.navigate('Dashboard');
-                        }
+                        // if (!navStateReloading && nativeEvent.statusCode >= 400) {
+                        //     navigation.navigate('Dashboard');
+                        // }
                     }}
                 />
             ) : (

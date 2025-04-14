@@ -55,22 +55,6 @@ const BillingScreen = ({ navigation }) => {
     setIsContentLoading(false);
   };
 
-  // Check if all critical data is loaded and valid
-  const validateAllDataLoaded = () => {
-    // For normal users
-    if (user?.isNormalUser) {
-      if (billAmt !== undefined && dueDate) {
-        setIsContentLoading(false);
-      }
-    } 
-    // For ACP users
-    else {
-      if (accountDetails && billAmt !== undefined && dueDate) {
-        setIsContentLoading(false);
-      }
-    }
-  };
-
   const getUserAccountDetails = () => {
     setBillAmt(undefined);
     setIsContentLoading(true);
@@ -99,7 +83,7 @@ const BillingScreen = ({ navigation }) => {
               email: getPrimaryEmail(res),
             });
             
-            validateAllDataLoaded();
+            setIsContentLoading(false);
           } else {
             setIsContentLoading(false);
           }
@@ -121,7 +105,7 @@ const BillingScreen = ({ navigation }) => {
         (res) => {
           setIsAutoPayStatus(res?.isEasyPay);
           setCardDigit(res?.epLastfour);
-          validateAllDataLoaded();
+          setIsContentLoading(false);
         },
         handleError
       );
@@ -129,9 +113,8 @@ const BillingScreen = ({ navigation }) => {
       GetApiRequest(
         `account/api/account/${accountNumber}/paperless/status`,
         (res) => {
-          console.log("res---------------------------------------------------------------", res);
           setPaperlessStatus(res?.isPaperless);
-          validateAllDataLoaded();
+          setIsContentLoading(false);
         },
         handleError
       );
@@ -185,25 +168,14 @@ const BillingScreen = ({ navigation }) => {
       setPaperlessEmail(p_email);
       dispatch(getPaperlessStatus(p_email));
       
-      validateAllDataLoaded();
+      setIsContentLoading(false);
     }
   }, [accountDetails, user]);
 
-  // Check if data is loaded when these dependencies change
-  useEffect(() => {
-    validateAllDataLoaded();
-  }, [billAmt, dueDate, accountDetails]);
 
   const handleNavigation = (url, name) => {
     navigation.navigate("ArticalWindowUtility", { url, name });
   };
-
-  // Validator for PCI connector data
-  const hasPCIConnectorData = 
-    defaultPaymentDetails && 
-    defaultPaymentDetails.dueDate !== null && 
-    defaultPaymentDetails.email !== null &&
-    defaultPaymentDetails.billAmount !== undefined;
 
   return (
     <View style={styles.account} accessibilityLabel="Billing Services screen">
@@ -270,8 +242,6 @@ const BillingScreen = ({ navigation }) => {
                       <TouchableOpacity
                         style={styles.frame9defaultSpaceBlock}
                         onPress={() => {
-                          // Only navigate if payment data is loaded
-                          if (hasPCIConnectorData) {
                             const billingURL = isNewBiller
                               ? `${Env.ACP_BILLING}/billing-payment`
                               : `${Env.URL}/billing`;
@@ -289,11 +259,10 @@ const BillingScreen = ({ navigation }) => {
                               handleNavigation(billingURL, "Manage Payment Method");
                             }
                           }
-                        }}
+                        }
                         accessible={true}
                         accessibilityRole="button"
                         accessibilityLabel="Manage Payment Method"
-                        disabled={!hasPCIConnectorData}
                       >
                         {isNewBiller && <Icon name="building-doc" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
                         <Text style={styles.modemHealthSupport}>Manage Payment Method</Text>
