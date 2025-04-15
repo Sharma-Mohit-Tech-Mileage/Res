@@ -18,7 +18,7 @@ import MenuGrid from "../ACPDashboard/MenuGrid";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
-import { GetApiRequest } from "../../network/APIClient";
+import { GetApiRequest,PostApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
 import { sign } from "react-native-pure-jwt";
@@ -55,6 +55,7 @@ const NewBillerHome = ({ navigation }) => {
   });
 
   // Redux selectors
+  const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector((state) => state.combinedReducers.home);
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
@@ -136,9 +137,45 @@ const paperlessStatusAcp = useSelector(
         email: getPrimaryEmail(accountDetails),
       });
       console.log('accountDetails', accountDetails);
-      loginToZendesk();
+      getZendeskChatToken();
     }
   }, [accountDetails]);
+
+//  get zendesk chat token
+const getZendeskChatToken = async() => {
+  //const user = await getUser();
+  console.log("getZendeskChatToken",JSON.stringify(accountDetails));
+  const accountNumber = user.userInfo.accountNumber;
+  const url = `/api/zendesk/TokenAuth`;
+  console.log("url", url);
+  const body={
+    "legacy_account_number": null,
+    "UserName": user?.userInfo.userName,
+    "AccountNumber": accountNumber,
+    "FirstName": accountDetails?.first_name,
+    "LastName": accountDetails?.last_name,
+    "UserIPAddress": "10.140.36.28",
+    "CustomerType": "RES",
+    "AuthLevel": accountDetails?.auth_level,
+    "AcctStatus": "Active",                    
+    "LegacyCompany": "Cable One",
+    "BusinessName": ""
+}
+console.log("data", body);
+  PostApiRequest(
+    url,
+    body,
+    (res) => {
+      console.log("res", res);
+      if (res) {
+        loginWithJWT(res?.jwt);
+      }
+    },
+    (error) => {
+      console.log("error", error);
+    }
+  );
+}
 
  // zendesk chat login
 
