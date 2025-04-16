@@ -152,9 +152,11 @@ const getZendeskChatToken = async() => {
     "legacy_account_number": null,
     "UserName": user?.userInfo.userName,
     "AccountNumber": accountNumber,
+    "email": defaultPaymentDetails.email,
+    "external_id": accountNumber,
     "FirstName": accountDetails?.first_name,
     "LastName": accountDetails?.last_name,
-    "UserIPAddress": "10.140.36.28",
+    "UserIPAddress": await getIPAddress(),
     "CustomerType": "RES",
     "AuthLevel": accountDetails?.auth_level,
     "AcctStatus": "Active",                    
@@ -175,6 +177,23 @@ console.log("data", body);
       console.log("error", error);
     }
   );
+}
+
+// get IP address
+
+const getIPAddress = async () => {
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    if (!response.ok) {
+      throw new Error('Failed to fetch IP address');
+    }
+
+    const data = await response.json();
+    return data.ip; // The IP address
+  } catch (error) {
+    console.error('Error fetching IP address:', error);
+    return null;
+  }
 }
 
  // zendesk chat login
