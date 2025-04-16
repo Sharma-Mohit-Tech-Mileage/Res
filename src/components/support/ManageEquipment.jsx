@@ -925,7 +925,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
                   navigation.navigate("ArticalWindowUtility", {
-                    url: "https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues",
+                    url: "https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues?isMobile=true",
                     name: "Wifi Issues",
                   });
                 }}

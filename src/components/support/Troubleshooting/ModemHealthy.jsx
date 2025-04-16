@@ -115,7 +115,7 @@ const ModemHealthy = () => {
                     icon={WifiIssueIcon}
                     text="Wi-Fi Issues"
                     onPress={() => navigation.navigate('ArticalWindowUtility', {
-                      url: 'https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues',
+                      url: 'https://support.sparklight.com/hc/en-us/articles/115010184927-What-Can-I-Do-for-WiFi-Issues?isMobile=true',
                       name: 'Wi-Fi Issues'
                     })}
                     testID="wifi-issues-button"
