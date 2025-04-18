@@ -66,42 +66,116 @@ const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, 
       </View>
 
       <View
-        style={{ flexDirection: "row", width: "92%", marginHorizontal: 20, justifyContent: "space-between", flex: 0.5, }}
+        style={{
+          flexDirection: "row",
+          marginHorizontal: 20,
+          justifyContent: "center",
+
+      
+        }}
       >
-        <View
-          style={{ flexDirection: "column", flex: 1, marginVertical: 24, justifyContent: "flex-start", }}
+        {/* <View
+          style={{
+            flexDirection: "column",
+            flex: 1,
+            marginVertical: 24,
+            justifyContent: "flex-start",
+          }}
         >
-          <Text style={[styles.label, { fontWeight: "600", color: colors.sparklight_purple_blue, fontSize: 14 }]}>
+          <Text
+            style={[
+              styles.label,
+              {
+                fontWeight: "600",
+                color: colors.sparklight_purple_blue,
+                fontSize: 14,
+              },
+            ]}
+          >
             Account Number
           </Text>
           <Text style={[styles.label, { fontSize: 14 }]}>{acno}</Text>
-        </View>
-        <View style={{
-          flexDirection: "column", flex: 1,
-          justifyContent: 'flex-start', marginVertical: 20, marginEnd: 40
-        }}>
+        </View> */}
+
+        <View
+          style={{
+            flexDirection: "column",
+            justifyContent: "center",
+            alignSelf: "center",
+            marginVertical: 15,
+          }}
+        >
+          <Text 
+          style={[
+              styles.label,
+              {
+                fontWeight: "700",
+                color: colors.sparklight_purple_blue,
+                fontSize: 18,
+                paddingBottom: 5,
+                alignSelf:'center',
+            
+              }
+            ]}>Total Amount Due</Text>
           {billAmt == undefined ? (
             <ActivityIndicator
               size="large"
-              color={colors.sparklight_bright_purple}
+              color={colors.primary_color}
               style={{ marginLeft: wp("15%") }}
             />
           ) : (
-            <Text style={styles.amount}>${billAmt || 0.0}</Text>
+            <Text style={styles.amount}>${billAmt}</Text>
           )}
 
-          {(dueDate != "Invalid date" && billAmt != undefined) && (
+          {dueDate != "Invalid date" && billAmt != undefined && (
             <Text
               accessible={true}
-              accessibilityLabel={`${dueDate ? (dueDate == 'Immediately') ? "Due Immediately" : `Due on ${dueDate}` : "Due on Not Available"}`}
-              style={[styles.dueDate, { color: (dueDate == 'Immediately') ? colors.sparklight_red : colors.sparklight_purple_blue, fontWeight: (dueDate == 'Immediately') ? "400" : '700' }]}>
-              {dueDate ? (dueDate == 'Immediately') ? "Due" : "Due on" : <NotAvailable />}
-              <Text style={[styles.dueDate, { fontWeight: "400", color: (dueDate == 'Immediately') ? colors.sparklight_red : colors.sparklight_purple_blue }]}>
-                {' ' + dueDate}
+              accessibilityLabel={`${
+                dueDate
+                  ? dueDate == "Immediately"
+                    ? "Due Immediately"
+                    : `Due on ${dueDate}`
+                  : "Due on Not Available"
+              }`}
+              // accessibilityRole={`${
+              //   dueDate != "Immediately" ? "button" : "none"
+              // }`}
+              style={[
+                styles.dueDate,
+                {
+                  color:
+                    dueDate == "Immediately"
+                      ? colors.sparklight_red
+                      : colors.sparklight_purple_blue,
+                  fontWeight: dueDate == "Immediately" ? "400" : "700",
+                },
+              ]}
+            >
+              {dueDate ? (
+                dueDate == "Immediately" ? (
+                  "Due"
+                ) : (
+                  "Due on"
+                )
+              ) : (
+                <NotAvailable />
+              )}
+              <Text
+                style={[
+                  styles.dueDate,
+                  {
+                    fontWeight: "400",
+                    color:
+                      dueDate == "Immediately"
+                        ? colors.sparklight_red
+                        : colors.sparklight_purple_blue,
+                  },
+                ]}
+              >
+                {" " + dueDate}
               </Text>
             </Text>
           )}
-
         </View>
       </View>
 
@@ -198,19 +272,20 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   amount: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: "bold",
-    alignSelf: 'flex-end',
+    alignSelf: "center",
+    paddingBottom: 5,
+    fontFamily: FontFamily.openSansRegular,
     color: colors.sp_black,
-    fontWeight: "700",
-
+    
   },
   dueDate: {
-
     fontSize: 14,
     fontWeight: "700",
     color: colors.dark_grey,
-    alignSelf: 'flex-end',
+    alignSelf: "center",
+    paddingBottom:5,
     fontFamily: FontFamily.openSansRegular,
     color: colors.sparklight_purple_blue,
   },
