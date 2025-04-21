@@ -210,7 +210,7 @@ const MyTabs = ({ navigation, route }) => {
                 return;
               }
               if (!user?.isNormalUser) {
-                Alert.alert('Coming Soon', 'We are still working on it.');
+                Alert.alert("Coming Soon", "This feature is not yet available.", [{ text: "Close", style: "cancel" }]);
                 return;
               }
               navigation.reset({
