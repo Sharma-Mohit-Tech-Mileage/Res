@@ -20,6 +20,7 @@ import VersionCheck from 'react-native-version-check';
 import { Env } from "../../network/apis/account/Constants";
 import AppStyles from "../common/styles/AppStyles";
 import UserIconWhite from "../../res/svgIcons/UserIconWhite";
+import moment from "moment";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -308,6 +309,10 @@ const AccountOverview = () => {
                 Version:{VersionCheck.getCurrentVersion()}
               </Text>
             </Pressable>
+
+            <Text style={{ color: Color.colorMidnightblue, alignSelf:'center', fontSize:FontSize.size_sm,fontFamily:FontFamily.openSansRegular , marginTop:50,fontWeight:'400' }}>
+                {`Copyright © ${moment().year()}, Sparklight ®, All Rights Reserved.`}
+            </Text>
           </View>
         </ScrollView>
       </View>

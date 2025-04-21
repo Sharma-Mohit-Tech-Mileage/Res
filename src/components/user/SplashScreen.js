@@ -17,7 +17,7 @@ import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import RenderText from "../common/RenderText";
-import SecondaryButton from "../common/customui/SecondaryButton";
+import moment from "moment";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -401,6 +401,10 @@ const SplashScreen = ({ navigation, route }) => {
         {ISUAT ? "UAT" : ""} Version:{VersionCheck.getCurrentVersion()}
       </Text>
       )}
+
+        <Text style={[{position:"absolute",bottom:hp("5%"),FontFamily:FontFamily.openSansRegular,fontSize:14,fontWeight:"400",color:colors.snow_white,alignSelf:"center"}]}>
+          {`Copyright © ${moment().year()}, Sparklight ®, All Rights Reserved.`}
+        </Text>
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}
