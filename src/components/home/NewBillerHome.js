@@ -156,21 +156,25 @@ const getZendeskChatToken = async() => {
     "external_id": accountNumber,
     "FirstName": accountDetails?.first_name,
     "LastName": accountDetails?.last_name,
+    "name": accountDetails?.first_name + " " + accountDetails?.last_name,
     "UserIPAddress": await getIPAddress(),
     "CustomerType": "RES",
     "AuthLevel": accountDetails?.auth_level,
     "AcctStatus": "Active",                    
     "LegacyCompany": "Cable One",
-    "BusinessName": ""
+    "BusinessName": "",
+    "email_verified": true,
+    "exp": new Date().getTime() + 3600 * 1000,
+    "scope":"user",
 }
 console.log("data", body);
   PostApiRequest(
     url,
     body,
     (res) => {
-      console.log("res", res);
+      console.log("res", res.jwtToken);
       if (res) {
-        loginWithJWT(res?.jwt);
+        loginWithJWT(res?.jwtToken);
       }
     },
     (error) => {
