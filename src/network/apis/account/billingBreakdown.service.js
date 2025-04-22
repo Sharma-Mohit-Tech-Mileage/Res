@@ -1,8 +1,6 @@
 import { _axios } from "../../RestApiClient";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import moment from "moment";
-// Import the mock data
-import billingBreakdownMockData from "../../../components/billing/billingData.json";
 
 // API service for billing statements
 const billingStatementApi = {
