@@ -6,6 +6,7 @@ import profileReducer from './ProfileReducer';
 import NotificationReducer from './NotificationReducer'; // Import the Notifications component
 import billingStatementReducer from './billingStatementReducer'; 
 import paymentHistoryReducer from './paymentHistoryReducer';
+import billingBreakdown from './billingBreakdownReducer';
 // Use combineReducers to create a combined reducer
 const appReducer = combineReducers({
   user: userReducer,
@@ -14,6 +15,7 @@ const appReducer = combineReducers({
   notification: NotificationReducer, // Add the Notifications reducer to the combined reducer
   billingStatements: billingStatementReducer,
   paymentHistory: paymentHistoryReducer, // Add the billingStatement reducer to the combined reducer
+  billingBreakdown: billingBreakdown,
 });
 
 // Wrap the combined reducer with a higher-order reducer to handle the LOGOUT action

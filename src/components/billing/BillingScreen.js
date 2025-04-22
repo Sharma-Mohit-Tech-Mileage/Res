@@ -270,13 +270,14 @@ const BillingScreen = ({ navigation }) => {
                       </TouchableOpacity>
                     )}
                     <View style={styles.frameLayout} />
-                    {!isNewBiller&&<TouchableOpacity
+                    {<TouchableOpacity
                       style={styles.frame9defaultSpaceBlock}
                       onPress={() => {
-                        const billingURL = isNewBiller
-                          ? `${Env.ACP_BILLING}/billing`
-                          : `${Env.URL}/billing`;
-                        handleNavigation(billingURL, isNewBiller ? "View Bill Breakdown" : "View Billing Details");
+                        if (isNewBiller) {
+                          navigation.navigate("BillingBreakDown"); 
+                        } else {
+                          handleNavigation(`${Env.URL}/billing`,  "View Billing Details");
+                        }
                       }}
                       accessible={true}
                       accessibilityRole="button"

@@ -8,6 +8,7 @@ import BillingScreen from "../../components/billing/BillingScreen";
 import BillingStatements from "../../components/billing/BillingStatements";
 import AutoPayPCIConnector from "../../components/utility/AutoPayPCIConnector";
 import PaymentHistoryScreen from "../../components/billing/PaymentHistory";
+import BillingBreakDownScreen from "../../components/billing/BillingBreakDownScreen";
 const BillingStack = createNativeStackNavigator();
 
 function BillingStackScreen({route}) {
@@ -52,6 +53,18 @@ function BillingStackScreen({route}) {
                 }}
             />
 
+<BillingStack.Screen
+                name="BillingBreakDown"
+                component={BillingBreakDownScreen}
+                options={{
+                    headerBackVisible: false,
+                    headerShown: false,
+                }}
+                listeners={{
+                    focus: () => setTabBarVisible(true),
+                    blur: () => setTabBarVisible(true),
+                }}
+            />
       <BillingStack.Screen
         name="ArticalWindowUtility"
         component={ArticalWindowUtility}
