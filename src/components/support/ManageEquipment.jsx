@@ -946,7 +946,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
                 style={[styles.frame9defaultSpaceBlock]}
                 onPress={() => {
                   navigation.navigate("ArticalWindowUtility", {
-                    url: "https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email",
+                    url: "https://support.sparklight.com/hc/en-us/sections/115002453808-Surfing-Email?isMobile=true",
                     name: "Surfing Issues",
                   });
                 }}
