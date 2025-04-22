@@ -1,32 +1,15 @@
 import React, { useEffect, useState, useCallback, memo } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  ActivityIndicator,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, Text, View, FlatList, ActivityIndicator, ScrollView, } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Color,
-  FontFamily,
-  FontSize,
-  Padding,
-  Border,
-} from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import AppStyles from "../common/styles/AppStyles";
 import { fetchBillingBreakdown } from "../../redux/actions/billingBreakdownActions";
-import {
-  selectBillingBreakDownLoading,
-  selectBillingBreakDownData,
-  selectBillingBreakDownError
-} from "../../redux/selectors/billingBreakdownSelectors";
+import { selectBillingBreakDownLoading, selectBillingBreakDownData, selectBillingBreakDownError } from "../../redux/selectors/billingBreakdownSelectors";
 import { InfoIcon } from "native-base";
 
 // Constants
@@ -34,14 +17,23 @@ const PLACEHOLDER_MESSAGE = "The bill breakdown reflects your latest monthly sta
 const SERVICE_DISCOUNT = "Service Discount";
 const DEFAULT_DATE_FORMAT = "MM/DD/YYYY";
 const MIN_DATE_PREFIX = "0001";
-
-/**
- * Individual detail item component
- * Renders a single detail item with description and amount
- */
 const DetailItem = memo(({ detail }) => {
-  const isDiscount = detail.description === SERVICE_DISCOUNT;
   const hasExpiryDate = !detail.endDate.startsWith(MIN_DATE_PREFIX);
+  const isDiscount = 
+    detail.description === SERVICE_DISCOUNT || 
+    detail.description.toLowerCase().includes("discount") ||
+    (hasExpiryDate && parseFloat(detail.amount) < 0) || // BCP line with expiry date
+    (detail.description.toLowerCase().includes("ridge") && parseFloat(detail.amount) < 0); // Ridge discounts
+
+  const shouldSkipItem = 
+    (detail.type && ['300', '301', 'CH', 'CHG', 'MMDTT'].includes(detail.type)) || 
+    (detail.description && detail.description.toLowerCase().includes("promotional discount"));
+
+  // Skip rendering this item if it matches the filter criteria
+  if (shouldSkipItem) return null;
+  
+  const textStyle = isDiscount ? { color: styles.colorGreen } : {};
+  
   return (
     <View 
       style={[styles.detailRow, styles.detailItemBorder]} 
@@ -49,20 +41,28 @@ const DetailItem = memo(({ detail }) => {
       accessibilityLabel={`${detail.description}: $${parseFloat(detail.amount).toFixed(2)}`}
     >
       <View style={styles.detailLabelContainer80}>
-        <Text style={styles.detailLabelNormal} numberOfLines={2} ellipsizeMode="tail">
+        <Text 
+          style={[styles.detailLabelNormal, textStyle]} 
+          numberOfLines={2} 
+          ellipsizeMode="tail"
+        >
           {detail.description}
         </Text>
         {hasExpiryDate && (
           <View style={styles.discountExpiryContainer}>
             <InfoIcon size="xs" color={Color.colorGray_200} />
             <Text style={styles.discountExpiryText}>
-              Discount expires {moment(detail.endDate).format(DEFAULT_DATE_FORMAT)}
+              Discount expires on {moment(detail.endDate).format(DEFAULT_DATE_FORMAT)}
             </Text>
           </View>
         )}
       </View>
       <View style={styles.detailValueContainer20}>
-        <Text style={styles.detailValueNormal} numberOfLines={2} ellipsizeMode="tail">
+        <Text 
+          style={[styles.detailValueNormal, textStyle]} 
+          numberOfLines={2} 
+          ellipsizeMode="tail"
+        >
           ${parseFloat(detail.amount).toFixed(2)}
         </Text>
       </View>
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   },
   paymentDetails: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: '#EFEFF6',
   },
   detailRow: {
     flexDirection: "row",

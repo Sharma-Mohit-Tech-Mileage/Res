@@ -34,7 +34,6 @@ const AddNotificationScreen = () => {
   const route = useRoute();
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const is_enrolled = route.params?.is_enrolled;
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
   );
@@ -58,6 +57,10 @@ const AddNotificationScreen = () => {
 
   const translateY = animatedValue;
 
+  // Get the initial is_enrolled value from route params, but also check for primaryEmail
+  const initialIsEnrolled = route.params?.is_enrolled;
+  const [isEnrolled, setIsEnrolled] = useState(!!initialIsEnrolled);
+
   useEffect(() => {
     AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
   }, []);
@@ -73,6 +76,9 @@ const AddNotificationScreen = () => {
       const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
       setValue("email", updatedPrimaryEmail);
       dispatch(getPaperlessStatus(updatedPrimaryEmail));
+      
+      // Update isEnrolled based on the actual presence of a primary email
+      setIsEnrolled(!!updatedPrimaryEmail);
     }
   }, [accountDetails, setValue, dispatch]);
 
@@ -207,9 +213,9 @@ const AddNotificationScreen = () => {
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader
-        title={is_enrolled ? "Edit Email Notifications" : "Add Email Notifications"}
+        title={isEnrolled ? "Edit Email Notifications" : "Add Email Notifications"}
         onPressBack={() => navigation.goBack()}
-        accessibilityLabel="Add Email Notifications"
+        accessibilityLabel={isEnrolled ? "Edit Email Notifications" : "Add Email Notifications"}
       />
       {isSubmitting && (
         <LoadingOverlay loading={isSubmitting} loadingTxt="Saving" accessibilityLiveRegion="polite" />
@@ -239,8 +245,8 @@ const AddNotificationScreen = () => {
             <View style={{ paddingHorizontal: Padding.p_5xl }} >
               <NotificationAlert
                 type="warning"
-                title={!is_enrolled?"Critical Notifications":""}
-                message={!is_enrolled?"By providing your email address, you're signing up for critical notifications. We'll keep you informed without overwhelming your inbox.":"By updating your email, you agree that this change will apply to all Sparklight email customer communications sent to you, including, but not limited to, account notifications, order updates, marketing emails, and service-related messages."}
+                title={!isEnrolled?"Critical Notifications":""}
+                message={!isEnrolled?"By providing your email address, you're signing up for critical notifications. We'll keep you informed without overwhelming your inbox.":"By updating your email, you agree that this change will apply to all Sparklight email customer communications sent to you, including, but not limited to, account notifications, order updates, marketing emails, and service-related messages."}
                 showCloseIcon={false}
                 isVisible={true}
                 accessibilityLabel="Important: By providing your email address, you're signing up for critical notifications"
@@ -250,11 +256,11 @@ const AddNotificationScreen = () => {
               />
             </View>
             <View style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}>
-            {is_enrolled &&<Text style={styles.instructions}>
+            {isEnrolled &&<Text style={styles.instructions}>
                 {"Edit Email Address"}
               </Text>}
               <Text style={styles.instructions}>
-                {!is_enrolled?"Please enter your email address below and stay connected with us.":"Please enter the email address you would like to receive all future customer communications. You may opt out at any time."}
+                {!isEnrolled?"Please enter your email address below and stay connected with us.":"Please enter the email address you would like to receive all future customer communications. You may opt out at any time."}
               </Text>
               <Controller
                 control={control}
