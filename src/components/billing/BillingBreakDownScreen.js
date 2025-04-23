@@ -25,13 +25,17 @@ const DetailItem = memo(({ detail }) => {
     (hasExpiryDate && parseFloat(detail.amount) < 0) || // BCP line with expiry date
     (detail.description.toLowerCase().includes("ridge") && parseFloat(detail.amount) < 0); // Ridge discounts
 
-  // Updated condition: Only ignore when ALL three conditions are met
+  // Skip items with specific types AND promotional discount in description AND zero amount
+  // Also skip items that contain "promotional discount will end" text with zero amount
   const shouldSkipItem = 
-    detail.type && 
-    ['300', '301', 'CH', 'CHG', 'MMDTT'].includes(detail.type) && 
-    detail.description && 
-    detail.description.toLowerCase().includes("promotional discount") &&
-    parseFloat(detail.amount) === 0;
+    (detail.type && 
+     ['300', '301', 'CH', 'CHG', 'MMDTT'].includes(detail.type) && 
+     detail.description && 
+     detail.description.toLowerCase().includes("promotional discount") &&
+     parseFloat(detail.amount) === 0) ||
+    (detail.description && 
+     detail.description.toLowerCase().includes("promotional discount will") &&
+     parseFloat(detail.amount) === 0);
 
   // Skip rendering this item if it matches the filter criteria
   if (shouldSkipItem) return null;
