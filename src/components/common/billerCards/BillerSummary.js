@@ -134,7 +134,7 @@ const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, 
                 dueDate
                   ? dueDate == "Immediately"
                     ? "Due Immediately"
-                    : `Due on ${dueDate}`
+                    : `By ${dueDate}`
                   : "Due on Not Available"
               }`}
               // accessibilityRole={`${
@@ -155,7 +155,7 @@ const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, 
                 dueDate == "Immediately" ? (
                   "Due"
                 ) : (
-                  "Due on"
+                  "By"
                 )
               ) : (
                 <NotAvailable />

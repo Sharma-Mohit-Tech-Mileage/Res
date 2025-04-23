@@ -51,9 +51,9 @@ const CardNewBiller = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, nav
           {(dueDate != "Invalid date" && billAmt!=undefined) && (
             <Text 
               accessible={true}
-              accessibilityLabel={`${dueDate ? (dueDate=='Immediately')?"Due Immediately"  :"Due on": "Due on Not Available"}`}
+              accessibilityLabel={`${dueDate ? (dueDate=='Immediately')?"Due Immediately"  :"By": "Due on Not Available"}`}
              style={[styles.dueDate,{color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue,fontWeight:(dueDate=='Immediately')? "400":'700'}]}>
-              {dueDate ? (dueDate=='Immediately')?"Due"  :"Due on": <NotAvailable/>}
+              {dueDate ? (dueDate=='Immediately')?"Due"  :"By": <NotAvailable/>}
               <Text style={[styles.dueDate, { fontWeight: "400",color:(dueDate=='Immediately')?colors.sparklight_red:colors.sparklight_purple_blue }]}>
                 {' '+dueDate}
               </Text>

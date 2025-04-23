@@ -112,8 +112,8 @@ const SplashScreen = ({ navigation, route }) => {
         setErrorMessage1(" to manage your Sparklight Business services account");
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
-        setErrorMessage(strings.nonAdminUserMsg);
-        setErrorMessage1(' to view information.');
+        setErrorMessage(strings.AdminMsg);
+        //setErrorMessage1(' to view information.');
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.customerType === 'Business') {
         setErrorMessage(strings.BusinessUserMsg);
