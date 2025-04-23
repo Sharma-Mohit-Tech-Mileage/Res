@@ -3,7 +3,7 @@ import { Env } from "./apis/account/Constants";
 import axios from "axios";
 import { RefreshToken } from '../components/user/Session';
 import { navigationRef } from '../navigations/UserNavigations';
-
+import AuthLoggingService from "../components/user/AuthLoggingService";
 // Base URLs with ensured trailing slashes
 const BASE_URL = Env.API_BASEURL.endsWith('/') ? Env.API_BASEURL : `${Env.API_BASEURL}/`;
 const API_ACP_BASEURL = Env.API_ACP_BASEURL.endsWith('/') ? Env.API_ACP_BASEURL : `${API_ACP_BASEURL}/`;
@@ -105,49 +105,86 @@ const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess
     }
 };
   
-export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => {
-    const idTokenGuid = body?.idTokenGuid;
-    const refreshToken = body?.refreshToken;
-    
-    try {
-      const requestBody = { ...body };
-      delete requestBody.idTokenGuid;
-      delete requestBody.refreshToken;
-      const res = await axios.post(`${BASE_URL}${endpoint}`, requestBody, {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        timeout: 30000,
-        validateStatus: (status) => status >= 200 && status < 300
-      });
-      const responseData = { ...res.data };
-      if (idTokenGuid) {
-        responseData.idTokenGuid = idTokenGuid;
-      }
-      if (refreshToken) {
-        responseData.refreshToken = refreshToken;
-      }
-      console.debug(`API call to ${endpoint} successful`);
-      onSuccess(responseData);
-    } catch (err) {
-      const errorResponse = {
-        err,
-        status: err.response?.status,
-        message: err.response?.data?.message || err.message || 'Request failed',
-        endpoint,
-        timestamp: new Date().toISOString()
-      };
 
-      console.error('PostAuthApiRequest error:', {
-        err,
-        endpoint,
-        status: errorResponse.status,
-        message: errorResponse.message
-      });
-      onError(errorResponse);
+
+export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => {
+  const idTokenGuid = body?.idTokenGuid;
+  const refreshToken = body?.refreshToken;
+  
+  // Start performance timer
+  const requestStartTime = Date.now();
+  
+  try {
+    const requestBody = { ...body };
+    delete requestBody.idTokenGuid;
+    delete requestBody.refreshToken;
+    
+    const res = await axios.post(`${BASE_URL}${endpoint}`, requestBody, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      timeout: 30000,
+      validateStatus: (status) => status >= 200 && status < 300
+    });
+    
+    // Calculate response time
+    const responseTime = Date.now() - requestStartTime;
+    
+    const responseData = { ...res.data };
+    if (idTokenGuid) {
+      responseData.idTokenGuid = idTokenGuid;
     }
-  };
+    if (refreshToken) {
+      responseData.refreshToken = refreshToken;
+    }
+    
+    // Background performance logging with zero UI impact
+    setTimeout(() => {
+      AuthLoggingService.logAuthSuccess("PostAuthApiRequest", {
+        userInfo: responseData.userInfo || {},
+        performance: `ResponseTime:${responseTime}ms|Endpoint:${endpoint}`
+      }).catch(() => {/* Silent catch */});
+    }, 0);
+    
+    onSuccess(responseData);
+  } catch (err) {
+    // Calculate response time even for errors
+    const responseTime = Date.now() - requestStartTime;
+    
+    // Enhanced diagnostic information
+    const diagnosticInfo = {
+      requestUrl: `${BASE_URL}${endpoint}`,
+      hasResponse: !!err.response,
+      statusCode: err.response?.status,
+      statusText: err.response?.statusText,
+      isTimeout: err.code === 'ECONNABORTED',
+      responseTime: `${responseTime}ms`
+    };
+    
+    // Create enhanced message
+    const enhancedMessage = `${err.response?.data?.message || err.message || 'Request failed'} - Endpoint:${endpoint} - Status:${diagnosticInfo.statusCode || 'N/A'} - Time:${diagnosticInfo.responseTime}`;
+    
+    const errorResponse = {
+      err,
+      status: diagnosticInfo.statusCode,
+      message: enhancedMessage,
+      endpoint,
+      timestamp: new Date().toISOString()
+    };
+
+    // Background logging with zero UI impact
+    setTimeout(() => {
+      AuthLoggingService.logAuthError(
+        "PostAuthApiRequest", 
+        errorResponse, 
+        AuthLoggingService.ERROR_CODES.TOKEN_REQUEST_FAILURE
+      ).catch(() => {/* Silent catch */});
+    }, 0);
+    
+    onError(errorResponse);
+  }
+};
 export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     const user = await getUser();
     const baseUrl = await getBaseUrl(); // Dynamically get the base URL

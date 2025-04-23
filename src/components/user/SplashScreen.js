@@ -18,6 +18,7 @@ import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import RenderText from "../common/RenderText";
 import moment from "moment";
+import AuthLoggingService from "./AuthLoggingService";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -54,18 +55,12 @@ const SplashScreen = ({ navigation, route }) => {
 
   const onSuccess = async (res) => {
     setLoading(false);
+    // Fire and forget logging - completely non-blocking
+  setTimeout(() => {
+    AuthLoggingService.logAuthSuccess("callSSOLoginApi", res)
+      .catch(() => {/* Silent catch */});
+  }, 0);
     handleLogin(res);
-    dispatch(
-      logInfo({
-        host: DeviceInfo.getSystemName(),
-        application: "Sparklight Residential Mobile App",
-        className: "AuthenticationService",
-        methodName: "callSSOLoginApi",
-        messageDate: new Date().toISOString().split("T")[0],
-        errorCode: 0,
-        message: "Successful SSO Login",
-      })
-    );
   };
 
   const handleLogin = async (res) => {
@@ -173,16 +168,25 @@ const SplashScreen = ({ navigation, route }) => {
   const onError = (error) => {
     setLoading(false);
     setDisconnected(true);
-    dispatch(
-      logError({
-        host: DeviceInfo.getSystemName(),
-        application: "Sparklight Residential Mobile App",
-        className: "AuthenticationService",
-        methodName: "callSSOLoginApi",
-        errorDate: new Date().toISOString().split("T")[0],
-         message: error.message,
-        errorCode: 30800,
-      }));
+    // Enhance error object with device context (no UI impact)
+  const enhancedError = {
+    ...error,
+    deviceContext: {
+      platform: Platform.OS,
+      version: Platform.Version,
+      model: DeviceInfo.getModel()
+    }
+  };
+  
+  // Fire and forget logging - completely non-blocking
+  setTimeout(() => {
+    AuthLoggingService.logAuthError(
+      "callSSOLoginApi", 
+      enhancedError, 
+      AuthLoggingService.ERROR_CODES.TOKEN_REQUEST_FAILURE
+    ).catch(() => {/* Silent catch */});
+  }, 0);
+
   };
 
   const CustomAlertModal = ({
@@ -258,23 +262,42 @@ const SplashScreen = ({ navigation, route }) => {
     logoutAction();
   };
 
-  const loginAuth = async () => {
-    try {
-      const result = await authorize(config);
-      const data = {
-        idToken: result.idToken,
-        accessToken: result.accessToken,
-        idTokenGuid: result.authorizeAdditionalParameters.session_state,
-        refreshToken: result.refreshToken,
-      };
-      setLoading(true);
-      storeSsoToken(data);
-      callSSOLoginApi(data);
-    } catch (error) {
-      setLoginEnable(true);
-      setLoginEnable(true);
-    }
-  };
+ // Update loginAuth function with robust background error handling
+const loginAuth = async () => {
+  try {
+    const result = await authorize(config);
+    const data = {
+      idToken: result.idToken,
+      accessToken: result.accessToken,
+      idTokenGuid: result.authorizeAdditionalParameters.session_state,
+      refreshToken: result.refreshToken,
+    };
+    
+    // Background logging with zero UI impact
+    setTimeout(() => {
+      AuthLoggingService.logAuthSuccess("loginAuth", { 
+        userInfo: { 
+          userName: result.authorizeAdditionalParameters.userName || "SSO_USER"
+        } 
+      }).catch(() => {/* Silent catch */});
+    }, 0);
+    
+    setLoading(true);
+    storeSsoToken(data);
+    callSSOLoginApi(data);
+  } catch (error) {
+    setLoginEnable(true);
+    
+    // Background logging with zero UI impact
+    setTimeout(() => {
+      AuthLoggingService.logAuthError(
+        "loginAuth", 
+        error, 
+        AuthLoggingService.ERROR_CODES.SSO_AUTH_FAILURE
+      ).catch(() => {/* Silent catch */});
+    }, 0);
+  }
+};
 
   useEffect(() => {
 
