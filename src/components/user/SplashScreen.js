@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, StyleSheet, Text, ActivityIndicator, Linking, Modal, Platform, Animated, Easing,TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, ActivityIndicator, Linking, Modal, Platform, Animated, Easing, TouchableOpacity } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
@@ -9,7 +9,6 @@ import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
-import DeviceInfo from "react-native-device-info";
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
@@ -18,6 +17,7 @@ import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import RenderText from "../common/RenderText";
 import moment from "moment";
+import LoginLogger from "../../components/utility/LoginLogger";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -44,28 +44,29 @@ const SplashScreen = ({ navigation, route }) => {
   const [isVisible, setIsVisible] = useState(false)
   const fadeAnim = useRef(new Animated.Value(0)).current;
   
-
-
+  const [loginAttemptInfo, setLoginAttemptInfo] = useState({});
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
+    setLoginAttemptInfo({
+      attemptTimestamp: new Date().toISOString(),
+      hasIdToken: !!request.idToken,
+      hasAccessToken: !!request.accessToken
+    });
     PostAuthApiRequest("/mobile/api/gettoken", request, onSuccess, onError);
   };
 
   const onSuccess = async (res) => {
     setLoading(false);
+    
+    if (res && res.userInfo) {
+      LoginLogger.logSuccessfulLogin(dispatch, logInfo, res.userInfo, {
+        hasJwtToken: !!res.jwtToken,
+        userHasServices: !!res.custServices
+      });
+    }
+    
     handleLogin(res);
-    dispatch(
-      logInfo({
-        host: DeviceInfo.getSystemName(),
-        application: "Sparklight Residential Mobile App",
-        className: "AuthenticationService",
-        methodName: "callSSOLoginApi",
-        messageDate: new Date().toISOString().split("T")[0],
-        errorCode: 0,
-        message: "Successful SSO Login",
-      })
-    );
   };
 
   const handleLogin = async (res) => {
@@ -82,10 +83,10 @@ const SplashScreen = ({ navigation, route }) => {
       let isNormalUser = userInfo && userInfo.accountNumber && userInfo.accountNumber.toString().length === 9 ? true : false;
       user['isNormalUser'] = isNormalUser;
       setIsBusiness(false);
+      
       if (!isNormalUser) {
         if (res.userInfo.authLevel != "HeadOfHousehold" && userInfo.authLevel == "Admin") {
           setErrorMessage(strings.AdminMsg);
-          //setErrorMessage1(" to view information.");
           setTimeout(() => { setModalVisible(true); }, 100);
         } else if (res.userInfo.customerType === "COM") {
           setIsBusiness(true);
@@ -104,7 +105,6 @@ const SplashScreen = ({ navigation, route }) => {
         userInfo.acctStatus !== "Active"
       ) {
         setErrorMessage(strings.AdminMsg);
-        //setErrorMessage1(" to view information.");
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.customerType != "Residential") {
         setIsBusiness(true);
@@ -113,7 +113,6 @@ const SplashScreen = ({ navigation, route }) => {
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
         setErrorMessage(strings.AdminMsg);
-        //setErrorMessage1(' to view information.');
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.customerType === 'Business') {
         setErrorMessage(strings.BusinessUserMsg);
@@ -145,24 +144,51 @@ const SplashScreen = ({ navigation, route }) => {
     getSsoToken()
       .then((res) => {
         const token = res.idToken;
-        logout(config, {
-          idToken: token,
-          postLogoutRedirectUrl: config.redirectUrl,
-        })
-          .then(() => {
-            storeUser({});
-            storeSsoToken({});
-            saveUserInfo({});
-            cleanUserData();
-            if (postLogoutCallback) {
-              postLogoutCallback();
-            }
+        
+        getUser().then(user => {
+          if (user && user.userInfo) {
+            LoginLogger.logLogout(dispatch, logInfo, user.userInfo);
+          }
+          
+          logout(config, {
+            idToken: token,
+            postLogoutRedirectUrl: config.redirectUrl,
           })
-          .catch((error) => {
-            if (postLogoutCallback) {
-              postLogoutCallback();
-            }
-          });
+            .then(() => {
+              storeUser({});
+              storeSsoToken({});
+              saveUserInfo({});
+              cleanUserData();
+              if (postLogoutCallback) {
+                postLogoutCallback();
+              }
+            })
+            .catch((error) => {
+              if (postLogoutCallback) {
+                postLogoutCallback();
+              }
+            });
+        }).catch(() => {
+          // If we can't get user info, still proceed with logout
+          logout(config, {
+            idToken: token,
+            postLogoutRedirectUrl: config.redirectUrl,
+          })
+            .then(() => {
+              storeUser({});
+              storeSsoToken({});
+              saveUserInfo({});
+              cleanUserData();
+              if (postLogoutCallback) {
+                postLogoutCallback();
+              }
+            })
+            .catch((error) => {
+              if (postLogoutCallback) {
+                postLogoutCallback();
+              }
+            });
+        });
       })
       .catch((error) => {
         if (postLogoutCallback) {
@@ -170,19 +196,12 @@ const SplashScreen = ({ navigation, route }) => {
         }
       });
   };
+  
   const onError = (error) => {
+    console.log("Error in SSO login API:---------------------------", error);
     setLoading(false);
     setDisconnected(true);
-    dispatch(
-      logError({
-        host: DeviceInfo.getSystemName(),
-        application: "Sparklight Residential Mobile App",
-        className: "AuthenticationService",
-        methodName: "callSSOLoginApi",
-        errorDate: new Date().toISOString().split("T")[0],
-         message: error.message,
-        errorCode: 30800,
-      }));
+    LoginLogger.logFailedLogin(dispatch, logError, error, loginAttemptInfo);
   };
 
   const CustomAlertModal = ({
@@ -269,19 +288,41 @@ const SplashScreen = ({ navigation, route }) => {
       };
       setLoading(true);
       storeSsoToken(data);
+      
+      // Log login attempt info
+      setLoginAttemptInfo({
+        attemptTimestamp: new Date().toISOString(),
+        authMethod: "authorize",
+        hasIdToken: !!data.idToken,
+        hasAccessToken: !!data.accessToken
+      });
+      
       callSSOLoginApi(data);
     } catch (error) {
-      setLoginEnable(true);
+      LoginLogger.logFailedLogin(dispatch, logError, {
+        message: "Authorization failed",
+        code: error?.code || 30801
+      }, {
+        authMethod: "authorize",
+        errorDetails: error?.message
+      });
+      
       setLoginEnable(true);
     }
   };
 
   useEffect(() => {
-
     const fetchData = async () => {
       try {
         const user = await getUser();
         if (user?.refreshToken != null) {
+          // Log refresh token attempt
+          setLoginAttemptInfo({
+            attemptTimestamp: new Date().toISOString(),
+            authMethod: "refresh",
+            accountNumber: user.userInfo?.accountNumber
+          });
+          
           const result = await refresh(config, {
             refreshToken: user.refreshToken,
           });
@@ -299,6 +340,15 @@ const SplashScreen = ({ navigation, route }) => {
           setLoginEnable(true);
         }
       } catch (error) {
+        // Log refresh token failure
+        LoginLogger.logFailedLogin(dispatch, logError, {
+          message: "Refresh token failed",
+          code: error?.code || 30802
+        }, {
+          authMethod: "refresh",
+          errorDetails: error?.message
+        });
+        
         setLoginEnable(true);
       }
     };

@@ -66,6 +66,12 @@ const AxiosInterceptorProvider = ({ children }) => {
             async error => {
                 const originalRequest = error.config;
 
+                // Handle timeout errors - retry once
+                if (error.code === 'ECONNABORTED' && error.message && error.message.includes('timeout') && !originalRequest._timeoutRetry) {
+                    originalRequest._timeoutRetry = true; // Mark as retried
+                    return _axios(originalRequest); // Retry the request
+                }
+
                 if (error.response && error.response.status === 401 && !originalRequest._retry) {
                     if (isRefreshing) {
                         return new Promise((resolve, reject) => {
