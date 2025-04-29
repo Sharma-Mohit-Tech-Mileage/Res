@@ -83,7 +83,7 @@ const SplashScreen = ({ navigation, route }) => {
       user['isNormalUser'] = isNormalUser;
       setIsBusiness(false);
       if (!isNormalUser) {
-        if (res.userInfo.authLevel != "HeadOfHousehold" && userInfo.authLevel == "Admin") {
+        if (res.userInfo?.authLevel != "HeadOfHousehold" && userInfo?.authLevel == "Admin") {
           setErrorMessage(strings.AdminMsg);
           //setErrorMessage1(" to view information.");
           setTimeout(() => { setModalVisible(true); }, 100);
@@ -100,7 +100,7 @@ const SplashScreen = ({ navigation, route }) => {
       } else if (res.userInfo.acctStatus === "Disconnect") {
         setTimeout(() => { setDisconnected(true); }, 500);
       } else if (
-        (userInfo.authLevel !== "HeadOfHousehold" && userInfo.authLevel == "Admin") ||
+        (userInfo?.authLevel !== "HeadOfHousehold" && userInfo?.authLevel == "Admin") ||
         userInfo.acctStatus !== "Active"
       ) {
         setErrorMessage(strings.AdminMsg);

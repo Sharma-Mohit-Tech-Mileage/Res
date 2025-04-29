@@ -213,7 +213,7 @@ const UserManagement = ({route}) => {
             }}
           />
           <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
-            <View style={[styles.usersParent, styles.frameGroupSpaceBlock]}>
+            {/* <View style={[styles.usersParent, styles.frameGroupSpaceBlock]}>
               <View style={{flexDirection:'column', flex:2}}>
               <Text style={[styles.users, styles.usersFlexBox]}>Users</Text>
               <Text style={[styles.users, styles.usersFlexBox,{fontSize:14}]}>*Add Up To 5 User Accounts</Text>
@@ -233,7 +233,7 @@ const UserManagement = ({route}) => {
                 </Text>
               </Pressable>
              )}
-            </View>
+            </View> */}
             <View style={styles.frameContainer}>
               {userList.map((user, index) => (
                 <React.Fragment key={index}>
