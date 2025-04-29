@@ -249,10 +249,13 @@ function* updateEntryEmailNotification(action) {
 }
 
 function* logErrorSaga(action) {
+    console.log('logErrorSaga: action.payload:-------------------', action.payload);
     try {
-        const response = yield call(logError, action.payload)
+       
+        yield call(logError, action.payload);
+            
     } catch (error) {
-        console.error('API Error Response:', error);
+        console.error('API Error Response failed ============', error);
     }
 }
 
