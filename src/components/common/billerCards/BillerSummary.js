@@ -121,7 +121,7 @@ const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, 
             <ActivityIndicator
               size="large"
               color={colors.primary_color}
-              style={{ marginLeft: wp("15%") }}
+              style={{ alignSelf: "center" }}
             />
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>
