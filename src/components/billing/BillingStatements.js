@@ -269,7 +269,8 @@ const styles = StyleSheet.create({
     marginBottom: 16, // Add 16px spacing between notifications and Year label
   },
   yearSelectorContainer: {
-    marginBottom: 8,
+    marginBottom: 24,
+    gap: 10,
   },
   yearLabel: {
     fontSize: FontSize.size_base,

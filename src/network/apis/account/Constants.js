@@ -21,6 +21,7 @@ export const config = {
     VIEW_BILLINGS :'https://customer.sparklight.com/residential/billing',
     VIEW_PAYMENT :'https://customer.sparklight.com/residential/billing/all-payments',
     BILLING_HISTORY:'https://customer.sparklight.com/residential/billing/statement',
+    PAY_METHOD: 'https://payment.sparklight.com/portalsV3/billing-payment',
     ACP_BILLING:'https://customer.sparklight.com/portals/app-secure',
     encryptvalPassword: '1 0 7 2 8 3 3634',
     ZENDESK_FEEDBACK: {
@@ -53,6 +54,7 @@ export const config = {
     VIEW_BILLINGS :'https://customer.uat.sparklight.com/residential/billing',
     VIEW_PAYMENT :'https://customer.uat.sparklight.com/residential/billing/all-payments',
     BILLING_HISTORY:'https://customer.uat.sparklight.com/residential/billing/statement',
+    PAY_METHOD: 'https://payment.uat.sparklight.com/portalsV3-Demo/billing-payment',
     ACP_BILLING:'https://customer.uat.sparklight.com/portals/app-secure',
     encryptvalPassword: '1 0 7 2 8 3 3634',
     PAYMENTURLNEW: 'https://customer.uat.sparklight.com/portals/app-secure/billing',

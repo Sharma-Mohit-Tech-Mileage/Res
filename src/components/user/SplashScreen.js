@@ -17,7 +17,7 @@ import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import RenderText from "../common/RenderText";
-import SecondaryButton from "../common/customui/SecondaryButton";
+import moment from "moment";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -83,9 +83,9 @@ const SplashScreen = ({ navigation, route }) => {
       user['isNormalUser'] = isNormalUser;
       setIsBusiness(false);
       if (!isNormalUser) {
-        if (res.userInfo.authLevel != "HeadOfHousehold") {
-          setErrorMessage(strings.nonAdminUserMsg);
-          setErrorMessage1(" to view information.");
+        if (res.userInfo?.authLevel != "HeadOfHousehold" && userInfo?.authLevel == "Admin") {
+          setErrorMessage(strings.AdminMsg);
+          //setErrorMessage1(" to view information.");
           setTimeout(() => { setModalVisible(true); }, 100);
         } else if (res.userInfo.customerType === "COM") {
           setIsBusiness(true);
@@ -100,11 +100,11 @@ const SplashScreen = ({ navigation, route }) => {
       } else if (res.userInfo.acctStatus === "Disconnect") {
         setTimeout(() => { setDisconnected(true); }, 500);
       } else if (
-        (userInfo.authLevel !== "HeadOfHousehold" && userInfo.authLevel !== "Admin") ||
+        (userInfo?.authLevel !== "HeadOfHousehold" && userInfo?.authLevel == "Admin") ||
         userInfo.acctStatus !== "Active"
       ) {
-        setErrorMessage(strings.nonAdminUserMsg);
-        setErrorMessage1(" to view information.");
+        setErrorMessage(strings.AdminMsg);
+        //setErrorMessage1(" to view information.");
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.customerType != "Residential") {
         setIsBusiness(true);
@@ -112,8 +112,8 @@ const SplashScreen = ({ navigation, route }) => {
         setErrorMessage1(" to manage your Sparklight Business services account");
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
-        setErrorMessage(strings.nonAdminUserMsg);
-        setErrorMessage1(' to view information.');
+        setErrorMessage(strings.AdminMsg);
+        //setErrorMessage1(' to view information.');
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.customerType === 'Business') {
         setErrorMessage(strings.BusinessUserMsg);
@@ -218,7 +218,7 @@ const SplashScreen = ({ navigation, route }) => {
               }}
               internalTextStyle={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: '', }]}
               splitKey={bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}
-              instruction={`${message} ${bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}${message2}`}
+              instruction={ message2? `${message} ${bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}${message2}`:message}
             />
              
             
@@ -401,6 +401,10 @@ const SplashScreen = ({ navigation, route }) => {
         {ISUAT ? "UAT" : ""} Version:{VersionCheck.getCurrentVersion()}
       </Text>
       )}
+
+        <Text style={[{position:"absolute",bottom:hp("5%"),FontFamily:FontFamily.openSansRegular,fontSize:14,fontWeight:"400",color:colors.snow_white,alignSelf:"center"}]}>
+          {`Copyright © ${moment().year()}, Sparklight ®, All Rights Reserved.`}
+        </Text>
       <CustomAlertModal
         visible={modalVisible}
         message={errorMessage}

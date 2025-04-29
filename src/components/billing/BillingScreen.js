@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Image, StyleSheet, Text, View, TouchableOpacity, ScrollView, } from "react-native";
+import { Image, StyleSheet, Text, View, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
@@ -11,13 +11,14 @@ import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
-import { fetchBillingPaper, fetchProfileDetails, fetchSvEmailAssociation, fetchACPUserAccountDetails,getPaperlessStatus } from "../../redux/actions/ProfileActionSuite";
+import { fetchBillingPaper, fetchProfileDetails, fetchSvEmailAssociation, fetchACPUserAccountDetails, getPaperlessStatus } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import Icon from "../common/Icon";
 import { Env } from "../../network/apis/account/Constants";
 import colors from "../../res/Colors";
 import AppStyles from "../common/styles/AppStyles";
 import { getPrimaryEmail } from "../utility/constant";
+
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.combinedReducers.user.userData);
@@ -25,9 +26,9 @@ const BillingScreen = ({ navigation }) => {
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
   );
-   const paperlessStatusAcp = useSelector(
-      (state) => state.combinedReducers.profile?.paperlessStatusAcp
-    );
+  const paperlessStatusAcp = useSelector(
+    (state) => state.combinedReducers.profile?.paperlessStatusAcp
+  );
   const { allSvEmailAssociated = [] } = profile;
   const paperlessEmails = allSvEmailAssociated.filter((email) => email.invoice);
   const [billAmt, setBillAmt] = useState(undefined);
@@ -38,6 +39,9 @@ const BillingScreen = ({ navigation }) => {
   const [isNewBiller, setIsNewBiller] = useState(!user?.isNormalUser);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
+  
+  // Content loading state
+  const [isContentLoading, setIsContentLoading] = useState(true);
 
   let paperlessCardEmail = '';
   if (isNewBiller) {
@@ -46,10 +50,15 @@ const BillingScreen = ({ navigation }) => {
     paperlessCardEmail = paperlessEmails[0].emailAddress;
   }
 
-  const handleError = (error) => { console.log("error", error); };
+  const handleError = (error) => { 
+    console.log("error", error); 
+    setIsContentLoading(false);
+  };
 
   const getUserAccountDetails = () => {
     setBillAmt(undefined);
+    setIsContentLoading(true);
+    
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
       const request = `account/api/account/${accountNumber}`;
@@ -66,44 +75,60 @@ const BillingScreen = ({ navigation }) => {
               Math.round((res.currentBalance || 0) * 100) / 100
             ).toFixed(2);
             setBillAmt(formattedBalance || 0);
+            
             setDefaultPaymentDetails({
               dueDate: res.paymentDueDate,
               billAmount: formattedBalance,
               pastPaymentDue: res.pastDueAmount,
               email: getPrimaryEmail(res),
             });
+            
+            setIsContentLoading(false);
+          } else {
+            setIsContentLoading(false);
           }
         },
         handleError
       );
+    }).catch(error => {
+      console.log("Error getting user:", error);
+      setIsContentLoading(false);
     });
   };
 
   const getStatus = () => {
+    setIsContentLoading(true);
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
       GetApiRequest(
-        user && user.isNormalUser?`account/api/account/${accountNumber}/easypay`:`api/Accounts/${accountNumber}/easypay`,
+        user && user.isNormalUser ? `account/api/account/${accountNumber}/easypay` : `api/Accounts/${accountNumber}/easypay`,
         (res) => {
           setIsAutoPayStatus(res?.isEasyPay);
           setCardDigit(res?.epLastfour);
+          setIsContentLoading(false);
         },
         handleError
       );
+      
       GetApiRequest(
         `account/api/account/${accountNumber}/paperless/status`,
         (res) => {
-         console.log("res---------------------------------------------------------------",res);
           setPaperlessStatus(res?.isPaperless);
+          setIsContentLoading(false);
         },
         handleError
       );
+    }).catch(error => {
+      console.log("Error getting user status:", error);
+      setIsContentLoading(false);
     });
   };
 
   useFocusEffect(
     useCallback(() => {
+      setIsContentLoading(true);
       getStatus();
+      
       if (user && user.isNormalUser) {
         getUserAccountDetails();
         dispatch(fetchBillingPaper());
@@ -133,6 +158,7 @@ const BillingScreen = ({ navigation }) => {
           ? "Immediately"
           : moment(accountDetails.payment_due_date).format("ll");
       setDueDate(formattedDueDate);
+      
       setDefaultPaymentDetails({
         dueDate: accountDetails.payment_due_date,
         billAmount: accountDetails.past_due_amount,
@@ -141,8 +167,11 @@ const BillingScreen = ({ navigation }) => {
       });
       setPaperlessEmail(p_email);
       dispatch(getPaperlessStatus(p_email));
+      
+      setIsContentLoading(false);
     }
   }, [accountDetails, user]);
+
 
   const handleNavigation = (url, name) => {
     navigation.navigate("ArticalWindowUtility", { url, name });
@@ -165,132 +194,142 @@ const BillingScreen = ({ navigation }) => {
       />
       <View style={styles.frameParent}>
         <View style={styles.rightActionableParent}>
-          <View style={styles.rightActionable}>
-            <Text
-              accessibilityLabel="Billing services icon"
-              style={[styles.text, { alignSelf: "center", marginLeft: 5, marginTop: 5 }]}
-            >
-              <BillingIconWhite isSelected={false} />
-            </Text>
+          <View style={[styles.rightActionable, { justifyContent: 'center', alignItems: 'center' }]}>
+            <BillingIconWhite isSelected={false} />
           </View>
           <Text style={styles.melissaSmith}>Billing Services</Text>
         </View>
+        
         <ScrollView showsVerticalScrollIndicator={false} style={{ marginHorizontal: 20 }}>
-          <View style={{ paddingBottom: 100, marginTop: Padding.p_5xl }}>
-            <Card
-              billAmt={billAmt}
-              dueDate={dueDate}
-              acno={user&& user.userInfo && user.userInfo.accountNumber}
-              isAutoPayStatus={isAutoPayStatus}
-              paperlessStatus={paperlessStatus}
-              navigation={navigation}
-              isNewBiller={isNewBiller}
-              style={styles.card}
-            />
-            <AutoPayCard
-              cardDigit={cardDigit}
-              isAutoPayStatus={isAutoPayStatus}
-              paymentDetails={defaultPaymentDetails}
-              navigation={navigation}
-              style={styles.card}
-            />
-            <PeperLessCard
-              paperlessCardEmail={paperlessCardEmail}
-              paperlessStatus={isNewBiller?paperlessStatusAcp:paperlessEmails}
-              navigation={navigation}
-              style={styles.card}
-            />
-            <View style={[AppStyles.card, styles.myModemSpaceBlock]}>
-              <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
-                <Text style={styles.leftTitle}>Billing Options</Text>
+          <View style={{ paddingBottom: 80, marginTop: Padding.p_5xl }}>
+            {isContentLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
+                <Text style={styles.loadingText}>Loading...</Text>
               </View>
-              <View style={[styles.supportAccordionParent, styles.supportParentFlexBox]}>
-               
-                <View style={styles.frameLayout} />
-                {isNewBiller &&<TouchableOpacity
-                  style={styles.frame9defaultSpaceBlock}
-                  onPress={() => {
-                    const billingURL = isNewBiller
-                      ? `${Env.ACP_BILLING}/billing-payment`
-                      : `${Env.URL}/billing`;
+            ) : (
+              <>
+                <Card
+                  billAmt={billAmt}
+                  dueDate={dueDate}
+                  acno={user && user.userInfo && user.userInfo.accountNumber}
+                  isAutoPayStatus={isAutoPayStatus}
+                  paperlessStatus={paperlessStatus}
+                  navigation={navigation}
+                  isNewBiller={isNewBiller}
+                  style={styles.card}
+                />
+                <AutoPayCard
+                  cardDigit={cardDigit}
+                  isAutoPayStatus={isAutoPayStatus}
+                  paymentDetails={defaultPaymentDetails}
+                  navigation={navigation}
+                  style={styles.card}
+                />
+                <PeperLessCard
+                  paperlessCardEmail={paperlessCardEmail}
+                  paperlessStatus={isNewBiller ? paperlessStatusAcp : paperlessEmails}
+                  navigation={navigation}
+                  style={styles.card}
+                />
+                <View style={[AppStyles.card, styles.myModemSpaceBlock]}>
+                  <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
+                    <Text style={styles.leftTitle}>Billing Options</Text>
+                  </View>
+                  <View style={[styles.supportAccordionParent, styles.supportParentFlexBox]}>
                   
-                    if (isNewBiller) {
-                       navigation.navigate("AutoPayPCIConnector", {
-                                      url: `${Env.URL}/billing-payment`,
-                                      name: "Manage Payment Method",
-                                      useNewPayment: true ,
-                                      status: isAutoPayStatus,
-                                      paymentDetails:defaultPaymentDetails
-                                    });
-                    } else {
-                      handleNavigation(billingURL, "Manage Payment Method");
-                    }
-                  }}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="Manage Payment Method"
-                >
-                   {isNewBiller && <Icon name="building-doc" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
-                  <Text style={styles.modemHealthSupport}>Manage Payment Method</Text>
-                  <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
-                </TouchableOpacity>}
-                <View style={styles.frameLayout} />
-                <TouchableOpacity
-                  style={styles.frame9defaultSpaceBlock}
-                  onPress={() => {
-                    const billingURL = isNewBiller
-                      ? `${Env.ACP_BILLING}/billing`
-                      : `${Env.URL}/billing`;
-                    handleNavigation(billingURL, isNewBiller?"View Bill Breakdown":"View Billing Details");
-                  }}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="View Bill Breakdown"
-                >
-                  {isNewBiller && <Icon name="search-book" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
-                  <Text style={styles.modemHealthSupport}>{isNewBiller?"View Bill Breakdown":"View Billing Details"}</Text>
-                  <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
-                </TouchableOpacity>
-                <View style={styles.frameLayout} />
-                <TouchableOpacity
-                  style={styles.frame9defaultSpaceBlock}
-                  onPress={() => {
-                    if (isNewBiller) {
-                      navigation.navigate("PaymentHistory"); 
-                    } else {
-                      handleNavigation(Env.VIEW_PAYMENT, "View Payment History");
-                    }
-                  }}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="View Payment History"
-                >
-                  {isNewBiller && <Icon name="document" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
-                  
-                  <Text style={styles.modemHealthSupport}>View Payment History</Text>
-               <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
-                </TouchableOpacity>
-                <View style={styles.frameLayout} />
-                
-                <TouchableOpacity
-                  style={styles.frame9defaultSpaceBlock}
-                  onPress={() => {
-                    if (isNewBiller) {
-                      navigation.navigate("BillingStatements"); // Direct navigation
-                    } else {
-                      handleNavigation(Env.BILLING_HISTORY, "View Billing Statements");
-                    }
-                  }}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="View Billing Statements"
-                >
-                  {isNewBiller && <Icon name="bill-paid" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
-                  <Text style={styles.modemHealthSupport}>View Billing Statements</Text>
-                  <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
-                </TouchableOpacity>
-              </View>
-            </View>
+                    <View style={styles.frameLayout} />
+                    {isNewBiller && (
+                      <TouchableOpacity
+                        style={styles.frame9defaultSpaceBlock}
+                        onPress={() => {
+                            const billingURL = isNewBiller
+                              ? `${Env.ACP_BILLING}/billing-payment`
+                              : `${Env.URL}/billing`;
+                          
+                            if (isNewBiller) {
+                              navigation.navigate("AutoPayPCIConnector", {
+                                url: Env.PAY_METHOD,
+                                name: "Manage Payment Method",
+                                useNewPayment: true,
+                                status: isAutoPayStatus,
+                                paymentDetails: defaultPaymentDetails,
+                                customPaymentUrl: Env.PAY_METHOD
+                              });
+                            } else {
+                              handleNavigation(billingURL, "Manage Payment Method");
+                            }
+                          }
+                        }
+                        accessible={true}
+                        accessibilityRole="button"
+                        accessibilityLabel="Manage Payment Method"
+                      >
+                        {isNewBiller && <Icon name="building-doc" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
+                        <Text style={styles.modemHealthSupport}>Manage Payment Method</Text>
+                        <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
+                      </TouchableOpacity>
+                    )}
+                    <View style={styles.frameLayout} />
+                    {<TouchableOpacity
+                      style={styles.frame9defaultSpaceBlock}
+                      onPress={() => {
+                        if (isNewBiller) {
+                          navigation.navigate("BillingBreakDown"); 
+                        } else {
+                          handleNavigation(`${Env.URL}/billing`,  "View Billing Details");
+                        }
+                      }}
+                      accessible={true}
+                      accessibilityRole="button"
+                      accessibilityLabel="View Bill Breakdown"
+                    >
+                      {isNewBiller && <Icon name="search-book" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
+                      <Text style={styles.modemHealthSupport}>{isNewBiller ? "View Bill Breakdown" : "View Billing Details"}</Text>
+                      <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
+                    </TouchableOpacity>}
+                    <View style={styles.frameLayout} />
+                    <TouchableOpacity
+                      style={styles.frame9defaultSpaceBlock}
+                      onPress={() => {
+                        if (isNewBiller) {
+                          navigation.navigate("PaymentHistory"); 
+                        } else {
+                          handleNavigation(Env.VIEW_PAYMENT, "View Payment History");
+                        }
+                      }}
+                      accessible={true}
+                      accessibilityRole="button"
+                      accessibilityLabel="View Payment History"
+                    >
+                      {isNewBiller && <Icon name="document" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
+                      
+                      <Text style={styles.modemHealthSupport}>View Payment History</Text>
+                      <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
+                    </TouchableOpacity>
+                    <View style={styles.frameLayout} />
+                    
+                    <TouchableOpacity
+                      style={styles.frame9defaultSpaceBlock}
+                      onPress={() => {
+                        if (isNewBiller) {
+                          navigation.navigate("BillingStatements"); // Direct navigation
+                        } else {
+                          handleNavigation(Env.BILLING_HISTORY, "View Billing Statements");
+                        }
+                      }}
+                      accessible={true}
+                      accessibilityRole="button"
+                      accessibilityLabel="View Billing Statements"
+                    >
+                      {isNewBiller && <Icon name="bill-paid" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
+                      <Text style={styles.modemHealthSupport}>View Billing Statements</Text>
+                      <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </>
+            )}
           </View>
         </ScrollView>
       </View>
@@ -307,12 +346,24 @@ const styles = StyleSheet.create({
     height: 150,
   },
   leftTitle: {
-    color: colors.sp_black,
+    color: colors.darkest_grey,
     fontSize: 18,
     fontWeight: "400",
     textAlign: "center",
     alignContent: "flex-start",
     alignSelf: "center",
+  },
+  loadingContainer: {
+    height: 500, // Provide enough height to center in the content area
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: colors.sparklight_bright_purple,
+    fontFamily: FontFamily.openSansRegular,
   },
   buttonsSpaceBlock: {
     paddingVertical: Padding.p_base,
@@ -495,7 +546,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     resizeMode: "contain",
-  },
+  }
 });
 
 export default BillingScreen;

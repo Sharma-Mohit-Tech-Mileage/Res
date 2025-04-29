@@ -10,6 +10,8 @@ import { Env } from '../../network/apis/account/Constants';
 import { GetApiRequest } from '../../network/APIClient';
 import { navigationRef } from '../../navigations/UserNavigations';
 import analytics from '@react-native-firebase/analytics';
+import { getPaymentUrl, getReferralUrl } from './PaymentUrlUtils';
+
 const { height, width } = Dimensions.get('window');
 
 const AutoPayPCIConnector = ({ navigation, route }) => {
@@ -27,8 +29,13 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const [html, setHtml] = useState('');
     const [appState, setAppState] = useState(AppState.currentState);
     const [hasTrackedInitialScreen, setHasTrackedInitialScreen] = useState(false);
+    const [isWebViewLoaded, setIsWebViewLoaded] = useState(false);
+    
+    // Support both parameter names for backward compatibility
+    const customReferUrl = route.params?.customReferUrl || route.params?.customPaymentUrl || null;
 
     console.log('AutoPayPCIConnector', paymentDetails);
+    
     const generateGuid = () => {
         const p8 = (s) => {
             const p = (Math.random().toString(16) + "000000000").substr(2, 8);
@@ -82,17 +89,31 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         }).toString();
 
         const param = { guid: gui, key: ix, PaymentObj: baX, RefererUrl: makePaymentUrl };
-        post(param, useNewPayment ? Env.PAYMENTURL_V3 : Env.PAYMENTURL_V2);
+        
+        // Get payment URL using the utility function - just pass the version
+        const version = useNewPayment ? 'V3' : 'V2';
+        const paymentUrl = getPaymentUrl(version);
+        
+        post(param, paymentUrl);
     };
 
     const post = (obj, url) => {
+        // Simplified HTML structure with minimal styling
         const html = `
             <html>
+                <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+                    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+                    <style>
+                        html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
+                    </style>
+                </head>
                 <body>
                     <form id="paymentForm" action="${url}" method="POST">
                         ${Object.keys(obj).map(key => `<input type="hidden" name="${key}" value="${obj[key]}" />`).join('')}
                     </form>
                     <script>
+                        // Simple script to immediately submit the form
                         document.getElementById("paymentForm").submit();
                     </script>
                 </body>
@@ -102,51 +123,133 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     const setDynamicCookie = () => {
-        user.userInfo['customerType']= "Residential";
-        const script = `(function() {
-            var cookieValue = "MobileApp";
-            var customerType = "Residential";
-            var domain = document.location.hostname; 
-            var expirationDate = new Date();
-            expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
-            document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-            document.cookie = "CustomerType=" + customerType + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-            
-            localStorage.setItem('jwt_token', '${currentUser.token}');
-            localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo)}');
-            var upgradeToken = '${currentUser?.upgradeToken}';
-            localStorage.setItem('upgrades_token', upgradeToken);
-        })();`;
+        // Only set cookies if WebView is available and loaded
+        if (!webViewRef.current) return;
+        
+        try {
+            const script = `(function() {
+                try {
+                    var cookieValue = "MobileApp";
+                    var customerType = "Residential";
+                    var domain = document.location.hostname; 
+                    var expirationDate = new Date();
+                    expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+                    
+                    // Set cookies
+                    document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+                    document.cookie = "CustomerType=" + customerType + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+                    
+                    // Set localStorage
+                    localStorage.setItem('jwt_token', '${currentUser.token || ""}');
+                    localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo || {}).replace(/'/g, "\\'")}');
+                    localStorage.setItem('upgrades_token', '${currentUser?.upgradeToken || ""}');
+                    
+                    return true;
+                } catch(e) {
+                    console.error("Error in cookie setting:", e);
+                    return true;
+                }
+            })();`;
 
-        if (webViewRef.current) {
             webViewRef.current.injectJavaScript(script);
-        } else {
-            console.warn('WebView reference is not available to inject JavaScript.');
+        } catch (error) {
+            console.warn('WebView reference error:', error);
         }
     };
 
     const initializePayment = async () => {
         try {
             const userLocal = await getUser();
+            if (!userLocal || !userLocal.userInfo || !userLocal.userInfo.accountNumber) {
+                console.error("Invalid user data");
+                navigation.navigate('Billing');
+                return;
+            }
+
             const accountNumber = userLocal.userInfo.accountNumber;
-            let isAcp = accountNumber.toString().length >= 16
-            GetApiRequest(
-                isAcp?`api/accounts/${accountNumber}/easypay`:`account/api/account/${accountNumber}/easypay`,
-                (res) => {
-                    console.log("Payment details fetched successfully:", res);
-                    const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.isEasyPay, res?.easyPayId);
-                    const payURL = useNewPayment
-                        ? (status ? Env.URL_EASYPAY_MANAGE_V3 : Env.URL_EASYPAY_SETUP_V3)
-                        : (status ? Env.URL_EASYPAY_MANAGE_V2 : Env.URL_EASYPAY_SETUP_V2);
-                    console.log("Payment details fetched successfully:", payURL);
-                    redirectToEBillpay(paymentObj, payURL);
-                },
-                (error) => {
-                    console.error("Error fetching payment details:", error);
+            let isAcp = accountNumber.toString().length >= 16;
+            
+            // Timeout for API requests to prevent hanging
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error("API request timed out")), 15000);
+            });
+            
+            // Race between actual request and timeout
+            const apiRequest = new Promise((resolve) => {
+                GetApiRequest(
+                    isAcp ? `api/accounts/${accountNumber}/easypay` : `account/api/account/${accountNumber}/easypay`,
+                    (res) => {
+                        resolve(res);
+                    },
+                    (error) => {
+                        console.error("Error fetching payment details:", error);
+                        resolve(null); // Resolve with null on error to handle in next step
+                    }
+                );
+            });
+            
+            const res = await Promise.race([apiRequest, timeoutPromise]).catch(error => {
+                console.error("API request failed:", error);
+                return null;
+            });
+            
+            if (!res) {
+                console.log("Using fallback approach due to API failure");
+                // Fallback approach - just use what we have
+                const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, false, '');
+                const version = useNewPayment ? 'V3' : 'V2';
+                const type = status ? 'MANAGE' : 'SETUP';
+                let referralUrl;
+                
+                try {
+                    referralUrl = getReferralUrl(version, type, customReferUrl);
+                } catch (error) {
+                    console.error("Error getting referral URL:", error);
+                    // Fallback to direct URLs if getReferralUrl fails
+                    if (version === 'V3') {
+                        referralUrl = status ? 
+                            (Env.REFERRAL_URL_MANAGE_V3 || 'https://myaccount.sparklight.com/billing/manage-payment-method') : 
+                            (Env.REFERRAL_URL_SETUP_V3 || 'https://myaccount.sparklight.com/billing/setup-payment-method');
+                    } else {
+                        referralUrl = status ? 
+                            (Env.REFERRAL_URL_MANAGE_V2 || 'https://myaccount.sparklight.com/billing/manage-payment-method') : 
+                            (Env.REFERRAL_URL_SETUP_V2 || 'https://myaccount.sparklight.com/billing/setup-payment-method');
+                    }
                 }
-            );
+                
+                redirectToEBillpay(paymentObj, referralUrl);
+                return;
+            }
+            
+            console.log("Payment details fetched successfully");
+            const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.isEasyPay, res?.easyPayId);
+            
+            // Get the correct referral URL
+            const version = useNewPayment ? 'V3' : 'V2';
+            const type = status ? 'MANAGE' : 'SETUP';
+            let referralUrl;
+            
+            try {
+                referralUrl = getReferralUrl(version, type, customReferUrl);
+            } catch (error) {
+                console.error("Error getting referral URL:", error);
+                // Fallback to direct URLs if getReferralUrl fails
+                if (version === 'V3') {
+                    referralUrl = status ? 
+                        (Env.REFERRAL_URL_MANAGE_V3 || 'https://myaccount.sparklight.com/billing/manage-payment-method') : 
+                        (Env.REFERRAL_URL_SETUP_V3 || 'https://myaccount.sparklight.com/billing/setup-payment-method');
+                } else {
+                    referralUrl = status ? 
+                        (Env.REFERRAL_URL_MANAGE_V2 || 'https://myaccount.sparklight.com/billing/manage-payment-method') : 
+                        (Env.REFERRAL_URL_SETUP_V2 || 'https://myaccount.sparklight.com/billing/setup-payment-method');
+                }
+            }
+            
+            console.log("Referral URL:", referralUrl);
+            redirectToEBillpay(paymentObj, referralUrl);
         } catch (error) {
             console.error("Error initializing payment:", error);
+            navigation.navigate('Billing');
         }
     };
 
@@ -158,7 +261,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             } catch (error) {
                 console.error("Error during navigation change token refresh", error);
                 if (navigationRef.current) {
-                    navigationRef.current.navigate('Splash');  // Navigate to Splash screen on error
+                    navigationRef.current.navigate('Splash');
                 }
             }
         };
@@ -166,15 +269,20 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         refreshAndInitialize();
     }, []);
 
-    const navigationChange = async (navState) => {
-        //setDynamicCookie();  // Update cookie on any navigation change
+  // Modify AutoPayPCIConnector.jsx where it handles the expiration
 
-        if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
-            if (!navStateReloading) {
-                navigation.navigate('Dashboard');
-            }
+const navigationChange = async (navState) => {
+    if (!navState || !navState.url) return;
+    
+    console.log("Navigation change to:", navState.url);
+    
+    if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
+        if (!navStateReloading) {
+            // Instead of navigating to Dashboard, navigate back to the Billing main screen
+            navigation.navigate('Billing');
         }
-    };
+    }
+};
 
     const userUpdate = async () => {
         const userLocal = await getUser();
@@ -192,27 +300,36 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const userUpdateScript = async (user) => {
         const upgradeToken = await getUpgradeToken();
         if (user.token) {
+            // Simplified script to avoid syntax errors
             const SAVE_FROM_RN = `(function() {
-                localStorage.setItem('jwt_token', '${user.token}');
-                localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
-                localStorage.setItem('upgrades_token', '${upgradeToken?.access_token}');
-               var cookieValue = "MobileApp";
-            var customerType = "Residential";
-            var domain = document.location.hostname; 
-            var expirationDate = new Date();
-            expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
-            document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-            document.cookie = "CustomerType=" + customerType + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-                var open = XMLHttpRequest.prototype.open;
-                XMLHttpRequest.prototype.open = function() {
-                    this.addEventListener("load", function(event) {
-                        if (this.responseURL.match('/account/.*/statements/') !== null) {
-                            var message = {"status" : this.status, "responseURL" : this.responseURL, "response" : this.response}
-                            window.ReactNativeWebView.postMessage(JSON.stringify(message));
-                        }
-                    });
-                    open.apply(this, arguments);
-                };
+                try {
+                    localStorage.setItem('jwt_token', '${user.token}');
+                    localStorage.setItem('user_info', '${JSON.stringify(user.userInfo || {}).replace(/'/g, "\\'")}');
+                    localStorage.setItem('upgrades_token', '${upgradeToken?.access_token || ""}');
+                    
+                    var cookieValue = "MobileApp";
+                    var customerType = "Residential";
+                    var domain = document.location.hostname; 
+                    var expirationDate = new Date();
+                    expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+                    
+                    document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+                    document.cookie = "CustomerType=" + customerType + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+                    
+                    var open = XMLHttpRequest.prototype.open;
+                    XMLHttpRequest.prototype.open = function() {
+                        this.addEventListener("load", function(event) {
+                            if (this.responseURL && this.responseURL.match('/account/.*/statements/') !== null) {
+                                var message = {"status" : this.status, "responseURL" : this.responseURL, "response" : this.response}
+                                window.ReactNativeWebView.postMessage(JSON.stringify(message));
+                            }
+                        });
+                        open.apply(this, arguments);
+                    };
+                } catch(e) {
+                    console.error("Error updating session:", e);
+                }
+                return true;
             })();`;
             setInitScript(SAVE_FROM_RN);
         }
@@ -223,10 +340,14 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     }, [url]);
 
     useEffect(() => {
-        setCurrentUser(user);
-        userUpdateScript(user);
-        setDynamicCookie();  // Set cookie when user is updated
-    }, [user]);
+        if (user) {
+            setCurrentUser(user);
+            userUpdateScript(user);
+            if (isWebViewLoaded) {
+                setTimeout(() => setDynamicCookie(), 500);
+            }
+        }
+    }, [user, isWebViewLoaded]);
 
     useEffect(() => {
         const handleAppStateChange = nextAppState => {
@@ -234,8 +355,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 setTimeout(() => {
                     if (webViewRef.current && !webViewRef.current.loading) {
                         webViewRef.current.reload();
-                    } else {
-                        console.warn('WebView ref is not available for reload or is still loading.');
                     }
                 }, 500);
             }
@@ -252,48 +371,37 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     }, [appState]);
 
     useEffect(() => {
-        setDynamicCookie();  // Push cookie when component is first mounted
-    }, [url, appState]);
-
-    useEffect(() => {
         console.log('PCI Screen Tracking useEffect triggered');
-        console.log('Current PCI screen name:', name);
-        console.log('PCI hasTrackedInitialScreen:', hasTrackedInitialScreen);
 
         const trackScreen = async () => {
             if (name && !hasTrackedInitialScreen) {
-                console.log('Attempting to track PCI screen with name:', name);
                 try {
                     await analytics().logEvent('screen_view', {
                         screen_name: name,
                         screen_class: 'AutoPayPCIConnector'
-                      });
-                    console.log('Successfully tracked PCI screen_view event:', {
-                        screen_name: name,
-                        screen_class: name
                     });
                     setHasTrackedInitialScreen(true);
-                    console.log('Set PCI hasTrackedInitialScreen to true');
                 } catch (error) {
-                    console.error('PCI Analytics error details:', {
-                        error: error.message,
-                        name: name,
-                        stack: error.stack
-                    });
+                    console.error('PCI Analytics error:', error.message);
                 }
-            } else {
-                console.log('Skipped PCI tracking because:', {
-                    hasName: !!name,
-                    name: name,
-                    hasTrackedInitialScreen: hasTrackedInitialScreen
-                });
             }
         };
 
         trackScreen();
     }, [name]);
+
+    // Handler for WebView messages
+    const onMessage = (event) => {
+        try {
+            const data = JSON.parse(event.nativeEvent.data);
+            console.log("WebView message received:", data);
+        } catch (error) {
+            console.error("Error parsing WebView message:", error);
+        }
+    };
+    
     return (
-        <View style={{ flex: 1, marginBottom: (Platform.OS === 'ios') ? 90 : 60 }}>
+        <View style={styles.container}>
             <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); }} title={name} />
             {progress < 1 && (
                 <View style={styles.progressBar}>
@@ -305,12 +413,36 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     ref={webViewRef}
                     source={{ html }}
                     onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
-                    onLoadEnd={() => setProgress(1)}  // Set progress to 1 when load ends
+                    onLoadStart={() => {
+                        console.log("WebView started loading");
+                        setIsWebViewLoaded(false);
+                    }}
+                    onLoadEnd={() => {
+                        console.log("WebView finished loading");
+                        setProgress(1);
+                        setIsWebViewLoaded(true);
+                        setTimeout(() => setDynamicCookie(), 500);
+                    }}
+                    onMessage={onMessage}
                     sharedCookiesEnabled={true}
                     injectedJavaScriptBeforeContentLoaded={initScript}
                     onNavigationStateChange={navigationChange}
-                    originWhitelist={['http://*', 'https://*', 'data:*']}
-                    incognito={true}
+                    originWhitelist={['*']}
+                    incognito={false} // Changed to false to allow cookies
+                    javaScriptEnabled={true}
+                    domStorageEnabled={true}
+                    thirdPartyCookiesEnabled={true}
+                    scalesPageToFit={true}
+                    allowsInlineMediaPlayback={true}
+                    mediaPlaybackRequiresUserAction={false}
+                    mixedContentMode="compatibility"
+                    cacheEnabled={false}
+                    androidHardwareAccelerationDisabled={Platform.OS === 'android'}
+                    onShouldStartLoadWithRequest={(request) => {
+                        console.log("Load request:", request.url);
+                        return true;
+                    }}
+                    style={styles.webView}
                     onError={(syntheticEvent) => {
                         const { nativeEvent } = syntheticEvent;
                         console.error('WebView error: ', nativeEvent);
@@ -318,9 +450,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     onHttpError={(syntheticEvent) => {
                         const { nativeEvent } = syntheticEvent;
                         console.error('WebView HTTP error: ', nativeEvent);
-                        if (!navStateReloading) {
-                            navigation.navigate('Dashboard');
-                        }
+                        // if (!navStateReloading && nativeEvent.statusCode >= 400) {
+                        //     navigation.navigate('Dashboard');
+                        // }
                     }}
                 />
             ) : (
@@ -334,10 +466,20 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        marginBottom: (Platform.OS === 'ios') ? 90 : 60,
+    },
+    webView: {
+        flex: 1,
+        backgroundColor: '#ffffff',
+    },
     loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#ffffff',
     },
     loadingText: {
         marginTop: 10,
@@ -346,8 +488,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     progressBar: {
-        height: height * 0.004, // 0.4% of screen height
+        height: height * 0.004,
         backgroundColor: 'lightgrey',
+        width: '100%',
     },
     progress: {
         height: '100%',
@@ -356,4 +499,3 @@ const styles = StyleSheet.create({
 });
 
 export default AutoPayPCIConnector;
-

@@ -27,7 +27,6 @@ const PasswordSecurityEdit = () => {
   const scrollViewRef = useRef(null);
   const mainContentRef = useRef(null);
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
-  const [isNewBiller, setIsNewBiller] = useState(false);
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
@@ -38,6 +37,7 @@ const PasswordSecurityEdit = () => {
   const [securityQuestionsNew, setSecurityQuestionsNew] = useState(securityQuestions);
 
   const profile = useSelector(state => state.combinedReducers.profile || {});
+  const user = useSelector(state => state.combinedReducers.user.userData);
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
@@ -110,8 +110,13 @@ const PasswordSecurityEdit = () => {
   const checkCustomSecurityQuestion = (questions) => {
     const storedQuestion = profileDetails.securityQuestion;
     const isCustom = storedQuestion && !questions.includes(storedQuestion);
+   
+    if(user?.isNormalUser){
     setIsCustomQuestionSelected(isCustom);
     setCustomSecurityQuestion(isCustom ? "Add your own question" : storedQuestion);
+    }else{
+      setCustomSecurityQuestion(storedQuestion);
+    }
   };
 
   useEffect(() => {
@@ -125,21 +130,19 @@ const PasswordSecurityEdit = () => {
   useEffect(() => {
     const storedQuestion = profileDetails.securityQuestion;
     const isCustom = storedQuestion && !securityQuestionsNew.includes(storedQuestion);
+    if(user?.isNormalUser){
     setIsCustomQuestionSelected(isCustom);
     setCustomSecurityQuestion(isCustom ? "Add your own question" : storedQuestion);
+    }else{
+      setCustomSecurityQuestion(storedQuestion);
+    }
 
   }, []);
 
   useEffect(() => {
     getUser().then((res) => {
-      const isNew = res.userInfo.accountNumber.toString().length >= 16;
-      setIsNewBiller(isNew);
-
-      if (isNew) {
+      if (!user?.isNormalUser) {
         getSecurityQuestions();
-
-
-
       }
     });
   }, []);

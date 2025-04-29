@@ -4,6 +4,7 @@ import ProfileSagas from './ProfileSaga';
 import NotificationSaga from './NotificationSaga';
 import watchPaymentHistoryActions from './paymentHistorySaga';
 import watchBillingStatementActions from './billingStatementSaga';
+import watchBillingBreakdownActions from './billingBreakdownSaga';
 function* rootSaga() {
   yield all([
     //fork (userSagas),
@@ -12,6 +13,7 @@ function* rootSaga() {
     fork(NotificationSaga),
     fork(watchBillingStatementActions),
     fork(watchPaymentHistoryActions),
+    fork(watchBillingBreakdownActions),
   ]);
 }
 
