@@ -263,10 +263,10 @@ const BillingBreakDownScreen = ({ navigation }) => {
   // Fetch billing data when screen is focused
   useFocusEffect(
     useCallback(() => {
-      if(user.userInfo.accountNumber=='8160530010206402'){
-        setErrorCode("204");
-        return;
-      }
+      // if(user.userInfo.accountNumber=='8160440040034354'){
+      //   setErrorCode("204");
+      //   return;
+      // }
       if(user.userInfo.accountNumber=='8160440040062702'){
         setErrorCode("404");
         return;

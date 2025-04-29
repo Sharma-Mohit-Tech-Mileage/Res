@@ -68,8 +68,8 @@ const billingStatementApi = {
       };
       
       const response = await _axios.get(`api/BillBreakdown/GetBills?accountId=${accountNumber}&startDate=${startDate}&endDate=${endDate}`, {...config});
-      console.log(response.data);
-      return response.data;
+      console.log("data",JSON.stringify(response));
+      return {data:response.data, status: response.status}
     } catch (error) {
       console.error("Error fetching billing breakdown:", error);
       throw error;
