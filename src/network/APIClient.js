@@ -113,7 +113,7 @@ export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => 
       const requestBody = { ...body };
       delete requestBody.idTokenGuid;
       delete requestBody.refreshToken;
-      const res = await axios.post(`${BASE_URL}${endpoint}`, {}, {
+      const res = await axios.post(`${BASE_URL}${endpoint}`, requestBody, {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
