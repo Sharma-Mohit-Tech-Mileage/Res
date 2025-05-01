@@ -198,7 +198,6 @@ const SplashScreen = ({ navigation, route }) => {
   };
   
   const onError = (error) => {
-    console.log("Error in SSO login API:---------------------------", error);
     setLoading(false);
     setDisconnected(true);
     LoginLogger.logFailedLogin(dispatch, logError, error, loginAttemptInfo);
