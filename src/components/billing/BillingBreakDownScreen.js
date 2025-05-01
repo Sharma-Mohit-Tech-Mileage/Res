@@ -326,7 +326,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         title="Billing Breakdown"
         onPressBack={handleBackPress}
       />
-      {true ? renderErrorMessage(errorCode,navigation) : 
+      {errorCode ? renderErrorMessage(errorCode,navigation) : 
       <View style={[AppStyles.card, styles.cardContainer, { marginBottom: 32 }]}> 
         <ScrollView contentContainerStyle={{ paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
           {/* Warning message */}
