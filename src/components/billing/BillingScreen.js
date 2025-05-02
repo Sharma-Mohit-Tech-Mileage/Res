@@ -18,6 +18,7 @@ import { Env } from "../../network/apis/account/Constants";
 import colors from "../../res/Colors";
 import AppStyles from "../common/styles/AppStyles";
 import { getPrimaryEmail } from "../utility/constant";
+import LoadingOverlay from "../common/LoadingOverlay";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -203,8 +204,9 @@ const BillingScreen = ({ navigation }) => {
           <View style={{ paddingBottom: 80, marginTop: Padding.p_5xl }}>
             {isContentLoading ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
-                <Text style={styles.loadingText}>Loading...</Text>
+                <LoadingOverlay loading={isContentLoading} loadingTxt={'Loading'} onRequestClose={()=>{
+                  setIsContentLoading(false)
+                }}/>
               </View>
             ) : (
               <>

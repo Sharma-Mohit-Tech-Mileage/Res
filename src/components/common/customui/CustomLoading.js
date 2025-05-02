@@ -1,6 +1,9 @@
 import React from 'react';
-import { Modal,View,ActivityIndicator,Text,StyleSheet } from 'react-native';
+import { Modal,View,Text,StyleSheet } from 'react-native';
 import { Color, FontFamily } from '../../../../GlobalStyles';
+import FastImage from "react-native-fast-image";
+import colors from '../../../res/Colors';
+const LoadingIcon = require('../../../../assets/loading.gif'); // Adjust the path as necessary
 
 const LoadingOverlay = ({loading,loadingTxt,onRequestClose}) => {
     return (
@@ -14,7 +17,7 @@ const LoadingOverlay = ({loading,loadingTxt,onRequestClose}) => {
       >
         <View style={styles.overlay}>
           <View style={styles.alertContainer}>
-            <ActivityIndicator size="large" color={Color.colorGainsboro_200} />
+            <FastImage resizeMode='contain' source={LoadingIcon}  style={{width:180,height:120}} co/>
             <Text style={styles.loadingTxt}>{loadingTxt}...</Text>
           </View>
         </View>
@@ -32,7 +35,7 @@ const LoadingOverlay = ({loading,loadingTxt,onRequestClose}) => {
         backgroundColor: "white",
         padding: 20,
         borderRadius: 5,
-        width: "45%",
+        
       },
       loadingTxt: {
         color: Color.sparklightGray1,
