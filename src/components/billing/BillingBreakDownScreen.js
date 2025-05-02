@@ -12,7 +12,7 @@ import { fetchBillingBreakdown } from "../../redux/actions/billingBreakdownActio
 import { selectBillingBreakDownLoading, selectBillingBreakDownData, selectBillingBreakDownError } from "../../redux/selectors/billingBreakdownSelectors";
 import { InfoIcon } from "native-base";
 import BillErrorIcon from "../../res/svgIcons/BillBreakDownErrorIcon";
-
+import SecondaryButton from '../common/customui/PrimaryButton';
 
 // Constants
 const PLACEHOLDER_MESSAGE = "The bill breakdown reflects your latest monthly statement, showing last month's usage, charges, credits, and adjustments. It's a snapshot in time and might not capture recent account changes post-statement.";
@@ -66,24 +66,14 @@ const ERROR_404="We’re sorry, your data is not available at this time. Please 
                 {"Return to Billing Services"}
               </Text>
             </Pressable>
-            <Pressable
-              style={({ pressed }) => [
-                styles.buttons1,
-                styles.buttonsLayout,
-                { opacity: pressed ? 0.7 : 1 },
-              ]}
-              onPress={() => {
-                console.log("Cancel button pressed");
-                navigation.goBack();
-              }}
-              accessibilityRole="button"
-              accessibilityLabel="Cancel"
-              accessibilityHint="Cancels the action and returns to previous screen"
-            >
-              <Text style={[{ color: Color.colorMidnightblue }, styles.makeTypo]}>
-                Cancel
-              </Text>
-            </Pressable>
+            <View style={styles.buttonsParent}>
+            <SecondaryButton
+                        title="Cancel"
+                        onPress={() => navigation.goBack()}
+                        accessibilityLabel="Cancel"
+                        accessibilityHint="Double tap to return to notifications screen"
+                    />
+          </View>
           </View>
         );
       };
