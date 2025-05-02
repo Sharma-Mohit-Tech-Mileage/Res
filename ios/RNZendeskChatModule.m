@@ -91,8 +91,45 @@ RCT_EXPORT_METHOD(logoutZendesk:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
     }
   });
 }
-  
 
+  
+RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)tags
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+  @try {
+    // Example: Using hypothetical Messaging SDK
+    // [MessagingSDK setConversationTags:tags];
+
+   //[[Zendesk instance] setCon]
+    [Zendesk.instance.messaging setConversationFields:@{@"userAgentId": tags[@"userAgent"]}];
+    
+    [Zendesk.instance.messaging setConversationFields:@{@"appVersionId": tags[@"appVersion"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"timezoneOffsetId": tags[@"timezoneOffsetId"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"platformId": tags[@"platform"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"locationHrefId": tags[@"locationHrefId"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"ipAddressId": tags[@"ipAddress"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"emailId": tags[@"email"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"firstNameId": tags[@"firstName"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"lastNameId": tags[@"lastName"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"nameId": tags[@"name"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"phoneId": tags[@"phone"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"externalId": tags[@"accountNumber"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"pId": tags[@"accountNumber"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"userNameId": tags[@"userName"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"customerTypeId": tags[@"customerType"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"authLevelId": tags[@"authLevel"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"jwtId": tags[@"jwtId"]}];
+
+    // Simulate success
+    resolve(@(YES));
+  }
+  @catch (NSException *exception) {
+    //NSLog(@"Exception: %@, Reason: %@, User Info: %@", exception.name, exception.reason, exception.userInfo);
+    NSLog(@"Zendesk login.\nError: %@", exception.reason);
+    reject(@"set_tags_error", @"Failed to set conversation tags", nil);
+  }
+}
 
 
 

@@ -22,13 +22,16 @@ import { GetApiRequest,PostApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
 import { sign } from "react-native-pure-jwt";
+import VersionCheck from 'react-native-version-check';
+import DeviceInfo from "react-native-device-info";
 
 import {
   startChatWithConfig,
   initChat,
   startChat,
-  loginWithJWT,
+  setConversationalFields,
 } from "../utility/RNZendeskChat";
+import { use } from "react";
 
 const CHANNEL_KEY = config.CHANNEL_KEY;
 
@@ -107,7 +110,16 @@ const paperlessStatusAcp = useSelector(
   useEffect(() => {
     if (defaultPaymentDetails.email) {
       dispatch(getPaperlessStatus(defaultPaymentDetails.email));
+
     }
+    DeviceInfo.getUserAgent().then((userAgent) => {
+      // iOS: "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143"
+      // tvOS: not available
+      // Android: "Mozilla/5.0 (Linux; Android 12; sdk_gphone64_arm64 Build/SE1A.220630.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36"
+      // Windows: ?
+      getZendeskChatToken(userAgent);
+    });
+    
   }, [defaultPaymentDetails.email, dispatch]);
 
   // Check modem status based on internet health count
@@ -136,14 +148,15 @@ const paperlessStatusAcp = useSelector(
         pastPaymentDue: accountDetails.past_due_amount,
         email: getPrimaryEmail(accountDetails),
       });
-      console.log('accountDetails', accountDetails);
-      getZendeskChatToken();
+      console.log('accountDetails', JSON.stringify(user));
+      
     }
   }, [accountDetails]);
 
 //  get zendesk chat token
-const getZendeskChatToken = async() => {
-  //const user = await getUser();
+const getZendeskChatToken = async(userAgent) => {
+  const user1 = await getUser();
+  
   console.log("getZendeskChatToken",JSON.stringify(accountDetails));
   const accountNumber = user.userInfo.accountNumber;
   const url = `/api/zendesk/TokenAuth`;
@@ -152,7 +165,7 @@ const getZendeskChatToken = async() => {
     "legacy_account_number": null,
     "UserName": user?.userInfo.userName,
     "AccountNumber": accountNumber,
-    "email": defaultPaymentDetails.email,
+    "email": defaultPaymentDetails.email || "",
     "external_id": accountNumber,
     "FirstName": accountDetails?.first_name,
     "LastName": accountDetails?.last_name,
@@ -174,7 +187,26 @@ console.log("data", body);
     (res) => {
       console.log("res", res.jwtToken);
       if (res) {
-        loginWithJWT(res?.jwtToken);
+
+        const fields={
+          userAgent:userAgent,
+          appVersion:VersionCheck.getCurrentVersion(),
+          timezoneOffsetId:new Date().getTimezoneOffset().toString(),
+          platform: Platform.OS,
+          locationHrefId:"x",
+          ipAddress: body.UserIPAddress,
+          email: defaultPaymentDetails.email || "",
+          firstName: accountDetails?.first_name || '',
+          lastName: accountDetails?.last_name || '',
+          name: accountDetails?.first_name + " " + accountDetails?.last_name,
+          phone: '3',
+          accountNumber: accountNumber,
+          userName: user?.userInfo.userName,
+          customerType:user?.userInfo.customerType,
+          authLevel: user?.userInfo.authLevel,
+          jwtId: user1.token,
+        }
+        setConversationalFields(fields);
       }
     },
     (error) => {
