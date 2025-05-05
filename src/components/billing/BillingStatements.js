@@ -9,6 +9,7 @@ import moment from "moment";
 import Icon from "../common/Icon";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import PDFViewModal from "../utility/PDFViewModal";
+import LoadingOverlay from "../common/customui/CustomLoading";
 import { heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { fetchBillingStatements, downloadStatement, setSelectedYear, setSortDirection, clearDownloadedStatement } from "../../redux/actions/billingStatementActions";
 import { selectFilteredAndSortedStatements, selectLoading, selectError, selectDownloading, selectDownloadError, selectSelectedYear, selectSortDirection, selectAllStatements, selectDownloadedStatement } from "../../redux/selectors/billingStatementSelectors";
@@ -222,9 +223,8 @@ const BillingStatementsScreen = ({ navigation }) => {
         </View>
 
         {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Color.sparklightBrightPurple} />
-          </View>
+          <LoadingOverlay
+            loading={loading}/>
         ) : statements.length > 0 ? (
           <FlatList
             data={statements}
