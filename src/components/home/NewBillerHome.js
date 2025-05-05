@@ -193,7 +193,7 @@ console.log("data", body);
           appVersion:VersionCheck.getCurrentVersion(),
           timezoneOffsetId:new Date().getTimezoneOffset().toString(),
           platform: Platform.OS,
-          locationHrefId:"x",
+          locationHrefId:Env.URL,
           ipAddress: body.UserIPAddress,
           email: defaultPaymentDetails.email || "",
           firstName: accountDetails?.first_name || '',
@@ -204,7 +204,7 @@ console.log("data", body);
           userName: user?.userInfo.userName,
           customerType:user?.userInfo.customerType,
           authLevel: user?.userInfo.authLevel,
-          jwtId: user1.token,
+          jwtId: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5MDA2OTA1MzgiLCJqdGkiOiJiZDg5NDBjZS1kOGM1LTQ2YjMtODBlMS03ZTk5YzRiNmRjZmQiLCJpYXQiOjE3NDYyMDU4MzQsIm5hbWUiOiJUZXN0IEVsQ2FtcG8xIiwiZW1haWwiOiJTVU1BTlRILlRIQU5FRVJVMUBTUEFSS0xJR0hULkJJWiIsImV4dGVybmFsX2lkIjoiOTAwNjkwNTM4IiwibmJmIjoxNzQ2MjA1ODMzLCJleHAiOjE3NDYyMTMwMzMsImlzcyI6IldOV0VCU1ZDVTAxIiwiYXVkIjoiMTAuMTQwLjM2LjI4In0.qkTTZIuhKTLgUmRPvHsEPMJdhczDlR3dcz5Vp0lKOcg',
         }
         setConversationalFields(fields);
       }

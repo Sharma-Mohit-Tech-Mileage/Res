@@ -102,24 +102,25 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)tags
     // [MessagingSDK setConversationTags:tags];
 
    //[[Zendesk instance] setCon]
-    [Zendesk.instance.messaging setConversationFields:@{@"userAgentId": tags[@"userAgent"]}];
+    NSLog(@"Zendesk login: %@", tags[@"userAgent"]);
+    [Zendesk.instance.messaging setConversationFields:@{@"29542407930903": tags[@"userAgent"]}];
     
-    [Zendesk.instance.messaging setConversationFields:@{@"appVersionId": tags[@"appVersion"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"timezoneOffsetId": tags[@"timezoneOffsetId"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"platformId": tags[@"platform"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"locationHrefId": tags[@"locationHrefId"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"ipAddressId": tags[@"ipAddress"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"emailId": tags[@"email"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"firstNameId": tags[@"firstName"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"lastNameId": tags[@"lastName"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"nameId": tags[@"name"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"phoneId": tags[@"phone"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"externalId": tags[@"accountNumber"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"pId": tags[@"accountNumber"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"userNameId": tags[@"userName"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"customerTypeId": tags[@"customerType"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"authLevelId": tags[@"authLevel"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"jwtId": tags[@"jwtId"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"29542536141335": tags[@"appVersion"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"29542663925271": tags[@"timezoneOffsetId"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"29542734993559": tags[@"platform"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"29230394216983": tags[@"locationHrefId"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"29542809023767": tags[@"ipAddress"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"360003617614": tags[@"email"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"360004035014": tags[@"firstName"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"360003976113": tags[@"lastName"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"360036705974": tags[@"name"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"360046174754": tags[@"phone"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"360004035174": tags[@"accountNumber"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"360004035174": tags[@"accountNumber"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"29542395738007": tags[@"userName"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"29542894274711": tags[@"customerType"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"29542032223895": tags[@"authLevel"]}];
+    [Zendesk.instance.messaging setConversationFields:@{@"29542045878167": tags[@"jwtId"]}];
 
     // Simulate success
     resolve(@(YES));
