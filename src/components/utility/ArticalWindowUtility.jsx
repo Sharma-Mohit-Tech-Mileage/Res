@@ -10,6 +10,7 @@ import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
 import colors from '../../res/Colors';
 import analytics from '@react-native-firebase/analytics';
+import LoadingOverlay from '../common/customui/CustomLoading';
 const { width, height } = Dimensions.get('window');
 
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -271,7 +272,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     const Spinner = () => (
         <View style={styles.activityContainer}>
-            <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
+            <LoadingOverlay loading={true} />
         </View>
     );
     return (

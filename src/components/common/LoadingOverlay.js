@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { View, StyleSheet, Dimensions, Animated, Text } from "react-native";
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import { Color, FontFamily } from "../../../GlobalStyles";
+import LoadingOverlay from "../common/customui/CustomLoading"
 
 const DoughnutSpinner = ({ size = 50, strokeWidth = 8 }) => {
   const spinAnim = useRef(new Animated.Value(0)).current;
@@ -47,28 +48,28 @@ const DoughnutSpinner = ({ size = 50, strokeWidth = 8 }) => {
   );
 };
 
-const LoadingOverlay = ({
-  isLoading,
-  message = "Saving...",
-  headerHeight = 96,
-}) => {
-  if (!isLoading) return null;
-  const window = Dimensions.get("window");
+// const LoadingOverlay = ({
+//   isLoading,
+//   message = "Saving...",
+//   headerHeight = 96,
+// }) => {
+//   if (!isLoading) return null;
+//   const window = Dimensions.get("window");
 
-  return (
-    <View
-      style={[
-        styles.overlay,
-        { top: headerHeight, height: window.height - headerHeight },
-      ]}
-    >
-      <View style={styles.banner}>
-        <DoughnutSpinner size={50} strokeWidth={8} />
-        <Text style={styles.message}>{message}</Text>
-      </View>
-    </View>
-  );
-};
+//   return (
+//     <View
+//       style={[
+//         styles.overlay,
+//         { top: headerHeight, height: window.height - headerHeight },
+//       ]}
+//     >
+//       <View style={styles.banner}>
+//         <DoughnutSpinner size={50} strokeWidth={8} />
+//         <Text style={styles.message}>{message}</Text>
+//       </View>
+//     </View>
+//   );
+// };
 
 const styles = StyleSheet.create({
   overlay: {

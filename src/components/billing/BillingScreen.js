@@ -204,7 +204,7 @@ const BillingScreen = ({ navigation }) => {
           <View style={{ paddingBottom: 80, marginTop: Padding.p_5xl }}>
             {isContentLoading ? (
               <View style={styles.loadingContainer}>
-                <LoadingOverlay loading={isContentLoading} loadingTxt={'Loading'} onRequestClose={()=>{
+                <LoadingOverlay loading={isContentLoading} onRequestClose={()=>{
                   setIsContentLoading(false)
                 }}/>
               </View>
