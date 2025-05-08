@@ -21,7 +21,7 @@ import InfoBanner from "../ACPDashboard/InfoBanner";
 import { GetApiRequest,PostApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
-import { sign } from "react-native-pure-jwt";
+import sign from "jwt-encode";
 import VersionCheck from 'react-native-version-check';
 import DeviceInfo from "react-native-device-info";
 
@@ -29,6 +29,7 @@ import {
   startChatWithConfig,
   initChat,
   startChat,
+  loginWithJWT,
   setConversationalFields,
 } from "../utility/RNZendeskChat";
 import { use } from "react";
@@ -206,7 +207,8 @@ console.log("data", body);
           authLevel: user?.userInfo.authLevel,
           jwtId: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5MDA2OTA1MzgiLCJqdGkiOiJiZDg5NDBjZS1kOGM1LTQ2YjMtODBlMS03ZTk5YzRiNmRjZmQiLCJpYXQiOjE3NDYyMDU4MzQsIm5hbWUiOiJUZXN0IEVsQ2FtcG8xIiwiZW1haWwiOiJTVU1BTlRILlRIQU5FRVJVMUBTUEFSS0xJR0hULkJJWiIsImV4dGVybmFsX2lkIjoiOTAwNjkwNTM4IiwibmJmIjoxNzQ2MjA1ODMzLCJleHAiOjE3NDYyMTMwMzMsImlzcyI6IldOV0VCU1ZDVTAxIiwiYXVkIjoiMTAuMTQwLjM2LjI4In0.qkTTZIuhKTLgUmRPvHsEPMJdhczDlR3dcz5Vp0lKOcg',
         }
-        setConversationalFields(fields);
+        //setConversationalFields(fields);
+        loginWithToken();
       }
     },
     (error) => {
@@ -259,6 +261,28 @@ var payload = {
     .catch(console.error); // possible errors
 
   
+ }
+
+ const loginWithToken= async () => {
+  const user = await getUser();
+  const secret = 'YT98N5WsTZbSAvs24O8jjtfeSx_B1AV70YpK62h_tepWExIp8y643H80BYmHNOC3qtgwfYvJrnvbuJcCuWrUXA';
+    const data = {
+        scope: "user",
+        external_id: user?.userInfo.accountNumber,
+        //name: "floydalford", // optional
+        //email: "jyoti.pillai@gmail.com", // optional
+       // email_verified: true, // optional
+        exp: new Date().getTime() + 3600 * 1000,
+    };
+    const options = {
+        "alg": "HS256",
+        "typ": "JWT",
+        "kid": "app_67ec131dcaaef888aa5376e4"
+    }
+    const jwt = sign(data, secret, options);
+    console.log("request data for jwt",data);
+    console.log("Loggin jwt",jwt);
+    loginWithJWT(jwt);
  }
 
   const renderHeader = () => (

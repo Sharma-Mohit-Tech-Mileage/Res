@@ -19,7 +19,6 @@ export const startChat = (config) => {
 // Login using JWT
 export const loginWithJWT = async (jwtToken) => {
     try {
-      console.error('Zendesk Login with:', jwtToken)
       const result = await RNZendeskChatModule.loginWithJWT(jwtToken);
       console.log(result);
     } catch (error) {

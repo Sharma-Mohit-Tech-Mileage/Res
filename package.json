@@ -28,6 +28,7 @@
     "@reduxjs/toolkit": "^1.9.5",
     "axios": "^1.6.0",
     "install": "^0.13.0",
+    "jwt-encode": "^1.0.1",
     "lodash.debounce": "^4.0.8",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.46",

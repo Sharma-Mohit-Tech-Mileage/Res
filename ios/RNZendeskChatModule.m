@@ -20,6 +20,8 @@ RCT_EXPORT_MODULE(RNZendeskChatModule);
         [Zendesk initializeWithChannelKey:@"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lLnplbmRlc2suY29tL21vYmlsZV9zZGtfYXBpL3NldHRpbmdzLzAxSlEwOTk0WUpERVpLMVdCWjlFVDdCRURYLmpzb24ifQ=="
                          messagingFactory:[[ZDKDefaultMessagingFactory alloc] init]
                         completionHandler:^(Zendesk * _Nullable zendesk, NSError * _Nullable error) {
+          ZDKLogger.enabled = YES;
+          ZDKLogger.level = ZDKLogLevelDefault;
                 if (error != nil) {
                     NSLog(@"Zendesk did not initialize.\nError: %@", error.localizedDescription);
                 }
@@ -63,16 +65,20 @@ RCT_EXPORT_METHOD(loginWithJWT:(NSString *)jwtToken resolver:(RCTPromiseResolveB
     @try {
       [[Zendesk instance] loginUserWith:jwtToken completionHandler:^(ZDKZendeskUser * _Nullable user, NSError * _Nullable error) {
         if (error) {
+          //NSLog(@"Zendesk jWt.\nError: %@", error);
           reject(@"ZendeskLoginError", @"Login failed", error);
+          NSLog(@"Zendesk jWt.\nError: %@", error);
         } else {
           resolve(@"User logged in successfully");
         }
       }];
     }
     @catch (NSException *exception) {
+      NSLog(@"Zendesk jWt.\nError: %@", exception.reason);
       reject(@"Exception", @"Exception occurred", nil);
     }
   });
+  
 }
 
 RCT_EXPORT_METHOD(logoutZendesk:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
@@ -87,6 +93,7 @@ RCT_EXPORT_METHOD(logoutZendesk:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
       }];
     }
     @catch (NSException *exception) {
+      
       reject(@"Exception", @"Exception occurred", nil);
     }
   });
