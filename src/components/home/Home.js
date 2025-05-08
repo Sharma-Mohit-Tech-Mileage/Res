@@ -24,6 +24,7 @@ import { checkForMinorUpdate } from "../utility/constant";
 import PromotionCard from "../common/PromotionCard/PromotionCard";
 import { useFocusEffect } from "@react-navigation/native";
 import WalkthroughOverlay from "../common/WalkthroughOverlay";
+import LoadingOverlay from "../common/customui/CustomLoading";
 
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
@@ -701,17 +702,12 @@ const HomeScreen = ({ navigation }) => {
                 accessibilityLabel={`Service Health`}
                 style={styles.internetHealth}>Service Health</Text>
               {checkModemStatus ? (
+                <>
                 <InternetHealthChart
                   currentValue={getInternetHealth(currentHealth)}
                   key={currentHealth}
                 />
-              ) : (
-                <ActivityIndicator
-                  size="large"
-                  color={Color.colorGainsboro_200}
-                />
-              )}
-              <View
+                <View
                 style={styles.internetStatusSection}
                 accessible={true}
                 accessibilityRole="text"
@@ -729,6 +725,13 @@ const HomeScreen = ({ navigation }) => {
                     : strings.internetStatus}
                 </Text>
               </View>
+              </>
+              ) : (
+                <View style={{ marginVertical: 40 }}>
+                <LoadingOverlay loading={true}/>
+                </View>
+              )}
+              
 
               <View
                 style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}

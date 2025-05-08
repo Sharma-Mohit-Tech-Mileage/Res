@@ -2,10 +2,10 @@ import React from "react";
 import { Modal, View, Text, StyleSheet } from "react-native";
 import { Color, FontFamily } from "../../../../GlobalStyles";
 import FastImage from "react-native-fast-image";
-import colors from "../../../res/Colors";
-const LoadingIcon = require("../../../../assets/loading.gif"); // Adjust the path as necessary
+const LoadingIcon = require("../../../../assets/loading.gif"); 
+const LoadingIconWhite = require("../../../../assets/loader-white.gif");
 
-const LoadingOverlay = ({ loading, loadingTxt, onRequestClose }) => {
+const LoadingOverlay = ({ loading, loadingTxt, onRequestClose, isWhite=false }) => {
   return loadingTxt !== undefined ? (
     <Modal
       visible={loading}
@@ -19,7 +19,7 @@ const LoadingOverlay = ({ loading, loadingTxt, onRequestClose }) => {
         <View style={styles.alertContainer}>
           <FastImage
             resizeMode="contain"
-            source={LoadingIcon}
+            source={(isWhite)? LoadingIconWhite:LoadingIcon}
             style={styles.LoadingImage}
             co
           />
@@ -31,9 +31,8 @@ const LoadingOverlay = ({ loading, loadingTxt, onRequestClose }) => {
     <View style={styles.noBackground}>
       <FastImage
         resizeMode="contain"
-        source={LoadingIcon}
+        source={(isWhite)? LoadingIconWhite:LoadingIcon}
         style={{ width: 180, height: 120 }}
-        co
       />
     </View>
   );

@@ -18,6 +18,7 @@ import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import RenderText from "../common/RenderText";
 import moment from "moment";
 import LoginLogger from "../../components/utility/LoginLogger";
+import LoadingOverlay from "../common/customui/CustomLoading";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -431,7 +432,7 @@ const SplashScreen = ({ navigation, route }) => {
 
       </View>
 
-      {loading ? <ActivityIndicator style={styles.loadingStyle} size="large" color={"white"} /> : <></>}
+      {loading ? <LoadingOverlay loading={loading} isWhite={true}/> : <></>}
       {!loading && isVisible && (
         <Animated.View style={{ marginTop: hp("35%"), opacity: fadeAnim }}>
           <SparkLightLoginButton
