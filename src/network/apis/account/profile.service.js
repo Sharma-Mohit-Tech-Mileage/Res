@@ -417,13 +417,7 @@ const handleSubmitFeedback = async (obj) => {
 };
 
 const logError = async (errorData) => {
-    let user = await getUser();
-    const config = {
-        headers: {
-            Authorization: `Bearer ${user.token}`
-        }
-    };
-    console.log('error logged Payload^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^', JSON.stringify(errorData));
+   
     try {
         await _axios.post('/logging/api/log/error', errorData);
         console.log('Error logged successfully');

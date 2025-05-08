@@ -36,6 +36,7 @@ import {
   selectHasMore,
   selectDownloadedReceipt
 } from "../../redux/selectors/paymentHistorySelectors";
+import LoadingOverlay from "../common/customui/CustomLoading";
 
 const CLEAR_PAYMENT_HISTORY_ERROR = 'CLEAR_PAYMENT_HISTORY_ERROR';
 const CLEAR_DOWNLOAD_ERROR = 'CLEAR_DOWNLOAD_ERROR';
@@ -272,9 +273,8 @@ const PaymentHistoryScreen = ({ navigation }) => {
 
         {/* Payment History List */}
         {loading && payments.length === 0 ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Color.sparklightBrightPurple} />
-          </View>
+          <LoadingOverlay
+          loading={loading}/>
         ) : payments.length > 0 ? (
           <FlatList
             data={payments}

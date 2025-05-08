@@ -25,6 +25,7 @@ import { getUser, getPendingTicket,storeValue } from "../../../redux/utils/Local
 import TicketListIcon from "../../../res/svgIcons/TicketListIcon";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import LoadingOverlay from "../../common/customui/CustomLoading"
 
 const SupportTicket = () => {
   const navigation = useNavigation();
@@ -339,10 +340,9 @@ const SupportTicket = () => {
               />
             </View>
           ) : loading ? (
-            <ActivityIndicator
-              size="small"
-              color="#8D3B90"
-              style={[styles.activityIndicator]}
+            <LoadingOverlay
+             loading={loading}
+              
             />
           ) : (
             <RenderNoTicket />

@@ -11,6 +11,7 @@ import { GetApiRequest } from '../../network/APIClient';
 import { navigationRef } from '../../navigations/UserNavigations';
 import analytics from '@react-native-firebase/analytics';
 import { getPaymentUrl, getReferralUrl } from './PaymentUrlUtils';
+import LoadingOverlay from '../common/customui/CustomLoading';
 
 const { height, width } = Dimensions.get('window');
 
@@ -457,8 +458,13 @@ const navigationChange = async (navState) => {
                 />
             ) : (
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="rgba(141, 59, 144, 1)" />
-                    <Text style={styles.loadingText}>Loading...</Text>
+                    {/* <ActivityIndicator size="large" color="rgba(141, 59, 144, 1)" />
+                    <Text style={styles.loadingText}>Loading...</Text> */}
+                    <LoadingOverlay
+                        loading={true}
+                       
+                        
+                    />
                 </View>
             )}
         </View>

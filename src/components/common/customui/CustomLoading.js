@@ -1,47 +1,79 @@
-import React from 'react';
-import { Modal,View,ActivityIndicator,Text,StyleSheet } from 'react-native';
-import { Color, FontFamily } from '../../../../GlobalStyles';
+import React from "react";
+import { Modal, View, Text, StyleSheet } from "react-native";
+import { Color, FontFamily } from "../../../../GlobalStyles";
+import FastImage from "react-native-fast-image";
+import colors from "../../../res/Colors";
+const LoadingIcon = require("../../../../assets/loading.gif"); // Adjust the path as necessary
 
-const LoadingOverlay = ({loading,loadingTxt,onRequestClose}) => {
-    return (
-      <Modal
-        visible={loading}
-        transparent
-        animationType="fade"
-        onRequestClose={() => {
-            onRequestClose(false);
-        }}
-      >
-        <View style={styles.overlay}>
-          <View style={styles.alertContainer}>
-            <ActivityIndicator size="large" color={Color.colorGainsboro_200} />
-            <Text style={styles.loadingTxt}>{loadingTxt}...</Text>
-          </View>
+const LoadingOverlay = ({ loading, loadingTxt, onRequestClose }) => {
+  return loadingTxt !== undefined ? (
+    <Modal
+      visible={loading}
+      transparent
+      animationType="fade"
+      onRequestClose={() => {
+        onRequestClose(false);
+      }}
+    >
+      <View style={styles.overlay}>
+        <View style={styles.alertContainer}>
+          <FastImage
+            resizeMode="contain"
+            source={LoadingIcon}
+            style={styles.LoadingImage}
+            co
+          />
+          <Text style={styles.loadingTxt}>{loadingTxt}...</Text>
         </View>
-      </Modal>
-    );
-  };
-  const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-      },
-      alertContainer: {
-        backgroundColor: "white",
-        padding: 20,
-        borderRadius: 5,
-        width: "45%",
-      },
-      loadingTxt: {
-        color: Color.sparklightGray1,
-        textAlign: "center",
-        fontFamily: FontFamily.openSansRegular,
-        fontSize: 22,
-        fontStyle: "normal",
-        fontWeight: "400",
-      },
-    
-  })
-  export default LoadingOverlay;
+      </View>
+    </Modal>
+  ) : (
+    <View style={styles.noBackground}>
+      <FastImage
+        resizeMode="contain"
+        source={LoadingIcon}
+        style={{ width: 180, height: 120 }}
+        co
+      />
+    </View>
+  );
+};
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  LoadingImage: {
+    width: 180,
+    height: 120,
+    alignSelf: "center",
+  },
+  alertContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    alignSelf: "center",
+    borderRadius: 5,
+  },
+  noBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    position: "absolute",
+    zIndex: 999,
+    top: 0,
+    right: 0,
+    left: 0,
+    bottom: 0,
+  },
+  loadingTxt: {
+    color: Color.sparklightGray1,
+    textAlign: "center",
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 22,
+    fontStyle: "normal",
+    fontWeight: "400",
+  },
+});
+export default LoadingOverlay;
