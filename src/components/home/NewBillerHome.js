@@ -207,8 +207,9 @@ console.log("data", body);
           authLevel: user?.userInfo.authLevel,
           jwtId: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5MDA2OTA1MzgiLCJqdGkiOiJiZDg5NDBjZS1kOGM1LTQ2YjMtODBlMS03ZTk5YzRiNmRjZmQiLCJpYXQiOjE3NDYyMDU4MzQsIm5hbWUiOiJUZXN0IEVsQ2FtcG8xIiwiZW1haWwiOiJTVU1BTlRILlRIQU5FRVJVMUBTUEFSS0xJR0hULkJJWiIsImV4dGVybmFsX2lkIjoiOTAwNjkwNTM4IiwibmJmIjoxNzQ2MjA1ODMzLCJleHAiOjE3NDYyMTMwMzMsImlzcyI6IldOV0VCU1ZDVTAxIiwiYXVkIjoiMTAuMTQwLjM2LjI4In0.qkTTZIuhKTLgUmRPvHsEPMJdhczDlR3dcz5Vp0lKOcg',
         }
-        //setConversationalFields(fields);
         loginWithToken();
+        setConversationalFields(fields);
+        
       }
     },
     (error) => {
@@ -236,36 +237,10 @@ const getIPAddress = async () => {
 
  // zendesk chat login
 
- const loginToZendesk = async() => {
-  const user = await getUser();
-  
-  //const token = jwt.sign(payload, '', { algorithm: 'HS256' });
- const header={
-    "alg": "HS256",
-    "typ": "JWT",
-    "kid": "app_67ec131dcaaef888aa5376e4"
-}
-var payload = {
-  name: 'Test User',
-  email: defaultPaymentDetails.email,
-  email_verified: true,
-  exp: new Date().getTime() + 3600 * 1000, // expiration date, required, in ms, absolute to 1/1/1970
-  external_id: user?.userInfo.accountNumber,
-};
-
-  sign(payload,'YT98N5WsTZbSAvs24O8jjtfeSx_B1AV70YpK62h_tepWExIp8y643H80BYmHNOC3qtgwfYvJrnvbuJcCuWrUXA',header)
-    .then((token)=>{
-        console.log("jwttoken", token);
-        loginWithJWT(user?.token)
-    }) // token as the only argument
-    .catch(console.error); // possible errors
-
-  
- }
-
+ 
  const loginWithToken= async () => {
   const user = await getUser();
-  const secret = 'YT98N5WsTZbSAvs24O8jjtfeSx_B1AV70YpK62h_tepWExIp8y643H80BYmHNOC3qtgwfYvJrnvbuJcCuWrUXA';
+  const secret = '2pibLgH2LymoLJUmqQ3A94noQR6MD8RUZ4feDkFrU4VvGGxrhrXeQuRPGP-lBVzdaEZLzifgtGzKoN6XPzoQXg';
     const data = {
         scope: "user",
         external_id: user?.userInfo.accountNumber,
@@ -277,7 +252,7 @@ var payload = {
     const options = {
         "alg": "HS256",
         "typ": "JWT",
-        "kid": "app_67ec131dcaaef888aa5376e4"
+        "kid": "app_681cd7b6f85f7c21e70c5e06"
     }
     const jwt = sign(data, secret, options);
     console.log("request data for jwt",data);
