@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Text, Platform, AppState, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Dimensions, Text, Platform, AppState } from 'react-native';
 import WebView from 'react-native-webview';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import CryptoJS from 'crypto-js';

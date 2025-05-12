@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Image, StyleSheet, Text, Pressable, View, ScrollView, Modal, ActivityIndicator, AccessibilityInfo } from "react-native";
+import { Image, StyleSheet, Text, Pressable, View, ScrollView, AccessibilityInfo } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";

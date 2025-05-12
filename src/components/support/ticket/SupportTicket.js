@@ -5,7 +5,6 @@ import {
   Text,
   View,
   FlatList,
-  ActivityIndicator,
   Pressable,
   Platform,
   RefreshControl,
@@ -342,6 +341,7 @@ const SupportTicket = () => {
           ) : loading ? (
             <LoadingOverlay
              loading={loading}
+             loadingTxt={"Loading..."}
               
             />
           ) : (

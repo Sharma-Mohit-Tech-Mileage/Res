@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, memo } from "react";
-import { StyleSheet, Text, View, FlatList, ActivityIndicator, ScrollView,Pressable } from "react-native";
+import { StyleSheet, Text, View, FlatList, ScrollView,Pressable } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";

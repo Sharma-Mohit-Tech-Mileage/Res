@@ -4,8 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
-  ActivityIndicator,
+  Image
 } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
@@ -15,6 +14,7 @@ import { FontFamily, Padding } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
+import SmallLoader from "../customui/SmallLoader";
 
 const BillerSummaryCard = ({
   billAmt,
@@ -85,9 +85,7 @@ const BillerSummaryCard = ({
         </View>
         <View style={styles.cardContent}>
           {billAmt == undefined ? (
-            <ActivityIndicator
-              size="large"
-              color={colors.sparklight_bright_purple}
+            <SmallLoader
             />
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>

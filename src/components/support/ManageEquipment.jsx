@@ -5,7 +5,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  ActivityIndicator,
+
   ScrollView,
   findNodeHandle,
   AccessibilityInfo,
@@ -46,6 +46,7 @@ import { useSelector } from "react-redux";
 import RenderText from "../common/RenderText";
 import AppStyles from "../common/styles/AppStyles";
 import LoadingOverlay from "../common/customui/CustomLoading";
+import SmallLoader from "../common/customui/SmallLoader";
 
 const ManageEquipment = ({ route }) => {
   const navigation = useNavigation();
@@ -596,10 +597,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
                           />
                         </View>
                       ) : (
-                        <ActivityIndicator
-                          size="small"
-                          color={Color.colorGainsboro_200}
-                          style={{ width: 40 }}
+                        <SmallLoader 
                         />
                       )}
                       {leased.length > 0 && (

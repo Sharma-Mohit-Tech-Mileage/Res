@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
@@ -9,7 +9,8 @@ import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
 import AppStyles from "../styles/AppStyles";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
-const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, style, acno, isNewBiller }) => {
+import SmallLoader from "../customui/SmallLoader";
+const Card = ({ billAmt, dueDate, navigation, style, acno, isNewBiller }) => {
 
 
   const NotAvailable = () => {
@@ -118,11 +119,10 @@ const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, 
               }
             ]}>Total Amount Due</Text>
           {billAmt == undefined ? (
-            <ActivityIndicator
-              size="large"
-              color={colors.primary_color}
-              style={{ alignSelf: "center" }}
+            <View style={{ alignSelf: "center" }}>
+            <SmallLoader
             />
+            </View>
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>
           )}

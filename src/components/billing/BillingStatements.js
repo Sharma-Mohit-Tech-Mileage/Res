@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
@@ -13,6 +13,7 @@ import LoadingOverlay from "../common/customui/CustomLoading";
 import { heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { fetchBillingStatements, downloadStatement, setSelectedYear, setSortDirection, clearDownloadedStatement } from "../../redux/actions/billingStatementActions";
 import { selectFilteredAndSortedStatements, selectLoading, selectError, selectDownloading, selectDownloadError, selectSelectedYear, selectSortDirection, selectAllStatements, selectDownloadedStatement } from "../../redux/selectors/billingStatementSelectors";
+import SmallLoader from "../common/customui/SmallLoader";
 const CLEAR_BILLING_ERROR = 'CLEAR_BILLING_ERROR';
 const CLEAR_DOWNLOAD_ERROR = 'CLEAR_DOWNLOAD_ERROR';
 
@@ -142,7 +143,7 @@ const BillingStatementsScreen = ({ navigation }) => {
         <View style={styles.iconButtonsContainer}>
           {isDownloading ? (
             <View style={styles.downloadingContainer}>
-              <ActivityIndicator size="small" color={Color.sparklightBrightPurple} />
+              <SmallLoader />
             </View>
           ) : (
             <Text style={styles.uploadText}>Download</Text>
