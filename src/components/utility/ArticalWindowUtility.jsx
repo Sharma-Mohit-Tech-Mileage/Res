@@ -11,6 +11,7 @@ import { navigationRef } from '../../navigations/UserNavigations';
 import colors from '../../res/Colors';
 import analytics from '@react-native-firebase/analytics';
 import LoadingOverlay from '../common/customui/CustomLoading';
+import LoadingSpinner from './LoadingSpinner';
 const { width, height } = Dimensions.get('window');
 
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -272,7 +273,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 
     const Spinner = () => (
         <View style={styles.activityContainer}>
-            <LoadingOverlay loading={true} />
+            <LoadingSpinner loading={true} color={'#EF4E3E'} />
         </View>
     );
     return (
