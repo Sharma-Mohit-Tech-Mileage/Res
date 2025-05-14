@@ -21,7 +21,7 @@ import InfoBanner from "../ACPDashboard/InfoBanner";
 import { GetApiRequest,PostApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import ChatIcon from "../../res/svgIcons/ChatIcon";
-import sign from "jwt-encode";
+import sign from "jwt-encode"; // npm method for signing JWT
 import VersionCheck from 'react-native-version-check';
 import DeviceInfo from "react-native-device-info";
 
@@ -208,7 +208,7 @@ console.log("data", body);
           jwtId: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5MDA2OTA1MzgiLCJqdGkiOiJiZDg5NDBjZS1kOGM1LTQ2YjMtODBlMS03ZTk5YzRiNmRjZmQiLCJpYXQiOjE3NDYyMDU4MzQsIm5hbWUiOiJUZXN0IEVsQ2FtcG8xIiwiZW1haWwiOiJTVU1BTlRILlRIQU5FRVJVMUBTUEFSS0xJR0hULkJJWiIsImV4dGVybmFsX2lkIjoiOTAwNjkwNTM4IiwibmJmIjoxNzQ2MjA1ODMzLCJleHAiOjE3NDYyMTMwMzMsImlzcyI6IldOV0VCU1ZDVTAxIiwiYXVkIjoiMTAuMTQwLjM2LjI4In0.qkTTZIuhKTLgUmRPvHsEPMJdhczDlR3dcz5Vp0lKOcg',
         }
         loginWithToken();
-        setConversationalFields(fields);
+        //setConversationalFields(fields);
         
       }
     },
@@ -241,14 +241,16 @@ const getIPAddress = async () => {
  const loginWithToken= async () => {
   const user = await getUser();
   const secret = '2pibLgH2LymoLJUmqQ3A94noQR6MD8RUZ4feDkFrU4VvGGxrhrXeQuRPGP-lBVzdaEZLzifgtGzKoN6XPzoQXg';
-    const data = {
+  //data payload 
+  const data = {
         scope: "user",
         external_id: user?.userInfo.accountNumber,
-        //name: "floydalford", // optional
-        //email: "jyoti.pillai@gmail.com", // optional
-       // email_verified: true, // optional
-        exp: new Date().getTime() + 3600 * 1000,
+        //email: defaultPaymentDetails.email || "",
+        name: accountDetails?.first_name + " " + accountDetails?.last_name,
+        //email_verified: true, // optional
+       // exp: new Date().getTime() + 3600 * 1000,
     };
+    // header ID
     const options = {
         "alg": "HS256",
         "typ": "JWT",
