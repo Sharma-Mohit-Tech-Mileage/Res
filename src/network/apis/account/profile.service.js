@@ -427,12 +427,6 @@ const logError = async (errorData) => {
 };
 
 const logInfo = async (infoData) => {
-    let user = await getUser();
-    const config = {
-        headers: {
-            Authorization: `Bearer ${user.token}`
-        }
-    };
     try {
         const response = await _axios.post('/logging/api/log/info', infoData);
         console.log('Info logged successfully');
