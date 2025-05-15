@@ -94,7 +94,7 @@ class LoginLogger {
       methodName: "callSSOLoginApi",
       errorDate: new Date().toISOString().split("T")[0],
       message: message,
-      errorCode: error?.code || 30800,
+      errorCode: 30800,
     };
     
     console.log("[LoginLogger] Failed Login:", message);
