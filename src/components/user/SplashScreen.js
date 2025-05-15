@@ -298,9 +298,9 @@ const SplashScreen = ({ navigation, route }) => {
       
       callSSOLoginApi(data);
     } catch (error) {
-      LoginLogger.logFailedLogin(dispatch, logError, {
+      LoginLogger.logFailedLogin(dispatch, logInfo, {
         message: "Authorization failed",
-        code: error?.code || 30801
+        code: 30801
       }, {
         authMethod: "authorize",
         errorDetails: error?.message
@@ -340,9 +340,9 @@ const SplashScreen = ({ navigation, route }) => {
         }
       } catch (error) {
         // Log refresh token failure
-        LoginLogger.logFailedLogin(dispatch, logError, {
+        LoginLogger.logFailedLogin(dispatch, logInfo, {
           message: "Refresh token failed",
-          code: error?.code || 30802
+          code: 30802
         }, {
           authMethod: "refresh",
           errorDetails: error?.message
