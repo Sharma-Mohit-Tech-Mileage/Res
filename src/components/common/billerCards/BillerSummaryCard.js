@@ -86,14 +86,26 @@ const BillerSummaryCard = ({
         <View style={styles.cardContent}>
           {billAmt == undefined ? (
             <SkeletonPlaceholder>
+              <>
               <View
                 style={{
-                  width: wp("40%"),
-                  height: 30,
+                  width: wp("25%"),
+                  height: 20,
+                  alignSelf: "flex-end",
                   borderRadius: 4,
                   marginBottom: 10,
                 }}
               />
+              <View
+                style={{
+                  width: wp("30%"),
+                  height: 20,
+                  alignSelf: "flex-end",
+                  borderRadius: 4,
+                  marginVertical: 10,
+                }}
+              />
+              </>
             </SkeletonPlaceholder>
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>

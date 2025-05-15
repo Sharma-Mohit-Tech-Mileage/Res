@@ -10,8 +10,8 @@ import {
 import Svg, { Circle } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
-const SIZE = 120;
-const STROKE_WIDTH = 14;
+const SIZE = 110;
+const STROKE_WIDTH = 12;
 const RADIUS = (SIZE - STROKE_WIDTH) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
@@ -47,7 +47,7 @@ const LoadingSpinner = () => {
             strokeWidth={STROKE_WIDTH}
           />
           <Circle
-            stroke="#EF4E3E"
+            stroke="#8D3B90"
             fill="none"
             cx={SIZE / 2}
             cy={SIZE / 2}
