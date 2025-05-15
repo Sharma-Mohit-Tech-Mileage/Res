@@ -11,7 +11,7 @@ import RightArrow from "../../../res/svgIcons/RightArrow";
 import WalletIcon from "../../../res/svgIcons/WalletIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
-import { Env } from "../../../network/apis/account/Constants";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
 import SmallLoader from "../customui/SmallLoader";
@@ -85,8 +85,16 @@ const BillerSummaryCard = ({
         </View>
         <View style={styles.cardContent}>
           {billAmt == undefined ? (
-            <SmallLoader
-            />
+            <SkeletonPlaceholder>
+              <View
+                style={{
+                  width: wp("40%"),
+                  height: 30,
+                  borderRadius: 4,
+                  marginBottom: 10,
+                }}
+              />
+            </SkeletonPlaceholder>
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>
           )}

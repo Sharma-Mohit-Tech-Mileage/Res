@@ -1,87 +1,82 @@
 import React, { useEffect, useRef } from 'react';
 import {
-  StyleSheet,
   View,
   Text,
+  StyleSheet,
   Animated,
-  Easing
+  Easing,
+  Dimensions,
 } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 
-const height = 80;
+const { width } = Dimensions.get('window');
+const SIZE = 120;
+const STROKE_WIDTH = 14;
+const RADIUS = (SIZE - STROKE_WIDTH) / 2;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-const startRotationAnimation = (durationMs, rotationDegree) => {
-  Animated.loop(
-    Animated.timing(rotationDegree, {
-      toValue: 360,
-      duration: durationMs,
-      easing: Easing.linear,
-      useNativeDriver: true
-    })
-  ).start();
-};
-
-const LoadingSpinner = ({ color, durationMs = 1000, text = 'Loading' }) => {
-  const rotationDegree = useRef(new Animated.Value(0)).current;
+const LoadingSpinner = () => {
+  const rotateAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    startRotationAnimation(durationMs, rotationDegree);
-  }, [durationMs]);
+    Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 1000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, []);
 
-  const rotate = rotationDegree.interpolate({
-    inputRange: [0, 360],
-    outputRange: ['0deg', '360deg']
+  const spin = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
   });
 
   return (
-    <View style={styles.container} accessibilityRole="progressbar">
-      <View style={[styles.background, { borderColor: color }]} />
-      <Animated.View
-        style={[
-          styles.progress,
-          { borderTopColor: color },
-          { transform: [{ rotateZ: rotate }] }
-        ]}
-      />
-      <View style={styles.textContainer}>
-        <Text style={styles.text}>{text}</Text>
-      </View>
+    <View style={styles.container}>
+      <Animated.View style={{ transform: [{ rotate: spin }] }}>
+        <Svg width={SIZE} height={SIZE}>
+          <Circle
+            stroke="#ddd"
+            fill="none"
+            cx={SIZE / 2}
+            cy={SIZE / 2}
+            r={RADIUS}
+            strokeWidth={STROKE_WIDTH}
+          />
+          <Circle
+            stroke="#EF4E3E"
+            fill="none"
+            cx={SIZE / 2}
+            cy={SIZE / 2}
+            r={RADIUS}
+            strokeDasharray={`${CIRCUMFERENCE}`}
+            strokeDashoffset={CIRCUMFERENCE * 0.75}
+            strokeLinecap="round"
+            strokeWidth={STROKE_WIDTH}
+          />
+        </Svg>
+      </Animated.View>
+      <Text style={styles.loadingText}>Loading...</Text>
     </View>
   );
 };
 
+export default LoadingSpinner;
+
 const styles = StyleSheet.create({
   container: {
-    width: height,
-    height: height,
+    flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
-  background: {
-    width: '100%',
-    height: '100%',
-    borderRadius: height / 2,
-    borderWidth: 8,
-    opacity: 0.25
-  },
-  progress: {
-    width: '100%',
-    height: '100%',
-    borderRadius: height / 2,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: 'transparent',
-    borderWidth: 8,
-    position: 'absolute'
-  },
-  textContainer: {
+  loadingText: {
     position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center'
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#001321',
   },
-  text: {
-    fontSize: 10,
-    color: '#000'
-  }
 });
-
-export default LoadingSpinner;

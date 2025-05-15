@@ -21,7 +21,6 @@ const LoadingOverlay = ({ loading, loadingTxt, onRequestClose, isWhite=false }) 
             resizeMode="contain"
             source={(isWhite)? LoadingIconWhite:LoadingIcon}
             style={styles.LoadingImage}
-            co
           />
           <Text style={styles.loadingTxt}>{loadingTxt}...</Text>
         </View>
