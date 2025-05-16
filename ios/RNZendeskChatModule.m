@@ -24,6 +24,24 @@ RCT_EXPORT_MODULE(RNZendeskChatModule);
           ZDKLogger.level = ZDKLogLevelDefault;
                 if (error != nil) {
                     NSLog(@"Zendesk did not initialize.\nError: %@", error.localizedDescription);
+                }else{
+                  // Get your Zendesk instance:
+                  Zendesk *instance = [Zendesk instance];
+
+                  // To add an event observer to your Zendesk instance:
+                  [instance addEventObserver:self :^(enum ZDKZendeskEvent event, id _Nullable value) {
+                      switch (event) {
+                      case ZDKZendeskEventUnreadMessageCountChanged:
+                          // Your custom action...
+                      case ZDKZendeskEventAuthenticationFailed:
+                          // Your custom action...
+                          NSLog(@"Zendesk ZDKZendeskEventAuthenticationFailed");
+                        
+                      default:
+                          break;
+                      }
+                  }];
+
                 }
             }];
       });
@@ -93,7 +111,6 @@ RCT_EXPORT_METHOD(logoutZendesk:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
       }];
     }
     @catch (NSException *exception) {
-      
       reject(@"Exception", @"Exception occurred", nil);
     }
   });
