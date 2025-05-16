@@ -30,6 +30,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
     const [hasTrackedInitialScreen, setHasTrackedInitialScreen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const toggleModal = () => {
         setShowPDFModal(!showPDFModal);
@@ -271,11 +272,15 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }, [url, modalOpen, appState]);
 
 
-    const Spinner = () => (
+    const Spinner = () => {
+       return(
         <View style={styles.activityContainer}>
-            <LoadingSpinner loading={true} color={'#EF4E3E'} />
+            {name =='Billing Details' ? <LoadingSpinner /> : <LoadingOverlay loading={true}  />}
+            
         </View>
-    );
+       )
+       
+    }
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => {

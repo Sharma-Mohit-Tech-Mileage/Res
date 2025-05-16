@@ -10,6 +10,7 @@ import AppStyles from "../styles/AppStyles";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
 import SmallLoader from "../customui/SmallLoader";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 const Card = ({ billAmt, dueDate, navigation, style, acno, isNewBiller }) => {
 
 
@@ -120,8 +121,29 @@ const Card = ({ billAmt, dueDate, navigation, style, acno, isNewBiller }) => {
             ]}>Total Amount Due</Text>
           {billAmt == undefined ? (
             <View style={{ alignSelf: "center" }}>
-            <SmallLoader
-            />
+            <SkeletonPlaceholder>
+              <>
+              <View
+                style={{
+                  width: wp("30%"),
+                  height: 20,
+                  alignSelf: "flex-end",
+                  borderRadius: 4,
+                  marginVertical: 5,
+                }}
+              />
+              <View
+                style={{
+                  width: wp("30%"),
+                  height: 20,
+                  alignSelf: "flex-end",
+                  borderRadius: 4,
+                  marginVertical: 5,
+                }}
+              />
+              </>
+            </SkeletonPlaceholder>
+            
             </View>
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>
