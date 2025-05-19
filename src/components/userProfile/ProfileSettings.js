@@ -162,7 +162,9 @@ const ProfileSettings = () => {
               </Text>
               <Text style={styles.manageSerTxt1}>
                 {"To cancel or change service, please call us at "}
-                <Text style={styles.manageSerTxt2}>833-807-1020 </Text>
+                <Text style={styles.manageSerTxt2} onPress={()=>{
+                  makeCall("833-807-1020");
+                }}>833-807-1020 </Text>
                 <Text style={styles.manageSerTxt3}>
                   M-F 9:00 AM-6:00 PM CST.
                 </Text>
@@ -307,8 +309,8 @@ const styles = StyleSheet.create({
   manageSerTxt2: {
     fontFamily: FontFamily.openSansSemiBold,
     color: Color.colorMidnightblue,
-    fontWeight: "700",
-    fontSize: FontSize.size_sm,
+    fontWeight: "500",
+    fontSize: FontSize.size_base,
   },
   manageSerTxt3: {
     fontFamily: FontFamily.openSansRegular,
