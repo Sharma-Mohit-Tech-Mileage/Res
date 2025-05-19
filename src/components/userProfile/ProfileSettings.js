@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   manageSerTxt2: {
     fontFamily: FontFamily.openSansSemiBold,
     color: Color.colorMidnightblue,
-    fontWeight: "500",
+    fontWeight: "700",
     fontSize: FontSize.size_base,
   },
   manageSerTxt3: {
