@@ -7,8 +7,9 @@ import { FontFamily, Padding ,Color} from "../../../../GlobalStyles";
 import { Env }  from "../../../network/apis/account/Constants";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../styles/AppStyles";
-const AutoPayCard = ({ cardDigit, isAutoPayStatus, paymentDetails,navigation ,style}) => {
+const AutoPayCard = ({ cardDigit, isAutoPayStatus, paymentDetails,navigation ,style,isStatusLoading}) => {
   const [useNewPayment, setUseNewPayment] = useState(false);
   const getStatus = () => {
     getUser().then((res) => {
@@ -18,6 +19,7 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, paymentDetails,navigation ,st
   };
   useEffect(() => {
     getStatus();
+    console.log("isStatusLoading", isStatusLoading);
   }, []);
 
   return (
@@ -43,12 +45,41 @@ const AutoPayCard = ({ cardDigit, isAutoPayStatus, paymentDetails,navigation ,st
               <Text style={[styles.dueDate, { fontWeight: '400' , color: colors.gray600 }]}>Account ending in  </Text>
               <Text style={[styles.dueDate]}>{cardDigit}</Text>
               </View>
+              {isStatusLoading ? 
+              <SkeletonPlaceholder>
+              <View
+                style={{
+                  width: wp("30%"),
+                  height: 20,
+                  alignSelf: "flex-end",
+                  borderRadius: 4,
+                  marginVertical: 5,
+                }}
+              />
+              
+            </SkeletonPlaceholder> :
               <Text style={styles.autoPayStatusText}>Auto Pay On</Text>
+}
               <Text style={[styles.thankYouText,{marginTop:5}]}>Thank you for choosing Auto Pay!</Text>
             </>
           ) : (
             <>
+            {isStatusLoading ? 
+            
+              <SkeletonPlaceholder>
+              <View
+                style={{
+                  width: wp("30%"),
+                  height: 30,
+                  alignSelf: 'center',
+                  borderRadius: 5,
+                  marginVertical: 5,
+                }}
+              />
+              
+            </SkeletonPlaceholder> :
               <Text style={styles.autoPayStatusTextInActive}>Auto Pay Off</Text>
+           }
               <View style={{flexDirection:'column'}}>
               <Text style={[styles.infoAuto]}>Turn on Auto Pay today!</Text>
               <Text style={styles.subText}>Never miss a payment with peace of mind.</Text>

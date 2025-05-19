@@ -6,7 +6,9 @@ import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
 import AppStyles from "../styles/AppStyles";
-const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style }) => {
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+
+const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style,isStatusLoading }) => {
   return (
       <View style={[AppStyles.card, style]}>
         <View style={styles.cardHreader}>

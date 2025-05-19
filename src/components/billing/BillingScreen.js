@@ -42,8 +42,8 @@ const BillingScreen = ({ navigation }) => {
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
   
   // Content loading state
-  const [isContentLoading, setIsContentLoading] = useState(true);
-
+  const [isContentLoading, setIsContentLoading] = useState(false);
+ const [isAutoPayStatusLoad, setIsAutoPayStatusLoad] = useState(false);
   let paperlessCardEmail = '';
   if (isNewBiller) {
     paperlessCardEmail = paperlessEmail;
@@ -54,6 +54,7 @@ const BillingScreen = ({ navigation }) => {
   const handleError = (error) => { 
     console.log("error", error); 
     setIsContentLoading(false);
+    setIsAutoPayStatusLoad(false);
   };
 
   const getUserAccountDetails = () => {
@@ -98,7 +99,7 @@ const BillingScreen = ({ navigation }) => {
   };
 
   const getStatus = () => {
-    setIsContentLoading(true);
+    setIsAutoPayStatusLoad(true);
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
       GetApiRequest(
@@ -106,7 +107,7 @@ const BillingScreen = ({ navigation }) => {
         (res) => {
           setIsAutoPayStatus(res?.isEasyPay);
           setCardDigit(res?.epLastfour);
-          setIsContentLoading(false);
+          
         },
         handleError
       );
@@ -115,13 +116,14 @@ const BillingScreen = ({ navigation }) => {
         `account/api/account/${accountNumber}/paperless/status`,
         (res) => {
           setPaperlessStatus(res?.isPaperless);
-          setIsContentLoading(false);
+          setIsAutoPayStatusLoad(false);
         },
         handleError
       );
     }).catch(error => {
       console.log("Error getting user status:", error);
       setIsContentLoading(false);
+      setIsAutoPayStatusLoad(false);
     });
   };
 
@@ -224,6 +226,7 @@ const BillingScreen = ({ navigation }) => {
                   cardDigit={cardDigit}
                   isAutoPayStatus={isAutoPayStatus}
                   paymentDetails={defaultPaymentDetails}
+                  isStatusLoading={isAutoPayStatusLoad}
                   navigation={navigation}
                   style={styles.card}
                 />
@@ -232,6 +235,7 @@ const BillingScreen = ({ navigation }) => {
                   paperlessStatus={isNewBiller ? paperlessStatusAcp : paperlessEmails}
                   navigation={navigation}
                   style={styles.card}
+                   isStatusLoading={isAutoPayStatusLoad}
                 />
                 <View style={[AppStyles.card, styles.myModemSpaceBlock]}>
                   <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
