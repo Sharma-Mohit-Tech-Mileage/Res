@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, ScrollView, Linking } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Linking,Pressable } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Padding,
@@ -160,15 +160,25 @@ const ProfileSettings = () => {
               <Text style={[styles.generalInformation, styles.melissaTypo]}>
                 Manage My Service
               </Text>
-              <Text style={styles.manageSerTxt1}>
-                {"To cancel or change service, please call us at "}
-                <Text style={styles.manageSerTxt2} onPress={()=>{
-                  makeCall("833-807-1020");
-                }}>833-807-1020 </Text>
-                <Text style={styles.manageSerTxt3}>
-                  M-F 9:00 AM-6:00 PM CST.
+              <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", marginTop: 20 }}>
+                <Text style={styles.manageSerTxt1}>
+                  To cancel or change service, please call us at{" "}
                 </Text>
-              </Text>
+                <Pressable
+                  onPress={() => makeCall("833-807-1020")}
+                  accessibilityRole="link"
+                  accessibilityLabel="Call 833 807 1020"
+                  accessibilityHint="Double tap to call customer service"
+                >
+                  <Text style={styles.manageSerTxt2}>833-807-1020</Text>
+                </Pressable>
+                <Text
+                  style={styles.manageSerTxt3}
+                  accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                >
+                  {" M-F 9:00 AM-6:00 PM CST."}
+                </Text>
+              </View>
             </View>
           </View>
         </View>
