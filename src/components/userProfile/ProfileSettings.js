@@ -1,30 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View, ScrollView, Linking } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Padding, Color, FontFamily, Border, FontSize } from "../../../GlobalStyles";
+import {
+  Padding,
+  Color,
+  FontFamily,
+  Border,
+  FontSize,
+} from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { useDispatch, useSelector } from 'react-redux';
-import { getUserType, convertToSpecialCase, getRoleBasedMessage } from '../utility/constant';
-import NotificationAlert from '../common/customui/NotificationAlert';
-import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
-import { RefreshToken } from '../user/Session';
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getUserType,
+  convertToSpecialCase,
+  getRoleBasedMessage,
+} from "../utility/constant";
+import NotificationAlert from "../common/customui/NotificationAlert";
+import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
+import { RefreshToken } from "../user/Session";
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [isNewBiller, setIsNewBiller] = useState(false);
-  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profile = useSelector((state) => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
-  const convertedRole = getUserType(profileDetails.memberType || '');
-  const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || '');
+  const convertedRole = getUserType(profileDetails.memberType || "");
+  const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || "");
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
       try {
         RefreshToken();
       } catch (error) {
-        navigation.navigate('Splash');
+        navigation.navigate("Splash");
       }
       dispatch(fetchProfileDetails());
       navigation.setParams({ updateSuccess: undefined });
@@ -37,87 +47,128 @@ const ProfileSettings = () => {
 
   useEffect(() => {
     if (profileDetails?.accountNumber?.toString().length >= 16) {
-      setIsNewBiller(true)
+      setIsNewBiller(true);
     }
-
   }, [profileDetails]);
 
+  const makeCall = (number) => {
+    let phoneNumber = "";
 
+    if (Platform.OS === "android") {
+      phoneNumber = `tel:${number}`;
+    } else {
+      phoneNumber = `telprompt:${number}`;
+    }
+
+    Linking.openURL(phoneNumber);
+  };
 
   return (
     <View style={{ zIndex: 1 }}>
-      <ProfileSettingsHeader title="Profile" onPressBack={() => navigation.goBack()} />
+      <ProfileSettingsHeader
+        title="Profile"
+        onPressBack={() => navigation.goBack()}
+      />
       <ScrollView accessibilityLabel="Profile settings page.">
-        <View style={styles.frameParent}>
-          <View style={[styles.frameGroup]}>
-            <View style={styles.infoWrapper}>
-              <NotificationAlert
-                type="success"
-                title="Success"
-                message="Your profile settings have been successfully saved."
-                showCloseIcon={true}
-                isVisible={showSuccessAlert}
-                onClose={() => setShowSuccessAlert(false)}
-              />
-            </View>
-            <View style={[styles.generalInformationParent]}>
-              <Text style={[styles.generalInformation, styles.melissaTypo]}>
-                General Information
-              </Text>
-              {/* {!isPrimary && <Pressable
+        <View style={{ flexDirection: "column", marginBottom: 300 }}>
+          <View style={styles.frameParent}>
+            <View style={[styles.frameGroup]}>
+              <View style={styles.infoWrapper}>
+                <NotificationAlert
+                  type="success"
+                  title="Success"
+                  message="Your profile settings have been successfully saved."
+                  showCloseIcon={true}
+                  isVisible={showSuccessAlert}
+                  onClose={() => setShowSuccessAlert(false)}
+                />
+              </View>
+              <View style={[styles.generalInformationParent]}>
+                <Text style={[styles.generalInformation, styles.melissaTypo]}>
+                  General Information
+                </Text>
+                {/* {!isPrimary && <Pressable
                 style={[styles.buttons, styles.buttonsLayout]}
                 onPress={() => navigation.navigate("ProfileSettingsEdit")}>
                 <Text style={[styles.makePayment, styles.text1Clr]}>Edit</Text>
               </Pressable>} */}
-            </View>
-            <View style={styles.frameContainer}>
-              <View style={styles.firstNameParent} accessible={true} >
-                <Text style={styles.firstName}>{isNewBiller ? 'Customer Name' : 'First Name'}</Text>
-                <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {isNewBiller ? profileDetails.fullName : profileDetails.firstName}
-                </Text>
               </View>
-              {!isNewBiller && (
-                <View style={styles.firstNameParent} accessible={true} >
-                  <Text style={styles.firstName}>Last Name</Text>
-                  <Text style={[styles.melissa, styles.melissaTypo]}>{profileDetails.lastName}</Text>
+              <View style={styles.frameContainer}>
+                <View style={styles.firstNameParent} accessible={true}>
+                  <Text style={styles.firstName}>
+                    {isNewBiller ? "Customer Name" : "First Name"}
+                  </Text>
+                  <Text style={[styles.melissa, styles.melissaTypo]}>
+                    {isNewBiller
+                      ? profileDetails.fullName
+                      : profileDetails.firstName}
+                  </Text>
                 </View>
-              )}
-              <View style={styles.firstNameParent} accessible={true} >
-                <Text style={styles.firstName}>Username</Text>
-                <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {profileDetails.userName}
-                </Text>
-              </View>
-
-              <View style={styles.firstNameParent} accessible={true} >
-                <Text style={styles.firstName}>Account Number</Text>
-                <Text style={[styles.melissa, styles.melissaTypo]}>
-                  {profileDetails.accountNumber}
-                </Text>
-              </View>
-
-              <View style={styles.firstNameParent} accessible={true} >
-                <Text style={styles.firstName}>Member Type</Text>
-                <View style={styles.badgeWrapper}>
-                  <View style={[styles.badge, styles.badgeBorder]}>
-                    <Text style={[styles.text, styles.textTypo]}>
-                      {convertedRole}
+                {!isNewBiller && (
+                  <View style={styles.firstNameParent} accessible={true}>
+                    <Text style={styles.firstName}>Last Name</Text>
+                    <Text style={[styles.melissa, styles.melissaTypo]}>
+                      {profileDetails.lastName}
                     </Text>
                   </View>
+                )}
+                <View style={styles.firstNameParent} accessible={true}>
+                  <Text style={styles.firstName}>Username</Text>
+                  <Text style={[styles.melissa, styles.melissaTypo]}>
+                    {profileDetails.userName}
+                  </Text>
+                </View>
+
+                <View style={styles.firstNameParent} accessible={true}>
+                  <Text style={styles.firstName}>Account Number</Text>
+                  <Text style={[styles.melissa, styles.melissaTypo]}>
+                    {profileDetails.accountNumber}
+                  </Text>
+                </View>
+
+                <View style={styles.firstNameParent} accessible={true}>
+                  <Text style={styles.firstName}>Member Type</Text>
+                  <View style={styles.badgeWrapper}>
+                    <View style={[styles.badge, styles.badgeBorder]}>
+                      <Text style={[styles.text, styles.textTypo]}>
+                        {convertedRole}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                <View style={styles.notificationsWrapper}>
+                  <NotificationAlert
+                    type="info"
+                    title={convertToSpecialCase(convertedRole)}
+                    showCloseIcon={false}
+                    message={roleBasedInfo}
+                  />
                 </View>
               </View>
-              <View style={styles.notificationsWrapper}>
-                <NotificationAlert
-                  type="info"
-                  title={convertToSpecialCase(convertedRole)}
-                  showCloseIcon={false}
-                  message={roleBasedInfo}
-                />
+              <View
+                style={[
+                  { paddingHorizontal: Padding.p_5xl },
+                  styles.frameParentSpaceBlock,
+                ]}
+              >
+                <View style={styles.frameChild} />
               </View>
             </View>
-            <View style={[{ paddingHorizontal: Padding.p_5xl }, styles.frameParentSpaceBlock]}>
-              <View style={styles.frameChild} />
+          </View>
+          <View style={[styles.frameGroup, { marginHorizontal: 16 }]}>
+            <View style={{ padding: 20, flexDirection: "column" }}>
+              <Text style={[styles.generalInformation, styles.melissaTypo]}>
+                Manage My Service
+              </Text>
+              <Text style={styles.manageSerTxt1}>
+                {"To cancel or change service, please call us at "}
+                <Text style={styles.manageSerTxt2} onPress={()=>{
+                  makeCall("833-807-1020");
+                }}>833-807-1020 </Text>
+                <Text style={styles.manageSerTxt3}>
+                  M-F 9:00 AM-6:00 PM CST.
+                </Text>
+              </Text>
             </View>
           </View>
         </View>
@@ -125,7 +176,6 @@ const ProfileSettings = () => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   melissaTypo: {
@@ -163,7 +213,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: FontSize.size_3xl,
     textAlign: "left",
-    fontWeight: '400'
+    fontWeight: "400",
   },
   makePayment: {
     textAlign: "center",
@@ -190,7 +240,7 @@ const styles = StyleSheet.create({
   melissa: {
     fontSize: FontSize.size_base,
     textAlign: "left",
-    fontWeight: '400'
+    fontWeight: "400",
   },
   firstNameParent: {
     paddingVertical: Padding.p_5xs,
@@ -229,7 +279,7 @@ const styles = StyleSheet.create({
   },
   frameContainer: {
     alignSelf: "stretch",
-    marginTop: Padding.p_base
+    marginTop: Padding.p_base,
   },
   frameChild: {
     height: 1,
@@ -244,10 +294,28 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   frameParent: {
-    paddingVertical: Padding.p_5xl,
+    paddingVertical: Padding.p_base,
     paddingHorizontal: Padding.p_base,
-    width: '100%',
-    marginBottom: 200,
+    width: "100%",
+  },
+  manageSerTxt1: {
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "400",
+    fontSize: FontSize.size_base,
+    textAlign: "left",
+    color: Color.sparklightGray1,
+    marginTop: 20,
+  },
+  manageSerTxt2: {
+    fontFamily: FontFamily.openSansSemiBold,
+    color: Color.colorMidnightblue,
+    fontWeight: "500",
+    fontSize: FontSize.size_base,
+  },
+  manageSerTxt3: {
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_base,
+    fontWeight: "500",
   },
 });
 
