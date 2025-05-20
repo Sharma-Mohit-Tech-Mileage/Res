@@ -326,6 +326,7 @@ const styles = StyleSheet.create({
   manageSerTxt3: {
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
+    color: Color.colorGray_100,
     fontWeight: "700",
   },
 });
