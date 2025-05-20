@@ -238,7 +238,7 @@ export const setPaperlessStatus = (status) => ({
 
 export const fetchPaperlessStatus = () => ({
     type: FETCH_PAPERLESS_STATUS,
-    payload: null
+    
 });
 export const fetchACPUserAccountDetails = () => ({
     type: FETCH_ACP_USER_ACCOUNT_DETAILS, // No payload needed

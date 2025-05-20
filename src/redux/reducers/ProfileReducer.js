@@ -4,6 +4,7 @@ import {
 
 const initialState = {
     isLoading: false,
+    isPaperLessStatusLoading: false,
     profileDetails: {},
     userList: [],
     smsSubscription: [],
@@ -67,12 +68,12 @@ const ProfileReducer = (state = initialState, action) => {
         case FETCH_PAPERLESS_STATUS:
             return {
                 ...state,
-                isLoading: true,
+                isPaperLessStatusLoading: true,
             };    
         case SET_PAPERLESS_STATUS:
             return {
                 ...state,
-                isLoading: false,
+                isPaperLessStatusLoading: false,
                 paperlessStatusAcp: action.payload
             };
         case SAVE_ACP_USER_ACCOUNT_DETAILS:

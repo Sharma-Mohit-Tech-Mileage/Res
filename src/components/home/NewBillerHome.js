@@ -53,6 +53,9 @@ const NewBillerHome = ({ navigation }) => {
 const paperlessStatusAcp = useSelector(
       (state) => state.combinedReducers.profile?.paperlessStatusAcp
   );
+  const paperlessLoading = useSelector(
+      (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
+  );
 
     const getStatus = () => {
       setloadingAutoPay(true);
@@ -75,7 +78,7 @@ const paperlessStatusAcp = useSelector(
   // Refresh data when the screen is focused
   useFocusEffect(
     useCallback(() => {
-      console.log("Refreshing data on focus",paperlessStatusAcp);
+      console.log("paperlessLoading",JSON.stringify(paperlessLoading));
       const refreshData = async () => {
         try {
           const status = await checkForMinorUpdate();
@@ -189,6 +192,7 @@ const paperlessStatusAcp = useSelector(
           }}
         />
         <FeatureCard
+         isLoading={loadingAutoPay}
           title="Paperless Billing"
           features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
           buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}

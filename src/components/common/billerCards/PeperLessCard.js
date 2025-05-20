@@ -26,12 +26,42 @@ const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style,i
             <>
               <Text style={[styles.dueDate, { fontWeight: '400', color: colors.gray600 }]}>Email Associated: </Text>
               <Text style={[styles.dueDate]}>{paperlessCardEmail}</Text>
+              {isStatusLoading ? 
+              <SkeletonPlaceholder>
+              <View
+                style={{
+                  width: wp("30%"),
+                  height: 20,
+                  alignSelf: "flex-end",
+                  borderRadius: 4,
+                  marginVertical: 5,
+                }}
+              />
+              
+            </SkeletonPlaceholder> :
+
               <Text style={styles.autoPayStatusText}>Paperless Billing On</Text>
+}
               <Text style={[styles.thankYouText,{marginTop:5}]}>Thank you for choosing Paperless Billing!</Text>
             </>
           ) : (
             <>
+            {isStatusLoading ? 
+              <SkeletonPlaceholder>
+              <View
+                style={{
+                  width: wp("30%"),
+                  height: 20,
+                  alignSelf: "flex-end",
+                  borderRadius: 4,
+                  marginVertical: 5,
+                }}
+              />
+              
+            </SkeletonPlaceholder> :
+
               <Text style={styles.autoPayStatusTextInActive}>Paperless Billing Off</Text>
+       }
               <View style={[styles.headerContainer,{alignItems:'center',justifyContent:'center'}]}>
                 <View style={{flexDirection:'column'}}>
                 <Text style={[styles.dueDate]}>Turn on Paperless Billing today! </Text>
