@@ -31,6 +31,7 @@ const NewBillerHome = ({ navigation }) => {
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
+  const [loadingAutoPay, setloadingAutoPay] = useState(false);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
     billAmount: 0,
@@ -51,9 +52,10 @@ const NewBillerHome = ({ navigation }) => {
   const dispatch = useDispatch();
 const paperlessStatusAcp = useSelector(
       (state) => state.combinedReducers.profile?.paperlessStatusAcp
-    );
+  );
 
     const getStatus = () => {
+      setloadingAutoPay(true);
         getUser().then((res) => {
           const accountNumber = res.userInfo.accountNumber;
           GetApiRequest(
@@ -61,14 +63,19 @@ const paperlessStatusAcp = useSelector(
             (res) => {
               console.log("res-------------------------------------------------------------------------------", res);
               setIsAutoPayStatus(res?.isEasyPay);
+              setloadingAutoPay(false);
             },
-            (error) => { console.log("error", error);}
+            (error) => {
+               console.log("error", error);
+              setloadingAutoPay(false);
+            }
           );
         });
       };
   // Refresh data when the screen is focused
   useFocusEffect(
     useCallback(() => {
+      console.log("Refreshing data on focus",paperlessStatusAcp);
       const refreshData = async () => {
         try {
           const status = await checkForMinorUpdate();
@@ -166,6 +173,7 @@ const paperlessStatusAcp = useSelector(
         />
         <FeatureCard
           title="Auto Pay"
+          isLoading={loadingAutoPay}
           features={["Convenient", "Timely Payments", "Peace of Mind"]}
           buttonText={isAutoPayStatus ? "Active" : "Activate Auto Pay"}
           buttonVariant={isAutoPayStatus ? "success" : "primary"}

@@ -64,7 +64,7 @@ const ProfileReducer = (state = initialState, action) => {
                 ...state,
                 allSvEmailAssociated: action.payload,
             };
-        case FETCH_ACP_USER_ACCOUNT_DETAILS:
+        case FETCH_PAPERLESS_STATUS:
             return {
                 ...state,
                 isLoading: true,

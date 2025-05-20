@@ -3,14 +3,15 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FontFamily, FontSize, Color, Padding, Border } from '../../../GlobalStyles';
 import Icon from '../common/Icon';
-
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 const FeatureCard = ({ 
   title, 
   features = [], 
   buttonText, 
   buttonVariant = 'primary',
   isActive = false,
-  onButtonPress 
+  onButtonPress ,
+  isLoading
 }) => {
   const getButtonStyle = () => {
     switch (buttonVariant) {
@@ -53,7 +54,21 @@ const FeatureCard = ({
         accessibilityRole="button"
         accessibilityLabel={buttonText}
       >
+        {isLoading ? 
+              <SkeletonPlaceholder>
+              <View
+                style={{
+                  width: 200,
+                  height: 30,
+                  alignSelf: "center",
+                  borderRadius: 4,
+                  marginVertical: 5,
+                }}
+              />
+              
+            </SkeletonPlaceholder> :
         <Text style={[styles.buttonText, getButtonTextStyle()]}>{buttonText}</Text>
+              }
       </TouchableOpacity>
     </View>
   );
