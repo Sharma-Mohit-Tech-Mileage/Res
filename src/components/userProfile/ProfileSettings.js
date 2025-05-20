@@ -163,21 +163,20 @@ const ProfileSettings = () => {
               <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", marginTop: 20 }}>
                 <Text style={styles.manageSerTxt1}>
                   To cancel or change service, please call us at{" "}
-                </Text>
-                <Pressable
-                  onPress={() => makeCall("833-807-1020")}
+                  
+                  <Text onPress={() => makeCall("833-807-1020")}
                   accessibilityRole="link"
                   accessibilityLabel="Call 833 807 1020"
                   accessibilityHint="Double tap to call customer service"
-                >
-                  <Text style={styles.manageSerTxt2}>833-807-1020</Text>
-                </Pressable>
+                   style={styles.manageSerTxt2}>833-807-1020</Text>
                 <Text
                   style={styles.manageSerTxt3}
                   accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
                 >
                   {" M-F 9:00 AM-6:00 PM CST."}
                 </Text>
+                </Text>
+                
               </View>
             </View>
           </View>
@@ -325,7 +324,7 @@ const styles = StyleSheet.create({
   manageSerTxt3: {
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
-    fontWeight: "500",
+    fontWeight: "700",
   },
 });
 
