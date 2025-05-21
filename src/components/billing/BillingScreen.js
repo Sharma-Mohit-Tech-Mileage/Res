@@ -44,6 +44,7 @@ const BillingScreen = ({ navigation }) => {
   // Content loading state
   const [isContentLoading, setIsContentLoading] = useState(false);
  const [isAutoPayStatusLoad, setIsAutoPayStatusLoad] = useState(false);
+  const [loadingPerless, setLoadingPerless] = useState(false);
   let paperlessCardEmail = '';
   if (isNewBiller) {
     paperlessCardEmail = paperlessEmail;
@@ -55,6 +56,7 @@ const BillingScreen = ({ navigation }) => {
     console.log("error", error); 
     setIsContentLoading(false);
     setIsAutoPayStatusLoad(false);
+    setLoadingPerless(false);
   };
 
   const getUserAccountDetails = () => {
@@ -100,6 +102,7 @@ const BillingScreen = ({ navigation }) => {
 
   const getStatus = () => {
     setIsAutoPayStatusLoad(true);
+    setLoadingPerless(true);
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
       GetApiRequest(
@@ -107,7 +110,7 @@ const BillingScreen = ({ navigation }) => {
         (res) => {
           setIsAutoPayStatus(res?.isEasyPay);
           setCardDigit(res?.epLastfour);
-          
+          setIsAutoPayStatusLoad(false);
         },
         handleError
       );
@@ -116,7 +119,7 @@ const BillingScreen = ({ navigation }) => {
         `account/api/account/${accountNumber}/paperless/status`,
         (res) => {
           setPaperlessStatus(res?.isPaperless);
-          setIsAutoPayStatusLoad(false);
+          setLoadingPerless(false);
         },
         handleError
       );
@@ -235,7 +238,7 @@ const BillingScreen = ({ navigation }) => {
                   paperlessStatus={isNewBiller ? paperlessStatusAcp : paperlessEmails}
                   navigation={navigation}
                   style={styles.card}
-                   isStatusLoading={isAutoPayStatusLoad}
+                  isStatusLoading={loadingPerless}
                 />
                 <View style={[AppStyles.card, styles.myModemSpaceBlock]}>
                   <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
