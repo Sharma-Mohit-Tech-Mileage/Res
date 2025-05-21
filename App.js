@@ -12,7 +12,7 @@ import AppUpdateAlert from "./src/components/utility/AppUpdateAlert";
 import { initializeApp } from "./src/firebase/FirebaseUtils";
 import analytics from '@react-native-firebase/analytics';
 import { ISUAT } from "./src/network/apis/account/Constants";
-
+import { MaintenanceProvider } from './src/components/maintenance/MaintenanceContext';
 Text.defaultProps = { ...Text.defaultProps, maxFontSizeMultiplier: 1.25, };
 
 const App = () => {
@@ -66,16 +66,19 @@ const App = () => {
     }
   }
 
-  return (
+ return (
     <Provider store={store}>
       <NativeBaseProvider>
         <TabBarVisibilityProvider>
           <AnalyticsContext.Provider value={{ logEvent: (eventName, eventData) => analytics().logEvent(eventName, eventData) }}>
-            <UserNavigations />
-            <AppUpdateAlert
-              visible={majorUpdateVisible}
-              onClose={() => setMajorUpdateVisible(false)}
-            />
+            {/* Add MaintenanceProvider here */}
+            <MaintenanceProvider>
+              <UserNavigations />
+              <AppUpdateAlert
+                visible={majorUpdateVisible}
+                onClose={() => setMajorUpdateVisible(false)}
+              />
+            </MaintenanceProvider>
           </AnalyticsContext.Provider>
         </TabBarVisibilityProvider>
       </NativeBaseProvider>

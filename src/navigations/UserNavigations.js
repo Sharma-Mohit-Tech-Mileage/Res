@@ -11,6 +11,7 @@ import TextNotifications from '../components/entry/TextNotifications';
 import Terms from '../components/entry/Terms';
 import MyTabs from "./MyTab";
 import { AxiosInterceptorProvider } from '../network/RestApiClient';
+import MaintenanceWrapper from '../components/maintenance/MaintenanceWrapper';
 
 const Stack = createNativeStackNavigator();
 
@@ -69,6 +70,7 @@ const UserNavigations = (props) => {
   return (
     <NavigationContainer ref={navigationRef} onReady={onReady} onStateChange={onStateChange}>
       <AxiosInterceptorProvider>
+         <MaintenanceWrapper>
         <Stack.Navigator>
           <Stack.Screen
             name="Splash"
@@ -110,6 +112,7 @@ const UserNavigations = (props) => {
             }}
           />
         </Stack.Navigator>
+        </MaintenanceWrapper>
       </AxiosInterceptorProvider>
     </NavigationContainer>
   );
