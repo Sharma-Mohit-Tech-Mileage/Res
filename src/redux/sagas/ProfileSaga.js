@@ -501,7 +501,6 @@ function* handleUpdateEmailAssociations(action) {
 
 function* checkPaperlessSaga(action) {
     try {
-        yield put(fetchPaperlessStatus());
         const status = yield call(isPaperlessEnabled, action.payload.email);
         yield put(setPaperlessStatus(status));
     } catch (error) {
