@@ -14,7 +14,9 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import zendesk.android.FailureCallback;
@@ -101,5 +103,29 @@ public class RNZendeskChatModule extends ReactContextBaseJavaModule {
         });
     }
 
+
+    @ReactMethod
+    public void setConversationTags(ReadableMap metadata ) {
+        Map<String,Object> fields = new HashMap<String, Object>();
+        fields.put("29542407930903", metadata.getString("userAgent"));
+        fields.put("29542536141335", metadata.getString("appVersion"));
+        fields.put("29542663925271", metadata.getString("timezoneOffsetId"));
+        fields.put("29542734993559", metadata.getString("platform"));
+        fields.put("29230394216983", metadata.getString("locationHrefId"));
+        fields.put("29542809023767", metadata.getString("ipAddress"));
+        fields.put("360003617614", metadata.getString("email"));
+        fields.put("360004035014", metadata.getString("firstName"));
+        fields.put("360003976113", metadata.getString("lastName"));
+        fields.put("360036705974", metadata.getString("name"));
+        fields.put("360046174754", metadata.getString("phone"));
+        fields.put("360004035174", metadata.getString("accountNumber"));
+        fields.put("360004035174", metadata.getString("accountNumber"));
+        fields.put("29542395738007", metadata.getString("userName"));
+        fields.put("29542894274711", metadata.getString("customerType"));
+        fields.put("29542032223895", metadata.getString("authLevel"));
+        fields.put("29542045878167", metadata.getString("jwtId"));
+        Zendesk.getInstance().getMessaging().setConversationFields(fields);
+
+    }
 
 }
