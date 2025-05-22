@@ -1451,9 +1451,6 @@ PODS:
     - React-Core
   - react-native-webview (13.6.3):
     - React-Core
-  - react-native-zendesk-messaging (0.3.2):
-    - React-Core
-    - ZendeskSDKMessaging (= 2.13.0)
   - React-nativeconfig (0.75.4)
   - React-NativeModulesApple (0.75.4):
     - glog
@@ -1984,7 +1981,6 @@ DEPENDENCIES:
   - react-native-version-check (from `../node_modules/react-native-version-check`)
   - react-native-view-shot (from `../node_modules/react-native-view-shot`)
   - react-native-webview (from `../node_modules/react-native-webview`)
-  - react-native-zendesk-messaging (from `../node_modules/react-native-zendesk-messaging`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -2176,8 +2172,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-view-shot"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
-  react-native-zendesk-messaging:
-    :path: "../node_modules/react-native-zendesk-messaging"
   React-nativeconfig:
     :path: "../node_modules/react-native/ReactCommon"
   React-NativeModulesApple:
@@ -2348,7 +2342,6 @@ SPEC CHECKSUMS:
   react-native-version-check: 6cd36aad4e30b8e3216747e3b4ddeb09e0647af8
   react-native-view-shot: 6b7ed61d77d88580fed10954d45fad0eb2d47688
   react-native-webview: 88293a0f23eca8465c0433c023ec632930e644d0
-  react-native-zendesk-messaging: 0675e18625620ec63ac09fc1b9cc2ff71b9a180d
   React-nativeconfig: 31072ab0146e643594f6959c7f970a04b6c9ddd0
   React-NativeModulesApple: f49bb0befd8650ac3ff8fc2684072b16c09bf478
   React-perflogger: 59e1a3182dca2cee7b9f1f7aab204018d46d1914

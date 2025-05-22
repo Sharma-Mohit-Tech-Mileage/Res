@@ -1,7 +1,7 @@
 
 #import "RNZendeskChatModule.h"
 #import <ZendeskSDKMessaging/ZendeskSDKMessaging.h>
-#import <ZendeskSDKLogger/ZendeskSDKLogger.h>
+//#import <ZendeskSDKLogger/ZendeskSDKLogger.h>
 #import <ZendeskSDK/ZendeskSDK.h>
 
 #import <ZendeskSDK/ZendeskSDK.h>
@@ -20,8 +20,8 @@ RCT_EXPORT_MODULE(RNZendeskChatModule);
         [Zendesk initializeWithChannelKey:@"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lLnplbmRlc2suY29tL21vYmlsZV9zZGtfYXBpL3NldHRpbmdzLzAxSlEwOTk0WUpERVpLMVdCWjlFVDdCRURYLmpzb24ifQ=="
                          messagingFactory:[[ZDKDefaultMessagingFactory alloc] init]
                         completionHandler:^(Zendesk * _Nullable zendesk, NSError * _Nullable error) {
-          ZDKLogger.enabled = YES;
-          ZDKLogger.level = ZDKLogLevelDefault;
+         // ZDKLogger.enabled = YES;
+          //ZDKLogger.level = ZDKLogLevelDefault;
                 if (error != nil) {
                     NSLog(@"Zendesk did not initialize.\nError: %@", error.localizedDescription);
                 }else{

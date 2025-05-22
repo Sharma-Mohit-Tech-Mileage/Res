@@ -20,7 +20,7 @@ import VersionCheck from 'react-native-version-check';
 import { Env } from "../../network/apis/account/Constants";
 import AppStyles from "../common/styles/AppStyles";
 import UserIconWhite from "../../res/svgIcons/UserIconWhite";
-import * as Zendesk from 'react-native-zendesk-messaging';
+//import * as Zendesk from 'react-native-zendesk-messaging';
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -70,7 +70,7 @@ const logoutAction = (dispatch, navigation) => {
       dispatch(saveUserInfo({}));
       dispatch(logoutApp());
       cleanUserData();
-      Zendesk.logout();
+      //Zendesk.logout();
     });
   });
 };

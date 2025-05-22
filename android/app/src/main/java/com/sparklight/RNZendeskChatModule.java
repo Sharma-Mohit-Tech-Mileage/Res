@@ -113,7 +113,7 @@ public class RNZendeskChatModule extends ReactContextBaseJavaModule {
         fields.put("29542734993559", metadata.getString("platform"));
         fields.put("29230394216983", metadata.getString("locationHrefId"));
         fields.put("29542809023767", metadata.getString("ipAddress"));
-        fields.put("360003617614", metadata.getString("email"));
+       // fields.put("360003617614", metadata.getString("email"));
         fields.put("360004035014", metadata.getString("firstName"));
         fields.put("360003976113", metadata.getString("lastName"));
         fields.put("360036705974", metadata.getString("name"));
