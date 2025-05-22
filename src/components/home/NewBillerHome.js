@@ -192,8 +192,8 @@ const paperlessStatusAcp = useSelector(
           }}
         />
         <FeatureCard
-         isLoading={loadingAutoPay}
-          title="Paperless Billing"
+         isLoading={paperlessLoading}
+         title="Paperless Billing"
           features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
           buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}
           buttonVariant={paperlessStatusAcp ? "success" : "primary"}
