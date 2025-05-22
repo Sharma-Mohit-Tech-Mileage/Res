@@ -70,17 +70,17 @@ const UserNavigations = (props) => {
   return (
     <NavigationContainer ref={navigationRef} onReady={onReady} onStateChange={onStateChange}>
       <AxiosInterceptorProvider>
-         <MaintenanceWrapper>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Splash"
-            component={SplashScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="EntryEmailNotifications"
-            component={EmailNotifications}
-            options={{ headerShown: false }}
+        <MaintenanceWrapper>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="Splash"
+              component={SplashScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="EntryEmailNotifications"
+              component={EmailNotifications}
+              options={{ headerShown: false }}
           />
           <Stack.Screen
             name="EntryPushNotifications"
@@ -112,10 +112,10 @@ const UserNavigations = (props) => {
             }}
           />
         </Stack.Navigator>
-        </MaintenanceWrapper>
-      </AxiosInterceptorProvider>
-    </NavigationContainer>
-  );
-};
+      </MaintenanceWrapper>
+    </AxiosInterceptorProvider>
+  </NavigationContainer>
+);
+}
 
 export default UserNavigations;

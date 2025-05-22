@@ -164,8 +164,7 @@ export const MaintenanceProvider = ({ children }) => {
     if (!userInfo) return null;
     
     // Replace with your actual business logic
-    if (userInfo.userType === "ACP" || userInfo.isACP || 
-        (userInfo.customerType && userInfo.customerType.toUpperCase() === "ACP")) {
+    if (userInfo.isNormalUser) {
       return "ACP";
     }
     return "SV";

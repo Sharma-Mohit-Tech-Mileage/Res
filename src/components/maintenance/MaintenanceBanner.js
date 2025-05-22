@@ -1,9 +1,12 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native';
-import { Color, FontFamily, FontSize, Border, Padding } from '../../../GlobalStyles';
+import React from "react";
+import { View, Text, Image, TouchableOpacity, StyleSheet, Linking, Platform } from "react-native";
+import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
+import CloseIcon from "../../res/svgIcons/CloseIcon";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 
 /**
  * MaintenanceBanner Component
+ * Styled to match AlertComponent from AlertUtils
  */
 const MaintenanceBanner = ({ 
   title = "Billing system upgrade – July 11",
@@ -15,27 +18,27 @@ const MaintenanceBanner = ({
   severity = "info" // "info", "warning", or "critical"
 }) => {
   
-  // Determine icon and background colors based on severity
+  // Determine indicator color, icon tint and background based on severity
   const getSeverityStyles = () => {
     switch(severity) {
       case "critical":
         return {
-          iconText: "⚠️",
-          backgroundColor: Color.colorlightRed,
-          borderColor: Color.sparkLightRed,
+          indicatorColor: Color.sparkLightRed,
+          iconTint: Color.sparkLightRed,
+          titleStyle: { color: Color.sparkLightRed }
         };
       case "warning":
         return {
-          iconText: "⚠️",
-          backgroundColor: `${Color.sparkLightInfo}22`, // 22 adds transparency
-          borderColor: Color.sparkLightInfo,
+          indicatorColor: Color.sparkLightInfo,
+          iconTint: Color.sparkLightInfo,
+          titleStyle: { color: Color.sparkLightInfo }
         };
       case "info":
       default:
         return {
-          iconText: "ℹ️",
-          backgroundColor: Color.sparklightWhite,
-          borderColor: null,
+          indicatorColor: "#4B2E83", // Deep purple/blue color
+          iconTint: "#4B2E83", // Deep purple/blue color
+          titleStyle: { color: "#4B2E83" } // Deep purple/blue color
         };
     }
   };
@@ -55,116 +58,118 @@ const MaintenanceBanner = ({
   };
   
   return (
-    <View style={[
-      styles.bannerContainer, 
-      { backgroundColor: severityStyles.backgroundColor },
-      severityStyles.borderColor && { borderLeftWidth: 4, borderLeftColor: severityStyles.borderColor }
-    ]}>
-      <View style={styles.iconContainer}>
-        <Text style={styles.infoIcon}>{severityStyles.iconText}</Text>
-      </View>
-      
-      <View style={styles.contentContainer}>
-        <Text style={styles.titleText}>{title}</Text>
-        <Text style={styles.messageText}>{message}</Text>
+    <View style={styles.errorBox}>
+      <View style={styles.alertRowContainer}>
+        <View style={[styles.indicator, { backgroundColor: severityStyles.indicatorColor }]} />
+        <View style={styles.alertContentContainer}>
+          <View style={styles.alertTitleRow}>
+            <Image
+              style={styles.alertIcon}
+              resizeMode="contain"
+              tintColor={severityStyles.iconTint}
+              source={require("../../../assets/info-circle.png")}
+            />
+            <Text style={[styles.alertTitle, severityStyles.titleStyle]}>{title}</Text>
+          </View>
+          
+          <Text style={styles.alertMessage}>{message}</Text>
+          
+          {link && (
+            <TouchableOpacity onPress={handleLinkPress} accessibilityRole="link">
+              <Text style={[styles.actionText, { marginLeft: 20 }]}>{linkText}</Text>
+            </TouchableOpacity>
+          )}
+          
+          {phoneNumber && (
+            <Text style={styles.alertMessage}>
+              Need help? Call{' '}
+              <Text 
+                style={styles.actionText}
+                onPress={handlePhonePress}
+                accessibilityRole="link"
+              >
+                {phoneNumber}
+              </Text>
+            </Text>
+          )}
+        </View>
         
-        {link && (
-          <TouchableOpacity onPress={handleLinkPress} accessibilityRole="link">
-            <Text style={styles.linkText}>{linkText}</Text>
+        {onDismiss && (
+          <TouchableOpacity
+            style={styles.closeButtonContainer}
+            onPress={onDismiss}
+            accessibilityLabel="Dismiss message"
+            accessibilityRole="button"
+          >
+            <CloseIcon />
           </TouchableOpacity>
         )}
-        
-        {phoneNumber && (
-          <Text style={styles.phoneText}>
-            Need help? Call{' '}
-            <Text 
-              style={styles.phoneNumberText}
-              onPress={handlePhonePress}
-              accessibilityRole="link"
-            >
-              {phoneNumber}
-            </Text>
-          </Text>
-        )}
       </View>
-      
-      {onDismiss && (
-        <TouchableOpacity 
-          style={styles.dismissButton} 
-          onPress={onDismiss}
-          accessibilityLabel="Dismiss message"
-          accessibilityRole="button"
-        >
-          <Text style={styles.dismissText}>✕</Text>
-        </TouchableOpacity>
-      )}
     </View>
   );
 };
 
+// Styles matching AlertUtils
 const styles = StyleSheet.create({
-  bannerContainer: {
+  errorBox: {
+    flexDirection: "column",
+    marginHorizontal: 4,
+    marginVertical: 20,
+    borderColor: Color.sparklightGray,
     backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_xs,
-    padding: Padding.p_base,
-    marginHorizontal: Padding.p_base,
-    marginVertical: Padding.p_xs,
-    flexDirection: 'row',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    zIndex: 100,
+    borderRadius: Border.br_11xs,
+    borderWidth: 1,
+    marginBottom: wp("15%"),
+    marginTop: wp("-10%"),
   },
-  iconContainer: {
-    marginRight: Padding.p_xs,
-    justifyContent: 'flex-start',
-    paddingTop: Padding.p_9xs,
+  alertRowContainer: {
+    flexDirection: "row",
+    width: "90%",
   },
-  infoIcon: {
-    fontSize: FontSize.size_lg,
+  alertContentContainer: {
+    flexDirection: "column",
+    padding: 10,
   },
-  contentContainer: {
-    flex: 1,
+  alertTitleRow: {
+    flexDirection: "row",
   },
-  titleText: {
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_base,
+  indicator: {
+    width: 4,
+  },
+  alertIcon: {
+    alignSelf: "center",
+  },
+  closeButtonContainer: {
+    marginTop: 10,
+  },
+  alertTitle: {
+    color: "#000",
+    fontFamily: FontFamily.textXsSemibold,
+    fontSize: 15,
+    fontStyle: "normal",
+    fontWeight: "700",
+    marginLeft: 5,
+    marginRight: 5,
+  },
+  alertMessage: {
     color: Color.colorGray_200,
-    marginBottom: Padding.p_9xs,
-  },
-  messageText: {
     fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
-    color: Color.colorGray_100,
-    marginBottom: Padding.p_5xs,
-    lineHeight: 22,
+    fontSize: 14,
+    fontStyle: "normal",
+    fontWeight: "400",
+    marginLeft: 20,
+    marginTop: 7,
+    marginRight: 5,
   },
-  linkText: {
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_sm,
-    color: Color.colorMidnightblue,
-    textDecorationLine: 'underline',
-    marginBottom: Padding.p_5xs,
-  },
-  phoneText: {
+  actionText: {
+    color: Color.sparklightBrightPurple, // Changed to deep purple/blue color for links
     fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
-    color: Color.colorGray_100,
-  },
-  phoneNumberText: {
-    fontFamily: FontFamily.openSansSemiBold,
-    color: Color.colorMidnightblue,
-  },
-  dismissButton: {
-    padding: Padding.p_9xs,
-    justifyContent: 'flex-start',
-  },
-  dismissText: {
-    fontSize: FontSize.size_lg,
-    color: Color.colorGray_100,
-  },
+    fontSize: 14,
+    fontStyle: "normal",
+    fontWeight: "700",
+    marginTop: 7,
+    marginRight: 5,
+  }
 });
 
 export default MaintenanceBanner;

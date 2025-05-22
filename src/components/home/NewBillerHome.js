@@ -20,6 +20,8 @@ import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
 import { GetApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
+import { useMaintenance } from '../maintenance/MaintenanceContext';
+import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 const NewBillerHome = ({ navigation }) => {
   // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
@@ -30,6 +32,13 @@ const NewBillerHome = ({ navigation }) => {
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
+  const { 
+      showBanner, 
+      showMaintenancePage, 
+      bannerConfig, 
+      pageConfig, 
+      dismissBanner
+    } = useMaintenance();
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
     billAmount: 0,
@@ -217,6 +226,17 @@ const paperlessStatusAcp = useSelector(
           <View style={styles.mainContentContainer}>
             {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
             {isOutageAlert && renderOutageAlert()}
+             {showBanner && bannerConfig && (
+        <MaintenanceBanner
+          title={bannerConfig.title}
+          message={bannerConfig.message}
+          link={bannerConfig.link}
+          linkText={bannerConfig.linkText}
+          phoneNumber={bannerConfig.phoneNumber}
+          onDismiss={bannerConfig.dismissible ? dismissBanner : undefined}
+          severity={bannerConfig.severity || 'info'}
+        />
+      )}
             {renderWelcomeCard()}
           </View>
         </ScrollView>
