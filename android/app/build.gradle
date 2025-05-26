@@ -121,6 +121,11 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+    compileOptions {
+        // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
+
+    }
     
 }
 
@@ -141,14 +146,14 @@ dependencies {
     // Add the dependencies for the Firebase products you want to use
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-messaging'
-
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 //    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
 //    debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
 //        exclude group:'com.squareup.okhttp3', module:'okhttp'
 //    }
 
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
-    implementation "zendesk.messaging:messaging-android:latest_version"
+    implementation 'zendesk.messaging:messaging-android:2.31.0'
 
    // debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
     if (hermesEnabled.toBoolean()) {
