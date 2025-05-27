@@ -48,28 +48,22 @@ const FeatureCard = ({
         ))}
       </View>
       
+      {isLoading ? 
+              <SkeletonPlaceholder>
+              <View
+                style={[styles.button,{height:100,paddingVertical:24}]}
+              />
+              
+            </SkeletonPlaceholder> :
       <TouchableOpacity 
         style={[styles.button, getButtonStyle()]}
         onPress={onButtonPress}
         accessibilityRole="button"
         accessibilityLabel={buttonText}
       >
-        {isLoading ? 
-              <SkeletonPlaceholder>
-              <View
-                style={{
-                  width: 200,
-                  height: 30,
-                  alignSelf: "center",
-                  borderRadius: 4,
-                  marginVertical: 5,
-                }}
-              />
-              
-            </SkeletonPlaceholder> :
         <Text style={[styles.buttonText, getButtonTextStyle()]}>{buttonText}</Text>
-              }
       </TouchableOpacity>
+    }
     </View>
   );
 };

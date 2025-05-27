@@ -10,8 +10,8 @@ import {
 import Svg, { Circle } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
-const SIZE = 110;
-const STROKE_WIDTH = 12;
+const SIZE = 130;
+const STROKE_WIDTH = 18;
 const RADIUS = (SIZE - STROKE_WIDTH) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 

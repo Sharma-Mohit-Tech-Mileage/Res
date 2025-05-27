@@ -214,7 +214,6 @@ const LoadingIndicator = memo(() => (
       loading={true}
       color={Color.sparklightBrightPurple}
       accessible={true}
-      loadingTxt={"Please wait"}
       accessibilityLabel="Loading billing breakdown data"
     />
   </View>
