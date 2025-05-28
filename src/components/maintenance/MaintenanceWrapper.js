@@ -2,51 +2,35 @@ import React from 'react';
 import { View } from 'react-native';
 import { useMaintenance } from './MaintenanceContext';
 import MaintenancePage from './MaintenancePage';
-import MaintenanceBanner from './MaintenanceBanner';
 
-/**
- * MaintenanceWrapper Component
- * 
- * This component handles conditional rendering based on maintenance state
- */
 const MaintenanceWrapper = ({ children }) => {
-  const { 
-    showBanner, 
-    showMaintenancePage, 
-    bannerConfig, 
-    pageConfig, 
-    dismissBanner
-  } = useMaintenance();
+  const { showMaintenancePage, pageConfig, isBlockingUser } = useMaintenance();
+  
+  console.log('🔧 🎁 MaintenanceWrapper render:', {
+    showMaintenancePage,
+    hasPageConfig: !!pageConfig,
+    isBlockingUser,
+    pageType: pageConfig?.type
+  });
   
   // If maintenance page should be shown, return only the maintenance page
   if (showMaintenancePage && pageConfig) {
+    console.log('🔧 🎁 Showing maintenance page with type:', pageConfig.type);
     return (
       <MaintenancePage
-        title={pageConfig.title}
-        message={pageConfig.message}
+        title={pageConfig.title || "System Maintenance in Progress"}
+        message={pageConfig.message || "We're updating our systems to serve you better."}
         estimatedTime={pageConfig.estimatedTime}
         contactInfo={pageConfig.contactInfo}
+        showLoginButton={pageConfig.showLoginButton || isBlockingUser}
+        isBlockingUser={isBlockingUser}
       />
     );
   }
   
-  // Otherwise, show regular content with optional banner
-  return (
-    <View style={{ flex: 1 }}>
-      {showBanner && bannerConfig && (
-        <MaintenanceBanner
-          title={bannerConfig.title}
-          message={bannerConfig.message}
-          link={bannerConfig.link}
-          linkText={bannerConfig.linkText}
-          phoneNumber={bannerConfig.phoneNumber}
-          onDismiss={bannerConfig.dismissible ? dismissBanner : undefined}
-          severity={bannerConfig.severity || 'info'}
-        />
-      )}
-      {children}
-    </View>
-  );
+  // Otherwise, show regular app content
+  console.log('🔧 🎁 Showing regular app content');
+  return <View style={{ flex: 1 }}>{children}</View>;
 };
 
 export default MaintenanceWrapper;

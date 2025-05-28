@@ -32,34 +32,16 @@ const NewBillerHome = ({ navigation }) => {
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
-  const { 
-      showBanner, 
-      showMaintenancePage, 
-      bannerConfig, 
-      pageConfig, 
-      dismissBanner
-    } = useMaintenance();
-  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
-    dueDate: null,
-    billAmount: 0,
-    pastPaymentDue: 0,
-    email: null,
-  });
-  const [updateStatus, setUpdateStatus] = useState({
-    isMinorUpdateAvailable: false,
-    currentVersion: "",
-    latestVersion: "",
-  });
-
+  const { showBanner, showMaintenancePage, bannerConfig, pageConfig, dismissBanner } = useMaintenance();
+  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
+  const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: "", latestVersion: "", });
   // Redux selectors
   const home = useSelector((state) => state.combinedReducers.home);
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
   );
   const dispatch = useDispatch();
-const paperlessStatusAcp = useSelector(
-      (state) => state.combinedReducers.profile?.paperlessStatusAcp
-    );
+const paperlessStatusAcp = useSelector( (state) => state.combinedReducers.profile?.paperlessStatusAcp );
 
     const getStatus = () => {
         getUser().then((res) => {
@@ -67,10 +49,11 @@ const paperlessStatusAcp = useSelector(
           GetApiRequest(
             `api/Accounts/${accountNumber}/easypay`,
             (res) => {
-              console.log("res-------------------------------------------------------------------------------", res);
               setIsAutoPayStatus(res?.isEasyPay);
             },
-            (error) => { console.log("error", error);}
+            (error) => {
+              console.log("error", error);
+            }
           );
         });
       };

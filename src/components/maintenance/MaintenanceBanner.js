@@ -83,13 +83,15 @@ const MaintenanceBanner = ({
           {phoneNumber && (
             <Text style={styles.alertMessage}>
               Need help? Call{' '}
-              <Text 
-                style={styles.actionText}
+              <TouchableOpacity 
                 onPress={handlePhonePress}
                 accessibilityRole="link"
+                style={{ display: 'inline' }}
               >
-                {phoneNumber}
-              </Text>
+                <Text style={styles.actionText}>
+                  {phoneNumber}
+                </Text>
+              </TouchableOpacity>
             </Text>
           )}
         </View>
@@ -128,7 +130,7 @@ const styles = StyleSheet.create({
   },
   alertContentContainer: {
     flexDirection: "column",
-    padding: 10,
+    padding: 22,
   },
   alertTitleRow: {
     flexDirection: "row",
