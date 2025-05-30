@@ -113,6 +113,11 @@ const AutoPayCard = ({
           )}
         </>
       )}
+      {isStatusLoading ? (
+        <SkeletonPlaceholder>
+          <View style={[styles.cardFooter, { height: 100, paddingVertical: 24 }]} />
+        </SkeletonPlaceholder>
+      ) : (
       <View style={styles.cardFooter}>
         <TouchableOpacity
           onPress={() => {
@@ -139,6 +144,7 @@ const AutoPayCard = ({
           </View>
         </TouchableOpacity>
       </View>
+      )}
     </View>
   );
 };

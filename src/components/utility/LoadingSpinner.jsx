@@ -54,7 +54,7 @@ const LoadingSpinner = () => {
             r={RADIUS}
             strokeDasharray={`${CIRCUMFERENCE}`}
             strokeDashoffset={CIRCUMFERENCE * 0.75}
-            strokeLinecap="round"
+            strokeLinecap="square"
             strokeWidth={STROKE_WIDTH}
           />
         </Svg>
