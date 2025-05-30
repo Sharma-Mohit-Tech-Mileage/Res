@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, ScrollView, Linking } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Linking, Pressable, Platform } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Padding,
@@ -160,15 +160,51 @@ const ProfileSettings = () => {
               <Text style={[styles.generalInformation, styles.melissaTypo]}>
                 Manage My Service
               </Text>
-              <Text style={styles.manageSerTxt1}>
-                {"To cancel or change service, please call us at "}
-                <Text style={styles.manageSerTxt2} onPress={()=>{
-                  makeCall("833-807-1020");
-                }}>833-807-1020 </Text>
-                <Text style={styles.manageSerTxt3}>
-                  M-F 9:00 AM-6:00 PM CST.
-                </Text>
-              </Text>
+              {Platform.OS === "android" ? (
+                <View style={{ marginTop: 20 }}>
+                  <Text style={styles.manageSerTxt1}>
+                    To cancel or change service, please call us at{" "}
+                    <Text
+                      style={styles.manageSerTxt2}
+                      onPress={() => makeCall("833-807-1020")}
+                      accessibilityRole="link"
+                      accessibilityLabel="Call 833 807 1020"
+                      accessibilityHint="Double tap to call customer service"
+                    >
+                      833-807-1020
+                    </Text>
+                    <Text
+                      style={styles.manageSerTxt3}
+                      accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                      accessible={true}
+                      importantForAccessibility="yes"
+                    >
+                      {" M-F 9:00 AM-6:00 PM CST."}
+                    </Text>
+                  </Text>
+                </View>
+              ) : (
+                <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", marginTop: 20 }}>
+                  <Text style={styles.manageSerTxt1}>
+                    To cancel or change service, please call us at{" "}
+                  </Text>
+                  <Text
+                    style={styles.manageSerTxt2}
+                    onPress={() => makeCall("833-807-1020")}
+                    accessibilityRole="link"
+                    accessibilityLabel="Call 833 807 1020"
+                    accessibilityHint="Double tap to call customer service"
+                  >
+                    833-807-1020
+                  </Text>
+                  <Text
+                    style={styles.manageSerTxt3}
+                    accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                  >
+                    {" M-F 9:00 AM-6:00 PM CST."}
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
         </View>
@@ -309,13 +345,14 @@ const styles = StyleSheet.create({
   manageSerTxt2: {
     fontFamily: FontFamily.openSansSemiBold,
     color: Color.colorMidnightblue,
-    fontWeight: "500",
+    fontWeight: "700",
     fontSize: FontSize.size_base,
   },
   manageSerTxt3: {
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
-    fontWeight: "500",
+    color: Color.colorGray_100,
+    fontWeight: "700",
   },
 });
 
