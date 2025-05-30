@@ -1,5 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Pressable, ActivityIndicator, Linking, AccessibilityInfo } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  Platform,
+  Dimensions,
+  Pressable,
+  ActivityIndicator,
+  Linking,
+  AccessibilityInfo,
+} from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
@@ -11,21 +24,48 @@ import UpArrow from "../../res/svgIcons/UpArrow";
 import NetworkDetails from "../common/NetworkDetails";
 import strings from "../../res/Strings";
 import MyInternetDetials from "../common/MyInternetDetails";
-import { getUser, getPushNotificationStatus, storePushNotificationStatus, storeUpgradeToken, } from "../../redux/utils/LocalStorage";
-import { GetApiRequest, GetModemStatusApiRequest, } from "../../network/APIClient";
+import {
+  getUser,
+  getPushNotificationStatus,
+  storePushNotificationStatus,
+  storeUpgradeToken,
+} from "../../redux/utils/LocalStorage";
+import {
+  GetApiRequest,
+  GetModemStatusApiRequest,
+} from "../../network/APIClient";
 import moment from "moment";
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
-import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
-import { updatePushNotifications, fetchPushNotifications, saveAccountServices } from "../../redux/actions/ProfileActionSuite";
+import {
+  getFcmToken,
+  requestUserPermission,
+} from "../../firebase/FirebaseUtils";
+import {
+  updatePushNotifications,
+  fetchPushNotifications,
+  saveAccountServices,
+} from "../../redux/actions/ProfileActionSuite";
 import { useSelector, useDispatch } from "react-redux";
 import { Env } from "../../network/apis/account/Constants";
 import { checkForMinorUpdate } from "../utility/constant";
 import PromotionCard from "../common/PromotionCard/PromotionCard";
 import { useFocusEffect } from "@react-navigation/native";
 import WalkthroughOverlay from "../common/WalkthroughOverlay";
+import ChatIcon from "../../res/svgIcons/ChatIcon";
+import DeviceInfo from "react-native-device-info";
+import VersionCheck from "react-native-version-check";
+import sign from "jwt-encode";
+//var jwt = require("jsonwebtoken")
 
 const tabWidth = Number(Dimensions.get("window").width / 4);
+import {
+  startChatWithConfig,
+  initChat,
+  startChat,
+  loginWithJWT,
+  setConversationalFields,
+} from "../utility/RNZendeskChat";
 
 const HomeScreen = ({ navigation }) => {
   const [isInternetDetails, setIsInternetDetails] = useState(false);
@@ -34,7 +74,7 @@ const HomeScreen = ({ navigation }) => {
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const dispatch = useDispatch();
   const [plans, setPlans] = useState([]);
-  const [tvPlan, setTVPlan] = useState('');
+  const [tvPlan, setTVPlan] = useState("");
   const [phonePlan, setPhonePlan] = useState([]);
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
@@ -47,11 +87,22 @@ const HomeScreen = ({ navigation }) => {
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
-  const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: '', latestVersion: '' });
-  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null });
+  const [updateStatus, setUpdateStatus] = useState({
+    isMinorUpdateAvailable: false,
+    currentVersion: "",
+    latestVersion: "",
+  });
+  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
+    dueDate: null,
+    billAmount: 0,
+    pastPaymentDue: 0,
+    email: null,
+  });
   const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
   const [hasEeroDevice, setHasEeroDevice] = useState(false);
   const [networkId, setNetworkId] = useState(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
   useEffect(() => {
     async function getAccessibility() {
@@ -61,7 +112,7 @@ const HomeScreen = ({ navigation }) => {
       } catch (error) {
         console.log(
           "There has been a problem with AccessibilityInfo.isScreenReaderEnabled(): " +
-          error.message
+            error.message
         );
         setIsScreenReaderEnabled(false);
       }
@@ -103,7 +154,7 @@ const HomeScreen = ({ navigation }) => {
   }
   const onFetchedPlan = (res) => {
     setPhonePlan(res);
-  }
+  };
   const onSuccessPhonePlan = (res) => {
     if (res.length && res[0].tcgCode) {
       getPhoneServicePlans(res[0].tcgCode);
@@ -118,7 +169,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const onSuccessTVPlan = (res) => {
-    setTVPlan(res || '');
+    setTVPlan(res || "");
   };
 
   const onErrorInPlanTV = (error) => {
@@ -212,7 +263,6 @@ const HomeScreen = ({ navigation }) => {
     GetModemStatusApiRequest(
       request,
       (res) => {
-
         if (res) {
           if (res?.status) {
             if (res.status === 408) {
@@ -298,14 +348,15 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const getUserAccountDetails = () => {
-    setBillAmt(undefined)
+    setBillAmt(undefined);
     getUser().then((res) => {
       const request = `account/api/account/${res.userInfo.accountNumber}`;
       GetApiRequest(
         request,
         (res) => {
           if (res) {
-            dispatch(saveAccountServices(res.services))
+            console.log("getUserAccountDetails", res);
+            dispatch(saveAccountServices(res.services));
             if (res.currentCollectionStep == "Soft Disconnect") {
               setAccountStatus("Disconnect");
               setIsInternetDetails(true);
@@ -314,27 +365,95 @@ const HomeScreen = ({ navigation }) => {
               updateInternetHealth(res.currentBalance, res.paymentDueDate);
             }
             setBillAmt((Math.round(res.currentBalance * 100) / 100).toFixed(2));
-            let dueDate = (res.pastDueAmount != 0) ? 'Immediately' : moment(res.paymentDueDate).format("ll");
+            let dueDate =
+              res.pastDueAmount != 0
+                ? "Immediately"
+                : moment(res.paymentDueDate).format("ll");
             setDueDate(dueDate);
             function getFirstEmail(emailArray) {
-              return (emailArray && emailArray.length > 0 && emailArray[0])
+              return emailArray && emailArray.length > 0 && emailArray[0]
                 ? emailArray[0]
                 : null;
             }
             let paymentDetails = { ...defaultPaymentDetails };
             paymentDetails.dueDate = res.paymentDueDate;
-            paymentDetails.billAmount = (Math.round(res.currentBalance * 100) / 100).toFixed(2);
+            paymentDetails.billAmount = (
+              Math.round(res.currentBalance * 100) / 100
+            ).toFixed(2);
             paymentDetails.pastPaymentDue = res.pastDueAmount;
             paymentDetails.email = getFirstEmail(res.email);
             setDefaultPaymentDetails(paymentDetails);
             getTVServiceDetails();
             getInternetPlanDetails();
             getPhoneServiceDetails();
+            setFirstName(res.firstName || "");
+            setLastName(res.lastName || "");
+            DeviceInfo.getUserAgent().then((userAgent) => {
+              // iOS: "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143"
+              // tvOS: not available
+              // Android: "Mozilla/5.0 (Linux; Android 12; sdk_gphone64_arm64 Build/SE1A.220630.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36"
+              // Windows: ?
+              //getZendeskChatToken(userAgent);
+              loginWithToken(userAgent,res.firstName || "",res.lastName || "");
+            });
           }
         },
         onErrorBill
       );
     });
+  };
+
+  const loginWithToken = async (userAgent,firstName,lastName) => {
+    const user = await getUser();
+    const secret =
+      (Platform.OS=='ios')?"JQ8sVOU9Hl3fnUf1gyt9xfRn9XVMZ44ilfSo5e3SnrutkSCXDmMVSdTOCVQMduayJwptKtfPrMNaUDz3LfzLxQ":"Rcmym7uJfKq-hqjXyhlC9y09AyPyw0K6Pt6cvqvBmR335YCChrSBS6rnSdEUT-9-YIIkSYS_AYU36ETkuCxnYA"
+    //data payload
+    const data = {
+      scope: "user",
+      external_id: user?.userInfo.accountNumber,
+      //email: defaultPaymentDetails.email || "",
+      name: `${firstName} ${lastName}` || "",
+      //email_verified: true, // optional
+      // exp: new Date().getTime() + 3600 * 1000,
+    };
+    // header ID
+    const options = {
+      alg: "HS256",
+      typ: "JWT",
+      kid: (Platform.OS=='ios')? "app_683930d35c8351994c5bff40":"app_683933455c8351994c6542b3",
+    };
+    const jwttoken = sign(data, secret, options);
+    console.log("request data for jwt", data);
+    console.log("request options for jwt", options);
+    console.log("Loggin jwt", jwttoken);
+    //loginWithJWT(jwttoken);
+    loginWithJWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjgzODcyNjMiLCJqdGkiOiI3MDI0MGU3MS0xZjc2LTRjNWUtYTJiMC1jMWNhOGU2NDQzNTkiLCJpYXQiOjE3NDg2MjI1NjMsIm5hbWUiOiJXRUJURUFNIEFMTFRIUkVFIiwiZW1haWwiOiJTVU1BTlRILlRIQU5FRVJVQFNQQVJLTElHSFQuQklaIiwiZXh0ZXJuYWxfaWQiOiIxMjgzODcyNjMiLCJuYmYiOjE3NDg2MjI1NjIsImV4cCI6MTc0ODYyOTc2MiwiaXNzIjoiQk4wMFRFQ0gwMDEiLCJhdWQiOiJodHRwczovL2N1c3RvbWVyLnNwYXJrbGlnaHQuY29tIn0.ExRq4C4e-Fsj1csJbOZPNsTUnbJjas97xmiWZGaI43w")
+
+    const fields = {
+      userAgent: userAgent,
+      appVersion: VersionCheck.getCurrentVersion(),
+      timezoneOffsetId: new Date().getTimezoneOffset().toString(),
+      platform: Platform.OS,
+      locationHrefId: Env.URL,
+      ipAddress: await getIPAddress(),
+      accountNumber: user?.userInfo.accountNumber,
+      email: defaultPaymentDetails.email || "",
+      firstName: firstName || "",
+      lastName: lastName || "",
+      name: `${firstName} ${lastName}` || "",
+      phone: "3",
+      accountNumber: user?.userInfo.accountNumber,
+      userName: user?.userInfo.userName,
+      customerType: user?.userInfo.customerType,
+      authLevel: user?.userInfo.authLevel,
+      jwtId:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjgzODcyNjMiLCJqdGkiOiI3MDI0MGU3MS0xZjc2LTRjNWUtYTJiMC1jMWNhOGU2NDQzNTkiLCJpYXQiOjE3NDg2MjI1NjMsIm5hbWUiOiJXRUJURUFNIEFMTFRIUkVFIiwiZW1haWwiOiJTVU1BTlRILlRIQU5FRVJVQFNQQVJLTElHSFQuQklaIiwiZXh0ZXJuYWxfaWQiOiIxMjgzODcyNjMiLCJuYmYiOjE3NDg2MjI1NjIsImV4cCI6MTc0ODYyOTc2MiwiaXNzIjoiQk4wMFRFQ0gwMDEiLCJhdWQiOiJodHRwczovL2N1c3RvbWVyLnNwYXJrbGlnaHQuY29tIn0.ExRq4C4e-Fsj1csJbOZPNsTUnbJjas97xmiWZGaI43w",
+    //jwtId: jwttoken,
+    };
+    setTimeout(() => {
+      console.log("Setting conversational fields", fields);
+      setConversationalFields(fields);
+    }, 1000);
   };
 
   const updateInternetHealth = (dueAmount, dueDate) => {
@@ -388,13 +507,13 @@ const HomeScreen = ({ navigation }) => {
         const messageTypes = profile.pushNotifications[0].pushMessageType;
         messageTypes.forEach((messageType) => {
           switch (messageType.messageType) {
-            case 'appointment':
+            case "appointment":
               optOut = messageType.optOutFlag;
               break;
-            case 'outage':
+            case "outage":
               outageOptOut = messageType.optOutFlag;
               break;
-            case 'billing':
+            case "billing":
               billingOptOutStatus = messageType.optOutFlag;
               break;
           }
@@ -402,7 +521,6 @@ const HomeScreen = ({ navigation }) => {
             optOutCountPushNotification += 1;
           }
         });
-
       }
 
       if (enabledNotification) {
@@ -410,7 +528,7 @@ const HomeScreen = ({ navigation }) => {
 
         if (enabledPermission) {
           const token = await getFcmToken();
-          console.log('FCM HOME WITH PERMISSION', token)
+          console.log("FCM HOME WITH PERMISSION", token);
           const data = {
             accountNumber: user.userInfo.accountNumber,
             deviceToken: token,
@@ -422,14 +540,14 @@ const HomeScreen = ({ navigation }) => {
             isAndroid: Platform.OS == "android",
           };
           const localData = {
-            status: 'accepted',
-            date: new Date()
+            status: "accepted",
+            date: new Date(),
           };
           storePushNotificationStatus(localData);
           await dispatch(updatePushNotifications(data, null));
         } else {
           const token = await getFcmToken();
-          console.log('FCM HOME WITHOUT PERMISSION', token)
+          console.log("FCM HOME WITHOUT PERMISSION", token);
           const data = {
             accountNumber: user.userInfo.accountNumber,
             deviceToken: token,
@@ -441,9 +559,9 @@ const HomeScreen = ({ navigation }) => {
             isAndroid: Platform.OS == "android",
           };
           const localData = {
-            status: 'skip',
+            status: "skip",
             date: new Date(),
-            permanentSkip: true
+            permanentSkip: true,
           };
           await dispatch(updatePushNotifications(data, null));
           storePushNotificationStatus(localData);
@@ -454,23 +572,26 @@ const HomeScreen = ({ navigation }) => {
   const checkEeroDevice = () => {
     getUser().then((res) => {
       const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${res.userInfo.accountNumber}`;
-      GetApiRequest(request, (response) => {
-        const networkId = response.data?.networks[0]?.split('/').pop();
-        if (networkId) {
-          setHasEeroDevice(true);
-          setNetworkId(networkId);
-        } else {
+      GetApiRequest(
+        request,
+        (response) => {
+          const networkId = response.data?.networks[0]?.split("/").pop();
+          if (networkId) {
+            setHasEeroDevice(true);
+            setNetworkId(networkId);
+          } else {
+            setHasEeroDevice(false);
+          }
+        },
+        (error) => {
+          console.log("error", error);
           setHasEeroDevice(false);
         }
-      }, (error) => {
-        console.log("error", error);
-        setHasEeroDevice(false);
-      });
+      );
     });
   };
   useFocusEffect(
     useCallback(() => {
-
       getUserAccountDetails();
     }, [])
   );
@@ -520,6 +641,24 @@ const HomeScreen = ({ navigation }) => {
       checkModemOutagStatus();
     }, [])
   );
+
+  // get IP address
+
+  const getIPAddress = async () => {
+    try {
+      const response = await fetch("https://api.ipify.org?format=json");
+      if (!response.ok) {
+        throw new Error("Failed to fetch IP address");
+      }
+
+      const data = await response.json();
+      return data.ip; // The IP address
+    } catch (error) {
+      console.error("Error fetching IP address:", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -539,9 +678,18 @@ const HomeScreen = ({ navigation }) => {
   const OutageAlert = ({ estimatedTime }) => {
     const alertMessage = `Our systems show that you may be experiencing an outage related to your Internet service. We are working to restore service as soon as possible. Estimated Time to Restore: ${estimatedTime}`;
     return (
-      <View style={styles.errorBox} accessibilityElementsHidden={showWalkThrough} importantForAccessibility={showWalkThrough ? "no-hide-descendants" : "yes"} >
+      <View
+        style={styles.errorBox}
+        accessibilityElementsHidden={showWalkThrough}
+        importantForAccessibility={
+          showWalkThrough ? "no-hide-descendants" : "yes"
+        }
+      >
         <View style={{ flexDirection: "row", width: "90%" }}>
-          <View accessible={false} style={{ backgroundColor: "#F88700", width: 4 }} />
+          <View
+            accessible={false}
+            style={{ backgroundColor: "#F88700", width: 4 }}
+          />
           <View style={{ flexDirection: "column", padding: 10 }}>
             <View style={{ flexDirection: "row" }}>
               <Image
@@ -569,6 +717,7 @@ const HomeScreen = ({ navigation }) => {
               your Internet service. We are working to restore service as soon
               as possible.
               <Text style={[styles.modemError2, { fontWeight: "700" }]}>
+                {" "}
                 Estimated Time to Restore: {estimatedTime}
               </Text>
             </Text>
@@ -612,8 +761,11 @@ const HomeScreen = ({ navigation }) => {
             <Text
               accessible={!showWalkThrough}
               accessibilityElementsHidden={showWalkThrough}
-              importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
-              style={styles.modemError2}>
+              importantForAccessibility={
+                showWalkThrough ? "no-hide-descendants" : "no"
+              }
+              style={styles.modemError2}
+            >
               Enhance your app experience with the latest version.
               <Text
                 accessible={!showWalkThrough}
@@ -642,8 +794,8 @@ const HomeScreen = ({ navigation }) => {
             onPress={() => {
               setUpdateStatus({
                 isMinorUpdateAvailable: false,
-                currentVersion: '',
-                latestVersion: ''
+                currentVersion: "",
+                latestVersion: "",
               });
             }}
           >
@@ -663,20 +815,29 @@ const HomeScreen = ({ navigation }) => {
     >
       {showWalkThrough && <View style={styles.shadowFullScreen} />}
       {showWalkThrough && (
-        <WalkthroughOverlay
-          onFinish={() => setShowWalkThrough(false)}
-        />
+        <WalkthroughOverlay onFinish={() => setShowWalkThrough(false)} />
       )}
 
       <SafeAreaView
         accessibilityElementsHidden={showWalkThrough}
-        importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
-        style={{ flex: 1 }}>
+        importantForAccessibility={
+          showWalkThrough ? "no-hide-descendants" : "no"
+        }
+        style={{ flex: 1 }}
+      >
         <View
           accessibilityElementsHidden={showWalkThrough}
-          importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
+          importantForAccessibility={
+            showWalkThrough ? "no-hide-descendants" : "no"
+          }
           accessibilityLabel={`SparkLight`}
-          style={{ height: Platform.OS == "ios" ? 60 : 50, flexDirection: "row", justifyContent: "space-between", marginHorizontal: 20, marginTop: Platform.OS == "ios" ? 0 : 20, }}
+          style={{
+            height: Platform.OS == "ios" ? 60 : 50,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginHorizontal: 20,
+            marginTop: Platform.OS == "ios" ? 0 : 20,
+          }}
         >
           <Image
             accessible={!showWalkThrough}
@@ -685,9 +846,27 @@ const HomeScreen = ({ navigation }) => {
             style={{ width: 120, height: 30.324, flexShrink: 0 }}
             source={require("../../../assets/SparklightEntryLogo.png")}
           />
+          <TouchableOpacity
+            onPress={() => {
+              if (Platform.OS === "ios") {
+                startChat();
+              } else {
+                startChatWithConfig({});
+              }
+            }}
+          >
+            <ChatIcon />
+          </TouchableOpacity>
         </View>
         <ScrollView style={{ height: "100%", paddingBottom: 100 }}>
-          <View style={{ backgroundColor: colors.backgound_blue, flex: 2, alignItems: "center", marginTop: 50, paddingBottom: 50, }}
+          <View
+            style={{
+              backgroundColor: colors.backgound_blue,
+              flex: 2,
+              alignItems: "center",
+              marginTop: 50,
+              paddingBottom: 50,
+            }}
           >
             {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert /> : null}
             {isOutageAlert ? (
@@ -695,11 +874,20 @@ const HomeScreen = ({ navigation }) => {
             ) : (
               <></>
             )}
-            <View style={[styles.card, styles.shadowProp, { marginTop: screenReaderEnabled ? 0 : -40 }]}>
+            <View
+              style={[
+                styles.card,
+                styles.shadowProp,
+                { marginTop: screenReaderEnabled ? 0 : -40 },
+              ]}
+            >
               <Text
                 accessible={true}
                 accessibilityLabel={`Service Health`}
-                style={styles.internetHealth}>Service Health</Text>
+                style={styles.internetHealth}
+              >
+                Service Health
+              </Text>
               {checkModemStatus ? (
                 <InternetHealthChart
                   currentValue={getInternetHealth(currentHealth)}
@@ -715,9 +903,11 @@ const HomeScreen = ({ navigation }) => {
                 style={styles.internetStatusSection}
                 accessible={true}
                 accessibilityRole="text"
-                accessibilityLabel={currentHealth != "Optimal"
-                  ? strings.internetStatusIssue
-                  : strings.internetStatus}
+                accessibilityLabel={
+                  currentHealth != "Optimal"
+                    ? strings.internetStatusIssue
+                    : strings.internetStatus
+                }
               >
                 <View style={{ marginTop: 5 }}>
                   <InfoIcon />
@@ -746,7 +936,9 @@ const HomeScreen = ({ navigation }) => {
                 }}
                 accessible={true}
                 accessibilityRole="button"
-                accessabilityLabel={isInternetDetails ? strings.collapseTxt : strings.expandTxt}
+                accessabilityLabel={
+                  isInternetDetails ? strings.collapseTxt : strings.expandTxt
+                }
               >
                 <Text style={styles.hideShowDetails}>
                   {isInternetDetails ? strings.collapseTxt : strings.expandTxt}
@@ -774,7 +966,13 @@ const HomeScreen = ({ navigation }) => {
               )}
             </View>
             <PromotionCard />
-            <MyInternetDetials plans={plans} billAmt={billAmt} dueDate={dueDate} paymentDetails={defaultPaymentDetails} navigation={navigation} />
+            <MyInternetDetials
+              plans={plans}
+              billAmt={billAmt}
+              dueDate={dueDate}
+              paymentDetails={defaultPaymentDetails}
+              navigation={navigation}
+            />
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -796,16 +994,16 @@ const styles = StyleSheet.create({
     top: 20,
   },
   bottomCarotStep2: {
-    left: (tabWidth - 30) * 1
+    left: (tabWidth - 30) * 1,
   },
   bottomCarotStep3: {
-    left: (tabWidth - 25) * 2
+    left: (tabWidth - 25) * 2,
   },
   bottomCarotStep4: {
-    left: (tabWidth - 25) * 3
+    left: (tabWidth - 25) * 3,
   },
   bottomCarotStep5: {
-    left: (tabWidth - 22) * 4
+    left: (tabWidth - 22) * 4,
   },
   circle: {
     width: 8,
@@ -929,7 +1127,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontStyle: "normal",
     fontWeight: "400",
-    width: '100%',
+    width: "100%",
     paddingVertical: 15,
     paddingHorizontal: 25,
   },
