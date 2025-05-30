@@ -61,8 +61,8 @@ const BillingScreen = ({ navigation }) => {
 
   const getUserAccountDetails = () => {
     setBillAmt(undefined);
-    setIsContentLoading(true);
-    
+    setIsContentLoading(false);
+    setIsAutoPayStatusLoad(true);
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
       const request = `account/api/account/${accountNumber}`;

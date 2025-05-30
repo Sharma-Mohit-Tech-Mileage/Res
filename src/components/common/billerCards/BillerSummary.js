@@ -201,6 +201,7 @@ const Card = ({ billAmt, dueDate, navigation, style, acno, isNewBiller }) => {
         </View>
       </View>
 
+     { billAmt !=undefined && (
       <View style={styles.cardFooter}>
         <TouchableOpacity
           onPress={() => {
@@ -222,6 +223,7 @@ const Card = ({ billAmt, dueDate, navigation, style, acno, isNewBiller }) => {
           </View>
         </TouchableOpacity>
       </View>
+     )}
     </View>
 
   );
