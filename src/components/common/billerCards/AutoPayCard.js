@@ -78,6 +78,15 @@ const AutoPayCard = ({
                 marginTop: 10,
               }}
             />
+            <View
+              style={{
+                width: wp("70%"),
+                height: 40,
+                alignSelf: "center",
+                borderRadius: 4,
+                marginVertical: 10,
+              }}
+            />
           </>
         </SkeletonPlaceholder>
       ) : (

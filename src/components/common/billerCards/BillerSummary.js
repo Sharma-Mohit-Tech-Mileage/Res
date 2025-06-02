@@ -201,7 +201,7 @@ const Card = ({ billAmt, dueDate, navigation, style, acno, isNewBiller }) => {
         </View>
       </View>
 
-     { billAmt !=undefined && (
+     { billAmt !=undefined ? (
       <View style={styles.cardFooter}>
         <TouchableOpacity
           onPress={() => {
@@ -223,7 +223,20 @@ const Card = ({ billAmt, dueDate, navigation, style, acno, isNewBiller }) => {
           </View>
         </TouchableOpacity>
       </View>
-     )}
+     ):<>
+     <SkeletonPlaceholder>
+        <View
+          style={{
+            width: wp("70%"),
+            height: 40,
+            alignSelf: "center",
+            borderRadius: 4,
+            marginVertical: 10,
+          }}
+        />
+      </SkeletonPlaceholder>
+     </>
+     }
     </View>
 
   );

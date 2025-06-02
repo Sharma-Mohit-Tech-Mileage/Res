@@ -66,7 +66,20 @@ const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style,i
                 <Text style={styles.subText}>Statements delivered via email.</Text>
                 </View>
               </View>
-            
+            </>
+          )}
+          { isStatusLoading ?
+          <SkeletonPlaceholder> 
+          <View
+            style={{
+              width: wp("70%"),
+              height: 40,
+              alignSelf: "center",
+              borderRadius: 4,
+              marginVertical: 10,
+            }}
+          />
+          </SkeletonPlaceholder> :
           <View style={styles.cardFooter}>
             <TouchableOpacity
              onPress={() => {
@@ -83,8 +96,8 @@ const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style,i
               </View>
             </TouchableOpacity>
           </View>
-          </>
-          )}
+          }
+          
       </View>
    
   );
