@@ -4,29 +4,50 @@ import LinearGradient from 'react-native-linear-gradient';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { Color, FontFamily, FontSize, Padding, Border } from '../../../GlobalStyles';
 import moment from 'moment';
-
-/**
- * MaintenancePage Component
- */
+import { navigationRef } from '../../navigations/UserNavigations';
+import Icon from "../common/Icon";
+import VersionCheck from 'react-native-version-check';
 const MaintenancePage = ({
-  title = "System Maintenance in Progress",
-  message = "We're updating our systems to serve you better. The app will be back online soon.",
-  estimatedTime = "Estimated completion: July 11, 6:00 PM CT",
-  contactInfo = "Need immediate assistance? Call 877-692-2253",
+  title = "We'll Be Back Soon",
+  message = "Our app is currently undergoing scheduled maintenance and will be temporarily unavailable. Thanks for your patience as we work to improve your experience. Please relaunch the app after the maintenance window.",
+  estimatedTime = null,
+  contactInfo = "contact us",
+  contactLink = null,
+  showLoginButton = false,
+  isBlockingUser = false,
+  pageType = "NORMAL"
 }) => {
   
-  const handleContactPress = () => {
-    // Extract phone number from contact info if it exists
-    const phoneRegex = /\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g;
-    const phoneMatch = contactInfo.match(phoneRegex);
+ const handleContactPress = () => {
+  
+  if (!contactLink) {
+    return;
+  }
+  
+  Linking.openURL(contactLink).catch(err => 
+    console.error('🔧 📄 Error opening contact link:', err)
+  );
+};
+  
+  const handleBackToLogin = () => {
     
-    if (phoneMatch && phoneMatch[0]) {
-      const phoneNumber = phoneMatch[0].replace(/[-.\s]/g, '');
-      Linking.openURL(`tel:${phoneNumber}`).catch(err => 
-        console.error('An error occurred opening phone:', err)
-      );
+    if (navigationRef.current) {
+      
+      navigationRef.current.reset({
+        index: 0,
+        routes: [{ 
+          name: 'Splash', 
+          params: { 
+            isLogout: true, 
+            fromBlocking: true
+          } 
+        }],
+      });
+    } else {
+      console.error('🔧 📄 🚫 Navigation ref not available');
     }
   };
+
   
   return (
     <LinearGradient
@@ -36,7 +57,7 @@ const MaintenancePage = ({
       style={styles.container}
     >
       <View style={styles.contentContainer}>
-        {/* Logo */}
+        {/* Logo with Version */}
         <View style={styles.logoContainer}>
           <Image
             resizeMode="contain"
@@ -45,33 +66,53 @@ const MaintenancePage = ({
             accessibilityRole="image"
             accessibilityLabel="SparkLight"
           />
+          <Text style={styles.versionText}>Version: {VersionCheck.getCurrentVersion()}</Text>
         </View>
         
         {/* Maintenance Message Card */}
         <View style={styles.cardContainer}>
-          <View style={styles.iconContainer}>
-            <Text style={styles.maintenanceIcon}>🔧</Text>
+          {/* Gear Icons - Replace this section with your SVG component */}
+          <View style={styles.gearIconsContainer}>
+            <Text style={styles.gearIcon}><Icon name="gear" color={Color.colorMidnightblue} size={84}/></Text>
+            
           </View>
           
           <Text style={styles.titleText}>{title}</Text>
           
-          <View style={styles.separator} />
-          
           <Text style={styles.messageText}>{message}</Text>
           
           {estimatedTime && (
-            <View style={styles.timeContainer}>
-              <Text style={styles.estimatedTimeText}>{estimatedTime}</Text>
+            <View style={styles.estimatedTimeSection}>
+              <Text style={styles.estimatedTimeLabel}>Estimated Completion Time</Text>
+              <Text style={styles.estimatedTimeValue}>{estimatedTime}</Text>
             </View>
           )}
           
-          {contactInfo && (
+        {contactInfo && contactLink && !showLoginButton && (
+  <View style={styles.contactSection}>
+    <Text style={styles.contactMessage}>
+      For immediate assistance, please{' '}
+      <TouchableOpacity 
+        onPress={handleContactPress}
+        accessibilityRole="link"
+        style={styles.contactLinkContainer}
+      >
+        <Text style={styles.contactLink}>{contactInfo}</Text>
+      </TouchableOpacity>
+      .
+    </Text>
+  </View>
+)}
+          
+          {/* Back to Login Button for blocking scenarios */}
+          {showLoginButton && (
             <TouchableOpacity 
-              style={styles.contactContainer} 
-              onPress={handleContactPress}
-              accessibilityRole="link"
+              style={styles.loginButton}
+              onPress={handleBackToLogin}
+              accessibilityRole="button"
+              accessibilityLabel="Go back to login screen"
             >
-              <Text style={styles.contactText}>{contactInfo}</Text>
+              <Text style={styles.loginButtonText}>Back to Login</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -92,85 +133,144 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 20,
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: Padding.p_13xl,
+    marginBottom: 40,
   },
   logo: {
-    width: 320,
-    height: 100,
+    width: 280,
+    height: 90,
+    marginBottom: 10,
+  },
+  versionText: {
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_sm,
+    color: '#FFFFFF',
+    fontWeight: '400',
+    opacity: 0.8,
   },
   cardContainer: {
     backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_xs,
-    padding: Padding.p_5xl,
-    width: wp('85%'),
+    borderRadius: 16,
+    padding: 32,
+    width: wp('90%'),
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 8,
+    shadowColor: 'green',
+    shadowOpacity: 0.9,
+    shadowRadius: 10,
+    elevation: 10,
   },
-  iconContainer: {
-    marginBottom: Padding.p_base,
+  gearIconsContainer: {
+    flexDirection: 'row',
+    marginBottom: 24,
+    alignItems: 'center',
   },
-  maintenanceIcon: {
-    fontSize: 48,
+  gearIcon: {
+    fontSize: 32,
+    marginHorizontal: 4,
+    color: Color.colorMidnightblue, // This will be replaced with SVG
   },
   titleText: {
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_3xl,
-    color: Color.colorGray_200,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 32,
+    color: Color.sparklightGray1,
     textAlign: 'center',
-    marginBottom: Padding.p_base,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: Color.colorWhitesmoke_300,
-    width: '100%',
-    marginBottom: Padding.p_5xl,
+    marginBottom: 20,
+    fontWeight: '400',
   },
   messageText: {
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
-    color: Color.colorGray_100,
+    color: '#707679',
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: Padding.p_5xl,
+    marginBottom: 24,
   },
-  timeContainer: {
+  estimatedTimeSection: {
     backgroundColor: Color.colorWhitesmoke_200,
-    padding: Padding.p_base,
-    borderRadius: Border.br_5xs,
-    marginBottom: Padding.p_5xl,
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 20,
     width: '100%',
+    alignItems: 'center',
   },
-  estimatedTimeText: {
+  estimatedTimeLabel: {
     fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_sm,
-    color: Color.colorGray_200,
-    textAlign: 'center',
+    fontSize: FontSize.size_base,
+    color: '#000',
+    marginBottom: 4,
+    fontWeight: '400',
   },
-  contactContainer: {
+  estimatedTimeValue: {
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: FontSize.size_base,
+    color: '#000',
+    fontWeight: '700',
+  },
+  contactSection: {
     width: '100%',
-    marginBottom: Padding.p_base,
+    alignItems: 'center',
   },
-  contactText: {
+  contactMessage: {
     fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
-    color: Color.colorMidnightblue,
+    fontSize: FontSize.size_base,
+    color: Color.sparklightGray1,
     textAlign: 'center',
+    fontWeight: '400',
+  },
+  contactLinkContainer: {
+    display: 'inline',
+  },
+  contactLink: {
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_base,
+    color: Color.sparklightBrightPurple,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
   },
   copyrightText: {
     position: "absolute",
-    bottom: hp("5%"),
+    bottom: hp("3%"),
     fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     fontWeight: "400",
-    color: Color.sparklightWhite,
+    color: '#FFFFFF',
     alignSelf: "center",
+    opacity: 0.8,
+  },
+  // Enhanced features for blocking scenarios
+  loginButton: {
+    backgroundColor: Color.colorMidnightblue,
+    borderRadius: Border.br_xs,
+    paddingVertical: Padding.p_base,
+    paddingHorizontal: Padding.p_5xl,
+    marginTop: Padding.p_base,
+    width: '100%',
+    alignItems: 'center',
+  },
+  loginButtonText: {
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: FontSize.size_base,
+    color: Color.sparklightWhite,
+    textAlign: 'center',
+  },
+  blockingInfoContainer: {
+    backgroundColor: '#FFF3CD',
+    borderColor: '#FFEAA7',
+    borderWidth: 1,
+    borderRadius: Border.br_5xs,
+    padding: Padding.p_base,
+    marginTop: Padding.p_base,
+    width: '100%',
+  },
+  blockingInfoText: {
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_sm,
+    color: '#856404',
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
 

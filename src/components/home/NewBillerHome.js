@@ -215,6 +215,7 @@ const paperlessStatusAcp = useSelector( (state) => state.combinedReducers.profil
           message={bannerConfig.message}
           link={bannerConfig.link}
           linkText={bannerConfig.linkText}
+          showPhoneNumber={bannerConfig.showPhoneNumber}
           phoneNumber={bannerConfig.phoneNumber}
           onDismiss={bannerConfig.dismissible ? dismissBanner : undefined}
           severity={bannerConfig.severity || 'info'}

@@ -156,7 +156,6 @@ const HomeScreen = ({ navigation }) => {
       GetApiRequest(
         request,
         (response) => {
-          console.log("checkModemOutagStatus", response);
           if (response != undefined) {
             if (response.hasOutage === true) {
               let time = moment(response.estimatedTimeOfResolution).format(
@@ -174,7 +173,6 @@ const HomeScreen = ({ navigation }) => {
           }
         },
         (errorCode) => {
-          console.log("checkModemOutagStatus erro", errorCode);
           if (errorCode == 204) {
             setInternetHealths((oldArray) => [...oldArray, "Green"]);
           }
@@ -184,7 +182,6 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const onSuccessPlan = (res) => {
-    console.log("getInternetPlanDetails", res);
     if (res) {
       setPlans(res);
       if (res.length > 0) {
@@ -224,7 +221,6 @@ const HomeScreen = ({ navigation }) => {
           }
 
           let temt = [];
-          console.log("checkModemDetails==", res);
           if (res.equipmentType == "DOCSIS") {
             temt.push(res.uTxP_State);
             temt.push(res.uRxL_State);
@@ -704,6 +700,7 @@ const HomeScreen = ({ navigation }) => {
                 message={bannerConfig.message}
                 link={bannerConfig.link}
                 linkText={bannerConfig.linkText}
+                showPhoneNumber={bannerConfig.showPhoneNumber}
                 phoneNumber={bannerConfig.phoneNumber}
                 onDismiss={bannerConfig.dismissible ? dismissBanner : undefined}
                 severity={bannerConfig.severity || 'info'}

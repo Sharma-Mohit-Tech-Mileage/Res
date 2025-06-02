@@ -27,7 +27,7 @@ const UserNavigations = (props) => {
 
   const onStateChange = async () => {
     const previousRouteName = routeNameRef.current;
-    const currentRouteName = navigationRef.current.getCurrentRoute().name;
+    const currentRouteName = navigationRef.current.getCurrentRoute()?.name;
 
     if (previousRouteName !== currentRouteName && currentRouteName && currentRouteName.trim() !== "") {
       try {

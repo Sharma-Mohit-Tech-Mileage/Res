@@ -4,26 +4,44 @@ import { useMaintenance } from './MaintenanceContext';
 import MaintenancePage from './MaintenancePage';
 
 const MaintenanceWrapper = ({ children }) => {
-  const { showMaintenancePage, pageConfig, isBlockingUser } = useMaintenance();
+  const { 
+    showMaintenancePage, 
+    pageConfig, 
+    blockingState,  // 🔧 NEW: Get enhanced blocking state
+    clearBlockingState  // 🔧 NEW: Get function to clear blocking state
+  } = useMaintenance();
   
   console.log('🔧 🎁 MaintenanceWrapper render:', {
     showMaintenancePage,
     hasPageConfig: !!pageConfig,
-    isBlockingUser,
+    blockingState: blockingState,
     pageType: pageConfig?.type
   });
   
   // If maintenance page should be shown, return only the maintenance page
-  if (showMaintenancePage && pageConfig) {
-    console.log('🔧 🎁 Showing maintenance page with type:', pageConfig.type);
+  if (showMaintenancePage && (pageConfig || blockingState.wasBlocked)) {
+    console.log('🔧 🎁 Showing maintenance page with enhanced blocking features');
+    
+    // 🔧 NEW: Use blocking config if available, otherwise use page config
+    const activeConfig = blockingState.blockingConfig || pageConfig;
+    const isCurrentlyBlocking = blockingState.wasBlocked;
+    
     return (
       <MaintenancePage
-        title={pageConfig.title || "System Maintenance in Progress"}
-        message={pageConfig.message || "We're updating our systems to serve you better."}
-        estimatedTime={pageConfig.estimatedTime}
-        contactInfo={pageConfig.contactInfo}
-        showLoginButton={pageConfig.showLoginButton || isBlockingUser}
-        isBlockingUser={isBlockingUser}
+        title={activeConfig?.title || "System Maintenance in Progress"}
+        message={activeConfig?.message || "We're updating our systems to serve you better."}
+        estimatedTime={activeConfig?.estimatedTime}
+        contactInfo={activeConfig?.contactInfo}
+         contactLink={activeConfig?.contactLink} 
+        showLoginButton={activeConfig?.showLoginButton}  // Always show for blocked users
+        isBlockingUser={isCurrentlyBlocking}                                    // Pass current blocking status
+        pageType={activeConfig?.type || "NORMAL"}                              // Pass page type
+        onClearBlocking={clearBlockingState}                                   // 🔧 NEW: Allow manual clear
+        blockingInfo={{                                                        // 🔧 NEW: Pass blocking info
+          blockedAudience: blockingState.blockedAudience,
+          blockingTimestamp: blockingState.blockingTimestamp,
+          wasBlocked: blockingState.wasBlocked
+        }}
       />
     );
   }

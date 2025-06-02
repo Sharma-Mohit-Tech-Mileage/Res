@@ -8,15 +8,7 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
  * MaintenanceBanner Component
  * Styled to match AlertComponent from AlertUtils
  */
-const MaintenanceBanner = ({ 
-  title = "Billing system upgrade – July 11",
-  message = "We're updating to a faster, more modern experience for managing your Sparklight services. Learn more:",
-  link = "https://www.sparklight.com/billingmigration",
-  linkText = "Learn more",
-  phoneNumber = "877-692-2253",
-  onDismiss,
-  severity = "info" // "info", "warning", or "critical"
-}) => {
+const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=false, phoneNumber, onDismiss, severity = "info" }) => {
   
   // Determine indicator color, icon tint and background based on severity
   const getSeverityStyles = () => {
@@ -36,9 +28,9 @@ const MaintenanceBanner = ({
       case "info":
       default:
         return {
-          indicatorColor: "#4B2E83", // Deep purple/blue color
-          iconTint: "#4B2E83", // Deep purple/blue color
-          titleStyle: { color: "#4B2E83" } // Deep purple/blue color
+          indicatorColor: "#353091", // Deep purple/blue color
+          iconTint: "#353091", // Deep purple/blue color
+          titleStyle: { color: "#353091" } // Deep purple/blue color
         };
     }
   };
@@ -80,18 +72,16 @@ const MaintenanceBanner = ({
             </TouchableOpacity>
           )}
           
-          {phoneNumber && (
+          {showPhoneNumber && (
             <Text style={styles.alertMessage}>
               Need help? Call{' '}
-              <TouchableOpacity 
+              <Text 
+                style={styles.actionText}
                 onPress={handlePhonePress}
                 accessibilityRole="link"
-                style={{ display: 'inline' }}
               >
-                <Text style={styles.actionText}>
-                  {phoneNumber}
-                </Text>
-              </TouchableOpacity>
+                {phoneNumber}
+              </Text>
             </Text>
           )}
         </View>
@@ -126,11 +116,11 @@ const styles = StyleSheet.create({
   },
   alertRowContainer: {
     flexDirection: "row",
-    width: "90%",
+    width: "85%",
   },
   alertContentContainer: {
     flexDirection: "column",
-    padding: 22,
+    padding: 12,
   },
   alertTitleRow: {
     flexDirection: "row",
@@ -164,7 +154,7 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   actionText: {
-    color: Color.sparklightBrightPurple, // Changed to deep purple/blue color for links
+    color: '#353091', // Changed to deep purple/blue color for links
     fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     fontStyle: "normal",
