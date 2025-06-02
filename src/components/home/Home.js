@@ -405,14 +405,15 @@ const HomeScreen = ({ navigation }) => {
 
   const loginWithToken = async (userAgent,firstName,lastName) => {
     const user = await getUser();
-    const secret =
-      (Platform.OS=='ios')?"JQ8sVOU9Hl3fnUf1gyt9xfRn9XVMZ44ilfSo5e3SnrutkSCXDmMVSdTOCVQMduayJwptKtfPrMNaUDz3LfzLxQ":"Rcmym7uJfKq-hqjXyhlC9y09AyPyw0K6Pt6cvqvBmR335YCChrSBS6rnSdEUT-9-YIIkSYS_AYU36ETkuCxnYA"
+    const secret ="0DE686CBBBF20A367D096D466BC5A895D8F62223CCB36C00A198E64F148E0D84"
+    // const secret =
+    //   (Platform.OS=='ios')?"JQ8sVOU9Hl3fnUf1gyt9xfRn9XVMZ44ilfSo5e3SnrutkSCXDmMVSdTOCVQMduayJwptKtfPrMNaUDz3LfzLxQ":"Rcmym7uJfKq-hqjXyhlC9y09AyPyw0K6Pt6cvqvBmR335YCChrSBS6rnSdEUT-9-YIIkSYS_AYU36ETkuCxnYA"
     //data payload
     const data = {
       scope: "user",
       external_id: user?.userInfo.accountNumber,
       //email: defaultPaymentDetails.email || "",
-      name: `${firstName} ${lastName}` || "",
+      //name: `${firstName} ${lastName}` || "",
       //email_verified: true, // optional
       // exp: new Date().getTime() + 3600 * 1000,
     };
@@ -420,14 +421,14 @@ const HomeScreen = ({ navigation }) => {
     const options = {
       alg: "HS256",
       typ: "JWT",
-      kid: (Platform.OS=='ios')? "app_683930d35c8351994c5bff40":"app_683933455c8351994c6542b3",
+      //kid: (Platform.OS=='ios')? "app_683930d35c8351994c5bff40":"app_683933455c8351994c6542b3",
     };
     const jwttoken = sign(data, secret, options);
     console.log("request data for jwt", data);
     console.log("request options for jwt", options);
     console.log("Loggin jwt", jwttoken);
     //loginWithJWT(jwttoken);
-    loginWithJWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjgzODcyNjMiLCJqdGkiOiI3MDI0MGU3MS0xZjc2LTRjNWUtYTJiMC1jMWNhOGU2NDQzNTkiLCJpYXQiOjE3NDg2MjI1NjMsIm5hbWUiOiJXRUJURUFNIEFMTFRIUkVFIiwiZW1haWwiOiJTVU1BTlRILlRIQU5FRVJVQFNQQVJLTElHSFQuQklaIiwiZXh0ZXJuYWxfaWQiOiIxMjgzODcyNjMiLCJuYmYiOjE3NDg2MjI1NjIsImV4cCI6MTc0ODYyOTc2MiwiaXNzIjoiQk4wMFRFQ0gwMDEiLCJhdWQiOiJodHRwczovL2N1c3RvbWVyLnNwYXJrbGlnaHQuY29tIn0.ExRq4C4e-Fsj1csJbOZPNsTUnbJjas97xmiWZGaI43w")
+    //loginWithJWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6InVzZXIiLCJleHRlcm5hbF9pZCI6IjEyODM4NzI2MyJ9.5d8kzoZS4Jp_9KDdvAPmqj_mETDFfI7C2C3VU3ZrDRA")
 
     const fields = {
       userAgent: userAgent,
@@ -446,14 +447,16 @@ const HomeScreen = ({ navigation }) => {
       userName: user?.userInfo.userName,
       customerType: user?.userInfo.customerType,
       authLevel: user?.userInfo.authLevel,
-      jwtId:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjgzODcyNjMiLCJqdGkiOiI3MDI0MGU3MS0xZjc2LTRjNWUtYTJiMC1jMWNhOGU2NDQzNTkiLCJpYXQiOjE3NDg2MjI1NjMsIm5hbWUiOiJXRUJURUFNIEFMTFRIUkVFIiwiZW1haWwiOiJTVU1BTlRILlRIQU5FRVJVQFNQQVJLTElHSFQuQklaIiwiZXh0ZXJuYWxfaWQiOiIxMjgzODcyNjMiLCJuYmYiOjE3NDg2MjI1NjIsImV4cCI6MTc0ODYyOTc2MiwiaXNzIjoiQk4wMFRFQ0gwMDEiLCJhdWQiOiJodHRwczovL2N1c3RvbWVyLnNwYXJrbGlnaHQuY29tIn0.ExRq4C4e-Fsj1csJbOZPNsTUnbJjas97xmiWZGaI43w",
-    //jwtId: jwttoken,
+      // jwtId:
+      // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6InVzZXIiLCJleHRlcm5hbF9pZCI6IjEyODM4NzI2MyJ9.5d8kzoZS4Jp_9KDdvAPmqj_mETDFfI7C2C3VU3ZrDRA",
+    jwtId: jwttoken,
     };
-    setTimeout(() => {
-      console.log("Setting conversational fields", fields);
-      setConversationalFields(fields);
-    }, 1000);
+
+    setConversationalFields(fields);
+    // setTimeout(() => {
+    //   console.log("Setting conversational fields", fields);
+    //   setConversationalFields(fields);
+    // }, 1000);
   };
 
   const updateInternetHealth = (dueAmount, dueDate) => {

@@ -81,6 +81,7 @@ RCT_EXPORT_METHOD(startChat:(RCTPromiseResolveBlock)resolve
 RCT_EXPORT_METHOD(loginWithJWT:(NSString *)jwtToken resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     @try {
+      NSLog(@"Zendesk jWt.: %@", jwtToken);
       [[Zendesk instance] loginUserWith:jwtToken completionHandler:^(ZDKZendeskUser * _Nullable user, NSError * _Nullable error) {
         if (error) {
           //NSLog(@"Zendesk jWt.\nError: %@", error);
@@ -122,10 +123,7 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)tags
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
   @try {
-    // Example: Using hypothetical Messaging SDK
-    // [MessagingSDK setConversationTags:tags];
-
-   //[[Zendesk instance] setCon]
+    
     NSLog(@"Zendesk login: %@", tags[@"userAgent"]);
     [Zendesk.instance.messaging setConversationFields:@{@"29542407930903": tags[@"userAgent"]}];
     
@@ -151,7 +149,7 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)tags
   }
   @catch (NSException *exception) {
     //NSLog(@"Exception: %@, Reason: %@, User Info: %@", exception.name, exception.reason, exception.userInfo);
-    NSLog(@"Zendesk login.\nError: %@", exception.reason);
+    NSLog(@"Zendesk metadata.\nError: %@", exception.reason);
     reject(@"set_tags_error", @"Failed to set conversation tags", nil);
   }
 }
