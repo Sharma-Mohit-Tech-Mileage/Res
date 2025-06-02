@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     flexShrink: 1,
     flexWrap: 'wrap',
-    textAlign: 'center', 
+    textAlign: 'left', 
   },
 });
 
