@@ -1,7 +1,7 @@
 
 #import "RNZendeskChatModule.h"
 #import <ZendeskSDKMessaging/ZendeskSDKMessaging.h>
-//#import <ZendeskSDKLogger/ZendeskSDKLogger.h>
+#import <ZendeskSDKLogger/ZendeskSDKLogger.h>
 #import <ZendeskSDK/ZendeskSDK.h>
 
 #import <ZendeskSDK/ZendeskSDK.h>
@@ -20,8 +20,8 @@ RCT_EXPORT_MODULE(RNZendeskChatModule);
         [Zendesk initializeWithChannelKey:@"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lLnplbmRlc2suY29tL21vYmlsZV9zZGtfYXBpL3NldHRpbmdzLzAxSlEwOTk0WUpERVpLMVdCWjlFVDdCRURYLmpzb24ifQ=="
                          messagingFactory:[[ZDKDefaultMessagingFactory alloc] init]
                         completionHandler:^(Zendesk * _Nullable zendesk, NSError * _Nullable error) {
-         // ZDKLogger.enabled = YES;
-          //ZDKLogger.level = ZDKLogLevelDefault;
+          ZDKLogger.enabled = YES;
+          ZDKLogger.level = ZDKLogLevelDefault;
                 if (error != nil) {
                     NSLog(@"Zendesk did not initialize.\nError: %@", error.localizedDescription);
                 }else{
@@ -118,31 +118,83 @@ RCT_EXPORT_METHOD(logoutZendesk:(RCTPromiseResolveBlock)resolve rejecter:(RCTPro
 }
 
   
-RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)tags
+RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
   @try {
     
-    NSLog(@"Zendesk login: %@", tags[@"userAgent"]);
-    [Zendesk.instance.messaging setConversationFields:@{@"29542407930903": tags[@"userAgent"]}];
+    NSLog(@"Zendesk login: %@", metadata[@"userAgent"]);
     
-    [Zendesk.instance.messaging setConversationFields:@{@"29542536141335": tags[@"appVersion"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"29542663925271": tags[@"timezoneOffsetId"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"29542734993559": tags[@"platform"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"29230394216983": tags[@"locationHrefId"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"29542809023767": tags[@"ipAddress"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"360003617614": tags[@"email"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"360004035014": tags[@"firstName"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"360003976113": tags[@"lastName"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"360036705974": tags[@"name"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"360046174754": tags[@"phone"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"360004035174": tags[@"accountNumber"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"360004035174": tags[@"accountNumber"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"29542395738007": tags[@"userName"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"29542894274711": tags[@"customerType"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"29542032223895": tags[@"authLevel"]}];
-    [Zendesk.instance.messaging setConversationFields:@{@"29542045878167": tags[@"jwtId"]}];
+    
+    NSMutableDictionary *fields = [NSMutableDictionary dictionary];
+
+      if (metadata[@"userAgent"]) {
+        fields[@"29542407930903"] = metadata[@"userAgent"];
+      }
+      if (metadata[@"appVersion"]) {
+        fields[@"29542536141335"] = metadata[@"appVersion"];
+      }
+      if (metadata[@"timezoneOffsetId"]) {
+        fields[@"29542663925271"] = metadata[@"timezoneOffsetId"];
+      }
+      if (metadata[@"platform"]) {
+        fields[@"29542734993559"] = metadata[@"platform"];
+      }
+      if (metadata[@"locationHrefId"]) {
+        fields[@"29230394216983"] = metadata[@"locationHrefId"];
+      }
+      if (metadata[@"ipAddress"]) {
+        fields[@"29542809023767"] = metadata[@"ipAddress"];
+      }
+      if (metadata[@"firstName"]) {
+        fields[@"360004035014"] = metadata[@"firstName"];
+      }
+      if (metadata[@"lastName"]) {
+        fields[@"360003976113"] = metadata[@"lastName"];
+      }
+      if (metadata[@"name"]) {
+        fields[@"360036705974"] = metadata[@"name"];
+      }
+      if (metadata[@"phone"]) {
+        fields[@"360046174754"] = metadata[@"phone"];
+      }
+      if (metadata[@"accountNumber"]) {
+        fields[@"360004035174"] = metadata[@"accountNumber"];
+      }
+      if (metadata[@"userName"]) {
+        fields[@"29542395738007"] = metadata[@"userName"];
+      }
+      if (metadata[@"customerType"]) {
+        fields[@"29542894274711"] = metadata[@"customerType"];
+      }
+      if (metadata[@"authLevel"]) {
+        fields[@"29542032223895"] = metadata[@"authLevel"];
+      }
+      if (metadata[@"jwtId"]) {
+        fields[@"29542045878167"] = metadata[@"jwtId"];
+      }
+
+      [[Zendesk instance].messaging setConversationFields:fields];
+    
+//    [Zendesk.instance.messaging setConversationFields:@{@"29542407930903": tags[@"userAgent"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"29542536141335": tags[@"appVersion"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"29542663925271": tags[@"timezoneOffsetId"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"29542734993559": tags[@"platform"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"29230394216983": tags[@"locationHrefId"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"29542809023767": tags[@"ipAddress"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"360003617614": tags[@"email"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"360004035014": tags[@"firstName"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"360003976113": tags[@"lastName"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"360036705974": tags[@"name"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"360046174754": tags[@"phone"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"360004035174": tags[@"accountNumber"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"360004035174": tags[@"accountNumber"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"29542395738007": tags[@"userName"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"29542894274711": tags[@"customerType"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"29542032223895": tags[@"authLevel"]}];
+//    [Zendesk.instance.messaging setConversationFields:@{@"29542045878167": tags[@"jwtId"]}];
+//    
 
     // Simulate success
     resolve(@(YES));

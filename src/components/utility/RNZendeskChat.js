@@ -38,7 +38,6 @@ export const loginWithJWT = async (jwtToken) => {
 
 // Set conversational fields
   export const setConversationalFields = async(data) => {
-    console.log('Setting conversational fields:', data);
     try {
       const result = await RNZendeskChatModule.setConversationTags(data);
       console.log("Result:",result);

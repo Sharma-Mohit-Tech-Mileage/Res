@@ -427,7 +427,7 @@ const HomeScreen = ({ navigation }) => {
     console.log("request data for jwt", data);
     console.log("request options for jwt", options);
     console.log("Loggin jwt", jwttoken);
-    //loginWithJWT(jwttoken);
+    loginWithJWT(jwttoken);
     //loginWithJWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6InVzZXIiLCJleHRlcm5hbF9pZCI6IjEyODM4NzI2MyJ9.5d8kzoZS4Jp_9KDdvAPmqj_mETDFfI7C2C3VU3ZrDRA")
 
     const fields = {
@@ -452,11 +452,11 @@ const HomeScreen = ({ navigation }) => {
     jwtId: jwttoken,
     };
 
-    setConversationalFields(fields);
-    // setTimeout(() => {
-    //   console.log("Setting conversational fields", fields);
-    //   setConversationalFields(fields);
-    // }, 1000);
+    
+    setTimeout(() => {
+      //console.log("Setting conversational fields", fields);
+      setConversationalFields(fields);
+    }, 1000);
   };
 
   const updateInternetHealth = (dueAmount, dueDate) => {
