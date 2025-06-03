@@ -119,7 +119,10 @@ const BillingScreen = ({ navigation }) => {
         `account/api/account/${accountNumber}/paperless/status`,
         (res) => {
           setPaperlessStatus(res?.isPaperless);
-          setLoadingPerless(false);
+          setTimeout(() => {
+             setLoadingPerless(false);
+          }, 2000);
+         
         },
         handleError
       );

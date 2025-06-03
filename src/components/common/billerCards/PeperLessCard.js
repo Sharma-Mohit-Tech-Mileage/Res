@@ -22,52 +22,78 @@ const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style,i
               <Text style={styles.leftTitle}>Paperless Billing</Text>
             </View>
           </View>
+
+          {isStatusLoading ? (
+            <SkeletonPlaceholder>
+            <>
+            {paperlessStatus && (
+              <View
+                style={{
+                  width: wp("60%"),
+                  height: 20,
+                  alignSelf: "center",
+                  borderRadius: 4,
+                  marginTop: 10,
+                }}
+              />
+            )}
+              <View
+                style={{
+                  width: wp("40%"),
+                  height: 30,
+                  alignSelf: "center",
+                  borderRadius: 4,
+                  marginTop: 10,
+                }}
+              />
+              <View
+                style={{
+                  width: wp("52%"),
+                  height: 20,
+                  alignSelf: "center",
+                  borderRadius: 4,
+                  marginTop: 20,
+                }}
+                
+              />
+
+               <View
+                style={{
+                  width: wp("50%"),
+                  height: 20,
+                  alignSelf: "center",
+                  borderRadius: 4,
+                  marginTop: 10,
+                }}
+                
+              />
+            </>
+            </SkeletonPlaceholder>
+          ) : (
+            <>
           {paperlessStatus ? (
             <>
               <Text style={[styles.dueDate, { fontWeight: '400', color: colors.gray600 }]}>Email Associated: </Text>
               <Text style={[styles.dueDate]}>{paperlessCardEmail}</Text>
-              {isStatusLoading ? 
-              <SkeletonPlaceholder>
-              <View
-                style={{
-                  width: wp("30%"),
-                  height: 30,
-                  alignSelf: "center",
-                  borderRadius: 4,
-                  marginVertical: 10,
-                }}
-              />
-              
-            </SkeletonPlaceholder> :
-
+            
               <Text style={styles.autoPayStatusText}>Paperless Billing On</Text>
-      }
               <Text style={[styles.thankYouText,{marginTop:5}]}>Thank you for choosing Paperless Billing!</Text>
             </>
           ) : (
             <>
-            {isStatusLoading ? 
-              <SkeletonPlaceholder>
-              <View
-                style={{
-                  width: wp("35%"),
-                  height: 30,
-                  alignSelf: "center",
-                  borderRadius: 4,
-                  marginVertical: 10,
-                }}
-              />   
-            </SkeletonPlaceholder> :
               <Text style={styles.autoPayStatusTextInActive}>Paperless Billing Off</Text>
-           }
               <View style={[styles.headerContainer,{alignItems:'center',justifyContent:'center'}]}>
                 <View style={{flexDirection:'column'}}>
                 <Text style={[styles.dueDate]}>Turn on Paperless Billing today! </Text>
                 <Text style={styles.subText}>Statements delivered via email.</Text>
                 </View>
               </View>
-            </>
+              </>
+           
           )}
+          </>
+          )}
+
           { isStatusLoading ?
           <SkeletonPlaceholder> 
           <View
@@ -77,6 +103,7 @@ const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style,i
               alignSelf: "center",
               borderRadius: 4,
               marginVertical: 10,
+              
             }}
           />
           </SkeletonPlaceholder> :
