@@ -7,6 +7,7 @@ import moment from 'moment';
 import { navigationRef } from '../../navigations/UserNavigations';
 import Icon from "../common/Icon";
 import VersionCheck from 'react-native-version-check';
+
 const MaintenancePage = ({
   title = "We'll Be Back Soon",
   message = "Our app is currently undergoing scheduled maintenance and will be temporarily unavailable. Thanks for your patience as we work to improve your experience. Please relaunch the app after the maintenance window.",
@@ -64,22 +65,51 @@ const MaintenancePage = ({
             style={styles.logo}
             source={require("../../../assets/SparklightEntryLogo.png")}
             accessibilityRole="image"
-            accessibilityLabel="SparkLight"
+            accessibilityLabel="Sparklight logo"
+            accessible={true}
           />
-          <Text style={styles.versionText}>Version: {VersionCheck.getCurrentVersion()}</Text>
+          <Text 
+            style={styles.versionText}
+            accessibilityLabel={`Version ${VersionCheck.getCurrentVersion()}`}
+            accessible={true}
+          >
+            Version: {VersionCheck.getCurrentVersion()}
+          </Text>
         </View>
         
         {/* Maintenance Message Card */}
         <View style={styles.cardContainer}>
           {/* Gear Icons - Replace this section with your SVG component */}
-          <View style={styles.gearIconsContainer}>
-            <Text style={styles.gearIcon}><Icon name="gear" color={Color.colorMidnightblue} size={84}/></Text>
-            
+          <View 
+            style={styles.gearIconsContainer}
+            accessible={false}
+            importantForAccessibility="no-hide-descendants"
+          >
+            <View
+              accessible={true}
+              accessibilityRole="image"
+              accessibilityLabel="Maintenance gear icon"
+            >
+              <Icon name="gear" color={Color.colorMidnightblue} size={84}/>
+            </View>
           </View>
           
-          <Text style={styles.titleText}>{title}</Text>
+          <Text 
+            style={styles.titleText}
+            accessibilityRole="header"
+            accessible={true}
+            accessibilityLabel={title}
+          >
+            {title}
+          </Text>
           
-          <Text style={styles.messageText}>{message}</Text>
+          <Text 
+            style={styles.messageText}
+            accessible={true}
+            accessibilityLabel={message}
+          >
+            {message}
+          </Text>
           
           {estimatedTime && (
             <View style={styles.estimatedTimeSection}>
@@ -89,20 +119,25 @@ const MaintenancePage = ({
           )}
           
         {contactInfo && contactLink && !showLoginButton && (
-  <View style={styles.contactSection}>
-    <Text style={styles.contactMessage}>
-      For immediate assistance, please{' '}
-      <TouchableOpacity 
-        onPress={handleContactPress}
-        accessibilityRole="link"
-        style={styles.contactLinkContainer}
-      >
-        <Text style={styles.contactLink}>{contactInfo}</Text>
-      </TouchableOpacity>
-      .
-    </Text>
-  </View>
-)}
+          <View style={styles.contactSection}>
+            <View style={styles.contactMessageContainer}>
+              <Text style={styles.contactMessage}>
+                For immediate assistance, please{' '}
+              </Text>
+              <TouchableOpacity 
+                onPress={handleContactPress}
+                accessibilityRole="link"
+                accessibilityLabel={`${contactInfo} link`}
+                accessibilityHint="Opens support page"
+                accessible={true}
+                style={styles.contactLinkButton}
+              >
+                <Text style={styles.contactLink}>{contactInfo}</Text>
+              </TouchableOpacity>
+              <Text style={styles.contactMessage}>.</Text>
+            </View>
+          </View>
+        )}
           
           {/* Back to Login Button for blocking scenarios */}
           {showLoginButton && (
@@ -110,7 +145,9 @@ const MaintenancePage = ({
               style={styles.loginButton}
               onPress={handleBackToLogin}
               accessibilityRole="button"
-              accessibilityLabel="Go back to login screen"
+              accessibilityLabel="Back to Login, go back to login screen"
+              accessibilityHint="Double tap to return to login screen"
+              accessible={true}
             >
               <Text style={styles.loginButtonText}>Back to Login</Text>
             </TouchableOpacity>
@@ -118,9 +155,11 @@ const MaintenancePage = ({
         </View>
       </View>
       
-      <Text style={styles.copyrightText}>
-        {`Copyright © ${moment().year()}, Sparklight ®, All Rights Reserved.`}
-      </Text>
+      <View style={styles.copyrightContainer}>
+        <Text style={styles.copyrightText}>
+          {`Copyright © ${moment().year()}, Sparklight ®, All Rights Reserved.`}
+        </Text>
+      </View>
     </LinearGradient>
   );
 };
@@ -133,15 +172,19 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: wp('5%'),
+    paddingVertical: hp('2%'),
+    minHeight: hp('85%'), // Ensure content doesn't take full height
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: hp('3%'),
   },
   logo: {
-    width: 280,
-    height: 90,
+    width: wp('70%'),
+    height: hp('8%'),
+    maxWidth: 280,
+    maxHeight: 90,
     marginBottom: 10,
   },
   versionText: {
@@ -154,30 +197,26 @@ const styles = StyleSheet.create({
   cardContainer: {
     backgroundColor: Color.sparklightWhite,
     borderRadius: 16,
-    padding: 32,
+    padding: wp('6%'),
     width: wp('90%'),
+    maxWidth: 400,
     alignItems: 'center',
-    shadowColor: 'green',
-    shadowOpacity: 0.9,
-    shadowRadius: 10,
-    elevation: 10,
+    // Adding subtle border for extra definition
+    borderWidth: 10,
+    borderColor: 'rgba(141, 59, 144, 0.5)',
   },
   gearIconsContainer: {
     flexDirection: 'row',
-    marginBottom: 24,
+    marginBottom: hp('2%'),
     alignItems: 'center',
-  },
-  gearIcon: {
-    fontSize: 32,
-    marginHorizontal: 4,
-    color: Color.colorMidnightblue, // This will be replaced with SVG
   },
   titleText: {
     fontFamily: FontFamily.openSansRegular,
-    fontSize: 32,
+    fontSize: wp('7%'),
+    maxFontSize: 32,
     color: Color.sparklightGray1,
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: hp('2%'),
     fontWeight: '400',
   },
   messageText: {
@@ -186,13 +225,13 @@ const styles = StyleSheet.create({
     color: '#707679',
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: 24,
+    marginBottom: hp('2%'),
   },
   estimatedTimeSection: {
     backgroundColor: Color.colorWhitesmoke_200,
-    padding: 16,
+    padding: wp('4%'),
     borderRadius: 8,
-    marginBottom: 20,
+    marginBottom: hp('2%'),
     width: '100%',
     alignItems: 'center',
   },
@@ -213,6 +252,12 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
+  contactMessageContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   contactMessage: {
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
@@ -220,8 +265,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '400',
   },
-  contactLinkContainer: {
-    display: 'inline',
+  contactLinkButton: {
+    // Remove inline display as it's not needed for TouchableOpacity
   },
   contactLink: {
     fontFamily: FontFamily.openSansRegular,
@@ -230,14 +275,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textDecorationLine: 'underline',
   },
+  copyrightContainer: {
+    paddingBottom: hp('2%'),
+    paddingHorizontal: wp('5%'),
+    alignItems: 'center',
+  },
   copyrightText: {
-    position: "absolute",
-    bottom: hp("3%"),
     fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     fontWeight: "400",
     color: '#FFFFFF',
-    alignSelf: "center",
+    textAlign: "center",
     opacity: 0.8,
   },
   // Enhanced features for blocking scenarios
