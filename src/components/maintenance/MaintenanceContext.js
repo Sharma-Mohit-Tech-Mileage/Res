@@ -446,6 +446,16 @@ export const MaintenanceProvider = ({ children }) => {
     
     // 🔧 Step 4: Maintenance is active - check individual features
     console.log('🔧 ✅ Maintenance window ACTIVE - checking individual features...');
+    if (bannerConfig && bannerConfig.enabled && (!pageConfig || !pageConfig.enabled) && blockingState.wasBlocked) {
+  console.log('🔧 Auto-clearing blocking state for banner mode');
+  setBlockingState({
+    isBlocking: false,
+    wasBlocked: false,
+    blockedAudience: null,
+    blockingConfig: null,
+    blockingTimestamp: null
+  });
+} 
     
     // ===== MAINTENANCE PAGE LOGIC (No Individual Time Checks) =====
     if (pageConfig && pageConfig.enabled) {
@@ -497,7 +507,7 @@ export const MaintenanceProvider = ({ children }) => {
     }
     
     // ===== BANNER LOGIC (No Individual Time Checks) =====
-    if (bannerConfig && bannerConfig.enabled && isUserLoggedIn && !blockingState.wasBlocked) {
+    if (bannerConfig && bannerConfig.enabled && isUserLoggedIn ) {
       const isAudienceValid = isAudienceMatch(bannerConfig.audience, currentUserAudience);
       
       console.log('🔧 🎌 Banner decision within active window:', {
@@ -565,27 +575,31 @@ export const MaintenanceProvider = ({ children }) => {
   const performLogout = async (isBlockingLogout = false) => {
     try {
       if (isBlockingLogout) {
-        console.log('🔧 🚪 === STARTING SILENT BLOCKING LOGOUT ===');
-        
-        // SILENT LOGOUT: Just clear local storage and Redux (no SSO browser logout)
-        console.log('🔧 🚪 🤫 Performing SILENT logout - no browser window');
-        await storeUser({});
-        await storeSsoToken({});
-        await cleanUserData();
-        dispatch(saveUserInfo({}));
-        
-        // Reset login state but PRESERVE blocking state
-        setIsUserLoggedIn(false);
-        setCurrentUserAudience(null);
-        
-        // 🔧 NEW: Update blocking state to reflect post-logout status
-        setBlockingState(prev => ({
-          ...prev,
-          isBlocking: false, // No longer actively blocking (logged out)
-          // Keep wasBlocked: true to maintain maintenance page
-        }));
-        
-        console.log('🔧 🚪 🤫 Silent logout completed - maintenance page should persist');
+      console.log('🔧 🚪 === STARTING ENHANCED SILENT LOGOUT ===');
+      
+      // 🔧 THOROUGH STORAGE CLEARING
+      await Promise.all([
+        storeUser({}),
+        storeUser(null),        // Double-clear to ensure removal
+        storeSsoToken({}),
+        storeSsoToken(null),    // Double-clear to ensure removal
+        cleanUserData()
+      ]);
+      
+      dispatch(saveUserInfo({}));
+      
+      // 🔧 WAIT FOR ASYNC OPERATIONS TO COMPLETE
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      // Reset states
+      setIsUserLoggedIn(false);
+      setCurrentUserAudience(null);
+      setBlockingState(prev => ({
+        ...prev,
+        isBlocking: false,
+      }));
+      
+      console.log('🔧 🚪 ✅ Enhanced silent logout completed');
         
       } else {
         // NORMAL LOGOUT: Keep existing browser-based logout for regular scenarios
