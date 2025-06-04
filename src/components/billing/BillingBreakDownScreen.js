@@ -257,7 +257,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
       //   setErrorCode("204");
       //   return;
       // }
-      if(user.userInfo.accountNumber=='8160440040062702'){
+      if(user?.userInfo?.accountNumber=='8160440040062702'){
         setErrorCode("404");
         return;
       }
@@ -271,7 +271,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
     }, [dispatch])
   );
   useEffect(() => {
-    //console.log("Error:123", errorCode.includ);
+    console.log("Error:123", errorCode);
     
     if(error && error.length > 0) {
       console.log("Error:123", error.includes("204"));
