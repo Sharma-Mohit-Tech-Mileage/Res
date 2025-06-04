@@ -30,6 +30,11 @@ const BillingScreen = ({ navigation }) => {
   const paperlessStatusAcp = useSelector(
     (state) => state.combinedReducers.profile?.paperlessStatusAcp
   );
+
+  const paperlessLoading = useSelector(
+        (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
+    );
+
   const { allSvEmailAssociated = [] } = profile;
   const paperlessEmails = allSvEmailAssociated.filter((email) => email.invoice);
   const [billAmt, setBillAmt] = useState(undefined);
@@ -241,7 +246,7 @@ const BillingScreen = ({ navigation }) => {
                   paperlessStatus={isNewBiller ? paperlessStatusAcp : paperlessEmails}
                   navigation={navigation}
                   style={styles.card}
-                  isStatusLoading={loadingPerless}
+                  isStatusLoading={paperlessLoading}
                 />
                 <View style={[AppStyles.card, styles.myModemSpaceBlock]}>
                   <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>
