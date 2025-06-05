@@ -575,28 +575,9 @@ export const MaintenanceProvider = ({ children }) => {
 // Key change: Reset navigation stack during blocking logout
 
 const performLogout = async (isBlockingLogout = false) => {
-  try {
-    if (isBlockingLogout) {
+    try {
+      if (isBlockingLogout) {
       console.log('🔧 🚪 === STARTING ENHANCED SILENT LOGOUT ===');
-      
-      // 🔧 CRITICAL FIX: Reset navigation stack FIRST
-      // This prevents the app from reverting to the previous screen
-      if (navigationRef.current) {
-        console.log('🔧 🚪 🔄 RESETTING NAVIGATION STACK for blocking logout');
-        navigationRef.current.reset({
-          index: 0,
-          routes: [{ 
-            name: 'Splash', 
-            params: { 
-              isLogout: true, 
-              fromBlocking: true 
-            } 
-          }],
-        });
-      }
-      
-      // Small delay to ensure navigation reset completes
-      await new Promise(resolve => setTimeout(resolve, 100));
       
       // 🔧 THOROUGH STORAGE CLEARING
       await Promise.all([
@@ -620,85 +601,33 @@ const performLogout = async (isBlockingLogout = false) => {
         isBlocking: false,
       }));
       
-      console.log('🔧 🚪 ✅ Enhanced silent logout completed with navigation reset');
+      console.log('🔧 🚪 ✅ Enhanced silent logout completed');
         
-    } else {
-      // NORMAL LOGOUT: Keep existing browser-based logout for regular scenarios
-      console.log('🔧 🚪 === STARTING NORMAL SESSION LOGOUT ===');
-      
-      const storedSsoToken = await getSsoToken();
-      console.log('🔧 🚪 SSO Token available:', !!storedSsoToken?.idToken);
-      
-      if (storedSsoToken && storedSsoToken.idToken) {
-        console.log('🔧 🚪 Performing SSO logout...');
-        await logout(config, {
-          idToken: storedSsoToken.idToken,
-          postLogoutRedirectUrl: config.redirectUrl,
-        });
-        console.log('🔧 🚪 SSO logout completed');
-      }
-      
-      console.log('🔧 🚪 Cleaning up storage and Redux...');
-      await storeUser({});
-      await storeSsoToken({});
-      await cleanUserData();
-      dispatch(saveUserInfo({}));
-      
-      // Reset all states for normal logout
-      setIsUserLoggedIn(false);
-      setCurrentUserAudience(null);
-      setShowBanner(false);
-      setShowMaintenancePage(false);
-      setBlockingState({
-        isBlocking: false,
-        wasBlocked: false,
-        blockedAudience: null,
-        blockingConfig: null,
-        blockingTimestamp: null
-      });
-      
-      // Navigate to splash screen for normal logout
-      if (navigationRef.current) {
-        console.log('🔧 🚪 Navigating to splash screen...');
-        navigationRef.current.reset({
-          index: 0,
-          routes: [{ name: 'Splash', params: { isLogout: true } }],
-        });
-      }
-    }
-    
-    console.log('🔧 🚪 ✅ Logout completed successfully');
-    
-  } catch (error) {
-    console.error('🔧 🚪 ❌ Error during logout:', error);
-    
-    // Fallback cleanup (always includes navigation reset for blocking logout)
-    try {
-      console.log('🔧 🚪 Attempting fallback cleanup...');
-      
-      // Reset navigation for blocking logout even in error case
-      if (isBlockingLogout && navigationRef.current) {
-        navigationRef.current.reset({
-          index: 0,
-          routes: [{ 
-            name: 'Splash', 
-            params: { 
-              isLogout: true, 
-              fromBlocking: true 
-            } 
-          }],
-        });
-      }
-      
-      await storeUser({});
-      await storeSsoToken({});
-      await cleanUserData();
-      dispatch(saveUserInfo({}));
-      
-      setIsUserLoggedIn(false);
-      setCurrentUserAudience(null);
-      
-      if (!isBlockingLogout) {
+      } else {
+        // NORMAL LOGOUT: Keep existing browser-based logout for regular scenarios
+        console.log('🔧 🚪 === STARTING NORMAL SESSION LOGOUT ===');
+        
+        const storedSsoToken = await getSsoToken();
+        console.log('🔧 🚪 SSO Token available:', !!storedSsoToken?.idToken);
+        
+        if (storedSsoToken && storedSsoToken.idToken) {
+          console.log('🔧 🚪 Performing SSO logout...');
+          await logout(config, {
+            idToken: storedSsoToken.idToken,
+            postLogoutRedirectUrl: config.redirectUrl,
+          });
+          console.log('🔧 🚪 SSO logout completed');
+        }
+        
+        console.log('🔧 🚪 Cleaning up storage and Redux...');
+        await storeUser({});
+        await storeSsoToken({});
+        await cleanUserData();
+        dispatch(saveUserInfo({}));
+        
+        // Reset all states for normal logout
+        setIsUserLoggedIn(false);
+        setCurrentUserAudience(null);
         setShowBanner(false);
         setShowMaintenancePage(false);
         setBlockingState({
@@ -709,19 +638,56 @@ const performLogout = async (isBlockingLogout = false) => {
           blockingTimestamp: null
         });
         
+        // Navigate to splash screen for normal logout
         if (navigationRef.current) {
+          console.log('🔧 🚪 Navigating to splash screen...');
           navigationRef.current.reset({
             index: 0,
             routes: [{ name: 'Splash', params: { isLogout: true } }],
           });
         }
       }
-      console.log('🔧 🚪 ✅ Fallback cleanup completed');
-    } catch (cleanupError) {
-      console.error('🔧 🚪 ❌ Fallback cleanup failed:', cleanupError);
+      
+      console.log('🔧 🚪 ✅ Logout completed successfully');
+      
+    } catch (error) {
+      console.error('🔧 🚪 ❌ Error during logout:', error);
+      
+      // Fallback cleanup (always silent for blocking logout)
+      try {
+        console.log('🔧 🚪 Attempting fallback cleanup...');
+        await storeUser({});
+        await storeSsoToken({});
+        await cleanUserData();
+        dispatch(saveUserInfo({}));
+        
+        setIsUserLoggedIn(false);
+        setCurrentUserAudience(null);
+        
+        if (!isBlockingLogout) {
+          setShowBanner(false);
+          setShowMaintenancePage(false);
+          setBlockingState({
+            isBlocking: false,
+            wasBlocked: false,
+            blockedAudience: null,
+            blockingConfig: null,
+            blockingTimestamp: null
+          });
+          
+          if (navigationRef.current) {
+            navigationRef.current.reset({
+              index: 0,
+              routes: [{ name: 'Splash', params: { isLogout: true } }],
+            });
+          }
+        }
+        console.log('🔧 🚪 ✅ Fallback cleanup completed');
+      } catch (cleanupError) {
+        console.error('🔧 🚪 ❌ Fallback cleanup failed:', cleanupError);
+      }
     }
-  }
-};
+  };
   
   return (
     <MaintenanceContext.Provider
