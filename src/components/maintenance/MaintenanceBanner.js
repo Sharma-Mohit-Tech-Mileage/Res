@@ -60,29 +60,40 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
               resizeMode="contain"
               tintColor={severityStyles.iconTint}
               source={require("../../../assets/info-circle.png")}
+              accessibilityLabel={`${severity} icon`}
             />
-            <Text style={[styles.alertTitle, severityStyles.titleStyle]}>{title}</Text>
+            <Text 
+              style={[styles.alertTitle, severityStyles.titleStyle]}
+              accessible={true}
+              accessibilityRole="header"
+              accessibilityLabel={title}
+            >
+              {title}
+            </Text>
           </View>
           
           <Text style={styles.alertMessage}>{message}</Text>
           
           {link && (
             <TouchableOpacity onPress={handleLinkPress} accessibilityRole="link">
-              <Text style={[styles.actionText, { marginLeft: 20 }]}>{linkText}</Text>
+              <Text style={[styles.actionText, { marginLeft: 20, textDecorationLine: 'underline' }]}>{linkText}</Text>
             </TouchableOpacity>
           )}
           
           {showPhoneNumber && (
-            <Text style={styles.alertMessage}>
-              Need help? Call{' '}
-              <Text 
-                style={styles.actionText}
-                onPress={handlePhonePress}
-                accessibilityRole="link"
-              >
-                {phoneNumber}
+            <TouchableOpacity 
+              onPress={handlePhonePress}
+              accessibilityRole="link"
+              accessibilityLabel={`Need help? Call ${phoneNumber}`}
+              accessibilityHint="Double tap to call this phone number"
+            >
+              <Text style={styles.alertMessage}>
+                Need help? Call{' '}
+                <Text style={styles.actionText}>
+                  {phoneNumber}
+                </Text>
               </Text>
-            </Text>
+            </TouchableOpacity>
           )}
         </View>
         
@@ -90,8 +101,10 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
           <TouchableOpacity
             style={styles.closeButtonContainer}
             onPress={onDismiss}
-            accessibilityLabel="Dismiss message"
+            accessibilityLabel="Dismiss maintenance banner"
             accessibilityRole="button"
+            accessibilityHint="Double tap to close this message"
+            accessible={true}
           >
             <CloseIcon />
           </TouchableOpacity>

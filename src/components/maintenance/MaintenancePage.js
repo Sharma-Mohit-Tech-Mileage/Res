@@ -78,7 +78,8 @@ const MaintenancePage = ({
         </View>
         
         {/* Maintenance Message Card */}
-        <View style={styles.cardContainer}>
+        <View style={styles.cardOuterContainer}>
+          <View style={styles.cardContainer}>
           {/* Gear Icons - Replace this section with your SVG component */}
           <View 
             style={styles.gearIconsContainer}
@@ -154,6 +155,7 @@ const MaintenancePage = ({
           )}
         </View>
       </View>
+      </View>
       
       <View style={styles.copyrightContainer}>
         <Text style={styles.copyrightText}>
@@ -194,16 +196,28 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     opacity: 0.8,
   },
-  cardContainer: {
-    backgroundColor: Color.sparklightWhite,
-    borderRadius: 16,
-    padding: wp('6%'),
+  cardOuterContainer: {
+    // Outer container with border (keeping your original border)
+    borderRadius: 20,
+    borderWidth: 10,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
     width: wp('90%'),
     maxWidth: 400,
+  },
+  cardContainer: {
+    backgroundColor: Color.sparklightWhite,
+    borderRadius: 10,
+    padding: wp('6%'),
     alignItems: 'center',
-    // Adding subtle border for extra definition
-    borderWidth: 10,
-    borderColor: 'rgba(141, 59, 144, 0.5)',
+    // Shadow on inner container (this is what worked!)
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 12,
   },
   gearIconsContainer: {
     flexDirection: 'row',
@@ -223,7 +237,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
     color: '#707679',
-    textAlign: 'center',
+    textAlign: 'left',
     lineHeight: 24,
     marginBottom: hp('2%'),
   },
