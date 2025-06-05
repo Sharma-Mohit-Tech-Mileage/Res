@@ -11,7 +11,7 @@ function* fetchBillingBreakdownSaga() {
 
     // Dispatch success action with data
     if(breakdownData?.data.statusCode==404){
-      yield put(actions.fetchBillingBreakdownFailure('No billing breakdown data available '+breakdownData.statusCode));
+      yield put(actions.fetchBillingBreakdownFailure('No billing breakdown data available '+breakdownData.data.statusCode));
 
     }else{
     if(breakdownData.status==200){

@@ -235,6 +235,8 @@ const BillingBreakDownScreen = ({ navigation }) => {
 
   // Calculate total due whenever billing data changes
   useEffect(() => {
+
+    console.log("Billing Data:", billingData);
     if (!billingData?.length) return;
     
     // Reset total first
