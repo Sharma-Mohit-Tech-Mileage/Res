@@ -18,7 +18,7 @@ import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import RenderText from "../common/RenderText";
 import moment from "moment";
 import LoginLogger from "../../components/utility/LoginLogger";
-
+import analytics from '@react-native-firebase/analytics';
 const config = {
   issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
@@ -130,72 +130,93 @@ const SplashScreen = ({ navigation, route }) => {
     }
   };
 
-  const moveAfterLogin = (user) => {
-    storeUser(user);
-    dispatch(saveUserInfo(user));
-    if (user.userInfo.mobileTCAcceptanceFlag) {
-      navigation.reset({ index: 0, routes: [{ name: "MyTab" }], });
-    } else {
-      navigation.reset({ index: 0, routes: [{ name: "Terms" }], });
+ const moveAfterLogin = async (user) => {
+  storeUser(user);
+  dispatch(saveUserInfo(user));
+  try {
+    if (user.userInfo && user.userInfo.userName) {
+      await analytics().setUserId(user.userInfo.userName.toString());
+      console.log('Analytics User ID set:', user.userInfo.userName);
     }
-  };
+  } catch (error) {
+    console.error('Error setting analytics user ID:', error);
+  }
+  // END ANALYTICS BLOCK
+  
+  if (user.userInfo.mobileTCAcceptanceFlag) {
+    navigation.reset({ index: 0, routes: [{ name: "MyTab" }], });
+  } else {
+    navigation.reset({ index: 0, routes: [{ name: "Terms" }], });
+  }
+};
 
-  const logoutAction = (postLogoutCallback) => {
-    getSsoToken()
-      .then((res) => {
-        const token = res.idToken;
-        
-        getUser().then(user => {
-          if (user && user.userInfo) {
-            LoginLogger.logLogout(dispatch, logInfo, user.userInfo);
-          }
-          
-          logout(config, {
-            idToken: token,
-            postLogoutRedirectUrl: config.redirectUrl,
-          })
-            .then(() => {
-              storeUser({});
-              storeSsoToken({});
-              saveUserInfo({});
-              cleanUserData();
-              if (postLogoutCallback) {
-                postLogoutCallback();
-              }
-            })
-            .catch((error) => {
-              if (postLogoutCallback) {
-                postLogoutCallback();
-              }
-            });
-        }).catch(() => {
-          // If we can't get user info, still proceed with logout
-          logout(config, {
-            idToken: token,
-            postLogoutRedirectUrl: config.redirectUrl,
-          })
-            .then(() => {
-              storeUser({});
-              storeSsoToken({});
-              saveUserInfo({});
-              cleanUserData();
-              if (postLogoutCallback) {
-                postLogoutCallback();
-              }
-            })
-            .catch((error) => {
-              if (postLogoutCallback) {
-                postLogoutCallback();
-              }
-            });
-        });
-      })
-      .catch((error) => {
-        if (postLogoutCallback) {
-          postLogoutCallback();
+const logoutAction = (postLogoutCallback) => {
+  getSsoToken()
+    .then((res) => {
+      const token = res.idToken;
+      
+      getUser().then(user => {
+        if (user && user.userInfo) {
+          LoginLogger.logLogout(dispatch, logInfo, user.userInfo);
         }
+        
+        logout(config, {
+          idToken: token,
+          postLogoutRedirectUrl: config.redirectUrl,
+        })
+          .then(() => {
+            try {
+              analytics().setUserId(null);
+              console.log('Analytics User ID cleared on logout');
+            } catch (error) {
+              console.error('Error clearing analytics user ID:', error);
+            }
+            storeUser({});
+            storeSsoToken({});
+            saveUserInfo({});
+            cleanUserData();
+            if (postLogoutCallback) {
+              postLogoutCallback();
+            }
+          })
+          .catch((error) => {
+            if (postLogoutCallback) {
+              postLogoutCallback();
+            }
+          });
+      }).catch(() => {
+        logout(config, {
+          idToken: token,
+          postLogoutRedirectUrl: config.redirectUrl,
+        })
+          .then(() => {
+            try {
+              analytics().setUserId(null);
+              console.log('Analytics User ID cleared on logout');
+            } catch (error) {
+              console.error('Error clearing analytics user ID:', error);
+            }
+            storeUser({});
+            storeSsoToken({});
+            saveUserInfo({});
+            cleanUserData();
+            if (postLogoutCallback) {
+              postLogoutCallback();
+            }
+          })
+          .catch((error) => {
+            if (postLogoutCallback) {
+              postLogoutCallback();
+            }
+          });
       });
-  };
+    })
+    .catch((error) => {
+      if (postLogoutCallback) {
+        postLogoutCallback();
+      }
+    });
+};
   
   const onError = (error) => {
     setLoading(false);
@@ -315,13 +336,11 @@ const SplashScreen = ({ navigation, route }) => {
       try {
         const user = await getUser();
         if (user?.refreshToken != null) {
-          // Log refresh token attempt
           setLoginAttemptInfo({
             attemptTimestamp: new Date().toISOString(),
             authMethod: "refresh",
             accountNumber: user.userInfo?.accountNumber
           });
-          
           const result = await refresh(config, {
             refreshToken: user.refreshToken,
           });

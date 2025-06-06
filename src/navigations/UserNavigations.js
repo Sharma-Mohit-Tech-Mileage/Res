@@ -11,6 +11,7 @@ import TextNotifications from '../components/entry/TextNotifications';
 import Terms from '../components/entry/Terms';
 import MyTabs from "./MyTab";
 import { AxiosInterceptorProvider } from '../network/RestApiClient';
+import MaintenanceWrapper from '../components/maintenance/MaintenanceWrapper';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,7 +27,7 @@ const UserNavigations = (props) => {
 
   const onStateChange = async () => {
     const previousRouteName = routeNameRef.current;
-    const currentRouteName = navigationRef.current.getCurrentRoute().name;
+    const currentRouteName = navigationRef.current.getCurrentRoute()?.name;
 
     if (previousRouteName !== currentRouteName && currentRouteName && currentRouteName.trim() !== "") {
       try {
@@ -69,16 +70,17 @@ const UserNavigations = (props) => {
   return (
     <NavigationContainer ref={navigationRef} onReady={onReady} onStateChange={onStateChange}>
       <AxiosInterceptorProvider>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="Splash"
-            component={SplashScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="EntryEmailNotifications"
-            component={EmailNotifications}
-            options={{ headerShown: false }}
+        <MaintenanceWrapper>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="Splash"
+              component={SplashScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="EntryEmailNotifications"
+              component={EmailNotifications}
+              options={{ headerShown: false }}
           />
           <Stack.Screen
             name="EntryPushNotifications"
@@ -110,9 +112,10 @@ const UserNavigations = (props) => {
             }}
           />
         </Stack.Navigator>
-      </AxiosInterceptorProvider>
-    </NavigationContainer>
-  );
-};
+      </MaintenanceWrapper>
+    </AxiosInterceptorProvider>
+  </NavigationContainer>
+);
+}
 
 export default UserNavigations;

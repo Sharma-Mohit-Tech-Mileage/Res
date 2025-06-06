@@ -24,10 +24,12 @@ import { checkForMinorUpdate } from "../utility/constant";
 import PromotionCard from "../common/PromotionCard/PromotionCard";
 import { useFocusEffect } from "@react-navigation/native";
 import WalkthroughOverlay from "../common/WalkthroughOverlay";
-
+import { useMaintenance } from '../maintenance/MaintenanceContext';
+import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
 const HomeScreen = ({ navigation }) => {
+  const { showBanner, bannerConfig, dismissBanner, isUserLoggedIn, currentUserAudience } = useMaintenance();
   const [isInternetDetails, setIsInternetDetails] = useState(false);
   const user = useSelector((state) => state.combinedReducers.user.userData);
   const home = useSelector((state) => state.combinedReducers.home);
@@ -52,7 +54,7 @@ const HomeScreen = ({ navigation }) => {
   const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
   const [hasEeroDevice, setHasEeroDevice] = useState(false);
   const [networkId, setNetworkId] = useState(null);
-
+ 
   useEffect(() => {
     async function getAccessibility() {
       try {
@@ -154,7 +156,6 @@ const HomeScreen = ({ navigation }) => {
       GetApiRequest(
         request,
         (response) => {
-          console.log("checkModemOutagStatus", response);
           if (response != undefined) {
             if (response.hasOutage === true) {
               let time = moment(response.estimatedTimeOfResolution).format(
@@ -172,7 +173,6 @@ const HomeScreen = ({ navigation }) => {
           }
         },
         (errorCode) => {
-          console.log("checkModemOutagStatus erro", errorCode);
           if (errorCode == 204) {
             setInternetHealths((oldArray) => [...oldArray, "Green"]);
           }
@@ -182,7 +182,6 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const onSuccessPlan = (res) => {
-    console.log("getInternetPlanDetails", res);
     if (res) {
       setPlans(res);
       if (res.length > 0) {
@@ -222,7 +221,6 @@ const HomeScreen = ({ navigation }) => {
           }
 
           let temt = [];
-          console.log("checkModemDetails==", res);
           if (res.equipmentType == "DOCSIS") {
             temt.push(res.uTxP_State);
             temt.push(res.uRxL_State);
@@ -695,6 +693,20 @@ const HomeScreen = ({ navigation }) => {
             ) : (
               <></>
             )}
+
+            {showBanner && bannerConfig ? (
+              <MaintenanceBanner
+                title={bannerConfig.title}
+                message={bannerConfig.message}
+                link={bannerConfig.link}
+                linkText={bannerConfig.linkText}
+                showPhoneNumber={bannerConfig.showPhoneNumber}
+                phoneNumber={bannerConfig.phoneNumber}
+                onDismiss={bannerConfig.dismissible ? dismissBanner : undefined}
+                severity={bannerConfig.severity || 'info'}
+              />
+            ) : null}
+           
             <View style={[styles.card, styles.shadowProp, { marginTop: screenReaderEnabled ? 0 : -40 }]}>
               <Text
                 accessible={true}
