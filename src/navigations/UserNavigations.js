@@ -68,9 +68,9 @@ const UserNavigations = (props) => {
   }, []);
 
   return (
+     <MaintenanceWrapper>
     <NavigationContainer ref={navigationRef} onReady={onReady} onStateChange={onStateChange}>
       <AxiosInterceptorProvider>
-        <MaintenanceWrapper>
           <Stack.Navigator>
             <Stack.Screen
               name="Splash"
@@ -112,9 +112,10 @@ const UserNavigations = (props) => {
             }}
           />
         </Stack.Navigator>
-      </MaintenanceWrapper>
+     
     </AxiosInterceptorProvider>
   </NavigationContainer>
+   </MaintenanceWrapper>
 );
 }
 
