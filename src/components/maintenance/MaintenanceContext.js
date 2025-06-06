@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import remoteConfig from '@react-native-firebase/remote-config';
-import { AppState } from 'react-native';
+import { Alert, AppState } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { saveUserInfo } from '../../redux/actions/UserAction';
 import { storeUser, storeSsoToken, cleanUserData, getSsoToken, getUser } from '../../redux/utils/LocalStorage';
@@ -637,19 +637,15 @@ const performLogout = async (isBlockingLogout = false) => {
           blockingConfig: null,
           blockingTimestamp: null
         });
-        
-        // Navigate to splash screen for normal logout
-        if (navigationRef.current) {
-          console.log('🔧 🚪 Navigating to splash screen...');
-          navigationRef.current.reset({
-            index: 0,
-            routes: [{ name: 'Splash', params: { isLogout: true } }],
-          });
-        }
       }
-      
-      console.log('🔧 🚪 ✅ Logout completed successfully');
-      
+
+      if (navigationRef.current) {
+        console.log('🔧 🚪 Navigating to splash screen...');
+        navigationRef.current.reset({
+          index: 0,
+          routes: [{ name: 'Splash', params: { isLogout: true } }],
+        });
+      }
     } catch (error) {
       console.error('🔧 🚪 ❌ Error during logout:', error);
       
