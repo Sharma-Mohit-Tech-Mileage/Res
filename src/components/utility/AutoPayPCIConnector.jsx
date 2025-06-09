@@ -11,6 +11,7 @@ import { GetApiRequest } from '../../network/APIClient';
 import { navigationRef } from '../../navigations/UserNavigations';
 import analytics from '@react-native-firebase/analytics';
 import { getPaymentUrl, getReferralUrl } from './PaymentUrlUtils';
+import MaintenanceAlert from './MaintenanceAlert';
 
 const { height, width } = Dimensions.get('window');
 
@@ -24,6 +25,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const [status, setStatus] = useState(route.params?.status || false);
     const [name, setTitle] = useState(route.params?.name);
     const [navStateReloading, setNavStateReloading] = useState(false);
+    const [ isServiceDown, setIsServiceDown ] = useState(false);
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
     const [html, setHtml] = useState('');
@@ -183,6 +185,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     },
                     (error) => {
                         console.error("Error fetching payment details:", error);
+                        if(error.includes('503')) {
+                            setIsServiceDown(true);
+                        }
                         resolve(null); // Resolve with null on error to handle in next step
                     }
                 );
@@ -393,6 +398,7 @@ const navigationChange = async (navState) => {
     // Handler for WebView messages
     const onMessage = (event) => {
         try {
+             console.log("WebView message received:", event.nativeEvent.data);
             const data = JSON.parse(event.nativeEvent.data);
             console.log("WebView message received:", data);
         } catch (error) {
@@ -409,52 +415,60 @@ const navigationChange = async (navState) => {
                 </View>
             )}
             {html ? (
-                <WebView
-                    ref={webViewRef}
-                    source={{ html }}
-                    onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
-                    onLoadStart={() => {
-                        console.log("WebView started loading");
-                        setIsWebViewLoaded(false);
-                    }}
-                    onLoadEnd={() => {
-                        console.log("WebView finished loading");
-                        setProgress(1);
-                        setIsWebViewLoaded(true);
-                        setTimeout(() => setDynamicCookie(), 500);
-                    }}
-                    onMessage={onMessage}
-                    sharedCookiesEnabled={true}
-                    injectedJavaScriptBeforeContentLoaded={initScript}
-                    onNavigationStateChange={navigationChange}
-                    originWhitelist={['*']}
-                    incognito={false} // Changed to false to allow cookies
-                    javaScriptEnabled={true}
-                    domStorageEnabled={true}
-                    thirdPartyCookiesEnabled={true}
-                    scalesPageToFit={true}
-                    allowsInlineMediaPlayback={true}
-                    mediaPlaybackRequiresUserAction={false}
-                    mixedContentMode="compatibility"
-                    cacheEnabled={false}
-                    androidHardwareAccelerationDisabled={Platform.OS === 'android'}
-                    onShouldStartLoadWithRequest={(request) => {
-                        console.log("Load request:", request.url);
-                        return true;
-                    }}
-                    style={styles.webView}
-                    onError={(syntheticEvent) => {
-                        const { nativeEvent } = syntheticEvent;
-                        console.error('WebView error: ', nativeEvent);
-                    }}
-                    onHttpError={(syntheticEvent) => {
-                        const { nativeEvent } = syntheticEvent;
-                        console.error('WebView HTTP error: ', nativeEvent);
-                        // if (!navStateReloading && nativeEvent.statusCode >= 400) {
-                        //     navigation.navigate('Dashboard');
-                        // }
-                    }}
-                />
+
+                isServiceDown ? (
+                    <View style={{ flex: 1, backgroundColor:'#ebeef1' }}> 
+                        <MaintenanceAlert/>
+                    </View>
+                ) : (
+                    <WebView
+                        ref={webViewRef}
+                        source={{ html }}
+                        onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
+                        onLoadStart={() => {
+                            console.log("WebView started loading");
+                            setIsWebViewLoaded(false);
+                        }}
+                        onLoadEnd={() => {
+                            console.log("WebView finished loading");
+                            setProgress(1);
+                            setIsWebViewLoaded(true);
+                            setTimeout(() => setDynamicCookie(), 500);
+                        }}
+                        onMessage={onMessage}
+                        sharedCookiesEnabled={true}
+                        injectedJavaScriptBeforeContentLoaded={initScript}
+                        onNavigationStateChange={navigationChange}
+                        originWhitelist={['*']}
+                        incognito={false}
+                        javaScriptEnabled={true}
+                        domStorageEnabled={true}
+                        thirdPartyCookiesEnabled={true}
+                        scalesPageToFit={true}
+                        allowsInlineMediaPlayback={true}
+                        mediaPlaybackRequiresUserAction={false}
+                        mixedContentMode="compatibility"
+                        cacheEnabled={false}
+                        androidHardwareAccelerationDisabled={Platform.OS === 'android'}
+                        onShouldStartLoadWithRequest={(request) => {
+                            console.log("Load request:", request.url);
+                            return true;
+                        }}
+                        style={styles.webView}
+                        onError={(syntheticEvent) => {
+                            const { nativeEvent } = syntheticEvent;
+                            console.error('WebView error: ', nativeEvent);
+                        }}
+                        onHttpError={(syntheticEvent) => {
+                            const { nativeEvent } = syntheticEvent;
+                            console.error('WebView HTTP error: ', nativeEvent);
+                            if (nativeEvent.statusCode === 503) {
+                                setIsServiceDown(true);
+                            }
+                        }}
+                    />
+                )
+                
             ) : (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="rgba(141, 59, 144, 1)" />
