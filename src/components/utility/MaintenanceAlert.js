@@ -15,38 +15,14 @@ const MaintenanceAlert = ({
   buttonText = "OK",
 }) => {
   return (
-    <View style={{ flexDirection: "column", margin: 8 }}>
+    <View style={{ flexDirection: "column",  }}>
       <View style={[AppStyles.card, { margin: 16 }]}>
-        <View style={styles.errorContainer}>
+        <View style={{ flexDirection: "column", alignItems: "center", padding: 16 }}>
           <MaintenaceIcon color="red" size={24} style={{ marginBottom: 8 }} />
           <Text style={styles.errorTxt}>
             {message}
           </Text>
         </View>
-      </View>
-      <Pressable
-        style={({ pressed }) => [
-          { backgroundColor: Color.colorMidnightblue },
-          styles.buttonsLayout,
-          { opacity: pressed ? 0.7 : 1 },
-        ]}
-        onPress={() => {     
-          navigation.goBack();
-        }}
-        accessibilityRole="button"
-        accessibilityLabel="Return to previous screen"
-      >
-        <Text style={[styles.makePayment, styles.makeTypo]}>
-          {buttonText}
-        </Text>
-      </Pressable>
-      <View style={styles.buttonsParent}>
-        <SecondaryButton
-          title="Cancel"
-          onPress={() => navigation.goBack()}
-          accessibilityLabel="Cancel"
-          accessibilityHint="Double tap to return to the previous screen"
-        />
       </View>
     </View>
   );

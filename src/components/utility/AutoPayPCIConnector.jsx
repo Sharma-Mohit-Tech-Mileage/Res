@@ -417,7 +417,7 @@ const navigationChange = async (navState) => {
             {html ? (
 
                 isServiceDown ? (
-                    <View >
+                    <View style={{ flex: 1, backgroundColor:'#ebeef1' }}> 
                         <MaintenanceAlert/>
                     </View>
                 ) : (
