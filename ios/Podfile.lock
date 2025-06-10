@@ -1,9 +1,9 @@
 PODS:
-  - AppAuth (1.7.6):
-    - AppAuth/Core (= 1.7.6)
-    - AppAuth/ExternalUserAgent (= 1.7.6)
-  - AppAuth/Core (1.7.6)
-  - AppAuth/ExternalUserAgent (1.7.6):
+  - AppAuth (2.0.0):
+    - AppAuth/Core (= 2.0.0)
+    - AppAuth/ExternalUserAgent (= 2.0.0)
+  - AppAuth/Core (2.0.0)
+  - AppAuth/ExternalUserAgent (2.0.0):
     - AppAuth/Core
   - BEMCheckBox (1.4.1)
   - boost (1.84.0)
@@ -158,17 +158,17 @@ PODS:
   - hermes-engine (0.75.4):
     - hermes-engine/Pre-built (= 0.75.4)
   - hermes-engine/Pre-built (0.75.4)
-  - libwebp (1.3.2):
-    - libwebp/demux (= 1.3.2)
-    - libwebp/mux (= 1.3.2)
-    - libwebp/sharpyuv (= 1.3.2)
-    - libwebp/webp (= 1.3.2)
-  - libwebp/demux (1.3.2):
+  - libwebp (1.5.0):
+    - libwebp/demux (= 1.5.0)
+    - libwebp/mux (= 1.5.0)
+    - libwebp/sharpyuv (= 1.5.0)
+    - libwebp/webp (= 1.5.0)
+  - libwebp/demux (1.5.0):
     - libwebp/webp
-  - libwebp/mux (1.3.2):
+  - libwebp/mux (1.5.0):
     - libwebp/demux
-  - libwebp/sharpyuv (1.3.2)
-  - libwebp/webp (1.3.2):
+  - libwebp/sharpyuv (1.5.0)
+  - libwebp/webp (1.5.0):
     - libwebp/sharpyuv
   - nanopb (2.30910.0):
     - nanopb/decode (= 2.30910.0)
@@ -1890,15 +1890,15 @@ PODS:
   - SocketRocket (0.7.0)
   - Yoga (0.0.0)
   - ZendeskChatProvidersSDK (5.0.5)
-  - ZendeskChatSDK (5.0.5):
+  - ZendeskChatSDK (5.0.6):
     - ZendeskChatProvidersSDK (~> 5.0.5)
-    - ZendeskMessagingSDK (~> 6.0.3)
-  - ZendeskCommonUISDK (9.0.3)
+    - ZendeskMessagingSDK (~> 6.1.0)
+  - ZendeskCommonUISDK (9.1.0)
   - ZendeskCoreSDK (5.0.5)
   - ZendeskMessagingAPISDK (6.0.2):
     - ZendeskSDKConfigurationsSDK (~> 4.0.1)
-  - ZendeskMessagingSDK (6.0.3):
-    - ZendeskCommonUISDK (~> 9.0.3)
+  - ZendeskMessagingSDK (6.1.0):
+    - ZendeskCommonUISDK (~> 9.1.0)
     - ZendeskMessagingAPISDK (~> 6.0.2)
   - ZendeskSDKConfigurationsSDK (4.0.1)
 
@@ -2239,7 +2239,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
+  AppAuth: 1c1a8afa7e12f2ec3a294d9882dfa5ab7d3cb063
   BEMCheckBox: 5ba6e37ade3d3657b36caecc35c8b75c6c2b1a4e
   boost: 4cb898d0bf20404aab1850c656dcea009429d6c1
   BVLinearGradient: 880f91a7854faff2df62518f0281afb1c60d49a3
@@ -2261,7 +2261,7 @@ SPEC CHECKSUMS:
   GoogleDataTransport: 6c09b596d841063d76d4288cc2d2f42cc36e1e2a
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
   hermes-engine: ea92f60f37dba025e293cbe4b4a548fd26b610a0
-  libwebp: 1786c9f4ff8a279e4dac1e8f385004d5fc253009
+  libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
   nanopb: 438bc412db1928dac798aa6fd75726007be04262
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   PromisesSwift: 9d77319bbe72ebf6d872900551f7eeba9bce2851
@@ -2359,11 +2359,11 @@ SPEC CHECKSUMS:
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
   Yoga: a9ef4f5c2cd79ad812110525ef61048be6a582a4
   ZendeskChatProvidersSDK: 5cfc4a3dee03317ba54920e3258edda52ff9a329
-  ZendeskChatSDK: 8e0041101a89c8fed51dadb14697bbb4bb4700fd
-  ZendeskCommonUISDK: f3ce3e7a1bd7762550a78dbaff57509f3112c22b
+  ZendeskChatSDK: ed0424221923aa0b82397fec8b4306fab6645942
+  ZendeskCommonUISDK: 1ad4f0051a999a5e56f09f789f916afe15e00419
   ZendeskCoreSDK: c542b3f82abc3ee52e1291c6fb3436515e098806
   ZendeskMessagingAPISDK: 5b3a9d16f2f4d8b3c07b4ca0451a7cf9bfd8107d
-  ZendeskMessagingSDK: 3915f0647246f079dd20bf2fd85084f495598fde
+  ZendeskMessagingSDK: 62eb7832104fbabcb4c2421a75823460f1ff1536
   ZendeskSDKConfigurationsSDK: d0b28eeb9c3d88191cfd2c7f246b2522c8c357f4
 
 PODFILE CHECKSUM: 0bafe83ecb406b2688604485f66f99bcf7b36034

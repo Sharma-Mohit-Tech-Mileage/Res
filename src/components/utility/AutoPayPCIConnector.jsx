@@ -408,8 +408,9 @@ const navigationChange = async (navState) => {
     
     return (
         <View style={styles.container}>
-            <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); }} title={name} />
-            {progress < 1 && (
+            <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); }} title={isServiceDown?'Scheduled Maintenance':name} />
+            {(!isServiceDown && progress < 1) && (
+                
                 <View style={styles.progressBar}>
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
                 </View>
