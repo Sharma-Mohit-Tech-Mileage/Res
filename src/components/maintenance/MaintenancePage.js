@@ -2,11 +2,15 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, Linking, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { Color, FontFamily, FontSize, Padding, Border } from '../../../GlobalStyles';
+//import { Color, FontFamily, FontSize, Padding, Border } from '../../../GlobalStyles';
 import moment from 'moment';
 import { navigationRef } from '../../navigations/UserNavigations';
 import Icon from "../common/Icon";
 import VersionCheck from 'react-native-version-check';
+//import { color } from 'native-base/lib/typescript/theme/styled-system';
+import { Color, Padding, Border, FontFamily, FontSize,color } from "../../../GlobalStyles";
+import colors from "../../res/Colors";
+
 
 const MaintenancePage = ({
   title = "We'll Be Back Soon",
@@ -54,7 +58,7 @@ const MaintenancePage = ({
     <LinearGradient
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+      colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
       <View style={styles.contentContainer}>
@@ -69,7 +73,7 @@ const MaintenancePage = ({
             accessible={true}
           />
           <Text 
-            style={styles.versionText}
+            style={{ color: "white", alignSelf: "center", marginTop: 0.8, fontSize: 16, }} 
             accessibilityLabel={`Version ${VersionCheck.getCurrentVersion()}`}
             accessible={true}
           >
@@ -158,7 +162,7 @@ const MaintenancePage = ({
       </View>
       
       <View style={styles.copyrightContainer}>
-        <Text style={styles.copyrightText}>
+       <Text style={[{position:"absolute",bottom:hp("5%"),FontFamily:FontFamily.openSansRegular,fontSize:14,fontWeight:"400",color:colors.snow_white,alignSelf:"center"}]}>
           {`Copyright © ${moment().year()}, Sparklight ®, All Rights Reserved.`}
         </Text>
       </View>
@@ -290,7 +294,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   copyrightContainer: {
-    paddingBottom: hp('2%'),
+    paddingBottom: hp('5%'),
     paddingHorizontal: wp('5%'),
     alignItems: 'center',
   },

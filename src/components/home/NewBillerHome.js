@@ -191,7 +191,7 @@ const paperlessStatusAcp = useSelector( (state) => state.combinedReducers.profil
     <LinearGradient
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+      colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
       {showWalkThrough && <View style={styles.shadowFullScreen} />}
