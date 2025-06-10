@@ -17,11 +17,13 @@ const MaintenanceAlert = ({
   return (
     <View style={{ flexDirection: "column",  }}>
       <View style={[AppStyles.card, { margin: 16 }]}>
-        <View style={{ flexDirection: "column", alignItems: "center", padding: 16 }}>
+        <View style={{ flexDirection: "column", alignItems: "center", marginVertical: 36,marginHorizontal:24 ,borderColor:'#E1E1E1',borderWidth:1}}>
+          <View style={{ flexDirection: "column", alignItems: "center", padding: 16 }}>
           <MaintenaceIcon color="red" size={24} style={{ marginBottom: 8 }} />
           <Text style={styles.errorTxt}>
             {message}
           </Text>
+          </View>
         </View>
       </View>
     </View>
