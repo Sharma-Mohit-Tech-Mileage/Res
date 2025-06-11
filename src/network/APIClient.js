@@ -22,8 +22,6 @@ export const isUserAuthorized = (authorize) => {
 const handleFetchResponse = async (response, url, onSuccess, onError) => {
     try {
         const rawResponse = await response.text(); // Read response as plain text
-        console.log("Request URL:", url); // Log the full URL being accessed
-        console.log("Raw Response:", response.status); // Log the raw response
 
         if (response.status === 204 || !rawResponse) {
             onSuccess({ message: 'No content', code: response.status }); // Pass a success message for no content
@@ -39,7 +37,6 @@ const handleFetchResponse = async (response, url, onSuccess, onError) => {
                 onError(`Response status ${response.status} (${response.statusText}): ${json.message}`);
             }
         } catch (jsonParseError) {
-            console.error('JSON Parse error:', jsonParseError);
             onError(`Failed to parse response: ${jsonParseError.message}, code: ${response.status}`);
         }
     } catch (error) {
@@ -51,10 +48,8 @@ const handleFetchResponse = async (response, url, onSuccess, onError) => {
 const processQueue = (error, token = null) => {
     failedQueue.forEach(({ resolve, reject }, index) => {
         if (error) {
-            console.error(`Queue item ${index} failed with error:`, error.message);
             reject(error);
         } else {
-            console.log(`Queue item ${index} retrying with new token.`);
             resolve(token);
         }
     });
@@ -64,10 +59,9 @@ const processQueue = (error, token = null) => {
 // Function to handle API calls with token refresh logic
 const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess, onError) => {
     try {
-        console.log('Attempting API call:', endpoint);
+        
         let response = await fetchFunction(endpoint, options);
         if (response.status === 401) {
-            console.log('401 Unauthorized, queuing request and refreshing token...');
             return new Promise((resolve, reject) => {
                 failedQueue.push({ resolve, reject });
             if (!isRefreshing) {
@@ -77,11 +71,9 @@ const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess
                         .then(async () => {
                     const user = await getUser();
                     options.headers['Authorization'] = `Bearer ${user.token}`;
-                    console.log('Token refreshed successfully');
                     processQueue(null, user.token);
                         })
                         .catch((refreshError) => {
-                    console.error('Token refresh failed:', refreshError);
                     processQueue(refreshError, null);
                     if (navigationRef.current) {
                         navigationRef.current.navigate('Splash');
@@ -94,13 +86,11 @@ const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess
 
             }).then((token) => {
                 options.headers['Authorization'] = `Bearer ${token}`;
-                console.log('Retrying request with new token for:', endpoint);
                 return fetchFunction(endpoint, options);
             });
         }
         return response;
     } catch (error) {
-        console.error('API call failed:', error.message);
         onError(error.message);
     }
 };
@@ -128,7 +118,6 @@ export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => 
       if (refreshToken) {
         responseData.refreshToken = refreshToken;
       }
-      console.debug(`API call to ${endpoint} successful`);
       onSuccess(responseData);
     } catch (err) {
       const errorResponse = {
@@ -138,13 +127,6 @@ export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => 
         endpoint,
         timestamp: new Date().toISOString()
       };
-
-      console.error('PostAuthApiRequest error:', {
-        err,
-        endpoint,
-        status: errorResponse.status,
-        message: errorResponse.message
-      });
       onError(errorResponse);
     }
   };
@@ -185,11 +167,9 @@ export const UploadMultipartData = async (endpoint, data, onSuccess, onError) =>
 
     const fetchFunction = (url, opts) => axios.post(url, opts.data, { headers: opts.headers });
 
-    console.log('UploadMultipartData:', `${baseUrl}${endpoint}`);
     fetchWithTokenRefresh(fetchFunction, `${baseUrl}${endpoint}`, options, onSuccess, onError)
         .then(response => onSuccess(response.data))
         .catch(error => {
-            console.error('UploadMultipartData error:', error.message);
             onError(error.message);
         });
 };
@@ -223,8 +203,6 @@ export const GetApiRequest = async (endpoint, onSuccess, onError) => {
         }
     };
 
-    console.log('GetApiRequest:', endpoint);
-    console.log('request Token:', user.token);
     fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
         .then(response => {
             if (response.status === 204) {
@@ -262,7 +240,6 @@ export const GetModemStatusApiRequest = async (endpoint, onSuccess, onError) => 
         }
     };
 
-    console.log('GetModemStatusApiRequest:', `${BASE_URL}${endpoint}`);
     fetch(`${BASE_URL}${endpoint}`, options)
         .then(response => {
             if (response.status >= 400 && response.status < 600) {
@@ -277,7 +254,6 @@ export const GetModemStatusApiRequest = async (endpoint, onSuccess, onError) => 
 
 // Truck roll API request function
 export const PostruckRollApi = (endpoint, body, onSuccess, onError) => {
-    console.log(`endpoint=endpoint`, JSON.stringify(body));
     fetch(Env.TRUCK_ROLL_BASE_URL, {
         method: "POST",
         headers: {
@@ -288,7 +264,6 @@ export const PostruckRollApi = (endpoint, body, onSuccess, onError) => {
     })
         .then((response) => Promise.all([response, response.json()]))
         .then(([response, json]) => {
-            console.log(response);
             onSuccess(json);
         })
         .catch((exception) => onError(exception.message));
@@ -298,19 +273,13 @@ export const PostruckRollApi = (endpoint, body, onSuccess, onError) => {
 const getBaseUrl = async () => {
     try {
         const user = await getUser();
-        console.log("[getBaseUrl] User:", user);
         // If user exists and is not a normal user, return ACP base URL
         if (user && user.isNormalUser === false) {
-            console.log("[getBaseUrl] User is ACP user.");
             return API_ACP_BASEURL;
         }
 
-        // Default case for normal user
-        console.log("[getBaseUrl] User is normal user:", user?.isNormalUser);
         return BASE_URL;
     } catch (error) {
-        // Log the error and return BASE_URL as a fallback
-        console.error("[getBaseUrl] Error determining base URL:", error);
         return BASE_URL;
     }
 };

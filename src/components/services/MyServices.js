@@ -161,7 +161,6 @@ const MyServices = ({ route }) => {
       GetApiRequest(
         request,
         (response) => {
-          console.log("getInternetPlanDetails", JSON.stringify(response));
           setPlans(response);
         },
         (error) => {

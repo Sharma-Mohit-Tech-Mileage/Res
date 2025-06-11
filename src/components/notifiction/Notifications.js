@@ -85,7 +85,7 @@ const Notifications = () => {
             infoText={infoText}
             email={emailAddress}
             navigationTarget="EmailNotifications"
-            transformedData={additionalSettings}  // Ensure this is passed correctly
+            transformedData={additionalSettings}  // Ensure this is passed correctly     
             additionalSettings={additionalSettings}  // Ensure this is passed correctly
             isAdmin={isAdmin}
             screenReaderEnabled={screenReaderEnabled}

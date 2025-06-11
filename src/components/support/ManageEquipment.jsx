@@ -235,7 +235,6 @@ To add a Sparklight Modem to your account, please contact our support team`);
       GetApiRequest(
         request,
         (response) => {
-          console.log("getInternetPlanDetails", JSON.stringify(response));
           setPlans(response);
           if (response.length > 0) {
             let macAddress = response[0].macAddress;
@@ -269,7 +268,6 @@ To add a Sparklight Modem to your account, please contact our support team`);
       request,
       (res) => {
         if (res) {
-          console.log("checkModemDetails", res);
           if (res.status && res.status === 408) {
             setLoadingHealth(false);
             setCurrentHealth("Poor");
