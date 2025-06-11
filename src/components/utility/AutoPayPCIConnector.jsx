@@ -186,7 +186,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     },
                     (error) => {
                         console.error("Error fetching payment details:", error);
-                        if(error.includes('503')) {
+                        if(error?.includes('503')) {
                             setIsServiceDown(true);
                         }
                         resolve(null); // Resolve with null on error to handle in next step
@@ -461,7 +461,7 @@ const navigationChange = async (navState) => {
                     onHttpError={(syntheticEvent) => {
                         const { nativeEvent } = syntheticEvent;
                         console.error('WebView HTTP error: ', nativeEvent);
-                        if (nativeEvent.statusCode === 503) {
+                        if (nativeEvent?.statusCode === 503) {
                                 setIsServiceDown(true);
                             }
                         // if (!navStateReloading && nativeEvent.statusCode >= 400) {

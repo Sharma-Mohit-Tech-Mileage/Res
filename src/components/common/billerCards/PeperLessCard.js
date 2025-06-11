@@ -26,30 +26,16 @@ const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style,i
           {isStatusLoading ? (
             <SkeletonPlaceholder>
             <>
-            {paperlessStatus && (
-              <>
+            
               <View
                 style={{
                   width: wp("50%"),
-                  height: 10,
+                  height: 20,
                   alignSelf: "center",
                   borderRadius: 4,
                   marginTop: 10,
                 }}
               />
-
-               <View
-                style={{
-                  width: wp("52%"),
-                  height: 10,
-                  alignSelf: "center",
-                  borderRadius: 4,
-                  marginTop: 10,
-                }}
-                
-              />
-              </>
-            )}
             
               <View
                 style={{
