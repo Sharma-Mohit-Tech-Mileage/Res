@@ -136,10 +136,10 @@ const SplashScreen = ({ navigation, route }) => {
   try {
     if (user.userInfo && user.userInfo.userName) {
       await analytics().setUserId(user.userInfo.userName.toString());
-      console.log('Analytics User ID set:', user.userInfo.userName);
+      console.log('Analytics User ID set:--------------------------------%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%', user.userInfo.userName);
     }
   } catch (error) {
-    console.error('Error setting analytics user ID:', error);
+    console.error('Error setting analytics user ID:--------------------------------------%%%%%%%%%%%%%%%%%%%%%%%%%%%', error);
   }
   // END ANALYTICS BLOCK
   
