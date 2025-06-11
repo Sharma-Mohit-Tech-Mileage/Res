@@ -227,7 +227,7 @@ const BillingScreen = ({ navigation }) => {
                 />
                 <PeperLessCard
                   paperlessCardEmail={paperlessCardEmail}
-                  paperlessStatus={isNewBiller ? paperlessStatusAcp : paperlessEmails}
+                  paperlessStatus={isNewBiller ? paperlessStatusAcp : paperlessEmails?.length>0}
                   navigation={navigation}
                   style={styles.card}
                 />
