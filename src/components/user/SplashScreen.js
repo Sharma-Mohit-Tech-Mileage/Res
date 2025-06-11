@@ -19,6 +19,7 @@ import RenderText from "../common/RenderText";
 import moment from "moment";
 import LoginLogger from "../../components/utility/LoginLogger";
 import LoadingOverlay from "../common/customui/CustomLoading";
+import analytics from '@react-native-firebase/analytics';
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -131,9 +132,18 @@ const SplashScreen = ({ navigation, route }) => {
     }
   };
 
-  const moveAfterLogin = (user) => {
+  const moveAfterLogin = async (user) => {
     storeUser(user);
     dispatch(saveUserInfo(user));
+    try {
+    if (user.userInfo && user.userInfo.userName) {
+      await analytics().setUserId(user.userInfo.userName.toString());
+      console.log('Analytics User ID set:', user.userInfo.userName);
+    }
+  } catch (error) {
+    console.error('Error setting analytics user ID:', error);
+  }
+  // END ANALYTICS BLOCK
     if (user.userInfo.mobileTCAcceptanceFlag) {
       navigation.reset({ index: 0, routes: [{ name: "MyTab" }], });
     } else {
@@ -156,6 +166,12 @@ const SplashScreen = ({ navigation, route }) => {
             postLogoutRedirectUrl: config.redirectUrl,
           })
             .then(() => {
+              try {
+              analytics().setUserId(null);
+              console.log('Analytics User ID cleared on logout');
+            } catch (error) {
+              console.error('Error clearing analytics user ID:', error);
+            }
               storeUser({});
               storeSsoToken({});
               saveUserInfo({});
@@ -176,6 +192,12 @@ const SplashScreen = ({ navigation, route }) => {
             postLogoutRedirectUrl: config.redirectUrl,
           })
             .then(() => {
+               try {
+              analytics().setUserId(null);
+              console.log('Analytics User ID cleared on logout');
+            } catch (error) {
+              console.error('Error clearing analytics user ID:', error);
+            }
               storeUser({});
               storeSsoToken({});
               saveUserInfo({});
@@ -406,7 +428,7 @@ const SplashScreen = ({ navigation, route }) => {
     <LinearGradient
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+      colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
       <View style={styles.splashContainer}>

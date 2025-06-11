@@ -12,6 +12,7 @@ import { navigationRef } from '../../navigations/UserNavigations';
 import analytics from '@react-native-firebase/analytics';
 import { getPaymentUrl, getReferralUrl } from './PaymentUrlUtils';
 import LoadingOverlay from '../common/customui/CustomLoading';
+import MaintenanceAlert from './MaintenanceAlert';
 
 const { height, width } = Dimensions.get('window');
 
@@ -25,6 +26,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const [status, setStatus] = useState(route.params?.status || false);
     const [name, setTitle] = useState(route.params?.name);
     const [navStateReloading, setNavStateReloading] = useState(false);
+    const [ isServiceDown, setIsServiceDown ] = useState(false);
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
     const [html, setHtml] = useState('');
@@ -184,6 +186,9 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                     },
                     (error) => {
                         console.error("Error fetching payment details:", error);
+                        if(error.includes('503')) {
+                            setIsServiceDown(true);
+                        }
                         resolve(null); // Resolve with null on error to handle in next step
                     }
                 );
@@ -403,13 +408,18 @@ const navigationChange = async (navState) => {
     
     return (
         <View style={styles.container}>
-            <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); }} title={name} />
-            {progress < 1 && (
+            <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); }} title={isServiceDown?'Scheduled Maintenance':name} />
+            {(!isServiceDown && progress < 1) && (
                 <View style={styles.progressBar}>
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
                 </View>
             )}
             {html ? (
+                isServiceDown ? (
+                    <View style={{ flex: 1, backgroundColor:'#ebeef1' }}> 
+                        <MaintenanceAlert/>
+                    </View>
+                ) : (
                 <WebView
                     ref={webViewRef}
                     source={{ html }}
@@ -451,11 +461,15 @@ const navigationChange = async (navState) => {
                     onHttpError={(syntheticEvent) => {
                         const { nativeEvent } = syntheticEvent;
                         console.error('WebView HTTP error: ', nativeEvent);
+                        if (nativeEvent.statusCode === 503) {
+                                setIsServiceDown(true);
+                            }
                         // if (!navStateReloading && nativeEvent.statusCode >= 400) {
                         //     navigation.navigate('Dashboard');
                         // }
                     }}
                 />
+                )
             ) : (
                 <View style={styles.loadingContainer}>
                     {/* <ActivityIndicator size="large" color="rgba(141, 59, 144, 1)" />
