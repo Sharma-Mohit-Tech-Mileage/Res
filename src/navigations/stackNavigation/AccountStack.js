@@ -25,6 +25,7 @@ import ThumbsUp from '../../components/support/ThumbsUp';
 import ArticalWindowUtility from '../../components/utility/ArticalWindowUtility';
 import { useTabBarVisibility } from '../TabBarVisibilityContext';
 import supportScreen from "../../components/support/supportScreen";
+import Survey from '../../components/cancelservice/Survey';
 
 // Import your user info helper function (adjust the path as needed)
 import { getUser } from '../../redux/utils/LocalStorage';
@@ -250,6 +251,16 @@ function AccountStackScreen() {
       <AccountStack.Screen
         name="AddEmailNotification"
         component={AddEmailNotification}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+
+      <AccountStack.Screen
+        name="cancelServiceSurvey"
+        component={Survey}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),

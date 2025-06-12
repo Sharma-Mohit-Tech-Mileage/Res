@@ -207,7 +207,7 @@ const ProfileSettings = () => {
               )}
                   <Pressable
                     style={{}}
-                    onPress={() => navigation.navigate("cancelService")}
+                    onPress={() => navigation.navigate("cancelServiceSurvey")}
                     accessible={true}
                     accessibilityLabel="cancel Service"
                     accessibilityRole="button"
