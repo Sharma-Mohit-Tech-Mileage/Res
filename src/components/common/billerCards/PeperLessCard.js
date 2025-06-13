@@ -25,40 +25,37 @@ const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style,i
 
           {isStatusLoading ? (
             <SkeletonPlaceholder>
-            <>
-            
-              <View
-                style={{
-                  width: wp("50%"),
-                  height: 20,
-                  alignSelf: "center",
-                  borderRadius: 4,
-                  marginTop: 10,
-                }}
-              />
-            
-              <View
-                style={{
-                  width: wp("40%"),
-                  height: 30,
-                  alignSelf: "center",
-                  borderRadius: 4,
-                  marginTop: 10,
-                }}
-              />
+          <>
+            <View
+              style={{
+                width: wp("40%"),
+                height: 20,
+                alignSelf: "center",
+                borderRadius: 4,
+                marginTop: 10,
+              }}
+            />
+            <View
+              style={{
+                width: wp("20%"),
+                height: 30,
+                alignSelf: "center",
+                borderRadius: 4,
+                marginVertical: 10,
+              }}
+            />
 
-               <View
-                style={{
-                  width: wp("50%"),
-                  height: 15,
-                  alignSelf: "center",
-                  borderRadius: 4,
-                  marginTop: 10,
-                }}
-                
-              />
-            </>
-            </SkeletonPlaceholder>
+            <View
+              style={{
+                width: wp("50%"),
+                height: 20,
+                alignSelf: "center",
+                borderRadius: 4,
+                marginTop: 10,
+              }}
+            />
+          </>
+        </SkeletonPlaceholder>
           ) : (
             <>
           {paperlessStatus ? (
