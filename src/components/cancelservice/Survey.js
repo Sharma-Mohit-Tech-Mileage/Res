@@ -2,15 +2,16 @@ import React, { useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { VStack, Radio } from "native-base";
+import { Radio } from "native-base";
 import { Color } from "../../../GlobalStyles";
+import AppStyles from "../common/styles/AppStyles";
 
 const surveyOptions = [
-  "Too expensive",
-  "Moving to a new location",
-  "Not satisfied with service",
-  "Found a better alternative",
-  "Other",
+  "I relocated recently and no longer need the internet service.",
+  "I switched to another internet provider.",
+  "The cost of the internet service was too expensive.",
+  "I was dissatisfied with the quality or reliability of the internet service.",
+  "Other (please explain below)",
 ];
 
 const Survey = (navigation) => {
@@ -31,7 +32,7 @@ const Survey = (navigation) => {
       <ProfileSettingsHeader
         title="Cancel Service Survey"
         iconAlignment="right"
-        showIcon={false}
+        showIcon={true}
       />
       <LinearGradient
         style={styles.linearGradientStyle}
@@ -40,8 +41,9 @@ const Survey = (navigation) => {
         useAngle={true}
         angle={90}
       />
-      <VStack space={4} mt={8}>
-        <Text fontSize="xl" fontWeight="bold">
+      <View style={[AppStyles.card, { margin: 16 }]}>
+        <View style={{ padding: 24 }}>
+        <Text>
           Why are you cancelling your service?
         </Text>
         <Radio.Group
@@ -50,13 +52,14 @@ const Survey = (navigation) => {
           onChange={setSelectedOption}
         >
           {surveyOptions.map((option, idx) => (
-            <Radio value={option} key={idx} my={1}>
+            <Radio value={option} key={idx} my={1} _checked={{ color: Color.sparklightBrightPurple }}>
               {option}
             </Radio>
           ))}
         </Radio.Group>
-      </VStack>
-      <VStack space={3} mb={2}>
+        </View>
+      </View>
+      <View space={3} mb={2}>
         <Pressable
           isDisabled={!selectedOption}
           colorScheme="danger"
@@ -67,7 +70,7 @@ const Survey = (navigation) => {
         <Pressable variant="outline" onPress={onCancel}>
           <Text> Don't Cancel</Text>
         </Pressable>
-      </VStack>
+      </View>
     </View>
   );
 };
@@ -76,7 +79,35 @@ const styles = {
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
     width: "100%",
-  },
+  },buttonsLayout: {
+      paddingHorizontal: 0,
+      marginHorizontal:16,
+      marginTop:16,
+      paddingVertical: Padding.p_base,
+      justifyContent: "center",
+      alignItems: "center",
+      borderRadius: Border.br_11xs,
+      height: 56,
+    },
+    makeTypo: {
+      width: 282,
+      fontFamily: FontFamily.openSansRegular,
+      fontSize: FontSize.size_base,
+      textAlign: "center",
+    },makePayment: {
+      color: Color.sparklightWhite,
+      width: 282,
+    },
+    buttons1: {
+      marginTop: Padding.p_base,
+      backgroundColor: Color.colorWhitesmoke_200,
+      paddingHorizontal: 0,
+      width: 382,
+    },
+    buttonsParent: {
+      marginTop: Padding.p_base,
+      alignSelf: "stretch",
+    },
 };
 
 export default Survey;
