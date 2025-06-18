@@ -25,6 +25,7 @@ const Survey = ({ navigation }) => {
   const [selectedOption, setSelectedOption] = useState("");
   const [myComment, setMyCommnet] = useState("");
   const [isNoComment, setIsNoComment] = useState(true);
+  const [selectedValue, setSelectedValue] = useState("option1");
 
   onCancel = () => {
     navigation.navigate("account", { screen: "Account" });
@@ -46,7 +47,9 @@ const Survey = ({ navigation }) => {
       <ProfileSettingsHeader
         title="Cancellation Reason"
         iconAlignment="right"
-        onPressBack={onCancel}
+        onPressBack={() => {
+          navigation.goBack();
+              }}
         showIcon={true}
       />
       <LinearGradient
@@ -67,6 +70,8 @@ const Survey = ({ navigation }) => {
             name="surveyOptions"
             value={selectedOption}
             onChange={onChangeValue}
+            alignContent={"flex-start"}
+            style={{ flexDirection: 'column', alignItems: 'flex-start' }} 
           >
             {surveyOptions.map((option, idx) => (
               <Radio
@@ -74,7 +79,6 @@ const Survey = ({ navigation }) => {
                 key={idx}
                 style={{marginVertical:5}}
                 //colorScheme={"primary.200"}
-                
                 accessibilityLabel={`Option ${idx + 1}`}
                 accessibilityHint={`Select this option if you ${option.value.toLowerCase()}`}
                 accessibilityRole="radio"
