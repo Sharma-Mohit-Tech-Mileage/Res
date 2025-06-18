@@ -29,6 +29,7 @@ import Survey from '../../components/cancelservice/Survey';
 
 // Import your user info helper function (adjust the path as needed)
 import { getUser } from '../../redux/utils/LocalStorage';
+import CancellationSummary from '../../components/cancelservice/CancellationSummary';
 
 /**
  * A wrapper component for the "Notifications" route.
@@ -261,6 +262,16 @@ function AccountStackScreen() {
       <AccountStack.Screen
         name="cancelServiceSurvey"
         component={Survey}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+
+      <AccountStack.Screen
+        name="cancelServiceSummary"
+        component={CancellationSummary}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),
