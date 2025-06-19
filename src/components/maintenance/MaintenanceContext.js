@@ -351,23 +351,25 @@ export const MaintenanceProvider = ({ children }) => {
       };
 
       await remoteConfig().setDefaults({
-        dev_config: JSON.stringify(defaultConfig),
+        maintenance_configuration: JSON.stringify(defaultConfig),
       });
 
       await remoteConfig().fetch(0);
       const activated = await remoteConfig().activate();
       console.log("🔧 📡 ✅ Config activated:", activated);
 
-      const configString = remoteConfig().getValue("dev_config").asString();
+      const configString = remoteConfig()
+        .getValue("maintenance_configuration")
+        .asString();
       console.log("🔧 📡 Raw config received:", configString);
 
       const parsedConfig = JSON.parse(configString);
       console.log("🔧 📡 Parsed config:", parsedConfig);
 
       let finalConfig;
-      if (parsedConfig.dev_config) {
-        console.log("🔧 📡 Config is nested under dev_config");
-        finalConfig = parsedConfig.dev_config;
+      if (parsedConfig.maintenance_configuration) {
+        console.log("🔧 📡 Config is nested under maintenance_configuration");
+        finalConfig = parsedConfig.maintenance_configuration;
       } else {
         console.log("🔧 📡 Config is at root level");
         finalConfig = parsedConfig;
