@@ -23,7 +23,7 @@ const MaintenanceWrapper = ({ children }) => {
     console.log('🔧 🎁 Showing maintenance page with enhanced blocking features');
     
     // 🔧 NEW: Use blocking config if available, otherwise use page config
-    const activeConfig = blockingState.blockingConfig || pageConfig;
+    const activeConfig =  pageConfig;
     const isCurrentlyBlocking = blockingState.wasBlocked;
     
     return (

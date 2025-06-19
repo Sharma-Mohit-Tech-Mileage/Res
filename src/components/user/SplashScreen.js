@@ -130,23 +130,31 @@ const SplashScreen = ({ navigation, route }) => {
     }
   };
 
- const moveAfterLogin = async (user) => {
+const moveAfterLogin = async (user) => {
   storeUser(user);
   dispatch(saveUserInfo(user));
+  
   try {
     if (user.userInfo && user.userInfo.userName) {
+      // Set the user ID (you already have this)
       await analytics().setUserId(user.userInfo.userName.toString());
-      console.log('Analytics User ID set:', user.userInfo.userName);
+      
+      // ADD THIS: Set custom user property for filtering
+      await analytics().setUserProperty('Sparklight_user_id', user.userInfo.userName.toString());
+      
+      // ADD THIS: Log login event with custom dimension
+      await analytics().logEvent('login', {
+        Sparklight_user_id: user.userInfo.userName.toString()
+      });
     }
   } catch (error) {
-    console.error('Error setting analytics user ID:', error);
+    console.error('Error setting analytics user ID and custom dimension:', error);
   }
-  // END ANALYTICS BLOCK
   
   if (user.userInfo.mobileTCAcceptanceFlag) {
-    navigation.reset({ index: 0, routes: [{ name: "MyTab" }], });
+    navigation.reset({ index: 0, routes: [{ name: "MyTab" }] });
   } else {
-    navigation.reset({ index: 0, routes: [{ name: "Terms" }], });
+    navigation.reset({ index: 0, routes: [{ name: "Terms" }] });
   }
 };
 
@@ -164,9 +172,10 @@ const logoutAction = (postLogoutCallback) => {
           idToken: token,
           postLogoutRedirectUrl: config.redirectUrl,
         })
-          .then(() => {
+          .then(async () => {
             try {
-              analytics().setUserId(null);
+              await analytics().setUserId(null);
+              await analytics().setUserProperty('Sparklight_user_id', null);
               console.log('Analytics User ID cleared on logout');
             } catch (error) {
               console.error('Error clearing analytics user ID:', error);
