@@ -1724,8 +1724,27 @@ PODS:
   - RNCCheckbox (0.5.17):
     - BEMCheckBox (~> 1.4)
     - React-Core
-  - RNCMaskedView (0.3.1):
+  - RNCMaskedView (0.3.2):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
     - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - RNDeviceInfo (10.13.1):
     - React-Core
   - RNExitApp (2.0.0):
@@ -1734,11 +1753,11 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
-  - RNFBAnalytics (20.5.0):
+  - RNFBAnalytics (20.4.0):
     - Firebase/Analytics (= 10.29.0)
     - React-Core
     - RNFBApp
-  - RNFBApp (20.5.0):
+  - RNFBApp (20.4.0):
     - Firebase/CoreOnly (= 10.29.0)
     - React-Core
   - RNFBCrashlytics (20.4.0):
@@ -2363,12 +2382,12 @@ SPEC CHECKSUMS:
   ReactNativeLocalization: fb171138cdc80d5d0d4f20243d2fc82c2b3cc48f
   RNCAsyncStorage: 687bb9e85dd3d45b966662440dcfc0cd962347e6
   RNCCheckbox: a3ca9978cb0846b981d28da4e9914bd437403d77
-  RNCMaskedView: 090213d32d8b3bb83a4dcb7d12c18f0152591906
+  RNCMaskedView: 7133577aa318952cac74dae97037a30cd33d73bf
   RNDeviceInfo: 4f9c7cfd6b9db1b05eb919620a001cf35b536423
   RNExitApp: 00036cabe7bacbb413d276d5520bf74ba39afa6a
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
-  RNFBAnalytics: 6ffcca3c60f402775f59d23402287e14de97616b
-  RNFBApp: 5f87753a8d8b37d229adf85cd0ff37709ffdf008
+  RNFBAnalytics: 2e647874278671963ef9049b4228acecfc88dd6d
+  RNFBApp: 2f83756f4d8be2859af5e2cf54130c20e380119d
   RNFBCrashlytics: a845824a269968ebb7a4a6cf4772c4977125b5f6
   RNFBMessaging: 91592ea949854c66697757af648a2c07bcb583b9
   RNFBRemoteConfig: 2867b9d3484b7aa86e095dcde8c333c029004bd0

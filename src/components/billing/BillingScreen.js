@@ -140,7 +140,7 @@ const BillingScreen = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      setIsContentLoading(true);
+      setIsContentLoading(false);
       getStatus();
       
       if (user && user.isNormalUser) {
