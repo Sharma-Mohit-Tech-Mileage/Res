@@ -61,26 +61,17 @@ const CancellationSummary = ({ navigation }) => {
             </Text>
           }
         >
-          {/* <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={styles.dueDate}>{"Due "}</Text>
+         <View style={{ flexDirection: "row", alignItems: "center" }}>
+            
             <Text
               style={[
-                styles.dueDate,
-                { fontWeight: "400", color: colors.dark_grey },
+                 {fontFamily:FontFamily.openSansRegular,fontSize:14,color:Color.colorGray_200,marginRight:8},
               ]}
             >
-              {"on: "}
-            </Text>
-            <Text
-              style={[
-                styles.dueDate,
-                { textDecorationLine: "underline", marginRight: 5 },
-              ]}
-            >
-              {"Not Available"}
+              {"Email Address"}
             </Text>
             <InfoIcon />
-          </View> */}
+          </View> 
         </Tooltip>
       </View>
     );
@@ -351,7 +342,9 @@ const CancellationSummary = ({ navigation }) => {
                 <TickIcon color={colors.sparklight_bright_purple} size={16} />
                 <Text style={[styles.terms,{ marginLeft: 8, marginRight:16 }]}>
                   All leased equipment should be returned to your nearest
-                  Sparklight Local Office. Prior to your visit, we recommend
+                  <Text style={[styles.terms,{color:Color.sparklightBrightPurple}]} onPress={()=>{
+                    console.log("Sparklight Local Office Pressed");
+                  }}> Sparklight Local Office.</Text> Prior to your visit, we recommend
                   confirming the hours of operation and ensuring the location
                   can accept returned equipment.{" "}
                 </Text>
@@ -409,8 +402,8 @@ const CancellationSummary = ({ navigation }) => {
               marginBottom: 16,
             }}
           >
-            <Text style={{fontFamily:FontFamily.openSansRegular,fontSize:14,color:Color.colorGray_200,marginRight:8}}>Email address</Text>
-            <InfoIcon />
+            {/* <Text style={{fontFamily:FontFamily.openSansRegular,fontSize:14,color:Color.colorGray_200,marginRight:8}}>Email address</Text> */}
+            <EmailInfo />
           </View>
           <View style={{ marginHorizontal: 24, marginBottom: 24 }}>
           <EntryInput
