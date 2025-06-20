@@ -10,6 +10,7 @@ import {
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import CheckBox from "@react-native-community/checkbox";
+import Tooltip from "rn-tooltip";
 import {
   Color,
   Padding,
@@ -45,6 +46,46 @@ const CancellationSummary = ({ navigation }) => {
           Keyboard.dismiss();
       };
     const [input, setInput] = useState("");
+
+    const EmailInfo = () => {
+    return (
+      <View style={{ flexDirection: "column" }}>
+        <Tooltip
+          backgroundColor="#4C5458"
+          overlayColor="#00000000"
+          width={180}
+          height={100}
+          popover={
+            <Text style={{ color: "#FFF" }}>
+              We’ll send the confirmation to this email address.
+            </Text>
+          }
+        >
+          {/* <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={styles.dueDate}>{"Due "}</Text>
+            <Text
+              style={[
+                styles.dueDate,
+                { fontWeight: "400", color: colors.dark_grey },
+              ]}
+            >
+              {"on: "}
+            </Text>
+            <Text
+              style={[
+                styles.dueDate,
+                { textDecorationLine: "underline", marginRight: 5 },
+              ]}
+            >
+              {"Not Available"}
+            </Text>
+            <InfoIcon />
+          </View> */}
+        </Tooltip>
+      </View>
+    );
+  };
+
 
   const renderSuccessMessage = () => {
     return (
