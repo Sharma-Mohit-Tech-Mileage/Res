@@ -28,7 +28,6 @@ const ConfimationPopup = ({
       <View style={styles.overlay}>
         <View style={styles.alertContainer}>
           <Text style={{textAlign:'center',alignSelf:'center',fontFamily:FontFamily.openSansRegular, color:colors.darkest_grey,fontSize:22,fontWeight:'600'}}> {title} </Text>
-
           <Text style={styles.message}>{message}</Text>
           <TouchableOpacity
             style={styles.openBtn}
@@ -39,7 +38,6 @@ const ConfimationPopup = ({
           >
             <Text style={styles.openPortaltxt}>{onActionTxt}</Text>
           </TouchableOpacity>
-
           <TouchableOpacity
             style={styles.closeBtn}
             onPress={onClose}

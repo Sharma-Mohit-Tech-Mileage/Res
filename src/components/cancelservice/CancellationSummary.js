@@ -1,5 +1,12 @@
-import React, { useState } from "react";
-import { View, Text, Pressable, ScrollView, Image,TouchableOpacity } from "react-native";
+import React, { useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  Pressable,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import CheckBox from "@react-native-community/checkbox";
@@ -15,16 +22,29 @@ import SecondaryButton from "../common/customui/SecondaryButton";
 import ConfimationPopup from "./ConfirmationPopup";
 import colors from "../../res/Colors";
 import UpArrow from "../../res/svgIcons/UpArrow";
-import TickIcon from "../../res/svgIcons/TickIcon";
-
+import TickIcon from "../../res/svgIcons/TickIcon1";
+import InfoIcon from "../../res/svgIcons/InfoIcon";
+import EntryInput from "..//entry/EntryInput";
 const CancellationSummary = ({ navigation }) => {
   const [selectedOption, setSelectedOption] = useState("");
   const [isConfirmationPopupVisible, setIsConfirmationPopupVisible] =
-    useState(true);
+    useState(false);
 
-    const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
-    const handleCheckboxToggle = () => {
-    }
+  const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
+  const handleCheckboxToggle = useCallback(() => {
+    setToggleCheckBoxTerm(!toggleCheckBoxTerm);
+  }, [toggleCheckBoxTerm]);
+
+
+  const onChangeText = (text) => {
+          setInput(text);
+          setEnableButton(text.length > 0);
+      };
+  
+      const keyboardDismiss = () => {
+          Keyboard.dismiss();
+      };
+    const [input, setInput] = useState("");
 
   const renderSuccessMessage = () => {
     return (
@@ -280,7 +300,7 @@ const CancellationSummary = ({ navigation }) => {
             >
               <View style={{ flexDirection: "row", marginTop: 16 }}>
                 <TickIcon color={colors.sparklight_bright_purple} size={16} />
-                <Text style={{ marginLeft: 8 }}>
+                <Text style={[styles.terms,{ marginLeft: 8, marginRight:16}]}>
                   To avoid incurring unreturned equipment fee charges, all
                   leased equipment must be returned by your next bill cycle.
                 </Text>
@@ -288,7 +308,7 @@ const CancellationSummary = ({ navigation }) => {
 
               <View style={{ flexDirection: "row", marginTop: 16 }}>
                 <TickIcon color={colors.sparklight_bright_purple} size={16} />
-                <Text style={{ marginLeft: 8 }}>
+                <Text style={[styles.terms,{ marginLeft: 8, marginRight:16 }]}>
                   All leased equipment should be returned to your nearest
                   Sparklight Local Office. Prior to your visit, we recommend
                   confirming the hours of operation and ensuring the location
@@ -298,7 +318,7 @@ const CancellationSummary = ({ navigation }) => {
 
               <View style={{ flexDirection: "row", marginTop: 16 }}>
                 <TickIcon color={colors.sparklight_bright_purple} size={16} />
-                <Text style={{ marginLeft: 8 }}>
+                <Text style={[styles.terms,{ marginLeft: 8, marginRight:16 }]}>
                   For your convenience, you may request an equipment pickup for
                   a fee. For more details on arranging this service, please
                   contact us directly.
@@ -321,7 +341,7 @@ const CancellationSummary = ({ navigation }) => {
                 style={styles.checkBox}
                 boxType="square"
                 tintColors={{
-                  true: "#1B99FF",
+                  true: "#8D3B90",
                   false:
                     Platform.OS === "ios"
                       ? Color.colorWhitesmoke_300
@@ -340,6 +360,29 @@ const CancellationSummary = ({ navigation }) => {
           </TouchableOpacity>
           <View style={styles.seperator} />
           
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 24,
+              marginBottom: 16,
+            }}
+          >
+            <Text style={{fontFamily:FontFamily.openSansRegular,fontSize:14,color:Color.colorGray_200,marginRight:8}}>Email address</Text>
+            <InfoIcon />
+          </View>
+          <View style={{ marginHorizontal: 24, marginBottom: 24 }}>
+          <EntryInput
+            
+            input={input}
+            onChangeText={onChangeText}
+            onSubmitText={keyboardDismiss}
+            keyboardType="email-address"
+            accessibilityRole="search"
+            accessibilityLabel="Email address input field"
+            accessibilityHint="Double tap to enter your email address for cancellation confirmation"
+          />
+          </View>
         </View>
         <View>
           <Pressable
@@ -350,7 +393,8 @@ const CancellationSummary = ({ navigation }) => {
             ]}
             onPress={() => {
               // TODo
-              onContinue(selectedOption);
+              //onContinue(selectedOption);
+              setIsConfirmationPopupVisible(true);
             }}
             accessibilityRole="button"
             accessibilityLabel="Continue to Cancel   the service"
@@ -450,35 +494,44 @@ const styles = {
     marginVertical: 24,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
-  },checkBox: {
-      width: 12,
-      height: 12,
-      marginRight: Platform.OS === "ios" ? 5 : 16,
-      backgroundColor: Color.colorWhitesmoke_100,
-      marginTop: Platform.OS === "ios" ? 5 : 0,
-    },
-    checkBoxArea: {
-      flexDirection: "row",
-      alignItems: "center",
-      flexWrap: "wrap",
-      paddingHorizontal: Padding.p_5xl,
-    },
-    checkboxTouchable: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginRight: 0,
-      paddingHorizontal: Padding.p_5xl,
-    },
-    checkboxContainer: {
-      flexDirection: "row",
-      alignItems: "flex-start",
-      marginVertical: Padding.p_5xl,
-    },
-    checkBoxAreaViewText: {
-      fontSize: 14,
-      fontFamily: FontFamily.openSansRegular,
-      color: Color.colorGray_200,
-    },
+  },
+  checkBox: {
+    width: 12,
+    height: 12,
+    marginRight: Platform.OS === "ios" ? 5 : 16,
+    backgroundColor: Color.colorWhitesmoke_100,
+    marginTop: Platform.OS === "ios" ? 5 : 0,
+  },
+  checkBoxArea: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    paddingHorizontal: Padding.p_5xl,
+  },
+  checkboxTouchable: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 0,
+    paddingHorizontal: Padding.p_5xl,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginVertical: 10,
+  },
+  checkBoxAreaViewText: {
+    fontSize: 16,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorGray_200,
+    fontWeight: "400",
+  },terms:{
+    fontSize: FontSize.size_sm,
+    color: Color.colorGray_200,
+    fontFamily: FontFamily.openSansRegular,
+    lineHeight:22,
+    fontWeight: "400",
+    
+  }
 };
 
 export default CancellationSummary;
