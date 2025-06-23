@@ -158,7 +158,7 @@ export const MaintenanceProvider = ({ children }) => {
       });
 
       // Set maintenance page visibility immediately
-      setShowMaintenancePage(true);
+      setShowMaintenancePage(false);
 
       // Trigger immediate silent data clearing
       setTimeout(() => {
@@ -374,7 +374,7 @@ export const MaintenanceProvider = ({ children }) => {
     if (pageConfig && pageConfig.enabled) {
       // Handle persistent blocking state first
       if (blockingState.wasBlocked && blockingState.blockingConfig) {
-        setShowMaintenancePage(true);
+        setShowMaintenancePage(false);
         setShowBanner(false);
         return;
       }
@@ -383,7 +383,7 @@ export const MaintenanceProvider = ({ children }) => {
       if (!isUserLoggedIn) {
         // Pre-login: Show for "BOTH" audience only
         const shouldShowForNotLoggedIn = pageConfig.audience === "BOTH";
-        setShowMaintenancePage(shouldShowForNotLoggedIn);
+        setShowMaintenancePage(false);
       } else {
         // Post-login: Check audience match
         const isAudienceValid = isAudienceMatch(
@@ -394,7 +394,7 @@ export const MaintenanceProvider = ({ children }) => {
         if (isAudienceValid && pageConfig.type === "BLOCK_AND_LOGOUT") {
           performImmediateBlockingCheck(currentUserAudience);
         } else if (isAudienceValid) {
-          setShowMaintenancePage(true);
+          setShowMaintenancePage(false);
         } else {
           setShowMaintenancePage(false);
         }

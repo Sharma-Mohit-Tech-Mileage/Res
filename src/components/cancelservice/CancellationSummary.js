@@ -26,6 +26,9 @@ import UpArrow from "../../res/svgIcons/UpArrow";
 import TickIcon from "../../res/svgIcons/TickIcon1";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import EntryInput from "..//entry/EntryInput";
+import {Calendar, LocaleConfig} from 'react-native-calendars';
+import moment from "moment";
+
 const CancellationSummary = ({ navigation }) => {
   const [selectedOption, setSelectedOption] = useState("");
   const [isConfirmationPopupVisible, setIsConfirmationPopupVisible] =
@@ -36,18 +39,32 @@ const CancellationSummary = ({ navigation }) => {
     setToggleCheckBoxTerm(!toggleCheckBoxTerm);
   }, [toggleCheckBoxTerm]);
 
+   
+
+  const [currentDate, setCurrentDate] = useState(moment().format("YYYY-MM-DD"));
+const markedDates = {};
+for (let i = 0; i < 3; i++) {
+    const date = moment(currentDate).add(i, "days").format("YYYY-MM-DD");
+    markedDates[date] = {
+        selected: true,
+        startingDay: i === 0,
+        endingDay: i === 2,
+        color: "#8D3B90",
+        textColor: "#fff",
+    };
+}
 
   const onChangeText = (text) => {
-          setInput(text);
-          setEnableButton(text.length > 0);
-      };
-  
-      const keyboardDismiss = () => {
-          Keyboard.dismiss();
-      };
-    const [input, setInput] = useState("");
+    setInput(text);
+    setEnableButton(text.length > 0);
+  };
 
-    const EmailInfo = () => {
+  const keyboardDismiss = () => {
+    Keyboard.dismiss();
+  };
+  const [input, setInput] = useState("");
+
+  const EmailInfo = () => {
     return (
       <View style={{ flexDirection: "column" }}>
         <Tooltip
@@ -61,22 +78,25 @@ const CancellationSummary = ({ navigation }) => {
             </Text>
           }
         >
-         <View style={{ flexDirection: "row", alignItems: "center" }}>
-            
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text
               style={[
-                 {fontFamily:FontFamily.openSansRegular,fontSize:14,color:Color.colorGray_200,marginRight:8},
+                {
+                  fontFamily: FontFamily.openSansRegular,
+                  fontSize: 14,
+                  color: Color.colorGray_200,
+                  marginRight: 8,
+                },
               ]}
             >
               {"Email Address"}
             </Text>
             <InfoIcon />
-          </View> 
+          </View>
         </Tooltip>
       </View>
     );
   };
-
 
   const renderSuccessMessage = () => {
     return (
@@ -332,7 +352,9 @@ const CancellationSummary = ({ navigation }) => {
             >
               <View style={{ flexDirection: "row", marginTop: 16 }}>
                 <TickIcon color={colors.sparklight_bright_purple} size={16} />
-                <Text style={[styles.terms,{ marginLeft: 8, marginRight:16}]}>
+                <Text
+                  style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
+                >
                   To avoid incurring unreturned equipment fee charges, all
                   leased equipment must be returned by your next bill cycle.
                 </Text>
@@ -340,19 +362,33 @@ const CancellationSummary = ({ navigation }) => {
 
               <View style={{ flexDirection: "row", marginTop: 16 }}>
                 <TickIcon color={colors.sparklight_bright_purple} size={16} />
-                <Text style={[styles.terms,{ marginLeft: 8, marginRight:16 }]}>
+                <Text
+                  style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
+                >
                   All leased equipment should be returned to your nearest
-                  <Text style={[styles.terms,{color:Color.sparklightBrightPurple}]} onPress={()=>{
-                    console.log("Sparklight Local Office Pressed");
-                  }}> Sparklight Local Office.</Text> Prior to your visit, we recommend
-                  confirming the hours of operation and ensuring the location
-                  can accept returned equipment.{" "}
+                  <Text
+                    style={[
+                      styles.terms,
+                      { color: Color.sparklightBrightPurple },
+                    ]}
+                    onPress={() => {
+                      console.log("Sparklight Local Office Pressed");
+                    }}
+                  >
+                    {" "}
+                    Sparklight Local Office.
+                  </Text>{" "}
+                  Prior to your visit, we recommend confirming the hours of
+                  operation and ensuring the location can accept returned
+                  equipment.{" "}
                 </Text>
               </View>
 
               <View style={{ flexDirection: "row", marginTop: 16 }}>
                 <TickIcon color={colors.sparklight_bright_purple} size={16} />
-                <Text style={[styles.terms,{ marginLeft: 8, marginRight:16 }]}>
+                <Text
+                  style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
+                >
                   For your convenience, you may request an equipment pickup for
                   a fee. For more details on arranging this service, please
                   contact us directly.
@@ -360,6 +396,35 @@ const CancellationSummary = ({ navigation }) => {
               </View>
             </View>
             <View style={styles.seperator} />
+
+            <Calendar
+              // Customize the appearance of the calendar
+              style={{
+                marginHorizontal: 24,
+                borderColor: Color.sparklightGray,
+                borderWidth: 1,
+                borderRadius: Border.br_11xs,
+              }}
+              // Specify the current date
+              current={currentDate}
+              // Callback that gets called when the user selects a day
+              onDayPress={(day) => {
+                console.log("selected day", day);
+              }}
+              // Mark specific dates as marked
+             markingType="multi-period"
+            minDate={new Date().toISOString().split("T")[0]} // Disable past dates
+            markedDates={markedDates}
+            />
+
+            <View style={{ backgroundColor:Color.Gray300,marginHorizontal: 24, marginVertical: 16, padding:8, flexDirection: "row" }}>
+
+            <Image style={{width:40,height:40}}source={require("../../../assets/icon-faq.png")}/>
+            <Text style={[styles.terms, { marginRight: 24,textAlign:"left" }]}>
+              {`please scure your pet(s) so that installer has
+safe access to your yard and inside your home.`}
+                 </Text>
+            </View>
           </View>
           <TouchableOpacity
             style={styles.checkboxTouchable}
@@ -393,7 +458,7 @@ const CancellationSummary = ({ navigation }) => {
             </View>
           </TouchableOpacity>
           <View style={styles.seperator} />
-          
+
           <View
             style={{
               flexDirection: "row",
@@ -406,16 +471,15 @@ const CancellationSummary = ({ navigation }) => {
             <EmailInfo />
           </View>
           <View style={{ marginHorizontal: 24, marginBottom: 24 }}>
-          <EntryInput
-            
-            input={input}
-            onChangeText={onChangeText}
-            onSubmitText={keyboardDismiss}
-            keyboardType="email-address"
-            accessibilityRole="search"
-            accessibilityLabel="Email address input field"
-            accessibilityHint="Double tap to enter your email address for cancellation confirmation"
-          />
+            <EntryInput
+              input={input}
+              onChangeText={onChangeText}
+              onSubmitText={keyboardDismiss}
+              keyboardType="email-address"
+              accessibilityRole="search"
+              accessibilityLabel="Email address input field"
+              accessibilityHint="Double tap to enter your email address for cancellation confirmation"
+            />
           </View>
         </View>
         <View>
@@ -558,14 +622,14 @@ const styles = {
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
     fontWeight: "400",
-  },terms:{
+  },
+  terms: {
     fontSize: FontSize.size_sm,
     color: Color.colorGray_200,
     fontFamily: FontFamily.openSansRegular,
-    lineHeight:22,
+    lineHeight: 22,
     fontWeight: "400",
-    
-  }
+  },
 };
 
 export default CancellationSummary;

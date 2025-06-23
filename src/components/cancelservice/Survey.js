@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Pressable,TextInput, ScrollView } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { Radio } from "native-base";
+import RadioGroup from 'react-native-radio-buttons-group';
 import {
   Color,
   Padding,
@@ -14,15 +14,16 @@ import AppStyles from "../common/styles/AppStyles";
 import SecondaryButton from "../common/customui/SecondaryButton";
 
 const surveyOptions = [ { id:1, 
-  value :"I relocated recently and no longer need the internet service."},
-  {id :2 ,value :"I switched to another internet provider."},
-  {id :3, value :"The cost of the internet service was too expensive."},
-  {id: 4,value :"I was dissatisfied with the quality or reliability of the internet service."},
-  {id:5 ,value :"Other (please explain below)"},
+  label :"I relocated recently and no longer need the internet service."},
+  {id :2 ,label :"I switched to another internet provider."},
+  {id :3, label :"The cost of the internet service was too expensive."},
+  {id: 4,label :"I was dissatisfied with the quality or reliability of the internet service."},
+  {id:5 ,label :"Other (please explain below)"},
 ];
 
 const Survey = ({ navigation }) => {
   const [selectedOption, setSelectedOption] = useState("");
+  const [selectedId, setSelectedId] = useState(null);
   const [myComment, setMyCommnet] = useState("");
   const [isNoComment, setIsNoComment] = useState(true);
   const [selectedValue, setSelectedValue] = useState("option1");
@@ -66,7 +67,7 @@ const Survey = ({ navigation }) => {
           <Text style={styles.header}>We’re Sad To See You Go</Text>
 
           <Text style={[styles.optionTxt,{marginVertical:24,marginBottom:24}]}>Before you cancel, please let us know the  reason you are leaving. Your feedback is important and helps improve our service.</Text>
-          <Radio.Group
+          {/* <Radio.Group
             name="surveyOptions"
             value={selectedOption}
             onChange={onChangeValue}
@@ -86,7 +87,14 @@ const Survey = ({ navigation }) => {
                 <Text style={styles.optionTxt}>{option.value}</Text>
               </Radio>
             ))}
-          </Radio.Group>
+          </Radio.Group> */}
+          <RadioGroup containerStyle={{alignItems: 'flex-start', marginTop: 10 ,justifyContent: 'flex-start'}}
+          labelStyle={{marginVertical: 5, fontSize: FontSize.size_base, color: Color.colorGray_200, fontFamily: FontFamily.openSansRegular  }}
+            radioButtons={surveyOptions} 
+            onPress={setSelectedId}
+            
+            selectedId={selectedId}
+        />
          {selectedOption !='' && (
           <View style={{ borderWidth: 1, borderColor:Color.sparklightGray, marginTop:10, borderRadius:5 }}>
             <TextInput
