@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Pressable,TextInput, ScrollView } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import RadioGroup from 'react-native-radio-buttons-group';
+import { Radio } from "native-base";
 import {
   Color,
   Padding,
@@ -67,7 +67,7 @@ const Survey = ({ navigation }) => {
           <Text style={styles.header}>We’re Sad To See You Go</Text>
 
           <Text style={[styles.optionTxt,{marginVertical:24,marginBottom:24}]}>Before you cancel, please let us know the  reason you are leaving. Your feedback is important and helps improve our service.</Text>
-          {/* <Radio.Group
+           <Radio.Group
             name="surveyOptions"
             value={selectedOption}
             onChange={onChangeValue}
@@ -81,20 +81,21 @@ const Survey = ({ navigation }) => {
                 style={{marginVertical:5}}
                 //colorScheme={"primary.200"}
                 accessibilityLabel={`Option ${idx + 1}`}
-                accessibilityHint={`Select this option if you ${option.value.toLowerCase()}`}
+                accessibilityHint={`Select this option if you ${option.label.toLowerCase()}`}
                 accessibilityRole="radio"
               >
-                <Text style={styles.optionTxt}>{option.value}</Text>
+                <Text style={styles.optionTxt}>{option.label}</Text>
               </Radio>
             ))}
-          </Radio.Group> */}
-          <RadioGroup containerStyle={{alignItems: 'flex-start', marginTop: 10 ,justifyContent: 'flex-start'}}
-          labelStyle={{marginVertical: 5, fontSize: FontSize.size_base, color: Color.colorGray_200, fontFamily: FontFamily.openSansRegular  }}
+          </Radio.Group> 
+          {/* <RadioGroup 
+         // labelStyle={styles.optionTxt}
             radioButtons={surveyOptions} 
             onPress={setSelectedId}
-            
             selectedId={selectedId}
-        />
+            containerStyle={styles.radioContainer}
+           labelStyle={styles.labelStyle}
+        /> */}
          {selectedOption !='' && (
           <View style={{ borderWidth: 1, borderColor:Color.sparklightGray, marginTop:10, borderRadius:5 }}>
             <TextInput
@@ -207,6 +208,15 @@ const styles = {
     textAlignVertical: "top",
     padding: Padding.p_xs,
     height: 110,
+  },radioContainer: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  labelStyle: {
+    textAlign: 'left',
+    fontSize: 16,
+    marginBottom: 8,
   },
 };
 

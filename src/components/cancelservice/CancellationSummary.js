@@ -43,16 +43,49 @@ const CancellationSummary = ({ navigation }) => {
 
   const [currentDate, setCurrentDate] = useState(moment().format("YYYY-MM-DD"));
 const markedDates = {};
-for (let i = 0; i < 3; i++) {
-    const date = moment(currentDate).add(i, "days").format("YYYY-MM-DD");
+//for (let i = 0; i < 3; i++) {
+    const date = moment(currentDate).add(0, "days").format("YYYY-MM-DD");
+     const date1 = moment(currentDate).add(1, "days").format("YYYY-MM-DD");
+      const date2 = moment(currentDate).add(2, "days").format("YYYY-MM-DD");
     markedDates[date] = {
-        selected: true,
-        startingDay: i === 0,
-        endingDay: i === 2,
-        color: "#8D3B90",
-        textColor: "#fff",
+        customStyles: {
+        container: {
+          backgroundColor: Color.sparklightGray,
+          borderColor: Color.gray50,
+          borderWidth: 1,
+          elevation: 2
+        },
+        text: {
+          color: 'black',
+          fontWeight: 'bold'
+        }
+      }
     };
-}
+
+    markedDates[date1] = {
+        customStyles: {
+        container: {
+          backgroundColor: 'green'
+        },
+        text: {
+          color: 'black',
+          fontWeight: 'bold'
+        }
+      }
+    };
+
+    markedDates[date2] = {
+        customStyles: {
+        container: {
+          backgroundColor: 'green'
+        },
+        text: {
+          color: 'black',
+          fontWeight: 'bold'
+        }
+      }
+    };
+//}
 
   const onChangeText = (text) => {
     setInput(text);
@@ -269,7 +302,7 @@ for (let i = 0; i < 3; i++) {
       <ProfileSettingsHeader
         title="Cancellation Summary"
         iconAlignment="right"
-        onPressBack={onCancel}
+        onPressBack={() => navigation.goBack()}
         showIcon={true}
       />
       <LinearGradient
@@ -412,7 +445,7 @@ for (let i = 0; i < 3; i++) {
                 console.log("selected day", day);
               }}
               // Mark specific dates as marked
-             markingType="multi-period"
+             markingType="custom"
             minDate={new Date().toISOString().split("T")[0]} // Disable past dates
             markedDates={markedDates}
             />
