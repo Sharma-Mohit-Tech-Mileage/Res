@@ -1,55 +1,57 @@
 import React from "react";
 import { Modal, View, Text, StyleSheet } from "react-native";
 import { Color, FontFamily } from "../../../../GlobalStyles";
-import FastImage from "react-native-fast-image";
-const LoadingIcon = require("../../../../assets/loading.gif"); 
-const LoadingIconWhite = require("../../../../assets/loader-white.gif");
+import LottieView from "lottie-react-native";
 
-const LoadingOverlay = ({ loading, loadingTxt, onRequestClose, isWhite=false }) => {
+const LoadingOverlay = ({ loading, loadingTxt, onRequestClose, isWhite = false }) => {
+  const animationSource = isWhite
+    ? require("../../../../assets/animations/loader-white.json")
+    : require("../../../../assets/animations/loader-colored.json");
+
+  const LottieAnimation = (
+    <LottieView
+      source={animationSource}
+      autoPlay
+      loop
+      style={styles.lottie}
+    />
+  );
+
   return loadingTxt !== undefined ? (
     <Modal
       visible={loading}
       transparent
       animationType="fade"
-      onRequestClose={() => {
-        onRequestClose(false);
-      }}
+      onRequestClose={() => onRequestClose(false)}
     >
       <View style={styles.overlay}>
         <View style={styles.alertContainer}>
-          <FastImage
-            resizeMode="contain"
-            source={(isWhite)? LoadingIconWhite:LoadingIcon}
-            style={styles.LoadingImage}
-          />
+          {LottieAnimation}
           <Text style={styles.loadingTxt}>{loadingTxt}...</Text>
         </View>
       </View>
     </Modal>
   ) : (
     <View style={styles.noBackground}>
-      <FastImage
-        resizeMode="contain"
-        source={(isWhite)? LoadingIconWhite:LoadingIcon}
-        style={{ width: 180, height: 120 }}
-      />
+      {LottieAnimation}
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "#ffffff",
   },
-  LoadingImage: {
+  lottie: {
     width: 180,
     height: 120,
     alignSelf: "center",
   },
   alertContainer: {
-    backgroundColor: "white",
+    backgroundColor: "#ffffff",
     padding: 20,
     alignSelf: "center",
     borderRadius: 5,
@@ -74,4 +76,5 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
 });
+
 export default LoadingOverlay;
