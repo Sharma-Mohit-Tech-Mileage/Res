@@ -10,6 +10,7 @@ import {
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import CheckBox from "@react-native-community/checkbox";
+import IconFaq from '../../res/svgIcons/troubleshooting/iconfaq';
 import Tooltip from "rn-tooltip";
 import {
   Color,
@@ -150,7 +151,7 @@ const markedDates = {};
         <Text
           style={{
             fontSize: 22,
-            fontWeight: "600",
+            fontWeight: "500",
             fontFamily: FontFamily.openSansRegular,
             color: Color.colorGray_200,
             textAlign: "center",
@@ -164,7 +165,7 @@ const markedDates = {};
             textAlign: "center",
             marginTop: 24,
             textDecorationLine: "underline",
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: "400",
             color: "#353091",
           }}
@@ -197,7 +198,7 @@ const markedDates = {};
           }}
         >
           <Text
-            style={{ flex: 1, fontWeight: "600", color: Color.sparklightWhite }}
+            style={{ flex: 1, fontWeight: "500", color: Color.sparklightWhite }}
           >
             {" "}
             {"  Device"}
@@ -244,6 +245,7 @@ const markedDates = {};
               style={{
                 flex: 1,
                 color: Color.colorGray_200,
+                fontSize: 14,
                 textAlign: "center",
               }}
             >
@@ -253,7 +255,8 @@ const markedDates = {};
               style={{
                 flex: 1,
                 color: Color.colorGray_200,
-                textAlign: "right",
+                fontSize: 14,
+                textAlign: "center",
               }}
             >
               ${(device.price * device.qty).toFixed(2)}
@@ -274,16 +277,17 @@ const markedDates = {};
           }}
         >
           <Text
-            style={{ flex: 1, fontWeight: "700", color: Color.colorGray_200 }}
+            style={{ flex: 1, fontWeight: "700", color: Color.colorGray_200,fontSize: 14,textAlign: "center", }}
           >
             Total
           </Text>
           <Text
             style={{
               flex: 1,
-              fontWeight: "700",
+              fontWeight: "500",
               color: Color.colorGray_200,
-              textAlign: "right",
+              fontSize: 14,
+              textAlign: "center",
             }}
           >
             ${total.toFixed(2)}
@@ -326,14 +330,14 @@ const markedDates = {};
             <Text style={styles.lableTxt}>Services</Text>
             <Text style={styles.valueTxt}>Internet - 300 Mbps Internet </Text>
             <View style={{ flexDirection: "row", marginTop: 5 }}>
-              <Text style={{ fontSize: 16, fontWeight: "400" }}>
-                Change Plan intead? Call{" "}
+              <Text style={{ fontSize: 14, fontWeight: "400" }}>
+                Change Plan instead? Call{" "}
               </Text>
               <Text
                 style={{
                   color: Color.colorMidnightblue,
                   textDecorationLine: "underline",
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: "700",
                 }}
               >
@@ -368,7 +372,7 @@ const markedDates = {};
             >
               <Text
                 style={[
-                  styles.valueTxt,
+                  styles.valueTxt1,
                   { color: colors.sparklight_bright_purple },
                 ]}
               >
@@ -398,11 +402,11 @@ const markedDates = {};
                 <Text
                   style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
                 >
-                  All leased equipment should be returned to your nearest
+                  All leased equipment should be returned to your nearest {""}
                   <Text
                     style={[
                       styles.terms,
-                      { color: Color.sparklightBrightPurple },
+                      { color: Color.sparklightBrightPurple,textDecorationLine: "underline"},
                     ]}
                     onPress={() => {
                       console.log("Sparklight Local Office Pressed");
@@ -411,6 +415,7 @@ const markedDates = {};
                     {" "}
                     Sparklight Local Office.
                   </Text>{" "}
+                  
                   Prior to your visit, we recommend confirming the hours of
                   operation and ensuring the location can accept returned
                   equipment.{" "}
@@ -423,8 +428,21 @@ const markedDates = {};
                   style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
                 >
                   For your convenience, you may request an equipment pickup for
-                  a fee. For more details on arranging this service, please
-                  contact us directly.
+                  a fee. For more details on arranging this service, please{" "}
+                <Text
+                    style={{
+                      color: Color.sparklightBrightPurple,
+                      textDecorationLine: "underline",
+                      fontFamily: FontFamily.openSansRegular,
+                      fontSize: 14,
+                      fontWeight: "400",
+                    }}
+                    onPress={() => {
+                      // Add your contact action here
+                    }}
+                  >
+                    contact us
+                  </Text> directly.
                 </Text>
               </View>
             </View>
@@ -450,13 +468,30 @@ const markedDates = {};
             markedDates={markedDates}
             />
 
-            <View style={{ backgroundColor:Color.Gray300,marginHorizontal: 24, marginVertical: 16, padding:8, flexDirection: "row" }}>
-
-            <Image style={{width:40,height:40}}source={require("../../../assets/icon-faq.png")}/>
-            <Text style={[styles.terms, { marginRight: 24,textAlign:"left" }]}>
-              {`please scure your pet(s) so that installer has
-safe access to your yard and inside your home.`}
-                 </Text>
+            <View
+              style={{
+                backgroundColor: Color.Gray300,
+                marginHorizontal: 24,
+                marginVertical: 16,
+                padding: 8,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginRight: 12,
+                }}
+              >
+                <IconFaq width={32} height={32} />
+              </View>
+              <Text style={[styles.terms, { marginRight: 24, textAlign: "left", flex: 1 }]}>
+                {`Note: You do not need to be home for disconnection. Please secure your pet(s) so that the installer has safe access to your yard and inside your home.`}
+              </Text>
             </View>
           </View>
           <TouchableOpacity
@@ -599,17 +634,25 @@ const styles = {
   },
   lableTxt: {
     fontSize: FontSize.size_sm,
-    fontWeight: "600",
-    fontFamily: FontFamily.openSansRegular,
+    fontWeight: "500",
+    fontFamily: FontFamily.openSansSemiBold,
     color: Color.colorGray_200,
-    lineHeight: 16,
+    lineHeight: 14,
   },
   valueTxt: {
     fontSize: FontSize.size_base,
     fontWeight: "700",
     fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200,
-    lineHeight: 18,
+    color: Color.colorblack_100,
+    lineHeight: 16,
+    marginTop: 5,
+  },
+    valueTxt1: {
+    fontSize: FontSize.size_base,
+    fontWeight: "400",
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorblack_100,
+    lineHeight: 16,
     marginTop: 5,
   },
   seperator: {
