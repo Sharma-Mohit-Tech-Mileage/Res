@@ -9,7 +9,7 @@ const IconFaq = (props) => (
     {...props}
   >
     <Path
-      stroke="#F8F5EF" // Changed color to F8F5EF
+      stroke="#393D40" // Changed color to F8F5EF
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}

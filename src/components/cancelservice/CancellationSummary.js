@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import CheckBox from "@react-native-community/checkbox";
-import IconFaq from '../../res/svgIcons/troubleshooting/iconfaq';
+import IconFaq from "../../res/svgIcons/troubleshooting/iconfaq";
 import Tooltip from "rn-tooltip";
 import {
   Color,
@@ -27,7 +27,7 @@ import UpArrow from "../../res/svgIcons/UpArrow";
 import TickIcon from "../../res/svgIcons/TickIcon1";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import EntryInput from "..//entry/EntryInput";
-import {Calendar, LocaleConfig} from 'react-native-calendars';
+import { Calendar, LocaleConfig } from "react-native-calendars";
 import moment from "moment";
 
 const CancellationSummary = ({ navigation }) => {
@@ -40,53 +40,72 @@ const CancellationSummary = ({ navigation }) => {
     setToggleCheckBoxTerm(!toggleCheckBoxTerm);
   }, [toggleCheckBoxTerm]);
 
-   
-
   const [currentDate, setCurrentDate] = useState(moment().format("YYYY-MM-DD"));
-const markedDates = {};
-//for (let i = 0; i < 3; i++) {
-    const date = moment(currentDate).add(0, "days").format("YYYY-MM-DD");
-     const date1 = moment(currentDate).add(1, "days").format("YYYY-MM-DD");
-      const date2 = moment(currentDate).add(2, "days").format("YYYY-MM-DD");
+  const [markedDates, setMarkedDates] = useState({});
+
+  const myTheme = {
+      arrowColor: Color.sparklightBrightPurple, 
+      textSectionTitleColor:  Color.sparklightDarkGray,
+    };
+
+  const date = moment(currentDate).add(0, "days").format("YYYY-MM-DD");
+  const date1 = moment(currentDate).add(1, "days").format("YYYY-MM-DD");
+  const date2 = moment(currentDate).add(2, "days").format("YYYY-MM-DD");
+
+  useEffect(() => {
+    console.log("Current Date:", date);
     markedDates[date] = {
-        customStyles: {
+      customStyles: {
         container: {
           backgroundColor: Color.sparklightGray,
-          borderColor: Color.gray50,
+          borderColor: Color.sparklightDarkGray,
           borderWidth: 1,
-          elevation: 2
+          elevation: 2,
         },
         text: {
-          color: 'black',
-          fontWeight: 'bold'
-        }
-      }
+          color: Color.colorGray_200,
+          fontWeight: "400",
+        },
+      },
     };
 
     markedDates[date1] = {
-        customStyles: {
+      customStyles: {
         container: {
-          backgroundColor: 'green'
+          backgroundColor: Color.sparklightGray,
+          borderColor: Color.sparklightDarkGray,
+          borderWidth: 1,
+          elevation: 2,
         },
         text: {
-          color: 'black',
-          fontWeight: 'bold'
-        }
-      }
+          color: Color.colorGray_200,
+          fontWeight: "400",
+        },
+      },
     };
 
     markedDates[date2] = {
-        customStyles: {
+      customStyles: {
         container: {
-          backgroundColor: 'green'
+          backgroundColor: Color.sparklightGray,
+          borderColor: Color.sparklightDarkGray,
+          borderWidth: 1,
+          elevation: 2,
         },
         text: {
-          color: 'black',
-          fontWeight: 'bold'
-        }
-      }
+          color: Color.colorGray_200,
+          fontWeight: "400",
+        },
+      },
     };
-//}
+
+    setMarkedDates(markedDates);
+  }, []);
+
+  useEffect(() => {
+    console.log("Marked Dates Updated:", JSON.stringify(markedDates));
+    setSelectedOption(date);
+  }, [markedDates]);
 
   const onChangeText = (text) => {
     setInput(text);
@@ -187,7 +206,7 @@ const markedDates = {};
     const total = devices.reduce((sum, d) => sum + d.qty * d.price, 0);
 
     return (
-      <View style={{ paddingHorizontal: 24, marginBottom: 16 }}>
+      <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
         {/* Header Row */}
         <View
           style={{
@@ -209,7 +228,8 @@ const markedDates = {};
               fontWeight: "600",
               color: Color.sparklightWhite,
               textAlign: "center",
-              paddingHorizontal: 4,
+              alignSelf: "center",
+              paddingLeft: 16,
             }}
           >
             Qty
@@ -220,7 +240,7 @@ const markedDates = {};
               fontWeight: "600",
               color: Color.sparklightWhite,
               textAlign: "right",
-              paddingHorizontal: 4,
+              paddingRight: 16,
             }}
           >
             {"Price per unit "}
@@ -234,6 +254,7 @@ const markedDates = {};
               flexDirection: "row",
               marginBottom: 4,
               paddingVertical: 8,
+              paddingHorizontal: 8,
               borderBottomWidth: idx != devices.length - 1 ? 1 : 0,
               borderBottomColor: Color.sparklightGray,
             }}
@@ -247,6 +268,7 @@ const markedDates = {};
                 color: Color.colorGray_200,
                 fontSize: 14,
                 textAlign: "center",
+                alignSelf: "center",
               }}
             >
               {device.qty}
@@ -257,6 +279,7 @@ const markedDates = {};
                 color: Color.colorGray_200,
                 fontSize: 14,
                 textAlign: "center",
+                alignSelf: "center",
               }}
             >
               ${(device.price * device.qty).toFixed(2)}
@@ -272,12 +295,19 @@ const markedDates = {};
             borderTopColor: Color.sparklightBrightPurple,
             paddingVertical: 8,
             backgroundColor: "#F8F8F8",
-            width: "60%",
+            width: "65%",
             alignSelf: "flex-end",
           }}
         >
           <Text
-            style={{ flex: 1, fontWeight: "700", color: Color.colorGray_200,fontSize: 14,textAlign: "center", }}
+            style={{
+              flex: 1,
+              fontWeight: "700",
+              color: Color.colorGray_200,
+              fontSize: 14,
+              textAlign: "center",
+              alignSelf: "center",
+            }}
           >
             Total
           </Text>
@@ -288,6 +318,7 @@ const markedDates = {};
               color: Color.colorGray_200,
               fontSize: 14,
               textAlign: "center",
+              marginRight: 10,
             }}
           >
             ${total.toFixed(2)}
@@ -299,6 +330,61 @@ const markedDates = {};
 
   onCancel = () => {
     navigation.navigate("account", { screen: "Account" });
+  };
+
+  const onDaySelected = (selectedDate) => {
+
+    
+    //setCurrentDate(selectedDate);
+    if(markedDates[selectedDate] ) {
+      // If the date is already selected, deselect it
+      const updatedMarkedDates = { ...markedDates };
+      if (updatedMarkedDates[selectedDate].isSelected) {
+        updatedMarkedDates[selectedDate] = {
+        customStyles: {
+          container: {
+            backgroundColor: Color.sparklightGray,
+            borderColor: Color.sparklightDarkGray,
+            borderWidth: 1,
+            elevation: 0,
+          },
+          text: {
+            color: Color.colorGray_200,
+            fontWeight: "400",
+          },
+        },
+      };
+      updatedMarkedDates[selectedDate].isSelected = false;
+      setMarkedDates(updatedMarkedDates);
+      return;
+
+      }else {
+      updatedMarkedDates[selectedDate] = {
+        customStyles: {
+          container: {
+            backgroundColor: Color.sparklightBrightPurple,
+            borderColor: Color.sparklightGray,
+            borderWidth: 1,
+            elevation: 0,
+          },
+          text: {
+            color: Color.sparklightWhite,
+            fontWeight: "400",
+          },
+        },
+      };
+      updatedMarkedDates[selectedDate].isSelected = true;
+      setMarkedDates(updatedMarkedDates);
+      return;
+
+      }
+
+    }else {
+      
+      
+    }
+
+    
   };
 
   return (
@@ -388,7 +474,9 @@ const markedDates = {};
               }}
             >
               <View style={{ flexDirection: "row", marginTop: 16 }}>
-                <TickIcon color={colors.sparklight_bright_purple} size={16} />
+                <View style={{ marginTop: 5 }}>
+                  <TickIcon />
+                </View>
                 <Text
                   style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
                 >
@@ -398,7 +486,9 @@ const markedDates = {};
               </View>
 
               <View style={{ flexDirection: "row", marginTop: 16 }}>
-                <TickIcon color={colors.sparklight_bright_purple} size={16} />
+                <View style={{ marginTop: 5 }}>
+                  <TickIcon />
+                </View>
                 <Text
                   style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
                 >
@@ -406,7 +496,10 @@ const markedDates = {};
                   <Text
                     style={[
                       styles.terms,
-                      { color: Color.sparklightBrightPurple,textDecorationLine: "underline"},
+                      {
+                        color: Color.sparklightBrightPurple,
+                        textDecorationLine: "underline",
+                      },
                     ]}
                     onPress={() => {
                       console.log("Sparklight Local Office Pressed");
@@ -415,7 +508,6 @@ const markedDates = {};
                     {" "}
                     Sparklight Local Office.
                   </Text>{" "}
-                  
                   Prior to your visit, we recommend confirming the hours of
                   operation and ensuring the location can accept returned
                   equipment.{" "}
@@ -423,13 +515,15 @@ const markedDates = {};
               </View>
 
               <View style={{ flexDirection: "row", marginTop: 16 }}>
-                <TickIcon color={colors.sparklight_bright_purple} size={16} />
+                <View style={{ marginTop: 5 }}>
+                  <TickIcon />
+                </View>
                 <Text
                   style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
                 >
                   For your convenience, you may request an equipment pickup for
                   a fee. For more details on arranging this service, please{" "}
-                <Text
+                  <Text
                     style={{
                       color: Color.sparklightBrightPurple,
                       textDecorationLine: "underline",
@@ -442,14 +536,17 @@ const markedDates = {};
                     }}
                   >
                     contact us
-                  </Text> directly.
+                  </Text>{" "}
+                  directly.
                 </Text>
               </View>
             </View>
             <View style={styles.seperator} />
 
             <Calendar
+            theme={myTheme}
               // Customize the appearance of the calendar
+              selectedOption={selectedOption}
               style={{
                 marginHorizontal: 24,
                 borderColor: Color.sparklightGray,
@@ -460,12 +557,12 @@ const markedDates = {};
               current={currentDate}
               // Callback that gets called when the user selects a day
               onDayPress={(day) => {
-                console.log("selected day", day);
+                onDaySelected(day.dateString);
               }}
               // Mark specific dates as marked
-             markingType="custom"
-            minDate={new Date().toISOString().split("T")[0]} // Disable past dates
-            markedDates={markedDates}
+              markingType="custom"
+              minDate={new Date().toISOString().split("T")[0]} // Disable past dates
+              markedDates={markedDates}
             />
 
             <View
@@ -474,6 +571,7 @@ const markedDates = {};
                 marginHorizontal: 24,
                 marginVertical: 16,
                 padding: 8,
+                borderRadius: 5,
                 flexDirection: "row",
                 alignItems: "center",
               }}
@@ -484,13 +582,19 @@ const markedDates = {};
                   height: 40,
                   justifyContent: "center",
                   alignItems: "center",
-                  marginRight: 12,
+                  marginRight: 8,
                 }}
               >
                 <IconFaq width={32} height={32} />
               </View>
-              <Text style={[styles.terms, { marginRight: 24, textAlign: "left", flex: 1 }]}>
-                {`Note: You do not need to be home for disconnection. Please secure your pet(s) so that the installer has safe access to your yard and inside your home.`}
+              <Text
+                style={[
+                  styles.terms,
+                  { marginRight: 8, textAlign: "left", flex: 1 },
+                ]}
+              >
+                <Text style={[styles.terms, { fontWeight: "700" }]}>Note:</Text>{" "}
+                {` You do not need to be home for disconnection. Please secure your pet(s) so that the installer has safe access to your yard and inside your home.`}
               </Text>
             </View>
           </View>
@@ -645,9 +749,9 @@ const styles = {
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorblack_100,
     lineHeight: 16,
-    marginTop: 5,
+    marginTop: 10,
   },
-    valueTxt1: {
+  valueTxt1: {
     fontSize: FontSize.size_base,
     fontWeight: "400",
     fontFamily: FontFamily.openSansRegular,
