@@ -44,9 +44,9 @@ const CancellationSummary = ({ navigation }) => {
   const [markedDates, setMarkedDates] = useState({});
 
   const myTheme = {
-      arrowColor: Color.sparklightBrightPurple, 
-      textSectionTitleColor:  Color.sparklightDarkGray,
-    };
+    arrowColor: Color.sparklightBrightPurple,
+    textSectionTitleColor: Color.sparklightDarkGray,
+  };
 
   const date = moment(currentDate).add(0, "days").format("YYYY-MM-DD");
   const date1 = moment(currentDate).add(1, "days").format("YYYY-MM-DD");
@@ -333,58 +333,49 @@ const CancellationSummary = ({ navigation }) => {
   };
 
   const onDaySelected = (selectedDate) => {
-
-    
     //setCurrentDate(selectedDate);
-    if(markedDates[selectedDate] ) {
+    if (markedDates[selectedDate]) {
       // If the date is already selected, deselect it
       const updatedMarkedDates = { ...markedDates };
       if (updatedMarkedDates[selectedDate].isSelected) {
         updatedMarkedDates[selectedDate] = {
-        customStyles: {
-          container: {
-            backgroundColor: Color.sparklightGray,
-            borderColor: Color.sparklightDarkGray,
-            borderWidth: 1,
-            elevation: 0,
+          customStyles: {
+            container: {
+              backgroundColor: Color.sparklightGray,
+              borderColor: Color.sparklightDarkGray,
+              borderWidth: 1,
+              elevation: 0,
+            },
+            text: {
+              color: Color.colorGray_200,
+              fontWeight: "400",
+            },
           },
-          text: {
-            color: Color.colorGray_200,
-            fontWeight: "400",
+        };
+        updatedMarkedDates[selectedDate].isSelected = false;
+        setMarkedDates(updatedMarkedDates);
+        return;
+      } else {
+        updatedMarkedDates[selectedDate] = {
+          customStyles: {
+            container: {
+              backgroundColor: Color.sparklightBrightPurple,
+              borderColor: Color.sparklightGray,
+              borderWidth: 1,
+              elevation: 0,
+            },
+            text: {
+              color: Color.sparklightWhite,
+              fontWeight: "400",
+            },
           },
-        },
-      };
-      updatedMarkedDates[selectedDate].isSelected = false;
-      setMarkedDates(updatedMarkedDates);
-      return;
-
-      }else {
-      updatedMarkedDates[selectedDate] = {
-        customStyles: {
-          container: {
-            backgroundColor: Color.sparklightBrightPurple,
-            borderColor: Color.sparklightGray,
-            borderWidth: 1,
-            elevation: 0,
-          },
-          text: {
-            color: Color.sparklightWhite,
-            fontWeight: "400",
-          },
-        },
-      };
-      updatedMarkedDates[selectedDate].isSelected = true;
-      setMarkedDates(updatedMarkedDates);
-      return;
-
+        };
+        updatedMarkedDates[selectedDate].isSelected = true;
+        setMarkedDates(updatedMarkedDates);
+        return;
       }
-
-    }else {
-      
-      
+    } else {
     }
-
-    
   };
 
   return (
@@ -406,6 +397,11 @@ const CancellationSummary = ({ navigation }) => {
         <View style={[AppStyles.card, { margin: 16 }]}>
           {renderSuccessMessage()}
           <Text style={styles.header}>We’re Sad To See You Go</Text>
+          <View style={styles.seperator} />
+          <View style={{ paddingVertical: 5, paddingHorizontal: 24 }}>
+            <Text style={styles.lableTxt}>Account Number</Text>
+            <Text style={styles.valueTxt}>239847324343</Text>
+          </View>
           <View style={styles.seperator} />
           <View style={{ paddingVertical: 5, paddingHorizontal: 24 }}>
             <Text style={styles.lableTxt}>Disconnection date</Text>
@@ -544,7 +540,7 @@ const CancellationSummary = ({ navigation }) => {
             <View style={styles.seperator} />
 
             <Calendar
-            theme={myTheme}
+              theme={myTheme}
               // Customize the appearance of the calendar
               selectedOption={selectedOption}
               style={{
@@ -642,7 +638,14 @@ const CancellationSummary = ({ navigation }) => {
             {/* <Text style={{fontFamily:FontFamily.openSansRegular,fontSize:14,color:Color.colorGray_200,marginRight:8}}>Email address</Text> */}
             <EmailInfo />
           </View>
-          <View style={{ marginHorizontal: 24, marginBottom: 24 }}>
+          <View
+            style={{
+              marginHorizontal: 8,
+              marginBottom: 24,
+              alignItems: "center", // Center the EntryInput horizontally
+              justifyContent: "center", // Optional: center vertically if needed
+            }}
+          >
             <EntryInput
               input={input}
               onChangeText={onChangeText}
