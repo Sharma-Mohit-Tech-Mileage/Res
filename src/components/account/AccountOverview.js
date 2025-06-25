@@ -58,10 +58,10 @@ const logoutAction = (dispatch, navigation) => {
     logout(config, {
       idToken: token,
       postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
-    }).then(async (result) => {
+    }).then(async(result) => {
      try {
-         await analytics().setUserId(null);
-         await analytics().setUserProperty('Sparklight_user_id', null);
+        analytics().setUserId(null);
+        await analytics().setUserProperty('Sparklight_user_id', null);
         console.log('Analytics User ID cleared on logout');
       } catch (error) {
         console.error('Error clearing analytics user ID:', error);
