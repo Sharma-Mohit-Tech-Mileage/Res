@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   lottie: {
     width: 180,
@@ -52,9 +52,19 @@ const styles = StyleSheet.create({
   },
   alertContainer: {
     backgroundColor: "#ffffff",
-    padding: 20,
+    padding: 30,
     alignSelf: "center",
-    borderRadius: 5,
+    borderRadius: 15,
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    minWidth: 200,
+    alignItems: "center",
   },
   noBackground: {
     flex: 1,
