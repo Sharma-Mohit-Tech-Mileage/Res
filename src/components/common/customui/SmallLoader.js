@@ -1,14 +1,16 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import FastImage from "react-native-fast-image"
-const LoadingIcon = require("../../../../assets/loading.gif"); // Adjust the path as necessary
-const LoadingWhiteIcon = require("../../../../assets/loader-white.gif");
+import LottieView from "lottie-react-native";
 
 const SmallLoader = ({ isWhite=false, width=80,height=60}) => {
+    const animationSource = isWhite
+    ? require("../../../../assets/animations/loader-white.json")
+    : require("../../../../assets/animations/loader-colored.json");
   return (
-      <FastImage
-        resizeMode="contain"
-        source={isWhite?LoadingWhiteIcon:LoadingIcon}
+      <LottieView
+        source={animationSource}
+        autoPlay
+        loop
         style={[styles.LoaderSize,{width:width,height:height}]}
       />
   );
