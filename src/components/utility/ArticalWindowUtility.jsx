@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Platform, AppState, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Platform, AppState } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -10,6 +10,8 @@ import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
 import colors from '../../res/Colors';
 import analytics from '@react-native-firebase/analytics';
+import LoadingOverlay from '../common/customui/CustomLoading';
+import LoadingSpinner from './LoadingSpinner';
 const { width, height } = Dimensions.get('window');
 
 const ArticalWindowUtility = ({ navigation, route }) => {
@@ -28,6 +30,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
     const [hasTrackedInitialScreen, setHasTrackedInitialScreen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const toggleModal = () => {
         setShowPDFModal(!showPDFModal);
@@ -269,11 +272,15 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     }, [url, modalOpen, appState]);
 
 
-    const Spinner = () => (
+    const Spinner = () => {
+       return(
         <View style={styles.activityContainer}>
-            <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
+            {name =='Billing Details' ? <LoadingSpinner /> : <LoadingOverlay loading={true}  />}
+            
         </View>
-    );
+       )
+       
+    }
     return (
         <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
             <ProfileSettingsHeader onPressBack={() => {

@@ -5,7 +5,6 @@ import {
   View,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator,
   TextInput
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -36,6 +35,8 @@ import {
   selectHasMore,
   selectDownloadedReceipt
 } from "../../redux/selectors/paymentHistorySelectors";
+import LoadingOverlay from "../common/customui/CustomLoading";
+import SmallLoader from "../common/customui/SmallLoader";
 
 const CLEAR_PAYMENT_HISTORY_ERROR = 'CLEAR_PAYMENT_HISTORY_ERROR';
 const CLEAR_DOWNLOAD_ERROR = 'CLEAR_DOWNLOAD_ERROR';
@@ -193,7 +194,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         accessibilityLabel="Load more payments"
       >
         {loading ? (
-          <ActivityIndicator size="small" color={Color.sparklightBrightPurple} />
+          <SmallLoader />
         ) : (
           <Text style={styles.loadMoreText}>Load more</Text>
         )}
@@ -272,9 +273,8 @@ const PaymentHistoryScreen = ({ navigation }) => {
 
         {/* Payment History List */}
         {loading && payments.length === 0 ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Color.sparklightBrightPurple} />
-          </View>
+          <LoadingOverlay
+          loading={loading}/>
         ) : payments.length > 0 ? (
           <FlatList
             data={payments}

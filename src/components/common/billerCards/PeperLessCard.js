@@ -6,7 +6,9 @@ import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
 import AppStyles from "../styles/AppStyles";
-const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style }) => {
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+
+const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style,isStatusLoading }) => {
   return (
       <View style={[AppStyles.card, style]}>
         <View style={styles.cardHreader}>
@@ -20,10 +22,47 @@ const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style }
               <Text style={styles.leftTitle}>Paperless Billing</Text>
             </View>
           </View>
+
+          {isStatusLoading ? (
+            <SkeletonPlaceholder>
+          <>
+            <View
+              style={{
+                width: wp("40%"),
+                height: 20,
+                alignSelf: "center",
+                borderRadius: 4,
+                marginTop: 10,
+              }}
+            />
+            <View
+              style={{
+                width: wp("20%"),
+                height: 30,
+                alignSelf: "center",
+                borderRadius: 4,
+                marginVertical: 10,
+              }}
+            />
+
+            <View
+              style={{
+                width: wp("50%"),
+                height: 20,
+                alignSelf: "center",
+                borderRadius: 4,
+                marginTop: 10,
+              }}
+            />
+          </>
+        </SkeletonPlaceholder>
+          ) : (
+            <>
           {paperlessStatus ? (
             <>
               <Text style={[styles.dueDate, { fontWeight: '400', color: colors.gray600 }]}>Email Associated: </Text>
               <Text style={[styles.dueDate]}>{paperlessCardEmail}</Text>
+            
               <Text style={styles.autoPayStatusText}>Paperless Billing On</Text>
               <Text style={[styles.thankYouText,{marginTop:5}]}>Thank you for choosing Paperless Billing!</Text>
             </>
@@ -36,8 +75,25 @@ const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style }
                 <Text style={styles.subText}>Statements delivered via email.</Text>
                 </View>
               </View>
-            </>
+              </>
+           
           )}
+          </>
+          )}
+
+          { isStatusLoading ?
+          <SkeletonPlaceholder> 
+          <View
+            style={{
+              width: wp("70%"),
+              height: 40,
+              alignSelf: "center",
+              borderRadius: 4,
+              marginVertical: 10,
+              
+            }}
+          />
+          </SkeletonPlaceholder> :
           <View style={styles.cardFooter}>
             <TouchableOpacity
              onPress={() => {
@@ -54,6 +110,8 @@ const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style }
               </View>
             </TouchableOpacity>
           </View>
+          }
+          
       </View>
    
   );

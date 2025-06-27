@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Pressable, ActivityIndicator, Linking, AccessibilityInfo } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Linking, AccessibilityInfo } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
@@ -24,8 +24,10 @@ import { checkForMinorUpdate } from "../utility/constant";
 import PromotionCard from "../common/PromotionCard/PromotionCard";
 import { useFocusEffect } from "@react-navigation/native";
 import WalkthroughOverlay from "../common/WalkthroughOverlay";
+import LoadingOverlay from "../common/customui/CustomLoading";
 import { useMaintenance } from '../maintenance/MaintenanceContext';
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
+
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
 const HomeScreen = ({ navigation }) => {
@@ -54,7 +56,7 @@ const HomeScreen = ({ navigation }) => {
   const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
   const [hasEeroDevice, setHasEeroDevice] = useState(false);
   const [networkId, setNetworkId] = useState(null);
- 
+
   useEffect(() => {
     async function getAccessibility() {
       try {
@@ -156,6 +158,7 @@ const HomeScreen = ({ navigation }) => {
       GetApiRequest(
         request,
         (response) => {
+          console.log("checkModemOutagStatus", response);
           if (response != undefined) {
             if (response.hasOutage === true) {
               let time = moment(response.estimatedTimeOfResolution).format(
@@ -173,6 +176,7 @@ const HomeScreen = ({ navigation }) => {
           }
         },
         (errorCode) => {
+          console.log("checkModemOutagStatus erro", errorCode);
           if (errorCode == 204) {
             setInternetHealths((oldArray) => [...oldArray, "Green"]);
           }
@@ -182,6 +186,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const onSuccessPlan = (res) => {
+    console.log("getInternetPlanDetails", res);
     if (res) {
       setPlans(res);
       if (res.length > 0) {
@@ -221,6 +226,7 @@ const HomeScreen = ({ navigation }) => {
           }
 
           let temt = [];
+          console.log("checkModemDetails==", res);
           if (res.equipmentType == "DOCSIS") {
             temt.push(res.uTxP_State);
             temt.push(res.uRxL_State);
@@ -693,7 +699,6 @@ const HomeScreen = ({ navigation }) => {
             ) : (
               <></>
             )}
-
             {showBanner && bannerConfig ? (
               <MaintenanceBanner
                 title={bannerConfig.title}
@@ -706,24 +711,18 @@ const HomeScreen = ({ navigation }) => {
                 severity={bannerConfig.severity || 'info'}
               />
             ) : null}
-           
             <View style={[styles.card, styles.shadowProp, { marginTop: screenReaderEnabled ? 0 : -40 }]}>
               <Text
                 accessible={true}
                 accessibilityLabel={`Service Health`}
                 style={styles.internetHealth}>Service Health</Text>
               {checkModemStatus ? (
+                <>
                 <InternetHealthChart
                   currentValue={getInternetHealth(currentHealth)}
                   key={currentHealth}
                 />
-              ) : (
-                <ActivityIndicator
-                  size="large"
-                  color={Color.colorGainsboro_200}
-                />
-              )}
-              <View
+                <View
                 style={styles.internetStatusSection}
                 accessible={true}
                 accessibilityRole="text"
@@ -741,6 +740,13 @@ const HomeScreen = ({ navigation }) => {
                     : strings.internetStatus}
                 </Text>
               </View>
+              </>
+              ) : (
+                <View style={{ marginVertical: 40 }}>
+                <LoadingOverlay loading={true}/>
+                </View>
+              )}
+              
 
               <View
                 style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}
