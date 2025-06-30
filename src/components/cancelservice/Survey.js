@@ -16,11 +16,12 @@ import SecondaryButton from "../common/customui/SecondaryButton";
 import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import moment from "moment";
-import { set } from "react-hook-form";
+import {useNavigation} from '@react-navigation/native';
 
 
 
-const Survey = ({ navigation }) => {
+const Survey = () => {
+    const navigation = useNavigation();
   const [selectedOption, setSelectedOption] = useState({});
  const [loading, setLoading] = useState(false);
   const [responseData, setResponseData] = useState(null);
@@ -92,7 +93,7 @@ console.log("Request body for disconnect:", requestBody);
       setLoading(false);
       console.log("Disconnect request successful:", res);
       // Handle success, e.g., navigate to a confirmation screen or show a success message
-      navigation.navigate("account", { screen: "cancelServiceSummary",item:selectedOption, comment: myComment });
+      navigation.navigate("cancelServiceSummary", {item:selectedOption, comment: myComment });
     },
     (error) => {
       setLoading(false);
@@ -214,7 +215,7 @@ console.log("Request body for disconnect:", requestBody);
         </View>
       </View>
 
-      {loading && <LoadingOverlay />}
+      {loading && <LoadingOverlay loadingTxt={'Loading'}/>}
       </View>
       </ScrollView>
     </View>

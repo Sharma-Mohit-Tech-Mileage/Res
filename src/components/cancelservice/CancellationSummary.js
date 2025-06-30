@@ -28,11 +28,12 @@ import UpArrow from "../../res/svgIcons/UpArrow";
 import TickIcon from "../../res/svgIcons/TickIcon1";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import EntryInput from "..//entry/EntryInput";
-import { GetApiRequest } from "../../network/APIClient";
+import { GetApiRequest,PostApiRequest } from "../../network/APIClient";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import moment from "moment";
 
-const CancellationSummary = ({ navigation }) => {
+const CancellationSummary = ({ navigation ,route}) => {
+  const { item,comment } = route.params || {};
   const MyRef = useRef(null);
   const [selectedOption, setSelectedOption] = useState("");
   const [isConfirmationPopupVisible, setIsConfirmationPopupVisible] =
@@ -49,7 +50,8 @@ const CancellationSummary = ({ navigation }) => {
   const [enableButton, setEnableButton] = useState(false);
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
-
+  const[previousResponse, setPreviousResponse] = useState(navigation.getState().routes[1].params?.item || {});
+  console.log('Data',JSON.stringify(item))
   const myTheme = {
     arrowColor: Color.sparklightBrightPurple,
     textSectionTitleColor: Color.sparklightDarkGray,
@@ -128,6 +130,54 @@ const CancellationSummary = ({ navigation }) => {
     );
 
   }
+
+
+  // Function to handle the confirmation popup
+
+  const requestPostCancellationservice = () => {
+const requestBody = {
+    "commitDisconnectOrder": {
+    "temporaryOrderID": "0000000000003011",
+    "temporaryJobID": "0001",
+    "conversationID": "QAHA009C3D08C549EE0000",
+    "orderReason": previousResponse.reasonCode, // reasonCode
+    "accountId": profileDetails.accountNumber,
+    "comments": comment, // comment
+    "customerRequestedCompletionDate": "2025-07-06T22:44:03.408Z",
+    "selectedDate": null,
+    "selectedTimeSlotCode": null,
+    "isForTransfer": false,
+    "newTransferLocationId": null,
+    "transferCustomerId": null
+  },
+  "surveyRequest": {
+    "QuestionId": 2,
+    "AccountId": profileDetails.accountNumber,
+    "Response": true,
+    "AdditionalResponseText": "",
+    "ReasonCode": "MV",
+    "EquipmentReturnPolicyAgreementFlag": true
+  },
+  "statisticsInfoRequest": {
+    "AccountId": profileDetails.accountNumber,
+    "FunctionName": "Cancel",
+    "Platform": "Mobile"
+  }
+}
+
+    const requestURL = `/api/Order/CommitDisconnect`
+    console.log("Request body for cancellation service:", requestBody);
+    PostApiRequest(requestURL, requestBody, 
+      (res) => {
+        console.log("Cancellation service request successful:", res);
+        setIsSuccessMessageVisible(true);
+        //getEquipmentDetails();
+      },
+      (error) => {
+        console.error("Error in cancellation service request:", error);
+      }
+    );  
+  };  
 
 
   const onChangeText = (text) => {
