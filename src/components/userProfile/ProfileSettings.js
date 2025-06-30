@@ -205,7 +205,7 @@ const ProfileSettings = () => {
                   </Text>
                 </View>
               )}
-                  <Pressable
+                  {/* <Pressable
                     style={{}}
                     onPress={() => navigation.navigate("cancelServiceSurvey")}
                     accessible={true}
@@ -215,7 +215,7 @@ const ProfileSettings = () => {
                     <Text style={[styles.manageSerTxt2,{marginVertical: 20,textDecorationLine: 'underline'}]}>
                       Cancel Service
                     </Text>
-                  </Pressable>
+                  </Pressable> */}
 
             </View>
           </View>
