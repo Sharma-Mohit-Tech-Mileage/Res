@@ -18,16 +18,23 @@ import {
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { RefreshToken } from "../user/Session";
+import { GetApiRequest } from "../../network/APIClient";
+
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [isNewBiller, setIsNewBiller] = useState(false);
+  const [isCancelService, setIsCancelService] = useState(true);
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
   const convertedRole = getUserType(profileDetails.memberType || "");
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || "");
+
+  const accountDetails = useSelector(
+      (state) => state.combinedReducers.profile?.accountDetails
+    );
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
@@ -43,6 +50,11 @@ const ProfileSettings = () => {
 
   useEffect(() => {
     dispatch(fetchProfileDetails());
+    //console.log("Account Details:", accountDetails);
+    if(accountDetails?.services.hsd){
+      setIsCancelService(true);
+      getPlanDetails();
+    }
   }, [dispatch]);
 
   useEffect(() => {
@@ -61,6 +73,16 @@ const ProfileSettings = () => {
     }
 
     Linking.openURL(phoneNumber);
+  };
+
+  const getPlanDetails = () => {
+      const requestURL=`api/Plan/GetServiceDetails?accountNumber=${profileDetails.accountNumber}&includeEquipment=false&includeLocation=false`
+      GetApiRequest(requestURL,onSuccess=(res)=>{
+
+      }), onError=(error)=>{
+        console.error("Error fetching plan details");
+      }
+    
   };
 
   return (
@@ -205,6 +227,8 @@ const ProfileSettings = () => {
                   </Text>
                 </View>
               )}
+
+              { isCancelService && (
                   <Pressable
                     style={{}}
                     onPress={() => navigation.navigate("cancelServiceSurvey")}
@@ -216,6 +240,7 @@ const ProfileSettings = () => {
                       Cancel Service
                     </Text>
                   </Pressable>
+              )}
 
             </View>
           </View>

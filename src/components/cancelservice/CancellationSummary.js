@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect,useRef } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import CheckBox from "@react-native-community/checkbox";
@@ -27,10 +28,12 @@ import UpArrow from "../../res/svgIcons/UpArrow";
 import TickIcon from "../../res/svgIcons/TickIcon1";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import EntryInput from "..//entry/EntryInput";
+import { GetApiRequest } from "../../network/APIClient";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import moment from "moment";
 
 const CancellationSummary = ({ navigation }) => {
+  const MyRef = useRef(null);
   const [selectedOption, setSelectedOption] = useState("");
   const [isConfirmationPopupVisible, setIsConfirmationPopupVisible] =
     useState(false);
@@ -42,6 +45,10 @@ const CancellationSummary = ({ navigation }) => {
 
   const [currentDate, setCurrentDate] = useState(moment().format("YYYY-MM-DD"));
   const [markedDates, setMarkedDates] = useState({});
+  const [isSuccessMessageVisible, setIsSuccessMessageVisible] = useState(false);
+  const [enableButton, setEnableButton] = useState(false);
+  const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {};
 
   const myTheme = {
     arrowColor: Color.sparklightBrightPurple,
@@ -53,7 +60,6 @@ const CancellationSummary = ({ navigation }) => {
   const date2 = moment(currentDate).add(2, "days").format("YYYY-MM-DD");
 
   useEffect(() => {
-    console.log("Current Date:", date);
     markedDates[date] = {
       customStyles: {
         container: {
@@ -106,6 +112,23 @@ const CancellationSummary = ({ navigation }) => {
     console.log("Marked Dates Updated:", JSON.stringify(markedDates));
     setSelectedOption(date);
   }, [markedDates]);
+
+
+  const getEquipmentDetails = () => {
+      const requestURL = `api/Equipment/GetEquipmentDetails?accountNumber=${profileDetails.accountNumber}&includeServiceCode=true`;
+    GetApiRequest(
+      requestURL,
+      (res) => {
+        console.log("Equipment Details:", res);
+        // Process the equipment details as needed
+      },
+      (error) => {
+        console.error("Error fetching equipment details:", error);
+      }
+    );
+
+  }
+
 
   const onChangeText = (text) => {
     setInput(text);
@@ -334,48 +357,92 @@ const CancellationSummary = ({ navigation }) => {
 
   const onDaySelected = (selectedDate) => {
     //setCurrentDate(selectedDate);
-    if (markedDates[selectedDate]) {
-      // If the date is already selected, deselect it
-      const updatedMarkedDates = { ...markedDates };
-      if (updatedMarkedDates[selectedDate].isSelected) {
-        updatedMarkedDates[selectedDate] = {
+      
+    //for (const date in markedDates) {
+      
+      // Deselect all dates first
+      const updatedMarkedDates = {};
+      Object.keys(markedDates).forEach((d) => {
+        updatedMarkedDates[d] = {
           customStyles: {
-            container: {
-              backgroundColor: Color.sparklightGray,
-              borderColor: Color.sparklightDarkGray,
-              borderWidth: 1,
-              elevation: 0,
-            },
-            text: {
-              color: Color.colorGray_200,
-              fontWeight: "400",
-            },
+        container: {
+          backgroundColor: Color.sparklightGray,
+          borderColor: Color.sparklightDarkGray,
+          borderWidth: 1,
+          elevation: 2,
+        },
+        text: {
+          color: Color.colorGray_200,
+          fontWeight: "400",
+        },
           },
         };
-        updatedMarkedDates[selectedDate].isSelected = false;
-        setMarkedDates(updatedMarkedDates);
-        return;
-      } else {
+      });
+
+      // Select the clicked date
+      if (updatedMarkedDates[selectedDate]) {
         updatedMarkedDates[selectedDate] = {
           customStyles: {
-            container: {
-              backgroundColor: Color.sparklightBrightPurple,
-              borderColor: Color.sparklightGray,
-              borderWidth: 1,
-              elevation: 0,
-            },
-            text: {
-              color: Color.sparklightWhite,
-              fontWeight: "400",
-            },
+        container: {
+          backgroundColor: Color.sparklightBrightPurple,
+          borderColor: Color.sparklightDarkGray,
+          borderWidth: 1,
+          elevation: 0,
+        },
+        text: {
+          color: Color.sparklightWhite,
+          fontWeight: "400",
+        },
           },
         };
-        updatedMarkedDates[selectedDate].isSelected = true;
-        setMarkedDates(updatedMarkedDates);
-        return;
       }
-    } else {
-    }
+
+      setMarkedDates(updatedMarkedDates);
+      setSelectedOption(selectedDate);
+    //}
+
+    // if (markedDates[selectedDate]) {
+    //   const updatedMarkedDates = { ...markedDates };
+    //   //if (updatedMarkedDates[selectedDate].isSelected) {
+    //     updatedMarkedDates[selectedDate] = {
+    //       customStyles: {
+    //         container: {
+    //           backgroundColor: Color.sparklightBrightPurple,
+    //           borderColor: Color.sparklightDarkGray,
+    //           borderWidth: 1,
+    //           elevation: 0,
+    //         },
+    //         text: {
+    //           color: Color.colorWhitesmoke_200,
+    //           fontWeight: "400",
+    //         },
+    //       },
+    //     };
+    //    // updatedMarkedDates[selectedDate].isSelected = false;
+    //   setMarkedDates(updatedMarkedDates);
+    //     return;
+      
+    // } else {
+    //   // If the date is not selected, select it
+    //   const updatedMarkedDates = { ...markedDates };
+    //   updatedMarkedDates[selectedDate] = {
+    //     customStyles: {
+    //       container: {
+    //         backgroundColor: Color.sparklightGray,
+    //         borderColor: Color.sparklightDarkGray,
+    //         borderWidth: 1,
+    //         elevation: 0,
+    //       },
+    //       text: {
+    //         color: Color.colorGray_200,
+    //         fontWeight: "400",
+    //       },
+    //     },
+    //   };
+    //   //updatedMarkedDates[selectedDate].isSelected = true;
+    //   setMarkedDates(updatedMarkedDates);
+    // }
+    
   };
 
   return (
@@ -393,14 +460,14 @@ const CancellationSummary = ({ navigation }) => {
         useAngle={true}
         angle={90}
       />
-      <ScrollView style={{ flex: 1, marginBottom: 100 }}>
+      <ScrollView style={{ flex: 1, marginBottom: 100 }}ref={MyRef} >
         <View style={[AppStyles.card, { margin: 16 }]}>
-          {renderSuccessMessage()}
+          {isSuccessMessageVisible && renderSuccessMessage()}
           <Text style={styles.header}>We’re Sad To See You Go</Text>
           <View style={styles.seperator} />
           <View style={{ paddingVertical: 5, paddingHorizontal: 24 }}>
             <Text style={styles.lableTxt}>Account Number</Text>
-            <Text style={styles.valueTxt}>239847324343</Text>
+            <Text style={styles.valueTxt}>{profileDetails.accountNumber}</Text>
           </View>
           <View style={styles.seperator} />
           <View style={{ paddingVertical: 5, paddingHorizontal: 24 }}>
@@ -693,6 +760,11 @@ const CancellationSummary = ({ navigation }) => {
             onActionTxt={"Confirm Cancellation"}
             onAction={() => {
               setIsConfirmationPopupVisible(false);
+              setIsSuccessMessageVisible(true);
+              MyRef.current?.scrollTo({
+                y: 0,
+                animated: true,
+            });
             }}
             onClose={() => {
               setIsConfirmationPopupVisible(false);

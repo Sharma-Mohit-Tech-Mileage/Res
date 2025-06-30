@@ -14,6 +14,7 @@ const getProfileDetails = async () => {
             Authorization: "Bearer " + data.token
         }
     };
+    console.log("Authorization header:", config.headers.Authorization);
     let ApiMethod = ''
     if (accountNumber.toString().length >= 16) {
         ApiMethod = `/api/profile/${accountNumber}`
@@ -637,6 +638,7 @@ const isPaperlessEnabled = async (email) => {
             "first_name", "last_name",
             "current_balance", "past_due_amount",
             "payment_due_date", "customer_type",
+            "services",
             "email_details", "email"
         ],
     };

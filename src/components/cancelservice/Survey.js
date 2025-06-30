@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { View, Text, Pressable,TextInput, ScrollView } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { Radio } from "native-base";
+import {  useSelector } from "react-redux";
 import {
   Color,
   Padding,
@@ -12,36 +13,95 @@ import {
 } from "../../../GlobalStyles";
 import AppStyles from "../common/styles/AppStyles";
 import SecondaryButton from "../common/customui/SecondaryButton";
+import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
+import LoadingOverlay from "../common/customui/CustomLoading";
+import moment from "moment";
+import { set } from "react-hook-form";
 
-const surveyOptions = [ { id:1, 
-  label :"I relocated recently and no longer need the internet service."},
-  {id :2 ,label :"I switched to another internet provider."},
-  {id :3, label :"The cost of the internet service was too expensive."},
-  {id: 4,label :"I was dissatisfied with the quality or reliability of the internet service."},
-  {id:5 ,label :"Other (please explain below)"},
-];
+
 
 const Survey = ({ navigation }) => {
-  const [selectedOption, setSelectedOption] = useState("");
-  const [selectedId, setSelectedId] = useState(null);
+  const [selectedOption, setSelectedOption] = useState({});
+ const [loading, setLoading] = useState(false);
+  const [responseData, setResponseData] = useState(null);
   const [myComment, setMyCommnet] = useState("");
   const [isNoComment, setIsNoComment] = useState(true);
-  const [selectedValue, setSelectedValue] = useState("option1");
+
+  const [surveyOptions, setSurveyOptions] = useState([])
+ const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const profileDetails = profile.profileDetails || {};
+  const [currentDate, setCurrentDate] = useState(moment().format("YYYY-MM-DDTHH:mm:ssZ"));
+  const [endDate, setEndDate] = useState(moment().add(10,'days').format("YYYY-MM-DDTHH:mm:ssZ"));
 
   onCancel = () => {
     navigation.navigate("account", { screen: "Account" });
   };
-  onContinue = (option) => {
+  const onContinue = (option) => {
+    setLoading(true);
     // Handle the continue action with the selected option
     console.log("Selected option:", option);
     // Navigate to the next screen or perform any other action
-    navigation.navigate("account", { screen: "cancelServiceSummary" });
+   // navigation.navigate("account", { screen: "cancelServiceSummary",item:selectedOption, comment: myComment });
+    if (option && option.reasonCode) {
+      requestPostDisconnect();
+    } else {
+      console.warn("Please select a reason before continuing.");
+    }
   };
 
   const onChangeValue = (value) => {
     console.log("Selected value:", value);
     setSelectedOption(value);
   }
+
+  useEffect(() => {
+    getSurveyData();
+  }, []);
+
+const getSurveyData = () => {
+  GetApiRequest("api/Survey",onSuccess=(res)=>{
+    console.log("Survey data fetched successfully:", res);
+    if(res && res.length > 0) {
+      setSurveyOptions(res)
+    }
+
+  }),onError=(error)=>{
+    console.error("Error fetching survey data:", error);
+  }
+    
+}
+
+const requestPostDisconnect = () => {
+  const requestBody ={
+  "disconnectOrder": {
+    "accountID": profileDetails.accountNumber,
+    "beginDate": currentDate,    //+10 days for end date
+    "endDate": endDate,
+    "customerRequestedCompletionDate": currentDate, //-begin date
+    "orderReason": selectedOption.reasonCode,    //------- reasonCode
+    "comments": myComment, //-comment
+    "isForTransfer": false,
+    "newTransferLocationId": ""
+  }
+}
+console.log("Request body for disconnect:", requestBody);
+  PostApiRequest(
+    "api/Order/Disconnect",
+    requestBody,
+    (res) => {
+      setLoading(false);
+      console.log("Disconnect request successful:", res);
+      // Handle success, e.g., navigate to a confirmation screen or show a success message
+      navigation.navigate("account", { screen: "cancelServiceSummary",item:selectedOption, comment: myComment });
+    },
+    (error) => {
+      setLoading(false);
+      console.error("Error in disconnect request:", error);
+      // Handle error, e.g., show an error message
+    }
+  );
+};
+
 
   return (
     <View style={styles.rootContainer}>
@@ -75,17 +135,26 @@ const Survey = ({ navigation }) => {
             style={{ flexDirection: 'column', alignItems: 'flex-start' }} 
           >
             {surveyOptions.map((option, idx) => (
-              <Radio
-                value={option.id}
+              <View
                 key={idx}
-                style={{marginVertical:5}}
-                //colorScheme={"primary.200"}
-                accessibilityLabel={`Option ${idx + 1}`}
-                accessibilityHint={`Select this option if you ${option.label.toLowerCase()}`}
-                accessibilityRole="radio"
+                style={{
+                  flexDirection: "row",
+                  alignItems: "flex-start",
+                  marginVertical: 5,
+                  width: "100%",
+                }}
               >
-                <Text style={styles.optionTxt}>{option.label}</Text>
-              </Radio>
+                <Radio
+                  value={option}
+                  accessibilityLabel={`Option ${idx + 1}`}
+                  accessibilityHint={`Select this option if you ${option.questionText.toLowerCase()}`}
+                  accessibilityRole="radio"
+                  style={{ marginTop: 0, marginRight: 5, transform: [{ scale: 0.9 }] }} // Make radio smaller
+                />
+                <Text style={[styles.optionTxt, { flex: 1, marginBottom: 0, marginTop: 0 }]}>
+                  {option.questionText}
+                </Text>
+              </View>
             ))}
           </Radio.Group> 
           {/* <RadioGroup 
@@ -144,6 +213,8 @@ const Survey = ({ navigation }) => {
           />
         </View>
       </View>
+
+      {loading && <LoadingOverlay />}
       </View>
       </ScrollView>
     </View>
