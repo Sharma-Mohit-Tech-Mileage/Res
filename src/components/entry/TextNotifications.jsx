@@ -1,11 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Keyboard, Pressable, KeyboardAvoidingView, TouchableWithoutFeedback, Platform } from "react-native";
+import { View, Image, StyleSheet, Text, ScrollView, Keyboard, Pressable, KeyboardAvoidingView, TouchableWithoutFeedback, Platform } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
-import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import InfoIcon from "../../res/svgIcons/InfoIcon";
-import BellIcon from "../../res/svgIcons/bellIcon";
 import PhoneRingingIcon from "../../res/svgIcons/PhoneRingingIcon";
 import EntryInput from "./EntryInput";
 import CheckBox from '@react-native-community/checkbox';

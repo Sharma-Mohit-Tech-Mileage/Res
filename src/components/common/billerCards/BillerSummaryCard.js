@@ -4,17 +4,17 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
-  ActivityIndicator,
+  Image
 } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import WalletIcon from "../../../res/svgIcons/WalletIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
-import { Env } from "../../../network/apis/account/Constants";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
+import SmallLoader from "../customui/SmallLoader";
 
 const BillerSummaryCard = ({
   billAmt,
@@ -85,10 +85,28 @@ const BillerSummaryCard = ({
         </View>
         <View style={styles.cardContent}>
           {billAmt == undefined ? (
-            <ActivityIndicator
-              size="large"
-              color={colors.sparklight_bright_purple}
-            />
+            <SkeletonPlaceholder>
+              <>
+              <View
+                style={{
+                  width: wp("25%"),
+                  height: 20,
+                  alignSelf: "flex-end",
+                  borderRadius: 4,
+                  marginBottom: 10,
+                }}
+              />
+              <View
+                style={{
+                  width: wp("30%"),
+                  height: 20,
+                  alignSelf: "flex-end",
+                  borderRadius: 4,
+                  marginVertical: 10,
+                }}
+              />
+              </>
+            </SkeletonPlaceholder>
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>
           )}

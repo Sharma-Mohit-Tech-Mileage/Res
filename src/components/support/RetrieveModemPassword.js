@@ -10,7 +10,7 @@ import { GetApiRequest } from "../../network/APIClient";
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import SparkLightInput from "../common/customui/SparkLightInput";
 import PlugIcon from "../../res/svgIcons/plug";
-import Loader from "../utility/Loader";
+import LoadingOverlay from "../common/customui/CustomLoading";
 
 const RetrieveModemPassword = () => {
 
@@ -185,7 +185,7 @@ const RetrieveModemPassword = () => {
           </Text>
         </Pressable>
       </View>
-      {loading ? <Loader /> : null}
+      {loading ? <LoadingOverlay loading={loading} /> : null}
     </View>
   );
 };

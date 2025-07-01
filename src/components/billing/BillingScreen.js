@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Image, StyleSheet, Text, View, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import { Image, StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
@@ -18,6 +18,7 @@ import { Env } from "../../network/apis/account/Constants";
 import colors from "../../res/Colors";
 import AppStyles from "../common/styles/AppStyles";
 import { getPrimaryEmail } from "../utility/constant";
+import LoadingOverlay from "../common/LoadingOverlay";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -29,6 +30,11 @@ const BillingScreen = ({ navigation }) => {
   const paperlessStatusAcp = useSelector(
     (state) => state.combinedReducers.profile?.paperlessStatusAcp
   );
+
+  const paperlessLoading = useSelector(
+        (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
+    );
+
   const { allSvEmailAssociated = [] } = profile;
   const paperlessEmails = allSvEmailAssociated.filter((email) => email.invoice);
   const [billAmt, setBillAmt] = useState(undefined);
@@ -41,8 +47,9 @@ const BillingScreen = ({ navigation }) => {
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
   
   // Content loading state
-  const [isContentLoading, setIsContentLoading] = useState(true);
-
+  const [isContentLoading, setIsContentLoading] = useState(false);
+ const [isAutoPayStatusLoad, setIsAutoPayStatusLoad] = useState(false);
+  const [loadingPerless, setLoadingPerless] = useState(false);
   let paperlessCardEmail = '';
   if (isNewBiller) {
     paperlessCardEmail = paperlessEmail;
@@ -53,12 +60,14 @@ const BillingScreen = ({ navigation }) => {
   const handleError = (error) => { 
     console.log("error", error); 
     setIsContentLoading(false);
+    setIsAutoPayStatusLoad(false);
+    setLoadingPerless(false);
   };
 
   const getUserAccountDetails = () => {
     setBillAmt(undefined);
-    setIsContentLoading(true);
-    
+    setIsContentLoading(false);
+    setIsAutoPayStatusLoad(true);
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
       const request = `account/api/account/${accountNumber}`;
@@ -97,7 +106,8 @@ const BillingScreen = ({ navigation }) => {
   };
 
   const getStatus = () => {
-    setIsContentLoading(true);
+    setIsAutoPayStatusLoad(true);
+    setLoadingPerless(true);
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
       GetApiRequest(
@@ -105,7 +115,7 @@ const BillingScreen = ({ navigation }) => {
         (res) => {
           setIsAutoPayStatus(res?.isEasyPay);
           setCardDigit(res?.epLastfour);
-          setIsContentLoading(false);
+          setIsAutoPayStatusLoad(false);
         },
         handleError
       );
@@ -114,19 +124,23 @@ const BillingScreen = ({ navigation }) => {
         `account/api/account/${accountNumber}/paperless/status`,
         (res) => {
           setPaperlessStatus(res?.isPaperless);
-          setIsContentLoading(false);
+          setTimeout(() => {
+             setLoadingPerless(false);
+          }, 2000);
+         
         },
         handleError
       );
     }).catch(error => {
       console.log("Error getting user status:", error);
       setIsContentLoading(false);
+      setIsAutoPayStatusLoad(false);
     });
   };
 
   useFocusEffect(
     useCallback(() => {
-      setIsContentLoading(true);
+      setIsContentLoading(false);
       getStatus();
       
       if (user && user.isNormalUser) {
@@ -203,8 +217,9 @@ const BillingScreen = ({ navigation }) => {
           <View style={{ paddingBottom: 80, marginTop: Padding.p_5xl }}>
             {isContentLoading ? (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={colors.sparklight_bright_purple} />
-                <Text style={styles.loadingText}>Loading...</Text>
+                <LoadingOverlay loading={isContentLoading} onRequestClose={()=>{
+                  setIsContentLoading(false)
+                }}/>
               </View>
             ) : (
               <>
@@ -222,6 +237,7 @@ const BillingScreen = ({ navigation }) => {
                   cardDigit={cardDigit}
                   isAutoPayStatus={isAutoPayStatus}
                   paymentDetails={defaultPaymentDetails}
+                  isStatusLoading={isAutoPayStatusLoad}
                   navigation={navigation}
                   style={styles.card}
                 />
@@ -230,6 +246,7 @@ const BillingScreen = ({ navigation }) => {
                   paperlessStatus={isNewBiller ? paperlessStatusAcp : paperlessEmails?.length>0}
                   navigation={navigation}
                   style={styles.card}
+                  isStatusLoading={paperlessLoading}
                 />
                 <View style={[AppStyles.card, styles.myModemSpaceBlock]}>
                   <View style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}>

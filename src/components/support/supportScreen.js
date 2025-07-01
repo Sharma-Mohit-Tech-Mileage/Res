@@ -7,7 +7,6 @@ import {
   ScrollView,
   Linking,
   RefreshControl,
-  ActivityIndicator,
   Platform,
   Text,
   TouchableOpacity,

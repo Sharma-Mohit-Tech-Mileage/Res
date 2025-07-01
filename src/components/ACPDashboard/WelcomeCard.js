@@ -4,6 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { FontFamily, FontSize, Color, Padding, Border } from '../../../GlobalStyles';
 import AccessibleYoutubePlayer from '../common/AccessibleYoutubePlayer';
 
+
 const WelcomeCard = () => {
   // Example YouTube video ID - replace with your actual video ID
   const videoId = 'C3cMQoWxv6I'; 

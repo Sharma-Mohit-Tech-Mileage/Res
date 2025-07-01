@@ -22,6 +22,7 @@ import { GetApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { useMaintenance } from '../maintenance/MaintenanceContext';
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
+
 const NewBillerHome = ({ navigation }) => {
   // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
@@ -32,27 +33,36 @@ const NewBillerHome = ({ navigation }) => {
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
+  const [loadingAutoPay, setloadingAutoPay] = useState(false);
   const { showBanner, showMaintenancePage, bannerConfig, pageConfig, dismissBanner } = useMaintenance();
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
   const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: "", latestVersion: "", });
+
   // Redux selectors
   const home = useSelector((state) => state.combinedReducers.home);
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
   );
   const dispatch = useDispatch();
-const paperlessStatusAcp = useSelector( (state) => state.combinedReducers.profile?.paperlessStatusAcp );
+  const paperlessStatusAcp = useSelector( (state) => state.combinedReducers.profile?.paperlessStatusAcp );
+  const paperlessLoading = useSelector(
+      (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
+  );
 
     const getStatus = () => {
+      setloadingAutoPay(true);
         getUser().then((res) => {
           const accountNumber = res.userInfo.accountNumber;
           GetApiRequest(
             `api/Accounts/${accountNumber}/easypay`,
             (res) => {
+              console.log("res-------------------------------------------------------------------------------", res);
               setIsAutoPayStatus(res?.isEasyPay);
+              setloadingAutoPay(false);
             },
             (error) => {
-              console.log("error", error);
+               console.log("error", error);
+              setloadingAutoPay(false);
             }
           );
         });
@@ -60,6 +70,7 @@ const paperlessStatusAcp = useSelector( (state) => state.combinedReducers.profil
   // Refresh data when the screen is focused
   useFocusEffect(
     useCallback(() => {
+      console.log("paperlessLoading",JSON.stringify(paperlessLoading));
       const refreshData = async () => {
         try {
           const status = await checkForMinorUpdate();
@@ -157,6 +168,7 @@ const paperlessStatusAcp = useSelector( (state) => state.combinedReducers.profil
         />
         <FeatureCard
           title="Auto Pay"
+          isLoading={loadingAutoPay}
           features={["Convenient", "Timely Payments", "Peace of Mind"]}
           buttonText={isAutoPayStatus ? "Active" : "Activate Auto Pay"}
           buttonVariant={isAutoPayStatus ? "success" : "primary"}
@@ -172,7 +184,8 @@ const paperlessStatusAcp = useSelector( (state) => state.combinedReducers.profil
           }}
         />
         <FeatureCard
-          title="Paperless Billing"
+         isLoading={paperlessLoading}
+         title="Paperless Billing"
           features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
           buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}
           buttonVariant={paperlessStatusAcp ? "success" : "primary"}

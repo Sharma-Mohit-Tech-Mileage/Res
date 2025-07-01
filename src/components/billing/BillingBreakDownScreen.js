@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, memo } from "react";
-import { StyleSheet, Text, View, FlatList, ActivityIndicator, ScrollView,Pressable } from "react-native";
+import { StyleSheet, Text, View, FlatList, ScrollView,Pressable } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
@@ -13,6 +13,7 @@ import { selectBillingBreakDownLoading, selectBillingBreakDownData, selectBillin
 import { InfoIcon } from "native-base";
 import BillErrorIcon from "../../res/svgIcons/BillBreakDownErrorIcon";
 import SecondaryButton from '../common/customui/PrimaryButton';
+import LoadingOverlay from "../common/customui/CustomLoading";
 
 // Constants
 const PLACEHOLDER_MESSAGE = "The bill breakdown reflects your latest monthly statement, showing last month's usage, charges, credits, and adjustments. It's a snapshot in time and might not capture recent account changes post-statement.";
@@ -208,8 +209,9 @@ const EmptyState = memo(() => (
  */
 const LoadingIndicator = memo(() => (
   <View style={styles.loadingContainer}>
-    <ActivityIndicator
+    <LoadingOverlay
       size="large"
+      loading={true}
       color={Color.sparklightBrightPurple}
       accessible={true}
       accessibilityLabel="Loading billing breakdown data"
