@@ -7,8 +7,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Linking,
-  Modal,
-  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -28,25 +26,26 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 import PrimaryButtom from "../common/customui/PrimaryButton";
+import LoadingOverlay from "../common/customui/CustomLoading";
 
-// LoadingOverlay Component
-const LoadingOverlay = ({ loading }) => {
-  return (
-    <Modal
-      visible={loading}
-      transparent
-      animationType="fade"
-      onRequestClose={() => {}}
-    >
-      <View style={styles.overlay}>
-        <View style={styles.alertContainer}>
-          <ActivityIndicator size="large" color={Color.colorGainsboro_200} />
-          <Text style={styles.loadingTxt}>Rebooting Modem</Text>
-        </View>
-      </View>
-    </Modal>
-  );
-};
+// // LoadingOverlay Component
+// const LoadingOverlay = ({ loading }) => {
+//   return (
+//     <Modal
+//       visible={loading}
+//       transparent
+//       animationType="fade"
+//       onRequestClose={() => {}}
+//     >
+//       <View style={styles.overlay}>
+//         <View style={styles.alertContainer}>
+//           <ActivityIndicator size="large" color={Color.colorGainsboro_200} />
+//           <Text style={styles.loadingTxt}>Rebooting Modem</Text>
+//         </View>
+//       </View>
+//     </Modal>
+//   );
+// };
 
 
 const ModemReboot = ({ route }) => {
@@ -181,7 +180,7 @@ const ModemReboot = ({ route }) => {
           />
             
 
-          <LoadingOverlay loading={loading} />
+          <LoadingOverlay loading={loading}loadingTxt={'Rebooting Modem'} />
           <CustomerErrorPage
             visible={isRebootError}
             message={rebootErrorMsg}

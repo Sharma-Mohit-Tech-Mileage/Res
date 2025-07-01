@@ -11,7 +11,7 @@ import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import SparkLightInput from "../common/customui/SparkLightInput";
 import SparkLightButton from "../common/customui/PrimaryButton";
 import NotificationAlert from "../common/customui/NotificationAlert";
-import Loader from "../utility/Loader";
+import LoadingOverlay from "../common/customui/CustomLoading";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const UpdateModemPassword = (props) => {
@@ -298,7 +298,7 @@ const UpdateModemPassword = (props) => {
         </View>
 
       </KeyboardAwareScrollView>
-      {loading ? <Loader /> : null}
+      {loading ? <LoadingOverlay loading={loading} /> : null}
     </View>
   );
 };

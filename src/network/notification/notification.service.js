@@ -54,14 +54,14 @@ export const isPaperlessEnabled = async (email) => {
 };
 
 // Enroll in paperless for an email
-export const enrollPaperless = async (emailAddress) => {
+export const enrollPaperless = async (data) => {
     try {
         const config = await getAuthConfig();
         const accountNumber = await getUserAccountNumber();
-        console.log('📨 Enrolling in paperless:', { emailAddress, accountNumber });
+        console.log('📨 Enrolling in paperless:', data.emailAddress);
         
         const response = await _axios.post(
-            `/api/Paperless/PaperlessEnrollment?emailAddress=${emailAddress}&account=${accountNumber}`, 
+            `/api/Paperless/PaperlessEnrollment?emailAddress=${data.emailAddress}&account=${accountNumber}`, 
             null, 
             {...config}
         );

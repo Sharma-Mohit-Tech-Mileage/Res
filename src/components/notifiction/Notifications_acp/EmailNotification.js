@@ -27,6 +27,7 @@ const AddNotificationScreen = () => {
   const [notification, setNotification] = useState(null);
   const [formState, setFormState] = useState({ paperlessBilling: false });
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+  const user = useSelector(state => state.combinedReducers.user.userData);
   const [isCheckboxVisible, setIsCheckboxVisible] = useState(null);
   const scrollViewRef = useRef(null);
   const animatedValue = useRef(new Animated.Value(-100)).current;
@@ -174,7 +175,7 @@ const AddNotificationScreen = () => {
             newEmail: email,
             oldEmail: primaryEmail,
             paperlessBilling,
-            account: accountDetails?.accountNumber,
+            account: user.userInfo?.accountNumber,
           },
           navigation
         )

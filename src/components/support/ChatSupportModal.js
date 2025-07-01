@@ -4,10 +4,8 @@ import {
   View,
   StyleSheet,
   Alert,
-  SafeAreaView,
   Linking,
   Platform,
-  ActivityIndicator
 } from "react-native";
 import WebView from "react-native-webview";
 
@@ -27,6 +25,7 @@ import {
 } from "react-native-responsive-screen";
 import colors from "../../res/Colors";
 import SupportChatHeader from "../common/SupportChatHeader";
+import LoadingOverlay from "../common/customui/CustomLoadingOverlay";
 
 const ChatSupportModal = ({ department, onClose }) => {
   const [modalVisible, setModalVisible] = useState(true);
@@ -174,7 +173,7 @@ const ChatSupportModal = ({ department, onClose }) => {
           />
         </View>
         {loading && (
-        <ActivityIndicator
+        <LoadingOverlay
           style={{ position: "absolute", top: hp('50%'), left: wp('48%') }}
           size="large"
           color={colors.sparklight_bright_purple}

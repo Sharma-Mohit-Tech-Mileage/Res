@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import WalletIcon from "../../../res/svgIcons/WalletIcon";
@@ -7,6 +7,7 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { Color, FontFamily, Padding } from "../../../../GlobalStyles";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
+import SmallLoader from "../customui/SmallLoader";
 const CardNewBiller = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, style}) => {
 
   const uncheck = require("../../../../assets/checkcircle1.png");
@@ -44,7 +45,7 @@ const CardNewBiller = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, nav
         </View>
         <View style={styles.cardContent}>
           {billAmt == undefined ? (
-            <ActivityIndicator size="large" color={Color.sparklightBrightPurple} style={{marginLeft:wp("15%")}} />
+            <SmallLoader  style={{marginLeft:wp("15%")}} />
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>
           )}

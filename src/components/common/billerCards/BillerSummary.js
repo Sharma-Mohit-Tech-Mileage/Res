@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
@@ -9,7 +9,9 @@ import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
 import AppStyles from "../styles/AppStyles";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
-const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, style, acno, isNewBiller }) => {
+import SmallLoader from "../customui/SmallLoader";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+const Card = ({ billAmt, dueDate, navigation, style, acno, isNewBiller }) => {
 
 
   const NotAvailable = () => {
@@ -118,11 +120,31 @@ const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, 
               }
             ]}>Total Amount Due</Text>
           {billAmt == undefined ? (
-            <ActivityIndicator
-              size="large"
-              color={colors.primary_color}
-              style={{ alignSelf: "center" }}
-            />
+            <View style={{ alignSelf: "center" }}>
+            <SkeletonPlaceholder>
+              <>
+              <View
+                style={{
+                  width: wp("30%"),
+                  height: 20,
+                  alignSelf: "flex-end",
+                  borderRadius: 4,
+                  marginVertical: 5,
+                }}
+              />
+              <View
+                style={{
+                  width: wp("30%"),
+                  height: 20,
+                  alignSelf: "flex-end",
+                  borderRadius: 4,
+                  marginVertical: 5,
+                }}
+              />
+              </>
+            </SkeletonPlaceholder>
+            
+            </View>
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>
           )}
@@ -179,6 +201,7 @@ const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, 
         </View>
       </View>
 
+     { billAmt !=undefined ? (
       <View style={styles.cardFooter}>
         <TouchableOpacity
           onPress={() => {
@@ -200,6 +223,20 @@ const Card = ({ billAmt, dueDate, isAutoPayStatus, paperlessStatus, navigation, 
           </View>
         </TouchableOpacity>
       </View>
+     ):<>
+     <SkeletonPlaceholder>
+        <View
+          style={{
+            width: wp("70%"),
+            height: 40,
+            alignSelf: "center",
+            borderRadius: 4,
+            marginVertical: 10,
+          }}
+        />
+      </SkeletonPlaceholder>
+     </>
+     }
     </View>
 
   );

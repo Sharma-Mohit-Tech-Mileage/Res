@@ -7,9 +7,6 @@ import {
   View,
   Pressable,
   TextInput,
-  Linking,
-  ActivityIndicator,
-  Alert
 } from "react-native";
 import {
   Padding,
@@ -38,6 +35,7 @@ import { Env } from "../../../network/apis/account/Constants";
 import LoadingOverlay from "../../common/customui/CustomLoading";
 import { getUser } from "../../../redux/utils/LocalStorage";
 import { useSelector } from "react-redux";
+import SmallLoader from "../../common/customui/SmallLoader";
 
 const ViewTicket = ({ route }) => {
   const navigation = useNavigation();
@@ -579,10 +577,7 @@ const ViewTicket = ({ route }) => {
                     )}
                   </View>
                   {isCommentLoading?
-                  <ActivityIndicator
-                  size="small"
-                  color="#8D3B90"
-                  style={[styles.activityIndicator]}
+                  <SmallLoader
                 />:<RenderComments />}
                   
                 </View>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Image, StyleSheet, Text, Pressable, View, ScrollView, Modal, ActivityIndicator, AccessibilityInfo } from "react-native";
+import { Image, StyleSheet, Text, Pressable, View, ScrollView, AccessibilityInfo } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -15,6 +15,7 @@ import { validatePassword, securityQuestions, passwordTerms } from "../utility/c
 import NotificationError from "../common/customui/NotificationError";
 import WarningIcon from "../../../assets/alert-triangle.png";
 import colors from "../../res/Colors";
+import LoadingOverlay from "../common/customui/CustomLoading";
 
 const announceForAccessibility = (message) => {
   AccessibilityInfo.announceForAccessibility(message);
@@ -144,23 +145,23 @@ const UserManagementEdit = ({ route }) => {
     }
   }, []);
 
-  const LoadingOverlay = () => (
-    <Modal
-      visible={loading}
-      transparent
-      animationType="fade"
-      onRequestClose={() => setLoading(false)}
-      accessible={true}
-      accessibilityLabel="Loading overlay"
-    >
-      <View style={styles.overlay}>
-        <View style={styles.alertContainer}>
-          <ActivityIndicator size="large" color={Color.colorGainsboro_200} />
-          <Text style={styles.loadingTxt}>Saving Data..</Text>
-        </View>
-      </View>
-    </Modal>
-  );
+  // const LoadingOverlay = () => (
+  //   <Modal
+  //     visible={loading}
+  //     transparent
+  //     animationType="fade"
+  //     onRequestClose={() => setLoading(false)}
+  //     accessible={true}
+  //     accessibilityLabel="Loading overlay"
+  //   >
+  //     <View style={styles.overlay}>
+  //       <View style={styles.alertContainer}>
+  //         <ActivityIndicator size="large" color={Color.colorGainsboro_200} />
+  //         <Text style={styles.loadingTxt}>Saving Data..</Text>
+  //       </View>
+  //     </View>
+  //   </Modal>
+  // );
 
   return (
     <View 
@@ -477,7 +478,7 @@ const UserManagementEdit = ({ route }) => {
               <Text style={[styles.makePayment2, styles.makeTypo]} accessibilityElementsHidden={true}>Cancel</Text>
             </Pressable>
           </View>
-          <LoadingOverlay />
+          <LoadingOverlay loading={loading} loadingTxt={'Saving Data...'}/>
         </View>
         </View>
       </ScrollView>
