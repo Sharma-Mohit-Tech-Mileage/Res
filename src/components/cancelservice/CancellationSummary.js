@@ -13,6 +13,7 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import CheckBox from "@react-native-community/checkbox";
 import IconFaq from "../../res/svgIcons/troubleshooting/iconfaq";
 import Tooltip from "rn-tooltip";
+import WarningIcon from "../../../assets/alert-triangle.png";
 import {
   Color,
   Padding,
@@ -33,9 +34,10 @@ import { Calendar, LocaleConfig } from "react-native-calendars";
 import moment from "moment";
 
 const CancellationSummary = ({ navigation ,route}) => {
-  const { item,comment } = route.params || {};
+  const { item,comment,planName,planPrice ,availableTimeslots} = route.params || {};
   const MyRef = useRef(null);
   const [selectedOption, setSelectedOption] = useState("");
+  const[isSubmitted, setIsSubmitted] = useState(false);
   const [isConfirmationPopupVisible, setIsConfirmationPopupVisible] =
     useState(false);
 
@@ -52,6 +54,7 @@ const CancellationSummary = ({ navigation ,route}) => {
   const profileDetails = profile.profileDetails || {};
   const[previousResponse, setPreviousResponse] = useState(navigation.getState().routes[1].params?.item || {});
   console.log('Data',JSON.stringify(item))
+  const [devices, setDevices] = useState([])
   const myTheme = {
     arrowColor: Color.sparklightBrightPurple,
     textSectionTitleColor: Color.sparklightDarkGray,
@@ -108,6 +111,7 @@ const CancellationSummary = ({ navigation ,route}) => {
     };
 
     setMarkedDates(markedDates);
+    getEquipmentDetails();
   }, []);
 
   useEffect(() => {
@@ -123,6 +127,7 @@ const CancellationSummary = ({ navigation ,route}) => {
       (res) => {
         console.log("Equipment Details:", res);
         // Process the equipment details as needed
+        setDevices(res.equipments || []);
       },
       (error) => {
         console.error("Error fetching equipment details:", error);
@@ -271,10 +276,7 @@ const requestBody = {
 
   const renderDeviceList = () => {
     // This function can be used to render a list of devices
-    const devices = [
-      { name: "Modem", qty: 1, price: 5.0 },
-      { name: "Router", qty: 2, price: 7.5 },
-    ];
+    
 
     const total = devices.reduce((sum, d) => sum + d.qty * d.price, 0);
 
@@ -333,7 +335,7 @@ const requestBody = {
             }}
           >
             <Text style={{ flex: 1, color: Color.colorGray_200 }}>
-              {device.name}
+              {device.equipment_description}
             </Text>
             <Text
               style={{
@@ -344,7 +346,7 @@ const requestBody = {
                 alignSelf: "center",
               }}
             >
-              {device.qty}
+              {""}
             </Text>
             <Text
               style={{
@@ -355,7 +357,8 @@ const requestBody = {
                 alignSelf: "center",
               }}
             >
-              ${(device.price * device.qty).toFixed(2)}
+              {/* ${(device.price * device.qty).toFixed(2)} */}
+              {device.equipment_type}
             </Text>
           </View>
         ))}
@@ -522,12 +525,12 @@ const requestBody = {
           <View style={styles.seperator} />
           <View style={{ paddingVertical: 5, paddingHorizontal: 24 }}>
             <Text style={styles.lableTxt}>Disconnection date</Text>
-            <Text style={styles.valueTxt}>10/10/2023</Text>
+            <Text style={styles.valueTxt}>{currentDate}</Text>
           </View>
           <View style={styles.seperator} />
           <View style={{ paddingVertical: 5, paddingHorizontal: 24 }}>
             <Text style={styles.lableTxt}>Services</Text>
-            <Text style={styles.valueTxt}>Internet - 300 Mbps Internet </Text>
+            <Text style={styles.valueTxt}>{planName} </Text>
             <View style={{ flexDirection: "row", marginTop: 5 }}>
               <Text style={{ fontSize: 14, fontWeight: "400" }}>
                 Change Plan instead? Call{" "}
@@ -547,7 +550,7 @@ const requestBody = {
           <View style={styles.seperator} />
           <View style={{ paddingVertical: 5, paddingHorizontal: 24 }}>
             <Text style={styles.lableTxt}>Monthly Price Plan</Text>
-            <Text style={styles.valueTxt}>$XX.XX</Text>
+            <Text style={styles.valueTxt}>${planPrice}</Text>
           </View>
 
           <View style={styles.seperator} />
@@ -616,6 +619,7 @@ const requestBody = {
                     ]}
                     onPress={() => {
                       console.log("Sparklight Local Office Pressed");
+                      navigation.navigate('ArticalWindowUtility',{url:"https://www.sparklight.com/locations",name:'Service Locations'})
                     }}
                   >
                     {" "}
@@ -646,6 +650,7 @@ const requestBody = {
                     }}
                     onPress={() => {
                       // Add your contact action here
+                      navigation.navigate('ArticalWindowUtility',{url:"https://www.sparklight.com/contactus?isMobile=true",name:'Contact Us'})
                     }}
                   >
                     contact us
@@ -654,6 +659,8 @@ const requestBody = {
                 </Text>
               </View>
             </View>
+            {availableTimeslots && availableTimeslots.length > 0 && (
+              <>
             <View style={styles.seperator} />
 
             <Calendar
@@ -677,7 +684,7 @@ const requestBody = {
               minDate={new Date().toISOString().split("T")[0]} // Disable past dates
               markedDates={markedDates}
             />
-
+            
             <View
               style={{
                 backgroundColor: Color.Gray300,
@@ -710,7 +717,10 @@ const requestBody = {
                 {` You do not need to be home for disconnection. Please secure your pet(s) so that the installer has safe access to your yard and inside your home.`}
               </Text>
             </View>
+            </>
+            )}
           </View>
+          
           <TouchableOpacity
             style={styles.checkboxTouchable}
             onPress={handleCheckboxToggle}
@@ -742,6 +752,12 @@ const requestBody = {
               </Text>
             </View>
           </TouchableOpacity>
+          {(!toggleCheckBoxTerm && isSubmitted) && (
+            <View style={{flexDirection: "row", marginHorizontal:24}}>
+            <Image style={styles.errorIcon} source={WarningIcon}/>
+              <Text style={[styles.checkBoxAreaViewText,{color:Color.sparkLightRed}]}>Please accept the above trem</Text>
+            </View>
+            )}
           <View style={styles.seperator} />
 
           <View
@@ -784,7 +800,10 @@ const requestBody = {
             onPress={() => {
               // TODo
               //onContinue(selectedOption);
+              setIsSubmitted(true);
+              if (toggleCheckBoxTerm) {
               setIsConfirmationPopupVisible(true);
+              }
             }}
             accessibilityRole="button"
             accessibilityLabel="Continue to Cancel   the service"
@@ -888,6 +907,11 @@ const styles = {
     height: 1,
     backgroundColor: Color.sparklightGray,
     marginVertical: Padding.p_base,
+  },errorIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 8,
+    
   },
   header: {
     fontSize: 22,

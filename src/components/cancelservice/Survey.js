@@ -20,13 +20,17 @@ import {useNavigation} from '@react-navigation/native';
 
 
 
-const Survey = () => {
+const Survey = ({route}) => {
     const navigation = useNavigation();
   const [selectedOption, setSelectedOption] = useState({});
  const [loading, setLoading] = useState(false);
   const [responseData, setResponseData] = useState(null);
   const [myComment, setMyCommnet] = useState("");
   const [isNoComment, setIsNoComment] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [planName, setPlanName] = useState(route.params?.planName || "");
+  const [planPrice, setPlanPrice] = useState(route.params?.planPrice || "");
+  // const [selectedId, setSelectedId] = useState(null);
 
   const [surveyOptions, setSurveyOptions] = useState([])
  const profile = useSelector((state) => state.combinedReducers.profile || {});
@@ -38,7 +42,7 @@ const Survey = () => {
     navigation.navigate("account", { screen: "Account" });
   };
   const onContinue = (option) => {
-    setLoading(true);
+    
     // Handle the continue action with the selected option
     console.log("Selected option:", option);
     // Navigate to the next screen or perform any other action
@@ -47,12 +51,15 @@ const Survey = () => {
       requestPostDisconnect();
     } else {
       console.warn("Please select a reason before continuing.");
+      setIsError(true);
     }
   };
 
   const onChangeValue = (value) => {
     console.log("Selected value:", value);
     setSelectedOption(value);
+    setIsError(false);
+    
   }
 
   useEffect(() => {
@@ -73,6 +80,7 @@ const getSurveyData = () => {
 }
 
 const requestPostDisconnect = () => {
+  setLoading(true);
   const requestBody ={
   "disconnectOrder": {
     "accountID": profileDetails.accountNumber,
@@ -93,7 +101,7 @@ console.log("Request body for disconnect:", requestBody);
       setLoading(false);
       console.log("Disconnect request successful:", res);
       // Handle success, e.g., navigate to a confirmation screen or show a success message
-      navigation.navigate("cancelServiceSummary", {item:selectedOption, comment: myComment });
+      navigation.navigate("cancelServiceSummary", {item:selectedOption, comment: myComment, planName: planName, planPrice: planPrice, availableTimeslots: res.availableTimeslots });
     },
     (error) => {
       setLoading(false);
@@ -135,6 +143,7 @@ console.log("Request body for disconnect:", requestBody);
             alignContent={"flex-start"}
             style={{ flexDirection: 'column', alignItems: 'flex-start' }} 
           >
+           {isError && <Text style={[styles.labelStyle,{color:Color.sparkLightRed}]}>Please select a reason before continuing.</Text> }
             {surveyOptions.map((option, idx) => (
               <View
                 key={idx}
@@ -167,7 +176,7 @@ console.log("Request body for disconnect:", requestBody);
            labelStyle={styles.labelStyle}
         /> */}
          {selectedOption !='' && (
-          <View style={{ borderWidth: 1, borderColor:Color.sparklightGray, marginTop:10, borderRadius:5 }}>
+          <View style={{ flexDirection:'column', borderWidth: 1, borderColor:Color.sparklightGray, marginTop:10, borderRadius:5 }}>
             <TextInput
               placeholder="Anything you want to share?.
               (Optional)"

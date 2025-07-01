@@ -19,6 +19,8 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { RefreshToken } from "../user/Session";
 import { GetApiRequest } from "../../network/APIClient";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+
 
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -26,11 +28,14 @@ const ProfileSettings = () => {
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [isNewBiller, setIsNewBiller] = useState(false);
-  const [isCancelService, setIsCancelService] = useState(true);
+  const [isCancelService, setIsCancelService] = useState(false);
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
   const convertedRole = getUserType(profileDetails.memberType || "");
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || "");
+  const [planName, setPlanName] = useState("");
+  const[planPrice, setPlanPrice] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const accountDetails = useSelector(
       (state) => state.combinedReducers.profile?.accountDetails
@@ -51,15 +56,17 @@ const ProfileSettings = () => {
   useEffect(() => {
     dispatch(fetchProfileDetails());
     //console.log("Account Details:", accountDetails);
-    if(accountDetails?.services.hsd){
-      setIsCancelService(true);
-      getPlanDetails();
-    }
+    
   }, [dispatch]);
 
   useEffect(() => {
     if (profileDetails?.accountNumber?.toString().length >= 16) {
       setIsNewBiller(true);
+      if(accountDetails?.services.hsd){
+      //setIsCancelService(true);
+      
+    }
+    getPlanDetails();
     }
   }, [profileDetails]);
 
@@ -76,14 +83,26 @@ const ProfileSettings = () => {
   };
 
   const getPlanDetails = () => {
+    setLoading(true);
       const requestURL=`api/Plan/GetServiceDetails?accountNumber=${profileDetails.accountNumber}&includeEquipment=false&includeLocation=false`
-      GetApiRequest(requestURL,onSuccess=(res)=>{
+      GetApiRequest(requestURL,(res)=>{
+        console.log("Plan Details Response:", JSON.stringify(res));
+        if(res && res.product_bundles.length > 0  ) {
+          let planName = res.product_bundles[0]?.hsd_services[0]?.product_name || "";
+          let planPrice = res.product_bundles[0]?.hsd_services[0]?.charges[0]?.monthly_rate || "";
+          console.log("Plan Name:", planName);
+          setPlanName(planName || "N/A");
+          setPlanPrice(planPrice || "N/A");
+          setIsCancelService(true);
+          setLoading(false);
+        }
 
-      }), onError=(error)=>{
-        console.error("Error fetching plan details");
+      },(error)=>{
+        console.error("Error fetching plan details",error);
+        setLoading(false);
       }
     
-  };
+  )};
 
   return (
     <View style={{ zIndex: 1 }}>
@@ -182,8 +201,16 @@ const ProfileSettings = () => {
               <Text style={[styles.generalInformation, styles.melissaTypo]}>
                 Manage My Service
               </Text>
+              {loading ? (
+                <SkeletonPlaceholder>
+                  <View style={{ width: "70%", height: 20, marginTop: 10 }} />
+                  </SkeletonPlaceholder>
+              )
+                  : 
+              <Text style={[styles.manageSerTxt3,{marginTop:10}]}>{planName}</Text>
+}
               {Platform.OS === "android" ? (
-                <View style={{ marginTop: 20 }}>
+                <View style={{ marginTop: 10 }}>
                   <Text style={styles.manageSerTxt1}>
                     To cancel or change service, please call us at{" "}
                     <Text
@@ -206,7 +233,7 @@ const ProfileSettings = () => {
                   </Text>
                 </View>
               ) : (
-                <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", marginTop: 20 }}>
+                <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", marginTop: 10 }}>
                   <Text style={styles.manageSerTxt1}>
                     To cancel or change service, please call us at{" "}
                   </Text>
@@ -231,7 +258,7 @@ const ProfileSettings = () => {
               { isCancelService && (
                   <Pressable
                     style={{}}
-                    onPress={() => navigation.navigate("cancelServiceSurvey")}
+                    onPress={() => navigation.navigate("cancelServiceSurvey",{planName: planName, planPrice: planPrice})}
                     accessible={true}
                     accessibilityLabel="cancel Service"
                     accessibilityRole="button"
@@ -244,6 +271,7 @@ const ProfileSettings = () => {
 
             </View>
           </View>
+        
         </View>
       </ScrollView>
     </View>
@@ -377,7 +405,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     textAlign: "left",
     color: Color.sparklightGray1,
-    marginTop: 20,
   },
   manageSerTxt2: {
     fontFamily: FontFamily.openSansSemiBold,
