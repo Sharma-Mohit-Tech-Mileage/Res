@@ -73,7 +73,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row', // To align icons and text
         alignItems: 'center', // Vertically center the content
         alignSelf: 'stretch',
-        flex: 1,
         paddingHorizontal: Padding.p_base, // Example padding
         fontSize: FontSize.size_base, // Example font size
         color: Color.sparklightGray1, 

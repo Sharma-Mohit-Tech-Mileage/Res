@@ -49,6 +49,7 @@ const SplashScreen = ({ navigation, route }) => {
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
+    console.log("SSO idToken:", request.idToken); // <-- Log the idToken here
     setLoginAttemptInfo({
       attemptTimestamp: new Date().toISOString(),
       hasIdToken: !!request.idToken,

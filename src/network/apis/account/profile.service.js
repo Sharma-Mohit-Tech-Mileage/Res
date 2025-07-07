@@ -639,7 +639,9 @@ const isPaperlessEnabled = async (email) => {
             "current_balance", "past_due_amount",
             "payment_due_date", "customer_type",
             "services",
-            "email_details", "email"
+            "email_details",
+             "email",
+             "unreturned_equipment_fees",
         ],
     };
 

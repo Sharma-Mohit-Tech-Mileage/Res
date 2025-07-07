@@ -15,6 +15,7 @@ import AppStyles from "../common/styles/AppStyles";
 import SecondaryButton from "../common/customui/SecondaryButton";
 import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
+import SmallLoader from "../common/customui/SmallLoader";
 import moment from "moment";
 import {useNavigation} from '@react-navigation/native';
 
@@ -37,7 +38,7 @@ const Survey = ({route}) => {
   const profileDetails = profile.profileDetails || {};
   const [currentDate, setCurrentDate] = useState(moment().format("YYYY-MM-DDTHH:mm:ssZ"));
   const [endDate, setEndDate] = useState(moment().add(10,'days').format("YYYY-MM-DDTHH:mm:ssZ"));
-
+  const [loadingData, setLoadingData]=useState(false)
   onCancel = () => {
     navigation.navigate("account", { screen: "Account" });
   };
@@ -47,11 +48,11 @@ const Survey = ({route}) => {
     console.log("Selected option:", option);
     // Navigate to the next screen or perform any other action
    // navigation.navigate("account", { screen: "cancelServiceSummary",item:selectedOption, comment: myComment });
-    if (option && option.reasonCode) {
+    if (option ) {
       requestPostDisconnect();
     } else {
-      console.warn("Please select a reason before continuing.");
-      setIsError(true);
+     console.warn("Please select a reason before continuing.");
+      //setIsError(true);
     }
   };
 
@@ -67,13 +68,15 @@ const Survey = ({route}) => {
   }, []);
 
 const getSurveyData = () => {
-  GetApiRequest("api/Survey",onSuccess=(res)=>{
+  setLoadingData(true)
+  GetApiRequest("api/Survey",(res)=>{
     console.log("Survey data fetched successfully:", res);
     if(res && res.length > 0) {
       setSurveyOptions(res)
     }
-
-  }),onError=(error)=>{
+     setLoadingData(false)
+  }),(error)=>{
+    setLoadingData(false)
     console.error("Error fetching survey data:", error);
   }
     
@@ -101,7 +104,7 @@ console.log("Request body for disconnect:", requestBody);
       setLoading(false);
       console.log("Disconnect request successful:", res);
       // Handle success, e.g., navigate to a confirmation screen or show a success message
-      navigation.navigate("cancelServiceSummary", {item:selectedOption, comment: myComment, planName: planName, planPrice: planPrice, availableTimeslots: res.availableTimeslots });
+      navigation.navigate("cancelServiceSummary", {item:selectedOption, comment: myComment, planName: planName, planPrice: planPrice, data: res });
     },
     (error) => {
       setLoading(false);
@@ -144,6 +147,7 @@ console.log("Request body for disconnect:", requestBody);
             style={{ flexDirection: 'column', alignItems: 'flex-start' }} 
           >
            {isError && <Text style={[styles.labelStyle,{color:Color.sparkLightRed}]}>Please select a reason before continuing.</Text> }
+           {loadingData && <View style={{alignSelf:'center'}}><SmallLoader/></View>}
             {surveyOptions.map((option, idx) => (
               <View
                 key={idx}
@@ -221,6 +225,12 @@ console.log("Request body for disconnect:", requestBody);
             accessibilityLabel="Don't Cancel"
             accessibilityHint="Double tap to return to Profile Settings"
           />
+        </View>
+        <View style={{flexDirection:'row',alignItems:'center', justifyContent:'center', marginTop:10}}>
+          <Text>
+            To change service, please call
+          </Text>
+          <Text> 833-807-1020</Text>
         </View>
       </View>
 

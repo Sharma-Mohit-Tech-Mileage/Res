@@ -62,13 +62,13 @@ const ProfileSettings = () => {
   useEffect(() => {
     if (profileDetails?.accountNumber?.toString().length >= 16) {
       setIsNewBiller(true);
-      if(accountDetails?.services.hsd){
-      //setIsCancelService(true);
+      if (accountDetails && accountDetails.services && accountDetails.services.hsd) {
+        // setIsCancelService(true);
+        getPlanDetails();
+      }
       
     }
-    getPlanDetails();
-    }
-  }, [profileDetails]);
+  }, [profileDetails, accountDetails]);
 
   const makeCall = (number) => {
     let phoneNumber = "";
@@ -84,8 +84,9 @@ const ProfileSettings = () => {
 
   const getPlanDetails = () => {
     setLoading(true);
-      const requestURL=`api/Plan/GetServiceDetails?accountNumber=${profileDetails.accountNumber}&includeEquipment=false&includeLocation=false`
+    const requestURL=`api/Plan/GetServiceDetails?accountNumber=${profileDetails.accountNumber}&includeEquipment=false&includeLocation=false`
       GetApiRequest(requestURL,(res)=>{
+        setLoading(false);
         console.log("Plan Details Response:", JSON.stringify(res));
         if(res && res.product_bundles.length > 0  ) {
           let planName = res.product_bundles[0]?.hsd_services[0]?.product_name || "";
@@ -94,7 +95,6 @@ const ProfileSettings = () => {
           setPlanName(planName || "N/A");
           setPlanPrice(planPrice || "N/A");
           setIsCancelService(true);
-          setLoading(false);
         }
 
       },(error)=>{
@@ -203,16 +203,16 @@ const ProfileSettings = () => {
               </Text>
               {loading ? (
                 <SkeletonPlaceholder>
-                  <View style={{ width: "70%", height: 20, marginTop: 10 }} />
+                  <View style={{ width: "70%", height: 20, marginTop: 25 }} />
                   </SkeletonPlaceholder>
               )
                   : 
-              <Text style={[styles.manageSerTxt3,{marginTop:10}]}>{planName}</Text>
+              <Text style={[styles.manageSerTxt3,{marginTop:25}]}>{planName}</Text>
 }
               {Platform.OS === "android" ? (
                 <View style={{ marginTop: 10 }}>
                   <Text style={styles.manageSerTxt1}>
-                    To cancel or change service, please call us at{" "}
+                    To change service, please call us at{" "}
                     <Text
                       style={styles.manageSerTxt2}
                       onPress={() => makeCall("833-807-1020")}
@@ -235,7 +235,7 @@ const ProfileSettings = () => {
               ) : (
                 <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", marginTop: 10 }}>
                   <Text style={styles.manageSerTxt1}>
-                    To cancel or change service, please call us at{" "}
+                    To change service, please call us at{" "}
                   </Text>
                   <Text
                     style={styles.manageSerTxt2}
@@ -263,7 +263,7 @@ const ProfileSettings = () => {
                     accessibilityLabel="cancel Service"
                     accessibilityRole="button"
                   >
-                    <Text style={[styles.manageSerTxt2,{marginVertical: 20,textDecorationLine: 'underline'}]}>
+                    <Text style={[styles.manageSerTxt2,{marginVertical: 20,textDecorationLine: 'underline', fontWeight:'500'}]}>
                       Cancel Service
                     </Text>
                   </Pressable>
@@ -411,6 +411,7 @@ const styles = StyleSheet.create({
     color: Color.colorMidnightblue,
     fontWeight: "700",
     fontSize: FontSize.size_base,
+    textDecorationLine: "underline",
   },
   manageSerTxt3: {
     fontFamily: FontFamily.openSansRegular,

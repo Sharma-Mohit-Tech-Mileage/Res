@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect,useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,7 +7,11 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
+import { useForm, Controller, set } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import { useDispatch, useSelector } from "react-redux";
+import SparkLightInput from "../common/customui/SparkLightInput";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import CheckBox from "@react-native-community/checkbox";
@@ -29,36 +33,82 @@ import UpArrow from "../../res/svgIcons/UpArrow";
 import TickIcon from "../../res/svgIcons/TickIcon1";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import EntryInput from "..//entry/EntryInput";
-import { GetApiRequest,PostApiRequest } from "../../network/APIClient";
+import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import moment from "moment";
+import LoadingOverlay from "../common/customui/CustomLoading";
+import { getPrimaryEmail } from '../utility/constant';
 
-const CancellationSummary = ({ navigation ,route}) => {
-  const { item,comment,planName,planPrice ,availableTimeslots} = route.params || {};
+const validationSchema = yup.object().shape({
+  email: yup.string().email("Invalid email address").required("Email is required"),
+});
+
+const CancellationSummary = ({ navigation, route }) => {
+  const { item, comment, planName, planPrice, data } = route.params || {};
   const MyRef = useRef(null);
   const [selectedOption, setSelectedOption] = useState("");
-  const[isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [isConfirmationPopupVisible, setIsConfirmationPopupVisible] =
     useState(false);
-
+  const [totalEquipmentFee, setTotalEquipmentFee] = useState(0);
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
   const handleCheckboxToggle = useCallback(() => {
     setToggleCheckBoxTerm(!toggleCheckBoxTerm);
   }, [toggleCheckBoxTerm]);
-
+  const [email, setEmail] = useState("");
   const [currentDate, setCurrentDate] = useState(moment().format("YYYY-MM-DD"));
   const [markedDates, setMarkedDates] = useState({});
+  const [loading, setLoading] = useState(false);
   const [isSuccessMessageVisible, setIsSuccessMessageVisible] = useState(false);
   const [enableButton, setEnableButton] = useState(false);
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
-  const[previousResponse, setPreviousResponse] = useState(navigation.getState().routes[1].params?.item || {});
-  console.log('Data',JSON.stringify(item))
-  const [devices, setDevices] = useState([])
+  const [equipmentDetails, setEquipmentDetails] = useState([]);
+
+
+  const accountDetails = useSelector(
+      (state) => state.combinedReducers.profile?.accountDetails
+    );
+
+  const [previousResponse, setPreviousResponse] = useState(
+    navigation.getState().routes[1].params?.item || {}
+  );
+  console.log("Account", JSON.stringify(accountDetails));
+  const [devices, setDevices] = useState([]);
   const myTheme = {
     arrowColor: Color.sparklightBrightPurple,
     textSectionTitleColor: Color.sparklightDarkGray,
   };
+
+  const {
+      control,
+      handleSubmit,
+      setValue,
+      formState: { errors },
+    } = useForm({
+      resolver: yupResolver(validationSchema),
+      defaultValues: {
+        email: getPrimaryEmail(accountDetails) || "", // Default email from profile details
+      },
+    });
+
+    const handleSave = useCallback(
+        (data) => {
+          const { email } = data;
+          console.log("Email:", email);
+          setEmail(email);
+          setIsConfirmationPopupVisible(true);
+        }
+         
+      );
+    
+      const handleValidationError = useCallback(() => {
+        if(!toggleCheckBoxTerm) {
+          //setIsSubmitted(true);
+          
+        }
+      }, []);
+    
 
   const date = moment(currentDate).add(0, "days").format("YYYY-MM-DD");
   const date1 = moment(currentDate).add(1, "days").format("YYYY-MM-DD");
@@ -111,7 +161,9 @@ const CancellationSummary = ({ navigation ,route}) => {
     };
 
     setMarkedDates(markedDates);
-    getEquipmentDetails();
+    //getEquipmentDetails();
+
+    
   }, []);
 
   useEffect(() => {
@@ -119,71 +171,111 @@ const CancellationSummary = ({ navigation ,route}) => {
     setSelectedOption(date);
   }, [markedDates]);
 
+  useEffect(() => {
+    if(accountDetails){
+    setDevices(accountDetails?.unreturned_equipment_fees || []);
+    if(accountDetails?.unreturned_equipment_fees) { 
+      const totalFee = accountDetails.unreturned_equipment_fees.reduce(
+        (sum, d) => sum + 1 * d.fee, 0
+      );
+     accountDetails.unreturned_equipment_fees.forEach((device) => {
+      let equipment = {
+        equipmentName: device.description,
+        quantity: 1,
+        pricePerUnit: device.fee,
+      };
+      setEquipmentDetails((prev) => [...prev, equipment]);
+     })
+
+      setTotalEquipmentFee(totalFee);
+    }
+     //const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
+     //setEmail(updatedPrimaryEmail)
+     //setValue({email: updatedPrimaryEmail})
+  }
+  }, [accountDetails]);
 
   const getEquipmentDetails = () => {
-      const requestURL = `api/Equipment/GetEquipmentDetails?accountNumber=${profileDetails.accountNumber}&includeServiceCode=true`;
+    const requestURL = `api/Equipment/GetEquipmentDetails?accountNumber=${profileDetails.accountNumber}&includeServiceCode=true`;
     GetApiRequest(
       requestURL,
       (res) => {
         console.log("Equipment Details:", res);
         // Process the equipment details as needed
-        setDevices(res.equipments || []);
+        //setDevices(res.equipments || []);
       },
       (error) => {
         console.error("Error fetching equipment details:", error);
       }
     );
-
-  }
-
+  };
 
   // Function to handle the confirmation popup
 
   const requestPostCancellationservice = () => {
-const requestBody = {
-    "commitDisconnectOrder": {
-    "temporaryOrderID": "0000000000003011",
-    "temporaryJobID": "0001",
-    "conversationID": "QAHA009C3D08C549EE0000",
-    "orderReason": previousResponse.reasonCode, // reasonCode
+    setLoading(true);
+    const nextendays = moment(currentDate).add(10, "days").format("YYYY-MM-DD");
+    const requestBody = {
+      commitDisconnectOrder: {
+        temporaryOrderID: data.temporaryOrderID, // temporaryOrderID
+        temporaryJobID: data.temporaryJobID, // temporaryJobID
+        conversationID: data.conversationID, // conversationID
+        orderReason: previousResponse.reasonCode, // reasonCode
+        accountId: profileDetails.accountNumber,
+        comments: comment || "Mobile", // comment
+        customerRequestedCompletionDate: nextendays, // -begin date
+        selectedDate: null,
+        selectedTimeSlotCode: null,
+        isForTransfer: false,
+        newTransferLocationId: null,
+        transferCustomerId: null,
+      },
+      surveyRequest: {
+        QuestionId: previousResponse.questionId, // questionId
+        AccountId: profileDetails.accountNumber,
+        Response: true,
+        AdditionalResponseText: "",
+        ReasonCode: previousResponse.reasonCode,
+        EquipmentReturnPolicyAgreementFlag: true,
+      },
+      statisticsInfoRequest: {
+        AccountId: profileDetails.accountNumber,
+        FunctionName: "Cancel",
+        Platform: "Mobile",
+      },
+    "disconnectSnapshotRequest": {
     "accountId": profileDetails.accountNumber,
-    "comments": comment, // comment
-    "customerRequestedCompletionDate": "2025-07-06T22:44:03.408Z",
-    "selectedDate": null,
-    "selectedTimeSlotCode": null,
-    "isForTransfer": false,
-    "newTransferLocationId": null,
-    "transferCustomerId": null
-  },
-  "surveyRequest": {
-    "QuestionId": 2,
-    "AccountId": profileDetails.accountNumber,
-    "Response": true,
-    "AdditionalResponseText": "",
-    "ReasonCode": "MV",
-    "EquipmentReturnPolicyAgreementFlag": true
-  },
-  "statisticsInfoRequest": {
-    "AccountId": profileDetails.accountNumber,
-    "FunctionName": "Cancel",
-    "Platform": "Mobile"
+    "productName": planName,
+    "monthlyRate": planPrice,
+    "disconnectedDate": nextendays,
+    "equipmentSnapshotRequest": equipmentDetails,
+    "isTruckRoll": (data?.availableTimeslots.length>0)?true :false,
+    "confirmationEmail": email,
+    "totalEquipmentFee": totalEquipmentFee
   }
-}
+    };
 
-    const requestURL = `/api/Order/CommitDisconnect`
+    const requestURL = `/api/Order/CommitDisconnect`;
     console.log("Request body for cancellation service:", requestBody);
-    PostApiRequest(requestURL, requestBody, 
+    PostApiRequest(
+      requestURL,
+      requestBody,
       (res) => {
         console.log("Cancellation service request successful:", res);
         setIsSuccessMessageVisible(true);
+        MyRef.current?.scrollTo({
+          y: 0,
+          animated: true,
+        });
+        setLoading(false);
         //getEquipmentDetails();
       },
       (error) => {
+        setLoading(false);
         console.error("Error in cancellation service request:", error);
       }
-    );  
-  };  
-
+    );
+  };
 
   const onChangeText = (text) => {
     setInput(text);
@@ -276,9 +368,8 @@ const requestBody = {
 
   const renderDeviceList = () => {
     // This function can be used to render a list of devices
-    
 
-    const total = devices.reduce((sum, d) => sum + d.qty * d.price, 0);
+    const total = devices.reduce((sum, d) => sum + 1 * d.fee, 0);
 
     return (
       <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
@@ -335,7 +426,7 @@ const requestBody = {
             }}
           >
             <Text style={{ flex: 1, color: Color.colorGray_200 }}>
-              {device.equipment_description}
+              {device.description}
             </Text>
             <Text
               style={{
@@ -346,7 +437,7 @@ const requestBody = {
                 alignSelf: "center",
               }}
             >
-              {""}
+              {"1"}
             </Text>
             <Text
               style={{
@@ -358,7 +449,7 @@ const requestBody = {
               }}
             >
               {/* ${(device.price * device.qty).toFixed(2)} */}
-              {device.equipment_type}
+              {device.fee}
             </Text>
           </View>
         ))}
@@ -410,48 +501,48 @@ const requestBody = {
 
   const onDaySelected = (selectedDate) => {
     //setCurrentDate(selectedDate);
-      
+
     //for (const date in markedDates) {
-      
-      // Deselect all dates first
-      const updatedMarkedDates = {};
-      Object.keys(markedDates).forEach((d) => {
-        updatedMarkedDates[d] = {
-          customStyles: {
-        container: {
-          backgroundColor: Color.sparklightGray,
-          borderColor: Color.sparklightDarkGray,
-          borderWidth: 1,
-          elevation: 2,
-        },
-        text: {
-          color: Color.colorGray_200,
-          fontWeight: "400",
-        },
-          },
-        };
-      });
 
-      // Select the clicked date
-      if (updatedMarkedDates[selectedDate]) {
-        updatedMarkedDates[selectedDate] = {
-          customStyles: {
-        container: {
-          backgroundColor: Color.sparklightBrightPurple,
-          borderColor: Color.sparklightDarkGray,
-          borderWidth: 1,
-          elevation: 0,
-        },
-        text: {
-          color: Color.sparklightWhite,
-          fontWeight: "400",
-        },
+    // Deselect all dates first
+    const updatedMarkedDates = {};
+    Object.keys(markedDates).forEach((d) => {
+      updatedMarkedDates[d] = {
+        customStyles: {
+          container: {
+            backgroundColor: Color.sparklightGray,
+            borderColor: Color.sparklightDarkGray,
+            borderWidth: 1,
+            elevation: 2,
           },
-        };
-      }
+          text: {
+            color: Color.colorGray_200,
+            fontWeight: "400",
+          },
+        },
+      };
+    });
 
-      setMarkedDates(updatedMarkedDates);
-      setSelectedOption(selectedDate);
+    // Select the clicked date
+    if (updatedMarkedDates[selectedDate]) {
+      updatedMarkedDates[selectedDate] = {
+        customStyles: {
+          container: {
+            backgroundColor: Color.sparklightBrightPurple,
+            borderColor: Color.sparklightDarkGray,
+            borderWidth: 1,
+            elevation: 0,
+          },
+          text: {
+            color: Color.sparklightWhite,
+            fontWeight: "400",
+          },
+        },
+      };
+    }
+
+    setMarkedDates(updatedMarkedDates);
+    setSelectedOption(selectedDate);
     //}
 
     // if (markedDates[selectedDate]) {
@@ -474,7 +565,7 @@ const requestBody = {
     //    // updatedMarkedDates[selectedDate].isSelected = false;
     //   setMarkedDates(updatedMarkedDates);
     //     return;
-      
+
     // } else {
     //   // If the date is not selected, select it
     //   const updatedMarkedDates = { ...markedDates };
@@ -495,7 +586,6 @@ const requestBody = {
     //   //updatedMarkedDates[selectedDate].isSelected = true;
     //   setMarkedDates(updatedMarkedDates);
     // }
-    
   };
 
   return (
@@ -513,7 +603,7 @@ const requestBody = {
         useAngle={true}
         angle={90}
       />
-      <ScrollView style={{ flex: 1, marginBottom: 100 }}ref={MyRef} >
+      <ScrollView style={{ flex: 1, marginBottom: 100 }} ref={MyRef}>
         <View style={[AppStyles.card, { margin: 16 }]}>
           {isSuccessMessageVisible && renderSuccessMessage()}
           <Text style={styles.header}>We’re Sad To See You Go</Text>
@@ -550,7 +640,7 @@ const requestBody = {
           <View style={styles.seperator} />
           <View style={{ paddingVertical: 5, paddingHorizontal: 24 }}>
             <Text style={styles.lableTxt}>Monthly Price Plan</Text>
-            <Text style={styles.valueTxt}>${planPrice}</Text>
+            <Text style={styles.valueTxt}>${planPrice?.toFixed(2)}</Text>
           </View>
 
           <View style={styles.seperator} />
@@ -619,7 +709,10 @@ const requestBody = {
                     ]}
                     onPress={() => {
                       console.log("Sparklight Local Office Pressed");
-                      navigation.navigate('ArticalWindowUtility',{url:"https://www.sparklight.com/locations",name:'Service Locations'})
+                      navigation.navigate("ArticalWindowUtility", {
+                        url: "https://www.sparklight.com/locations",
+                        name: "Service Locations",
+                      });
                     }}
                   >
                     {" "}
@@ -650,7 +743,10 @@ const requestBody = {
                     }}
                     onPress={() => {
                       // Add your contact action here
-                      navigation.navigate('ArticalWindowUtility',{url:"https://www.sparklight.com/contactus?isMobile=true",name:'Contact Us'})
+                      navigation.navigate("ArticalWindowUtility", {
+                        url: "https://www.sparklight.com/contactus?isMobile=true",
+                        name: "Contact Us",
+                      });
                     }}
                   >
                     contact us
@@ -659,68 +755,70 @@ const requestBody = {
                 </Text>
               </View>
             </View>
-            {availableTimeslots && availableTimeslots.length > 0 && (
+            {data.availableTimeslots && data.availableTimeslots.length > 0 && (
               <>
-            <View style={styles.seperator} />
+                <View style={styles.seperator} />
 
-            <Calendar
-              theme={myTheme}
-              // Customize the appearance of the calendar
-              selectedOption={selectedOption}
-              style={{
-                marginHorizontal: 24,
-                borderColor: Color.sparklightGray,
-                borderWidth: 1,
-                borderRadius: Border.br_11xs,
-              }}
-              // Specify the current date
-              current={currentDate}
-              // Callback that gets called when the user selects a day
-              onDayPress={(day) => {
-                onDaySelected(day.dateString);
-              }}
-              // Mark specific dates as marked
-              markingType="custom"
-              minDate={new Date().toISOString().split("T")[0]} // Disable past dates
-              markedDates={markedDates}
-            />
-            
-            <View
-              style={{
-                backgroundColor: Color.Gray300,
-                marginHorizontal: 24,
-                marginVertical: 16,
-                padding: 8,
-                borderRadius: 5,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginRight: 8,
-                }}
-              >
-                <IconFaq width={32} height={32} />
-              </View>
-              <Text
-                style={[
-                  styles.terms,
-                  { marginRight: 8, textAlign: "left", flex: 1 },
-                ]}
-              >
-                <Text style={[styles.terms, { fontWeight: "700" }]}>Note:</Text>{" "}
-                {` You do not need to be home for disconnection. Please secure your pet(s) so that the installer has safe access to your yard and inside your home.`}
-              </Text>
-            </View>
-            </>
+                <Calendar
+                  theme={myTheme}
+                  // Customize the appearance of the calendar
+                  selectedOption={selectedOption}
+                  style={{
+                    marginHorizontal: 24,
+                    borderColor: Color.sparklightGray,
+                    borderWidth: 1,
+                    borderRadius: Border.br_11xs,
+                  }}
+                  // Specify the current date
+                  current={currentDate}
+                  // Callback that gets called when the user selects a day
+                  onDayPress={(day) => {
+                    onDaySelected(day.dateString);
+                  }}
+                  // Mark specific dates as marked
+                  markingType="custom"
+                  minDate={new Date().toISOString().split("T")[0]} // Disable past dates
+                  markedDates={markedDates}
+                />
+
+                <View
+                  style={{
+                    backgroundColor: Color.Gray300,
+                    marginHorizontal: 24,
+                    marginVertical: 16,
+                    padding: 8,
+                    borderRadius: 5,
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 40,
+                      height: 40,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginRight: 8,
+                    }}
+                  >
+                    <IconFaq width={32} height={32} />
+                  </View>
+                  <Text
+                    style={[
+                      styles.terms,
+                      { marginRight: 8, textAlign: "left", flex: 1 },
+                    ]}
+                  >
+                    <Text style={[styles.terms, { fontWeight: "700" }]}>
+                      Note:
+                    </Text>{" "}
+                    {` You do not need to be home for disconnection. Please secure your pet(s) so that the installer has safe access to your yard and inside your home.`}
+                  </Text>
+                </View>
+              </>
             )}
           </View>
-          
+
           <TouchableOpacity
             style={styles.checkboxTouchable}
             onPress={handleCheckboxToggle}
@@ -734,8 +832,11 @@ const requestBody = {
                 value={toggleCheckBoxTerm}
                 style={styles.checkBox}
                 boxType="square"
+                onCheckColor={Color.sparklightBrightPurple}
+                tintColor={Color.sparklightBrightPurple}
+                onTintColor={Color.sparklightBrightPurple}
                 tintColors={{
-                  true: "#8D3B90",
+                  true: Color.sparklightBrightPurple,
                   false:
                     Platform.OS === "ios"
                       ? Color.colorWhitesmoke_300
@@ -752,12 +853,19 @@ const requestBody = {
               </Text>
             </View>
           </TouchableOpacity>
-          {(!toggleCheckBoxTerm && isSubmitted) && (
-            <View style={{flexDirection: "row", marginHorizontal:24}}>
-            <Image style={styles.errorIcon} source={WarningIcon}/>
-              <Text style={[styles.checkBoxAreaViewText,{color:Color.sparkLightRed}]}>Please accept the above trem</Text>
+          {!toggleCheckBoxTerm && isSubmitted && (
+            <View style={{ flexDirection: "row", marginHorizontal: 24 }}>
+              <Image style={styles.errorIcon} source={WarningIcon} />
+              <Text
+                style={[
+                  styles.checkBoxAreaViewText,
+                  { color: Color.sparkLightRed },
+                ]}
+              >
+                You must agree to the terms and conditions.
+              </Text>
             </View>
-            )}
+          )}
           <View style={styles.seperator} />
 
           <View
@@ -779,14 +887,25 @@ const requestBody = {
               justifyContent: "center", // Optional: center vertically if needed
             }}
           >
-            <EntryInput
-              input={input}
-              onChangeText={onChangeText}
-              onSubmitText={keyboardDismiss}
-              keyboardType="email-address"
-              accessibilityRole="search"
-              accessibilityLabel="Email address input field"
-              accessibilityHint="Double tap to enter your email address for cancellation confirmation"
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <SparkLightInput
+                  placeholder="Email Address"
+                  onBlur={onBlur}
+                  style={{ width: "92%", marginHorizontal:24 }}
+                  onChangeText={onChange}
+                  value={value ? value.toLowerCase() : ""}
+                  error={errors.email?.message}
+                  label=""
+                  accessibilityLabel={
+                    errors.email
+                      ? `Email address input. Error: ${errors.email.message}`
+                      : "Email address input"
+                  }
+                />
+              )}
             />
           </View>
         </View>
@@ -798,13 +917,10 @@ const requestBody = {
               { opacity: pressed ? 0.7 : 1 },
             ]}
             onPress={() => {
-              // TODo
-              //onContinue(selectedOption);
               setIsSubmitted(true);
-              if (toggleCheckBoxTerm) {
-              setIsConfirmationPopupVisible(true);
-              }
-            }}
+              handleSubmit(handleSave)();
+             }
+            }
             accessibilityRole="button"
             accessibilityLabel="Continue to Cancel   the service"
           >
@@ -829,16 +945,18 @@ const requestBody = {
             onActionTxt={"Confirm Cancellation"}
             onAction={() => {
               setIsConfirmationPopupVisible(false);
-              setIsSuccessMessageVisible(true);
-              MyRef.current?.scrollTo({
-                y: 0,
-                animated: true,
-            });
+              requestPostCancellationservice();
             }}
             onClose={() => {
               setIsConfirmationPopupVisible(false);
             }}
           />
+          {loading && (
+            <LoadingOverlay
+              loadingTxt={"Cancelling your service..."}
+              visible={loading}
+            />
+          )}
         </View>
       </ScrollView>
     </View>
@@ -907,11 +1025,11 @@ const styles = {
     height: 1,
     backgroundColor: Color.sparklightGray,
     marginVertical: Padding.p_base,
-  },errorIcon: {
+  },
+  errorIcon: {
     width: 20,
     height: 20,
     marginRight: 8,
-    
   },
   header: {
     fontSize: 22,
