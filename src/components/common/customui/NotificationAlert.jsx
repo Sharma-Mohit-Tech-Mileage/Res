@@ -23,42 +23,10 @@ const NotificationAlert = ({
    const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
 
    const typeStyles = {
-       info: { 
-           backgroundColor: '#F0F8FF',
-           borderColor: '#0060AE',
-           iconColor: Color.sparklightBrightPurple,
-           textColor: '#000000',
-           titleColor: '#0060AE',
-           closeButtonColor: '#0060AE',
-           image: require('../../../../assets/Icon/Info.png') 
-       },
-       error: { 
-           backgroundColor: '#FEF3F2',
-           borderColor: '#B92A1C',
-           iconColor: Color.sparkLightRed,
-           textColor: '#000000',
-           titleColor: '#B92A1C',
-           closeButtonColor: '#B92A1C',
-           image: require('../../../../assets/Icon/CircleAlert.png') 
-       },
-       success: { 
-           backgroundColor: '#F1FCF2',
-           borderColor: '#1D7832',
-           iconColor: Color.sparklightGreen,
-           textColor: '#000000',
-           titleColor: '#1D7832',
-           closeButtonColor: '#1D7832',
-           image: require('../../../../assets/Icon/CircleCheck.png') 
-       },
-       warning: { 
-           backgroundColor: '#FFFAEB',
-           borderColor: '#DD6D02',
-           iconColor: Color.sparkLightInfo,
-           textColor: '#000000',
-           titleColor: '#DD6D02',
-           closeButtonColor: '#DD6D02',
-           image: require('../../../../assets/Icon/TriangleAlert.png') 
-       },
+       info: { color: Color.sparklightBrightPurple, image: require('../../../../assets/info.png') },
+       error: { color: Color.sparkLightRed, image: require('../../../../assets/error.png') },
+       success: { color: Color.sparklightGreen, image: require('../../../../assets/checkcircle.png') },
+       warning: { color: Color.sparkLightInfo, image: require('../../../../assets/warning.png') },
    };
 
    const currentTypeStyle = typeStyles[type] || typeStyles.info;
@@ -90,21 +58,11 @@ const NotificationAlert = ({
        if (splitKey === 'Account') {
            const parts = message.split('Account');
            return (
-               <Text style={[
-                   !title ? styles.messageOnEmpty : styles.message,
-                   { color: currentTypeStyle.textColor }
-               ]}>
+               <Text style={!title ? styles.messageOnEmpty : styles.message}>
                    {parts.map((part, i) => (
                        <React.Fragment key={i}>
                            {part}
-                           {i < parts.length - 1 && (
-                               <Text style={[
-                                   styles.boldText, 
-                                   { color: currentTypeStyle.textColor }
-                               ]}>
-                                   Account
-                               </Text>
-                           )}
+                           {i < parts.length - 1 && <Text style={styles.boldText}>Account</Text>}
                        </React.Fragment>
                    ))}
                </Text>
@@ -117,10 +75,7 @@ const NotificationAlert = ({
                splitKey={splitKey}
                instruction={message}
                isFromNotification={true}
-               style={[
-                   !title ? styles.messageOnEmpty : styles.message,
-                   { color: currentTypeStyle.textColor }
-               ]}
+               style={!title ? styles.messageOnEmpty : styles.message}
                onTextPress={() => {
                    navigation.reset({
                        index: 0,
@@ -134,13 +89,7 @@ const NotificationAlert = ({
    return (
        <View style={styles.outerContainer}>
            <View 
-               style={[
-                   styles.notificationContainer, 
-                   { 
-                       backgroundColor: currentTypeStyle.backgroundColor,
-                       borderColor: currentTypeStyle.borderColor,
-                   }
-               ]}
+               style={[styles.notificationContainer, { borderLeftColor: currentTypeStyle.color }]}
                accessibilityLabel={`${type} notification: ${title || ''} ${message || ''}`}
                accessibilityLiveRegion="polite"
            >
@@ -152,13 +101,10 @@ const NotificationAlert = ({
                    importantForAccessibility="no"
                />
                
-               <View style={[
-                   styles.textContentContainer,
-                   !showCloseIcon && styles.textContentContainerNoClose
-               ]}>
+               <View style={styles.textContentContainer}>
                    {title && (
                        <Text 
-                           style={[styles.title, { color: currentTypeStyle.titleColor }]}
+                           style={[styles.title, { color: currentTypeStyle.color }]}
                            accessible={true}
                            accessibilityRole="text"
                        >
@@ -194,9 +140,11 @@ const NotificationAlert = ({
                        accessibilityRole='button'
                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                    >
-                       <Text style={[styles.closeButtonText, { color: currentTypeStyle.closeButtonColor }]}>
-                           ✕
-                       </Text>
+                       <Image
+                           source={require('../../../../assets/right-actionable7.png')}
+                           accessible={false}
+                           importantForAccessibility="no"
+                       />
                    </TouchableOpacity>
                )}
            </View>
@@ -209,39 +157,37 @@ const styles = StyleSheet.create({
        position: 'relative',
    },
    notificationContainer: {
-        flexDirection: 'row',
+       backgroundColor: '#fff',
+       flexDirection: 'row',
        alignItems: 'flex-start',
-       borderRadius: 8,
-       borderWidth: 1,
-       paddingLeft: 16,
-       paddingRight: 12,
-       paddingVertical: 16,
-       marginVertical: 8,
+       borderLeftWidth: 4,
+       borderRadius: 2,
+       borderTopWidth: 1,
+       borderBottomWidth: 1,
+       borderRightWidth: 1,
+       paddingLeft: 10,
+       paddingVertical: 10,
+       borderBottomColor: '#E1E1E1',
+       borderEndColor: '#E1E1E1',
+       borderTopColor: '#E1E1E1'
    },
    textContentContainer: {
        flex: 1,
-       marginLeft: 12,
-       paddingRight: 20,
-   },
-   textContentContainerNoClose: {
-       paddingRight: 0,
+       marginLeft: 8,
+       paddingRight: 35, // Just enough space for the close button
    },
    iconStyle: {
-       height: 22,
-       width: 20,
+       height: 18,
+       width: 18,
    },
    closeButton: {
        position: 'absolute',
        top: 0,
-       bottom: 0,
-       right: 8,
-       width: 16,
+       right: 0,
+       width: 44,
+       height: 44,
        justifyContent: 'center',
        alignItems: 'center',
-   },
-   closeButtonText: {
-       fontSize: 16,
-       fontWeight: '700',
    },
    title: {
        fontSize: FontSize.size_base,
@@ -253,6 +199,7 @@ const styles = StyleSheet.create({
        fontSize: FontSize.size_sm,
        fontFamily: FontFamily.openSansRegular,
        fontWeight: '400',
+       color: Color.colorGray_200,
        paddingLeft: 0,
        paddingRight: 0,
    },
@@ -260,16 +207,18 @@ const styles = StyleSheet.create({
        fontSize: FontSize.size_sm,
        fontFamily: FontFamily.openSansRegular,
        fontWeight: '400',
+       color: Color.colorGray_200,
        paddingLeft: 0,
        paddingRight: 0,
    },
    boldText: {
        fontWeight: '700',
        fontFamily: FontFamily.openSansSemiBold,
+       color: Color.colorGray_200,
        fontSize: FontSize.size_sm,
    },
    contactUsText: {
-       color: '#000000',
+       color: Color.colorMidnightblue,
        fontFamily: FontFamily.openSansSemiBold,
        fontSize: 16,
        fontStyle: "normal",
@@ -278,7 +227,7 @@ const styles = StyleSheet.create({
        flexWrap: 'wrap'
    },
    resendText: {
-       color: '#000000',
+       color: Color.colorMidnightblue,
        fontFamily: FontFamily.openSansSemiBold,
        fontSize: 16,
        fontStyle: "normal",

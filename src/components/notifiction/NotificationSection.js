@@ -81,7 +81,7 @@ const NotificationSection = ({
                 <Image
                   style={styles.icon}
                   resizeMode="contain"
-                  source={require("../../../assets/Icon/Info.png")}
+                  source={require("../../../assets/infocircle.png")}
                 />
               </View>
               <Text style={styles.infoText}>{infoText}</Text>
@@ -192,14 +192,12 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     borderRadius: Border.br_5xs,
+    backgroundColor: Color.colorWhitesmoke_100,
     paddingHorizontal: Padding.p_base,
     paddingVertical: Padding.p_7xs,
     flexDirection: "row",
     alignSelf: "stretch",
-    marginTop: Padding.p_7xs,
-     borderWidth: 1,
-    borderColor: '#0060AE',
-    backgroundColor: '#F0F8FF',
+    marginTop: Padding.p_7xs
   },
   infoContainerAdmin: {
     backgroundColor: Color.colorWhitesmoke_100,

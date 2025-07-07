@@ -1,7 +1,6 @@
 import * as React from "react"
 import {Svg,Path} from 'react-native-svg';
-
-const CloseIcon = ({ color = "#767676", ...props }) => (
+const CloseIcon = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
     width={36}
@@ -10,7 +9,7 @@ const CloseIcon = ({ color = "#767676", ...props }) => (
     {...props}
   >
     <Path
-      stroke={color}
+      stroke="#767676"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}
@@ -18,5 +17,4 @@ const CloseIcon = ({ color = "#767676", ...props }) => (
     />
   </Svg>
 )
-
 export default CloseIcon
