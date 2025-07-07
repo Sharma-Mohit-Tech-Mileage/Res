@@ -51,7 +51,7 @@ const ProfileSettings = () => {
   useEffect(() => {
     dispatch(fetchProfileDetails());
     //console.log("Account Details:", accountDetails);
-    if(accountDetails?.services.hsd){
+    if(accountDetails?.services?.hsd){
       setIsCancelService(true);
       getPlanDetails();
     }

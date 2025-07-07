@@ -540,123 +540,210 @@ const HomeScreen = ({ navigation }) => {
     }
   }, [profile, user]);
 
-  const OutageAlert = ({ estimatedTime }) => {
-    const alertMessage = `Our systems show that you may be experiencing an outage related to your Internet service. We are working to restore service as soon as possible. Estimated Time to Restore: ${estimatedTime}`;
-    return (
-      <View style={styles.errorBox} accessibilityElementsHidden={showWalkThrough} importantForAccessibility={showWalkThrough ? "no-hide-descendants" : "yes"} >
-        <View style={{ flexDirection: "row", width: "90%" }}>
-          <View accessible={false} style={{ backgroundColor: "#F88700", width: 4 }} />
-          <View style={{ flexDirection: "column", padding: 10 }}>
-            <View style={{ flexDirection: "row" }}>
-              <Image
-                accessible={false}
-                style={{ alignSelf: "center" }}
-                resizeMode="contain"
-                tintColor={"#F88700"}
-                source={require("../../../assets/info-circle.png")}
-              />
-              <Text
-                accessible={true}
-                accessibilityRole="header"
-                style={styles.modemError1}
-              >
-                Outage Alert
-              </Text>
-            </View>
-            <Text
-              accessible={true}
-              accessibilityRole="text"
-              accessibilityLabel={alertMessage}
-              style={styles.modemError2}
-            >
-              Our systems show that you may be experiencing an outage related to
-              your Internet service. We are working to restore service as soon
-              as possible.
-              <Text style={[styles.modemError2, { fontWeight: "700" }]}>
-                Estimated Time to Restore: {estimatedTime}
-              </Text>
-            </Text>
-          </View>
-
-          <TouchableOpacity
+ const OutageAlert = ({ estimatedTime }) => {
+  const alertMessage = `Our systems show that you may be experiencing an outage related to your Internet service. We are working to restore service as soon as possible. Estimated Time to Restore: ${estimatedTime}`;
+  
+  return (
+    <View style={[
+      styles.errorBox,
+      {
+        backgroundColor: '#FFFAEB', // Warning background
+        borderColor: '#DD6D02', // Warning border
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        borderRadius: 8,
+        borderWidth: 1,
+        paddingLeft: 16,
+        paddingRight: 12,
+        paddingVertical: 16,
+      }
+    ]} 
+    accessibilityElementsHidden={showWalkThrough} 
+    importantForAccessibility={showWalkThrough ? "no-hide-descendants" : "yes"} 
+    >
+      <Image
+        accessible={false}
+        style={{ 
+          width: 20, 
+          height: 22,
+        }}
+        resizeMode="contain"
+        tintColor="#DD6D02" // Warning color
+        source={require("../../../assets/Icon/TriangleAlert.png")} // Warning icon
+      />
+      
+      <View style={{ 
+        flexDirection: "column", 
+        flex: 1, 
+        paddingRight: 20 // Space for close button
+      }}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text
             accessible={true}
-            accessibilityRole="button"
-            accessibilityLabel="Close outage alert"
-            style={{ marginTop: 10 }}
+            accessibilityRole="header"
+            style={[
+              styles.modemError1,
+              { color: '#DD6D02' } // Warning color for title
+            ]}
+          >
+            Outage Alert
+          </Text>
+        </View>
+        
+        <Text
+          accessible={true}
+          accessibilityRole="text"
+          accessibilityLabel={alertMessage}
+          style={[
+            styles.modemError2,
+            { 
+              color: '#000000', // Black text for readability
+              marginTop: 8,
+              marginRight: 5
+            }
+          ]}
+        >
+          Our systems show that you may be experiencing an outage related to
+          your Internet service. We are working to restore service as soon
+          as possible.{" "}
+          <Text style={[
+            styles.modemError2, 
+            { 
+              fontWeight: "700",
+              color: '#000000' // Keep bold text black too
+            }
+          ]}>
+            Estimated Time to Restore: {estimatedTime}
+          </Text>
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Close outage alert"
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          right: 16,
+          width: 16,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        onPress={() => {
+          setIsOutageAlert(false);
+        }}
+      >
+        <CloseIcon color="#DD6D02" width={16} height={16} />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+ const AppUpdateAlert = () => {
+  return (
+    <View style={[
+      styles.errorBox,
+      {
+        backgroundColor: '#F0F8FF', // Info background
+        borderColor: '#0060AE', // Info border
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        borderRadius: 8,
+        borderWidth: 1,
+        paddingLeft: 16,
+        paddingRight: 12,
+        paddingVertical: 16,
+      }
+    ]}>
+      <Image
+        style={{ 
+          width: 20, 
+          height: 22,
+        }}
+        resizeMode="contain"
+        tintColor="#0060AE" // Info color
+        source={require("../../../assets/Icon/Info.png")} // Info icon
+      />
+      
+      <View style={{ 
+        flexDirection: "column", 
+        flex: 1, 
+        paddingRight: 24 // Space for close button
+      }}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text
+            style={[
+              styles.modemError1, 
+              { color: '#0060AE' } // Info color for title
+            ]}
+          >
+            What's New
+          </Text>
+        </View>
+        
+        <Text
+          accessible={!showWalkThrough}
+          accessibilityElementsHidden={showWalkThrough}
+          importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
+          style={[
+            styles.modemError2,
+            { 
+              color: '#000000', // Black text for readability
+              marginTop: 8,
+            }
+          ]}
+        >
+          Enhance your app experience with the latest version.
+          <Text
+            accessible={!showWalkThrough}
+            style={styles.updateNow} // Keep original updateNow styling
             onPress={() => {
-              setIsOutageAlert(false);
+              if (Platform.OS === "android") {
+                Linking.openURL(
+                  "https://play.google.com/store/apps/details?id=com.sparklight"
+                );
+              } else {
+                Linking.openURL(
+                  "https://apps.apple.com/us/app/mysparklight/6469003880"
+                );
+              }
             }}
           >
-            <CloseIcon />
-          </TouchableOpacity>
-        </View>
+            {" "}
+            Update Now{" "}
+          </Text>
+          and keep your app running smoothly.
+        </Text>
       </View>
-    );
-  };
 
-  const AppUpdateAlert = () => {
-    return (
-      <View style={styles.errorBox}>
-        <View style={{ flexDirection: "row", width: "90%" }}>
-          <View style={{ backgroundColor: Color.sparklightGreen, width: 4 }} />
-          <View style={{ flexDirection: "column", padding: 10 }}>
-            <View style={{ flexDirection: "row" }}>
-              <Image
-                style={{ alignSelf: "center" }}
-                resizeMode="contain"
-                tintColor={Color.sparklightGreen}
-                source={require("../../../assets/info-circle.png")}
-              />
-              <Text
-                style={[styles.modemError1, { color: Color.sparklightGreen }]}
-              >
-                What's New
-              </Text>
-            </View>
-            <Text
-              accessible={!showWalkThrough}
-              accessibilityElementsHidden={showWalkThrough}
-              importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
-              style={styles.modemError2}>
-              Enhance your app experience with the latest version.
-              <Text
-                accessible={!showWalkThrough}
-                style={styles.updateNow}
-                onPress={() => {
-                  if (Platform.OS === "android") {
-                    Linking.openURL(
-                      "https://play.google.com/store/apps/details?id=com.sparklight"
-                    );
-                  } else {
-                    Linking.openURL(
-                      "https://apps.apple.com/us/app/mysparklight/6469003880"
-                    );
-                  }
-                }}
-              >
-                {" "}
-                Update Now{" "}
-              </Text>
-              and keep your app running smoothly.
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            style={{ marginTop: 10 }}
-            onPress={() => {
-              setUpdateStatus({
-                isMinorUpdateAvailable: false,
-                currentVersion: '',
-                latestVersion: ''
-              });
-            }}
-          >
-            <CloseIcon />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  };
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          right: 16,
+          width: 24,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        onPress={() => {
+          setUpdateStatus({
+            isMinorUpdateAvailable: false,
+            currentVersion: '',
+            latestVersion: ''
+          });
+        }}
+        accessibilityLabel="Close update alert"
+        accessibilityRole="button"
+        accessibilityHint="Double tap to close this alert"
+      >
+        <CloseIcon color="#0060AE" width={16} height={16} />
+      </TouchableOpacity>
+    </View>
+  );
+};
 
   return (
     <LinearGradient
@@ -994,7 +1081,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontStyle: "normal",
     fontWeight: "400",
-    marginLeft: 20,
+    marginLeft: 0,
     marginTop: 7,
     marginRight: 5,
   },
@@ -1010,7 +1097,7 @@ const styles = StyleSheet.create({
   },
   errorBox: {
     flexDirection: "column",
-    marginHorizontal: 20,
+    marginHorizontal: 14,
     marginVertical: 20,
     borderColor: Color.sparklightGray,
     backgroundColor: Color.sparklightWhite,
