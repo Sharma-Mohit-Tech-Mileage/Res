@@ -22,6 +22,7 @@ import { GetApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { useMaintenance } from '../maintenance/MaintenanceContext';
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
+import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 
 const NewBillerHome = ({ navigation }) => {
   // State definitions
@@ -56,7 +57,6 @@ const NewBillerHome = ({ navigation }) => {
           GetApiRequest(
             `api/Accounts/${accountNumber}/easypay`,
             (res) => {
-              console.log("res-------------------------------------------------------------------------------", res);
               setIsAutoPayStatus(res?.isEasyPay);
               setloadingAutoPay(false);
             },
@@ -160,7 +160,8 @@ const NewBillerHome = ({ navigation }) => {
   const renderWelcomeCard = () => (
     <View style={[styles.card, styles.shadowProp, styles.welcomeCard]}>
       <View style={styles.contentWrapper}>
-        <WelcomeCard />
+        {/* <WelcomeCard /> */}
+        <DisconnectedBanner />
         <MenuGrid />
         <PromoBanner
           title="Auto Pay + Paperless is a Winning Combination!"
@@ -233,7 +234,7 @@ const NewBillerHome = ({ navigation }) => {
           onDismiss={bannerConfig.dismissible ? dismissBanner : undefined}
           severity={bannerConfig.severity || 'info'}
         />
-      )}
+        )}
             {renderWelcomeCard()}
           </View>
         </ScrollView>
