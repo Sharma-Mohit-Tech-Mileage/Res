@@ -161,7 +161,7 @@ const NewBillerHome = ({ navigation }) => {
     <View style={[styles.card, styles.shadowProp, styles.welcomeCard]}>
       <View style={styles.contentWrapper}>
         {/* <WelcomeCard /> */}
-        <DisconnectedBanner />
+        <DisconnectedBanner navigation={navigation} />
         <MenuGrid />
         <PromoBanner
           title="Auto Pay + Paperless is a Winning Combination!"

@@ -3,20 +3,28 @@ import { View, Text, StyleSheet } from 'react-native';
 import { FontFamily, FontSize, Color, Padding } from '../../../GlobalStyles';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import Icon from "../common/Icon";
+
 const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
   const disconnectedBannerMessage = `Your service has been disconnected. However, your online account will remain active for 90 days after disconnection. During this time, you can continue to log in to view your account details and pay any remaining balances.`;
 
   const handleManageServicesPress = () => {
     if (navigation) {
-      navigation.navigate('account', { screen: 'Profile' });
+      // Navigate to Account tab first, then to ProfileSettings
+      // This ensures proper back navigation to Account page
+      navigation.navigate('account', { screen: 'Account' });
+      // Small delay to ensure proper navigation stack setup
+      setTimeout(() => {
+        navigation.navigate('account', { screen: 'ProfileSettings' });
+      }, 100);
     }
   };
 
   const handleContactSupportPress = () => {
     if (navigation) {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Support', params: { isContactUs: true } }],
+      // Open the contact us URL in a webview using ArticalWindowUtility
+      navigation.navigate('ArticalWindowUtility', {
+        url: 'https://www.sparklight.com/contactus',
+        name: 'Contact Support'
       });
     }
   };
