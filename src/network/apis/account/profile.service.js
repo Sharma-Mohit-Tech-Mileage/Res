@@ -652,35 +652,6 @@ const isPaperlessEnabled = async (email) => {
         throw error;
     }
 };
-let getDisconnectOrderSnapshotCount = 0;
-const getDisconnectOrderSnapshot = async (accountNumber) => {
-    getDisconnectOrderSnapshotCount = getDisconnectOrderSnapshotCount + 1;
-    let user = await getUser();
-    const config = {
-        headers: {
-            Authorization: "Bearer " + user.token
-        }
-    };
-    
-    // Single endpoint - no account number length checking as requested
-    const requestUrl = `/api/Order/GetDisconnectOrderSnapshot?accountNumber=${accountNumber}`;
-    
-    console.log(`Making API Call to ${requestUrl}`);
-    
-    return _axios.get(requestUrl, config)
-        .then(res => {
-            console.log('GetDisconnectOrderSnapshot API Success Response:', res.data);
-            return res.data;
-        })
-        .catch(error => {
-            console.error('GetDisconnectOrderSnapshot API Error:', error);
-            if (error.toString().includes('AxiosError: timeout of') && getDisconnectOrderSnapshotCount < 2) {
-                return getDisconnectOrderSnapshot(accountNumber);
-            } else {
-                getDisconnectOrderSnapshotCount = 0;
-                throw error;
-            }
-        });
-};
 
-export { getDisconnectOrderSnapshot,fetchACPUserAccountDetails,logError, logInfo, fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, manageSVEmails, isPaperlessEnabled, resendEmailVerification, addUserAction, removeUser, editUserAction, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, addSVEmailMktFlag }
+
+export { fetchACPUserAccountDetails,logError, logInfo, fetchUserList, getProfileDetails, fetchSmsSubscription, postProfileInfo, postTextNotifictionInfo, fetchBillingStatus, fetchPaperLessDetails, putEmailNotification, postEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, manageSVEmails, isPaperlessEnabled, resendEmailVerification, addUserAction, removeUser, editUserAction, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, addSVEmailMktFlag }
