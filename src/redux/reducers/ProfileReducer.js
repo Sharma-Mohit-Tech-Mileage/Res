@@ -13,7 +13,6 @@ import {
   SAVE_USER_ACCOUNT_SERVICE,
   SET_PAPERLESS_STATUS,
   GET_PAPERLESS_STATUS,
-  SAVE_DISCONNECT_SNAPSHOT
 } from "../constants/index";
 
 const initialState = {
@@ -28,7 +27,6 @@ const initialState = {
   allSvEmailAssociated: [],
   paperlessStatusAcp: false,
   accountDetails: {},
-  disconnectSnapshot: null,
   erro: "",
 };
 
@@ -103,12 +101,6 @@ const ProfileReducer = (state = initialState, action) => {
         ...state,
         isLoading: false,
         accountDetails: action.payload,
-      };
-      case SAVE_DISCONNECT_SNAPSHOT:
-      return {
-        ...state,
-        isLoading: false,
-        disconnectSnapshot: action.payload,
       };
     case LOGOUT:
       return {

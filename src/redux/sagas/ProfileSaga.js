@@ -1,9 +1,9 @@
 import { all, call, put, takeLatest } from "redux-saga/effects";
 import { updateEmailList } from "../../components/utility/constant";
-import { getDisconnectOrderSnapshot,fetchACPUserAccountDetails,isPaperlessEnabled,getProfileDetails, fetchUserList, fetchSmsSubscription, fetchBillingStatus, postProfileInfo, postTextNotifictionInfo, fetchPaperLessDetails, postEmailNotification, putEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification, logError, logInfo, addUserAction, removeUser, editUserAction, fetchSecurityQuestions, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, manageSVEmails, addSVEmailMktFlag } from "../../network/apis/account/profile.service";
-import {FETCH_DISCONNECT_SNAPSHOT,FETCH_ACP_USER_ACCOUNT_DETAILS, FETCH_PROFILE_DETAILS, FETCH_USER_LIST, FETCH_SMS_SELECTION, UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SECURITY, UPDATE_TEXT_NOTIFICATION, FETCH_EMIAL_SELECTION, FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS, UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS, FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2, SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION, UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION, LOG_ERROR, LOG_INFO, ADD_NEW_USER, DELETE_USER, EDIT_USER, GET_SECURITY_QUESTION, ALLSVEMAILASSOCIATED, ADD_SV_EMAIL_NO_FLAGS_REQUEST, DELETE_SV_EMAIL_REQUEST, UPDATE_SV_EMAILS_REQUEST, MANAGE_EMAIL_REQUEST, UPDATE_EMAIL_ASSOCIATIONS, SET_PAPERLESS_STATUS,GET_PAPERLESS_STATUS } from "../constants";
-import {saveDisconnectSnapshot, saveACPUserAccountDetails,fetchProfileSuccess, fetchUserListSuccess, saveSMSSelection, saveEmailBillings, saveSvEmailAssociation, savePaperlessDetails, savePushNotifications, updatedSecurityQuestions,setPaperlessStatus,setLoading,clearLoading } from "../actions/ProfileActionSuite";
-import { DisconnectUtils } from "../../components/utility/disconnectUtils";
+import { fetchACPUserAccountDetails,isPaperlessEnabled,getProfileDetails, fetchUserList, fetchSmsSubscription, fetchBillingStatus, postProfileInfo, postTextNotifictionInfo, fetchPaperLessDetails, postEmailNotification, putEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification, logError, logInfo, addUserAction, removeUser, editUserAction, fetchSecurityQuestions, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, manageSVEmails, addSVEmailMktFlag } from "../../network/apis/account/profile.service";
+import {FETCH_ACP_USER_ACCOUNT_DETAILS, FETCH_PROFILE_DETAILS, FETCH_USER_LIST, FETCH_SMS_SELECTION, UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SECURITY, UPDATE_TEXT_NOTIFICATION, FETCH_EMIAL_SELECTION, FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS, UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS, FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2, SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION, UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION, LOG_ERROR, LOG_INFO, ADD_NEW_USER, DELETE_USER, EDIT_USER, GET_SECURITY_QUESTION, ALLSVEMAILASSOCIATED, ADD_SV_EMAIL_NO_FLAGS_REQUEST, DELETE_SV_EMAIL_REQUEST, UPDATE_SV_EMAILS_REQUEST, MANAGE_EMAIL_REQUEST, UPDATE_EMAIL_ASSOCIATIONS, SET_PAPERLESS_STATUS,GET_PAPERLESS_STATUS } from "../constants";
+import { saveACPUserAccountDetails,fetchProfileSuccess, fetchUserListSuccess, saveSMSSelection, saveEmailBillings, saveSvEmailAssociation, savePaperlessDetails, savePushNotifications, updatedSecurityQuestions,setPaperlessStatus,setLoading,clearLoading } from "../actions/ProfileActionSuite";
+
 function* getProfileUsers(action) {
     try {
         const response = yield call(fetchUserList)
@@ -522,37 +522,6 @@ function* fetchACPUserAccountDetailsSaga() {
       console.error('Error fetching ACP user account details:', error);
     }
   }
-
-  function* handleDisconnectLogic(action) {
-    try {
-        const { accountNumber, acctStatus, daysSinceDisconnectDate } = action.payload;
-        
-        console.log('handleDisconnectLogic - Input:', { 
-            accountNumber, 
-            acctStatus, 
-            daysSinceDisconnectDate 
-        });
-        
-        // Use business logic utility to determine if we should call API
-        const shouldCallAPI = DisconnectUtils.shouldCallSnapshotAPI(acctStatus, daysSinceDisconnectDate);
-        
-        if (shouldCallAPI) {
-            console.log('Calling GetDisconnectOrderSnapshot API - conditions met');
-            const snapshotResponse = yield call(getDisconnectOrderSnapshot, accountNumber);
-            yield put(saveDisconnectSnapshot(snapshotResponse));
-            console.log('Disconnect snapshot data saved to Redux:', snapshotResponse);
-        } else {
-            console.log('Skipping GetDisconnectOrderSnapshot API call - conditions not met');
-            // Store null to indicate no snapshot data needed for this account
-            yield put(saveDisconnectSnapshot(null));
-        }
-        
-    } catch (error) {
-        console.error('Error in handleDisconnectLogic:', error);
-        // Store null on error to prevent UI issues
-        yield put(saveDisconnectSnapshot(null));
-    }
-}
 function* ProfileSagas() {
     yield takeLatest(FETCH_PROFILE_DETAILS, fetchProfileDetails);
     yield takeLatest(FETCH_USER_LIST, getProfileUsers);
@@ -585,6 +554,5 @@ function* ProfileSagas() {
     yield takeLatest(UPDATE_EMAIL_ASSOCIATIONS, handleUpdateEmailAssociations);
     yield takeLatest(GET_PAPERLESS_STATUS, checkPaperlessSaga);
     yield takeLatest(FETCH_ACP_USER_ACCOUNT_DETAILS, fetchACPUserAccountDetailsSaga);
-    yield takeLatest(FETCH_DISCONNECT_SNAPSHOT, handleDisconnectLogic);
 }
 export default ProfileSagas;

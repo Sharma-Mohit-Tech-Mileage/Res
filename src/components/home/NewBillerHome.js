@@ -23,7 +23,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { useMaintenance } from '../maintenance/MaintenanceContext';
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
-import { getDashboardConfig } from "../../redux/selectors/profileSelectors";
+
 const NewBillerHome = ({ navigation }) => {
   // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
@@ -49,9 +49,8 @@ const NewBillerHome = ({ navigation }) => {
   const paperlessLoading = useSelector(
       (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
   );
-const dashboardConfig = useSelector(getDashboardConfig);
 
-const getStatus = () => {
+    const getStatus = () => {
       setloadingAutoPay(true);
         getUser().then((res) => {
           const accountNumber = res.userInfo.accountNumber;
@@ -158,18 +157,11 @@ const getStatus = () => {
       })
     );
 
- const renderWelcomeCard = () => (
+  const renderWelcomeCard = () => (
     <View style={[styles.card, styles.shadowProp, styles.welcomeCard]}>
       <View style={styles.contentWrapper}>
-        {/* CLEAN: No business logic - just consume computed state */}
-        {dashboardConfig.showDisconnectedBanner && (
-          <DisconnectedBanner navigation={navigation} />
-        )}
-        
-        {dashboardConfig.showWelcomeCard && (
-          <WelcomeCard />
-        )}
-        
+        {/* <WelcomeCard /> */}
+        <DisconnectedBanner navigation={navigation} />
         <MenuGrid />
         <PromoBanner
           title="Auto Pay + Paperless is a Winning Combination!"

@@ -30,7 +30,7 @@ const MaintenancePage = ({
   }
   
   Linking.openURL(contactLink).catch(err => 
-    console.error(' Error opening contact link:', err)
+    console.error('🔧 📄 Error opening contact link:', err)
   );
 };
   
@@ -49,7 +49,7 @@ const MaintenancePage = ({
         }],
       });
     } else {
-      console.error(' Navigation ref not available');
+      console.error('🔧 📄 🚫 Navigation ref not available');
     }
   };
 
