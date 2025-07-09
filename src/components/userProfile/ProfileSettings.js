@@ -29,17 +29,18 @@ const ProfileSettings = () => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [isNewBiller, setIsNewBiller] = useState(false);
   const [isCancelService, setIsCancelService] = useState(false);
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
-  const profileDetails = profile.profileDetails || {};
+  const profileData = useSelector((state) => state.combinedReducers || {});
+  const profileDetails = profileData.profile.profileDetails || {};
   const convertedRole = getUserType(profileDetails.memberType || "");
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || "");
   const [planName, setPlanName] = useState("");
   const[planPrice, setPlanPrice] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const accountDetails = useSelector(
-      (state) => state.combinedReducers.profile?.accountDetails
-    );
+  const accountDetails = profileData.profile?.accountDetails
+
+    const userData = profileData.user.userData
+
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
@@ -62,12 +63,22 @@ const ProfileSettings = () => {
   useEffect(() => {
     if (profileDetails?.accountNumber?.toString().length >= 16) {
       setIsNewBiller(true);
-      if (accountDetails && accountDetails.services && accountDetails.services.hsd) {
-        // setIsCancelService(true);
-        getPlanDetails();
-      }
-      
     }
+ 
+    console.log('profile details',JSON.stringify(profileDetails))
+      let isVideo=userData?.userInfo?.services?.video || false
+      let isHSd=userData?.userInfo?.services?.hsd || false
+      let isPhone=userData?.userInfo?.services?.phone || false
+      console.log('isVieo=',isVideo,isHSd,isPhone)
+      //setIsCancelService(true)
+      if(isHSd && !isVideo && !isPhone){
+       //setIsCancelService(true)
+       getPlanDetails();
+        console.log('valid for cancel service')
+      }else{
+        console.log(' Not valid for cancel service')
+      }
+  
   }, [profileDetails, accountDetails]);
 
   const makeCall = (number) => {
@@ -88,7 +99,7 @@ const ProfileSettings = () => {
       GetApiRequest(requestURL,(res)=>{
         setLoading(false);
         console.log("Plan Details Response:", JSON.stringify(res));
-        if(res && res.product_bundles.length > 0  ) {
+        if(res && res?.product_bundles.length > 0  ) {
           let planName = res.product_bundles[0]?.hsd_services[0]?.product_name || "";
           let planPrice = res.product_bundles[0]?.hsd_services[0]?.charges[0]?.monthly_rate || "";
           console.log("Plan Name:", planName);
@@ -204,11 +215,14 @@ const ProfileSettings = () => {
               {loading ? (
                 <SkeletonPlaceholder>
                   <View style={{ width: "70%", height: 20, marginTop: 25 }} />
-                  </SkeletonPlaceholder>
-              )
-                  : 
-              <Text style={[styles.manageSerTxt3,{marginTop:25}]}>{planName}</Text>
-}
+                </SkeletonPlaceholder>
+              ) : (
+                planName && (
+                  <Text style={[styles.manageSerTxt3, { marginTop: 25 }]}>
+                    {planName}
+                  </Text>
+                )
+              )}
               {Platform.OS === "android" ? (
                 <View style={{ marginTop: 10 }}>
                   <Text style={styles.manageSerTxt1}>
@@ -256,22 +270,21 @@ const ProfileSettings = () => {
               )}
 
               { isCancelService && (
-                  <Pressable
-                    style={{}}
-                    onPress={() => navigation.navigate("cancelServiceSurvey",{planName: planName, planPrice: planPrice})}
-                    accessible={true}
-                    accessibilityLabel="cancel Service"
-                    accessibilityRole="button"
-                  >
-                    <Text style={[styles.manageSerTxt2,{marginVertical: 20,textDecorationLine: 'underline', fontWeight:'500'}]}>
-                      Cancel Service
-                    </Text>
-                  </Pressable>
+                <Pressable
+                  style={{}}
+                  onPress={() => navigation.navigate("cancelServiceSurvey", { planName: planName, planPrice: planPrice })}
+                  accessible={true}
+                  accessibilityLabel="cancel Service"
+                  accessibilityRole="button"
+                >
+                  <Text style={[styles.manageSerTxt2, { marginVertical: 20, textDecorationLine: 'underline', fontWeight: '500' }]}>
+                    Cancel Service
+                  </Text>
+                </Pressable>
               )}
 
             </View>
           </View>
-        
         </View>
       </ScrollView>
     </View>

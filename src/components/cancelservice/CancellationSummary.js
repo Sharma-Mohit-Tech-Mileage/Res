@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useForm, Controller, set } from "react-hook-form";
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import LinearGradient from "react-native-linear-gradient";
@@ -32,16 +32,25 @@ import colors from "../../res/Colors";
 import UpArrow from "../../res/svgIcons/UpArrow";
 import TickIcon from "../../res/svgIcons/TickIcon1";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
-import EntryInput from "..//entry/EntryInput";
-import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
+import NotificationAlert from "../common/customui/NotificationAlert";
+import { PostApiRequest } from "../../network/APIClient";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import moment from "moment";
 import LoadingOverlay from "../common/customui/CustomLoading";
-import { getPrimaryEmail } from '../utility/constant';
+import { getPrimaryEmail } from "../utility/constant";
+import DownArrow from "../../res/svgIcons/DownArrow";
 
 const validationSchema = yup.object().shape({
-  email: yup.string().email("Invalid email address").required("Email is required"),
+  email: yup
+    .string()
+    .email("Invalid email address")
+    .required("Email is required"),
 });
+
+const errorRes = {
+  error: "DISCONNECT_ERROR",
+  message:"Sample error message..Sample error message..Sample error message..Sample error message..",
+};
 
 const CancellationSummary = ({ navigation, route }) => {
   const { item, comment, planName, planPrice, data } = route.params || {};
@@ -61,19 +70,21 @@ const CancellationSummary = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
   const [isSuccessMessageVisible, setIsSuccessMessageVisible] = useState(false);
   const [enableButton, setEnableButton] = useState(false);
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
-  const profileDetails = profile.profileDetails || {};
+  const profileData = useSelector((state) => state.combinedReducers || {});
+  const profileDetails = profileData.profile.profileDetails || {};
   const [equipmentDetails, setEquipmentDetails] = useState([]);
+  const [showTerms, setShowTerms] = useState(true);
 
+  const accountDetails = profileData?.profile?.accountDetails;
 
-  const accountDetails = useSelector(
-      (state) => state.combinedReducers.profile?.accountDetails
-    );
+  const userData = profileData?.user?.userData;
 
   const [previousResponse, setPreviousResponse] = useState(
     navigation.getState().routes[1].params?.item || {}
   );
-  console.log("Account", JSON.stringify(accountDetails));
+
+  const [error, setError] = useState(errorRes);
+  //console.log("Account", JSON.stringify(accountDetails));
   const [devices, setDevices] = useState([]);
   const myTheme = {
     arrowColor: Color.sparklightBrightPurple,
@@ -81,34 +92,31 @@ const CancellationSummary = ({ navigation, route }) => {
   };
 
   const {
-      control,
-      handleSubmit,
-      setValue,
-      formState: { errors },
-    } = useForm({
-      resolver: yupResolver(validationSchema),
-      defaultValues: {
-        email: getPrimaryEmail(accountDetails) || "", // Default email from profile details
-      },
-    });
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      email: getPrimaryEmail(accountDetails) || "", // Default email from profile details
+    },
+  });
 
-    const handleSave = useCallback(
-        (data) => {
-          const { email } = data;
-          console.log("Email:", email);
-          setEmail(email);
-          setIsConfirmationPopupVisible(true);
-        }
-         
-      );
-    
-      const handleValidationError = useCallback(() => {
-        if(!toggleCheckBoxTerm) {
-          //setIsSubmitted(true);
-          
-        }
-      }, []);
-    
+  const handleSave = useCallback((data) => {
+    const { email } = data;
+    console.log("Email:", email);
+    setEmail(email);
+    if (toggleCheckBoxTerm) {
+      setIsConfirmationPopupVisible(true);
+    }
+  });
+
+  const handleValidationError = useCallback(() => {
+    if (!toggleCheckBoxTerm) {
+      //setIsSubmitted(true);
+    }
+  }, []);
 
   const date = moment(currentDate).add(0, "days").format("YYYY-MM-DD");
   const date1 = moment(currentDate).add(1, "days").format("YYYY-MM-DD");
@@ -162,8 +170,6 @@ const CancellationSummary = ({ navigation, route }) => {
 
     setMarkedDates(markedDates);
     //getEquipmentDetails();
-
-    
   }, []);
 
   useEffect(() => {
@@ -172,43 +178,44 @@ const CancellationSummary = ({ navigation, route }) => {
   }, [markedDates]);
 
   useEffect(() => {
-    if(accountDetails){
-    setDevices(accountDetails?.unreturned_equipment_fees || []);
-    if(accountDetails?.unreturned_equipment_fees) { 
-      const totalFee = accountDetails.unreturned_equipment_fees.reduce(
-        (sum, d) => sum + 1 * d.fee, 0
-      );
-     accountDetails.unreturned_equipment_fees.forEach((device) => {
-      let equipment = {
-        equipmentName: device.description,
-        quantity: 1,
-        pricePerUnit: device.fee,
-      };
-      setEquipmentDetails((prev) => [...prev, equipment]);
-     })
+    if (accountDetails) {
+      setDevices(userData?.userInfo?.unreturnedEquipmentFees || []);
+      if (userData?.userInfo.unreturnedEquipmentFees) {
+        const totalFee = userData?.userInfo.unreturnedEquipmentFees.reduce(
+          (sum, d) => sum + 1 * d.fee,
+          0
+        );
+        userData?.userInfo.unreturnedEquipmentFees.forEach((device) => {
+          let equipment = {
+            equipmentName: device.description,
+            quantity: 1,
+            pricePerUnit: device.fee,
+          };
+          setEquipmentDetails((prev) => [...prev, equipment]);
+        });
 
-      setTotalEquipmentFee(totalFee);
+        setTotalEquipmentFee(totalFee);
+      }
+      //const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
+      //setEmail(updatedPrimaryEmail)
+      //setValue({email: updatedPrimaryEmail})
     }
-     //const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
-     //setEmail(updatedPrimaryEmail)
-     //setValue({email: updatedPrimaryEmail})
-  }
   }, [accountDetails]);
 
-  const getEquipmentDetails = () => {
-    const requestURL = `api/Equipment/GetEquipmentDetails?accountNumber=${profileDetails.accountNumber}&includeServiceCode=true`;
-    GetApiRequest(
-      requestURL,
-      (res) => {
-        console.log("Equipment Details:", res);
-        // Process the equipment details as needed
-        //setDevices(res.equipments || []);
-      },
-      (error) => {
-        console.error("Error fetching equipment details:", error);
-      }
-    );
-  };
+  // const getEquipmentDetails = () => {
+  //   const requestURL = `api/Equipment/GetEquipmentDetails?accountNumber=${profileDetails.accountNumber}&includeServiceCode=true`;
+  //   GetApiRequest(
+  //     requestURL,
+  //     (res) => {
+  //       console.log("Equipment Details:", res);
+  //       // Process the equipment details as needed
+  //       //setDevices(res.equipments || []);
+  //     },
+  //     (error) => {
+  //       console.error("Error fetching equipment details:", error);
+  //     }
+  //   );
+  // };
 
   // Function to handle the confirmation popup
 
@@ -243,16 +250,16 @@ const CancellationSummary = ({ navigation, route }) => {
         FunctionName: "Cancel",
         Platform: "Mobile",
       },
-    "disconnectSnapshotRequest": {
-    "accountId": profileDetails.accountNumber,
-    "productName": planName,
-    "monthlyRate": planPrice,
-    "disconnectedDate": nextendays,
-    "equipmentSnapshotRequest": equipmentDetails,
-    "isTruckRoll": (data?.availableTimeslots.length>0)?true :false,
-    "confirmationEmail": email,
-    "totalEquipmentFee": totalEquipmentFee
-  }
+      disconnectSnapshotRequest: {
+        accountId: profileDetails.accountNumber,
+        productName: planName,
+        monthlyRate: planPrice,
+        disconnectedDate: nextendays,
+        equipmentSnapshotRequest: equipmentDetails,
+        isTruckRoll: data?.availableTimeslots.length > 0 ? true : false,
+        confirmationEmail: email,
+        totalEquipmentFee: totalEquipmentFee,
+      },
     };
 
     const requestURL = `/api/Order/CommitDisconnect`;
@@ -262,12 +269,17 @@ const CancellationSummary = ({ navigation, route }) => {
       requestBody,
       (res) => {
         console.log("Cancellation service request successful:", res);
+        setLoading(false);
+        if(res.error!=null && res?.error?.message){
+           setError(res.error)
+        }else{
         setIsSuccessMessageVisible(true);
         MyRef.current?.scrollTo({
           y: 0,
           animated: true,
         });
-        setLoading(false);
+      }
+        
         //getEquipmentDetails();
       },
       (error) => {
@@ -302,22 +314,36 @@ const CancellationSummary = ({ navigation, route }) => {
           }
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text
-              style={[
-                {
-                  fontFamily: FontFamily.openSansRegular,
-                  fontSize: 14,
-                  color: Color.colorGray_200,
-                  marginRight: 8,
-                },
-              ]}
-            >
-              {"Email Address"}
-            </Text>
             <InfoIcon />
           </View>
         </Tooltip>
       </View>
+    );
+  };
+
+  const renderErrorMessage = () => {
+    console.log('Error message',error)
+    return (
+      <>
+        {error && error?.message && (
+          <View style={{ paddingHorizontal: Padding.p_5xl,marginVertical:16 }}>
+            <NotificationAlert
+              type="warning"
+              title={"Disconnect Error"}
+              message={error.message}
+              showCloseIcon={true}
+              onClose={()=>{
+                setError(null)
+              }}
+              isVisible={true}
+              accessibilityLabel={error.message}
+              accessibilityLiveRegion="polite"
+              accessibilityRole="alert"
+              customStyle={styles.warningAlert}
+            />
+          </View>
+        )}
+      </>
     );
   };
 
@@ -372,7 +398,7 @@ const CancellationSummary = ({ navigation, route }) => {
     const total = devices.reduce((sum, d) => sum + 1 * d.fee, 0);
 
     return (
-      <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
+      <View style={{ paddingHorizontal: 16, marginBottom: 16, marginTop: 10 }}>
         {/* Header Row */}
         <View
           style={{
@@ -405,11 +431,11 @@ const CancellationSummary = ({ navigation, route }) => {
               flex: 1,
               fontWeight: "600",
               color: Color.sparklightWhite,
-              textAlign: "right",
+              textAlign: "center",
               paddingRight: 16,
             }}
           >
-            {"Price per unit "}
+            {"Price"}
           </Text>
         </View>
         {/* Device Rows */}
@@ -448,8 +474,8 @@ const CancellationSummary = ({ navigation, route }) => {
                 alignSelf: "center",
               }}
             >
-              {/* ${(device.price * device.qty).toFixed(2)} */}
-              {device.fee}
+              {/* ${(device.price * device.qty).toFixed(2)} */}$
+              {device?.fee?.toFixed(2)}
             </Text>
           </View>
         ))}
@@ -476,7 +502,7 @@ const CancellationSummary = ({ navigation, route }) => {
               alignSelf: "center",
             }}
           >
-            Total
+            Total Price
           </Text>
           <Text
             style={{
@@ -488,7 +514,7 @@ const CancellationSummary = ({ navigation, route }) => {
               marginRight: 10,
             }}
           >
-            ${total.toFixed(2)}
+            ${total?.toFixed(2)}
           </Text>
         </View>
       </View>
@@ -606,6 +632,7 @@ const CancellationSummary = ({ navigation, route }) => {
       <ScrollView style={{ flex: 1, marginBottom: 100 }} ref={MyRef}>
         <View style={[AppStyles.card, { margin: 16 }]}>
           {isSuccessMessageVisible && renderSuccessMessage()}
+          {renderErrorMessage()}
           <Text style={styles.header}>We’re Sad To See You Go</Text>
           <View style={styles.seperator} />
           <View style={{ paddingVertical: 5, paddingHorizontal: 24 }}>
@@ -614,7 +641,7 @@ const CancellationSummary = ({ navigation, route }) => {
           </View>
           <View style={styles.seperator} />
           <View style={{ paddingVertical: 5, paddingHorizontal: 24 }}>
-            <Text style={styles.lableTxt}>Disconnection date</Text>
+            <Text style={styles.lableTxt}>Disconnection Date</Text>
             <Text style={styles.valueTxt}>{currentDate}</Text>
           </View>
           <View style={styles.seperator} />
@@ -640,7 +667,7 @@ const CancellationSummary = ({ navigation, route }) => {
           <View style={styles.seperator} />
           <View style={{ paddingVertical: 5, paddingHorizontal: 24 }}>
             <Text style={styles.lableTxt}>Monthly Price Plan</Text>
-            <Text style={styles.valueTxt}>${planPrice?.toFixed(2)}</Text>
+            <Text style={styles.valueTxt}>${planPrice}</Text>
           </View>
 
           <View style={styles.seperator} />
@@ -648,7 +675,7 @@ const CancellationSummary = ({ navigation, route }) => {
             <Text style={styles.lableTxt}>Equipment</Text>
             <Text style={styles.valueTxt}>Leased Equipment Returns</Text>
           </View>
-          <View style={styles.seperator} />
+
           {renderDeviceList()}
 
           <View style={styles.seperator} />
@@ -668,93 +695,106 @@ const CancellationSummary = ({ navigation, route }) => {
                   { color: colors.sparklight_bright_purple },
                 ]}
               >
-                Equipment return policy
+                EQUIPMENT RETURN POLICY
               </Text>
-              <UpArrow color={colors.sparklight_bright_purple} />
+              <Pressable
+                onPress={() => {
+                  setShowTerms((prev) => !prev);
+                }}
+              >
+                {showTerms ? (
+                  <UpArrow color={colors.sparklight_bright_purple} />
+                ) : (
+                  <DownArrow />
+                )}
+              </Pressable>
             </View>
-            <View
-              style={{
-                flexDirection: "column",
-                paddingHorizontal: 24,
-                marginBottom: 16,
-              }}
-            >
-              <View style={{ flexDirection: "row", marginTop: 16 }}>
-                <View style={{ marginTop: 5 }}>
-                  <TickIcon />
-                </View>
-                <Text
-                  style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
-                >
-                  To avoid incurring unreturned equipment fee charges, all
-                  leased equipment must be returned by your next bill cycle.
-                </Text>
-              </View>
-
-              <View style={{ flexDirection: "row", marginTop: 16 }}>
-                <View style={{ marginTop: 5 }}>
-                  <TickIcon />
-                </View>
-                <Text
-                  style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
-                >
-                  All leased equipment should be returned to your nearest {""}
+            {showTerms && (
+              <View
+                style={{
+                  flexDirection: "column",
+                  paddingHorizontal: 24,
+                  marginBottom: 16,
+                }}
+              >
+                <View style={{ flexDirection: "row", marginTop: 16 }}>
+                  <View style={{ marginTop: 5 }}>
+                    <TickIcon />
+                  </View>
                   <Text
-                    style={[
-                      styles.terms,
-                      {
+                    style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
+                  >
+                    To avoid incurring unreturned equipment fee charges, all
+                    leased equipment must be returned by your next bill cycle.
+                  </Text>
+                </View>
+
+                <View style={{ flexDirection: "row", marginTop: 16 }}>
+                  <View style={{ marginTop: 5 }}>
+                    <TickIcon />
+                  </View>
+                  <Text
+                    style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
+                  >
+                    All leased equipment should be returned to your nearest {""}
+                    <Text
+                      style={[
+                        styles.terms,
+                        {
+                          color: Color.sparklightBrightPurple,
+                          textDecorationLine: "underline",
+                        },
+                      ]}
+                      onPress={() => {
+                        console.log("Sparklight Local Office Pressed");
+                        navigation.navigate("ArticalWindowUtility", {
+                          url: "https://www.sparklight.com/locations",
+                          name: "Service Locations",
+                        });
+                      }}
+                    >
+                      {" "}
+                      Sparklight Local Office.
+                    </Text>{" "}
+                    Prior to your visit, we recommend confirming the hours of
+                    operation and ensuring the location can accept returned
+                    equipment.{" "}
+                  </Text>
+                </View>
+
+                <View style={{ flexDirection: "row", marginTop: 16 }}>
+                  <View style={{ marginTop: 5 }}>
+                    <TickIcon />
+                  </View>
+                  <Text
+                    style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
+                  >
+                    For your convenience, you may request an equipment pickup
+                    for a fee. For more details on arranging this service,
+                    please{" "}
+                    <Text
+                      style={{
                         color: Color.sparklightBrightPurple,
                         textDecorationLine: "underline",
-                      },
-                    ]}
-                    onPress={() => {
-                      console.log("Sparklight Local Office Pressed");
-                      navigation.navigate("ArticalWindowUtility", {
-                        url: "https://www.sparklight.com/locations",
-                        name: "Service Locations",
-                      });
-                    }}
-                  >
-                    {" "}
-                    Sparklight Local Office.
-                  </Text>{" "}
-                  Prior to your visit, we recommend confirming the hours of
-                  operation and ensuring the location can accept returned
-                  equipment.{" "}
-                </Text>
-              </View>
-
-              <View style={{ flexDirection: "row", marginTop: 16 }}>
-                <View style={{ marginTop: 5 }}>
-                  <TickIcon />
+                        fontFamily: FontFamily.openSansRegular,
+                        fontSize: 14,
+                        fontWeight: "400",
+                      }}
+                      onPress={() => {
+                        // Add your contact action here
+                        navigation.navigate("ArticalWindowUtility", {
+                          url: "https://www.sparklight.com/contactus?isMobile=true",
+                          name: "Contact Us",
+                        });
+                      }}
+                    >
+                      contact us
+                    </Text>{" "}
+                    directly.
+                  </Text>
                 </View>
-                <Text
-                  style={[styles.terms, { marginLeft: 8, marginRight: 16 }]}
-                >
-                  For your convenience, you may request an equipment pickup for
-                  a fee. For more details on arranging this service, please{" "}
-                  <Text
-                    style={{
-                      color: Color.sparklightBrightPurple,
-                      textDecorationLine: "underline",
-                      fontFamily: FontFamily.openSansRegular,
-                      fontSize: 14,
-                      fontWeight: "400",
-                    }}
-                    onPress={() => {
-                      // Add your contact action here
-                      navigation.navigate("ArticalWindowUtility", {
-                        url: "https://www.sparklight.com/contactus?isMobile=true",
-                        name: "Contact Us",
-                      });
-                    }}
-                  >
-                    contact us
-                  </Text>{" "}
-                  directly.
-                </Text>
               </View>
-            </View>
+            )}
             {data.availableTimeslots && data.availableTimeslots.length > 0 && (
               <>
                 <View style={styles.seperator} />
@@ -862,7 +902,7 @@ const CancellationSummary = ({ navigation, route }) => {
                   { color: Color.sparkLightRed },
                 ]}
               >
-                You must agree to the terms and conditions.
+                You must agree to the Equipment Return Policy.
               </Text>
             </View>
           )}
@@ -877,6 +917,18 @@ const CancellationSummary = ({ navigation, route }) => {
             }}
           >
             {/* <Text style={{fontFamily:FontFamily.openSansRegular,fontSize:14,color:Color.colorGray_200,marginRight:8}}>Email address</Text> */}
+            <Text
+              style={[
+                {
+                  fontFamily: FontFamily.openSansRegular,
+                  fontSize: 14,
+                  color: Color.colorGray_200,
+                  marginRight: 8,
+                },
+              ]}
+            >
+              {"Email Address"}
+            </Text>
             <EmailInfo />
           </View>
           <View
@@ -894,7 +946,7 @@ const CancellationSummary = ({ navigation, route }) => {
                 <SparkLightInput
                   placeholder="Email Address"
                   onBlur={onBlur}
-                  style={{ width: "92%", marginHorizontal:24 }}
+                  style={{ width: "92%", marginHorizontal: 24 }}
                   onChangeText={onChange}
                   value={value ? value.toLowerCase() : ""}
                   error={errors.email?.message}
@@ -919,13 +971,12 @@ const CancellationSummary = ({ navigation, route }) => {
             onPress={() => {
               setIsSubmitted(true);
               handleSubmit(handleSave)();
-             }
-            }
+            }}
             accessibilityRole="button"
-            accessibilityLabel="Continue to Cancel   the service"
+            accessibilityLabel="Confirm to cancel the service"
           >
             <Text style={[styles.makePayment, styles.makeTypo]}>
-              {"Continue to cancel"}
+              {"Confirm cancel"}
             </Text>
           </Pressable>
           <View style={styles.buttonsParent}>
@@ -1021,6 +1072,12 @@ const styles = {
     lineHeight: 16,
     marginTop: 5,
   },
+  warningAlert: {
+    borderLeftWidth: 4,
+    borderLeftColor: "#FF9800",
+    marginBottom: 0,
+    borderRadius: 0,
+  },
   seperator: {
     height: 1,
     backgroundColor: Color.sparklightGray,
@@ -1065,7 +1122,7 @@ const styles = {
     marginVertical: 10,
   },
   checkBoxAreaViewText: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
     fontWeight: "400",
@@ -1074,7 +1131,7 @@ const styles = {
     fontSize: FontSize.size_sm,
     color: Color.colorGray_200,
     fontFamily: FontFamily.openSansRegular,
-    lineHeight: 22,
+    lineHeight: 18,
     fontWeight: "400",
   },
 };

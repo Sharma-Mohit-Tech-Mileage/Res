@@ -17,13 +17,13 @@ const AppStyles = StyleSheet.create({
     },
     card: {
         backgroundColor: '#fff',
-        borderRadius: 5,
+        borderRadius: 2,
         marginBottom: 16,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.12,
+        shadowRadius: 1.84,
+        elevation: 2,
     },
 });
 
