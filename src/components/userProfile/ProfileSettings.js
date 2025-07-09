@@ -1,24 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, ScrollView, Linking, Pressable, Platform } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import {
-  Padding,
-  Color,
-  FontFamily,
-  Border,
-  FontSize,
-} from "../../../GlobalStyles";
+import { Padding, Color, FontFamily, Border, FontSize, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getUserType,
-  convertToSpecialCase,
-  getRoleBasedMessage,
-} from "../utility/constant";
+import { getUserType, convertToSpecialCase, getRoleBasedMessage, } from "../utility/constant";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { RefreshToken } from "../user/Session";
 import { GetApiRequest } from "../../network/APIClient";
+import { shouldShowDisconnectedBanner } from "../../redux/selectors/profileSelectors";
 
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -31,10 +22,11 @@ const ProfileSettings = () => {
   const profileDetails = profile.profileDetails || {};
   const convertedRole = getUserType(profileDetails.memberType || "");
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || "");
-
+  const showDisconnectedBanner = useSelector(shouldShowDisconnectedBanner);
   const accountDetails = useSelector(
       (state) => state.combinedReducers.profile?.accountDetails
     );
+
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
@@ -50,7 +42,6 @@ const ProfileSettings = () => {
 
   useEffect(() => {
     dispatch(fetchProfileDetails());
-    //console.log("Account Details:", accountDetails);
     if(accountDetails?.services.hsd){
       setIsCancelService(true);
       getPlanDetails();
@@ -65,24 +56,19 @@ const ProfileSettings = () => {
 
   const makeCall = (number) => {
     let phoneNumber = "";
-
     if (Platform.OS === "android") {
       phoneNumber = `tel:${number}`;
     } else {
       phoneNumber = `telprompt:${number}`;
     }
-
     Linking.openURL(phoneNumber);
   };
 
   const getPlanDetails = () => {
-      const requestURL=`api/Plan/GetServiceDetails?accountNumber=${profileDetails.accountNumber}&includeEquipment=false&includeLocation=false`
-      GetApiRequest(requestURL,onSuccess=(res)=>{
-
-      }), onError=(error)=>{
-        console.error("Error fetching plan details");
-      }
-    
+    const requestURL=`api/Plan/GetServiceDetails?accountNumber=${profileDetails.accountNumber}&includeEquipment=false&includeLocation=false`
+    GetApiRequest(requestURL,onSuccess=(res)=>{}, onError=(error)=>{
+      console.error("Error fetching plan details");
+    });
   };
 
   return (
@@ -109,11 +95,6 @@ const ProfileSettings = () => {
                 <Text style={[styles.generalInformation, styles.melissaTypo]}>
                   General Information
                 </Text>
-                {/* {!isPrimary && <Pressable
-                style={[styles.buttons, styles.buttonsLayout]}
-                onPress={() => navigation.navigate("ProfileSettingsEdit")}>
-                <Text style={[styles.makePayment, styles.text1Clr]}>Edit</Text>
-              </Pressable>} */}
               </View>
               <View style={styles.frameContainer}>
                 <View style={styles.firstNameParent} accessible={true}>
@@ -140,14 +121,12 @@ const ProfileSettings = () => {
                     {profileDetails.userName}
                   </Text>
                 </View>
-
                 <View style={styles.firstNameParent} accessible={true}>
                   <Text style={styles.firstName}>Account Number</Text>
                   <Text style={[styles.melissa, styles.melissaTypo]}>
                     {profileDetails.accountNumber}
                   </Text>
                 </View>
-
                 <View style={styles.firstNameParent} accessible={true}>
                   <Text style={styles.firstName}>Member Type</Text>
                   <View style={styles.badgeWrapper}>
@@ -182,66 +161,114 @@ const ProfileSettings = () => {
               <Text style={[styles.generalInformation, styles.melissaTypo]}>
                 Manage My Service
               </Text>
-              {Platform.OS === "android" ? (
+              {showDisconnectedBanner ? (
                 <View style={{ marginTop: 20 }}>
-                  <Text style={styles.manageSerTxt1}>
-                    To cancel or change service, please call us at{" "}
-                    <Text
-                      style={styles.manageSerTxt2}
-                      onPress={() => makeCall("833-807-1020")}
-                      accessibilityRole="link"
-                      accessibilityLabel="Call 833 807 1020"
-                      accessibilityHint="Double tap to call customer service"
-                    >
-                      833-807-1020
+                  {Platform.OS === "android" ? (
+                    <Text style={styles.manageSerTxt1}>
+                      To reconnect your service, please call us at{" "}
+                      <Text
+                        style={styles.manageSerTxt2}
+                        onPress={() => makeCall("833-807-1020")}
+                        accessibilityRole="link"
+                        accessibilityLabel="Call 833 807 1020"
+                        accessibilityHint="Double tap to call customer service"
+                      >
+                        833-807-1020
+                      </Text>
+                      <Text
+                        style={styles.manageSerTxt3}
+                        accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                        accessible={true}
+                        importantForAccessibility="yes"
+                      >
+                        {" M-F 9:00 AM-6:00 PM CST."}
+                      </Text>
                     </Text>
-                    <Text
-                      style={styles.manageSerTxt3}
-                      accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
-                      accessible={true}
-                      importantForAccessibility="yes"
-                    >
-                      {" M-F 9:00 AM-6:00 PM CST."}
-                    </Text>
-                  </Text>
+                  ) : (
+                    <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center" }}>
+                      <Text style={styles.manageSerTxt1}>
+                        To reconnect your service, please call us at{" "}
+                      </Text>
+                      <Text
+                        style={styles.manageSerTxt2}
+                        onPress={() => makeCall("833-807-1020")}
+                        accessibilityRole="link"
+                        accessibilityLabel="Call 833 807 1020"
+                        accessibilityHint="Double tap to call customer service"
+                      >
+                        833-807-1020
+                      </Text>
+                      <Text
+                        style={styles.manageSerTxt3}
+                        accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                      >
+                        {" M-F 9:00 AM-6:00 PM CST."}
+                      </Text>
+                    </View>
+                  )}
                 </View>
               ) : (
-                <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", marginTop: 20 }}>
-                  <Text style={styles.manageSerTxt1}>
-                    To cancel or change service, please call us at{" "}
-                  </Text>
-                  <Text
-                    style={styles.manageSerTxt2}
-                    onPress={() => makeCall("833-807-1020")}
-                    accessibilityRole="link"
-                    accessibilityLabel="Call 833 807 1020"
-                    accessibilityHint="Double tap to call customer service"
-                  >
-                    833-807-1020
-                  </Text>
-                  <Text
-                    style={styles.manageSerTxt3}
-                    accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
-                  >
-                    {" M-F 9:00 AM-6:00 PM CST."}
-                  </Text>
-                </View>
+                <>
+                  {Platform.OS === "android" ? (
+                    <View style={{ marginTop: 20 }}>
+                      <Text style={styles.manageSerTxt1}>
+                        To cancel or change service, please call us at{" "}
+                        <Text
+                          style={styles.manageSerTxt2}
+                          onPress={() => makeCall("833-807-1020")}
+                          accessibilityRole="link"
+                          accessibilityLabel="Call 833 807 1020"
+                          accessibilityHint="Double tap to call customer service"
+                        >
+                          833-807-1020
+                        </Text>
+                        <Text
+                          style={styles.manageSerTxt3}
+                          accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                          accessible={true}
+                          importantForAccessibility="yes"
+                        >
+                          {" M-F 9:00 AM-6:00 PM CST."}
+                        </Text>
+                      </Text>
+                    </View>
+                  ) : (
+                    <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", marginTop: 20 }}>
+                      <Text style={styles.manageSerTxt1}>
+                        To cancel or change service, please call us at{" "}
+                      </Text>
+                      <Text
+                        style={styles.manageSerTxt2}
+                        onPress={() => makeCall("833-807-1020")}
+                        accessibilityRole="link"
+                        accessibilityLabel="Call 833 807 1020"
+                        accessibilityHint="Double tap to call customer service"
+                      >
+                        833-807-1020
+                      </Text>
+                      <Text
+                        style={styles.manageSerTxt3}
+                        accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
+                      >
+                        {" M-F 9:00 AM-6:00 PM CST."}
+                      </Text>
+                    </View>
+                  )}
+                  {/* {isCancelService && (
+                    <Pressable
+                      style={{}}
+                      onPress={() => navigation.navigate("cancelServiceSurvey")}
+                      accessible={true}
+                      accessibilityLabel="cancel Service"
+                      accessibilityRole="button"
+                    >
+                      <Text style={[styles.manageSerTxt2,{marginVertical: 20,textDecorationLine: 'underline'}]}>
+                        Cancel Service
+                      </Text>
+                    </Pressable>
+                  )} */}
+                </>
               )}
-
-              { isCancelService && (
-                  <Pressable
-                    style={{}}
-                    onPress={() => navigation.navigate("cancelServiceSurvey")}
-                    accessible={true}
-                    accessibilityLabel="cancel Service"
-                    accessibilityRole="button"
-                  >
-                    <Text style={[styles.manageSerTxt2,{marginVertical: 20,textDecorationLine: 'underline'}]}>
-                      Cancel Service
-                    </Text>
-                  </Pressable>
-              )}
-
             </View>
           </View>
         </View>

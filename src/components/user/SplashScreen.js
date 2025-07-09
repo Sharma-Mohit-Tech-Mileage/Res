@@ -20,6 +20,8 @@ import moment from "moment";
 import LoginLogger from "../../components/utility/LoginLogger";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import analytics from '@react-native-firebase/analytics';
+import { shouldBlockUserLogin, getLoginBlockMessage } from "../../redux/selectors/profileSelectors";
+import { triggerDisconnectCheck } from "../../redux/actions/ProfileActionSuite";
 const config = {
   issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
@@ -71,79 +73,98 @@ const SplashScreen = ({ navigation, route }) => {
   };
 
   const handleLogin = async (res) => {
-    if (res) {
-      let token = res.jwtToken;
-      let userInfo = res.userInfo;
-      let user = {
-        userInfo: userInfo,
-        token: token,
-        tokenGuid: res.idTokenGuid,
-        refreshToken: res.refreshToken,
-      };
+    console.log("[HANDLE_LOGIN] Response received:-------------------------------------------------------", res);
+  if (res) {
+    let token = res.jwtToken;
+    let userInfo = res.userInfo;
+    let user = {
+      userInfo: userInfo,
+      token: token,
+      tokenGuid: res.idTokenGuid,
+      refreshToken: res.refreshToken,
+    };
 
-      let isNormalUser = userInfo && userInfo.accountNumber && userInfo.accountNumber.toString().length === 9 ? true : false;
-      user['isNormalUser'] = isNormalUser;
-      setIsBusiness(false);
-      
-      if (!isNormalUser) {
-        if (res.userInfo?.authLevel != "HeadOfHousehold" && userInfo?.authLevel == "Admin") {
-          setErrorMessage(strings.AdminMsg);
-          setTimeout(() => { setModalVisible(true); }, 100);
-        } else if (res.userInfo.customerType === "COM") {
-          setIsBusiness(true);
-          setErrorMessage(strings.BusinessUserMsg);
-          setErrorMessage1(" to manage your Sparklight Business services account.");
-          setTimeout(() => { setModalVisible(true); }, 500);
-        } else if (res.userInfo.acctStatus != "Normal") {
-          setTimeout(() => { setDisconnected(true); }, 500);
-        } else {
-          moveAfterLogin(user);
-        }
-      } else if (res.userInfo.acctStatus === "Disconnect") {
-        setTimeout(() => { setDisconnected(true); }, 500);
-      } else if (
-        (userInfo?.authLevel !== "HeadOfHousehold" && userInfo?.authLevel == "Admin") ||
-        userInfo.acctStatus !== "Active"
-      ) {
+    let isNormalUser = userInfo && userInfo.accountNumber && userInfo.accountNumber.toString().length === 9 ? true : false;
+    user['isNormalUser'] = isNormalUser;
+    setIsBusiness(false);
+    
+    // NEW: Clean disconnect blocking logic using utility
+    if (shouldBlockUserLogin(userInfo)) {
+      console.log('Login blocked: Account disconnected for more than 90 days');
+      setErrorMessage(getLoginBlockMessage());
+      setTimeout(() => { setModalVisible(true); }, 100);
+      return;
+    }
+    
+    if (!isNormalUser) {
+      console.log("[HANDLE_LOGIN] User is not a normal user, but account is normal. and comes tp login 1");
+      if (res.userInfo?.authLevel != "HeadOfHousehold" && userInfo?.authLevel == "Admin") {
         setErrorMessage(strings.AdminMsg);
         setTimeout(() => { setModalVisible(true); }, 100);
-      } else if (userInfo.customerType != "Residential") {
+      } else if (res.userInfo.customerType === "COM") {
         setIsBusiness(true);
         setErrorMessage(strings.BusinessUserMsg);
-        setErrorMessage1(" to manage your Sparklight Business services account");
-        setTimeout(() => { setModalVisible(true); }, 100);
-      } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
-        setErrorMessage(strings.AdminMsg);
-        setTimeout(() => { setModalVisible(true); }, 100);
-      } else if (userInfo.customerType === 'Business') {
-        setErrorMessage(strings.BusinessUserMsg);
-        setErrorMessage1(' to view information.');
-        setTimeout(() => { setModalVisible(true); }, 100);
-      } else if (res.custServices.internet == false) {
-        setErrorMessage(strings.nonInternetUserMessage);
-        setErrorMessage1(" to manage your service.");
-        setTimeout(() => { setModalVisible(true); }, 100);
+        setErrorMessage1(" to manage your Sparklight Business services account.");
+        setTimeout(() => { setModalVisible(true); }, 500);
       } else {
+        console.log("[HANDLE_LOGIN] User is not a normal user, but account is normal. and comes tp login");
         moveAfterLogin(user);
       }
+    } else if (res.userInfo.acctStatus === "Disconnect") {
+      // NEW: Clean check for disconnect blocking before showing disconnect page
+      if (shouldBlockUserLogin(userInfo)) {
+        setErrorMessage(getLoginBlockMessage());
+        setTimeout(() => { setModalVisible(true); }, 100);
+      } else {
+        setTimeout(() => { setDisconnected(true); }, 500);
+      }
+    } else if (
+      (userInfo?.authLevel !== "HeadOfHousehold" && userInfo?.authLevel == "Admin") ||
+      userInfo.acctStatus !== "Active"
+    ) {
+      setErrorMessage(strings.AdminMsg);
+      setTimeout(() => { setModalVisible(true); }, 100);
+    } else if (userInfo.customerType != "Residential") {
+      setIsBusiness(true);
+      setErrorMessage(strings.BusinessUserMsg);
+      setErrorMessage1(" to manage your Sparklight Business services account");
+      setTimeout(() => { setModalVisible(true); }, 100);
+    } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
+      setErrorMessage(strings.AdminMsg);
+      setTimeout(() => { setModalVisible(true); }, 100);
+    } else if (userInfo.customerType === 'Business') {
+      setErrorMessage(strings.BusinessUserMsg);
+      setErrorMessage1(' to view information.');
+      setTimeout(() => { setModalVisible(true); }, 100);
+    } else if (res.custServices.internet == false) {
+      setErrorMessage(strings.nonInternetUserMessage);
+      setErrorMessage1(" to manage your service.");
+      setTimeout(() => { setModalVisible(true); }, 100);
     } else {
-      console.log("[HANDLE_LOGIN] No response received.");
+      moveAfterLogin(user);
     }
-  };
+  } else {
+    console.log("[HANDLE_LOGIN] No response received.");
+  }
+};
 
 const moveAfterLogin = async (user) => {
   storeUser(user);
   dispatch(saveUserInfo(user));
   
+  // NEW: Clean disconnect check trigger using action creator
+  console.log('Triggering disconnect check for user:', user.userInfo.accountNumber);
+  dispatch(triggerDisconnectCheck(user.userInfo));
+  
   try {
     if (user.userInfo && user.userInfo.userName) {
-      // Set the user ID (you already have this)
+      // Set the user ID (existing analytics code)
       await analytics().setUserId(user.userInfo.userName.toString());
       
-      // ADD THIS: Set custom user property for filtering
+      // Set custom user property for filtering (existing code)
       await analytics().setUserProperty('Sparklight_user_id', user.userInfo.userName.toString());
       
-      // ADD THIS: Log login event with custom dimension
+      // Log login event with custom dimension (existing code)
       await analytics().logEvent('login', {
         Sparklight_user_id: user.userInfo.userName.toString()
       });
@@ -177,7 +198,6 @@ const logoutAction = (postLogoutCallback) => {
             try {
               await analytics().setUserId(null);
               await analytics().setUserProperty('Sparklight_user_id', null);
-              console.log('Analytics User ID cleared on logout');
             } catch (error) {
               console.error('Error clearing analytics user ID:', error);
             }
@@ -202,7 +222,6 @@ const logoutAction = (postLogoutCallback) => {
           .then(() => {
             try {
               analytics().setUserId(null);
-              console.log('Analytics User ID cleared on logout');
             } catch (error) {
               console.error('Error clearing analytics user ID:', error);
             }

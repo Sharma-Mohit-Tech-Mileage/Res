@@ -18,8 +18,6 @@ class LoginLogger {
       className: "AuthenticationService",
     };
     
-    // Console log the base log object
-    console.log("[LoginLogger] Base Log Object:", baseLog);
     
     return baseLog;
   }
@@ -67,7 +65,6 @@ class LoginLogger {
       message: message,
     };
     
-    console.log("[LoginLogger] Successful Login:", message);
     dispatch(logInfo(logObject));
   }
 

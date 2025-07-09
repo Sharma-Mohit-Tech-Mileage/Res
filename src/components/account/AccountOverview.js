@@ -62,7 +62,6 @@ const logoutAction = (dispatch, navigation) => {
      try {
         analytics().setUserId(null);
         await analytics().setUserProperty('Sparklight_user_id', null);
-        console.log('Analytics User ID cleared on logout');
       } catch (error) {
         console.error('Error clearing analytics user ID:', error);
       }
