@@ -30,7 +30,7 @@ export const shouldShowDisconnectedBanner = (state) => {
 
 // Selector to get disconnect snapshot data
 export const getDisconnectSnapshot = (state) => {
-    const snapshot = state.combinedReducers.profile?.disconnectSnapshot;
+    const snapshot = state.combinedReducers.profile;
     console.log("[GET_DISCONNECT_SNAPSHOT] Found snapshot:", snapshot);
     return snapshot;
 };
