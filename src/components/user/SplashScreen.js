@@ -85,11 +85,12 @@ const SplashScreen = ({ navigation, route }) => {
       let isNormalUser = userInfo && userInfo.accountNumber && userInfo.accountNumber.toString().length === 9 ? true : false;
       user['isNormalUser'] = isNormalUser;
       setIsBusiness(false);
+      setErrorMessage1(null)
       
       if (!isNormalUser) {
         if (res.userInfo?.authLevel != "HeadOfHousehold" && userInfo?.authLevel == "Admin") {
           setErrorMessage(strings.AdminMsg);
-          setTimeout(() => { setModalVisible(true); }, 100);
+          setTimeout(() => { setModalVisible(true); }, 500);
         } else if (res.userInfo.customerType === "COM") {
           setIsBusiness(true);
           setErrorMessage(strings.BusinessUserMsg);
@@ -107,7 +108,7 @@ const SplashScreen = ({ navigation, route }) => {
         userInfo.acctStatus !== "Active"
       ) {
         setErrorMessage(strings.AdminMsg);
-        setTimeout(() => { setModalVisible(true); }, 100);
+        setTimeout(() => { setModalVisible(true); }, 500);
       } else if (userInfo.customerType != "Residential") {
         setIsBusiness(true);
         setErrorMessage(strings.BusinessUserMsg);
@@ -115,7 +116,7 @@ const SplashScreen = ({ navigation, route }) => {
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
         setErrorMessage(strings.AdminMsg);
-        setTimeout(() => { setModalVisible(true); }, 100);
+        setTimeout(() => { setModalVisible(true); }, 500);
       } else if (userInfo.customerType === 'Business') {
         setErrorMessage(strings.BusinessUserMsg);
         setErrorMessage1(' to view information.');
