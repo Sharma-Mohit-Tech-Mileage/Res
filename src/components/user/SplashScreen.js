@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, StyleSheet, Text, ActivityIndicator, Linking, Modal, Platform, Animated, Easing, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, Linking, Modal, Platform, Animated, Easing, TouchableOpacity } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
@@ -86,8 +86,7 @@ const SplashScreen = ({ navigation, route }) => {
       user['isNormalUser'] = isNormalUser;
       setIsBusiness(false);
       setErrorMessage1(null)
-      
-      if (!isNormalUser) {
+    
         if (res.userInfo?.authLevel != "HeadOfHousehold" && userInfo?.authLevel == "Admin") {
           setErrorMessage(strings.AdminMsg);
           setTimeout(() => { setModalVisible(true); }, 500);
@@ -101,33 +100,6 @@ const SplashScreen = ({ navigation, route }) => {
         } else {
           moveAfterLogin(user);
         }
-      } else if (res.userInfo.acctStatus === "Disconnect") {
-        setTimeout(() => { setDisconnected(true); }, 500);
-      } else if (
-        (userInfo?.authLevel !== "HeadOfHousehold" && userInfo?.authLevel == "Admin") ||
-        userInfo.acctStatus !== "Active"
-      ) {
-        setErrorMessage(strings.AdminMsg);
-        setTimeout(() => { setModalVisible(true); }, 500);
-      } else if (userInfo.customerType != "Residential") {
-        setIsBusiness(true);
-        setErrorMessage(strings.BusinessUserMsg);
-        setErrorMessage1(" to manage your Sparklight Business services account");
-        setTimeout(() => { setModalVisible(true); }, 100);
-      } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
-        setErrorMessage(strings.AdminMsg);
-        setTimeout(() => { setModalVisible(true); }, 500);
-      } else if (userInfo.customerType === 'Business') {
-        setErrorMessage(strings.BusinessUserMsg);
-        setErrorMessage1(' to view information.');
-        setTimeout(() => { setModalVisible(true); }, 100);
-      } else if (res.custServices.internet == false) {
-        setErrorMessage(strings.nonInternetUserMessage);
-        setErrorMessage1(" to manage your service.");
-        setTimeout(() => { setModalVisible(true); }, 100);
-      } else {
-        moveAfterLogin(user);
-      }
     } else {
       console.log("[HANDLE_LOGIN] No response received.");
     }

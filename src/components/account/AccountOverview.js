@@ -215,11 +215,7 @@ const AccountOverview = () => {
       <View style={[styles.frameParent]}>
         <View style={styles.rightActionableParent}>
           <View style={styles.rightActionable}>
-          {!user?.isNormalUser ? <UserIconWhite width={28} height={26}/> :
-            <Text style={styles.text}>
-              {initials}
-            </Text>
-            }
+            <UserIconWhite width={28} height={26}/> 
           </View>
           {/* Full name for profile */}
           <Text style={styles.melissaSmith} >

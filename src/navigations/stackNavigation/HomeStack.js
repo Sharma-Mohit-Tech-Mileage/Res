@@ -1,8 +1,6 @@
 import React, { Suspense } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import HomeScreen1 from "../../components/home/Home";
 import NewBillerHome from "../../components/home/NewBillerHome";
-import HomeScreen from '../../components/ACPDashboard/HomeScreen';
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemStackScreen from "./ManageEquepmentStack";
@@ -30,11 +28,7 @@ function HomeStackScreen() {
       >
         {({ navigation }) => (
           <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
-            {isNormalUser ? (
-              <HomeScreen1 navigation={navigation} />
-            ) : (
-              <NewBillerHome navigation={navigation} />
-            )}
+            <NewBillerHome navigation={navigation} />
           </Suspense>
         )}
       </HomeStack.Screen>
