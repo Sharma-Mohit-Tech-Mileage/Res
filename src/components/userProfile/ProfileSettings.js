@@ -19,7 +19,7 @@ import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
 import { RefreshToken } from "../user/Session";
 import { GetApiRequest } from "../../network/APIClient";
-
+import { isAccountDisconnected } from "../utility/disconnectHelpers";
 const ProfileSettings = () => {
   const navigation = useNavigation();
   const route = useRoute();
@@ -35,6 +35,10 @@ const ProfileSettings = () => {
   const accountDetails = useSelector(
       (state) => state.combinedReducers.profile?.accountDetails
     );
+  const userInfo = useSelector((state) => state.combinedReducers?.user?.userData?.userInfo);
+  
+  const showReconnectMessage = userInfo ? 
+    isAccountDisconnected(userInfo.acctStatus, userInfo.daysSinceDisconnectDate) : false;
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
@@ -182,66 +186,38 @@ const ProfileSettings = () => {
               <Text style={[styles.generalInformation, styles.melissaTypo]}>
                 Manage My Service
               </Text>
-              {Platform.OS === "android" ? (
-                <View style={{ marginTop: 20 }}>
-                  <Text style={styles.manageSerTxt1}>
-                    To cancel or change service, please call us at{" "}
-                    <Text
-                      style={styles.manageSerTxt2}
-                      onPress={() => makeCall("833-807-1020")}
-                      accessibilityRole="link"
-                      accessibilityLabel="Call 833 807 1020"
-                      accessibilityHint="Double tap to call customer service"
-                    >
-                      833-807-1020
-                    </Text>
-                    <Text
-                      style={styles.manageSerTxt3}
-                      accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
-                      accessible={true}
-                      importantForAccessibility="yes"
-                    >
-                      {" M-F 9:00 AM-6:00 PM CST."}
-                    </Text>
-                  </Text>
-                </View>
-              ) : (
-                <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", marginTop: 20 }}>
-                  <Text style={styles.manageSerTxt1}>
-                    To cancel or change service, please call us at{" "}
-                  </Text>
-                  <Text
-                    style={styles.manageSerTxt2}
-                    onPress={() => makeCall("833-807-1020")}
-                    accessibilityRole="link"
-                    accessibilityLabel="Call 833 807 1020"
-                    accessibilityHint="Double tap to call customer service"
-                  >
-                    833-807-1020
-                  </Text>
-                  <Text
-                    style={styles.manageSerTxt3}
-                    accessibilityLabel="Monday to Friday 9:00 AM to 6:00 PM Central Standard Time"
-                  >
-                    {" M-F 9:00 AM-6:00 PM CST."}
-                  </Text>
-                </View>
-              )}
-
-              { isCancelService && (
-                  <Pressable
-                    style={{}}
-                    onPress={() => navigation.navigate("cancelServiceSurvey")}
-                    accessible={true}
-                    accessibilityLabel="cancel Service"
-                    accessibilityRole="button"
-                  >
-                    <Text style={[styles.manageSerTxt2,{marginVertical: 20,textDecorationLine: 'underline'}]}>
-                      Cancel Service
-                    </Text>
-                  </Pressable>
-              )}
-
+              {showReconnectMessage ? (
+        // Show reconnect message, no link
+        <Text style={styles.manageSerTxt1}>
+          To reconnect your service, please call us at{" "}
+          <Text style={styles.manageSerTxt2} onPress={() => makeCall("833-807-1020")}>
+            833-807-1020
+          </Text>
+          <Text style={styles.manageSerTxt3}>
+            {" M-F 9:00 AM-6:00 PM CST."}
+          </Text>
+        </Text>
+      ) : (
+        // Show existing cancel/change message + link
+        <>
+          <Text style={styles.manageSerTxt1}>
+            To cancel or change service, please call us at{" "}
+            <Text style={styles.manageSerTxt2} onPress={() => makeCall("833-807-1020")}>
+              833-807-1020
+            </Text>
+            <Text style={styles.manageSerTxt3}>
+              {" M-F 9:00 AM-6:00 PM CST."}
+            </Text>
+          </Text>
+          {isCancelService && (
+            <Pressable onPress={() => navigation.navigate("cancelServiceSurvey")}>
+              <Text style={[styles.manageSerTxt2,{marginVertical: 20,textDecorationLine: 'underline'}]}>
+                Cancel Service
+              </Text>
+            </Pressable>
+          )}
+        </>
+      )}
             </View>
           </View>
         </View>

@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { FontFamily, FontSize, Color, Padding } from '../../../GlobalStyles';
-import NotificationAlert from '../common/customui/NotificationAlert';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { FontFamily, FontSize, Color, Padding } from "../../../GlobalStyles";
+import NotificationAlert from "../common/customui/NotificationAlert";
 import Icon from "../common/Icon";
 
 const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
@@ -11,10 +11,10 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
     if (navigation) {
       // Navigate to Account tab first, then to ProfileSettings
       // This ensures proper back navigation to Account page
-      navigation.navigate('account', { screen: 'Account' });
+      navigation.navigate("account", { screen: "Account" });
       // Small delay to ensure proper navigation stack setup
       setTimeout(() => {
-        navigation.navigate('account', { screen: 'ProfileSettings' });
+        navigation.navigate("account", { screen: "ProfileSettings" });
       }, 100);
     }
   };
@@ -22,9 +22,9 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
   const handleContactSupportPress = () => {
     if (navigation) {
       // Open the contact us URL in a webview using ArticalWindowUtility
-      navigation.navigate('ArticalWindowUtility', {
-        url: 'https://www.sparklight.com/contactus',
-        name: 'Contact Support'
+      navigation.navigate("ArticalWindowUtility", {
+        url: "https://www.sparklight.com/contactus",
+        name: "Contact Support",
       });
     }
   };
@@ -46,35 +46,49 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
       <View style={styles.reconnectionSection}>
         <View style={styles.reconnectionItem}>
           <View style={styles.checkIconContainer}>
-            <Icon name="green-checkcircle" size={16} color={Color.sparklightGreen} style={styles.checkIcon} />
+            <Icon
+              name="green-checkcircle"
+              size={16}
+              color={Color.sparklightGreen}
+              style={styles.checkIcon}
+            />
           </View>
           <Text style={styles.reconnectionText}>
             If you'd like to reconnect your service, please visit the{" "}
-            <Text 
+            <Text
               style={styles.linkText}
               onPress={handleManageServicesPress}
               accessibilityRole="link"
-              accessibilityLabel="Navigate to Manage Services"
-              accessibilityHint="Double tap to go to Manage Services section"
+              accessibilityLabel="Manage Services link"
+              accessibilityHint="Double tap to navigate to Manage Services section"
+              accessible={true}
+              importantForAccessibility="yes"
             >
               Manage Services
             </Text>{" "}
             section in your account to explore available options.
           </Text>
         </View>
-        
+
         <View style={styles.reconnectionItem}>
           <View style={styles.checkIconContainer}>
-            <Icon name="green-checkcircle" size={16} color={Color.sparklightGreen} style={styles.checkIcon} />
+            <Icon
+              name="green-checkcircle"
+              size={16}
+              color={Color.sparklightGreen}
+              style={styles.checkIcon}
+            />
           </View>
           <Text style={styles.reconnectionText}>
             If you have any questions or need assistance, please{" "}
-            <Text 
+            <Text
               style={styles.linkText}
               onPress={handleContactSupportPress}
               accessibilityRole="link"
-              accessibilityLabel="Contact our support team"
+              accessibilityLabel="Contact our support team link"
               accessibilityHint="Double tap to contact support"
+              accessible={true}
+              importantForAccessibility="yes"
             >
               contact our support team
             </Text>
@@ -104,20 +118,20 @@ const styles = StyleSheet.create({
     paddingTop: Padding.p_base,
   },
   reconnectionItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: Padding.p_base,
   },
   checkIconContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: Padding.p_xs,
     marginTop: 5,
   },
   checkIcon: {
     color: Color.sparklightWhite,
     fontSize: FontSize.size_sm,
-    fontWeight: '700',
+    fontWeight: "700",
     fontFamily: FontFamily.openSansSemiBold,
   },
   reconnectionText: {
@@ -126,26 +140,26 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     color: Color.colorGray_100,
     lineHeight: 22,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
   },
   linkText: {
     color: Color.sparklightBrightPurple,
     fontFamily: FontFamily.openSansSemiBold,
     fontSize: FontSize.size_base,
-    textDecorationLine: 'underline',
-    fontWeight: '400',
+    textDecorationLine: "underline",
+    fontWeight: "400",
   },
   thankYouSection: {
     paddingTop: Padding.p_xs,
   },
   thankYouText: {
-   flex: 1,
+    flex: 1,
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
     color: Color.colorGray_100,
     lineHeight: 22,
-    flexWrap: 'wrap',
-    textAlign: 'center',
+    flexWrap: "wrap",
+    textAlign: "center",
   },
 });
 
