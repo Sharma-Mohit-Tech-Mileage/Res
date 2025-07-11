@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ActivityIndicator, ScrollView, Pressable, Dimensions } from "react-native";
+import { View, StyleSheet, Text, ActivityIndicator, Pressable, Dimensions } from "react-native";
 import WebView from 'react-native-webview';
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';

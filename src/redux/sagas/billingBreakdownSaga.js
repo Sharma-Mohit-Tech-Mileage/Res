@@ -10,7 +10,16 @@ function* fetchBillingBreakdownSaga() {
     console.log('Fetched billing breakdown:', breakdownData);
 
     // Dispatch success action with data
-    yield put(actions.fetchBillingBreakdownSuccess(breakdownData));
+    if(breakdownData?.data.statusCode==404){
+      yield put(actions.fetchBillingBreakdownFailure('No billing breakdown data available '+breakdownData.data.statusCode));
+
+    }else{
+    if(breakdownData.status==200){
+    yield put(actions.fetchBillingBreakdownSuccess(breakdownData.data));
+    }else{
+      yield put(actions.fetchBillingBreakdownFailure('Failed to fetch billing breakdown: ' + breakdownData.status));
+    }
+  }
   } catch (error) {
     console.error('Error in fetchBillingBreakdownSaga:', error);
     // Dispatch error action

@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorMidnightblue,
   },
   cancelButton: {
-    backgroundColor: Color.colorWhitesmoke_200, // Adjust color as needed
+   // backgroundColor: '#fff', // Adjust color as needed
   },
   submitText: {
     textAlign: "center",

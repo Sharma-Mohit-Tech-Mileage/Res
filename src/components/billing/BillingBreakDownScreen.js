@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, memo } from "react";
-import { StyleSheet, Text, View, FlatList, ActivityIndicator, ScrollView, } from "react-native";
+import { StyleSheet, Text, View, FlatList, ScrollView,Pressable } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
@@ -11,12 +11,75 @@ import AppStyles from "../common/styles/AppStyles";
 import { fetchBillingBreakdown } from "../../redux/actions/billingBreakdownActions";
 import { selectBillingBreakDownLoading, selectBillingBreakDownData, selectBillingBreakDownError } from "../../redux/selectors/billingBreakdownSelectors";
 import { InfoIcon } from "native-base";
+import BillErrorIcon from "../../res/svgIcons/BillBreakDownErrorIcon";
+import SecondaryButton from '../common/customui/PrimaryButton';
+import LoadingOverlay from "../common/customui/CustomLoading";
 
 // Constants
 const PLACEHOLDER_MESSAGE = "The bill breakdown reflects your latest monthly statement, showing last month's usage, charges, credits, and adjustments. It's a snapshot in time and might not capture recent account changes post-statement.";
 const SERVICE_DISCOUNT = "Service Discount";
 const DEFAULT_DATE_FORMAT = "MM/DD/YYYY";
 const MIN_DATE_PREFIX = "0001";
+const ERROR_204 ="We’re sorry, your data could not be retrieved at this time. Please try again in a little while.";
+const ERROR_404="We’re sorry, your data is not available at this time. Please check back after your current billing cycle."
+  
+
+
+
+    /**
+     * 
+      renderErrorMessage - Renders an error message if there is an error.
+     */
+
+      const renderErrorMessage = (errorCode, navigation) => {
+        console.log("Error Code:", errorCode);
+        return (
+          <View style={{ flexDirection: "column",margin:8 }}>
+            <View style={[AppStyles.card, { margin: 16 }]}>
+              <View
+                style={styles.errorContainer}
+              >
+                <BillErrorIcon color="red" size={24} style={{ marginBottom: 8 }} />
+                <Text
+                  style={styles.errorTxt}
+                >
+                  {errorCode.includes("404")
+                    ? ERROR_404
+                    : ERROR_204
+                    }
+                </Text>
+              </View>
+            </View>
+            <Pressable
+              style={({ pressed }) => [
+                { backgroundColor: Color.colorMidnightblue },
+                styles.buttonsLayout,
+                { opacity: pressed ? 0.7 : 1 },
+              ]}
+              onPress={() => {
+                console.log("Return to Billing Services button pressed");
+                navigation.goBack();
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Return to Billing Services"
+            >
+              <Text style={[styles.makePayment, styles.makeTypo]}>
+                {"Return to Billing Services"}
+              </Text>
+            </Pressable>
+            <View style={styles.buttonsParent}>
+            <SecondaryButton
+                        title="Cancel"
+                        onPress={() => navigation.goBack()}
+                        accessibilityLabel="Cancel"
+                        accessibilityHint="Double tap to return to notifications screen"
+                    />
+          </View>
+          </View>
+        );
+      };
+  
+
 const DetailItem = memo(({ detail }) => {
   const hasExpiryDate = !detail.endDate.startsWith(MIN_DATE_PREFIX);
   const isDiscount = 
@@ -146,8 +209,9 @@ const EmptyState = memo(() => (
  */
 const LoadingIndicator = memo(() => (
   <View style={styles.loadingContainer}>
-    <ActivityIndicator
+    <LoadingOverlay
       size="large"
+      loading={true}
       color={Color.sparklightBrightPurple}
       accessible={true}
       accessibilityLabel="Loading billing breakdown data"
@@ -162,15 +226,19 @@ const LoadingIndicator = memo(() => (
 const BillingBreakDownScreen = ({ navigation }) => {
   // Redux state and dispatch
   const dispatch = useDispatch();
+  const user = useSelector(state => state.combinedReducers.user.userData);
   const loading = useSelector(selectBillingBreakDownLoading);
   const billingData = useSelector(selectBillingBreakDownData);
   const error = useSelector(selectBillingBreakDownError);
   // Local state
   const [totalDue, setTotalDue] = useState(0);
+  const [errorCode, setErrorCode] = useState("");
   const [userMsg] = useState(PLACEHOLDER_MESSAGE);
 
   // Calculate total due whenever billing data changes
   useEffect(() => {
+
+    console.log("Billing Data:", billingData);
     if (!billingData?.length) return;
     
     // Reset total first
@@ -189,6 +257,15 @@ const BillingBreakDownScreen = ({ navigation }) => {
   // Fetch billing data when screen is focused
   useFocusEffect(
     useCallback(() => {
+      // if(user.userInfo.accountNumber=='8160440040034354'){
+      //   setErrorCode("204");
+      //   return;
+      // }
+      if(user?.userInfo?.accountNumber=='8160440040062702'){
+        setErrorCode("404");
+        return;
+      }
+
       dispatch(fetchBillingBreakdown());
       setTotalDue(0); // Reset total due on screen focus
       
@@ -197,6 +274,15 @@ const BillingBreakDownScreen = ({ navigation }) => {
       };
     }, [dispatch])
   );
+  useEffect(() => {
+    console.log("Error:123", errorCode);
+    
+    if(error && error.length > 0) {
+      console.log("Error:123", error.includes("204"));
+      setErrorCode(error);
+    }
+  }, [error]);
+
 
   // Handle back button press
   const handleBackPress = useCallback(() => {
@@ -244,6 +330,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
         title="Billing Breakdown"
         onPressBack={handleBackPress}
       />
+      {errorCode ? renderErrorMessage(errorCode,navigation) : 
       <View style={[AppStyles.card, styles.cardContainer, { marginBottom: 32 }]}> 
         <ScrollView contentContainerStyle={{ paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
           {/* Warning message */}
@@ -264,6 +351,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
           {renderContent()}
         </ScrollView>
       </View>
+       }
     </View>
   );
 };
@@ -291,6 +379,12 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_3xl,
     fontFamily: FontFamily.poppinsBold,
     color: Color.black,
+  },errorTxt: {
+    color: "#001321",
+    fontSize: FontSize.size_base,
+    fontWeight: "400",
+    fontFamily: FontFamily.openSansRegular,
+    marginTop: 8,
   },
   loadingContainer: {
     flex: 1,
@@ -319,6 +413,13 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightWhite,
     borderRadius: 4,
     marginBottom: 100,
+  },errorContainer: {
+    borderWidth: 1,
+    borderColor: Color.sparklightGray,
+    borderRadius: 2,
+    padding: 24,
+    alignItems: "center",
+    margin: 24,
   },
   paymentRow: {
     paddingHorizontal: Padding.p_base,
@@ -427,6 +528,34 @@ const styles = StyleSheet.create({
     borderLeftColor: "#FF9800",
     marginBottom: 0,
     borderRadius: 0,
+  },buttonsLayout: {
+    paddingHorizontal: 0,
+    marginHorizontal:16,
+    marginTop:16,
+    paddingVertical: Padding.p_base,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: Border.br_11xs,
+    height: 56,
+  },
+  makeTypo: {
+    width: 282,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_base,
+    textAlign: "center",
+  },makePayment: {
+    color: Color.sparklightWhite,
+    width: 282,
+  },
+  buttons1: {
+    marginTop: Padding.p_base,
+    backgroundColor: Color.colorWhitesmoke_200,
+    paddingHorizontal: 0,
+    width: 382,
+  },
+  buttonsParent: {
+    marginTop: Padding.p_base,
+    alignSelf: "stretch",
   },
   colorGreen: '#0C8306',
 });

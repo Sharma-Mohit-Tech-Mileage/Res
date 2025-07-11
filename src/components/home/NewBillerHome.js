@@ -20,6 +20,10 @@ import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
 import { GetApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
+import { useMaintenance } from '../maintenance/MaintenanceContext';
+import MaintenanceBanner from "../maintenance/MaintenanceBanner";
+import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
+import { isAccountDisconnected } from "../utility/disconnectHelpers";
 const NewBillerHome = ({ navigation }) => {
   // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
@@ -30,17 +34,10 @@ const NewBillerHome = ({ navigation }) => {
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
-  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
-    dueDate: null,
-    billAmount: 0,
-    pastPaymentDue: 0,
-    email: null,
-  });
-  const [updateStatus, setUpdateStatus] = useState({
-    isMinorUpdateAvailable: false,
-    currentVersion: "",
-    latestVersion: "",
-  });
+  const [loadingAutoPay, setloadingAutoPay] = useState(false);
+  const { showBanner, showMaintenancePage, bannerConfig, pageConfig, dismissBanner } = useMaintenance();
+  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
+  const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: "", latestVersion: "", });
 
   // Redux selectors
   const home = useSelector((state) => state.combinedReducers.home);
@@ -48,26 +45,37 @@ const NewBillerHome = ({ navigation }) => {
     (state) => state.combinedReducers.profile?.accountDetails
   );
   const dispatch = useDispatch();
-const paperlessStatusAcp = useSelector(
-      (state) => state.combinedReducers.profile?.paperlessStatusAcp
-    );
+  const paperlessStatusAcp = useSelector( (state) => state.combinedReducers.profile?.paperlessStatusAcp );
+  const paperlessLoading = useSelector(
+      (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
+  );
+  const userInfo = useSelector((state) => state.combinedReducers?.user?.userData?.userInfo);
+  
+ 
+  const showDisconnectedBanner = userInfo ? 
+    isAccountDisconnected(userInfo.acctStatus, userInfo.daysSinceDisconnectDate) : false;
 
     const getStatus = () => {
+      setloadingAutoPay(true);
         getUser().then((res) => {
           const accountNumber = res.userInfo.accountNumber;
           GetApiRequest(
             `api/Accounts/${accountNumber}/easypay`,
             (res) => {
-              console.log("res-------------------------------------------------------------------------------", res);
               setIsAutoPayStatus(res?.isEasyPay);
+              setloadingAutoPay(false);
             },
-            (error) => { console.log("error", error);}
+            (error) => {
+               console.log("error", error);
+              setloadingAutoPay(false);
+            }
           );
         });
       };
   // Refresh data when the screen is focused
   useFocusEffect(
     useCallback(() => {
+      console.log("paperlessLoading",JSON.stringify(paperlessLoading));
       const refreshData = async () => {
         try {
           const status = await checkForMinorUpdate();
@@ -157,7 +165,11 @@ const paperlessStatusAcp = useSelector(
   const renderWelcomeCard = () => (
     <View style={[styles.card, styles.shadowProp, styles.welcomeCard]}>
       <View style={styles.contentWrapper}>
-        <WelcomeCard />
+       {showDisconnectedBanner ? (
+          <DisconnectedBanner navigation={navigation} />
+        ) : (
+          <WelcomeCard />
+        )}
         <MenuGrid />
         <PromoBanner
           title="Auto Pay + Paperless is a Winning Combination!"
@@ -165,6 +177,7 @@ const paperlessStatusAcp = useSelector(
         />
         <FeatureCard
           title="Auto Pay"
+          isLoading={loadingAutoPay}
           features={["Convenient", "Timely Payments", "Peace of Mind"]}
           buttonText={isAutoPayStatus ? "Active" : "Activate Auto Pay"}
           buttonVariant={isAutoPayStatus ? "success" : "primary"}
@@ -180,7 +193,8 @@ const paperlessStatusAcp = useSelector(
           }}
         />
         <FeatureCard
-          title="Paperless Billing"
+         isLoading={paperlessLoading}
+         title="Paperless Billing"
           features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
           buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}
           buttonVariant={paperlessStatusAcp ? "success" : "primary"}
@@ -199,7 +213,7 @@ const paperlessStatusAcp = useSelector(
     <LinearGradient
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+      colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
       {showWalkThrough && <View style={styles.shadowFullScreen} />}
@@ -217,6 +231,18 @@ const paperlessStatusAcp = useSelector(
           <View style={styles.mainContentContainer}>
             {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
             {isOutageAlert && renderOutageAlert()}
+             {showBanner && bannerConfig && (
+        <MaintenanceBanner
+          title={bannerConfig.title}
+          message={bannerConfig.message}
+          link={bannerConfig.link}
+          linkText={bannerConfig.linkText}
+          showPhoneNumber={bannerConfig.showPhoneNumber}
+          phoneNumber={bannerConfig.phoneNumber}
+          onDismiss={bannerConfig.dismissible ? dismissBanner : undefined}
+          severity={bannerConfig.severity || 'info'}
+        />
+        )}
             {renderWelcomeCard()}
           </View>
         </ScrollView>

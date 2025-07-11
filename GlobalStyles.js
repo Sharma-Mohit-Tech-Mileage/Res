@@ -29,6 +29,7 @@ export const Color = {
     colorGainsboro_200: "#d9d9d9",
     colorMidnightblue: "#353091",
     colorGray_200: "#001321",
+    colorblack_100: "#000000",
     sparklightGreen: "#2ba948",
     sparklightGray: "#e1e1e1",
     sparklightDarkGray: "#767676",

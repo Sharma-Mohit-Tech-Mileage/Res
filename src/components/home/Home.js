@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Pressable, ActivityIndicator, Linking, AccessibilityInfo } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Linking, AccessibilityInfo } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import colors from "../../res/Colors";
@@ -24,10 +24,14 @@ import { checkForMinorUpdate } from "../utility/constant";
 import PromotionCard from "../common/PromotionCard/PromotionCard";
 import { useFocusEffect } from "@react-navigation/native";
 import WalkthroughOverlay from "../common/WalkthroughOverlay";
+import LoadingOverlay from "../common/customui/CustomLoading";
+import { useMaintenance } from '../maintenance/MaintenanceContext';
+import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
 const HomeScreen = ({ navigation }) => {
+  const { showBanner, bannerConfig, dismissBanner, isUserLoggedIn, currentUserAudience } = useMaintenance();
   const [isInternetDetails, setIsInternetDetails] = useState(false);
   const user = useSelector((state) => state.combinedReducers.user.userData);
   const home = useSelector((state) => state.combinedReducers.home);
@@ -658,7 +662,7 @@ const HomeScreen = ({ navigation }) => {
     <LinearGradient
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+      colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
       {showWalkThrough && <View style={styles.shadowFullScreen} />}
@@ -695,23 +699,30 @@ const HomeScreen = ({ navigation }) => {
             ) : (
               <></>
             )}
+            {showBanner && bannerConfig ? (
+              <MaintenanceBanner
+                title={bannerConfig.title}
+                message={bannerConfig.message}
+                link={bannerConfig.link}
+                linkText={bannerConfig.linkText}
+                showPhoneNumber={bannerConfig.showPhoneNumber}
+                phoneNumber={bannerConfig.phoneNumber}
+                onDismiss={bannerConfig.dismissible ? dismissBanner : undefined}
+                severity={bannerConfig.severity || 'info'}
+              />
+            ) : null}
             <View style={[styles.card, styles.shadowProp, { marginTop: screenReaderEnabled ? 0 : -40 }]}>
               <Text
                 accessible={true}
                 accessibilityLabel={`Service Health`}
                 style={styles.internetHealth}>Service Health</Text>
               {checkModemStatus ? (
+                <>
                 <InternetHealthChart
                   currentValue={getInternetHealth(currentHealth)}
                   key={currentHealth}
                 />
-              ) : (
-                <ActivityIndicator
-                  size="large"
-                  color={Color.colorGainsboro_200}
-                />
-              )}
-              <View
+                <View
                 style={styles.internetStatusSection}
                 accessible={true}
                 accessibilityRole="text"
@@ -729,6 +740,13 @@ const HomeScreen = ({ navigation }) => {
                     : strings.internetStatus}
                 </Text>
               </View>
+              </>
+              ) : (
+                <View style={{ marginVertical: 40 }}>
+                <LoadingOverlay loading={true}/>
+                </View>
+              )}
+              
 
               <View
                 style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 20 }}

@@ -14,6 +14,7 @@ const getProfileDetails = async () => {
             Authorization: "Bearer " + data.token
         }
     };
+    console.log("Authorization header:", config.headers.Authorization);
     let ApiMethod = ''
     if (accountNumber.toString().length >= 16) {
         ApiMethod = `/api/profile/${accountNumber}`
@@ -417,13 +418,7 @@ const handleSubmitFeedback = async (obj) => {
 };
 
 const logError = async (errorData) => {
-    let user = await getUser();
-    const config = {
-        headers: {
-            Authorization: `Bearer ${user.token}`
-        }
-    };
-    console.log('error logged Payload^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^', JSON.stringify(errorData));
+   
     try {
         await _axios.post('/logging/api/log/error', errorData);
         console.log('Error logged successfully');
@@ -433,12 +428,6 @@ const logError = async (errorData) => {
 };
 
 const logInfo = async (infoData) => {
-    let user = await getUser();
-    const config = {
-        headers: {
-            Authorization: `Bearer ${user.token}`
-        }
-    };
     try {
         const response = await _axios.post('/logging/api/log/info', infoData);
         console.log('Info logged successfully');
@@ -649,6 +638,7 @@ const isPaperlessEnabled = async (email) => {
             "first_name", "last_name",
             "current_balance", "past_due_amount",
             "payment_due_date", "customer_type",
+            "services",
             "email_details", "email"
         ],
     };

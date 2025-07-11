@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { StyleSheet, View, Image, Pressable, ScrollView, Linking, RefreshControl, ActivityIndicator, Platform, Text, TouchableOpacity, Alert, PermissionsAndroid, } from "react-native";
+import { StyleSheet, View, Image, Pressable, ScrollView, Linking, RefreshControl, Platform, Text, TouchableOpacity, Alert, PermissionsAndroid, } from "react-native";
 import { useSelector } from "react-redux";
 import { Border, Padding, Color, FontSize, FontFamily, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -161,7 +161,6 @@ const MyServices = ({ route }) => {
       GetApiRequest(
         request,
         (response) => {
-          console.log("getInternetPlanDetails", JSON.stringify(response));
           setPlans(response);
         },
         (error) => {

@@ -8,7 +8,7 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 import { deleteSVEmailRequest, fetchSvEmailAssociation, updateEmailAssociations, fetchBillingPaper } from '../../redux/actions/ProfileActionSuite';
-import LoadingOverlay from '../common/LoadingOverlay';
+import LoadingOverlay from '../common/customui/CustomLoading';
 import { extractAcknowledgementEmail } from '../../components/utility/constant';
 
 const EmailNotifications = () => {
@@ -478,8 +478,8 @@ const EmailNotifications = () => {
       </ScrollView>
 
       <LoadingOverlay
-        isLoading={isSubmitting || isDeleting}
-        message={isDeleting ? "Deleting..." : "Saving..."}
+        loading={isSubmitting || isDeleting}
+        loadingTxt={isDeleting ? "Deleting..." : "Saving..."}
         accessibilityLabel={isDeleting ? "Deleting email address" : "Saving changes"}
         accessibilityLiveRegion="polite"
       />

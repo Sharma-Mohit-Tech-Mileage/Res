@@ -2,7 +2,7 @@ import { all, call, put, takeLatest } from "redux-saga/effects";
 import { updateEmailList } from "../../components/utility/constant";
 import { fetchACPUserAccountDetails,isPaperlessEnabled,getProfileDetails, fetchUserList, fetchSmsSubscription, fetchBillingStatus, postProfileInfo, postTextNotifictionInfo, fetchPaperLessDetails, postEmailNotification, putEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification, logError, logInfo, addUserAction, removeUser, editUserAction, fetchSecurityQuestions, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, manageSVEmails, addSVEmailMktFlag } from "../../network/apis/account/profile.service";
 import {FETCH_ACP_USER_ACCOUNT_DETAILS, FETCH_PROFILE_DETAILS, FETCH_USER_LIST, FETCH_SMS_SELECTION, UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SECURITY, UPDATE_TEXT_NOTIFICATION, FETCH_EMIAL_SELECTION, FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS, UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS, FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2, SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION, UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION, LOG_ERROR, LOG_INFO, ADD_NEW_USER, DELETE_USER, EDIT_USER, GET_SECURITY_QUESTION, ALLSVEMAILASSOCIATED, ADD_SV_EMAIL_NO_FLAGS_REQUEST, DELETE_SV_EMAIL_REQUEST, UPDATE_SV_EMAILS_REQUEST, MANAGE_EMAIL_REQUEST, UPDATE_EMAIL_ASSOCIATIONS, SET_PAPERLESS_STATUS,GET_PAPERLESS_STATUS } from "../constants";
-import { saveACPUserAccountDetails,fetchProfileSuccess, fetchUserListSuccess, saveSMSSelection, saveEmailBillings, saveSvEmailAssociation, savePaperlessDetails, savePushNotifications, updatedSecurityQuestions,setPaperlessStatus } from "../actions/ProfileActionSuite";
+import { saveACPUserAccountDetails,fetchProfileSuccess, fetchUserListSuccess, saveSMSSelection, saveEmailBillings, saveSvEmailAssociation, savePaperlessDetails, savePushNotifications, updatedSecurityQuestions,setPaperlessStatus,setLoading,clearLoading } from "../actions/ProfileActionSuite";
 
 function* getProfileUsers(action) {
     try {
@@ -249,10 +249,13 @@ function* updateEntryEmailNotification(action) {
 }
 
 function* logErrorSaga(action) {
+    console.log('logErrorSaga: action.payload:-------------------', action.payload);
     try {
-        const response = yield call(logError, action.payload)
+       
+        yield call(logError, action.payload);
+            
     } catch (error) {
-        console.error('API Error Response:', error);
+        console.error('API Error Response failed ============', error);
     }
 }
 
@@ -498,15 +501,19 @@ function* handleUpdateEmailAssociations(action) {
 
 function* checkPaperlessSaga(action) {
     try {
+        yield put(setLoading(true));
         const status = yield call(isPaperlessEnabled, action.payload.email);
         yield put(setPaperlessStatus(status));
     } catch (error) {
         console.error('Error fetching ACP user isPaperlessEnabled:', error);
+    }finally {
+        yield put(clearLoading());
     }
 }
 
 function* fetchACPUserAccountDetailsSaga() {
     try {
+
       const response = yield call(fetchACPUserAccountDetails); // Calls API with no params
       if (response) {
         yield put(saveACPUserAccountDetails(response)); // Saves response to Redux store

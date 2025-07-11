@@ -4,7 +4,7 @@ import UserNavigations from "./src/navigations/UserNavigations";
 import { Provider } from "react-redux";
 import store from "./src/redux/configureStore.js";
 import { TabBarVisibilityProvider } from './src/navigations/TabBarVisibilityContext';
-import { NativeBaseProvider } from 'native-base';
+import { NativeBaseProvider ,extendTheme} from 'native-base';
 import { AnalyticsContext } from './src/components/utility/AnalyticsContext';
 import DeviceInfo from 'react-native-device-info';
 import VersionCheck from 'react-native-version-check';
@@ -12,7 +12,7 @@ import AppUpdateAlert from "./src/components/utility/AppUpdateAlert";
 import { initializeApp } from "./src/firebase/FirebaseUtils";
 import analytics from '@react-native-firebase/analytics';
 import { ISUAT } from "./src/network/apis/account/Constants";
-
+import { MaintenanceProvider } from './src/components/maintenance/MaintenanceContext';
 Text.defaultProps = { ...Text.defaultProps, maxFontSizeMultiplier: 1.25, };
 
 const App = () => {
@@ -66,16 +66,44 @@ const App = () => {
     }
   }
 
-  return (
+  const customTheme = extendTheme({
+  colors: {
+       // Add a new color
+       custom: {
+          500: '#8D3B90',
+       },
+     },
+     components: {
+       Radio: {
+         baseStyle: {
+           _icon: {
+             color: 'custom.500', // Default color for the icon
+             _checked: {
+               color: 'custom.500', // Color when checked
+             },
+           },
+         },
+         
+         defaultProps: {
+           colorScheme: 'custom', // Default color scheme for Radio
+         },
+       },
+     },
+});
+
+ return (
     <Provider store={store}>
-      <NativeBaseProvider>
+      <NativeBaseProvider theme={customTheme}>
         <TabBarVisibilityProvider>
           <AnalyticsContext.Provider value={{ logEvent: (eventName, eventData) => analytics().logEvent(eventName, eventData) }}>
-            <UserNavigations />
-            <AppUpdateAlert
-              visible={majorUpdateVisible}
-              onClose={() => setMajorUpdateVisible(false)}
-            />
+            {/* Add MaintenanceProvider here */}
+            <MaintenanceProvider>
+              <UserNavigations />
+              <AppUpdateAlert
+                visible={majorUpdateVisible}
+                onClose={() => setMajorUpdateVisible(false)}
+              />
+            </MaintenanceProvider>
           </AnalyticsContext.Provider>
         </TabBarVisibilityProvider>
       </NativeBaseProvider>

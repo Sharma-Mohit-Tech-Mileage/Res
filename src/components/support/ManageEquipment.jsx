@@ -5,7 +5,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  ActivityIndicator,
+
   ScrollView,
   findNodeHandle,
   AccessibilityInfo,
@@ -42,10 +42,11 @@ import PasswordKey from "../../res/svgIcons/passwordKey";
 import Surfingissue from "../../res/svgIcons/surfingissue";
 import PasswordRetrieve from "../../res/svgIcons/PasswordRetrieve";
 import PasswordShare from "../../res/svgIcons/PasswordShare";
-import Loader from "../utility/Loader";
 import { useSelector } from "react-redux";
 import RenderText from "../common/RenderText";
 import AppStyles from "../common/styles/AppStyles";
+import LoadingOverlay from "../common/customui/CustomLoading";
+import SmallLoader from "../common/customui/SmallLoader";
 
 const ManageEquipment = ({ route }) => {
   const navigation = useNavigation();
@@ -234,7 +235,6 @@ To add a Sparklight Modem to your account, please contact our support team`);
       GetApiRequest(
         request,
         (response) => {
-          console.log("getInternetPlanDetails", JSON.stringify(response));
           setPlans(response);
           if (response.length > 0) {
             let macAddress = response[0].macAddress;
@@ -268,7 +268,6 @@ To add a Sparklight Modem to your account, please contact our support team`);
       request,
       (res) => {
         if (res) {
-          console.log("checkModemDetails", res);
           if (res.status && res.status === 408) {
             setLoadingHealth(false);
             setCurrentHealth("Poor");
@@ -596,10 +595,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
                           />
                         </View>
                       ) : (
-                        <ActivityIndicator
-                          size="small"
-                          color={Color.colorGainsboro_200}
-                          style={{ width: 40 }}
+                        <SmallLoader 
                         />
                       )}
                       {leased.length > 0 && (
@@ -989,7 +985,7 @@ To add a Sparklight Modem to your account, please contact our support team`);
           </View>
         </View>
       </ScrollView>
-      {loading ? <Loader /> : null}
+      {loading ? <LoadingOverlay loading={loading} /> : null}
     </View>
   );
 };

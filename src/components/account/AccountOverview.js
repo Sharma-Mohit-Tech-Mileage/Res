@@ -21,6 +21,7 @@ import { Env } from "../../network/apis/account/Constants";
 import AppStyles from "../common/styles/AppStyles";
 import UserIconWhite from "../../res/svgIcons/UserIconWhite";
 import moment from "moment";
+import analytics from '@react-native-firebase/analytics';
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -57,10 +58,14 @@ const logoutAction = (dispatch, navigation) => {
     logout(config, {
       idToken: token,
       postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
-    }).then((result) => {
-      console.log('Logout', result);
-      
-      //SetClearTimer();
+    }).then(async(result) => {
+     try {
+        analytics().setUserId(null);
+        await analytics().setUserProperty('Sparklight_user_id', null);
+        console.log('Analytics User ID cleared on logout');
+      } catch (error) {
+        console.error('Error clearing analytics user ID:', error);
+      }
       navigation.reset({
         index: 0,
         routes: [{ name: 'Splash', params: { isLogout: true } }],

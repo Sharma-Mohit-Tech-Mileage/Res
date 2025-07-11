@@ -13,7 +13,7 @@ import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { manageEmailRequest } from '../../redux/actions/ProfileActionSuite';
 import SecondaryButton from '../common/customui/PrimaryButton';
-import LoadingOverlay from '../common/LoadingOverlay';
+import LoadingOverlay from '../common/customui/CustomLoading';
 const validationSchema = yup.object().shape({
     email: yup.string().email('Invalid email address').required('Email is required'),
 });
@@ -125,8 +125,8 @@ const AddEmailNotification = () => {
             />
 
             <LoadingOverlay
-                isLoading={isSubmitting}
-                message="Saving..."
+                loading={isSubmitting}
+                loadingTxt="Saving..."
                 accessibilityLiveRegion="polite"
             />
 

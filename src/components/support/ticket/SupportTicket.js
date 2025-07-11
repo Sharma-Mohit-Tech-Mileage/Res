@@ -5,7 +5,6 @@ import {
   Text,
   View,
   FlatList,
-  ActivityIndicator,
   Pressable,
   Platform,
   RefreshControl,
@@ -25,6 +24,7 @@ import { getUser, getPendingTicket,storeValue } from "../../../redux/utils/Local
 import TicketListIcon from "../../../res/svgIcons/TicketListIcon";
 import SparkLightInput from "../../common/customui/SparkLightInput";
 import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import SmallLoader from "../../common/customui/SmallLoader";
 
 const SupportTicket = () => {
   const navigation = useNavigation();
@@ -339,11 +339,13 @@ const SupportTicket = () => {
               />
             </View>
           ) : loading ? (
-            <ActivityIndicator
-              size="small"
-              color="#8D3B90"
-              style={[styles.activityIndicator]}
+            <View style={{ justifyContent: "center", alignItems: "center", margin:20 }}>
+            <SmallLoader
+             loading={loading} 
+             width={180}
+             height={120} 
             />
+            </View>
           ) : (
             <RenderNoTicket />
           )}

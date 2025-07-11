@@ -20,6 +20,7 @@ import BillingdocIcon from '../../res/svgIcons/BillingdocIcon';
 import DocumentIcon from '../../res/svgIcons/DocumentIcon';
 import SearchBookIcon from '../../res/svgIcons/SearchBookIcon';
 import BuildingDocIcon from '../../res/svgIcons/BuildingDocIcon';
+import GearIcon from '../../res/svgIcons/GearIcon';
 const Icon = ({ name, size = 24, color = '#000', style }) => {
   const iconMap = {
     'credit-card': { library: 'SVG', source: creditCard },
@@ -41,6 +42,7 @@ const Icon = ({ name, size = 24, color = '#000', style }) => {
     'bill-paid': { library: 'SVG', source: BillingdocIcon },
     'document': { library: 'SVG', source: DocumentIcon },
     'search-book': { library: 'SVG', source: SearchBookIcon },
+    'gear': { library: 'SVG', source: GearIcon },
 
     // Image asset example
     'building-doc': { library: 'SVG', source: BuildingDocIcon },

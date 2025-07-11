@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, StyleSheet, Text, ActivityIndicator, Linking, Modal, Platform, Animated, Easing,TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, ActivityIndicator, Linking, Modal, Platform, Animated, Easing, TouchableOpacity } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
@@ -9,7 +9,6 @@ import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
-import DeviceInfo from "react-native-device-info";
 import strings from "../../res/Strings";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
@@ -18,6 +17,10 @@ import VersionCheck from "react-native-version-check";
 import SparkLightLoginButton from "../common/customui/SparkLightLoginButton";
 import RenderText from "../common/RenderText";
 import moment from "moment";
+import LoginLogger from "../../components/utility/LoginLogger";
+import LoadingOverlay from "../common/customui/CustomLoading";
+import analytics from '@react-native-firebase/analytics';
+import { shouldBlockLogin } from "../utility/disconnectHelpers";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -44,28 +47,29 @@ const SplashScreen = ({ navigation, route }) => {
   const [isVisible, setIsVisible] = useState(false)
   const fadeAnim = useRef(new Animated.Value(0)).current;
   
-
-
+  const [loginAttemptInfo, setLoginAttemptInfo] = useState({});
 
   const callSSOLoginApi = (request) => {
     setLoading(true);
+    setLoginAttemptInfo({
+      attemptTimestamp: new Date().toISOString(),
+      hasIdToken: !!request.idToken,
+      hasAccessToken: !!request.accessToken
+    });
     PostAuthApiRequest("/mobile/api/gettoken", request, onSuccess, onError);
   };
 
   const onSuccess = async (res) => {
     setLoading(false);
+    
+    if (res && res.userInfo) {
+      LoginLogger.logSuccessfulLogin(dispatch, logInfo, res.userInfo, {
+        hasJwtToken: !!res.jwtToken,
+        userHasServices: !!res.custServices
+      });
+    }
+    
     handleLogin(res);
-    dispatch(
-      logInfo({
-        host: DeviceInfo.getSystemName(),
-        application: "Sparklight Residential Mobile App",
-        className: "AuthenticationService",
-        methodName: "callSSOLoginApi",
-        messageDate: new Date().toISOString().split("T")[0],
-        errorCode: 0,
-        message: "Successful SSO Login",
-      })
-    );
   };
 
   const handleLogin = async (res) => {
@@ -82,29 +86,28 @@ const SplashScreen = ({ navigation, route }) => {
       let isNormalUser = userInfo && userInfo.accountNumber && userInfo.accountNumber.toString().length === 9 ? true : false;
       user['isNormalUser'] = isNormalUser;
       setIsBusiness(false);
+
+      if (shouldBlockLogin(userInfo.acctStatus, userInfo.daysSinceDisconnectDate)) {
+      setTimeout(() => { setModalVisible(true); }, 100);
+      return;
+    }
       if (!isNormalUser) {
-        if (res.userInfo.authLevel != "HeadOfHousehold" && userInfo.authLevel == "Admin") {
+        if (res.userInfo?.authLevel != "HeadOfHousehold" && userInfo?.authLevel == "Admin") {
           setErrorMessage(strings.AdminMsg);
-          //setErrorMessage1(" to view information.");
           setTimeout(() => { setModalVisible(true); }, 100);
         } else if (res.userInfo.customerType === "COM") {
           setIsBusiness(true);
           setErrorMessage(strings.BusinessUserMsg);
           setErrorMessage1(" to manage your Sparklight Business services account.");
           setTimeout(() => { setModalVisible(true); }, 500);
-        } else if (res.userInfo.acctStatus != "Normal") {
-          setTimeout(() => { setDisconnected(true); }, 500);
         } else {
           moveAfterLogin(user);
         }
-      } else if (res.userInfo.acctStatus === "Disconnect") {
-        setTimeout(() => { setDisconnected(true); }, 500);
       } else if (
-        (userInfo.authLevel !== "HeadOfHousehold" && userInfo.authLevel == "Admin") ||
+        (userInfo?.authLevel !== "HeadOfHousehold" && userInfo?.authLevel == "Admin") ||
         userInfo.acctStatus !== "Active"
       ) {
         setErrorMessage(strings.AdminMsg);
-        //setErrorMessage1(" to view information.");
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.customerType != "Residential") {
         setIsBusiness(true);
@@ -113,7 +116,6 @@ const SplashScreen = ({ navigation, route }) => {
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
         setErrorMessage(strings.AdminMsg);
-        //setErrorMessage1(' to view information.');
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.customerType === 'Business') {
         setErrorMessage(strings.BusinessUserMsg);
@@ -131,25 +133,56 @@ const SplashScreen = ({ navigation, route }) => {
     }
   };
 
-  const moveAfterLogin = (user) => {
-    storeUser(user);
-    dispatch(saveUserInfo(user));
-    if (user.userInfo.mobileTCAcceptanceFlag) {
-      navigation.reset({ index: 0, routes: [{ name: "MyTab" }], });
-    } else {
-      navigation.reset({ index: 0, routes: [{ name: "Terms" }], });
+const moveAfterLogin = async (user) => {
+  storeUser(user);
+  dispatch(saveUserInfo(user));
+  
+  try {
+    if (user.userInfo && user.userInfo.userName) {
+      // Set the user ID (you already have this)
+      await analytics().setUserId(user.userInfo.userName.toString());
+      
+      // ADD THIS: Set custom user property for filtering
+      await analytics().setUserProperty('Sparklight_user_id', user.userInfo.userName.toString());
+      
+      // ADD THIS: Log login event with custom dimension
+      await analytics().logEvent('login', {
+        Sparklight_user_id: user.userInfo.userName.toString()
+      });
     }
-  };
+  } catch (error) {
+    console.error('Error setting analytics user ID and custom dimension:', error);
+  }
+  
+  if (user.userInfo.mobileTCAcceptanceFlag) {
+    navigation.reset({ index: 0, routes: [{ name: "MyTab" }] });
+  } else {
+    navigation.reset({ index: 0, routes: [{ name: "Terms" }] });
+  }
+};
 
-  const logoutAction = (postLogoutCallback) => {
-    getSsoToken()
-      .then((res) => {
-        const token = res.idToken;
+const logoutAction = (postLogoutCallback) => {
+  getSsoToken()
+    .then((res) => {
+      const token = res.idToken;
+      
+      getUser().then(user => {
+        if (user && user.userInfo) {
+          LoginLogger.logLogout(dispatch, logInfo, user.userInfo);
+        }
+        
         logout(config, {
           idToken: token,
           postLogoutRedirectUrl: config.redirectUrl,
         })
-          .then(() => {
+          .then(async () => {
+            try {
+              await analytics().setUserId(null);
+              await analytics().setUserProperty('Sparklight_user_id', null);
+              console.log('Analytics User ID cleared on logout');
+            } catch (error) {
+              console.error('Error clearing analytics user ID:', error);
+            }
             storeUser({});
             storeSsoToken({});
             saveUserInfo({});
@@ -163,26 +196,44 @@ const SplashScreen = ({ navigation, route }) => {
               postLogoutCallback();
             }
           });
-      })
-      .catch((error) => {
-        if (postLogoutCallback) {
-          postLogoutCallback();
-        }
+      }).catch(() => {
+        logout(config, {
+          idToken: token,
+          postLogoutRedirectUrl: config.redirectUrl,
+        })
+          .then(() => {
+            try {
+              analytics().setUserId(null);
+              console.log('Analytics User ID cleared on logout');
+            } catch (error) {
+              console.error('Error clearing analytics user ID:', error);
+            }
+            storeUser({});
+            storeSsoToken({});
+            saveUserInfo({});
+            cleanUserData();
+            if (postLogoutCallback) {
+              postLogoutCallback();
+            }
+          })
+          .catch((error) => {
+            if (postLogoutCallback) {
+              postLogoutCallback();
+            }
+          });
       });
-  };
+    })
+    .catch((error) => {
+      if (postLogoutCallback) {
+        postLogoutCallback();
+      }
+    });
+};
+  
   const onError = (error) => {
     setLoading(false);
     setDisconnected(true);
-    dispatch(
-      logError({
-        host: DeviceInfo.getSystemName(),
-        application: "Sparklight Residential Mobile App",
-        className: "AuthenticationService",
-        methodName: "callSSOLoginApi",
-        errorDate: new Date().toISOString().split("T")[0],
-         message: error.message,
-        errorCode: 30800,
-      }));
+    LoginLogger.logFailedLogin(dispatch, logError, error, loginAttemptInfo);
   };
 
   const CustomAlertModal = ({
@@ -269,19 +320,39 @@ const SplashScreen = ({ navigation, route }) => {
       };
       setLoading(true);
       storeSsoToken(data);
+      
+      // Log login attempt info
+      setLoginAttemptInfo({
+        attemptTimestamp: new Date().toISOString(),
+        authMethod: "authorize",
+        hasIdToken: !!data.idToken,
+        hasAccessToken: !!data.accessToken
+      });
+      
       callSSOLoginApi(data);
     } catch (error) {
-      setLoginEnable(true);
+      LoginLogger.logFailedLogin(dispatch, logInfo, {
+        message: "Authorization failed",
+        code: 30801
+      }, {
+        authMethod: "authorize",
+        errorDetails: error?.message
+      });
+      
       setLoginEnable(true);
     }
   };
 
   useEffect(() => {
-
     const fetchData = async () => {
       try {
         const user = await getUser();
         if (user?.refreshToken != null) {
+          setLoginAttemptInfo({
+            attemptTimestamp: new Date().toISOString(),
+            authMethod: "refresh",
+            accountNumber: user.userInfo?.accountNumber
+          });
           const result = await refresh(config, {
             refreshToken: user.refreshToken,
           });
@@ -299,6 +370,15 @@ const SplashScreen = ({ navigation, route }) => {
           setLoginEnable(true);
         }
       } catch (error) {
+        // Log refresh token failure
+        LoginLogger.logFailedLogin(dispatch, logInfo, {
+          message: "Refresh token failed",
+          code: 30802
+        }, {
+          authMethod: "refresh",
+          errorDetails: error?.message
+        });
+        
         setLoginEnable(true);
       }
     };
@@ -356,7 +436,7 @@ const SplashScreen = ({ navigation, route }) => {
     <LinearGradient
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+      colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
       <View style={styles.splashContainer}>
@@ -382,7 +462,7 @@ const SplashScreen = ({ navigation, route }) => {
 
       </View>
 
-      {loading ? <ActivityIndicator style={styles.loadingStyle} size="large" color={"white"} /> : <></>}
+      {loading ? <LoadingOverlay loading={loading} isWhite={true}/> : <></>}
       {!loading && isVisible && (
         <Animated.View style={{ marginTop: hp("35%"), opacity: fadeAnim }}>
           <SparkLightLoginButton

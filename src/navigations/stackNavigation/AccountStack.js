@@ -256,6 +256,7 @@ function AccountStackScreen() {
           blur: () => setTabBarVisible(true),
         }}
       />
+
     </AccountStack.Navigator>
   );
 }

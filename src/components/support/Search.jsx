@@ -2,10 +2,6 @@ import React, { useState, useCallback, useEffect } from "react";
 import {
   StyleSheet,
   View,
-  Image,
-  Text,
-  KeyboardAvoidingView,
-  ActivityIndicator,
 } from "react-native";
 import {
   Color,
@@ -20,6 +16,7 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { GetApiRequest, GetApiRequestSearch } from "../../network/APIClient";
 
 import debounce from "lodash.debounce";
+import SmallLoader from "../common/customui/SmallLoader";
 
 const Search = ({ navigation }) => {
   const [input, setInput] = useState("");
@@ -103,7 +100,7 @@ const Search = ({ navigation }) => {
   }, []);
 
   const ListEndLoader = () => {
-    return <ActivityIndicator size={"small"} />;
+    return <SmallLoader size={"small"} />;
   };
 
   return (
