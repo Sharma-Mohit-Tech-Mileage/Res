@@ -22,7 +22,8 @@ import { GetApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { useMaintenance } from '../maintenance/MaintenanceContext';
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
-
+import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
+import { isAccountDisconnected } from "../utility/disconnectHelpers";
 const NewBillerHome = ({ navigation }) => {
   // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
@@ -48,6 +49,11 @@ const NewBillerHome = ({ navigation }) => {
   const paperlessLoading = useSelector(
       (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
   );
+  const userInfo = useSelector((state) => state.combinedReducers?.user?.userData?.userInfo);
+  
+ 
+  const showDisconnectedBanner = userInfo ? 
+    isAccountDisconnected(userInfo.acctStatus, userInfo.daysSinceDisconnectDate) : false;
 
     const getStatus = () => {
       setloadingAutoPay(true);
@@ -56,7 +62,6 @@ const NewBillerHome = ({ navigation }) => {
           GetApiRequest(
             `api/Accounts/${accountNumber}/easypay`,
             (res) => {
-              console.log("res-------------------------------------------------------------------------------", res);
               setIsAutoPayStatus(res?.isEasyPay);
               setloadingAutoPay(false);
             },
@@ -160,7 +165,11 @@ const NewBillerHome = ({ navigation }) => {
   const renderWelcomeCard = () => (
     <View style={[styles.card, styles.shadowProp, styles.welcomeCard]}>
       <View style={styles.contentWrapper}>
-        <WelcomeCard />
+       {showDisconnectedBanner ? (
+          <DisconnectedBanner navigation={navigation} />
+        ) : (
+          <WelcomeCard />
+        )}
         <MenuGrid />
         <PromoBanner
           title="Auto Pay + Paperless is a Winning Combination!"
@@ -233,7 +242,7 @@ const NewBillerHome = ({ navigation }) => {
           onDismiss={bannerConfig.dismissible ? dismissBanner : undefined}
           severity={bannerConfig.severity || 'info'}
         />
-      )}
+        )}
             {renderWelcomeCard()}
           </View>
         </ScrollView>
