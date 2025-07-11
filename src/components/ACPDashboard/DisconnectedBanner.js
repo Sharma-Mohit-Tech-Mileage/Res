@@ -1,94 +1,33 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, AccessibilityInfo } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { FontFamily, FontSize, Color, Padding } from "../../../GlobalStyles";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import Icon from "../common/Icon";
 
 const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
-  const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
-
   const disconnectedBannerMessage = `Your service has been disconnected. However, your online account will remain active for 90 days after disconnection. During this time, you can continue to log in to view your account details and pay any remaining balances.`;
-
-  useEffect(() => {
-    AccessibilityInfo.isScreenReaderEnabled().then(setIsScreenReaderEnabled);
-    const subscription = AccessibilityInfo.addEventListener(
-      'screenReaderChanged',
-      setIsScreenReaderEnabled
-    );
-
-    return () => subscription?.remove();
-  }, []);
 
   const handleManageServicesPress = () => {
     if (navigation) {
-      try {
-        navigation.navigate("account", { screen: "Account" });
-        setTimeout(() => {
-          navigation.navigate("account", { screen: "ProfileSettings" });
-        }, 100);
-      } catch (error) {
-        console.warn("Navigation error:", error);
-        navigation.navigate("account", { screen: "Account" });
-      }
+      // Navigate to Account tab first, then to ProfileSettings
+      // This ensures proper back navigation to Account page
+      navigation.navigate("account", { screen: "Account" });
+      // Small delay to ensure proper navigation stack setup
+      setTimeout(() => {
+        navigation.navigate("account", { screen: "ProfileSettings" });
+      }, 100);
     }
   };
 
   const handleContactSupportPress = () => {
     if (navigation) {
-      try {
-        navigation.navigate("ArticalWindowUtility", {
-          url: "https://www.sparklight.com/contactus",
-          name: "Contact Support",
-        });
-      } catch (error) {
-        console.warn("Navigation error:", error);
-      }
+      // Open the contact us URL in a webview using ArticalWindowUtility
+      navigation.navigate("ArticalWindowUtility", {
+        url: "https://www.sparklight.com/contactus",
+        name: "Contact Support",
+      });
     }
   };
-
-  // Render method for when accessibility is enabled (entire statement clickable)
-  const renderAccessibleItem = (iconName, onPress, accessibilityLabel, accessibilityHint, children) => (
-    <View style={styles.reconnectionItem}>
-      <View style={styles.checkIconContainer}>
-        <Icon
-          name={iconName}
-          size={16}
-          color={Color.sparklightGreen}
-          style={styles.checkIcon}
-        />
-      </View>
-      <TouchableOpacity
-        style={styles.touchableTextContainer}
-        onPress={onPress}
-        accessibilityRole="link"
-        accessibilityLabel={accessibilityLabel}
-        accessibilityHint={accessibilityHint}
-        accessible={true}
-        importantForAccessibility="yes"
-      >
-        <Text style={styles.reconnectionText}>
-          {children}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  // Render method for when accessibility is disabled (only link text clickable)
-  const renderRegularItem = (iconName, children) => (
-    <View style={styles.reconnectionItem}>
-      <View style={styles.checkIconContainer}>
-        <Icon
-          name={iconName}
-          size={16}
-          color={Color.sparklightGreen}
-          style={styles.checkIcon}
-        />
-      </View>
-      <Text style={styles.reconnectionText}>
-        {children}
-      </Text>
-    </View>
-  );
 
   return (
     <View style={styles.container}>
@@ -105,72 +44,57 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
       </View>
 
       <View style={styles.reconnectionSection}>
-        {/* First statement - Manage Services */}
-        {isScreenReaderEnabled ? (
-          renderAccessibleItem(
-            "green-checkcircle",
-            handleManageServicesPress,
-            "If you'd like to reconnect your service, please visit the Manage Services section in your account to explore available options.",
-            "Double tap to navigate to Manage Services section",
-            <>
-              If you'd like to reconnect your service, please visit the{" "}
-              <Text style={styles.linkText}>Manage Services</Text>{" "}
-              section in your account to explore available options.
-            </>
-          )
-        ) : (
-          renderRegularItem(
-            "green-checkcircle",
-            <>
-              If you'd like to reconnect your service, please visit the{" "}
-              <Text
-                style={styles.linkText}
-                onPress={handleManageServicesPress}
-                accessibilityRole="link"
-                accessibilityLabel="Manage Services link"
-                accessibilityHint="Double tap to navigate to Manage Services section"
-                accessible={true}
-                importantForAccessibility="yes"
-              >
-                Manage Services
-              </Text>{" "}
-              section in your account to explore available options.
-            </>
-          )
-        )}
+        <View style={styles.reconnectionItem}>
+          <View style={styles.checkIconContainer}>
+            <Icon
+              name="green-checkcircle"
+              size={16}
+              color={Color.sparklightGreen}
+              style={styles.checkIcon}
+            />
+          </View>
+          <Text style={styles.reconnectionText}>
+            If you'd like to reconnect your service, please visit the{" "}
+            <Text
+              style={styles.linkText}
+              onPress={handleManageServicesPress}
+              accessibilityRole="link"
+              accessibilityLabel="Manage Services link"
+              accessibilityHint="Double tap to navigate to Manage Services section"
+              accessible={true}
+              importantForAccessibility="yes"
+            >
+              Manage Services
+            </Text>{" "}
+            section in your account to explore available options.
+          </Text>
+        </View>
 
-        {/* Second statement - Contact Support */}
-        {isScreenReaderEnabled ? (
-          renderAccessibleItem(
-            "green-checkcircle",
-            handleContactSupportPress,
-            "If you have any questions or need assistance, please contact our support team.",
-            "Double tap to contact support",
-            <>
-              If you have any questions or need assistance, please{" "}
-              <Text style={styles.linkText}>contact our support team</Text>.
-            </>
-          )
-        ) : (
-          renderRegularItem(
-            "green-checkcircle",
-            <>
-              If you have any questions or need assistance, please{" "}
-              <Text
-                style={styles.linkText}
-                onPress={handleContactSupportPress}
-                accessibilityRole="link"
-                accessibilityLabel="Contact our support team link"
-                accessibilityHint="Double tap to contact support"
-                accessible={true}
-                importantForAccessibility="yes"
-              >
-                contact our support team
-              </Text>
-              .
-            </>
-          )
-        )}
+        <View style={styles.reconnectionItem}>
+          <View style={styles.checkIconContainer}>
+            <Icon
+              name="green-checkcircle"
+              size={16}
+              color={Color.sparklightGreen}
+              style={styles.checkIcon}
+            />
+          </View>
+          <Text style={styles.reconnectionText}>
+            If you have any questions or need assistance, please{" "}
+            <Text
+              style={styles.linkText}
+              onPress={handleContactSupportPress}
+              accessibilityRole="link"
+              accessibilityLabel="Contact our support team link"
+              accessibilityHint="Double tap to contact support"
+              accessible={true}
+              importantForAccessibility="yes"
+            >
+              contact our support team
+            </Text>
+            .
+          </Text>
+        </View>
       </View>
 
       <View style={styles.thankYouSection}>
@@ -209,9 +133,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_sm,
     fontWeight: "700",
     fontFamily: FontFamily.openSansSemiBold,
-  },
-  touchableTextContainer: {
-    flex: 1,
   },
   reconnectionText: {
     flex: 1,
