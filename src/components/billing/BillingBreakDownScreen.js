@@ -336,7 +336,7 @@ const BillingBreakDownScreen = ({ navigation }) => {
           {/* Warning message */}
           <View style={styles.alertContainer}>
             <NotificationAlert
-              type="warning"
+              type="info"
               title=""
               message={userMsg}
               showCloseIcon={false}
