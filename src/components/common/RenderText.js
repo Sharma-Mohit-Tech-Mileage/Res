@@ -47,7 +47,7 @@ export default RenderText = ({
 
   let instructionFirstPart = '';
   let instructionSecondPart = '';
-  if (instruction.includes(splitKey)) {
+  if (instruction?.includes(splitKey)) {
     instructionFirstPart = instruction.split(splitKey)[0];
     instructionSecondPart = instruction.split(splitKey)[1];
   }
@@ -79,7 +79,7 @@ export default RenderText = ({
 
   if (screenReaderEnabled) {
     return (
-      instruction.includes(splitKey)
+      instruction?.includes(splitKey)
         ?
         <Text
           style={[styles.instructionText, style]}

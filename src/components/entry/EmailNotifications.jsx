@@ -19,7 +19,6 @@ const EmailNotifications = ({ navigation }) => {
     const scrollRef = useRef();
     const userData = useSelector(state => state.combinedReducers.userData || {});
 
-    // For ACP users, user.isNormalUser is false. For normal users, it is true.
     const isNormalUser = userData.isNormalUser;
 
     useEffect(() => {
@@ -41,7 +40,7 @@ const EmailNotifications = ({ navigation }) => {
             profile.profileDetails &&
             profile.profileDetails.svEmailAddress &&
             profile.profileDetails.svEmailAddress !== "Multiple Emails" &&
-            profile.profileDetails.svEmailAddress.length > 0
+            profile.profileDetails.svEmailAddress?.length > 0
         ) {
             setInput(profile.profileDetails.svEmailAddress);
             setEnableButton(true);
@@ -59,7 +58,7 @@ const EmailNotifications = ({ navigation }) => {
 
     const onChangeText = (text) => {
         setInput(text);
-        setEnableButton(text.length > 0);
+        setEnableButton(text?.length > 0);
     };
 
     const keyboardDismiss = () => {
