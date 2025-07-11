@@ -20,6 +20,8 @@ import moment from "moment";
 import LoginLogger from "../../components/utility/LoginLogger";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import analytics from '@react-native-firebase/analytics';
+import { shouldBlockLogin } from "../utility/disconnectHelpers";
+
 const config = {
   issuer: Env.SSO_LOGIN,
   clientId: "sparklight-customer-mobile-app",
@@ -84,7 +86,11 @@ const SplashScreen = ({ navigation, route }) => {
       let isNormalUser = userInfo && userInfo.accountNumber && userInfo.accountNumber.toString().length === 9 ? true : false;
       user['isNormalUser'] = isNormalUser;
       setIsBusiness(false);
-      
+
+      if (shouldBlockLogin(userInfo.acctStatus, userInfo.daysSinceDisconnectDate)) {
+      setTimeout(() => { setModalVisible(true); }, 100);
+      return;
+    }
       if (!isNormalUser) {
         if (res.userInfo?.authLevel != "HeadOfHousehold" && userInfo?.authLevel == "Admin") {
           setErrorMessage(strings.AdminMsg);
@@ -94,13 +100,9 @@ const SplashScreen = ({ navigation, route }) => {
           setErrorMessage(strings.BusinessUserMsg);
           setErrorMessage1(" to manage your Sparklight Business services account.");
           setTimeout(() => { setModalVisible(true); }, 500);
-        } else if (res.userInfo.acctStatus != "Normal") {
-          setTimeout(() => { setDisconnected(true); }, 500);
         } else {
           moveAfterLogin(user);
         }
-      } else if (res.userInfo.acctStatus === "Disconnect") {
-        setTimeout(() => { setDisconnected(true); }, 500);
       } else if (
         (userInfo?.authLevel !== "HeadOfHousehold" && userInfo?.authLevel == "Admin") ||
         userInfo.acctStatus !== "Active"

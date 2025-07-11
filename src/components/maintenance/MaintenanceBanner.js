@@ -28,9 +28,9 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
       case "info":
       default:
         return {
-          indicatorColor: "#0060AE", // Deep purple/blue color
-          iconTint: "#0060AE", // Deep purple/blue color
-          titleStyle: { color: "#0060AE" } // Deep purple/blue color
+          indicatorColor: "#353091", // Deep purple/blue color
+          iconTint: "#353091", // Deep purple/blue color
+          titleStyle: { color: "#353091" } // Deep purple/blue color
         };
     }
   };
@@ -52,14 +52,14 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
   return (
     <View style={styles.errorBox}>
       <View style={styles.alertRowContainer}>
-        <View style={[{ backgroundColor: severityStyles.indicatorColor }]} />
+        <View style={[styles.indicator, { backgroundColor: severityStyles.indicatorColor }]} />
         <View style={styles.alertContentContainer}>
           <View style={styles.alertTitleRow}>
             <Image
               style={styles.alertIcon}
               resizeMode="contain"
               tintColor={severityStyles.iconTint}
-              source={require("../../../assets/Icon/Info.png")}
+              source={require("../../../assets/info-circle.png")}
               accessibilityLabel={`${severity} icon`}
             />
             <Text 
@@ -106,7 +106,7 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
             accessibilityHint="Double tap to close this message"
             accessible={true}
           >
-            <CloseIcon color="#0060AE" />
+            <CloseIcon />
           </TouchableOpacity>
         )}
       </View>
@@ -120,13 +120,12 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     marginHorizontal: 4,
     marginVertical: 20,
-    borderColor: '#0060AE',
-    backgroundColor:'#F0F8FF',
+    borderColor: Color.sparklightGray,
+    backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_11xs,
     borderWidth: 1,
     marginBottom: wp("15%"),
     marginTop: wp("-10%"),
-     borderRadius: 8,
   },
   alertRowContainer: {
     flexDirection: "row",
@@ -139,14 +138,14 @@ const styles = StyleSheet.create({
   alertTitleRow: {
     flexDirection: "row",
   },
+  indicator: {
+    width: 4,
+  },
   alertIcon: {
     alignSelf: "center",
-     height: 20,
-      width: 20,
   },
   closeButtonContainer: {
-   alignContent: "center",
-    justifyContent: "center",
+    marginTop: 10,
   },
   alertTitle: {
     color: "#000",
