@@ -22,12 +22,22 @@ const UserNavigations = (props) => {
   const routeNameRef = useRef();
 
   const onReady = () => {
-    routeNameRef.current = navigationRef.current.getCurrentRoute().name;
+    // Add null check to prevent crash
+    if (navigationRef.current) {
+      const currentRoute = navigationRef.current.getCurrentRoute();
+      if (currentRoute) {
+        routeNameRef.current = currentRoute.name;
+      }
+    }
   };
 
   const onStateChange = async () => {
+    // Add null check to prevent crash
+    if (!navigationRef.current) return;
+    
     const previousRouteName = routeNameRef.current;
-    const currentRouteName = navigationRef.current.getCurrentRoute()?.name;
+    const currentRoute = navigationRef.current.getCurrentRoute();
+    const currentRouteName = currentRoute?.name;
 
     if (previousRouteName !== currentRouteName && currentRouteName && currentRouteName.trim() !== "") {
       try {
@@ -44,26 +54,68 @@ const UserNavigations = (props) => {
   };
 
   const handleBackButton = () => {
-    const currentRoute = navigationRef.current.getRootState();
-    const currentTab = currentRoute.routes[currentRoute.index];
-
-    if (currentTab.state && currentTab.state.index > 0) {
-      return false;
-    } else if (navigationRef.current.canGoBack()) {
-      return false;
+    // CRITICAL FIX: Add null checks to prevent crash
+    if (!navigationRef.current) {
+      return true; // Allow default back behavior if navigation not ready
     }
 
-    return true;
+    try {
+      const currentRoute = navigationRef.current.getRootState();
+      
+      // Additional safety check
+      if (!currentRoute || !currentRoute.routes) {
+        return true; // Allow default back behavior
+      }
+      
+      const currentTab = currentRoute.routes[currentRoute.index];
+
+      if (currentTab && currentTab.state && currentTab.state.index > 0) {
+        return false;
+      } else if (navigationRef.current.canGoBack()) {
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in handleBackButton:', error);
+      return true; // Allow default back behavior on error
+    }
   };
 
   useEffect(() => {
-    onReady();
-    const unsubscribe = navigationRef.current.addListener('state', onStateChange);
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+    // Add safety checks and delay listener setup
+    let unsubscribe = null;
+    let backHandler = null;
+
+    const setupListeners = () => {
+      try {
+        if (navigationRef.current) {
+          unsubscribe = navigationRef.current.addListener('state', onStateChange);
+        }
+        backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+      } catch (error) {
+        console.error('Error setting up listeners:', error);
+      }
+    };
+
+    // Small delay to ensure navigation is ready
+    const timeoutId = setTimeout(() => {
+      onReady();
+      setupListeners();
+    }, 50);
 
     return () => {
-      unsubscribe();
-      backHandler.remove();
+      clearTimeout(timeoutId);
+      if (unsubscribe) {
+        try {
+          unsubscribe();
+        } catch (error) {
+          console.error('Error removing listener:', error);
+        }
+      }
+      if (backHandler) {
+        backHandler.remove();
+      }
     };
   }, []);
 
