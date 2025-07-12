@@ -4,7 +4,7 @@ import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import WalletIcon from "../../../res/svgIcons/WalletIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { Color, FontFamily, Padding } from "../../../../GlobalStyles";
+import { FontFamily, Padding } from "../../../../GlobalStyles";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
 import SmallLoader from "../customui/SmallLoader";

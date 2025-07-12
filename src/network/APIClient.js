@@ -8,7 +8,6 @@ import { navigationRef } from '../navigations/UserNavigations';
 const BASE_URL = Env.API_BASEURL.endsWith('/') ? Env.API_BASEURL : `${Env.API_BASEURL}/`;
 const API_ACP_BASEURL = Env.API_ACP_BASEURL.endsWith('/') ? Env.API_ACP_BASEURL : `${API_ACP_BASEURL}/`;
 const SUPPORT_URL = "https://support.sparklight.com/api/v2/help_center/";
-const MODEM_BASE_URL = Env.MODEM_BASE_URL.endsWith('/') ? Env.MODEM_BASE_URL : `${Env.MODEM_BASE_URL}/`;
 
 export let UserAuthorized = false;
 let isRefreshing = false;
@@ -271,15 +270,5 @@ export const PostruckRollApi = (endpoint, body, onSuccess, onError) => {
 
 // Helper method to decide the base URL based on user type
 const getBaseUrl = async () => {
-    try {
-        const user = await getUser();
-        // If user exists and is not a normal user, return ACP base URL
-        if (user && user.isNormalUser === false) {
-            return API_ACP_BASEURL;
-        }
-
-        return BASE_URL;
-    } catch (error) {
-        return BASE_URL;
-    }
+    return API_ACP_BASEURL;
 };

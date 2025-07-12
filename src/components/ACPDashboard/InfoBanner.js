@@ -1,7 +1,7 @@
 // components/InfoBanner.js
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { FontFamily, FontSize, Color, Padding, Border } from '../../../GlobalStyles';
+import { Color, Padding, Border } from '../../../GlobalStyles';
 import Icon from '../common/Icon';
 
 const InfoBanner = ({ message, icon = 'info' }) => {

@@ -69,19 +69,12 @@ export const MaintenanceProvider = ({ children }) => {
   );
   const dispatch = useDispatch();
 
-  // Simple user audience detection using ONLY isNormalUser flag
+  // Simple user audience detection using ONLY  flag
   function getUserAudience(userInfo) {
     if (!userInfo) {
       return null;
     }
-
-    let isNormalUser = userInfo.isNormalUser;
-    if (isNormalUser === undefined && userInfo.accountNumber) {
-      const accountLength = userInfo.accountNumber.toString().length;
-      isNormalUser = accountLength === 9;
-    }
-
-    const audience = isNormalUser ? "SV" : "ACP";
+    const audience = "ACP";
     return audience;
   }
 

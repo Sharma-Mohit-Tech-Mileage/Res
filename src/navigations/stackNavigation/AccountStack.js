@@ -28,36 +28,12 @@ import supportScreen from "../../components/support/supportScreen";
 import Survey from '../../components/cancelservice/Survey';
 import CancellationSummary from '../../components/cancelservice/CancellationSummary';
 
-// Import your user info helper function (adjust the path as needed)
-import { getUser } from '../../redux/utils/LocalStorage';
-
 /**
  * A wrapper component for the "Notifications" route.
  * It checks the user type and conditionally renders either the ACP or the normal Notifications component.
  */
 const NotificationsSwitch = (props) => {
-  // Initially null so that we know when the user info has been loaded.
-  const [isAcpUser, setIsAcpUser] = React.useState(null);
-
-  React.useEffect(() => {
-    const fetchUserType = async () => {
-      try {
-        const user = await getUser();
-        // If a user exists and user.isNormalUser is false, then it's an ACP user.
-        setIsAcpUser(user && !user.isNormalUser);
-      } catch (error) {
-        console.error("Error fetching user type:", error);
-        setIsAcpUser(false); // fallback to normal user if error occurs
-      }
-    };
-    fetchUserType();
-  }, []);
-
-  // Until we have loaded the user information, render nothing (or a loader)
-  if (isAcpUser === null) return null;
-
-  // If ACP user, render the ACP Notifications component; otherwise, render the normal component.
-  return isAcpUser ? <Notifications_acp {...props} /> : <Notifications {...props} />;
+  return <Notifications {...props} />
 };
 
 /**
@@ -65,25 +41,7 @@ const NotificationsSwitch = (props) => {
  * It checks the user type and conditionally renders either the ACP or the normal EmailNotifications component.
  */
 const EmailNotificationsSwitch = (props) => {
-  const [isAcpUser, setIsAcpUser] = React.useState(null);
-
-  React.useEffect(() => {
-    const fetchUserType = async () => {
-      try {
-        const user = await getUser();
-        setIsAcpUser(user && !user.isNormalUser);
-      } catch (error) {
-        console.error("Error fetching user type:", error);
-        setIsAcpUser(false);
-      }
-    };
-    fetchUserType();
-  }, []);
-
-  if (isAcpUser === null) return null;
-
-  // If ACP user, render the ACP EmailNotifications component; otherwise, the normal one.
-  return isAcpUser ? <EmailNotifications_acp {...props} /> : <EmailNotifications {...props} />;
+  return  <EmailNotifications_acp {...props} /> 
 };
 
 const AccountStack = createNativeStackNavigator();

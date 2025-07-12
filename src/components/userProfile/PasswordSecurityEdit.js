@@ -109,14 +109,7 @@ const PasswordSecurityEdit = () => {
 
   const checkCustomSecurityQuestion = (questions) => {
     const storedQuestion = profileDetails.securityQuestion;
-    const isCustom = storedQuestion && !questions.includes(storedQuestion);
-   
-    if(user?.isNormalUser){
-    setIsCustomQuestionSelected(isCustom);
-    setCustomSecurityQuestion(isCustom ? "Add your own question" : storedQuestion);
-    }else{
-      setCustomSecurityQuestion(storedQuestion);
-    }
+     setCustomSecurityQuestion(storedQuestion);
   };
 
   useEffect(() => {
@@ -129,22 +122,13 @@ const PasswordSecurityEdit = () => {
 
   useEffect(() => {
     const storedQuestion = profileDetails.securityQuestion;
-    const isCustom = storedQuestion && !securityQuestionsNew.includes(storedQuestion);
-    if(user?.isNormalUser){
-    setIsCustomQuestionSelected(isCustom);
-    setCustomSecurityQuestion(isCustom ? "Add your own question" : storedQuestion);
-    }else{
-      setCustomSecurityQuestion(storedQuestion);
-    }
+     setCustomSecurityQuestion(storedQuestion);
+    
 
   }, []);
 
   useEffect(() => {
-    getUser().then((res) => {
-      if (!user?.isNormalUser) {
-        getSecurityQuestions();
-      }
-    });
+     getSecurityQuestions();
   }, []);
 
   useEffect(() => {

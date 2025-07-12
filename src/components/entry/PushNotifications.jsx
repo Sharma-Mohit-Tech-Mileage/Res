@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Image, StyleSheet, Text, ScrollView, Pressable, Platform } from "react-native";
+import { View,StyleSheet, Text, ScrollView, Pressable, Platform } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
-import colors from "../../res/Colors";
-import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import InfoIcon from "../../res/svgIcons/InfoIcon";
-import BellIcon from "../../res/svgIcons/bellIcon";
 import BellRingingIcon from "../../res/svgIcons/BellRingingIcon";
 import {getFcmToken,requestUserPermission} from '../../firebase/FirebaseUtils';
 import { useSelector, useDispatch } from 'react-redux';

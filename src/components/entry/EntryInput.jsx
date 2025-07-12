@@ -1,11 +1,8 @@
-import React, { memo , useRef, useEffect,useState } from 'react';
+import React, { useRef } from 'react';
 import {
     StyleSheet,
     View,
     TextInput,
-    FlatList,
-    Text,
-    TouchableOpacity,
     Image,
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../GlobalStyles';

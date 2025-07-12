@@ -75,7 +75,7 @@ const MyTabs = ({ navigation, route }) => {
         accessible={false}
         importantForAccessibility="no"
       >
-        <IconComponent focused={focused} isNewBiller={!user?.isNormalUser} />
+        <IconComponent focused={focused} isNewBiller={true} />
       </View>
     );
   };
@@ -158,7 +158,7 @@ const MyTabs = ({ navigation, route }) => {
         <Tab.Screen
           name="Home"
           component={HomeStackScreen}
-          initialParams={{ data: route, isNormalUser: user?.isNormalUser }}
+          initialParams={{ data: route, isNormalUser: false }}
           options={{
             headerShown: false,
             swipeEnabled: false,
@@ -209,14 +209,7 @@ const MyTabs = ({ navigation, route }) => {
               if (!isTabAccessibleDuringWalkthrough(2) && isScreenReaderEnabled) {
                 return;
               }
-              if (!user?.isNormalUser) {
-                Alert.alert("Coming Soon", "This feature is not yet available.", [{ text: "Close", style: "cancel" }]);
-                return;
-              }
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'MyServices' }],
-              });
+              Alert.alert("Coming Soon", "This feature is not yet available.", [{ text: "Close", style: "cancel" }])
             },
           })}
           options={{
@@ -232,7 +225,7 @@ const MyTabs = ({ navigation, route }) => {
                 accessible={false}
                 importantForAccessibility="no"
               >
-                {focused ? <SupportIconSelected/> : <SupportIcon isNewBillerUser={!user?.isNormalUser}/>}
+                {focused ? <SupportIconSelected/> : <SupportIcon isNewBillerUser={true}/>}
               </View>
             ),
           }}
@@ -266,18 +259,8 @@ const MyTabs = ({ navigation, route }) => {
                 accessible={false}
                 importantForAccessibility="no"
               >
-
-            { user?.isNormalUser ? (
-                <Image
-                style={{width:33, height:28}}
-                resizeMode='contain'
-                tintColor={focused ? '#353091' : '#767676'}
-                source={require("../../assets/phone-outgoing-03.png")}
-                accessible={false}
-                importantForAccessibility="no"
-              /> )
-                : <NewSupportIcon focused={focused} />
-                }
+                <NewSupportIcon focused={focused} />
+                
                 
               </View>
             ),
@@ -300,7 +283,7 @@ const MyTabs = ({ navigation, route }) => {
             headerShown: false,
             tabBarLabel: 'Account',
             tabBarIcon: ({ focused }) => getTabBarIconWrapper(
-              user?.isNormalUser? AccountIcon :HomeAccountIcon,
+              HomeAccountIcon,
               focused,
               4
             ),

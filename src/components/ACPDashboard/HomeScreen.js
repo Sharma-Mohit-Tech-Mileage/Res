@@ -9,7 +9,7 @@ import {
   Platform 
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { FontFamily, FontSize, Color, Padding, Border } from './../../../GlobalStyles';
+import {Color, Padding} from './../../../GlobalStyles';
 
 // Components
 import WelcomeCard from './WelcomeCard';

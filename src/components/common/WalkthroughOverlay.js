@@ -10,14 +10,12 @@ const WalkthroughOverlay = ({ onFinish }) => {
   const dispatch = useDispatch();
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(true);
-  const user = useSelector(state => state.combinedReducers.user.userData);
+  
 
   const walkThroughScreens =  [
     {
       title: "Home",
-      description: user?.isNormalUser
-        ? "View information related to your internet health, billing, service and more."
-        : "Get a quick overview of your account.",
+      description: "Get a quick overview of your account.",
       buttonText: "Next",
     },
     {
@@ -32,25 +30,19 @@ const WalkthroughOverlay = ({ onFinish }) => {
     },
     {
       title: "Support",
-      description: user?.isNormalUser
-        ? "View our FAQ, check in on your modem or troubleshoot your issues."
-        : "View FAQs and contact our Support Team for assistance.",
+      description: "View FAQs and contact our Support Team for assistance.",
       buttonText: "Next",
     },
     {
       title: "Account",
-      description: user?.isNormalUser
-        ? "Manage your profile settings, notifications, users and more."
-        : "Manage your profile settings, notifications, and more.",
+      description: "Manage your profile settings, notifications, and more.",
       buttonText: "Let's Go!",
     },
   ];
   const changeWalkThroughStep = (requestedStep) => {
     // Assume walkThroughStep holds the current step (0–4)
     let newStep = requestedStep;
-    
-    // For non-normal users, skip step 2.
-    if (user && !user.isNormalUser) {
+  
       // Determine direction by comparing current step and the requested step.
       // If moving forward (current < requested) and requested is 2, jump to 3.
       if (walkThroughStep < requestedStep && requestedStep === 2) {
@@ -60,7 +52,7 @@ const WalkthroughOverlay = ({ onFinish }) => {
       else if (walkThroughStep > requestedStep && requestedStep === 2) {
         newStep = 1;
       }
-    }
+    
   
     if (newStep > 4) { // We have 5 steps (0–4)
       dispatch(updateWalkThroughStep(null));

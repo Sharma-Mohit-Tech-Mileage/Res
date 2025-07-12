@@ -39,19 +39,10 @@ const Terms = ({ navigation }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-
-                if (userData?.isNormalUser) {
-                    dispatch(fetchPushNotifications());
-                    dispatch(fetchBillingStatus());
-                    dispatch(fetchBillingPaper());
-                    dispatch(fetchSMSSelection());
-                    dispatch(fetchProfileDetails());
-                } else {
-                    dispatch(fetchACPUserAccountDetails());
-                }
-            } catch (error) {
+                 dispatch(fetchACPUserAccountDetails());       
+                } catch (error) {
                 console.error("Error fetching data", error);
-            }
+              }
         };
         fetchData();
     }, [dispatch]);
@@ -61,23 +52,6 @@ const Terms = ({ navigation }) => {
         let optOutCount = 0;
         let goToPushNotificationScreen = false;
         let optOutCountPushNotification = 0;
-
-        if (userData?.isNormalUser) {
-            if (profile?.pushNotifications?.length > 0) {
-                const messageTypes = profile.pushNotifications[0].pushMessageType;
-                messageTypes.forEach((messageType) => {
-                    if (messageType.optOutFlag) {
-                        optOutCountPushNotification += 1;
-                    }
-                });
-                if (optOutCountPushNotification > 2) {
-                    goToPushNotificationScreen = true;
-                }
-            } else {
-                goToPushNotificationScreen = true;
-            }
-        }
-
         if (profile?.smsSubscription?.length > 0) {
             const firstSubscription = profile.smsSubscription[0];
             firstSubscription.smsMessageType.forEach((messageType) => {
@@ -136,13 +110,7 @@ const Terms = ({ navigation }) => {
     const termsAccepted = async () => {
         await dispatch(updateTermsAndConditions(true, null));
         await dispatch(updateWalkThroughStep(0));
-        if (userData?.isNormalUser) {
-            console.log('termsAccepted: ', nextScreen);
-            navigation.reset({
-                index: 0,
-                routes: [{ name: nextScreen }],
-            });
-        } else if (!userData?.isNormalUser && !value) {
+        if (!value) {
             navigation.reset({
                 index: 0,
                 routes: [{ name: 'EntryEmailNotifications' }],

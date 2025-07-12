@@ -1,11 +1,9 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable, Modal,TouchableOpacity } from "react-native";
-import AppStyles from "../common/styles/AppStyles";
+import { View, Text, StyleSheet,Modal,TouchableOpacity } from "react-native";
 import {
   Color,
   Padding,
   FontFamily,
-  FontSize,
   Border,
 } from "../../../GlobalStyles";
 import colors from "../../res/Colors";

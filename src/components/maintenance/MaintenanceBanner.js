@@ -1,6 +1,6 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Linking, Platform } from "react-native";
-import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
+import { View, Text, Image, TouchableOpacity, StyleSheet, Linking } from "react-native";
+import { Border, Color, FontFamily } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 

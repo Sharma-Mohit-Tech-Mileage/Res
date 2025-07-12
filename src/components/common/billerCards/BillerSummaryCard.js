@@ -14,7 +14,7 @@ import { FontFamily, Padding } from "../../../../GlobalStyles";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
-import SmallLoader from "../customui/SmallLoader";
+
 
 const BillerSummaryCard = ({
   billAmt,

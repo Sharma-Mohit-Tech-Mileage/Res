@@ -11,7 +11,7 @@ import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
 import SmallLoader from "../customui/SmallLoader";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-const Card = ({ billAmt, dueDate, navigation, style, acno, isNewBiller }) => {
+const Card = ({ billAmt, dueDate, navigation, style}) => {
 
 
   const NotAvailable = () => {
@@ -205,7 +205,7 @@ const Card = ({ billAmt, dueDate, navigation, style, acno, isNewBiller }) => {
       <View style={styles.cardFooter}>
         <TouchableOpacity
           onPress={() => {
-            let billingURL = (isNewBiller) ? `${Env.ACP_BILLING}/billing` : `${Env.URL}/billing`;
+            let billingURL = `${Env.ACP_BILLING}/billing`
             console.log("Billing URL", billingURL);
             navigation.navigate("ArticalWindowUtility", {
               url: billingURL,

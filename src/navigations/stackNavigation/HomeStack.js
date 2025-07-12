@@ -6,16 +6,12 @@ import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import ModemStackScreen from "./ManageEquepmentStack";
 import ModemSpeedTest from "../../components/common/speedTest/ModemSpeedTest";
 import AutoPayPCIConnector from '../../components/utility/AutoPayPCIConnector'
-import { useRoute } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native";
 
 const HomeStack = createNativeStackNavigator();
 
 function HomeStackScreen() {
   const { setTabBarVisible } = useTabBarVisibility();
-  const route = useRoute();
-  const isNormalUser = route.params?.isNormalUser ?? true;
-
   return (
     <HomeStack.Navigator
       initialRouteName="Dashboard"

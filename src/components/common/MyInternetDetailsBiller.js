@@ -6,7 +6,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import { useFocusEffect } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-const MyInternetDetailsBiller = ({ plans, billAmt, dueDate, pastPaymentDue, paymentDetails, navigation }) => {
+const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,navigation }) => {
   const [cardDigit, setCardDigit] = useState("");
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [accountNumber, setAccountNumber] = useState(undefined)

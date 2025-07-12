@@ -42,18 +42,7 @@ const AxiosInterceptorProvider = ({ children }) => {
         const interceptor = _axios.interceptors.request.use(
             async config => {
                 // Dynamically switch the baseURL based on user type
-                try {
-                    const user = await getUser();
-
-                    if (user && !user.isNormalUser) {
-                        config.baseURL = API_ACP_BASEURL; // Set ACP base URL for ACP users
-                    } else {
-                        config.baseURL = BASE_URL; // Set default base URL for normal users
-                    }
-                } catch (error) {
-                    console.error("[Interceptor] Error determining baseURL:", error);
-                    config.baseURL = BASE_URL; // Default to BASE_URL in case of any error
-                }
+                config.baseURL = API_ACP_BASEURL
                 return config;
             },
             error => {

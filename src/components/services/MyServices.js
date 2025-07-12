@@ -17,7 +17,7 @@ import AppStyles from "../common/styles/AppStyles";
 
 const MyServices = ({ route }) => {
   const navigation = useNavigation();
-  const userData = useSelector((state) => state.combinedReducers.user.userData);
+  // const userData = useSelector((state) => state.combinedReducers.user.userData);
   const scrollViewRef = useRef(null);
   const [isAgentAvailable, setisAgentAvailable] = useState(false);
   const [istechAgentAvailable, setIstechAgentAvailable] = useState(false);
@@ -258,7 +258,7 @@ const MyServices = ({ route }) => {
             />
           }
         >
-          {userData?.isNormalUser && (
+          {/* {userData?.isNormalUser && (
             <>
               <View
                 style={[AppStyles.card, { marginTop: Padding.p_5xs }]}
@@ -395,7 +395,7 @@ const MyServices = ({ route }) => {
               />
               <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
             </>
-          )}
+          )} */}
           <CustomerErrorPage
             visible={isAgentNotAvailable}
             message={

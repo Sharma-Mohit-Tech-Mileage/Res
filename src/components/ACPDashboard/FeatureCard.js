@@ -6,7 +6,6 @@ import {
   FontSize,
   Color,
   Padding,
-  Border,
 } from "../../../GlobalStyles";
 import Icon from "../common/Icon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";

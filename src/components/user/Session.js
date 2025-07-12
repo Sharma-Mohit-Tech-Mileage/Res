@@ -4,7 +4,7 @@ import store from '../../redux/configureStore';
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { Env } from "../../network/apis/account/Constants";
-import { navigationRef } from '../../navigations/UserNavigations';
+
 
 const config = {
     issuer: Env.SSO_LOGIN,

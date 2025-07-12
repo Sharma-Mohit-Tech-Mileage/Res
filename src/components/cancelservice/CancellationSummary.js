@@ -7,10 +7,10 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import { useForm, Controller, set } from "react-hook-form";
+import { useForm, Controller} from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useDispatch, useSelector } from "react-redux";
+import {useSelector } from "react-redux";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -34,7 +34,7 @@ import TickIcon from "../../res/svgIcons/TickIcon1";
 import InfoIcon from "../../res/svgIcons/InfoIcon";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { PostApiRequest } from "../../network/APIClient";
-import { Calendar, LocaleConfig } from "react-native-calendars";
+import { Calendar } from "react-native-calendars";
 import moment from "moment";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { getPrimaryEmail } from "../utility/constant";

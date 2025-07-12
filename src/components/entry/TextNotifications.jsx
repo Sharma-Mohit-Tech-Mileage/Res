@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Image, StyleSheet, Text, ScrollView, Keyboard, Pressable, KeyboardAvoidingView, TouchableWithoutFeedback, Platform } from "react-native";
+import { View,StyleSheet, Text, ScrollView, Keyboard, Pressable, Platform } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import PhoneRingingIcon from "../../res/svgIcons/PhoneRingingIcon";
