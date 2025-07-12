@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { BackHandler } from "react-native"; 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -15,31 +15,19 @@ import MaintenanceWrapper from '../components/maintenance/MaintenanceWrapper';
 
 const Stack = createNativeStackNavigator();
 
-// Use useRef instead of createRef for better stability
+// Export the navigation reference for global use
 export const navigationRef = React.createRef();
 
 const UserNavigations = (props) => {
   const routeNameRef = useRef();
-  const [isNavigationReady, setIsNavigationReady] = useState(false);
 
   const onReady = () => {
-    // Only proceed if navigation ref is available
-    if (navigationRef.current) {
-      const currentRoute = navigationRef.current.getCurrentRoute();
-      if (currentRoute) {
-        routeNameRef.current = currentRoute.name;
-      }
-      setIsNavigationReady(true);
-    }
+    routeNameRef.current = navigationRef.current.getCurrentRoute().name;
   };
 
   const onStateChange = async () => {
-    // Add null checks
-    if (!navigationRef.current) return;
-    
     const previousRouteName = routeNameRef.current;
-    const currentRoute = navigationRef.current.getCurrentRoute();
-    const currentRouteName = currentRoute?.name;
+    const currentRouteName = navigationRef.current.getCurrentRoute()?.name;
 
     if (previousRouteName !== currentRouteName && currentRouteName && currentRouteName.trim() !== "") {
       try {
@@ -56,77 +44,33 @@ const UserNavigations = (props) => {
   };
 
   const handleBackButton = () => {
-    // CRITICAL: Add comprehensive null checks
-    if (!navigationRef.current) {
-      console.warn('Navigation ref not available, allowing default back behavior');
-      return true; // Allow default back button behavior
+    const currentRoute = navigationRef.current.getRootState();
+    const currentTab = currentRoute.routes[currentRoute.index];
+
+    if (currentTab.state && currentTab.state.index > 0) {
+      return false;
+    } else if (navigationRef.current.canGoBack()) {
+      return false;
     }
 
-    try {
-      const rootState = navigationRef.current.getRootState();
-      if (!rootState || !rootState.routes) {
-        console.warn('Navigation state not available, allowing default back behavior');
-        return true;
-      }
-
-      const currentTab = rootState.routes[rootState.index];
-      
-      // Check if we're in a nested navigator with multiple screens
-      if (currentTab?.state && currentTab.state.index > 0) {
-        return false; // Let React Navigation handle the back action
-      } 
-      
-      // Check if we can go back in the main stack
-      if (navigationRef.current.canGoBack()) {
-        return false; // Let React Navigation handle the back action
-      }
-
-      // If we're at the root, allow the app to exit
-      return true;
-      
-    } catch (error) {
-      console.error('Error in handleBackButton:', error);
-      // On error, allow default behavior to prevent crash
-      return true;
-    }
+    return true;
   };
 
   useEffect(() => {
-    let unsubscribe = null;
-    let backHandler = null;
-
-    // Only set up listeners after navigation is ready
-    if (isNavigationReady && navigationRef.current) {
-      try {
-        unsubscribe = navigationRef.current.addListener('state', onStateChange);
-        backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
-      } catch (error) {
-        console.error('Error setting up navigation listeners:', error);
-      }
-    }
+    onReady();
+    const unsubscribe = navigationRef.current.addListener('state', onStateChange);
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
 
     return () => {
-      if (unsubscribe) {
-        try {
-          unsubscribe();
-        } catch (error) {
-          console.error('Error removing navigation listener:', error);
-        }
-      }
-      if (backHandler) {
-        backHandler.remove();
-      }
+      unsubscribe();
+      backHandler.remove();
     };
-  }, [isNavigationReady]); // Re-run when navigation becomes ready
+  }, []);
 
   return (
-    <MaintenanceWrapper>
-      <NavigationContainer 
-        ref={navigationRef} 
-        onReady={onReady} 
-        onStateChange={onStateChange}
-      >
-        <AxiosInterceptorProvider>
+     <MaintenanceWrapper>
+    <NavigationContainer ref={navigationRef} onReady={onReady} onStateChange={onStateChange}>
+      <AxiosInterceptorProvider>
           <Stack.Navigator>
             <Stack.Screen
               name="Splash"
@@ -137,41 +81,42 @@ const UserNavigations = (props) => {
               name="EntryEmailNotifications"
               component={EmailNotifications}
               options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="EntryPushNotifications"
-              component={PushNotifications}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="EntryTextNotifications"
-              component={TextNotifications}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="Terms"
-              component={Terms}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="ArticalWindowUtility"
-              component={ArticalWindowUtility}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="MyTab"
-              component={MyTabs}
-              initialParams={{ user: props.data }}
-              options={{
-                headerBackVisible: false,
-                headerShown: false
-              }}
-            />
-          </Stack.Navigator>
-        </AxiosInterceptorProvider>
-      </NavigationContainer>
-    </MaintenanceWrapper>
-  );
+          />
+          <Stack.Screen
+            name="EntryPushNotifications"
+            component={PushNotifications}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="EntryTextNotifications"
+            component={TextNotifications}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Terms"
+            component={Terms}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="ArticalWindowUtility"
+            component={ArticalWindowUtility}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="MyTab"
+            component={MyTabs}
+            initialParams={{ user: props.data }}
+            options={{
+              headerBackVisible: false,
+              headerShown: false
+            }}
+          />
+        </Stack.Navigator>
+     
+    </AxiosInterceptorProvider>
+  </NavigationContainer>
+   </MaintenanceWrapper>
+);
 }
 
 export default UserNavigations;
