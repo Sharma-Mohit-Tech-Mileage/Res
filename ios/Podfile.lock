@@ -184,6 +184,29 @@ PODS:
   - libwebp/sharpyuv (1.5.0)
   - libwebp/webp (1.5.0):
     - libwebp/sharpyuv
+  - lottie-ios (4.5.0)
+  - lottie-react-native (7.2.4):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - lottie-ios (= 4.5.0)
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - nanopb (2.30910.0):
     - nanopb/decode (= 2.30910.0)
     - nanopb/encode (= 2.30910.0)
@@ -1753,7 +1776,7 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
-  - RNFBAnalytics (20.4.0):
+  - RNFBAnalytics (20.5.0):
     - Firebase/Analytics (= 10.29.0)
     - React-Core
     - RNFBApp
@@ -1951,6 +1974,7 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - GoogleUtilities
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
+  - lottie-react-native (from `../node_modules/lottie-react-native`)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCT-Folly/Fabric (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
   - RCTDeprecation (from `../node_modules/react-native/ReactApple/Libraries/RCTFoundation/RCTDeprecation`)
@@ -2068,6 +2092,7 @@ SPEC REPOS:
     - GoogleDataTransport
     - GoogleUtilities
     - libwebp
+    - lottie-ios
     - nanopb
     - PromisesObjC
     - PromisesSwift
@@ -2098,6 +2123,8 @@ EXTERNAL SOURCES:
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
     :tag: hermes-2024-08-15-RNv0.75.1-4b3bf912cc0f705b51b71ce1a5b8bd79b93a451b
+  lottie-react-native:
+    :path: "../node_modules/lottie-react-native"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTDeprecation:
@@ -2308,6 +2335,8 @@ SPEC CHECKSUMS:
   GoogleUtilities: ea963c370a38a8069cc5f7ba4ca849a60b6d7d15
   hermes-engine: ea92f60f37dba025e293cbe4b4a548fd26b610a0
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
+  lottie-ios: a881093fab623c467d3bce374367755c272bdd59
+  lottie-react-native: 4f393994b61f092263b05fd6ad81a12eeed0a1c4
   nanopb: 438bc412db1928dac798aa6fd75726007be04262
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   PromisesSwift: 9d77319bbe72ebf6d872900551f7eeba9bce2851
@@ -2386,7 +2415,7 @@ SPEC CHECKSUMS:
   RNDeviceInfo: 4f9c7cfd6b9db1b05eb919620a001cf35b536423
   RNExitApp: 00036cabe7bacbb413d276d5520bf74ba39afa6a
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
-  RNFBAnalytics: 2e647874278671963ef9049b4228acecfc88dd6d
+  RNFBAnalytics: 6ffcca3c60f402775f59d23402287e14de97616b
   RNFBApp: 2f83756f4d8be2859af5e2cf54130c20e380119d
   RNFBCrashlytics: a845824a269968ebb7a4a6cf4772c4977125b5f6
   RNFBMessaging: 91592ea949854c66697757af648a2c07bcb583b9
@@ -2404,7 +2433,7 @@ SPEC CHECKSUMS:
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  Yoga: a9ef4f5c2cd79ad812110525ef61048be6a582a4
+  Yoga: b05994d1933f507b0a28ceaa4fdb968dc18da178
   ZendeskChatProvidersSDK: 5cfc4a3dee03317ba54920e3258edda52ff9a329
   ZendeskChatSDK: ed0424221923aa0b82397fec8b4306fab6645942
   ZendeskCommonUISDK: 1ad4f0051a999a5e56f09f789f916afe15e00419
@@ -2415,4 +2444,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 0bafe83ecb406b2688604485f66f99bcf7b36034
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2
