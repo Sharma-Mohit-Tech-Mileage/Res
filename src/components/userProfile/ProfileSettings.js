@@ -407,8 +407,8 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontSize: FontSize.size_base,
     textAlign: "left",
-    color: Color.sparklightGray1,
-    marginTop: 20,
+    color:'#000000',
+    marginTop: 5,
   },
   manageSerTxt2: {
     fontFamily: FontFamily.openSansSemiBold,

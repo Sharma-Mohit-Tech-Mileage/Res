@@ -97,7 +97,7 @@ android {
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
         versionCode 268
-        versionName "16.5.0"
+        versionName "17.0.0"
     }
 
     

@@ -1776,7 +1776,7 @@ PODS:
     - React-Core
     - SDWebImage (~> 5.11.1)
     - SDWebImageWebPCoder (~> 0.8.4)
-  - RNFBAnalytics (20.5.0):
+  - RNFBAnalytics (20.4.0):
     - Firebase/Analytics (= 10.29.0)
     - React-Core
     - RNFBApp
@@ -2415,7 +2415,7 @@ SPEC CHECKSUMS:
   RNDeviceInfo: 4f9c7cfd6b9db1b05eb919620a001cf35b536423
   RNExitApp: 00036cabe7bacbb413d276d5520bf74ba39afa6a
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
-  RNFBAnalytics: 6ffcca3c60f402775f59d23402287e14de97616b
+  RNFBAnalytics: 2e647874278671963ef9049b4228acecfc88dd6d
   RNFBApp: 2f83756f4d8be2859af5e2cf54130c20e380119d
   RNFBCrashlytics: a845824a269968ebb7a4a6cf4772c4977125b5f6
   RNFBMessaging: 91592ea949854c66697757af648a2c07bcb583b9
@@ -2433,7 +2433,7 @@ SPEC CHECKSUMS:
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
-  Yoga: b05994d1933f507b0a28ceaa4fdb968dc18da178
+  Yoga: a9ef4f5c2cd79ad812110525ef61048be6a582a4
   ZendeskChatProvidersSDK: 5cfc4a3dee03317ba54920e3258edda52ff9a329
   ZendeskChatSDK: ed0424221923aa0b82397fec8b4306fab6645942
   ZendeskCommonUISDK: 1ad4f0051a999a5e56f09f789f916afe15e00419
@@ -2444,4 +2444,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 0bafe83ecb406b2688604485f66f99bcf7b36034
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.15.2

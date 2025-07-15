@@ -194,7 +194,10 @@ const NotificationAlert = ({
                        accessibilityRole='button'
                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                    >
-                       <Text style={[styles.closeButtonText, { color: currentTypeStyle.closeButtonColor }]}>
+                       <Text accessibilityLabel="Close notification"
+                       accessibilityRole='button'
+                    
+                        style={[styles.closeButtonText, { color: currentTypeStyle.closeButtonColor }]}>
                            ✕
                        </Text>
                    </TouchableOpacity>

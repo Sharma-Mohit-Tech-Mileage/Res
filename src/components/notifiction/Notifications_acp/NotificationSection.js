@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   // Info Message
   infoMessage: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     padding: Padding.p_base,
     marginHorizontal: Padding.p_base,
     marginBottom: Padding.p_base,
