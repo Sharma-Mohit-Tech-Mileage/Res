@@ -90,6 +90,7 @@ const SplashScreen = ({ navigation, route }) => {
   };
 
   const handleLogin = async (res) => {
+    console.log('User data',res)
     if (res) {
       let token = res.jwtToken;
       let userInfo = res.userInfo;

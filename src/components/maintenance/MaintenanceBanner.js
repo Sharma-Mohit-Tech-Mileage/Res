@@ -54,7 +54,8 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
       <View style={styles.alertRowContainer}>
         <View style={[{ backgroundColor: severityStyles.indicatorColor }]} />
         <View style={styles.alertContentContainer}>
-          <View style={styles.alertTitleRow}>
+          <View accessible={true}
+          style={styles.alertTitleRow}>
             <Image
               style={styles.alertIcon}
               resizeMode="contain"
@@ -66,8 +67,7 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
               style={[styles.alertTitle, severityStyles.titleStyle]}
               accessibilityRole="header"              
               accessibilityLabel={title}
-             
-
+              accessible={true}
             >
               {title}
             </Text>
