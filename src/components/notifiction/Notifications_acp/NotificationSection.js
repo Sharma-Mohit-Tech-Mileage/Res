@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, Pressable, Image, StyleSheet } from 'react-native';
 import { Color, Padding, FontSize, FontFamily, Border } from '../../../../GlobalStyles';
-
+import NotificationAlert from '../../common/customui/NotificationAlert';
 // Sub-components
 const StatusIcon = ({ status }) => (
   <Image
@@ -19,7 +19,7 @@ const InfoIcon = () => (
   <Image
     style={styles.icon}
     resizeMode="contain"
-    source={require('../../../../assets/infocircle.png')}
+    source={require('../../../../assets/Icon/Info.png')}
   />
 );
 
@@ -188,12 +188,14 @@ const styles = StyleSheet.create({
   // Info Message
   infoMessage: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Color.colorWhitesmoke_100,
+    alignItems: 'flex-start',
     padding: Padding.p_base,
     marginHorizontal: Padding.p_base,
     marginBottom: Padding.p_base,
-    borderRadius: Border.br_5xs
+    borderRadius: Border.br_5xs,
+    borderWidth: 1,
+    borderColor: '#0060AE',
+    backgroundColor: '#F0F8FF',
   },
   infoText: {
     flex: 1,

@@ -235,7 +235,7 @@ const EmailNotifications = () => {
 
   const ListHeaderComponent = () => {
     const maxEmails = 5;
-    const showAddButton = allSvEmailAssociated.length < maxEmails;
+    const showAddButton = allSvEmailAssociated?.length < maxEmails;
 
     return (
       <View style={styles.sectionContainer}>
@@ -265,7 +265,7 @@ const EmailNotifications = () => {
           {showAddButton && (
             <Pressable
               style={styles.addButton}
-              onPress={() => navigation.navigate('AddEmailNotification', { newEmail: paperlessEmails.length === 0 })}
+              onPress={() => navigation.navigate('AddEmailNotification', { newEmail: paperlessEmails?.length === 0 })}
               accessibilityRole="button"
               accessibilityLabel="Add new email notification"
               accessibilityHint="Double tap to add a new email address"
@@ -287,7 +287,7 @@ const EmailNotifications = () => {
             <Image
               style={styles.icon}
               resizeMode="contain"
-              source={emailsWithOnSettings.length > 0 ?
+              source={emailsWithOnSettings?.length > 0 ?
                 require("../../../assets/checkcircle.png") :
                 require("../../../assets/checkcircle1.png")
               }
@@ -303,7 +303,7 @@ const EmailNotifications = () => {
           </Text>
         </View>
 
-        {(paperlessEmails.length > 0 || (allSvEmailAssociated.length > 0 && acknowledgement)) && (
+        {(paperlessEmails?.length > 0 || (allSvEmailAssociated?.length > 0 && acknowledgement)) && (
           <View style={styles.sectionBox}>
             <View accessible={true} accessibilityRole="header" >
               <Text style={styles.infoTitle}> Paperless Billing </Text>
@@ -311,7 +311,7 @@ const EmailNotifications = () => {
             <Text style={styles.infoText} accessible={true} accessibilityRole="text" >
               Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips. By signing up for Paperless Billing, you'll also receive occasional updates and offers via email.
             </Text>
-            {paperlessEmails.length > 0 && (
+            {paperlessEmails?.length > 0 && (
               <View accessible={true} accessibilityRole="header" >
                 <Text style={styles.infoTitle}> Email address </Text>
               </View>
@@ -339,7 +339,7 @@ const EmailNotifications = () => {
           </View>
         )}
 
-        {marketingEmails.length > 0 && (
+        {marketingEmails?.length > 0 && (
           <View style={styles.sectionBox}>
             <View 
               accessible={true}
@@ -372,7 +372,7 @@ const EmailNotifications = () => {
           </View>
         )}
 
-        {sparklightTvEmails.length > 0 && (
+        {sparklightTvEmails?.length > 0 && (
           <View style={styles.sectionBox}>
             <View 
               accessible={true}
@@ -405,7 +405,7 @@ const EmailNotifications = () => {
           </View>
         )}
 
-        {additionalEmails.length > 0 && (
+        {additionalEmails?.length > 0 && (
           <View style={styles.sectionBox}>
             <View 
               accessible={true}

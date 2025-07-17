@@ -234,7 +234,7 @@ const AddNotificationScreen = () => {
                     type={notification.type}
                     title={notification.type === "error" ? "Error" : "Success"}
                     message={notification.message}
-                    showCloseIcon={notification.type === "error"}
+                    showCloseIcon={false}
                     onClose={() => setNotification(null)}
                     accessibilityLiveRegion="assertive"
                     accessibilityRole="alert"
