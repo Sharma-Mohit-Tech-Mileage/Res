@@ -6,7 +6,7 @@ import ShopScreen from "../../components/home/ShopScreen";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import MyServices from "../../components/services/MyServices";
 import TroubleShootStack from "./TroubleShootStack";
-import ManageEquipment from "../../components/support/ManageEquipment";
+
 
 const ShopStack = createNativeStackNavigator();
 

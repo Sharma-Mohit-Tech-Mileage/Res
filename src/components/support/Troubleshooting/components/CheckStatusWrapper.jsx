@@ -1,10 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Dimensions, findNodeHandle, AccessibilityInfo } from 'react-native';
 import WaveAnimation from '../../../common/WaveIcon';
-// import OutageAreaIcon from '../../../../res/svgIcons/troubleshooting/OutageAreaIcon';
-// import ServiceIcon from '../../../../res/svgIcons/troubleshooting/ServiceIcon';
-// import WalletIcon from '../../../../res/svgIcons/troubleshooting/WalletIcon';
-// import TroubleshootIcon from '../../../../res/svgIcons/troubleshooting/TroubleshootIcon';
 import OutageAreaIcon from '../../../../res/svgIcons/troubleshooting/icon-marker';
 import ServiceIcon from '../../../../res/svgIcons/troubleshooting/icon-globe';
 import WalletIcon from '../../../../res/svgIcons/troubleshooting/icon-wallet';

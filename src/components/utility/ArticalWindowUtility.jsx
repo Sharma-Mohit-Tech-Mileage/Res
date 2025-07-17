@@ -8,7 +8,6 @@ import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
-import colors from '../../res/Colors';
 import analytics from '@react-native-firebase/analytics';
 import LoadingOverlay from '../common/customui/CustomLoading';
 import LoadingSpinner from './LoadingSpinner';

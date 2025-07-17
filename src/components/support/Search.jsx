@@ -13,7 +13,7 @@ import {
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import SearchSuggestions from "../common/customui/SearchSuggestions";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { GetApiRequest, GetApiRequestSearch } from "../../network/APIClient";
+import { GetApiRequestSearch } from "../../network/APIClient";
 
 import debounce from "lodash.debounce";
 import SmallLoader from "../common/customui/SmallLoader";

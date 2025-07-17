@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { StyleSheet, View, Image, Pressable, ScrollView, Linking, RefreshControl, Platform, Text, TouchableOpacity, Alert, PermissionsAndroid, } from "react-native";
-import { useSelector } from "react-redux";
+import { StyleSheet, View, Image, ScrollView, RefreshControl, Platform, Text } from "react-native";
+
 import { Border, Padding, Color, FontSize, FontFamily, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import LinearGradient from "react-native-linear-gradient";
@@ -9,11 +9,8 @@ import PubSub from "pubsub-js";
 import base64 from "react-native-base64";
 import { startChatWithConfig, startChat, } from "../utility/RNZendeskChat";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
-import MyServicePlan from "../common/MyServicePlan";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
-import MyDataUsage from "../common/MyDataUsage";
-import AppStyles from "../common/styles/AppStyles";
 
 const MyServices = ({ route }) => {
   const navigation = useNavigation();

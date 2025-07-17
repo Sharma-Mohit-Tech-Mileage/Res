@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { View, StyleSheet } from "react-native";
 import Card from "./billerCards/NewBillerSummary";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
@@ -6,7 +6,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
 import { useFocusEffect } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-const MyInternetDetailsBiller = ({ plans, billAmt, dueDate,navigation }) => {
+const MyInternetDetailsBiller = ({  billAmt, dueDate,navigation }) => {
   const [cardDigit, setCardDigit] = useState("");
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [accountNumber, setAccountNumber] = useState(undefined)

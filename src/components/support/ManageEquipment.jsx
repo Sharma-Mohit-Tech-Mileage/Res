@@ -18,12 +18,11 @@ import {
   FontSize,
   Border,
 } from "../../../GlobalStyles";
-import MyServicePlan from "../common/MyServicePlan";
+
 import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import {
   GetApiRequest,
-  GetEuroApiRequest,
   GetModemStatusApiRequest,
   PostruckRollApi,
 } from "../../network/APIClient";

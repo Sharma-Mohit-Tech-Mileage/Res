@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Billpaidicon from "../../res/svgIcons/Billpaidicon";
 import Outageicon from "../../res/svgIcons/Outageicon";
 import Modemicon from "../../res/svgIcons/Modemicon";
@@ -9,7 +9,6 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import RightArrow from "../../res/svgIcons/RightArrow";
 import { FontFamily } from "../../../GlobalStyles";
 
-import { CommonActions } from '@react-navigation/native';
 const NetworkDetails = ({ navigation, billPaid, hasOutage, currentHealth }) => {
 
   console.log('Internethealth',currentHealth)

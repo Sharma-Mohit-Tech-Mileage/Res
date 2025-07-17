@@ -9,7 +9,6 @@ import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
 import AppStyles from "../styles/AppStyles";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
-import SmallLoader from "../customui/SmallLoader";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 const Card = ({ billAmt, dueDate, navigation, style}) => {
 

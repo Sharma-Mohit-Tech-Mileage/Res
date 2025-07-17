@@ -1,8 +1,8 @@
 import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import MaintenaceIcon from "../../res/svgIcons/MaintenanceIcon";
 import AppStyles from "../common/styles/AppStyles";
-import SecondaryButton from "../common/customui/SecondaryButton";
+
 import { Color,Padding,
   FontFamily, FontSize, Border
  } from "../../../GlobalStyles";

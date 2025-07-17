@@ -1,6 +1,6 @@
 // notificationHelpers.js
 
-import { AccessibilityInfo, Text } from 'react-native';
+import { AccessibilityInfo } from 'react-native';
 import { transformResponse, transformNotificationPreferences, isPrimaryAdmin, isAdminRole, extractAcknowledgementEmail } from '../../components/utility/constant';
 import { fetchBillingPaper, fetchProfileDetails, fetchSMSSelection, fetchPushNotifications, fetchSvEmailAssociation } from '../../redux/actions/ProfileActionSuite';
 

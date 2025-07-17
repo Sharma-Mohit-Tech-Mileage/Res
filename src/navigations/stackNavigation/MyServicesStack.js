@@ -5,7 +5,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Search from "../../components/support/Search";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
-import SupportScreen from "../../components/support/supportScreen";
 import MyServices from "../../components/services/MyServices";
 import ModemStackScreen from "./ManageEquepmentStack";
 import ModemConnectivityGuide from '../../components/support/Troubleshooting/ModemConnectivityGuide';

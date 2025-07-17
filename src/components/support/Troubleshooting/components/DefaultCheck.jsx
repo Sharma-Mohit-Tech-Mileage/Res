@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { AccessibilityInfo } from 'react-native';
+import React, {useState } from 'react';
+
 import CheckStatusWrapper from './CheckStatusWrapper';
 
 const DefaultCheck = ({ onComplete, step }) => {

@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, StyleSheet, Text, ActivityIndicator, Linking, Modal, Platform, Animated, Easing, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text,Linking, Modal, Platform, Animated, Easing, TouchableOpacity } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
-import { saveUserInfo, logError, logInfo, } from "../../redux/actions/UserAction";
+import { saveUserInfo, logInfo, } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import strings from "../../res/Strings";
-import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
+import { Color, FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from "react-native-version-check";
@@ -100,9 +100,6 @@ const SplashScreen = ({ navigation, route }) => {
         tokenGuid: res.idTokenGuid,
         refreshToken: res.refreshToken,
       };
-
-      let isNormalUser = userInfo && userInfo.accountNumber && userInfo.accountNumber.toString().length === 9 ? true : false;
-      user['isNormalUser'] = isNormalUser;
       setIsBusiness(false);
 
       if (shouldBlockLogin(userInfo.acctStatus, userInfo.daysSinceDisconnectDate)) {
@@ -111,7 +108,6 @@ const SplashScreen = ({ navigation, route }) => {
         return;
       }
       
-      if (!isNormalUser) {
         if (res.userInfo?.authLevel != "HeadOfHousehold" && userInfo?.authLevel == "Admin") {
           setLoading(false); // 🟢 Set loading false for error modal
           setLoginEnable(true); // 🟢 Re-enable login for modal cases
@@ -128,42 +124,6 @@ const SplashScreen = ({ navigation, route }) => {
           // 🟢 Keep loading true, navigation will happen
           moveAfterLogin(user);
         }
-      } else if (
-        (userInfo?.authLevel !== "HeadOfHousehold" && userInfo?.authLevel == "Admin") ||
-        userInfo.acctStatus !== "Active"
-      ) {
-        setLoading(false); // 🟢 Set loading false for error modal
-        setLoginEnable(true); // 🟢 Re-enable login for modal cases
-        setErrorMessage(strings.AdminMsg);
-        setTimeout(() => { setModalVisible(true); }, 100);
-      } else if (userInfo.customerType != "Residential") {
-        setLoading(false); // 🟢 Set loading false for business modal
-        setLoginEnable(true); // 🟢 Re-enable login for modal cases
-        setIsBusiness(true);
-        setErrorMessage(strings.BusinessUserMsg);
-        setErrorMessage1(" to manage your Sparklight Business services account");
-        setTimeout(() => { setModalVisible(true); }, 100);
-      } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
-        setLoading(false); // 🟢 Set loading false for error modal
-        setLoginEnable(true); // 🟢 Re-enable login for modal cases
-        setErrorMessage(strings.AdminMsg);
-        setTimeout(() => { setModalVisible(true); }, 100);
-      } else if (userInfo.customerType === 'Business') {
-        setLoading(false); // 🟢 Set loading false for business modal
-        setLoginEnable(true); // 🟢 Re-enable login for modal cases
-        setErrorMessage(strings.BusinessUserMsg);
-        setErrorMessage1(' to view information.');
-        setTimeout(() => { setModalVisible(true); }, 100);
-      } else if (res.custServices.internet == false) {
-        setLoading(false); // 🟢 Set loading false for error modal
-        setLoginEnable(true); // 🟢 Re-enable login for modal cases
-        setErrorMessage(strings.nonInternetUserMessage);
-        setErrorMessage1(" to manage your service.");
-        setTimeout(() => { setModalVisible(true); }, 100);
-      } else {
-        // 🟢 Keep loading true, navigation will happen
-        moveAfterLogin(user);
-      }
     } else {
       console.log("[HANDLE_LOGIN] No response received.");
       setLoading(false); // 🟢 Set loading false for no response

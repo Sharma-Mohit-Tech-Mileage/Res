@@ -5,7 +5,7 @@ import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalSty
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useSelector, useDispatch } from 'react-redux';
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
-import { fetchACPUserAccountDetails, updateTermsAndConditions, fetchSMSSelection, fetchBillingStatus, fetchPushNotifications, fetchBillingPaper, fetchProfileDetails } from '../../redux/actions/ProfileActionSuite';
+import { fetchACPUserAccountDetails, updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
 import { logout } from 'react-native-app-auth';
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { Env } from "../../network/apis/account/Constants";

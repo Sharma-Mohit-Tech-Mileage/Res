@@ -1,9 +1,9 @@
 import React from "react";
-import { View, Text, TextInput, StyleSheet, Image, Pressable, Platform, Linking } from "react-native";
+import { View, Text, StyleSheet, Image, Pressable, Platform, Linking } from "react-native";
 import { FontFamily, Padding, Color, FontSize, Border, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { useDispatch, useSelector } from 'react-redux';
+import { useNavigation} from "@react-navigation/native";
+import { useDispatch} from 'react-redux';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import WifiScheduling from "../../res/svgIcons/WifiScheduling";
 import AdvanceSecurity from "../../res/svgIcons/AdvanceSecurity";

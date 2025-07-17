@@ -13,7 +13,6 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import {
   FontFamily,
   Color,
-  Border,
 } from "../../../GlobalStyles";
 import {
   widthPercentageToDP as wp,

@@ -1,11 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Image, Pressable } from "react-native";
 import { FontFamily, Padding, Color, FontSize, Border, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useNavigation } from "@react-navigation/native";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { useForm, Controller } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
 import { GetApiRequest, PutApiRequest } from "../../network/APIClient";
 import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import SparkLightInput from "../common/customui/SparkLightInput";

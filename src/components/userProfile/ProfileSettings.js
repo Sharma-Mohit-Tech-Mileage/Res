@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, ScrollView, Linking, Pressable, Platform } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Linking, Platform } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Padding,

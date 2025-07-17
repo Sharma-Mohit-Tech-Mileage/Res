@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   Modal,
-  Linking
 } from "react-native";
 import colors from "../../res/Colors";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";

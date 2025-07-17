@@ -8,7 +8,6 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
 import { useDispatch } from "react-redux";
-import { getUserType } from "../utility/constant";
 import { userSchema, userSchemaNoPass } from "../utility/validationSchema";
 import { addNewUser, editNewUser } from "../../redux/actions/ProfileActionSuite";
 import { validatePassword, securityQuestions, passwordTerms } from "../utility/constant";

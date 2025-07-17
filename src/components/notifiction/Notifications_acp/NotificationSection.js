@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, Pressable, Image, StyleSheet } from 'react-native';
 import { Color, Padding, FontSize, FontFamily, Border } from '../../../../GlobalStyles';
-import NotificationAlert from '../../common/customui/NotificationAlert';
+
 // Sub-components
 const StatusIcon = ({ status }) => (
   <Image

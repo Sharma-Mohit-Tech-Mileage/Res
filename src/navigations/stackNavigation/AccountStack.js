@@ -9,13 +9,12 @@ import PasswordSecurityEdit from '../../components/userProfile/PasswordSecurityE
 
 // Import normal notification components
 import Notifications from '../../components/notifiction/Notifications';
-import EmailNotifications from '../../components/notifiction/EmailNotifications';
+
 import AddEmailNotification from '../../components/notifiction/AddEmailNotification';
 import InAppNotifications from '../../components/notifiction/InAppNotifications';
 import TextNotifications from '../../components/notifiction/TextNotifications';
 
-// Import ACP notification components
-import Notifications_acp from '../../components/notifiction/Notifications_acp/Notifications';
+
 import EmailNotifications_acp from '../../components/notifiction/Notifications_acp/EmailNotification';
 
 import UserManagement from '../../components/userManagement/UserManagement';

@@ -3,9 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Dimensions,
-  SafeAreaView,
   Pressable,
   Image,
   StatusBar,
@@ -14,7 +12,6 @@ import { useNavigation } from "@react-navigation/native";
 import QRCode from "react-native-qrcode-svg";
 import Share from "react-native-share";
 import { captureRef } from "react-native-view-shot";
-import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import SparkLightDropdown from "../common/customui/SparkLightDropdown";
 import {
   Color,
@@ -24,7 +21,6 @@ import {
   Border,
 } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
-import { Select, Box, CheckIcon } from "native-base";
 import LinearGradient from "react-native-linear-gradient";
 
 const ShareWifiScreen = ({ route }) => {

@@ -59,47 +59,7 @@ const BillingScreen = ({ navigation }) => {
     setLoadingPerless(false);
   };
 
-  const getUserAccountDetails = () => {
-    setBillAmt(undefined);
-    setIsContentLoading(false);
-    setIsAutoPayStatusLoad(true);
-    getUser().then((res) => {
-      const accountNumber = res.userInfo.accountNumber;
-      const request = `account/api/account/${accountNumber}`;
-      GetApiRequest(
-        request,
-        (res) => {
-          if (res) {
-            const formattedDueDate =
-              res.pastDueAmount !== 0
-                ? "Immediately"
-                : moment(res.paymentDueDate).format("ll");
-            setDueDate(formattedDueDate);
-            const formattedBalance = (
-              Math.round((res.currentBalance || 0) * 100) / 100
-            ).toFixed(2);
-            setBillAmt(formattedBalance || 0);
-            
-            setDefaultPaymentDetails({
-              dueDate: res.paymentDueDate,
-              billAmount: formattedBalance,
-              pastPaymentDue: res.pastDueAmount,
-              email: getPrimaryEmail(res),
-            });
-            
-            setIsContentLoading(false);
-          } else {
-            setIsContentLoading(false);
-          }
-        },
-        handleError
-      );
-    }).catch(error => {
-      console.log("Error getting user:", error);
-      setIsContentLoading(false);
-    });
-  };
-
+  
   const getStatus = () => {
     setIsAutoPayStatusLoad(true);
     setLoadingPerless(true);

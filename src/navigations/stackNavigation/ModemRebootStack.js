@@ -6,7 +6,6 @@ import ModemReboot from "../../components/support/ModemReboot";
 import ModemRebootInstructions from "../../components/support/ModemRebootInstuction";
 import SupportStackScreen from "./SupportStack";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import SupportScreen from "./SupportStack";
 
 const ModemRebootStack1 = createNativeStackNavigator();
 

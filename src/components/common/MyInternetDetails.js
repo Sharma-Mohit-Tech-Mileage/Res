@@ -8,9 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchBillingPaper, fetchProfileDetails ,fetchSvEmailAssociation} from "../../redux/actions/ProfileActionSuite";
 import { useFocusEffect } from "@react-navigation/native";
 
-const { width: viewportWidth } = Dimensions.get('window');
-
-const MyInternetDetails = ({ plans, billAmt, dueDate, paymentDetails,navigation }) => {
+const MyInternetDetails = ({billAmt, dueDate,navigation }) => {
   const dispatch = useDispatch();
   const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [cardDigit, setCardDigit] = useState("");

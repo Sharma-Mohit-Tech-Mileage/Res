@@ -1,17 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { StyleSheet,TouchableOpacity, Text, Pressable, View, ScrollView } from "react-native";
+import { StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
 import { validatePassword, passwordTerms,securityQuestions } from "../utility/constant";
 import SparkLightInput from '../common/customui/SparkLightInput';
-import SparkLightDropdown from '../common/customui/SparkLightDropdown';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUser } from "../../redux/utils/LocalStorage";
 import NotificationAlert from '../common/customui/NotificationAlert';
-import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
 import { GetApiRequest,PutApiRequest } from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { passwordSchema } from '../utility/validationSchema'; // Update the path as necessary

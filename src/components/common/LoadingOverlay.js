@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, StyleSheet, Dimensions, Animated, Text } from "react-native";
+import { StyleSheet, Animated } from "react-native";
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import { Color, FontFamily } from "../../../GlobalStyles";
 import LoadingOverlay from "../common/customui/CustomLoading"

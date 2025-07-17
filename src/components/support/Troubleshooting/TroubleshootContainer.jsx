@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, SafeAreaView, StyleSheet, AccessibilityInfo, findNodeHandle, BackHandler, Modal, Text, TouchableOpacity } from "react-native";
+import { View, SafeAreaView, StyleSheet, BackHandler } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";

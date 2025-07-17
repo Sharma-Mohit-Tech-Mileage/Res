@@ -14,7 +14,7 @@ import Modemicon from "../../../res/svgIcons/Modemicon";
 import WaveAnimation from '../../common/WaveIcon';
 
 const windowHeight = Dimensions.get("window").height;
-const windowWidth = Dimensions.get("window").width;
+
 
 const ModemHealthy = () => {
   const navigation = useNavigation();

@@ -17,7 +17,6 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import PubSub from 'pubsub-js'
 import RenderText from "../common/RenderText";
 
 const ModemReboot = () => {

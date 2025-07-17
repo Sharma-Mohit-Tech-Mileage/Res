@@ -9,7 +9,6 @@ import {
   RefreshControl,
   Platform,
   Text,
-  TouchableOpacity,
   Alert,
   PermissionsAndroid,
 } from "react-native";
