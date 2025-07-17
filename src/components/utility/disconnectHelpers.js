@@ -16,9 +16,9 @@ export const shouldBlockLogin = (acctStatus, daysSinceDisconnectDate) => {
   
   const disconnectedStatuses = ["DISCONNECT", "VOLUNTARY DISC", "NON-PAY DISC", "CHARGED OFF"];
   const isDisconnected = disconnectedStatuses?.includes(acctStatus?.toUpperCase());
-  if(daysSinceDisconnectDate > 0 && daysSinceDisconnectDate<=90){
+  if(daysSinceDisconnectDate > -1 && daysSinceDisconnectDate<=90){
     return false;
-  }else if((daysSinceDisconnectDate === 0 || daysSinceDisconnectDate === null) && isDisconnected){
+  }else if(daysSinceDisconnectDate == -1 && isDisconnected){
       return true;
   }else if(daysSinceDisconnectDate>90){
     return true
