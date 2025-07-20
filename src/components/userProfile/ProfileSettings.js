@@ -31,9 +31,6 @@ const ProfileSettings = () => {
   const convertedRole = getUserType(profileDetails.memberType || "");
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || "");
 
-  const accountDetails = useSelector(
-      (state) => state.combinedReducers.profile?.accountDetails
-    );
   const userInfo = useSelector((state) => state.combinedReducers?.user?.userData?.userInfo);
   
   const showReconnectMessage = userInfo ? 

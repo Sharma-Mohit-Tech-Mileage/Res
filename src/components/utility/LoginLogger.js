@@ -1,6 +1,5 @@
 // LoginLogger.js
 import DeviceInfo from "react-native-device-info";
-import moment from "moment";
 
 /**
  * Utility class to handle login-related logging in a consistent format

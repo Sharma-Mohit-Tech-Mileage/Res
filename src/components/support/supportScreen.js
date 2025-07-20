@@ -25,20 +25,15 @@ import LinearGradient from "react-native-linear-gradient";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { check, request, PERMISSIONS, RESULTS } from "react-native-permissions";
 import PubSub from "pubsub-js";
-import ChatIcon from "../../res/svgIcons/ChatIcon";
 import base64 from "react-native-base64";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 //import ZendDesk from '@pagopa/io-react-native-zendesk';
 
 import {
   startChatWithConfig,
-  setVisitorInfo,
   startChat,
-  clearChatData,
 } from "../utility/RNZendeskChat";
-import TicketListIcon from "../../res/svgIcons/TicketListIcon";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
-import BillingSupportIcon from "../../res/svgIcons/BillingSupportIcon";
 import AppStyles from "../common/styles/AppStyles";
 import SupportIcon from "../../res/svgIcons/NewSupportIcon";
 

@@ -5,7 +5,6 @@ import Article from './ArticleModal';
 
 const WebView = () => {
     const [showWebView, setShowWebView] = React.useState(false);
-
     const handlePress = () => {
         console.log("clicked");
         setShowWebView(true);

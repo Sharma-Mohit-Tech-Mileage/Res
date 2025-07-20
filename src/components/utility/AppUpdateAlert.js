@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   View,
   Platform,
   StyleSheet,
   Text,
-  SafeAreaView,
   TouchableOpacity,
   Modal,
   Linking,

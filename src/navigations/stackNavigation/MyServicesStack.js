@@ -6,16 +6,8 @@ import Search from "../../components/support/Search";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import MyServices from "../../components/services/MyServices";
-import ModemStackScreen from "./ManageEquepmentStack";
-import ModemConnectivityGuide from '../../components/support/Troubleshooting/ModemConnectivityGuide';
-import ShareWifiScreen from "../../components/support/ShareWifiScreen";
-
-import TroubleShootStack from "./TroubleShootStack";  
-import ModemSpeedTest from "../../components/common/speedTest/ModemSpeedTest";
 const ServiceStack = createNativeStackNavigator();
-
 function MyServicesStack({route}) {
-  console.log('Support',JSON.stringify(route))
   const { setTabBarVisible } = useTabBarVisibility();
   return (
     <ServiceStack.Navigator initialRouteName={(route.params?.isManagementEquipment)?"ManageEquipment":"MyService"}  defaultNavigationOptions={{ gestureEnabled: true }}>
@@ -51,19 +43,6 @@ function MyServicesStack({route}) {
           blur: () => setTabBarVisible(true),
         }}
       />
-      
-      
-
-         <ServiceStack.Screen
-        name="ManageEquipment"
-        component={ModemStackScreen}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
-      
       <ServiceStack.Screen
         name="DiagnosticFlow"
         component={TroubleShootStack}
@@ -83,24 +62,6 @@ function MyServicesStack({route}) {
         component={ModemConnectivityGuide}
       />
 
-      <ServiceStack.Screen
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-        name="ShareWifiScreen"
-        component={ShareWifiScreen}
-      />
-      <ServiceStack.Screen
-        name="ModemSpeedTest"
-        component={ModemSpeedTest}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
 
     </ServiceStack.Navigator>
   );

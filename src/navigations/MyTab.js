@@ -9,7 +9,6 @@ import HomeStackScreen from './stackNavigation/HomeStack';
 import HomeIconSelected from '../res/svgIcons/HomeIconSelected';
 import HomeIcon from '../res/svgIcons/HomeIcon';
 import SupportIcon from '../res/svgIcons/SupportIcon';
-import AccountIcon from '../res/svgIcons/AccountIcone';
 import SupportIconSelected from '../res/svgIcons/SupportIconSelected';
 import { FontFamily } from '../../GlobalStyles';
 import { fetchProfileDetails } from '../redux/actions/ProfileActionSuite';

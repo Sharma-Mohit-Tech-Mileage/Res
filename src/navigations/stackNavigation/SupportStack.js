@@ -4,9 +4,7 @@ import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import supportScreen from "../../components/support/supportScreen";
 import Search from "../../components/support/Search";
-import TicketStackScreen from "./TicketStack";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
-
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
 
 const SupportStack = createNativeStackNavigator();
@@ -35,15 +33,7 @@ function SupportStackScreen({route}) {
           blur: () => setTabBarVisible(true),
         }}
       />
-      <SupportStack.Screen
-        name="TicketStackScreen"
-        component={TicketStackScreen}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
+      
      
       
       <SupportStack.Screen
