@@ -655,14 +655,19 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   closeBtn: {
-    backgroundColor:colors.sparklight_bright_purple,
+    backgroundColor: colors.backgound_blue,
     paddingHorizontal: 30,
     paddingVertical: 10,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 5,
   },
   closeAlertTxt: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: colors.sparklight_purple_blue,
+    fontWeight:'400',
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
     fontSize: 16,
   },
 });
