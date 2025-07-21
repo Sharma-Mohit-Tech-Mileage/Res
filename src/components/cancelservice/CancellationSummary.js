@@ -15,7 +15,6 @@ import SparkLightInput from "../common/customui/SparkLightInput";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import CheckBox from "@react-native-community/checkbox";
-import IconFaq from "../../res/svgIcons/troubleshooting/iconfaq";
 import Tooltip from "rn-tooltip";
 import WarningIcon from "../../../assets/alert-triangle.png";
 import {

@@ -3,7 +3,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NewBillerHome from "../../components/home/NewBillerHome";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import { useTabBarVisibility } from "../TabBarVisibilityContext";
-import ModemSpeedTest from "../../components/common/speedTest/ModemSpeedTest";
 import AutoPayPCIConnector from '../../components/utility/AutoPayPCIConnector'
 import { ActivityIndicator } from "react-native";
 
@@ -57,15 +56,7 @@ function HomeStackScreen() {
       />
 
     
-      <HomeStack.Screen
-        name="ModemSpeedTest"
-        component={ModemSpeedTest}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
+      
     </HomeStack.Navigator>
   );
 }
