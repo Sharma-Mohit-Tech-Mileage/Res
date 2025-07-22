@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Dimensions, Platform, Alert, Pressable, Image, AccessibilityInfo } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  Platform,
+  Alert,
+  Pressable,
+  Image,
+  AccessibilityInfo
+} from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useTabBarVisibility } from './TabBarVisibilityContext';
@@ -18,11 +27,12 @@ import BillingStackScreen from "./stackNavigation/BillingStack";
 import MyServicesStack from "./stackNavigation/MyServicesStack";
 import NewSupportIcon from "../res/svgIcons/NewSupportIcon";
 import HomeAccountIcon from "../res/svgIcons/HomeAccountIcon";
-
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const { width } = Dimensions.get('window');
 const tabWidth = Number(width / 5);
 const Tab = createBottomTabNavigator();
 import Icon from '../components/common/Icon';
+
 const MyTabs = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
@@ -31,6 +41,7 @@ const MyTabs = ({ navigation, route }) => {
   const { tabBarVisible } = useTabBarVisibility();
   const user = useSelector(state => state.combinedReducers.user.userData);
   const home = useSelector(state => state.combinedReducers.home);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     dispatch(fetchProfileDetails());
@@ -54,20 +65,20 @@ const MyTabs = ({ navigation, route }) => {
   }, []);
 
   const isTabAccessibleDuringWalkthrough = (tabIndex) => {
-    if ( home.walkThroughStep === null || home.walkThroughStep === undefined) {
+    if (home.walkThroughStep === null || home.walkThroughStep === undefined) {
       return true;
     }
     return home.walkThroughStep === tabIndex;
   };
 
   const isWalkthroughActive = () => {
-    return  home.walkThroughStep !== null && home.walkThroughStep !== undefined;
+    return home.walkThroughStep !== null && home.walkThroughStep !== undefined;
   };
 
   const getTabBarIconWrapper = (IconComponent, focused, tabIndex) => {
     const isAccessible = isTabAccessibleDuringWalkthrough(tabIndex);
     return (
-      <View 
+      <View
         style={[
           styles.tabItem,
           !isAccessible && styles.disabledTab
@@ -81,59 +92,64 @@ const MyTabs = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-      switch(home.walkThroughStep) {
-        case 0:
-          setShadowStyle(styles.shadowTabs);
-          setShadowStyleLeft(styles.shadowTabsLeft);
-          break;
-        case 1:
-          setShadowStyle([styles.shadowTabs, styles.shadowTabsStep2]);
-          setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep2Left]);
-          break;
-        case 2:
-          setShadowStyle([styles.shadowTabs, styles.shadowTabsStep32]);
-          setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep31Left]);
-          break;
-        case 3:
-          setShadowStyle([styles.shadowTabs, styles.shadowTabsStep3]);
-          setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left]);
-          break;
-        case 4:
-          setShadowStyle([styles.shadowTabs, styles.shadowTabsStep4]);
-          setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep4Left]);
-          break;
-      }
+    switch (home.walkThroughStep) {
+      case 0:
+        setShadowStyle(styles.shadowTabs);
+        setShadowStyleLeft(styles.shadowTabsLeft);
+        break;
+      case 1:
+        setShadowStyle([styles.shadowTabs, styles.shadowTabsStep2]);
+        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep2Left]);
+        break;
+      case 2:
+        setShadowStyle([styles.shadowTabs, styles.shadowTabsStep32]);
+        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep31Left]);
+        break;
+      case 3:
+        setShadowStyle([styles.shadowTabs, styles.shadowTabsStep3]);
+        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left]);
+        break;
+      case 4:
+        setShadowStyle([styles.shadowTabs, styles.shadowTabsStep4]);
+        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep4Left]);
+        break;
+    }
   }, [home]);
 
   return (
     <>
-      { home.walkThroughStep !== null && home.walkThroughStep !== undefined && (
+      {(home.walkThroughStep !== null && home.walkThroughStep !== undefined) && (
         <>
           <View style={shadowStyleLeft} />
-          <View style={shadowStyle} />
+          <View
+            style={[
+              ...[].concat(shadowStyle),
+              { height: Platform.OS === 'ios' ? 90 : 60 + insets.bottom }
+            ]}
+          />
         </>
       )}
       <Tab.Navigator
         name='MyTab'
         initialRouteName="Home"
         screenOptions={({ route }) => ({
-          tabBarStyle: { 
-            paddingVertical: 5, 
-            position: 'absolute', 
-            height: (Platform.OS === 'ios') ? 90 : 60, 
-            display: tabBarVisible ? 'flex' : 'none' 
+          tabBarStyle: {
+            paddingVertical: 5,
+            position: 'absolute',
+            height: Platform.OS === 'ios' ? 90 : 60 + insets.bottom,
+            display: tabBarVisible ? 'flex' : 'none'
           },
           tabBarActiveTintColor: '#353091',
           tabBarInactiveTintColor: '#767676',
-          tabBarLabelStyle: { 
-            fontSize: 12, 
-            fontFamily: FontFamily.openSansRegular, 
-            fontWeight: '600' 
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontFamily: FontFamily.openSansRegular,
+            fontWeight: '600'
           },
           tabBarButton: (props) => {
             const tabIndex = ["Home", "BillingTab", "MyServices", "Support", "account"].indexOf(route.name);
             const isAccessible = isTabAccessibleDuringWalkthrough(tabIndex);
-            
+
             return (
               <Pressable
                 {...props}
@@ -171,7 +187,6 @@ const MyTabs = ({ navigation, route }) => {
             ),
           }}
         />
-        
         <Tab.Screen
           name="BillingTab"
           component={BillingStackScreen}
@@ -199,7 +214,6 @@ const MyTabs = ({ navigation, route }) => {
             ),
           }}
         />
-
         <Tab.Screen
           name="MyServices"
           component={MyServicesStack}
@@ -224,7 +238,7 @@ const MyTabs = ({ navigation, route }) => {
             tabBarLabel: 'Service',
             tabBarAccessibilityLabel: isTabAccessibleDuringWalkthrough(2) ? 'Service' : undefined,
             tabBarIcon: ({ focused }) => (
-              <View 
+              <View
                 style={[
                   styles.tabItem,
                   !isTabAccessibleDuringWalkthrough(2) && styles.disabledTab
@@ -232,12 +246,13 @@ const MyTabs = ({ navigation, route }) => {
                 accessible={false}
                 importantForAccessibility="no"
               >
-                {focused ? <SupportIconSelected/> : <SupportIcon isNewBillerUser={!user?.isNormalUser}/>}
+                {focused
+                  ? <SupportIconSelected />
+                  : <SupportIcon isNewBillerUser={!user?.isNormalUser} />}
               </View>
             ),
           }}
         />
-
         <Tab.Screen
           name="Support"
           component={SupportStack}
@@ -247,10 +262,9 @@ const MyTabs = ({ navigation, route }) => {
               if (!isTabAccessibleDuringWalkthrough(3) && isScreenReaderEnabled) {
                 return;
               }
-             // navigation.navigate('Support');
               navigation.reset({
                 index: 0,
-                routes: [{ name: 'Support'}],
+                routes: [{ name: 'Support' }],
               });
             },
           })}
@@ -258,7 +272,7 @@ const MyTabs = ({ navigation, route }) => {
             headerShown: false,
             tabBarLabel: 'Support',
             tabBarIcon: ({ focused }) => (
-              <View 
+              <View
                 style={[
                   styles.tabItem,
                   !isTabAccessibleDuringWalkthrough(3) && styles.disabledTab
@@ -266,24 +280,20 @@ const MyTabs = ({ navigation, route }) => {
                 accessible={false}
                 importantForAccessibility="no"
               >
-
-            { user?.isNormalUser ? (
-                <Image
-                style={{width:33, height:28}}
-                resizeMode='contain'
-                tintColor={focused ? '#353091' : '#767676'}
-                source={require("../../assets/phone-outgoing-03.png")}
-                accessible={false}
-                importantForAccessibility="no"
-              /> )
-                : <NewSupportIcon focused={focused} />
-                }
-                
+                {user?.isNormalUser ? (
+                  <Image
+                    style={{ width: 33, height: 28 }}
+                    resizeMode='contain'
+                    tintColor={focused ? '#353091' : '#767676'}
+                    source={require("../../assets/phone-outgoing-03.png")}
+                    accessible={false}
+                    importantForAccessibility="no"
+                  />
+                ) : <NewSupportIcon focused={focused} />}
               </View>
             ),
           }}
         />
-
         <Tab.Screen
           name="account"
           component={AccountStackScreen}
@@ -300,7 +310,7 @@ const MyTabs = ({ navigation, route }) => {
             headerShown: false,
             tabBarLabel: 'Account',
             tabBarIcon: ({ focused }) => getTabBarIconWrapper(
-              user?.isNormalUser? AccountIcon :HomeAccountIcon,
+              user?.isNormalUser ? AccountIcon : HomeAccountIcon,
               focused,
               4
             ),
@@ -317,7 +327,6 @@ const styles = StyleSheet.create({
   },
   shadowTabs: {
     backgroundColor: 'black',
-    height: (Platform.OS === 'ios') ? 90 : 60,
     width: '100%',
     position: 'absolute',
     bottom: 0,

@@ -323,6 +323,7 @@ const BillingScreen = ({ navigation }) => {
                       <Text style={styles.modemHealthSupport}>View Payment History</Text>
                       <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
                     </TouchableOpacity>
+                    
                     <View style={styles.frameLayout} />
                     
                     <TouchableOpacity
@@ -555,7 +556,6 @@ const styles = StyleSheet.create({
     color: colors.sparklight_purple_blue,
     fontFamily: FontFamily.openSansRegular,
     textAlign: "left",
-    lineHeight: 28,
     flex: 1,
   },
   rightIconStyle: {
