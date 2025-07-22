@@ -644,8 +644,10 @@ const styles = StyleSheet.create({
   },
   alertTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
     marginTop: 10,
+    color:colors.sp_black,
+    fontFamily: FontFamily.openSansRegular,
     textAlign: 'center',
   },
   alertDescription: {
