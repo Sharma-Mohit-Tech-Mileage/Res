@@ -120,7 +120,7 @@ const MyTabs = ({ navigation, route }) => {
     <>
       {(home.walkThroughStep !== null && home.walkThroughStep !== undefined) && (
         <>
-          <View style={shadowStyleLeft} />
+          <View style={[...[].concat(shadowStyleLeft), { height: Platform.OS === 'ios' ? 90 : 60 + insets.bottom }]} />
           <View
             style={[
               ...[].concat(shadowStyle),
