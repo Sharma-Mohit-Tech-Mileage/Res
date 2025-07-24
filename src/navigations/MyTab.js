@@ -99,19 +99,19 @@ const MyTabs = ({ navigation, route }) => {
         break;
       case 1:
         setShadowStyle([styles.shadowTabs, styles.shadowTabsStep2]);
-        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep2Left]);
+        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep2Left, { height: Platform.OS === 'ios' ? 90 : 60 + insets.bottom } ]);
         break;
       case 2:
         setShadowStyle([styles.shadowTabs, styles.shadowTabsStep32]);
-        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep31Left]);
+        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep31Left, { height: Platform.OS === 'ios' ? 90 : 60 + insets.bottom }]);
         break;
       case 3:
         setShadowStyle([styles.shadowTabs, styles.shadowTabsStep3]);
-        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left]);
+        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep3Left, { height: Platform.OS === 'ios' ? 90 : 60 + insets.bottom }]);
         break;
       case 4:
         setShadowStyle([styles.shadowTabs, styles.shadowTabsStep4]);
-        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep4Left]);
+        setShadowStyleLeft([styles.shadowTabs, styles.shadowTabsStep4Left, { height: Platform.OS === 'ios' ? 90 : 60 + insets.bottom }]);
         break;
     }
   }, [home]);
@@ -120,7 +120,7 @@ const MyTabs = ({ navigation, route }) => {
     <>
       {(home.walkThroughStep !== null && home.walkThroughStep !== undefined) && (
         <>
-          <View style={[...[].concat(shadowStyleLeft), { height: Platform.OS === 'ios' ? 90 : 60 + insets.bottom }]} />
+          <View style={[...[].concat(shadowStyleLeft)] } />
           <View
             style={[
               ...[].concat(shadowStyle),
