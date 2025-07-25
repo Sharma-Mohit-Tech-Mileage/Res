@@ -54,9 +54,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             webViewRef.current.injectJavaScript(script);
         } else {
             console.warn('WebView ref is not available for injecting JavaScript. Navigating back to Dashboard.');
-            if (navigationRef.current) {
-                navigationRef.current.navigate('Dashboard');
-            }
+            // if (navigationRef.current) {
+            //     navigationRef.current.navigate('Dashboard');
+            // }
         }
     };
 
@@ -247,9 +247,9 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     if (webViewRef?.current) {
                         webViewRef.current.reload();
                     } else {
-                        if (navigationRef.current) {
-                            navigationRef.current.navigate('Dashboard');
-                        }
+                        // if (navigationRef.current) {
+                        //     navigationRef.current.navigate('Dashboard');
+                        // }
                     }
                 }, 500);
             }
