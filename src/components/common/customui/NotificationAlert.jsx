@@ -14,7 +14,7 @@ const NotificationAlert = ({
    showCloseIcon = true, 
    isVisible = true, 
    resentemail = false,
-   splitKey = 'contact us'
+   splitKey = 'contact us',
 }) => {
    if (!isVisible) return null;
    
@@ -194,9 +194,8 @@ const NotificationAlert = ({
                        accessibilityRole='button'
                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                    >
-                       <Text accessibilityLabel="Close notification"
-                       accessibilityRole='button'
-                    
+                       <Text
+                
                         style={[styles.closeButtonText, { color: currentTypeStyle.closeButtonColor }]}>
                            ✕
                        </Text>
