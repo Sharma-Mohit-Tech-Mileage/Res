@@ -21,6 +21,9 @@ import DocumentIcon from '../../res/svgIcons/DocumentIcon';
 import SearchBookIcon from '../../res/svgIcons/SearchBookIcon';
 import BuildingDocIcon from '../../res/svgIcons/BuildingDocIcon';
 import GearIcon from '../../res/svgIcons/GearIcon';
+import SearchIcon from '../../../assets/svgs/searchmd'; 
+import Checkcircle from '../../../assets/svgs/checkcircle';
+import Chevronleft from '../../../assets/svgs/chevronleft';
 const Icon = ({ name, size = 24, color = '#000', style }) => {
   const iconMap = {
     'credit-card': { library: 'SVG', source: creditCard },
@@ -46,9 +49,9 @@ const Icon = ({ name, size = 24, color = '#000', style }) => {
 
     // Image asset example
     'building-doc': { library: 'SVG', source: BuildingDocIcon },
-    'search': { library: 'Image', source: require('../../../assets/searchsm.png') },
-    'green-checkcircle': { library: 'Image', source: require('../../../assets/checkcircle.png') },
-    'down-chevron': { library: 'Image', source: require('../../../assets/chevrondown.png') },
+    'search': { library: 'Image', source: SearchIcon},
+    'green-checkcircle': { library: 'Image', source: Checkcircle },
+    //'down-chevron': { library: 'Image', source: require('../../../assets/chevrondown.png') },
     'right-chevron': { library: 'Image', source: require('../../../assets/chevronright.png') },
   };
 

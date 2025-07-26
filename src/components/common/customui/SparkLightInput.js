@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../../GlobalStyles";
-import warningIcon from '../../../../assets/alert-triangle.png';
-import eyeIcon from '../../../../assets/eye.png';
-import eyeSlashIcon from '../../../../assets/HidePassword-01.png'
+import WarningIcon from '../../../../assets/svgs/alerttriangle';
+import EyeIcon from '../../../../assets/svgs/EyeIcon';
+import EyeSlashIcon from '../../../../assets/svgs/EyeHide';
+import Passwordlock from '../../../../assets/svgs/passwordlock';
 
+
+const MyPassIcon = (passwordVisible) => {
+  return passwordVisible ? <EyeSlashIcon/> : <EyeIcon />;
+};
 const SparkLightInput = ({
     name,
     label,
@@ -45,10 +50,13 @@ const SparkLightInput = ({
                     accessibilityRole="button"
                     accessible={true}
                     onPress={togglePasswordVisibility} style={styles.eyeButton}>
-                        <Image
+                        <View style={styles.eyeIcon}>
+                            {MyPassIcon(passwordVisible)}
+                        </View>
+                        {/* <Image
                             source={passwordVisible ? eyeSlashIcon : eyeIcon}
                             style={styles.eyeIcon}
-                        />
+                        /> */}
                         <Text style={styles.eyeText}>{passwordVisible ? 'Hide' : 'Show'}</Text>
                     </TouchableOpacity>
                 )}
@@ -57,7 +65,10 @@ const SparkLightInput = ({
                 borderColor: isFocused && !error ? Color.sparklightBrightPurple : Color.sparklightDarkGray
             }]}>
                 {showTextIcon &&
-                    <Image style={styles.lockIcon} source={require('../../../../assets/password_lock.png')} />
+                <View style={styles.lockIcon}>
+                    <Passwordlock/>
+                </View>
+                    // <Image style={styles.lockIcon} source={require('../../../../assets/password_lock.png')} />
                 }
 
                 <TextInput
@@ -84,7 +95,10 @@ const SparkLightInput = ({
             </View>
             {error && (
                 <View style={styles.errorContainer}>
-                    <Image source={warningIcon} style={styles.errorIcon} />
+                    <View style={styles.errorIcon}>
+                        <WarningIcon/>
+                    </View>
+                    {/* <Image source={warningIcon} style={styles.errorIcon} /> */}
                     <Text style={styles.errorText}>{error}</Text>
                 </View>
             )}

@@ -139,7 +139,7 @@ const EmailNotifications = ({ navigation }) => {
               accessibilityLabel="Email address input section"
             >
               <EntryInput
-                iconImage={require("../../../assets/mail.png")}
+                name="email"
                 placeholder="Email Address"
                 input={input}
                 onChangeText={onChangeText}

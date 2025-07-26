@@ -225,7 +225,7 @@ const EmailNotifications = () => {
           style={styles.deleteButton}
         >
           <Image
-            source={require("../../../assets/right-actionable6.png")}
+            //source={require("../../../assets/right-actionable6.png")}
             importantForAccessibility="no"
           />
         </Pressable>

@@ -136,7 +136,7 @@ const UserManagement = ({route}) => {
               <Image
                 style={styles.rightActionableIcon}
                 resizeMode="cover"
-                source={require("../../../assets/right-actionable5.png")}
+                //source={require("../../../assets/right-actionable5.png")}
               />
             </Pressable>
           )}
@@ -151,7 +151,7 @@ const UserManagement = ({route}) => {
               <Image
                 style={styles.rightActionableIcon}
                 resizeMode="cover"
-                source={require("../../../assets/right-actionable6.png")}
+                //source={require("../../../assets/right-actionable6.png")}
               />
             </Pressable>
           )}

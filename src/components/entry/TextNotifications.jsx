@@ -146,7 +146,7 @@ const TextNotifications = ({ navigation }) => {
                             }}                            
                         >
                             <EntryInput
-                                iconImage={require('../../../assets/phone.png')}
+                                name="phone"
                                 placeholder="Phone number"
                                 input={input}
                                 onChangeText={onChangeText}

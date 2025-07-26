@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../../GlobalStyles';
 import { widthPercentageToDP as wp,heightPercentageToDP as hp} from 'react-native-responsive-screen';
+import SearchIcon from '../../../../assets/svgs/searchmd';
 const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,navigation, onEndReached,Footer }) => {
     const inputRef = useRef(null);
     const [input, setInput] = useState('');
@@ -48,10 +49,13 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
     return (
         <View style={styles.flatList}>
         <View style={styles.inputContainer}>
-            <Image
+            <View style={[styles.searchIcon, styles.leftIcon]}>
+                <SearchIcon/>
+            </View>
+            {/* <Image
                 source={require('../../../../assets/search-md-1.png')}
                 style={[styles.searchIcon, styles.leftIcon]}
-            />
+            /> */}
             <TextInput
                     maxFontSizeMultiplier={1.25}
                     ref={inputRef}
