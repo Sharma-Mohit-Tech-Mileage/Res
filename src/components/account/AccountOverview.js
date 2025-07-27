@@ -9,7 +9,7 @@ import passwordSecurityIcon from '../../../assets/right-actionable16.png';
 import notificationsIcon from '../../../assets/right-actionable17.png';
 import userManagementIcon from '../../../assets/right-actionable18.png';
 //import feedbackicon from '../../../assets/message-alert-circle.png';
-import feedbackicon from '../../../assets/svgs/messagealertcircle';
+import feedbackicon from '../../../assets/svgs/Messagealertcircle';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
@@ -229,38 +229,43 @@ const AccountOverview = () => {
               <View style={AppStyles.card}>
                 {/* Mapping through menu items */}
                 {menues.map((item, index) => (
-                  item.includeInMenu && (<React.Fragment key={item.name}>
-                    <Pressable
-                      style={[styles.rightActionableGroup, styles.tabsFlexBox]}
-                      onPress={item.onPress}
-                      accessibilityLabel={item.name}
-                      accessibilityHint={`Navigates to ${item.name}`}
-                      accessibilityRole="button"
-                    >
-                      {/* Menu item icon */}
-                      <Image
-                        style={styles.rightIconLayout}
-                        resizeMode='contain'
-                        source={item.icon}
-                        accessible
-                        accessibilityLabel={`${item.name} icon`}
-                      />
-                      {/* Menu item text */}
-                      <Text style={[styles.profileSettings, styles.makePaymentTypo]}>
-                        {item.name}
-                      </Text>
-                      {/* Chevron/Arrow icon */}
-                      <Image
-                        style={[{ marginLeft: 10 }, styles.rightIconLayout]}
-                        resizeMode="cover"
-                        source={chevronRightIcon}
-                        accessible
-                        accessibilityLabel="Arrow right"
-                      />
-                    </Pressable>
-                    {/* Divider, if not the last item */}
-                    {item.includeInMenu && index < menuItems.length - 1 && <View style={styles.frameChild} />}
-                  </React.Fragment>
+                  item.includeInMenu && (
+                    <React.Fragment key={item.name}>
+                      <Pressable
+                        style={[styles.rightActionableGroup, styles.tabsFlexBox]}
+                        onPress={item.onPress}
+                        accessibilityLabel={item.name}
+                        accessibilityHint={`Navigates to ${item.name}`}
+                        accessibilityRole="button"
+                      >
+                        {/* Menu item icon */}
+                        {typeof item.icon === 'function' ? (
+                          <item.icon width={24} height={24} />
+                        ) : (
+                          <Image
+                            style={styles.rightIconLayout}
+                            resizeMode='contain'
+                            source={item.icon}
+                            accessible
+                            accessibilityLabel={`${item.name} icon`}
+                          />
+                        )}
+                        {/* Menu item text */}
+                        <Text style={[styles.profileSettings, styles.makePaymentTypo]}>
+                          {item.name}
+                        </Text>
+                        {/* Chevron/Arrow icon */}
+                        <Image
+                          style={[{ marginLeft: 10 }, styles.rightIconLayout]}
+                          resizeMode="cover"
+                          source={chevronRightIcon}
+                          accessible
+                          accessibilityLabel="Arrow right"
+                        />
+                      </Pressable>
+                      {/* Divider, if not the last item */}
+                      {item.includeInMenu && index < menuItems.length - 1 && <View style={styles.frameChild} />}
+                    </React.Fragment>
                   )))}
               </View>
               <View style={styles.buttonContainer}>
