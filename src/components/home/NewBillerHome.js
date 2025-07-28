@@ -18,23 +18,25 @@ import MenuGrid from "../ACPDashboard/MenuGrid";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
-import { GetApiRequest } from "../../network/APIClient";
+import { GetApiRequest,PostApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { useMaintenance } from '../maintenance/MaintenanceContext';
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
+import LoadingOverlay from "../common/LoadingOverlay";
+import SmallLoader from "../common/customui/SmallLoader";
 const NewBillerHome = ({ navigation }) => {
   // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
   const [isOutageAlert, setIsOutageAlert] = useState(false);
-  const [checkModemStatus, setCheckModemStatus] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [internetHealths, setInternetHealths] = useState([]);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [loadingAutoPay, setloadingAutoPay] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const { showBanner, showMaintenancePage, bannerConfig, pageConfig, dismissBanner } = useMaintenance();
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
   const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: "", latestVersion: "", });
@@ -55,6 +57,34 @@ const NewBillerHome = ({ navigation }) => {
   const showDisconnectedBanner = userInfo ? 
     isAccountDisconnected(userInfo.acctStatus, userInfo.daysSinceDisconnectDate) : false;
 
+  /* Function to check outage status */
+    const checOutagStatus = () => {
+      setLoading(true);
+        getUser().then((res) => {
+          const request = `api/outage/GetOutages/?accountNumber=${res.userInfo.accountNumber}`;
+          PostApiRequest(
+            request,
+            {},
+            (response) => {
+              setLoading(false);
+              console.log("checOutagStatus response", response);
+              if (response?.error==false && response?.outageStatus) {
+                console.log("its outage");
+                setIsOutageAlert(true);
+                setEstimatedRestoreTime(moment(response?.restoredBy).format('LT'));
+              } else {
+                setIsOutageAlert(false);
+              }
+            },
+            (errorCode) => {
+              setLoading(false);
+              console.log("checOutagStatus error", errorCode);
+              
+            }
+          );
+        });
+      };
+    
     const getStatus = () => {
       setloadingAutoPay(true);
         getUser().then((res) => {
@@ -78,10 +108,12 @@ const NewBillerHome = ({ navigation }) => {
       console.log("paperlessLoading",JSON.stringify(paperlessLoading));
       const refreshData = async () => {
         try {
+          checOutagStatus();
           const status = await checkForMinorUpdate();
           setUpdateStatus(status);
           dispatch(fetchACPUserAccountDetails());
           getStatus();
+          
         } catch (error) {
           console.error("Error refreshing data on focus", error);
         }
@@ -105,11 +137,11 @@ const NewBillerHome = ({ navigation }) => {
   }, [defaultPaymentDetails.email, dispatch]);
 
   // Check modem status based on internet health count
-  useEffect(() => {
-    if (internetHealths.length >= 3) {
-      setCheckModemStatus(true);
-    }
-  }, [internetHealths]);
+  // useEffect(() => {
+  //   if (internetHealths.length >= 3) {
+  //     setCheckModemStatus(true);
+  //   }
+  // }, [internetHealths]);
 
   // Update local state when account details are received
   useEffect(() => {
@@ -230,7 +262,11 @@ const NewBillerHome = ({ navigation }) => {
         <ScrollView style={styles.scrollContainer}>
           <View style={styles.mainContentContainer}>
             {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
-            {isOutageAlert && renderOutageAlert()}
+            {isLoading ? 
+            <View style={{zIndex:10}}>
+            <SmallLoader/> 
+            </View> 
+            : isOutageAlert && renderOutageAlert()}
              {showBanner && bannerConfig && (
         <MaintenanceBanner
           title={bannerConfig.title}
@@ -244,6 +280,7 @@ const NewBillerHome = ({ navigation }) => {
         />
         )}
             {renderWelcomeCard()}
+            
           </View>
         </ScrollView>
       </SafeAreaView>
