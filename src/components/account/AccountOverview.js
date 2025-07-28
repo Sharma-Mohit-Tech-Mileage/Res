@@ -3,11 +3,11 @@ import { Image, StyleSheet, Text, View, Pressable, Alert, ScrollView } from "rea
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
-import chevronRightIcon from '../../../assets/chevronright.png';
-import profileSettingsIcon from '../../../assets/right-actionable15.png';
-import passwordSecurityIcon from '../../../assets/right-actionable16.png';
-import notificationsIcon from '../../../assets/right-actionable17.png';
-import userManagementIcon from '../../../assets/right-actionable18.png';
+
+import ProfileSettingsIcon from '../../../assets/svgs/Rightactionable15';
+import PasswordSecurityIcon from '../../../assets/svgs/Rightactionable16';
+import NotificationsIcon from '../../../assets/svgs/Rightactinable17';
+import UserManagementIcon from '../../../assets/svgs/Rightactionable18';
 //import feedbackicon from '../../../assets/message-alert-circle.png';
 import feedbackicon from '../../../assets/svgs/Messagealertcircle';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
@@ -23,6 +23,7 @@ import AppStyles from "../common/styles/AppStyles";
 import UserIconWhite from "../../res/svgIcons/UserIconWhite";
 import moment from "moment";
 import analytics from '@react-native-firebase/analytics';
+import RightIcon from '../../../assets/svgs/Chevonright';
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -106,28 +107,28 @@ const AccountOverview = () => {
     {
       name: 'Profile',
       onPress: () => navigation.navigate('ProfileSettings'),
-      icon: profileSettingsIcon,
+      icon: ProfileSettingsIcon,
       accessibilityLabel: 'Navigate to profile',
       includeInMenu: true,
     },
     {
       name: 'Password & Security',
       onPress: () => navigation.navigate('PasswordSecurity'),
-      icon: passwordSecurityIcon,
+      icon: PasswordSecurityIcon,
       accessibilityLabel: 'Navigate to password and security settings',
       includeInMenu: true,
     },
     {
       name: 'Notifications',
       onPress: () => navigation.navigate('Notifications'),
-      icon: notificationsIcon,
+      icon: NotificationsIcon,
       accessibilityLabel: 'Navigate to notifications settings',
       includeInMenu: true,
     },
     {
       name: 'User Management',
       onPress: () => navigation.navigate('UserManagement'),
-      icon: userManagementIcon,
+      icon: UserManagementIcon,
       accessibilityLabel: 'Navigate to user management settings',
       includeInMenu: true,
     },
@@ -144,7 +145,7 @@ const AccountOverview = () => {
     {
       name: 'Profile',
       onPress: () => navigation.navigate('ProfileSettings'),
-      icon: profileSettingsIcon,
+      icon: ProfileSettingsIcon,
       accessibilityLabel: 'Navigate to profile',
       includeInMenu: true,
     },
@@ -153,14 +154,14 @@ const AccountOverview = () => {
     {
       name: 'Password & Security',
       onPress: () => navigation.navigate('PasswordSecurity'),
-      icon: passwordSecurityIcon,
+      icon: PasswordSecurityIcon,
       accessibilityLabel: 'Navigate to password and security settings',
       includeInMenu: true,
     },
     {
       name: 'Notifications',
       onPress: () => navigation.navigate('Notifications'),
-      icon: notificationsIcon,
+      icon: NotificationsIcon,
       accessibilityLabel: 'Navigate to notifications settings',
       includeInMenu: true,
     },
@@ -240,28 +241,23 @@ const AccountOverview = () => {
                       >
                         {/* Menu item icon */}
                         {typeof item.icon === 'function' ? (
-                          <item.icon width={24} height={24} />
+                          <item.icon width={28} height={28} />
                         ) : (
-                          <Image
-                            style={styles.rightIconLayout}
-                            resizeMode='contain'
-                            source={item.icon}
-                            accessible
-                            accessibilityLabel={`${item.name} icon`}
-                          />
+                    
+                          <View accessible={true} accessibilityLabel={`${item.name} icon`}
+                          style={styles.rightIconLayout}>
+                            <item.icon />
+                          </View>
                         )}
                         {/* Menu item text */}
                         <Text style={[styles.profileSettings, styles.makePaymentTypo]}>
                           {item.name}
                         </Text>
                         {/* Chevron/Arrow icon */}
-                        <Image
-                          style={[{ marginLeft: 10 }, styles.rightIconLayout]}
-                          resizeMode="cover"
-                          source={chevronRightIcon}
-                          accessible
-                          accessibilityLabel="Arrow right"
-                        />
+                        <View style={[{ marginLeft: 10 }, styles.rightIconLayout]}>
+                          <RightIcon />
+                          </View>
+                        
                       </Pressable>
                       {/* Divider, if not the last item */}
                       {item.includeInMenu && index < menuItems.length - 1 && <View style={styles.frameChild} />}
@@ -375,6 +371,8 @@ const styles = StyleSheet.create({
   rightIconLayout: {
     height: 24,
     width: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 5
   },
   title: {

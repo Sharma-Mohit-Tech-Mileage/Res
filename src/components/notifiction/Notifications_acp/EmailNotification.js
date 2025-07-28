@@ -16,6 +16,8 @@ import LoadingOverlay from "../../common/customui/CustomLoading";
 import { updatePrimaryAndPaperlessRequest } from "../../../redux/actions/NotificationActionSuite";
 import { fetchACPUserAccountDetails, getPaperlessStatus } from "../../../redux/actions/ProfileActionSuite";
 import { getPrimaryEmail } from "../../utility/constant";
+import Checkcircle from '../../../../assets/svgs/Checkcircle';
+import Checkcircle1 from '../../../../assets/svgs/Checkcircle1';
 
 const validationSchema = yup.object().shape({
   email: yup.string().email("Invalid email address").required("Email is required"),
@@ -289,12 +291,15 @@ const AddNotificationScreen = () => {
               <View style={styles.toggleHeader}>
                 <Text style={styles.toggleTitle}>Critical Notifications</Text>
                 <View style={styles.iconContainer}>
-                  <Image
+                  <View style={styles.icon}>
+                    <Checkcircle />
+                  </View>
+                  {/* <Image
                     style={styles.icon}
                     resizeMode="cover"
                     source={require("../../../../assets/checkcircle.png")}
                     accessible={false}
-                  />
+                  /> */}
                   <Text style={styles.toggleStatus}>On</Text>
                 </View>
               </View>

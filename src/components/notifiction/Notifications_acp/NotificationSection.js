@@ -2,25 +2,23 @@
 import React from 'react';
 import { View, Text, Pressable, Image, StyleSheet } from 'react-native';
 import { Color, Padding, FontSize, FontFamily, Border } from '../../../../GlobalStyles';
+import Checkcircle from '../../../../assets/svgs/Checkcircle';
+import Checkcircle1 from '../../../../assets/svgs/Checkcircle1';
+import InfoICon from '../../../../assets/svgs/Infocircle';
 
 // Sub-components
 const StatusIcon = ({ status }) => (
-  <Image
+  <View
     style={styles.icon}
-    resizeMode="cover"
-    source={status === 'On' ? 
-      require('../../../../assets/checkcircle.png') : 
-      require('../../../../assets/checkcircle1.png')
-    }
-  />
+>
+  {status==='On'? <Checkcircle /> : <Checkcircle1 />}
+</View>
 );
 
 const InfoIcon = () => (
-  <Image
-    style={styles.icon}
-    resizeMode="contain"
-    source={require('../../../../assets/Icon/Info.png')}
-  />
+  <View style={styles.icon}>
+    <InfoICon />
+  </View>
 );
 
 const EditButton = ({ onPress }) => (

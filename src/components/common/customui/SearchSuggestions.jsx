@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../../GlobalStyles';
 import { widthPercentageToDP as wp,heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import SearchIcon from '../../../../assets/svgs/searchmd';
+import SearchIcon from '../../../../assets/svgs/SearchIcon';
+import Rightactionable from '../../../res/svgIcons/RightArrow';
 const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,navigation, onEndReached,Footer }) => {
     const inputRef = useRef(null);
     const [input, setInput] = useState('');
@@ -39,9 +40,9 @@ const SearchSuggestions = memo(({ placeholder, onChangeInput, suggestions,naviga
             />
             <Text maxFontSizeMultiplier={1.25} style={styles.suggestionText}>{item.title}</Text>
             {(item.html_url!='') ?
-            <Image
-                source={require('../../../../assets/right-actionable10.png')}
-            />
+            <View>
+                <Rightactionable/>
+            </View>
                 : <></>}
         </TouchableOpacity>
     );

@@ -16,7 +16,7 @@ import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import CheckBox from "@react-native-community/checkbox";
 import Tooltip from "rn-tooltip";
-import WarningIcon from "../../../assets/alert-triangle.png";
+import WarningIcon from "../../../assets/svgs/Alerttriangle";
 import {
   Color,
   Padding,
@@ -894,7 +894,9 @@ const CancellationSummary = ({ navigation, route }) => {
           </TouchableOpacity>
           {!toggleCheckBoxTerm && isSubmitted && (
             <View style={{ flexDirection: "row", marginHorizontal: 24 }}>
-              <Image style={styles.errorIcon} source={WarningIcon} />
+              <View style={styles.errorIcon}>
+                <WarningIcon/>
+              </View>
               <Text
                 style={[
                   styles.checkBoxAreaViewText,

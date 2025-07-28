@@ -36,6 +36,8 @@ import {
 import CustomerErrorPage from "../utility/SystemErrorPopup";
 import AppStyles from "../common/styles/AppStyles";
 import SupportIcon from "../../res/svgIcons/NewSupportIcon";
+import RighIcon from "../../../assets/svgs/Chevonright";
+import Searchmd from "../../../assets/svgs/Searchmd";
 
 const Support = ({ route }) => {
   const navigation = useNavigation();
@@ -48,7 +50,7 @@ const Support = ({ route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isAgentNotAvailable, setIsAgentNotAvailable] = useState(false);
 
-  const rightIcon = require("../../../assets/chevronright.png");
+  
   const makeCall = (number) => {
     let phoneNumber = "";
 
@@ -236,14 +238,14 @@ const Support = ({ route }) => {
     {
       key: "searchIssues",
       text: "Search",
-      icon: require("../../../assets/search-md.png"),
+      icon: Searchmd,
       iconAlignment: "left", // Icon to the left of the text
       navigateTo: "searchArticals",
     },
     {
       key: "Faqs",
       text: "FAQs",
-      icon: require("../../../assets/chevronright.png"),
+      icon: RighIcon,
       iconAlignment: "right", // Icon to the left of the text
       navigateTo: "ArticalWindowUtility",
       url: "https://support.sparklight.com/hc/en-us/articles/18929657224855?isMobile=true",
@@ -251,7 +253,7 @@ const Support = ({ route }) => {
     {
       key: "moreOptions",
       text: "Billing & Payments",
-      icon: require("../../../assets/chevronright.png"),
+      icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
       url: "https://support.sparklight.com/hc/en-us/categories/15840476056727-Billing-Payments?isMobile=true",
@@ -259,7 +261,7 @@ const Support = ({ route }) => {
     {
       key: "moreOptions",
       text: "Internet Service",
-      icon: require("../../../assets/chevronright.png"),
+      icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
       url: "https://support.sparklight.com/hc/en-us/categories/115000833068-Internet?isMobile=true",
@@ -267,7 +269,7 @@ const Support = ({ route }) => {
     {
       key: "moreOptions",
       text: "WiFi",
-      icon: require("../../../assets/chevronright.png"),
+      icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
       url: "https://support.sparklight.com/hc/en-us/categories/115001419607-WiFi?isMobile=true",
@@ -275,7 +277,7 @@ const Support = ({ route }) => {
     {
       key: "moreOptions",
       text: "More...",
-      icon: require("../../../assets/chevronright.png"),
+      icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
       url: "https://support.sparklight.com/hc/en-us?isMobile=true",
@@ -425,15 +427,16 @@ const Support = ({ route }) => {
                       },
                     ]}
                   >
-                    <Image
-                      source={item.icon}
+                    <View
                       style={[
                         styles.iconStyle,
                         item.iconAlignment === "right"
                           ? styles.iconRight
                           : styles.iconLeft,
                       ]}
-                    />
+                    >
+                      <item.icon/>
+                    </View>
                     {item.iconAlignment === "right" ? (
                       <Text style={[styles.searchChild, styles.textTypoRight]}>
                         {item.text}
@@ -493,8 +496,7 @@ const Support = ({ route }) => {
                         paddingHorizontal: Padding.p_base,
                       }}
                     >
-                      <Image
-                        source={rightIcon}
+                      <View
                         style={[
                           {
                             width: 20,
@@ -504,7 +506,9 @@ const Support = ({ route }) => {
                             marginTop:10
                           },
                         ]}
-                      />
+                      >
+                        <RighIcon/>
+                      </View>
                       <Text
                         style={[
                           styles.textTypoRight,

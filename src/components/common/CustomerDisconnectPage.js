@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import colors from "../../res/Colors";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
-import warningIcon from "../../../assets/alert-triangle.png";
+import WarningIcon from "../../../assets/svgs/Alerttriangle"
 
 import logo from "../../../assets/sparklightlogo-01.png";
 
@@ -41,7 +41,9 @@ const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
 
           <Text style={[styles.message, { fontSize: 16 }]}>{msg1}</Text>
           <View style={{ flexDirection: "row", marginTop: 10 }}>
-            <Image source={warningIcon} style={{ width: 24, height: 24 }} />
+            <View style={{ width: 24, height: 24 }} >
+              <WarningIcon/>
+            </View>
             <Text style={{ textAlign: "center", marginLeft: 5, alignSelf: "center", fontWeight: "600", fontFamily: FontFamily.openSansSemiBold, }} >
               We're sorry!
             </Text>

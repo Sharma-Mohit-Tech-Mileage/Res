@@ -3,6 +3,9 @@ import { View, Text, Pressable, Image, StyleSheet } from "react-native";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { useNavigation } from "@react-navigation/native";
 import { Padding, Color, FontSize, FontFamily, Border } from "../../../GlobalStyles";
+import Checkcircle from '../../../assets/svgs/Checkcircle';
+import Checkcircle1 from '../../../assets/svgs/Checkcircle1';
+import InfoIcon from '../../../assets/svgs/Infocircle';
 
 const NotificationSection = ({
   title,
@@ -81,7 +84,7 @@ const NotificationSection = ({
                 <Image
                   style={styles.icon}
                   resizeMode="contain"
-                  source={require("../../../assets/Icon/Info.png")}
+                  source={InfoIcon}
                 />
               </View>
               <Text style={styles.infoText}>{infoText}</Text>
@@ -110,16 +113,16 @@ const NotificationType = ({ type, status, warn, isLastItem }) => {
     case 'On':
     case 'Subscribed':
       displayStatus = status;
-      imageSource = require("../../../assets/checkcircle.png");
+      imageSource = Checkcircle
       break;
     case 'Off':
     case 'Unsubscribed':
       displayStatus = status;
-      imageSource = require("../../../assets/checkcircle1.png");
+      imageSource = Checkcircle1
       break;
     default:
       displayStatus = 'Unknown';
-      imageSource = require("../../../assets/checkcircle1.png");
+      imageSource = Checkcircle1
       break;
   }
 
@@ -127,7 +130,10 @@ const NotificationType = ({ type, status, warn, isLastItem }) => {
     <View style={[styles.settingRow, !isLastItem && styles.settingRowBorder, warn && { backgroundColor: Color.colorlightRed }]}>
       <Text style={styles.settingText}>{type}</Text>
       <View style={styles.statusWrapper}>
-        <Image style={styles.icon} resizeMode="cover" source={imageSource} />
+        {/* <Image style={styles.icon} resizeMode="cover" source={imageSource} /> */}
+        <View style={styles.icon}>
+          {imageSource}
+        </View>
         <Text style={styles.statusText}>{displayStatus}</Text>
       </View>
     </View>

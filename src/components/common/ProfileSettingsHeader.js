@@ -10,12 +10,14 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
+import LeftIcon from '../../../assets/svgs/Chevronleft';
+
 
 const ProfileSettingsHeader = ({
     title,
     onPressBack,
     iconAlignment = 'right',
-    iconSource = require("../../../assets/chevronleft.png"),
+    iconSource = LeftIcon,
     showIcon = true
 }) => {
     const [iconPressed, setIconPressed] = useState(false);
@@ -53,11 +55,14 @@ const ProfileSettingsHeader = ({
                                 onPressIn={handlePressIn}
                                 onPressOut={handlePressOut}
                             >
-                                <Image
+                                {/* <Image
                                     style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                                     resizeMode="cover"
                                     source={iconSource}
-                                />
+                                /> */}
+                                <View style={[styles.icon, iconPressed ? styles.iconPressed : null]}>
+                                    <LeftIcon/>
+                                </View>
                             </Pressable>
                         </View>
                     )}

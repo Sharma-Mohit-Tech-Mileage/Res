@@ -1,5 +1,5 @@
 import * as React from "react"
-import{ Svg ,Path,G,Defs} from "react-native-svg";
+import{ Svg ,Path,G,Defs,ClipPath} from "react-native-svg";
 const Checkcircle1 = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
@@ -18,9 +18,9 @@ const Checkcircle1 = (props) => (
       />
     </G>
     <Defs>
-      <clipPath id="a">
-        <path fill="#fff" d="M0 0h16v16H0z" />
-      </clipPath>
+      <ClipPath id="a">
+        <Path fill="#fff" d="M0 0h16v16H0z" />
+      </ClipPath>
     </Defs>
   </Svg>
 )
