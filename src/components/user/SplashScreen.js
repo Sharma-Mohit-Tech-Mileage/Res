@@ -21,6 +21,7 @@ import LoginLogger from "../../components/utility/LoginLogger";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import analytics from '@react-native-firebase/analytics';
 import { shouldBlockLogin } from "../utility/disconnectHelpers";
+import Logo from "../../res/images/SpalshLogo";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -430,17 +431,17 @@ const SplashScreen = ({ navigation, route }) => {
           justifyContent: 'center',
           opacity: backgroundFade
         }}>
-          <Animated.Image
-            resizeMode="contain"
-            source={require("../../res/images/Logo.png")}
-            style={[styles.logo, {
-              opacity: logoFade,
-              transform: [{ translateY: logoMovement }]
-            }]}
+          <Animated.View
+            style={[
+              styles.logo,
+              { opacity: logoFade, transform: [{ translateY: logoMovement }] },
+            ]}
             accessibilityRole="image"
             accessibilityLabel="SparkLight"
             accessible={true}
-          />
+          >
+            <Logo  />
+          </Animated.View>
         </Animated.View>
       </View>
 

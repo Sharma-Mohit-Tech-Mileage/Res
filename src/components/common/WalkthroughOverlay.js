@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { FontSize, FontFamily, Color, Border } from "../../../GlobalStyles";
 
+
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
 const WalkthroughOverlay = ({ onFinish }) => {

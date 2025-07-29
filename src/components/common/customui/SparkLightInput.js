@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { FontFamily, Padding, Color, FontSize, Border } from "../../../../GlobalStyles";
-import WarningIcon from '../../../../assets/svgs/alerttriangle';
+import WarningIcon from '../../../../assets/svgs/Alerttriangle';
 import EyeIcon from '../../../../assets/svgs/EyeIcon';
 import EyeSlashIcon from '../../../../assets/svgs/EyeHide';
-import Passwordlock from '../../../../assets/svgs/passwordlock';
+import Passwordlock from '../../../../assets/svgs/Passwordlock';
 
 
 const MyPassIcon = (passwordVisible) => {

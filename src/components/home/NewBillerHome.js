@@ -24,6 +24,7 @@ import { useMaintenance } from '../maintenance/MaintenanceContext';
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
+import LogoSmall from "../../../src/res/images/LogoSmall";
 const NewBillerHome = ({ navigation }) => {
   // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
@@ -140,13 +141,20 @@ const NewBillerHome = ({ navigation }) => {
       accessibilityLabel="SparkLight"
       style={styles.headerContainer}
     >
-      <Image
+      <View
+              accessible={true}
+              accessibilityLabel={`SparkLight Bussiness`}
+
+            >
+              <LogoSmall/>
+            </View>
+      {/* <Image
         accessible={!showWalkThrough}
         accessibilityLabel="SparkLight"
         resizeMode="contain"
         style={styles.logoImage}
         source={require("../../../assets/SparklightEntryLogo.png")}
-      />
+      /> */}
     </View>
   );
 

@@ -9,12 +9,7 @@ import PasswordSecurityEdit from '../../components/userProfile/PasswordSecurityE
 
 // Import normal notification components
 import Notifications from '../../components/notifiction/Notifications_acp/Notifications';
-
 import AddEmailNotification from '../../components/notifiction/Notifications_acp/EmailNotification';
-import InAppNotifications from '../../components/notifiction/InAppNotifications';
-import TextNotifications from '../../components/notifiction/TextNotifications';
-
-
 import EmailNotifications_acp from '../../components/notifiction/Notifications_acp/EmailNotification';
 
 import Feedback from '../../components/support/Feedback';
@@ -138,24 +133,8 @@ function AccountStackScreen() {
           blur: () => setTabBarVisible(true),
         }}
       />
-      <AccountStack.Screen
-        name="TextNotifications"
-        component={TextNotifications}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
-      <AccountStack.Screen
-        name="InAppNotifications"
-        component={InAppNotifications}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
+      
+      
       <AccountStack.Screen
         name="ArticalWindowUtility"
         component={ArticalWindowUtility}
