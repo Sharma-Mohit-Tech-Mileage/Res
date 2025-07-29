@@ -262,11 +262,7 @@ const NewBillerHome = ({ navigation }) => {
         <ScrollView style={styles.scrollContainer}>
           <View style={styles.mainContentContainer}>
             {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
-            {isLoading ? 
-            <View style={{zIndex:10}}>
-            <SmallLoader/> 
-            </View> 
-            : isOutageAlert && renderOutageAlert()}
+            {isOutageAlert && renderOutageAlert()}
              {showBanner && bannerConfig && (
         <MaintenanceBanner
           title={bannerConfig.title}
