@@ -11,7 +11,6 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 export const AlertComponent = ({ 
   title, 
   message, 
-  message2,
   indicatorColor, // Now used for determining background and border colors
   iconTint, 
   titleStyle, 
@@ -103,7 +102,6 @@ export const AlertComponent = ({
               </Text>
             )}
             {actionText && "and keep your app running smoothly."}
-            {message2 && message2}
           </Text>
         </View>
         
@@ -133,13 +131,12 @@ export const AlertUtils = {
    */
   createOutageAlert: (estimatedRestoreTime, onClose) => (
     <AlertComponent
-      title="Service Alert"
-      message="We're currently experiencing an outage in your area. Our team is working hard to resolve the issue. The estimated resolution time is "
+      title="Outage Notification"
+      message="Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible."
       indicatorColor="#F88700" // Maps to warning styling internally
       iconTint="#DD6D02" // Use finalized warning color for icon
       titleStyle={{ color: "#DD6D02" }}
-      boldText={`${estimatedRestoreTime}.`}
-      message2={" We apologize for any inconvenience this may cause."}
+      boldText={`Estimated Time to Restore: ${estimatedRestoreTime}.`}
       iconSource={require("../../../assets/Icon/TriangleAlert.png")} // Warning icon
       onClose={onClose}
     />
