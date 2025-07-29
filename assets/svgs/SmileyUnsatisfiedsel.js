@@ -10,7 +10,7 @@ const SmileyUnsatisfiedsel = (props) => (
     {...props}
   >
     <Path
-      stroke="#001321"
+      stroke= { props?.color ? props.color : "#001321"}
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}

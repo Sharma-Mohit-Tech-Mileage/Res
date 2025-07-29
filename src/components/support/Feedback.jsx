@@ -10,19 +10,19 @@ import SparkLightInput from '../common/customui/SparkLightInput';
 import NotificationAlert from '../common/customui/NotificationAlert';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveUserFeedback } from '../../redux/actions/ProfileActionSuite';
-import LeftIcon from '../../../assets/svgs/Chevronleft';
-import facesad from '../../../assets/svgs/SmileyUnsatisfiedsel';
-import facefrown from '../../../assets/svgs/facefrown';
-import faceneutral from '../../../assets/svgs/faceneutral';
-import facesmile from '../../../assets/svgs/facesmile';
-import facehappy from '../../../assets/svgs/facehappy';
+import Facesad from '../../../assets/svgs/SmileyUnsatisfiedsel';
+import Terrible from '../../../assets/svgs/SmileyVeryUnsatisfiedsel';
+import Faceneutral from '../../../assets/svgs/Smileyneutralsel';
+import Facesmile from '../../../assets/svgs/SmileySatisfiedsel';
+import Facehappy from '../../../assets/svgs/SmileyverySatisfiedsel';
+
 
 const feedbackOptions = [
-    { value: 1, category: 'complaint', name: 'facesad', text: 'Terrible', image: facesad, selectedImage: require("../../../assets/Terrible.png") },
-    { value: 2, category: 'complaint', name: 'facefrown', text: 'Poor', image: require("../../../assets/facefrown.png"), selectedImage: require("../../../assets/Poor.png") },
-    { value: 3, category: 'neutral', name: 'faceneutral', text: 'Neutral', image: require("../../../assets/faceneutral.png"), selectedImage: require("../../../assets/Neutral.png") },
-    { value: 4, category: 'compliment', name: 'facesmile', text: 'Satisfied', image: require("../../../assets/facesmile.png"), selectedImage: require("../../../assets/Satisfied.png") },
-    { value: 5, category: 'compliment', name: 'facehappy', text: 'Great', image: require("../../../assets/facehappy.png"), selectedImage: require("../../../assets/Great.png") },
+    { value: 1, category: 'complaint', name: 'facesad', text: 'Terrible', image: Terrible, selectedImage: Terrible },
+    { value: 2, category: 'complaint', name: 'facefrown', text: 'Poor', image: Facesad, selectedImage: Facesad },
+    { value: 3, category: 'neutral', name: 'faceneutral', text: 'Neutral', image: Faceneutral, selectedImage: Faceneutral },
+    { value: 4, category: 'compliment', name: 'facesmile', text: 'Satisfied', image: Facesmile, selectedImage: Facesmile },
+    { value: 5, category: 'compliment', name: 'facehappy', text: 'Great', image: Facehappy, selectedImage: Facehappy },
 ];
 const Feedback = () => {
 
@@ -117,11 +117,18 @@ const Feedback = () => {
                                     ]}
                                     onPress={() => handleIconPress(option)}
                                 >
-                                    <Image
+                                    <View style={styles.iconLayout}>
+                                        {selectedFeedback === option.name ? (
+                                            <option.selectedImage color='#fff' />
+                                        ) : (
+                                            <option.image />
+                                        )  }
+                                        </View>
+                                    {/* <Image
                                         style={styles.iconLayout}
                                         resizeMode="contain"
                                         source={selectedFeedback === option.name ? option.selectedImage : option.image}
-                                    />
+                                    /> */}
                                     <Text
                                         allowFontScaling={false}
                                         style={[

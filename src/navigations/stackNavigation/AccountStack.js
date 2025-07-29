@@ -17,8 +17,6 @@ import TextNotifications from '../../components/notifiction/TextNotifications';
 
 import EmailNotifications_acp from '../../components/notifiction/Notifications_acp/EmailNotification';
 
-import UserManagement from '../../components/userManagement/UserManagement';
-import UserManagementEdit from '../../components/userManagement/UserManagementEdit';
 import Feedback from '../../components/support/Feedback';
 import ThumbsUp from '../../components/support/ThumbsUp';
 import ArticalWindowUtility from '../../components/utility/ArticalWindowUtility';
@@ -152,24 +150,6 @@ function AccountStackScreen() {
       <AccountStack.Screen
         name="InAppNotifications"
         component={InAppNotifications}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
-      <AccountStack.Screen
-        name="UserManagement"
-        component={UserManagement}
-        options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
-      />
-      <AccountStack.Screen
-        name="UserManagementEdit"
-        component={UserManagementEdit}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),

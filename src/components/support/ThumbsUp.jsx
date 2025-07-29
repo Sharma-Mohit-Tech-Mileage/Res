@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, Pressable, View, ScrollView } from "react-nati
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useNavigation } from "@react-navigation/native";
 import { Padding, Border, FontSize, Color, FontFamily } from "../../../GlobalStyles";
+import ThumbsupIcon from "../../../assets/svgs/Thumbsup";
 
 const ThumbsUp = () => {
     const navigation = useNavigation();
@@ -22,12 +23,7 @@ const ThumbsUp = () => {
                             accessibilityLabel="Thumbs up icon indicating successful feedback submission"
                             accessibilityRole="image"
                         >
-                            <Image
-                                accessible={true}
-                                style={styles.image}
-                                resizeMode="cover"
-                                source={require("../../../assets/thumbsup.png")}
-                            />
+                         <ThumbsupIcon/>
                         </View>
                         <View style={styles.textContainer}>
                             <Text

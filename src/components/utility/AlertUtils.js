@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet, Linking, Platform } from "react-native";
 import {Color, FontFamily } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
+import Infocircle from "../../../assets/svgs/Infocircle";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 
 /**
@@ -68,12 +69,15 @@ export const AlertComponent = ({
         mergedStyles.alertRowContainer,
         !onClose && mergedStyles.alertRowContainerNoClose
       ]}>
-        <Image
+        {/* <Image
           style={mergedStyles.alertIcon}
           resizeMode="contain"
           tintColor={iconTint}
           source={iconSource || require("../../../assets/info-circle.png")}
-        />
+        /> */}
+        <View style={mergedStyles.alertIcon}>
+         { iconSource? <iconSource/> :<Infocircle />}
+        </View>
         
         <View style={mergedStyles.alertContentContainer}>
           <View style={mergedStyles.alertTitleRow}>

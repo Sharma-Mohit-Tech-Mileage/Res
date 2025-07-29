@@ -10,6 +10,8 @@ import CustomerErrorPage from "../utility/SystemErrorPopup";
 import { deleteSVEmailRequest, fetchSvEmailAssociation, updateEmailAssociations, fetchBillingPaper } from '../../redux/actions/ProfileActionSuite';
 import LoadingOverlay from '../common/customui/CustomLoading';
 import { extractAcknowledgementEmail } from '../../components/utility/constant';
+import Checkcircle from "../../../assets/svgs/Checkcircle";
+import Checkcircle1 from "../../../assets/svgs/Checkcircle1";
 
 const EmailNotifications = () => {
   const scrollViewRef = useRef(null);
@@ -284,15 +286,10 @@ const EmailNotifications = () => {
             <Text style={[styles.emailText, { fontWeight: '600' }]}>
               Critical Notifications
             </Text>
-            <Image
-              style={styles.icon}
-              resizeMode="contain"
-              source={emailsWithOnSettings?.length > 0 ?
-                require("../../../assets/checkcircle.png") :
-                require("../../../assets/checkcircle1.png")
-              }
-              importantForAccessibility="no"
-            />
+            <View style={styles.icon}>
+              {emailsWithOnSettings?.length > 0 ? <Checkcircle /> : <Checkcircle1 />}
+              </View>
+            
           </View>
           <Text
             style={[styles.infoText, { color: Color.colorGray_200 }]}
