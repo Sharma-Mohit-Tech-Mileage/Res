@@ -10,6 +10,7 @@ import VersionCheck from 'react-native-version-check';
 //import { color } from 'native-base/lib/typescript/theme/styled-system';
 import { Color, Padding, Border, FontFamily, FontSize,color } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
+import Logo from "../../res/images/LogoSmall"
 
 
 const MaintenancePage = ({
@@ -64,14 +65,19 @@ const MaintenancePage = ({
       <View style={styles.contentContainer}>
         {/* Logo with Version */}
         <View style={styles.logoContainer}>
-          <Image
+          {/* <Image
             resizeMode="contain"
             style={styles.logo}
             source={require("../../../assets/SparklightEntryLogo.png")}
             accessibilityRole="image"
             accessibilityLabel="Sparklight logo"
             accessible={true}
-          />
+          /> */}
+          <View style={styles.logo}
+           accessibilityRole="image"
+            accessibilityLabel="Sparklight logo" >
+            <Logo/>
+          </View>
           <Text 
             style={{ color: "white", alignSelf: "center", marginTop: 0.8, fontSize: 16, }} 
             accessibilityLabel={`Version ${VersionCheck.getCurrentVersion()}`}
