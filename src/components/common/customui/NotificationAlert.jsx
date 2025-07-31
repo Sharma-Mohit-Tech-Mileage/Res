@@ -233,14 +233,14 @@ const styles = StyleSheet.create({
        width: 20,
    },
    closeButton: {
-       position: 'absolute',
-       top: 0,
-       bottom: 0,
-       right: 8,
-       width: 16,
-       justifyContent: 'center',
-       alignItems: 'center',
-   },
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',       // vertically center in parent (if parent is a row)
+    width: 24,
+    height: 24,
+    marginLeft: 12,            // space from adjacent content
+    marginRight: 0,            // flush to right edge (or controlled by parent padding)
+},
    closeButtonText: {
        fontSize: 16,
        fontWeight: '700',

@@ -74,7 +74,6 @@ export const AlertComponent = ({
           tintColor={iconTint}
           source={iconSource || require("../../../assets/info-circle.png")}
         />
-        
         <View style={mergedStyles.alertContentContainer}>
           <View style={mergedStyles.alertTitleRow}>
             <Text style={[
@@ -85,7 +84,6 @@ export const AlertComponent = ({
               {title}
             </Text>
           </View>
-          
           <Text style={mergedStyles.alertMessage}>
             {message}
             {boldText && (
@@ -104,7 +102,6 @@ export const AlertComponent = ({
             {actionText && "and keep your app running smoothly."}
           </Text>
         </View>
-        
         {onClose && (
           <TouchableOpacity
             style={mergedStyles.closeButtonContainer}
@@ -203,13 +200,13 @@ const styles = StyleSheet.create({
     height: 22,
   },
   closeButtonContainer: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 8,
-    width: 16,
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'center', // vertical center in row
+    width: 24,
+    height: 24,
+    marginLeft: 12, // space from content
+    marginRight: 0, // flush to right edge
   },
   alertTitle: {
     fontFamily: FontFamily.textXsSemibold,
