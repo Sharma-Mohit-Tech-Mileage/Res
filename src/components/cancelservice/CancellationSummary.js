@@ -38,6 +38,7 @@ import moment from "moment";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { getPrimaryEmail } from "../utility/constant";
 import DownArrow from "../../res/svgIcons/DownArrow";
+import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -357,11 +358,14 @@ const CancellationSummary = ({ navigation, route }) => {
           justifyContent: "center",
         }}
       >
-        <Image
+        {/* <Image
           source={require("../../../assets/success.png")}
           size={48}
           style={{ marginBottom: 16 }}
-        />
+        /> */}
+        <View style={{ marginBottom: 16 }}> 
+          <SuccessIcon/>
+          </View>
         <Text
           style={{
             fontSize: 22,

@@ -14,6 +14,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import Pdf from 'react-native-pdf';
 import sharePDF from 'react-native-share-pdf';
 import { Padding, Color, FontFamily, Border, FontSize } from '../../../GlobalStyles';
+import Xclose from "../../../src/res/svgIcons/Xclose";
+import Share from "../../../src/res/svgIcons/Share";
 
 const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
   const [modalVisible, setModalVisible] = useState(true);
@@ -68,12 +70,16 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
                         onPressIn={() => setIconPressed(true)}
                         onPressOut={() => setIconPressed(false)}
                     >
-                      <Image
+                      {/* <Image
                           style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                           resizeMode="cover"
                           source={require("../../../assets/xclose.png")}
                           accessible={false}
-                      />
+                      /> */}
+                      <View  style={[styles.icon, iconPressed ? styles.iconPressed : null]}
+                          accessible={false}>
+                         <Xclose/>
+                      </View>
                     </Pressable>
                     <Text style={styles.title}>{title}</Text>
                     <Pressable
@@ -87,12 +93,16 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
                         onPressIn={() => setIconPressed(true)}
                         onPressOut={() => setIconPressed(false)}
                     >
-                        <Image
+                        {/* <Image
                             style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                             resizeMode="cover"
                             source={require("../../../assets/share.png")}
                             accessible={false}
-                        />
+                        /> */}
+                        <View  style={[styles.icon, iconPressed ? styles.iconPressed : null]}
+                          accessible={false}>
+                         <Share/>
+                      </View>
                     </Pressable>                 
                 </View>
           </LinearGradient>      

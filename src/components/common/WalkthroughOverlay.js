@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, Pressable, Dimensions } from "react-nati
 import { useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { FontSize, FontFamily, Color, Border } from "../../../GlobalStyles";
+import PolygonIcon from "../../../src/res/svgIcons/PolygonIcon";
 
 
 const tabWidth = Number(Dimensions.get("window").width / 4);
@@ -168,11 +169,14 @@ const WalkthroughOverlay = ({ onFinish }) => {
         </View>
       </View>
       <View>
-        <Image
+        {/* <Image
           style={bottomCarotStyles}
           tintColor={"#FFF"}
           source={require("../../../assets/polygon.png")}
-        />
+        /> */}
+        <View style={bottomCarotStyles}>
+          <PolygonIcon/>
+        </View>
       </View>
     </View>
   );
