@@ -1,8 +1,7 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet, Linking, Platform } from "react-native";
-import {Color, FontFamily } from "../../../GlobalStyles";
+import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
-import Infocircle from "../../../assets/svgs/Infocircle";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 
 /**
@@ -69,16 +68,12 @@ export const AlertComponent = ({
         mergedStyles.alertRowContainer,
         !onClose && mergedStyles.alertRowContainerNoClose
       ]}>
-        {/* <Image
+        <Image
           style={mergedStyles.alertIcon}
           resizeMode="contain"
           tintColor={iconTint}
           source={iconSource || require("../../../assets/info-circle.png")}
-        /> */}
-        <View style={mergedStyles.alertIcon}>
-         { iconSource? <iconSource/> :<Infocircle />}
-        </View>
-        
+        />
         <View style={mergedStyles.alertContentContainer}>
           <View style={mergedStyles.alertTitleRow}>
             <Text style={[
@@ -89,7 +84,6 @@ export const AlertComponent = ({
               {title}
             </Text>
           </View>
-          
           <Text style={mergedStyles.alertMessage}>
             {message}
             {boldText && (
@@ -108,7 +102,6 @@ export const AlertComponent = ({
             {actionText && "and keep your app running smoothly."}
           </Text>
         </View>
-        
         {onClose && (
           <TouchableOpacity
             style={mergedStyles.closeButtonContainer}
@@ -135,12 +128,12 @@ export const AlertUtils = {
    */
   createOutageAlert: (estimatedRestoreTime, onClose) => (
     <AlertComponent
-      title="Outage Alert"
-      message="Our systems show that you may be experiencing an outage related to your Internet service. We are working to restore service as soon as possible."
+      title="Outage Notification"
+      message="Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible."
       indicatorColor="#F88700" // Maps to warning styling internally
       iconTint="#DD6D02" // Use finalized warning color for icon
       titleStyle={{ color: "#DD6D02" }}
-      boldText={`Estimated Time to Restore: ${estimatedRestoreTime}`}
+      boldText={`Estimated Time to Restore: ${estimatedRestoreTime}.`}
       iconSource={require("../../../assets/Icon/TriangleAlert.png")} // Warning icon
       onClose={onClose}
     />
@@ -207,13 +200,13 @@ const styles = StyleSheet.create({
     height: 22,
   },
   closeButtonContainer: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 8,
-    width: 16,
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'center', // vertical center in row
+    width: 24,
+    height: 24,
+    marginLeft: 12, // space from content
+    marginRight: 0, // flush to right edge
   },
   alertTitle: {
     fontFamily: FontFamily.textXsSemibold,

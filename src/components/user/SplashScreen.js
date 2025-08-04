@@ -162,32 +162,52 @@ const SplashScreen = ({ navigation, route }) => {
     }
   };
 
-  const CustomAlertModal = ({ visible, message, message2, onClose, closeModal }) => {
+  const CustomAlertModal = ({
+    visible,
+    message,
+    message2,
+    onClose,
+    closeModal,
+  }) => {
     return (
       <Modal
         visible={visible}
-        transparent={true}
+        transparent
         animationType="fade"
-        onRequestClose={closeModal}
+        onRequestClose={onClose}
       >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <AlertIcon />
-            <RenderText
-              customStyle={styles.alertTitle}
-              text="Account Access"
-              boldSegments={["Account Access"]}
+        <View style={styles.overlay}>
+          <View style={styles.alertContainer}>
+            <View style={{ flexDirection: "row", justifyContent: "center" }}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={{marginTop:5}}>
+                  <AlertIcon />
+                </View>
+                
+                <Text style={styles.alertTitle}>{" Access Denied"}</Text>
+              </View>
+            </View>
+            <View
+              style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }}
             />
-            
-            <RenderText 
-              customStyle={styles.alertDescription}
-              text={bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}
+            <RenderText
+              navigation={navigation}
+              style={styles.message}
+              onTextPress={() => {
+                onClose();
+              }}
+              internalTextStyle={[styles.message, { fontWeight: '600', color: colors.sparklight_purple_blue, textDecorationLine: '', }]}
+              splitKey={bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}
               instruction={ message2? `${message} ${bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}${message2}`:message}
             />
              
+            
             <TouchableOpacity accessibilityRole="button" style={[styles.closeBtn,{marginTop:20}]} onPress={closeModal}>
               <Text style={styles.closeAlertTxt}>Close</Text>
             </TouchableOpacity>
+           
+               
+
           </View>
         </View>
       </Modal>
@@ -546,10 +566,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 20,
   },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  alertContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 5,
+    alignItems: "center",
+    width: "90%",
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    padding: 5,
+  },
+  closeText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "black",
+    fontFamily: FontFamily.openSansRegular,
+  },
+  message: {
+    color: colors.darkest_grey,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 14,
+    fontWeight: "400",
+    lineHeight: 28,
+    marginTop: 10,
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
   alertTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
     marginTop: 10,
+    color:colors.sp_black,
+    fontFamily: FontFamily.openSansRegular,
     textAlign: 'center',
   },
   alertDescription: {
@@ -559,14 +618,19 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   closeBtn: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.backgound_blue,
     paddingHorizontal: 30,
     paddingVertical: 10,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 5,
   },
   closeAlertTxt: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: colors.sparklight_purple_blue,
+    fontWeight:'400',
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
     fontSize: 16,
   },
 });
