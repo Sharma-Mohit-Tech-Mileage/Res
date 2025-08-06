@@ -291,22 +291,30 @@ const AddNotificationScreen = () => {
               <View style={styles.toggleHeader}>
                 <Text style={styles.toggleTitle}>Critical Notifications</Text>
                 <View style={styles.iconContainer}>
-                  <View style={styles.icon}>
-                    <Checkcircle />
-                  </View>
                   {/* <Image
                     style={styles.icon}
                     resizeMode="cover"
-                    source={require("../../../../assets/checkcircle.png")}
-                    accessible={false}
+                    source={
+                      formState.criticalNotifications
+                        ? require("../../../../assets/checkcircle.png")
+                        : require("../../../../assets/checkcircle1.png")
+                    }
+                    accessible={false} // decorative
                   /> */}
-                  <Text style={styles.toggleStatus}>On</Text>
+                  <View style={styles.icon} accessible={false}>
+                    {formState.criticalNotifications ?  <Checkcircle /> : <Checkcircle1 />}
+                  </View>
+                  {/* Display text "On" or "Off" after the icon */}
+                  <Text style={styles.toggleStatus}>
+                    {formState.criticalNotifications ? "On" : "Off"}
+                  </Text>
                 </View>
               </View>
               <Text style={styles.toggleDescription}>
-                Receive critical information, account changes, and service updates.
+                Receive critical information, account changes, and service
+                updates.
               </Text>
-            </View>
+          </View>
             <View style={styles.divider} />
             <View style={{ paddingTop: Padding.p_base, paddingBottom: 8, paddingHorizontal: Padding.p_5xl }}>
               <View style={styles.toggleHeader}>

@@ -22,7 +22,7 @@ import SearchBookIcon from '../../res/svgIcons/SearchBookIcon';
 import BuildingDocIcon from '../../res/svgIcons/BuildingDocIcon';
 import GearIcon from '../../res/svgIcons/GearIcon';
 import SearchIcon from '../../../assets/svgs/SearchIcon'; 
-import Checkcircle from '../../../assets/svgs/Checkcircle';
+import Checkcircle from '../../../assets/Icon/CircleCheck.png';
 import ChevronRight from '../../../assets/svgs/Chevonright';
 const Icon = ({ name, size = 24, color = '#000', style }) => {
   const iconMap = {
@@ -50,8 +50,8 @@ const Icon = ({ name, size = 24, color = '#000', style }) => {
     // Image asset example
     'building-doc': { library: 'SVG', source: BuildingDocIcon },
     'search': { library: 'SVG', source: SearchIcon},
-    'green-checkcircle': { library: 'SVG', source: Checkcircle },
-    //'down-chevron': { library: 'Image', source: require('../../../assets/chevrondown.png') },
+    'green-checkcircle': { library: 'Image', source: Checkcircle },
+    'down-chevron': { library: 'Image', source: DownArrow },
     'right-chevron': { library: 'SVG', source: ChevronRight },
   };
 

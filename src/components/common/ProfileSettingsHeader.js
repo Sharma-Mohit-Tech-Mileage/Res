@@ -124,6 +124,8 @@ const styles = StyleSheet.create({
     icon: {
         height: 24,
         width: 24,
+        marginLeft:10,
+        marginTop:12
     },
     iconPressed: {
         opacity: 0.5,

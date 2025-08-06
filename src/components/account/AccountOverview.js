@@ -9,7 +9,7 @@ import PasswordSecurityIcon from '../../../assets/svgs/Rightactionable16';
 import NotificationsIcon from '../../../assets/svgs/Rightactinable17';
 import UserManagementIcon from '../../../assets/svgs/Rightactionable18';
 //import feedbackicon from '../../../assets/message-alert-circle.png';
-import feedbackicon from '../../../assets/svgs/Messagealertcircle';
+import Feedbackicon from '../../../assets/svgs/Messagealertcircle';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
@@ -135,7 +135,7 @@ const AccountOverview = () => {
     {
       name: 'App Feedback',
       onPress: () => navigation.navigate('Feedback'),
-      icon: feedbackicon,
+      icon: Feedbackicon,
       accessibilityLabel: 'Navigate to user management settings',
       includeInMenu: true,
     }
@@ -169,7 +169,7 @@ const AccountOverview = () => {
     {
       name: 'App Feedback',
       onPress: () => navigation.navigate('Feedback'),
-      icon: feedbackicon,
+      icon: Feedbackicon,
       accessibilityLabel: 'Navigate to user management settings',
       includeInMenu: true,
     }
@@ -241,7 +241,10 @@ const AccountOverview = () => {
                       >
                         {/* Menu item icon */}
                         {typeof item.icon === 'function' ? (
-                          <item.icon width={28} height={28} />
+                          <View style={{alignSelf:'center', marginTop:8}}>
+                            <item.icon width={28} height={28} />
+                          </View>
+                          
                         ) : (
                     
                           <View accessible={true} accessibilityLabel={`${item.name} icon`}

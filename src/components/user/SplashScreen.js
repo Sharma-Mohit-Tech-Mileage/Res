@@ -162,6 +162,7 @@ const SplashScreen = ({ navigation, route }) => {
     }
   };
 
+<<<<<<< HEAD
   const CustomAlertModal = ({
     visible,
     message,
@@ -208,11 +209,50 @@ const SplashScreen = ({ navigation, route }) => {
            
                
 
+=======
+  const CustomAlertModal = ({ visible, message, message2, onClose, closeModal }) => (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <View style={styles.overlay}>
+        <View style={styles.alertContainer}>
+          <View style={{ flexDirection: "row", justifyContent: "center" }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <AlertIcon />
+              <Text style={styles.alertTitle}>{" Access Denied"}</Text>
+            </View>
+>>>>>>> b688153 (code_clean_up)
           </View>
+          <View style={{ backgroundColor: "#F4F4F5", height: 1, marginTop: 10 }} />
+          <RenderText
+            navigation={navigation}
+            style={styles.message}
+            onTextPress={onClose}
+            internalTextStyle={[
+              styles.message,
+              {
+                fontWeight: "600",
+                color: colors.sparklight_purple_blue,
+                textDecorationLine: "",
+              },
+            ]}
+            splitKey={bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}
+            instruction={ message2? `${message} ${bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}${message2}`:message}
+          />
+          <TouchableOpacity
+            accessibilityRole="button"
+            style={styles.closeBtn}
+            onPress={closeModal}
+          >
+            <Text style={styles.closeAlertTxt}>Close</Text>
+          </TouchableOpacity>
         </View>
-      </Modal>
-    );
-  };
+      </View>
+    </Modal>
+  );
 
   const handleCloseAlert = () => {
     setModalVisible(false);
@@ -460,7 +500,10 @@ const SplashScreen = ({ navigation, route }) => {
             accessibilityLabel="SparkLight"
             accessible={true}
           >
-            <Logo  />
+            <View style={{alignSelf:'center'}}>
+              <Logo/>
+            </View>
+            
           </Animated.View>
         </Animated.View>
       </View>
@@ -549,6 +592,7 @@ const styles = StyleSheet.create({
   logo: {
     width: wp("60%"),
     height: hp("20%"),
+    
   },
   SSoBtnContainer: {
     marginHorizontal: wp("10%"),
@@ -566,11 +610,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 20,
   },
+<<<<<<< HEAD
+=======
+  
+>>>>>>> b688153 (code_clean_up)
   overlay: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+<<<<<<< HEAD
   },
   alertContainer: {
     backgroundColor: "white",
@@ -610,15 +659,37 @@ const styles = StyleSheet.create({
     color:colors.sp_black,
     fontFamily: FontFamily.openSansRegular,
     textAlign: 'center',
+=======
+>>>>>>> b688153 (code_clean_up)
   },
-  alertDescription: {
-    fontSize: 16,
+  alertContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 5,
+    alignItems: "center",
+    width: "90%",
+    alignSelf: "center",
+  },
+  message: {
+    color: colors.darkest_grey,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 14,
+    fontWeight: "400",
+    lineHeight: 28,
     marginTop: 10,
-    textAlign: 'center',
-    lineHeight: 22,
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
+  alertTitle: {
+    color: colors.sparklight_grey,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 22,
+    fontWeight: "700",
+    marginLeft: 5,
   },
   closeBtn: {
     backgroundColor: colors.backgound_blue,
+<<<<<<< HEAD
     paddingHorizontal: 30,
     paddingVertical: 10,
     width: "100%",
@@ -631,7 +702,18 @@ const styles = StyleSheet.create({
     fontWeight:'400',
     fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
+=======
+    justifyContent: "center",
+    width: "100%",
+    marginTop: 15,
+  },
+  closeAlertTxt: {
+    color: colors.sparklight_purple_blue,
+    textAlign: "center",
+    padding: 8,
+>>>>>>> b688153 (code_clean_up)
     fontSize: 16,
+    fontFamily: FontFamily.openSansRegular,
   },
 });
 

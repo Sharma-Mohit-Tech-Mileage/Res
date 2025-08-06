@@ -236,7 +236,7 @@ const PaymentHistoryScreen = ({ navigation }) => {
         {/* Search and Sort */}
         <View style={styles.controlsContainer}>
           <View style={styles.searchContainer}>
-            <Icon name="search" size={20} color={Color.sparklightGray1} style={styles.searchIcon} />
+            <Icon name="search" size={20} color={Color.sparklightWhite} style={styles.searchIcon} />
             <TextInput
               style={styles.searchInput}
               placeholder="Search by Confirmation ID"

@@ -89,7 +89,7 @@ const SparkLightDropdown = ({
         <Text style={styles.dropdownText} accessible={false}>
           {selectedValue || placeholder}
         </Text>
-        <Text style={styles.chevron} accessible={false}><Icon name={'down-chevron'}/></Text>
+        <View style={styles.chevron} accessible={false}><Icon name={'down-chevron'}/></View>
       </TouchableOpacity>
 
       <Modal
@@ -207,6 +207,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Color.colorGray_200,
     marginLeft: 8,
+    marginTop:12,
+    alignSelf: 'center',
   },
   modalContainer: {
     flex: 1,
