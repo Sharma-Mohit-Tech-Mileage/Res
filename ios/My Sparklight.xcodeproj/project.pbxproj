@@ -587,7 +587,11 @@
 					"@executable_path/Frameworks",
 				);
 <<<<<<< HEAD
+<<<<<<< HEAD
 				MARKETING_VERSION = 19.0.0;
+=======
+				MARKETING_VERSION = 19.0.1;
+>>>>>>> b688153 (code_clean_up)
 =======
 				MARKETING_VERSION = 19.0.1;
 >>>>>>> b688153 (code_clean_up)
@@ -628,7 +632,11 @@
 					"@executable_path/Frameworks",
 				);
 <<<<<<< HEAD
+<<<<<<< HEAD
 				MARKETING_VERSION = 19.0.0;
+=======
+				MARKETING_VERSION = 19.0.1;
+>>>>>>> b688153 (code_clean_up)
 =======
 				MARKETING_VERSION = 19.0.1;
 >>>>>>> b688153 (code_clean_up)
