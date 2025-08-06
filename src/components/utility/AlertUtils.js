@@ -3,7 +3,8 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Linking, Platform } fr
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-
+import Infocircle from "../../../assets/svgs/Infocircle";
+import WarningIcon from '../../../assets/svgs/Alerttriangle'
 /**
  * Generic Alert Component that can be customized for different alert types
  * Updated to match finalized notification design
@@ -19,7 +20,7 @@ export const AlertComponent = ({
   onActionPress, 
   onClose,
   styles: customStyles,
-  iconSource // New prop for icon source
+  IconSource // New prop for icon source
 }) => {
   // Enhanced color schemes based on finalized notification design
   const getAlertStyles = () => {
@@ -68,12 +69,9 @@ export const AlertComponent = ({
         mergedStyles.alertRowContainer,
         !onClose && mergedStyles.alertRowContainerNoClose
       ]}>
-        <Image
-          style={mergedStyles.alertIcon}
-          resizeMode="contain"
-          tintColor={iconTint}
-          source={iconSource || require("../../../assets/info-circle.png")}
-        />
+        <View style={mergedStyles.alertIcon}>
+         { IconSource? <IconSource/> :<Infocircle />}
+        </View>
         <View style={mergedStyles.alertContentContainer}>
           <View style={mergedStyles.alertTitleRow}>
             <Text style={[
@@ -134,7 +132,7 @@ export const AlertUtils = {
       iconTint="#DD6D02" // Use finalized warning color for icon
       titleStyle={{ color: "#DD6D02" }}
       boldText={`Estimated Time to Restore: ${estimatedRestoreTime}.`}
-      iconSource={require("../../../assets/Icon/TriangleAlert.png")} // Warning icon
+      IconSource={WarningIcon} // Warning icon
       onClose={onClose}
     />
   ),
@@ -150,7 +148,7 @@ export const AlertUtils = {
       iconTint="#0060AE" // Use finalized info color for icon
       titleStyle={{ color: "#0060AE" }}
       actionText="Update Now"
-      iconSource={require("../../../assets/Icon/Info.png")} // Info icon
+      IconSource={Infocircle} // Info icon
       onActionPress={() => {
         const storeUrl = Platform.OS === "android"
           ? "https://play.google.com/store/apps/details?id=com.sparklight"

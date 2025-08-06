@@ -9,7 +9,10 @@ import { useFocusEffect } from "@react-navigation/native";
 import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
 import WalkthroughOverlay from "../common/WalkthroughOverlay";
-import { fetchACPUserAccountDetails, getPaperlessStatus } from "../../redux/actions/ProfileActionSuite";
+import {
+  fetchACPUserAccountDetails,
+  getPaperlessStatus,
+} from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
 import { Env } from "../../network/apis/account/Constants";
@@ -18,14 +21,13 @@ import MenuGrid from "../ACPDashboard/MenuGrid";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
-import { GetApiRequest,PostApiRequest } from "../../network/APIClient";
+import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
-import { useMaintenance } from '../maintenance/MaintenanceContext';
+import { useMaintenance } from "../maintenance/MaintenanceContext";
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
-import LoadingOverlay from "../common/LoadingOverlay";
-import SmallLoader from "../common/customui/SmallLoader";
+import LogoSmall from "../../res/images/LogoSmall";
 const NewBillerHome = ({ navigation }) => {
   // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
@@ -37,9 +39,24 @@ const NewBillerHome = ({ navigation }) => {
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [loadingAutoPay, setloadingAutoPay] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const { showBanner, showMaintenancePage, bannerConfig, pageConfig, dismissBanner } = useMaintenance();
-  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
-  const [updateStatus, setUpdateStatus] = useState({ isMinorUpdateAvailable: false, currentVersion: "", latestVersion: "", });
+  const {
+    showBanner,
+    showMaintenancePage,
+    bannerConfig,
+    pageConfig,
+    dismissBanner,
+  } = useMaintenance();
+  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
+    dueDate: null,
+    billAmount: 0,
+    pastPaymentDue: 0,
+    email: null,
+  });
+  const [updateStatus, setUpdateStatus] = useState({
+    isMinorUpdateAvailable: false,
+    currentVersion: "",
+    latestVersion: "",
+  });
 
   // Redux selectors
   const home = useSelector((state) => state.combinedReducers.home);
@@ -47,65 +64,71 @@ const NewBillerHome = ({ navigation }) => {
     (state) => state.combinedReducers.profile?.accountDetails
   );
   const dispatch = useDispatch();
-  const paperlessStatusAcp = useSelector( (state) => state.combinedReducers.profile?.paperlessStatusAcp );
-  const paperlessLoading = useSelector(
-      (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
+  const paperlessStatusAcp = useSelector(
+    (state) => state.combinedReducers.profile?.paperlessStatusAcp
   );
-  const userInfo = useSelector((state) => state.combinedReducers?.user?.userData?.userInfo);
-  
- 
-  const showDisconnectedBanner = userInfo ? 
-    isAccountDisconnected(userInfo.acctStatus, userInfo.daysSinceDisconnectDate) : false;
+  const paperlessLoading = useSelector(
+    (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
+  );
+  const userInfo = useSelector(
+    (state) => state.combinedReducers?.user?.userData?.userInfo
+  );
+
+  const showDisconnectedBanner = userInfo
+    ? isAccountDisconnected(
+        userInfo.acctStatus,
+        userInfo.daysSinceDisconnectDate
+      )
+    : false;
 
   /* Function to check outage status */
-    const checOutagStatus = () => {
-      setLoading(true);
-        getUser().then((res) => {
-          const request = `api/outage/GetOutages/?accountNumber=${res.userInfo.accountNumber}`;
-          PostApiRequest(
-            request,
-            {},
-            (response) => {
-              setLoading(false);
-              console.log("checOutagStatus response", response);
-              if (response?.error==false && response?.outageStatus) {
-                console.log("its outage");
-                setIsOutageAlert(true);
-                setEstimatedRestoreTime(moment(response?.restoredBy).format('LT'));
-              } else {
-                setIsOutageAlert(false);
-              }
-            },
-            (errorCode) => {
-              setLoading(false);
-              console.log("checOutagStatus error", errorCode);
-              
-            }
-          );
-        });
-      };
-    
-    const getStatus = () => {
-      setloadingAutoPay(true);
-        getUser().then((res) => {
-          const accountNumber = res.userInfo.accountNumber;
-          GetApiRequest(
-            `api/Accounts/${accountNumber}/easypay`,
-            (res) => {
-              setIsAutoPayStatus(res?.isEasyPay);
-              setloadingAutoPay(false);
-            },
-            (error) => {
-               console.log("error", error);
-              setloadingAutoPay(false);
-            }
-          );
-        });
-      };
+  const checOutagStatus = () => {
+    setLoading(true);
+    getUser().then((res) => {
+      const request = `api/outage/GetOutages/?accountNumber=${res.userInfo.accountNumber}`;
+      PostApiRequest(
+        request,
+        {},
+        (response) => {
+          setLoading(false);
+          console.log("checOutagStatus response", response);
+          if (response?.error == false && response?.outageStatus) {
+            console.log("its outage");
+            setIsOutageAlert(true);
+            setEstimatedRestoreTime(moment(response?.restoredBy).format("LT"));
+          } else {
+            setIsOutageAlert(false);
+          }
+        },
+        (errorCode) => {
+          setLoading(false);
+          console.log("checOutagStatus error", errorCode);
+        }
+      );
+    });
+  };
+
+  const getStatus = () => {
+    setloadingAutoPay(true);
+    getUser().then((res) => {
+      const accountNumber = res.userInfo.accountNumber;
+      GetApiRequest(
+        `api/Accounts/${accountNumber}/easypay`,
+        (res) => {
+          setIsAutoPayStatus(res?.isEasyPay);
+          setloadingAutoPay(false);
+        },
+        (error) => {
+          console.log("error", error);
+          setloadingAutoPay(false);
+        }
+      );
+    });
+  };
   // Refresh data when the screen is focused
   useFocusEffect(
     useCallback(() => {
-      console.log("paperlessLoading",JSON.stringify(paperlessLoading));
+      console.log("paperlessLoading", JSON.stringify(paperlessLoading));
       const refreshData = async () => {
         try {
           checOutagStatus();
@@ -113,7 +136,6 @@ const NewBillerHome = ({ navigation }) => {
           setUpdateStatus(status);
           dispatch(fetchACPUserAccountDetails());
           getStatus();
-          
         } catch (error) {
           console.error("Error refreshing data on focus", error);
         }
@@ -172,18 +194,20 @@ const NewBillerHome = ({ navigation }) => {
       accessibilityLabel="SparkLight"
       style={styles.headerContainer}
     >
-      <Image
-        accessible={!showWalkThrough}
-        accessibilityLabel="SparkLight"
-        resizeMode="contain"
+      <View
         style={styles.logoImage}
-        source={require("../../../assets/SparklightEntryLogo.png")}
-      />
+        accessible={true}
+        accessibilityLabel={`SparkLight`}
+      >
+        <LogoSmall />
+      </View>
     </View>
   );
 
   const renderOutageAlert = () =>
-    AlertUtils.createOutageAlert(estimatedRestoreTime, () => setIsOutageAlert(false));
+    AlertUtils.createOutageAlert(estimatedRestoreTime, () =>
+      setIsOutageAlert(false)
+    );
 
   const renderAppUpdateAlert = () =>
     AlertUtils.createAppUpdateAlert(() =>
@@ -197,7 +221,7 @@ const NewBillerHome = ({ navigation }) => {
   const renderWelcomeCard = () => (
     <View style={[styles.card, styles.shadowProp, styles.welcomeCard]}>
       <View style={styles.contentWrapper}>
-       {showDisconnectedBanner ? (
+        {showDisconnectedBanner ? (
           <DisconnectedBanner navigation={navigation} />
         ) : (
           <WelcomeCard />
@@ -217,7 +241,7 @@ const NewBillerHome = ({ navigation }) => {
           onButtonPress={() => {
             navigation.navigate("AutoPayPCIConnector", {
               url: `${Env.URL}/billing`,
-              name: isAutoPayStatus?"Manage Auto Pay":"Setup Auto Pay",
+              name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
               useNewPayment: true,
               status: isAutoPayStatus,
               paymentDetails: defaultPaymentDetails,
@@ -225,13 +249,15 @@ const NewBillerHome = ({ navigation }) => {
           }}
         />
         <FeatureCard
-         isLoading={paperlessLoading}
-         title="Paperless Billing"
+          isLoading={paperlessLoading}
+          title="Paperless Billing"
           features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
           buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}
           buttonVariant={paperlessStatusAcp ? "success" : "primary"}
           isActive={paperlessStatusAcp}
-          onButtonPress={() => navigation.navigate("account", {screen: "Notifications"})}
+          onButtonPress={() =>
+            navigation.navigate("account", { screen: "Notifications" })
+          }
         />
         <InfoBanner
           message="We are working diligently to enhance your experience"
@@ -253,34 +279,37 @@ const NewBillerHome = ({ navigation }) => {
         <WalkthroughOverlay onFinish={() => setShowWalkThrough(false)} />
       )}
       <View
-  accessibilityElementsHidden={showWalkThrough}
-  importantForAccessibility={showWalkThrough ? "no-hide-descendants" : "auto"}
-  style={{ flex: 1 }}
->
-      <SafeAreaView style={{ flex: 1 }}>
-        {renderHeader()}
-        <ScrollView style={styles.scrollContainer}>
-          <View style={styles.mainContentContainer}>
-            {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
-            {isOutageAlert && renderOutageAlert()}
-             {showBanner && bannerConfig && (
-        <MaintenanceBanner
-          title={bannerConfig.title}
-          message={bannerConfig.message}
-          link={bannerConfig.link}
-          linkText={bannerConfig.linkText}
-          showPhoneNumber={bannerConfig.showPhoneNumber}
-          phoneNumber={bannerConfig.phoneNumber}
-          onDismiss={bannerConfig.dismissible ? dismissBanner : undefined}
-          severity={bannerConfig.severity || 'info'}
-        />
-        )}
-            {renderWelcomeCard()}
-            
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+        accessibilityElementsHidden={showWalkThrough}
+        importantForAccessibility={
+          showWalkThrough ? "no-hide-descendants" : "auto"
+        }
+        style={{ flex: 1 }}
+      >
+        <SafeAreaView style={{ flex: 1 }}>
+          {renderHeader()}
+          <ScrollView style={styles.scrollContainer}>
+            <View style={styles.mainContentContainer}>
+              {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
+              {isOutageAlert && renderOutageAlert()}
+              {showBanner && bannerConfig && (
+                <MaintenanceBanner
+                  title={bannerConfig.title}
+                  message={bannerConfig.message}
+                  link={bannerConfig.link}
+                  linkText={bannerConfig.linkText}
+                  showPhoneNumber={bannerConfig.showPhoneNumber}
+                  phoneNumber={bannerConfig.phoneNumber}
+                  onDismiss={
+                    bannerConfig.dismissible ? dismissBanner : undefined
+                  }
+                  severity={bannerConfig.severity || "info"}
+                />
+              )}
+              {renderWelcomeCard()}
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </View>
     </LinearGradient>
   );
 };

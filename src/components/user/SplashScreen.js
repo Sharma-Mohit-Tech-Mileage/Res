@@ -454,11 +454,6 @@ const SplashScreen = ({ navigation, route }) => {
             <View style={{alignSelf:'center'}}>
               <Logo/>
             </View>
-            
-            <View style={{alignSelf:'center'}}>
-              <Logo/>
-            </View>
-            
           </Animated.View>
         </Animated.View>
       </View>
