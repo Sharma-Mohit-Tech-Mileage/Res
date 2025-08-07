@@ -86,6 +86,11 @@ const EmailNotifications = ({ navigation }) => {
       >
         <ProfileSettingsHeader showIcon={false} title={"Notifications"} />
         
+        <View style={styles.headerTabView}>
+                            <View style={styles.headerTabOne} />
+                            <View style={styles.headerTabTwo} />
+                            <View style={styles.headerTabThree} />
+                        </View>
         <View
           style={[styles.viewContainer, { marginTop: 90 }]}
           accessibilityLabel="Email notification setup section"

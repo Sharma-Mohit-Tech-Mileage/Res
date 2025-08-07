@@ -119,14 +119,15 @@ const PushNotifications = ({ navigation }) => {
 
     return  (
         <View style={styles.container}>
+            <ProfileSettingsHeader 
+                    showIcon={false}
+                    title={'Notifications'}
+                />
             <ScrollView 
                 style={styles.inner}
                 contentContainerStyle={styles.innerContent}
             >                    
-                <ProfileSettingsHeader 
-                    showIcon={false}
-                    title={'Notifications'}
-                />
+                
                 <View style={styles.headerTabView}>
                     <View style={styles.headerTabOne} />
                     <View style={styles.headerTabTwo} />

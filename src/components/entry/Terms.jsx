@@ -108,19 +108,19 @@ const Terms = ({ navigation }) => {
     }, [accountDetails, dispatch]);
 
     const termsAccepted = async () => {
-        await dispatch(updateTermsAndConditions(true, null));
-        await dispatch(updateWalkThroughStep(0));
+        await dispatch(updateTermsAndConditions(true, navigation));
+        //await dispatch(updateWalkThroughStep(0));
         if (!value) {
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'EntryEmailNotifications' }],
-            });
+            // navigation.reset({
+            //     index: 0,
+            //     routes: [{ name: 'EntryEmailNotifications' }],
+            // });
         }
         else {
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'MyTab' }],
-            });
+            // navigation.reset({
+            //     index: 0,
+            //     routes: [{ name: 'MyTab' }],
+            // });
         }
 
     };

@@ -7,6 +7,7 @@ import EntryInput from "./EntryInput";
 import CheckBox from '@react-native-community/checkbox';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateTextNotification } from '../../redux/actions/ProfileActionSuite';
+import Phone from "../../res/svgIcons/Phone";
 
 const TextNotifications = ({ navigation }) => {
     const dispatch = useDispatch();

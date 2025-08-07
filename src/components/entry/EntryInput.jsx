@@ -6,16 +6,25 @@ import {
     Image,
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../GlobalStyles';
+import Phone from '../../res/svgIcons/Phone';
+import EmailIcon from '../../res/svgIcons/EmailIcone';
 
-const EntryInput = ({ input, placeholder, onChangeText, onSubmitText, iconImage, keyboardType }) => {
+const EntryInput = ({ name,input, placeholder, onChangeText, onSubmitText, IconImage, keyboardType }) => {
     const inputRef = useRef(null);
 
     return (
         <View style={styles.inputContainer}  accessibilityLabel="Input field with icon">
-        <Image
+        {/* <Image
             source={iconImage}
             style={[styles.searchIcon, styles.leftIcon]}
-        />
+        /> */}
+        <View style={[styles.searchIcon, styles.leftIcon]}>
+           {name=='phone'?<Phone/>: 
+           <View style={{marginTop:4}}>
+           <EmailIcon/>
+           </View>
+           }
+        </View>
         <TextInput
             autoCapitalize="none"
             ref={inputRef}
@@ -69,7 +78,7 @@ const styles = StyleSheet.create({
         flex:1,
         flexDirection: 'row', // To align icons and text
         alignItems: 'center', // Vertically center the content
-        alignSelf: 'stretch',
+        alignSelf: 'center',
         paddingHorizontal: Padding.p_base, // Example padding
         fontSize: FontSize.size_base, // Example font size
         color: Color.sparklightGray1, 
