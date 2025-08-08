@@ -249,7 +249,7 @@ const AddNotificationScreen = () => {
             <View style={{ paddingHorizontal: Padding.p_5xl }} >
               <NotificationAlert
                 type="warning"
-                title={"Disconnect Error"}
+                title={"Critical Notifications"}
                 message={!isEnrolled?"By providing your email address, you're signing up for critical notifications. We'll keep you informed without overwhelming your inbox.":"By updating your email, you agree that this change will apply to all Sparklight email customer communications sent to you, including, but not limited to, account notifications, order updates, marketing emails, and service-related messages."}
                 showCloseIcon={false}
                 isVisible={true}

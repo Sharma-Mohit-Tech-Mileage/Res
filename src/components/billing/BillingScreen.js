@@ -19,6 +19,7 @@ import colors from "../../res/Colors";
 import AppStyles from "../common/styles/AppStyles";
 import { getPrimaryEmail } from "../utility/constant";
 import LoadingOverlay from "../common/LoadingOverlay";
+import RightIcon from '../../../assets/svgs/Chevonright';
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -219,7 +220,7 @@ const BillingScreen = ({ navigation }) => {
                       >
                         {<Icon name="building-doc" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
                         <Text style={styles.modemHealthSupport}>Manage Payment Method</Text>
-                        <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
+                        <RightIcon/>
                       </TouchableOpacity>
                   
                     <View style={styles.frameLayout} />
@@ -234,7 +235,7 @@ const BillingScreen = ({ navigation }) => {
                     >
                       {<Icon name="search-book" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
                       <Text style={styles.modemHealthSupport}>{"View Bill Breakdown"}</Text>
-                      <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
+                      <RightIcon/>
                     </TouchableOpacity>}
                     <View style={styles.frameLayout} />
                     <TouchableOpacity
@@ -249,7 +250,7 @@ const BillingScreen = ({ navigation }) => {
                       {<Icon name="document" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
                       
                       <Text style={styles.modemHealthSupport}>View Payment History</Text>
-                      <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
+                      <RightIcon/>
                     </TouchableOpacity>
                     <View style={styles.frameLayout} />
                     
@@ -265,7 +266,7 @@ const BillingScreen = ({ navigation }) => {
                     >
                       {<Icon name="bill-paid" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
                       <Text style={styles.modemHealthSupport}>View Billing Statements</Text>
-                      <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
+                      <RightIcon/>
                     </TouchableOpacity>
                   </View>
                 </View>

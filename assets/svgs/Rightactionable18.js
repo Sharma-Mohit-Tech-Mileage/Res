@@ -5,6 +5,7 @@ const Rightactionable18 = (props) => (
     xmlns="http://www.w3.org/2000/svg"
     width={20}
     height={17}
+     viewBox="0 0 20 17"
     fill="none"
     {...props}
   >

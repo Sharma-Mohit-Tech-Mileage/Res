@@ -3,8 +3,9 @@ import{ Svg ,Path} from "react-native-svg";
 const Rightactionable16 = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
-    width={16}
-    height={20}
+    width={20}
+    height={19}
+     viewBox="0 0 20 19"
     fill="none"
     {...props}
   >

@@ -241,8 +241,8 @@ const AccountOverview = () => {
                       >
                         {/* Menu item icon */}
                         {typeof item.icon === 'function' ? (
-                          <View style={{alignSelf:'center', marginTop:8}}>
-                            <item.icon width={28} height={28} />
+                          <View style={{alignSelf:'center'}}>
+                            <item.icon width={24} height={24} />
                           </View>
                           
                         ) : (
@@ -254,7 +254,7 @@ const AccountOverview = () => {
                         )}
                         {/* Menu item text */}
                         <Text style={[styles.profileSettings, styles.makePaymentTypo]}>
-                          {item.name}
+                          {' '+item.name}
                         </Text>
                         {/* Chevron/Arrow icon */}
                         <View style={[{ marginLeft: 10 }, styles.rightIconLayout]}>

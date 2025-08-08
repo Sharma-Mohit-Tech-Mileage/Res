@@ -51,7 +51,7 @@ const Icon = ({ name, size = 24, color = '#000', style }) => {
     'building-doc': { library: 'SVG', source: BuildingDocIcon },
     'search': { library: 'SVG', source: SearchIcon},
     'green-checkcircle': { library: 'Image', source: Checkcircle },
-    'down-chevron': { library: 'Image', source: DownArrow },
+    'down-chevron': { library: 'SVG', source: DownArrow },
     'right-chevron': { library: 'SVG', source: ChevronRight },
   };
 
