@@ -129,12 +129,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
             }
         }
         
-        // Check for 404 or error pages
-        if (navState.url.includes('404') || navState.title?.includes('Not Found')) {
-            console.log('404 Page detected');
-            setIsError(true);
-            setErrorMessage('Page not found (404). Please check your account access.');
-        }
     }, [navStateReloading]);
 
     const onMessage = useCallback((event) => {
