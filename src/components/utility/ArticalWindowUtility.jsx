@@ -1,335 +1,372 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Platform, AppState } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, Platform, AppState, Alert } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
-import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
 import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import PDFViewModal from './PDFViewModal';
 import { navigationRef } from '../../navigations/UserNavigations';
-import colors from '../../res/Colors';
 import analytics from '@react-native-firebase/analytics';
 import LoadingOverlay from '../common/customui/CustomLoading';
 import LoadingSpinner from './LoadingSpinner';
-const { width, height } = Dimensions.get('window');
 
 const ArticalWindowUtility = ({ navigation, route }) => {
-    const [initScript, setInitScript] = useState('');
     const [progress, setProgress] = useState(0);
-    const [name, setTitle] = useState(route.params?.name);
-    const [isExpandable, setIsExpandable] = useState(route.params?.isExpandable ?? false);
+    const [name] = useState(route.params?.name);
     const [isError, setIsError] = useState(false);
-    const [url, setUrl] = useState(route.params?.url);
-    const [currentUser, setCurrentUser] = useState({});
+    const [errorMessage, setErrorMessage] = useState('');
+    const [url] = useState(route.params?.url);
     const [modalOpen, setModalOpen] = useState(true);
     const [navStateReloading, setNavStateReloading] = useState(false);
     const [showPDFModal, setShowPDFModal] = useState(false);
     const [showPDFUrl, setShowPDFUrl] = useState('');
-    const [appState, setAppState] = useState(AppState.currentState);
+    const [isTokenRefreshing, setIsTokenRefreshing] = useState(false);
+    const [contentLoaded, setContentLoaded] = useState(false);
+    const [loadStartTime, setLoadStartTime] = useState(0);
+    const [forceWebViewRecreation, setForceWebViewRecreation] = useState(false);
+    const [appBackgroundTime, setAppBackgroundTime] = useState(0);
     const user = useSelector(state => state.combinedReducers.user.userData);
     const webViewRef = useRef();
-    const [hasTrackedInitialScreen, setHasTrackedInitialScreen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
 
-    const toggleModal = () => {
-        setShowPDFModal(!showPDFModal);
-    };
-
-    const setDynamicCookie = () => {
-        if (webViewRef?.current) {
-            const script = `(function() {
-                var cookieValue = "MobileApp";
-                var domain = document.location.hostname; 
-                var expirationDate = new Date();
-                expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
+    // FIXED: Simplified and more compatible script
+    const enhancedScript = `
+        (function() {
+            try {
+                console.log('Sparklight script injection started');
                 
-                document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+                // Simple localStorage setup
+                const token = '${user?.token || ''}';
+                const userInfo = '${JSON.stringify(user?.userInfo || {})}';
                 
-                localStorage.setItem('jwt_token', '${currentUser.token}');
-                localStorage.setItem('user_info', '${JSON.stringify(currentUser?.userInfo)}');
-                var upgradeToken = '${currentUser.upgradeToken}';
-                localStorage.setItem('upgrades_token', upgradeToken);
-            })();`;
-            webViewRef.current.injectJavaScript(script);
-        } else {
-            console.warn('WebView ref is not available for injecting JavaScript. Navigating back to Dashboard.');
-            // if (navigationRef.current) {
-            //     navigationRef.current.navigate('Dashboard');
-            // }
-        }
-    };
+                if (token) {
+                    localStorage.setItem('jwt_token', token);
+                    console.log('JWT token set');
+                }
+                
+                if (userInfo && userInfo !== '{}') {
+                    localStorage.setItem('user_info', userInfo);
+                    console.log('User info set');
+                }
+                
+                // Simplified cookie setting - removed problematic flags
+                try {
+                    const cookieValue = "Source=MobileApp; domain=" + location.hostname + "; path=/; max-age=31536000";
+                    document.cookie = cookieValue;
+                    console.log('Cookie set successfully');
+                } catch (cookieError) {
+                    console.error('Cookie setting failed:', cookieError);
+                }
+                
+                // FIXED: Simplified PDF interceptor setup
+                if (!window.pdfInterceptorSetup) {
+                    const origOpen = XMLHttpRequest.prototype.open;
+                    XMLHttpRequest.prototype.open = function(method, url) {
+                        this.addEventListener('load', function() {
+                            if ((url.includes('/statements/') || url.includes('Statement')) && this.status === 200) {
+                                try {
+                                    const data = JSON.parse(this.response);
+                                    if (data.fileBinary) {
+                                        window.ReactNativeWebView.postMessage(JSON.stringify({
+                                            type: 'pdf',
+                                            data: data.fileBinary
+                                        }));
+                                    }
+                                } catch(parseError) {
+                                    console.error('PDF parsing error:', parseError);
+                                }
+                            }
+                        });
+                        
+                        this.addEventListener('error', function() {
+                            console.error('XHR Error:', this.status, url);
+                        });
+                        
+                        origOpen.apply(this, arguments);
+                    };
+                    
+                    window.pdfInterceptorSetup = true;
+                    console.log('PDF interceptor setup complete');
+                }
+                
+                console.log('Script injection completed successfully');
+                
+            } catch(scriptError) {
+                console.error('Script injection error:', scriptError);
+            }
+        })();
+    `;
 
-
-    const navigationChange = async (navState) => {
-
+    const navigationChange = useCallback(async (navState) => {
+        console.log('Navigation change:', navState.url);
+        
+        // Check for authentication redirects
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
-                setModalOpen(false);
-                setProgress(1);
+                console.log('Token refresh required');
+                setIsTokenRefreshing(true);
                 setNavStateReloading(true);
+                
                 try {
                     await RefreshToken();
-                    setTimeout(async () => {
-                        await userUpdate();
-                    }, 1000);
+                    console.log('Token refresh successful');
+                    setTimeout(() => {
+                        webViewRef.current?.reload();
+                        setIsTokenRefreshing(false);
+                        setNavStateReloading(false);
+                        console.log('WebView reload completed');
+                    }, 500);
                 } catch (error) {
-                    console.error("Error during navigation change token refresh", error);
-                    if (navigationRef.current) {
-                        navigationRef.current.navigate('Splash');
-                    }
+                    console.log('Token refresh failed:', error);
+                    setIsTokenRefreshing(false);
+                    setNavStateReloading(false);
+                    Alert.alert(
+                        'Session Expired',
+                        'Please log in again.',
+                        [{ text: 'OK', onPress: () => navigationRef.current?.navigate('Splash') }]
+                    );
                 }
             }
         }
-    };
+        
+    }, [navStateReloading]);
 
-    const onMessage = (event) => {
-
+    const onMessage = useCallback((event) => {
         try {
             const data = JSON.parse(event.nativeEvent.data);
-            console.log('File Data', JSON.stringify(data))
-            if (data.type === "XMLHttpRequest" && data.status === 200) {
-                if ((data.responseURL.includes("/statements/") || data.responseURL.includes("/api/Statement")|| data.responseURL.includes("/api/Statement"))) {
-                const responseData = JSON.parse(data.response);
-                
-                    if (responseData.fileBinary) {
-                        const base64Data = responseData.fileBinary;
-                        setShowPDFUrl(base64Data);
+            console.log('WebView message received:', data.type);
+            
+            switch (data.type) {
+                case 'pdf':
+                    if (data.data) {
+                        setShowPDFUrl(data.data);
                         setShowPDFModal(true);
-                    } else {
-                        console.log('fileBinary is missing, modal will not open');
+                        console.log('PDF modal opened');
                     }
-                }
+                    break;
+                    
+                case 'xhr_error':
+                    console.log('XHR Error:', data);
+                    break;
+                    
+                case 'page_error':
+                    console.log('Page Error:', data);
+                    break;
+                    
+                default:
+                    console.log('Unknown message type:', data.type);
             }
         } catch (error) {
-            console.log('onMessageError: ', error);
+            console.log('Message parsing error:', error);
         }
-    };
+    }, []);
 
-    const userUpdate = async () => {
-        const userLocal = await getUser();
-
-        if (userLocal.token === currentUser.token) {
-            console.log('Tokens match, retrying user update');
-            setTimeout(async () => {
-                await userUpdate();
-            }, 1000);
-        } else {
-            setNavStateReloading(false);
-            userUpdateScript(userLocal);
-            setUrl(route.params?.url);
-            setModalOpen(true);
-            setProgress(0);
-            setCurrentUser(userLocal);
-        }
-    };
-
-    const userUpdateScript = async (user) => {
-        const upgradeToken = await getUpgradeToken();
-        user.userInfo['customerType'] = "Residential";
-
-        if (user.token !== undefined) {
-            const SAVE_FROM_RN = `(function() {
-                localStorage.setItem('jwt_token', '${user.token}');
-                localStorage.setItem('user_info', '${JSON.stringify(user.userInfo)}');
-                localStorage.setItem('upgrades_token', '${upgradeToken?.access_token}');
-    
-                var cookieValue = "MobileApp";
-                var domain = document.location.hostname; 
-                var expirationDate = new Date();
-                expirationDate.setTime(expirationDate.getTime() + (365 * 24 * 60 * 60 * 1000)); 
-                document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-    
-                var originalOpen = XMLHttpRequest.prototype.open;
-                XMLHttpRequest.prototype.open = function(method, url) {
-                    this.addEventListener("load", function(event) {
-                        console.log('Intercepted URL:', url); // Log for debugging
-                        if (url.includes("/statements/") || url.includes("Statement")) {
-                            var message = {
-                                "type": "XMLHttpRequest",
-                                "status": this.status,
-                                "responseURL": this.responseURL,
-                                "response": this.response
-                            };
-                            console.log('Sending message:', message); // Debug log
-                            window.ReactNativeWebView.postMessage(JSON.stringify(message));
-                        }
-                    }); 
-                    originalOpen.apply(this, arguments);
-                };
-    
-                var originalFetch = window.fetch;
-                window.fetch = function() {
-                    return originalFetch.apply(this, arguments).then(function(response) {
-                        console.log('Intercepted fetch URL:', response.url); // Log for debugging
-                        if (response.url.includes("/statements/") || response.url.includes("Statement")) {
-                            response.clone().text().then(function(responseText) {
-                                var message = {
-                                    "type": "fetch",
-                                    "status": response.status,
-                                    "responseURL": response.url,
-                                    "response": responseText
-                                };
-                                console.log('Sending fetch message:', message); // Debug log
-                                window.ReactNativeWebView.postMessage(JSON.stringify(message));
-                            });
-                        }
-                        return response;
-                    });
-                };
-            })();`;
-
-            setInitScript(prevScript => `${prevScript}\n${SAVE_FROM_RN}`);
-        }
-    };
-
-    useEffect(() => {
-        console.log('Screen Tracking useEffect triggered');
-        console.log('Current name:', name);
-        console.log('hasTrackedInitialScreen:', hasTrackedInitialScreen);
-
-        const trackScreen = async () => {
-            if (name && !hasTrackedInitialScreen) {
-                console.log('Attempting to track screen with name:', name);
-                try {
-                    await analytics().logEvent('screen_view', {
-                        screen_name: name,
-                        screen_class: name
-                    });
-                    console.log('Successfully tracked screen_view event:', {
-                        screen_name: name,
-                        screen_class: 'ArticalWindowUtility'
-                    });
-                    setHasTrackedInitialScreen(true);
-                    console.log('Set hasTrackedInitialScreen to true');
-                } catch (error) {
-                    console.error('Analytics error details:', {
-                        error: error.message,
-                        name: name,
-                        stack: error.stack
-                    });
-                }
-            } else {
-                console.log('Skipped tracking because:', {
-                    hasName: !!name,
-                    name: name,
-                    hasTrackedInitialScreen: hasTrackedInitialScreen
-                });
-            }
-        };
-
-        trackScreen();
-    }, [name]);
-
-    useEffect(() => {
-        setProgress(0);
+    const onLoadStart = useCallback((syntheticEvent) => {
+        const startTime = Date.now();
+        setLoadStartTime(startTime);
+        setProgress(0.1);
         setIsError(false);
-    }, [url, name, modalOpen]);
+        setErrorMessage('');
+        
+        console.log('WebView load started:', syntheticEvent.nativeEvent.url);
+    }, []);
 
-    useEffect(() => {
-        if (modalOpen) {
-            setUrl(route.params?.url);
-            setTitle(route.params?.name);
-            setIsExpandable(route.params?.isExpandable);
+    const onLoadProgress = useCallback(({ nativeEvent }) => {
+        setProgress(nativeEvent.progress);
+    }, []);
+
+    const onLoadEnd = useCallback((syntheticEvent) => {
+        const endTime = Date.now();
+        const loadTime = endTime - loadStartTime;
+        setProgress(1);
+        setContentLoaded(true);
+        
+        console.log(`Page loaded in: ${loadTime}ms (${(loadTime/1000).toFixed(2)}s)`);
+    }, [loadStartTime]);
+
+    const onError = useCallback((syntheticEvent) => {
+        const { nativeEvent } = syntheticEvent;
+        console.error('WebView error:', nativeEvent);
+        setIsError(true);
+        setErrorMessage(`Loading error: ${nativeEvent.description || 'Unknown error'}`);
+    }, []);
+
+    const onHttpError = useCallback((syntheticEvent) => {
+        const { nativeEvent } = syntheticEvent;
+        console.error('HTTP error:', nativeEvent.statusCode);
+        
+        if (nativeEvent.statusCode === 404) {
+            setIsError(true);
+            setErrorMessage('Page not found (404). Please verify your account has access to this feature.');
+        } else if (nativeEvent.statusCode === 403) {
+            setIsError(true);
+            setErrorMessage('Access denied (403). Please check your permissions.');
+        } else if (nativeEvent.statusCode >= 500) {
+            setIsError(true);
+            setErrorMessage('Server error. Please try again later.');
         }
-    }, [modalOpen]);
+    }, []);
 
+    // User validation
     useEffect(() => {
-        setCurrentUser(user);
-        userUpdateScript(user);
-        setDynamicCookie();
+        if (!user?.token) {
+            console.log('No user token found');
+            Alert.alert(
+                'Authentication Required',
+                'Please log in to continue.',
+                [{ text: 'OK', onPress: () => navigationRef.current?.navigate('Splash') }]
+            );
+        }
     }, [user]);
 
+    // Analytics tracking
     useEffect(() => {
-        const handleAppStateChange = nextAppState => {
-            if (appState?.match(/inactive|background/) && nextAppState === 'active') {
+        if (name) {
+            analytics().logEvent('screen_view', {
+                screen_name: name,
+                screen_class: 'ArticalWindowUtility'
+            }).catch(console.error);
+        }
+    }, [name]);
+
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState) => {
+        if (nextAppState === 'background') {
+            // Track when app goes to background
+            setAppBackgroundTime(Date.now());
+        } else if (nextAppState === 'active') {
+            const backgroundDuration = Date.now() - appBackgroundTime;
+            const wasBackgroundedLong = backgroundDuration > 300000; // 5 minutes
+            
+            if (wasBackgroundedLong || !contentLoaded) {
+                // Force WebView recreation for long background periods
+                console.log('App was backgrounded for', Math.round(backgroundDuration/1000), 'seconds - forcing WebView recreation');
+                setForceWebViewRecreation(true);
+                setModalOpen(false);
+                
+                // Recreate after brief delay
                 setTimeout(() => {
-                    if (webViewRef?.current) {
+                    setForceWebViewRecreation(false);
+                    setModalOpen(true);
+                    setContentLoaded(false);
+                }, 100);
+            } else if (contentLoaded) {
+                // Short background - try gentle reload first
+                setTimeout(() => {
+                    if (webViewRef.current) {
                         webViewRef.current.reload();
-                    } else {
-                        // if (navigationRef.current) {
-                        //     navigationRef.current.navigate('Dashboard');
-                        // }
                     }
                 }, 500);
             }
-            setAppState(nextAppState);
-        };
+        }
+    };
 
-        const subscription = AppState.addEventListener('change', handleAppStateChange);
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => subscription?.remove();
+}, [contentLoaded, appBackgroundTime]);
 
-        return () => {
-            if (subscription) {
-                subscription.remove();
-            }
-        };
-    }, [appState]);
-
-
-
-    useEffect(() => {
-        setDynamicCookie();
-    }, [url, modalOpen, appState]);
-
-
-    const Spinner = () => {
-       return(
-        <View style={styles.activityContainer}>
-            {name =='Billing Details' ? <LoadingSpinner /> : <LoadingOverlay loading={true}  />}
-            
+    const LoadingComponent = useCallback(() => (
+        <View style={styles.loadingContainer}>
+            {name === 'Billing Details' ? (
+                <LoadingSpinner />
+            ) : (
+                <LoadingOverlay loading={true} />
+            )}
         </View>
-       )
-       
-    }
+    ), [name]);
+
+    const TokenRefreshOverlay = useCallback(() => (
+        <View style={styles.refreshOverlay}>
+            <LoadingSpinner />
+        </View>
+    ), []);
+
     return (
-        <View style={{ flex: 1, marginBottom: (Platform.OS == 'ios') ? 90 : 60 }}>
-            <ProfileSettingsHeader onPressBack={() => {
-                if (route.params?.isBilling) {
-                    navigation.reset({
-                        index: 0,
-                        routes: [{ name: "MyTab" }],
-                    });
-                }else if (route.params?.isPayBill) {
-                    navigation.reset({
-                        index: 0,
-                        routes: [{ name: "MyServices" }],
-                    });
-                }
-                 else {
-                    navigation.goBack();
-                }
-                setModalOpen(false);
-            }} title={name} />
-            {progress < 1 ? (
+        <View style={styles.container}>
+            <ProfileSettingsHeader 
+                onPressBack={() => {
+                    console.log('Back button pressed');
+                    setModalOpen(false);
+                    if (route.params?.isBilling) {
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: "MyTab" }],
+                        });
+                    } else if (route.params?.isPayBill) {
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: "MyServices" }],
+                        });
+                    } else {
+                        navigation.goBack();
+                    }
+                }} 
+                title={name} 
+            />
+            
+            {progress < 1 && (
                 <View style={styles.progressBar}>
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
                 </View>
-            ) : null}
-            {modalOpen && (
+            )}
+            
+            {modalOpen && !isTokenRefreshing && !forceWebViewRecreation && (
                 <WebView
+                    key={forceWebViewRecreation ? Date.now() : undefined}
                     ref={webViewRef}
-                    key={url}
                     source={{ uri: url }}
-                    onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
-                    sharedCookiesEnabled={true}
-                    injectedJavaScriptBeforeContentLoaded={initScript}
-                    onNavigationStateChange={navigationChange}
+                    // Event handlers
+                    onLoadStart={onLoadStart}
+                    onLoadProgress={onLoadProgress}
+                    onLoadEnd={onLoadEnd}
+                    onError={onError}
+                    onHttpError={onHttpError}
                     onMessage={onMessage}
-                    originWhitelist={['http://*', 'https://*', 'data:*']}
+                    onNavigationStateChange={navigationChange}
+                    
+                    // Script injection
+                    injectedJavaScript={enhancedScript}
+                    
+                    // FIXED: Simplified WebView settings to prevent first-load errors
                     startInLoadingState={true}
-                    renderLoading={Spinner}
-                    incognito={true}
+                    renderLoading={LoadingComponent}
+                    javaScriptEnabled={true}
+                    domStorageEnabled={true}
+                    sharedCookiesEnabled={true}
+                    cacheEnabled={true}
+                    
+                    // FIXED: Removed problematic props that cause first-load errors
+                    originWhitelist={['https://*']}
+                    mixedContentMode="compatibility"
+                    allowsInlineMediaPlayback={true}
+                    
+                    // FIXED: Removed dataDetectorTypes and other problematic performance settings
+                    allowsBackForwardNavigationGestures={false}
+                    showsHorizontalScrollIndicator={false}
+                    showsVerticalScrollIndicator={false}
                 />
             )}
-            {isError ? (
-                <View style={[styles.errorContainer, { marginTop: '23%' }]}>
-                    <Text style={styles.errorText}>Failed to load. Please try again later.</Text>
+
+            {(isTokenRefreshing || forceWebViewRecreation)&& <TokenRefreshOverlay />}
+            
+            {isError && (
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorTitle}>Unable to Load Page</Text>
+                    <Text style={styles.errorText}>{errorMessage || 'An error occurred while loading the page.'}</Text>
+                    <Text style={styles.retryText} onPress={() => {
+                        setIsError(false);
+                        setErrorMessage('');
+                        webViewRef.current?.reload();
+                    }}>
+                        Tap to Retry
+                    </Text>
                 </View>
-            ) : null}
+            )}
+            
             {showPDFModal && (
                 <PDFViewModal
                     url={showPDFUrl}
-                    onClose={() => toggleModal()}
+                    onClose={() => setShowPDFModal(false)}
                 />
             )}
         </View>
@@ -337,34 +374,71 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        marginBottom: Platform.OS === 'ios' ? 90 : 60,
+    },
     progressBar: {
-        height: height * 0.004,
-        backgroundColor: 'lightgrey',
+        height: 3,
+        backgroundColor: '#E0E0E0',
     },
     progress: {
         height: '100%',
-        backgroundColor: 'rgba(141, 59, 144, 1)',
+        backgroundColor: '#8D3B90',
+    },
+    loadingContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'transparent',
+    },
+    refreshOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+        top: 100,
+    },
+    refreshText: {
+        marginTop: 16,
+        fontSize: 16,
+        color: '#333',
+        fontWeight: '500',
     },
     errorContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: width * 0.05,
+        padding: 20,
+    },
+    errorTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 10,
     },
     errorText: {
-        fontSize: width * 0.04,
-        marginBottom: height * 0.02,
+        fontSize: 16,
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 20,
+        lineHeight: 24,
     },
-    activityContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        backgroundColor: '#00000000',
-        height: '100%',
-        width: '100%',
-    }
+    retryText: {
+        fontSize: 16,
+        color: '#8D3B90',
+        fontWeight: '600',
+        textDecorationLine: 'underline',
+    },
 });
 
 export default ArticalWindowUtility;
