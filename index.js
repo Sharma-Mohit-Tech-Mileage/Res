@@ -2,6 +2,7 @@ import 'react-native-gesture-handler';
 import 'react-native-url-polyfill/auto';
 import { AppRegistry } from 'react-native';
 import App from './App.js';
+import LogoAnimation from './src/components/user/LogoAnimation.js';
 import messaging from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
 import { name as appName } from './app.json';
@@ -85,4 +86,4 @@ messaging().onMessage(async remoteMessage => {
     }
 });
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent(appName, () => LogoAnimation);
