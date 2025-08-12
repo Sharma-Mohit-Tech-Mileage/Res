@@ -118,82 +118,8 @@ const InAppNotifications = ({ navigation }) => {
         <View style={styles.inAppNotificationsInner}>
           <View style={{ alignSelf: "stretch" }}>
             <View style={[styles.frameGroup, styles.frameBorder]}>
-              <View
-                style={[
-                  styles.frameView,
-                  {
-                    backgroundColor: "#F8F8F8",
-                    margin: 20,
-                    borderRadius: 4,
-                    paddingHorizontal: Padding.p_5xs,
-                  },
-                ]}
-              >
-                <View style={styles.infoCircleWrapper}>
-                  <Infocircle />
-                </View>
-                <Text
-                  style={[
-                    styles.youAreSubscribedContainer,
-                    styles.containerTypo,
-                  ]}
-                >
-                  <Text
-                    style={styles.youAreSubscribed}
-                  >{`You are subscribed to text message alerts. `}</Text>
-                  <Text>
-                    Reply STOP to cancel at any time. Message and data rates may
-                    apply.
-                  </Text>
-                </Text>
-              </View>
-              <View
-                style={{
-                  height: 1,
-                  backgroundColor: Color.sparklightGray,
-                  width: "100%",
-                }}
-              />
+        
 
-              
-              
-                <View style={[styles.frameParent3,{marginHorizontal:20,marginVertical:10}]}>
-                  <Text style={styles.mobilePhoneTypo}>Mobile Phone</Text>
-                  <View style={{ paddingVertical: 4 }}>
-                    <Controller
-                      control={control}
-                      name="phoneNumber"
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <SparkLightInput
-                          placeholder="Mobile Number"
-                          onBlur={onBlur}
-                          onChangeText={onChange}
-                          value={value}
-                          error={errors.phoneNumber?.message}
-                        />
-                      )}
-                    />
-                  
-                  <Text
-                    style={[
-                      styles.receiveTextNotifications1,
-                      styles.containerTypo,
-                    ]}
-                  >
-                    Message and data rates may apply. Message frequency may
-                    vary. Text STOP to opt out or HELP for help.
-                  </Text>
-                </View>
-              </View>
-
-               <View
-                style={{
-                  height: 1,
-                  backgroundColor: Color.sparklightGray,
-                  width: "100%",
-                }}
-              />
-              
               <View style={styles.infoWrapper}>
                 <NotificationAlert
                   type="error"
