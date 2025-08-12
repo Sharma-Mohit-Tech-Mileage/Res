@@ -42,6 +42,23 @@ const Notifications = () => {
     },
   ], [profileData.emailAddress, paperlessStatusAcp]);
 
+  const InAppSettings = useMemo(() => [
+    {
+      id: 'Appointment',
+      type: 'Appointments',
+      status: 'On' 
+    },
+    {
+      id: 'outage',
+      type: 'Outage',
+      status:  'On' 
+    },
+    {
+      id: 'billing',
+      type: 'Billing',
+      status:  'On' 
+    },
+  ], []);
   const sections = useMemo(() => [
     {
       id: 'text',
@@ -60,14 +77,19 @@ const Notifications = () => {
     {
       id: 'app',
       title: 'In-App Notifications',
-      isComingSoon: true,
-      infoMessage: '',
+      isComingSoon: false,
+      settings:InAppSettings,
+      infoMessage: 'Notifications sent from your application.',
     },
   ], [profileData, emailSettings]);
 
   const handleEdit = (section) => {
     console.log(`Editing ${section}`);
-    navigation.navigate('EmailNotifications', { is_enrolled: profileData.emailAddress });
+    if(section=='app'){
+       navigation.navigate('InAppNotifications', { is_enrolled: profileData.emailAddress });
+    }else{
+       navigation.navigate('EmailNotifications', { is_enrolled: profileData.emailAddress });
+    }
   };
 
   const handleBackPress = () => navigation.navigate('Account');
