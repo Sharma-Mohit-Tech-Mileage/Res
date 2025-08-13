@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Linking,
-  Platform,
+  AccessibilityInfo,
 } from "react-native";
 import AlertIcon from "../../res/svgIcons/AlertIconV2";
 import { FontFamily } from "../../../GlobalStyles";
@@ -34,16 +34,89 @@ class ErrorManager {
 
 export const globalErrorManager = new ErrorManager();
 
+const SUPPORT_NUMBER_RAW = "18776922253";
+const SUPPORT_NUMBER_DISPLAY = "1-877-692-2253";
+
 export const GlobalErrorModal = () => {
   const [visible, setVisible] = useState(false);
+  const [srEnabled, setSrEnabled] = useState(false); // screen reader on/off
 
   useEffect(() => {
     const unsubscribe = globalErrorManager.subscribe(setVisible);
-    return unsubscribe;
+
+    // fetch current SR state
+    AccessibilityInfo.isScreenReaderEnabled()
+      .then(setSrEnabled)
+      .catch(() => {});
+
+    // subscribe to changes (RN new vs legacy API)
+    const sub = AccessibilityInfo.addEventListener
+      ? AccessibilityInfo.addEventListener("screenReaderChanged", setSrEnabled)
+      : null;
+
+    return () => {
+      unsubscribe();
+      // remove listener safely across RN versions
+      if (sub && typeof sub.remove === "function") sub.remove();
+    };
   }, []);
 
   if (!visible) return null;
 
+  const dialSupport = () => Linking.openURL(`tel:${SUPPORT_NUMBER_RAW}`);
+
+  // When screen reader is ON - entire text is clickable
+  if (srEnabled) {
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => globalErrorManager.hide()}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.alertContainer}>
+            {/* Alert Icon - centered like in new design */}
+            <View style={styles.iconWrapper}>
+              <AlertIcon />
+            </View>
+
+            <Text style={styles.alertTitle}>Login Unavailable</Text>
+
+            <View style={styles.messageContainer}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                accessible={true}
+                accessibilityRole="link"
+                accessibilityLabel="We apologize but due to technical issues, we are unable to log in at this time. Please call 1 8 7 7 6 9 2 2 2 5 3 for further assistance."
+                accessibilityHint="Double tap to call support"
+                onPress={dialSupport}
+              >
+                <Text style={styles.message}>
+                  We apologize but due to technical issues, we are unable to log in
+                  at this time. Please call{" "}
+                  <Text style={styles.phoneNumber}>
+                    {SUPPORT_NUMBER_DISPLAY}
+                  </Text>{" "}
+                  for further assistance.
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              accessibilityRole="button"
+              style={[styles.closeBtn, { marginTop: 24 }]}
+              onPress={() => globalErrorManager.hide()}
+            >
+              <Text style={styles.closeAlertTxt}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
+  // When screen reader is OFF - only phone number is clickable
   return (
     <Modal
       visible={visible}
@@ -59,16 +132,16 @@ export const GlobalErrorModal = () => {
           </View>
 
           <Text style={styles.alertTitle}>Login Unavailable</Text>
+
           <View style={styles.messageContainer}>
             <Text style={styles.message}>
               We apologize but due to technical issues, we are unable to log in
               at this time. Please call{" "}
               <Text
-                
-                onPress={() => Linking.openURL("tel:18776922253")}
-                accessibilityRole="link"
+                style={styles.phoneNumber}
+                onPress={dialSupport}
               >
-                1-877-692-2253
+                {SUPPORT_NUMBER_DISPLAY}
               </Text>{" "}
               for further assistance.
             </Text>
@@ -102,17 +175,12 @@ const styles = StyleSheet.create({
     width: "90%",
     alignSelf: "center",
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
   },
-  iconWrapper: {
-    marginBottom: 16,
-  },
+  iconWrapper: { marginBottom: 16 },
   alertTitle: {
     fontSize: 22,
     fontWeight: "600",
@@ -132,7 +200,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "400",
     lineHeight: 28,
-    textAlign: "left", // Left aligned as requested
+    textAlign: "left",
   },
   // Using EXACT button styles from CustomAlertModal
   closeBtn: {
@@ -153,7 +221,7 @@ const styles = StyleSheet.create({
   },
   phoneNumber: {
     color: colors.sparklight_purple_blue,
-    fontWeight: "600",
+    fontWeight: "700",
     textDecorationLine: "underline",
   },
 });
