@@ -320,9 +320,10 @@ const BillingScreen = ({ navigation }) => {
                     >
                       {isNewBiller && <Icon name="document" color={Color.colorMidnightblue} size={20} style={{marginRight: 16}}/>}
                       
-                      <Text style={styles.modemHealthSupport}>View Payment History</Text>
+                      <Text style={styles.modemHealthSupport}>View Payment History </Text>
                       <Icon name="right-chevron" color={Color.colorMidnightblue} size={20}/>
                     </TouchableOpacity>
+                    
                     <View style={styles.frameLayout} />
                     
                     <TouchableOpacity
