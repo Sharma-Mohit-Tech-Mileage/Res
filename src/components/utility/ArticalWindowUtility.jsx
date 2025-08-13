@@ -326,7 +326,8 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                     
                     // Script injection
                     injectedJavaScript={enhancedScript}
-                    
+                    // Add this property to the WebView (around line 330 where other props are)
+                    injectedJavaScriptBeforeContentLoaded={Platform.OS === 'android' ? enhancedScript : undefined}
                     // FIXED: Simplified WebView settings to prevent first-load errors
                     startInLoadingState={true}
                     renderLoading={LoadingComponent}
