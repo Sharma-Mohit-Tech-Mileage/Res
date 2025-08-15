@@ -4,7 +4,7 @@ import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
-import { saveUserInfo, logError, logInfo, } from "../../redux/actions/UserAction";
+import { saveUserInfo, logInfo, } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -21,6 +21,7 @@ import LoginLogger from "../../components/utility/LoginLogger";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import analytics from '@react-native-firebase/analytics';
 import { shouldBlockLogin } from "../utility/disconnectHelpers";
+import { globalErrorManager } from '../common/GlobalErrorModal';
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -36,7 +37,7 @@ const SplashScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [authInProgress, setAuthInProgress] = useState(false);
-  const authLockRef = useRef(false); // 🟢 IMPROVED: Synchronous lock
+  const authLockRef = useRef(false); //  IMPROVED: Synchronous lock
   const [bussinessApp, setIsBusiness] = useState(false);
   const [loginEnable, setLoginEnable] = useState(false);
   const [disconnected, setDisconnected] = useState(false);
@@ -63,8 +64,6 @@ const SplashScreen = ({ navigation, route }) => {
   };
 
   const onSuccess = async (res) => {
-    // 🟢 DON'T set loading to false here - keep it until navigation or error
-    // setLoading(false);  // ❌ Removed this line
     
     if (res && res.userInfo) {
       LoginLogger.logSuccessfulLogin(dispatch, logInfo, res.userInfo, {
@@ -80,7 +79,9 @@ const SplashScreen = ({ navigation, route }) => {
     console.error('Login API Error:', error);
     setLoading(false);
     setLoginEnable(true);
-    
+    if (error?.status === 204) {
+      globalErrorManager.show();
+    }
     LoginLogger.logFailedLogin(dispatch, logInfo, {
       message: "API login failed",
       code: 30803
@@ -106,67 +107,67 @@ const SplashScreen = ({ navigation, route }) => {
       setIsBusiness(false);
 
       if (shouldBlockLogin(userInfo.acctStatus, userInfo.daysSinceDisconnectDate)) {
-        setLoading(false); // 🟢 Set loading false for disconnect modal
+        setLoading(false); //  Set loading false for disconnect modal
         setDisconnected(true);
         return;
       }
       
       if (!isNormalUser) {
         if (res.userInfo?.authLevel != "HeadOfHousehold" && userInfo?.authLevel == "Admin") {
-          setLoading(false); // 🟢 Set loading false for error modal
-          setLoginEnable(true); // 🟢 Re-enable login for modal cases
+          setLoading(false); //  Set loading false for error modal
+          setLoginEnable(true); //  Re-enable login for modal cases
           setErrorMessage(strings.AdminMsg);
           setTimeout(() => { setModalVisible(true); }, 100);
         } else if (res.userInfo.customerType === "COM") {
-          setLoading(false); // 🟢 Set loading false for business modal
-          setLoginEnable(true); // 🟢 Re-enable login for modal cases
+          setLoading(false); //  Set loading false for business modal
+          setLoginEnable(true); //  Re-enable login for modal cases
           setIsBusiness(true);
           setErrorMessage(strings.BusinessUserMsg);
           setErrorMessage1(" to manage your Sparklight Business services account.");
           setTimeout(() => { setModalVisible(true); }, 500);
         } else {
-          // 🟢 Keep loading true, navigation will happen
+          //  Keep loading true, navigation will happen
           moveAfterLogin(user);
         }
       } else if (
         (userInfo?.authLevel !== "HeadOfHousehold" && userInfo?.authLevel == "Admin") ||
         userInfo.acctStatus !== "Active"
       ) {
-        setLoading(false); // 🟢 Set loading false for error modal
-        setLoginEnable(true); // 🟢 Re-enable login for modal cases
+        setLoading(false); //  Set loading false for error modal
+        setLoginEnable(true); // Re-enable login for modal cases
         setErrorMessage(strings.AdminMsg);
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.customerType != "Residential") {
-        setLoading(false); // 🟢 Set loading false for business modal
-        setLoginEnable(true); // 🟢 Re-enable login for modal cases
+        setLoading(false); //  Set loading false for business modal
+        setLoginEnable(true); //  Re-enable login for modal cases
         setIsBusiness(true);
         setErrorMessage(strings.BusinessUserMsg);
         setErrorMessage1(" to manage your Sparklight Business services account");
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.authLevel === 'Limited' || userInfo.authLevel === 'Restricted') {
-        setLoading(false); // 🟢 Set loading false for error modal
-        setLoginEnable(true); // 🟢 Re-enable login for modal cases
+        setLoading(false); //  Set loading false for error modal
+        setLoginEnable(true); //  Re-enable login for modal cases
         setErrorMessage(strings.AdminMsg);
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (userInfo.customerType === 'Business') {
-        setLoading(false); // 🟢 Set loading false for business modal
-        setLoginEnable(true); // 🟢 Re-enable login for modal cases
+        setLoading(false); //  Set loading false for business modal
+        setLoginEnable(true); //  Re-enable login for modal cases
         setErrorMessage(strings.BusinessUserMsg);
         setErrorMessage1(' to view information.');
         setTimeout(() => { setModalVisible(true); }, 100);
       } else if (res.custServices.internet == false) {
-        setLoading(false); // 🟢 Set loading false for error modal
-        setLoginEnable(true); // 🟢 Re-enable login for modal cases
+        setLoading(false); //  Set loading false for error modal
+        setLoginEnable(true); //  Re-enable login for modal cases
         setErrorMessage(strings.nonInternetUserMessage);
         setErrorMessage1(" to manage your service.");
         setTimeout(() => { setModalVisible(true); }, 100);
       } else {
-        // 🟢 Keep loading true, navigation will happen
+        // Keep loading true, navigation will happen
         moveAfterLogin(user);
       }
     } else {
       console.log("[HANDLE_LOGIN] No response received.");
-      setLoading(false); // 🟢 Set loading false for no response
+      setLoading(false); // Set loading false for no response
       setLoginEnable(true);
     }
   };
@@ -185,7 +186,7 @@ const SplashScreen = ({ navigation, route }) => {
         });
       }
       
-      // 🟢 Navigation will replace this screen, so keep loading true
+      //  Navigation will replace this screen, so keep loading true
       // Don't set setLoading(false) here
       
       // Navigation
@@ -196,7 +197,7 @@ const SplashScreen = ({ navigation, route }) => {
       }
     } catch (error) {
       console.error('Error in moveAfterLogin:', error);
-      setLoading(false); // 🟢 Only set loading false on error
+      setLoading(false); //  Only set loading false on error
       setLoginEnable(true);
     }
   };
@@ -255,7 +256,7 @@ const SplashScreen = ({ navigation, route }) => {
 
   const handleCloseAlert = () => {
     setModalVisible(false);
-    setLoading(false); // 🟢 Reset loading when closing modal
+    setLoading(false); // Reset loading when closing modal
     logoutAction(() => {
       if (bussinessApp) {
         if (Platform.OS === "android") {
@@ -275,12 +276,12 @@ const SplashScreen = ({ navigation, route }) => {
 
   const closeModal = () => {
     setModalVisible(false);
-    setLoading(false); // 🟢 Reset loading when closing modal
-    setLoginEnable(true); // 🟢 Re-enable login button
+    setLoading(false); //  Reset loading when closing modal
+    setLoginEnable(true); //  Re-enable login button
     logoutAction();
   };
 
-  // 🟢 IMPROVED: Synchronous race condition protection
+  //  IMPROVED: Synchronous race condition protection
   const loginAuth = async () => {
     // Synchronous check - prevents all race conditions
     if (authLockRef.current || authInProgress || loading) {
@@ -506,7 +507,7 @@ const SplashScreen = ({ navigation, route }) => {
 
       {loading ? <LoadingOverlay loading={loading} isWhite={true}/> : <></>}
       
-      {/* 🟢 IMPROVED: Better button state management with synchronous protection */}
+      {/*  IMPROVED: Better button state management with synchronous protection */}
       {!loading && !authInProgress && isVisible && (
         <Animated.View style={{ marginTop: hp("35%"), opacity: fadeAnim }}>
           <SparkLightLoginButton
@@ -518,7 +519,7 @@ const SplashScreen = ({ navigation, route }) => {
               }
             }}
             buttonText={"Login"}
-            disabled={authLockRef.current || authInProgress || loading || !loginEnable} // 🟢 Include sync lock
+            disabled={authLockRef.current || authInProgress || loading || !loginEnable} //  Include sync lock
           />
         </Animated.View>
       )}
@@ -560,8 +561,8 @@ const SplashScreen = ({ navigation, route }) => {
         }}
         onClose={() => {
           setDisconnected(false);
-          setLoading(false); // 🟢 Reset loading when closing disconnect modal
-          setLoginEnable(true); // 🟢 Re-enable login button
+          setLoading(false); //  Reset loading when closing disconnect modal
+          setLoginEnable(true); //  Re-enable login button
           logoutAction();
         }}
       />

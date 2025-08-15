@@ -3,12 +3,9 @@ import { Env } from "./apis/account/Constants";
 import axios from "axios";
 import { RefreshToken } from '../components/user/Session';
 import { navigationRef } from '../navigations/UserNavigations';
-import { globalErrorManager } from '../components/common/GlobalErrorModal';
-// Base URLs with ensured trailing slashes
 const BASE_URL = Env.API_BASEURL.endsWith('/') ? Env.API_BASEURL : `${Env.API_BASEURL}/`;
 const API_ACP_BASEURL = Env.API_ACP_BASEURL.endsWith('/') ? Env.API_ACP_BASEURL : `${API_ACP_BASEURL}/`;
 const SUPPORT_URL = "https://support.sparklight.com/api/v2/help_center/";
-const MODEM_BASE_URL = Env.MODEM_BASE_URL.endsWith('/') ? Env.MODEM_BASE_URL : `${Env.MODEM_BASE_URL}/`;
 
 export let UserAuthorized = false;
 let isRefreshing = false;
@@ -115,8 +112,6 @@ export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => 
     
     // Check for 204 No Content
     if (res.status === 204) {
-      console.error('[API Error]: 204 No Content received');
-      globalErrorManager.show();  // Show error modal for 204
       onError({
         status: 204,
         message: 'No content received',
@@ -143,11 +138,6 @@ export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => 
       endpoint,
       timestamp: new Date().toISOString()
     };
-    
-    console.error('[API Error]:', errorResponse);
-    
-    // Show error modal for ANY API failure
-    globalErrorManager.show();
     
     onError(errorResponse);
   }

@@ -42,7 +42,7 @@ const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
           <Text style={[styles.message, { fontSize: 16 }]}>{msg1}</Text>
           <View style={{ flexDirection: "row", marginTop: 10 }}>
             <Image source={warningIcon} style={{ width: 24, height: 24 }} />
-            <Text style={{ textAlign: "center", marginLeft: 5, alignSelf: "center", fontWeight: "600", fontFamily: FontFamily.openSansSemiBold, }} >
+            <Text style={{ color: colors.darkest_grey,textAlign: "center", marginLeft: 5, alignSelf: "center", fontWeight: "600", fontFamily: FontFamily.openSansSemiBold, }} >
               We're sorry!
             </Text>
           </View>
