@@ -211,9 +211,9 @@ const postTextNotifictionInfo = async (data) => {
             Authorization: "Bearer " + user.token
         }
     };
-    console.log('Making API Call to /users/api/SMS with data:', data); // Log the request data
+    console.log('Making API Call to api/SMS with data:', data); // Log the request data
     try {
-        const response = await _axios.post(`/users/api/SMS`, data, config);
+        const response = await _axios.post(`/api/SMS`, data, config);
         console.log('API Call Successful, Response:', response.data); // Log the successful response
         return response.data;
     } catch (error) {
@@ -350,13 +350,15 @@ const postPushNotifications = async (data) => {
         }
     };
 
-    try {
-        const response = await _axios.post(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, data, config);
+    console.log('postPushNotifications',data)
 
-        console.log(`API Call Successful to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:`, response);
+    try {
+        const response = await _axios.post(`/api/mobilenotificationpreferences/newBillerP2har/mobilepreferences`, data, config);
+
+        console.log(`API Call Successful to /api/mobilenotificationpreferences/newBillerP2har/mobilepreferences, Response:`, response?.data);
         return response;
     } catch (error) {
-        console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferences`, error);
+        console.error(`Error in API Call to /api/mobilenotificationpreferences/newBillerP2har/mobilepreferences`, error);
         throw error;
     }
 };

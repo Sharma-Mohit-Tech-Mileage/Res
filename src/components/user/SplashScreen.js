@@ -150,7 +150,7 @@ const SplashScreen = ({ navigation, route }) => {
       // Don't set setLoading(false) here
       
       // Navigation
-      if (!user.userInfo.mobileTCAcceptanceFlag) {
+      if (user.userInfo.mobileTCAcceptanceFlag) {
         navigation.reset({ index: 0, routes: [{ name: "MyTab" }] });
       } else {
         navigation.reset({ index: 0, routes: [{ name: "Terms" }] });

@@ -5,6 +5,7 @@ import { Color, Padding, FontSize, FontFamily, Border } from '../../../../Global
 import Checkcircle from '../../../../assets/svgs/Checkcircle';
 import Checkcircle1 from '../../../../assets/svgs/Checkcircle1';
 import InfoICon from '../../../../assets/svgs/Infocircle';
+import SmallLoader from '../../..//components/common/customui/SmallLoader';
 
 // Sub-components
 const StatusIcon = ({ status }) => (
@@ -42,16 +43,18 @@ const ComingSoonBadge = () => (
   </View>
 );
 
-const NotificationToggle = ({ type, status, isLast, warn }) => (
+const NotificationToggle = ({ type, status, isLast, warn,loading }) => (
   <View style={[
     styles.toggleContainer,
     !isLast && styles.bottomBorder,
     warn && styles.warnBackground
   ]}>
     <Text style={styles.toggleText}>{type}</Text>
-    <View style={styles.statusContainer}>
+    
+   <View style={styles.statusContainer}>
       <StatusIcon status={status} />
-      <Text style={styles.statusText}>{status}</Text>
+
+      { loading ?  <SmallLoader/> : <Text style={styles.statusText}>{status}</Text>}
     </View>
   </View>
 );
@@ -72,10 +75,23 @@ const BoldEmailText = ({ message }) => {
   </Text>
 );
 };
-const InfoMessage = ({ message }) => (
+
+const BoldPhoneText = ({ phoneNum }) => {
+ return (
+  <Text>
+      <React.Fragment>
+        {'Text alert are sent to '}
+        { <Text style={[styles.infoText,{fontWeight:'600',color:Color.colorGray_200}]}>{phoneNum}</Text>}
+      </React.Fragment>
+    
+  </Text>
+);
+};
+const InfoMessage = ({ message,phoneNumber,id }) => (
   <View style={styles.infoMessage}>
     <InfoIcon />
-    <Text style={styles.infoText}>{<BoldEmailText message={message}/>}</Text>
+    <Text style={styles.infoText}>
+      {id=='text'? <BoldPhoneText phoneNum ={phoneNumber}/> : <BoldEmailText message={message}/>}</Text>
   </View>
 );
 
@@ -89,12 +105,15 @@ const AdminMessage = () => (
 
 // Main component
 const NotificationSection = ({
+  id,
   title,
   infoMessage,
   settings = [],
   isComingSoon = false,
   isAdmin = false,
-  onEdit
+  isLoading=false,
+  onEdit,
+  phoneNumber
 }) => {
   return (
     <View style={styles.sectionContainer}>
@@ -112,7 +131,7 @@ const NotificationSection = ({
       {isAdmin && <AdminMessage />}
 
       {/* Info Message */}
-      {infoMessage && <InfoMessage message={infoMessage} />}
+      {infoMessage && <InfoMessage message={infoMessage} phoneNumber={phoneNumber} id={id}/>}
       <View style={styles.bottomBorder} />
 
       {/* Settings List */}
@@ -121,6 +140,7 @@ const NotificationSection = ({
           key={setting.id}
           {...setting}
           isLast={index === settings.length - 1}
+          loading={isLoading}
         />
       ))}
     </View>

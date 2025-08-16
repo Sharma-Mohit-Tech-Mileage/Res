@@ -12,6 +12,7 @@ import Notifications from '../../components/notifiction/Notifications_acp/Notifi
 import AddEmailNotification from '../../components/notifiction/Notifications_acp/EmailNotification';
 import EmailNotifications_acp from '../../components/notifiction/Notifications_acp/EmailNotification';
 import InAppNotifications from '../../components/notifiction/Notifications_acp/InAppNotifications';
+import TextNotifications from '../..//components/notifiction/Notifications_acp/TextNotifications';
 
 import Feedback from '../../components/support/Feedback';
 import ThumbsUp from '../../components/support/ThumbsUp';
@@ -138,6 +139,16 @@ function AccountStackScreen() {
       <AccountStack.Screen
         name="InAppNotifications"
         component={InAppNotifications}
+        options={{ headerShown: false }}
+        listeners={{
+          focus: () => setTabBarVisible(true),
+          blur: () => setTabBarVisible(true),
+        }}
+      />
+
+      <AccountStack.Screen
+        name="TextNotifications"
+        component={TextNotifications}
         options={{ headerShown: false }}
         listeners={{
           focus: () => setTabBarVisible(true),

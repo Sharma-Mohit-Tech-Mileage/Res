@@ -17,7 +17,6 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import SparkLightInput from "../../common/customui/SparkLightInput";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
@@ -33,7 +32,7 @@ import {
   requestUserPermission,
 } from "../../../firebase/FirebaseUtils";
 import { getPushNotificationStatus } from "../../../redux/utils/LocalStorage";
-import Infocircle from "../../../../assets/svgs/Infocircle";
+
 // Define your validation schema
 const validationSchema = yup.object().shape({
     phoneNumber: yup.string()
@@ -45,14 +44,14 @@ const validationSchema = yup.object().shape({
 });
 
 const InAppNotifications = ({ navigation }) => {
-  const [initialize, setInitializeSettings] = useState({});
-  const [showErrorAlert, setShowErrorAlert] = useState(false);
   const route = useRoute();
+  const [initialize, setInitializeSettings] = useState(route.params?.additionalData);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
   const additionalData = route.params?.additionalData;
   const dispatch = useDispatch();
   const scrollViewRef = useRef(null);
   const isFocused = useIsFocused();
-  const formatedData = initializeSettings(route.params?.additionalData);
+  const formatedData = (route.params?.additionalData);
     const { control, handleSubmit, setValue, getValues, formState: { errors } } = useForm({
         resolver: yupResolver(validationSchema),
         defaultValues: {
@@ -66,7 +65,7 @@ const InAppNotifications = ({ navigation }) => {
 
   useEffect(() => {
     if (isFocused) {
-      const initializedSettings = transformToUserPreferences(additionalData);
+      const initializedSettings = (additionalData);
       setInitializeSettings(initializedSettings);
     }
 
@@ -76,15 +75,17 @@ const InAppNotifications = ({ navigation }) => {
       }
     };
   }, [isFocused, additionalData]);
+
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
-    setInitializeSettings((initialize) => {
-      const updatedSettings = {
-        ...initialize,
-        [name]: !value,
-      };
-      return updatedSettings;
-    });
+    formatedData[name]=value
+    // setInitializeSettings((initialize) => {
+    //   const updatedSettings = {
+    //     ...initialize,
+    //     [name]: !value,
+    //   };
+    //   return updatedSettings;
+    // });
   };
 
   useEffect(() => {
@@ -103,10 +104,11 @@ const InAppNotifications = ({ navigation }) => {
       await requestUserPermission();
     }
     const token = await getFcmToken();
-    initialize.deviceToken = token;
-    initialize.deviceTokenTimestamp = moment().format();
-    initialize.isAndroid = Platform.OS === "android";
-    await dispatch(updatePushNotificationsv2(initialize, navigation));
+    formatedData.deviceToken = token;
+    formatedData.deviceTokenTimestamp = moment().format();
+    formatedData.isAndroid = Platform.OS === "android";
+    console.log('Request data',formatedData)
+    await dispatch(updatePushNotificationsv2(formatedData, navigation));
   };
   return (
     <View style={styles.inAppNotifications}>
@@ -133,21 +135,21 @@ const InAppNotifications = ({ navigation }) => {
               <NotificationSetting
                 title="Appointments"
                 name="optOut"
-                value={!initialize.optOut}
+                value={formatedData.optOut}
                 description="Receive app notifications when your appointments have updates."
                 onChange={handleToggleChange}
               />
               <NotificationSetting
                 title="Outage Alerts"
                 name="outageOptOut"
-                value={!initialize.outageOptOut}
+                value={formatedData.outageOptOut}
                 description="Receive app notifications when outage occur."
                 onChange={handleToggleChange}
               />
               <NotificationSetting
                 title="Billing"
                 name="billingOptOutStatus"
-                value={!initialize.billingOptOutStatus}
+                value={formatedData.billingOptOutStatus}
                 description="Receive app notifications for billing."
                 onChange={handleToggleChange}
               />
