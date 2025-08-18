@@ -3,8 +3,6 @@ import { Env } from "./apis/account/Constants";
 import axios from "axios";
 import { RefreshToken } from '../components/user/Session';
 import { navigationRef } from '../navigations/UserNavigations';
-
-// Base URLs with ensured trailing slashes
 const BASE_URL = Env.API_BASEURL.endsWith('/') ? Env.API_BASEURL : `${Env.API_BASEURL}/`;
 const API_ACP_BASEURL = Env.API_ACP_BASEURL.endsWith('/') ? Env.API_ACP_BASEURL : `${API_ACP_BASEURL}/`;
 const SUPPORT_URL = "https://support.sparklight.com/api/v2/help_center/";
@@ -95,40 +93,57 @@ const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess
 };
   
 export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => {
-    const idTokenGuid = body?.idTokenGuid;
-    const refreshToken = body?.refreshToken;
+  const idTokenGuid = body?.idTokenGuid;
+  const refreshToken = body?.refreshToken;
+  
+  try {
+    const requestBody = { ...body };
+    delete requestBody.idTokenGuid;
+    delete requestBody.refreshToken;
     
-    try {
-      const requestBody = { ...body };
-      delete requestBody.idTokenGuid;
-      delete requestBody.refreshToken;
-      const res = await axios.post(`${BASE_URL}${endpoint}`, requestBody, {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        timeout: 30000,
-        validateStatus: (status) => status >= 200 && status < 300
-      });
-      const responseData = { ...res.data };
-      if (idTokenGuid) {
-        responseData.idTokenGuid = idTokenGuid;
-      }
-      if (refreshToken) {
-        responseData.refreshToken = refreshToken;
-      }
-      onSuccess(responseData);
-    } catch (err) {
-      const errorResponse = {
-        err,
-        status: err.response?.status,
-        message: err.response?.data?.message || err.message || 'Request failed',
+    const res = await axios.post(`${BASE_URL}${endpoint}`, requestBody, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      timeout: 30000,
+      validateStatus: (status) => status >= 200 && status < 300 && status !== 204  // Exclude 204
+    });
+    
+    // Check for 204 No Content
+    if (res.status === 204) {
+      onError({
+        status: 204,
+        message: 'No content received',
         endpoint,
         timestamp: new Date().toISOString()
-      };
-      onError(errorResponse);
+      });
+      return;
     }
-  };
+    
+    const responseData = { ...res.data };
+    if (idTokenGuid) {
+      responseData.idTokenGuid = idTokenGuid;
+    }
+    if (refreshToken) {
+      responseData.refreshToken = refreshToken;
+    }
+    onSuccess(responseData);
+    
+  } catch (err) {
+    const errorResponse = {
+      err,
+      status: err.response?.status,
+      message: err.response?.data?.message || err.message || 'Request failed',
+      endpoint,
+      timestamp: new Date().toISOString()
+    };
+    
+    onError(errorResponse);
+  }
+};
+
+
 export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     const user = await getUser();
     const baseUrl = await getBaseUrl(); // Dynamically get the base URL
