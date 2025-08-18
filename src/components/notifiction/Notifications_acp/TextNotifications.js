@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Image,
   StyleSheet,
@@ -6,9 +6,11 @@ import {
   Pressable,
   View,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
+import CheckBox from "@react-native-community/checkbox";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRoute } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
@@ -25,7 +27,7 @@ import {
 } from "../../../../GlobalStyles";
 import { initializeSettings } from "../../utility/constant";
 import Toggle from "../../common/Toggle";
-import Infocircle from "../../../../assets/svgs/Infocircle";
+import AlertIcon from "../../../../assets/svgs/Alerttriangle";
 
 // Define your validation schema
 const validationSchema = yup.object().shape({
@@ -47,6 +49,9 @@ const TextNotifications = ({ navigation }) => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorText, setErrorText] = useState(false);
   const formatedData = route.params?.additionalData;
+  const [isCheckboxVisible, setIsCheckboxVisible] = useState(true);
+  const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
+  const [isTermRequired, setIsTermRequired]= useState(false)
   console.log("pass data", route.params?.additionalData);
   const {
     control,
@@ -65,6 +70,30 @@ const TextNotifications = ({ navigation }) => {
     },
   });
 
+  const handleCheckboxToggle = useCallback(() => {
+    setToggleCheckBoxTerm(!toggleCheckBoxTerm);
+  }, [toggleCheckBoxTerm]);
+
+  const handleTermsLinkPress = useCallback(
+    (event) => {
+      event.stopPropagation();
+      navigation.navigate("ArticalWindowUtility", {
+        url: "https://www.sparklight.com/legal/text-messaging-terms-and-conditions",
+        name: "Terms & Conditions",
+      });
+    },
+    [navigation]
+  );
+
+  useEffect(() => {
+    if (formatedData?.phoneNumber) {
+      setIsCheckboxVisible(true);
+    } else {
+      setIsCheckboxVisible(false);
+    }
+
+  }, []);
+
   useEffect(() => {
     if (route.params?.updateFailed) {
       setErrorText("Something went wrong. Please try again.");
@@ -81,13 +110,27 @@ const TextNotifications = ({ navigation }) => {
   };
 
   const onSubmit = (data) => {
-    dispatch(updateTextNotification(data, navigation));
+    if(isCheckboxVisible){
+     if(data.billingOptOutStatus ||data.outageOptOut||data.optOut){
+        dispatch(updateTextNotification(data, navigation));
+     }else{
+        setIsTermRequired(true)
+     }
+    }else{
+        dispatch(updateTextNotification(data, navigation));
+    }
+    //console.log('data',data)
+    //dispatch(updateTextNotification(data, navigation));
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: Color.colorWhitesmoke_200 }}>
       <ProfileSettingsHeader
-        title="Edit Text Notifications"
+        title={
+          formatedData?.phoneNumber
+            ? "Edit Text Notifications"
+            : "Add Text Notifications"
+        }
         onPressBack={() => navigation.navigate("Notifications")}
       />
       <ScrollView ref={scrollViewRef}>
@@ -122,14 +165,15 @@ const TextNotifications = ({ navigation }) => {
             </View>
 
             <View style={styles.frameChild} />
-             <View style={{marginHorizontal:20, marginVertical:10}}>
-                <Text style={[styles.mobilePhoneTypo]}>
+            <View style={{ marginHorizontal: 20, marginVertical: 10 }}>
+              {/* <Text style={[styles.mobilePhoneTypo]}>
                 Edit Mobile Phone Number
-                </Text>
-                <Text style={[styles.mobilePhoneTypo,{marginTop:10}]}>
-                    Please enter the mobile phone number you would like to receive all future customer communications. You may opt out at any time.
-                </Text>
-             </View>
+                </Text> */}
+              <Text style={[styles.mobilePhoneTypo, { marginTop: 10 }]}>
+                Please enter the mobile phone number you would like to receive
+                all future customer communications. You may opt out at any time.
+              </Text>
+            </View>
             <View style={styles.frameChild} />
             <View style={styles.frameGroup}>
               <View style={[styles.frameParent3]}>
@@ -175,7 +219,13 @@ const TextNotifications = ({ navigation }) => {
                         render={({ field: { onChange, value } }) => (
                           <Toggle
                             label="Appointments"
-                            onToggle={() => onChange(!value)}
+                            onToggle={() => {
+                                onChange(!value)
+                                if(!value){
+                                    setIsTermRequired(false)
+                                }
+                            }
+                        }
                             initialValue={formatedData?.optOut}
                           />
                         )}
@@ -209,7 +259,11 @@ const TextNotifications = ({ navigation }) => {
                         render={({ field: { onChange, value } }) => (
                           <Toggle
                             label="Outage Alerts"
-                            onToggle={() => onChange(!value)}
+                            onToggle={() => {onChange(!value)
+                                if(!value){
+                                    setIsTermRequired(false)
+                                }
+                            }}
                             initialValue={formatedData?.outageOptOut}
                           />
                         )}
@@ -242,7 +296,11 @@ const TextNotifications = ({ navigation }) => {
                         render={({ field: { onChange, value } }) => (
                           <Toggle
                             label="Billing"
-                            onToggle={() => onChange(!value)}
+                            onToggle={() => {onChange(!value)
+                            if(!value){
+                                    setIsTermRequired(false)
+                                }
+                        }}
                             initialValue={formatedData?.billingOptOutStatus}
                           />
                         )}
@@ -261,6 +319,77 @@ const TextNotifications = ({ navigation }) => {
               </View>
             </View>
             <View style={styles.frameChild} />
+            {isCheckboxVisible && (
+              <View style={{ paddingVertical: 16, marginHorizontal: 16 }}>
+                <View style={styles.checkBoxArea}>
+                  <TouchableOpacity
+                    style={styles.checkboxTouchable}
+                    onPress={handleCheckboxToggle}
+                    accessibilityRole="checkbox"
+                    accessibilityLabel="I agree to Text Messaging Terms and Conditions"
+                    accessibilityState={{ checked: toggleCheckBoxTerm }}
+                  >
+                    <View style={styles.checkboxContainer}>
+                      <CheckBox
+                        disabled={true}
+                        value={toggleCheckBoxTerm}
+                        style={styles.checkBox}
+                        boxType="square"
+                        tintColors={{
+                          true: "#1B99FF",
+                          false:
+                            Platform.OS === "ios"
+                              ? Color.colorWhitesmoke_300
+                              : "#D0D5DD",
+                        }}
+                        accessible={false}
+                      />
+                      <Text
+                        style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
+                        allowFontScaling={true}
+                        maxFontSizeMultiplier={1}
+                      >
+                        I agree to{" "}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={handleTermsLinkPress}
+                    accessibilityRole="link"
+                    accessibilityLabel="View Text Messaging Terms and Conditions"
+                    accessibilityHint="Opens Text Messaging Terms and Conditions in a new window"
+                  >
+                    <Text
+                      style={[
+                        styles.checkBoxAreaViewText,
+                        {
+                          color: Color.sparklightBrightPurple,
+                          textDecorationLine: "underline",
+                        },
+                      ]}
+                      allowFontScaling={true}
+                      maxFontSizeMultiplier={1}
+                    >
+                      Text Messaging Terms & Conditions
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                { isTermRequired && <View style={{ paddingTop: 8 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                    }}
+                  >
+                    <AlertIcon />
+                    <Text style={styles.ErrorToggle}>
+                      Please agree to the Terms & Conditions to proceed.
+                    </Text>
+                  </View>
+                </View> }
+              </View>
+            )}
           </View>
           <View style={[{ alignSelf: "stretch" }]}>
             <Pressable
@@ -309,9 +438,10 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   mobilePhoneTypo: {
-    color: Color.sparklightGray1,
+    color: Color.colorblack_100,
     fontSize: FontSize.size_base,
     lineHeight: 22,
+    fontWeight: "400",
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
   },
@@ -323,6 +453,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: Border.br_11xs,
     height: 56,
+  },
+  ErrorToggle: {
+    color: Color.sparkLightRed,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "600",
+    fontSize: 14,
+    marginLeft: 4,
   },
   makeTypo: {
     fontSize: FontSize.size_base,
@@ -392,8 +529,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   receiveTextNotifications1: {
-    color: Color.sparklightaddGray,
+    color: Color.sparklightDarkGray,
     lineHeight: 22,
+    fontWeight: "400",
     fontFamily: FontFamily.openSansRegular,
     textAlign: "left",
     alignSelf: "stretch",
@@ -432,6 +570,29 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Padding.p_base,
     marginBottom: 200,
+  },
+  checkBox: {
+    width: 12,
+    height: 12,
+    marginRight: Platform.OS === "ios" ? 2 : 16,
+    backgroundColor: Color.colorWhitesmoke_100,
+  },
+  checkBoxArea: {
+    flexDirection: "row",
+  },
+  checkboxTouchable: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 0,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  checkBoxAreaViewText: {
+    fontSize: 14,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorGray_200,
   },
 });
 
