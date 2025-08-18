@@ -28,6 +28,7 @@ import {
 import { initializeSettings } from "../../utility/constant";
 import Toggle from "../../common/Toggle";
 import AlertIcon from "../../../../assets/svgs/Alerttriangle";
+import { widthPercentageToDP } from "react-native-responsive-screen";
 
 // Define your validation schema
 const validationSchema = yup.object().shape({
@@ -49,9 +50,10 @@ const TextNotifications = ({ navigation }) => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorText, setErrorText] = useState(false);
   const formatedData = route.params?.additionalData;
-  const [isCheckboxVisible, setIsCheckboxVisible] = useState(true);
+  const [isCheckboxVisible, setIsCheckboxVisible] = useState(false);
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
   const [isTermRequired, setIsTermRequired]= useState(false)
+  const [message,setMessage]=useState('Please enter your mobile phone number below and then select the type of message you would like to receive.')
   console.log("pass data", route.params?.additionalData);
   const {
     control,
@@ -87,9 +89,10 @@ const TextNotifications = ({ navigation }) => {
 
   useEffect(() => {
     if (formatedData?.phoneNumber) {
-      setIsCheckboxVisible(true);
-    } else {
       setIsCheckboxVisible(false);
+      setMessage('Please enter the mobile phone number you would like to receive all future customer communications. You may opt out at any time.')
+    } else {
+      setIsCheckboxVisible(true);
     }
 
   }, []);
@@ -110,7 +113,7 @@ const TextNotifications = ({ navigation }) => {
   };
 
   const onSubmit = (data) => {
-    if(isCheckboxVisible){
+    if(isCheckboxVisible && !toggleCheckBoxTerm){
      if(data.billingOptOutStatus ||data.outageOptOut||data.optOut){
         dispatch(updateTextNotification(data, navigation));
      }else{
@@ -164,21 +167,20 @@ const TextNotifications = ({ navigation }) => {
               </View>
             </View>
 
-            <View style={styles.frameChild} />
+            
             <View style={{ marginHorizontal: 20, marginVertical: 10 }}>
               {/* <Text style={[styles.mobilePhoneTypo]}>
                 Edit Mobile Phone Number
                 </Text> */}
               <Text style={[styles.mobilePhoneTypo, { marginTop: 10 }]}>
-                Please enter the mobile phone number you would like to receive
-                all future customer communications. You may opt out at any time.
+                {message}
               </Text>
             </View>
-            <View style={styles.frameChild} />
+            
             <View style={styles.frameGroup}>
               <View style={[styles.frameParent3]}>
                 <Text style={styles.mobilePhoneTypo}>Mobile Phone</Text>
-                <View style={{ paddingVertical: 4 }}>
+                <View style={{ paddingVertical: 4 , width:widthPercentageToDP('80%')}}>
                   <Controller
                     control={control}
                     name="phoneNumber"
@@ -193,15 +195,7 @@ const TextNotifications = ({ navigation }) => {
                     )}
                   />
                 </View>
-                <Text
-                  style={[
-                    styles.receiveTextNotifications1,
-                    styles.containerTypo,
-                  ]}
-                >
-                  Message and data rates may apply. Message frequency may vary.
-                  Text STOP to opt out or HELP for help.
-                </Text>
+                
               </View>
             </View>
             <View style={styles.frameChild} />

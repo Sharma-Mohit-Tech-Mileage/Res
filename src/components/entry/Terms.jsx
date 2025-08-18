@@ -103,6 +103,7 @@ const Terms = ({ navigation }) => {
     useEffect(() => {
         if (accountDetails) {
             const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
+            console.log('Email',updatedPrimaryEmail)
             setValue(updatedPrimaryEmail);
         }
     }, [accountDetails, dispatch]);

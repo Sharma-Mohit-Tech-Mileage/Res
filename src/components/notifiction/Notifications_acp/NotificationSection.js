@@ -78,9 +78,11 @@ const BoldEmailText = ({ message }) => {
 
 const BoldPhoneText = ({ phoneNum }) => {
  return (
-  <Text>
+  
+  <Text style={[styles.infoText]}>
       <React.Fragment>
-        {'Text alert are sent to '}
+
+        {phoneNum?'Text alert are sent to ' :'You have not enabled text notifications'}
         { <Text style={[styles.infoText,{fontWeight:'600',color:Color.colorGray_200}]}>{phoneNum}</Text>}
       </React.Fragment>
     

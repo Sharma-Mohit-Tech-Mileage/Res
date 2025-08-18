@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   bottomContainer: {
-    height: 170,
+    height: 120,
   },
   textBottomHeight: {
     height: 200,
