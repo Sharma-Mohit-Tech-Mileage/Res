@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
    textContentContainer: {
        flex: 1,
        marginLeft: 12,
-       paddingRight: 20,
+       paddingRight: 10,
    },
    textContentContainerNoClose: {
        paddingRight: 0,

@@ -113,11 +113,17 @@ const TextNotifications = ({ navigation }) => {
   };
 
   const onSubmit = (data) => {
-    if(isCheckboxVisible && !toggleCheckBoxTerm){
+    if(isCheckboxVisible ){
+        if(!toggleCheckBoxTerm){
+            setIsTermRequired(true);
+            return;
+        }
      if(data.billingOptOutStatus ||data.outageOptOut||data.optOut){
         dispatch(updateTextNotification(data, navigation));
      }else{
-        setIsTermRequired(true)
+        setErrorText("Please select the type of messages you would like to receive.");
+        setShowErrorAlert(true);
+        scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
      }
     }else{
         dispatch(updateTextNotification(data, navigation));
@@ -140,6 +146,7 @@ const TextNotifications = ({ navigation }) => {
         <View style={styles.textNotificationsInner}>
           <View style={[styles.navigationBorder]}>
             <View style={styles.frameGroup}>
+             <View style={{ width: "100%" }}>    
               <NotificationAlert
                 type="error"
                 title="Failed"
@@ -150,6 +157,7 @@ const TextNotifications = ({ navigation }) => {
                 isVisible={showErrorAlert}
                 onClose={() => setShowErrorAlert(false)}
               />
+              </View>
               <View style={{ width: "100%" }}>
                 <NotificationAlert
                   type="warning"

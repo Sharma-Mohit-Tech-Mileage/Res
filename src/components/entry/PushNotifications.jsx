@@ -49,6 +49,8 @@ const PushNotifications = ({ navigation }) => {
             && profile.profileDetails.memberType === "Admin") {
             setNextScreen('MyTab');
         }
+
+        console.log('nextScreen: ', profile);
     }, [profile]);
     
     const enableNotifications = async () => {
