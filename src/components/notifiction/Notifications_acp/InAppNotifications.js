@@ -125,7 +125,7 @@ const InAppNotifications = ({ navigation }) => {
               <View style={styles.infoWrapper}>
                 <NotificationAlert
                   type="error"
-                  title="Failed"
+                  title="Error"
                   message="Notifications updated failed."
                   showCloseIcon={true}
                   isVisible={showErrorAlert}

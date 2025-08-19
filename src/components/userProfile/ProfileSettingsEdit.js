@@ -91,7 +91,7 @@ const ProfileSettingsEdit = () => {
             <View style={styles.infoWrapper}>
               <NotificationAlert
                 type="error"
-                title="Failed"
+                title="Error"
                 message="Your profile update failed."
                 showCloseIcon={true}
                 isVisible={showErrorAlert}

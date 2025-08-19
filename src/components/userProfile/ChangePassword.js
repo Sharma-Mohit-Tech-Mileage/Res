@@ -187,7 +187,7 @@ const ChangePassword = () => {
               <View style={styles.infoWrapper}>
               <NotificationAlert
                 type="error"
-                title="Failed"
+                title="Error"
                 message="Password and security update failed."
                 showCloseIcon={true}
                 isVisible={showErrorAlert}

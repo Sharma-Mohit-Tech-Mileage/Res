@@ -35,7 +35,7 @@ const validationSchema = yup.object().shape({
   phoneNumber: yup
     .string()
     .matches(
-      /^(?:(\+1|1)?\s*(?:\([2-10]\d{2}\)\ ?|[2-10]\d{2}[- ]?)[2-10]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/,
+      /^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/,
       "Invalid mobile phone number."
     )
     .required("Phone number is required"),
@@ -151,7 +151,7 @@ const TextNotifications = ({ navigation }) => {
              <View style={{ width: "100%" }}>    
               <NotificationAlert
                 type="error"
-                title="Failed"
+                title="Error"
                 message={
                   errorText ? errorText : "Notifications updated failed."
                 }
