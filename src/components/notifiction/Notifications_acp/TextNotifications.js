@@ -25,7 +25,7 @@ import {
   Padding,
   Border,
 } from "../../../../GlobalStyles";
-import { initializeSettings } from "../../utility/constant";
+
 import Toggle from "../../common/Toggle";
 import AlertIcon from "../../../../assets/svgs/Alerttriangle";
 import { widthPercentageToDP } from "react-native-responsive-screen";
@@ -35,7 +35,7 @@ const validationSchema = yup.object().shape({
   phoneNumber: yup
     .string()
     .matches(
-      /^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/,
+      /^(?:(\+1|1)?\s*(?:\([2-10]\d{2}\)\ ?|[2-10]\d{2}[- ]?)[2-10]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/,
       "Invalid mobile phone number."
     )
     .required("Phone number is required"),
@@ -53,6 +53,7 @@ const TextNotifications = ({ navigation }) => {
   const [isCheckboxVisible, setIsCheckboxVisible] = useState(false);
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
   const [isTermRequired, setIsTermRequired]= useState(false)
+  const [message1, setMessage1] = useState('You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-4567 for support. Message and data rates may apply.')
   const [message,setMessage]=useState('Please enter your mobile phone number below and then select the type of message you would like to receive.')
   console.log("pass data", route.params?.additionalData);
   const {
@@ -91,6 +92,7 @@ const TextNotifications = ({ navigation }) => {
     if (formatedData?.phoneNumber) {
       setIsCheckboxVisible(false);
       setMessage('Please enter the mobile phone number you would like to receive all future customer communications. You may opt out at any time.')
+      setMessage1('You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-4567 for support. Message and data rates may apply.')
     } else {
       setIsCheckboxVisible(true);
     }
@@ -163,11 +165,11 @@ const TextNotifications = ({ navigation }) => {
                   type="warning"
                   title={""}
                   message={
-                    "You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-4567 for support. Message and data rates may apply."
+                    message1
                   }
                   showCloseIcon={false}
                   isVisible={true}
-                  accessibilityLabel="You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-4567 for support. Message and data rates may apply."
+                  accessibilityLabel={message1}
                   accessibilityLiveRegion="polite"
                   accessibilityRole="alert"
                   customStyle={styles.warningAlert}
