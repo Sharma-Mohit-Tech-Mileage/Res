@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef,useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -7,7 +7,7 @@ import {
   Keyboard,
   Pressable,
   Platform,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import {
   Color,
@@ -23,7 +23,8 @@ import CheckBox from "@react-native-community/checkbox";
 import { useSelector, useDispatch } from "react-redux";
 import { updateTextNotification } from "../../redux/actions/ProfileActionSuite";
 import Phone from "../../res/svgIcons/Phone";
-
+import AlertIcon from "../../res/svgIcons/AlertIcon";
+import { getPrimaryEmail } from "../../components/utility/constant";
 const TextNotifications = ({ navigation }) => {
   const dispatch = useDispatch();
   const [input, setInput] = useState("");
@@ -36,30 +37,34 @@ const TextNotifications = ({ navigation }) => {
   const [textInputLayout, setTextInputLayout] = useState({});
   const [isTermRequired, setIsTermRequired] = useState(false);
   const scrollRef = useRef();
+   const [error, setError] = useState("");
+  const accountDetails = useSelector(
+    (state) => state.combinedReducers.profile?.accountDetails
+  );
 
-  useEffect(() => {
-    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
-      setKeyboardHidden(false);
-    });
+//   useEffect(() => {
+//     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+//       setKeyboardHidden(false);
+//     });
 
-    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
-      setKeyboardHidden(true);
-    });
+//     const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+//       setKeyboardHidden(true);
+//     });
 
-    return () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    };
-  }, []);
+//     return () => {
+//       showSubscription.remove();
+//       hideSubscription.remove();
+//     };
+//   }, []);
 
-  useEffect(() => {
-    if (!keyboardHidden) {
-      scrollRef.current?.scrollTo({
-        y: textInputLayout.y,
-        animated: true,
-      });
-    }
-  }, [keyboardHidden]);
+//   useEffect(() => {
+//     if (!keyboardHidden) {
+//       scrollRef.current?.scrollTo({
+//         y: textInputLayout.y,
+//         animated: true,
+//       });
+//     }
+//   }, [keyboardHidden]);
 
   useEffect(() => {
     if (
@@ -72,20 +77,28 @@ const TextNotifications = ({ navigation }) => {
     ) {
       setNextScreen("MyTab");
     }
-  }, []);
-
-  useEffect(() => {
-    if (profile.smsSubscription?.length > 0) {
-      if (
-        profile.smsSubscription[0].phoneNum !== undefined &&
-        profile.smsSubscription[0].phoneNum.length > 0
-      ) {
-        setInput(profile.smsSubscription[0].phoneNum.substring(1));
+    console.log("Account Details in Text Notification: ", accountDetails);
+    if (accountDetails) {
+      const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
+      console.log("Updated Primary Email: ", updatedPrimaryEmail);
+      if (updatedPrimaryEmail && updatedPrimaryEmail.length > 0) {
+        setNextScreen("MyTab");
       }
-    } else {
-      setInput(user.userInfo.phone);
     }
   }, []);
+
+//   useEffect(() => {
+//     if (profile.smsSubscription?.length > 0) {
+//       if (
+//         profile.smsSubscription[0].phoneNum !== undefined &&
+//         profile.smsSubscription[0].phoneNum.length > 0
+//       ) {
+//         setInput(profile.smsSubscription[0].phoneNum.substring(1));
+//       }
+//     } else {
+//       setInput(user.userInfo.phone);
+//     }
+//   }, []);
 
   const onChangeText = (text) => {
     setInput(text);
@@ -94,9 +107,21 @@ const TextNotifications = ({ navigation }) => {
     } else {
       setEnableButton(false);
     }
+    const phoneRegex = /^(?:\+?\d{11})$/;
+    if (!phoneRegex.test(text) && text.length > 1) {
+      setError("Invalid phone number.");
+    } else {
+      setError("");
+    }
   };
   const handleCheckboxToggle = useCallback(() => {
     setToggleCheckBox(!toggleCheckBox);
+    console.log("toggleCheckBox", !toggleCheckBox, input);
+    if(toggleCheckBox){
+            setEnableButton(true)
+        }else{
+            setEnableButton(false)
+        }
   }, [toggleCheckBox]);
 
   const onCheckBox = (value) => {
@@ -107,18 +132,17 @@ const TextNotifications = ({ navigation }) => {
       setEnableButton(false);
     }
   };
-  
-  
-    const handleTermsLinkPress = useCallback(
-      (event) => {
-        event.stopPropagation();
-        navigation.navigate("ArticalWindowUtility", {
-          url: "https://www.sparklight.com/legal/text-messaging-terms-and-conditions",
-          name: "Terms & Conditions",
-        });
-      },
-      [navigation]
-    );
+
+  const handleTermsLinkPress = useCallback(
+    (event) => {
+      event.stopPropagation();
+      navigation.navigate("ArticalWindowUtility", {
+        url: "https://www.sparklight.com/legal/text-messaging-terms-and-conditions",
+        name: "Terms & Conditions",
+      });
+    },
+    [navigation]
+  );
 
   const keyboardDismiss = () => {
     Keyboard.dismiss();
@@ -127,9 +151,9 @@ const TextNotifications = ({ navigation }) => {
   const enableTextNotifications = () => {
     const data = {
       accountNumber: user.userInfo.accountNumber,
-      billingOptOutStatus: false,
-      optOut: false,
-      outageOptOut: false,
+      billingOptOutStatus: true,
+      optOut: true,
+      outageOptOut: true,
       phoneNumber: input,
     };
     console.log("enableTextNotifications: ", data);
@@ -140,62 +164,75 @@ const TextNotifications = ({ navigation }) => {
         index: 0,
         routes: [{ name: nextScreen }],
       });
+    }else{
+        setIsTermRequired(true);
     }
   };
 
   return (
     <View style={styles.container}>
+      <ProfileSettingsHeader showIcon={false} title={"Notifications"} />
       <ScrollView
         style={styles.inner}
         contentContainerStyle={styles.innerContent}
         ref={scrollRef}
       >
-        <ProfileSettingsHeader showIcon={false} title={"Notifications"} />
-        <View style={styles.headerTabView}>
-          <View style={styles.headerTabOne} />
-          <View style={styles.headerTabTwo} />
-          <View style={styles.headerTabThree} />
-        </View>
-        <View style={styles.viewContainer}>
-          <View>
-            <View style={styles.headerIconViewContainer}>
-              <View style={styles.headerIconView}>
-                <PhoneRingingIcon />
+        <>
+          <View style={styles.headerTabView}>
+            <View style={styles.headerTabOne} />
+            <View style={styles.headerTabTwo} />
+            <View style={styles.headerTabThree} />
+          </View>
+          <View style={styles.viewContainer}>
+            <View>
+              <View style={styles.headerIconViewContainer}>
+                <View style={styles.headerIconView}>
+                  <PhoneRingingIcon />
+                </View>
+              </View>
+              <View style={styles.header}>
+                <Text style={styles.headerText}>
+                  Turn on Text Notifications
+                </Text>
+              </View>
+              <View style={styles.subHeader}>
+                <Text style={styles.subHeaderText}>
+                  Receive text alerts related to your account, updates and more
+                  from Sparklight.
+                </Text>
               </View>
             </View>
-            <View style={styles.header}>
-              <Text style={styles.headerText}>Turn on Text Notifications</Text>
-            </View>
-            <View style={styles.subHeader}>
-              <Text style={styles.subHeaderText}>
-                Receive text alerts related to your account, updates and more
-                from Sparklight.
-              </Text>
+            <View
+              style={[styles.subInput]}
+              onLayout={(event) => {
+                //setTextInputLayout(event.nativeEvent.layout);
+              }}
+            >
+              <EntryInput
+                name="phone"
+                placeholder="Phone number"
+                input={input}
+                style={error ? styles.errorInput : {}}
+                onChangeText={onChangeText}
+                onSubmitText={keyboardDismiss}
+                keyboardType="number-pad"
+              />
+              {error ? <Text style={styles.errorText}>{error}</Text> : null}
             </View>
           </View>
+          <View style={styles.bottomContainer}></View>
+
           <View
-            style={styles.subInput}
-            onLayout={(event) => {
-              setTextInputLayout(event.nativeEvent.layout);
+            style={{
+              marginHorizontal: 20,
+              marginVertical: 20,
+              marginBottom: 50,
             }}
           >
-            <EntryInput
-              name="phone"
-              placeholder="Phone number"
-              input={input}
-              onChangeText={onChangeText}
-              onSubmitText={keyboardDismiss}
-              keyboardType="number-pad"
-            />
-          </View>
-        </View>
-        <View style={styles.bottomContainer}></View>
-        
-          <View style={{ marginHorizontal:20, marginVertical:20, marginBottom: 50 }}>
             <View style={styles.checkBoxArea}>
               <TouchableOpacity
                 style={styles.checkboxTouchable}
-                onPress={handleCheckboxToggle}
+                onPress={onCheckBox.bind(null, !toggleCheckBox)}
                 accessibilityRole="checkbox"
                 accessibilityLabel="I agree to Text Messaging Terms and Conditions"
                 accessibilityState={{ checked: toggleCheckBox }}
@@ -204,7 +241,7 @@ const TextNotifications = ({ navigation }) => {
                   <CheckBox
                     disabled={true}
                     value={toggleCheckBox}
-                    onValueChange={handleCheckboxToggle}
+                    onValueChange={onCheckBox.bind(null, !toggleCheckBox)}
                     style={styles.checkBox}
                     boxType="square"
                     tintColors={{
@@ -247,7 +284,7 @@ const TextNotifications = ({ navigation }) => {
               </TouchableOpacity>
             </View>
             {isTermRequired && (
-              <View style={{ paddingTop: 8 }}>
+              <View style={{ paddingTop: 8, flexDirection: "row" }}>
                 <View
                   style={{
                     flexDirection: "row",
@@ -263,9 +300,8 @@ const TextNotifications = ({ navigation }) => {
               </View>
             )}
           </View>
-        
 
-        {/* <View style={styles.checkBoxArea}>
+          {/* <View style={styles.checkBoxArea}>
                         <View style={Platform.OS == "ios" ? styles.checkBoxView : styles.checkBoxViewAndroid }>
                             <CheckBox
                                 disabled={false}
@@ -280,51 +316,52 @@ const TextNotifications = ({ navigation }) => {
                             <Text style={styles.checkBoxAreaViewText}>I understand that message and data rates may apply. Message frequency may vary.</Text>
                         </View>             
                     </View>                                 */}
-        <View style={styles.bottomBar}>
-          <Pressable
-            disabled={!enableButton}
-            accessibilityRole="button"
-            accessibilityState={{ disabled: !enableButton }}
-            accessibilityLabel="Enable Text Notifications"
-            accessibilityHint="Activates text message notifications for your account."
-            style={
-              enableButton
-                ? [styles.button, styles.buttonsLayout]
-                : [styles.button, styles.buttonsLayout, styles.buttonDisabled]
-            }
-            onPress={enableTextNotifications}
-          >
-            <Text
+          <View style={styles.bottomBar}>
+            <Pressable
+              disabled={!enableButton}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !enableButton }}
+              accessibilityLabel="Enable Text Notifications"
+              accessibilityHint="Activates text message notifications for your account."
               style={
                 enableButton
-                  ? styles.accept
-                  : [styles.accept, styles.buttonDisabledText]
+                  ? [styles.button, styles.buttonsLayout]
+                  : [styles.button, styles.buttonsLayout, styles.buttonDisabled]
               }
+              onPress={enableTextNotifications}
             >
-              Enable Text Notifications
-            </Text>
-          </Pressable>
-          <View
-            style={styles.buttonsParent}
-            accessibilityLabel="Buttons Section"
-          >
-            <Pressable
-              style={[styles.buttonDecline, styles.buttonsLayout]}
-              onPress={() => {
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: nextScreen }],
-                });
-              }}
-              accessibilityLabel="Skip Button"
-              accessibilityRole="button"
-              accessibilityHint="Skip Terms and Conditions"
-            >
-              <Text style={styles.decline}>Skip for now</Text>
+              <Text
+                style={
+                  enableButton
+                    ? styles.accept
+                    : [styles.accept, styles.buttonDisabledText]
+                }
+              >
+                Enable Text Notifications
+              </Text>
             </Pressable>
+            <View
+              style={styles.buttonsParent}
+              accessibilityLabel="Buttons Section"
+            >
+              <Pressable
+                style={[styles.buttonDecline, styles.buttonsLayout]}
+                onPress={() => {
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name: nextScreen }],
+                  });
+                }}
+                accessibilityLabel="Skip Button"
+                accessibilityRole="button"
+                accessibilityHint="Skip Terms and Conditions"
+              >
+                <Text style={styles.decline}>Skip for now</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-        {!keyboardHidden && <View style={styles.textBottomHeight} />}
+          {!keyboardHidden && <View style={styles.textBottomHeight} />}
+        </>
       </ScrollView>
     </View>
   );
@@ -395,7 +432,8 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     // marginTop: 10,
     //backgroundColor: Color.colorWhitesmoke_100
-  },checkboxContainer: {
+  },
+  checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
@@ -407,7 +445,7 @@ const styles = StyleSheet.create({
   },
   checkBoxArea: {
     flexDirection: "row",
-    marginLeft:4
+    marginLeft: 4,
   },
   checkboxTouchable: {
     flexDirection: "row",
@@ -457,7 +495,8 @@ const styles = StyleSheet.create({
     height: 25,
     marginBottom: 10,
     marginTop: 10,
-  },ErrorToggle: {
+  },
+  ErrorToggle: {
     color: Color.sparkLightRed,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "600",
@@ -539,6 +578,14 @@ const styles = StyleSheet.create({
   },
   textBottomHeight: {
     height: 200,
+  },errorInput: {
+    borderColor: "red",
+    borderWidth: 1,
+  },
+  errorText: {
+    marginTop: 8,
+    color: "red",
+    fontSize: 14,
   },
 });
 

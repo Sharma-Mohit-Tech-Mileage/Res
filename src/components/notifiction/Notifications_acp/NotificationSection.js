@@ -5,7 +5,7 @@ import { Color, Padding, FontSize, FontFamily, Border } from '../../../../Global
 import Checkcircle from '../../../../assets/svgs/Checkcircle';
 import Checkcircle1 from '../../../../assets/svgs/Checkcircle1';
 import InfoICon from '../../../../assets/svgs/Infocircle';
-import SmallLoader from '../../..//components/common/customui/SmallLoader';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 
 // Sub-components
 const StatusIcon = ({ status }) => (
@@ -52,9 +52,13 @@ const NotificationToggle = ({ type, status, isLast, warn,loading }) => (
     <Text style={styles.toggleText}>{type}</Text>
     
    <View style={styles.statusContainer}>
-      <StatusIcon status={status} />
-
-      { loading ?  <SmallLoader/> : <Text style={styles.statusText}>{status}</Text>}
+      { loading ?   <SkeletonPlaceholder>
+        <View style={{height: 20,width:40,marginLeft:Padding.p_5xs,borderRadius:5}} />
+        </SkeletonPlaceholder> : <>
+        <StatusIcon status={status} />
+        <Text style={styles.statusText}>{status}</Text>
+        </>
+        }
     </View>
   </View>
 );

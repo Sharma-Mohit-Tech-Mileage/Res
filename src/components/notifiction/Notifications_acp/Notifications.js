@@ -197,7 +197,7 @@ const Notifications = () => {
             
             res[0]?.smsMessageType.forEach((value, index) => {
               console.log(`Index: ${index}, Value: ${value}`);
-              TextNotifSettings[index].status = value?.optOutFlag ? "On" : "Off";
+              TextNotifSettings[index].status = (value?.optOutFlag) ? "Off" : "On";
             });
             let phoneNum=res[0].phoneNum ||''
             setPhoneNumber(phoneNum)

@@ -35,9 +35,13 @@ const validationSchema = yup.object().shape({
   phoneNumber: yup
     .string()
     .matches(
-      /^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/,
-      "Invalid mobile phone number."
-    )
+  /^(?:\+?\d{11})$/,
+  "Invalid mobile phone number."
+)
+    // .matches(
+    //   /^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/,
+    //   "Invalid mobile phone number."
+    // )
     .required("Phone number is required"),
   optOut: yup.boolean(),
   outageOptOut: yup.boolean(),
@@ -55,7 +59,7 @@ const TextNotifications = ({ navigation }) => {
   const [isTermRequired, setIsTermRequired]= useState(false)
   const [message1, setMessage1] = useState('You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-4567 for support. Message and data rates may apply.')
   const [message,setMessage]=useState('Please enter your mobile phone number below and then select the type of message you would like to receive.')
-  console.log("pass data", route.params?.additionalData);
+  //console.log("pass data", route.params?.additionalData);
   const {
     control,
     handleSubmit,
@@ -75,6 +79,9 @@ const TextNotifications = ({ navigation }) => {
 
   const handleCheckboxToggle = useCallback(() => {
     setToggleCheckBoxTerm(!toggleCheckBoxTerm);
+    if (!toggleCheckBoxTerm) {
+    setIsTermRequired(false);
+    }
   }, [toggleCheckBoxTerm]);
 
   const handleTermsLinkPress = useCallback(
@@ -121,7 +128,7 @@ const TextNotifications = ({ navigation }) => {
             return;
         }
      if(data.billingOptOutStatus ||data.outageOptOut||data.optOut){
-        dispatch(updateTextNotification(data, navigation));
+        dispatch(updateTextNotification(formatedData, navigation));
      }else{
         setErrorText("Please select the type of messages you would like to receive.");
         setShowErrorAlert(true);
@@ -339,6 +346,7 @@ const TextNotifications = ({ navigation }) => {
                         value={toggleCheckBoxTerm}
                         style={styles.checkBox}
                         boxType="square"
+                        tintColor={isTermRequired?"#EF4E3E":Color.colorWhitesmoke_300}
                         tintColors={{
                           true: "#1B99FF",
                           false:

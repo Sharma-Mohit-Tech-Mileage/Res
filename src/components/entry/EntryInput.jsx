@@ -9,11 +9,11 @@ import { Padding, Color, FontSize, FontFamily } from '../../../GlobalStyles';
 import Phone from '../../res/svgIcons/Phone';
 import EmailIcon from '../../res/svgIcons/EmailIcone';
 
-const EntryInput = ({ name,input, placeholder, onChangeText, onSubmitText, IconImage, keyboardType }) => {
+const EntryInput = ({ name,input, placeholder, onChangeText, onSubmitText, IconImage, keyboardType,style }) => {
     const inputRef = useRef(null);
 
     return (
-        <View style={styles.inputContainer}  accessibilityLabel="Input field with icon">
+        <View style={[styles.inputContainer,style]}  accessibilityLabel="Input field with icon">
         {/* <Image
             source={iconImage}
             style={[styles.searchIcon, styles.leftIcon]}
@@ -28,7 +28,7 @@ const EntryInput = ({ name,input, placeholder, onChangeText, onSubmitText, IconI
         <TextInput
             autoCapitalize="none"
             ref={inputRef}
-            style={styles.searchInput}
+            style={[styles.searchInput]}
             placeholder={placeholder}
             value={input}
             onChangeText={onChangeText}

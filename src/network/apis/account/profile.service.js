@@ -204,16 +204,24 @@ const postProfileInfo = async (data) => {
 
 const postTextNotifictionInfo = async (data) => {
     let user = await getUser();
+   
     const accountNumber = user.userInfo?.accountNumber || null;
     data['accountNumber'] = accountNumber;
+     const postData={
+  "accountNumber": accountNumber,
+  "phoneNumber": data.phoneNumber,
+  "optOut": !data.optOut,
+  "outageOptOut": !data.outageOptOut,
+  "billingOptOutStatus": !data.billingOptOutStatus,
+}
     const config = {
         headers: {
             Authorization: "Bearer " + user.token
         }
     };
-    console.log('Making API Call to api/SMS with data:', data); // Log the request data
+    console.log('Making API Call to api/SMS with data:', postData); // Log the request data
     try {
-        const response = await _axios.post(`/api/SMS`, data, config);
+        const response = await _axios.post(`/api/SMS`, postData, config);
         console.log('API Call Successful, Response:', response.data); // Log the successful response
         return response.data;
     } catch (error) {
@@ -637,13 +645,13 @@ const isPaperlessEnabled = async (email) => {
     const data = {
         accountNumber: accountNumber,
         fieldList: [
-            "first_name", "last_name",
-            "current_balance", "past_due_amount",
-            "payment_due_date", "customer_type",
+            "first_name",
+            "last_name",
+            "current_balance",
+            "past_due_amount",
+            "payment_due_date",
             "services",
-            "email_details",
-             "email",
-             "unreturned_equipment_fees",
+            "email",
         ],
     };
 

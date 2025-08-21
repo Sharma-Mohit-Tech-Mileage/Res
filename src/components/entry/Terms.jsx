@@ -10,7 +10,6 @@ import { logout } from 'react-native-app-auth';
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { Env } from "../../network/apis/account/Constants";
 import { getPrimaryEmail } from "../../components/utility/constant";
-import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 
 const config = { issuer: Env.SSO_LOGIN, iosPrefersEphemeralSession: true, };
 
@@ -23,18 +22,17 @@ const Terms = ({ navigation }) => {
     const [profileLoadCount, setProfileLoadCount] = useState(0);
     const [isError, setIsError] = useState(false);
     const dispatch = useDispatch();
-    const userData = useSelector(state => state.combinedReducers.user.userData);
     const profile = useSelector(state => state.combinedReducers.profile || {});
     const [value, setValue] = useState(null);
     const url = 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions';
     const accountDetails = useSelector(
         (state) => state.combinedReducers.profile?.accountDetails
     );
-    useEffect(() => {
-        setTimeout(() => {
-            setLoading(false);
-        }, 10000);
-    }, []);
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         setLoading(false);
+    //     }, 2000);
+    // }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -105,6 +103,10 @@ const Terms = ({ navigation }) => {
             const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
             console.log('Email',updatedPrimaryEmail)
             setValue(updatedPrimaryEmail);
+            setTimeout(() => { 
+                setLoading(false); 
+            },2000)
+            
         }
     }, [accountDetails, dispatch]);
 

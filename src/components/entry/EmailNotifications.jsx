@@ -79,12 +79,14 @@ const EmailNotifications = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView
+      
+        <ProfileSettingsHeader showIcon={false} title={"Notifications"} />
+        <ScrollView
         ref={scrollRef}
         style={styles.inner}
         contentContainerStyle={styles.innerContent}
       >
-        <ProfileSettingsHeader showIcon={false} title={"Notifications"} />
+        <>
         
         <View style={styles.headerTabView}>
                             <View style={styles.headerTabOne} />
@@ -201,6 +203,7 @@ const EmailNotifications = ({ navigation }) => {
           </View>
         </View>
         {!keyboardHidden && <View style={styles.textBottomHeight} />}
+        </>
       </ScrollView>
     </View>
   );
