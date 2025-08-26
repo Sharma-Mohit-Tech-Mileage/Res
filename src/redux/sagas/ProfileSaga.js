@@ -119,14 +119,16 @@ function* updateProfileSecurity(action) {
 }
 
 function* updateTextNotification(action) {
+    let message = 'Your text notification preferences have been successfully updated to enable marketing messages.';
     try {
         const response = yield call(postTextNotifictionInfo, action.payload);
         if (action.navigation !== null) {
-            action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'Text' });
+            action.navigation.navigate('TextNotifications', { updateSuccess: true, updatedType: 'Text', successMessage: message,additionalData:action.payload });
         }
     } catch (error) {
+     message = 'Something went wrong. Please try again. If the problem persists, contact support.';
         if (action.navigation !== null) {
-            action.navigation.navigate('TextNotifications', { updateFailed: true });
+            action.navigation.navigate('TextNotifications', { updateFailed: true ,failureMessage: message, updatedType: 'Text',additionalData:action.payload });
         }
     }
 }
@@ -190,14 +192,16 @@ function* updatePushNotifications(action) {
     }
 }
 function* updatePushNotificationsV2(action) {
+    let message = 'Your InApp notification preferences have been successfully updated to enable marketing messages.';
     try {
         yield call(postPushNotifications, action.payload);
         if (action.navigation !== null) {
-            action.navigation.navigate('Notifications', { updateSuccess: true, updatedType: 'App' });
+            action.navigation.navigate('InAppNotifications', { updateSuccess: true, updatedType: 'App', successMessage: message, additionalData: action.payload });
         }
     } catch (error) {
+            message = 'Something went wrong. Please try again. If the problem persists, contact support.';
         if (action.navigation !== null) {
-            action.navigation.navigate('InAppNotifications', { updateFailed: true, updatedType: 'App' });
+            action.navigation.navigate('InAppNotifications', { updateFailed: true, updatedType: 'App', failureMessage: message, additionalData: action.payload });
         }
     }
 }

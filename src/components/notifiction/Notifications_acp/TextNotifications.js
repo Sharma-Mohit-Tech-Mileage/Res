@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Image,
+  Animated,
   StyleSheet,
   Text,
   Pressable,
   View,
+  Keyboard,
   ScrollView,
   TouchableOpacity,
 } from "react-native";
@@ -34,14 +36,9 @@ import { widthPercentageToDP } from "react-native-responsive-screen";
 const validationSchema = yup.object().shape({
   phoneNumber: yup
     .string()
-    .matches(
-  /^(?:\+?\d{11})$/,
-  "Invalid mobile phone number."
-)
-    // .matches(
-    //   /^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/,
-    //   "Invalid mobile phone number."
-    // )
+    .matches(/^(?:1)?\s*(?:\([2-9]\d{2}\)\s*|[2-9]\d{2}[- ]?)?[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?$/,
+      "Invalid mobile phone number."
+    )
     .required("Phone number is required"),
   optOut: yup.boolean(),
   outageOptOut: yup.boolean(),
@@ -51,13 +48,16 @@ const TextNotifications = ({ navigation }) => {
   const scrollViewRef = useRef(null);
   const route = useRoute();
   const dispatch = useDispatch();
+  const animatedValue = useRef(new Animated.Value(-100)).current;
+  const timeoutRef = useRef(null);
+  const [notification, setNotification] = useState(null);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorText, setErrorText] = useState(false);
   const formatedData = route.params?.additionalData;
   const [isCheckboxVisible, setIsCheckboxVisible] = useState(false);
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
   const [isTermRequired, setIsTermRequired]= useState(false)
-  const [message1, setMessage1] = useState('You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-4567 for support. Message and data rates may apply.')
+  const [message1, setMessage1] = useState('You are subscribing to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply.')
   const [message,setMessage]=useState('Please enter your mobile phone number below and then select the type of message you would like to receive.')
   //console.log("pass data", route.params?.additionalData);
   const {
@@ -76,7 +76,7 @@ const TextNotifications = ({ navigation }) => {
       accountNumber: "",
     },
   });
-
+const translateY = animatedValue;
   const handleCheckboxToggle = useCallback(() => {
     setToggleCheckBoxTerm(!toggleCheckBoxTerm);
     if (!toggleCheckBoxTerm) {
@@ -99,7 +99,7 @@ const TextNotifications = ({ navigation }) => {
     if (formatedData?.phoneNumber) {
       setIsCheckboxVisible(false);
       setMessage('Please enter the mobile phone number you would like to receive all future customer communications. You may opt out at any time.')
-      setMessage1('You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-4567 for support. Message and data rates may apply.')
+      setMessage1('You are subscribed to text message alerts. Reply STOP to cancel at any time. Call 1-800-123-0456 for support. Message and data rates may apply.')
     } else {
       setIsCheckboxVisible(true);
     }
@@ -121,7 +121,65 @@ const TextNotifications = ({ navigation }) => {
     //setShowErrorAlert(true);
   };
 
+  useEffect(() => {
+      
+        if (route.params?.updateSuccess) {
+          setNotification({ message: route.params.successMessage, type: "success" });
+          
+        } else if (route.params?.updateFailed) {
+          setNotification({ message: route.params.failureMessage, type: "error" });
+          
+        }
+      
+    }, [route.params, ]);
+  
+
+
+  const animateNotification = useCallback(() => {
+      // Clear any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+  
+      // Always animate in notification from off-screen
+      animatedValue.setValue(-100);
+  
+      Animated.timing(animatedValue, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(() => {
+        // Only auto-dismiss if notification is NOT an error type
+        if (notification && notification.type !== "error") {
+          timeoutRef.current = setTimeout(() => {
+            Animated.timing(animatedValue, {
+              toValue: -100,
+              duration: 500,
+              useNativeDriver: true,
+            }).start(() => setNotification(null));
+          }, 3000);
+        }
+      });
+    }, [animatedValue, notification]);
+  
+    useEffect(() => {
+      return () => {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+      };
+    }, []);
+  
+    useEffect(() => {
+      if (notification) {
+        scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+         animateNotification();
+      }
+    }, [notification, animateNotification])
+
   const onSubmit = (data) => {
+    Keyboard.dismiss();
     if(isCheckboxVisible ){
         if(!toggleCheckBoxTerm){
             setIsTermRequired(true);
@@ -151,10 +209,34 @@ const TextNotifications = ({ navigation }) => {
         }
         onPressBack={() => navigation.navigate("Notifications")}
       />
-      <ScrollView ref={scrollViewRef}>
+      <ScrollView ref={scrollViewRef} keyboardShouldPersistTaps="always" >
         <View style={styles.textNotificationsInner}>
           <View style={[styles.navigationBorder]}>
+
+            {notification && (
+              <Animated.View
+                style={{ transform: [{ translateY }], paddingHorizontal: Padding.p_5xl }}
+                accessible={true}
+              >
+                <View style={styles.spaceBottom}>
+                  <NotificationAlert
+                    type={notification.type}
+                    title={notification.type === "error" ? "Error" : "Success"}
+                    message={notification.message}
+                    
+                    showCloseIcon={false}
+                    onClose={() => setNotification(null)}
+                    accessibilityLiveRegion="assertive"
+                    accessibilityRole="alert"
+                    accessibilityLabel={notification.message}
+                  />
+                </View>
+              </Animated.View>
+            )}
+
             <View style={styles.frameGroup}>
+
+
              <View style={{ width: "100%" }}>    
               <NotificationAlert
                 type="error"
@@ -185,18 +267,18 @@ const TextNotifications = ({ navigation }) => {
             </View>
 
             
-            <View style={{ marginHorizontal: 20, marginVertical: 10 }}>
+            <View style={{ marginHorizontal: 20 }}>
               {/* <Text style={[styles.mobilePhoneTypo]}>
                 Edit Mobile Phone Number
                 </Text> */}
-              <Text style={[styles.mobilePhoneTypo, { marginTop: 10 }]}>
+              <Text style={[styles.mobilePhoneTypo]}>
                 {message}
               </Text>
             </View>
             
             <View style={styles.frameGroup}>
               <View style={[styles.frameParent3]}>
-                <Text style={styles.mobilePhoneTypo}>Mobile Phone</Text>
+                {/* <Text style={styles.mobilePhoneTypo}>Mobile Phone</Text> */}
                 <View style={{ paddingVertical: 4 , width:widthPercentageToDP('80%')}}>
                   <Controller
                     control={control}
@@ -204,10 +286,13 @@ const TextNotifications = ({ navigation }) => {
                     render={({ field: { onChange, onBlur, value } }) => (
                       <SparkLightInput
                         placeholder="Mobile Number"
+                        label={"Mobile Number"}
                         onBlur={onBlur}
                         onChangeText={onChange}
+                        keyboardType="number-pad"
                         value={value}
                         error={errors.phoneNumber?.message}
+                        maxLength={11}
                       />
                     )}
                   />
@@ -220,10 +305,10 @@ const TextNotifications = ({ navigation }) => {
               <View style={styles.frameWrapper2}>
                 <View style={styles.frameParent3}>
                   <View style={styles.frameParent4}>
-                    <Text style={[{ flex: 1 }, styles.mobilePhoneTypo]}>
+                    <Text style={[{ flex: 0.9}, styles.mobilePhoneTypo]}>
                       Appointments
                     </Text>
-                    <View>
+                    <View style={{flex:0.1}}>
                       <Controller
                         control={control}
                         name="optOut"
@@ -260,10 +345,10 @@ const TextNotifications = ({ navigation }) => {
               <View style={styles.frameWrapper2}>
                 <View style={styles.frameParent3}>
                   <View style={styles.frameParent4}>
-                    <Text style={[{ flex: 1 }, styles.mobilePhoneTypo]}>
+                    <Text style={[{ flex: 0.9 }, styles.mobilePhoneTypo]}>
                       Outage Alerts
                     </Text>
-                    <View>
+                    <View style={{flex:0.1}}>
                       <Controller
                         control={control}
                         name="outageOptOut"
@@ -295,12 +380,12 @@ const TextNotifications = ({ navigation }) => {
             <View style={styles.frameChild} />
             <View style={styles.frameGroup}>
               <View style={styles.frameWrapper2}>
-                <View style={styles.frameParent3}>
+                <View style={[styles.frameParent3]}>
                   <View style={styles.frameParent4}>
-                    <Text style={[{ flex: 1 }, styles.mobilePhoneTypo]}>
+                    <Text style={[{ flex: 0.9 }, styles.mobilePhoneTypo]}>
                       Billing
                     </Text>
-                    <View>
+                    <View style={{flex:0.1}}>
                       <Controller
                         control={control}
                         name="billingOptOutStatus"
@@ -331,7 +416,7 @@ const TextNotifications = ({ navigation }) => {
             </View>
             <View style={styles.frameChild} />
             {isCheckboxVisible && (
-              <View style={{ paddingVertical: 16, marginHorizontal: 16 }}>
+              <View style={{ paddingVertical: 16, marginHorizontal: 16,alignContent:'flex-start' , alignItems:'flex-start'}}>
                 <View style={styles.checkBoxArea}>
                   <TouchableOpacity
                     style={styles.checkboxTouchable}
@@ -538,7 +623,7 @@ const styles = StyleSheet.create({
   frameWrapper2: {
     flexDirection: "row",
     alignItems: "center",
-    flex: 1,
+    marginHorizontal: 10,
   },
   receiveTextNotifications1: {
     color: Color.sparklightDarkGray,
@@ -561,6 +646,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Color.sparklightWhite,
     alignSelf: "stretch",
+  },spaceBottom: {
+    marginVertical: 16,
+    width: widthPercentageToDP('85%')
   },
   frameGroup: {
     justifyContent: "center",

@@ -137,7 +137,10 @@ const NotificationSection = ({
       {isAdmin && <AdminMessage />}
 
       {/* Info Message */}
-      {infoMessage && <InfoMessage message={infoMessage} phoneNumber={phoneNumber} id={id}/>}
+      {isLoading ? <SkeletonPlaceholder>
+        <View style={{height: 40,width:'90%',marginHorizontal:Padding.p_base,marginBottom:Padding.p_base,borderRadius:5}} />
+        </SkeletonPlaceholder> :
+      infoMessage && <InfoMessage message={infoMessage} phoneNumber={phoneNumber} id={id}/>}
       <View style={styles.bottomBorder} />
 
       {/* Settings List */}

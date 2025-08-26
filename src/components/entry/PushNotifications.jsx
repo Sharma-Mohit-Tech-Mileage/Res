@@ -50,8 +50,8 @@ const PushNotifications = ({ navigation }) => {
               JSON.stringify(res)
             );
             if (res.length > 0) {
-              let phoneNum = res[0].phoneNum || "";
-              if (phoneNum && phoneNum.length > 0) {
+              let phoneNum = res[0]?.phoneNum || "";
+              if (phoneNum && phoneNum?.length > 0) {
                 if (accountDetails) {
                       const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
                       console.log("Updated Primary Email: ", updatedPrimaryEmail);
@@ -287,6 +287,8 @@ const styles = StyleSheet.create({
   decline: {
     color: Color.colorMidnightblue,
     textAlign: "center",
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
   },
   inner: {
     flex: 1,

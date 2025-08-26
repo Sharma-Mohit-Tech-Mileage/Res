@@ -128,7 +128,7 @@ const Notifications = () => {
     if (section == "app") {
       navigation.navigate("InAppNotifications", {
         is_enrolled: profileData.emailAddress,
-        additionalData:{optOut:InAppSettings[0].status=='On'? true:false,outageOptOut:InAppSettings[1].status=='On'? true:false,billingOptOutStatus:InAppSettings[2].status=='On'? true:false,phoneNumber:''}
+        additionalData:{optOut:InAppSettings[0].status=='On'? true:false,outageOptOut:InAppSettings[1].status=='On'? true:false,billingOptOutStatus:InAppSettings[2].status=='On'? true:false}
       });
     } else if (section == "email") {
       navigation.navigate("EmailNotifications", {
@@ -158,7 +158,7 @@ const Notifications = () => {
 
   const getInAppNotificationsData = () => {
     getUser().then((res1) => {
-      let requestUrl = `/api/mobilenotificationpreferences/newBillerP2har/mobilepreferences/${res1.userInfo?.accountNumber}`;
+      let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.accountNumber}/mobilepreferences/${res1.userInfo?.accountNumber}`;
       console.log(requestUrl);
       GetApiRequest(
         requestUrl,
@@ -169,7 +169,7 @@ const Notifications = () => {
               JSON.stringify(res)
             );
             res[0]?.pushMessageType.forEach((value, index) => {
-              //console.log(`Index: ${index}, Value: ${value}`);
+              console.log(`Index: ${index}, Value: ${value}`);
               InAppSettings[index].status = value?.optOutFlag ? "On" : "Off";
             });
           }
@@ -199,7 +199,7 @@ const Notifications = () => {
               console.log(`Index: ${index}, Value: ${value}`);
               TextNotifSettings[index].status = (value?.optOutFlag) ? "Off" : "On";
             });
-            let phoneNum=res[0].phoneNum ||''
+            let phoneNum=res[0]?.phoneNum ||''
             setPhoneNumber(phoneNum)
             
           }

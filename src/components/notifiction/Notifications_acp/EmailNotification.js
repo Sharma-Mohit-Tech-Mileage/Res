@@ -289,8 +289,8 @@ const AddNotificationScreen = () => {
             <View style={styles.divider} />
             <View style={[styles.section, { paddingHorizontal: Padding.p_5xl }]} >
               <View style={styles.toggleHeader}>
-                <Text style={styles.toggleTitle}>Critical Notifications</Text>
-                <View style={styles.iconContainer}>
+                <Text style={[styles.toggleTitle,{flex:0.86}]}>Critical Notifications</Text>
+                <View style={[styles.iconContainer,{ flex: 0.14 }]}>
                   {/* <Image
                     style={styles.icon}
                     resizeMode="cover"
@@ -318,14 +318,17 @@ const AddNotificationScreen = () => {
             <View style={styles.divider} />
             <View style={{ paddingTop: Padding.p_base, paddingBottom: 8, paddingHorizontal: Padding.p_5xl }}>
               <View style={styles.toggleHeader}>
-                <Text style={styles.toggleTitle}>Paperless Billing</Text>
+                <Text style={[styles.toggleTitle,{flex:0.9}]}>Paperless Billing</Text>
+                <View style={{ flex: 0.1}}>
                 <Toggle
+                  
                   name="paperlessBilling"
                   initialValue={paperlessStatusAcp || false}
                   onToggle={handleToggleChange}
                   disabled={!toggleCheckBoxTerm && !paperlessStatusAcp}
                   section="paperless"
                 />
+                </View>
               </View>
               <Text style={styles.toggleDescription}>
                 Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips.
@@ -450,7 +453,6 @@ const styles = StyleSheet.create({
   },
   toggleHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
   },
   toggleTitle: {

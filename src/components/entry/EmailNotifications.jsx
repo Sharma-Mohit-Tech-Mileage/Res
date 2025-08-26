@@ -334,6 +334,8 @@ const styles = StyleSheet.create({
   decline: {
     color: Color.colorMidnightblue,
     textAlign: "center",
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
   },
   bottomContainer: {
     height: 120,

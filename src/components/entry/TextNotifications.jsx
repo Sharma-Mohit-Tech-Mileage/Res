@@ -8,6 +8,7 @@ import {
   Pressable,
   Platform,
   TouchableOpacity,
+  Linking
 } from "react-native";
 import {
   Color,
@@ -18,13 +19,28 @@ import {
 } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import PhoneRingingIcon from "../../res/svgIcons/PhoneRingingIcon";
-import EntryInput from "./EntryInput";
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import SparkLightInput from "../common/customui/SparkLightInput";
 import CheckBox from "@react-native-community/checkbox";
 import { useSelector, useDispatch } from "react-redux";
 import { updateTextNotification } from "../../redux/actions/ProfileActionSuite";
 import Phone from "../../res/svgIcons/Phone";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import { getPrimaryEmail } from "../../components/utility/constant";
+// Define your validation schema
+  const validationSchema = yup.object().shape({
+    phoneNumber: yup
+      .string()
+      .matches(
+        /^(?:1)?\s*(?:\([2-9]\d{2}\)\s*|[2-9]\d{2}[- ]?)?[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?$/,
+        "Invalid mobile phone number."
+      )
+      .required("Phone number is required"),
+    
+  });
+
 const TextNotifications = ({ navigation }) => {
   const dispatch = useDispatch();
   const [input, setInput] = useState("");
@@ -37,34 +53,49 @@ const TextNotifications = ({ navigation }) => {
   const [textInputLayout, setTextInputLayout] = useState({});
   const [isTermRequired, setIsTermRequired] = useState(false);
   const scrollRef = useRef();
-   const [error, setError] = useState("");
+  const [error, setError] = useState("");
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
   );
+  
+  const {
+      control,
+      handleSubmit,
+      setValue,
+      getValues,
+      formState: { errors },
+    } = useForm({
+      resolver: yupResolver(validationSchema),
+      defaultValues: {
+        phoneNumber: "",
+        
+      },
+    });
+  
 
-//   useEffect(() => {
-//     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
-//       setKeyboardHidden(false);
-//     });
+  //   useEffect(() => {
+  //     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+  //       setKeyboardHidden(false);
+  //     });
 
-//     const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
-//       setKeyboardHidden(true);
-//     });
+  //     const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+  //       setKeyboardHidden(true);
+  //     });
 
-//     return () => {
-//       showSubscription.remove();
-//       hideSubscription.remove();
-//     };
-//   }, []);
+  //     return () => {
+  //       showSubscription.remove();
+  //       hideSubscription.remove();
+  //     };
+  //   }, []);
 
-//   useEffect(() => {
-//     if (!keyboardHidden) {
-//       scrollRef.current?.scrollTo({
-//         y: textInputLayout.y,
-//         animated: true,
-//       });
-//     }
-//   }, [keyboardHidden]);
+  //   useEffect(() => {
+  //     if (!keyboardHidden) {
+  //       scrollRef.current?.scrollTo({
+  //         y: textInputLayout.y,
+  //         animated: true,
+  //       });
+  //     }
+  //   }, [keyboardHidden]);
 
   useEffect(() => {
     if (
@@ -87,18 +118,18 @@ const TextNotifications = ({ navigation }) => {
     }
   }, []);
 
-//   useEffect(() => {
-//     if (profile.smsSubscription?.length > 0) {
-//       if (
-//         profile.smsSubscription[0].phoneNum !== undefined &&
-//         profile.smsSubscription[0].phoneNum.length > 0
-//       ) {
-//         setInput(profile.smsSubscription[0].phoneNum.substring(1));
-//       }
-//     } else {
-//       setInput(user.userInfo.phone);
-//     }
-//   }, []);
+  //   useEffect(() => {
+  //     if (profile.smsSubscription?.length > 0) {
+  //       if (
+  //         profile.smsSubscription[0].phoneNum !== undefined &&
+  //         profile.smsSubscription[0].phoneNum.length > 0
+  //       ) {
+  //         setInput(profile.smsSubscription[0].phoneNum.substring(1));
+  //       }
+  //     } else {
+  //       setInput(user.userInfo.phone);
+  //     }
+  //   }, []);
 
   const onChangeText = (text) => {
     setInput(text);
@@ -107,21 +138,16 @@ const TextNotifications = ({ navigation }) => {
     } else {
       setEnableButton(false);
     }
-    const phoneRegex = /^(?:\+?\d{11})$/;
-    if (!phoneRegex.test(text) && text.length > 1) {
-      setError("Invalid phone number.");
-    } else {
-      setError("");
-    }
+    
   };
   const handleCheckboxToggle = useCallback(() => {
     setToggleCheckBox(!toggleCheckBox);
     console.log("toggleCheckBox", !toggleCheckBox, input);
-    if(toggleCheckBox){
-            setEnableButton(true)
-        }else{
-            setEnableButton(false)
-        }
+    if (toggleCheckBox) {
+      setEnableButton(true);
+    } else {
+      setEnableButton(false);
+    }
   }, [toggleCheckBox]);
 
   const onCheckBox = (value) => {
@@ -136,10 +162,13 @@ const TextNotifications = ({ navigation }) => {
   const handleTermsLinkPress = useCallback(
     (event) => {
       event.stopPropagation();
-      navigation.navigate("ArticalWindowUtility", {
-        url: "https://www.sparklight.com/legal/text-messaging-terms-and-conditions",
-        name: "Terms & Conditions",
-      });
+    //   navigation.navigate("ArticalWindowUtility", {
+    //     url: "https://www.sparklight.com/legal/text-messaging-terms-and-conditions",
+    //     name: "Terms & Conditions",
+    //   });
+        Linking.openURL(
+            "https://www.sparklight.com/legal/text-messaging-terms-and-conditions"
+        );
     },
     [navigation]
   );
@@ -164,8 +193,8 @@ const TextNotifications = ({ navigation }) => {
         index: 0,
         routes: [{ name: nextScreen }],
       });
-    }else{
-        setIsTermRequired(true);
+    } else {
+      setIsTermRequired(true);
     }
   };
 
@@ -176,6 +205,7 @@ const TextNotifications = ({ navigation }) => {
         style={styles.inner}
         contentContainerStyle={styles.innerContent}
         ref={scrollRef}
+        keyboardShouldPersistTaps="always"
       >
         <>
           <View style={styles.headerTabView}>
@@ -203,12 +233,30 @@ const TextNotifications = ({ navigation }) => {
               </View>
             </View>
             <View
-              style={[styles.subInput]}
+              style={[styles.subInput,{width: "85%"}]}
               onLayout={(event) => {
                 //setTextInputLayout(event.nativeEvent.layout);
               }}
             >
-              <EntryInput
+              <Controller
+                control={control}
+                name="phoneNumber"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <SparkLightInput
+                    placeholder="Mobile Number"
+                    keyboardType="number-pad"
+                    onBlur={onBlur}
+                    onChangeText={(text) => {
+                      onChangeText(text);
+                      onChange(text);
+                    }}
+                    value={value}
+                    error={errors.phoneNumber?.message}
+                    maxLength={11}
+                  />
+                )}
+              />
+              {/* <EntryInput
                 name="phone"
                 placeholder="Phone number"
                 input={input}
@@ -217,7 +265,7 @@ const TextNotifications = ({ navigation }) => {
                 onSubmitText={keyboardDismiss}
                 keyboardType="number-pad"
               />
-              {error ? <Text style={styles.errorText}>{error}</Text> : null}
+              {error ? <Text style={styles.errorText}>{error}</Text> : null} */}
             </View>
           </View>
           <View style={styles.bottomContainer}></View>
@@ -328,7 +376,7 @@ const TextNotifications = ({ navigation }) => {
                   ? [styles.button, styles.buttonsLayout]
                   : [styles.button, styles.buttonsLayout, styles.buttonDisabled]
               }
-              onPress={enableTextNotifications}
+              onPress={handleSubmit(enableTextNotifications)}
             >
               <Text
                 style={
@@ -446,6 +494,7 @@ const styles = StyleSheet.create({
   checkBoxArea: {
     flexDirection: "row",
     marginLeft: 4,
+    alignSelf: "center",
   },
   checkboxTouchable: {
     flexDirection: "row",
@@ -464,7 +513,7 @@ const styles = StyleSheet.create({
     color: Color.sparklightWhite,
   },
   decline: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorMidnightblue,
     textAlign: "center",
@@ -567,8 +616,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   subInput: {
-    marginTop: 10,
-    marginBottom: 10,
+    marginVertical: 20,
   },
   viewContainer: {
     flex: 1,
@@ -578,7 +626,8 @@ const styles = StyleSheet.create({
   },
   textBottomHeight: {
     height: 200,
-  },errorInput: {
+  },
+  errorInput: {
     borderColor: "red",
     borderWidth: 1,
   },

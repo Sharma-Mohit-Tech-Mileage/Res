@@ -151,6 +151,8 @@ const fetchPushNotifications = async () => {
             Authorization: "Bearer " + user.token
         }
     };
+
+    console.log("Bearer token for fetchPushNotifications:", config.headers.Authorization);
     console.log(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`);
     try {
         const response = await _axios.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`, { ...config });
@@ -350,7 +352,8 @@ const postPushNotifications = async (data) => {
     const userName = user.userInfo?.userName || null;
     data.accountNumber = accountNumber;
     data.userName = userName;
-    data['deviceId'] = deviceToken;
+    data['id'] = 0;
+    data['DeviceId'] = deviceToken;
     data['customerType'] = 'Residential'
     const config = {
         headers: {
@@ -361,7 +364,7 @@ const postPushNotifications = async (data) => {
     console.log('postPushNotifications',data)
 
     try {
-        const response = await _axios.post(`/api/mobilenotificationpreferences/newBillerP2har/mobilepreferences`, data, config);
+        const response = await _axios.post(`api/mobilenotificationpreferences/${userName}/mobilepreferences`, data, config);
 
         console.log(`API Call Successful to /api/mobilenotificationpreferences/newBillerP2har/mobilepreferences, Response:`, response?.data);
         return response;

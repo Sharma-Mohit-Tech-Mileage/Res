@@ -18,13 +18,13 @@ const EntryInput = ({ name,input, placeholder, onChangeText, onSubmitText, IconI
             source={iconImage}
             style={[styles.searchIcon, styles.leftIcon]}
         /> */}
-        <View style={[styles.searchIcon, styles.leftIcon]}>
+        {/* <View style={[styles.searchIcon, styles.leftIcon]}>
            {name=='phone'?<Phone/>: 
            <View style={{marginTop:4}}>
            <EmailIcon/>
            </View>
            }
-        </View>
+        </View> */}
         <TextInput
             autoCapitalize="none"
             ref={inputRef}

@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   StyleSheet,
   Text,
   Pressable,
   View,
+  Animated,
   ScrollView,
   Platform,
 } from "react-native";
@@ -20,12 +21,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
-import { transformToUserPreferences } from "../../utility/constant";
+import { widthPercentageToDP } from "react-native-responsive-screen";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import { updatePushNotificationsv2 } from "../../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import Toggle from "../../common/Toggle";
-import { initializeSettings } from '../../utility/constant';
+
 import {
   getFcmToken,
   notifyPermission,
@@ -35,37 +36,97 @@ import { getPushNotificationStatus } from "../../../redux/utils/LocalStorage";
 
 // Define your validation schema
 const validationSchema = yup.object().shape({
-    phoneNumber: yup.string()
-        .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number.')
-        .required('Phone number is required'),
-    optOut: yup.boolean(),
-    outageOptOut: yup.boolean(),
-    billingOptOutStatus: yup.boolean(),
+  phoneNumber: yup
+    .string()
+    .matches(
+      /^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/,
+      "Invalid mobile phone number."
+    )
+    .required("Phone number is required"),
+  optOut: yup.boolean(),
+  outageOptOut: yup.boolean(),
+  billingOptOutStatus: yup.boolean(),
 });
 
 const InAppNotifications = ({ navigation }) => {
   const route = useRoute();
-  const [initialize, setInitializeSettings] = useState(route.params?.additionalData);
+  const [initialize, setInitializeSettings] = useState(
+    route.params?.additionalData
+  );
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const additionalData = route.params?.additionalData;
   const dispatch = useDispatch();
   const scrollViewRef = useRef(null);
+  const animatedValue = useRef(new Animated.Value(-100)).current;
+  const timeoutRef = useRef(null);
   const isFocused = useIsFocused();
-  const formatedData = (route.params?.additionalData);
-    const { control, handleSubmit, setValue, getValues, formState: { errors } } = useForm({
-        resolver: yupResolver(validationSchema),
-        defaultValues: {
-            phoneNumber: formatedData?.phoneNumber || '',
-            optOut: formatedData?.optOut || false,
-            outageOptOut: formatedData?.outageOptOut || false,
-            billingOptOutStatus: formatedData?.billingOptOutStatus || false,
-            accountNumber: ''
-        }
+  const [notification, setNotification] = useState(null);
+  const formatedData = route.params?.additionalData || {};
+  console.log("additionalData", JSON.stringify(route.params));
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      phoneNumber: formatedData?.phoneNumber || "",
+      optOut: formatedData?.optOut || false,
+      outageOptOut: formatedData?.outageOptOut || false,
+      billingOptOutStatus: formatedData?.billingOptOutStatus || false,
+      accountNumber: "",
+    },
+  });
+
+  const translateY = animatedValue;
+  const animateNotification = useCallback(() => {
+    // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
+    // Always animate in notification from off-screen
+    animatedValue.setValue(-100);
+
+    Animated.timing(animatedValue, {
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: true,
+    }).start(() => {
+      // Only auto-dismiss if notification is NOT an error type
+      if (notification && notification.type !== "error") {
+        timeoutRef.current = setTimeout(() => {
+          Animated.timing(animatedValue, {
+            toValue: -100,
+            duration: 500,
+            useNativeDriver: true,
+          }).start(() => setNotification(null));
+        }, 3000);
+      }
     });
+  }, [animatedValue, notification]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (notification) {
+      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+      animateNotification();
+    }
+  }, [notification, animateNotification]);
 
   useEffect(() => {
     if (isFocused) {
-      const initializedSettings = (additionalData);
+      const initializedSettings = additionalData;
       setInitializeSettings(initializedSettings);
     }
 
@@ -78,7 +139,7 @@ const InAppNotifications = ({ navigation }) => {
 
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
-    formatedData[name]=value
+    formatedData[name] = value;
     // setInitializeSettings((initialize) => {
     //   const updatedSettings = {
     //     ...initialize,
@@ -96,7 +157,19 @@ const InAppNotifications = ({ navigation }) => {
     }
   }, [route.params?.updateFailed, navigation, dispatch]);
 
+  useEffect(() => {
+    if (route.params?.updateSuccess) {
+      setNotification({
+        message: route.params.successMessage,
+        type: "success",
+      });
+    } else if (route.params?.updateFailed) {
+      //setNotification({ message: route.params.failureMessage, type: "error" });
+    }
+  }, [route.params]);
+
   const handleSave = async () => {
+    
     const pushNotification = await getPushNotificationStatus();
     if (pushNotification?.permanentSkip) {
       await notifyPermission();
@@ -107,7 +180,7 @@ const InAppNotifications = ({ navigation }) => {
     formatedData.deviceToken = token;
     formatedData.deviceTokenTimestamp = moment().format();
     formatedData.isAndroid = Platform.OS === "android";
-    console.log('Request data',formatedData)
+    console.log("Request data", formatedData);
     await dispatch(updatePushNotificationsv2(formatedData, navigation));
   };
   return (
@@ -120,7 +193,30 @@ const InAppNotifications = ({ navigation }) => {
         <View style={styles.inAppNotificationsInner}>
           <View style={{ alignSelf: "stretch" }}>
             <View style={[styles.frameGroup, styles.frameBorder]}>
-        
+              {notification && (
+                <Animated.View
+                  style={{
+                    transform: [{ translateY }],
+                    paddingHorizontal: Padding.p_5xl,
+                  }}
+                  accessible={true}
+                >
+                  <View style={styles.spaceBottom}>
+                    <NotificationAlert
+                      type={notification.type}
+                      title={
+                        notification.type === "error" ? "Error" : "Success"
+                      }
+                      message={notification.message}
+                      showCloseIcon={false}
+                      onClose={() => setNotification(null)}
+                      accessibilityLiveRegion="assertive"
+                      accessibilityRole="alert"
+                      accessibilityLabel={notification.message}
+                    />
+                  </View>
+                </Animated.View>
+              )}
 
               <View style={styles.infoWrapper}>
                 <NotificationAlert
@@ -203,21 +299,28 @@ const InAppNotifications = ({ navigation }) => {
 const NotificationSetting = ({ name, value, title, description, onChange }) => (
   <View style={[styles.frameContainer, styles.frameBorder]}>
     <View style={styles.frameView}>
-      <View style={[{ justifyContent: "center" }, styles.tabsParentFlexBox]}>
-        <View style={styles.appointmentsParent}>
+      <View style={styles.appointmentsParent}>
+        <View style={{ flexDirection: "column", flex: 1.7, marginRight: 10 }}>
           <Text style={styles.appointments}>{title}</Text>
-          <View>
-            <Toggle
-              name={name}
-              initialValue={value}
-              label={title}
-              onToggle={onChange}
-            />
-          </View>
+          <Text
+            style={[
+              styles.receiveAppNotifications1,
+              styles.receiveTypo,
+              { marginTop: 8 },
+            ]}
+          >
+            {description}
+          </Text>
         </View>
-        <Text style={[styles.receiveAppNotifications1, styles.receiveTypo]}>
-          {description}
-        </Text>
+
+        <View style={{ flex: 0.2 }}>
+          <Toggle
+            name={name}
+            initialValue={value}
+            label={title}
+            onToggle={onChange}
+          />
+        </View>
       </View>
     </View>
   </View>
@@ -231,7 +334,6 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
   },
   tabsParentFlexBox: {
-    flex: 1,
     justifyContent: "center",
   },
   frameParent3: {
@@ -278,14 +380,14 @@ const styles = StyleSheet.create({
   appointmentsParent: {
     flexDirection: "row",
     alignItems: "center",
-    alignSelf: "stretch",
+    justifyContent: "space-between",
   },
   frameView: {
     paddingVertical: Padding.p_base,
     flexDirection: "row",
     //alignItems: "center",
     paddingHorizontal: Padding.p_5xl,
-    flex: 1,
+    //flex: 1,
   },
   frameContainer: {
     borderBottomWidth: 1,
@@ -309,7 +411,10 @@ const styles = StyleSheet.create({
   infoWrapper: {
     paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
-    paddingTop: Padding.p_base,
+  },
+  spaceBottom: {
+    marginVertical: 16,
+    width: widthPercentageToDP("85%"),
   },
   buttons1: {
     marginTop: 16,
@@ -321,7 +426,7 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   inAppNotificationsInner: {
-    paddingTop: Padding.p_5xl,
+    paddingTop: Padding.p_xl,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     width: "100%",
