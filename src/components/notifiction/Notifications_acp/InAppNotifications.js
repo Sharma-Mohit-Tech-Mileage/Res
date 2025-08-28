@@ -15,7 +15,7 @@ import {
   Padding,
   Border,
 } from "../../../../GlobalStyles";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, set } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
@@ -26,6 +26,10 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import { updatePushNotificationsv2 } from "../../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import Toggle from "../../common/Toggle";
+import { getUser } from "../../../redux/utils/LocalStorage";
+import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
+import { PostApiRequest } from "../../../network/APIClient";
+import LoadingOverlay from "../../common/customui/CustomLoading";
 
 import {
   getFcmToken,
@@ -59,6 +63,7 @@ const InAppNotifications = ({ navigation }) => {
   const scrollViewRef = useRef(null);
   const animatedValue = useRef(new Animated.Value(-100)).current;
   const timeoutRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
   const [notification, setNotification] = useState(null);
   const formatedData = route.params?.additionalData || {};
@@ -180,15 +185,79 @@ const InAppNotifications = ({ navigation }) => {
     formatedData.deviceToken = token;
     formatedData.deviceTokenTimestamp = moment().format();
     formatedData.isAndroid = Platform.OS === "android";
-    console.log("Request data", formatedData);
-    await dispatch(updatePushNotificationsv2(formatedData, navigation));
+    //await dispatch(updatePushNotificationsv2(formatedData, navigation));
+    const request = {
+      optOut: formatedData.optOut,
+      outageOptOut: formatedData.outageOptOut,
+      billingOptOutStatus: formatedData.billingOptOutStatus,  
+      deviceToken: formatedData.deviceToken,
+      deviceTokenTimestamp: formatedData.deviceTokenTimestamp,
+      isAndroid: formatedData.isAndroid,
+    }
+    await postRequestInAppNotification(request);
   };
+
+
+ const postRequestInAppNotification = async(data) => {
+   let user = await getUser();
+    let deviceToken = await getDeviceUniqueId();
+    const accountNumber = user.userInfo?.accountNumber || null;
+    const userName = user.userInfo?.userName || null;
+    data.accountNumber = accountNumber;
+    data.userName = userName;
+
+    data['id'] = 0;
+    data['DeviceId'] = deviceToken;
+    data['customerType'] = 'Residential'
+    data['optOut'] = !data.optOut
+    data['outageOptOut'] = !data.outageOptOut
+    data['billingOptOutStatus'] = !data.billingOptOutStatus
+
+    console.log('postPushNotifications',data)
+   setIsLoading(true)
+    PostApiRequest(
+      `api/mobilenotificationpreferences/${userName}/mobilepreferences`,
+      data,
+      (res) => {
+        setIsLoading(false)
+        console.log("Response  postRequestInAppNotification", JSON.stringify(res));
+        if (res) {
+          setNotification({
+            message: "In-App Notifications updated successfully.",
+            type: "success",
+          });
+          //navigation.navigate("Notifications", { updateSuccess: true, successMessage: "In-App Notifications updated successfully." });
+        }
+      },
+      (error) => {
+        setIsLoading(false)
+        console.error("Error on retrying postRequestInAppNotification", error);
+        setNotification({
+          message: "In-App Notifications update failed.",
+          type: "error",
+        });
+        //setShowErrorAlert(true);
+        //navigation.navigate("Notifications", { updateFailed: true, failureMessage: "In-App Notifications update failed." });
+      }
+    );
+ }
+
+
   return (
     <View style={styles.inAppNotifications}>
       <ProfileSettingsHeader
         title="Edit In-App Notifications"
         onPressBack={() => navigation.navigate("Notifications")}
       />
+
+       {isLoading && (
+        <LoadingOverlay
+          loading={isLoading}
+          loadingTxt="Saving"
+          accessibilityLiveRegion="polite"
+        />
+      )}
+
       <ScrollView>
         <View style={styles.inAppNotificationsInner}>
           <View style={{ alignSelf: "stretch" }}>

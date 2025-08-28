@@ -13,6 +13,7 @@ import {
   getPaperlessStatus,
 } from "../../../redux/actions/ProfileActionSuite";
 
+
 const Notifications = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -133,6 +134,7 @@ const Notifications = () => {
     } else if (section == "email") {
       navigation.navigate("EmailNotifications", {
         is_enrolled: profileData.emailAddress,
+        isPaperlessEnabled: paperlessStatusAcp,
       });
     } else if (section == "text") {
       console.log('status',TextNotifSettings[1].status)
@@ -170,7 +172,7 @@ const Notifications = () => {
             );
             res[0]?.pushMessageType.forEach((value, index) => {
               console.log(`Index: ${index}, Value: ${value}`);
-              InAppSettings[index].status = value?.optOutFlag ? "On" : "Off";
+              InAppSettings[index].status = value?.optOutFlag ? "Off" : "On";
             });
           }
         },

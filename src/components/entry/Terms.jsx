@@ -8,6 +8,7 @@ import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redu
 import { fetchACPUserAccountDetails, updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
 import { logout } from 'react-native-app-auth';
 import { saveUserInfo } from "../../redux/actions/UserAction";
+import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { Env } from "../../network/apis/account/Constants";
 import { getPrimaryEmail } from "../../components/utility/constant";
 
@@ -112,7 +113,7 @@ const Terms = ({ navigation }) => {
 
     const termsAccepted = async () => {
         await dispatch(updateTermsAndConditions(true, navigation));
-        //await dispatch(updateWalkThroughStep(0));
+        await dispatch(updateWalkThroughStep(0));
         if (!value) {
             // navigation.reset({
             //     index: 0,

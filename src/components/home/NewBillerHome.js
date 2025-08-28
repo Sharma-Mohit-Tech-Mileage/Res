@@ -28,6 +28,13 @@ import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
 import LogoSmall from "../../res/images/LogoSmall";
+import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
+import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
+import {
+  getFcmToken,
+  requestUserPermission,
+} from "../../firebase/FirebaseUtils";
+
 const NewBillerHome = ({ navigation }) => {
   // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
@@ -35,10 +42,13 @@ const NewBillerHome = ({ navigation }) => {
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [showWalkThrough, setShowWalkThrough] = useState(false);
-  const [internetHealths, setInternetHealths] = useState([]);
+  const [isNotificationEnable, setIsNotificationEnable] = useState(false);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [loadingAutoPay, setloadingAutoPay] = useState(false);
   const [isLoading, setLoading] = useState(false);
+  const [optOutStatus, setOptOutStatus] = useState(false);
+  const [outageOptOutStatus, setOutageOptOutStatus] = useState(false);
+  const [billingOptOutStatus, setBillingOptOutStatus] = useState(false);
   const {
     showBanner,
     showMaintenancePage,
@@ -136,6 +146,7 @@ const NewBillerHome = ({ navigation }) => {
           setUpdateStatus(status);
           dispatch(fetchACPUserAccountDetails());
           getStatus();
+          getInAppNotificationsData();
         } catch (error) {
           console.error("Error refreshing data on focus", error);
         }
@@ -150,6 +161,12 @@ const NewBillerHome = ({ navigation }) => {
       setShowWalkThrough(true);
     }
   }, [home.walkThroughStep]);
+
+  useEffect(() => {
+    if (isNotificationEnable) {
+      enableNotifications();
+    }
+  }, [isNotificationEnable]);
 
   // Update paperless status whenever the email changes
   useEffect(() => {
@@ -186,6 +203,85 @@ const NewBillerHome = ({ navigation }) => {
       });
     }
   }, [accountDetails]);
+
+  const getInAppNotificationsData = () => {
+      getUser().then((res1) => {
+        let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.accountNumber}/mobilepreferences/${res1.userInfo?.accountNumber}`;
+        GetApiRequest(
+          requestUrl,
+          (res) => {
+            if (res) {
+              console.log(
+                " Home  getInAppNotificationsData",
+                JSON.stringify(res)
+              );
+              res[0]?.pushMessageType.forEach((value, index) => {
+                if(!value?.optOutFlag ){
+                  setIsNotificationEnable(true)
+                }
+              });
+            }
+          },
+          (error) => {
+            console.error("Error on retrying getInAppNotificationsData", error);
+          }
+        );
+      });
+    };
+
+const enableNotifications = async () => {
+    const enabledPermission = await requestUserPermission();
+    if (enabledPermission) {
+      const token = await getFcmToken();
+      console.log(
+        "FCM TERM WITH PERMISSION >>>>>>><<<<<<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        token
+      );
+      const data = {
+        accountNumber: userInfo?.accountNumber,
+        deviceToken: token,
+        deviceTokenTimestamp: moment().format(),
+        optOut: true,
+        outageOptOut: true,
+        billingOptOutStatus: true,
+        userName: userInfo.userName,
+        isAndroid: Platform.OS == "android",
+      };
+      const localData = {
+        status: "accepted",
+        date: new Date(),
+        permanentSkip: false,
+      };
+      storePushNotificationStatus(localData);
+      await dispatch(updatePushNotificationsv2(data, null));
+      
+    } else {
+      const token = await getFcmToken();
+      console.log(
+        "FCM TERM WITHOUT PERMISSION >>>>>>><<<<<<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        token
+      );
+      const dataWithoutPermission = {
+        accountNumber: userInfo.accountNumber,
+        deviceToken: token,
+        deviceTokenTimestamp: moment().format(),
+        optOut: true,
+        outageOptOut: true,
+        billingOptOutStatus: true,
+        userName: userInfo.userName,
+        isAndroid: Platform.OS == "android",
+      };
+      const localData = {
+        status: "skip",
+        date: new Date(),
+        permanentSkip: true,
+      };
+      storePushNotificationStatus(localData);
+      await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
+      
+    }
+  };
+
 
   const renderHeader = () => (
     <View

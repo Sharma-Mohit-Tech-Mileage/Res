@@ -17,8 +17,16 @@ import {
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
 import EntryInput from "./EntryInput";
+import SparkLightInput from "../common/customui/SparkLightInput";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import { addPrimaryEmailRequest } from "../../redux/actions/NotificationActionSuite";
+
+const validationSchema = yup.object().shape({
+  email: yup.string().email("Invalid email address").required("Email is required"),
+});
 
 const EmailNotifications = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -28,7 +36,21 @@ const EmailNotifications = ({ navigation }) => {
   const [keyboardHidden, setKeyboardHidden] = useState(true);
   const [textInputLayout, setTextInputLayout] = useState({});
   const scrollRef = useRef();
+
+
+  const {
+      control,
+      handleSubmit,
+      setValue,
+      formState: { errors },
+    } = useForm({
+      resolver: yupResolver(validationSchema),
+      defaultValues: {
+        email:  "",
+      },
+    });
   
+
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
       setKeyboardHidden(false);
@@ -79,130 +101,140 @@ const EmailNotifications = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      
-        <ProfileSettingsHeader showIcon={false} title={"Notifications"} />
-        <ScrollView
+      <ProfileSettingsHeader showIcon={false} title={"Notifications"} />
+      <ScrollView
         ref={scrollRef}
         style={styles.inner}
         contentContainerStyle={styles.innerContent}
       >
         <>
-        
-        <View style={styles.headerTabView}>
-                            <View style={styles.headerTabOne} />
-                            <View style={styles.headerTabTwo} />
-                            <View style={styles.headerTabThree} />
-                        </View>
-        <View
-          style={[styles.viewContainer, { marginTop: 90 }]}
-          accessibilityLabel="Email notification setup section"
-        >
+          <View style={styles.headerTabView}>
+            <View style={styles.headerTabOne} />
+            <View style={styles.headerTabTwo} />
+            <View style={styles.headerTabThree} />
+          </View>
           <View
-            accessibilityRole="none"
-            accessibilityLabel="Email notification options"
+            style={[styles.viewContainer, { marginTop: 90 }]}
+            accessibilityLabel="Email notification setup section"
           >
-            <View style={styles.headerIconViewContainer}>
+            <View
+              accessibilityRole="none"
+              accessibilityLabel="Email notification options"
+            >
+              <View style={styles.headerIconViewContainer}>
+                <View
+                  style={styles.headerIconView}
+                  accessibilityRole="image"
+                  accessibilityLabel="Email notification icon"
+                  accessible={true}
+                >
+                  <MailRingingIcon />
+                </View>
+              </View>
               <View
-                style={styles.headerIconView}
-                accessibilityRole="image"
-                accessibilityLabel="Email notification icon"
+                style={styles.header}
                 accessible={true}
+                accessibilityRole="header"
               >
-                <MailRingingIcon />
+                <Text
+                  style={styles.headerText}
+                  accessibilityRole="text"
+                  accessibilityLabel="Turn on Email Notifications"
+                >
+                  Turn on Email Notifications
+                </Text>
+              </View>
+              <View style={styles.subHeader} accessible={true}>
+                <Text
+                  style={styles.subHeaderText}
+                  accessibilityRole="text"
+                  accessible={true}
+                  accessibilityLabel="Receive email alerts related to your account, updates and more from Sparklight"
+                >
+                  Receive email alerts related to your account, updates and more
+                  from Sparklight.
+                </Text>
               </View>
             </View>
-            <View
-              style={styles.header}
-              accessible={true}
-              accessibilityRole="header"
-            >
-              <Text
-                style={styles.headerText}
-                accessibilityRole="text"
-                accessibilityLabel="Turn on Email Notifications"
+            <>
+              <View
+                style={styles.subInput}
+                onLayout={(event) => {
+                  setTextInputLayout(event.nativeEvent.layout);
+                }}
+                accessibilityRole="none"
+                accessibilityLabel="Email address input section"
               >
-                Turn on Email Notifications
-              </Text>
-            </View>
-            <View style={styles.subHeader} accessible={true}>
-              <Text
-                style={styles.subHeaderText}
-                accessibilityRole="text"
-                accessible={true}
-                accessibilityLabel="Receive email alerts related to your account, updates and more from Sparklight"
-              >
-                Receive email alerts related to your account, updates and more
-                from Sparklight.
-              </Text>
-            </View>
-          </View>
-          <>
-            <View
-              style={styles.subInput}
-              onLayout={(event) => {
-                setTextInputLayout(event.nativeEvent.layout);
-              }}
-              accessibilityRole="none"
-              accessibilityLabel="Email address input section"
-            >
-              <EntryInput
+                <Controller
+                control={control}
                 name="email"
-                placeholder="Email Address"
-                input={input}
-                onChangeText={onChangeText}
-                onSubmitText={keyboardDismiss}
-                keyboardType="email-address"
-                accessibilityRole="search"
-                accessibilityLabel="Email address input field"
-                accessibilityHint="Double tap to enter your email address for notifications"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <SparkLightInput
+                    placeholder="Email Address"
+                    onBlur={onBlur}
+                    onChangeText={(text)=>{
+                      onChangeText(text)
+                      onChange(text)
+                    }}
+
+                    value={value ? value.toLowerCase() : ""}
+                    error={errors.email?.message}
+                    
+                    accessibilityLabel="Email address input"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    textContentType="emailAddress"
+                    style={styles.emailInput}
+                  />
+                )}
               />
-            </View>
-          </>
-        </View>
-        <View style={styles.bottomContainer} />
-        <View style={styles.bottomBar}>
-          <Pressable
-            disabled={!enableButton}
-            style={
-              enableButton
-                ? [styles.button, styles.buttonsLayout]
-                : [styles.button, styles.buttonsLayout, styles.buttonDisabled]
-            }
-            onPress={enableEmailNotifications}
-            accessibilityRole="button"
-            accessibilityLabel={
-              enableButton
-                ? "Enable Email Notifications"
-                : "Enable Email Notifications (disabled)"
-            }
-          >
-            <Text
+              </View>
+            </>
+          </View>
+          <View style={styles.bottomContainer} />
+          <View style={styles.bottomBar}>
+            <Pressable
+              disabled={!enableButton}
               style={
                 enableButton
-                  ? styles.accept
-                  : [styles.accept, styles.buttonDisabledText]
+                  ? [styles.button, styles.buttonsLayout]
+                  : [styles.button, styles.buttonsLayout, styles.buttonDisabled]
+              }
+              onPress={handleSubmit(enableEmailNotifications)}
+              accessibilityRole="button"
+              accessibilityLabel={
+                enableButton
+                  ? "Enable Email Notifications"
+                  : "Enable Email Notifications (disabled)"
               }
             >
-              Enable Email Notifications
-            </Text>
-          </Pressable>
-          <View style={styles.buttonsParent}>
-            <Pressable
-              style={[styles.buttonDecline, styles.buttonsLayout]}
-              onPress={() => {
-                navigation.reset({
-                  index: 0,
-                  routes: [{ name: "MyTab" }],
-                });
-              }}
-              accessibilityRole="button"
-              accessibilityLabel="Skip for now"
-            >
-              <Text style={styles.decline}>Skip for now</Text>
+              <Text
+                style={
+                  enableButton
+                    ? styles.accept
+                    : [styles.accept, styles.buttonDisabledText]
+                }
+              >
+                Enable Email Notifications
+              </Text>
             </Pressable>
+            <View style={styles.buttonsParent}>
+              <Pressable
+                style={[styles.buttonDecline, styles.buttonsLayout]}
+                onPress={() => {
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name: "MyTab" }],
+                  });
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Skip for now"
+              >
+                <Text style={styles.decline}>Skip for now</Text>
+              </Pressable>
+            </View>
           </View>
-        </View>
-        {!keyboardHidden && <View style={styles.textBottomHeight} />}
+          {!keyboardHidden && <View style={styles.textBottomHeight} />}
         </>
       </ScrollView>
     </View>
@@ -285,6 +317,7 @@ const styles = StyleSheet.create({
   subInput: {
     marginTop: 20,
     marginBottom: 20,
+    width: '85%'
   },
   viewContainer: {
     flex: 1,

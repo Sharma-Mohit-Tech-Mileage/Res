@@ -46,7 +46,7 @@ const PushNotifications = ({ navigation }) => {
         (res) => {
           if (res) {
             console.log(
-              "Response getTextNotificationsData",
+              "Response on entry getTextNotificationsData",
               JSON.stringify(res)
             );
             if (res.length > 0) {
@@ -57,6 +57,8 @@ const PushNotifications = ({ navigation }) => {
                       console.log("Updated Primary Email: ", updatedPrimaryEmail);
                       if (updatedPrimaryEmail && updatedPrimaryEmail.length > 0) {
                         setNextScreen("MyTab");
+                      }else{
+                        setNextScreen("EntryEmailNotifications");
                       }
                     }else{
                         setNextScreen("EntryEmailNotifications");
@@ -170,7 +172,7 @@ const PushNotifications = ({ navigation }) => {
         permanentSkip: true,
       };
       storePushNotificationStatus(localData);
-      await dispatch(updatePushNotifications(dataWithoutPermission, null));
+      await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
       navigation.reset({
         index: 0,
         routes: [{ name: nextScreen }],
@@ -260,7 +262,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonDecline: {
-    marginBottom: 50,
+    marginBottom: 100,
   },
   button: {
     backgroundColor: Color.colorMidnightblue,

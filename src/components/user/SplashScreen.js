@@ -150,7 +150,7 @@ const SplashScreen = ({ navigation, route }) => {
       // Don't set setLoading(false) here
       
       // Navigation
-      if (!user.userInfo.mobileTCAcceptanceFlag) {
+      if (user.userInfo.mobileTCAcceptanceFlag) {
         navigation.reset({ index: 0, routes: [{ name: "MyTab" }] });
       } else {
         navigation.reset({ index: 0, routes: [{ name: "Terms" }] });
@@ -451,14 +451,13 @@ const SplashScreen = ({ navigation, route }) => {
             accessibilityLabel="SparkLight"
             accessible={true}
           >
-            <View style={{alignSelf:'center'}}>
-              <Logo/>
+            <View style={{alignSelf:'center',marginTop:hp("5%")}}>
+              <Logo width={300} height={71}/>
             </View>
           </Animated.View>
         </Animated.View>
       </View>
-
-      {loading ? <LoadingOverlay loading={loading} isWhite={true}/> : <></>}
+{loading ? <LoadingOverlay loading={loading} isWhite={true}/> : <></>}
       
       {/* 🟢 IMPROVED: Better button state management with synchronous protection */}
       {!loading && !authInProgress && isVisible && (

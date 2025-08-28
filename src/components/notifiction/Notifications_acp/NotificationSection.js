@@ -1,19 +1,23 @@
 // NotificationSection.js
-import React from 'react';
-import { View, Text, Pressable, Image, StyleSheet } from 'react-native';
-import { Color, Padding, FontSize, FontFamily, Border } from '../../../../GlobalStyles';
-import Checkcircle from '../../../../assets/svgs/Checkcircle';
-import Checkcircle1 from '../../../../assets/svgs/Checkcircle1';
-import InfoICon from '../../../../assets/svgs/Infocircle';
-import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import React from "react";
+import { View, Text, Pressable, Image, StyleSheet } from "react-native";
+import {
+  Color,
+  Padding,
+  FontSize,
+  FontFamily,
+  Border,
+} from "../../../../GlobalStyles";
+import Checkcircle from "../../../../assets/svgs/Checkcircle";
+import Checkcircle1 from "../../../../assets/svgs/Checkcircle1";
+import InfoICon from "../../../../assets/svgs/Infocircle";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 // Sub-components
 const StatusIcon = ({ status }) => (
-  <View
-    style={styles.icon}
->
-  {status==='On'? <Checkcircle /> : <Checkcircle1 />}
-</View>
+  <View style={styles.icon}>
+    {status === "On" ? <Checkcircle /> : <Checkcircle1 />}
+  </View>
 );
 
 const InfoIcon = () => (
@@ -22,13 +26,15 @@ const InfoIcon = () => (
   </View>
 );
 
-const EditButton = ({ onPress }) => (
+const EditButton = ({ onPress,isLoading }) => (
   <Pressable
     style={({ pressed }) => [
       styles.editButton,
-      pressed && styles.editButtonPressed
+      pressed && styles.editButtonPressed,
+      isLoading && { backgroundColor: Color.sparklightGray },
     ]}
     accessible={true}
+    disabled={isLoading}
     accessibilityRole="button"
     accessibilityLabel="Edit notifications"
     onPress={onPress}
@@ -43,22 +49,34 @@ const ComingSoonBadge = () => (
   </View>
 );
 
-const NotificationToggle = ({ type, status, isLast, warn,loading }) => (
-  <View style={[
-    styles.toggleContainer,
-    !isLast && styles.bottomBorder,
-    warn && styles.warnBackground
-  ]}>
+const NotificationToggle = ({ type, status, isLast, warn, loading }) => (
+  <View
+    style={[
+      styles.toggleContainer,
+      !isLast && styles.bottomBorder,
+      warn && styles.warnBackground,
+    ]}
+  >
     <Text style={styles.toggleText}>{type}</Text>
-    
-   <View style={styles.statusContainer}>
-      { loading ?   <SkeletonPlaceholder>
-        <View style={{height: 20,width:40,marginLeft:Padding.p_5xs,borderRadius:5}} />
-        </SkeletonPlaceholder> : <>
-        <StatusIcon status={status} />
-        <Text style={styles.statusText}>{status}</Text>
+
+    <View style={styles.statusContainer}>
+      {loading ? (
+        <SkeletonPlaceholder>
+          <View
+            style={{
+              height: 20,
+              width: 40,
+              marginLeft: Padding.p_5xs,
+              borderRadius: 5,
+            }}
+          />
+        </SkeletonPlaceholder>
+      ) : (
+        <>
+          <StatusIcon status={status} />
+          <Text style={styles.statusText}>{status}</Text>
         </>
-        }
+      )}
     </View>
   </View>
 );
@@ -67,45 +85,65 @@ const BoldEmailText = ({ message }) => {
   const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/;
   const parts = message.split(emailRegex);
   const emails = message.match(emailRegex);
- console.log(emails);
- return (
-  <Text>
-    {parts.map((part, index) => (
-      <React.Fragment key={index}>
-        {part}
-        {emails && emails[index] && <Text style={[styles.infoText,{fontWeight:'600',color:Color.colorGray_200}]}>{emails[index]}</Text>}
-      </React.Fragment>
-    ))}
-  </Text>
-);
+  console.log(emails);
+  return (
+    <Text>
+      {parts.map((part, index) => (
+        <React.Fragment key={index}>
+          {part}
+          {emails && emails[index] && (
+            <Text
+              style={[
+                styles.infoText,
+                { fontWeight: "600", color: Color.colorGray_200 },
+              ]}
+            >
+              {emails[index]}
+            </Text>
+          )}
+        </React.Fragment>
+      ))}
+    </Text>
+  );
 };
 
 const BoldPhoneText = ({ phoneNum }) => {
- return (
-  
-  <Text style={[styles.infoText]}>
+  return (
+    <Text style={[styles.infoText]}>
       <React.Fragment>
-
-        {phoneNum?'Text alert are sent to ' :'You have not enabled text notifications'}
-        { <Text style={[styles.infoText,{fontWeight:'600',color:Color.colorGray_200}]}>{phoneNum}</Text>}
+        {phoneNum
+          ? "Text alert are sent to "
+          : "You have not enabled text notifications"}
+        {
+          <Text
+            style={[
+              styles.infoText,
+              { fontWeight: "600", color: Color.colorGray_200 },
+            ]}
+          >
+            {phoneNum}
+          </Text>
+        }
       </React.Fragment>
-    
-  </Text>
-);
+    </Text>
+  );
 };
-const InfoMessage = ({ message,phoneNumber,id }) => (
+const InfoMessage = ({ message, phoneNumber, id }) => (
   <View style={styles.infoMessage}>
     <InfoIcon />
     <Text style={styles.infoText}>
-      {id=='text'? <BoldPhoneText phoneNum ={phoneNumber}/> : <BoldEmailText message={message}/>}</Text>
+      {id == "text" ? (
+        <BoldPhoneText phoneNum={phoneNumber} />
+      ) : (
+        <BoldEmailText message={message} />
+      )}
+    </Text>
   </View>
 );
 
 const AdminMessage = () => (
   <View style={styles.adminMessage}>
-    <Text style={styles.adminText}>
-      Only Primary Admin can make changes
-    </Text>
+    <Text style={styles.adminText}>Only Primary Admin can make changes</Text>
   </View>
 );
 
@@ -117,9 +155,9 @@ const NotificationSection = ({
   settings = [],
   isComingSoon = false,
   isAdmin = false,
-  isLoading=false,
+  isLoading = false,
   onEdit,
-  phoneNumber
+  phoneNumber,
 }) => {
   return (
     <View style={styles.sectionContainer}>
@@ -128,8 +166,8 @@ const NotificationSection = ({
         <Text style={styles.title}>{title}</Text>
         {isComingSoon ? (
           <ComingSoonBadge />
-        ) : !isAdmin && (
-          <EditButton onPress={onEdit} />
+        ) : (
+          !isAdmin && <EditButton onPress={onEdit} isLoading={isLoading}/>
         )}
       </View>
 
@@ -137,10 +175,27 @@ const NotificationSection = ({
       {isAdmin && <AdminMessage />}
 
       {/* Info Message */}
-      {isLoading ? <SkeletonPlaceholder>
-        <View style={{height: 40,width:'90%',marginHorizontal:Padding.p_base,marginBottom:Padding.p_base,borderRadius:5}} />
-        </SkeletonPlaceholder> :
-      infoMessage && <InfoMessage message={infoMessage} phoneNumber={phoneNumber} id={id}/>}
+      {isLoading ? (
+        <SkeletonPlaceholder>
+          <View
+            style={{
+              height: 40,
+              width: "90%",
+              marginHorizontal: Padding.p_base,
+              marginBottom: Padding.p_base,
+              borderRadius: 5,
+            }}
+          />
+        </SkeletonPlaceholder>
+      ) : (
+        infoMessage && (
+          <InfoMessage
+            message={infoMessage}
+            phoneNumber={phoneNumber}
+            id={id}
+          />
+        )
+      )}
       <View style={styles.bottomBorder} />
 
       {/* Settings List */}
@@ -164,20 +219,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Color.sparklightGray,
     marginBottom: Padding.p_base,
-    overflow: 'hidden'
+    overflow: "hidden",
   },
 
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: Padding.p_base
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: Padding.p_base,
   },
   title: {
     fontSize: FontSize.size_3xl,
     fontFamily: FontFamily.openSansRegular,
-    color: Color.sparklightGray1
+    color: Color.sparklightGray1,
   },
 
   // Edit Button
@@ -187,15 +242,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: Padding.p_base,
     borderRadius: Border.br_11xs,
     minWidth: 70,
-    alignItems: 'center'
+    alignItems: "center",
   },
   editButtonPressed: {
-    opacity: 0.8
+    opacity: 0.8,
   },
   editButtonText: {
     fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
-    color: Color.sparklightWhite
+    color: Color.sparklightWhite,
   },
 
   // Coming Soon Badge
@@ -209,78 +264,78 @@ const styles = StyleSheet.create({
   comingSoonText: {
     fontSize: FontSize.textXsSemibold_size,
     fontFamily: FontFamily.openSansRegular,
-    color: Color.sparklightGray1
+    color: Color.sparklightGray1,
   },
 
   // Info Message
   infoMessage: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     padding: Padding.p_base,
     marginHorizontal: Padding.p_base,
     marginBottom: Padding.p_base,
     borderRadius: Border.br_5xs,
     borderWidth: 1,
-    borderColor: '#0060AE',
-    backgroundColor: '#F0F8FF',
+    borderColor: "#0060AE",
+    backgroundColor: "#F0F8FF",
   },
   infoText: {
     flex: 1,
     marginLeft: Padding.p_5xs,
     fontSize: FontSize.textXsSemibold_size,
     fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200
+    color: Color.colorGray_200,
   },
 
   // Toggle
   toggleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: Padding.p_base
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: Padding.p_base,
   },
   bottomBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: Color.sparklightGray
+    borderBottomColor: Color.sparklightGray,
   },
   toggleText: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200
+    color: Color.colorGray_200,
   },
   statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center'
+    flexDirection: "row",
+    alignItems: "center",
   },
   statusText: {
     marginLeft: Padding.p_5xs,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200
+    color: Color.colorGray_200,
   },
 
   icon: {
     width: 18,
-    height: 18
+    height: 18,
   },
 
   // Admin Message
   adminMessage: {
     backgroundColor: Color.colorWhitesmoke_100,
     padding: Padding.p_base,
-    marginBottom: Padding.p_base
+    marginBottom: Padding.p_base,
   },
   adminText: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: FontSize.textXsSemibold_size,
     fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200
+    color: Color.colorGray_200,
   },
 
   // Warning state
   warnBackground: {
-    backgroundColor: Color.colorlightRed
-  }
+    backgroundColor: Color.colorlightRed,
+  },
 });
 
 export default NotificationSection;

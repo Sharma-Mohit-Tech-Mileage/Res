@@ -352,9 +352,14 @@ const postPushNotifications = async (data) => {
     const userName = user.userInfo?.userName || null;
     data.accountNumber = accountNumber;
     data.userName = userName;
+
     data['id'] = 0;
     data['DeviceId'] = deviceToken;
     data['customerType'] = 'Residential'
+    data['optOut'] = !data.optOut
+    data['outageOptOut'] = !data.outageOptOut
+    data['billingOptOutStatus'] = !data.billingOptOutStatus
+
     const config = {
         headers: {
             Authorization: `Bearer ${user.token}`
@@ -366,10 +371,10 @@ const postPushNotifications = async (data) => {
     try {
         const response = await _axios.post(`api/mobilenotificationpreferences/${userName}/mobilepreferences`, data, config);
 
-        console.log(`API Call Successful to /api/mobilenotificationpreferences/newBillerP2har/mobilepreferences, Response:`, response?.data);
+        console.log(`API Call Successful to /api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:`, response?.data);
         return response;
     } catch (error) {
-        console.error(`Error in API Call to /api/mobilenotificationpreferences/newBillerP2har/mobilepreferences`, error);
+        console.error(`Error in API Call to /api/mobilenotificationpreferences/${userName}/mobilepreferences`, error);
         throw error;
     }
 };

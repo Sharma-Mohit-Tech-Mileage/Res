@@ -302,11 +302,11 @@ const AddNotificationScreen = () => {
                     accessible={false} // decorative
                   /> */}
                   <View style={styles.icon} accessible={false}>
-                    {formState.criticalNotifications ?  <Checkcircle /> : <Checkcircle1 />}
+                    {primaryEmail ?  <Checkcircle /> : <Checkcircle1 />}
                   </View>
                   {/* Display text "On" or "Off" after the icon */}
                   <Text style={styles.toggleStatus}>
-                    {formState.criticalNotifications ? "On" : "Off"}
+                    {primaryEmail ? "On" : "Off"}
                   </Text>
                 </View>
               </View>
@@ -463,8 +463,8 @@ const styles = StyleSheet.create({
   toggleStatus: {
     marginLeft: 4,
     fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
-    color: Color.sparklightDarkGray,
+    fontSize: FontSize.size_base,
+    color: Color.colorGray_200,
   },
   toggleDescription: {
     fontFamily: FontFamily.openSansRegular,
