@@ -114,7 +114,7 @@ const EmailNotifications = ({ navigation }) => {
             <View style={styles.headerTabThree} />
           </View>
           <View
-            style={[styles.viewContainer, { marginTop: 90 }]}
+            style={[styles.viewContainer]}
             accessibilityLabel="Email notification setup section"
           >
             <View
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   subInput: {
-    marginTop: 20,
+    marginTop: 25,
     marginBottom: 20,
     width: '85%'
   },
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   bottomContainer: {
-    height: 120,
+    height: 100,
   },
   textBottomHeight: {
     height: 200,

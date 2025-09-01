@@ -274,7 +274,7 @@ const TextNotifications = ({ navigation }) => {
             style={{
               marginHorizontal: 20,
               marginVertical: 20,
-              marginBottom: 50,
+              
             }}
           >
             <View style={styles.checkBoxArea}>
@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   bottomContainer: {
-    height: 100,
+    height: 65,
   },
   buttonDecline: {
     marginBottom: 50,
@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   header: {
-    paddingTop: 10,
+    paddingTop: 20,
   },
   headerText: {
     fontFamily: FontFamily.openSansRegular,
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   subInput: {
-    marginVertical: 20,
+    marginTop: 25,
   },
   viewContainer: {
     flex: 1,
@@ -625,7 +625,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   textBottomHeight: {
-    height: 200,
+    height: 150,
   },
   errorInput: {
     borderColor: "red",

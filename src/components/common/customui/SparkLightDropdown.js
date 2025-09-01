@@ -11,8 +11,8 @@ import {
   AccessibilityInfo 
 } from 'react-native';
 import { Box } from 'native-base';
-import { Padding, Color, FontFamily, FontSize } from "../../../../GlobalStyles";
-import Icon from '../Icon';      
+import { Padding, Color, FontFamily, FontSize } from "../../../../GlobalStyles"; 
+import DownArrow from '../../../res/svgIcons/DownArrow';    
 const SparkLightDropdown = ({
   items,
   selectedValue,
@@ -89,7 +89,8 @@ const SparkLightDropdown = ({
         <Text style={styles.dropdownText} accessible={false}>
           {selectedValue || placeholder}
         </Text>
-        <View style={styles.chevron} accessible={false}><Icon name={'down-chevron'}/></View>
+        <DownArrow/>
+        
       </TouchableOpacity>
 
       <Modal

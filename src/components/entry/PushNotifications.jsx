@@ -262,11 +262,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonDecline: {
-    marginBottom: 100,
+    marginBottom: 125, // was 100, reduce this value
   },
   button: {
     backgroundColor: Color.colorMidnightblue,
-    marginBottom: 20,
+    marginBottom: 20, // was 20, reduce this value
     width: "90%",
   },
   buttonsLayout: {
