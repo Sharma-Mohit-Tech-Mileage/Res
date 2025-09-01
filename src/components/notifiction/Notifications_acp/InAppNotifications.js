@@ -68,22 +68,7 @@ const InAppNotifications = ({ navigation }) => {
   const [notification, setNotification] = useState(null);
   const formatedData = route.params?.additionalData || {};
   console.log("additionalData", JSON.stringify(route.params));
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    getValues,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(validationSchema),
-    defaultValues: {
-      phoneNumber: formatedData?.phoneNumber || "",
-      optOut: formatedData?.optOut || false,
-      outageOptOut: formatedData?.outageOptOut || false,
-      billingOptOutStatus: formatedData?.billingOptOutStatus || false,
-      accountNumber: "",
-    },
-  });
+  
 
   const translateY = animatedValue;
   const animateNotification = useCallback(() => {
@@ -386,6 +371,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
           <Toggle
             name={name}
             initialValue={value}
+            section="inAppNotif"
             label={title}
             onToggle={onChange}
           />

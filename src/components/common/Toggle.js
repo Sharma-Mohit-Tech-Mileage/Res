@@ -50,7 +50,10 @@ const Toggle = ({
         const sectionLabel = {
             paperless: `Paperless billing notifications ${status}${name && name.trim() !== '' ? ` for ${name}` : ''}`,
             marketing: `Marketing communications ${status} for ${name}`,
-            iptv: `Sparklight TV notifications ${status} for ${name}`
+            iptv: `Sparklight TV notifications ${status} for ${name}`,
+            textNotif: `Text Notification ${status}${label && label.trim() !== '' ? ` for ${label}` : ''}`,
+            inAppNotif: `In-App Notification ${status}${label && label.trim() !== '' ? ` for ${label}` : ''}`,
+
         }[section] || label;
 
         return `${sectionLabel}${disabled ? '. This setting cannot be changed' : ''}`;

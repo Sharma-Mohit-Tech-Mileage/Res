@@ -9,6 +9,7 @@ import {
   Keyboard,
   ScrollView,
   TouchableOpacity,
+  AccessibilityInfo
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -52,6 +53,7 @@ const validationSchema = yup.object().shape({
 });
 const TextNotifications = ({ navigation }) => {
   const scrollViewRef = useRef(null);
+  const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
   const route = useRoute();
   const dispatch = useDispatch();
   const animatedValue = useRef(new Animated.Value(-100)).current;
@@ -60,7 +62,7 @@ const TextNotifications = ({ navigation }) => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorText, setErrorText] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const formatedData = route.params?.additionalData;
+  const formatedData = route.params?.additionalData || {};
   const [isCheckboxVisible, setIsCheckboxVisible] = useState(false);
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
   const [isTermRequired, setIsTermRequired] = useState(false);
@@ -135,6 +137,20 @@ const TextNotifications = ({ navigation }) => {
     //setShowErrorAlert(true);
   };
 
+
+  const handleToggleChange = (e) => {
+    const { name, value } = e.target;
+    formatedData[name] = value;
+    console.log("toggle data", JSON.stringify(formatedData));
+    // setInitializeSettings((initialize) => {
+    //   const updatedSettings = {
+    //     ...initialize,
+    //     [name]: !value,
+    //   };
+    //   return updatedSettings;
+    // });
+  };
+
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setNotification({
@@ -189,16 +205,16 @@ const TextNotifications = ({ navigation }) => {
     }
   }, [notification, animateNotification]);
 
-  const onSubmit = (data) => {
+  const onSubmit = () => {
     Keyboard.dismiss();
     if (isCheckboxVisible) {
       if (!toggleCheckBoxTerm) {
         setIsTermRequired(true);
         return;
       }
-      if (data.billingOptOutStatus || data.outageOptOut || data.optOut) {
+      if (formatedData.billingOptOutStatus || formatedData.outageOptOut || formatedData.optOut) {
         //dispatch(updateTextNotification(formatedData, navigation));
-        postRequestTextNotification(data);
+        postRequestTextNotification();
       } else {
         setErrorText(
           "Please select the type of messages you would like to receive."
@@ -208,25 +224,25 @@ const TextNotifications = ({ navigation }) => {
       }
     } else {
       //dispatch(updateTextNotification(data, navigation));
-      postRequestTextNotification(data);
+      postRequestTextNotification();
     }
     //console.log('data',data)
     //dispatch(updateTextNotification(data, navigation));
   };
 
-  const postRequestTextNotification = async (data) => {
+  const postRequestTextNotification = async () => {
     let user = await getUser();
     const accountNumber = user.userInfo?.accountNumber || null;
-    data["accountNumber"] = accountNumber;
+    formatedData["accountNumber"] = accountNumber;
     const postData = {
       accountNumber: accountNumber,
-      phoneNumber: data.phoneNumber,
-      optOut: !data.optOut,
-      outageOptOut: !data.outageOptOut,
-      billingOptOutStatus: !data.billingOptOutStatus,
+      phoneNumber: formatedData.phoneNumber,
+      optOut: !formatedData.optOut,
+      outageOptOut: !formatedData.outageOptOut,
+      billingOptOutStatus: !formatedData.billingOptOutStatus,
     };
 
-    console.log("postTextNotifications", data);
+    console.log("postTextNotifications", postData);
     setIsLoading(true);
     PostApiRequest(
       `/api/SMS`,
@@ -369,120 +385,28 @@ const TextNotifications = ({ navigation }) => {
               </View>
             </View>
             <View style={styles.frameChild} />
-            <View style={styles.frameGroup}>
-              <View style={styles.frameWrapper2}>
-                <View style={styles.frameParent3}>
-                  <View style={styles.frameParent4}>
-                    <Text style={[{ flex: 0.9 }, styles.mobilePhoneTypo]}>
-                      Appointments
-                    </Text>
-                    <View style={{ flex: 0.1 }}>
-                      <Controller
-                        control={control}
-                        name="optOut"
-                        render={({ field: { onChange, value } }) => (
-                          <Toggle
-                            label="Appointments"
-                            onToggle={() => {
-                              onChange(!value);
-                              if (!value) {
-                                setIsTermRequired(false);
-                              }
-                            }}
-                            initialValue={formatedData?.optOut}
-                          />
-                        )}
-                      />
-                    </View>
-                  </View>
-                  <Text
-                    style={[
-                      styles.receiveTextNotifications1,
-                      styles.containerTypo,
-                    ]}
-                  >
-                    Receive text notifications when your appointments have
-                    updates.
-                  </Text>
-                </View>
-              </View>
-            </View>
-            <View style={styles.frameChild} />
-            <View style={styles.frameGroup}>
-              <View style={styles.frameWrapper2}>
-                <View style={styles.frameParent3}>
-                  <View style={styles.frameParent4}>
-                    <Text style={[{ flex: 0.9 }, styles.mobilePhoneTypo]}>
-                      Outage Alerts
-                    </Text>
-                    <View style={{ flex: 0.1 }}>
-                      <Controller
-                        control={control}
-                        name="outageOptOut"
-                        render={({ field: { onChange, value } }) => (
-                          <Toggle
-                            label="Outage Alerts"
-                            onToggle={() => {
-                              onChange(!value);
-                              if (!value) {
-                                setIsTermRequired(false);
-                              }
-                            }}
-                            initialValue={formatedData?.outageOptOut}
-                          />
-                        )}
-                      />
-                    </View>
-                  </View>
-                  <Text
-                    style={[
-                      styles.receiveTextNotifications1,
-                      styles.containerTypo,
-                    ]}
-                  >
-                    Receive text notifications when outage occur.
-                  </Text>
-                </View>
-              </View>
-            </View>
-            <View style={styles.frameChild} />
-            <View style={styles.frameGroup}>
-              <View style={styles.frameWrapper2}>
-                <View style={[styles.frameParent3]}>
-                  <View style={styles.frameParent4}>
-                    <Text style={[{ flex: 0.9 }, styles.mobilePhoneTypo]}>
-                      Billing
-                    </Text>
-                    <View style={{ flex: 0.1 }}>
-                      <Controller
-                        control={control}
-                        name="billingOptOutStatus"
-                        render={({ field: { onChange, value } }) => (
-                          <Toggle
-                            label="Billing"
-                            onToggle={() => {
-                              onChange(!value);
-                              if (!value) {
-                                setIsTermRequired(false);
-                              }
-                            }}
-                            initialValue={formatedData?.billingOptOutStatus}
-                          />
-                        )}
-                      />
-                    </View>
-                  </View>
-                  <Text
-                    style={[
-                      styles.receiveTextNotifications1,
-                      styles.containerTypo,
-                    ]}
-                  >
-                    Receive text notifications for billing.
-                  </Text>
-                </View>
-              </View>
-            </View>
+            <NotificationSetting
+                title="Appointments"
+                name="optOut"
+                value={formatedData.optOut}
+                description="Receive text notifications when your appointments have updates."
+                onChange={handleToggleChange}
+              />
+              <NotificationSetting
+                title="Outage Alerts"
+                name="outageOptOut"
+                value={formatedData.outageOptOut}
+                description="Receive text notifications when outage occur."
+                onChange={handleToggleChange}
+              />
+              <NotificationSetting
+                title="Billing"
+                name="billingOptOutStatus"
+                value={formatedData.billingOptOutStatus}
+                description="Receive text notifications for billing."
+                onChange={handleToggleChange}
+              />
+
             <View style={styles.frameChild} />
             {isCheckboxVisible && (
               <View
@@ -601,6 +525,39 @@ const TextNotifications = ({ navigation }) => {
     </View>
   );
 };
+
+
+const NotificationSetting = ({ name, value, title, description, onChange }) => (
+  <View style={[styles.frameContainer, styles.frameBorder]}>
+    <View style={styles.frameView}>
+      <View style={styles.appointmentsParent}>
+        <View style={{ flexDirection: "column", flex: 1.7, marginRight: 10 }}>
+          <Text style={styles.appointments}>{title}</Text>
+          <Text
+            style={[
+              styles.receiveAppNotifications1,
+              styles.receiveTypo,
+              { marginTop: 8 },
+            ]}
+          >
+            {description}
+          </Text>
+        </View>
+
+        <View style={{ flex: 0.2 }}>
+          <Toggle
+            name={name}
+            initialValue={value}
+            section="textNotif"
+            label={title}
+            onToggle={onChange}
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+);
+
 
 const styles = StyleSheet.create({
   navigationBorder: {
@@ -728,7 +685,7 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   spaceBottom: {
-    marginVertical: 16,
+    marginTop: 16,
     width: widthPercentageToDP("85%"),
   },
   frameGroup: {
@@ -774,6 +731,46 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
+  },makeTypo: {
+    width: 282,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_base,
+    textAlign: "center",
+  },
+  appointments: {
+    color: Color.colorGray_100,
+    textAlign: "left",
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_base,
+    lineHeight: 22,
+    flex: 1,
+  },
+  appointmentsParent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  frameView: {
+    paddingVertical: Padding.p_base,
+    flexDirection: "row",
+    //alignItems: "center",
+    paddingHorizontal: Padding.p_5xl,
+    //flex: 1,
+  },
+  frameContainer: {
+    borderBottomWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "stretch",
+  },
+  receiveAppNotifications1: {
+    color: Color.colorGray_100,
+    lineHeight: 22,
+  },frameBorder: {
+    borderColor: Color.sparklightGray,
+    backgroundColor: Color.sparklightWhite,
+    alignItems: "center",
+    borderStyle: "solid",
   },
 });
 

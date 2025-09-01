@@ -5,6 +5,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import {
   FontFamily,
@@ -21,6 +22,28 @@ import Passwordlock from "../../../../assets/svgs/Passwordlock";
 const MyPassIcon = (passwordVisible) => {
   return passwordVisible ? <EyeSlashIcon /> : <EyeIcon />;
 };
+
+// 🔹 Convert numbers into words for TalkBack accessibility (Android only)
+const numberToWordsForAccessibility = (numStr) => {
+  if (!numStr) return "";
+  const digitsMap = {
+    "0": "zero",
+    "1": "one",
+    "2": "two",
+    "3": "three",
+    "4": "four",
+    "5": "five",
+    "6": "six",
+    "7": "seven",
+    "8": "eight",
+    "9": "nine",
+  };
+  return numStr
+    .split("")
+    .map((digit) => digitsMap[digit] || digit)
+    .join(" ");
+};
+
 const SparkLightInput = ({
   name,
   label,
@@ -37,16 +60,43 @@ const SparkLightInput = ({
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [passwordVisible, setPasswordVisible] = useState(!secure); // default to false if secure is true
+  const [passwordVisible, setPasswordVisible] = useState(!secure);
 
   const handleInputChange = (text) => {
     if (onChangeText) {
       onChangeText(text);
     }
   };
-  console.log("error", error);
+
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
+  };
+
+  // 🔹 Auto-detect keyboard type based on field name/placeholder
+  const getKeyboardType = () => {
+    const lowerName = (name || placeholder || "").toLowerCase();
+    if (lowerName.includes("phone") || lowerName.includes("mobile")) {
+      return "phone-pad";
+    }
+    if (lowerName.includes("email")) {
+      return "email-address";
+    }
+    if (secure) {
+      return "default";
+    }
+    return "default";
+  };
+
+  // 🔹 Accessibility label handling
+  const getAccessibilityLabel = () => {
+    if (
+      Platform.OS === "android" &&
+      getKeyboardType() === "phone-pad" &&
+      value
+    ) {
+      return numberToWordsForAccessibility(value);
+    }
+    return accessibilityLabel || label || placeholder;
   };
 
   return (
@@ -65,29 +115,26 @@ const SparkLightInput = ({
         )}
         {secure && (
           <TouchableOpacity
-            accessibilityLabel={passwordVisible ? "Hide" : "Show"}
+            accessibilityLabel={passwordVisible ? "Hide password" : "Show password"}
             accessibilityRole="button"
             accessible={true}
             onPress={togglePasswordVisibility}
             style={styles.eyeButton}
           >
             <View style={styles.eyeIcon}>{MyPassIcon(passwordVisible)}</View>
-            {/* <Image
-                            source={passwordVisible ? eyeSlashIcon : eyeIcon}
-                            style={styles.eyeIcon}
-                        /> */}
             <Text style={styles.eyeText}>
               {passwordVisible ? "Hide" : "Show"}
             </Text>
           </TouchableOpacity>
         )}
       </View>
+
       <View
         style={[
           styles.textInputContainer,
           {
             borderColor:
-              isFocused && error!=undefined
+              isFocused && error != undefined
                 ? "red"
                 : isFocused
                 ? Color.sparklightBrightPurple
@@ -95,14 +142,11 @@ const SparkLightInput = ({
           },
         ]}
       >
-        {
-          showTextIcon && (
-            <View style={styles.lockIcon}>
-              <Passwordlock />
-            </View>
-          )
-          // <Image style={styles.lockIcon} source={require('../../../../assets/password_lock.png')} />
-        }
+        {showTextIcon && (
+          <View style={styles.lockIcon}>
+            <Passwordlock />
+          </View>
+        )}
 
         <TextInput
           placeholder={placeholder}
@@ -117,7 +161,7 @@ const SparkLightInput = ({
             inputStyle,
             !editable && styles.disabledInput,
             {
-              borderWidth: error ? 0.5 : 0,  
+              borderWidth: error ? 0.5 : 0,
               borderColor: error
                 ? "red"
                 : isFocused
@@ -125,19 +169,25 @@ const SparkLightInput = ({
                 : Color.sparklightDarkGray,
             },
           ]}
-          accessibilityLabel={accessibilityLabel || placeholder}
-          returnKeyType="done" // Set the return key type to "done"
-          keyboardAppearance="default" // Ensures the default keyboard appearance
+          accessibilityLabel={getAccessibilityLabel()}
+          accessibilityRole="text"
+          accessibilityHint={
+            getKeyboardType() === "phone-pad" ? "Enter phone number" : undefined
+          }
+          importantForAccessibility="yes"
+          keyboardType={getKeyboardType()}
+          returnKeyType="done"
+          keyboardAppearance="default"
           maxFontSizeMultiplier={1.25}
           {...props}
         />
       </View>
+
       {error && (
         <View style={styles.errorContainer}>
           <View style={styles.errorIcon}>
             <WarningIcon />
           </View>
-          {/* <Image source={warningIcon} style={styles.errorIcon} /> */}
           <Text style={styles.errorText}>{error}</Text>
         </View>
       )}
@@ -147,19 +197,19 @@ const SparkLightInput = ({
 
 const styles = StyleSheet.create({
   outerContainer: {
-    minHeight: 48, // Use minHeight instead of height
+    minHeight: 48,
     borderColor: Color.sparklightWhite,
     borderWidth: 1,
     borderRadius: Border.br_11xs,
     justifyContent: "center",
-    position: "relative", // For absolute positioning of the error text
+    position: "relative",
   },
   container: {
-    height: 40, // Keep the input field height
+    height: 40,
     justifyContent: "center",
   },
   textInput: {
-    height: 48, // Keep the input field height
+    height: 48,
     color: Color.colorGray_200,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
@@ -168,18 +218,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   textInputContainer: {
-    // height: 48, // Keep the input field height
-    color: Color.colorGray_200,
     borderWidth: 1,
     borderRadius: Border.br_11xs,
     flexDirection: "row",
     alignItems: "center",
   },
-
   errorContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 4, // Space between the input and the error message
+    marginTop: 4,
   },
   errorIcon: {
     width: 20,
@@ -192,11 +239,11 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
   },
   disabledInput: {
-    backgroundColor: Color.Gray300, // Light gray background
-    opacity: 1, // Make it look faded
+    backgroundColor: Color.Gray300,
+    opacity: 1,
   },
   outerContainerError: {
-    paddingBottom: 0, // Add padding to accommodate the error message
+    paddingBottom: 0,
   },
   label: {
     fontSize: FontSize.size_sm,
@@ -205,23 +252,20 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "600",
     marginBottom: Padding.p_5xs,
-    justifyContent: "center",
     alignSelf: "stretch",
   },
   errorLabel: {
-    color: "red", // Red color for the label when there's an error
+    color: "red",
   },
   labelContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // If the label and eye button are not aligning correctly, adjust padding and margin here
   },
   eyeButton: {
-    flexDirection: "row", // Ensure flex direction is row
-    alignItems: "center", // Align items in the center vertically
-    justifyContent: "center", // Center the items horizontally
-    // Adjust padding as needed for touch area and internal spacing
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   eyeIcon: {
     width: 15,
