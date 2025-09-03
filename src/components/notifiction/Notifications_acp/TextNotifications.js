@@ -708,7 +708,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     marginRight: Platform.OS === "ios" ? 2 : 16,
-    backgroundColor: Color.colorWhitesmoke_100,
+    
   },
   checkBoxArea: {
     flexDirection: "row",
