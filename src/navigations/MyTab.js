@@ -6,7 +6,6 @@ import {
   Platform,
   Alert,
   Pressable,
-  Image,
   AccessibilityInfo,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
@@ -26,15 +25,14 @@ import BillingStackScreen from "./stackNavigation/BillingStack";
 import MyServicesStack from "./stackNavigation/MyServicesStack";
 import NewSupportIcon from "../res/svgIcons/NewSupportIcon";
 import HomeAccountIcon from "../res/svgIcons/HomeAccountIcon";
-import { heightPercentageToDP as hp } from "react-native-responsive-screen";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-
-const { width } = Dimensions.get("window");
-const tabWidth = Number(width / 5);
-const Tab = createBottomTabNavigator();
 import Icon from "../components/common/Icon";
 import DeviceInfo from "react-native-device-info";
+
+const { height, width } = Dimensions.get("window");
+const tabWidth = Number(width / 100);
+const Tab = createBottomTabNavigator();
+
 const MyTabs = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
@@ -134,9 +132,8 @@ const MyTabs = ({ navigation, route }) => {
             position: "absolute",
             height:
               Platform.OS === "ios"
-                ? 90 + insets.bottom
-                : hp(8.5) + insets.bottom, // hp = heightPercentageToDP
-            paddingBottom: insets.bottom,
+                ? 90 // fixed for iOS
+                : Math.max(55, height * 0.08) + insets.bottom, // auto-adjust for Android
             display: tabBarVisible ? "flex" : "none",
           },
           tabBarActiveTintColor: "#353091",
@@ -284,7 +281,6 @@ const MyTabs = ({ navigation, route }) => {
               ) {
                 return;
               }
-              // navigation.navigate('Support');
               navigation.reset({
                 index: 0,
                 routes: [{ name: "Support" }],
