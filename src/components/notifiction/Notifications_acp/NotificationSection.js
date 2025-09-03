@@ -13,6 +13,26 @@ import Checkcircle1 from "../../../../assets/svgs/Checkcircle1";
 import InfoICon from "../../../../assets/svgs/Infocircle";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
+// 🔹 Convert numbers into words for TalkBack accessibility (Android only)
+const digitToWord = {
+  '0': 'zero',
+  '1': 'one',
+  '2': 'two',
+  '3': 'three',
+  '4': 'four',
+  '5': 'five',
+  '6': 'six',
+  '7': 'seven',
+  '8': 'eight',
+  '9': 'nine',
+};
+
+function phoneNumberToWords(phoneNum) {
+  return phoneNum
+    ? phoneNum.replace(/\D/g, '').split('').map(d => digitToWord[d] || d).join(' ')
+    : '';
+}
+
 // Sub-components
 const StatusIcon = ({ status }) => (
   <View style={styles.icon}>
@@ -108,8 +128,18 @@ const BoldEmailText = ({ message }) => {
 };
 
 const BoldPhoneText = ({ phoneNum }) => {
+  // Convert phone number to words for accessibility
+  const phoneNumWords = phoneNumberToWords(phoneNum);
+
   return (
-    <Text style={[styles.infoText]}>
+    <Text
+      style={[styles.infoText]}
+      accessibilityLabel={
+        phoneNum
+          ? `Text alert are sent to ${phoneNumWords}`
+          : "You have not enabled text notifications"
+      }
+    >
       <React.Fragment>
         {phoneNum
           ? "Text alert are sent to "
@@ -131,13 +161,11 @@ const BoldPhoneText = ({ phoneNum }) => {
 const InfoMessage = ({ message, phoneNumber, id }) => (
   <View style={styles.infoMessage}>
     <InfoIcon />
-    <Text style={styles.infoText}>
-      {id == "text" ? (
-        <BoldPhoneText phoneNum={phoneNumber} />
-      ) : (
-        <BoldEmailText message={message} />
-      )}
-    </Text>
+    {id == "text" ? (
+      <BoldPhoneText phoneNum={phoneNumber} />
+    ) : (
+      <BoldEmailText message={message} />
+    )}
   </View>
 );
 

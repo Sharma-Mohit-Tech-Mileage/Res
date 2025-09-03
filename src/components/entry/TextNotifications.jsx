@@ -8,7 +8,7 @@ import {
   Pressable,
   Platform,
   TouchableOpacity,
-  Linking
+  Linking,
 } from "react-native";
 import {
   Color,
@@ -30,16 +30,15 @@ import Phone from "../../res/svgIcons/Phone";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import { getPrimaryEmail } from "../../components/utility/constant";
 // Define your validation schema
-  const validationSchema = yup.object().shape({
-    phoneNumber: yup
-      .string()
-      .matches(
-        /^(?:1)?\s*(?:\([2-9]\d{2}\)\s*|[2-9]\d{2}[- ]?)?[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?$/,
-        "Invalid mobile phone number."
-      )
-      .required("Phone number is required"),
-    
-  });
+const validationSchema = yup.object().shape({
+  phoneNumber: yup
+    .string()
+    .matches(
+      /^(?:1)?\s*(?:\([2-9]\d{2}\)\s*|[2-9]\d{2}[- ]?)?[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?$/,
+      "Invalid mobile phone number."
+    )
+    .required("Phone number is required"),
+});
 
 const TextNotifications = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -57,21 +56,19 @@ const TextNotifications = ({ navigation }) => {
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
   );
-  
+
   const {
-      control,
-      handleSubmit,
-      setValue,
-      getValues,
-      formState: { errors },
-    } = useForm({
-      resolver: yupResolver(validationSchema),
-      defaultValues: {
-        phoneNumber: "",
-        
-      },
-    });
-  
+    control,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      phoneNumber: "",
+    },
+  });
 
   //   useEffect(() => {
   //     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -138,7 +135,6 @@ const TextNotifications = ({ navigation }) => {
     } else {
       setEnableButton(false);
     }
-    
   };
   const handleCheckboxToggle = useCallback(() => {
     setToggleCheckBox(!toggleCheckBox);
@@ -162,13 +158,13 @@ const TextNotifications = ({ navigation }) => {
   const handleTermsLinkPress = useCallback(
     (event) => {
       event.stopPropagation();
-    //   navigation.navigate("ArticalWindowUtility", {
-    //     url: "https://www.sparklight.com/legal/text-messaging-terms-and-conditions",
-    //     name: "Terms & Conditions",
-    //   });
-        Linking.openURL(
-            "https://www.sparklight.com/legal/text-messaging-terms-and-conditions"
-        );
+      //   navigation.navigate("ArticalWindowUtility", {
+      //     url: "https://www.sparklight.com/legal/text-messaging-terms-and-conditions",
+      //     name: "Terms & Conditions",
+      //   });
+      Linking.openURL(
+        "https://www.sparklight.com/legal/text-messaging-terms-and-conditions"
+      );
     },
     [navigation]
   );
@@ -233,7 +229,7 @@ const TextNotifications = ({ navigation }) => {
               </View>
             </View>
             <View
-              style={[styles.subInput,{width: "85%"}]}
+              style={[styles.subInput, { width: "85%" }]}
               onLayout={(event) => {
                 //setTextInputLayout(event.nativeEvent.layout);
               }}
@@ -274,7 +270,6 @@ const TextNotifications = ({ navigation }) => {
             style={{
               marginHorizontal: 20,
               marginVertical: 20,
-              
             }}
           >
             <View style={styles.checkBoxArea}>
@@ -292,6 +287,9 @@ const TextNotifications = ({ navigation }) => {
                     onValueChange={onCheckBox.bind(null, !toggleCheckBox)}
                     style={styles.checkBox}
                     boxType="square"
+                    tintColor={
+                      isTermRequired ? "#EF4E3E" : Color.colorWhitesmoke_300
+                    }
                     tintColors={{
                       true: "#1B99FF",
                       false:

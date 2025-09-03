@@ -117,9 +117,9 @@ const MyTabs = ({ navigation, route }) => {
         initialRouteName="Home"
         screenOptions={({ route }) => ({
           tabBarStyle: { 
-            paddingVertical: 5, 
+            paddingVertical: (Platform.OS==='ios')?5:10, 
             position: 'absolute', 
-            height: (Platform.OS === 'ios') ? 90 : 60, 
+            height: (Platform.OS === 'ios') ? 90 : 90, 
             display: tabBarVisible ? 'flex' : 'none' 
           },
           tabBarActiveTintColor: '#353091',

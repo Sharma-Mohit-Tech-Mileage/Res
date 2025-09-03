@@ -49,6 +49,7 @@ const SplashScreen = ({ navigation, route }) => {
   const logoMovement = useRef(new Animated.Value(350)).current;
   const [isVisible, setIsVisible] = useState(false)
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [isMobile, setIsMobile] = useState(false);
   
   const [loginAttemptInfo, setLoginAttemptInfo] = useState({});
 
@@ -81,6 +82,12 @@ const SplashScreen = ({ navigation, route }) => {
     console.error('Login API Error:', error);
     setLoading(false);
     setLoginEnable(true);
+    if(error.status===204){
+      setIsMobile(true)
+      setErrorMessage(strings.ErrorMsg204);
+      setTimeout(() => { setModalVisible(true); }, 500);
+      return; 
+    }
     
     LoginLogger.logFailedLogin(dispatch, logInfo, {
       message: "API login failed",
@@ -190,7 +197,7 @@ const SplashScreen = ({ navigation, route }) => {
                 textDecorationLine: "",
               },
             ]}
-            splitKey={bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}
+            splitKey={bussinessApp ? "download the MySparklight Business mobile app" : isMobile? "1-877-692-2253" : "log in to your online account"}
             instruction={ message2? `${message} ${bussinessApp ? "download the MySparklight Business mobile app" : "log in to your online account"}${message2}`:message}
           />
           <TouchableOpacity
@@ -208,6 +215,11 @@ const SplashScreen = ({ navigation, route }) => {
   const handleCloseAlert = () => {
     setModalVisible(false);
     setLoading(false); // 🟢 Reset loading when closing modal
+    if(isMobile){   
+      setIsMobile(false)
+      setTimeout(() => { Linking.openURL('tel:1-877-692-2253'); }, 500);
+      return
+    }
     logoutAction(() => {
       if (bussinessApp) {
         if (Platform.OS === "android") {

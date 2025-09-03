@@ -22,7 +22,8 @@ let strings = new LocalizedStrings({
    BusinessUserMsg:'Only customers with Sparklight home internet services can use the MySparklight mobile app for account management. Please',
    //nonAdminUserMsg:'Only customers with Sparklight home internet services can use the MySparklight mobile app for account management. Please',
    nonInternetUserMessage:'Currently, only a Sparklight account with Internet service can use the MySparklight mobile app for service management. Please',
-   AdminMsg:'Please sign in as the Primary Admin to access your account.'
+   AdminMsg:'Please sign in as the Primary Admin to access your account.',
+   ErrorMsg204:'We apologize, but due to technical issues, we are unable to log you in at this time . Please call 1-877-692-2253 for further assistance.'
  },
  
 });

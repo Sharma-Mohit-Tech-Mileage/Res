@@ -357,12 +357,11 @@ const TextNotifications = ({ navigation }) => {
             </View>
 
             <View style={styles.frameGroup}>
-              <View style={[styles.frameParent3]}>
+              <View style={[styles.frameParent3,{width:widthPercentageToDP('82%')}]}>
                 {/* <Text style={styles.mobilePhoneTypo}>Mobile Phone</Text> */}
                 <View
                   style={{
                     paddingVertical: 4,
-                    width: widthPercentageToDP("80%"),
                   }}
                 >
                   <Controller
@@ -412,7 +411,7 @@ const TextNotifications = ({ navigation }) => {
               <View
                 style={{
                   paddingVertical: 16,
-                  marginHorizontal: 16,
+                  marginHorizontal: 20,
                   alignContent: "flex-start",
                   alignItems: "flex-start",
                 }}
@@ -563,7 +562,6 @@ const styles = StyleSheet.create({
   navigationBorder: {
     borderColor: Color.sparklightWhite,
     justifyContent: "center",
-    alignItems: "center",
     borderStyle: "solid",
     backgroundColor: Color.sparklightWhite,
   },

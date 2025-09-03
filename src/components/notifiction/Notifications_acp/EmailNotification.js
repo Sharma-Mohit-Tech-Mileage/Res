@@ -1,5 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, View, ScrollView, Image, Animated, Platform, TouchableOpacity, AccessibilityInfo, } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Image,
+  Animated,
+  Platform,
+  TouchableOpacity,
+  AccessibilityInfo,
+} from "react-native";
 import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -14,22 +24,30 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 import LoadingOverlay from "../../common/customui/CustomLoading";
 import { updatePrimaryAndPaperlessRequest } from "../../../redux/actions/NotificationActionSuite";
-import { fetchACPUserAccountDetails, getPaperlessStatus } from "../../../redux/actions/ProfileActionSuite";
+import {
+  fetchACPUserAccountDetails,
+  getPaperlessStatus,
+} from "../../../redux/actions/ProfileActionSuite";
 import { getPrimaryEmail } from "../../utility/constant";
-import Checkcircle from '../../../../assets/svgs/Checkcircle';
-import Checkcircle1 from '../../../../assets/svgs/Checkcircle1';
+import Checkcircle from "../../../../assets/svgs/Checkcircle";
+import Checkcircle1 from "../../../../assets/svgs/Checkcircle1";
+import AlertIcon from "../../../res/svgIcons/AlertIcon";
 
 const validationSchema = yup.object().shape({
-  email: yup.string().email("Invalid email address").required("Email is required"),
+  email: yup
+    .string()
+    .email("Invalid email address")
+    .required("Email is required"),
 });
 
 const AddNotificationScreen = () => {
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [isTermRequired, setIsTermRequired] = useState(false);
   const [formState, setFormState] = useState({ paperlessBilling: false });
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
-  const user = useSelector(state => state.combinedReducers.user.userData);
+  const user = useSelector((state) => state.combinedReducers.user.userData);
   const [isCheckboxVisible, setIsCheckboxVisible] = useState(null);
   const scrollViewRef = useRef(null);
   const animatedValue = useRef(new Animated.Value(-100)).current;
@@ -79,7 +97,7 @@ const AddNotificationScreen = () => {
       const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
       setValue("email", updatedPrimaryEmail);
       dispatch(getPaperlessStatus(updatedPrimaryEmail));
-      
+
       // Update isEnrolled based on the actual presence of a primary email
       setIsEnrolled(!!updatedPrimaryEmail);
     }
@@ -94,15 +112,24 @@ const AddNotificationScreen = () => {
       if (route.params?.updateSuccess) {
         try {
           await dispatch(fetchACPUserAccountDetails());
-          setNotification({ message: route.params.successMessage, type: "success" });
+          setNotification({
+            message: route.params.successMessage,
+            type: "success",
+          });
         } catch (error) {
-          setNotification({ message: 'Error updating account details', type: "error" });
+          setNotification({
+            message: "Error updating account details",
+            type: "error",
+          });
         } finally {
           setIsSubmitting(false);
           setToggleCheckBoxTerm(false);
         }
       } else if (route.params?.updateFailed) {
-        setNotification({ message: route.params.failureMessage, type: "error" });
+        setNotification({
+          message: route.params.failureMessage,
+          type: "error",
+        });
         setIsSubmitting(false);
         setToggleCheckBoxTerm(false);
       }
@@ -155,19 +182,18 @@ const AddNotificationScreen = () => {
   }, [notification, animateNotification]);
 
   const handleToggleChange = useCallback((newValue) => {
-    setFormState((prevState) => ({ ...prevState, paperlessBilling: newValue.target.value }));
+    setFormState((prevState) => ({
+      ...prevState,
+      paperlessBilling: newValue.target.value,
+    }));
   }, []);
 
   const handleSave = useCallback(
     (data) => {
       const { email } = data;
       const { paperlessBilling } = formState;
-     if (paperlessBilling && isCheckboxVisible && !toggleCheckBoxTerm) {
-        setNotification({
-          message: "Please accept the Paperless Billing Terms & Conditions to continue.",
-          type: "error",
-        });
-        animateNotification();
+      if (isCheckboxVisible && !toggleCheckBoxTerm) {
+        setIsTermRequired(true);
         return;
       }
       setIsSubmitting(true);
@@ -196,39 +222,57 @@ const AddNotificationScreen = () => {
   );
 
   const handleValidationError = useCallback(() => {
-    scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-    setNotification({ message: "Please enter valid information to continue.", type: "error" });
-    animateNotification();
+    // scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+    // setNotification({
+    //   message: "Please enter valid information to continue.",
+    //   type: "error",
+    // });
+    // animateNotification();
   }, [animateNotification]);
 
   const handleCheckboxToggle = useCallback(() => {
     setToggleCheckBoxTerm(!toggleCheckBoxTerm);
+    setIsTermRequired(false);
   }, [toggleCheckBoxTerm]);
 
-  const handleTermsLinkPress = useCallback((event) => {
-    event.stopPropagation();
-    navigation.navigate("ArticalWindowUtility", {
-      url: "https://www.sparklight.com/legal/paperless-terms-and-conditions",
-      name: "Terms & Conditions",
-    });
-  }, [navigation]);
+  const handleTermsLinkPress = useCallback(
+    (event) => {
+      event.stopPropagation();
+      navigation.navigate("ArticalWindowUtility", {
+        url: "https://www.sparklight.com/legal/paperless-terms-and-conditions",
+        name: "Terms & Conditions",
+      });
+    },
+    [navigation]
+  );
 
   return (
     <View style={styles.container}>
       <ProfileSettingsHeader
-        title={isEnrolled ? "Edit Email Notifications" : "Add Email Notifications"}
+        title={
+          isEnrolled ? "Edit Email Notifications" : "Add Email Notifications"
+        }
         onPressBack={() => navigation.goBack()}
-        accessibilityLabel={isEnrolled ? "Edit Email Notifications" : "Add Email Notifications"}
+        accessibilityLabel={
+          isEnrolled ? "Edit Email Notifications" : "Add Email Notifications"
+        }
       />
       {isSubmitting && (
-        <LoadingOverlay loading={isSubmitting} loadingTxt="Saving" accessibilityLiveRegion="polite" />
+        <LoadingOverlay
+          loading={isSubmitting}
+          loadingTxt="Saving"
+          accessibilityLiveRegion="polite"
+        />
       )}
       <ScrollView ref={scrollViewRef}>
         <View style={styles.frameContainer}>
           <View style={{ paddingVertical: 16 }}>
             {notification && (
               <Animated.View
-                style={{ transform: [{ translateY }], paddingHorizontal: Padding.p_5xl }}
+                style={{
+                  transform: [{ translateY }],
+                  paddingHorizontal: Padding.p_5xl,
+                }}
                 accessible={true}
               >
                 <View style={styles.spaceBottom}>
@@ -246,11 +290,15 @@ const AddNotificationScreen = () => {
               </Animated.View>
             )}
 
-            <View style={{ paddingHorizontal: Padding.p_5xl }} >
+            <View style={{ paddingHorizontal: Padding.p_5xl }}>
               <NotificationAlert
                 type="warning"
                 title={"Critical Notifications"}
-                message={!isEnrolled?"By providing your email address, you're signing up for critical notifications. We'll keep you informed without overwhelming your inbox.":"By updating your email, you agree that this change will apply to all Sparklight email customer communications sent to you, including, but not limited to, account notifications, order updates, marketing emails, and service-related messages."}
+                message={
+                  !isEnrolled
+                    ? "By providing your email address, you're signing up for critical notifications. We'll keep you informed without overwhelming your inbox."
+                    : "By updating your email, you agree that this change will apply to all Sparklight email customer communications sent to you, including, but not limited to, account notifications, order updates, marketing emails, and service-related messages."
+                }
                 showCloseIcon={false}
                 isVisible={true}
                 accessibilityLabel="Important: By providing your email address, you're signing up for critical notifications"
@@ -259,12 +307,16 @@ const AddNotificationScreen = () => {
                 customStyle={styles.warningAlert}
               />
             </View>
-            <View style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}>
-            {isEnrolled &&<Text style={styles.instructions}>
-                {"Edit Email Address"}
-              </Text>}
+            <View
+              style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
+            >
+              {isEnrolled && (
+                <Text style={styles.instructions}>{"Edit Email Address"}</Text>
+              )}
               <Text style={styles.instructions}>
-                {!isEnrolled?"Please enter your email address below and stay connected with us.":"Please enter the email address you would like to receive all future customer communications. You may opt out at any time."}
+                {!isEnrolled
+                  ? "Please enter your email address below and stay connected with us."
+                  : "Please enter the email address you would like to receive all future customer communications. You may opt out at any time."}
               </Text>
               <Controller
                 control={control}
@@ -287,10 +339,14 @@ const AddNotificationScreen = () => {
               />
             </View>
             <View style={styles.divider} />
-            <View style={[styles.section, { paddingHorizontal: Padding.p_5xl }]} >
+            <View
+              style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
+            >
               <View style={styles.toggleHeader}>
-                <Text style={[styles.toggleTitle,{flex:0.86}]}>Critical Notifications</Text>
-                <View style={[styles.iconContainer,{ flex: 0.14 }]}>
+                <Text style={[styles.toggleTitle, { flex: 0.86 }]}>
+                  Critical Notifications
+                </Text>
+                <View style={[styles.iconContainer, { flex: 0.14 }]}>
                   {/* <Image
                     style={styles.icon}
                     resizeMode="cover"
@@ -302,7 +358,7 @@ const AddNotificationScreen = () => {
                     accessible={false} // decorative
                   /> */}
                   <View style={styles.icon} accessible={false}>
-                    {primaryEmail ?  <Checkcircle /> : <Checkcircle1 />}
+                    {primaryEmail ? <Checkcircle /> : <Checkcircle1 />}
                   </View>
                   {/* Display text "On" or "Off" after the icon */}
                   <Text style={styles.toggleStatus}>
@@ -314,24 +370,33 @@ const AddNotificationScreen = () => {
                 Receive critical information, account changes, and service
                 updates.
               </Text>
-          </View>
+            </View>
             <View style={styles.divider} />
-            <View style={{ paddingTop: Padding.p_base, paddingBottom: 8, paddingHorizontal: Padding.p_5xl }}>
+            <View
+              style={{
+                paddingTop: Padding.p_base,
+                paddingBottom: 8,
+                paddingHorizontal: Padding.p_5xl,
+              }}
+            >
               <View style={styles.toggleHeader}>
-                <Text style={[styles.toggleTitle,{flex:0.9}]}>Paperless Billing</Text>
-                <View style={{ flex: 0.1}}>
-                <Toggle
-                  
-                  name="paperlessBilling"
-                  initialValue={paperlessStatusAcp || false}
-                  onToggle={handleToggleChange}
-                  disabled={!toggleCheckBoxTerm && !paperlessStatusAcp}
-                  section="paperless"
-                />
+                <Text style={[styles.toggleTitle, { flex: 0.9 }]}>
+                  Paperless Billing
+                </Text>
+                <View style={{ flex: 0.1 }}>
+                  <Toggle
+                    name="paperlessBilling"
+                    initialValue={paperlessStatusAcp || false}
+                    onToggle={handleToggleChange}
+                    disabled={!toggleCheckBoxTerm && !paperlessStatusAcp}
+                    section="paperless"
+                  />
                 </View>
               </View>
               <Text style={styles.toggleDescription}>
-                Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips.
+                Opt for email statements and say goodbye to paper clutter. It's
+                convenient, eco-friendly, and keeps your information at your
+                fingertips.
               </Text>
             </View>
             {isCheckboxVisible && (
@@ -349,14 +414,20 @@ const AddNotificationScreen = () => {
                       value={toggleCheckBoxTerm}
                       style={styles.checkBox}
                       boxType="square"
+                      tintColor={
+                        isTermRequired ? "#EF4E3E" : Color.colorWhitesmoke_300
+                      }
                       tintColors={{
                         true: "#1B99FF",
-                        false: Platform.OS === "ios" ? Color.colorWhitesmoke_300 : "#D0D5DD",
+                        false:
+                          Platform.OS === "ios"
+                            ? Color.colorWhitesmoke_300
+                            : "#D0D5DD",
                       }}
                       accessible={false}
                     />
                     <Text
-                      style={[styles.checkBoxAreaViewText,{marginLeft: 4}]}
+                      style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
                       allowFontScaling={true}
                       maxFontSizeMultiplier={1}
                     >
@@ -373,7 +444,10 @@ const AddNotificationScreen = () => {
                   <Text
                     style={[
                       styles.checkBoxAreaViewText,
-                      { color: Color.sparklightBrightPurple, textDecorationLine: "underline" },
+                      {
+                        color: Color.sparklightBrightPurple,
+                        textDecorationLine: "underline",
+                      },
                     ]}
                     allowFontScaling={true}
                     maxFontSizeMultiplier={1}
@@ -384,13 +458,37 @@ const AddNotificationScreen = () => {
               </View>
             )}
           </View>
+          {isTermRequired && (
+            <View
+              style={{
+                flexDirection: "row",
+                marginHorizontal: Padding.p_5xl,
+                marginBottom: 16,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+
+                  alignItems: "center",
+                }}
+              >
+                <AlertIcon />
+                <Text style={styles.ErrorToggle}>
+                  Please agree to the Terms & Conditions to proceed.
+                </Text>
+              </View>
+            </View>
+          )}
         </View>
         <View style={styles.buttonContainer}>
           <SecondaryButton
             title="Save"
             buttonType="submit"
             onPress={handleSubmit(handleSave, handleValidationError)}
-            accessibilityLabel={isSubmitting ? "Saving settings" : "Save settings"}
+            accessibilityLabel={
+              isSubmitting ? "Saving settings" : "Save settings"
+            }
             accessibilityRole="button"
             style={styles.saveButton}
             disabled={isSubmitting}
@@ -459,6 +557,13 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansSemiBold,
     fontSize: FontSize.size_base,
     color: Color.colorGray_200,
+  },
+  ErrorToggle: {
+    color: Color.sparkLightRed,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "600",
+    fontSize: 14,
+    marginLeft: 4,
   },
   toggleStatus: {
     marginLeft: 4,

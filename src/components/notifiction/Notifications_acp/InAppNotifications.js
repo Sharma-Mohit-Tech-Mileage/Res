@@ -67,8 +67,8 @@ const InAppNotifications = ({ navigation }) => {
   const isFocused = useIsFocused();
   const [notification, setNotification] = useState(null);
   const formatedData = route.params?.additionalData || {};
-  console.log("additionalData", JSON.stringify(route.params));
-  
+  const checkNotifData=formatedData?.optOut || formatedData?.outageOptOut || formatedData?.billingOptOutStatus;
+  console.log("checkNotifData", checkNotifData);
 
   const translateY = animatedValue;
   const animateNotification = useCallback(() => {
@@ -137,6 +137,24 @@ const InAppNotifications = ({ navigation }) => {
     //   };
     //   return updatedSettings;
     // });
+    const checkNofif = async () => {
+      console.log("Toggle data", JSON.stringify(formatedData));
+      if (
+        formatedData?.optOut ||
+        formatedData?.outageOptOut ||
+        formatedData?.billingOptOutStatus 
+      ) {
+        if(!checkNotifData){
+        const pushNotification = await getPushNotificationStatus();
+        if (pushNotification?.permanentSkip) {
+          await notifyPermission();
+        } else {
+          await requestUserPermission();
+        }
+      }
+      }
+    };
+    checkNofif();
   };
 
   useEffect(() => {
@@ -159,13 +177,12 @@ const InAppNotifications = ({ navigation }) => {
   }, [route.params]);
 
   const handleSave = async () => {
-    
-    const pushNotification = await getPushNotificationStatus();
-    if (pushNotification?.permanentSkip) {
-      await notifyPermission();
-    } else {
-      await requestUserPermission();
-    }
+    // const pushNotification = await getPushNotificationStatus();
+    // if (pushNotification?.permanentSkip) {
+    //   await notifyPermission();
+    // } else {
+    //   await requestUserPermission();
+    // }
     const token = await getFcmToken();
     formatedData.deviceToken = token;
     formatedData.deviceTokenTimestamp = moment().format();
@@ -174,38 +191,40 @@ const InAppNotifications = ({ navigation }) => {
     const request = {
       optOut: formatedData.optOut,
       outageOptOut: formatedData.outageOptOut,
-      billingOptOutStatus: formatedData.billingOptOutStatus,  
+      billingOptOutStatus: formatedData.billingOptOutStatus,
       deviceToken: formatedData.deviceToken,
       deviceTokenTimestamp: formatedData.deviceTokenTimestamp,
       isAndroid: formatedData.isAndroid,
-    }
+    };
     await postRequestInAppNotification(request);
   };
 
-
- const postRequestInAppNotification = async(data) => {
-   let user = await getUser();
+  const postRequestInAppNotification = async (data) => {
+    let user = await getUser();
     let deviceToken = await getDeviceUniqueId();
     const accountNumber = user.userInfo?.accountNumber || null;
     const userName = user.userInfo?.userName || null;
     data.accountNumber = accountNumber;
     data.userName = userName;
 
-    data['id'] = 0;
-    data['DeviceId'] = deviceToken;
-    data['customerType'] = 'Residential'
-    data['optOut'] = !data.optOut
-    data['outageOptOut'] = !data.outageOptOut
-    data['billingOptOutStatus'] = !data.billingOptOutStatus
+    data["id"] = 0;
+    data["DeviceId"] = deviceToken;
+    data["customerType"] = "Residential";
+    data["optOut"] = !data.optOut;
+    data["outageOptOut"] = !data.outageOptOut;
+    data["billingOptOutStatus"] = !data.billingOptOutStatus;
 
-    console.log('postPushNotifications',data)
-   setIsLoading(true)
+    console.log("postPushNotifications", data);
+    setIsLoading(true);
     PostApiRequest(
       `api/mobilenotificationpreferences/${userName}/mobilepreferences`,
       data,
       (res) => {
-        setIsLoading(false)
-        console.log("Response  postRequestInAppNotification", JSON.stringify(res));
+        setIsLoading(false);
+        console.log(
+          "Response  postRequestInAppNotification",
+          JSON.stringify(res)
+        );
         if (res) {
           setNotification({
             message: "In-App Notifications updated successfully.",
@@ -215,7 +234,7 @@ const InAppNotifications = ({ navigation }) => {
         }
       },
       (error) => {
-        setIsLoading(false)
+        setIsLoading(false);
         console.error("Error on retrying postRequestInAppNotification", error);
         setNotification({
           message: "In-App Notifications update failed.",
@@ -225,8 +244,7 @@ const InAppNotifications = ({ navigation }) => {
         //navigation.navigate("Notifications", { updateFailed: true, failureMessage: "In-App Notifications update failed." });
       }
     );
- }
-
+  };
 
   return (
     <View style={styles.inAppNotifications}>
@@ -235,7 +253,7 @@ const InAppNotifications = ({ navigation }) => {
         onPressBack={() => navigation.navigate("Notifications")}
       />
 
-       {isLoading && (
+      {isLoading && (
         <LoadingOverlay
           loading={isLoading}
           loadingTxt="Saving"
