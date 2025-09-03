@@ -435,10 +435,7 @@ const TextNotifications = ({ navigation }) => {
                         }
                         tintColors={{
                           true: "#1B99FF",
-                          false:
-                            Platform.OS === "ios"
-                              ? Color.colorWhitesmoke_300
-                              : "#D0D5DD",
+                          false: isTermRequired? "#EF4E3E": "#D0D5DD",
                         }}
                         accessible={false}
                       />

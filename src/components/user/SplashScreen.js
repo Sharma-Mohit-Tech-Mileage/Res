@@ -217,6 +217,7 @@ const SplashScreen = ({ navigation, route }) => {
     setLoading(false); // 🟢 Reset loading when closing modal
     if(isMobile){   
       setIsMobile(false)
+      logoutAction();
       setTimeout(() => { Linking.openURL('tel:1-877-692-2253'); }, 500);
       return
     }

@@ -110,7 +110,9 @@ const BoldEmailText = ({ message }) => {
     <Text>
       {parts.map((part, index) => (
         <React.Fragment key={index}>
+          <Text style={styles.infoText}>
           {part}
+          </Text>
           {emails && emails[index] && (
             <Text
               style={[
@@ -141,9 +143,11 @@ const BoldPhoneText = ({ phoneNum }) => {
       }
     >
       <React.Fragment>
+        <Text style={styles.infoText}>
         {phoneNum
           ? "Text alert are sent to "
           : "You have not enabled text notifications"}
+        </Text>
         {
           <Text
             style={[

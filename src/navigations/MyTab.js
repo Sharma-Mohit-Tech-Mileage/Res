@@ -17,6 +17,7 @@ import BillingStackScreen from "./stackNavigation/BillingStack";
 import MyServicesStack from "./stackNavigation/MyServicesStack";
 import NewSupportIcon from "../res/svgIcons/NewSupportIcon";
 import HomeAccountIcon from "../res/svgIcons/HomeAccountIcon";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 
 const { width } = Dimensions.get('window');
 const tabWidth = Number(width / 5);
@@ -119,7 +120,7 @@ const MyTabs = ({ navigation, route }) => {
           tabBarStyle: { 
             paddingVertical: (Platform.OS==='ios')?5:10, 
             position: 'absolute', 
-            height: (Platform.OS === 'ios') ? 90 : 90, 
+            height: (Platform.OS === 'ios') ? 90 : 70, 
             display: tabBarVisible ? 'flex' : 'none' 
           },
           tabBarActiveTintColor: '#353091',
@@ -127,7 +128,8 @@ const MyTabs = ({ navigation, route }) => {
           tabBarLabelStyle: { 
             fontSize: 12, 
             fontFamily: FontFamily.openSansRegular, 
-            fontWeight: '600' 
+            fontWeight: '600' ,
+            marginBottom: 5
           },
           tabBarButton: (props) => {
             const tabIndex = ["Home", "BillingTab", "MyServices", "Support", "account"].indexOf(route.name);
