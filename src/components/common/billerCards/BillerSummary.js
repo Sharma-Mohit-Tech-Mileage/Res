@@ -57,10 +57,10 @@ const Card = ({ billAmt, dueDate, navigation, style}) => {
 
     <View style={[AppStyles.card, style]}>
       <View style={styles.cardHreader}>
-        <View style={{ marginLeft: 10, flexDirection: "row", alignItems: "center", }} >
-          <View style={{ alignSelf: "center" }}>
+        <View style={{ flexDirection: "row", alignItems: "center", }} >
+          {/* <View style={{ alignSelf: "center" }}>
             <WalletSummaryIcon />
-          </View>
+          </View> */}
 
           <Text style={styles.leftTitle}>Bill Summary</Text>
         </View>
@@ -110,9 +110,9 @@ const Card = ({ billAmt, dueDate, navigation, style}) => {
           style={[
               styles.label,
               {
-                fontWeight: "700",
-                color: colors.sparklight_purple_blue,
-                fontSize: 18,
+                fontWeight: "600",
+                color: colors.sparklight_grey,
+                fontSize: 14,
                 paddingBottom: 5,
                 alignSelf:'center',
             
@@ -167,7 +167,7 @@ const Card = ({ billAmt, dueDate, navigation, style}) => {
                   color:
                     dueDate == "Immediately"
                       ? colors.sparklight_red
-                      : colors.sparklight_purple_blue,
+                      : colors.sparklight_grey,
                   fontWeight: dueDate == "Immediately" ? "400" : "700",
                 },
               ]}
@@ -189,7 +189,7 @@ const Card = ({ billAmt, dueDate, navigation, style}) => {
                     color:
                       dueDate == "Immediately"
                         ? colors.sparklight_red
-                        : colors.sparklight_purple_blue,
+                        : colors.sparklight_grey,
                   },
                 ]}
               >
@@ -217,9 +217,9 @@ const Card = ({ billAmt, dueDate, navigation, style}) => {
           style={styles.paymentButton}
         >
           <Text style={styles.paymentButtonText}>Make a Payment</Text>
-          <View style={{ marginLeft: 2, alignSelf: "center" }}>
+          {/* <View style={{ marginLeft: 2, alignSelf: "center" }}>
             <RightArrow color={colors.snow_white} />
-          </View>
+          </View> */}
         </TouchableOpacity>
       </View>
      ):<>
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   leftTitle: {
     color: colors.sp_black,
     fontSize: 18,
-    fontWeight: "400",
+    fontWeight: "600",
     textAlign: "center",
     marginLeft: 10,
     alignContent: "flex-start",
@@ -358,13 +358,13 @@ const styles = StyleSheet.create({
   paymentButton: {
     flexDirection: "row",
     backgroundColor: colors.sparklight_purple_blue,
-    width: wp("70%"),
+    width: wp("80%"),
     paddingVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 5,
+    borderRadius: 2,
     alignSelf: "center",
-    marginLeft: wp("9%"),
+    
   },
   paymentButtonText: {
     color: colors.snow_white,
@@ -375,18 +375,17 @@ const styles = StyleSheet.create({
   },
   cardHreader: {
     flexDirection: "row",
-    backgroundColor: "#F8F8F8",
+   
     width: "100%",
     padding: 10,
   },
   cardFooter: {
     flexDirection: "row",
-    backgroundColor: "#F8F8F8",
     width: "100%",
     padding: 10,
     position: "absolute",
     bottom: 0,
-    left: 0,
+    left: 10,
   },
 });
 

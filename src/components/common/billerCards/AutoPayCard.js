@@ -31,22 +31,33 @@ const AutoPayCard = ({
 
   return (
     <View style={[AppStyles.card, style]}>
-      <View style={styles.cardHreader}>
-        <View
+      
+
+      <View
           style={{
-            marginLeft: 10,
+            margin: 10,
             flexDirection: "row",
-            alignItems: "center",
+            
           }}
         >
-          <View style={{ alignSelf: "center" }}>
+          
+          <View style={styles.iconBg}>
             <AutoPayIcon />
           </View>
-
+          <View style={{flexDirection:'column'}}>
           <Text style={styles.leftTitle}>Auto Pay</Text>
+           <Text style={{textDecorationStyle:'solid',textDecorationLine:'underline', fontSize:14,fontWeight:'400',fontFamily:FontFamily.openSansRegular, marginLeft:10}} onPress={()=>{
+            navigation.navigate("AutoPayPCIConnector", {
+              url: `${Env.URL}/billing`,
+              name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
+              useNewPayment: useNewPayment,
+              status: isAutoPayStatus,
+              paymentDetails: paymentDetails,
+            });
+           }}>Manage</Text>
+          </View>
         </View>
-      </View>
-
+{/* 
       {isStatusLoading ? (
         <SkeletonPlaceholder>
           <>
@@ -120,36 +131,35 @@ const AutoPayCard = ({
               </View>
             </>
           )}
-        
-      
-      <View style={styles.cardFooter}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("AutoPayPCIConnector", {
-              url: `${Env.URL}/billing`,
-              name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-              useNewPayment: useNewPayment,
-              status: isAutoPayStatus,
-              paymentDetails: paymentDetails,
-            });
-          }}
-          accessible={true}
-          accessibilityLabel={
-            isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"
-          }
-          accessibilityRole="button"
-          style={styles.paymentButton}
-        >
-          <Text style={styles.paymentButtonText}>
-            {isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"}
-          </Text>
-          <View style={{ marginLeft: 2 }}>
-            <RightArrow color={colors.snow_white} />
-          </View>
-        </TouchableOpacity>
-      </View>
-      </>
-      )}
+
+          <View style={styles.cardFooter}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("AutoPayPCIConnector", {
+                  url: `${Env.URL}/billing`,
+                  name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
+                  useNewPayment: useNewPayment,
+                  status: isAutoPayStatus,
+                  paymentDetails: paymentDetails,
+                });
+              }}
+              accessible={true}
+              accessibilityLabel={
+                isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"
+              }
+              accessibilityRole="button"
+              style={styles.paymentButton}
+            >
+              <Text style={styles.paymentButtonText}>
+                {isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"}
+              </Text>
+              <View style={{ marginLeft: 2 }}>
+                <RightArrow color={colors.snow_white} />
+              </View>
+            </TouchableOpacity>
+          </View> 
+        </>
+      )}*/}
     </View>
   );
 };
@@ -173,8 +183,9 @@ const styles = StyleSheet.create({
   leftTitle: {
     color: colors.sp_black,
     fontSize: 18,
-    fontWeight: "400",
+    fontWeight: "600",
     textAlign: "center",
+    fontFamily: FontFamily.openSansRegular,
     marginLeft: 10,
     alignContent: "flex-start",
     alignSelf: "center",
@@ -248,6 +259,15 @@ const styles = StyleSheet.create({
     marginVertical: Padding.p_xs,
     marginTop: Padding.p_xs,
   },
+  iconBg: {
+    alignSelf: "center",
+    backgroundColor: "#8D3B901A",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   paymentButton: {
     flexDirection: "row",
     backgroundColor: colors.sparklight_purple_blue,
@@ -275,13 +295,12 @@ const styles = StyleSheet.create({
   },
   cardHreader: {
     flexDirection: "row",
-    backgroundColor: "#F8F8F8",
     width: wp("92%"),
     padding: 10,
   },
   cardFooter: {
     flexDirection: "row",
-    backgroundColor: "#F8F8F8",
+
     width: wp("100%"),
     padding: 10,
     position: "absolute",

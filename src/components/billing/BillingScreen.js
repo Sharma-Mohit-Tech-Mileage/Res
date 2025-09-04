@@ -184,7 +184,7 @@ const BillingScreen = ({ navigation }) => {
                   paymentDetails={defaultPaymentDetails}
                   isStatusLoading={isAutoPayStatusLoad}
                   navigation={navigation}
-                  style={styles.card}
+                  
                 />
                 <PeperLessCard
                   paperlessCardEmail={paperlessCardEmail}
