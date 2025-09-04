@@ -54,7 +54,7 @@ const BillingScreen = ({ navigation }) => {
   let paperlessCardEmail = paperlessEmail;
   
   const handleError = (error) => { 
-    console.log("error", error); 
+    console.log("error on Billing auto pay", error); 
     setIsContentLoading(false);
     setIsAutoPayStatusLoad(false);
     setLoadingPerless(false);
@@ -67,8 +67,9 @@ const BillingScreen = ({ navigation }) => {
     getUser().then((res) => {
       const accountNumber = res.userInfo.accountNumber;
       GetApiRequest(
-        `account/api/account/${accountNumber}/easypay`,
+         `api/Accounts/${accountNumber}/easypay`,
         (res) => {
+          console.log("AutoPay API Success Response:", res);
           setIsAutoPayStatus(res?.isEasyPay);
           setCardDigit(res?.epLastfour);
           setIsAutoPayStatusLoad(false);

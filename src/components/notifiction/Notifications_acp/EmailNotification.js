@@ -33,19 +33,22 @@ import Checkcircle from "../../../../assets/svgs/Checkcircle";
 import Checkcircle1 from "../../../../assets/svgs/Checkcircle1";
 import AlertIcon from "../../../res/svgIcons/AlertIcon";
 
+const emailRegex =
+  /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
 const validationSchema = yup.object().shape({
   email: yup
     .string()
-    .email("Invalid email address")
+    .matches(emailRegex, "Invalid email address")
     .required("Email is required"),
 });
+
 
 const AddNotificationScreen = () => {
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
   const [isTermRequired, setIsTermRequired] = useState(false);
-  const [formState, setFormState] = useState({ paperlessBilling: false });
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
   const user = useSelector((state) => state.combinedReducers.user.userData);
   const [isCheckboxVisible, setIsCheckboxVisible] = useState(null);
@@ -62,6 +65,7 @@ const AddNotificationScreen = () => {
     (state) => state.combinedReducers.profile?.paperlessStatusAcp
   );
 
+   const [formState, setFormState] = useState({ paperlessBilling: paperlessStatusAcp });
   const primaryEmail = accountDetails ? getPrimaryEmail(accountDetails) : "";
 
   const {
@@ -186,13 +190,17 @@ const AddNotificationScreen = () => {
       ...prevState,
       paperlessBilling: newValue.target.value,
     }));
+    if (newValue.target.value === true) {
+      setIsTermRequired(false);
+    }
   }, []);
 
   const handleSave = useCallback(
     (data) => {
       const { email } = data;
       const { paperlessBilling } = formState;
-      if (isCheckboxVisible && !toggleCheckBoxTerm) {
+      
+      if (isCheckboxVisible && paperlessBilling && !toggleCheckBoxTerm) {
         setIsTermRequired(true);
         return;
       }

@@ -4,16 +4,12 @@ import { useDispatch } from "react-redux";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
 import { FontSize, FontFamily, Color, Border } from "../../../GlobalStyles";
 import PolygonIcon from "../../../src/res/svgIcons/PolygonIcon";
-
-
 const tabWidth = Number(Dimensions.get("window").width / 4);
 
 const WalkthroughOverlay = ({ onFinish }) => {
   const dispatch = useDispatch();
   const [walkThroughStep, setWalkThroughStep] = useState(0);
   const [showWalkThrough, setShowWalkThrough] = useState(true);
-  
-
   const walkThroughScreens =  [
     {
       title: "Home",
@@ -37,14 +33,17 @@ const WalkthroughOverlay = ({ onFinish }) => {
     },
     {
       title: "Account",
-      description: "Manage your profile settings, notifications, and more.",
+      description: "Manage your profile settings, notifications and more.",
       buttonText: "Let's Go!",
     },
   ];
+
   const changeWalkThroughStep = (requestedStep) => {
     // Assume walkThroughStep holds the current step (0–4)
     let newStep = requestedStep;
-  
+    
+    // For non-normal users, skip step 2.
+    
       // Determine direction by comparing current step and the requested step.
       // If moving forward (current < requested) and requested is 2, jump to 3.
       if (walkThroughStep < requestedStep && requestedStep === 2) {
@@ -94,10 +93,10 @@ const WalkthroughOverlay = ({ onFinish }) => {
       <View>
         <View
           accessible={true}
-          accessibilityLabel={currentScreen?.title}
+          accessibilityLabel={currentScreen.title}
           style={styles.title}
         >
-          <Text style={styles.titleText}>{currentScreen?.title}</Text>
+          <Text style={styles.titleText}>{currentScreen.title}</Text>
         </View>
         <View
           accessible={true}
@@ -169,11 +168,7 @@ const WalkthroughOverlay = ({ onFinish }) => {
         </View>
       </View>
       <View>
-        {/* <Image
-          style={bottomCarotStyles}
-          tintColor={"#FFF"}
-          source={require("../../../assets/polygon.png")}
-        /> */}
+        
         <View style={bottomCarotStyles}>
           <PolygonIcon/>
         </View>
