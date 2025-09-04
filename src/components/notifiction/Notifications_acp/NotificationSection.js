@@ -111,7 +111,7 @@ const BoldEmailText = ({ message }) => {
       {parts.map((part, index) => (
         <React.Fragment key={index}>
           <Text style={styles.infoText}>
-          {part}
+          { ' '+ part}
           </Text>
           {emails && emails[index] && (
             <Text
@@ -302,18 +302,18 @@ const styles = StyleSheet.create({
   // Info Message
   infoMessage: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    padding: Padding.p_base,
-    marginHorizontal: Padding.p_base,
-    marginBottom: Padding.p_base,
-    borderRadius: Border.br_5xs,
-    borderWidth: 1,
-    borderColor: "#0060AE",
-    backgroundColor: "#F0F8FF",
+  alignItems: "center",   // ✅ centers the icon with the text baseline
+  padding: Padding.p_base,
+  marginHorizontal: Padding.p_base,
+  marginBottom: Padding.p_base,
+  borderRadius: Border.br_5xs,
+  borderWidth: 1,
+  borderColor: "#0060AE",
+  backgroundColor: "#F0F8FF",
   },
   infoText: {
     flex: 1,
-    marginLeft: Padding.p_5xs,
+    marginLeft: 2,
     fontSize: FontSize.textXsSemibold_size,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
