@@ -24,8 +24,11 @@ import * as yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import { addPrimaryEmailRequest } from "../../redux/actions/NotificationActionSuite";
 
+const emailRegex =
+  /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
 const validationSchema = yup.object().shape({
-  email: yup.string().email("Invalid email address").required("Email is required"),
+  email: yup.string().matches(emailRegex, "Invalid email address").required("Email is required"),
 });
 
 const EmailNotifications = ({ navigation }) => {
