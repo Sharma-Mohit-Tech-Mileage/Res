@@ -290,6 +290,7 @@ const enableNotifications = async () => {
       accessibilityLabel="SparkLight"
       style={styles.headerContainer}
     >
+    
       <View
         style={styles.logoImage}
         accessible={true}
@@ -425,8 +426,8 @@ const styles = StyleSheet.create({
   },
   logoImage: {
     width: 120,
-    height: 30.324,
-    flexShrink: 0,
+    height: 32,
+    resizeMode: "contain",
   },
   scrollContainer: {
     height: "100%",

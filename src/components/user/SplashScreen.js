@@ -465,7 +465,7 @@ const SplashScreen = ({ navigation, route }) => {
             accessible={true}
           >
             <View style={{alignSelf:'center',marginTop:hp("5%")}}>
-              <Logo width={300} height={71}/>
+              <Logo />
             </View>
           </Animated.View>
         </Animated.View>
