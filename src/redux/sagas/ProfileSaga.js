@@ -507,6 +507,7 @@ function* checkPaperlessSaga(action) {
     try {
         yield put(setLoading(true));
         const status = yield call(isPaperlessEnabled, action.payload.email);
+        console.log('isPaperlessEnabled API Success Response:', status);
         yield put(setPaperlessStatus(status));
     } catch (error) {
         console.error('Error fetching ACP user isPaperlessEnabled:', error);

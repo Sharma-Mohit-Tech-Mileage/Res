@@ -44,7 +44,7 @@ const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
             <View style={{ width: 24, height: 24 }} >
               <WarningIcon/>
             </View>
-            <Text style={{ textAlign: "center", marginLeft: 5, alignSelf: "center", fontWeight: "600", fontFamily: FontFamily.openSansSemiBold, }} >
+            <Text style={{color: colors.darkest_grey, textAlign: "center", marginLeft: 5, alignSelf: "center", fontWeight: "600", fontFamily: FontFamily.openSansSemiBold, }} >
               We're sorry!
             </Text>
           </View>
