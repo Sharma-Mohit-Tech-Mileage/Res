@@ -160,7 +160,7 @@ const Notifications = () => {
 
   const getInAppNotificationsData = () => {
     getUser().then((res1) => {
-      let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.accountNumber}/mobilepreferences/${res1.userInfo?.accountNumber}`;
+      let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
       console.log(requestUrl);
       GetApiRequest(
         requestUrl,

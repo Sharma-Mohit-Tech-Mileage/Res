@@ -449,26 +449,26 @@ const SplashScreen = ({ navigation, route }) => {
       style={styles.container}
     >
       <View style={styles.splashContainer}>
+       
         <Animated.View style={{
           flex: 1,
           alignItems: 'center',
           justifyContent: 'center',
           opacity: backgroundFade
         }}>
-          <Animated.View
-            style={[
-              styles.logo,
-              { opacity: logoFade, transform: [{ translateY: logoMovement }] },
-            ]}
+          <Animated.Image
+            resizeMode="contain"
+            source={require("../../res/images/Logo.png")}
+            style={[styles.logo, {
+              opacity: logoFade,
+              transform: [{ translateY: logoMovement }]
+            }]}
             accessibilityRole="image"
             accessibilityLabel="SparkLight"
             accessible={true}
-          >
-            <View style={{alignSelf:'center',marginTop:hp("5%")}}>
-              <Logo width={300} height={71}/>
-            </View>
-          </Animated.View>
+          />
         </Animated.View>
+
       </View>
 {loading ? <LoadingOverlay loading={loading} isWhite={true}/> : <></>}
       

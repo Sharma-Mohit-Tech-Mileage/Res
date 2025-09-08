@@ -30,9 +30,10 @@ const styles = StyleSheet.create({
         fontSize: FontSize.size_sm,
         fontFamily: FontFamily.openSansRegular,
         textAlign: "center",
-        color: Color.darkest_grey,
+        fontWeight:'700',
+        color: Color.colorGray_200,
         padding: 16,
-        fontSize: 16,
+        fontSize: 18,
     },
 });
 

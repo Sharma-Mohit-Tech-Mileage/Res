@@ -155,10 +155,10 @@ const fetchPushNotifications = async () => {
     console.log("Bearer token for fetchPushNotifications:", config.headers.Authorization);
     console.log(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`);
     try {
-        const response = await _axios.get(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`, { ...config });
+        const response = await _axios.get(`/mobile/api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferencesSec/${accountNumber}`, { ...config });
         return response.data;
     } catch (error) {
-        console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`, error);
+        console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferencesSec/${accountNumber}`, error);
         if (error.toString().includes('AxiosError: timeout of') && fetchPushNotificationsCount < 2) {
             fetchPushNotifications();
         } else {

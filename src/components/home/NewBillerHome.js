@@ -206,7 +206,7 @@ const NewBillerHome = ({ navigation }) => {
 
   const getInAppNotificationsData = () => {
       getUser().then((res1) => {
-        let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.accountNumber}/mobilepreferences/${res1.userInfo?.accountNumber}`;
+        let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
         GetApiRequest(
           requestUrl,
           (res) => {
@@ -290,13 +290,13 @@ const enableNotifications = async () => {
       accessibilityLabel="SparkLight"
       style={styles.headerContainer}
     >
-      <View
+      <Image
+        accessible={!showWalkThrough}
+        accessibilityLabel="SparkLight"
+        resizeMode="contain"
         style={styles.logoImage}
-        accessible={true}
-        accessibilityLabel={`SparkLight`}
-      >
-        <LogoSmall />
-      </View>
+        source={require("../../res/images/Logo.png")}
+      />
     </View>
   );
 

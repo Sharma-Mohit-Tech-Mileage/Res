@@ -206,6 +206,7 @@ const TextNotifications = ({ navigation }) => {
   }, [notification, animateNotification]);
 
   const onSubmit = () => {
+    formatedData["phoneNumber"] = getValues("phoneNumber");
     Keyboard.dismiss();
     if (isCheckboxVisible) {
       if (!toggleCheckBoxTerm) {
