@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
   autoPayStatusText: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.sparklight_green,
+    color: colors.sp_black,
     backgroundColor: Color.success50,
     alignSelf: "center",
     width: wp("16%"),
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   autoPayStatusTextInActive: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.dark_grey,
+    color: colors.sp_black,
     backgroundColor: Color.sparklightGray,
     alignSelf: "center",
     width: wp("16%"),
