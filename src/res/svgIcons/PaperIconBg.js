@@ -1,6 +1,6 @@
 import * as React from "react"
 import {Svg,Path} from 'react-native-svg';
-const PaperIconBg = ({ size = 32, color = "#8D3B90", ...props }) => {
+const PaperIconBg = ({ size = 24, color = "#8D3B90", ...props }) => {
   const height = size;
   const width = (68 / 60) * size;
 

@@ -288,10 +288,11 @@ const styles = StyleSheet.create({
     height: 150,
   },
   leftTitle: {
-    color: colors.darkest_grey,
+    color: colors.sp_black,
     fontSize: 18,
-    fontWeight: "400",
+    fontWeight: "600",
     textAlign: "center",
+    fontFamily: FontFamily.openSansRegular,
     alignContent: "flex-start",
     alignSelf: "center",
   },

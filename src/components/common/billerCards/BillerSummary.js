@@ -300,6 +300,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     textAlign: "center",
+    fontFamily: FontFamily.openSansRegular,
     marginLeft: 10,
     alignContent: "flex-start",
     alignSelf: "center",
