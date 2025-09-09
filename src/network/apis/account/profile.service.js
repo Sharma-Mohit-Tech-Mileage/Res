@@ -14,7 +14,7 @@ const getProfileDetails = async () => {
             Authorization: "Bearer " + data.token
         }
     };
-    console.log("Authorization header:", config.headers.Authorization);
+    
     let ApiMethod = ''
     if (accountNumber.toString().length >= 16) {
         ApiMethod = `/api/profile/${accountNumber}`
@@ -447,7 +447,7 @@ const logError = async (errorData) => {
 
 const logInfo = async (infoData) => {
     try {
-        const response = await _axios.post('/logging/api/log/info', infoData);
+        const response = await _axios.post('/api/log/info', infoData);
         console.log('Info logged successfully');
     } catch (logErr) {
         console.error('Failed to log info:', logErr);

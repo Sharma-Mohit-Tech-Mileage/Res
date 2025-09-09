@@ -233,10 +233,6 @@ const enableNotifications = async () => {
     const enabledPermission = await requestUserPermission();
     if (enabledPermission) {
       const token = await getFcmToken();
-      console.log(
-        "FCM TERM WITH PERMISSION >>>>>>><<<<<<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-        token
-      );
       const data = {
         accountNumber: userInfo?.accountNumber,
         deviceToken: token,

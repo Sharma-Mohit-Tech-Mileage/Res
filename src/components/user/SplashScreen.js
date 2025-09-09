@@ -37,7 +37,7 @@ const SplashScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [authInProgress, setAuthInProgress] = useState(false);
-  const authLockRef = useRef(false); // 🟢 IMPROVED: Synchronous lock
+  const authLockRef = useRef(false); 
   const [bussinessApp, setIsBusiness] = useState(false);
   const [loginEnable, setLoginEnable] = useState(false);
   const [disconnected, setDisconnected] = useState(false);
@@ -65,8 +65,6 @@ const SplashScreen = ({ navigation, route }) => {
   };
 
   const onSuccess = async (res) => {
-    // 🟢 DON'T set loading to false here - keep it until navigation or error
-    // setLoading(false);  // ❌ Removed this line
     
     if (res && res.userInfo) {
       LoginLogger.logSuccessfulLogin(dispatch, logInfo, res.userInfo, {
@@ -111,30 +109,30 @@ const SplashScreen = ({ navigation, route }) => {
       setIsBusiness(false);
 
       if (shouldBlockLogin(userInfo.acctStatus, userInfo.daysSinceDisconnectDate)) {
-        setLoading(false); // 🟢 Set loading false for disconnect modal
+        setLoading(false); // Set loading false for disconnect modal
         setDisconnected(true);
         return;
       }
       
         if (res.userInfo?.authLevel != "HeadOfHousehold" && userInfo?.authLevel == "Admin") {
-          setLoading(false); // 🟢 Set loading false for error modal
-          setLoginEnable(true); // 🟢 Re-enable login for modal cases
+          setLoading(false); //  Set loading false for error modal
+          setLoginEnable(true); // Re-enable login for modal cases
           setErrorMessage(strings.AdminMsg);
           setTimeout(() => { setModalVisible(true); }, 100);
         } else if (res.userInfo.customerType === "COM") {
-          setLoading(false); // 🟢 Set loading false for business modal
-          setLoginEnable(true); // 🟢 Re-enable login for modal cases
+          setLoading(false); //  Set loading false for business modal
+          setLoginEnable(true); // Re-enable login for modal cases
           setIsBusiness(true);
           setErrorMessage(strings.BusinessUserMsg);
           setErrorMessage1(" to manage your Sparklight Business services account.");
           setTimeout(() => { setModalVisible(true); }, 500);
         } else {
-          // 🟢 Keep loading true, navigation will happen
+          // Keep loading true, navigation will happen
           moveAfterLogin(user);
         }
     } else {
       console.log("[HANDLE_LOGIN] No response received.");
-      setLoading(false); // 🟢 Set loading false for no response
+      setLoading(false); 
       setLoginEnable(true);
     }
   };
@@ -153,7 +151,7 @@ const SplashScreen = ({ navigation, route }) => {
         });
       }
       
-      // 🟢 Navigation will replace this screen, so keep loading true
+      // Navigation will replace this screen, so keep loading true
       // Don't set setLoading(false) here
       
       // Navigation
@@ -164,7 +162,7 @@ const SplashScreen = ({ navigation, route }) => {
       }
     } catch (error) {
       console.error('Error in moveAfterLogin:', error);
-      setLoading(false); // 🟢 Only set loading false on error
+      setLoading(false); // Only set loading false on error
       setLoginEnable(true);
     }
   };
@@ -214,7 +212,7 @@ const SplashScreen = ({ navigation, route }) => {
 
   const handleCloseAlert = () => {
     setModalVisible(false);
-    setLoading(false); // 🟢 Reset loading when closing modal
+    setLoading(false); //  Reset loading when closing modal
     if(isMobile){   
       setIsMobile(false)
       logoutAction();
@@ -240,12 +238,12 @@ const SplashScreen = ({ navigation, route }) => {
 
   const closeModal = () => {
     setModalVisible(false);
-    setLoading(false); // 🟢 Reset loading when closing modal
-    setLoginEnable(true); // 🟢 Re-enable login button
+    setLoading(false); // Reset loading when closing modal
+    setLoginEnable(true); //  Re-enable login button
     logoutAction();
   };
 
-  // 🟢 IMPROVED: Synchronous race condition protection
+  // IMPROVED: Synchronous race condition protection
   const loginAuth = async () => {
     // Synchronous check - prevents all race conditions
     if (authLockRef.current || authInProgress || loading) {
@@ -472,7 +470,7 @@ const SplashScreen = ({ navigation, route }) => {
       </View>
 {loading ? <LoadingOverlay loading={loading} isWhite={true}/> : <></>}
       
-      {/* 🟢 IMPROVED: Better button state management with synchronous protection */}
+      {/* IMPROVED: Better button state management with synchronous protection */}
       {!loading && !authInProgress && isVisible && (
         <Animated.View style={{ marginTop: hp("35%"), opacity: fadeAnim }}>
           <SparkLightLoginButton
@@ -484,7 +482,7 @@ const SplashScreen = ({ navigation, route }) => {
               }
             }}
             buttonText={"Login"}
-            disabled={authLockRef.current || authInProgress || loading || !loginEnable} // 🟢 Include sync lock
+            disabled={authLockRef.current || authInProgress || loading || !loginEnable} // Include sync lock
           />
         </Animated.View>
       )}
@@ -526,8 +524,8 @@ const SplashScreen = ({ navigation, route }) => {
         }}
         onClose={() => {
           setDisconnected(false);
-          setLoading(false); // 🟢 Reset loading when closing disconnect modal
-          setLoginEnable(true); // 🟢 Re-enable login button
+          setLoading(false); // Reset loading when closing disconnect modal
+          setLoginEnable(true); // Re-enable login button
           logoutAction();
         }}
       />

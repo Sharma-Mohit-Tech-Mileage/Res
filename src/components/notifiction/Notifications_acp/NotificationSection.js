@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   // Info Message
   infoMessage: {
     flexDirection: "row",
-  alignItems: "center",   // ✅ centers the icon with the text baseline
+  alignItems: "center",   // centers the icon with the text baseline
   padding: Padding.p_base,
   marginHorizontal: Padding.p_base,
   marginBottom: Padding.p_base,
