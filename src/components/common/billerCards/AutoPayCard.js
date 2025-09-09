@@ -26,38 +26,75 @@ const AutoPayCard = ({
   };
   useEffect(() => {
     getStatus();
-    console.log("isStatusLoading", isStatusLoading);
   }, []);
 
   return (
     <View style={[AppStyles.card, style]}>
-      
-
       <View
-          style={{
-            margin: 10,
-            flexDirection: "row",
-            
-          }}
-        >
-          
+        style={{
+          margin: 10,
+          flexDirection: "row",
+          flex: 1,
+          padding: 5,
+          alignItems: "center",
+        }}
+      >
+        <>
           <View style={styles.iconBg}>
             <AutoPayIcon />
           </View>
-          <View style={{flexDirection:'column'}}>
-          <Text style={styles.leftTitle}>Auto Pay</Text>
-           <Text style={{textDecorationStyle:'solid',textDecorationLine:'underline', fontSize:14,fontWeight:'400',fontFamily:FontFamily.openSansRegular, marginLeft:10}} onPress={()=>{
-            navigation.navigate("AutoPayPCIConnector", {
-              url: `${Env.URL}/billing`,
-              name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-              useNewPayment: useNewPayment,
-              status: isAutoPayStatus,
-              paymentDetails: paymentDetails,
-            });
-           }}>Manage</Text>
+          <View style={{ flexDirection: "column" }}>
+            <Text style={styles.leftTitle}>Auto Pay</Text>
+            <Text
+              style={{
+                textDecorationStyle: "solid",
+                textDecorationLine: "underline",
+                fontSize: 14,
+                fontWeight: "400",
+                fontFamily: FontFamily.openSansRegular,
+                marginLeft: 10,
+              }}
+              onPress={() => {
+                navigation.navigate("AutoPayPCIConnector", {
+                  url: `${Env.URL}/billing`,
+                  name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
+                  useNewPayment: useNewPayment,
+                  status: isAutoPayStatus,
+                  paymentDetails: paymentDetails,
+                });
+              }}
+            >
+              Manage
+            </Text>
           </View>
+        </>
+
+        <View style={{ position: "absolute", right: 10 }}>
+          {isStatusLoading ? (
+            <SkeletonPlaceholder>
+              <View
+                style={{
+                  width: wp("16%"),
+                  height: 25,
+                  alignSelf: "center",
+                  borderRadius: 4,
+                  paddingVertical: 4,
+                  paddingHorizontal: 8,
+                }}
+              />
+            </SkeletonPlaceholder>
+          ) : (
+            <>
+              {isAutoPayStatus ? (
+                <Text style={styles.autoPayStatusText}>ON</Text>
+              ) : (
+                <Text style={styles.autoPayStatusTextInActive}>OFF</Text>
+              )}
+            </>
+          )}
         </View>
-{/* 
+      </View>
+      {/* 
       {isStatusLoading ? (
         <SkeletonPlaceholder>
           <>
@@ -230,34 +267,30 @@ const styles = StyleSheet.create({
   autoPayStatusText: {
     fontSize: 14,
     fontWeight: "700",
-    marginVertical: 5,
     color: colors.sparklight_green,
     backgroundColor: Color.success50,
     alignSelf: "center",
-    width: wp("27%"),
+    width: wp("16%"),
     borderColor: colors.sparklight_green,
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 3,
     textAlign: "center",
-    padding: 5,
-    marginTop: 13,
-    marginBottom: Padding.p_base,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   autoPayStatusTextInActive: {
     fontSize: 14,
     fontWeight: "700",
-    marginVertical: 5,
     color: colors.dark_grey,
     backgroundColor: Color.sparklightGray,
     alignSelf: "center",
-    width: wp("27%"),
+    width: wp("16%"),
     textAlign: "center",
     borderColor: colors.dark_grey,
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 5,
-    marginVertical: Padding.p_xs,
-    marginTop: Padding.p_xs,
+    borderRadius: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   iconBg: {
     alignSelf: "center",

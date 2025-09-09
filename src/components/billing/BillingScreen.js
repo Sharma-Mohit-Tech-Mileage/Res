@@ -191,7 +191,6 @@ const BillingScreen = ({ navigation }) => {
                   paperlessCardEmail={paperlessCardEmail}
                   paperlessStatus={paperlessStatusAcp}
                   navigation={navigation}
-                  style={styles.card}
                   isStatusLoading={paperlessLoading}
                 />
                 <View style={[AppStyles.card, styles.myModemSpaceBlock]}>

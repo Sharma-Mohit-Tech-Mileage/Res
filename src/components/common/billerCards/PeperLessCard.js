@@ -8,22 +8,79 @@ import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
 import AppStyles from "../styles/AppStyles";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
-const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style,isStatusLoading }) => {
+const PeperLessCard = ({
+  paperlessCardEmail,
+  paperlessStatus,
+  navigation,
+  style,
+  isStatusLoading,
+}) => {
   return (
-      <View style={[AppStyles.card, style]}>
-        <View style={styles.cardHreader}>
-            <View
-              style={{ marginLeft: 10, flexDirection: "row", alignItems: "center", }}
-            >
-              <View style={{ alignSelf: "center" }}>
+    <View style={[AppStyles.card, style]}>
+     
+        <View
+          style={{
+            margin: 10,
+            flexDirection: "row",
+            flex: 1,
+            padding: 5,
+            alignItems: "center",
+          }}
+        >
+          <>
+            <View style={styles.iconBg}>
               <PaperIconBg />
-              </View>
-
-              <Text style={styles.leftTitle}>Paperless Billing</Text>
             </View>
-          </View>
+            <View style={{ flexDirection: "column" }}>
+              <Text style={styles.leftTitle}>Paperless Billings</Text>
+              <Text
+                style={{
+                  textDecorationStyle: "solid",
+                  textDecorationLine: "underline",
+                  fontSize: 14,
+                  fontWeight: "400",
+                  fontFamily: FontFamily.openSansRegular,
+                  marginLeft: 10,
+                }}
+                onPress={() => {
+                  navigation.navigate("account", { screen: "Notifications" });
+                }}
+                accessible={true}
+                accessibilityLabel="Manage Paperless Billing"
+                accessibilityRole="button"
+              >
+                Manage
+              </Text>
+            </View>
+          </>
 
-          {isStatusLoading ? (
+          <View style={{ position: "absolute", right: 10 }}>
+            {isStatusLoading ? (
+              <SkeletonPlaceholder>
+                <View
+                  style={{
+                    width: wp("16%"),
+                    height: 25,
+                    alignSelf: "center",
+                    borderRadius: 4,
+                    paddingVertical: 4,
+                    paddingHorizontal: 8,
+                  }}
+                />
+              </SkeletonPlaceholder>
+            ) : (
+              <>
+                {paperlessStatus ? (
+                  <Text style={styles.autoPayStatusText}>ON</Text>
+                ) : (
+                  <Text style={styles.autoPayStatusTextInActive}>OFF</Text>
+                )}
+              </>
+            )}
+          </View>
+        </View>
+
+        {/* {isStatusLoading ? (
             <SkeletonPlaceholder>
           <>
             <View
@@ -111,9 +168,9 @@ const PeperLessCard = ({paperlessCardEmail, paperlessStatus, navigation, style,i
             </TouchableOpacity>
           </View>
           }
-          
-      </View>
-   
+           */}
+    
+    </View>
   );
 };
 
@@ -122,7 +179,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: Padding.p_xs,
-    marginBottom: 23
+    marginBottom: 23,
   },
   shadowContainer: {
     shadowColor: "#171717",
@@ -131,58 +188,59 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   card: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: "white",
     borderRadius: 10,
     alignSelf: "center",
-    overflow: 'hidden',
-    width: wp('92%'),
+    overflow: "hidden",
+    width: wp("92%"),
   },
   leftSection: {
     paddingHorizontal: Padding.p_5xl,
     paddingBottom: Padding.p_xs,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: wp('39%'),
-    height: '100%',
-    position: 'relative',
+    alignItems: "center",
+    justifyContent: "center",
+    width: wp("39%"),
+    height: "100%",
+    position: "relative",
   },
   circleContainerShadow: {
-    position: 'absolute',
-    top: '50%',
-    left: -wp('38.75%') - 20,
-    width: wp('84%'),
-    height: wp('84%'),
-    borderRadius: wp('41.5%'),
-    backgroundColor: 'rgba(71, 84, 103, 0.05)',
-    transform: [{ translateY: -wp('41.5%') }],
+    position: "absolute",
+    top: "50%",
+    left: -wp("38.75%") - 20,
+    width: wp("84%"),
+    height: wp("84%"),
+    borderRadius: wp("41.5%"),
+    backgroundColor: "rgba(71, 84, 103, 0.05)",
+    transform: [{ translateY: -wp("41.5%") }],
   },
   circleContainer: {
-    position: 'absolute',
-    top: '50%',
-    left: -wp('38.75%') - 15,
-    width: wp('77.5%'),
-    height: wp('77.5%'),
-    borderRadius: wp('38.75%'),
+    position: "absolute",
+    top: "50%",
+    left: -wp("38.75%") - 15,
+    width: wp("77.5%"),
+    height: wp("77.5%"),
+    borderRadius: wp("38.75%"),
     backgroundColor: colors.sparklight_bright_purple,
-    transform: [{ translateY: -wp('38.75%') }],
+    transform: [{ translateY: -wp("38.75%") }],
   },
   icon: {
-    alignContent: 'flex-start',
-    alignSelf: 'flex-start',
+    alignContent: "flex-start",
+    alignSelf: "flex-start",
     marginBottom: 10,
   },
   leftTitle: {
     color: colors.sp_black,
     fontSize: 18,
-    fontWeight: "400",
+    fontWeight: "600",
+     fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
     marginLeft: 10,
     alignContent: "flex-start",
     alignSelf: "center",
   },
   cardContent: {
-    alignItems:"center",
+    alignItems: "center",
   },
   statusRow: {
     flexDirection: "row",
@@ -194,16 +252,16 @@ const styles = StyleSheet.create({
   dueDate: {
     fontSize: 14,
     fontWeight: "700",
-    alignContent: 'center',
+    alignContent: "center",
     fontFamily: FontFamily.openSansRegular,
     color: colors.sparklight_purple_blue,
-    textAlign: 'center',
-    marginHorizontal:20,
+    textAlign: "center",
+    marginHorizontal: 20,
   },
   thankYouText: {
     fontSize: 14,
     color: colors.sparklight_purple_blue,
-    textAlign: 'center',
+    textAlign: "center",
     fontWeight: "700",
     FontFamily: FontFamily.openSansRegular,
     marginTop: Padding.p_xs,
@@ -212,8 +270,7 @@ const styles = StyleSheet.create({
   subText: {
     fontSize: 14,
     color: colors.gray600,
-    alignSelf: 'center',
-    
+    alignSelf: "center",
     fontFamily: FontFamily.openSansRegular,
     fontWeight: "400",
   },
@@ -222,39 +279,36 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.sparklight_green,
     backgroundColor: Color.success50,
-    alignSelf: 'center',
-    width: wp("40%"),
-    textAlign: 'center',
+    alignSelf: "center",
+    width: wp("16%"),
     borderColor: colors.sparklight_green,
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 5,
-    marginTop: 13,
-    marginBottom: 12,
-    marginHorizontal:20,
+    borderRadius: 3,
+    textAlign: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   autoPayStatusTextInActive: {
     fontSize: 14,
     fontWeight: "700",
     color: colors.dark_grey,
     backgroundColor: Color.sparklightGray,
-    alignSelf: 'center',
+    alignSelf: "center",
+    width: wp("16%"),
+    textAlign: "center",
     borderColor: colors.dark_grey,
     borderWidth: 1,
-    textAlign: 'center',
-    width: wp("40%"),
-    borderRadius: 5,
-    padding: 5,
-    marginHorizontal:20,
-    marginVertical: Padding.p_base,
+    borderRadius: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   paymentButton: {
     flexDirection: "row",
     backgroundColor: colors.sparklight_purple_blue,
-    width:wp("70%"),
+    width: wp("70%"),
     paddingVertical: 8,
-    alignItems:'center',
-    justifyContent:'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 5,
     alignSelf: "center",
     marginLeft: wp("9%"),
@@ -263,22 +317,32 @@ const styles = StyleSheet.create({
     color: colors.snow_white,
     fontSize: 16,
     fontWeight: "600",
-    alignSelf:'center',
+    alignSelf: "center",
     fontFamily: FontFamily.openSansRegular,
-  },cardHreader: {
+  },
+  cardHreader: {
     flexDirection: "row",
-    backgroundColor: "#F8F8F8",
-    width:wp("92%"),
+    width: wp("92%"),
     padding: 10,
-  },cardFooter: {
+  },
+  cardFooter: {
     flexDirection: "row",
     backgroundColor: "#F8F8F8",
-    width:wp("100%"),
+    width: wp("100%"),
     padding: 10,
     position: "absolute",
     bottom: 0,
     left: 0,
-  }
+  },
+  iconBg: {
+    alignSelf: "center",
+    backgroundColor: "#8D3B901A",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
 
 export default PeperLessCard;

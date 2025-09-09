@@ -185,7 +185,7 @@ const Card = ({ billAmt, dueDate, navigation, style}) => {
                 style={[
                   styles.dueDate,
                   {
-                    fontWeight: "400",
+                    fontWeight: "600",
                     color:
                       dueDate == "Immediately"
                         ? colors.sparklight_red
