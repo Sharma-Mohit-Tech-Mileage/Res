@@ -15,15 +15,12 @@ import {
   Padding,
   Border,
 } from "../../../../GlobalStyles";
-import { useForm, Controller, set } from "react-hook-form";
 import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import NotificationAlert from "../../common/customui/NotificationAlert";
-import { updatePushNotificationsv2 } from "../../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import Toggle from "../../common/Toggle";
 import { getUser } from "../../../redux/utils/LocalStorage";

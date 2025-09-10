@@ -45,6 +45,20 @@ const AutoPayCard = ({
           </View>
           <View style={{ flexDirection: "column" }}>
             <Text style={styles.leftTitle}>Auto Pay</Text>
+            { isStatusLoading ? <SkeletonPlaceholder>
+              <View
+                style={{
+                  width: wp("16%"),
+                  height: 25,
+                  alignSelf: "center",
+                  borderRadius: 4,
+                  paddingVertical: 4,
+                  paddingHorizontal: 8,
+                  marginTop:5
+                }}
+              />
+            </SkeletonPlaceholder> :
+
             <Text
               style={{
                 textDecorationStyle: "solid",
@@ -64,9 +78,13 @@ const AutoPayCard = ({
                   paymentDetails: paymentDetails,
                 });
               }}
+              accessible={true}
+              accessibilityLabel={isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"}
+              accessibilityRole="button"
             >
-              Manage
+              {isAutoPayStatus ? "Manage" : "Setup"}
             </Text>
+          }
           </View>
         </>
 

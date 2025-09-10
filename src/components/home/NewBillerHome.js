@@ -253,7 +253,7 @@ const enableNotifications = async () => {
         permanentSkip: false,
       };
       storePushNotificationStatus(localData);
-      await dispatch(updatePushNotificationsv2(data, null));
+     // await dispatch(updatePushNotificationsv2(data, null));
       
     } else {
       const token = await getFcmToken();
@@ -277,7 +277,7 @@ const enableNotifications = async () => {
         permanentSkip: true,
       };
       storePushNotificationStatus(localData);
-      await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
+      //await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
       
     }
   };
