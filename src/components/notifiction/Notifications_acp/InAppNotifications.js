@@ -138,12 +138,7 @@ const InAppNotifications = ({ navigation }) => {
     //   return updatedSettings;
     // });
     const checkNofif = async () => {
-      console.log("Toggle data", JSON.stringify(formatedData));
-      if (
-        formatedData?.optOut ||
-        formatedData?.outageOptOut ||
-        formatedData?.billingOptOutStatus 
-      ) {
+      if(value){
         if(!checkNotifData){
         const pushNotification = await getPushNotificationStatus();
         if (pushNotification?.permanentSkip) {
@@ -177,12 +172,16 @@ const InAppNotifications = ({ navigation }) => {
   }, [route.params]);
 
   const handleSave = async () => {
-    // const pushNotification = await getPushNotificationStatus();
-    // if (pushNotification?.permanentSkip) {
-    //   await notifyPermission();
-    // } else {
-    //   await requestUserPermission();
-    // }
+    if (formatedData.optOut || formatedData.outageOptOut || formatedData.billingOptOutStatus) {
+    const pushNotification = await getPushNotificationStatus();
+    if (pushNotification?.permanentSkip) {
+     const isENabled = await notifyPermission();
+     if(!isENabled) return;
+    } else {
+      await requestUserPermission();
+    }
+    
+  }
     const token = await getFcmToken();
     formatedData.deviceToken = token;
     formatedData.deviceTokenTimestamp = moment().format();
