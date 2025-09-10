@@ -42,19 +42,37 @@ const PeperLessCard = ({
         </View>
         <View style={{ flexDirection: "column" }}>
           <Text style={styles.leftTitle}>Paperless Billing</Text>
-          <Text
-            style={{
-              textDecorationStyle: "solid",
-              textDecorationLine: "underline",
-              fontSize: 14,
-              fontWeight: "400",
-              color: colors.sparklight_purple_blue,
-              fontFamily: FontFamily.openSansRegular,
-              marginLeft: 10,
-            }}
-          >
-            Manage
-          </Text>
+          {isStatusLoading ? (
+            <SkeletonPlaceholder>
+              <View
+                style={{
+                  width: wp("16%"),
+                  right: 10,
+                  height: 25,
+                  alignSelf: "center",
+                  borderRadius: 4,
+                  paddingVertical: 4,
+                  paddingHorizontal: 8,
+                  marginTop: 5,
+                  marginLeft: 1, // <-- Add this line to move it more to the left
+                }}
+              />
+            </SkeletonPlaceholder>
+          ) : (
+            <Text
+              style={{
+                textDecorationStyle: "solid",
+                textDecorationLine: "underline",
+                fontSize: 14,
+                fontWeight: "400",
+                color: colors.sparklight_purple_blue,
+                fontFamily: FontFamily.openSansRegular,
+                marginLeft: 10,
+              }}
+            >
+              Manage
+            </Text>
+          )}
         </View>
         <View style={{ position: "absolute", right: 10 }}>
           {isStatusLoading ? (
