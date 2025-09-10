@@ -15,163 +15,73 @@ const PeperLessCard = ({
   style,
   isStatusLoading,
 }) => {
+  const handleCardPress = () => {
+    navigation.navigate("account", { screen: "Notifications" });
+  };
+
   return (
-    <View style={[AppStyles.card, style]}>
-     
-        <View
-          style={{
-            margin: 10,
-            flexDirection: "row",
-            flex: 1,
-            padding: 5,
-            alignItems: "center",
-          }}
-        >
-          <>
-            <View style={styles.iconBg}>
-              <PaperIconBg />
-            </View>
-            <View style={{ flexDirection: "column" }}>
-              <Text style={styles.leftTitle}>Paperless Billing</Text>
-              <Text
-                style={{
-                  textDecorationStyle: "solid",
-                  textDecorationLine: "underline",
-                  fontSize: 14,
-                  fontWeight: "400",
-                  color: colors.sparklight_purple_blue,
-                  fontFamily: FontFamily.openSansRegular,
-                  marginLeft: 10,
-                }}
-                onPress={() => {
-                  navigation.navigate("account", { screen: "Notifications" });
-                }}
-                accessible={true}
-                accessibilityLabel="Manage Paperless Billing"
-                accessibilityRole="button"
-              >
-                Manage
-              </Text>
-            </View>
-          </>
-
-          <View style={{ position: "absolute", right: 10 }}>
-            {isStatusLoading ? (
-              <SkeletonPlaceholder>
-                <View
-                  style={{
-                    width: wp("16%"),
-                    height: 25,
-                    alignSelf: "center",
-                    borderRadius: 4,
-                    paddingVertical: 4,
-                    paddingHorizontal: 8,
-                  }}
-                />
-              </SkeletonPlaceholder>
-            ) : (
-              <>
-                {paperlessStatus ? (
-                  <Text style={styles.autoPayStatusText}>ON</Text>
-                ) : (
-                  <Text style={styles.autoPayStatusTextInActive}>OFF</Text>
-                )}
-              </>
-            )}
-          </View>
+    <TouchableOpacity
+      style={[AppStyles.card, style]}
+      onPress={handleCardPress}
+      activeOpacity={0.8}
+      accessible={true}
+      accessibilityLabel="Manage Paperless Billing"
+      accessibilityRole="button"
+    >
+      <View
+        style={{
+          margin: 10,
+          flexDirection: "row",
+          flex: 1,
+          padding: 5,
+          alignItems: "center",
+        }}
+      >
+        <View style={styles.iconBg}>
+          <PaperIconBg />
         </View>
-
-        {/* {isStatusLoading ? (
-            <SkeletonPlaceholder>
-          <>
-            <View
-              style={{
-                width: wp("40%"),
-                height: 20,
-                alignSelf: "center",
-                borderRadius: 4,
-                marginTop: 10,
-              }}
-            />
-            <View
-              style={{
-                width: wp("20%"),
-                height: 30,
-                alignSelf: "center",
-                borderRadius: 4,
-                marginVertical: 10,
-              }}
-            />
-
-            <View
-              style={{
-                width: wp("50%"),
-                height: 20,
-                alignSelf: "center",
-                borderRadius: 4,
-                marginTop: 10,
-              }}
-            />
-          </>
-        </SkeletonPlaceholder>
-          ) : (
-            <>
-          {paperlessStatus ? (
-            <>
-              <Text style={[styles.dueDate, { fontWeight: '400', color: colors.gray600 }]}>Email Associated: </Text>
-              <Text style={[styles.dueDate]}>{paperlessCardEmail}</Text>
-            
-              <Text style={styles.autoPayStatusText}>Paperless Billing On</Text>
-              <Text style={[styles.thankYouText,{marginTop:5}]}>Thank you for choosing Paperless Billing!</Text>
-            </>
-          ) : (
-            <>
-              <Text style={styles.autoPayStatusTextInActive}>Paperless Billing Off</Text>
-              <View style={[styles.headerContainer,{alignItems:'center',justifyContent:'center'}]}>
-                <View style={{flexDirection:'column'}}>
-                <Text style={[styles.dueDate]}>Turn on Paperless Billing today! </Text>
-                <Text style={styles.subText}>Statements delivered via email.</Text>
-                </View>
-              </View>
-              </>
-           
-          )}
-          </>
-          )}
-
-          { isStatusLoading ?
-          <SkeletonPlaceholder> 
-          <View
+        <View style={{ flexDirection: "column" }}>
+          <Text style={styles.leftTitle}>Paperless Billing</Text>
+          <Text
             style={{
-              width: wp("70%"),
-              height: 40,
-              alignSelf: "center",
-              borderRadius: 4,
-              marginVertical: 10,
-              
+              textDecorationStyle: "solid",
+              textDecorationLine: "underline",
+              fontSize: 14,
+              fontWeight: "400",
+              color: colors.sparklight_purple_blue,
+              fontFamily: FontFamily.openSansRegular,
+              marginLeft: 10,
             }}
-          />
-          </SkeletonPlaceholder> :
-          <View style={styles.cardFooter}>
-            <TouchableOpacity
-             onPress={() => {
-              navigation.navigate("account", {screen: "Notifications"});
-            }}
-              accessible={true}
-              accessibilityLabel="Manage Paperless Billing"
-              accessibilityRole="button"
-              style={styles.paymentButton}
-            >
-              <Text style={styles.paymentButtonText}>Manage Paperless Billing</Text>
-              <View style={{ marginLeft: 2 }}>
-                <RightArrow color={colors.snow_white} />
-              </View>
-            </TouchableOpacity>
-          </View>
-          }
-           */}
-    
-    </View>
+          >
+            Manage
+          </Text>
+        </View>
+        <View style={{ position: "absolute", right: 10 }}>
+          {isStatusLoading ? (
+            <SkeletonPlaceholder>
+              <View
+                style={{
+                  width: wp("16%"),
+                  height: 25,
+                  alignSelf: "center",
+                  borderRadius: 4,
+                  paddingVertical: 4,
+                  paddingHorizontal: 8,
+                }}
+              />
+            </SkeletonPlaceholder>
+          ) : (
+            <>
+              {paperlessStatus ? (
+                <Text style={styles.autoPayStatusText}>ON</Text>
+              ) : (
+                <Text style={styles.autoPayStatusTextInActive}>OFF</Text>
+              )}
+            </>
+          )}
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 };
 
@@ -234,7 +144,7 @@ const styles = StyleSheet.create({
     color: colors.sp_black,
     fontSize: 18,
     fontWeight: "600",
-     fontFamily: FontFamily.openSansRegular,
+    fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
     marginLeft: 10,
     alignContent: "flex-start",

@@ -28,8 +28,25 @@ const AutoPayCard = ({
     getStatus();
   }, []);
 
+  const handleCardPress = () => {
+    navigation.navigate("AutoPayPCIConnector", {
+      url: `${Env.URL}/billing`,
+      name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
+      useNewPayment: useNewPayment,
+      status: isAutoPayStatus,
+      paymentDetails: paymentDetails,
+    });
+  };
+
   return (
-    <View style={[AppStyles.card, style]}>
+    <TouchableOpacity
+      style={[AppStyles.card, style]}
+      onPress={handleCardPress}
+      activeOpacity={0.8}
+      accessible={true}
+      accessibilityLabel="Manage Auto Pay"
+      accessibilityRole="button"
+    >
       <View
         style={{
           margin: 10,
@@ -39,13 +56,13 @@ const AutoPayCard = ({
           alignItems: "center",
         }}
       >
-        <>
-          <View style={styles.iconBg}>
-            <AutoPayIcon />
-          </View>
-          <View style={{ flexDirection: "column" }}>
-            <Text style={styles.leftTitle}>Auto Pay</Text>
-            { isStatusLoading ? <SkeletonPlaceholder>
+        <View style={styles.iconBg}>
+          <AutoPayIcon />
+        </View>
+        <View style={{ flexDirection: "column" }}>
+          <Text style={styles.leftTitle}>Auto Pay</Text>
+          {isStatusLoading ? (
+            <SkeletonPlaceholder>
               <View
                 style={{
                   width: wp("16%"),
@@ -54,11 +71,11 @@ const AutoPayCard = ({
                   borderRadius: 4,
                   paddingVertical: 4,
                   paddingHorizontal: 8,
-                  marginTop:5
+                  marginTop: 5,
                 }}
               />
-            </SkeletonPlaceholder> :
-
+            </SkeletonPlaceholder>
+          ) : (
             <Text
               style={{
                 textDecorationStyle: "solid",
@@ -69,25 +86,11 @@ const AutoPayCard = ({
                 fontFamily: FontFamily.openSansRegular,
                 marginLeft: 10,
               }}
-              onPress={() => {
-                navigation.navigate("AutoPayPCIConnector", {
-                  url: `${Env.URL}/billing`,
-                  name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-                  useNewPayment: useNewPayment,
-                  status: isAutoPayStatus,
-                  paymentDetails: paymentDetails,
-                });
-              }}
-              accessible={true}
-              accessibilityLabel={isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"}
-              accessibilityRole="button"
             >
-              {isAutoPayStatus ? "Manage" : "Setup"}
+            Manage
             </Text>
-          }
-          </View>
-        </>
-
+          )}
+        </View>
         <View style={{ position: "absolute", right: 10 }}>
           {isStatusLoading ? (
             <SkeletonPlaceholder>
@@ -102,121 +105,14 @@ const AutoPayCard = ({
                 }}
               />
             </SkeletonPlaceholder>
+          ) : isAutoPayStatus ? (
+            <Text style={styles.autoPayStatusText}>ON</Text>
           ) : (
-            <>
-              {isAutoPayStatus ? (
-                <Text style={styles.autoPayStatusText}>ON</Text>
-              ) : (
-                <Text style={styles.autoPayStatusTextInActive}>OFF</Text>
-              )}
-            </>
+            <Text style={styles.autoPayStatusTextInActive}>OFF</Text>
           )}
         </View>
       </View>
-      {/* 
-      {isStatusLoading ? (
-        <SkeletonPlaceholder>
-          <>
-            <View
-              style={{
-                width: wp("40%"),
-                height: 20,
-                alignSelf: "center",
-                borderRadius: 4,
-                marginTop: 10,
-              }}
-            />
-            <View
-              style={{
-                width: wp("20%"),
-                height: 30,
-                alignSelf: "center",
-                borderRadius: 4,
-                marginVertical: 10,
-              }}
-            />
-
-            <View
-              style={{
-                width: wp("50%"),
-                height: 20,
-                alignSelf: "center",
-                borderRadius: 4,
-                marginTop: 10,
-              }}
-            />
-            <View
-              style={{
-                width: wp("70%"),
-                height: 40,
-                alignSelf: "center",
-                borderRadius: 4,
-                marginVertical: 10,
-              }}
-            />
-          </>
-        </SkeletonPlaceholder>
-      ) : (
-        <>
-          {isAutoPayStatus ? (
-            <>
-              <View style={{ flexDirection: "row", alignSelf: "center" }}>
-                <Text
-                  style={[
-                    styles.dueDate,
-                    { fontWeight: "400", color: colors.gray600 },
-                  ]}
-                >
-                  Account ending in{" "}
-                </Text>
-                <Text style={[styles.dueDate]}>{cardDigit}</Text>
-              </View>
-              <Text style={styles.autoPayStatusText}>Auto Pay On</Text>
-              <Text style={[styles.thankYouText, { marginTop: 5 }]}>
-                Thank you for choosing Auto Pay!
-              </Text>
-            </>
-          ) : (
-            <>
-              <Text style={styles.autoPayStatusTextInActive}>Auto Pay Off</Text>
-              <View style={{ flexDirection: "column" }}>
-                <Text style={[styles.infoAuto]}>Turn on Auto Pay today!</Text>
-                <Text style={styles.subText}>
-                  Never miss a payment with peace of mind.
-                </Text>
-              </View>
-            </>
-          )}
-
-          <View style={styles.cardFooter}>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("AutoPayPCIConnector", {
-                  url: `${Env.URL}/billing`,
-                  name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-                  useNewPayment: useNewPayment,
-                  status: isAutoPayStatus,
-                  paymentDetails: paymentDetails,
-                });
-              }}
-              accessible={true}
-              accessibilityLabel={
-                isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"
-              }
-              accessibilityRole="button"
-              style={styles.paymentButton}
-            >
-              <Text style={styles.paymentButtonText}>
-                {isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"}
-              </Text>
-              <View style={{ marginLeft: 2 }}>
-                <RightArrow color={colors.snow_white} />
-              </View>
-            </TouchableOpacity>
-          </View> 
-        </>
-      )}*/}
-    </View>
+    </TouchableOpacity>
   );
 };
 
