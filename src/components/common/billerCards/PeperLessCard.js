@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
@@ -16,11 +16,13 @@ const PeperLessCard = ({
   isStatusLoading,
 }) => {
   const handleCardPress = () => {
-    navigation.navigate("account", { screen: "Notifications" });
+    if (!isStatusLoading){
+      navigation.navigate("account", { screen: "Notifications" });
+    }
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={[AppStyles.card, style]}
       onPress={handleCardPress}
       activeOpacity={0.8}
@@ -41,20 +43,21 @@ const PeperLessCard = ({
           <PaperIconBg />
         </View>
         <View style={{ flexDirection: "column" }}>
-          <Text style={styles.leftTitle}>Paperless Billing</Text>
+          <Text accessible={true}
+            accessibilityLabel={'Paperless Billing' + (paperlessStatus ? ' is On' : ' is Off')}
+            accessibilityRole="text"
+          style={styles.leftTitle}>Paperless Billing</Text>
           {isStatusLoading ? (
             <SkeletonPlaceholder>
               <View
                 style={{
-                  width: wp("16%"),
-                  right: 10,
-                  height: 25,
-                  alignSelf: "center",
-                  borderRadius: 4,
-                  paddingVertical: 4,
-                  paddingHorizontal: 8,
-                  marginTop: 5,
-                  marginLeft: 1, // <-- Add this line to move it more to the left
+                 width: wp("16%"),
+                    height: 25,
+                    marginLeft: 10,
+                    borderRadius: 4,
+                    paddingVertical: 4,
+                    paddingHorizontal: 8,
+                    marginTop: 5,// <-- Add this line to move it more to the left
                 }}
               />
             </SkeletonPlaceholder>
@@ -99,7 +102,7 @@ const PeperLessCard = ({
           )}
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 

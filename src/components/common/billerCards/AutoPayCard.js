@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
@@ -29,17 +29,19 @@ const AutoPayCard = ({
   }, []);
 
   const handleCardPress = () => {
+    if (!isStatusLoading){
     navigation.navigate("AutoPayPCIConnector", {
       url: `${Env.URL}/billing`,
-      name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
+      name: "Manage Auto Pay" ,
       useNewPayment: useNewPayment,
       status: isAutoPayStatus,
       paymentDetails: paymentDetails,
     });
+  }
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={[AppStyles.card, style]}
       onPress={handleCardPress}
       activeOpacity={0.8}
@@ -60,7 +62,9 @@ const AutoPayCard = ({
           <AutoPayIcon />
         </View>
         <View style={{ flexDirection: "column" }}>
-          <Text style={styles.leftTitle}>Auto Pay</Text>
+          <Text accessible={true} accessibilityRole="text"
+            accessibilityLabel={"Auto Pay"+ (isStatusLoading ? "" : isAutoPayStatus ? " is On" : " is Off")}
+          style={styles.leftTitle}>Auto Pay</Text>
           {isStatusLoading ? (
             <SkeletonPlaceholder>
               <View
@@ -112,7 +116,7 @@ const AutoPayCard = ({
           )}
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
