@@ -350,19 +350,9 @@ const CancellationSummary = ({ navigation, route }) => {
   const renderSuccessMessage = () => {
     return (
       <View
-        style={{
-          padding: 24,
-          backgroundColor: "#F0F9F2",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        style={{ padding: 24, backgroundColor: "#F0F9F2", flexDirection: "column", alignItems: "center", justifyContent: "center", }}
       >
-        {/* <Image
-          source={require("../../../assets/success.png")}
-          size={48}
-          style={{ marginBottom: 16 }}
-        /> */}
+       
         <View style={{ marginBottom: 16 }}> 
           <SuccessIcon/>
           </View>

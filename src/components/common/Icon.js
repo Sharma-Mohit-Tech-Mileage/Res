@@ -22,8 +22,8 @@ import SearchBookIcon from '../../res/svgIcons/SearchBookIcon';
 import BuildingDocIcon from '../../res/svgIcons/BuildingDocIcon';
 import GearIcon from '../../res/svgIcons/GearIcon';
 import SearchIcon from '../../../assets/svgs/SearchIcon'; 
-import Checkcircle from '../../../assets/Icon/CircleCheck.png';
 import ChevronRight from '../../../assets/svgs/Chevonright';
+import SuccessIcon from '../../res/svgIcons/SuccessIcon';
 const Icon = ({ name, size = 24, color = '#000', style }) => {
   const iconMap = {
     'credit-card': { library: 'SVG', source: creditCard },
@@ -50,7 +50,7 @@ const Icon = ({ name, size = 24, color = '#000', style }) => {
     // Image asset example
     'building-doc': { library: 'SVG', source: BuildingDocIcon },
     'search': { library: 'SVG', source: SearchIcon},
-    'green-checkcircle': { library: 'Image', source: Checkcircle },
+    'green-checkcircle': { library: 'SVG', source: SuccessIcon },
     'down-chevron': { library: 'SVG', source: DownArrow },
     'right-chevron': { library: 'SVG', source: ChevronRight },
   };
@@ -67,7 +67,7 @@ const Icon = ({ name, size = 24, color = '#000', style }) => {
       case 'SVG': {
         // Use the direct SVG file (imported as a component) as the source
         const SvgIcon = iconInfo.source;
-        return <SvgIcon width={size} height={size} fill={color} />;
+        return <SvgIcon width={size} height={size} />;
       }
       case 'Image':
         return (

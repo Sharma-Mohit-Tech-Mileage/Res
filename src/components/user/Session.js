@@ -16,7 +16,6 @@ const config = {
 
 const onSuccess = async (res) => {
     try {
-        console.log('Session onSuccess:', res);
         if (!res) throw new Error("No token received");
 
         const { jwtToken: token, userInfo, idTokenGuid, refreshToken } = res;
@@ -29,11 +28,9 @@ const onSuccess = async (res) => {
         
         if (token) {
             await storeUser(user);
-            console.log('User stored in local storage:', user);
         }
 
         store.dispatch(saveUserInfo(user));
-        console.log('User info saved in Redux store:', user);
         return token;
 
     } catch (error) {
@@ -80,7 +77,6 @@ export const RefreshToken = async () => {
             refreshToken: user.refreshToken,
         });
 
-        console.log('Token refresh result:', result);
 
         const data = {
             idToken: result.idToken,
@@ -89,7 +85,6 @@ export const RefreshToken = async () => {
             refreshToken: result.refreshToken,
         };
 
-        console.log('Data prepared for PostAuthApiRequest:', data);
 
         const apiResponse = await retryRequest(data, 2);
         return onSuccess(apiResponse);

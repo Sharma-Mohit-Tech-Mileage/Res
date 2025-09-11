@@ -454,17 +454,9 @@ const SplashScreen = ({ navigation, route }) => {
           justifyContent: 'center',
           opacity: backgroundFade
         }}>
-          <Animated.Image
-            resizeMode="contain"
-            source={require("../../res/images/Logo.png")}
-            style={[styles.logo, {
-              opacity: logoFade,
-              transform: [{ translateY: logoMovement }]
-            }]}
-            accessibilityRole="image"
-            accessibilityLabel="SparkLight"
-            accessible={true}
-          />
+           <View style={{alignSelf:'center',marginTop:hp("5%")}}>
+              <Logo width={300} height={84}/>
+            </View>
         </Animated.View>
 
       </View>
@@ -515,7 +507,7 @@ const SplashScreen = ({ navigation, route }) => {
       />
       
       <CustomerDisconnectPage
-        visible={disconnected}
+        visible={true}
         onLogin={() => {
           setDisconnected(false);
           if (!authLockRef.current && !authInProgress && !loading) {

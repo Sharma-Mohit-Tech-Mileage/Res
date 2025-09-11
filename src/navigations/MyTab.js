@@ -168,7 +168,7 @@ const MyTabs = ({ navigation, route }) => {
         <Tab.Screen
           name="Home"
           component={HomeStackScreen}
-          initialParams={{ data: route, isNormalUser: false }}
+          initialParams={{ data: route }}
           options={{
             headerShown: false,
             swipeEnabled: false,
