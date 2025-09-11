@@ -13,7 +13,7 @@ export const config = {
     PAYMENTURL_V2 : 'https://payment.sparklight.com/PortalsV2/PortalsPayment',
     URL_EASYPAY_SETUP_V2 : 'https://payment.sparklight.com/portalsV2/setup-auto-pay',
     URL_EASYPAY_MANAGE_V2 : 'https://payment.sparklight.com/portalsV2/manage-auto-pay',
-    PAYMENTURL_V3 : 'https://payment.sparklight.com/portalsV3/PortalsBiller',
+    PAYMENTURL_V3 : 'https://payment.sparklight.com/portalsV3/PortalsBiller/GetPostDataWithKey',
     URL_EASYPAY_SETUP_V3 : 'https://payment.sparklight.com/portalsV3/activate-autopay',
     URL_EASYPAY_MANAGE_V3 : 'https://payment.sparklight.com/portalsV3/manage-autopay',
     PAYMENTURLNEW: 'https://customer.sparklight.com/portals/app-secure/billing',
@@ -48,7 +48,7 @@ export const config = {
     URL_EASYPAY_SETUP_V2 : 'https://payment.uat.sparklight.com/PortalsV2/setup-auto-pay',
     URL_EASYPAY_MANAGE_V2 : 'https://payment.uat.sparklight.com/PortalsV2/manage-auto-pay',
 
-    PAYMENTURL_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/PortalsBiller',
+    PAYMENTURL_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/PortalsBiller/GetPostDataWithKey',
     URL_EASYPAY_SETUP_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/activate-autopay',
     URL_EASYPAY_MANAGE_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/manage-autopay',
     VIEW_BILLINGS :'https://customer.uat.sparklight.com/residential/billing',
