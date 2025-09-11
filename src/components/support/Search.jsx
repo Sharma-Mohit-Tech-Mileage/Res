@@ -121,31 +121,6 @@ const Search = ({ navigation }) => {
         />
       </View>
 
-      {/* Bottom buttons wrapper 
-            <View style={styles.bottomButtonsWrapper}>
-                <View style={styles.buttonsParent}>
-                    
-                    <View style={styles.buttons}>
-                        <Image
-                            style={styles.buttonIcon}
-                            resizeMode="cover"
-                            source={require("../../../assets/tool-02.png")}
-                        />
-                        <Text style={styles.buttonText}>Troubleshooting</Text>
-                    </View>
-                   
-                    <View style={styles.buttons}>
-                        <Image
-                            style={styles.buttonIcon}
-                            resizeMode="cover"
-                            source={require("../../../assets/message-text-square-02.png")} // Update the source
-                        />
-                        <Text style={[styles.makePayment, styles.titleTypo]}>Live Support</Text>
-                    </View>
-                </View>
-                
-            </View>
-            */}
     </View>
   );
 };

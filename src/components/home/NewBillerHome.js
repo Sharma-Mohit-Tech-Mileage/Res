@@ -9,10 +9,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
 import WalkthroughOverlay from "../common/WalkthroughOverlay";
-import {
-  fetchACPUserAccountDetails,
-  getPaperlessStatus,
-} from "../../redux/actions/ProfileActionSuite";
+import { fetchACPUserAccountDetails, getPaperlessStatus, } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
 import { Env } from "../../network/apis/account/Constants";
@@ -27,16 +24,11 @@ import { useMaintenance } from "../maintenance/MaintenanceContext";
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
-import LogoSmall from "../../res/images/LogoSmall";
 import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
-import {
-  getFcmToken,
-  requestUserPermission,
-} from "../../firebase/FirebaseUtils";
+import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
 
 const NewBillerHome = ({ navigation }) => {
-  // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
   const [isOutageAlert, setIsOutageAlert] = useState(false);
@@ -46,9 +38,6 @@ const NewBillerHome = ({ navigation }) => {
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [loadingAutoPay, setloadingAutoPay] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [optOutStatus, setOptOutStatus] = useState(false);
-  const [outageOptOutStatus, setOutageOptOutStatus] = useState(false);
-  const [billingOptOutStatus, setBillingOptOutStatus] = useState(false);
   const {
     showBanner,
     showMaintenancePage,
@@ -175,13 +164,6 @@ const NewBillerHome = ({ navigation }) => {
     }
   }, [defaultPaymentDetails.email, dispatch]);
 
-  // Check modem status based on internet health count
-  // useEffect(() => {
-  //   if (internetHealths.length >= 3) {
-  //     setCheckModemStatus(true);
-  //   }
-  // }, [internetHealths]);
-
   // Update local state when account details are received
   useEffect(() => {
     if (accountDetails) {
@@ -253,10 +235,6 @@ const enableNotifications = async () => {
       
     } else {
       const token = await getFcmToken();
-      console.log(
-        "FCM TERM WITHOUT PERMISSION >>>>>>><<<<<<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-        token
-      );
       const dataWithoutPermission = {
         accountNumber: userInfo.accountNumber,
         deviceToken: token,

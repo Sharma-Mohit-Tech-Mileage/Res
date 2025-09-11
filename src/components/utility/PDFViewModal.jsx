@@ -70,12 +70,7 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
                         onPressIn={() => setIconPressed(true)}
                         onPressOut={() => setIconPressed(false)}
                     >
-                      {/* <Image
-                          style={[styles.icon, iconPressed ? styles.iconPressed : null]}
-                          resizeMode="cover"
-                          source={require("../../../assets/xclose.png")}
-                          accessible={false}
-                      /> */}
+                      
                       <View  style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                           accessible={false}>
                          <Xclose/>
@@ -93,12 +88,7 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
                         onPressIn={() => setIconPressed(true)}
                         onPressOut={() => setIconPressed(false)}
                     >
-                        {/* <Image
-                            style={[styles.icon, iconPressed ? styles.iconPressed : null]}
-                            resizeMode="cover"
-                            source={require("../../../assets/share.png")}
-                            accessible={false}
-                        /> */}
+                        
                         <View  style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                           accessible={false}>
                          <Share/>

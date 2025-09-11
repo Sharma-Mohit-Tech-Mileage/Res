@@ -65,14 +65,7 @@ const MaintenancePage = ({
       <View style={styles.contentContainer}>
         {/* Logo with Version */}
         <View style={styles.logoContainer}>
-          {/* <Image
-            resizeMode="contain"
-            style={styles.logo}
-            source={require("../../../assets/SparklightEntryLogo.png")}
-            accessibilityRole="image"
-            accessibilityLabel="Sparklight logo"
-            accessible={true}
-          /> */}
+         
           <View style={styles.logo}
            accessibilityRole="image"
             accessibilityLabel="Sparklight logo" >

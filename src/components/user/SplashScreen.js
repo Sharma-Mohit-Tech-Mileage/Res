@@ -507,7 +507,7 @@ const SplashScreen = ({ navigation, route }) => {
       />
       
       <CustomerDisconnectPage
-        visible={true}
+        visible={disconnected}
         onLogin={() => {
           setDisconnected(false);
           if (!authLockRef.current && !authInProgress && !loading) {
@@ -516,7 +516,7 @@ const SplashScreen = ({ navigation, route }) => {
         }}
         onClose={() => {
           setDisconnected(false);
-          setLoading(false); // Reset loading when closing disconnect modal
+          setLoading(false); 
           setLoginEnable(true); // Re-enable login button
           logoutAction();
         }}

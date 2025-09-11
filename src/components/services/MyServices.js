@@ -234,7 +234,6 @@ const MyServices = ({ route }) => {
             <Image
               style={[styles.lifeBuoy02IconLayout]}
               resizeMode="stretch"
-              //source={require("../../../assets/right-actionable19.png")}
             />
           </View>
           <View style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}>

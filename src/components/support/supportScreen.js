@@ -360,11 +360,7 @@ const Support = ({ route }) => {
       <View style={[styles.mainContainer]}>
         <View style={styles.header}>
           <View style={styles.featuredIcon}>
-            {/* <Image
-              style={[styles.lifeBuoy02IconLayout]}
-              resizeMode="stretch"
-              source={require("../../../assets/right-actionable19.png")}
-            /> */}
+            
             <SupportIcon white={'#fff'}/>
             
           </View>

@@ -355,16 +355,7 @@ const AddNotificationScreen = () => {
                   Critical Notifications
                 </Text>
                 <View style={[styles.iconContainer, { flex: 0.14 }]}>
-                  {/* <Image
-                    style={styles.icon}
-                    resizeMode="cover"
-                    source={
-                      formState.criticalNotifications
-                        ? require("../../../../assets/checkcircle.png")
-                        : require("../../../../assets/checkcircle1.png")
-                    }
-                    accessible={false} // decorative
-                  /> */}
+                  
                   <View style={styles.icon} accessible={false}>
                     {primaryEmail ? <Checkcircle /> : <Checkcircle1 />}
                   </View>
