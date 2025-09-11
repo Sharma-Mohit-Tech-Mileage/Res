@@ -23,7 +23,7 @@ import BuildingDocIcon from '../../res/svgIcons/BuildingDocIcon';
 import GearIcon from '../../res/svgIcons/GearIcon';
 import SearchIcon from '../../../assets/svgs/SearchIcon'; 
 import ChevronRight from '../../../assets/svgs/Chevonright';
-import SuccessIcon from '../../res/svgIcons/SuccessIcon';
+import SuccessIcon from '../../../assets/svgs/SuccessIcon';
 const Icon = ({ name, size = 24, color = '#000', style }) => {
   const iconMap = {
     'credit-card': { library: 'SVG', source: creditCard },

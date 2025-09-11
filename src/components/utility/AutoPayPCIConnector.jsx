@@ -91,8 +91,8 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             padding: CryptoJS.pad.Pkcs7
         }).toString();
 
-        const param = { guid: gui, key: ix, PaymentObj: baX, RefererUrl: makePaymentUrl };
-        
+        const param = { guid: gui, key: ix, PaymentObj: baX, RefererUrl: makePaymentUrl, apiKey: Env.secretKey };
+
         // Get payment URL using the utility function - just pass the version
         const version = useNewPayment ? 'V3' : 'V2';
         const paymentUrl = getPaymentUrl(version);

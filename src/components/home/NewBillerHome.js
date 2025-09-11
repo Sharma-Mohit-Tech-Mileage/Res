@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, StyleSheet, Image, ScrollView, Platform } from "react-native";
+import { View, StyleSheet, ScrollView, Platform } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
@@ -27,7 +27,7 @@ import { isAccountDisconnected } from "../utility/disconnectHelpers";
 import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
 import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
-
+import Logo from "../../res/images/SpalshLogo";
 const NewBillerHome = ({ navigation }) => {
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
@@ -264,13 +264,7 @@ const enableNotifications = async () => {
       accessibilityLabel="SparkLight"
       style={styles.headerContainer}
     >
-      <Image
-        accessible={!showWalkThrough}
-        accessibilityLabel="SparkLight"
-        resizeMode="contain"
-        style={styles.logoImage}
-        source={require("../../res/images/Logo.png")}
-      />
+       <Logo width={120} height={33.32}/>
     </View>
   );
 

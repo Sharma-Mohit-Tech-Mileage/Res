@@ -59,6 +59,12 @@ const BillingScreen = ({ navigation }) => {
     setIsAutoPayStatusLoad(false);
     setLoadingPerless(false);
   };
+  const handleError1 = (error) => { 
+    console.log("error on Billing paperless", error); 
+    setIsContentLoading(false);
+    setIsAutoPayStatusLoad(false);
+    setLoadingPerless(false);
+  };
 
   
   const getStatus = () => {
@@ -86,7 +92,7 @@ const BillingScreen = ({ navigation }) => {
           }, 2000);
          
         },
-        handleError
+        handleError1
       );
     }).catch(error => {
       console.log("Error getting user status:", error);

@@ -79,7 +79,7 @@ const DisconnectedBanner = ({ navigation, onClose, showCloseIcon = false }) => {
       <View style={styles.checkIconContainer}>
         <Icon
           name={iconName}
-          size={16}
+          size={18}
           color={Color.sparklightGreen}
           style={styles.checkIcon}
         />

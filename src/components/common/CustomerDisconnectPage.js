@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Modal,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, } from "react-native";
 import colors from "../../res/Colors";
 import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
 import WarningIcon from "../../../assets/svgs/Alerttriangle"
