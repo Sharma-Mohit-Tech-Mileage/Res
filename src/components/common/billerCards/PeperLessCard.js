@@ -27,8 +27,11 @@ const PeperLessCard = ({
       onPress={handleCardPress}
       activeOpacity={0.8}
       accessible={true}
-      accessibilityLabel="Manage Paperless Billing"
-      accessibilityRole="button"
+      accessibilityLabel={
+        (paperlessStatus ? "Paperless Billing is On. " : "Paperless Billing is Off. ") +
+        "Manage Paperless Billing"
+      }
+      accessibilityRole="link"
     >
       <View
         style={{
@@ -43,9 +46,7 @@ const PeperLessCard = ({
           <PaperIconBg />
         </View>
         <View style={{ flexDirection: "column" }}>
-          <Text accessible={true}
-            accessibilityLabel={'Paperless Billing' + (paperlessStatus ? ' is On' : ' is Off')}
-            accessibilityRole="text"
+          <Text 
           style={styles.leftTitle}>Paperless Billing</Text>
           {isStatusLoading ? (
             <SkeletonPlaceholder>
