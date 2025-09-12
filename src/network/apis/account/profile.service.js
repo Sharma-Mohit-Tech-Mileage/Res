@@ -14,13 +14,9 @@ const getProfileDetails = async () => {
             Authorization: "Bearer " + data.token
         }
     };
+
+    let ApiMethod  = `/api/profile/${accountNumber}`;
     
-    let ApiMethod = ''
-    if (accountNumber.toString().length >= 16) {
-        ApiMethod = `/api/profile/${accountNumber}`
-    } else {
-        ApiMethod = `/users/api/profile/${accountNumber}`
-    }
     return _axios.get(ApiMethod, { ...config })
         .then(res => res.data)
         .catch(error => {
@@ -337,10 +333,10 @@ const postTermsAndConditionsv2 = async (flag) => {
     };
     try {
         const response = await _axios.put('/api/Mobile/UpdateMobileAspnetUserData', payload, config);
-        console.log(`API Call Successful to /mobile/api/MobileUser/updateMobiletAspnuserDataSec, Response:`, response);
+        console.log(`API Call Successful to /api/Mobile/UpdateMobileAspnetUserData, Response:`, response);
         return response;
     } catch (error) {
-        console.error(`Error in API Call to /mobile/api/MobileUser/updateMobiletAspnuserDataSec:`, error);
+        console.error(`Error in API Call to /api/Mobile/UpdateMobileAspnetUserData:`, error);
         throw error;
     }
 };
@@ -438,7 +434,7 @@ const handleSubmitFeedback = async (obj) => {
 const logError = async (errorData) => {
    
     try {
-        await _axios.post('/logging/api/log/error', errorData);
+        await _axios.post('/api/log/error', errorData);
         console.log('Error logged successfully');
     } catch (logErr) {
         console.error('Failed to log error:', logErr);

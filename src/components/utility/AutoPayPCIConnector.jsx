@@ -170,9 +170,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             }
 
             const accountNumber = userLocal.userInfo.accountNumber;
-            let isAcp = accountNumber.toString().length >= 16;
             
-            // Timeout for API requests to prevent hanging
             const timeoutPromise = new Promise((_, reject) => {
                 setTimeout(() => reject(new Error("API request timed out")), 15000);
             });
@@ -180,7 +178,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             // Race between actual request and timeout
             const apiRequest = new Promise((resolve) => {
                 GetApiRequest(
-                    isAcp ? `api/accounts/${accountNumber}/easypay` : `account/api/account/${accountNumber}/easypay`,
+                   `api/Accounts/${accountNumber}/easypay`,
                     (res) => {
                         resolve(res);
                     },

@@ -75,16 +75,13 @@ const ChangePassword = () => {
       }
     );
   }
-  //usersvc/api/profile/password/8160210010000010
 
   const updateUserPassword = async (newPassword) => {
     try {
         const user = await getUser();
 
         // Construct the request URL based on the user's billing type
-        const request = isNewBiller
-            ? `api/profile/password/${user.userInfo.accountNumber}`
-            : `users/api/profile/password/${user.userInfo.accountNumber}`;
+        const request = `api/profile/password/${user.userInfo.accountNumber}`;
 
         const body = { newPassword };
 
