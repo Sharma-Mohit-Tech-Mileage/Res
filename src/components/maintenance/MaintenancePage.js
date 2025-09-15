@@ -31,7 +31,7 @@ const MaintenancePage = ({
   }
   
   Linking.openURL(contactLink).catch(err => 
-    console.error('🔧 📄 Error opening contact link:', err)
+    console.error('Error opening contact link:', err)
   );
 };
   
@@ -50,7 +50,7 @@ const MaintenancePage = ({
         }],
       });
     } else {
-      console.error('🔧 📄 🚫 Navigation ref not available');
+      console.error('Navigation ref not available');
     }
   };
 
@@ -65,14 +65,7 @@ const MaintenancePage = ({
       <View style={styles.contentContainer}>
         {/* Logo with Version */}
         <View style={styles.logoContainer}>
-          {/* <Image
-            resizeMode="contain"
-            style={styles.logo}
-            source={require("../../../assets/SparklightEntryLogo.png")}
-            accessibilityRole="image"
-            accessibilityLabel="Sparklight logo"
-            accessible={true}
-          /> */}
+         
           <View style={styles.logo}
            accessibilityRole="image"
             accessibilityLabel="Sparklight logo" >

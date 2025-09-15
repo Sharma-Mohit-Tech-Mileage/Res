@@ -18,7 +18,6 @@ const ChangePassword = () => {
 
   const navigation = useNavigation();
   const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
-  const [isNewBiller, setIsNewBiller] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingTxt, setLoadingTxt] = useState("Please wait...");
   const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
@@ -26,7 +25,7 @@ const ChangePassword = () => {
   const [showValidationAlert, setShowValidationAlert] = useState(false);
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
   const [securityQuestionsNew,setSecurityQuestionsNew] =useState(securityQuestions)
-  const route = useRoute(); // Use the useRoute hook
+  const route = useRoute(); 
   const dispatch = useDispatch();
   const profile = useSelector(state => state.combinedReducers.profile || {});
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
@@ -75,16 +74,13 @@ const ChangePassword = () => {
       }
     );
   }
-  //usersvc/api/profile/password/8160210010000010
 
   const updateUserPassword = async (newPassword) => {
     try {
         const user = await getUser();
 
         // Construct the request URL based on the user's billing type
-        const request = isNewBiller
-            ? `api/profile/password/${user.userInfo.accountNumber}`
-            : `users/api/profile/password/${user.userInfo.accountNumber}`;
+        const request = `api/profile/password/${user.userInfo.accountNumber}`;
 
         const body = { newPassword };
 
@@ -137,28 +133,7 @@ const ChangePassword = () => {
     }
   }
 
-  useEffect(() => {
-    let re = getUser().then((res) => {
-      if(res.userInfo.accountNumber.toString().length>=16){
-        setIsNewBiller(true)
-      }
-    });
-   
-    if(isNewBiller){
-      getSecurityQuestions();
-    }else{
-      
-      const storedSecurityQuestion = profileDetails.securityQuestion;
-      const isCustomQuestion = storedSecurityQuestion && !securityQuestionsNew.includes(storedSecurityQuestion);
-      setIsCustomQuestionSelected(isCustomQuestion);
-      if (isCustomQuestion) {
-        setCustomSecurityQuestion("Add your own question");
-      } else {
-        setCustomSecurityQuestion(storedSecurityQuestion);
-      }
-
-    }
-  }, [isNewBiller]);
+  useEffect(() => { getSecurityQuestions(); }, []);
 
   useEffect(() => {
     if (route.params?.updateFailed) {

@@ -8,7 +8,6 @@ import ProfileSettingsIcon from '../../../assets/svgs/Rightactionable15';
 import PasswordSecurityIcon from '../../../assets/svgs/Rightactionable16';
 import NotificationsIcon from '../../../assets/svgs/Rightactinable17';
 import UserManagementIcon from '../../../assets/svgs/Rightactionable18';
-//import feedbackicon from '../../../assets/message-alert-circle.png';
 import Feedbackicon from '../../../assets/svgs/Messagealertcircle';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useDispatch, useSelector } from 'react-redux';

@@ -14,13 +14,9 @@ const getProfileDetails = async () => {
             Authorization: "Bearer " + data.token
         }
     };
-    console.log("Authorization header:", config.headers.Authorization);
-    let ApiMethod = ''
-    if (accountNumber.toString().length >= 16) {
-        ApiMethod = `/api/profile/${accountNumber}`
-    } else {
-        ApiMethod = `/users/api/profile/${accountNumber}`
-    }
+
+    let ApiMethod  = `/api/profile/${accountNumber}`;
+
     return _axios.get(ApiMethod, { ...config })
         .then(res => res.data)
         .catch(error => {
@@ -66,13 +62,11 @@ const fetchSmsSubscription = async () => {
         }
     };
 
-    return _axios.get(`/users/api/SMS/sms?AccountNumber=${accountNumber}`, { ...config })
+    return _axios.get(`api/SMS/sms?AccountNumber=${accountNumber}`, { ...config })
         .then(res => {
-            console.log('fetching SMS subscription list:', JSON.stringify(res.data, null, 2));
-            return res.data;  // Return the actual data, not the stringified version
+            return res.data; 
         })
         .catch(error => {
-            console.error('Error fetching SMS subscription list:', error);
             if (error.toString().includes('AxiosError: timeout of') && fetchSmsSubscriptionCount < 2) {
                 fetchSmsSubscription();
             } else {
@@ -144,21 +138,16 @@ let fetchPushNotificationsCount = 0;
 const fetchPushNotifications = async () => {
     fetchPushNotificationsCount = fetchPushNotificationsCount + 1;
     let user = await getUser();
-    const userName = user.userInfo?.userName || null;
     const accountNumber = user.userInfo?.accountNumber || null;
     const config = {
         headers: {
             Authorization: "Bearer " + user.token
         }
     };
-
-    console.log("Bearer token for fetchPushNotifications:", config.headers.Authorization);
-    console.log(`/mobile/api/mobilenotificationpreferences/${userName}/mobilepreferencesSec/${accountNumber}`);
     try {
-        const response = await _axios.get(`/mobile/api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferencesSec/${accountNumber}`, { ...config });
+        const response = await _axios.get(`/api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferencesSec/${accountNumber}`, { ...config });
         return response.data;
     } catch (error) {
-        console.error(`Error in API Call to /mobile/api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferencesSec/${accountNumber}`, error);
         if (error.toString().includes('AxiosError: timeout of') && fetchPushNotificationsCount < 2) {
             fetchPushNotifications();
         } else {
@@ -171,31 +160,14 @@ const fetchPushNotifications = async () => {
 const postProfileInfo = async (data) => {
     try {
         const user = await getUser();
-        if (!user || !user.token) {
-            throw new Error("User information or token is missing");
-        }
 
         const config = {
             headers: {
                 Authorization: `Bearer ${user.token}`,
             },
         };
-        console.log('API Request Configuration:', config);
 
-        const accountNumber = user.userInfo?.accountNumber;
-        if (!accountNumber) {
-            throw new Error("Account number is missing");
-        }
-        let ApiMethod = ''
-        if (accountNumber.toString().length >= 16) {
-            ApiMethod = `/api/profile`
-        } else {
-            ApiMethod = `/users/api/profile`
-        }
-        console.log(`Making API Call to ${ApiMethod} with data:`, data);
-
-        const response = await _axios.put(ApiMethod, data, config);
-        console.log('API Call Successful, Response:', response.data);
+        const response = await _axios.put(`/api/profile`, data, config);
 
         return response.data;
     } catch (error) {
@@ -224,7 +196,6 @@ const postTextNotifictionInfo = async (data) => {
     console.log('Making API Call to api/SMS with data:', postData); // Log the request data
     try {
         const response = await _axios.post(`/api/SMS`, postData, config);
-        console.log('API Call Successful, Response:', response.data); // Log the successful response
         return response.data;
     } catch (error) {
         console.error('API Call Failed, Error:', error); // Log the error
@@ -242,12 +213,12 @@ const putEmailNotification = async (email) => {
     };
 
     try {
-        const response = await _axios.put(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
+        const response = await _axios.put(`/api/account/${accountNumber}/paperless/${email}`, {}, config);
 
-        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless/${email}, Response:`, response);
+        console.log(`API Call Successful to /api/account/${accountNumber}/paperless/${email}, Response:`, response);
         return response;
     } catch (error) {
-        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless/${email}:`, error);
+        console.error(`Error in API Call to /api/account/${accountNumber}/paperless/${email}:`, error);
         throw error;
     }
 };
@@ -262,12 +233,12 @@ const resendEmailVerification = async () => {
     };
 
     try {
-        const response = await _axios.post(`/account/api/account/${accountNumber}/paperless/resend`, {}, config);
+        const response = await _axios.post(`/api/account/${accountNumber}/paperless/resend`, {}, config);
 
-        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless/resend, Response:`, response);
+        console.log(`API Call Successful to /api/account/${accountNumber}/paperless/resend, Response:`, response);
         return response;
     } catch (error) {
-        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless/resend:`, error);
+        console.error(`Error in API Call to /api/account/${accountNumber}/paperless/resend:`, error);
         throw error;
     }
 };
@@ -283,13 +254,13 @@ const postEmailNotification = async (email) => {
     };
 
     try {
-        const response = await _axios.post(`/account/api/account/${accountNumber}/paperless/${email}`, {}, config);
+        const response = await _axios.post(`/api/account/${accountNumber}/paperless/${email}`, {}, config);
 
-        console.log(`API Call Successful to /account/api/account/${accountNumber}/paperless, Response:`, response);
+        console.log(`API Call Successful to /api/account/${accountNumber}/paperless, Response:`, response);
         return response;
     } catch (error) {
         // Log the error with a descriptive message
-        console.error(`Error in API Call to /account/api/account/${accountNumber}/paperless:`, error);
+        console.error(`Error in API Call to /api/account/${accountNumber}/paperless:`, error);
         throw error;
     }
 };
@@ -305,11 +276,11 @@ const postTermsAndConditions = async (flag) => {
     };
 
     try {
-        const response = await _axios.put(`/mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}`, {}, config);
+        const response = await _axios.put(`api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}`, {}, config);
 
         return response;
     } catch (error) {
-        console.error(`Error in API Call to /mobile/api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}:`, error);
+        console.error(`Error in API Call to /api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}:`, error);
         throw error;
     }
 };
@@ -337,10 +308,10 @@ const postTermsAndConditionsv2 = async (flag) => {
     };
     try {
         const response = await _axios.put('/api/Mobile/UpdateMobileAspnetUserData', payload, config);
-        console.log(`API Call Successful to /mobile/api/MobileUser/updateMobiletAspnuserDataSec, Response:`, response);
+        console.log(`API Call Successful to /api/Mobile/UpdateMobileAspnetUserData, Response:`, response);
         return response;
     } catch (error) {
-        console.error(`Error in API Call to /mobile/api/MobileUser/updateMobiletAspnuserDataSec:`, error);
+        console.error(`Error in API Call to /api/Mobile/UpdateMobileAspnetUserData:`, error);
         throw error;
     }
 };
@@ -360,19 +331,12 @@ const postPushNotifications = async (data) => {
     data['outageOptOut'] = !data.outageOptOut
     data['billingOptOutStatus'] = !data.billingOptOutStatus
 
-    const config = {
-        headers: {
-            Authorization: `Bearer ${user.token}`
-        }
-    };
-
-    console.log('postPushNotifications',data)
+    const config = { headers: { Authorization: `Bearer ${user.token}` } };
 
     try {
         const response = await _axios.post(`api/mobilenotificationpreferences/${userName}/mobilepreferences`, data, config);
 
-        console.log(`API Call Successful to /api/mobilenotificationpreferences/${userName}/mobilepreferences, Response:`, response?.data);
-        return response;
+       return response;
     } catch (error) {
         console.error(`Error in API Call to /api/mobilenotificationpreferences/${userName}/mobilepreferences`, error);
         throw error;
@@ -438,7 +402,7 @@ const handleSubmitFeedback = async (obj) => {
 const logError = async (errorData) => {
    
     try {
-        await _axios.post('/logging/api/log/error', errorData);
+        await _axios.post('/api/log/error', errorData);
         console.log('Error logged successfully');
     } catch (logErr) {
         console.error('Failed to log error:', logErr);
@@ -447,7 +411,7 @@ const logError = async (errorData) => {
 
 const logInfo = async (infoData) => {
     try {
-        const response = await _axios.post('/logging/api/log/info', infoData);
+        const response = await _axios.post('/api/log/info', infoData);
         console.log('Info logged successfully');
     } catch (logErr) {
         console.error('Failed to log info:', logErr);
@@ -522,9 +486,9 @@ const fetchAllSvEmails = async (data) => {
             Authorization: "Bearer " + user.token
         }
     };
-    console.log(`/mobile/api/email/${accountNumber}/GetAllSVEmails`);
+    console.log(`/api/email/${accountNumber}/GetAllSVEmails`);
     try {
-        const response = await _axios.get(`/mobile/api/email/${accountNumber}/GetAllSVEmails`, config);
+        const response = await _axios.get(`api/email/${accountNumber}/GetAllSVEmails`, config);
         console.log('API Call Successful, Response:', response.data);
         return response.data;
     } catch (error) {
@@ -621,7 +585,7 @@ const addSVEmailMktFlag = async (email) => {
         }
     };
     try {
-        const response = await _axios.post(`/Mobile/api/email/${accountNumber}/${email}/AddSVEmailMktFlag`, {}, config);
+        const response = await _axios.post(`/api/email/${accountNumber}/${email}/AddSVEmailMktFlag`, {}, config);
         console.log(`API Call Successful to add SV email marketing flag: ${email}`, response.data);
         return response.data;
     } catch (error) {

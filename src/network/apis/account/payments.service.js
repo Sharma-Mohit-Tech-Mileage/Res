@@ -41,7 +41,6 @@ const paymentHistoryApi = {
         },
       };
       
-      // Note: This is a placeholder endpoint, update it based on your actual API
       const response = await _axios.get(
         `/api/payments/${accountNumber}/receipt/${paymentId}`,
         {...config}

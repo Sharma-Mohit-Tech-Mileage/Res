@@ -1,15 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  Image,
-  Animated,
-  Platform,
-  TouchableOpacity,
-  AccessibilityInfo,
-} from "react-native";
+import { StyleSheet, Text, View, ScrollView, Image, Animated, Platform, TouchableOpacity, AccessibilityInfo, } from "react-native";
 import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -24,15 +14,10 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 import LoadingOverlay from "../../common/customui/CustomLoading";
 import { updatePrimaryAndPaperlessRequest } from "../../../redux/actions/NotificationActionSuite";
-import {
-  fetchACPUserAccountDetails,
-  getPaperlessStatus,
-} from "../../../redux/actions/ProfileActionSuite";
+import { fetchACPUserAccountDetails, getPaperlessStatus, } from "../../../redux/actions/ProfileActionSuite";
 import { getPrimaryEmail } from "../../utility/constant";
-import Checkcircle from "../../../../assets/svgs/Checkcircle";
-import Checkcircle1 from "../../../../assets/svgs/Checkcircle1";
 import AlertIcon from "../../../res/svgIcons/AlertIcon";
-
+import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 const emailRegex =
   /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
@@ -355,18 +340,9 @@ const AddNotificationScreen = () => {
                   Critical Notifications
                 </Text>
                 <View style={[styles.iconContainer, { flex: 0.14 }]}>
-                  {/* <Image
-                    style={styles.icon}
-                    resizeMode="cover"
-                    source={
-                      formState.criticalNotifications
-                        ? require("../../../../assets/checkcircle.png")
-                        : require("../../../../assets/checkcircle1.png")
-                    }
-                    accessible={false} // decorative
-                  /> */}
+                  
                   <View style={styles.icon} accessible={false}>
-                    {primaryEmail ? <Checkcircle /> : <Checkcircle1 />}
+                    {primaryEmail ? <SuccessIcon /> : <SuccessIcon color={'#4C5458'} />}
                   </View>
                   {/* Display text "On" or "Off" after the icon */}
                   <Text style={styles.toggleStatus}>

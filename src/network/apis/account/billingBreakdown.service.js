@@ -56,9 +56,6 @@ const billingStatementApi = {
     try {
       let startDate = moment().subtract(180, 'days').format('YYYY-MM-DD');
       let endDate = moment().format('YYYY-MM-DD');
-      console.log("startDate", startDate);
-      console.log("endDate", endDate);
-      
       let user = await getUser();
       const accountNumber = user.userInfo.accountNumber;
       const config = {

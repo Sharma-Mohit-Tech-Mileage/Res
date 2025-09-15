@@ -20,16 +20,15 @@ export const getAllEmails = async () => {
     try {
         const config = await getAuthConfig();
         const accountNumber = await getUserAccountNumber();
-        console.log('🔍 Fetching all emails for account:', accountNumber);
         
         const response = await _axios.get(
             `/api/Paperless/GetAllEmails?account=${accountNumber}`, 
             {...config}
         );
-        console.log('✅ Emails fetched successfully:', response.data);
+        console.log(' Emails fetched successfully:', response.data);
         return response.data;
     } catch (error) {
-        console.error('❌ Error fetching emails:', error);
+        console.error(' Error fetching emails:', error);
         throw error;
     }
 };
@@ -45,10 +44,10 @@ export const isPaperlessEnabled = async (email) => {
             `/api/Paperless/IsPaperless?account=${accountNumber}&email=${email}`, 
             {...config}
         );
-        console.log('✅ Paperless status checked:', response.data);
+        console.log(' Paperless status checked:', response.data);
         return response.data;
     } catch (error) {
-        console.error('❌ Error checking paperless status:', error);
+        console.error(' Error checking paperless status:', error);
         throw error;
     }
 };
@@ -58,38 +57,34 @@ export const enrollPaperless = async (data) => {
     try {
         const config = await getAuthConfig();
         const accountNumber = await getUserAccountNumber();
-        console.log('📨 Enrolling in paperless:', data.emailAddress);
         
         const response = await _axios.post(
             `/api/Paperless/PaperlessEnrollment?emailAddress=${data.emailAddress}&account=${accountNumber}`, 
             null, 
             {...config}
         );
-        console.log('✅ Paperless enrollment successful:', response.data);
+        console.log('Paperless enrollment successful:', response.data);
         return response.data;
     } catch (error) {
-        console.error('❌ Error enrolling in paperless:', error);
+        console.error(' Error enrolling in paperless:', error);
         throw error;
     }
 };
 
-// Unenroll from paperless for an email
 export const unenrollPaperless = async (data) => {
     try {
         const config = await getAuthConfig();
         const accountNumber = await getUserAccountNumber();
-        console.log('📨 emailtobeunenrolled from paperless:', data);
         const { emailAddress } = data;
-        console.log('📨 Unenrolling from paperless:', emailAddress);
         const response = await _axios.post(
             `/api/Paperless/PaperlessUnenroll?emailAddress=${emailAddress}&account=${accountNumber}`,
             null,
             { ...config }
         );
-        console.log('✅ Paperless unenrollment successful:', response);
+        console.log(' Paperless unenrollment successful:', response);
         return response.data;
     } catch (error) {
-        console.error('❌ Error unenrolling from paperless:', error);
+        console.error(' Error unenrolling from paperless:', error);
         throw error;
     }
 };
@@ -112,10 +107,10 @@ export const addPrimaryEmail = async ({ newEmail, oldEmail }) => {
             payload, 
             {...config}
         );
-        console.log('✅ Primary email added successfully:', response.data);
+        console.log(' Primary email added successfully:', response.data);
         return response.data;
     } catch (error) {
-        console.error('❌ Error adding primary email:', error);
+        console.error(' Error adding primary email:', error);
         throw error;
     }
 };
@@ -138,10 +133,10 @@ export const updatePrimaryEmail = async ({ newEmail, oldEmail }) => {
             payload, 
             {...config}
         );
-        console.log('✅ Primary email updated successfully:', response.data);
+        console.log(' Primary email updated successfully:', response.data);
         return response.data;
     } catch (error) {
-        console.error('❌ Error updating primary email:', error);
+        console.error(' Error updating primary email:', error);
         throw error;
     }
 };

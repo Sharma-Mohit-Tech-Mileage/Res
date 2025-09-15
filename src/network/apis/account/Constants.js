@@ -13,7 +13,7 @@ export const config = {
     PAYMENTURL_V2 : 'https://payment.sparklight.com/PortalsV2/PortalsPayment',
     URL_EASYPAY_SETUP_V2 : 'https://payment.sparklight.com/portalsV2/setup-auto-pay',
     URL_EASYPAY_MANAGE_V2 : 'https://payment.sparklight.com/portalsV2/manage-auto-pay',
-    PAYMENTURL_V3 : 'https://payment.sparklight.com/portalsV3/PortalsBiller',
+    PAYMENTURL_V3 : 'https://payment.sparklight.com/portalsV3/PortalsBiller/GetPostDataWithKey',
     URL_EASYPAY_SETUP_V3 : 'https://payment.sparklight.com/portalsV3/activate-autopay',
     URL_EASYPAY_MANAGE_V3 : 'https://payment.sparklight.com/portalsV3/manage-autopay',
     PAYMENTURLNEW: 'https://customer.sparklight.com/portals/app-secure/billing',
@@ -23,6 +23,7 @@ export const config = {
     PAY_METHOD: 'https://payment.sparklight.com/portalsV3/billing-payment',
     ACP_BILLING:'https://customer.sparklight.com/portals/app-secure',
     encryptvalPassword: '1 0 7 2 8 3 3634',
+    secretKey: "6LeG6bEUAAAAAM7vlsL7QL6xw2IFhvtbgbQng-za",
     ZENDESK_FEEDBACK: {
       Url: 'https://cableone.zendesk.com/api/v2/requests.json',
       ticket_form_id: "360000052934",
@@ -47,7 +48,7 @@ export const config = {
     URL_EASYPAY_SETUP_V2 : 'https://payment.uat.sparklight.com/PortalsV2/setup-auto-pay',
     URL_EASYPAY_MANAGE_V2 : 'https://payment.uat.sparklight.com/PortalsV2/manage-auto-pay',
 
-    PAYMENTURL_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/PortalsBiller',
+    PAYMENTURL_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/PortalsBiller/GetPostDataWithKey',
     URL_EASYPAY_SETUP_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/activate-autopay',
     URL_EASYPAY_MANAGE_V3 : 'https://payment.uat.sparklight.com/portalsV3-Demo/manage-autopay',
     VIEW_BILLINGS :'https://customer.uat.sparklight.com/residential/billing',
@@ -56,6 +57,7 @@ export const config = {
     PAY_METHOD: 'https://payment.uat.sparklight.com/portalsV3-Demo/billing-payment',
     ACP_BILLING:'https://customer.uat.sparklight.com/portals/app-secure',
     encryptvalPassword: '1 0 7 2 8 3 3634',
+    secretKey: "6LeG6bEUAAAAAM7vlsL7QL6xw2IFhvtbgbQng-za",
     PAYMENTURLNEW: 'https://customer.uat.sparklight.com/portals/app-secure/billing',
     ZENDESK_FEEDBACK: {
       Url: 'https://cableone1718812169.zendesk.com/api/v2/requests.json',
@@ -72,6 +74,6 @@ export const config = {
 
 }
 
-export const ISUAT = false;
+export const ISUAT = true;
 
 export const Env = (ISUAT) ? config.UAT : config.PRODUCTION

@@ -125,10 +125,6 @@ const PushNotifications = ({ navigation }) => {
     const enabledPermission = await requestUserPermission();
     if (enabledPermission) {
       const token = await getFcmToken();
-      console.log(
-        "FCM TERM WITH PERMISSION >>>>>>><<<<<<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-        token
-      );
       const data = {
         accountNumber: user.userInfo?.accountNumber,
         deviceToken: token,

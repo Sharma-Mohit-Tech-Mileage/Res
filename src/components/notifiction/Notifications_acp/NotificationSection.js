@@ -1,52 +1,28 @@
-// NotificationSection.js
 import React from "react";
-import { View, Text, Pressable, Image, StyleSheet } from "react-native";
-import {
-  Color,
-  Padding,
-  FontSize,
-  FontFamily,
-  Border,
-} from "../../../../GlobalStyles";
-import Checkcircle from "../../../../assets/svgs/Checkcircle";
-import Checkcircle1 from "../../../../assets/svgs/Checkcircle1";
-import InfoICon from "../../../../assets/svgs/Infocircle";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { Color, Padding, FontSize, FontFamily, Border, } from "../../../../GlobalStyles";
+import InfoICon from "../../../../assets/svgs/InfoIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 
-// 🔹 Convert numbers into words for TalkBack accessibility (Android only)
 const digitToWord = {
-  '0': 'zero',
-  '1': 'one',
-  '2': 'two',
-  '3': 'three',
-  '4': 'four',
-  '5': 'five',
-  '6': 'six',
-  '7': 'seven',
-  '8': 'eight',
-  '9': 'nine',
+  0: "zero", 1: "one", 2: "two", 3: "three", 4: "four",
+  5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine",
 };
 
 function phoneNumberToWords(phoneNum) {
   return phoneNum
-    ? phoneNum.replace(/\D/g, '').split('').map(d => digitToWord[d] || d).join(' ')
-    : '';
+    ? phoneNum.replace(/\D/g, "").split("").map((d) => digitToWord[d] || d).join(" ")
+    : "";
 }
 
-// Sub-components
 const StatusIcon = ({ status }) => (
   <View style={styles.icon}>
-    {status === "On" ? <Checkcircle /> : <Checkcircle1 />}
+    {status === "On" ? <SuccessIcon /> : <SuccessIcon color={'#4C5458'} />}
   </View>
 );
 
-const InfoIcon = () => (
-  <View style={styles.icon}>
-    <InfoICon />
-  </View>
-);
-
-const EditButton = ({ onPress,isLoading }) => (
+const EditButton = ({ onPress, isLoading }) => (
   <Pressable
     style={({ pressed }) => [
       styles.editButton,
@@ -78,7 +54,6 @@ const NotificationToggle = ({ type, status, isLast, warn, loading }) => (
     ]}
   >
     <Text style={styles.toggleText}>{type}</Text>
-
     <View style={styles.statusContainer}>
       {loading ? (
         <SkeletonPlaceholder>
@@ -105,21 +80,14 @@ const BoldEmailText = ({ message }) => {
   const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/;
   const parts = message.split(emailRegex);
   const emails = message.match(emailRegex);
-  console.log(emails);
+  
   return (
-    <Text>
+    <Text style={styles.infoText}>
       {parts.map((part, index) => (
         <React.Fragment key={index}>
-          <Text style={styles.infoText}>
-          { ' '+ part}
-          </Text>
+          <Text style={styles.infoText}>{part}</Text>
           {emails && emails[index] && (
-            <Text
-              style={[
-                styles.infoText,
-                { fontWeight: "600", color: Color.colorGray_200 },
-              ]}
-            >
+            <Text style={[styles.infoText, styles.boldText]}>
               {emails[index]}
             </Text>
           )}
@@ -130,46 +98,43 @@ const BoldEmailText = ({ message }) => {
 };
 
 const BoldPhoneText = ({ phoneNum }) => {
-  // Convert phone number to words for accessibility
   const phoneNumWords = phoneNumberToWords(phoneNum);
 
   return (
     <Text
-      style={[styles.infoText]}
+      style={styles.infoText}
       accessibilityLabel={
         phoneNum
           ? `Text alert are sent to ${phoneNumWords}`
           : "You have not enabled text notifications"
       }
     >
-      <React.Fragment>
-        <Text style={styles.infoText}>
+      <Text style={styles.infoText}>
         {phoneNum
           ? "Text alert are sent to "
           : "You have not enabled text notifications"}
+      </Text>
+      {phoneNum && (
+        <Text style={[styles.infoText, styles.boldText]}>
+          {phoneNum}
         </Text>
-        {
-          <Text
-            style={[
-              styles.infoText,
-              { fontWeight: "600", color: Color.colorGray_200 },
-            ]}
-          >
-            {phoneNum}
-          </Text>
-        }
-      </React.Fragment>
+      )}
     </Text>
   );
 };
+
 const InfoMessage = ({ message, phoneNumber, id }) => (
   <View style={styles.infoMessage}>
-    <InfoIcon />
-    {id == "text" ? (
-      <BoldPhoneText phoneNum={phoneNumber} />
-    ) : (
-      <BoldEmailText message={message} />
-    )}
+    <View style={styles.iconContainer}>
+      <InfoICon color="#0060AE" />
+    </View>
+    <View style={styles.textContainer}>
+      {id == "text" ? (
+        <BoldPhoneText phoneNum={phoneNumber} />
+      ) : (
+        <BoldEmailText message={message} />
+      )}
+    </View>
   </View>
 );
 
@@ -179,7 +144,6 @@ const AdminMessage = () => (
   </View>
 );
 
-// Main component
 const NotificationSection = ({
   id,
   title,
@@ -193,20 +157,17 @@ const NotificationSection = ({
 }) => {
   return (
     <View style={styles.sectionContainer}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>{title}</Text>
         {isComingSoon ? (
           <ComingSoonBadge />
         ) : (
-          !isAdmin && <EditButton onPress={onEdit} isLoading={isLoading}/>
+          !isAdmin && <EditButton onPress={onEdit} isLoading={isLoading} />
         )}
       </View>
 
-      {/* Admin Message */}
       {isAdmin && <AdminMessage />}
 
-      {/* Info Message */}
       {isLoading ? (
         <SkeletonPlaceholder>
           <View
@@ -228,9 +189,9 @@ const NotificationSection = ({
           />
         )
       )}
+      
       <View style={styles.bottomBorder} />
 
-      {/* Settings List */}
       {settings.map((setting, index) => (
         <NotificationToggle
           key={setting.id}
@@ -244,7 +205,6 @@ const NotificationSection = ({
 };
 
 const styles = StyleSheet.create({
-  // Section Container
   sectionContainer: {
     backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_5xs,
@@ -253,8 +213,6 @@ const styles = StyleSheet.create({
     marginBottom: Padding.p_base,
     overflow: "hidden",
   },
-
-  // Header
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -266,8 +224,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
   },
-
-  // Edit Button
   editButton: {
     backgroundColor: Color.colorMidnightblue,
     paddingVertical: Padding.p_7xs,
@@ -284,8 +240,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightWhite,
   },
-
-  // Coming Soon Badge
   comingSoonBadge: {
     backgroundColor: Color.sparklightGray,
     paddingVertical: Padding.p_9xs,
@@ -298,28 +252,37 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
   },
-
-  // Info Message
   infoMessage: {
     flexDirection: "row",
-  alignItems: "center",   // ✅ centers the icon with the text baseline
-  padding: Padding.p_base,
-  marginHorizontal: Padding.p_base,
-  marginBottom: Padding.p_base,
-  borderRadius: Border.br_5xs,
-  borderWidth: 1,
-  borderColor: "#0060AE",
-  backgroundColor: "#F0F8FF",
+    alignItems: "flex-start",
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    marginHorizontal: 20,
+    marginBottom: Padding.p_base,
+    borderRadius: Border.br_5xs,
+    borderWidth: 1,
+    borderColor: "#0060AE",
+    backgroundColor: "#F0F8FF",
+  },
+  iconContainer: {
+    paddingTop: 1,
+    paddingRight: 6,
+    paddingLeft: 2,
+  },
+  textContainer: {
+    flex: 1,
+    paddingRight: 4,
   },
   infoText: {
-    flex: 1,
-    marginLeft: 2,
     fontSize: FontSize.textXsSemibold_size,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
+    lineHeight: FontSize.textXsSemibold_size * 1.3,
   },
-
-  // Toggle
+  boldText: {
+    fontWeight: "600",
+    color: Color.colorGray_200,
+  },
   toggleContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -345,13 +308,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
   },
-
-  icon: {
-    width: 18,
-    height: 18,
-  },
-
-  // Admin Message
   adminMessage: {
     backgroundColor: Color.colorWhitesmoke_100,
     padding: Padding.p_base,
@@ -363,8 +319,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_200,
   },
-
-  // Warning state
   warnBackground: {
     backgroundColor: Color.colorlightRed,
   },

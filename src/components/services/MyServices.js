@@ -130,7 +130,7 @@ const MyServices = ({ route }) => {
     try {
       const user = await getUser();
       const accountNumber = user?.userInfo?.accountNumber;
-      const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${accountNumber}`;
+      const request = `api/Eero/GetEeroAccountDetails?accountnumber=${accountNumber}`;
       GetApiRequest(
         request,
         (response) => {
@@ -234,7 +234,6 @@ const MyServices = ({ route }) => {
             <Image
               style={[styles.lifeBuoy02IconLayout]}
               resizeMode="stretch"
-              //source={require("../../../assets/right-actionable19.png")}
             />
           </View>
           <View style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}>
@@ -255,144 +254,7 @@ const MyServices = ({ route }) => {
             />
           }
         >
-          {/* {userData?.isNormalUser && (
-            <>
-              <View
-                style={[AppStyles.card, { marginTop: Padding.p_5xs }]}
-              >
-                <View
-                  style={[
-                    styles.headingContainer,
-                    styles.headingContainerSpaceBlock,
-                  ]}
-                >
-                  <Text style={[styles.heading, styles.headingTypo]}>
-                    Equipment Support
-                  </Text>
-                </View>
-
-                {
-                  <Pressable
-                    accessible={true}
-                    accessibilityLabel={`Sparklight Smart Check`}
-                    accessibilityRole="button"
-                    style={[
-                      styles.integrationCardMobileContainer,
-                      styles.contentSpaceBlock,
-                    ]}
-                    onPress={() => {
-                      navigation.navigate("DiagnosticFlow");
-                    }}
-                  >
-                    <View
-                      style={[
-                        styles.integrationCardMobile1,
-                        styles.integrationCardBorder,
-                      ]}
-                    >
-                      <View
-                        style={[
-                          { paddingVertical: Padding.p_xl },
-                          styles.contentSpaceBlock,
-                        ]}
-                      >
-                        <View style={styles.headingAndIcon}>
-                          <View style={[styles.icon]}>
-                            <Image
-                              style={styles.supportIcon}
-                              resizeMode="stretch"
-                              source={require("../../../assets/tool-02.png")}
-                            />
-                          </View>
-                          <View style={styles.frameParent}>
-                            <View style={styles.headingAndToggle}>
-                              <Text style={[styles.headingTypo]}>
-                                Sparklight Smart Check
-                              </Text>
-                              <Image
-                                style={styles.chevronIconLayout}
-                                resizeMode="stretch"
-                                source={require("../../../assets/chevronright.png")}
-                              />
-                            </View>
-                            <Text
-                              style={[
-                                styles.supportingText,
-                                styles.supportingTypo1,
-                              ]}
-                            >
-                              Instant troubleshooting & outage check.
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-                  </Pressable>
-                }
-
-                <View
-                  style={[
-                    styles.integrationCardMobileContainer,
-                    styles.contentSpaceBlock,
-                  ]}
-                >
-                  <Pressable
-                    accessible={true}
-                    accessibilityLabel={`Equipment Management`}
-                    accessibilityRole="button"
-                    style={[
-                      styles.integrationCardMobile1,
-                      styles.integrationCardBorder,
-                    ]}
-                    onPress={() => {
-                      navigation.navigate("ManageEquipment");
-                    }}
-                  >
-                    <View style={[styles.content, styles.contentSpaceBlock]}>
-                      <View style={styles.headingAndIcon}>
-                        <View style={[styles.icon]}>
-                          <Image
-                            style={styles.supportIcon}
-                            resizeMode="stretch"
-                            source={require("../../../assets/modem-02.png")}
-                          />
-                        </View>
-                        <View style={styles.frameParent}>
-                          <View style={styles.headingAndToggle}>
-                            <Text style={[styles.headingTypo]}>
-                              Equipment Management
-                            </Text>
-                            <Image
-                              style={styles.chevronIconLayout}
-                              resizeMode="stretch"
-                              source={require("../../../assets/chevronright.png")}
-                            />
-                          </View>
-                          <Text
-                            style={[
-                              styles.supportingText,
-                              styles.supportingTypo1,
-                            ]}
-                          >
-                            View and manage equipment.
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  </Pressable>
-                </View>
-              </View>
-
-
-              <MyServicePlan
-                plans={plans}
-                hasEeroDevice={hasEeroDevice}
-                networkId={networkId}
-                navigation={navigation}
-              />
-              <MyDataUsage plans={plans} tvPlan={tvPlan} phonePlan={phonePlan} navigation={navigation} />
-            </>
-          )} */}
+          
           <CustomerErrorPage
             visible={isAgentNotAvailable}
             message={

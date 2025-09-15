@@ -208,7 +208,7 @@ export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
 // Function for GET API requests
 export const GetApiRequest = async (endpoint, onSuccess, onError) => {
     const user = await getUser();
-    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
+    const baseUrl = await getBaseUrl(); 
     const options = {
         method: 'GET',
         headers: {

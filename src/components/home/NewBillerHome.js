@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, StyleSheet, Image, ScrollView, Platform } from "react-native";
+import { View, StyleSheet, ScrollView, Platform } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
@@ -9,10 +9,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
 import WalkthroughOverlay from "../common/WalkthroughOverlay";
-import {
-  fetchACPUserAccountDetails,
-  getPaperlessStatus,
-} from "../../redux/actions/ProfileActionSuite";
+import { fetchACPUserAccountDetails, getPaperlessStatus, } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
 import { Env } from "../../network/apis/account/Constants";
@@ -27,16 +24,11 @@ import { useMaintenance } from "../maintenance/MaintenanceContext";
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
-import LogoSmall from "../../res/images/LogoSmall";
 import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
-import {
-  getFcmToken,
-  requestUserPermission,
-} from "../../firebase/FirebaseUtils";
-
+import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
+import Logo from "../../res/images/SpalshLogo";
 const NewBillerHome = ({ navigation }) => {
-  // State definitions
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
   const [isOutageAlert, setIsOutageAlert] = useState(false);
@@ -46,9 +38,6 @@ const NewBillerHome = ({ navigation }) => {
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [loadingAutoPay, setloadingAutoPay] = useState(false);
   const [isLoading, setLoading] = useState(false);
-  const [optOutStatus, setOptOutStatus] = useState(false);
-  const [outageOptOutStatus, setOutageOptOutStatus] = useState(false);
-  const [billingOptOutStatus, setBillingOptOutStatus] = useState(false);
   const {
     showBanner,
     showMaintenancePage,
@@ -175,13 +164,6 @@ const NewBillerHome = ({ navigation }) => {
     }
   }, [defaultPaymentDetails.email, dispatch]);
 
-  // Check modem status based on internet health count
-  // useEffect(() => {
-  //   if (internetHealths.length >= 3) {
-  //     setCheckModemStatus(true);
-  //   }
-  // }, [internetHealths]);
-
   // Update local state when account details are received
   useEffect(() => {
     if (accountDetails) {
@@ -233,10 +215,6 @@ const enableNotifications = async () => {
     const enabledPermission = await requestUserPermission();
     if (enabledPermission) {
       const token = await getFcmToken();
-      console.log(
-        "FCM TERM WITH PERMISSION >>>>>>><<<<<<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-        token
-      );
       const data = {
         accountNumber: userInfo?.accountNumber,
         deviceToken: token,
@@ -257,10 +235,6 @@ const enableNotifications = async () => {
       
     } else {
       const token = await getFcmToken();
-      console.log(
-        "FCM TERM WITHOUT PERMISSION >>>>>>><<<<<<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-        token
-      );
       const dataWithoutPermission = {
         accountNumber: userInfo.accountNumber,
         deviceToken: token,
@@ -290,13 +264,7 @@ const enableNotifications = async () => {
       accessibilityLabel="SparkLight"
       style={styles.headerContainer}
     >
-      <Image
-        accessible={!showWalkThrough}
-        accessibilityLabel="SparkLight"
-        resizeMode="contain"
-        style={styles.logoImage}
-        source={require("../../res/images/Logo.png")}
-      />
+       <Logo width={120} height={33.32}/>
     </View>
   );
 

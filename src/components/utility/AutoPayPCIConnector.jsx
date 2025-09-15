@@ -21,7 +21,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const [progress, setProgress] = useState(0);
     const [url, setUrl] = useState(route.params?.url || Env.URL);
     const [currentUser, setCurrentUser] = useState({});
-    const [useNewPayment, setuseNewPayment] = useState(route.params?.useNewPayment || false);
     const [paymentDetails, setPaymentDetails] = useState(route.params?.paymentDetails || {});
     const [status, setStatus] = useState(route.params?.status || false);
     const [name, setTitle] = useState(route.params?.name);
@@ -34,7 +33,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const [hasTrackedInitialScreen, setHasTrackedInitialScreen] = useState(false);
     const [isWebViewLoaded, setIsWebViewLoaded] = useState(false);
     
-    // Support both parameter names for backward compatibility
     const customReferUrl = route.params?.customReferUrl || route.params?.customPaymentUrl || null;
 
     console.log('AutoPayPCIConnector', paymentDetails);
@@ -91,17 +89,15 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             padding: CryptoJS.pad.Pkcs7
         }).toString();
 
-        const param = { guid: gui, key: ix, PaymentObj: baX, RefererUrl: makePaymentUrl };
-        
-        // Get payment URL using the utility function - just pass the version
-        const version = useNewPayment ? 'V3' : 'V2';
+        const param = { guid: gui, key: ix, PaymentObj: baX, RefererUrl: makePaymentUrl, apiKey: Env.secretKey };
+
+        const version = 'V3';
         const paymentUrl = getPaymentUrl(version);
         
         post(param, paymentUrl);
     };
 
     const post = (obj, url) => {
-        // Simplified HTML structure with minimal styling
         const html = `
             <html>
                 <head>
@@ -126,7 +122,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     const setDynamicCookie = () => {
-        // Only set cookies if WebView is available and loaded
         if (!webViewRef.current) return;
         
         try {
@@ -164,23 +159,19 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         try {
             const userLocal = await getUser();
             if (!userLocal || !userLocal.userInfo || !userLocal.userInfo.accountNumber) {
-                console.error("Invalid user data");
                 navigation.navigate('Billing');
                 return;
             }
 
             const accountNumber = userLocal.userInfo.accountNumber;
-            let isAcp = accountNumber.toString().length >= 16;
             
-            // Timeout for API requests to prevent hanging
             const timeoutPromise = new Promise((_, reject) => {
                 setTimeout(() => reject(new Error("API request timed out")), 15000);
             });
             
-            // Race between actual request and timeout
             const apiRequest = new Promise((resolve) => {
                 GetApiRequest(
-                    isAcp ? `api/accounts/${accountNumber}/easypay` : `account/api/account/${accountNumber}/easypay`,
+                   `api/Accounts/${accountNumber}/easypay`,
                     (res) => {
                         resolve(res);
                     },
@@ -189,7 +180,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                         if(error?.includes('503')) {
                             setIsServiceDown(true);
                         }
-                        resolve(null); // Resolve with null on error to handle in next step
+                        resolve(null); 
                     }
                 );
             });
@@ -200,26 +191,18 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             });
             
             if (!res) {
-                console.log("Using fallback approach due to API failure");
-                // Fallback approach - just use what we have
                 const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, false, '');
-                const version = useNewPayment ? 'V3' : 'V2';
+                const version = 'V3';
                 const type = status ? 'MANAGE' : 'SETUP';
                 let referralUrl;
                 
                 try {
                     referralUrl = getReferralUrl(version, type, customReferUrl);
                 } catch (error) {
-                    console.error("Error getting referral URL:", error);
-                    // Fallback to direct URLs if getReferralUrl fails
                     if (version === 'V3') {
-                        referralUrl = status ? 
-                            (Env.REFERRAL_URL_MANAGE_V3 || 'https://myaccount.sparklight.com/billing/manage-payment-method') : 
-                            (Env.REFERRAL_URL_SETUP_V3 || 'https://myaccount.sparklight.com/billing/setup-payment-method');
+                        referralUrl = status ? (Env.REFERRAL_URL_MANAGE_V3 ) : (Env.REFERRAL_URL_SETUP_V3 );
                     } else {
-                        referralUrl = status ? 
-                            (Env.REFERRAL_URL_MANAGE_V2 || 'https://myaccount.sparklight.com/billing/manage-payment-method') : 
-                            (Env.REFERRAL_URL_SETUP_V2 || 'https://myaccount.sparklight.com/billing/setup-payment-method');
+                        referralUrl = status ? (Env.REFERRAL_URL_MANAGE_V2 ) : (Env.REFERRAL_URL_SETUP_V2 );
                     }
                 }
                 
@@ -227,34 +210,24 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 return;
             }
             
-            console.log("Payment details fetched successfully");
             const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.isEasyPay, res?.easyPayId);
             
-            // Get the correct referral URL
-            const version = useNewPayment ? 'V3' : 'V2';
+            const version = 'V3';
             const type = status ? 'MANAGE' : 'SETUP';
             let referralUrl;
             
             try {
                 referralUrl = getReferralUrl(version, type, customReferUrl);
             } catch (error) {
-                console.error("Error getting referral URL:", error);
-                // Fallback to direct URLs if getReferralUrl fails
                 if (version === 'V3') {
-                    referralUrl = status ? 
-                        (Env.REFERRAL_URL_MANAGE_V3 || 'https://myaccount.sparklight.com/billing/manage-payment-method') : 
-                        (Env.REFERRAL_URL_SETUP_V3 || 'https://myaccount.sparklight.com/billing/setup-payment-method');
+                    referralUrl = status ? (Env.REFERRAL_URL_MANAGE_V3 ) : (Env.REFERRAL_URL_SETUP_V3 );
                 } else {
-                    referralUrl = status ? 
-                        (Env.REFERRAL_URL_MANAGE_V2 || 'https://myaccount.sparklight.com/billing/manage-payment-method') : 
-                        (Env.REFERRAL_URL_SETUP_V2 || 'https://myaccount.sparklight.com/billing/setup-payment-method');
+                    referralUrl = status ? (Env.REFERRAL_URL_MANAGE_V2 ) : (Env.REFERRAL_URL_SETUP_V2 );
                 }
             }
             
-            console.log("Referral URL:", referralUrl);
             redirectToEBillpay(paymentObj, referralUrl);
         } catch (error) {
-            console.error("Error initializing payment:", error);
             navigation.navigate('Billing');
         }
     };
@@ -265,7 +238,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                 await RefreshToken();
                 await initializePayment();
             } catch (error) {
-                console.error("Error during navigation change token refresh", error);
                 if (navigationRef.current) {
                     navigationRef.current.navigate('Splash');
                 }
@@ -275,7 +247,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         refreshAndInitialize();
     }, []);
 
-  // Modify AutoPayPCIConnector.jsx where it handles the expiration
 
 const navigationChange = async (navState) => {
     if (!navState || !navState.url) return;
@@ -284,7 +255,6 @@ const navigationChange = async (navState) => {
     
     if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
         if (!navStateReloading) {
-            // Instead of navigating to Dashboard, navigate back to the Billing main screen
             navigation.navigate('Billing');
         }
     }
@@ -464,16 +434,11 @@ const navigationChange = async (navState) => {
                         if (nativeEvent?.statusCode === 503) {
                                 setIsServiceDown(true);
                             }
-                        // if (!navStateReloading && nativeEvent.statusCode >= 400) {
-                        //     navigation.navigate('Dashboard');
-                        // }
                     }}
                 />
                 )
             ) : (
                 <View style={styles.loadingContainer}>
-                    {/* <ActivityIndicator size="large" color="rgba(141, 59, 144, 1)" />
-                    <Text style={styles.loadingText}>Loading...</Text> */}
                     <LoadingOverlay
                         loading={true}
                        

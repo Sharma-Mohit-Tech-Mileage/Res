@@ -78,10 +78,6 @@ const SearchSuggestions = memo(
           <View style={[styles.searchIcon, styles.leftIcon]}>
             <SearchIcon />
           </View>
-          {/* <Image
-                source={require('../../../../assets/search-md-1.png')}
-                style={[styles.searchIcon, styles.leftIcon]}
-            /> */}
           <TextInput
             maxFontSizeMultiplier={1.25}
             ref={inputRef}

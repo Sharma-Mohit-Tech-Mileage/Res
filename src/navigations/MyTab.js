@@ -77,7 +77,7 @@ const MyTabs = ({ navigation, route }) => {
         accessible={false}
         importantForAccessibility="no"
       >
-        <IconComponent focused={focused} isNewBiller={true} />
+        <IconComponent focused={focused} />
       </View>
     );
   };
@@ -168,7 +168,7 @@ const MyTabs = ({ navigation, route }) => {
         <Tab.Screen
           name="Home"
           component={HomeStackScreen}
-          initialParams={{ data: route, isNormalUser: false }}
+          initialParams={{ data: route }}
           options={{
             headerShown: false,
             swipeEnabled: false,
@@ -235,7 +235,7 @@ const MyTabs = ({ navigation, route }) => {
                 accessible={false}
                 importantForAccessibility="no"
               >
-                {focused ? <SupportIconSelected/> : <SupportIcon isNewBillerUser={true}/>}
+                {focused ? <SupportIconSelected/> : <SupportIcon />}
               </View>
             ),
           }}

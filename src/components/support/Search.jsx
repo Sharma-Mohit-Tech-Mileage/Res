@@ -35,39 +35,28 @@ const Search = ({ navigation }) => {
       (res) => {
         try {
           if (res) {
-            console.log(`Search page no ${res.page} and total page ${res.page_count}`)
-            
             if (query.trim() && query.length > 0) {
               setTotalPage(res.page_count)
               var data = filteredSuggestions.concat(res.results);
-             // console.log('Data',data)
               if(data.length===0){
                 data=[...noData]
-                
               }
-              
               setFilteredSuggestions(data);
             } else {
-              setFilteredSuggestions([]); // Set to empty array when there's no input
+              setFilteredSuggestions([]); 
             }
-
-            //setIsLoading(false)
-            //setPageNo(pageNo+1)
           }else{
             console.log('No Data')
           }
         } catch (e) {}
       },
       (error) => {
-        console.log("filterSuggestions error", error);
         setIsLoading(false);
       }
     );
-    // }
   };
 
   const onListScrollEnd = () => {
-    console.log("onListScrollEnd");
     if(pageNo<totalPage){
     setPageNo(pageNo + 1);
     
@@ -121,31 +110,6 @@ const Search = ({ navigation }) => {
         />
       </View>
 
-      {/* Bottom buttons wrapper 
-            <View style={styles.bottomButtonsWrapper}>
-                <View style={styles.buttonsParent}>
-                    
-                    <View style={styles.buttons}>
-                        <Image
-                            style={styles.buttonIcon}
-                            resizeMode="cover"
-                            source={require("../../../assets/tool-02.png")}
-                        />
-                        <Text style={styles.buttonText}>Troubleshooting</Text>
-                    </View>
-                   
-                    <View style={styles.buttons}>
-                        <Image
-                            style={styles.buttonIcon}
-                            resizeMode="cover"
-                            source={require("../../../assets/message-text-square-02.png")} // Update the source
-                        />
-                        <Text style={[styles.makePayment, styles.titleTypo]}>Live Support</Text>
-                    </View>
-                </View>
-                
-            </View>
-            */}
     </View>
   );
 };
