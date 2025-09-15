@@ -103,7 +103,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         // Check for authentication redirects
         if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
             if (!navStateReloading) {
-                console.log('Token refresh required');
                 setIsTokenRefreshing(true);
                 setNavStateReloading(true);
                 

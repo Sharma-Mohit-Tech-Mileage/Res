@@ -20,7 +20,6 @@ export const getAllEmails = async () => {
     try {
         const config = await getAuthConfig();
         const accountNumber = await getUserAccountNumber();
-        console.log('🔍 Fetching all emails for account:', accountNumber);
         
         const response = await _axios.get(
             `/api/Paperless/GetAllEmails?account=${accountNumber}`, 
@@ -58,7 +57,6 @@ export const enrollPaperless = async (data) => {
     try {
         const config = await getAuthConfig();
         const accountNumber = await getUserAccountNumber();
-        console.log('📨 Enrolling in paperless:', data.emailAddress);
         
         const response = await _axios.post(
             `/api/Paperless/PaperlessEnrollment?emailAddress=${data.emailAddress}&account=${accountNumber}`, 
@@ -73,14 +71,11 @@ export const enrollPaperless = async (data) => {
     }
 };
 
-// Unenroll from paperless for an email
 export const unenrollPaperless = async (data) => {
     try {
         const config = await getAuthConfig();
         const accountNumber = await getUserAccountNumber();
-        console.log('📨 emailtobeunenrolled from paperless:', data);
         const { emailAddress } = data;
-        console.log('📨 Unenrolling from paperless:', emailAddress);
         const response = await _axios.post(
             `/api/Paperless/PaperlessUnenroll?emailAddress=${emailAddress}&account=${accountNumber}`,
             null,

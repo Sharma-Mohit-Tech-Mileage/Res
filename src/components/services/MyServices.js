@@ -130,7 +130,7 @@ const MyServices = ({ route }) => {
     try {
       const user = await getUser();
       const accountNumber = user?.userInfo?.accountNumber;
-      const request = `/mobile/api/Eero/GetEeroAccountDetails?accountnumber=${accountNumber}`;
+      const request = `api/Eero/GetEeroAccountDetails?accountnumber=${accountNumber}`;
       GetApiRequest(
         request,
         (response) => {

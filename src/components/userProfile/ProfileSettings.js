@@ -25,7 +25,6 @@ const ProfileSettings = () => {
   const route = useRoute();
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [isNewBiller, setIsNewBiller] = useState(false);
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const profileDetails = profile.profileDetails || {};
   const convertedRole = getUserType(profileDetails.memberType || "");
@@ -48,11 +47,6 @@ const ProfileSettings = () => {
     }
   }, [route.params?.updateSuccess, navigation, dispatch]);
 
-  useEffect(() => {
-    if (profileDetails?.accountNumber?.toString().length >= 16) {
-      setIsNewBiller(true);
-    }
-  }, [profileDetails]);
 
   const makeCall = (number) => {
     let phoneNumber = "";
@@ -100,31 +94,16 @@ const ProfileSettings = () => {
                 <Text style={[styles.generalInformation, styles.melissaTypo]}>
                   General Information
                 </Text>
-                {/* {!isPrimary && <Pressable
-                style={[styles.buttons, styles.buttonsLayout]}
-                onPress={() => navigation.navigate("ProfileSettingsEdit")}>
-                <Text style={[styles.makePayment, styles.text1Clr]}>Edit</Text>
-              </Pressable>} */}
               </View>
               <View style={styles.frameContainer}>
                 <View style={styles.firstNameParent} accessible={true}>
                   <Text style={styles.firstName}>
-                    {isNewBiller ? "Customer Name" : "First Name"}
+                    {"First Name"}
                   </Text>
                   <Text style={[styles.melissa, styles.melissaTypo]}>
-                    {isNewBiller
-                      ? profileDetails.fullName
-                      : profileDetails.firstName}
+                    {profileDetails.fullName}
                   </Text>
                 </View>
-                {!isNewBiller && (
-                  <View style={styles.firstNameParent} accessible={true}>
-                    <Text style={styles.firstName}>Last Name</Text>
-                    <Text style={[styles.melissa, styles.melissaTypo]}>
-                      {profileDetails.lastName}
-                    </Text>
-                  </View>
-                )}
                 <View style={styles.firstNameParent} accessible={true}>
                   <Text style={styles.firstName}>Username</Text>
                   <Text style={[styles.melissa, styles.melissaTypo]}>

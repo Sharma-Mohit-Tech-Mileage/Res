@@ -1,6 +1,6 @@
 import * as React from "react"
 import {Svg, Path} from 'react-native-svg';
-const BillingIcon = ({isNewBiller,...props}) => (
+const BillingIcon = ({...props}) => (
   (props.focused)?
   <Svg
   xmlns="http://www.w3.org/2000/svg"

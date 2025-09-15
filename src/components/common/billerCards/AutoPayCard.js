@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
-import { getUser } from "../../../redux/utils/LocalStorage";
 import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../styles/AppStyles";
@@ -17,18 +16,6 @@ const AutoPayCard = ({
   style,
   isStatusLoading,
 }) => {
-  const [useNewPayment, setUseNewPayment] = useState(false);
-  const getStatus = () => {
-    getUser().then((res) => {
-      const accountNumber = res.userInfo.accountNumber;
-      setUseNewPayment(accountNumber.toString().length >= 16);
-    });
-  };
-  useEffect(() => {
-    getStatus();
-    console.log("isStatusLoading", isStatusLoading);
-  }, []);
-
   return (
     <View style={[AppStyles.card, style]}>
       <View style={styles.cardHreader}>
@@ -120,35 +107,34 @@ const AutoPayCard = ({
               </View>
             </>
           )}
-        
-      
-      <View style={styles.cardFooter}>
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("AutoPayPCIConnector", {
-              url: `${Env.URL}/billing`,
-              name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-              useNewPayment: useNewPayment,
-              status: isAutoPayStatus,
-              paymentDetails: paymentDetails,
-            });
-          }}
-          accessible={true}
-          accessibilityLabel={
-            isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"
-          }
-          accessibilityRole="button"
-          style={styles.paymentButton}
-        >
-          <Text style={styles.paymentButtonText}>
-            {isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"}
-          </Text>
-          <View style={{ marginLeft: 2 }}>
-            <RightArrow color={colors.snow_white} />
+
+          <View style={styles.cardFooter}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("AutoPayPCIConnector", {
+                  url: `${Env.URL}/billing`,
+                  name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
+                  useNewPayment: true,
+                  status: isAutoPayStatus,
+                  paymentDetails: paymentDetails,
+                });
+              }}
+              accessible={true}
+              accessibilityLabel={
+                isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"
+              }
+              accessibilityRole="button"
+              style={styles.paymentButton}
+            >
+              <Text style={styles.paymentButtonText}>
+                {isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay"}
+              </Text>
+              <View style={{ marginLeft: 2 }}>
+                <RightArrow color={colors.snow_white} />
+              </View>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      </View>
-      </>
+        </>
       )}
     </View>
   );

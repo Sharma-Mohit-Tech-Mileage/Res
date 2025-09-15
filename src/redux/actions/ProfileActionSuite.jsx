@@ -221,8 +221,8 @@ export const manageEmailRequest = (email, isPaperless, isMarketing,newEmail, nav
 export const updateEmailAssociations = (paperlessEmail, marketingEmails, navigation) => ({
     type: UPDATE_EMAIL_ASSOCIATIONS,
     payload: {
-        paperlessEmail,   // Single email for paperless
-        marketingEmails   // Array of emails for marketing
+        paperlessEmail,  
+        marketingEmails   
     },
     navigation,
 });
