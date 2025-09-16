@@ -16,7 +16,6 @@ function* getProfileUsers(action) {
 function* fetchProfileDetails(action) {
     try {
         const response = yield call(getProfileDetails)
-        console.log('fetchProfileDetails API Success Response:', response);
         yield put(fetchProfileSuccess(response));
     } catch (error) {
         console.error('API Error Response:', error);

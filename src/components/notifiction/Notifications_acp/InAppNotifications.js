@@ -23,7 +23,6 @@ import { useRoute, useIsFocused } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import NotificationAlert from "../../common/customui/NotificationAlert";
-import { updatePushNotificationsv2 } from "../../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import Toggle from "../../common/Toggle";
 import { getUser } from "../../../redux/utils/LocalStorage";
@@ -177,17 +176,10 @@ const InAppNotifications = ({ navigation }) => {
   }, [route.params]);
 
   const handleSave = async () => {
-    // const pushNotification = await getPushNotificationStatus();
-    // if (pushNotification?.permanentSkip) {
-    //   await notifyPermission();
-    // } else {
-    //   await requestUserPermission();
-    // }
     const token = await getFcmToken();
     formatedData.deviceToken = token;
     formatedData.deviceTokenTimestamp = moment().format();
     formatedData.isAndroid = Platform.OS === "android";
-    //await dispatch(updatePushNotificationsv2(formatedData, navigation));
     const request = {
       optOut: formatedData.optOut,
       outageOptOut: formatedData.outageOptOut,

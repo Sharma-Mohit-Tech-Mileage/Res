@@ -1,33 +1,13 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  Linking,
-  Modal,
-  Platform,
-  Animated,
-  Easing,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
+import { View, StyleSheet, Text, Linking, Modal, Platform, Animated, Easing, TouchableOpacity, Dimensions, } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
 import { saveUserInfo, logInfo } from "../../redux/actions/UserAction";
-import {
-  storeUser,
-  storeSsoToken,
-  getSsoToken,
-  getUser,
-  cleanUserData,
-} from "../../redux/utils/LocalStorage";
+import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import strings from "../../res/Strings";
 import { Color, FontFamily } from "../../../GlobalStyles";
@@ -314,7 +294,6 @@ const SplashScreen = ({ navigation, route }) => {
         moveAfterLogin(user);
       }
     } else {
-      console.log("[HANDLE_LOGIN] No response received.");
       setLoading(false);
       setLoginEnable(true);
     }
@@ -324,6 +303,8 @@ const SplashScreen = ({ navigation, route }) => {
     try {
       storeUser(user);
       dispatch(saveUserInfo(user));
+
+      console.log("User information saved to Redux store:", user);
 
       // Analytics tracking
       if (user.userInfo && user.userInfo.userName) {
