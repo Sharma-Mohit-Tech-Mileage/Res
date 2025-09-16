@@ -460,7 +460,7 @@ const addUserAction = async (data) => {
   };
 
   try {
-    const response = await _axios.post("/users/api/users", data, config);
+    const response = await _axios.post("/api/users", data, config);
     console.log("API Call Successful, Response:", response.data);
     return response.data;
   } catch (error) {
@@ -478,11 +478,11 @@ const editUserAction = async (data) => {
     },
   };
 
-  console.log("Making API Call to /users/api/users with data:", data); // Log the request data
+  console.log("Making API Call to api/users with data:", data); // Log the request data
 
   try {
     const response = await _axios.put(
-      `/users/api/users/${data.userName}`,
+      `api/users/${data.userName}`,
       data,
       config
     );
@@ -503,11 +503,11 @@ const removeUser = async (data) => {
     },
   };
 
-  console.log(`/users/api/users/remove/${data.accountNumber}/${data.userName}`); // Log the request data
+  console.log(`/api/users/remove/${data.accountNumber}/${data.userName}`); // Log the request data
 
   try {
     const response = await _axios.put(
-      `/users/api/users/remove/${data.accountNumber}/${data.userName}`,
+      `/api/users/remove/${data.accountNumber}/${data.userName}`,
       data,
       config
     );
