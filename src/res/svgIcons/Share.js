@@ -9,7 +9,7 @@ const Share = (props) => (
     {...props}
   >
     <Path
-      stroke="#767676"
+      stroke={props?.color? props?.color :"#767676"}
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={1.5}

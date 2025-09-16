@@ -91,7 +91,7 @@ const PDFViewModal = ({ url, onClose, title = "Billing History" }) => {
                         
                         <View  style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                           accessible={false}>
-                         <Share/>
+                         <Share color={'#FFF'}/>
                       </View>
                     </Pressable>                 
                 </View>

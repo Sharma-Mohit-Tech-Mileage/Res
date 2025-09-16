@@ -9,7 +9,7 @@ const Xclose = (props) => (
     {...props}
   >
     <Path
-      stroke="#767676"
+      stroke="#fff"
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}

@@ -32,7 +32,7 @@ const AutoPayCard = ({
     if (!isStatusLoading){
     navigation.navigate("AutoPayPCIConnector", {
       url: `${Env.URL}/billing`,
-      name: "Manage Auto Pay" ,
+      name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
       useNewPayment: useNewPayment,
       status: isAutoPayStatus,
       paymentDetails: paymentDetails,
