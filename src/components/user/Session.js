@@ -41,16 +41,13 @@ const onSuccess = async (res) => {
 
 const onError = (error) => {
     console.error('Session onError:', error);
-    // Handle the error or navigate to the appropriate screen
-    // You could navigate to Splash here if needed
-    // navigationRef.current?.navigate('Splash');
-    throw error;  // Re-throw the error if needed
+    throw error; 
 };
 
 const retryRequest = async (data, retries = 1) => {
     try {
         return await new Promise((resolve, reject) => {
-            PostAuthApiRequest("/mobile/api/gettoken", data, resolve, reject);
+            PostAuthApiRequest("/api/mobile/gettoken", data, resolve, reject);
         });
     } catch (error) {
         if (retries > 0) {

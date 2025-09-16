@@ -3,14 +3,6 @@ import * as yup from 'yup';
 export const profileSchema = (isPrimaryAdmin, multipleEmails) => yup.object({
     firstName: yup.string().required('First Name is required'),
     lastName: yup.string().required('Last Name is required'),
-    // svEmailAddress: (isPrimaryAdmin && !multipleEmails)
-    //     ? yup.string().email('Invalid email address').required('Email is required')
-    //     : yup.string().nullable(),
-    // phoneNumber: isPrimaryAdmin
-    //     ? yup.string()
-    //         .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid mobile phone number.')
-    //         .required('Phone number is required')
-    //     : yup.string().nullable(),
 });
 
 export const updatePasswordSchema = () => yup.object({
@@ -24,9 +16,6 @@ export const updatePasswordSchema = () => yup.object({
             'newPassword-conditional-validation',
             'Password must meet the requirements',
             value => {
-                // If the value is null or empty, skip further validation
-                //if (!value) return true;
-
                 // Define the password rules
                 const passwordRules = yup.string()
                     .min(8, 'Password must be at least 8 characters long')
@@ -113,7 +102,6 @@ export const userSchemaNoPass = (isCustomQuestionSelected) => yup.object({
     
 });
 
-export const svEmailAddressValidation = yup.string().email('Invalid email address').required('Email is required');
 
 export const phoneSchema = yup.object({
     phone: yup.string()

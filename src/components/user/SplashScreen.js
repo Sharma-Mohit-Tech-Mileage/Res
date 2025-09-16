@@ -223,7 +223,7 @@ const SplashScreen = ({ navigation, route }) => {
       hasAccessToken: !!request.accessToken,
     });
 
-    PostAuthApiRequest("/mobile/api/gettoken", request, onSuccess, onError);
+    PostAuthApiRequest("/api/mobile/gettoken", request, onSuccess, onError);
   }, []);
 
   const onSuccess = useCallback(

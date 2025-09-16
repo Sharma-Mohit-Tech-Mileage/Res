@@ -65,8 +65,8 @@ const Feedback = () => {
         defaultValues: {
             category: 'compliment',
             feedbackValue: 5,
-            feedbackText: "",
-            feedbackEmail: profileDetails.multipleEmails ? '' : profileDetails.svEmailAddress
+            feedbackText: '',
+            feedbackEmail: ''
         }
     });
 

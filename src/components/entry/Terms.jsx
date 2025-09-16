@@ -5,7 +5,7 @@ import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalSty
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import { useSelector, useDispatch } from 'react-redux';
 import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
-import { fetchACPUserAccountDetails, updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
+import { updateTermsAndConditions } from '../../redux/actions/ProfileActionSuite';
 import { logout } from 'react-native-app-auth';
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
@@ -17,6 +17,7 @@ const config = { issuer: Env.SSO_LOGIN, iosPrefersEphemeralSession: true, };
 const { width, height } = Dimensions.get('window');
 
 const Terms = ({ navigation }) => {
+
     const [loading, setLoading] = useState(true);
     const [nextScreen, setNextScreen] = useState('EntryPushNotifications');
     const [progress, setProgress] = useState(0);
@@ -24,33 +25,13 @@ const Terms = ({ navigation }) => {
     const [isError, setIsError] = useState(false);
     const dispatch = useDispatch();
     const profile = useSelector(state => state.combinedReducers.profile || {});
-    const [value, setValue] = useState(null);
     const url = 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions';
-    const accountDetails = useSelector(
-        (state) => state.combinedReducers.profile?.accountDetails
-    );
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         setLoading(false);
-    //     }, 2000);
-    // }, []);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                 dispatch(fetchACPUserAccountDetails());       
-                } catch (error) {
-                console.error("Error fetching data", error);
-              }
-        };
-        fetchData();
-    }, [dispatch]);
+    const accountDetails = useSelector( (state) => state.combinedReducers.profile?.accountDetails );
 
     useEffect(() => {
         let goToPhoneScreen = false;
         let optOutCount = 0;
         let goToPushNotificationScreen = false;
-        let optOutCountPushNotification = 0;
         if (profile?.smsSubscription?.length > 0) {
             const firstSubscription = profile.smsSubscription[0];
             firstSubscription.smsMessageType.forEach((messageType) => {
@@ -103,7 +84,6 @@ const Terms = ({ navigation }) => {
         if (accountDetails) {
             const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
             console.log('Email',updatedPrimaryEmail)
-            setValue(updatedPrimaryEmail);
             setTimeout(() => { 
                 setLoading(false); 
             },2000)
@@ -114,18 +94,6 @@ const Terms = ({ navigation }) => {
     const termsAccepted = async () => {
         await dispatch(updateTermsAndConditions(true, navigation));
         await dispatch(updateWalkThroughStep(0));
-        if (!value) {
-            // navigation.reset({
-            //     index: 0,
-            //     routes: [{ name: 'EntryEmailNotifications' }],
-            // });
-        }
-        else {
-            // navigation.reset({
-            //     index: 0,
-            //     routes: [{ name: 'MyTab' }],
-            // });
-        }
 
     };
 
@@ -167,7 +135,7 @@ const Terms = ({ navigation }) => {
                 key={url}
                 source={{ uri: url }}
                 onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
-                onError={() => setIsError(true)}
+                onError={() => {setIsError(true)}}
             />
             {isError && (
                 <View style={[styles.errorContainer, { marginTop: '23%' }]}>
@@ -200,8 +168,8 @@ const Terms = ({ navigation }) => {
                                 <Pressable
                                     style={[styles.buttons, styles.buttonsLayout]}
                                     onPress={termsAccepted}
-                                    accessibilityRole="button"  // Indicates this is a button
-                                    accessibilityLabel="Accept terms and conditions"  // Describes the button's function
+                                    accessibilityRole="button"  
+                                    accessibilityLabel="Accept terms and conditions"  
                                     accessibilityHint="tap to accept the terms and conditions"
                                 >
                                     <Text style={styles.accept}>Accept</Text>
