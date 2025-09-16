@@ -132,7 +132,6 @@ const NewBillerHome = ({ navigation }) => {
   // Refresh data when the screen is focused
   useFocusEffect(
     useCallback(() => {
-      console.log("paperlessLoading", JSON.stringify(paperlessLoading));
       const refreshData = async () => {
         try {
           checOutagStatus();
