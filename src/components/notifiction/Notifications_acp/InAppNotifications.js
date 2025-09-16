@@ -1,23 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  StyleSheet,
-  Text,
-  Pressable,
-  View,
-  Animated,
-  ScrollView,
-  Platform,
-} from "react-native";
-import {
-  Color,
-  FontSize,
-  FontFamily,
-  Padding,
-  Border,
-} from "../../../../GlobalStyles";
-import { useForm, Controller, set } from "react-hook-form";
+import { StyleSheet, Text, Pressable, View, Animated, ScrollView, Platform, } from "react-native";
+import { Color, FontSize, FontFamily, Padding, Border, } from "../../../../GlobalStyles";
 import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
