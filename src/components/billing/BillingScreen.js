@@ -5,8 +5,6 @@ import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalSt
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import BillingIconWhite from "../../res/svgIcons/BillingIconWhite";
-import { getUser } from "../../redux/utils/LocalStorage";
-import { GetApiRequest } from "../../network/APIClient";
 import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
@@ -18,13 +16,11 @@ import { Env } from "../../network/apis/account/Constants";
 import colors from "../../res/Colors";
 import AppStyles from "../common/styles/AppStyles";
 import { getPrimaryEmail } from "../utility/constant";
-import LoadingOverlay from "../common/LoadingOverlay";
 import RightIcon from '../../../assets/svgs/Chevonright';
  
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.combinedReducers.user.userData);
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
   );
@@ -32,17 +28,10 @@ const BillingScreen = ({ navigation }) => {
     (state) => state.combinedReducers.profile?.paperlessStatusAcp
   );
  
-  const paperlessLoading = useSelector(
-        (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
-    );
  
-  const { allSvEmailAssociated = [] } = profile;
-  const paperlessEmails = allSvEmailAssociated.filter((email) => email.invoice);
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState();
-  const [paperlessStatus, setPaperlessStatus] = useState(false);
   const [paperlessEmail, setPaperlessEmail] = useState(null);
-  const [cardDigit, setCardDigit] = useState("");
  
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null, });
@@ -50,57 +39,10 @@ const BillingScreen = ({ navigation }) => {
   // Content loading state
 const [isAutoPayStatusLoad, setIsAutoPayStatusLoad] = useState(false);
   const [loadingPerless, setLoadingPerless] = useState(false);
-  let paperlessCardEmail = paperlessEmail;
-  
-  const handleError = (error) => {
-    console.log("error on Billing auto pay", error);
-    setIsAutoPayStatusLoad(false);
-    setLoadingPerless(false);
-  };
-  const handleError1 = (error) => {
-    console.log("error on Billing paperless", error);
-    setIsAutoPayStatusLoad(false);
-    setLoadingPerless(false);
-  };
  
-  
-  const getStatus = () => {
-     setIsAutoPayStatusLoad(true);
-    getUser().then((res) => {
-      const accountNumber = res.userInfo.accountNumber;
-      GetApiRequest(
-         `api/Accounts/${accountNumber}/easypay`,
-        (res) => {
-          console.log("AutoPay API Success Response:", res);
-          setIsAutoPayStatus(res?.isEasyPay);
-          setCardDigit(res?.epLastfour);
-          setTimeout(() => {
-             setIsAutoPayStatusLoad(false);
-          }, 2000);
-        },
-        handleError
-      );
-      setLoadingPerless(true);
-      GetApiRequest(
-        `account/api/account/${accountNumber}/paperless/status`,
-        (res) => {
-          setPaperlessStatus(res?.isPaperless);
-          setTimeout(() => {
-             setLoadingPerless(false);
-          }, 2000);
-         
-        },
-        handleError1
-      );
-    }).catch(error => {
-      console.log("Error getting user status:", error);
-      setIsAutoPayStatusLoad(false);
-    });
-  };
  
   useFocusEffect(
     useCallback(() => {
-      getStatus();
       setBillAmt(undefined);
       dispatch(fetchACPUserAccountDetails());
       
@@ -133,10 +75,7 @@ const [isAutoPayStatusLoad, setIsAutoPayStatusLoad] = useState(false);
     }
   }, [accountDetails, user]);
  
- 
-  const handleNavigation = (url, name) => {
-    navigation.navigate("ArticalWindowUtility", { url, name });
-  };
+
  
   return (
     <View style={styles.account} accessibilityLabel="Billing Services screen">
@@ -167,25 +106,19 @@ const [isAutoPayStatusLoad, setIsAutoPayStatusLoad] = useState(false);
                 <Card
                   billAmt={billAmt}
                   dueDate={dueDate}
-                  acno={user && user.userInfo && user.userInfo.accountNumber}
-                  isAutoPayStatus={isAutoPayStatus}
-                  paperlessStatus={paperlessStatus}
                   navigation={navigation}
                   style={styles.card}
                 />
                 <AutoPayCard
-                  cardDigit={cardDigit}
                   isAutoPayStatus={isAutoPayStatus}
                   paymentDetails={defaultPaymentDetails}
-                  isStatusLoading={isAutoPayStatusLoad}
                   navigation={navigation}
+                  isStatusLoading={isAutoPayStatusLoad}
               
                 />
                 <PeperLessCard
-                  paperlessCardEmail={paperlessCardEmail}
                   paperlessStatus={paperlessStatusAcp}
                   navigation={navigation}
- 
                   isStatusLoading={loadingPerless}
                 />
                 <View style={[AppStyles.card, styles.myModemSpaceBlock]}>

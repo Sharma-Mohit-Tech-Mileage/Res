@@ -9,7 +9,6 @@ import AppStyles from "../styles/AppStyles";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 const PeperLessCard = ({
-  paperlessCardEmail,
   paperlessStatus,
   navigation,
   style,
