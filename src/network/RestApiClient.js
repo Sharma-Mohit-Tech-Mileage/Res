@@ -10,7 +10,7 @@ const _axios = axios.create({
     baseURL: API_ACP_BASEURL,
     withCredentials: false,
     crossDomain: true,
-    timeout: 15000, // Standard 15 seconds timeout
+    timeout: 15000, 
     headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
@@ -127,7 +127,6 @@ const AxiosInterceptorProvider = ({ children }) => {
                     }
                 }
 
-                // Handle timeout and network errors with retry
                 if (isRetryableError(error) && !originalRequest._retryAttempted) {
                     originalRequest._retryAttempted = true;
                     try {
