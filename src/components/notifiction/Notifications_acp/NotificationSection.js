@@ -306,7 +306,6 @@ const styles = StyleSheet.create({
     lineHeight: FontSize.textXsSemibold_size * 1.3,
   },
   boldText: {
-    // Force a stronger visual difference on Android when custom font weights are ignored.
     color: Color.colorGray_200,
     ...(Platform.OS === "android"
       ? {
