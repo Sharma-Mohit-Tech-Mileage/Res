@@ -121,6 +121,12 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     
 }
 
@@ -148,8 +154,8 @@ dependencies {
 //    }
 
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
-    api group: 'com.zendesk', name: 'chat', version: '3.4.0'
-    api group: 'com.zendesk', name: 'messaging', version: '5.4.0'
+    implementation("zendesk.messaging:messaging-android:2.32.0")
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 
    // debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
     if (hermesEnabled.toBoolean()) {

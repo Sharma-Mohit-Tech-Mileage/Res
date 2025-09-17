@@ -1,174 +1,193 @@
+
 #import "RNZendeskChatModule.h"
-#import <MessagingSDK/MessagingSDK.h>
-#import <MessagingAPI/MessagingAPI.h>
-#import <CommonUISDK/CommonUISDK.h>
-#import <ChatSDK/ChatSDK.h>
-#import <ChatProvidersSDK/ChatProvidersSDK.h>
-#import <CommonUISDK/CommonUISDK.h>
+#import <ZendeskSDKMessaging/ZendeskSDKMessaging.h>
+#import <ZendeskSDKLogger/ZendeskSDKLogger.h>
+#import <ZendeskSDK/ZendeskSDK.h>
+
+#import <ZendeskSDK/ZendeskSDK.h>
 
 
 @implementation RNZendeskChatModule
 
 RCT_EXPORT_MODULE(RNZendeskChatModule);
-ZDKChatAPIConfiguration *_visitorAPIConfig;
 
-- (UIColor *)colorFromHexString:(NSString *)hexString {
-    unsigned rgbValue = 0;
-    NSScanner *scanner = [NSScanner scannerWithString:hexString];
-    [scanner setScanLocation:1]; // bypass '#' character
-    [scanner scanHexInt:&rgbValue];
-    return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:1.0];
-}
+
 
 + (void) init {
+  
+  
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [Zendesk initializeWithChannelKey:@"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lLnplbmRlc2suY29tL21vYmlsZV9zZGtfYXBpL3NldHRpbmdzLzAxSlEwOTk0WUpERVpLMVdCWjlFVDdCRURYLmpzb24ifQ=="
+                         messagingFactory:[[ZDKDefaultMessagingFactory alloc] init]
+                        completionHandler:^(Zendesk * _Nullable zendesk, NSError * _Nullable error) {
+          ZDKLogger.enabled = YES;
+          ZDKLogger.level = ZDKLogLevelDefault;
+                if (error != nil) {
+                    NSLog(@"Zendesk did not initialize.\nError: %@", error.localizedDescription);
+                }else{
+                  // Get your Zendesk instance:
+                  Zendesk *instance = [Zendesk instance];
 
-  [ZDKChat initializeWithAccountKey:@"4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC" queue: dispatch_get_main_queue()];
-}
+                  // To add an event observer to your Zendesk instance:
+                  [instance addEventObserver:self :^(enum ZDKZendeskEvent event, id _Nullable value) {
+                      switch (event) {
+                      case ZDKZendeskEventUnreadMessageCountChanged:
+                          // Your custom action...
+                      case ZDKZendeskEventAuthenticationFailed:
+                          // Your custom action...
+                          NSLog(@"Zendesk ZDKZendeskEventAuthenticationFailed");
+                        
+                      default:
+                          break;
+                      }
+                  }];
 
-RCT_EXPORT_METHOD(setVisitorInfo:(NSDictionary *)options) {
-  if (!NSThread.isMainThread) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [self setVisitorInfo:options];
-    });
-    return;
-  }
-
-  ZDKChat.instance.configuration = _visitorAPIConfig = [self applyVisitorInfo:options intoConfig: _visitorAPIConfig ?: [[ZDKChatAPIConfiguration alloc] init]];
-}
-
-- (ZDKChatAPIConfiguration*)applyVisitorInfo:(NSDictionary*)options intoConfig:(ZDKChatAPIConfiguration*)config {
-  if (options[@"department"]) {
-    config.departmentName = options[@"department"];
-  }
-  if (options[@"tags"]) {
-    config.tags = options[@"tags"];
-  }
-  config.visitorInfo = [[ZDKVisitorInfo alloc] initWithName:options[@"name"]
-                            email:options[@"email"]
-                          phoneNumber:options[@"phone"]];
-
-  NSLog(@"[RNZendeskChatModule] Applied visitor info: department: %@ tags: %@, email: %@, name: %@, phone: %@", config.departmentName, config.tags, config.visitorInfo.email, config.visitorInfo.name, config.visitorInfo.phoneNumber);
-  return config;
-}
-
-- (ZDKClassicMessagingConfiguration *) messagingConfiguration {
-    ZDKClassicMessagingConfiguration *config = [ZDKClassicMessagingConfiguration new];
-    config.name = @"Sparklight Support";
-    config.isMultilineResponseOptionsEnabled = YES;
-    return config;
-}
-
-- (ZDKChatConfiguration *) chatConfiguration {
-    ZDKChatConfiguration *config = [ZDKChatConfiguration new];
+                }
+            }];
+      });
+          
     
-     config.isAgentAvailabilityEnabled = NO;
-     config.isPreChatFormEnabled = YES;
-     config.preChatFormConfiguration = [[ZDKChatFormConfiguration alloc] initWithName:ZDKFormFieldStatusRequired
-                                                                                           email:ZDKFormFieldStatusRequired
-                                                                                    phoneNumber:ZDKFormFieldStatusRequired
-                                                                                      department:ZDKFormFieldStatusHidden];
-    return config;
-}
-
-- (ZDKChatAPIConfiguration *) chatAPIConfiguration:(NSDictionary *)options {
-    ZDKChatAPIConfiguration *config = [ZDKChatAPIConfiguration new];
-  if (options[@"tags"]) {
-      config.tags = options[@"tags"];
-    }
   
-  config.department = options[@"department"]; // Set the department
-  [ZDKChat instance].configuration = config;
-    return config;
 }
 
-RCT_EXPORT_METHOD(clearChatSession)
+
+
+
+- (UIViewController *)getRootViewController {
+    return [UIApplication sharedApplication].delegate.window.rootViewController;
+}
+
+RCT_EXPORT_METHOD(startChat:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject )
 {
-  [[ZDKChat instance] resetIdentity:^{
-             // Completion block code here
-         }];
-}
-
-- (void)resetSession {
-  // Clear the visitor identity
-  ZDKChatAPIConfiguration *config = [[ZDKChatAPIConfiguration alloc] init];
-  config.visitorInfo = [[ZDKVisitorInfo alloc] initWithName:@"" email:@"" phoneNumber:@""];
-
-  [[ZDKChat instance] resetIdentity:^{
-             // Completion block code here
-         }];
-     
-  NSLog(@"Helper method called");
-}
-
-UIViewController *viewController;
-RCT_EXPORT_METHOD(startChat:(NSDictionary *)config )
-{
-  
-  [[ZDKChat instance] setConfiguration: [self chatAPIConfiguration: config]];
-  
-
-  NSArray<id<ZDKConfiguration>> *configs = @[[self messagingConfiguration], [self chatConfiguration]];
-  
-  
-  [[ZDKChat instance] setConfiguration: [self chatAPIConfiguration: config]];
-  [ZDKCommonTheme currentTheme].primaryColor = [UIColor purpleColor];
-  NSArray<id<ZDKConfiguration>> *configs1 = @[[self messagingConfiguration], [self chatConfiguration]];
   dispatch_async(dispatch_get_main_queue(), ^{
+    @try {
+      UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+      UIViewController *viewController = [Zendesk.instance.messaging messagingViewController];
+      if (viewController != NULL) {
+        //UIViewController *rootViewController = [self getRootViewController];
+        UINavigationController *chatController = [[UINavigationController alloc] initWithRootViewController: viewController];
+        [rootViewController presentViewController:chatController animated:YES completion:nil];
+        resolve(@(YES)); // Resolve the promise with a success value
+      }
+    }@catch (NSException *exception) {
+           reject(@"start_error", @"Failed to start Zendesk messaging", nil); // Reject the promise with an error
+         }
+    
+  });
+}
 
-    NSError *error = nil;
-    NSArray *engines = @[
-      (id <ZDKEngine>) [ZDKChatEngine engineAndReturnError:&error]
-    ];
-   
-    UIViewController *viewController = [ZDKClassicMessaging.instance buildUIWithEngines:engines
-                                     configs:configs1
-                                       error:&error];
 
-    UIViewController *rootViewController = [UIApplication sharedApplication].delegate.window.rootViewController;
+RCT_EXPORT_METHOD(loginWithJWT:(NSString *)jwtToken resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    @try {
+      NSLog(@"Zendesk jWt.: %@", jwtToken);
+      [[Zendesk instance] loginUserWith:jwtToken completionHandler:^(ZDKZendeskUser * _Nullable user, NSError * _Nullable error) {
+        if (error) {
+          //NSLog(@"Zendesk jWt.\nError: %@", error);
+          reject(@"ZendeskLoginError", @"Login failed", error);
+          NSLog(@"Zendesk jWt.\nError: %@", error);
+        } else {
+          resolve(@"User logged in successfully");
+        }
+      }];
+    }
+    @catch (NSException *exception) {
+      NSLog(@"Zendesk jWt.\nError: %@", exception.reason);
+      reject(@"Exception", @"Exception occurred", nil);
+    }
+  });
+  
+}
 
-    if (rootViewController) {
-      // Define your custom color using the hex code EAEAEA
-      UIColor *customColor = [UIColor colorWithRed:234/255.0 green:234/255.0 blue:234/255.0 alpha:1.0];
-
-      // Set the custom color as the bar tint color
-      [[UINavigationBar appearance] setBarTintColor:customColor];
-      viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle: @"Close"
-                                                                                                   style: UIBarButtonItemStylePlain
-                                                                                                  target: self
-                                                                                                  action: @selector(dismiss)];
-      UINavigationController *chatController = [[UINavigationController alloc] initWithRootViewController: viewController];
-      [rootViewController presentViewController:chatController animated:YES completion:nil];
-     
-    } else {
-        NSError *error = [NSError errorWithDomain:@"RNZendeskChatModule" code:500 userInfo:@{NSLocalizedDescriptionKey: @"Root view controller is not available"}];
+RCT_EXPORT_METHOD(logoutZendesk:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+    @try {
+      [[Zendesk instance] logoutUserWithCompletionHandler:^(NSError * _Nullable error) {
+        if (error) {
+          reject(@"ZendeskLogoutError", @"Logout failed", error);
+        } else {
+          resolve(@"User logged out successfully");
+        }
+      }];
+    }
+    @catch (NSException *exception) {
+      reject(@"Exception", @"Exception occurred", nil);
     }
   });
 }
 
-- (UIViewController *)topViewController {
-    UIViewController *rootViewController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    return [self getTopViewController:rootViewController];
+  
+RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+  @try {
+    
+    NSLog(@"Zendesk login: %@", metadata[@"userAgent"]);
+    
+    
+    NSMutableDictionary *fields = [NSMutableDictionary dictionary];
+
+      if (metadata[@"userAgent"]) {
+        fields[@"29542407930903"] = metadata[@"userAgent"];
+      }
+      if (metadata[@"appVersion"]) {
+        fields[@"29542536141335"] = metadata[@"appVersion"];
+      }
+      if (metadata[@"timezoneOffsetId"]) {
+        fields[@"29542663925271"] = metadata[@"timezoneOffsetId"];
+      }
+      if (metadata[@"platform"]) {
+        fields[@"29542734993559"] = metadata[@"platform"];
+      }
+      if (metadata[@"locationHrefId"]) {
+        fields[@"29230394216983"] = metadata[@"locationHrefId"];
+      }
+      if (metadata[@"ipAddress"]) {
+        fields[@"29542809023767"] = metadata[@"ipAddress"];
+      }
+      if (metadata[@"firstName"]) {
+        fields[@"360004035014"] = metadata[@"firstName"];
+      }
+      if (metadata[@"lastName"]) {
+        fields[@"360003976113"] = metadata[@"lastName"];
+      }
+      if (metadata[@"name"]) {
+        fields[@"360036705974"] = metadata[@"name"];
+      }
+      if (metadata[@"phone"]) {
+        fields[@"360046174754"] = metadata[@"phone"];
+      }
+      if (metadata[@"accountNumber"]) {
+        fields[@"360004035174"] = metadata[@"accountNumber"];
+      }
+      if (metadata[@"userName"]) {
+        fields[@"29542395738007"] = metadata[@"userName"];
+      }
+      if (metadata[@"customerType"]) {
+        fields[@"29542894274711"] = metadata[@"customerType"];
+      }
+      if (metadata[@"authLevel"]) {
+        fields[@"29542032223895"] = metadata[@"authLevel"];
+      }
+      if (metadata[@"jwtId"]) {
+        fields[@"29542045878167"] = metadata[@"jwtId"];
+      }
+
+      [[Zendesk instance].messaging setConversationFields:fields];
+  
+    // Simulate success
+    resolve(@(YES));
+  }
+  @catch (NSException *exception) {
+    //NSLog(@"Exception: %@, Reason: %@, User Info: %@", exception.name, exception.reason, exception.userInfo);
+    NSLog(@"Zendesk metadata.\nError: %@", exception.reason);
+    reject(@"set_tags_error", @"Failed to set conversation tags", nil);
+  }
 }
 
-- (UIViewController *)getTopViewController:(UIViewController *)viewController {
-    if ([viewController isKindOfClass:[UINavigationController class]]) {
-        return [self getTopViewController:[(UINavigationController *)viewController topViewController]];
-    } else if ([viewController isKindOfClass:[UITabBarController class]]) {
-        return [self getTopViewController:[(UITabBarController *)viewController selectedViewController]];
-    } else if (viewController.presentedViewController) {
-        return [self getTopViewController:viewController.presentedViewController];
-    }
-    return viewController;
-}
 
-- (void)dismiss {
-  NSLog(@"Chat Close called");
-  UIViewController *currentVC = [self topViewController];
 
-  // Dismiss the chat controller and reset the session after chat ends
-  [currentVC dismissViewControllerAnimated:YES completion:^{
-
-  }];
-}
 
 @end

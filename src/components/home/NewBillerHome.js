@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, StyleSheet, ScrollView, Platform } from "react-native";
+import { View, StyleSheet, ScrollView, Platform,TouchableOpacity } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
@@ -24,10 +24,22 @@ import { useMaintenance } from "../maintenance/MaintenanceContext";
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
-import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
+import sign from "jwt-encode"; // npm method for signing JWT
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
 import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
+import ChatIcon from "../../res/svgIcons/ChatIcon";
+import VersionCheck from 'react-native-version-check';
+import DeviceInfo from "react-native-device-info";
+
+import {
+  startChatWithConfig,
+  initChat,
+  startChat,
+  loginWithJWT,
+  setConversationalFields,
+} from "../utility/RNZendeskChat";
+
 const NewBillerHome = ({ navigation }) => {
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState("");
@@ -184,6 +196,17 @@ const NewBillerHome = ({ navigation }) => {
         email: getPrimaryEmail(accountDetails),
       });
     }
+
+    DeviceInfo.getUserAgent().then((userAgent) => {
+      // iOS: "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143"
+      // tvOS: not available
+      // Android: "Mozilla/5.0 (Linux; Android 12; sdk_gphone64_arm64 Build/SE1A.220630.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36"
+      // Windows: ?
+      //getZendeskChatToken(userAgent);
+      loginWithToken(userAgent);
+    });
+
+
   }, [accountDetails]);
 
   const getInAppNotificationsData = () => {
@@ -257,6 +280,77 @@ const enableNotifications = async () => {
   };
 
 
+
+  // get IP address
+
+const getIPAddress = async () => {
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    if (!response.ok) {
+      throw new Error('Failed to fetch IP address');
+    }
+
+    const data = await response.json();
+    return data.ip; // The IP address
+  } catch (error) {
+    console.error('Error fetching IP address:', error);
+    return null;
+  }
+}
+
+ // zendesk chat login
+
+ 
+ const loginWithToken= async (userAgent) => {
+  const user = await getUser();
+  const secret = '2pibLgH2LymoLJUmqQ3A94noQR6MD8RUZ4feDkFrU4VvGGxrhrXeQuRPGP-lBVzdaEZLzifgtGzKoN6XPzoQXg';
+  //data payload 
+  const data = {
+        scope: "user",
+        external_id: user?.userInfo.accountNumber,
+        //email: defaultPaymentDetails.email || "",
+        name: accountDetails?.first_name + " " + accountDetails?.last_name,
+        //email_verified: true, // optional
+       // exp: new Date().getTime() + 3600 * 1000,
+    };
+    // header ID
+    const options = {
+        "alg": "HS256",
+        "typ": "JWT",
+        "kid": "app_681cd7b6f85f7c21e70c5e06"
+    }
+    const jwt = sign(data, secret, options);
+    console.log("request data for jwt",data);
+    console.log("Loggin jwt",jwt);
+    loginWithJWT('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFwcF82ODFjZDdiNmY4NWY3YzIxZTcwYzVlMDYifQ.eyJleHRlcm5hbF9pZCI6IjgxNjA0NDAwNDAwNjI3MDIiLCJuYW1lIjoidW5kZWZpbmVkIHVuZGVmaW5lZCIsInNjb3BlIjoidXNlciJ9.vZFFDl5lEe96OTgi9y0pxZ3oDff9-0MHzUYSXHjuemQ');
+
+     const fields={
+          userAgent:userAgent,
+          appVersion:VersionCheck.getCurrentVersion(),
+          timezoneOffsetId:new Date().getTimezoneOffset().toString(),
+          platform: Platform.OS,
+          locationHrefId:Env.URL,
+          ipAddress: await getIPAddress(),
+          accountNumber: user?.userInfo.accountNumber,
+          email: defaultPaymentDetails.email || "",
+          firstName: accountDetails?.first_name || '',
+          lastName: accountDetails?.last_name || '',
+          name: accountDetails?.first_name + " " + accountDetails?.last_name,
+          phone: '3',
+          accountNumber: user?.userInfo.accountNumber,
+          userName: user?.userInfo.userName,
+          customerType:user?.userInfo.customerType,
+          authLevel: user?.userInfo.authLevel,
+          jwtId: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFwcF82ODFjZDdiNmY4NWY3YzIxZTcwYzVlMDYifQ.eyJleHRlcm5hbF9pZCI6IjgxNjA0NDAwNDAwNjI3MDIiLCJuYW1lIjoidW5kZWZpbmVkIHVuZGVmaW5lZCIsInNjb3BlIjoidXNlciJ9.vZFFDl5lEe96OTgi9y0pxZ3oDff9-0MHzUYSXHjuemQ',
+        }
+        setTimeout(() => {
+          setConversationalFields(fields);
+        }, 2000);
+        
+ }
+
+
+
   const renderHeader = () => (
     <View
       accessibilityElementsHidden={showWalkThrough}
@@ -265,6 +359,18 @@ const enableNotifications = async () => {
       style={styles.headerContainer}
     >
        <Logo width={120} height={33.32}/>
+
+       <TouchableOpacity
+              onPress={() => {
+                if (Platform.OS === "ios") {
+                  startChat();
+                } else {
+                  startChatWithConfig({});
+                }
+              }}
+            >
+              <ChatIcon />
+            </TouchableOpacity>
     </View>
   );
 
