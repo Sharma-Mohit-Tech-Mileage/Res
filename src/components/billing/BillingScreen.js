@@ -49,10 +49,20 @@ const BillingScreen = ({ navigation }) => {
   const [isContentLoading, setIsContentLoading] = useState(false);
   const [isAutoPayStatusLoad, setIsAutoPayStatusLoad] = useState(false);
   let paperlessCardEmail = paperlessEmail;
-
+let focusEffectExecutionCount = 0;
 
   useFocusEffect(
     useCallback(() => {
+      focusEffectExecutionCount++;
+
+      console.log(
+        "==================== FOCUS EFFECT EXECUTION ====================",
+        "\nComponent: MyComponent",
+        `\nExecution Count: ${focusEffectExecutionCount}`,
+        `\nTimestamp: ${new Date().toISOString()}`,
+        "\nAction: setIsContentLoading(false), reset billAmt, dispatch(fetchACPUserAccountDetails)",
+        "\n================================================================"
+      );
       setIsContentLoading(false);
       setBillAmt(undefined);
       dispatch(fetchACPUserAccountDetails());
