@@ -7,10 +7,10 @@ import { useAuthInterceptor } from '../network/useAuthInterceptor';
 const API_ACP_BASEURL = Env.API_ACP_BASEURL;
 
 const _axios = axios.create({
-    baseURL: API_ACP_BASEURL, // Default base URL
+    baseURL: API_ACP_BASEURL,
     withCredentials: false,
     crossDomain: true,
-    timeout: 10000,
+    timeout: 15000, // Standard 15 seconds timeout
     headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
@@ -19,7 +19,7 @@ const _axios = axios.create({
 
 let isRefreshing = false;
 let failedQueue = [];
-let navigationPending = false; // Flag to prevent multiple navigations
+let navigationPending = false;
 
 const processQueue = (error, token = null) => {
     failedQueue.forEach(prom => {
@@ -29,8 +29,39 @@ const processQueue = (error, token = null) => {
             prom.resolve(token);
         }
     });
-
     failedQueue = [];
+};
+
+const isRetryableError = (error) => {
+    return (
+        error.code === 'ECONNABORTED' ||
+        error.message.includes('timeout') ||
+        error.message.includes('Network Error') ||
+        (error.response && error.response.status >= 500)
+    );
+};
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const retryRequest = async (axiosInstance, originalRequest, retryCount = 0) => {
+    const maxRetries = 3;
+    const baseDelay = 1000; // 1 second base delay
+    
+    if (retryCount >= maxRetries) {
+        throw new Error('Max retries exceeded');
+    }
+    
+    const delayMs = baseDelay * Math.pow(2, retryCount); // Exponential backoff
+    await delay(delayMs);
+    
+    try {
+        return await axiosInstance(originalRequest);
+    } catch (error) {
+        if (isRetryableError(error)) {
+            return retryRequest(axiosInstance, originalRequest, retryCount + 1);
+        }
+        throw error;
+    }
 };
 
 const AxiosInterceptorProvider = ({ children }) => {
@@ -39,7 +70,12 @@ const AxiosInterceptorProvider = ({ children }) => {
     useEffect(() => {
         const interceptor = _axios.interceptors.request.use(
             async config => {
-                config.baseURL = API_ACP_BASEURL
+                try {
+                    config.baseURL = API_ACP_BASEURL;
+                } catch (error) {
+                    console.error("[Interceptor] Error determining baseURL:", error);
+                    config.baseURL = BASE_URL;
+                }
                 return config;
             },
             error => {
@@ -51,11 +87,8 @@ const AxiosInterceptorProvider = ({ children }) => {
             response => response,
             async error => {
                 const originalRequest = error.config;
-                if (error.code === 'ECONNABORTED' && error.message && error.message.includes('timeout') && !originalRequest._timeoutRetry) {
-                    originalRequest._timeoutRetry = true; // Mark as retried
-                    return _axios(originalRequest); // Retry the request
-                }
 
+                // Handle 401 errors (existing token refresh logic)
                 if (error.response && error.response.status === 401 && !originalRequest._retry) {
                     if (isRefreshing) {
                         return new Promise((resolve, reject) => {
@@ -83,15 +116,24 @@ const AxiosInterceptorProvider = ({ children }) => {
                     } catch (tokenRefreshError) {
                         processQueue(tokenRefreshError, null);
                         isRefreshing = false;
-
                         if (!navigationPending) {
-                            navigationPending = true;
+                            navigationPending = true; 
                             setTimeout(async () => {
                                 await redirectToLogin();
-                                navigationPending = false;
-                            }, 500);
+                                navigationPending = false; 
+                            }, 500); 
                         }
                         return Promise.reject(tokenRefreshError);
+                    }
+                }
+
+                // Handle timeout and network errors with retry
+                if (isRetryableError(error) && !originalRequest._retryAttempted) {
+                    originalRequest._retryAttempted = true;
+                    try {
+                        return await retryRequest(_axios, originalRequest);
+                    } catch (retryError) {
+                        return Promise.reject(retryError);
                     }
                 }
 
