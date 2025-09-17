@@ -29,10 +29,7 @@ import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
 import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
-import {
-  getFcmToken,
-  requestUserPermission,
-} from "../../firebase/FirebaseUtils";
+import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
 const NewBillerHome = ({ navigation }) => {
   const [billAmt, setBillAmt] = useState(undefined);
@@ -197,10 +194,6 @@ const NewBillerHome = ({ navigation }) => {
         requestUrl,
         (res) => {
           if (res) {
-            console.log(
-              " Home  getInAppNotificationsData",
-              JSON.stringify(res)
-            );
             res[0]?.pushMessageType.forEach((value, index) => {
               if (!value?.optOutFlag) {
                 setIsNotificationEnable(true);

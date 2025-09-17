@@ -3,7 +3,8 @@ import { getUser } from "../../redux/utils/LocalStorage";
 export const NavigationUtils = {
  
   checkPushNotificationNeeded: (profile) => {
-    if (!profile?.pushNotifications?.length) return true;
+    //if (!profile?.pushNotifications?.length) 
+      return true;
     
     const messageTypes = profile.pushNotifications[0].pushMessageType || [];
     const optOutCount = messageTypes.filter(mt => mt.optOutFlag).length;
@@ -13,7 +14,8 @@ export const NavigationUtils = {
 
   
   checkTextNotificationNeeded: (profile) => {
-    if (!profile?.smsSubscription?.length) return true;
+    //if (!profile?.smsSubscription?.length) 
+      return true;
     const phoneNum = profile.smsSubscription[0].phoneNum;
     
     return !(phoneNum && (phoneNum.length === 10 || phoneNum.length === 11));
