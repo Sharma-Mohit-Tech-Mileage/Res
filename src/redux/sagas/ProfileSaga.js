@@ -1,7 +1,7 @@
 import { all, call, put, takeLatest } from "redux-saga/effects";
 import { updateEmailList } from "../../components/utility/constant";
 import { fetchACPUserAccountDetails,isPaperlessEnabled,getProfileDetails, fetchUserList, fetchSmsSubscription, fetchBillingStatus, postProfileInfo, postTextNotifictionInfo, fetchPaperLessDetails, postEmailNotification, putEmailNotification, postTermsAndConditions, postTermsAndConditionsv2, postPushNotifications, unsubscribPaperLess, fetchPushNotifications, handleSubmitFeedback, resendEmailVerification, logError, logInfo, addUserAction, removeUser, editUserAction, fetchSecurityQuestions, fetchAllSvEmails, addSVEmailNoFlags, deleteSVEmail, updateSVEmails, manageSVEmails, addSVEmailMktFlag } from "../../network/apis/account/profile.service";
-import {FETCH_ACP_USER_ACCOUNT_DETAILS, FETCH_PROFILE_DETAILS, FETCH_USER_LIST, FETCH_SMS_SELECTION, UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SECURITY, UPDATE_TEXT_NOTIFICATION, FETCH_EMIAL_SELECTION, FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS, UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS, FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2, SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION, UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION, LOG_ERROR, LOG_INFO, ADD_NEW_USER, DELETE_USER, EDIT_USER, GET_SECURITY_QUESTION, ALLSVEMAILASSOCIATED, ADD_SV_EMAIL_NO_FLAGS_REQUEST, DELETE_SV_EMAIL_REQUEST, UPDATE_SV_EMAILS_REQUEST, MANAGE_EMAIL_REQUEST, UPDATE_EMAIL_ASSOCIATIONS, SET_PAPERLESS_STATUS,GET_PAPERLESS_STATUS } from "../constants";
+import {FETCH_ACP_USER_ACCOUNT_DETAILS, FETCH_PROFILE_DETAILS, FETCH_USER_LIST, FETCH_SMS_SELECTION, UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SECURITY, UPDATE_TEXT_NOTIFICATION, FETCH_EMIAL_SELECTION, FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS, UPDATE_PUSH_NOTIFICATIONS, UNSUBSCRIBE_PAPERLESS, FETCH_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2, SAVE_USER_FEEDBACK, UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION, LOG_ERROR, LOG_INFO, ADD_NEW_USER, DELETE_USER, EDIT_USER, GET_SECURITY_QUESTION, ALLSVEMAILASSOCIATED, ADD_SV_EMAIL_NO_FLAGS_REQUEST, DELETE_SV_EMAIL_REQUEST, UPDATE_SV_EMAILS_REQUEST, MANAGE_EMAIL_REQUEST, UPDATE_EMAIL_ASSOCIATIONS, SET_PAPERLESS_STATUS,GET_PAPERLESS_STATUS } from "../constants";
 import { saveACPUserAccountDetails,fetchProfileSuccess, fetchUserListSuccess, saveSMSSelection, saveEmailBillings, saveSvEmailAssociation, savePaperlessDetails, savePushNotifications, updatedSecurityQuestions,setPaperlessStatus,setLoading,clearLoading } from "../actions/ProfileActionSuite";
 
 function* getProfileUsers(action) {
@@ -16,7 +16,6 @@ function* getProfileUsers(action) {
 function* fetchProfileDetails(action) {
     try {
         const response = yield call(getProfileDetails)
-        console.log('fetchProfileDetails API Success Response:', response);
         yield put(fetchProfileSuccess(response));
     } catch (error) {
         console.error('API Error Response:', error);
@@ -232,25 +231,6 @@ function* resentVerifiction(action) {
     }
 }
 
-function* updateEntryEmailNotification(action) {
-    try {
-        const profile = action.payload.profile;
-        const updateEmail = action.payload.email;
-        const oldEmail = action.payload.profile.svEmailAddress;
-
-        if (updateEmail !== oldEmail) {
-            profile.svEmailAddress = updateEmail;
-            profile.email = oldEmail;
-            yield call(postProfileInfo, profile);
-        }
-
-        yield call(postEmailNotification, updateEmail);
-        action.navigation.navigate('MyTab');
-    } catch (error) {
-        action.navigation.navigate('EntryEmailNotifications', { updateFailed: true });
-        console.error('API Error Response:', error, action.payload); // Log the error response
-    }
-}
 
 function* logErrorSaga(action) {
     console.log('logErrorSaga: action.payload:-------------------', action.payload);
@@ -543,7 +523,6 @@ function* ProfileSagas() {
     yield takeLatest(UPDATE_PUSH_NOTIFICATIONS_V2, updatePushNotificationsV2);
     yield takeLatest(UNSUBSCRIBE_PAPERLESS, unsubscribPaperLessSaga);
     yield takeLatest(SAVE_USER_FEEDBACK, saveUserFeedBack);
-    yield takeLatest(UPDATE_ENTRY_EMAIL_NOTIFICATION, updateEntryEmailNotification);
     yield takeLatest(UPDATE_EXISTING_EMAIL_NOTIFICATION, updateNewEmail);
     yield takeLatest(RESEND_EMAIL_VERIFICTION, resentVerifiction);
     yield takeLatest(ADD_NEW_USER, addUser)

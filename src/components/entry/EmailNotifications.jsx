@@ -1,27 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-  Pressable,
-  Keyboard,
-} from "react-native";
-import {
-  Color,
-  FontFamily,
-  FontSize,
-  Padding,
-  Border,
-} from "../../../GlobalStyles";
+import { View, StyleSheet, Text, ScrollView, Pressable, Keyboard, } from "react-native";
+import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
-import EntryInput from "./EntryInput";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useSelector, useDispatch } from "react-redux";
+import {  useDispatch } from "react-redux";
 import { addPrimaryEmailRequest } from "../../redux/actions/NotificationActionSuite";
 
 const emailRegex =
@@ -34,7 +20,6 @@ const validationSchema = yup.object().shape({
 const EmailNotifications = ({ navigation }) => {
   const dispatch = useDispatch();
   const [input, setInput] = useState("");
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
   const [enableButton, setEnableButton] = useState(false);
   const [keyboardHidden, setKeyboardHidden] = useState(true);
   const [textInputLayout, setTextInputLayout] = useState({});
@@ -68,17 +53,6 @@ const EmailNotifications = ({ navigation }) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (
-      profile.profileDetails &&
-      profile.profileDetails.svEmailAddress &&
-      profile.profileDetails.svEmailAddress !== "Multiple Emails" &&
-      profile.profileDetails.svEmailAddress?.length > 0
-    ) {
-      setInput(profile.profileDetails.svEmailAddress);
-      setEnableButton(true);
-    }
-  }, []);
 
   useEffect(() => {
     if (!keyboardHidden) {
@@ -94,9 +68,6 @@ const EmailNotifications = ({ navigation }) => {
     setEnableButton(text?.length > 0);
   };
 
-  const keyboardDismiss = () => {
-    Keyboard.dismiss();
-  };
 
   const enableEmailNotifications = () => {
     dispatch(addPrimaryEmailRequest(input, "", navigation));

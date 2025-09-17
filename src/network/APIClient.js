@@ -3,7 +3,6 @@ import { Env } from "./apis/account/Constants";
 import axios from "axios";
 import { RefreshToken } from '../components/user/Session';
 import { navigationRef } from '../navigations/UserNavigations';
-const BASE_URL = Env.API_BASEURL.endsWith('/') ? Env.API_BASEURL : `${Env.API_BASEURL}/`;
 const API_ACP_BASEURL = Env.API_ACP_BASEURL.endsWith('/') ? Env.API_ACP_BASEURL : `${API_ACP_BASEURL}/`;
 const SUPPORT_URL = "https://support.sparklight.com/api/v2/help_center/";
 
@@ -101,7 +100,7 @@ export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => 
     delete requestBody.idTokenGuid;
     delete requestBody.refreshToken;
     
-    const res = await axios.post(`${BASE_URL}${endpoint}`, requestBody, {
+    const res = await axios.post(`${API_ACP_BASEURL}${endpoint}`, requestBody, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -254,7 +253,7 @@ export const GetModemStatusApiRequest = async (endpoint, onSuccess, onError) => 
         }
     };
 
-    fetch(`${BASE_URL}${endpoint}`, options)
+    fetch(`${API_ACP_BASEURL}${endpoint}`, options)
         .then(response => {
             if (response.status >= 400 && response.status < 600) {
                 onError(response.status);

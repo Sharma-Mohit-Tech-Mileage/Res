@@ -1,24 +1,42 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
-import { Color, Padding, FontSize, FontFamily, Border, } from "../../../../GlobalStyles";
+import { View, Text, Pressable, StyleSheet, Platform } from "react-native";
+import {
+  Color,
+  Padding,
+  FontSize,
+  FontFamily,
+  Border,
+} from "../../../../GlobalStyles";
 import InfoICon from "../../../../assets/svgs/InfoIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 
 const digitToWord = {
-  0: "zero", 1: "one", 2: "two", 3: "three", 4: "four",
-  5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine",
+  0: "zero",
+  1: "one",
+  2: "two",
+  3: "three",
+  4: "four",
+  5: "five",
+  6: "six",
+  7: "seven",
+  8: "eight",
+  9: "nine",
 };
 
 function phoneNumberToWords(phoneNum) {
   return phoneNum
-    ? phoneNum.replace(/\D/g, "").split("").map((d) => digitToWord[d] || d).join(" ")
+    ? phoneNum
+        .replace(/\D/g, "")
+        .split("")
+        .map((d) => digitToWord[d] || d)
+        .join(" ")
     : "";
 }
 
 const StatusIcon = ({ status }) => (
   <View style={styles.icon}>
-    {status === "On" ? <SuccessIcon /> : <SuccessIcon color={'#4C5458'} />}
+    {status === "On" ? <SuccessIcon /> : <SuccessIcon color={"#4C5458"} />}
   </View>
 );
 
@@ -80,14 +98,18 @@ const BoldEmailText = ({ message }) => {
   const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/;
   const parts = message.split(emailRegex);
   const emails = message.match(emailRegex);
-  
+
   return (
     <Text style={styles.infoText}>
       {parts.map((part, index) => (
         <React.Fragment key={index}>
           <Text style={styles.infoText}>{part}</Text>
           {emails && emails[index] && (
-            <Text style={[styles.infoText, styles.boldText]}>
+            <Text
+              style={[styles.infoText, styles.boldText]}
+              accessibilityRole="text"
+              accessibilityLabel={`Email ${emails[index]}`}
+            >
               {emails[index]}
             </Text>
           )}
@@ -115,7 +137,11 @@ const BoldPhoneText = ({ phoneNum }) => {
           : "You have not enabled text notifications"}
       </Text>
       {phoneNum && (
-        <Text style={[styles.infoText, styles.boldText]}>
+        <Text
+          style={[styles.infoText, styles.boldText]}
+          accessibilityRole="text"
+          accessibilityLabel={`Phone number ${phoneNumWords}`}
+        >
           {phoneNum}
         </Text>
       )}
@@ -189,7 +215,7 @@ const NotificationSection = ({
           />
         )
       )}
-      
+
       <View style={styles.bottomBorder} />
 
       {settings.map((setting, index) => (
@@ -280,8 +306,17 @@ const styles = StyleSheet.create({
     lineHeight: FontSize.textXsSemibold_size * 1.3,
   },
   boldText: {
-    fontWeight: "600",
+    // Force a stronger visual difference on Android when custom font weights are ignored.
     color: Color.colorGray_200,
+    ...(Platform.OS === "android"
+      ? {
+          fontFamily: "OpenSans-Bold",
+          letterSpacing: 0.15,
+        }
+      : {
+          fontFamily: FontFamily.openSansSemiBold,
+          fontWeight: "600",
+        }),
   },
   toggleContainer: {
     flexDirection: "row",

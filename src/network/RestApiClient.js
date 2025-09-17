@@ -4,12 +4,10 @@ import { Env } from "./apis/account/Constants";
 import { getUser, storeUser } from "../redux/utils/LocalStorage";
 import { RefreshToken } from '../components/user/Session';
 import { useAuthInterceptor } from '../network/useAuthInterceptor';
-
-const BASE_URL = Env.API_BASEURL;
 const API_ACP_BASEURL = Env.API_ACP_BASEURL;
 
 const _axios = axios.create({
-    baseURL: BASE_URL, // Default base URL
+    baseURL: API_ACP_BASEURL, // Default base URL
     withCredentials: false,
     crossDomain: true,
     timeout: 10000,
@@ -41,7 +39,6 @@ const AxiosInterceptorProvider = ({ children }) => {
     useEffect(() => {
         const interceptor = _axios.interceptors.request.use(
             async config => {
-                // Dynamically switch the baseURL based on user type
                 config.baseURL = API_ACP_BASEURL
                 return config;
             },
@@ -54,8 +51,6 @@ const AxiosInterceptorProvider = ({ children }) => {
             response => response,
             async error => {
                 const originalRequest = error.config;
-
-                // Handle timeout errors - retry once
                 if (error.code === 'ECONNABORTED' && error.message && error.message.includes('timeout') && !originalRequest._timeoutRetry) {
                     originalRequest._timeoutRetry = true; // Mark as retried
                     return _axios(originalRequest); // Retry the request

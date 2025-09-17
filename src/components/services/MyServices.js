@@ -114,7 +114,6 @@ const MyServices = ({ route }) => {
         } else if (group_id == "1500003304341") {
           setIstechAgentAvailable(false);
           if (data) {
-            //PromptForAgentOffline()
             setIsAgentNotAvailable(true);
           }
         }

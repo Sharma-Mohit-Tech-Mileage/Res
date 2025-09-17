@@ -1,20 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  StyleSheet,
-  Text,
-  Pressable,
-  View,
-  Animated,
-  ScrollView,
-  Platform,
-} from "react-native";
-import {
-  Color,
-  FontSize,
-  FontFamily,
-  Padding,
-  Border,
-} from "../../../../GlobalStyles";
+import { StyleSheet, Text, Pressable, View, Animated, ScrollView, Platform, } from "react-native";
+import { Color, FontSize, FontFamily, Padding, Border, } from "../../../../GlobalStyles";
 import * as yup from "yup";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
@@ -135,7 +121,12 @@ const InAppNotifications = ({ navigation }) => {
     //   return updatedSettings;
     // });
     const checkNofif = async () => {
-      if(value){
+      console.log("Toggle data", JSON.stringify(formatedData));
+      if (
+        formatedData?.optOut ||
+        formatedData?.outageOptOut ||
+        formatedData?.billingOptOutStatus 
+      ) {
         if(!checkNotifData){
         const pushNotification = await getPushNotificationStatus();
         if (pushNotification?.permanentSkip) {
@@ -169,21 +160,10 @@ const InAppNotifications = ({ navigation }) => {
   }, [route.params]);
 
   const handleSave = async () => {
-    if (formatedData.optOut || formatedData.outageOptOut || formatedData.billingOptOutStatus) {
-    const pushNotification = await getPushNotificationStatus();
-    if (pushNotification?.permanentSkip) {
-     const isENabled = await notifyPermission();
-     if(!isENabled) return;
-    } else {
-      await requestUserPermission();
-    }
-    
-  }
     const token = await getFcmToken();
     formatedData.deviceToken = token;
     formatedData.deviceTokenTimestamp = moment().format();
     formatedData.isAndroid = Platform.OS === "android";
-    //await dispatch(updatePushNotificationsv2(formatedData, navigation));
     const request = {
       optOut: formatedData.optOut,
       outageOptOut: formatedData.outageOptOut,

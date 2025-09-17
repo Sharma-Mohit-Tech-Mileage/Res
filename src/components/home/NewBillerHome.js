@@ -9,7 +9,10 @@ import { useFocusEffect } from "@react-navigation/native";
 import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
 import WalkthroughOverlay from "../common/WalkthroughOverlay";
-import { fetchACPUserAccountDetails, getPaperlessStatus, } from "../../redux/actions/ProfileActionSuite";
+import {
+  fetchACPUserAccountDetails,
+  getPaperlessStatus,
+} from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
 import { Env } from "../../network/apis/account/Constants";
@@ -26,7 +29,10 @@ import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
 import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
-import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
+import {
+  getFcmToken,
+  requestUserPermission,
+} from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
 const NewBillerHome = ({ navigation }) => {
   const [billAmt, setBillAmt] = useState(undefined);
@@ -101,7 +107,6 @@ const NewBillerHome = ({ navigation }) => {
         },
         (errorCode) => {
           setLoading(false);
-          console.log("checOutagStatus error", errorCode);
         }
       );
     });
@@ -127,7 +132,6 @@ const NewBillerHome = ({ navigation }) => {
   // Refresh data when the screen is focused
   useFocusEffect(
     useCallback(() => {
-      console.log("paperlessLoading", JSON.stringify(paperlessLoading));
       const refreshData = async () => {
         try {
           checOutagStatus();
@@ -187,31 +191,31 @@ const NewBillerHome = ({ navigation }) => {
   }, [accountDetails]);
 
   const getInAppNotificationsData = () => {
-      getUser().then((res1) => {
-        let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
-        GetApiRequest(
-          requestUrl,
-          (res) => {
-            if (res) {
-              console.log(
-                " Home  getInAppNotificationsData",
-                JSON.stringify(res)
-              );
-              res[0]?.pushMessageType.forEach((value, index) => {
-                if(!value?.optOutFlag ){
-                  setIsNotificationEnable(true)
-                }
-              });
-            }
-          },
-          (error) => {
-            console.error("Error on retrying getInAppNotificationsData", error);
+    getUser().then((res1) => {
+      let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
+      GetApiRequest(
+        requestUrl,
+        (res) => {
+          if (res) {
+            console.log(
+              " Home  getInAppNotificationsData",
+              JSON.stringify(res)
+            );
+            res[0]?.pushMessageType.forEach((value, index) => {
+              if (!value?.optOutFlag) {
+                setIsNotificationEnable(true);
+              }
+            });
           }
-        );
-      });
-    };
+        },
+        (error) => {
+          console.error("Error on retrying getInAppNotificationsData", error);
+        }
+      );
+    });
+  };
 
-const enableNotifications = async () => {
+  const enableNotifications = async () => {
     const enabledPermission = await requestUserPermission();
     if (enabledPermission) {
       const token = await getFcmToken();
@@ -231,8 +235,7 @@ const enableNotifications = async () => {
         permanentSkip: false,
       };
       storePushNotificationStatus(localData);
-     // await dispatch(updatePushNotificationsv2(data, null));
-      
+      await dispatch(updatePushNotificationsv2(data, null));
     } else {
       const token = await getFcmToken();
       const dataWithoutPermission = {
@@ -251,11 +254,9 @@ const enableNotifications = async () => {
         permanentSkip: true,
       };
       storePushNotificationStatus(localData);
-      //await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
-      
+      await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
     }
   };
-
 
   const renderHeader = () => (
     <View
@@ -264,7 +265,7 @@ const enableNotifications = async () => {
       accessibilityLabel="SparkLight"
       style={styles.headerContainer}
     >
-       <Logo width={120} height={33.32}/>
+      <Logo width={120} height={33.32} />
     </View>
   );
 
