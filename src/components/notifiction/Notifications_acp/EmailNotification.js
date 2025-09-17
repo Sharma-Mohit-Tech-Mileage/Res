@@ -18,6 +18,7 @@ import { fetchACPUserAccountDetails, getPaperlessStatus, } from "../../../redux/
 import { getPrimaryEmail } from "../../utility/constant";
 import AlertIcon from "../../../res/svgIcons/AlertIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
+import { platformSpecificSpaceUnits } from "native-base/lib/typescript/theme/tools";
 const emailRegex =
   /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
@@ -580,7 +581,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     flexWrap: "wrap",
-    paddingHorizontal: Padding.p_5xl,
+    paddingHorizontal:Platform.OS==='android'? 16 : Padding.p_5xl
   },
   checkboxTouchable: {
     flexDirection: "row",
