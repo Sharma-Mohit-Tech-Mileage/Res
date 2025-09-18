@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import {
   View,
   StyleSheet,
   Text,
   ScrollView,
-  Keyboard,
   Pressable,
   Platform,
   TouchableOpacity,
@@ -26,10 +25,8 @@ import SparkLightInput from "../common/customui/SparkLightInput";
 import CheckBox from "@react-native-community/checkbox";
 import { useSelector, useDispatch } from "react-redux";
 import { updateTextNotification } from "../../redux/actions/ProfileActionSuite";
-import Phone from "../../res/svgIcons/Phone";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
-import { getPrimaryEmail } from "../../components/utility/constant";
-// Define your validation schema
+import NavigationUtils from "./NavigationUtils";
 const validationSchema = yup.object().shape({
   phoneNumber: yup
     .string()
@@ -46,17 +43,12 @@ const TextNotifications = ({ navigation }) => {
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
   const [enableButton, setEnableButton] = useState(false);
   const [nextScreen, setNextScreen] = useState("EntryEmailNotifications");
-  const user = useSelector((state) => state.combinedReducers.user.userData);
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
   const [keyboardHidden, setKeyboardHidden] = useState(true);
-  const [textInputLayout, setTextInputLayout] = useState({});
   const [isTermRequired, setIsTermRequired] = useState(false);
   const scrollRef = useRef();
-  const [error, setError] = useState("");
-  const accountDetails = useSelector(
-    (state) => state.combinedReducers.profile?.accountDetails
-  );
-
+  const user = useSelector((state) => state.combinedReducers.user.userData);
+  const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const accountNumber = user?.userInfo?.accountNumber || "";
   const {
     control,
     handleSubmit,
@@ -70,64 +62,6 @@ const TextNotifications = ({ navigation }) => {
     },
   });
 
-  //   useEffect(() => {
-  //     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
-  //       setKeyboardHidden(false);
-  //     });
-
-  //     const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
-  //       setKeyboardHidden(true);
-  //     });
-
-  //     return () => {
-  //       showSubscription.remove();
-  //       hideSubscription.remove();
-  //     };
-  //   }, []);
-
-  //   useEffect(() => {
-  //     if (!keyboardHidden) {
-  //       scrollRef.current?.scrollTo({
-  //         y: textInputLayout.y,
-  //         animated: true,
-  //       });
-  //     }
-  //   }, [keyboardHidden]);
-
-  useEffect(() => {
-    if (
-      profile.paperLessInfo !== undefined &&
-      profile.paperLessInfo.accountNumber !== undefined &&
-      profile.paperLessInfo.accountNumber.length > 0 &&
-      profile.paperLessInfo.paperlessStatus !== undefined &&
-      (profile.paperLessInfo.paperlessStatus.toLowerCase() === "approved" ||
-        profile.paperLessInfo.paperlessStatus.toLowerCase() === "active")
-    ) {
-      setNextScreen("MyTab");
-    }
-    console.log("Account Details in Text Notification: ", accountDetails);
-    if (accountDetails) {
-      const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
-      console.log("Updated Primary Email: ", updatedPrimaryEmail);
-      if (updatedPrimaryEmail && updatedPrimaryEmail.length > 0) {
-        setNextScreen("MyTab");
-      }
-    }
-  }, []);
-
-  //   useEffect(() => {
-  //     if (profile.smsSubscription?.length > 0) {
-  //       if (
-  //         profile.smsSubscription[0].phoneNum !== undefined &&
-  //         profile.smsSubscription[0].phoneNum.length > 0
-  //       ) {
-  //         setInput(profile.smsSubscription[0].phoneNum.substring(1));
-  //       }
-  //     } else {
-  //       setInput(user.userInfo.phone);
-  //     }
-  //   }, []);
-
   const onChangeText = (text) => {
     setInput(text);
     if (toggleCheckBox && text.length > 0) {
@@ -136,15 +70,6 @@ const TextNotifications = ({ navigation }) => {
       setEnableButton(false);
     }
   };
-  const handleCheckboxToggle = useCallback(() => {
-    setToggleCheckBox(!toggleCheckBox);
-    console.log("toggleCheckBox", !toggleCheckBox, input);
-    if (toggleCheckBox) {
-      setEnableButton(true);
-    } else {
-      setEnableButton(false);
-    }
-  }, [toggleCheckBox]);
 
   const onCheckBox = (value) => {
     setToggleCheckBox(value);
@@ -158,10 +83,6 @@ const TextNotifications = ({ navigation }) => {
   const handleTermsLinkPress = useCallback(
     (event) => {
       event.stopPropagation();
-      //   navigation.navigate("ArticalWindowUtility", {
-      //     url: "https://www.sparklight.com/legal/text-messaging-terms-and-conditions",
-      //     name: "Terms & Conditions",
-      //   });
       Linking.openURL(
         "https://www.sparklight.com/legal/text-messaging-terms-and-conditions"
       );
@@ -169,11 +90,16 @@ const TextNotifications = ({ navigation }) => {
     [navigation]
   );
 
-  const keyboardDismiss = () => {
-    Keyboard.dismiss();
+   const handleSkip = async () => {
+    await NavigationUtils.navigateToNext(
+      navigation,
+      "EntryTextNotifications",
+      profile,
+      accountNumber
+    );
   };
 
-  const enableTextNotifications = () => {
+  const enableTextNotifications = async() => {
     const data = {
       accountNumber: user.userInfo.accountNumber,
       billingOptOutStatus: true,
@@ -181,14 +107,15 @@ const TextNotifications = ({ navigation }) => {
       outageOptOut: true,
       phoneNumber: input,
     };
-    console.log("enableTextNotifications: ", data);
-    //{"accountNumber": "900690538", "billingOptOutStatus": false, "optOut": false, "outageOptOut": false, "phoneNumber": ""}
+    
     if (toggleCheckBox && input.length > 0) {
-      dispatch(updateTextNotification(data, null));
-      navigation.reset({
-        index: 0,
-        routes: [{ name: nextScreen }],
-      });
+      await dispatch(updateTextNotification(data, null));
+      await NavigationUtils.navigateToNext(
+        navigation,
+        "EntryTextNotifications",
+        profile,
+        accountNumber
+      );
     } else {
       setIsTermRequired(true);
     }
@@ -230,9 +157,7 @@ const TextNotifications = ({ navigation }) => {
             </View>
             <View
               style={[styles.subInput, { width: "85%" }]}
-              onLayout={(event) => {
-                //setTextInputLayout(event.nativeEvent.layout);
-              }}
+              onLayout={(event) => {}}
             >
               <Controller
                 control={control}
@@ -252,16 +177,6 @@ const TextNotifications = ({ navigation }) => {
                   />
                 )}
               />
-              {/* <EntryInput
-                name="phone"
-                placeholder="Phone number"
-                input={input}
-                style={error ? styles.errorInput : {}}
-                onChangeText={onChangeText}
-                onSubmitText={keyboardDismiss}
-                keyboardType="number-pad"
-              />
-              {error ? <Text style={styles.errorText}>{error}</Text> : null} */}
             </View>
           </View>
           <View style={styles.bottomContainer}></View>
@@ -292,7 +207,7 @@ const TextNotifications = ({ navigation }) => {
                     }
                     tintColors={{
                       true: "#1B99FF",
-                      false: isTermRequired? "#EF4E3E": "#D0D5DD",
+                      false: isTermRequired ? "#EF4E3E" : "#D0D5DD",
                     }}
                     accessible={false}
                   />
@@ -343,22 +258,6 @@ const TextNotifications = ({ navigation }) => {
               </View>
             )}
           </View>
-
-          {/* <View style={styles.checkBoxArea}>
-                        <View style={Platform.OS == "ios" ? styles.checkBoxView : styles.checkBoxViewAndroid }>
-                            <CheckBox
-                                disabled={false}
-                                value={toggleCheckBox}
-                                onValueChange={onCheckBox}
-                                style={Platform.OS == "ios" ? styles.checkBox : styles.checkBoxAndroid} 
-                                boxType="square"
-                                tintColors={{ true: Color.colorMidnightblue, false: Platform.OS == "ios" ? Color.colorWhitesmoke_300 : '#D0D5DD' }}
-                            />   
-                        </View>
-                        <View style={styles.checkBoxAreaView}>
-                            <Text style={styles.checkBoxAreaViewText}>I understand that message and data rates may apply. Message frequency may vary.</Text>
-                        </View>             
-                    </View>                                 */}
           <View style={styles.bottomBar}>
             <Pressable
               disabled={!enableButton}
@@ -389,12 +288,7 @@ const TextNotifications = ({ navigation }) => {
             >
               <Pressable
                 style={[styles.buttonDecline, styles.buttonsLayout]}
-                onPress={() => {
-                  navigation.reset({
-                    index: 0,
-                    routes: [{ name: nextScreen }],
-                  });
-                }}
+                onPress={handleSkip}
                 accessibilityLabel="Skip Button"
                 accessibilityRole="button"
                 accessibilityHint="Skip Terms and Conditions"
@@ -452,30 +346,6 @@ const styles = StyleSheet.create({
     height: 12,
     backgroundColor: Color.colorWhitesmoke_100,
   },
-  checkBoxView: {
-    width: 12,
-    height: 12,
-    marginRight: Platform.OS == "ios" ? 20 : 30,
-    marginTop: 10,
-    backgroundColor: Color.colorWhitesmoke_100,
-  },
-  checkBoxAndroid: {
-    //marginLeft: 10,
-    //marginRight: 20,
-    //width: 12,
-    //height: 12,
-    //backgroundColor: Color.colorWhitesmoke_100
-  },
-  checkBoxViewAndroid: {
-    //width: 20,
-    //height: 20,
-    //margin: 10,
-    //backgroundColor: '#000',
-    marginRight: 10,
-    marginLeft: 10,
-    // marginTop: 10,
-    //backgroundColor: Color.colorWhitesmoke_100
-  },
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -527,30 +397,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     height: "100%",
   },
-  scrollViewContainer: {
-    padding: 20,
-    marginBottom: 0,
-  },
-  scrollViewContentContainer: {
-    paddingBottom: 30,
-  },
-  sparklightImageView: {
-    width: 100,
-    height: 25,
-    marginBottom: 10,
-    marginTop: 10,
-  },
   ErrorToggle: {
     color: Color.sparkLightRed,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "600",
     fontSize: 14,
     marginLeft: 4,
-  },
-  sparklightImage: {
-    tintColor: "#CCC",
-    width: "100%",
-    height: "100%",
   },
   headerIconViewContainer: {
     alignItems: "center",
@@ -621,15 +473,6 @@ const styles = StyleSheet.create({
   },
   textBottomHeight: {
     height: 150,
-  },
-  errorInput: {
-    borderColor: "red",
-    borderWidth: 1,
-  },
-  errorText: {
-    marginTop: 8,
-    color: "red",
-    fontSize: 14,
   },
 });
 

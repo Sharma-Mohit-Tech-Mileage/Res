@@ -1,125 +1,20 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  ScrollView,
-  Pressable,
-  Platform,
-} from "react-native";
-import {
-  Color,
-  FontFamily,
-  FontSize,
-  Padding,
-  Border,
-} from "../../../GlobalStyles";
+import React from "react";
+import { View, StyleSheet, Text, ScrollView, Pressable, Platform, } from "react-native";
+import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import BellRingingIcon from "../../res/svgIcons/BellRingingIcon";
-import {
-  getFcmToken,
-  requestUserPermission,
-} from "../../firebase/FirebaseUtils";
+import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
 import { useSelector, useDispatch } from "react-redux";
 import moment from "moment";
 import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
-import { getUser } from "../../redux/utils/LocalStorage";
-import { GetApiRequest } from "../../network/APIClient";
-import { getPrimaryEmail } from "../../components/utility/constant";
+import NavigationUtils from "./NavigationUtils";
 
 const PushNotifications = ({ navigation }) => {
-  const [nextScreen, setNextScreen] = useState("EntryTextNotifications");
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.combinedReducers.profile || {});
   const user = useSelector((state) => state.combinedReducers.user.userData);
-  const accountDetails = useSelector(
-    (state) => state.combinedReducers.profile?.accountDetails
-  );
-
-  const getTextNotificationsData = () => {
-    getUser().then((res1) => {
-      let requestUrl = `api/SMS/sms?AccountNumber=${res1.userInfo?.accountNumber}`;
-      console.log(requestUrl);
-      GetApiRequest(
-        requestUrl,
-        (res) => {
-          if (res) {
-            console.log(
-              "Response on entry getTextNotificationsData",
-              JSON.stringify(res)
-            );
-            if (res.length > 0) {
-              let phoneNum = res[0]?.phoneNum || "";
-              if (phoneNum && phoneNum?.length > 0) {
-                if (accountDetails) {
-                      const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
-                      console.log("Updated Primary Email: ", updatedPrimaryEmail);
-                      if (updatedPrimaryEmail && updatedPrimaryEmail.length > 0) {
-                        setNextScreen("MyTab");
-                      }else{
-                        setNextScreen("EntryEmailNotifications");
-                      }
-                    }else{
-                        setNextScreen("EntryEmailNotifications");
-                    }
-                
-              }
-            }
-          }
-        },
-        (error) => {
-          console.error("Error on retrying getInAppNotificationsData", error);
-        }
-      );
-    });
-  };
-
-  useEffect(() => {
-    getTextNotificationsData();
-  }, []);
-
-  useEffect(() => {
-    let goToPhoneScreen = false;
-    let optOutCount = 0;
-    const isValidStatus = ["approved", "active"].includes(
-      profile.paperLessInfo?.paperlessStatus?.toLowerCase()
-    );
-
-    if (profile?.smsSubscription?.length > 0) {
-      const firstSubscription = profile?.smsSubscription[0];
-      firstSubscription.smsMessageType.forEach((messageType) => {
-        if (messageType.optOutFlag) {
-          optOutCount = optOutCount + 1;
-        }
-      });
-      console.log("optOutCountAfterLoop: ", optOutCount);
-      if (optOutCount > 2) {
-        goToPhoneScreen = true;
-      }
-    } else {
-      goToPhoneScreen = true;
-    }
-
-    if (goToPhoneScreen) {
-      setNextScreen("EntryTextNotifications");
-    } else {
-      if (profile.paperLessInfo?.accountNumber?.length > 0 && isValidStatus) {
-        setNextScreen("MyTab");
-      } else {
-        setNextScreen("EntryEmailNotifications");
-      }
-    }
-
-    if (
-      profile.profileDetails !== undefined &&
-      profile.profileDetails.memberType === "Admin"
-    ) {
-      setNextScreen("MyTab");
-    }
-
-    console.log("nextScreen: ", profile);
-  }, [profile]);
+  const accountNumber = user?.userInfo?.accountNumber || "";
 
   const enableNotifications = async () => {
     const enabledPermission = await requestUserPermission();
@@ -142,16 +37,14 @@ const PushNotifications = ({ navigation }) => {
       };
       storePushNotificationStatus(localData);
       await dispatch(updatePushNotificationsv2(data, null));
-      navigation.reset({
-        index: 0,
-        routes: [{ name: nextScreen }],
-      });
+      await NavigationUtils.navigateToNext(
+        navigation,
+        "EntryPushNotifications",
+        profile,
+        accountNumber
+      );
     } else {
       const token = await getFcmToken();
-      console.log(
-        "FCM TERM WITHOUT PERMISSION >>>>>>><<<<<<^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
-        token
-      );
       const dataWithoutPermission = {
         accountNumber: user.userInfo.accountNumber,
         deviceToken: token,
@@ -169,10 +62,12 @@ const PushNotifications = ({ navigation }) => {
       };
       storePushNotificationStatus(localData);
       await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
-      navigation.reset({
-        index: 0,
-        routes: [{ name: nextScreen }],
-      });
+      await NavigationUtils.navigateToNext(
+        navigation,
+        "EntryPushNotifications",
+        profile,
+        accountNumber
+      );
     }
   };
 
@@ -183,10 +78,12 @@ const PushNotifications = ({ navigation }) => {
       permanentSkip: false,
     };
     storePushNotificationStatus(data);
-    navigation.reset({
-      index: 0,
-      routes: [{ name: nextScreen }],
-    });
+    await NavigationUtils.navigateToNext(
+      navigation,
+      "EntryPushNotifications",
+      profile,
+      accountNumber
+    );
   };
 
   return (

@@ -9,7 +9,8 @@ import {
   Keyboard,
   ScrollView,
   TouchableOpacity,
-  AccessibilityInfo
+  AccessibilityInfo,
+  Platform
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
@@ -412,7 +413,7 @@ const TextNotifications = ({ navigation }) => {
               <View
                 style={{
                   paddingVertical: 16,
-                  marginHorizontal: 20,
+                  marginHorizontal: Platform.OS==='android'? 10: 20,
                   alignContent: "flex-start",
                   alignItems: "flex-start",
                 }}

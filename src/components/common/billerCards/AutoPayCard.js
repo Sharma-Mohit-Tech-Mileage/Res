@@ -10,7 +10,6 @@ import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../styles/AppStyles";
 const AutoPayCard = ({
-  cardDigit,
   isAutoPayStatus,
   paymentDetails,
   navigation,
