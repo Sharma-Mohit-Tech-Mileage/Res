@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, ScrollView, Linking, Platform } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Linking,
+  Platform,
+} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Padding,
@@ -17,8 +24,6 @@ import {
 } from "../utility/constant";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
-import { RefreshToken } from "../user/Session";
-import { GetApiRequest } from "../../network/APIClient";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
 const ProfileSettings = () => {
   const navigation = useNavigation();
@@ -30,23 +35,23 @@ const ProfileSettings = () => {
   const convertedRole = getUserType(profileDetails.memberType || "");
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || "");
 
-  const userInfo = useSelector((state) => state.combinedReducers?.user?.userData?.userInfo);
-  
-  const showReconnectMessage = userInfo ? 
-    isAccountDisconnected(userInfo.acctStatus, userInfo.daysSinceDisconnectDate) : false;
+  const userInfo = useSelector(
+    (state) => state.combinedReducers?.user?.userData?.userInfo
+  );
+
+  const showReconnectMessage = userInfo
+    ? isAccountDisconnected(
+        userInfo.acctStatus,
+        userInfo.daysSinceDisconnectDate
+      )
+    : false;
   useEffect(() => {
     if (route.params?.updateSuccess) {
       setShowSuccessAlert(true);
-      try {
-        RefreshToken();
-      } catch (error) {
-        navigation.navigate("Splash");
-      }
       dispatch(fetchProfileDetails());
       navigation.setParams({ updateSuccess: undefined });
     }
   }, [route.params?.updateSuccess, navigation, dispatch]);
-
 
   const makeCall = (number) => {
     let phoneNumber = "";
@@ -58,16 +63,6 @@ const ProfileSettings = () => {
     }
 
     Linking.openURL(phoneNumber);
-  };
-
-  const getPlanDetails = () => {
-      const requestURL=`api/Plan/GetServiceDetails?accountNumber=${profileDetails.accountNumber}&includeEquipment=false&includeLocation=false`
-      GetApiRequest(requestURL,onSuccess=(res)=>{
-
-      }), onError=(error)=>{
-        console.error("Error fetching plan details");
-      }
-    
   };
 
   return (
@@ -97,9 +92,7 @@ const ProfileSettings = () => {
               </View>
               <View style={styles.frameContainer}>
                 <View style={styles.firstNameParent} accessible={true}>
-                  <Text style={styles.firstName}>
-                    {"First Name"}
-                  </Text>
+                  <Text style={styles.firstName}>{"First Name"}</Text>
                   <Text style={[styles.melissa, styles.melissaTypo]}>
                     {profileDetails.fullName}
                   </Text>
@@ -147,7 +140,7 @@ const ProfileSettings = () => {
               </View>
             </View>
           </View>
-         <View style={[styles.frameGroup, { marginHorizontal: 16 }]}>
+          <View style={[styles.frameGroup, { marginHorizontal: 16 }]}>
             <View style={{ padding: 20, flexDirection: "column" }}>
               <Text style={[styles.generalInformation, styles.melissaTypo]}>
                 Manage My Service
@@ -178,7 +171,14 @@ const ProfileSettings = () => {
                     </Text>
                   </View>
                 ) : (
-                  <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", marginTop: 20 }}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      marginTop: 20,
+                    }}
+                  >
                     <Text style={styles.manageSerTxt1}>
                       To reconnect your service, please call us at{" "}
                     </Text>
@@ -200,7 +200,6 @@ const ProfileSettings = () => {
                   </View>
                 )
               ) : (
-                // Show existing cancel/change message + link
                 <>
                   {Platform.OS === "android" ? (
                     <View style={{ marginTop: 20 }}>
@@ -226,7 +225,14 @@ const ProfileSettings = () => {
                       </Text>
                     </View>
                   ) : (
-                    <View style={{ flexDirection: "row", flexWrap: "wrap", alignItems: "center", marginTop: 20 }}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        marginTop: 20,
+                      }}
+                    >
                       <Text style={styles.manageSerTxt1}>
                         To cancel or change service, please call us at{" "}
                       </Text>
@@ -383,7 +389,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontSize: FontSize.size_base,
     textAlign: "left",
-    color:'#000000',
+    color: "#000000",
     marginTop: 5,
   },
   manageSerTxt2: {

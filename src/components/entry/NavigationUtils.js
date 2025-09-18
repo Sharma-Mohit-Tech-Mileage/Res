@@ -1,9 +1,8 @@
-import { PostApiRequest } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 export const NavigationUtils = {
  
   checkPushNotificationNeeded: (profile) => {
-    //if (!profile?.pushNotifications?.length) 
+    if (!profile?.pushNotifications?.length) 
       return true;
     
     const messageTypes = profile.pushNotifications[0].pushMessageType || [];
@@ -14,7 +13,7 @@ export const NavigationUtils = {
 
   
   checkTextNotificationNeeded: (profile) => {
-    //if (!profile?.smsSubscription?.length) 
+    if (!profile?.smsSubscription?.length) 
       return true;
     const phoneNum = profile.smsSubscription[0].phoneNum;
     
