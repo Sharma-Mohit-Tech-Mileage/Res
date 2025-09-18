@@ -1,40 +1,37 @@
 import { useEffect } from "react";
-import { getUser } from "../redux/utils/LocalStorage";
+import { useSelector } from "react-redux";
+import { getPrimaryEmail } from "../components/utility/constant";
 
 /**
  * useUserEmailPrefill
  * Clean reusable hook that prefills an email field in react-hook-form only if empty.
- * @param {Function} getValues - react-hook-form getValues
- * @param {Function} setValue - react-hook-form setValue
- * @param {string} fieldName - form field name to prefill (default: 'feedbackEmail')
  */
 export const useUserEmailPrefill = (
   getValues,
   setValue,
   fieldName = "feedbackEmail"
 ) => {
+  const accountDetails = useSelector(
+    (state) => state?.combinedReducers?.profile?.accountDetails
+  );
+
   useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        if (getValues(fieldName)) return; // do not override user input
-        const user = await getUser();
-        const email = user?.userInfo?.email?.trim();
-        if (active && email) {
-          setValue(fieldName, email.toLowerCase(), {
-            shouldValidate: true,
-            shouldDirty: false,
-          });
-        }
-      } catch (e) {
-        // Intentionally silent; failure to prefill shouldn't surface
-        if (__DEV__) console.log("useUserEmailPrefill warning:", e?.message);
+    try {
+      if (getValues(fieldName)) return;
+
+      const email = getPrimaryEmail(accountDetails)?.trim();
+      if (email) {
+        setValue(fieldName, email.toLowerCase(), {
+          shouldValidate: true,
+          shouldDirty: false,
+        });
       }
-    })();
-    return () => {
-      active = false;
-    };
-  }, [getValues, setValue, fieldName]);
+    } catch (e) {
+      if (typeof __DEV__ !== "undefined" && __DEV__) {
+        console.log("useUserEmailPrefill warning:", e?.message);
+      }
+    }
+  }, [accountDetails, getValues, setValue, fieldName]);
 };
 
 export default useUserEmailPrefill;
