@@ -126,7 +126,7 @@ const NewBillerHome = ({ navigation }) => {
       );
     });
   };
-  // Refresh data when the screen is focused
+
   useFocusEffect(
     useCallback(() => {
       const refreshData = async () => {
@@ -145,7 +145,6 @@ const NewBillerHome = ({ navigation }) => {
     }, [dispatch])
   );
 
-  // Show walkthrough overlay if applicable
   useEffect(() => {
     if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
       setShowWalkThrough(true);

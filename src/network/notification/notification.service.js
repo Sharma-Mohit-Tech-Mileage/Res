@@ -94,7 +94,7 @@ export const addPrimaryEmail = async ({ newEmail, oldEmail }) => {
     try {
         const config = await getAuthConfig();
         const accountNumber = await getUserAccountNumber();
-        console.log('📧 Adding primary email:', { newEmail, oldEmail, accountNumber });
+        console.log('Adding primary email:', { newEmail, oldEmail, accountNumber });
         
         const payload = {
             account: accountNumber,
@@ -103,7 +103,7 @@ export const addPrimaryEmail = async ({ newEmail, oldEmail }) => {
         };
         
         const response = await _axios.post(
-            '/api/UpdateEmail/AddPrimaryEmail', 
+            'api/UpdateEmail/AddPrimaryEmail', 
             payload, 
             {...config}
         );
@@ -120,7 +120,7 @@ export const updatePrimaryEmail = async ({ newEmail, oldEmail }) => {
     try {
         const config = await getAuthConfig();
         const accountNumber = await getUserAccountNumber();
-        console.log('📧 Updating primary email:', { newEmail, oldEmail, accountNumber });
+        console.log(' Updating primary email:', { newEmail, oldEmail, accountNumber });
         
         const payload = {
             account: accountNumber,

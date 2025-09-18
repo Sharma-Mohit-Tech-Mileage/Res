@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import colors from "../../../res/Colors";
-import RightArrow from "../../../res/svgIcons/RightArrow";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
+import { FontFamily, Color } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
-import { getUser } from "../../../redux/utils/LocalStorage";
 import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 import AppStyles from "../styles/AppStyles";
@@ -13,35 +11,23 @@ const AutoPayCard = ({
   isAutoPayStatus,
   paymentDetails,
   navigation,
-  style,
   isStatusLoading,
 }) => {
-  const [useNewPayment, setUseNewPayment] = useState(false);
-  const getStatus = () => {
-    getUser().then((res) => {
-      const accountNumber = res.userInfo.accountNumber;
-      setUseNewPayment(accountNumber.toString().length >= 16);
-    });
-  };
-  useEffect(() => {
-    getStatus();
-  }, []);
-
   const handleCardPress = () => {
-    if (!isStatusLoading){
-    navigation.navigate("AutoPayPCIConnector", {
-      url: `${Env.URL}/billing`,
-      name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
-      useNewPayment: useNewPayment,
-      status: isAutoPayStatus,
-      paymentDetails: paymentDetails,
-    });
-  }
+    if (!isStatusLoading) {
+      navigation.navigate("AutoPayPCIConnector", {
+        url: `${Env.URL}/billing`,
+        name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
+        useNewPayment: true,
+        status: isAutoPayStatus,
+        paymentDetails: paymentDetails,
+      });
+    }
   };
 
   return (
     <Pressable
-      style={[AppStyles.card, style]}
+      style={[AppStyles.card]}
       onPress={handleCardPress}
       activeOpacity={0.8}
       accessible={true}
@@ -64,8 +50,7 @@ const AutoPayCard = ({
           <AutoPayIcon />
         </View>
         <View style={{ flexDirection: "column" }}>
-          <Text 
-          style={styles.leftTitle}>Auto Pay</Text>
+          <Text style={styles.leftTitle}>Auto Pay</Text>
           {isStatusLoading ? (
             <SkeletonPlaceholder>
               <View
@@ -92,7 +77,7 @@ const AutoPayCard = ({
                 marginLeft: 10,
               }}
             >
-            Manage
+              Manage
             </Text>
           )}
         </View>
@@ -122,12 +107,6 @@ const AutoPayCard = ({
 };
 
 const styles = StyleSheet.create({
-  shadowContainer: {
-    shadowColor: "#171717",
-    shadowOffset: { width: -2, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
   card: {
     flexDirection: "row",
     backgroundColor: "white",
@@ -146,43 +125,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     alignContent: "flex-start",
     alignSelf: "center",
-  },
-  cardContent: {
-    alignItems: "center",
-  },
-  dueDate: {
-    fontSize: 14,
-    fontWeight: "700",
-    alignContent: "center",
-    fontFamily: FontFamily.openSansRegular,
-    color: colors.sparklight_purple_blue,
-    textAlign: "center",
-    marginVertical: 5,
-  },
-  infoAuto: {
-    fontSize: 14,
-    fontWeight: "600",
-    alignContent: "center",
-    fontFamily: FontFamily.openSansRegular,
-    color: colors.sparklight_purple_blue,
-    textAlign: "center",
-    marginTop: Padding.p_xs,
-    marginHorizontal: Padding.p_xs,
-  },
-  thankYouText: {
-    fontSize: 14,
-    color: colors.sparklight_purple_blue,
-    textAlign: "center",
-    fontWeight: "700",
-    marginTop: Padding.p_xs,
-    marginBottom: 23,
-  },
-  subText: {
-    fontSize: 14,
-    color: colors.gray600,
-    textAlign: "center",
-    fontFamily: FontFamily.openSansRegular,
-    fontWeight: "400",
   },
   autoPayStatusText: {
     fontSize: 14,
@@ -220,45 +162,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
-  },
-  paymentButton: {
-    flexDirection: "row",
-    backgroundColor: colors.sparklight_purple_blue,
-    width: wp("70%"),
-    paddingVertical: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 5,
-    alignSelf: "center",
-    marginLeft: wp("9%"),
-  },
-  paymentButtonText: {
-    color: colors.snow_white,
-    fontSize: 16,
-    fontWeight: "600",
-    alignSelf: "center",
-    fontFamily: FontFamily.openSansRegular,
-  },
-  statusRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    marginVertical: 5,
-  },
-  cardHreader: {
-    flexDirection: "row",
-    width: wp("92%"),
-    padding: 10,
-  },
-  cardFooter: {
-    flexDirection: "row",
-
-    width: wp("100%"),
-    padding: 10,
-    position: "absolute",
-    bottom: 0,
-    left: 0,
   },
 });
 

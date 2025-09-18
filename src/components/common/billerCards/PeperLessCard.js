@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import colors from "../../../res/Colors";
-import RightArrow from "../../../res/svgIcons/RightArrow";
 import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
@@ -11,7 +10,6 @@ import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 const PeperLessCard = ({
   paperlessStatus,
   navigation,
-  style,
   isStatusLoading,
 }) => {
   const handleCardPress = () => {
@@ -22,7 +20,7 @@ const PeperLessCard = ({
 
   return (
     <Pressable
-      style={[AppStyles.card, style]}
+      style={[AppStyles.card]}
       onPress={handleCardPress}
       activeOpacity={0.8}
       accessible={true}
@@ -57,7 +55,7 @@ const PeperLessCard = ({
                     borderRadius: 4,
                     paddingVertical: 4,
                     paddingHorizontal: 8,
-                    marginTop: 5,// <-- Add this line to move it more to the left
+                    marginTop: 5,
                 }}
               />
             </SkeletonPlaceholder>
