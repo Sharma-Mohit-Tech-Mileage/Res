@@ -301,54 +301,60 @@ const getIPAddress = async () => {
  // zendesk chat login
 
  
- const loginWithToken= async (userAgent) => {
-  const user = await getUser();
-  const secret = '2pibLgH2LymoLJUmqQ3A94noQR6MD8RUZ4feDkFrU4VvGGxrhrXeQuRPGP-lBVzdaEZLzifgtGzKoN6XPzoQXg';
-  //data payload 
-  const data = {
-        scope: "user",
-        external_id: user?.userInfo.accountNumber,
-        //email: defaultPaymentDetails.email || "",
-        name: accountDetails?.first_name + " " + accountDetails?.last_name,
-        //email_verified: true, // optional
-       // exp: new Date().getTime() + 3600 * 1000,
+ const loginWithToken = async (userAgent,firstName,lastName) => {
+    const user = await getUser();
+    const secret ="0DE686CBBBF20A367D096D466BC5A895D8F62223CCB36C00A198E64F148E0D84"
+    // const secret =
+    //   (Platform.OS=='ios')?"JQ8sVOU9Hl3fnUf1gyt9xfRn9XVMZ44ilfSo5e3SnrutkSCXDmMVSdTOCVQMduayJwptKtfPrMNaUDz3LfzLxQ":"Rcmym7uJfKq-hqjXyhlC9y09AyPyw0K6Pt6cvqvBmR335YCChrSBS6rnSdEUT-9-YIIkSYS_AYU36ETkuCxnYA"
+    //data payload
+    const data = {
+      scope: "user",
+      external_id: user?.userInfo.accountNumber,
+      //email: defaultPaymentDetails.email || "",
+      //name: `${firstName} ${lastName}` || "",
+      //email_verified: true, // optional
+      // exp: new Date().getTime() + 3600 * 1000,
     };
     // header ID
     const options = {
-        "alg": "HS256",
-        "typ": "JWT",
-        "kid": "app_681cd7b6f85f7c21e70c5e06"
-    }
-    const jwt = sign(data, secret, options);
-    console.log("request data for jwt",data);
-    console.log("Loggin jwt",jwt);
-    loginWithJWT('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFwcF82ODFjZDdiNmY4NWY3YzIxZTcwYzVlMDYifQ.eyJleHRlcm5hbF9pZCI6IjgxNjA0NDAwNDAwNjI3MDIiLCJuYW1lIjoidW5kZWZpbmVkIHVuZGVmaW5lZCIsInNjb3BlIjoidXNlciJ9.vZFFDl5lEe96OTgi9y0pxZ3oDff9-0MHzUYSXHjuemQ');
+      alg: "HS256",
+      typ: "JWT",
+      //kid: (Platform.OS=='ios')? "app_683930d35c8351994c5bff40":"app_683933455c8351994c6542b3",
+    };
+    const jwttoken = sign(data, secret, options);
+    console.log("request data for jwt", data);
+    console.log("request options for jwt", options);
+    console.log("Loggin jwt", jwttoken);
+    loginWithJWT(jwttoken);
+    //loginWithJWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6InVzZXIiLCJleHRlcm5hbF9pZCI6IjEyODM4NzI2MyJ9.5d8kzoZS4Jp_9KDdvAPmqj_mETDFfI7C2C3VU3ZrDRA")
 
-     const fields={
-          userAgent:userAgent,
-          appVersion:VersionCheck.getCurrentVersion(),
-          timezoneOffsetId:new Date().getTimezoneOffset().toString(),
-          platform: Platform.OS,
-          locationHrefId:Env.URL,
-          ipAddress: await getIPAddress(),
-          accountNumber: user?.userInfo.accountNumber,
-          email: defaultPaymentDetails.email || "",
-          firstName: accountDetails?.first_name || '',
-          lastName: accountDetails?.last_name || '',
-          name: accountDetails?.first_name + " " + accountDetails?.last_name,
-          phone: '3',
-          accountNumber: user?.userInfo.accountNumber,
-          userName: user?.userInfo.userName,
-          customerType:user?.userInfo.customerType,
-          authLevel: user?.userInfo.authLevel,
-          jwtId: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFwcF82ODFjZDdiNmY4NWY3YzIxZTcwYzVlMDYifQ.eyJleHRlcm5hbF9pZCI6IjgxNjA0NDAwNDAwNjI3MDIiLCJuYW1lIjoidW5kZWZpbmVkIHVuZGVmaW5lZCIsInNjb3BlIjoidXNlciJ9.vZFFDl5lEe96OTgi9y0pxZ3oDff9-0MHzUYSXHjuemQ',
-        }
-        setTimeout(() => {
-          setConversationalFields(fields);
-        }, 2000);
-        
- }
+    const fields = {
+      userAgent: userAgent,
+      appVersion: VersionCheck.getCurrentVersion(),
+      timezoneOffsetId: new Date().getTimezoneOffset().toString(),
+      platform: Platform.OS,
+      locationHrefId: Env.URL,
+      ipAddress: await getIPAddress(),
+      accountNumber: user?.userInfo.accountNumber,
+      email: defaultPaymentDetails.email || "",
+      firstName: firstName || "",
+      lastName: lastName || "",
+      name: `${firstName} ${lastName}` || "",
+      phone: "3",
+      accountNumber: user?.userInfo.accountNumber,
+      userName: user?.userInfo.userName,
+      customerType: user?.userInfo.customerType,
+      authLevel: user?.userInfo.authLevel,
+      // jwtId:
+      // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6InVzZXIiLCJleHRlcm5hbF9pZCI6IjEyODM4NzI2MyJ9.5d8kzoZS4Jp_9KDdvAPmqj_mETDFfI7C2C3VU3ZrDRA",
+    jwtId: jwttoken,
+  };
 
+    setTimeout(() => {
+      //console.log("Setting conversational fields", fields);
+      setConversationalFields(fields);
+    }, 1000);
+  };
 
 
   const renderHeader = () => (
