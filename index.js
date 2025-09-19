@@ -47,7 +47,6 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
     }
 });
 
-// Foreground message handler
 messaging().onMessage(async remoteMessage => {
     console.log('Push Notification Message: ', remoteMessage);
 
