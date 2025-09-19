@@ -9,10 +9,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
 import WalkthroughOverlay from "../common/WalkthroughOverlay";
-import {
-  fetchACPUserAccountDetails,
-  getPaperlessStatus,
-} from "../../redux/actions/ProfileActionSuite";
+import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
 import { Env } from "../../network/apis/account/Constants";
@@ -29,25 +26,19 @@ import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
 import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
-import { getFcmToken, requestUserPermission, } from "../../firebase/FirebaseUtils";
+import {
+  getFcmToken,
+  requestUserPermission,
+} from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
 const NewBillerHome = ({ navigation }) => {
-  const [billAmt, setBillAmt] = useState(undefined);
-  const [dueDate, setDueDate] = useState("");
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
   const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [isNotificationEnable, setIsNotificationEnable] = useState(false);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [loadingAutoPay, setloadingAutoPay] = useState(false);
-  const [isLoading, setLoading] = useState(false);
-  const {
-    showBanner,
-    showMaintenancePage,
-    bannerConfig,
-    pageConfig,
-    dismissBanner,
-  } = useMaintenance();
+  const { showBanner, bannerConfig, dismissBanner } = useMaintenance();
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
     billAmount: 0,
@@ -85,14 +76,12 @@ const NewBillerHome = ({ navigation }) => {
 
   /* Function to check outage status */
   const checOutagStatus = () => {
-    setLoading(true);
     getUser().then((res) => {
       const request = `api/outage/GetOutages/?accountNumber=${res.userInfo.accountNumber}`;
       PostApiRequest(
         request,
         {},
         (response) => {
-          setLoading(false);
           console.log("checOutagStatus response", response);
           if (response?.error == false && response?.outageStatus) {
             console.log("its outage");
@@ -103,7 +92,7 @@ const NewBillerHome = ({ navigation }) => {
           }
         },
         (errorCode) => {
-          setLoading(false);
+          console.log("error in checOutagStatus", errorCode);
         }
       );
     });
@@ -157,26 +146,8 @@ const NewBillerHome = ({ navigation }) => {
     }
   }, [isNotificationEnable]);
 
-  // Update paperless status whenever the email changes
-  useEffect(() => {
-    if (defaultPaymentDetails.email) {
-      dispatch(getPaperlessStatus(defaultPaymentDetails.email));
-    }
-  }, [defaultPaymentDetails.email, dispatch]);
-
-  // Update local state when account details are received
   useEffect(() => {
     if (accountDetails) {
-      const userBillAmt =
-        accountDetails.past_due_amount <= 0
-          ? accountDetails.current_balance
-          : accountDetails.past_due_amount;
-      setBillAmt(userBillAmt?.toFixed(2));
-      const formattedDueDate =
-        accountDetails.past_due_amount !== 0
-          ? "Immediately"
-          : moment(accountDetails.payment_due_date).format("ll");
-      setDueDate(formattedDueDate);
       setDefaultPaymentDetails({
         dueDate: accountDetails.payment_due_date,
         billAmount: accountDetails.payment_due_amount,
@@ -383,11 +354,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginHorizontal: 20,
     marginTop: Platform.OS === "ios" ? 0 : 20,
-  },
-  logoImage: {
-    width: 120,
-    height: 30.324,
-    flexShrink: 0,
   },
   scrollContainer: {
     height: "100%",

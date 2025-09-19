@@ -1,5 +1,5 @@
-import { all, call, put, takeLatest } from "redux-saga/effects";
-import { updateEmailList } from "../../components/utility/constant";
+import { all, call, put, takeLatest ,takeLeading,cancelled} from "redux-saga/effects";
+import { updateEmailList ,getPrimaryEmail} from "../../components/utility/constant";
 import {
   fetchACPUserAccountDetails,
   isPaperlessEnabled,
@@ -643,29 +643,58 @@ function* handleUpdateEmailAssociations(action) {
   }
 }
 
-function* checkPaperlessSaga(action) {
+export function* checkPaperlessSaga(action) {
+const controller = new AbortController();
   try {
     yield put(setLoading(true));
-    const status = yield call(isPaperlessEnabled, action.payload.email);
+    const status = yield call(
+      isPaperlessEnabled,
+      action.payload.email,
+      controller.signal
+    );
     console.log("isPaperlessEnabled API Success Response:", status);
     yield put(setPaperlessStatus(status));
   } catch (error) {
     console.error("Error fetching ACP user isPaperlessEnabled:", error);
   } finally {
+    if (yield cancelled()) controller.abort();
     yield put(clearLoading());
   }
 }
 
 function* fetchACPUserAccountDetailsSaga() {
+  const controller = new AbortController();
+  yield put(setLoading(true));
   try {
-    const response = yield call(fetchACPUserAccountDetails); // Calls API with no params
-    if (response) {
-      yield put(saveACPUserAccountDetails(response)); // Saves response to Redux store
+    const accountData = yield call(fetchACPUserAccountDetails, controller.signal);
+    
+    if (!accountData) {
+      return; 
     }
+    
+    yield put(saveACPUserAccountDetails(accountData));
+    
+    const email = getPrimaryEmail(accountData);
+    
+    if (!email) {
+      return; // Exit if no email found
+    }
+    
+    const paperlessStatus = yield call(isPaperlessEnabled, email, controller.signal);
+    
+    yield put(setPaperlessStatus(paperlessStatus));
+    
   } catch (error) {
-    console.error("Error fetching ACP user account details:", error);
+    console.error("Error in account/paperless fetch:", error);
+  } finally {
+    yield put(clearLoading());
+    
+    if (yield cancelled()) {
+      controller.abort();
+    }
   }
 }
+
 function* ProfileSagas() {
   yield takeLatest(FETCH_PROFILE_DETAILS, fetchProfileDetails);
   yield takeLatest(FETCH_USER_LIST, getProfileUsers);
@@ -690,18 +719,12 @@ function* ProfileSagas() {
   yield takeLatest(LOG_ERROR, logErrorSaga);
   yield takeLatest(LOG_INFO, logInfoSaga);
   yield takeLatest(ALLSVEMAILASSOCIATED, fetchSvEmails);
-  yield takeLatest(
-    ADD_SV_EMAIL_NO_FLAGS_REQUEST,
-    handleAddSVEmailNoFlagsRequest
-  );
+  yield takeLatest( ADD_SV_EMAIL_NO_FLAGS_REQUEST, handleAddSVEmailNoFlagsRequest );
   yield takeLatest(DELETE_SV_EMAIL_REQUEST, handleDeleteSVEmailRequest);
   yield takeLatest(UPDATE_SV_EMAILS_REQUEST, handleUpdateSVEmailsRequest);
   yield takeLatest(MANAGE_EMAIL_REQUEST, handleManageEmailRequest);
   yield takeLatest(UPDATE_EMAIL_ASSOCIATIONS, handleUpdateEmailAssociations);
-  yield takeLatest(GET_PAPERLESS_STATUS, checkPaperlessSaga);
-  yield takeLatest(
-    FETCH_ACP_USER_ACCOUNT_DETAILS,
-    fetchACPUserAccountDetailsSaga
-  );
+  yield takeLeading(GET_PAPERLESS_STATUS, checkPaperlessSaga);
+  yield takeLeading( FETCH_ACP_USER_ACCOUNT_DETAILS, fetchACPUserAccountDetailsSaga );
 }
 export default ProfileSagas;

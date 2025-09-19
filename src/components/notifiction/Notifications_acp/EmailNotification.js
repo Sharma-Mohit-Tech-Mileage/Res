@@ -1,5 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, View, ScrollView, Image, Animated, Platform, TouchableOpacity, AccessibilityInfo, } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  Image,
+  Animated,
+  Platform,
+  TouchableOpacity,
+  AccessibilityInfo,
+} from "react-native";
 import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -14,13 +24,11 @@ import NotificationAlert from "../../common/customui/NotificationAlert";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 import LoadingOverlay from "../../common/customui/CustomLoading";
 import { updatePrimaryAndPaperlessRequest } from "../../../redux/actions/NotificationActionSuite";
-import { fetchACPUserAccountDetails, getPaperlessStatus, } from "../../../redux/actions/ProfileActionSuite";
+import { fetchACPUserAccountDetails } from "../../../redux/actions/ProfileActionSuite";
 import { getPrimaryEmail } from "../../utility/constant";
 import AlertIcon from "../../../res/svgIcons/AlertIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
-import { platformSpecificSpaceUnits } from "native-base/lib/typescript/theme/tools";
-const emailRegex =
-  /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -28,7 +36,6 @@ const validationSchema = yup.object().shape({
     .matches(emailRegex, "Invalid email address")
     .required("Email is required"),
 });
-
 
 const AddNotificationScreen = () => {
   const [toggleCheckBoxTerm, setToggleCheckBoxTerm] = useState(false);
@@ -51,7 +58,9 @@ const AddNotificationScreen = () => {
     (state) => state.combinedReducers.profile?.paperlessStatusAcp
   );
 
-   const [formState, setFormState] = useState({ paperlessBilling: paperlessStatusAcp });
+  const [formState, setFormState] = useState({
+    paperlessBilling: paperlessStatusAcp,
+  });
   const primaryEmail = accountDetails ? getPrimaryEmail(accountDetails) : "";
 
   const {
@@ -81,17 +90,6 @@ const AddNotificationScreen = () => {
       AccessibilityInfo.announceForAccessibility(notification.message);
     }
   }, [notification, screenReaderEnabled]);
-
-  useEffect(() => {
-    if (accountDetails) {
-      const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
-      setValue("email", updatedPrimaryEmail);
-      dispatch(getPaperlessStatus(updatedPrimaryEmail));
-
-      // Update isEnrolled based on the actual presence of a primary email
-      setIsEnrolled(!!updatedPrimaryEmail);
-    }
-  }, [accountDetails, setValue, dispatch]);
 
   useEffect(() => {
     setIsCheckboxVisible(!paperlessStatusAcp);
@@ -185,7 +183,7 @@ const AddNotificationScreen = () => {
     (data) => {
       const { email } = data;
       const { paperlessBilling } = formState;
-      
+
       if (isCheckboxVisible && paperlessBilling && !toggleCheckBoxTerm) {
         setIsTermRequired(true);
         return;
@@ -215,14 +213,7 @@ const AddNotificationScreen = () => {
     ]
   );
 
-  const handleValidationError = useCallback(() => {
-    // scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-    // setNotification({
-    //   message: "Please enter valid information to continue.",
-    //   type: "error",
-    // });
-    // animateNotification();
-  }, [animateNotification]);
+  const handleValidationError = useCallback(() => {}, [animateNotification]);
 
   const handleCheckboxToggle = useCallback(() => {
     setToggleCheckBoxTerm(!toggleCheckBoxTerm);
@@ -341,9 +332,12 @@ const AddNotificationScreen = () => {
                   Critical Notifications
                 </Text>
                 <View style={[styles.iconContainer, { flex: 0.14 }]}>
-                  
                   <View style={styles.icon} accessible={false}>
-                    {primaryEmail ? <SuccessIcon /> : <SuccessIcon color={'#4C5458'} />}
+                    {primaryEmail ? (
+                      <SuccessIcon />
+                    ) : (
+                      <SuccessIcon color={"#4C5458"} />
+                    )}
                   </View>
                   {/* Display text "On" or "Off" after the icon */}
                   <Text style={styles.toggleStatus}>
@@ -404,7 +398,7 @@ const AddNotificationScreen = () => {
                       }
                       tintColors={{
                         true: "#1B99FF",
-                        false: isTermRequired? "#EF4E3E": "#D0D5DD",
+                        false: isTermRequired ? "#EF4E3E" : "#D0D5DD",
                       }}
                       accessible={false}
                     />
@@ -581,7 +575,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     flexWrap: "wrap",
-    paddingHorizontal:Platform.OS==='android'? 16 : Padding.p_5xl
+    paddingHorizontal: Platform.OS === "android" ? 16 : Padding.p_5xl,
   },
   checkboxTouchable: {
     flexDirection: "row",

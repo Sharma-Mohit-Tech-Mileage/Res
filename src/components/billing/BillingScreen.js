@@ -23,10 +23,7 @@ import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
-import {
-  fetchACPUserAccountDetails,
-  getPaperlessStatus,
-} from "../../redux/actions/ProfileActionSuite";
+import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
 import Icon from "../common/Icon";
 import { Env } from "../../network/apis/account/Constants";
@@ -100,7 +97,7 @@ const BillingScreen = ({ navigation }) => {
     }, [])
   );
   useEffect(() => {
-     if (accountDetails) {
+    if (accountDetails) {
       const p_email = getPrimaryEmail(accountDetails);
       const userBillAmt =
         accountDetails.past_due_amount === 0
@@ -119,7 +116,6 @@ const BillingScreen = ({ navigation }) => {
         pastPaymentDue: accountDetails.past_due_amount,
         email: p_email,
       });
-      dispatch(getPaperlessStatus(p_email));
       setIsContentLoading(false);
     }
   }, [accountDetails]);

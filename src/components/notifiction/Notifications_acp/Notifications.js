@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
@@ -8,17 +8,16 @@ import { getUser } from "../../..//redux/utils/LocalStorage";
 import { Color, Padding } from "../../../../GlobalStyles";
 import { getPrimaryEmail } from "../../utility/constant";
 import { GetApiRequest } from "../../../network/APIClient";
-import {
-  fetchACPUserAccountDetails,
-  getPaperlessStatus,
-} from "../../../redux/actions/ProfileActionSuite";
+import { fetchACPUserAccountDetails, } from "../../../redux/actions/ProfileActionSuite";
 
 
 const Notifications = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const [loading,setLoading]=useState(false)
-  const [phoneNumber,setPhoneNumber]=useState(undefined)
+  
+  const [textNotificationLoading, setTextNotificationLoading] = useState(false);
+  const [inAppNotificationLoading, setInAppNotificationLoading] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState(undefined);
 
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
@@ -27,6 +26,10 @@ const Notifications = () => {
     (state) => state.combinedReducers.profile?.paperlessStatusAcp
   );
 
+  const paperlessLoading = useSelector(
+    (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
+  );
+  
   const profileData = useMemo(() => {
     return accountDetails
       ? {
@@ -94,6 +97,7 @@ const Notifications = () => {
     ],
     []
   );
+
   const sections = useMemo(
     () => [
       {
@@ -103,6 +107,7 @@ const Notifications = () => {
         settings: TextNotifSettings,
         infoMessage: phoneNumber ? `Text alert are sent to ${phoneNumber}`
         : "You have not enabled text notifications.",
+        isLoading: textNotificationLoading,
       },
       {
         id: "email",
@@ -111,6 +116,7 @@ const Notifications = () => {
         infoMessage: profileData.emailAddress
           ? `Emails are sent to ${profileData.emailAddress}`
           : "You have not enabled email notifications.",
+        isLoading: paperlessLoading, 
       },
       {
         id: "app",
@@ -118,9 +124,10 @@ const Notifications = () => {
         isComingSoon: false,
         settings: InAppSettings,
         infoMessage: "Notifications sent from your application.",
+        isLoading: inAppNotificationLoading,
       },
     ],
-    [profileData, emailSettings]
+    [profileData, emailSettings, textNotificationLoading, paperlessLoading, inAppNotificationLoading, phoneNumber]
   );
 
   const handleEdit = (section) => {
@@ -147,18 +154,8 @@ const Notifications = () => {
 
   const handleBackPress = () => navigation.navigate("Account");
 
-  // Existing effect: when accountDetails change, update the paperless status using the new email.
-  useEffect(() => {
-    if (accountDetails) {
-      const updatedPrimaryEmail = getPrimaryEmail(accountDetails);
-      dispatch(getPaperlessStatus(updatedPrimaryEmail));
-      //console.log('Account details',accountDetails)
-    }
-  }, [accountDetails, dispatch]);
-
-  // On focus, trigger the Redux Saga to refresh account details.
-
   const getInAppNotificationsData = () => {
+    setInAppNotificationLoading(true); 
     getUser().then((res1) => {
       let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
       console.log('REQUEST',requestUrl);
@@ -166,17 +163,15 @@ const Notifications = () => {
         requestUrl,
         (res) => {
           if (res) {
-            console.log(
-              "Response getInAppNotificationsData",
-              JSON.stringify(res)
-            );
             res[0]?.pushMessageType.forEach((value, index) => {
               console.log(`Index: ${index}, Value: ${value}`);
               InAppSettings[index].status = value?.optOutFlag ? "Off" : "On";
             });
           }
+          setInAppNotificationLoading(false); 
         },
         (error) => {
+          setInAppNotificationLoading(false); 
           console.error("Error on retrying getInAppNotificationsData", error);
         }
       );
@@ -184,7 +179,7 @@ const Notifications = () => {
   };
 
   const getTextNotificationsData = () => {
-    setLoading(true)
+    setTextNotificationLoading(true); 
     getUser().then((res1) => {
       let requestUrl = `api/SMS/sms?AccountNumber=${res1.userInfo?.accountNumber}`;
       console.log(requestUrl);
@@ -192,29 +187,22 @@ const Notifications = () => {
         requestUrl,
         (res) => {
           if (res) {
-            console.log(
-              "Response getTextNotificationsData",
-              JSON.stringify(res)
-            );
-            
             res[0]?.smsMessageType.forEach((value, index) => {
               console.log(`Index: ${index}, Value: ${value}`);
               TextNotifSettings[index].status = (value?.optOutFlag) ? "Off" : "On";
             });
             let phoneNum=res[0]?.phoneNum ||''
             setPhoneNumber(phoneNum)
-            
           }
-             setLoading(false)
+          setTextNotificationLoading(false); 
         },
         (error) => {
-          setLoading(false)
-          console.error("Error on retrying getInAppNotificationsData", error);
+          setTextNotificationLoading(false);
+          console.error("Error on retrying getTextNotificationsData", error);
         }
       );
     });
   };
-
 
   useFocusEffect(
     useCallback(() => {
@@ -226,10 +214,7 @@ const Notifications = () => {
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader
-        title="Notifications"
-        onPressBack={handleBackPress}
-      />
+      <ProfileSettingsHeader title="Notifications" onPressBack={handleBackPress} />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.sectionsContainer}>
           {sections.map((section) => (
@@ -238,9 +223,8 @@ const Notifications = () => {
               {...section}
               onEdit={() => handleEdit(section.id)}
               isAdmin={profileData.isAdmin}
-              isLoading={loading}
+              isLoading={section.isLoading} 
               phoneNumber={phoneNumber}
-
             />
           ))}
         </View>

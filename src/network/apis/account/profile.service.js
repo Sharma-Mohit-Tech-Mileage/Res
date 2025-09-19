@@ -671,16 +671,19 @@ const addSVEmailMktFlag = async (email) => {
   }
 };
 
-const isPaperlessEnabled = async (email) => {
+ const isPaperlessEnabled = async (email, signal) => {
   const user = await getUser();
   const response = await _axios.get(
-    `/api/Paperless/IsPaperless?account=${user.userInfo.accountNumber}&email=${email}`,
-    { headers: { Authorization: `Bearer ${user.token}` } }
+    `/api/Paperless/IsPaperless?account=${user.userInfo.accountNumber}&email=${encodeURIComponent(email)}`,
+    {
+      headers: { Authorization: `Bearer ${user.token}` },
+      signal, // <-- allows cancellation from saga
+    }
   );
   return response.data;
 };
 
-const fetchACPUserAccountDetails = async () => {
+const fetchACPUserAccountDetails = async (signal) => {
   let user = await getUser();
   const accountNumber = user.userInfo?.accountNumber || null;
 
@@ -688,6 +691,7 @@ const fetchACPUserAccountDetails = async () => {
     headers: {
       Authorization: "Bearer " + user.token,
     },
+    signal: signal,
   };
 
   const requestUrl = `/api/Accounts/GetAccountDetails`;

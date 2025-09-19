@@ -68,7 +68,6 @@ export const RefreshToken = async () => {
             throw new Error("No user or refresh token found");
         }
 
-        console.log('User retrieved from local storage:', user);
 
         const result = await refresh(config, {
             refreshToken: user.refreshToken,
