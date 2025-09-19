@@ -1,15 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  Image,
-  Animated,
-  Platform,
-  TouchableOpacity,
-  AccessibilityInfo,
-} from "react-native";
+import { StyleSheet, Text, View, ScrollView, Animated, Platform, TouchableOpacity, AccessibilityInfo, } from "react-native";
 import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
