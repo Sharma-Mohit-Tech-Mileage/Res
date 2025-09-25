@@ -23,7 +23,10 @@ import UserIconWhite from "../../res/svgIcons/UserIconWhite";
 import moment from "moment";
 import analytics from '@react-native-firebase/analytics';
 import RightIcon from '../../../assets/svgs/Chevonright';
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
 const config = {
   issuer: Env.SSO_LOGIN,
   iosPrefersEphemeralSession: true,
@@ -315,8 +318,8 @@ const AccountOverview = () => {
               </Text>
             </Pressable>
 
-            <Text style={{ color: Color.colorMidnightblue, alignSelf:'center', fontSize:FontSize.size_sm,fontFamily:FontFamily.openSansRegular , marginTop:50,fontWeight:'400' }}>
-                {`Copyright © ${moment().year()}, Sparklight ®, All Rights Reserved.`}
+            <Text style={styles.copyright}>
+                {`Copyright © ${moment().year()} Cable One, Inc. , Sparklight ®, All Rights Reserved.`}
             </Text>
           </View>
         </ScrollView>
@@ -463,6 +466,15 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: Padding.p_base,
     alignSelf: 'stretch',
+  },copyright: {
+    marginTop:wp("25%"),
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 14,
+    textAlign: "center",
+    fontWeight: "400",
+    color: Color.colorMidnightblue,
+    alignSelf: "center",
+    paddingHorizontal: wp("3%"),
   },
   account: {
     flex: 1,

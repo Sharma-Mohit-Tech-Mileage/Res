@@ -5,7 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   AccessibilityInfo,
-} from "react-native"; 
+} from "react-native";
 import { Color, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { resentEmailVerifiction } from "../../../redux/actions/ProfileActionSuite";
@@ -163,14 +163,20 @@ const NotificationAlert = ({
         accessibilityLiveRegion="polite"
       >
         {/* Replace Image with SVG Component */}
-        <IconComponent
-          width={20}
-          height={22}
-          color={currentTypeStyle.titleColor}
-          style={{ marginTop: !title ? 1 : 1 }}
-          accessible={false}
-          importantForAccessibility="no"
-        />
+        <View
+          style={[styles.iconStyle, { marginTop: !title ? 1 : 1 }]}
+          accessible={true}
+          accessibilityLabel={`${type} icon`}
+          accessibilityRole="image"
+        >
+          <IconComponent
+            width={20}
+            height={22}
+            color={currentTypeStyle.titleColor}
+            accessible={false}
+            importantForAccessibility="no"
+          />
+        </View>
 
         <View
           style={[
