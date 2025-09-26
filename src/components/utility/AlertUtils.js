@@ -209,6 +209,7 @@ const styles = StyleSheet.create({
   alertTitle: {
     fontFamily: FontFamily.textXsSemibold,
     fontSize: 15,
+    color:"#000000",
     fontStyle: "normal",
     fontWeight: "700",
     marginRight: 5,

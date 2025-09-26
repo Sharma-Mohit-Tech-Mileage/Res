@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   alertTitle: {
-    color: colors.sparklight_purple_blue,
+    color: colors.black,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 22,
     fontWeight: "600",

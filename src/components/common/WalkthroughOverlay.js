@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   titleText: {
-    color: Color.sparklightGray1,
+    color: Color.colorblack_100,
     fontSize: FontSize.size_lg,
     fontFamily: FontFamily.openSansSemiBold,
   },

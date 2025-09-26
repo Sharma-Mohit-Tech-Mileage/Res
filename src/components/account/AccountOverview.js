@@ -319,7 +319,7 @@ const AccountOverview = () => {
             </Pressable>
 
             <Text style={styles.copyright}>
-                {`Copyright © ${moment().year()} Cable One, Inc. , Sparklight ®, All Rights Reserved.`}
+                {`©${moment().year()} Cable One, Inc. All rights reserved.`}
             </Text>
           </View>
         </ScrollView>

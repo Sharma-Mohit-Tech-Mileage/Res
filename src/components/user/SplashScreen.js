@@ -598,7 +598,7 @@ const SplashScreen = ({ navigation, route }) => {
       )}
 
       <Text style={getStyle("copyright")}>
-        {`Copyright © ${moment().year()}Cable One, Inc. , Sparklight ®, All Rights Reserved.`}
+        {`©${moment().year()} Cable One, Inc. All rights reserved.`}
       </Text>
 
       <CustomAlertModal
@@ -677,7 +677,7 @@ const styles = StyleSheet.create({
     paddingRight: 0,
   },
   alertTitle: {
-    color: colors.sparklight_grey,
+    color: colors.black,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 22,
     fontWeight: "700",

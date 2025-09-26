@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontSize: wp('7%'),
     maxFontSize: 32,
-    color: Color.sparklightGray1,
+    color: Color.colorblack_100,
     textAlign: 'center',
     marginBottom: hp('2%'),
     fontWeight: '400',
