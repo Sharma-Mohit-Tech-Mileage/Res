@@ -1,5 +1,15 @@
-import { all, call, put, takeLatest ,takeLeading,cancelled} from "redux-saga/effects";
-import { updateEmailList ,getPrimaryEmail} from "../../components/utility/constant";
+import {
+  all,
+  call,
+  put,
+  takeLatest,
+  takeLeading,
+  cancelled,
+} from "redux-saga/effects";
+import {
+  updateEmailList,
+  getPrimaryEmail,
+} from "../../components/utility/constant";
 import {
   fetchACPUserAccountDetails,
   isPaperlessEnabled,
@@ -26,7 +36,7 @@ import {
   fetchAllSvEmails,
   addSVEmailNoFlags,
   updateSVEmails,
-  manageSVEmails
+  manageSVEmails,
 } from "../../network/apis/account/profile.service";
 import {
   FETCH_ACP_USER_ACCOUNT_DETAILS,
@@ -164,7 +174,7 @@ function* updateProfile(action) {
     action.navigation.navigate("ProfileSettings", { updateSuccess: true });
   } catch (error) {
     action.navigation.navigate("ProfileSettingsEdit", { updateFailed: true });
-    console.error("API Error Response:", error, action.payload); 
+    console.error("API Error Response:", error, action.payload);
   }
 }
 
@@ -180,11 +190,11 @@ function* saveUserFeedBack(action) {
 function* updateProfileSecurity(action) {
   try {
     const response = yield call(postProfileInfo, action.payload);
-    console.log("API Success Response:", response); 
+    console.log("API Success Response:", response);
     action.navigation.navigate("PasswordSecurity", { updateSuccess: true });
   } catch (error) {
     action.navigation.navigate("PasswordSecurityEdit", { updateFailed: true });
-    console.error("API Error Response:", error, action.payload); 
+    console.error("API Error Response:", error, action.payload);
   }
 }
 
@@ -644,7 +654,7 @@ function* handleUpdateEmailAssociations(action) {
 }
 
 export function* checkPaperlessSaga(action) {
-const controller = new AbortController();
+  const controller = new AbortController();
   try {
     yield put(setLoading(true));
     const status = yield call(
@@ -666,29 +676,35 @@ function* fetchACPUserAccountDetailsSaga() {
   const controller = new AbortController();
   yield put(setLoading(true));
   try {
-    const accountData = yield call(fetchACPUserAccountDetails, controller.signal);
-    
+    const accountData = yield call(
+      fetchACPUserAccountDetails,
+      controller.signal
+    );
+
     if (!accountData) {
-      return; 
+      return;
     }
-    
+
     yield put(saveACPUserAccountDetails(accountData));
-    
+
     const email = getPrimaryEmail(accountData);
-    
+
     if (!email) {
       return; // Exit if no email found
     }
-    
-    const paperlessStatus = yield call(isPaperlessEnabled, email, controller.signal);
-    
+
+    const paperlessStatus = yield call(
+      isPaperlessEnabled,
+      email,
+      controller.signal
+    );
+
     yield put(setPaperlessStatus(paperlessStatus));
-    
   } catch (error) {
     console.error("Error in account/paperless fetch:", error);
   } finally {
     yield put(clearLoading());
-    
+
     if (yield cancelled()) {
       controller.abort();
     }
@@ -719,12 +735,18 @@ function* ProfileSagas() {
   yield takeLatest(LOG_ERROR, logErrorSaga);
   yield takeLatest(LOG_INFO, logInfoSaga);
   yield takeLatest(ALLSVEMAILASSOCIATED, fetchSvEmails);
-  yield takeLatest( ADD_SV_EMAIL_NO_FLAGS_REQUEST, handleAddSVEmailNoFlagsRequest );
+  yield takeLatest(
+    ADD_SV_EMAIL_NO_FLAGS_REQUEST,
+    handleAddSVEmailNoFlagsRequest
+  );
   yield takeLatest(DELETE_SV_EMAIL_REQUEST, handleDeleteSVEmailRequest);
   yield takeLatest(UPDATE_SV_EMAILS_REQUEST, handleUpdateSVEmailsRequest);
   yield takeLatest(MANAGE_EMAIL_REQUEST, handleManageEmailRequest);
   yield takeLatest(UPDATE_EMAIL_ASSOCIATIONS, handleUpdateEmailAssociations);
   yield takeLeading(GET_PAPERLESS_STATUS, checkPaperlessSaga);
-  yield takeLeading( FETCH_ACP_USER_ACCOUNT_DETAILS, fetchACPUserAccountDetailsSaga );
+  yield takeLeading(
+    FETCH_ACP_USER_ACCOUNT_DETAILS,
+    fetchACPUserAccountDetailsSaga
+  );
 }
 export default ProfileSagas;

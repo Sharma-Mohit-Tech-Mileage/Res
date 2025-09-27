@@ -1,30 +1,14 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  AccessibilityInfo,
-} from "react-native"; 
+import { View, Text, StyleSheet, TouchableOpacity, AccessibilityInfo, } from "react-native"; 
 import { Color, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { resentEmailVerifiction } from "../../../redux/actions/ProfileActionSuite";
 import { useDispatch } from "react-redux";
 import RenderText from "../RenderText";
-
 import InfoIcon from "../../../../assets/svgs/InfoIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 
-const NotificationAlert = ({
-  type,
-  title,
-  message,
-  onClose,
-  showCloseIcon = true,
-  isVisible = true,
-  resentemail = false,
-  splitKey = "contact us",
-}) => {
+const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true, isVisible = true, resentemail = false, splitKey = "contact us", }) => {
   if (!isVisible) return null;
 
   const dispatch = useDispatch();
@@ -39,7 +23,7 @@ const NotificationAlert = ({
       textColor: "#000000",
       titleColor: "#0060AE",
       closeButtonColor: "#0060AE",
-      IconComponent: InfoIcon, // Changed from image to IconComponent
+      IconComponent: InfoIcon, 
     },
     error: {
       backgroundColor: "#FEF3F2",

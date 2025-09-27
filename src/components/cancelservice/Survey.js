@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Pressable, TextInput, ScrollView ,Platform,Linking} from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  TextInput,
+  ScrollView,
+  Platform,
+  Linking,
+} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { Radio } from "native-base";
@@ -11,7 +19,7 @@ import {
   Border,
   FontSize,
 } from "../../../GlobalStyles";
-import AppStyles from "../common/styles/AppStyles";
+import AppStyles from "../utility/AppStyles";
 import NotificationAlert from "../common/customui/NotificationAlert";
 import SecondaryButton from "../common/customui/SecondaryButton";
 import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
@@ -22,7 +30,8 @@ import { useNavigation } from "@react-navigation/native";
 
 const errorRes = {
   error: "DISCONNECT_ERROR",
-  message:"Sample error message..Sample error message..Sample error message..Sample error message..",
+  message:
+    "Sample error message..Sample error message..Sample error message..Sample error message..",
 };
 
 const Survey = ({ route }) => {
@@ -36,9 +45,9 @@ const Survey = ({ route }) => {
   const [planName, setPlanName] = useState(route.params?.planName || "");
   const [planPrice, setPlanPrice] = useState(route.params?.planPrice || "");
   // const [selectedId, setSelectedId] = useState(null);
- const [error, setError] = useState(errorRes);
+  const [error, setError] = useState(errorRes);
   const [surveyOptions, setSurveyOptions] = useState([]);
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {};
   const [currentDate, setCurrentDate] = useState(
     moment().format("YYYY-MM-DDTHH:mm:ssZ")
@@ -64,17 +73,16 @@ const Survey = ({ route }) => {
   };
 
   const makeCall = (number) => {
-      let phoneNumber = "";
-  
-      if (Platform.OS === "android") {
-        phoneNumber = `tel:${number}`;
-      } else {
-        phoneNumber = `telprompt:${number}`;
-      }
-  
-      Linking.openURL(phoneNumber);
-    };
-  
+    let phoneNumber = "";
+
+    if (Platform.OS === "android") {
+      phoneNumber = `tel:${number}`;
+    } else {
+      phoneNumber = `telprompt:${number}`;
+    }
+
+    Linking.openURL(phoneNumber);
+  };
 
   const onChangeValue = (value) => {
     console.log("Selected value:", value);
@@ -123,17 +131,17 @@ const Survey = ({ route }) => {
         setLoading(false);
         console.log("Disconnect request successful:", res);
         // Handle success, e.g., navigate to a confirmation screen or show a success message
-       if(res.error!=null && res?.error?.message){
-          setError(res.error)
-        }else{
-        navigation.navigate("cancelServiceSummary", {
-          item: selectedOption,
-          comment: myComment,
-          planName: planName,
-          planPrice: planPrice,
-          data: res,
-        });
-      }
+        if (res.error != null && res?.error?.message) {
+          setError(res.error);
+        } else {
+          navigation.navigate("cancelServiceSummary", {
+            item: selectedOption,
+            comment: myComment,
+            planName: planName,
+            planPrice: planPrice,
+            data: res,
+          });
+        }
       },
       (error) => {
         setLoading(false);
@@ -143,20 +151,21 @@ const Survey = ({ route }) => {
     );
   };
 
-
   const renderErrorMessage = () => {
-    console.log('Error message',error)
+    console.log("Error message", error);
     return (
       <>
         {error && error?.message && (
-          <View style={{ paddingHorizontal: Padding.p_5xl,marginVertical:16 }}>
+          <View
+            style={{ paddingHorizontal: Padding.p_5xl, marginVertical: 16 }}
+          >
             <NotificationAlert
               type="warning"
               title={"Disconnect Error"}
               message={error.message}
               showCloseIcon={true}
-              onClose={()=>{
-                setError(null)
+              onClose={() => {
+                setError(null);
               }}
               isVisible={true}
               accessibilityLabel={error.message}
@@ -169,7 +178,6 @@ const Survey = ({ route }) => {
       </>
     );
   };
-
 
   return (
     <View style={styles.rootContainer}>
@@ -311,50 +319,45 @@ const Survey = ({ route }) => {
                 {"Continue to Cancel"}
               </Text>
             </Pressable>
-            <View style={[styles.buttonsParent,{marginTop:10}]}>
+            <View style={[styles.buttonsParent, { marginTop: 10 }]}>
               <SecondaryButton
                 text="Don't Cancel"
                 onPress={() => navigation.goBack()}
                 accessibilityLabel="Don't Cancel"
                 accessibilityHint="Double tap to return to Profile Settings"
               />
-              
             </View>
             <View
               style={{
-                flexDirection: 'column',
+                flexDirection: "column",
                 alignItems: "center",
-                alignContent:'center',
+                alignContent: "center",
                 justifyContent: "center",
-                
               }}
             >
-              
-                <View
-                  style={{
-                    flexDirection: "row",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    justifyContent:'center',
-                    marginBottom:24,
-                    marginTop:10,
-                  }}
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: 24,
+                  marginTop: 10,
+                }}
+              >
+                <Text style={styles.manageSerTxt1}>
+                  To cancel service, please call{" "}
+                </Text>
+                <Text
+                  style={styles.manageSerTxt2}
+                  onPress={() => makeCall("833-807-1020")}
+                  accessibilityRole="link"
+                  accessibilityLabel="Call 833 807 1020"
+                  accessibilityHint="Double tap to call customer service"
                 >
-                  <Text style={styles.manageSerTxt1}>
-                    To cancel service, please call{" "}
-                  </Text>
-                  <Text
-                    style={styles.manageSerTxt2}
-                    onPress={() => makeCall("833-807-1020")}
-                    accessibilityRole="link"
-                    accessibilityLabel="Call 833 807 1020"
-                    accessibilityHint="Double tap to call customer service"
-                  >
-                    833-807-1020
-                  </Text>
-                  
-                </View>
-              
+                  833-807-1020
+                </Text>
+              </View>
             </View>
           </View>
 
@@ -454,7 +457,8 @@ const styles = {
     fontSize: FontSize.size_base,
     color: Color.colorGray_100,
     fontWeight: "700",
-  },warningAlert: {
+  },
+  warningAlert: {
     borderLeftWidth: 4,
     borderLeftColor: "#FF9800",
     marginBottom: 0,

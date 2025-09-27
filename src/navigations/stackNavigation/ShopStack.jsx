@@ -1,17 +1,12 @@
-// Support.js
-
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ShopScreen from "../../components/home/ShopScreen";
-import { useTabBarVisibility } from "../TabBarVisibilityContext";
 import MyServices from "../../components/services/MyServices";
 import TroubleShootStack from "./TroubleShootStack";
-
 
 const ShopStack = createNativeStackNavigator();
 
 function ServiceStackScreen() {
-  const { setTabBarVisible } = useTabBarVisibility();
   return (
     <ShopStack.Navigator defaultNavigationOptions={{ gestureEnabled: true }}>
       <ShopStack.Screen
@@ -21,19 +16,11 @@ function ServiceStackScreen() {
           headerBackVisible: false,
           headerShown: false,
         }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
       />
       <ShopStack.Screen
         name="DiagnosticFlow"
         component={TroubleShootStack}
         options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
       />
       <ShopStack.Screen
         name="shopHome"
@@ -41,10 +28,6 @@ function ServiceStackScreen() {
         options={{
           headerBackVisible: false,
           headerShown: false,
-        }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
         }}
       />
     </ShopStack.Navigator>

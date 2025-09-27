@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 
 // Basic selectors
-const getBillingBreakdownState = state => state.combinedReducers.billingBreakdown;
+const getBillingBreakdownState = state => state.billingBreakdown;
 
 // Extract breakdown data from serviceDetailGroups with failsafe
 export const selectServiceDetailGroups = createSelector(

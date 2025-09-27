@@ -28,22 +28,22 @@ import moment from "moment";
 import Icon from "../common/Icon";
 import { Env } from "../../network/apis/account/Constants";
 import colors from "../../res/Colors";
-import AppStyles from "../common/styles/AppStyles";
+import AppStyles from "../utility/AppStyles";
 import { getPrimaryEmail } from "../utility/constant";
-import LoadingOverlay from "../common/LoadingOverlay";
+import LoadingOverlay from "../common/customui/CustomLoading";
 import RightIcon from "../../../assets/svgs/Chevonright";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const accountDetails = useSelector(
-    (state) => state.combinedReducers.profile?.accountDetails
+    (state) => state.profile?.accountDetails
   );
   const paperlessStatusAcp = useSelector(
-    (state) => state.combinedReducers.profile?.paperlessStatusAcp
+    (state) => state.profile?.paperlessStatusAcp
   );
 
   const paperlessLoading = useSelector(
-    (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
+    (state) => state.profile?.isPaperLessStatusLoading
   );
 
   const [billAmt, setBillAmt] = useState(undefined);

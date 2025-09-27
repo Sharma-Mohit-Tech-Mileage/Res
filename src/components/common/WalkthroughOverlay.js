@@ -39,27 +39,21 @@ const WalkthroughOverlay = ({ onFinish }) => {
   ];
 
   const changeWalkThroughStep = (requestedStep) => {
-    // Assume walkThroughStep holds the current step (0–4)
     let newStep = requestedStep;
     
-    // For non-normal users, skip step 2.
-    
-      // Determine direction by comparing current step and the requested step.
-      // If moving forward (current < requested) and requested is 2, jump to 3.
       if (walkThroughStep < requestedStep && requestedStep === 2) {
         newStep = 3;
       }
-      // If moving backward (current > requested) and requested is 2, go back to 1.
       else if (walkThroughStep > requestedStep && requestedStep === 2) {
         newStep = 1;
       }
     
   
-    if (newStep > 4) { // We have 5 steps (0–4)
+    if (newStep > 4) { 
       dispatch(updateWalkThroughStep(null));
       setShowWalkThrough(false);
       if (onFinish) {
-        onFinish(); // Notify parent that walkthrough is finished.
+        onFinish(); 
       }
     } else {
       dispatch(updateWalkThroughStep(newStep));
@@ -85,7 +79,6 @@ const WalkthroughOverlay = ({ onFinish }) => {
   }
 
   return (
-    // Mark the overlay container as modal so that screen readers ignore the background.
     <View 
       style={styles.walkThroughBubble} 
       accessibilityViewIsModal={true} 
@@ -101,7 +94,6 @@ const WalkthroughOverlay = ({ onFinish }) => {
         <View
           accessible={true}
           accessibilityLabel={currentScreen.description}
-          style={styles.description}
         >
           <Text style={styles.descriptionText}>
             {currentScreen.description}
@@ -241,7 +233,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_lg,
     fontFamily: FontFamily.openSansSemiBold,
   },
-  description: {},
   descriptionText: {
     color: Color.sparklightGray1,
     fontSize: FontSize.size_sm,

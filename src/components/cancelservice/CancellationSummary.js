@@ -7,10 +7,10 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import { useForm, Controller} from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import {useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
@@ -24,7 +24,7 @@ import {
   Border,
   FontSize,
 } from "../../../GlobalStyles";
-import AppStyles from "../common/styles/AppStyles";
+import AppStyles from "../utility/AppStyles";
 import SecondaryButton from "../common/customui/SecondaryButton";
 import ConfimationPopup from "./ConfirmationPopup";
 import colors from "../../res/Colors";
@@ -49,7 +49,8 @@ const validationSchema = yup.object().shape({
 
 const errorRes = {
   error: "DISCONNECT_ERROR",
-  message:"Sample error message..Sample error message..Sample error message..Sample error message..",
+  message:
+    "Sample error message..Sample error message..Sample error message..Sample error message..",
 };
 
 const CancellationSummary = ({ navigation, route }) => {
@@ -70,12 +71,12 @@ const CancellationSummary = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
   const [isSuccessMessageVisible, setIsSuccessMessageVisible] = useState(false);
   const [enableButton, setEnableButton] = useState(false);
-  const profileData = useSelector((state) => state.combinedReducers || {});
-  const profileDetails = profileData.profile.profileDetails || {};
+  const profileData = useSelector((state) => state.profile || {});
+  const profileDetails = profileData.profileDetails || {};
   const [equipmentDetails, setEquipmentDetails] = useState([]);
   const [showTerms, setShowTerms] = useState(true);
 
-  const accountDetails = profileData?.profile?.accountDetails;
+  const accountDetails = profileData?.accountDetails;
 
   const userData = profileData?.user?.userData;
 
@@ -270,16 +271,16 @@ const CancellationSummary = ({ navigation, route }) => {
       (res) => {
         console.log("Cancellation service request successful:", res);
         setLoading(false);
-        if(res.error!=null && res?.error?.message){
-           setError(res.error)
-        }else{
-        setIsSuccessMessageVisible(true);
-        MyRef.current?.scrollTo({
-          y: 0,
-          animated: true,
-        });
-      }
-        
+        if (res.error != null && res?.error?.message) {
+          setError(res.error);
+        } else {
+          setIsSuccessMessageVisible(true);
+          MyRef.current?.scrollTo({
+            y: 0,
+            animated: true,
+          });
+        }
+
         //getEquipmentDetails();
       },
       (error) => {
@@ -322,18 +323,20 @@ const CancellationSummary = ({ navigation, route }) => {
   };
 
   const renderErrorMessage = () => {
-    console.log('Error message',error)
+    console.log("Error message", error);
     return (
       <>
         {error && error?.message && (
-          <View style={{ paddingHorizontal: Padding.p_5xl,marginVertical:16 }}>
+          <View
+            style={{ paddingHorizontal: Padding.p_5xl, marginVertical: 16 }}
+          >
             <NotificationAlert
               type="warning"
               title={"Disconnect Error"}
               message={error.message}
               showCloseIcon={true}
-              onClose={()=>{
-                setError(null)
+              onClose={() => {
+                setError(null);
               }}
               isVisible={true}
               accessibilityLabel={error.message}
@@ -350,12 +353,17 @@ const CancellationSummary = ({ navigation, route }) => {
   const renderSuccessMessage = () => {
     return (
       <View
-        style={{ padding: 24, backgroundColor: "#F0F9F2", flexDirection: "column", alignItems: "center", justifyContent: "center", }}
+        style={{
+          padding: 24,
+          backgroundColor: "#F0F9F2",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
       >
-       
-        <View style={{ marginBottom: 16 }}> 
-          <SuccessIcon/>
-          </View>
+        <View style={{ marginBottom: 16 }}>
+          <SuccessIcon />
+        </View>
         <Text
           style={{
             fontSize: 22,
@@ -889,7 +897,7 @@ const CancellationSummary = ({ navigation, route }) => {
           {!toggleCheckBoxTerm && isSubmitted && (
             <View style={{ flexDirection: "row", marginHorizontal: 24 }}>
               <View style={styles.errorIcon}>
-                <WarningIcon/>
+                <WarningIcon />
               </View>
               <Text
                 style={[

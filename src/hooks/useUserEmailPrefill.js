@@ -12,7 +12,7 @@ export const useUserEmailPrefill = (
   fieldName = "feedbackEmail"
 ) => {
   const accountDetails = useSelector(
-    (state) => state?.combinedReducers?.profile?.accountDetails
+    (state) => state?.profile?.accountDetails
   );
 
   useEffect(() => {

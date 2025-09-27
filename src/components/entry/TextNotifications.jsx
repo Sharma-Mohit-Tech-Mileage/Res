@@ -46,8 +46,8 @@ const TextNotifications = ({ navigation }) => {
   const [keyboardHidden, setKeyboardHidden] = useState(true);
   const [isTermRequired, setIsTermRequired] = useState(false);
   const scrollRef = useRef();
-  const user = useSelector((state) => state.combinedReducers.user.userData);
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const user = useSelector((state) => state.user.userData);
+  const profile = useSelector((state) => state.profile || {});
   const accountNumber = user?.userInfo?.accountNumber || "";
   const {
     control,

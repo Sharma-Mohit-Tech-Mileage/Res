@@ -78,7 +78,7 @@ const Feedback = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const route = useRoute();
   const dispatch = useDispatch();
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {};
   const isSubmittingRef = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

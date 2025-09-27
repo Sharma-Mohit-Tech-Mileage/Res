@@ -52,19 +52,19 @@ const NewBillerHome = ({ navigation }) => {
   });
 
   // Redux selectors
-  const home = useSelector((state) => state.combinedReducers.home);
+  const home = useSelector((state) => state.home);
   const accountDetails = useSelector(
-    (state) => state.combinedReducers.profile?.accountDetails
+    (state) => state.profile?.accountDetails
   );
   const dispatch = useDispatch();
   const paperlessStatusAcp = useSelector(
-    (state) => state.combinedReducers.profile?.paperlessStatusAcp
+    (state) => state.profile?.paperlessStatusAcp
   );
   const paperlessLoading = useSelector(
-    (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
+    (state) => state.profile?.isPaperLessStatusLoading
   );
   const userInfo = useSelector(
-    (state) => state.combinedReducers?.user?.userData?.userInfo
+    (state) => state.user?.userData?.userInfo
   );
 
   const showDisconnectedBanner = userInfo

@@ -1,8 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Modal,
+} from "react-native";
 import colors from "../../res/Colors";
-import { Color, Padding, Border, FontFamily } from "../../../GlobalStyles";
-import WarningIcon from "../../../assets/svgs/Alerttriangle"
+import { FontFamily } from "../../../GlobalStyles";
+import WarningIcon from "../../../assets/svgs/Alerttriangle";
 
 import logo from "../../../assets/sparklightlogo-01.png";
 
@@ -34,16 +41,29 @@ const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
 
           <Text style={[styles.message, { fontSize: 16 }]}>{msg1}</Text>
           <View style={{ flexDirection: "row", marginTop: 10 }}>
-            <View style={{ width: 24, height: 24 }} >
-              <WarningIcon/>
+            <View style={{ width: 24, height: 24 }}>
+              <WarningIcon />
             </View>
-            <Text style={{color: colors.darkest_grey, textAlign: "center", marginLeft: 5, alignSelf: "center", fontWeight: "600", fontFamily: FontFamily.openSansSemiBold, }} >
+            <Text
+              style={{
+                color: colors.darkest_grey,
+                textAlign: "center",
+                marginLeft: 5,
+                alignSelf: "center",
+                fontWeight: "600",
+                fontFamily: FontFamily.openSansSemiBold,
+              }}
+            >
               We're sorry!
             </Text>
           </View>
           <Text style={styles.message}>{msg2}</Text>
 
-          <TouchableOpacity style={styles.closeBtn} accessibilityRole="button" onPress={onClose}>
+          <TouchableOpacity
+            style={styles.closeBtn}
+            accessibilityRole="button"
+            onPress={onClose}
+          >
             <Text style={styles.closeAlertTxt}>Close</Text>
           </TouchableOpacity>
         </View>
@@ -53,10 +73,6 @@ const CustomerDisconnectPage = ({ visible, onLogin, onClose }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.splash_bg,
-  },
   overlay: {
     flex: 1,
     justifyContent: "center",
@@ -69,18 +85,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: "85%",
   },
-  closeButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    padding: 5,
-  },
-  closeText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "black",
-    fontFamily: FontFamily.openSansRegular,
-  },
   message: {
     color: colors.darkest_grey,
     fontFamily: FontFamily.openSansRegular,
@@ -89,22 +93,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginTop: 10,
   },
-  buttonContainer: {
-    alignItems: "center",
-  },
-  buttons: {
-    backgroundColor: Color.colorWhitesmoke_300,
-  },
-  buttonsLayout: {
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: 0,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    height: 50,
-    width: "45%",
-    marginTop: 20,
-  },
   alertTitle: {
     color: colors.sparklight_purple_blue,
     fontFamily: FontFamily.openSansRegular,
@@ -112,24 +100,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginTop: 20,
   },
-  openBtn: {
-    backgroundColor: colors.sparklight_purple_blue,
-    justifyContent: "center",
-    width: "100%",
-    marginTop: 20,
-  },
   closeBtn: {
     backgroundColor: colors.backgound_blue,
     justifyContent: "center",
     width: "100%",
     marginTop: 15,
-  },
-  openPortaltxt: {
-    color: colors.snow_white,
-    textAlign: "center",
-    padding: 8,
-    fontSize: 16,
-    fontFamily: FontFamily.openSansRegular,
   },
   closeAlertTxt: {
     color: colors.sparklight_purple_blue,

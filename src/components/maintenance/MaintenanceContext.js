@@ -65,7 +65,7 @@ export const MaintenanceProvider = ({ children }) => {
   });
 
   const userData = useSelector(
-    (state) => state.combinedReducers.user?.userData
+    (state) => state.user?.userData
   );
   const dispatch = useDispatch();
 

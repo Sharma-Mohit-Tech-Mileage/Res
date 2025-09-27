@@ -3,7 +3,7 @@ import { Text, Pressable, StyleSheet ,View} from 'react-native';
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../../GlobalStyles";
 
 const PrimaryButtom = ({ title, onPress, buttonType }) => {
-  const buttonStyles = [buttonType === 'submit' ? styles.button : styles.canbutton, buttonType === 'submit' ? styles.submitButton : styles.cancelButton];
+  const buttonStyles = [buttonType === 'submit' ? styles.button : styles.canbutton, buttonType === 'submit' ? styles.submitButton : null];
   const textStyles = [buttonType === 'submit' ? styles.submitText : styles.cancelText];
 
   return (
@@ -17,20 +17,16 @@ const PrimaryButtom = ({ title, onPress, buttonType }) => {
 
 const styles = StyleSheet.create({
   button: {
-    //marginTop: Border.p_base,
     alignSelf: "stretch",
     paddingVertical: Padding.p_base,
     paddingHorizontal: Padding.p_base,
-    borderRadius: Border.br_11xs, // Adjust as needed
-    elevation: Padding.p_5xs, // For Android shadow
+    borderRadius: Border.br_11xs, 
+    elevation: Padding.p_5xs,
   },
   canbutton: {
-    //marginTop: Border.p_base,
     alignSelf: "stretch",
     paddingVertical: Padding.p_base,
     paddingHorizontal: Padding.p_base,
-    //borderRadius: Border.br_11xs, // Adjust as needed
-    //elevation: Padding.p_5xs, // For Android shadow
   },
   margin:{
     marginTop: Padding.p_base,
@@ -38,9 +34,6 @@ const styles = StyleSheet.create({
 
   submitButton: {
     backgroundColor: Color.colorMidnightblue,
-  },
-  cancelButton: {
-   // backgroundColor: '#fff', // Adjust color as needed
   },
   submitText: {
     textAlign: "center",
@@ -50,7 +43,7 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     textAlign: "center",
-    color: Color.colorMidnightblue, // Adjust color as needed
+    color: Color.colorMidnightblue, 
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
   },

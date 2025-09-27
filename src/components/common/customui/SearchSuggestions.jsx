@@ -1,41 +1,19 @@
 import React, { memo, useRef, useEffect, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  TextInput,
-  FlatList,
-  Text,
-  TouchableOpacity,
-  Image,
-} from "react-native";
+import { StyleSheet, View, TextInput, FlatList, Text, TouchableOpacity } from "react-native";
 import { Padding, Color, FontSize, FontFamily } from "../../../../GlobalStyles";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import SearchIcon from "../../../../assets/svgs/SearchIcon";
 import Rightactionable from "../../../res/svgIcons/RightArrow";
 import File05 from "../../../../assets/svgs/File05";
-const SearchSuggestions = memo(
-  ({
-    placeholder,
-    onChangeInput,
-    suggestions,
-    navigation,
-    onEndReached,
-    Footer,
-  }) => {
+const SearchSuggestions = memo( ({ placeholder, onChangeInput, suggestions, navigation, onEndReached }) => {
     const inputRef = useRef(null);
     const [input, setInput] = useState("");
 
     useEffect(() => {
-      // Assuming `onChangeInput` is a debounced function that updates `suggestions`
       onChangeInput(input);
     }, [input, onChangeInput]);
 
     const handleSuggestionClick = (suggestion) => {
-      //setInput(suggestion.title);
-      // Optionally close the keyboard
       if (suggestion.html_url != "") {
         navigation.navigate("ArticalWindowUtility", {
           url: suggestion.html_url + "?isMobile=true",
@@ -97,7 +75,6 @@ const SearchSuggestions = memo(
             renderItem={renderSuggestion}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.1}
-            //ListFooterComponent={Footer}
           />
         </View>
       </View>
@@ -115,77 +92,72 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F8F8F8", // Example background color
+    backgroundColor: "#F8F8F8", 
     borderBottomWidth: 1,
-    borderColor: Color.sparklightGray, // Example border color
-    borderRadius: 8, // Example border radius
-    height: 56, // Example height
+    borderColor: Color.sparklightGray, 
+    borderRadius: 8, 
+    height: 56, 
   },
   searchIcon: {
-    marginLeft: Padding.p_xs, // Example padding
-    width: 24, // Example width
-    height: 24, // Example height
+    marginLeft: Padding.p_xs,
+    width: 24, 
+    height: 24, 
   },
   clearIcon: {
-    width: 24, // Example width
-    height: 24, // Example height
+    width: 24, 
+    height: 24,
   },
   searchInput: {
     flex: 1,
-    flexDirection: "row", // To align icons and text
-    alignItems: "center", // Vertically center the content
+    flexDirection: "row", 
+    alignItems: "center", 
     alignSelf: "stretch",
     flex: 1,
-    paddingHorizontal: Padding.p_base, // Example padding
-    fontSize: FontSize.size_base, // Example font size
+    paddingHorizontal: Padding.p_base, 
+    fontSize: FontSize.size_base, 
     color: Color.sparklightGray1,
   },
   suggestionsContainer: {
-    marginTop: 0, // Gap from the design
+    marginTop: 0,
     alignSelf: "stretch",
     backgroundColor: Color.sparklightWhite,
     borderTopWidth: 0,
     borderColor: Color.sparklightGray,
   },
   searchContainer: {
-    flexDirection: "row", // Align children horizontally
-    alignItems: "center", // Center children vertically
-    // Apply any additional styling as needed
+    flexDirection: "row", 
+    alignItems: "center", 
   },
 
   leftIcon: {
-    marginRight: 8, // Space between the icon and the text input
-    backgroundColor: "#F8F8F8", // Hex color from the design
-    // Set the size if needed, e.g. width: 20, height: 20
+    marginRight: 8, 
+    backgroundColor: "#F8F8F8", 
   },
   rightIcon: {
-    marginLeft: 8, // Space between the text input and the icon
-    backgroundColor: "#F8F8F8", // Hex color from the design
+    marginLeft: 8,
+    backgroundColor: "#F8F8F8",
   },
   suggestionItem: {
-    flexDirection: "row", // To align icons and text
-    alignItems: "center", // Vertically center the content
+    flexDirection: "row", 
+    alignItems: "center", 
     paddingVertical: Padding.p_xs,
-    paddingHorizontal: 24, // Horizontal padding from the design
+    paddingHorizontal: 24, 
     borderBottomWidth: 1,
-    borderColor: Color.sparklightGray, // Sparklight Dark Gray from the design
-    backgroundColor: "#F8F8F8", // Hex color from the design
+    borderColor: Color.sparklightGray, 
+    backgroundColor: "#F8F8F8", 
   },
   iconStyle: {
-    // Styles for the icons
-    width: 24, // Width from the design
-    height: 24, // Height from the design
-    tintColor: Color.colorMidnightblue, // Spark Light Purple from the design
-    // Add margin if needed to separate from the text
+    width: 24, 
+    height: 24, 
+    tintColor: Color.colorMidnightblue,
   },
   suggestionText: {
-    flex: 1, // To ensure text takes up the remaining space
+    flex: 1, 
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorMidnightblue,
     flexWrap: "wrap",
     maxWidth: wp("90%"),
-    // Spark Light Purple from the design
   },
   overlayStyle: {
     position: "absolute",
