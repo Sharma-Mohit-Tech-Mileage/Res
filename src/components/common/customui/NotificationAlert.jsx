@@ -172,7 +172,7 @@ const NotificationAlert = ({
           <IconComponent
             width={20}
             height={22}
-            color={currentTypeStyle.titleColor}
+            color={currentTypeStyle.iconColor}
             accessible={false}
             importantForAccessibility="no"
           />
