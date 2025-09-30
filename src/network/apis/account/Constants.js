@@ -38,10 +38,11 @@ export const config = {
       os_version_id: "TBD_PROD",
       device_model_id: "TBD_PROD",
       area_of_concern_id: "TBD_PROD",
+      account_no: "35310872274455"
     },
     ZENDESK_AUTH: {
       email: 'mobile-support@sparklight.biz',
-      api_token: 'YOUR_API_TOKEN_HERE',
+      api_token: '0DE686CBBBF20A367D096D466BC5A895D8F62223CCB36C00A198E64F148E0D84',
     },
     ZENDESK_CHAT_KEY: '4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC'
   },
@@ -72,9 +73,9 @@ export const config = {
       Url: 'https://cableone1718812169.zendesk.com/api/v2/requests.json',
       ticket_form_id: "24297809981847",
       recipient: "24290572271767",
-      assignee_id: "24290572271767",
+      assignee_id: "24347657899927",
       group_id: "360017953054",
-      category_id: "24347657899927",
+      category_id: "24297731666839",
       feedbackValue_id: "24297761149335",
       email_id: "24297758328599",
       app_version_id: "33744205015191",
@@ -82,10 +83,11 @@ export const config = {
       os_version_id: "33744250028439",
       device_model_id: "33744244857239",
       area_of_concern_id: "33731342867479",
+      account_no: "35310872274455"
     },
     ZENDESK_AUTH: {
       email: 'mobile-support@sparklight.biz',
-      api_token: 'YOUR_UAT_API_TOKEN_HERE',
+      api_token: '0DE686CBBBF20A367D096D466BC5A895D8F62223CCB36C00A198E64F148E0D84',
     },
   }
 
