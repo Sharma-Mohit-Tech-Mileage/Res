@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   chipsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: Padding.p_xs,
+    gap: 4,
   },
   chipWrapper: {
     marginBottom: Padding.p_xs,

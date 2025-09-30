@@ -121,7 +121,11 @@ export const feedbackSchema = yup.object().shape({
   areaOfConcern: yup
     .array()
     .of(yup.string())
-    .optional(),
+    .when("feedbackValue", {
+      is: (val) => val < 3,
+      then: (schema) => schema.min(1, "Please select at least one area of concern").required("Please select at least one area of concern"),
+      otherwise: (schema) => schema.optional(),
+    }),
   feedbackText: yup
     .string()
     .max(500, "Feedback must be 500 characters or less")

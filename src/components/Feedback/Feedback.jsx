@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { feedbackSchema } from "../utility/validationSchema";
+import WarningIcon from "../../../assets/svgs/Alerttriangle";
 import {
   ScrollView,
   StyleSheet,
@@ -72,11 +73,17 @@ const Feedback = () => {
   };
 
   const handleRatingSelect = (option) => {
-    if (isSubmittingRef.current) return;
-    setSelectedFeedback(option.name);
-    setValue("category", option.category);
-    setValue("feedbackValue", option.value);
-  };
+  if (isSubmittingRef.current) return;
+  setSelectedFeedback(option.name);
+  setValue("category", option.category);
+  setValue("feedbackValue", option.value);
+  
+  // Reset area of concern if rating >= 3
+  if (option.value >= 3) {
+    setSelectedConcerns([]);
+    setValue("areaOfConcern", []);
+  }
+};
 
   const handleConcernSelect = (concernId) => {
     if (isSubmittingRef.current) return;
@@ -160,29 +167,34 @@ const Feedback = () => {
             />
           </Animated.View>
 
-          <Animated.View
-            entering={FadeInDown.delay(400).springify()}
-            style={styles.concernWrapper}
-          >
-            <Controller
-              control={control}
-              name="areaOfConcern"
-              render={({ field: { value } }) => (
-                <>
-                  <AreaOfConcernSelector
-                    selectedConcerns={selectedConcerns}
-                    onSelect={handleConcernSelect}
-                    disabled={isSubmitting}
-                  />
-                  {errors.areaOfConcern && (
-                    <Text style={styles.errorText}>
-                      {errors.areaOfConcern.message}
-                    </Text>
-                  )}
-                </>
-              )}
-            />
-          </Animated.View>
+        {getValues("feedbackValue") < 3 && (
+  <Animated.View
+    entering={FadeInDown.delay(400).springify()}
+    style={styles.concernWrapper}
+  >
+    <Controller
+      control={control}
+      name="areaOfConcern"
+      render={({ field: { value } }) => (
+        <>
+          <AreaOfConcernSelector
+            selectedConcerns={selectedConcerns}
+            onSelect={handleConcernSelect}
+            disabled={isSubmitting}
+          />
+          {errors.areaOfConcern && (
+             <View style={styles.errorContainer}>
+          <View style={styles.errorIcon}>
+            <WarningIcon />
+          </View>
+          <Text style={styles.errorText}>{errors.areaOfConcern.message}</Text>
+        </View>
+          )}
+        </>
+      )}
+    />
+  </Animated.View>
+)}
 
           <Animated.View
             entering={FadeInDown.delay(500).springify()}
@@ -324,12 +336,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_xs,
     marginTop: Padding.p_5xs,
   },
-  errorText: {
-    color: Color.colorRed,
-    fontSize: FontSize.size_xs,
-    fontFamily: FontFamily.openSansRegular,
-    marginTop: Padding.p_5xs,
-  },
+ 
   buttonContainer: {
     paddingTop: Padding.p_5xl,
     paddingHorizontal: Padding.p_base,
@@ -369,6 +376,22 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base,
     fontWeight: "600",
     lineHeight: 20,
+  },
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  errorIcon: {
+    width: 20,
+    height: 20,
+    marginRight: Padding.p_xs,
+  },
+  errorText: {
+    color: "red",
+    fontSize: FontSize.size_xs,
+    fontFamily: FontFamily.openSansRegular,
+    marginTop: Padding.p_5xs,
   },
 });
 
