@@ -113,13 +113,6 @@ const InAppNotifications = ({ navigation }) => {
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
     formatedData[name] = value;
-    // setInitializeSettings((initialize) => {
-    //   const updatedSettings = {
-    //     ...initialize,
-    //     [name]: !value,
-    //   };
-    //   return updatedSettings;
-    // });
     const checkNofif = async () => {
       console.log("Toggle data", JSON.stringify(formatedData));
       if (

@@ -143,13 +143,6 @@ const TextNotifications = ({ navigation }) => {
     const { name, value } = e.target;
     formatedData[name] = value;
     console.log("toggle data", JSON.stringify(formatedData));
-    // setInitializeSettings((initialize) => {
-    //   const updatedSettings = {
-    //     ...initialize,
-    //     [name]: !value,
-    //   };
-    //   return updatedSettings;
-    // });
   };
 
   useEffect(() => {
