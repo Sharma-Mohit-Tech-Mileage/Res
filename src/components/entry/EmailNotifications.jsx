@@ -1,20 +1,35 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, StyleSheet, Text, ScrollView, Pressable, Keyboard, } from "react-native";
-import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
+import {
+  View,
+  StyleSheet,
+  Text,
+  ScrollView,
+  Pressable,
+  Keyboard,
+} from "react-native";
+import {
+  Color,
+  FontFamily,
+  FontSize,
+  Padding,
+  Border,
+} from "../../../GlobalStyles";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import MailRingingIcon from "../../res/svgIcons/MailRingingIcon";
 import SparkLightInput from "../common/customui/SparkLightInput";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import {  useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addPrimaryEmailRequest } from "../../redux/actions/NotificationActionSuite";
-
-const emailRegex =
-  /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+import AppStyles from "../common/styles/AppStyles";
+const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 const validationSchema = yup.object().shape({
-  email: yup.string().matches(emailRegex, "Invalid email address").required("Email is required"),
+  email: yup
+    .string()
+    .matches(emailRegex, "Invalid email address")
+    .required("Email is required"),
 });
 
 const EmailNotifications = ({ navigation }) => {
@@ -25,19 +40,17 @@ const EmailNotifications = ({ navigation }) => {
   const [textInputLayout, setTextInputLayout] = useState({});
   const scrollRef = useRef();
 
-
   const {
-      control,
-      handleSubmit,
-      setValue,
-      formState: { errors },
-    } = useForm({
-      resolver: yupResolver(validationSchema),
-      defaultValues: {
-        email:  "",
-      },
-    });
-  
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -53,7 +66,6 @@ const EmailNotifications = ({ navigation }) => {
     };
   }, []);
 
-
   useEffect(() => {
     if (!keyboardHidden) {
       scrollRef.current?.scrollTo({
@@ -67,7 +79,6 @@ const EmailNotifications = ({ navigation }) => {
     setInput(text);
     setEnableButton(text?.length > 0);
   };
-
 
   const enableEmailNotifications = () => {
     dispatch(addPrimaryEmailRequest(input, "", navigation));
@@ -128,6 +139,11 @@ const EmailNotifications = ({ navigation }) => {
                   Receive email alerts related to your account, updates and more
                   from Sparklight.
                 </Text>
+
+                <Text style={AppStyles.requiredField}>
+                  {" "}
+                  Fields marked with * are required.
+                </Text>
               </View>
             </View>
             <>
@@ -139,29 +155,28 @@ const EmailNotifications = ({ navigation }) => {
                 accessibilityRole="none"
                 accessibilityLabel="Email address input section"
               >
+                <Text style={styles.fieldLabel}>Email Address*</Text>
                 <Controller
-                control={control}
-                name="email"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <SparkLightInput
-                    placeholder="Email Address"
-                    onBlur={onBlur}
-                    onChangeText={(text)=>{
-                      onChangeText(text)
-                      onChange(text)
-                    }}
-
-                    value={value ? value.toLowerCase() : ""}
-                    error={errors.email?.message}
-                    
-                    accessibilityLabel="Email address input"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    textContentType="emailAddress"
-                    style={styles.emailInput}
-                  />
-                )}
-              />
+                  control={control}
+                  name="email"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <SparkLightInput
+                      placeholder="Email Address"
+                      onBlur={onBlur}
+                      onChangeText={(text) => {
+                        onChangeText(text);
+                        onChange(text);
+                      }}
+                      value={value ? value.toLowerCase() : ""}
+                      error={errors.email?.message}
+                      accessibilityLabel="Email address input"
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      textContentType="emailAddress"
+                      style={styles.emailInput}
+                    />
+                  )}
+                />
               </View>
             </>
           </View>
@@ -291,7 +306,8 @@ const styles = StyleSheet.create({
   subInput: {
     marginTop: 25,
     marginBottom: 20,
-    width: '85%'
+    flexDirection: "column",
+    width: "85%",
   },
   viewContainer: {
     flex: 1,
@@ -349,6 +365,12 @@ const styles = StyleSheet.create({
   },
   textBottomHeight: {
     height: 200,
+  },
+  fieldLabel: {
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.sparklightGray1,
+    fontSize: FontSize.size_sm,
+    fontWeight: "600",
   },
 });
 

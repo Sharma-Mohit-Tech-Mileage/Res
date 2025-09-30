@@ -19,6 +19,7 @@ import { getPrimaryEmail } from "../../utility/constant";
 import AlertIcon from "../../../res/svgIcons/AlertIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+import AppStyles from "../../../components/common/styles/AppStyles";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -292,13 +293,20 @@ const AddNotificationScreen = () => {
                 {!isEnrolled
                   ? "Please enter your email address below and stay connected with us."
                   : "Please enter the email address you would like to receive all future customer communications. You may opt out at any time."}
+
               </Text>
+              <Text
+               style={AppStyles.requiredField}>
+                {" "}
+                Fields marked with * are required.
+              </Text>
+              
               <Controller
                 control={control}
                 name="email"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <SparkLightInput
-                    placeholder="Email Address"
+                    placeholder="Email Address*"
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value ? value.toLowerCase() : ""}

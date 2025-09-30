@@ -27,6 +27,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateTextNotification } from "../../redux/actions/ProfileActionSuite";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import NavigationUtils from "./NavigationUtils";
+import AppStyles from "../common/styles/AppStyles";
 const validationSchema = yup.object().shape({
   phoneNumber: yup
     .string()
@@ -154,11 +155,16 @@ const TextNotifications = ({ navigation }) => {
                   from Sparklight.
                 </Text>
               </View>
+              <Text style={AppStyles.requiredField}>
+              {" "}
+              Fields marked with * are required.
+            </Text>
             </View>
             <View
               style={[styles.subInput, { width: "85%" }]}
               onLayout={(event) => {}}
             >
+              <Text style={styles.fieldLabel}>Mobile Number*</Text>
               <Controller
                 control={control}
                 name="phoneNumber"
@@ -464,6 +470,7 @@ const styles = StyleSheet.create({
   },
   subInput: {
     marginTop: 25,
+    flexDirection: "column",
   },
   viewContainer: {
     flex: 1,
@@ -473,6 +480,11 @@ const styles = StyleSheet.create({
   },
   textBottomHeight: {
     height: 150,
+  },fieldLabel: {
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.sparklightGray1,
+    fontSize: FontSize.size_sm,
+    fontWeight: "600",
   },
 });
 
