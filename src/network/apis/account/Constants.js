@@ -41,8 +41,8 @@ export const config = {
       account_no: "35310872274455"
     },
     ZENDESK_AUTH: {
-      email: 'mobile-support@sparklight.biz',
-      api_token: '0DE686CBBBF20A367D096D466BC5A895D8F62223CCB36C00A198E64F148E0D84',
+      email: 'jyoti.pillai@sparklight.biz',
+      api_token: '3uAMCeT702AJHwBMmZIY2DgNH12K8Cm9suC7HGmD',
     },
     ZENDESK_CHAT_KEY: '4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC'
   },
@@ -86,8 +86,8 @@ export const config = {
       account_no: "35310872274455"
     },
     ZENDESK_AUTH: {
-      email: 'mobile-support@sparklight.biz',
-      api_token: '0DE686CBBBF20A367D096D466BC5A895D8F62223CCB36C00A198E64F148E0D84',
+     email: 'jyoti.pillai@sparklight.biz',
+      api_token: '3uAMCeT702AJHwBMmZIY2DgNH12K8Cm9suC7HGmD',
     },
   }
 
