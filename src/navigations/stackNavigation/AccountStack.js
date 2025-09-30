@@ -11,7 +11,7 @@ import AddEmailNotification from "../../components/notifiction/Notifications_acp
 import EmailNotifications_acp from "../../components/notifiction/Notifications_acp/EmailNotification";
 import InAppNotifications from "../../components/notifiction/Notifications_acp/InAppNotifications";
 import TextNotifications from "../../components/notifiction/Notifications_acp/TextNotifications";
-import Feedback from "../../components/support/Feedback";
+import Feedback from "../../components/Feedback/Feedback";
 import ThumbsUp from "../../components/support/ThumbsUp";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import supportScreen from "../../components/support/supportScreen";

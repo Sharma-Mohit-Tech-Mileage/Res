@@ -109,12 +109,27 @@ export const phoneSchema = yup.object({
         .matches(/^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/, 'Invalid US mobile phone number with optional extension'),
 });
 
-export const feedbackSchema = yup.object({
-    feedbackText: yup.string().required('Comment is required'),
-    feedbackEmail: yup
-        .string()
-        .email('Please enter a valid email address')
-        .required('Email is required')
+export const feedbackSchema = yup.object().shape({
+  category: yup
+    .string()
+    .required("Please select a rating"),
+  feedbackValue: yup
+    .number()
+    .required("Please select a rating")
+    .min(1)
+    .max(5),
+  areaOfConcern: yup
+    .array()
+    .of(yup.string())
+    .optional(),
+  feedbackText: yup
+    .string()
+    .max(500, "Feedback must be 500 characters or less")
+    .optional(),
+  feedbackEmail: yup
+    .string()
+    .email("Please enter a valid email address")
+    .required("Email is required"),
 });
 
 

@@ -4,6 +4,7 @@ import axios from "axios";
 import moment from "moment";
 import { Env } from "./Constants";
 import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
+import { getDeviceMetadata } from "../../../components/utility/DeviceInfo";
 
 const getProfileDetails = async () => {
   let data = await getUser();
@@ -391,8 +392,29 @@ const unsubscribPaperLess = async () => {
 
 const handleSubmitFeedback = async (obj) => {
   const zendeskRequestApiUrl = Env.ZENDESK_FEEDBACK.Url;
-  let user = await getUser();
+  const user = await getUser();
+  const deviceMetadata = await getDeviceMetadata();
   const fullName = user.userInfo?.fullName;
+
+  const auth = base64.encode(
+    `${Env.ZENDESK_AUTH.email}/token:${Env.ZENDESK_AUTH.api_token}`
+  );
+
+  const concernLabels = (obj.areaOfConcern || []).map((id) => {
+    const labels = {
+      service_issue: "Service Issue",
+      speed_concern: "Speed Concern",
+      bug: "Bug",
+      pricing_plans: "Pricing & Plans",
+      billing_payments: "Billing & Payments",
+      customer_support: "Customer Support",
+      feature_request: "Feature Request",
+      equipment_issue: "Equipment Issue",
+      other: "Other",
+    };
+    return labels[id] || id;
+  });
+
   const payload = {
     request: {
       ticket_form_id: Env.ZENDESK_FEEDBACK.ticket_form_id,
@@ -408,26 +430,41 @@ const handleSubmitFeedback = async (obj) => {
         { id: Env.ZENDESK_FEEDBACK.category_id, value: obj.category },
         { id: Env.ZENDESK_FEEDBACK.feedbackValue_id, value: obj.feedbackValue },
         { id: Env.ZENDESK_FEEDBACK.email_id, value: obj.feedbackEmail },
+        { id: Env.ZENDESK_FEEDBACK.app_version_id, value: deviceMetadata.appVersion },
+        { id: Env.ZENDESK_FEEDBACK.platform_id, value: deviceMetadata.platform },
+        { id: Env.ZENDESK_FEEDBACK.os_version_id, value: deviceMetadata.osVersion },
+        { id: Env.ZENDESK_FEEDBACK.device_model_id, value: deviceMetadata.deviceModel },
+        { id: Env.ZENDESK_FEEDBACK.area_of_concern_id, value: concernLabels.join(", ") },
       ],
       subject: "Residential MobileApp Feedback",
       comment: {
-        body: obj.feedbackText,
+        body: obj.feedbackText || "No additional feedback provided.",
         uploads: null,
       },
       tags: [
         "Feedback",
         "Residential",
         "resimobileapp",
-        "pid_" + user.userInfo.accountNumber,
+        `pid_${user.userInfo.accountNumber}`,
+        deviceMetadata.platform.toLowerCase(),
+        ...concernLabels.map((label) => label.toLowerCase().replace(/\s+/g, "_")),
       ],
       via: { channel: "MobileApp" },
     },
   };
-  console.log("PAYLOAD====================", payload);
+
+  console.log("ZENDESK PAYLOAD:", JSON.stringify(payload, null, 2));
+
   try {
-    const response = await axios.post(zendeskRequestApiUrl, payload);
+    const response = await axios.post(zendeskRequestApiUrl, payload, {
+      headers: {
+        Authorization: `Basic ${auth}`,
+        "Content-Type": "application/json",
+      },
+    });
     return response;
   } catch (error) {
+    console.error("Zendesk API Error:", error.response?.data || error.message);
     throw error;
   }
 };

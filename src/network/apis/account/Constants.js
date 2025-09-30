@@ -33,6 +33,15 @@ export const config = {
       category_id: "360022798993",
       feedbackValue_id: "1900000846365",
       email_id: "36003617614",
+      app_version_id: "TBD_PROD",
+      platform_id: "TBD_PROD",
+      os_version_id: "TBD_PROD",
+      device_model_id: "TBD_PROD",
+      area_of_concern_id: "TBD_PROD",
+    },
+    ZENDESK_AUTH: {
+      email: 'mobile-support@sparklight.biz',
+      api_token: 'YOUR_API_TOKEN_HERE',
     },
     ZENDESK_CHAT_KEY: '4DZVK5GTMjPKd6rXN0jDsc2iPDdwVLgC'
   },
@@ -68,8 +77,16 @@ export const config = {
       category_id: "24347657899927",
       feedbackValue_id: "24297761149335",
       email_id: "24297758328599",
+      app_version_id: "33744205015191",
+      platform_id: "33744206980503",
+      os_version_id: "33744250028439",
+      device_model_id: "33744244857239",
+      area_of_concern_id: "33731342867479",
     },
-    ZENDESK_CHAT_KEY: '84AFF64rwYVgQS35EsTakO03d98WTdJb'
+    ZENDESK_AUTH: {
+      email: 'mobile-support@sparklight.biz',
+      api_token: 'YOUR_UAT_API_TOKEN_HERE',
+    },
   }
 
 }
