@@ -79,11 +79,11 @@ export const AlertComponent = ({
               titleStyle,
               { color: alertStyles.titleColor }
             ]}>
-              {title}
+              {" "}{`${title}`}
             </Text>
           </View>
           <Text style={mergedStyles.alertMessage}>
-            {message}
+            {" "}{message}
             {boldText && (
               <Text style={[mergedStyles.alertMessage, mergedStyles.boldText]}>
                 {" "}{boldText}{" "}

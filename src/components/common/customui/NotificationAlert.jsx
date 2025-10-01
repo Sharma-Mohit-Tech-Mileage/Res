@@ -164,7 +164,7 @@ const NotificationAlert = ({
       >
         {/* Replace Image with SVG Component */}
         <View
-          style={[styles.iconStyle, { marginTop: !title ? 1 : 1 }]}
+          style={[styles.iconStyle, { marginTop: !title ? 1 : 1 ,marginEnd:10}]}
           accessible={true}
           accessibilityLabel={`${type} icon`}
           accessibilityRole="image"
@@ -226,7 +226,7 @@ const NotificationAlert = ({
                 { color: currentTypeStyle.closeButtonColor },
               ]}
             >
-              ✕
+              {' ✕'}
             </Text>
           </TouchableOpacity>
         )}
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   },
   textContentContainer: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: 10,
     paddingRight: 10,
   },
   textContentContainerNoClose: {
