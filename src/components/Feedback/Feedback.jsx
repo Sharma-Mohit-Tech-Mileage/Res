@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightWhite,
   },
   content: {
-    paddingBottom: 100,
+    paddingBottom: 150,
   },
   alertWrapper: {
     paddingTop: Padding.p_base,
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   cancelWrapper: {
-    paddingTop: Padding.p_base,
+    marginTop: Padding.p_13xl,
     paddingHorizontal: Padding.p_base,
     alignItems: "center",
   },
