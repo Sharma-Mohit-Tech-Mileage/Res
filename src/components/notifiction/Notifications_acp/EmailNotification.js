@@ -264,7 +264,7 @@ const AddNotificationScreen = () => {
                 </View>
               </Animated.View>
             )}
-
+           { !isEnrolled &&(
             <View style={{ paddingHorizontal: Padding.p_5xl }}>
               <NotificationAlert
                 type="warning"
@@ -282,6 +282,7 @@ const AddNotificationScreen = () => {
                 customStyle={styles.warningAlert}
               />
             </View>
+           )}
             <View
               style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
