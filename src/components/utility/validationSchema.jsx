@@ -127,9 +127,13 @@ export const feedbackSchema = yup.object().shape({
       otherwise: (schema) => schema.optional(),
     }),
  feedbackText: yup
-    .string()
-    .max(500, "Feedback must be 500 characters or less")
-    .required("Additional feedback is required"),
+     .string()
+     .transform((value) =>
+        typeof value === "string" ? value.trim() : value
+     )
+     .min(1, "Additional feedback is required")
+     .max(500, "Feedback must be 500 characters or less")
+     .required("Additional feedback is required"),
   feedbackEmail: yup
     .string()
     .email("Please enter a valid email address")
