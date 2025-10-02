@@ -5,7 +5,13 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from "react-native-reanimated";
-import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
+import {
+  Color,
+  FontFamily,
+  FontSize,
+  Padding,
+  Border,
+} from "../../../GlobalStyles";
 
 const concernOptions = [
   { id: "service_issue", label: "Service Issue" },
@@ -19,10 +25,17 @@ const concernOptions = [
   { id: "other", label: "Other" },
 ];
 
-const AreaOfConcernSelector = ({ selectedConcerns = [], onSelect, disabled }) => {
+const AreaOfConcernSelector = ({
+  selectedConcerns = [],
+  onSelect,
+  disabled,
+  hasError = false,
+}) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Area of Concern</Text>
+      <Text style={[styles.label, hasError && styles.labelError]}>
+        Area of Concern
+      </Text>
       <View style={styles.chipsContainer}>
         {concernOptions.map((option) => (
           <ConcernChip
@@ -86,18 +99,24 @@ const styles = StyleSheet.create({
     marginTop: Padding.p_5xs,
   },
   label: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_100,
-    marginBottom: Padding.p_xs,
+    fontSize: FontSize.size_sm,
+    textAlign: "left",
+    color: Color.sparklightGray1,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "600",
+    marginBottom: Padding.p_5xs,
+    alignSelf: "stretch",
+  },
+  labelError: {
+    color: "red",
   },
   chipsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 4,
+    gap: 6,
   },
   chipWrapper: {
-    marginBottom: Padding.p_xs,
+    marginBottom: 6,
   },
   chip: {
     paddingHorizontal: Padding.p_base,
@@ -112,14 +131,12 @@ const styles = StyleSheet.create({
     borderColor: Color.colorMidnightblue,
   },
   chipText: {
-    fontSize: FontSize.size_sm,
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorGray_100,
-    fontWeight: "500",
   },
   selectedChipText: {
     color: Color.sparklightWhite,
-    fontWeight: "600",
   },
 });
 

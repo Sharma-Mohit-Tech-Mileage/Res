@@ -12,7 +12,7 @@ import EmailNotifications_acp from "../../components/notifiction/Notifications_a
 import InAppNotifications from "../../components/notifiction/Notifications_acp/InAppNotifications";
 import TextNotifications from "../../components/notifiction/Notifications_acp/TextNotifications";
 import Feedback from "../../components/Feedback/Feedback";
-import ThumbsUp from "../../components/support/ThumbsUp";
+import ThumbsUp from "../../components/Feedback/ThumbsUp";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import supportScreen from "../../components/support/supportScreen";
 import Survey from "../../components/cancelservice/Survey";

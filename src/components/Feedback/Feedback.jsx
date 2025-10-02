@@ -53,6 +53,7 @@ const Feedback = () => {
     handleSubmit,
     setValue,
     getValues,
+    clearErrors,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(feedbackSchema),
@@ -73,27 +74,34 @@ const Feedback = () => {
   };
 
   const handleRatingSelect = (option) => {
-  if (isSubmittingRef.current) return;
-  setSelectedFeedback(option.name);
-  setValue("category", option.category);
-  setValue("feedbackValue", option.value);
-  
-  // Reset area of concern if rating >= 3
-  if (option.value >= 3) {
-    setSelectedConcerns([]);
-    setValue("areaOfConcern", []);
-  }
-};
+    if (isSubmittingRef.current) return;
+    setSelectedFeedback(option.name);
+    setValue("category", option.category);
+    setValue("feedbackValue", option.value);
+
+    // Reset area of concern if rating >= 3
+    if (option.value >= 3) {
+      setSelectedConcerns([]);
+      setValue("areaOfConcern", [], {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      clearErrors("areaOfConcern");
+    }
+  };
 
   const handleConcernSelect = (concernId) => {
     if (isSubmittingRef.current) return;
-    
+
     const updatedConcerns = selectedConcerns.includes(concernId)
       ? selectedConcerns.filter((id) => id !== concernId)
       : [...selectedConcerns, concernId];
-    
+
     setSelectedConcerns(updatedConcerns);
-    setValue("areaOfConcern", updatedConcerns);
+    setValue("areaOfConcern", updatedConcerns, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   };
 
   const onSubmit = (data) => {
@@ -167,34 +175,37 @@ const Feedback = () => {
             />
           </Animated.View>
 
-        {getValues("feedbackValue") < 3 && (
-  <Animated.View
-    entering={FadeInDown.delay(400).springify()}
-    style={styles.concernWrapper}
-  >
-    <Controller
-      control={control}
-      name="areaOfConcern"
-      render={({ field: { value } }) => (
-        <>
-          <AreaOfConcernSelector
-            selectedConcerns={selectedConcerns}
-            onSelect={handleConcernSelect}
-            disabled={isSubmitting}
-          />
-          {errors.areaOfConcern && (
-             <View style={styles.errorContainer}>
-          <View style={styles.errorIcon}>
-            <WarningIcon />
-          </View>
-          <Text style={styles.errorText}>{errors.areaOfConcern.message}</Text>
-        </View>
+          {getValues("feedbackValue") < 3 && (
+            <Animated.View
+              entering={FadeInDown.delay(400).springify()}
+              style={styles.concernWrapper}
+            >
+              <Controller
+                control={control}
+                name="areaOfConcern"
+                render={({ field: { value } }) => (
+                  <>
+                    <AreaOfConcernSelector
+                      selectedConcerns={selectedConcerns}
+                      onSelect={handleConcernSelect}
+                      disabled={isSubmitting}
+                      hasError={!!errors.areaOfConcern}
+                    />
+                    {errors.areaOfConcern && (
+                      <View style={styles.errorContainer}>
+                        <View style={styles.errorIcon}>
+                          <WarningIcon />
+                        </View>
+                        <Text style={styles.errorText}>
+                          {errors.areaOfConcern.message}
+                        </Text>
+                      </View>
+                    )}
+                  </>
+                )}
+              />
+            </Animated.View>
           )}
-        </>
-      )}
-    />
-  </Animated.View>
-)}
 
           <Animated.View
             entering={FadeInDown.delay(500).springify()}
@@ -336,7 +347,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_xs,
     marginTop: Padding.p_5xs,
   },
- 
+
   buttonContainer: {
     paddingTop: Padding.p_5xl,
     paddingHorizontal: Padding.p_base,
@@ -387,9 +398,10 @@ const styles = StyleSheet.create({
     height: 20,
     marginRight: Padding.p_xs,
   },
+  
   errorText: {
     color: "red",
-    fontSize: FontSize.size_xs,
+    fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
     marginTop: Padding.p_5xs,
   },
