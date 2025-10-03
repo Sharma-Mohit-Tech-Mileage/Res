@@ -265,11 +265,11 @@ const AddNotificationScreen = () => {
                 </View>
               </Animated.View>
             )}
-
+           {
             <View style={{ paddingHorizontal: Padding.p_5xl }}>
               <NotificationAlert
                 type="warning"
-                title={"Critical Notifications"}
+                title={!isEnrolled ? "Critical Notifications" : undefined}
                 message={
                   !isEnrolled
                     ? "By providing your email address, you're signing up for critical notifications. We'll keep you informed without overwhelming your inbox."
@@ -283,6 +283,7 @@ const AddNotificationScreen = () => {
                 customStyle={styles.warningAlert}
               />
             </View>
+            }
             <View
               style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
