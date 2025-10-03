@@ -257,7 +257,7 @@ const TextNotifications = ({ navigation }) => {
         if (res) {
           setIsLoading(false);
           setNotification({
-            message: "Text Notifications updated successfully.",
+            message: "Your text notification preferences have been updated successfully.",
             type: "success",
           });
           //navigation.navigate("Notifications", { updateSuccess: true, successMessage: "In-App Notifications updated successfully." });

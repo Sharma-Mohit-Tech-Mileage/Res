@@ -155,8 +155,8 @@ const ProfileSettings = () => {
                         style={styles.manageSerTxt2}
                         onPress={() => makeCall("833-807-1020")}
                         accessibilityRole="link"
-                        accessibilityLabel="Call 833 807 1020"
-                        accessibilityHint="Double tap to call customer service"
+                        accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
+                        accessibilityHint="Double tap to call customer service 833 807 1020"
                       >
                         833-807-1020
                         <Text
@@ -187,8 +187,8 @@ const ProfileSettings = () => {
                       style={styles.manageSerTxt2}
                       onPress={() => makeCall("833-807-1020")}
                       accessibilityRole="link"
-                      accessibilityLabel="Call 833 807 1020"
-                      accessibilityHint="Double tap to call customer service"
+                      accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
+                      accessibilityHint="Double tap to call customer service 833 807 1020"
                     >
                       833-807-1020
                       <Text
@@ -211,8 +211,8 @@ const ProfileSettings = () => {
                           style={styles.manageSerTxt2}
                           onPress={() => makeCall("833-807-1020")}
                           accessibilityRole="link"
-                          accessibilityLabel="Call 833 807 1020"
-                          accessibilityHint="Double tap to call customer service"
+                          accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
+                          accessibilityHint="Double tap to call customer service 833 807 1020"
                         >
                           833-807-1020
                           <Text
@@ -243,8 +243,8 @@ const ProfileSettings = () => {
                         style={styles.manageSerTxt2}
                         onPress={() => makeCall("833-807-1020")}
                         accessibilityRole="link"
-                        accessibilityLabel="Call 833 807 1020"
-                        accessibilityHint="Double tap to call customer service"
+                        accessibilityLabel="Call 833 807 1020 Monday through Friday 9:00 AM to 6:00 PM Central Standard Time"
+                        accessibilityHint="Double tap to call customer service 833 807 1020"
                       >
                         833-807-1020
                         <Text
