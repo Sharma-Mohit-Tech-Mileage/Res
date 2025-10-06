@@ -19,7 +19,8 @@ import {
     ADD_PRIMARY_EMAIL_FAILURE,
     UPDATE_PRIMARY_EMAIL_REQUEST,
     UPDATE_PRIMARY_EMAIL_SUCCESS,
-    UPDATE_PRIMARY_EMAIL_FAILURE
+    UPDATE_PRIMARY_EMAIL_FAILURE,
+    UPDATE_PRIMARY_AND_PAPERLESS_SUCCESS
 } from '../constants/notificationConstants';
 
 const initialState = {
@@ -232,7 +233,7 @@ const NotificationReducer = (state = initialState, action) => {
                 }
             };
 
-        case UPDATE_PRIMARY_EMAIL_SUCCESS:
+        case UPDATE_PRIMARY_EMAIL_SUCCESS || UPDATE_PRIMARY_AND_PAPERLESS_SUCCESS:
             return {
                 ...state,
                 primaryEmailStatus: {
