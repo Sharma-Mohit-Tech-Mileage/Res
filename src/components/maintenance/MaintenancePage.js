@@ -104,7 +104,7 @@ const MaintenancePage = ({
             accessible={true}
             accessibilityLabel={title}
           >
-            {title}
+          {title}
           </Text>
           
           <Text 
@@ -112,7 +112,7 @@ const MaintenancePage = ({
             accessible={true}
             accessibilityLabel={message}
           >
-            {message}
+           {message}
           </Text>
           
           {estimatedTime && (
@@ -191,6 +191,7 @@ const styles = StyleSheet.create({
     maxWidth: 280,
     maxHeight: 90,
     marginBottom: 10,
+    marginEnd:10
   },
   versionText: {
     fontFamily: FontFamily.openSansRegular,
@@ -242,6 +243,7 @@ const styles = StyleSheet.create({
     color: '#707679',
     textAlign: 'left',
     lineHeight: 24,
+    marginLeft:10,
     marginBottom: hp('2%'),
   },
   estimatedTimeSection: {
