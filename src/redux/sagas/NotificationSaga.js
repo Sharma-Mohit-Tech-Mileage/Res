@@ -121,7 +121,7 @@ function* handleUpdatePrimaryAndPaperless(action) {
       // }
       
     }
-
+    console.log('end of try block result:', result);
     yield put(updatePrimaryAndPaperlessSuccess(result));
   } catch (error) {
     console.error("Combined update failed:", error);

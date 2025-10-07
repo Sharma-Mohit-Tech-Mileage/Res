@@ -233,7 +233,7 @@ const NotificationReducer = (state = initialState, action) => {
                 }
             };
 
-        case UPDATE_PRIMARY_EMAIL_SUCCESS || UPDATE_PRIMARY_AND_PAPERLESS_SUCCESS:
+        case UPDATE_PRIMARY_EMAIL_SUCCESS :
             return {
                 ...state,
                 primaryEmailStatus: {
@@ -244,6 +244,18 @@ const NotificationReducer = (state = initialState, action) => {
                 },
                 lastUpdated: new Date().toISOString()
             };
+
+        case UPDATE_PRIMARY_AND_PAPERLESS_SUCCESS:
+            return {
+                ...state,
+                primaryEmailStatus: {
+                    loading: false,
+                    error: null,
+                    success: true,
+                    message: 'Primary email and paperless status updated successfully'
+                },
+                lastUpdated: new Date().toISOString()
+            };    
 
         case UPDATE_PRIMARY_EMAIL_FAILURE:
             return {
