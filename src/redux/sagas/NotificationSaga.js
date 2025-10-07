@@ -73,13 +73,13 @@ function* handleUpdatePrimaryAndPaperless(action) {
         yield call(enrollPaperless, { account, emailAddress: newEmail });
       }
 
-      if (navigation) {
-        const config = getNavigationConfig("Primary", true, {
-          isNewPrimary: true,
-          paperless: paperlessBilling
-        });
-        navigation.navigate(config.screen, config.params);
-      }
+      // if (navigation) {
+      //   const config = getNavigationConfig("Primary", true, {
+      //     isNewPrimary: true,
+      //     paperless: paperlessBilling
+      //   });
+      //   navigation.navigate(config.screen, config.params);
+      // }
     }
     // Case 2: Primary email exists and new email is different – update primary.
     else if (oldEmail && newEmail !== oldEmail) {
@@ -93,13 +93,14 @@ function* handleUpdatePrimaryAndPaperless(action) {
         yield call(unenrollPaperless, { account, emailAddress: newEmail });
       }
 
-      if (navigation) {
-        const config = getNavigationConfig("Primary", true, {
-          isPrimaryUpdate: true,
-          paperless: paperlessBilling
-        });
-        navigation.navigate(config.screen, config.params);
-      }
+      // if (navigation) {
+      //   const config = getNavigationConfig("Primary", true, {
+      //     isPrimaryUpdate: true,
+      //     paperless: paperlessBilling
+      //   });
+      //   navigation.navigate(config.screen, config.params);
+      // }
+     
     }
     // Case 3: Email unchanged – update paperless status.
     else if (oldEmail && newEmail === oldEmail) {
@@ -112,25 +113,26 @@ function* handleUpdatePrimaryAndPaperless(action) {
         yield call(unenrollPaperless, { account, emailAddress: newEmail });
       }
 
-      if (navigation) {
-        const config = getNavigationConfig("Primary", true, {
-          paperlessOnly: true
-        });
-        navigation.navigate(config.screen, config.params);
-      }
+      // if (navigation) {
+      //   const config = getNavigationConfig("Primary", true, {
+      //     paperlessOnly: true
+      //   });
+      //   navigation.navigate(config.screen, config.params);
+      // }
+      
     }
-
+    console.log('end of try block result:', result);
     yield put(updatePrimaryAndPaperlessSuccess(result));
   } catch (error) {
     console.error("Combined update failed:", error);
     yield put(updatePrimaryAndPaperlessFailure(error.message || "Update failed"));
 
-    if (navigation) {
-      const config = getNavigationConfig("Primary", false, {
-        error: error.message
-      });
-      navigation.navigate(config.screen, config.params);
-    }
+    // if (navigation) {
+    //   const config = getNavigationConfig("Primary", false, {
+    //     error: error.message
+    //   });
+    //   navigation.navigate(config.screen, config.params);
+    // }
   } finally {
     yield put(clearLoading());
   }

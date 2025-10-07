@@ -15,6 +15,7 @@ import { GetApiRequest} from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { securitySchema } from '../utility/validationSchema'; // Update the path as necessary
 import colors from "../../res/Colors";
+import AppStyles from "../common/styles/AppStyles";
 const announceForAccessibility = (message) => {
   AccessibilityInfo.announceForAccessibility(message);
 };
@@ -174,12 +175,18 @@ const PasswordSecurityEdit = () => {
                   accessible={!dropdownFocused}
                   accessibilityElementsHidden={dropdownFocused}
                 >
+                  <View style={{flexDirection:'column'}}>
                   <Text
                     style={[styles.password, styles.passwordFlexBox]}
                     accessibilityRole="header"
                   >
                     Security Question
                   </Text>
+                  <Text style={[AppStyles.requiredField]} accessible={true} accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
+                  {" "}
+                  Fields marked with * are required.
+                </Text>
+                </View>
                 </View>
 
                 <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
@@ -188,7 +195,7 @@ const PasswordSecurityEdit = () => {
                       style={[styles.firstName1, styles.firstTypo]}
                       accessible={!dropdownFocused}
                     >
-                      Password Reset Question
+                      Password Reset Question*
                     </Text>
                     <SparkLightDropdown
                       items={securityQuestionsNew}
@@ -236,7 +243,7 @@ const PasswordSecurityEdit = () => {
                       <SparkLightInput
                         onBlur={onBlur}
                         onChangeText={onChange}
-                        label="Password Reset Answer"
+                        label="Password Reset Answer*"
                         value={value}
                         error={error?.message}
                         accessibilityLabel="Security question answer input"

@@ -19,6 +19,7 @@ import { getPrimaryEmail } from "../../utility/constant";
 import AlertIcon from "../../../res/svgIcons/AlertIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+import AppStyles from "../../../components/common/styles/AppStyles";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -46,6 +47,9 @@ const AddNotificationScreen = () => {
   );
   const paperlessStatusAcp = useSelector(
     (state) => state.combinedReducers.profile?.paperlessStatusAcp
+  );
+  const emailNotificationUpdate = useSelector(
+    (state) => state.combinedReducers?.notification
   );
 
   const [formState, setFormState] = useState({
@@ -75,6 +79,29 @@ const AddNotificationScreen = () => {
     AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
   }, []);
 
+
+  useEffect(() => {
+    console.log("emailNotificationUpdate changed:", emailNotificationUpdate);
+const updateAccountDetails = async () => {
+    if (emailNotificationUpdate && emailNotificationUpdate.primaryEmailStatus && isSubmitting) {
+      const { error, success, message } =
+        emailNotificationUpdate.primaryEmailStatus;
+      if (error) {
+        setNotification({ message: error, type: "error" });
+        setIsSubmitting(false);
+        setToggleCheckBoxTerm(false);
+        
+      } else if (success) {
+        //await dispatch(fetchACPUserAccountDetails());
+        setNotification({ message: message, type: "success" });
+        //setIsSubmitting(false);
+        
+      }
+      setIsSubmitting(false);
+    }}
+    updateAccountDetails();
+  }, [emailNotificationUpdate,dispatch]);
+
   useEffect(() => {
     if (notification && screenReaderEnabled) {
       AccessibilityInfo.announceForAccessibility(notification.message);
@@ -85,36 +112,36 @@ const AddNotificationScreen = () => {
     setIsCheckboxVisible(!paperlessStatusAcp);
   }, [paperlessStatusAcp, isCheckboxVisible]);
 
-  useEffect(() => {
-    const updateAccountDetails = async () => {
-      if (route.params?.updateSuccess) {
-        try {
-          await dispatch(fetchACPUserAccountDetails());
-          setNotification({
-            message: route.params.successMessage,
-            type: "success",
-          });
-        } catch (error) {
-          setNotification({
-            message: "Error updating account details",
-            type: "error",
-          });
-        } finally {
-          setIsSubmitting(false);
-          setToggleCheckBoxTerm(false);
-        }
-      } else if (route.params?.updateFailed) {
-        setNotification({
-          message: route.params.failureMessage,
-          type: "error",
-        });
-        setIsSubmitting(false);
-        setToggleCheckBoxTerm(false);
-      }
-    };
+  // useEffect(() => {
+  //   const updateAccountDetails = async () => {
+  //     if (route.params?.updateSuccess) {
+  //       try {
+  //         await dispatch(fetchACPUserAccountDetails());
+  //         setNotification({
+  //           message: route.params.successMessage,
+  //           type: "success",
+  //         });
+  //       } catch (error) {
+  //         setNotification({
+  //           message: "Error updating account details",
+  //           type: "error",
+  //         });
+  //       } finally {
+  //         setIsSubmitting(false);
+  //         setToggleCheckBoxTerm(false);
+  //       }
+  //     } else if (route.params?.updateFailed) {
+  //       setNotification({
+  //         message: route.params.failureMessage,
+  //         type: "error",
+  //       });
+  //       setIsSubmitting(false);
+  //       setToggleCheckBoxTerm(false);
+  //     }
+  //   };
 
-    updateAccountDetails();
-  }, [route.params, dispatch]);
+  //   updateAccountDetails();
+  // }, [route.params, dispatch]);
 
   const animateNotification = useCallback(() => {
     // Clear any existing timeout
@@ -173,7 +200,6 @@ const AddNotificationScreen = () => {
     (data) => {
       const { email } = data;
       const { paperlessBilling } = formState;
-
       if (isCheckboxVisible && paperlessBilling && !toggleCheckBoxTerm) {
         setIsTermRequired(true);
         return;
@@ -293,13 +319,20 @@ const AddNotificationScreen = () => {
                 {!isEnrolled
                   ? "Please enter your email address below and stay connected with us."
                   : "Please enter the email address you would like to receive all future customer communications. You may opt out at any time."}
+
               </Text>
+              <Text
+               style={AppStyles.requiredField}>
+                {" "}
+                Fields marked with * are required.
+              </Text>
+              
               <Controller
                 control={control}
                 name="email"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <SparkLightInput
-                    placeholder="Email Address"
+                    placeholder="Email Address*"
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value ? value.toLowerCase() : ""}

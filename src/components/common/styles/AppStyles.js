@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { Color, FontFamily,FontSize } from '../../../../GlobalStyles';
 
 const AppStyles = StyleSheet.create({
     container: {
@@ -24,7 +25,13 @@ const AppStyles = StyleSheet.create({
         shadowOpacity: 0.12,
         shadowRadius: 1.84,
         elevation: 2,
-    },
+    },requiredField: {
+        marginVertical:5,
+        fontFamily: FontFamily.openSansRegular,
+        fontWeight: "400",
+        fontSize: FontSize.size_sm,
+        color: Color.sparklightGray1,
+      },
 });
 
 export default AppStyles;

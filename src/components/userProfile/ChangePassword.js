@@ -14,6 +14,7 @@ import { GetApiRequest,PutApiRequest } from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { passwordSchema } from '../utility/validationSchema'; // Update the path as necessary
 import colors from "../../res/Colors";
+import AppStyles from "../common/styles/AppStyles";
 const ChangePassword = () => {
 
   const navigation = useNavigation();
@@ -178,9 +179,16 @@ const ChangePassword = () => {
                 />
               </View>
               <View style={[styles.passwordWrapper, styles.wrapperSpaceBlock1]}>
+                <View style={{flexDirection:'column'}}>
                 <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header">
                   Password
                 </Text>
+                <Text style={[AppStyles.requiredField,{marginTop:10}]} accessible={true} accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
+                  {" "}
+                  Fields marked with * are required.
+                </Text>
+                </View>
+
               </View>
               <View style={styles.frameParent}
               accessibilityElementsHidden={isDropDownOpen}
@@ -195,7 +203,7 @@ const ChangePassword = () => {
                           <SparkLightInput
                             placeholder="New Password"
                             onBlur={onBlur}
-                            label={'New Password'}
+                            label={'New Password*'}
                             onChangeText={onChange}
                             value={value}
                             secure={true}
