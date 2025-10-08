@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     marginBottom: hp("3%"),
   },
   logo: {
-    maxWidth: 2800,
+    maxWidth: 280,
     maxHeight: 90,
     marginBottom: 10,
   },
