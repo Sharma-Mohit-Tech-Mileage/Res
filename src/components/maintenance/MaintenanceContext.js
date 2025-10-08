@@ -298,7 +298,6 @@ export const MaintenanceProvider = ({ children }) => {
       case "IMMEDIATE":
         isMaintenanceActive = true;
         break;
-      // ✅ NEW CODE - PASTE THIS:
       case "SCHEDULED":
         if (maintenanceWindow.startTime && maintenanceWindow.endTime) {
           try {
@@ -348,13 +347,6 @@ export const MaintenanceProvider = ({ children }) => {
               "MAINTENANCE ERROR: Exception in SCHEDULED mode check:",
               error
             );
-
-            if (crashlytics && !__DEV__) {
-              crashlytics().recordError(
-                error,
-                "maintenance_scheduled_check_failed"
-              );
-            }
 
             isMaintenanceActive = false;
           }

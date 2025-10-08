@@ -77,10 +77,6 @@ function AccountStackScreen() {
         name="InAppNotifications"
         component={InAppNotifications}
         options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
       />
 
       <AccountStack.Screen
