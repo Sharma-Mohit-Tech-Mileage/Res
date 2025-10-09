@@ -314,10 +314,6 @@ export const MaintenanceProvider = ({ children }) => {
                 reason: "Invalid date format - not a valid ISO 8601 string",
               };
 
-              // Log to Firebase Analytics (production only)
-              if (analytics && !__DEV__) {
-                analytics().logEvent("maintenance_config_error", errorData);
-              }
 
               console.warn(
                 "MAINTENANCE CONFIG ERROR: Invalid times - falling back to DISABLED",
