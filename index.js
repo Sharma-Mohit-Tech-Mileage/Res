@@ -5,6 +5,7 @@ import App from './App.js';
 import messaging from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
 import { name as appName } from './app.json';
+import PilotServiceStatus from './src/components/ACPDashboard/MobilePilotLandingPage.js';
 
 // Store processed message IDs to prevent duplicates
 const processedMessages = new Set();
@@ -84,4 +85,4 @@ messaging().onMessage(async remoteMessage => {
     }
 });
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent(appName, () => PilotServiceStatus);
