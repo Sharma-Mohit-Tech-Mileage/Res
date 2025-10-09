@@ -3,12 +3,11 @@
 buildscript {
     ext {
         buildToolsVersion = '35.0.0'
-        minSdkVersion = 24  // ⚠️ CHANGED from 23
+        minSdkVersion = 23
         compileSdkVersion = 35
         targetSdkVersion = 35
-        ndkVersion = "28.2.13676358"  // ⚠️ CHANGED from 26.1.10909125
-        kotlinVersion = "2.0.21"  // ⚠️ CHANGED from 1.9.24
-        agpVersion = "8.5.1"  // ⚠️ NEW LINE ADDED
+        ndkVersion = "26.1.10909125"
+        kotlinVersion = "1.9.24"
 
     }
     repositories {
@@ -19,11 +18,12 @@ buildscript {
         }
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:$agpVersion")  // ⚠️ Added :$agpVersion
+        classpath("com.android.tools.build:gradle")
         classpath("com.facebook.react:react-native-gradle-plugin")
+        // Add the Google Services Gradle plugin
         classpath 'com.google.gms:google-services:4.4.2'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.3'
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")  // ⚠️ Added :$kotlinVersion
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
     }
 }
 
