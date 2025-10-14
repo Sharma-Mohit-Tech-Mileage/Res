@@ -11,8 +11,8 @@ import AddEmailNotification from "../../components/notifiction/Notifications_acp
 import EmailNotifications_acp from "../../components/notifiction/Notifications_acp/EmailNotification";
 import InAppNotifications from "../../components/notifiction/Notifications_acp/InAppNotifications";
 import TextNotifications from "../../components/notifiction/Notifications_acp/TextNotifications";
-// import Feedback from "../../components/Feedback/Feedback";
-// import ThumbsUp from "../../components/Feedback/ThumbsUp";
+ import Feedback from "../../components/Feedback/Feedback";
+ import ThumbsUp from "../../components/Feedback/ThumbsUp";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
 import supportScreen from "../../components/support/supportScreen";
 import Survey from "../../components/cancelservice/Survey";
@@ -93,7 +93,7 @@ function AccountStackScreen() {
           headerShown: false,
         }}
       />
-      {/* <AccountStack.Screen
+      <AccountStack.Screen
         name="Feedback"
         component={Feedback}
         options={{ headerShown: false }}
@@ -102,7 +102,7 @@ function AccountStackScreen() {
         name="ThumbsUp"
         component={ThumbsUp}
         options={{ headerShown: false }}
-      /> */}
+      />
       <AccountStack.Screen
         name="AddEmailNotification"
         component={AddEmailNotification}
