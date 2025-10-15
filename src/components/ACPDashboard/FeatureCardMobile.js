@@ -35,7 +35,7 @@ const FeatureCardMobile = ({
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: "#000" }]}>
+      <Text style={[styles.title, { color: "#393D40" }]}>
         Now take your connection on the go{" "}
         <Text style={[styles.title]}>- Introducing Sparklight Mobile</Text>
       </Text>
@@ -108,12 +108,13 @@ const styles = StyleSheet.create({
   featureText: {
     fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_lg,
-    color: Color.colorGray_100,
+    color: Color.sparklightGray1,
     fontWeight: "400",
   },
   button: {
     marginHorizontal: Padding.p_base,
-    marginBottom: Padding.p_base,
+    marginBottom: 36,
+    marginTop: 16, // <-- Add this line for top spacing
     paddingVertical: Padding.p_xs,
     borderRadius: 4,
     alignItems: "center",
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: FontFamily.openSansSemiBold,
     fontSize: FontSize.size_lg,
-    fontWeight: "400",
+    fontWeight: "700",
   },
   buttonTextPrimary: {
     color: Color.sparklightWhite,

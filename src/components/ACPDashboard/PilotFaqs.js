@@ -27,11 +27,13 @@ const PilotFaqs = ({ navigation }) => {
           style={[
             styles.title,
             {
-              fontSize: FontSize.size_lg,
+              fontSize: 16,
               fontFamily: FontFamily.openSansRegular,
               marginBottom: 24,
+              fontWeight:'600',
               color: Color.sparklightBrightPurple,
               textDecorationLine: "underline",
+              lineHeight: 18,
             },
           ]}
           onPress={() => {
@@ -43,7 +45,7 @@ const PilotFaqs = ({ navigation }) => {
         >
           Service Activation FAQ’s
         </Text>
-        <Image source={PromoImage} resizeMode="contain" />
+        <Image source={PromoImage} resizeMode='stretch' style={styles.promoImageSty} />
       </View>
     </View>
   );
@@ -52,23 +54,33 @@ const PilotFaqs = ({ navigation }) => {
 const styles = StyleSheet.create({
   title: {
     fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_5xl,
+    fontSize: 20,
     color: Color.sparklightBrightPurple,
-    fontWeight: "700",
+    fontWeight: "600",
     marginHorizontal: 24,
-    marginTop: 10,
+    marginTop: 5,
   },
   title2: {
-    fontFamily: FontFamily.openSansSemiBold,
+    fontFamily: FontFamily.openSansRegular,
     fontSize: FontSize.size_base,
-    color: Color.colorGray_200,
-    fontWeight: "600",
+    color: "#000000",
+    fontWeight: "400",
     margin: 24,
     lineHeight: 24,
+    marginTop: 12,
   },
   videoContainer: {
     borderRadius: Border.br_11xs,
+    minHeight: 400, // Increase the box size
+    backgroundColor: "#fff", // Optional: ensure background is visible
+    justifyContent: "center", // Optional: center content vertically
   },
+  promoImageSty: {
+  width: "100%",
+  aspectRatio: 1.92, // Adjust this ratio to match your image's proportions
+  borderRadius: Border.br_11xs,
+  resizeMode: "cover",
+},
 });
 
 export default PilotFaqs;

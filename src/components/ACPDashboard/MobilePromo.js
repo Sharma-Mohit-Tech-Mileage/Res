@@ -17,7 +17,7 @@ const MobilePromo = ({ navigation }) => {
       style={[AppStyles.card, { marginVertical: 10, marginHorizontal: 24 }]}
     >
       <View style={styles.videoContainer}>
-        <Image source={PromoImage} resizeMode="contain" />
+        <Image source={PromoImage} resizeMode='stretch' style={styles.promoImageSty}  />
       </View>
 
       <FeatureCard
@@ -30,23 +30,32 @@ const MobilePromo = ({ navigation }) => {
         onButtonPress={() =>
           navigation.navigate("account", { screen: "Notifications" })
         }
+
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  title: {
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_5xl,
-    color: Color.colorGray_200,
-    marginBottom: Padding.p_5xl,
-    fontWeight: "700",
-  },
-  videoContainer: {
-    borderRadius: Border.br_11xs,
-    alignSelf: "center",
-  },
+    title: {
+        fontFamily: FontFamily.openSansSemiBold,
+        fontSize: FontSize.size_5xl,
+        color: Color.colorGray_200,
+        marginBottom: Padding.p_5xl,
+        fontWeight: "700",
+    },
+    videoContainer: {
+        borderRadius: Border.br_11xs,
+        alignSelf: "center",
+        overflow: "hidden",
+        marginBottom: 20,
+        width: "100%",
+    },
+    promoImageSty: {
+    width: "100%",
+    aspectRatio: 1.1, // Adjust the ratio as needed (e.g., 2 for 2:1 width:height)
+    resizeMode: "cover",
+},
 });
 
 export default MobilePromo;

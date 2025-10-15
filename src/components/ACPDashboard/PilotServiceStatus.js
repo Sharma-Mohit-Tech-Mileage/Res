@@ -102,7 +102,7 @@ export default function PilotServiceStatus({
             </View>
 
             <View style={styles.rightColumn}>
-              <Text style={[styles.label, filled && styles.labelFilled,{marginTop:10}]}>
+              <Text style={[styles.label, filled && styles.labelFilled,{marginTop:15}]}>
                 {stage.label}
               </Text>
             </View>
