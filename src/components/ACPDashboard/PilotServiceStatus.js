@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import PilotTick from "../../res/svgIcons/PilotTick";
+import { FontFamily } from "../../../GlobalStyles";
 
 /**
  * VerticalServiceStages
@@ -17,9 +18,9 @@ import PilotTick from "../../res/svgIcons/PilotTick";
  */
 
 const DEFAULT_STAGES = [
-  { key: "purchase", label: "Service purchase" },
-  { key: "pending", label: "Pending status" },
-  { key: "activated", label: "Service activated" },
+  { key: "purchase", label: "Service Purchased" },
+  { key: "pending", label: "Pending Status" },
+  { key: "activated", label: "Service Activated" },
 ];
 
 export default function PilotServiceStatus({
@@ -50,14 +51,16 @@ export default function PilotServiceStatus({
                 onPress={() => onStagePress && onStagePress(index)}
                 activeOpacity={0.8}
               >
+                <View style={styles.iconWrapOuter}>
                 <View
                   style={[styles.iconWrap, filled && styles.iconWrapFilled]}
                 >
+                 
                   <View
                     style={{
                       backgroundColor: filled ? "#8D3B90" : "#CCCCCC",
                       borderRadius: 22,
-                      padding: 6,
+                      padding: 8,
                     }}
                   >
                     {filled ? (
@@ -75,14 +78,16 @@ export default function PilotServiceStatus({
                         <Text
                           style={[
                             styles.fallbackText,
-                            filled && styles.fallbackTextFilled,
+                            filled && styles.fallbackTextFilled
                           ]}
                         >
                           {index}
                         </Text>
                       </View>
                     )}
+                   
                   </View>
+                </View>
                 </View>
               </TouchableOpacity>
 
@@ -90,14 +95,14 @@ export default function PilotServiceStatus({
                 <View
                   style={[
                     styles.connector,
-                    filled ? styles.connectorFilled : styles.connectorUnfilled,
+                    (filled && (index < activeIndex)) ? styles.connectorFilled : styles.connectorUnfilled,
                   ]}
                 />
               )}
             </View>
 
             <View style={styles.rightColumn}>
-              <Text style={[styles.label, filled && styles.labelFilled]}>
+              <Text style={[styles.label, filled && styles.labelFilled,{marginTop:10}]}>
                 {stage.label}
               </Text>
             </View>
@@ -115,7 +120,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     width: "100%",
-    height: "100%",
     backgroundColor: "white",
   },
   stageRow: {
@@ -137,10 +141,19 @@ const styles = StyleSheet.create({
     height: SIZE,
     borderRadius: SIZE / 2,
     borderWidth: 2,
-    borderColor: "#CCCCCC",
+    borderColor: "#E4E7E9",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "white",
+    overflow: "hidden",
+  },
+  iconWrapOuter: {
+    width: SIZE+15,
+    height: SIZE+15,
+    borderRadius: (SIZE+15) / 2,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f1eeeeff",
     overflow: "hidden",
   },
   iconWrapFilled: {
@@ -159,7 +172,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "#CCCCCC",
+    borderColor: "#E4E7E9",
   },
   fallbackCircleFilled: {
     backgroundColor: "#8D3B90",
@@ -181,16 +194,22 @@ const styles = StyleSheet.create({
   },
   connectorFilled: {
     backgroundColor: "#8D3B90",
+    width: 4,
   },
   connectorUnfilled: {
     backgroundColor: "#E0E0E0",
+    width: 4,
   },
   label: {
     fontSize: 16,
-    color: "#666",
+    color: "#737373",
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "600",
   },
   labelFilled: {
-    color: "#111",
+    color: "#8D3B90",
+    fontSize: 16,
+    fontFamily: FontFamily.openSansSemiBold,
     fontWeight: "600",
   },
 });
