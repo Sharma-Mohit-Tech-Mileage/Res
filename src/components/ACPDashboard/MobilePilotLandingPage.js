@@ -19,7 +19,6 @@ import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import Infocircle from "../../../assets/svgs/Infocircle";
 import MobilePromo from "./MobilePromo";
 import PilotFaqs from "./PilotFaqs";
-import { XAxis } from "react-native-svg-charts";
 
 const MobilePilotLandingPage = ({ navigation }) => {
   return (

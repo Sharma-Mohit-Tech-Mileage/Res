@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   },
   videoContainer: {
     borderRadius: Border.br_11xs,
-    minHeight: 400, // Increase the box size
+    minHeight: 370, // Increase the box size
     backgroundColor: "#fff", // Optional: ensure background is visible
     justifyContent: "center", // Optional: center content vertically
   },

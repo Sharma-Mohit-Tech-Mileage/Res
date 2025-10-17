@@ -189,7 +189,6 @@ const styles = StyleSheet.create({
   connector: {
     width: 2,
     height: CONNECTOR_HEIGHT,
-    marginTop: 6,
     borderRadius: 2,
   },
   connectorFilled: {
