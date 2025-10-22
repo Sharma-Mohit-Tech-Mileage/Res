@@ -16,6 +16,7 @@ import LeftIcon from '../../../assets/svgs/Chevronleft';
 const ProfileSettingsHeader = ({
     title,
     onPressBack,
+    accessibleLable=undefined,
     iconAlignment = 'right',
     iconSource = LeftIcon,
     showIcon = true
@@ -70,8 +71,7 @@ const ProfileSettingsHeader = ({
                         <Text
                             style={styles.title}
                             accessible={true}
-                            accessibilityRole="header"
-                            accessibilityLabel={`Header: ${title}`}
+                            accessibilityLabel={`Header: ${accessibleLable ? accessibleLable : title}`}
                         >
                             {title}
                         </Text>

@@ -15,8 +15,12 @@ const MobilePromo = ({ navigation }) => {
   return (
     <View
       style={[AppStyles.card, { marginVertical: 10, marginHorizontal: 24 }]}
+     
     >
-      <View style={styles.videoContainer}>
+      <View style={styles.imageContainer}
+      accessible={true}
+      accessibilityLabel="Smiling man holding a phone"
+      accessibilityRole="image">
         <Image source={PromoImage} resizeMode='stretch' style={styles.promoImageSty}  />
       </View>
 
@@ -44,7 +48,7 @@ const styles = StyleSheet.create({
         marginBottom: Padding.p_5xl,
         fontWeight: "700",
     },
-    videoContainer: {
+    imageContainer: {
         borderRadius: Border.br_11xs,
         alignSelf: "center",
         overflow: "hidden",

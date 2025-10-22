@@ -34,7 +34,11 @@ export default function PilotServiceStatus({
   const activeIndex = Math.max(1, Math.min(currentStage, stages.length));
 
   return (
-    <View style={styles.wrapper}>
+    <View
+      style={styles.wrapper}
+      accessibilityLabel="Service Progress section heading level 2."
+      accessibilityRole="summary"
+    >
       {stages.map((stage, idx) => {
         const index = idx + 1;
         const filled = index <= activeIndex;
@@ -45,64 +49,74 @@ export default function PilotServiceStatus({
             <View style={styles.leftColumn}>
               <TouchableOpacity
                 accessibilityRole="button"
-                accessibilityLabel={`${stage.label} ${
-                  filled ? "completed" : "incomplete"
+                accessibilityLabel={`Step ${index} of ${stages.length} ${stage.label} ${
+                  filled ? "Completed" : "In progress"
                 }`}
                 onPress={() => onStagePress && onStagePress(index)}
                 activeOpacity={0.8}
               >
                 <View style={styles.iconWrapOuter}>
-                <View
-                  style={[styles.iconWrap, filled && styles.iconWrapFilled]}
-                >
-                 
                   <View
-                    style={{
-                      backgroundColor: filled ? "#8D3B90" : "#CCCCCC",
-                      borderRadius: 22,
-                      padding: 8,
-                    }}
+                    style={[styles.iconWrap, filled && styles.iconWrapFilled]}
                   >
-                    {filled ? (
-                      <FilledIcon isActive={true} />
-                    ) : !filled ? (
-                      <UnfilledIcon isActive={false} />
-                    ) : (
-                      // fallback: a simple colored circle with number
-                      <View
-                        style={[
-                          styles.fallbackCircle,
-                          filled && styles.fallbackCircleFilled,
-                        ]}
-                      >
-                        <Text
+                    <View
+                      style={{
+                        backgroundColor: filled ? "#8D3B90" : "#CCCCCC",
+                        borderRadius: 22,
+                        padding: 8,
+                      }}
+                    >
+                      {filled ? (
+                        <FilledIcon isActive={true} />
+                      ) : !filled ? (
+                        <UnfilledIcon isActive={false} />
+                      ) : (
+                        // fallback: a simple colored circle with number
+                        <View
                           style={[
-                            styles.fallbackText,
-                            filled && styles.fallbackTextFilled
+                            styles.fallbackCircle,
+                            filled && styles.fallbackCircleFilled,
                           ]}
                         >
-                          {index}
-                        </Text>
-                      </View>
-                    )}
-                   
+                          <Text
+                            style={[
+                              styles.fallbackText,
+                              filled && styles.fallbackTextFilled,
+                            ]}
+                          >
+                            {index}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
                   </View>
                 </View>
-                </View>
               </TouchableOpacity>
-
               {showConnector && (
                 <View
                   style={[
                     styles.connector,
-                    (filled && (index < activeIndex)) ? styles.connectorFilled : styles.connectorUnfilled,
+                    filled && index < activeIndex
+                      ? styles.connectorFilled
+                      : styles.connectorUnfilled,
                   ]}
                 />
               )}
             </View>
 
-            <View style={styles.rightColumn}>
-              <Text style={[styles.label, filled && styles.labelFilled,{marginTop:15}]}>
+            <View
+              style={styles.rightColumn}
+              accessibilityLabel={`${stage.label} stage`}
+              accessible={true}
+              accessibilityRole="text"
+            >
+              <Text
+                style={[
+                  styles.label,
+                  filled && styles.labelFilled,
+                  { marginTop: 15 },
+                ]}
+              >
                 {stage.label}
               </Text>
             </View>
@@ -148,9 +162,9 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   iconWrapOuter: {
-    width: SIZE+15,
-    height: SIZE+15,
-    borderRadius: (SIZE+15) / 2,
+    width: SIZE + 15,
+    height: SIZE + 15,
+    borderRadius: (SIZE + 15) / 2,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#f1eeeeff",

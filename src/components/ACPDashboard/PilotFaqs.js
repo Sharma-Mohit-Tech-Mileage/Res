@@ -14,11 +14,17 @@ const PilotFaqs = ({ navigation }) => {
   return (
     <View
       style={[AppStyles.card, { marginVertical: 10, marginHorizontal: 24 }]}
+      
     >
-      <View style={styles.videoContainer}>
+      <View style={styles.videoContainer}
+      accessibilityLabel="Service Activation section"
+      accessible={true}
+      accessibilityRole="summary">
         <Text style={styles.title}>Service Activation</Text>
 
-        <Text style={styles.title2}>
+        <Text style={styles.title2} accessible={true} accessibilityRole="text"
+        accessibilityLabel="For more information about Service Activation."
+        >
           For more information about Service Activation, please visit our FAQ
           page by clicking the link below.
         </Text>
@@ -41,11 +47,15 @@ const PilotFaqs = ({ navigation }) => {
             Linking.openURL("https://www.sparklight.com/support/service-activation-faq");
           }}
           accessibilityRole="link"
-          accessibilityLabel="Service Activation FAQs, link"
+          accessibilityLabel="Visit Service Activation FAQ’s page, link "
         >
           Service Activation FAQ’s
         </Text>
-        <Image source={PromoImage} resizeMode='stretch' style={styles.promoImageSty} />
+        <Image source={PromoImage} resizeMode='stretch' style={styles.promoImageSty} 
+        accessibilityLabel="Decorative image of technician standing near service vehicle"
+        accessibilityRole="image"
+         accessible={true} 
+        />
       </View>
     </View>
   );

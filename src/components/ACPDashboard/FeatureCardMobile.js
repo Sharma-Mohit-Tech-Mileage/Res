@@ -35,14 +35,29 @@ const FeatureCardMobile = ({
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, { color: "#393D40" }]}>
+      <Text
+        style={[styles.title, { color: "#393D40" }]}
+        accessibilityLabel="Now take your connection on the go - Introducing Sparklight Mobile "
+        accessible={false}
+        accessibilityRole="header"
+      >
         Now take your connection on the go{" "}
         <Text style={[styles.title]}>- Introducing Sparklight Mobile</Text>
       </Text>
 
-      <View style={styles.features}>
+      <View
+        style={styles.features}
+        accessible={true}
+        accessibilityLabel="Feature list: Reliable 5G National Coverage, Unlimited Talk & Text, No Annual Contracts, Easy to Switch, Keep Your Number"
+        accessibilityRole="list"
+      >
         {features.map((feature, index) => (
-          <View key={index} style={styles.featureRow}>
+          <View
+            key={index}
+            style={styles.featureRow}
+            accessibilityRole="listitem"
+            accessibilityLabel={feature}
+          >
             <Icon
               name="green-checkcircle"
               size={18}
