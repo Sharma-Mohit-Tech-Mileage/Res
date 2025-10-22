@@ -37,8 +37,8 @@ const FeatureCardMobile = ({
     <View style={styles.container}>
       <Text
         style={[styles.title, { color: "#393D40" }]}
-        accessibilityLabel="Now take your connection on the go - Introducing Sparklight Mobile "
-        accessible={false}
+        accessibilityLabel="Smiling man holding a phone. Plans starting at $15 per month, heading level 2. Now take your connection on the go - Introducing Sparklight Mobile "
+        accessible={true}
         accessibilityRole="header"
       >
         Now take your connection on the go{" "}
@@ -48,7 +48,7 @@ const FeatureCardMobile = ({
       <View
         style={styles.features}
         accessible={true}
-        accessibilityLabel="Feature list: Reliable 5G National Coverage, Unlimited Talk & Text, No Annual Contracts, Easy to Switch, Keep Your Number"
+        accessibilityLabel="List with 4 items: Reliable 5G National Coverage., Unlimited Talk & Text., No Annual Contracts., Easy to Switch., Keep Your Number."
         accessibilityRole="list"
       >
         {features.map((feature, index) => (
