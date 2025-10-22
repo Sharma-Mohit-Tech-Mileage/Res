@@ -8,7 +8,6 @@
         <item name="colorPrimaryDark">@color/my_color_primary_dark</item>
         <item name="colorAccent">@color/my_color_accent</item>
         <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
-
     </style>
 
 
