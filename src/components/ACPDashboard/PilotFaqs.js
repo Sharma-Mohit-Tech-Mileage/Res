@@ -17,7 +17,7 @@ const PilotFaqs = ({ navigation }) => {
       
     >
       <View style={styles.videoContainer}
-      accessibilityLabel="Service Activation section"
+      accessibilityLabel="Service Activation section,heading level 2"
       accessible={true}
       accessibilityRole="summary">
         <Text style={styles.title}>Service Activation</Text>
@@ -53,8 +53,7 @@ const PilotFaqs = ({ navigation }) => {
         </Text>
         <Image source={PromoImage} resizeMode='stretch' style={styles.promoImageSty} 
         accessibilityLabel="Decorative image of technician standing near service vehicle"
-        accessibilityRole="image"
-         accessible={true} 
+        accessible={true} 
         />
       </View>
     </View>

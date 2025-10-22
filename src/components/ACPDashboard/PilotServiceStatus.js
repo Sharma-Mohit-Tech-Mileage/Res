@@ -36,22 +36,37 @@ export default function PilotServiceStatus({
   return (
     <View
       style={styles.wrapper}
-      accessibilityLabel="Service Progress section heading level 2."
-      accessibilityRole="summary"
+      accessible={true}
+      accessibilityLabel="Service Progress, heading level 2.”
+“Step 1 of 3. Service Purchased. Completed.” 
+“Step 2 of 3. Pending Status. In progress.” 
+“Step 3 of 3. Service Activated. Not started.”
+ "
+      //accessibilityRole="header"
     >
       {stages.map((stage, idx) => {
         const index = idx + 1;
         const filled = index <= activeIndex;
-        const showConnector = idx !== stages.length - 1;
+        let statusText = "";
+        if (filled && index < activeIndex) {
+          statusText = "Completed.";
+        } else if (index === activeIndex) {
+          statusText = "In progress.";
+        } else {
+          statusText = "Not started.";
+        }
 
         return (
-          <View key={stage.key} style={styles.stageRow}>
+          <View
+            key={stage.key}
+            accessible={true}
+            accessibilityLabel={`Step ${index} of ${stages.length}. ${stage.label}. ${statusText}`}
+            accessibilityRole="text"
+            style={styles.stageRow}
+          >
             <View style={styles.leftColumn}>
               <TouchableOpacity
-                accessibilityRole="button"
-                accessibilityLabel={`Step ${index} of ${stages.length} ${stage.label} ${
-                  filled ? "Completed" : "In progress"
-                }`}
+                accessibilityRole="none"
                 onPress={() => onStagePress && onStagePress(index)}
                 activeOpacity={0.8}
               >
@@ -71,7 +86,6 @@ export default function PilotServiceStatus({
                       ) : !filled ? (
                         <UnfilledIcon isActive={false} />
                       ) : (
-                        // fallback: a simple colored circle with number
                         <View
                           style={[
                             styles.fallbackCircle,
@@ -92,7 +106,7 @@ export default function PilotServiceStatus({
                   </View>
                 </View>
               </TouchableOpacity>
-              {showConnector && (
+              {idx !== stages.length - 1 && (
                 <View
                   style={[
                     styles.connector,
@@ -103,13 +117,7 @@ export default function PilotServiceStatus({
                 />
               )}
             </View>
-
-            <View
-              style={styles.rightColumn}
-              accessibilityLabel={`${stage.label} stage`}
-              accessible={true}
-              accessibilityRole="text"
-            >
+            <View style={styles.rightColumn}>
               <Text
                 style={[
                   styles.label,
