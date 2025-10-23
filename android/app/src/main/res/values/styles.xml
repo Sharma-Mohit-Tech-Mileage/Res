@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -7,7 +7,7 @@
         <item name="colorPrimary">@color/my_color_primary</item>
         <item name="colorPrimaryDark">@color/my_color_primary_dark</item>
         <item name="colorAccent">@color/my_color_accent</item>
-        <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
+        <item name="android:forceDarkAllowed">false</item>
     </style>
 
 
