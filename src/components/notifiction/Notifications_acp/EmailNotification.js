@@ -322,7 +322,10 @@ const updateAccountDetails = async () => {
 
               </Text>
               <Text
-               style={AppStyles.requiredField}>
+               style={AppStyles.requiredField}
+                  accessibilityRole="text" 
+                  accessible={true}
+                  accessibilityLabel="Required fields information. Fields marked with asterisk are required.">
                 {" "}
                 Fields marked with * are required.
               </Text>
@@ -332,7 +335,7 @@ const updateAccountDetails = async () => {
                 name="email"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <SparkLightInput
-                    placeholder="Email Address*"
+                    placeholder="Email Address *"
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value ? value.toLowerCase() : ""}

@@ -182,7 +182,7 @@ const PasswordSecurityEdit = () => {
                   >
                     Security Question
                   </Text>
-                  <Text style={[AppStyles.requiredField]} accessible={true} accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
+                  <Text style={[AppStyles.requiredField]} accessible={true} accessibilityRole="text" accessibilityLabel="Required fields information. Fields marked with asterisk are required">
                   {" "}
                   Fields marked with * are required.
                 </Text>
@@ -195,7 +195,7 @@ const PasswordSecurityEdit = () => {
                       style={[styles.firstName1, styles.firstTypo]}
                       accessible={!dropdownFocused}
                     >
-                      Password Reset Question*
+                      Password Reset Question *
                     </Text>
                     <SparkLightDropdown
                       items={securityQuestionsNew}

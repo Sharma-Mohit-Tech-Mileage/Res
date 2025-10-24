@@ -183,7 +183,7 @@ const ChangePassword = () => {
                 <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header">
                   Password
                 </Text>
-                <Text style={[AppStyles.requiredField,{marginTop:10}]} accessible={true} accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
+                <Text style={[AppStyles.requiredField,{marginTop:10}]} accessible={true} accessibilityRole="text" accessibilityLabel="Required fields information. Fields marked with asterisk are required">
                   {" "}
                   Fields marked with * are required.
                 </Text>
@@ -203,7 +203,7 @@ const ChangePassword = () => {
                           <SparkLightInput
                             placeholder="New Password"
                             onBlur={onBlur}
-                            label={'New Password*'}
+                            label={'New Password *'}
                             onChangeText={onChange}
                             value={value}
                             secure={true}
