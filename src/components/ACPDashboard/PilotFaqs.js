@@ -23,7 +23,7 @@ const PilotFaqs = ({ navigation }) => {
         //accessibilityRole="header"
         accessibilityRole="none"
       >
-        <Text style={styles.title}>Service Activation</Text>
+        <Text style={styles.title} accessible={false}>Service Activation</Text>
       </View>
       <Text
         style={styles.title2}

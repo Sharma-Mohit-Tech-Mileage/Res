@@ -105,7 +105,7 @@ const MobilePilotLandingPage = ({
                 
               
               </View>
-              <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <View style={{ flexDirection: "row", flexWrap: "wrap" , marginTop:4}}>
               <Text style={styles.subText}>
                 If you have any questions, please call{" "}
               </Text>
@@ -168,7 +168,7 @@ const styles = {
     fontSize: FontSize.size_sm,
     color: Color.colorblack_100,
     fontWeight: "400",
-    marginVertical: 4,
+    
   },
   infoCircleIcon: {
     width: 16, // typical icon width
