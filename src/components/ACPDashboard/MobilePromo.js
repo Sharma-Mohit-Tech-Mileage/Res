@@ -21,6 +21,7 @@ const MobilePromo = ({ navigation }) => {
      >
       <Image accessibilityLabel="Smiling man holding a phone. Plans starting at $15 per month, heading level 2."
       accessible={false}
+      accessibilityRole='none'
       source={PromoImage} resizeMode='stretch' style={styles.promoImageSty}  />
       </View>
 

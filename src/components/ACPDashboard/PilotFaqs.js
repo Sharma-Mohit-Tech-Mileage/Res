@@ -21,6 +21,7 @@ const PilotFaqs = ({ navigation }) => {
         accessibilityLabel="Service Activation section, heading level 2. For more information about Service Activation, please visit our FAQ
         page by clicking the link below."
         //accessibilityRole="header"
+        accessibilityRole="none"
       >
         <Text style={styles.title}>Service Activation</Text>
       </View>

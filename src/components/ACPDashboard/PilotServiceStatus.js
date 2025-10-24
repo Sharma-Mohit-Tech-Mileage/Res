@@ -42,7 +42,7 @@ export default function PilotServiceStatus({
 “Step 2 of 3. Pending Status. In progress.” 
 “Step 3 of 3. Service Activated. Not started.”
  "
-      //accessibilityRole="header"
+      accessibilityRole="none"
     >
       {stages.map((stage, idx) => {
         const index = idx + 1;

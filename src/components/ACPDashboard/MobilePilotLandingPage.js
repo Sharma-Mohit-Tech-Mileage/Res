@@ -48,6 +48,7 @@ const MobilePilotLandingPage = ({
             <View
               accessibilityLabel="Information icon "
               accessible={true}
+              accessibilityRole='text'
             >
               <Infocircle
                 color={"#0060AE"}
