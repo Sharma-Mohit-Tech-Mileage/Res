@@ -37,7 +37,7 @@ const FeatureCardMobile = ({
     <View style={styles.container}>
       <Text
         style={[styles.title, { color: "#393D40" }]}
-        accessibilityLabel="Smiling man holding a phone. Plans starting at $15 per month, heading level 2. Now take your connection on the go - Introducing Sparklight Mobile "
+        accessibilityLabel="Smiling man holding a phone. Plans starting at $15 per month. Now take your connection on the go - Introducing Sparklight Mobile, heading level 2."
         accessible={true}
         accessibilityRole="header"
       >
