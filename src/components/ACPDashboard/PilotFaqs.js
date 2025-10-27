@@ -8,6 +8,7 @@ import {
   Border,
 } from "../../../GlobalStyles";
 import AppStyles from "../common/styles/AppStyles";
+import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 const PromoImage = require("../../../assets/sparklight-tech-app.jpg");
 
 const PilotFaqs = ({ navigation }) => {
@@ -54,6 +55,7 @@ const PilotFaqs = ({ navigation }) => {
       >
         Service Activation FAQ’s
       </Text>
+      <View style={{ minWidth:wp("80%"), overflow: "hidden" }} >
       <Image
         source={PromoImage}
         resizeMode="cover"
@@ -61,6 +63,7 @@ const PilotFaqs = ({ navigation }) => {
         accessibilityLabel="Decorative image of technician standing near service vehicle"
         accessible={true}
       />
+      </View>
     </View>
   );
 };
@@ -90,7 +93,6 @@ const styles = StyleSheet.create({
     justifyContent: "center", // Optional: center content vertically
   },
   promoImageSty: {
-    width: "100%",
     aspectRatio: 1.92, // Adjust this ratio to match your image's proportions
     borderRadius: Border.br_11xs,
     resizeMode: "cover",

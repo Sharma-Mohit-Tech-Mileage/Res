@@ -61,6 +61,7 @@ const notifyPermission = async () => {
         },
         {
           text: 'Go to Settings',
+          style:'cancel',
           onPress: () => {
             if (Platform.OS === 'ios') {
               Linking.openURL('app-settings:');

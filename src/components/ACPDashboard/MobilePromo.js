@@ -50,7 +50,6 @@ const styles = StyleSheet.create({
         fontWeight: "700",
     },
     imageContainer: {
-        borderRadius: Border.br_11xs,
         alignSelf: "center",
         overflow: "hidden",
         marginBottom: 20,
@@ -60,6 +59,8 @@ const styles = StyleSheet.create({
     width: "100%",
     aspectRatio: 1.1, // Adjust the ratio as needed (e.g., 2 for 2:1 width:height)
     resizeMode: "cover",
+    borderTopLeftRadius:3,
+    borderTopRightRadius:3,
 },
 });
 

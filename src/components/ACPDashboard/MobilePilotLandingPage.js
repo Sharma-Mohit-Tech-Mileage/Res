@@ -2,8 +2,6 @@ import React from "react";
 import {
   View,
   Text,
-  StyleSheet,
-  SafeAreaView,
   Linking,
   ScrollView,
   Platform,
@@ -105,7 +103,7 @@ const MobilePilotLandingPage = ({
                 
               
               </View>
-              <View style={{ flexDirection: "row", flexWrap: "wrap" , marginTop:4}}>
+              <View style={{ flexDirection: "row", flexWrap: "wrap" , marginTop:8}}>
               <Text style={styles.subText}>
                 If you have any questions, please call{" "}
               </Text>
