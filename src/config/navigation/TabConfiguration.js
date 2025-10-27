@@ -53,10 +53,10 @@ export const TABS = [
     // Visibility: Conditional
     isVisible: (userInfo, featureFlags) => {
       // Hide for pending activation users
-      if (true) {
+      if (userInfo?.acctStatus === 'PENDING_ACTIVATION') {
         return false;
       }
-      
+
       // Hide if feature flag disables it
       if (featureFlags?.disableBilling === true) {
         return false;
