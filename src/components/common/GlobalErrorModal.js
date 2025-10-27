@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "600",
     marginBottom: 20,
-    color: colors.sparklight_grey,
+    color: colors.black,
     fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
   },

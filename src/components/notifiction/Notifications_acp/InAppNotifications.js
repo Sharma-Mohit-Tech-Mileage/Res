@@ -196,7 +196,7 @@ const InAppNotifications = ({ navigation }) => {
         );
         if (res) {
           setNotification({
-            message: "In-App Notifications updated successfully.",
+            message: "Your in-app notification preferences have been updated successfully.",
             type: "success",
           });
           //navigation.navigate("Notifications", { updateSuccess: true, successMessage: "In-App Notifications updated successfully." });
