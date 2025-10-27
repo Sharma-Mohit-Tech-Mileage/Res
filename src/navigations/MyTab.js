@@ -41,11 +41,13 @@ const Tab = createBottomTabNavigator();
 const MyTabs = ({ route }) => {
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
-
   const visibleTabs = useVisibleTabs();
   const home = useSelector((state) => state.home);
-  const [showWalkthrough, setShowWalkthrough] = useState(true);
+  const [showWalkthrough, setShowWalkthrough] = useState(false);
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
+
+  useEffect(() => { const fetchData = async () => { if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) { setShowWalkthrough(true); } }; fetchData(); }, []);
+
   useEffect(() => {
     const checkScreenReader = async () => {
       const enabled = await AccessibilityInfo.isScreenReaderEnabled();

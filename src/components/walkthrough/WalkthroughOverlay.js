@@ -1,12 +1,19 @@
 /**
  * ============================================================================
- * WALKTHROUGH OVERLAY - WITH SPOTLIGHT CUTOUT
+ * WALKTHROUGH OVERLAY - WITH SPOTLIGHT CUTOUT - REDESIGNED
  * ============================================================================
  * 
- * Now creates a true spotlight effect:
+ * Creates a true spotlight effect with improved UX:
  * - Dark overlay covers entire screen EXCEPT active tab
  * - Active tab remains fully visible and interactive-looking
  * - Arrow points to the clear/visible tab
+ * - NO FADE TRANSITIONS between steps (instant switch)
+ * - Improved accessibility for screen readers
+ * 
+ * IMPROVEMENTS:
+ * - Removed card fade transitions for smoother UX
+ * - Added accessibility props to hide overlays from screen readers
+ * - Lighter overlay shadow (softer look with white card)
  * 
  * ============================================================================
  */
@@ -66,7 +73,7 @@ const WalkthroughOverlay = ({ visibleTabs, currentStep, onFinish, tabBarHeight }
     setLocalStep(currentStep);
   }, [currentStep]);
 
-  // Handle step change
+  // Handle step change - NO FADE TRANSITION
   const handleNext = () => {
     const nextStep = localStep + 1;
 
@@ -75,20 +82,7 @@ const WalkthroughOverlay = ({ visibleTabs, currentStep, onFinish, tabBarHeight }
       return;
     }
 
-    // Transition animation
-    Animated.sequence([
-      Animated.timing(bubbleFade, {
-        toValue: 0.5,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-      Animated.timing(bubbleFade, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
+    // Instant step change - no fade animation
     setLocalStep(nextStep);
     dispatch(updateWalkThroughStep(nextStep));
   };
@@ -98,20 +92,7 @@ const WalkthroughOverlay = ({ visibleTabs, currentStep, onFinish, tabBarHeight }
 
     const prevStep = localStep - 1;
 
-    // Transition animation
-    Animated.sequence([
-      Animated.timing(bubbleFade, {
-        toValue: 0.5,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-      Animated.timing(bubbleFade, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
+    // Instant step change - no fade animation
     setLocalStep(prevStep);
     dispatch(updateWalkThroughStep(prevStep));
   };
@@ -175,10 +156,12 @@ const WalkthroughOverlay = ({ visibleTabs, currentStep, onFinish, tabBarHeight }
             height: SCREEN_HEIGHT - tabBarHeight,
             opacity: overlayFade.interpolate({
               inputRange: [0, 1],
-              outputRange: [0, 0.75],
+              outputRange: [0, 0.70],
             }),
           },
         ]}
+        importantForAccessibility="no-hide-descendants"
+        accessible={false}
       />
 
       {/* LEFT SHADOW - Covers tabs to the LEFT of active tab */}
@@ -197,6 +180,8 @@ const WalkthroughOverlay = ({ visibleTabs, currentStep, onFinish, tabBarHeight }
               }),
             },
           ]}
+          importantForAccessibility="no-hide-descendants"
+          accessible={false}
         />
       )}
 
@@ -216,10 +201,12 @@ const WalkthroughOverlay = ({ visibleTabs, currentStep, onFinish, tabBarHeight }
               }),
             },
           ]}
+          importantForAccessibility="no-hide-descendants"
+          accessible={false}
         />
       )}
 
-      {/* ACTIVE TAB HIGHLIGHT (Optional - adds subtle glow) */}
+      {/* ACTIVE TAB HIGHLIGHT (Subtle purple glow) */}
       <Animated.View
         style={[
           styles.activeTabHighlight,
@@ -230,10 +217,12 @@ const WalkthroughOverlay = ({ visibleTabs, currentStep, onFinish, tabBarHeight }
             height: tabBarHeight,
             opacity: overlayFade.interpolate({
               inputRange: [0, 1],
-              outputRange: [0, 0.2],
+              outputRange: [0, 0.15],
             }),
           },
         ]}
+        importantForAccessibility="no-hide-descendants"
+        accessible={false}
       />
 
       {/* Walkthrough bubble */}
@@ -281,7 +270,7 @@ const styles = StyleSheet.create({
   },
   activeTabHighlight: {
     position: 'absolute',
-    backgroundColor: 'rgba(141, 59, 144, 0.3)', // Subtle purple glow matching your brand
+    backgroundColor: 'rgba(53, 48, 145, 0.3)',
     zIndex: 99,
   },
   bubbleContainer: {

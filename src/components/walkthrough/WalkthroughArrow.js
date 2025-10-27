@@ -1,19 +1,20 @@
 /**
  * ============================================================================
- * WALKTHROUGH ARROW POINTER
+ * WALKTHROUGH ARROW POINTER - REDESIGNED
  * ============================================================================
- * 
+ *
  * Animated arrow that points to the active tab.
- * 
- * PROPS:
- *   - leftPosition: Horizontal position (calculated externally)
- * 
+ * Now matches brand purple color.
+ *
+ * DESIGN IMPROVEMENTS:
+ * - Arrow color: Brand purple (#353091)
+ * - Matches the redesigned card accent color
+ *
  * ============================================================================
  */
 
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, Easing } from 'react-native';
-import { Color } from "../../../GlobalStyles";
+import React, { useEffect, useRef } from "react";
+import { View, StyleSheet, Animated, Easing } from "react-native";
 
 const WalkthroughArrow = ({ leftPosition }) => {
   const bounceAnim = useRef(new Animated.Value(0)).current;
@@ -55,12 +56,12 @@ const WalkthroughArrow = ({ leftPosition }) => {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    position: "absolute",
     bottom: -20,
     width: 32,
     height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   triangle: {
     width: 0,
@@ -68,9 +69,9 @@ const styles = StyleSheet.create({
     borderLeftWidth: 16,
     borderRightWidth: 16,
     borderTopWidth: 20,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderTopColor: Color.sparklightWhite,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderTopColor: "#353091",
   },
 });
 

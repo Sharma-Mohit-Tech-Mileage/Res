@@ -1,20 +1,21 @@
 /**
  * ============================================================================
- * WALKTHROUGH PROGRESS INDICATORS
+ * WALKTHROUGH PROGRESS INDICATORS - REDESIGNED
  * ============================================================================
  * 
- * Shows progress dots for walkthrough steps.
+ * Modern progress dots with brand purple accent
  * 
- * PROPS:
- *   - totalSteps: Number of total steps
- *   - currentStep: Current step index (0-based)
+ * DESIGN IMPROVEMENTS:
+ * - Active: Brand purple (#353091)
+ * - Inactive: Modern light gray (#E5E7EB)
+ * - Better visual contrast
  * 
  * ============================================================================
  */
 
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Color, Padding } from '../../../GlobalStyles';
+import { Padding } from '../../../GlobalStyles';
 
 const WalkthroughProgress = ({ totalSteps, currentStep }) => {
   return (
@@ -43,15 +44,15 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#E5E7EB',
   },
   dotActive: {
     width: 32,
-    backgroundColor: Color.sparklightWhite,
+    backgroundColor: '#353091',
   },
   dotCompleted: {
     width: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    backgroundColor: '#9CA3AF',
   },
 });
 
