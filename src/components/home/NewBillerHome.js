@@ -8,7 +8,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
-import WalkthroughOverlay from "../common/WalkthroughOverlay";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
@@ -34,7 +33,6 @@ import Logo from "../../res/images/SpalshLogo";
 const NewBillerHome = ({ navigation }) => {
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
-  const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [isNotificationEnable, setIsNotificationEnable] = useState(false);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [loadingAutoPay, setloadingAutoPay] = useState(false);
@@ -50,12 +48,7 @@ const NewBillerHome = ({ navigation }) => {
     currentVersion: "",
     latestVersion: "",
   });
-
-  // Redux selectors
-  const home = useSelector((state) => state.home);
-  const accountDetails = useSelector(
-    (state) => state.profile?.accountDetails
-  );
+  const accountDetails = useSelector((state) => state.profile?.accountDetails);
   const dispatch = useDispatch();
   const paperlessStatusAcp = useSelector(
     (state) => state.profile?.paperlessStatusAcp
@@ -63,9 +56,7 @@ const NewBillerHome = ({ navigation }) => {
   const paperlessLoading = useSelector(
     (state) => state.profile?.isPaperLessStatusLoading
   );
-  const userInfo = useSelector(
-    (state) => state.user?.userData?.userInfo
-  );
+  const userInfo = useSelector((state) => state.user?.userData?.userInfo);
 
   const showDisconnectedBanner = userInfo
     ? isAccountDisconnected(
@@ -133,12 +124,6 @@ const NewBillerHome = ({ navigation }) => {
       refreshData();
     }, [dispatch])
   );
-
-  useEffect(() => {
-    if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
-      setShowWalkThrough(true);
-    }
-  }, [home.walkThroughStep]);
 
   useEffect(() => {
     if (isNotificationEnable) {
@@ -221,17 +206,6 @@ const NewBillerHome = ({ navigation }) => {
     }
   };
 
-  const renderHeader = () => (
-    <View
-      accessibilityElementsHidden={showWalkThrough}
-      importantForAccessibility={showWalkThrough ? "no-hide-descendants" : "no"}
-      accessibilityLabel="SparkLight"
-      style={styles.headerContainer}
-    >
-      <Logo width={120} height={33.32} />
-    </View>
-  );
-
   const renderOutageAlert = () =>
     AlertUtils.createOutageAlert(estimatedRestoreTime, () =>
       setIsOutageAlert(false)
@@ -302,19 +276,11 @@ const NewBillerHome = ({ navigation }) => {
       colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
-      {showWalkThrough && <View style={styles.shadowFullScreen} />}
-      {showWalkThrough && (
-        <WalkthroughOverlay onFinish={() => setShowWalkThrough(false)} />
-      )}
-      <View
-        accessibilityElementsHidden={showWalkThrough}
-        importantForAccessibility={
-          showWalkThrough ? "no-hide-descendants" : "auto"
-        }
-        style={{ flex: 1 }}
-      >
+      <View style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }}>
-          {renderHeader()}
+          <View accessibilityLabel="SparkLight" style={styles.headerContainer}>
+            <Logo width={120} height={33.32} />
+          </View>
           <ScrollView style={styles.scrollContainer}>
             <View style={styles.mainContentContainer}>
               {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
@@ -380,15 +346,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: -2, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
-  },
-  shadowFullScreen: {
-    backgroundColor: "black",
-    height: "100%",
-    width: "100%",
-    position: "absolute",
-    top: 0,
-    zIndex: 5,
-    opacity: 0.7,
   },
   contentWrapper: {
     flex: 1,
