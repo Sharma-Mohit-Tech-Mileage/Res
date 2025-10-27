@@ -24,7 +24,6 @@ import GearIcon from '../../res/svgIcons/GearIcon';
 import SearchIcon from '../../../assets/svgs/SearchIcon'; 
 import ChevronRight from '../../../assets/svgs/Chevonright';
 import SuccessIcon from '../../../assets/svgs/SuccessIcon';
-import HomeIcone from '../../../assets/svgs/Home';  
 const Icon = ({ name, size = 24, color = '#000', style }) => {
   const iconMap = {
     'credit-card': { library: 'SVG', source: creditCard },
@@ -47,7 +46,6 @@ const Icon = ({ name, size = 24, color = '#000', style }) => {
     'document': { library: 'SVG', source: DocumentIcon },
     'search-book': { library: 'SVG', source: SearchBookIcon },
     'gear': { library: 'SVG', source: GearIcon },
-    'home': { library: 'SVG', source: HomeIcone },
 
     // Image asset example
     'building-doc': { library: 'SVG', source: BuildingDocIcon },
