@@ -1,32 +1,51 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Image, StyleSheet, Text, View, Pressable, Alert, ScrollView } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  Alert,
+  ScrollView,
+} from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { Color, FontFamily, FontSize, Padding, Border } from "../../../GlobalStyles";
+import {
+  Color,
+  FontFamily,
+  FontSize,
+  Padding,
+  Border,
+} from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
 
-import ProfileSettingsIcon from '../../../assets/svgs/Rightactionable15';
-import PasswordSecurityIcon from '../../../assets/svgs/Rightactionable16';
-import NotificationsIcon from '../../../assets/svgs/Rightactinable17';
-import UserManagementIcon from '../../../assets/svgs/Rightactionable18';
-import Feedbackicon from '../../../assets/svgs/Messagealertcircle';
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { useDispatch, useSelector } from 'react-redux';
-import { getSsoToken, cleanUserData, storeSsoToken, storeUser } from "../../redux/utils/LocalStorage";
-import { fetchProfileDetails } from '../../redux/actions/ProfileActionSuite'
-import { logout } from 'react-native-app-auth';
+import ProfileSettingsIcon from "../../../assets/svgs/Rightactionable15";
+import PasswordSecurityIcon from "../../../assets/svgs/Rightactionable16";
+import NotificationsIcon from "../../../assets/svgs/Rightactinable17";
+import UserManagementIcon from "../../../assets/svgs/Rightactionable18";
+import Feedbackicon from "../../../assets/svgs/Messagealertcircle";
+import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getSsoToken,
+  cleanUserData,
+  storeSsoToken,
+  storeUser,
+} from "../../redux/utils/LocalStorage";
+import { fetchProfileDetails } from "../../redux/actions/ProfileActionSuite";
+import { logout } from "react-native-app-auth";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { saveUserInfo, logoutApp } from "../../redux/actions/UserAction";
-import VersionCheck from 'react-native-version-check';
+import VersionCheck from "react-native-version-check";
 import { Env } from "../../network/apis/account/Constants";
-import AppStyles from "../common/styles/AppStyles";
+import AppStyles from "../utility/AppStyles";
 import UserIconWhite from "../../res/svgIcons/UserIconWhite";
 import moment from "moment";
-import analytics from '@react-native-firebase/analytics';
-import RightIcon from '../../../assets/svgs/Chevonright';
+import analytics from "@react-native-firebase/analytics";
+import RightIcon from "../../../assets/svgs/Chevonright";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
+} from "react-native-responsive-screen";
 const config = {
   issuer: Env.SSO_LOGIN,
   iosPrefersEphemeralSession: true,
@@ -34,16 +53,16 @@ const config = {
 
 const logoutConfirmationPopup = (dispatch, navigation) => {
   Alert.alert(
-    'Confirm Logout',
-    'Are you sure you want to logout?',
+    "Confirm Logout",
+    "Are you sure you want to logout?",
     [
       {
-        text: 'Cancel',
+        text: "Cancel",
         onPress: () => null,
-        style: 'cancel',
+        style: "cancel",
       },
       {
-        text: 'Ok',
+        text: "Ok",
         onPress: () => {
           logoutAction(dispatch, navigation);
         },
@@ -53,26 +72,26 @@ const logoutConfirmationPopup = (dispatch, navigation) => {
   );
 };
 
-
 const logoutAction = (dispatch, navigation) => {
   getSsoToken().then((res) => {
-    console.log('token', res);
+    console.log("token", res);
     let token = res.idToken;
-    console.log('idToken', token);
+    console.log("idToken", token);
     logout(config, {
       idToken: token,
-      postLogoutRedirectUrl: 'com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback',
-    }).then(async(result) => {
-     try {
+      postLogoutRedirectUrl:
+        "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
+    }).then(async (result) => {
+      try {
         analytics().setUserId(null);
-        await analytics().setUserProperty('Sparklight_user_id', null);
-        console.log('Analytics User ID cleared on logout');
+        await analytics().setUserProperty("Sparklight_user_id", null);
+        console.log("Analytics User ID cleared on logout");
       } catch (error) {
-        console.error('Error clearing analytics user ID:', error);
+        console.error("Error clearing analytics user ID:", error);
       }
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Splash', params: { isLogout: true } }],
+        routes: [{ name: "Splash", params: { isLogout: true } }],
       });
       storeUser({});
       storeSsoToken({});
@@ -85,105 +104,100 @@ const logoutAction = (dispatch, navigation) => {
 
 const AccountOverview = () => {
   const navigation = useNavigation();
-  const [fullName, setFullName] = useState('');
-  const [initials, setInitials] = useState('');
+  const [fullName, setFullName] = useState("");
   const [menues, setMenues] = useState([]);
   const dispatch = useDispatch();
-  const user = useSelector(state => state.combinedReducers.user.userData);
-  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {};
   useEffect(() => {
     dispatch(fetchProfileDetails());
 
     getUser().then((res) => {
-      if(res.userInfo?.accountNumber.toString().length>=16){
-        setMenues(menuItems1)
-      }else{
-        setMenues(menuItems)
+      if (res.userInfo?.accountNumber.toString().length >= 16) {
+        setMenues(menuItems1);
+      } else {
+        setMenues(menuItems);
       }
     });
-    
   }, []);
 
   const menuItems = [
     {
-      name: 'Profile',
-      onPress: () => navigation.navigate('ProfileSettings'),
+      name: "Profile",
+      onPress: () => navigation.navigate("ProfileSettings"),
       icon: ProfileSettingsIcon,
-      accessibilityLabel: 'Navigate to profile',
+      accessibilityLabel: "Navigate to profile",
       includeInMenu: true,
     },
     {
-      name: 'Password & Security',
-      onPress: () => navigation.navigate('PasswordSecurity'),
+      name: "Password & Security",
+      onPress: () => navigation.navigate("PasswordSecurity"),
       icon: PasswordSecurityIcon,
-      accessibilityLabel: 'Navigate to password and security settings',
+      accessibilityLabel: "Navigate to password and security settings",
       includeInMenu: true,
     },
     {
-      name: 'Notifications',
-      onPress: () => navigation.navigate('Notifications'),
+      name: "Notifications",
+      onPress: () => navigation.navigate("Notifications"),
       icon: NotificationsIcon,
-      accessibilityLabel: 'Navigate to notifications settings',
+      accessibilityLabel: "Navigate to notifications settings",
       includeInMenu: true,
     },
     {
-      name: 'User Management',
-      onPress: () => navigation.navigate('UserManagement'),
+      name: "User Management",
+      onPress: () => navigation.navigate("UserManagement"),
       icon: UserManagementIcon,
-      accessibilityLabel: 'Navigate to user management settings',
+      accessibilityLabel: "Navigate to user management settings",
       includeInMenu: true,
     },
     {
-      name: 'App Feedback',
-      onPress: () => navigation.navigate('Feedback'),
+      name: "App Feedback",
+      onPress: () => navigation.navigate("Feedback"),
       icon: Feedbackicon,
-      accessibilityLabel: 'Navigate to user management settings',
+      accessibilityLabel: "Navigate to user management settings",
       includeInMenu: true,
-    }
+    },
   ];
 
   const menuItems1 = [
     {
-      name: 'Profile',
-      onPress: () => navigation.navigate('ProfileSettings'),
+      name: "Profile",
+      onPress: () => navigation.navigate("ProfileSettings"),
       icon: ProfileSettingsIcon,
-      accessibilityLabel: 'Navigate to profile',
+      accessibilityLabel: "Navigate to profile",
       includeInMenu: true,
     },
 
-   
     {
-      name: 'Password & Security',
-      onPress: () => navigation.navigate('PasswordSecurity'),
+      name: "Password & Security",
+      onPress: () => navigation.navigate("PasswordSecurity"),
       icon: PasswordSecurityIcon,
-      accessibilityLabel: 'Navigate to password and security settings',
+      accessibilityLabel: "Navigate to password and security settings",
       includeInMenu: true,
     },
     {
-      name: 'Notifications',
-      onPress: () => navigation.navigate('Notifications'),
+      name: "Notifications",
+      onPress: () => navigation.navigate("Notifications"),
       icon: NotificationsIcon,
-      accessibilityLabel: 'Navigate to notifications settings',
+      accessibilityLabel: "Navigate to notifications settings",
       includeInMenu: true,
     },
-    
-    {
-      name: 'App Feedback',
-      onPress: () => navigation.navigate('Feedback'),
-      icon: Feedbackicon,
-      accessibilityLabel: 'Navigate to user management settings',
-      includeInMenu: true,
-    }
-  ];
 
+    {
+      name: "App Feedback",
+      onPress: () => navigation.navigate("Feedback"),
+      icon: Feedbackicon,
+      accessibilityLabel: "Navigate to user management settings",
+      includeInMenu: true,
+    },
+  ];
 
   useFocusEffect(
     useCallback(() => {
-      const firstName = profileDetails?.firstName || '';
-      const lastName = profileDetails?.lastName || '';
+      const firstName = profileDetails?.firstName || "";
+      const lastName = profileDetails?.lastName || "";
 
-      let initials = '';
+      let initials = "";
       if (firstName.length > 0) {
         initials += firstName.charAt(0).toUpperCase();
       }
@@ -192,14 +206,14 @@ const AccountOverview = () => {
       }
 
       const fullNameCamelCase = [firstName, lastName]
-        .map(name => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase())
-        .join(' ');
+        .map(
+          (name) => name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+        )
+        .join(" ");
 
       setFullName(fullNameCamelCase);
-      setInitials(initials);
-      return () => {
-      };
-    }, [profileDetails]) 
+      return () => {};
+    }, [profileDetails])
   );
 
   return (
@@ -207,7 +221,7 @@ const AccountOverview = () => {
       <ProfileSettingsHeader
         title="Account"
         iconAlignment="right"
-        showIcon={false} 
+        showIcon={false}
       />
       <LinearGradient
         style={styles.linearGradientStyle}
@@ -219,55 +233,67 @@ const AccountOverview = () => {
       <View style={[styles.frameParent]}>
         <View style={styles.rightActionableParent}>
           <View style={styles.rightActionable}>
-            <UserIconWhite width={28} height={26}/> 
+            <UserIconWhite width={28} height={26} />
           </View>
           {/* Full name for profile */}
-          <Text style={styles.melissaSmith} >
-            {fullName}
-          </Text>
+          <Text style={styles.melissaSmith}>{fullName}</Text>
         </View>
         <ScrollView style={{ flex: 1 }}>
-          <View style={{ marginBottom: '30%' }}>
+          <View style={{ marginBottom: "30%" }}>
             <View style={styles.frameGroup}>
               <View style={AppStyles.card}>
                 {/* Mapping through menu items */}
-                {menues.map((item, index) => (
-                  item.includeInMenu && (
-                    <React.Fragment key={item.name}>
-                      <Pressable
-                        style={[styles.rightActionableGroup, styles.tabsFlexBox]}
-                        onPress={item.onPress}
-                        accessibilityLabel={item.name}
-                        accessibilityHint={`Navigates to ${item.name}`}
-                        accessibilityRole="button"
-                      >
-                        {/* Menu item icon */}
-                        {typeof item.icon === 'function' ? (
-                          <View style={{alignSelf:'center'}}>
-                            <item.icon width={24} height={24} />
+                {menues.map(
+                  (item, index) =>
+                    item.includeInMenu && (
+                      <React.Fragment key={item.name}>
+                        <Pressable
+                          style={[
+                            styles.rightActionableGroup,
+                            styles.tabsFlexBox,
+                          ]}
+                          onPress={item.onPress}
+                          accessibilityLabel={item.name}
+                          accessibilityHint={`Navigates to ${item.name}`}
+                          accessibilityRole="button"
+                        >
+                          {/* Menu item icon */}
+                          {typeof item.icon === "function" ? (
+                            <View style={{ alignSelf: "center" }}>
+                              <item.icon width={24} height={24} />
+                            </View>
+                          ) : (
+                            <View
+                              accessible={true}
+                              accessibilityLabel={`${item.name} icon`}
+                              style={styles.rightIconLayout}
+                            >
+                              <item.icon />
+                            </View>
+                          )}
+                          {/* Menu item text */}
+                          <Text
+                            style={[
+                              styles.profileSettings,
+                              styles.makePaymentTypo,
+                            ]}
+                          >
+                            {" " + item.name}
+                          </Text>
+                          {/* Chevron/Arrow icon */}
+                          <View
+                            style={[{ marginLeft: 10 }, styles.rightIconLayout]}
+                          >
+                            <RightIcon />
                           </View>
-                          
-                        ) : (
-                    
-                          <View accessible={true} accessibilityLabel={`${item.name} icon`}
-                          style={styles.rightIconLayout}>
-                            <item.icon />
-                          </View>
+                        </Pressable>
+                        {/* Divider, if not the last item */}
+                        {item.includeInMenu && index < menuItems.length - 1 && (
+                          <View style={styles.frameChild} />
                         )}
-                        {/* Menu item text */}
-                        <Text style={[styles.profileSettings, styles.makePaymentTypo]}>
-                          {' '+item.name}
-                        </Text>
-                        {/* Chevron/Arrow icon */}
-                        <View style={[{ marginLeft: 10 }, styles.rightIconLayout]}>
-                          <RightIcon />
-                          </View>
-                        
-                      </Pressable>
-                      {/* Divider, if not the last item */}
-                      {item.includeInMenu && index < menuItems.length - 1 && <View style={styles.frameChild} />}
-                    </React.Fragment>
-                  )))}
+                      </React.Fragment>
+                    )
+                )}
               </View>
               <View style={styles.buttonContainer}>
                 <Pressable
@@ -275,21 +301,36 @@ const AccountOverview = () => {
                   accessibilityRole="button"
                   accessibilityLabel="Logout"
                   style={[styles.button, styles.buttonsLayout]}
-                  onPress={() => { logoutConfirmationPopup(dispatch, navigation) }}
+                  onPress={() => {
+                    logoutConfirmationPopup(dispatch, navigation);
+                  }}
                 >
-                  <Text style={[styles.accept]}>
-                    Logout
-                  </Text>
+                  <Text style={[styles.accept]}>Logout</Text>
                 </Pressable>
               </View>
 
-              <View style={{ flexDirection: 'row', ...styles.buttonsSpaceBlock, ...styles.buttons, ...styles.buttonsSpaceBlock }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  ...styles.buttonsSpaceBlock,
+                  ...styles.buttons,
+                  ...styles.buttonsSpaceBlock,
+                }}
+              >
                 <Pressable
                   accessible={true}
                   accessibilityRole="link"
-                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-privacy-policy', name: 'Privacy Policy' })}
+                  onPress={() =>
+                    navigation.navigate("ArticalWindowUtility", {
+                      url: "https://www.sparklight.com/legal/mobile-app-privacy-policy",
+                      name: "Privacy Policy",
+                    })
+                  }
                 >
-                  <Text accessibilityLabel="Privacy Policy" style={styles.linkStyle}>
+                  <Text
+                    accessibilityLabel="Privacy Policy"
+                    style={styles.linkStyle}
+                  >
                     Privacy Policy
                   </Text>
                 </Pressable>
@@ -299,27 +340,45 @@ const AccountOverview = () => {
                 <Pressable
                   accessible={true}
                   accessibilityRole="link"
-                  onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://www.sparklight.com/legal/mobile-app-terms-and-conditions?isMobile=true', name: 'Terms & Conditions' })}
+                  onPress={() =>
+                    navigation.navigate("ArticalWindowUtility", {
+                      url: "https://www.sparklight.com/legal/mobile-app-terms-and-conditions?isMobile=true",
+                      name: "Terms & Conditions",
+                    })
+                  }
                 >
-                  <Text accessibilityLabel="Terms & Conditions" style={styles.linkStyle}>
+                  <Text
+                    accessibilityLabel="Terms & Conditions"
+                    style={styles.linkStyle}
+                  >
                     Terms & Conditions
                   </Text>
                 </Pressable>
               </View>
-
             </View>
             <Pressable
-              onPress={() => navigation.navigate('ArticalWindowUtility', { url: 'https://support.sparklight.com/hc/en-us/articles/30080605597079-MySparklight-App-Release-Notes?isMobile=true', name: 'App Release Notes' })}
-              accessibilityLabel={'Version '+VersionCheck.getCurrentVersion()}
+              onPress={() =>
+                navigation.navigate("ArticalWindowUtility", {
+                  url: "https://support.sparklight.com/hc/en-us/articles/30080605597079-MySparklight-App-Release-Notes?isMobile=true",
+                  name: "App Release Notes",
+                })
+              }
+              accessibilityLabel={"Version " + VersionCheck.getCurrentVersion()}
               accessibilityRole="link"
             >
-              <Text style={{ color: Color.colorMidnightblue, alignSelf: 'center', textDecorationLine: 'underline' }}>
+              <Text
+                style={{
+                  color: Color.colorMidnightblue,
+                  alignSelf: "center",
+                  textDecorationLine: "underline",
+                }}
+              >
                 Version:{VersionCheck.getCurrentVersion()}
               </Text>
             </Pressable>
 
             <Text style={styles.copyright}>
-                {`©${moment().year()} Cable One, Inc. All rights reserved.`}
+              {`©${moment().year()} Cable One, Inc. All rights reserved.`}
             </Text>
           </View>
         </ScrollView>
@@ -330,7 +389,7 @@ const AccountOverview = () => {
 
 const styles = StyleSheet.create({
   linearGradientStyle: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     top: 0,
@@ -339,12 +398,6 @@ const styles = StyleSheet.create({
   buttonsSpaceBlock: {
     paddingVertical: Padding.p_base,
     alignItems: "center",
-  },
-  navigationBorder: {
-    borderColor: Color.sparklightGray,
-    backgroundColor: Color.sparklightWhite,
-    borderStyle: "solid",
-    justifyContent: "center",
   },
   accept: {
     fontSize: FontSize.size_base,
@@ -358,27 +411,27 @@ const styles = StyleSheet.create({
   },
   linkStyle: {
     color: Color.colorMidnightblue,
-    alignSelf: 'center',
-    fontWeight: '600',
-    textDecorationLine: 'underline', // added underscore for linkStyle
+    alignSelf: "center",
+    fontWeight: "600",
+    textDecorationLine: "underline", // added underscore for linkStyle
   },
   makePaymentTypo: {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    width: '100%', 
+    flexDirection: "row",
+    justifyContent: "center",
+    width: "100%",
     paddingTop: Padding.p_5xl,
   },
 
   rightIconLayout: {
     height: 24,
     width: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 5
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 5,
   },
   title: {
     marginLeft: -35,
@@ -386,7 +439,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: Color.colorMidnightblue,
-    width: '100%',
+    width: "100%",
   },
   buttonsLayout: {
     paddingVertical: Padding.p_base,
@@ -394,7 +447,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: Border.br_11xs,
-    minHeight: 50
+    minHeight: 50,
   },
   rightActionable: {
     borderColor: Color.colorWhitesmoke_200,
@@ -403,8 +456,8 @@ const styles = StyleSheet.create({
     height: 72,
     backgroundColor: Color.colorMidnightblue,
     borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   text: {
@@ -426,7 +479,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "stretch",
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   profileSettings: {
     textAlign: "left",
@@ -452,7 +505,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   buttons: {
-    width: '100%',
+    width: "100%",
     paddingHorizontal: 0,
     justifyContent: "center",
     paddingVertical: Padding.p_base,
@@ -465,9 +518,10 @@ const styles = StyleSheet.create({
   frameParent: {
     flex: 1,
     paddingVertical: Padding.p_base,
-    alignSelf: 'stretch',
-  },copyright: {
-    marginTop:wp("25%"),
+    alignSelf: "stretch",
+  },
+  copyright: {
+    marginTop: wp("25%"),
     fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     textAlign: "center",
@@ -481,7 +535,6 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorWhitesmoke_200,
     width: "100%",
   },
-
 });
 
 export default AccountOverview;

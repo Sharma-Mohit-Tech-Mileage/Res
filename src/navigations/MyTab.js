@@ -1,170 +1,195 @@
-/**
- * ============================================================================
- * BOTTOM TAB NAVIGATOR
- * ============================================================================
- * 
- * Main tab navigation with dynamic visibility based on user context.
- * 
- * KEY FEATURES:
- * - Dynamic tab visibility
- * - Walkthrough integration
- * - Accessibility support
- * 
- * ========================x====================================================
- */
-
-import React, { useEffect, useState, useCallback } from "react";
-import { View, StyleSheet, Platform, Pressable, AccessibilityInfo } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  Platform,
+  Alert,
+  Pressable,
+  AccessibilityInfo,
+} from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useFocusEffect } from "@react-navigation/native";
-import { useVisibleTabs } from "../hooks/useVisibleTabs";
-import { fetchProfileDetails } from "../redux/actions/ProfileActionSuite";
-import WalkthroughOverlay from "../components/walkthrough/WalkthroughOverlay";
-import AccountStackScreen from "./stackNavigation/AccountStack";
-import SupportStack from "./stackNavigation/SupportStack";
+import AccountStackScreen from "../navigations/stackNavigation/AccountStack";
+import SupportStack from "../navigations/stackNavigation/SupportStack";
 import HomeStackScreen from "./stackNavigation/HomeStack";
-import BillingStackScreen from "./stackNavigation/BillingStack";
-import MyServicesStack from "./stackNavigation/MyServicesStack";
 import HomeIconSelected from "../res/svgIcons/HomeIconSelected";
 import HomeIcon from "../res/svgIcons/HomeIcon";
 import SupportIcon from "../res/svgIcons/SupportIcon";
 import SupportIconSelected from "../res/svgIcons/SupportIconSelected";
+import { FontFamily } from "../../GlobalStyles";
+import { fetchProfileDetails } from "../redux/actions/ProfileActionSuite";
 import BillingIcon from "../res/svgIcons/BillingIcon";
+import BillingStackScreen from "./stackNavigation/BillingStack";
+import MyServicesStack from "./stackNavigation/MyServicesStack";
 import NewSupportIcon from "../res/svgIcons/NewSupportIcon";
 import HomeAccountIcon from "../res/svgIcons/HomeAccountIcon";
-import { FontFamily, Color, FontSize } from "../../GlobalStyles";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+const { height, width } = Dimensions.get("window");
+const tabWidth = Number(width / 5);
 const Tab = createBottomTabNavigator();
-
 const MyTabs = ({ route }) => {
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
-
-  const visibleTabs = useVisibleTabs();
-  const home = useSelector((state) => state.home);
-  const [showWalkthrough, setShowWalkthrough] = useState(true);
+  const [shadowStyleLeft, setShadowStyleLeft] = useState(styles.shadowTabsLeft);
+  const [shadowStyle, setShadowStyle] = useState(styles.shadowTabs);
   const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
+  const home = useSelector((state) => state.home);
+
+  useEffect(() => {
+    dispatch(fetchProfileDetails());
+  }, [dispatch]);
+
   useEffect(() => {
     const checkScreenReader = async () => {
-      const enabled = await AccessibilityInfo.isScreenReaderEnabled();
-      setIsScreenReaderEnabled(enabled);
+      const screenReaderEnabled =
+        await AccessibilityInfo.isScreenReaderEnabled();
+      setIsScreenReaderEnabled(screenReaderEnabled);
     };
-
     checkScreenReader();
-
     const subscription = AccessibilityInfo.addEventListener(
       "screenReaderChanged",
-      setIsScreenReaderEnabled
+      (enabled) => {
+        setIsScreenReaderEnabled(enabled);
+      }
     );
-
-    return () => subscription.remove();
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
-
-  useFocusEffect(
-    useCallback(() => {
-      dispatch(fetchProfileDetails());
-    }, [dispatch])
-  );
-
-  /**
-   * Get component for tab ID
-   */
-  const getComponent = (componentName) => {
-    const componentMap = {
-      HomeStackScreen,
-      BillingStackScreen,
-      MyServicesStack,
-      SupportStack,
-      AccountStackScreen,
-    };
-    return componentMap[componentName] || HomeStackScreen;
-  };
-
-  /**
-   * Get icon for tab
-   */
-  const getIcon = (tab, focused) => {
-    const iconMap = {
-      home: focused ? HomeIconSelected : HomeIcon,
-      billing: BillingIcon,
-      services: focused ? SupportIconSelected : SupportIcon,
-      support: NewSupportIcon,
-      account: HomeAccountIcon,
-    };
-
-    const IconComponent = iconMap[tab.id] || HomeIcon;
-    return <IconComponent focused={focused} />;
-  };
-
-  /**
-   * Check if tab is accessible during walkthrough
-   */
-  const isTabAccessible = (tabIndex) => {
-    if (!showWalkthrough) return true;
+  const isTabAccessibleDuringWalkthrough = (tabIndex) => {
     if (home.walkThroughStep === null || home.walkThroughStep === undefined) {
       return true;
     }
     return home.walkThroughStep === tabIndex;
   };
 
-  /**
-   * Check if walkthrough is active
-   */
   const isWalkthroughActive = () => {
+    return home.walkThroughStep !== null && home.walkThroughStep !== undefined;
+  };
+
+  const getTabBarIconWrapper = (IconComponent, focused, tabIndex) => {
+    const isAccessible = isTabAccessibleDuringWalkthrough(tabIndex);
     return (
-      showWalkthrough &&
-      home.walkThroughStep !== null &&
-      home.walkThroughStep !== undefined
+      <View
+        style={[styles.tabItem, !isAccessible && styles.disabledTab]}
+        accessible={false}
+        importantForAccessibility="no"
+      >
+        <IconComponent focused={focused} />
+      </View>
     );
   };
 
-  // Calculate tab bar height
-  const tabBarHeight =
-    Platform.OS === "ios"
-      ? 90
-      : Math.max(55, insets.bottom + 60);
-
-  // Wait for tabs to load
-  if (visibleTabs.length === 0) {
-    return null; // Or loading indicator
-  }
+  useEffect(() => {
+    switch (home.walkThroughStep) {
+      case 0:
+        setShadowStyle(styles.shadowTabs);
+        setShadowStyleLeft(styles.shadowTabsLeft);
+        break;
+      case 1:
+        setShadowStyle([styles.shadowTabs, styles.shadowTabsStep2]);
+        setShadowStyleLeft([
+          styles.shadowTabs,
+          styles.shadowTabsStep2Left,
+          {
+            height:
+              Platform.OS === "ios"
+                ? 90
+                : Math.max(55, height * 0.08) + insets.bottom,
+          },
+        ]);
+        break;
+      case 2:
+        setShadowStyle([styles.shadowTabs, styles.shadowTabsStep32]);
+        setShadowStyleLeft([
+          styles.shadowTabs,
+          styles.shadowTabsStep31Left,
+          {
+            height:
+              Platform.OS === "ios"
+                ? 90
+                : Math.max(55, height * 0.08) + insets.bottom,
+          },
+        ]);
+        break;
+      case 3:
+        setShadowStyle([styles.shadowTabs, styles.shadowTabsStep3]);
+        setShadowStyleLeft([
+          styles.shadowTabs,
+          styles.shadowTabsStep3Left,
+          {
+            height:
+              Platform.OS === "ios"
+                ? 90
+                : Math.max(55, height * 0.08) + insets.bottom,
+          },
+        ]);
+        break;
+      case 4:
+        setShadowStyle([styles.shadowTabs, styles.shadowTabsStep4]);
+        setShadowStyleLeft([
+          styles.shadowTabs,
+          styles.shadowTabsStep4Left,
+          {
+            height:
+              Platform.OS === "ios"
+                ? 90
+                : Math.max(55, height * 0.08) + insets.bottom,
+          },
+        ]);
+        break;
+    }
+  }, [home]);
 
   return (
     <>
-     {showWalkthrough && (
-        <WalkthroughOverlay
-          visibleTabs={visibleTabs}
-          currentStep={home.walkThroughStep || 0}
-          onFinish={() => setShowWalkthrough(false)}
-          tabBarHeight={tabBarHeight}
-        />
+      {home.walkThroughStep !== null && home.walkThroughStep !== undefined && (
+        <>
+          <View style={[...[].concat(shadowStyleLeft)]} />
+          <View
+            style={[
+              ...[].concat(shadowStyle),
+              {
+                height:
+                  Platform.OS === "ios"
+                    ? 90
+                    : Math.max(55, height * 0.08) + insets.bottom,
+              },
+            ]}
+          />
+        </>
       )}
-
-      {/* Tab Navigator */}
       <Tab.Navigator
+        name="MyTab"
         initialRouteName="Home"
-        screenOptions={{
+        screenOptions={({ route }) => ({
           tabBarStyle: {
             paddingVertical: 5,
             position: "absolute",
-            height: tabBarHeight,
+            height:
+              Platform.OS === "ios"
+                ? 90
+                : Math.max(55, height * 0.08) + insets.bottom,
           },
-          tabBarActiveTintColor: Color.colorMidnightblue,
-          tabBarInactiveTintColor: Color.sparklightDarkGray,
+          tabBarActiveTintColor: "#353091",
+          tabBarInactiveTintColor: "#767676",
           tabBarLabelStyle: {
-            fontSize: FontSize.size_xs,
+            fontSize: 12,
             fontFamily: FontFamily.openSansRegular,
             fontWeight: "600",
           },
           tabBarButton: (props) => {
-            // Find tab by screen name
-            const tab = visibleTabs.find(
-              (t) => t.screenName === props.to?.split("/").pop()
-            );
-            const isAccessible = tab ? isTabAccessible(tab.index) : true;
+            const tabIndex = [
+              "Home",
+              "BillingTab",
+              "MyServices",
+              "Support",
+              "account",
+            ].indexOf(route.name);
+            const isAccessible = isTabAccessibleDuringWalkthrough(tabIndex);
 
             return (
               <Pressable
@@ -177,8 +202,8 @@ const MyTabs = ({ route }) => {
                 style={[props.style, !isAccessible && styles.disabledTab]}
                 onPress={(e) => {
                   if (
-                    !isAccessible &&
-                    (isScreenReaderEnabled || isWalkthroughActive())
+                    (!isAccessible && isScreenReaderEnabled) ||
+                    isWalkthroughActive()
                   ) {
                     return;
                   }
@@ -187,65 +212,209 @@ const MyTabs = ({ route }) => {
               />
             );
           },
-        }}
+        })}
       >
-        {visibleTabs.map((tab) => (
-          <Tab.Screen
-            key={tab.id}
-            name={tab.screenName}
-            component={getComponent(tab.component)}
-            initialParams={{ data: route }}
-            options={{
-              headerShown: false,
-              swipeEnabled: false,
-              tabBarLabel: tab.name,
-              tabBarAccessibilityLabel: isTabAccessible(tab.index)
-                ? tab.name
-                : undefined,
-              tabBarIcon: ({ focused }) => (
-                <View
-                  style={[ styles.tabIcon, !isTabAccessible(tab.index) && styles.disabledTab, ]}
-                  accessible={false}
-                  importantForAccessibility="no"
-                >
-                  {getIcon(tab, focused)}
-                </View>
+        <Tab.Screen
+          name="Home"
+          component={HomeStackScreen}
+          initialParams={{ data: route }}
+          options={{
+            headerShown: false,
+            swipeEnabled: false,
+            tabBarLabel: "Home",
+            tabBarAccessibilityLabel: isTabAccessibleDuringWalkthrough(0)
+              ? "Home"
+              : undefined,
+            tabBarIcon: ({ focused }) =>
+              getTabBarIconWrapper(
+                focused ? HomeIconSelected : HomeIcon,
+                focused,
+                0
               ),
-            }}
-            listeners={({ navigation }) => ({
-              tabPress: (e) => {
-                if (
-                  !isTabAccessible(tab.index) &&
-                  (isScreenReaderEnabled || isWalkthroughActive())
-                ) {
-                  e.preventDefault();
-                  return;
-                }
+          }}
+        />
 
-                // Reset navigation for specific tabs
-                if (["billing", "support"].includes(tab.id)) {
-                  e.preventDefault();
-                  navigation.reset({
-                    index: 0,
-                    routes: [{ name: tab.screenName }],
-                  });
-                }
-              },
-            })}
-          />
-        ))}
+        <Tab.Screen
+          name="BillingTab"
+          component={BillingStackScreen}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              if (
+                !isTabAccessibleDuringWalkthrough(1) &&
+                isScreenReaderEnabled
+              ) {
+                return;
+              }
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "BillingTab" }],
+              });
+            },
+          })}
+          options={{
+            headerShown: false,
+            swipeEnabled: false,
+            tabBarLabel: "Billing",
+            tabBarAccessibilityLabel: isTabAccessibleDuringWalkthrough(1)
+              ? "Billing"
+              : undefined,
+            tabBarIcon: ({ focused }) =>
+              getTabBarIconWrapper(BillingIcon, focused, 1),
+          }}
+        />
+
+        <Tab.Screen
+          name="MyServices"
+          component={MyServicesStack}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              if (
+                !isTabAccessibleDuringWalkthrough(2) &&
+                isScreenReaderEnabled
+              ) {
+                return;
+              }
+              Alert.alert("Coming Soon", "This feature is not yet available.", [
+                { text: "Close", style: "cancel" },
+              ]);
+            },
+          })}
+          options={{
+            headerShown: false,
+            tabBarLabel: "Service",
+            tabBarAccessibilityLabel: isTabAccessibleDuringWalkthrough(2)
+              ? "Service"
+              : undefined,
+            tabBarIcon: ({ focused }) => (
+              <View
+                style={[
+                  styles.tabItem,
+                  !isTabAccessibleDuringWalkthrough(2) && styles.disabledTab,
+                ]}
+                accessible={false}
+                importantForAccessibility="no"
+              >
+                {focused ? <SupportIconSelected /> : <SupportIcon />}
+              </View>
+            ),
+          }}
+        />
+
+        <Tab.Screen
+          name="Support"
+          component={SupportStack}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              if (
+                !isTabAccessibleDuringWalkthrough(3) &&
+                isScreenReaderEnabled
+              ) {
+                return;
+              }
+              navigation.reset({
+                index: 0,
+                routes: [{ name: "Support" }],
+              });
+            },
+          })}
+          options={{
+            headerShown: false,
+            tabBarLabel: "Support",
+            tabBarIcon: ({ focused }) => (
+              <View
+                style={[
+                  styles.tabItem,
+                  !isTabAccessibleDuringWalkthrough(3) && styles.disabledTab,
+                ]}
+                accessible={false}
+                importantForAccessibility="no"
+              >
+                <NewSupportIcon focused={focused} />
+              </View>
+            ),
+          }}
+        />
+
+        <Tab.Screen
+          name="account"
+          component={AccountStackScreen}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              if (
+                !isTabAccessibleDuringWalkthrough(4) &&
+                isScreenReaderEnabled
+              ) {
+                return;
+              }
+              navigation.navigate("account", { screen: "Account" });
+            },
+          })}
+          options={{
+            headerShown: false,
+            tabBarLabel: "Account",
+            tabBarIcon: ({ focused }) =>
+              getTabBarIconWrapper(HomeAccountIcon, focused, 4),
+          }}
+        />
       </Tab.Navigator>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  tabIcon: {
+  tabItem: {
     textAlign: "center",
+  },
+  shadowTabs: {
+    backgroundColor: "black",
+    height: Platform.OS === "ios" ? 90 : 60,
+    width: "100%",
+    position: "absolute",
+    bottom: 0,
+    zIndex: 5,
+    opacity: 0.7,
+    left: 80,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  shadowTabsStep2: {
+    left: tabWidth * 1.99,
+  },
+  shadowTabsStep32: {
+    left: tabWidth * 3.0,
+  },
+  shadowTabsStep3: {
+    left: tabWidth * 4.0,
+  },
+  shadowTabsStep4: {
+    left: tabWidth * 5,
+  },
+  shadowTabsLeft: {},
+  shadowTabsStep2Left: {
+    width: tabWidth * 0.88,
+    left: 0,
+  },
+  shadowTabsStep3Left: {
+    width: tabWidth * 2.99,
+    left: 0,
+  },
+  shadowTabsStep31Left: {
+    width: tabWidth * 2.0,
+    left: 0,
+  },
+  shadowTabsStep4Left: {
+    width: tabWidth * 4.1,
+    left: 0,
   },
   disabledTab: {
     pointerEvents: "none",
-    opacity: 0.5,
   },
 });
 
