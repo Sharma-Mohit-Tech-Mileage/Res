@@ -11,6 +11,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		3F1CC01C2EA834490065957B /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1CC01B2EA834490065957B /* File.swift */; };
 		5AA4F6F9711A10F5FF37F603 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 54FB1A3F0D81553C57C22FFA /* PrivacyInfo.xcprivacy */; };
 		6CE6FB97BEE719BE45FCBBF4 /* Pods_My_Sparklight.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 20538EB60AA90B60C171A757 /* Pods_My_Sparklight.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
@@ -49,6 +50,8 @@
 		20538EB60AA90B60C171A757 /* Pods_My_Sparklight.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_My_Sparklight.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B4392A12AC88292D35C810B /* Pods-Sparklight.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sparklight.debug.xcconfig"; path = "Target Support Files/Pods-Sparklight/Pods-Sparklight.debug.xcconfig"; sourceTree = "<group>"; };
 		3B7DA79E4D51D8CD31E27B89 /* Pods_My_Sparklight_My_SparklightTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_My_Sparklight_My_SparklightTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F1CC01A2EA834480065957B /* My Sparklight-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "My Sparklight-Bridging-Header.h"; sourceTree = "<group>"; };
+		3F1CC01B2EA834490065957B /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		54FB1A3F0D81553C57C22FFA /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = Sparklight/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-Sparklight.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sparklight.release.xcconfig"; path = "Target Support Files/Pods-Sparklight/Pods-Sparklight.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-Sparklight-SparklightTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sparklight-SparklightTests.debug.xcconfig"; path = "Target Support Files/Pods-Sparklight-SparklightTests/Pods-Sparklight-SparklightTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -126,6 +129,8 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				91F2150D2CE700540069587B /* RNZendeskChatModule.h */,
 				91F2150E2CE700540069587B /* RNZendeskChatModule.m */,
+				3F1CC01B2EA834490065957B /* File.swift */,
+				3F1CC01A2EA834480065957B /* My Sparklight-Bridging-Header.h */,
 			);
 			name = Sparklight;
 			sourceTree = "<group>";
@@ -258,7 +263,7 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 1120;
+						LastSwiftMigration = 2600;
 					};
 				};
 			};
@@ -519,6 +524,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
+				3F1CC01C2EA834490065957B /* File.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				91F2150F2CE700540069587B /* RNZendeskChatModule.m in Sources */,
 			);
@@ -601,12 +607,13 @@
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Sparklight/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Sparklight;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 21.0.1;
+				MARKETING_VERSION = 22.2.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -617,6 +624,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "My Sparklight-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -638,12 +646,13 @@
 				DEVELOPMENT_TEAM = W486HD85BD;
 				INFOPLIST_FILE = Sparklight/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Sparklight;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 21.0.1;
+				MARKETING_VERSION = 22.2.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -654,6 +663,7 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "My Sparklight-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
