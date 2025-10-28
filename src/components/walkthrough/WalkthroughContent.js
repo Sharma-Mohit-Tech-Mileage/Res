@@ -18,7 +18,14 @@
  */
 
 import React, { useRef, useEffect } from "react";
-import { View, Text, StyleSheet, Pressable, Animated, Easing } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Animated,
+  Easing,
+} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import Icon from "../common/Icon";
 import WalkthroughProgress from "./WalkthroughProgress";
