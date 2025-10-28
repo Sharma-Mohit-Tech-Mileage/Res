@@ -68,7 +68,7 @@ const WalkthroughContent = ({
             style={[styles.iconCircle, { transform: [{ scale: pulseAnim }] }]}
           >
             <LinearGradient
-              colors={["#353091", "#8D3B90"]}
+              colors={["#edf1f4", "#edf1f4"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.iconGradient}

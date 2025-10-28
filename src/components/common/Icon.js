@@ -74,7 +74,7 @@ const Icon = ({ name, size = 24, color = "#000", style }) => {
         );
       case "SVG": {
         const SvgIcon = iconInfo.source;
-        return <SvgIcon width={size} height={size} fill={color} />;
+        return <SvgIcon width={size} height={size} />;
       }
       case "Image":
         return (

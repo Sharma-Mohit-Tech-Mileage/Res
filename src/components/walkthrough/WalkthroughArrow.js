@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 20,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
-    borderTopColor: "#353091",
+    borderTopColor: "#8D3B90",
   },
 });
 
