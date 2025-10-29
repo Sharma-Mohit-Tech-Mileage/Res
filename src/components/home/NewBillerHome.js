@@ -25,7 +25,10 @@ import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
 import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
-import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
+import {
+  storePushNotificationStatus,
+  getPushNotificationStatus,
+} from "../../redux/utils/LocalStorage";
 import {
   getFcmToken,
   requestUserPermission,
@@ -52,6 +55,8 @@ const NewBillerHome = ({ navigation }) => {
   });
 
   // Redux selectors
+  const user = useSelector((state) => state.combinedReducers.user.userData);
+  const profile = useSelector((state) => state.combinedReducers.profile || {});
   const home = useSelector((state) => state.combinedReducers.home);
   const accountDetails = useSelector(
     (state) => state.combinedReducers.profile?.accountDetails
@@ -142,9 +147,48 @@ const NewBillerHome = ({ navigation }) => {
 
   useEffect(() => {
     if (isNotificationEnable) {
-      enableNotifications();
+      checkNotifications();
     }
   }, [isNotificationEnable]);
+
+  const checkNotifications = async () => {
+    const pushNotification = await getPushNotificationStatus();
+    let askNotification = false;
+    if (pushNotification === null) {
+      askNotification = true;
+    } else {
+      if (pushNotification.permanentSkip) {
+        askNotification = false;
+      } else {
+        if (pushNotification.status === "skip") {
+          const now = moment();
+          const days = now.diff(pushNotification.date, "days");
+
+          if (days >= 15) {
+            askNotification = true;
+          } else {
+            askNotification = false;
+          }
+        }
+      }
+    }
+
+    if (askNotification) {
+      const enabledPermission = await requestUserPermission();
+
+      if (enabledPermission) {
+        const token = await getFcmToken();
+        console.log("FCM HOME WITH PERMISSION", token);
+
+        const localData = {
+          status: "accepted",
+          date: new Date(),
+        };
+        storePushNotificationStatus(localData);
+        //await dispatch(updatePushNotifications(data, null));
+      }
+    }
+  };
 
   useEffect(() => {
     if (accountDetails) {
@@ -163,6 +207,7 @@ const NewBillerHome = ({ navigation }) => {
       GetApiRequest(
         requestUrl,
         (res) => {
+          console.log("getInAppNotificationsData res", JSON.stringify(res));
           if (res) {
             res[0]?.pushMessageType.forEach((value, index) => {
               if (!value?.optOutFlag) {
@@ -179,45 +224,46 @@ const NewBillerHome = ({ navigation }) => {
   };
 
   const enableNotifications = async () => {
+    console.log("enableNotifications called");
     const enabledPermission = await requestUserPermission();
     if (enabledPermission) {
-      const token = await getFcmToken();
-      const data = {
-        accountNumber: userInfo?.accountNumber,
-        deviceToken: token,
-        deviceTokenTimestamp: moment().format(),
-        optOut: true,
-        outageOptOut: true,
-        billingOptOutStatus: true,
-        userName: userInfo.userName,
-        isAndroid: Platform.OS == "android",
-      };
+      // const token = await getFcmToken();
+      // const data = {
+      //   accountNumber: userInfo?.accountNumber,
+      //   deviceToken: token,
+      //   deviceTokenTimestamp: moment().format(),
+      //   optOut: true,
+      //   outageOptOut: true,
+      //   billingOptOutStatus: true,
+      //   userName: userInfo.userName,
+      //   isAndroid: Platform.OS == "android",
+      // };
       const localData = {
         status: "accepted",
         date: new Date(),
         permanentSkip: false,
       };
       storePushNotificationStatus(localData);
-      await dispatch(updatePushNotificationsv2(data, null));
+      //await dispatch(updatePushNotificationsv2(data, null));
     } else {
-      const token = await getFcmToken();
-      const dataWithoutPermission = {
-        accountNumber: userInfo.accountNumber,
-        deviceToken: token,
-        deviceTokenTimestamp: moment().format(),
-        optOut: true,
-        outageOptOut: true,
-        billingOptOutStatus: true,
-        userName: userInfo.userName,
-        isAndroid: Platform.OS == "android",
-      };
+      // const token = await getFcmToken();
+      // const dataWithoutPermission = {
+      //   accountNumber: userInfo.accountNumber,
+      //   deviceToken: token,
+      //   deviceTokenTimestamp: moment().format(),
+      //   optOut: true,
+      //   outageOptOut: true,
+      //   billingOptOutStatus: true,
+      //   userName: userInfo.userName,
+      //   isAndroid: Platform.OS == "android",
+      // };
       const localData = {
         status: "skip",
         date: new Date(),
         permanentSkip: true,
       };
       storePushNotificationStatus(localData);
-      await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
+      //await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
     }
   };
 
