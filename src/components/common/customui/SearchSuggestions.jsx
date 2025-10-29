@@ -1,11 +1,22 @@
 import React, { memo, useRef, useEffect, useState } from "react";
-import { StyleSheet, View, TextInput, FlatList, Text, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  TextInput,
+  FlatList,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { Padding, Color, FontSize, FontFamily } from "../../../../GlobalStyles";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import SearchIcon from "../../../../assets/svgs/SearchIcon";
 import Rightactionable from "../../../res/svgIcons/RightArrow";
 import File05 from "../../../../assets/svgs/File05";
-const SearchSuggestions = memo( ({ placeholder, onChangeInput, suggestions, navigation, onEndReached }) => {
+const SearchSuggestions = memo(
+  ({ placeholder, onChangeInput, suggestions, navigation, onEndReached }) => {
     const inputRef = useRef(null);
     const [input, setInput] = useState("");
 
@@ -27,14 +38,7 @@ const SearchSuggestions = memo( ({ placeholder, onChangeInput, suggestions, navi
         onPress={() => handleSuggestionClick(item)}
         style={styles.suggestionItem}
       >
-
-        <View
-          style={{
-            marginRight: 18,
-            width: 13.333,
-            height: 16.667,
-          }}
-        >
+        <View style={{ marginRight: 18, width: 13.333, height: 16.667 }}>
           <File05 />
         </View>
         <Text maxFontSizeMultiplier={1.25} style={styles.suggestionText}>
@@ -83,87 +87,51 @@ const SearchSuggestions = memo( ({ placeholder, onChangeInput, suggestions, navi
 );
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "flex-start",
-    alignSelf: "stretch",
-  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F8F8F8", 
+    backgroundColor: "#F8F8F8",
     borderBottomWidth: 1,
-    borderColor: Color.sparklightGray, 
-    borderRadius: 8, 
-    height: 56, 
+    borderColor: Color.sparklightGray,
+    borderRadius: 8,
+    height: 56,
   },
   searchIcon: {
     marginLeft: Padding.p_xs,
-    width: 24, 
-    height: 24, 
-  },
-  clearIcon: {
-    width: 24, 
+    width: 24,
     height: 24,
   },
   searchInput: {
     flex: 1,
-    flexDirection: "row", 
-    alignItems: "center", 
+    flexDirection: "row",
+    alignItems: "center",
     alignSelf: "stretch",
     flex: 1,
-    paddingHorizontal: Padding.p_base, 
-    fontSize: FontSize.size_base, 
+    paddingHorizontal: Padding.p_base,
+    fontSize: FontSize.size_base,
     color: Color.sparklightGray1,
-  },
-  suggestionsContainer: {
-    marginTop: 0,
-    alignSelf: "stretch",
-    backgroundColor: Color.sparklightWhite,
-    borderTopWidth: 0,
-    borderColor: Color.sparklightGray,
-  },
-  searchContainer: {
-    flexDirection: "row", 
-    alignItems: "center", 
   },
 
   leftIcon: {
-    marginRight: 8, 
-    backgroundColor: "#F8F8F8", 
-  },
-  rightIcon: {
-    marginLeft: 8,
+    marginRight: 8,
     backgroundColor: "#F8F8F8",
   },
   suggestionItem: {
-    flexDirection: "row", 
-    alignItems: "center", 
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: Padding.p_xs,
-    paddingHorizontal: 24, 
+    paddingHorizontal: 24,
     borderBottomWidth: 1,
-    borderColor: Color.sparklightGray, 
-    backgroundColor: "#F8F8F8", 
-  },
-  iconStyle: {
-    width: 24, 
-    height: 24, 
-    tintColor: Color.colorMidnightblue,
+    borderColor: Color.sparklightGray,
+    backgroundColor: "#F8F8F8",
   },
   suggestionText: {
-    flex: 1, 
+    flex: 1,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     color: Color.colorMidnightblue,
     flexWrap: "wrap",
     maxWidth: wp("90%"),
-  },
-  overlayStyle: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    backgroundColor: "transparent",
   },
 });
 

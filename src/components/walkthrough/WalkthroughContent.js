@@ -30,7 +30,6 @@ import LinearGradient from "react-native-linear-gradient";
 import Icon from "../common/Icon";
 import WalkthroughProgress from "./WalkthroughProgress";
 import { FontFamily, Color, Border, Padding } from "../../../GlobalStyles";
-import { getResponsiveFontSizes } from "../utility/walkthroughHelpers";
 
 const WalkthroughContent = ({
   tab,
@@ -41,7 +40,6 @@ const WalkthroughContent = ({
   onSkip,
 }) => {
   const pulseAnim = useRef(new Animated.Value(1)).current;
-  const fontSizes = getResponsiveFontSizes();
 
   useEffect(() => {
     // Pulse animation for icon
@@ -206,7 +204,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansSemiBold,
     color: "#1F2937",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: Padding.p_5xs,
     lineHeight: 22,
   },
