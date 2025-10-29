@@ -1,18 +1,3 @@
-/**
- * ============================================================================
- * WALKTHROUGH PROGRESS INDICATORS - REDESIGNED
- * ============================================================================
- * 
- * Modern progress dots with brand purple accent
- * 
- * DESIGN IMPROVEMENTS:
- * - Active: Brand purple (#353091)
- * - Inactive: Modern light gray (#E5E7EB)
- * - Better visual contrast
- * 
- * ============================================================================
- */
-
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Padding } from '../../../GlobalStyles';

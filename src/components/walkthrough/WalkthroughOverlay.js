@@ -1,23 +1,3 @@
-/**
- * ============================================================================
- * WALKTHROUGH OVERLAY - WITH SPOTLIGHT CUTOUT - REDESIGNED
- * ============================================================================
- * 
- * Creates a true spotlight effect with improved UX:
- * - Dark overlay covers entire screen EXCEPT active tab
- * - Active tab remains fully visible and interactive-looking
- * - Arrow points to the clear/visible tab
- * - NO FADE TRANSITIONS between steps (instant switch)
- * - Improved accessibility for screen readers
- * 
- * IMPROVEMENTS:
- * - Removed card fade transitions for smoother UX
- * - Added accessibility props to hide overlays from screen readers
- * - Lighter overlay shadow (softer look with white card)
- * 
- * ============================================================================
- */
-
 import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, Easing, Platform, Dimensions } from 'react-native';
 import { useDispatch } from 'react-redux';
@@ -68,12 +48,10 @@ const WalkthroughOverlay = ({ visibleTabs, currentStep, onFinish, tabBarHeight }
     ]).start();
   }, []);
 
-  // Sync with parent
   useEffect(() => {
     setLocalStep(currentStep);
   }, [currentStep]);
 
-  // Handle step change - NO FADE TRANSITION
   const handleNext = () => {
     const nextStep = localStep + 1;
 
@@ -82,17 +60,13 @@ const WalkthroughOverlay = ({ visibleTabs, currentStep, onFinish, tabBarHeight }
       return;
     }
 
-    // Instant step change - no fade animation
     setLocalStep(nextStep);
     dispatch(updateWalkThroughStep(nextStep));
   };
 
   const handlePrevious = () => {
     if (localStep === 0) return;
-
     const prevStep = localStep - 1;
-
-    // Instant step change - no fade animation
     setLocalStep(prevStep);
     dispatch(updateWalkThroughStep(prevStep));
   };
@@ -102,7 +76,6 @@ const WalkthroughOverlay = ({ visibleTabs, currentStep, onFinish, tabBarHeight }
   };
 
   const handleFinish = () => {
-    // Exit animation
     Animated.parallel([
       Animated.timing(overlayFade, {
         toValue: 0,
