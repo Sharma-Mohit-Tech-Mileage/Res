@@ -38,12 +38,12 @@ const NotificationAlert = ({
     info: {
       backgroundColor: "#F0F8FF",
       borderColor: "#0060AE",
-      iconColor: Color.sparklightBrightPurple,
+      iconColor: "#0060AE",
       textColor: "#000000",
       titleColor: "#000000",
       closeButtonColor: "#0060AE",
       IconComponent: InfoIcon,
-      iconLabel: "Information icon",
+      iconLabel: "Information icon.",
       labelPrefix: "Information Notification: ",
     },
     error: {
@@ -54,7 +54,7 @@ const NotificationAlert = ({
       titleColor: "#000000",
       closeButtonColor: "#B92A1C",
       IconComponent: InfoIcon,
-      iconLabel: "Error icon",
+      iconLabel: "Error icon.",
       labelPrefix: "Error Notification: ",
     },
     success: {
@@ -65,7 +65,7 @@ const NotificationAlert = ({
       titleColor: "#000000",
       closeButtonColor: "#1D7832",
       IconComponent: SuccessIcon,
-      iconLabel: "Success icon",
+      iconLabel: "Success icon.",
       labelPrefix: "Success Notification: ",
     },
     warning: {
@@ -76,7 +76,7 @@ const NotificationAlert = ({
       titleColor: "#000000",
       closeButtonColor: "#DD6D02",
       IconComponent: WarningIcon,
-      iconLabel: "Warning icon",
+      iconLabel: "Warning icon.",
       labelPrefix: "Warning Notification: ",
     },
   };
@@ -210,6 +210,7 @@ const NotificationAlert = ({
             <Text
               style={[styles.title, { color: currentTypeStyle.titleColor }]}
               accessible={true}
+              accessibilityLabel={title}
               accessibilityRole="text"
             >
               {title}
@@ -223,8 +224,8 @@ const NotificationAlert = ({
               onPress={handleResendEmail}
               accessible={true}
               accessibilityRole="link"
-              accessibilityLabel="Resend Confirmation Email"
-              accessibilityHint="Double tap to resend the confirmation email"
+              accessibilityLabel="Resend Confirmation Email."
+              accessibilityHint="Double tap to resend the confirmation email."
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
               <Text style={styles.resendText}>Resend Confirmation Email</Text>
