@@ -233,7 +233,7 @@ const NewBillerHome = ({ navigation }) => {
         )}
         {/* <MenuGrid /> */}
         <PromoBanner
-          title="Auto Pay + Paperless is a Winning Combination!"
+          title="Sign up for Auto Pay and Paperless Billing to start saving"
           showBonus={true}
         />
         <FeatureCard
@@ -282,11 +282,14 @@ const NewBillerHome = ({ navigation }) => {
     <View style={{ flex: 1 }}>
       <SafeAreaView 
         style={{ flex: 1 }}
-        
+        importantForAccessibility={isWalkthroughActive ? "no-hide-descendants" : "auto"}
+        accessibilityElementsHidden={isWalkthroughActive}
       >
         <View 
           accessibilityLabel="SparkLight" 
           style={styles.headerContainer}
+          importantForAccessibility={isWalkthroughActive ? "no-hide-descendants" : "auto"}
+        accessibilityElementsHidden={isWalkthroughActive}
         >
           <Logo width={120} height={33.32} />
         </View>
@@ -295,6 +298,8 @@ const NewBillerHome = ({ navigation }) => {
         >
           <View 
             style={styles.mainContentContainer}
+            importantForAccessibility={isWalkthroughActive ? "no-hide-descendants" : "auto"}
+            accessibilityElementsHidden={isWalkthroughActive}
           >
             {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
             {isOutageAlert && renderOutageAlert()}

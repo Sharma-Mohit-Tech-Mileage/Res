@@ -114,47 +114,55 @@ const MyTabs = ({ route }) => {
     []
   );
 
-  const createTabBarButton = useCallback(
-    (props) => {
-      const tab = visibleTabs.find(
-        (t) => t.screenName === props.to?.split("/").pop()
-      );
-      
-      if (!tab) {
-        return <Pressable {...props} />;
-      }
-      
-      const isAccessible = isTabAccessible(tab.index);
-      const shouldPreventPress = !isAccessible && 
-        (isScreenReaderEnabled || isWalkthroughActive);
+const createTabBarButton = useCallback(
+  (props) => {
+    const tab = visibleTabs.find(
+      (t) => t.screenName === props.to?.split("/").pop()
+    );
+    
+    if (!tab) {
+      return <Pressable {...props} />;
+    }
+    
+    const isAccessible = isTabAccessible(tab.index);
+    const shouldPreventPress = !isAccessible && 
+      (isScreenReaderEnabled || isWalkthroughActive);
 
-      return (
-        <Pressable
-          {...props}
-          accessible={!isWalkthroughActive}
-          importantForAccessibility={isWalkthroughActive ? "no-hide-descendants" : "auto"}
-          accessibilityElementsHidden={isWalkthroughActive}
-          accessibilityLabel={`${tab.name} tab`}
-          accessibilityRole="tab"
-          accessibilityState={{
-            disabled: !isAccessible,
-          }}
-          style={[
-            props.style,
-            !isAccessible && styles.disabledTab,
-          ]}
-          onPress={(e) => {
-            if (isWalkthroughActive || shouldPreventPress) {
-              e.preventDefault();
-              return;
-            }
-            props.onPress(e);
-          }}
-        />
-      );
-    },
-    [visibleTabs, isTabAccessible, isScreenReaderEnabled, isWalkthroughActive]
-  );
+    return (
+      <Pressable
+        {...props}
+        accessible={isAccessible && !isWalkthroughActive}
+        // Fix for Android - use proper importantForAccessibility
+        importantForAccessibility={
+          !isAccessible || isWalkthroughActive 
+            ? "no-hide-descendants" 
+            : "yes"
+        }
+        // iOS only - keep it
+        accessibilityElementsHidden={!isAccessible || isWalkthroughActive}
+        accessibilityLabel={`${tab.name} tab`}
+        accessibilityRole="tab"
+        accessibilityState={{
+          disabled: !isAccessible,
+        }}
+        style={[
+          props.style,
+          !isAccessible && styles.disabledTab,
+        ]}
+        // Add pointerEvents for better Android handling
+        pointerEvents={!isAccessible && isWalkthroughActive ? "none" : "auto"}
+        onPress={(e) => {
+          if (isWalkthroughActive || shouldPreventPress) {
+            e.preventDefault();
+            return;
+          }
+          props.onPress(e);
+        }}
+      />
+    );
+  },
+  [visibleTabs, isTabAccessible, isScreenReaderEnabled, isWalkthroughActive]
+);
 
 
   const createTabListeners = useCallback(
