@@ -34,16 +34,7 @@ function MyServicesStack({ route }) {
         component={Search}
         options={{ headerShown: false }}
       />
-      <ServiceStack.Screen
-        name="DiagnosticFlow"
-        component={TroubleShootStack}
-        options={{ headerShown: false }}
-      />
-      <ServiceStack.Screen
-        options={{ headerShown: false }}
-        name="ModemConnectivityGuide"
-        component={ModemConnectivityGuide}
-      />
+     
     </ServiceStack.Navigator>
   );
 }

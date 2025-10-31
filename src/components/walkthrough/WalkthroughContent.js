@@ -1,31 +1,5 @@
-/**
- * ============================================================================
- * WALKTHROUGH CONTENT BUBBLE - REDESIGNED
- * ============================================================================
- *
- * Professional white card design with brand purple accents
- * Better visual hierarchy and modern styling
- *
- * DESIGN IMPROVEMENTS:
- * - White background as requested
- * - Rich dark gray title (#1F2937) instead of dull #344054
- * - Medium gray body text (#6B7280) for better hierarchy
- * - Brand purple (#353091) for interactive elements
- * - Gradient button matching original brand identity
- * - Improved contrast and accessibility
- *
- * ============================================================================
- */
-
 import React, { useRef, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Animated,
-  Easing,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable, Animated, Easing, } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import Icon from "../common/Icon";
 import WalkthroughProgress from "./WalkthroughProgress";
@@ -36,7 +10,6 @@ const WalkthroughContent = ({
   currentStep,
   totalSteps,
   onNext,
-  onPrevious,
   onSkip,
 }) => {
   const pulseAnim = useRef(new Animated.Value(1)).current;

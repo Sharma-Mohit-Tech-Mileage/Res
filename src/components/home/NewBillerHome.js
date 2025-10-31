@@ -49,6 +49,9 @@ const NewBillerHome = ({ navigation }) => {
     latestVersion: "",
   });
   const accountDetails = useSelector((state) => state.profile?.accountDetails);
+  const home = useSelector((state) => state.home);
+  const isWalkthroughActive = 
+    home.walkThroughStep !== null && home.walkThroughStep !== undefined;
   const dispatch = useDispatch();
   const paperlessStatusAcp = useSelector(
     (state) => state.profile?.paperlessStatusAcp
@@ -228,7 +231,7 @@ const NewBillerHome = ({ navigation }) => {
         ) : (
           <WelcomeCard />
         )}
-        <MenuGrid />
+        {/* <MenuGrid /> */}
         <PromoBanner
           title="Auto Pay + Paperless is a Winning Combination!"
           showBonus={true}
@@ -270,42 +273,52 @@ const NewBillerHome = ({ navigation }) => {
   );
 
   return (
-    <LinearGradient
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
-      colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
-      style={styles.container}
-    >
-      <View style={{ flex: 1 }}>
-        <SafeAreaView style={{ flex: 1 }}>
-          <View accessibilityLabel="SparkLight" style={styles.headerContainer}>
-            <Logo width={120} height={33.32} />
+  <LinearGradient
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 0 }}
+    colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+    style={styles.container}
+  >
+    <View style={{ flex: 1 }}>
+      <SafeAreaView 
+        style={{ flex: 1 }}
+        
+      >
+        <View 
+          accessibilityLabel="SparkLight" 
+          style={styles.headerContainer}
+        >
+          <Logo width={120} height={33.32} />
+        </View>
+        <ScrollView 
+          style={styles.scrollContainer}
+        >
+          <View 
+            style={styles.mainContentContainer}
+          >
+            {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
+            {isOutageAlert && renderOutageAlert()}
+            {showBanner && bannerConfig && (
+              <MaintenanceBanner
+                title={bannerConfig.title}
+                message={bannerConfig.message}
+                link={bannerConfig.link}
+                linkText={bannerConfig.linkText}
+                showPhoneNumber={bannerConfig.showPhoneNumber}
+                phoneNumber={bannerConfig.phoneNumber}
+                onDismiss={
+                  bannerConfig.dismissible ? dismissBanner : undefined
+                }
+                severity={bannerConfig.severity || "info"}
+              />
+            )}
+            {renderWelcomeCard()}
           </View>
-          <ScrollView style={styles.scrollContainer}>
-            <View style={styles.mainContentContainer}>
-              {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
-              {isOutageAlert && renderOutageAlert()}
-              {showBanner && bannerConfig && (
-                <MaintenanceBanner
-                  title={bannerConfig.title}
-                  message={bannerConfig.message}
-                  link={bannerConfig.link}
-                  linkText={bannerConfig.linkText}
-                  showPhoneNumber={bannerConfig.showPhoneNumber}
-                  phoneNumber={bannerConfig.phoneNumber}
-                  onDismiss={
-                    bannerConfig.dismissible ? dismissBanner : undefined
-                  }
-                  severity={bannerConfig.severity || "info"}
-                />
-              )}
-              {renderWelcomeCard()}
-            </View>
-          </ScrollView>
-        </SafeAreaView>
-      </View>
-    </LinearGradient>
-  );
+        </ScrollView>
+      </SafeAreaView>
+    </View>
+  </LinearGradient>
+);
 };
 
 const styles = StyleSheet.create({

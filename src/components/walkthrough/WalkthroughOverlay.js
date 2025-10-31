@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, Easing, Platform, Dimensions } from 'react-native';
+import { StyleSheet, Animated, Easing, Dimensions } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { updateWalkThroughStep } from '../../redux/actions/DashboardAction';
 import WalkthroughContent from './WalkthroughContent';
 import WalkthroughArrow from './WalkthroughArrow';
@@ -16,14 +15,24 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const WalkthroughOverlay = ({ visibleTabs, currentStep, onFinish, tabBarHeight }) => {
   const dispatch = useDispatch();
-  const insets = useSafeAreaInsets();
   const [localStep, setLocalStep] = useState(currentStep);
 
   // Animation values
   const overlayFade = useRef(new Animated.Value(0)).current;
   const bubbleFade = useRef(new Animated.Value(0)).current;
   const bubbleSlide = useRef(new Animated.Value(50)).current;
-
+// Right after calculating positions, add:
+useEffect(() => {
+  console.log('=== WALKTHROUGH DEBUG ===');
+  console.log('Step:', localStep);
+  console.log('Tab Bar Height:', tabBarHeight);
+  console.log('Screen Height:', SCREEN_HEIGHT);
+  console.log('Top Overlay Height:', SCREEN_HEIGHT - tabBarHeight);
+  console.log('Active Tab Left:', activeTabLeft);
+  console.log('Active Tab Right:', activeTabRight);
+  console.log('Has Left Shadow:', localStep > 0);
+  console.log('Has Right Shadow:', localStep < visibleTabs.length - 1);
+}, [localStep, tabBarHeight]);
   // Entry animation
   useEffect(() => {
     Animated.parallel([
@@ -75,28 +84,30 @@ const WalkthroughOverlay = ({ visibleTabs, currentStep, onFinish, tabBarHeight }
     handleFinish();
   };
 
-  const handleFinish = () => {
+const handleFinish = () => {
+  Animated.sequence([
     Animated.parallel([
-      Animated.timing(overlayFade, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
       Animated.timing(bubbleFade, {
         toValue: 0,
-        duration: 300,
+        duration: 200,
         useNativeDriver: true,
       }),
       Animated.timing(bubbleSlide, {
         toValue: 50,
-        duration: 300,
+        duration: 200,
         useNativeDriver: true,
       }),
-    ]).start(() => {
-      dispatch(updateWalkThroughStep(null));
-      if (onFinish) onFinish();
-    });
-  };
+    ]),
+    Animated.timing(overlayFade, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }),
+  ]).start(() => {
+    dispatch(updateWalkThroughStep(null));
+    if (onFinish) onFinish();
+  });
+};
 
   // Validation
   if (!visibleTabs || visibleTabs.length === 0) {
@@ -120,111 +131,117 @@ const WalkthroughOverlay = ({ visibleTabs, currentStep, onFinish, tabBarHeight }
   const activeTabRight = tabWidth * (localStep + 1);
 
   return (
-    <>
-      {/* TOP OVERLAY - Covers everything ABOVE the tab bar */}
+  <>
+    {/* TOP OVERLAY */}
+    <Animated.View
+      style={[
+        styles.topOverlay,
+        {
+          height: SCREEN_HEIGHT - tabBarHeight,
+          opacity: overlayFade.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, 0.70],
+          }),
+        },
+      ]}
+      importantForAccessibility="no-hide-descendants"
+      accessibilityElementsHidden={true}
+      accessible={false}
+    />
+
+    {/* LEFT SHADOW */}
+    {localStep > 0 && (
       <Animated.View
         style={[
-          styles.topOverlay,
-          {
-            height: SCREEN_HEIGHT - tabBarHeight,
-            opacity: overlayFade.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0, 0.70],
-            }),
-          },
-        ]}
-        importantForAccessibility="no-hide-descendants"
-        accessible={false}
-      />
-
-      {/* LEFT SHADOW - Covers tabs to the LEFT of active tab */}
-      {localStep > 0 && (
-        <Animated.View
-          style={[
-            styles.tabShadow,
-            {
-              bottom: 0,
-              left: 0,
-              width: activeTabLeft,
-              height: tabBarHeight,
-              opacity: overlayFade.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 0.85],
-              }),
-            },
-          ]}
-          importantForAccessibility="no-hide-descendants"
-          accessible={false}
-        />
-      )}
-
-      {/* RIGHT SHADOW - Covers tabs to the RIGHT of active tab */}
-      {localStep < visibleTabs.length - 1 && (
-        <Animated.View
-          style={[
-            styles.tabShadow,
-            {
-              bottom: 0,
-              left: activeTabRight,
-              width: SCREEN_WIDTH - activeTabRight,
-              height: tabBarHeight,
-              opacity: overlayFade.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 0.85],
-              }),
-            },
-          ]}
-          importantForAccessibility="no-hide-descendants"
-          accessible={false}
-        />
-      )}
-
-      {/* ACTIVE TAB HIGHLIGHT (Subtle purple glow) */}
-      <Animated.View
-        style={[
-          styles.activeTabHighlight,
+          styles.tabShadow,
           {
             bottom: 0,
-            left: activeTabLeft,
-            width: tabWidth,
+            left: 0,
+            width: activeTabLeft,
             height: tabBarHeight,
             opacity: overlayFade.interpolate({
               inputRange: [0, 1],
-              outputRange: [0, 0.15],
+              outputRange: [0, 0.85],
             }),
           },
         ]}
         importantForAccessibility="no-hide-descendants"
+        accessibilityElementsHidden={true}
         accessible={false}
       />
+    )}
 
-      {/* Walkthrough bubble */}
-      <Animated.View
-        style={[
-          styles.bubbleContainer,
-          {
-            bottom: bubbleBottomPosition,
-            left: horizontalPadding,
-            right: horizontalPadding,
-            opacity: bubbleFade,
-            transform: [{ translateY: bubbleSlide }],
-          },
-        ]}
-        accessibilityViewIsModal={true}
-      >
-        <WalkthroughContent
-          tab={currentTab}
-          currentStep={localStep}
-          totalSteps={visibleTabs.length}
-          onNext={handleNext}
-          onPrevious={handlePrevious}
-          onSkip={handleSkip}
-        />
+   {(localStep < visibleTabs.length - 1 || Platform.OS === 'android') && (
+  <Animated.View
+    style={[
+      styles.tabShadow,
+      {
+        bottom: 0,
+        left: activeTabRight,
+        width: localStep < visibleTabs.length - 1 
+          ? SCREEN_WIDTH - activeTabRight 
+          : 0.1, // Tiny width on last step for Android fix
+        height: tabBarHeight,
+        opacity: overlayFade.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 0.85],
+        }),
+      },
+    ]}
+    importantForAccessibility="no-hide-descendants"
+    accessibilityElementsHidden={true}
+    accessible={false}
+  />
+)}
 
-        <WalkthroughArrow leftPosition={arrowPosition} />
-      </Animated.View>
-    </>
-  );
+    {/* ACTIVE TAB HIGHLIGHT */}
+    <Animated.View
+      style={[
+        styles.activeTabHighlight,
+        {
+          bottom: 0,
+          left: activeTabLeft,
+          width: tabWidth,
+          height: tabBarHeight,
+          opacity: overlayFade.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, 0.15],
+          }),
+        },
+      ]}
+      importantForAccessibility="no-hide-descendants"
+      accessibilityElementsHidden={true}
+      accessible={false}
+    />
+
+    {/* Walkthrough bubble */}
+    <Animated.View
+      style={[
+        styles.bubbleContainer,
+        {
+          bottom: bubbleBottomPosition,
+          left: horizontalPadding,
+          right: horizontalPadding,
+          opacity: bubbleFade,
+          transform: [{ translateY: bubbleSlide }],
+        },
+      ]}
+      accessibilityViewIsModal={true}
+      importantForAccessibility="yes"
+    >
+      <WalkthroughContent
+        tab={currentTab}
+        currentStep={localStep}
+        totalSteps={visibleTabs.length}
+        onNext={handleNext}
+        onPrevious={handlePrevious}
+        onSkip={handleSkip}
+      />
+
+      <WalkthroughArrow leftPosition={arrowPosition} />
+    </Animated.View>
+  </>
+);
 };
 
 const styles = StyleSheet.create({
@@ -235,20 +252,24 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: '#000',
     zIndex: 100,
+    elevation: 100, // ADD THIS for Android
   },
   tabShadow: {
     position: 'absolute',
     backgroundColor: '#000',
     zIndex: 100,
+    elevation: 100, // ADD THIS for Android
   },
   activeTabHighlight: {
     position: 'absolute',
     backgroundColor: 'rgba(53, 48, 145, 0.3)',
     zIndex: 99,
+    elevation: 99, // ADD THIS for Android
   },
   bubbleContainer: {
     position: 'absolute',
     zIndex: 102,
+    elevation: 102, // ADD THIS for Android
   },
 });
 

@@ -4,30 +4,33 @@ import { FontFamily, FontSize, Color, Padding, Border } from '../../../GlobalSty
 import Icon from '../common/Icon';
 
 const PromoBanner = ({ title, showBonus = false }) => {
-  // Calculate how much of the title to display on the first line
-  const calculateFirstLineText = () => {
-    if (!showBonus) return title;
+  // Split title intelligently for two-line layout with bonus
+  const getTextLayout = () => {
+    if (!showBonus) {
+      return { fullText: title, showSplit: false };
+    }
     
-    // For simplicity, just show most of the title on first line
-    // This is an approximation - you may need to adjust based on font metrics
-    const titleLength = title.length;
-    const cutoffPoint = Math.floor(titleLength * 0.55); // Show 70% on first line
+    // Find a good breaking point (after "is a")
+    const breakPoint = title.lastIndexOf(' is a');
+    if (breakPoint !== -1) {
+      return {
+        firstLine: title.substring(0, breakPoint + 5), // Include " is a"
+        secondLine: title.substring(breakPoint + 5).trim(),
+        showSplit: true
+      };
+    }
     
-    return title.substring(0, cutoffPoint);
-  };
-  
-  // Calculate second line text + bonus
-  const calculateSecondLineText = () => {
-    if (!showBonus) return '';
-    
-    const titleLength = title.length;
-    const cutoffPoint = Math.floor(titleLength * 0.55);
-    
-    return title.substring(cutoffPoint);
+    // Fallback: break at approximately 60% of the text
+    const words = title.split(' ');
+    const splitIndex = Math.ceil(words.length * 0.6);
+    return {
+      firstLine: words.slice(0, splitIndex).join(' '),
+      secondLine: words.slice(splitIndex).join(' '),
+      showSplit: true
+    };
   };
 
-  const firstLineText = calculateFirstLineText();
-  const secondLineText = calculateSecondLineText();
+  const layout = getTextLayout();
 
   return (
     <View style={styles.container}>
@@ -36,21 +39,22 @@ const PromoBanner = ({ title, showBonus = false }) => {
       </View>
       
       <View style={styles.contentContainer}>
-        {/* First line of text */}
-        <Text style={styles.title} numberOfLines={1}>
-          {firstLineText}
-        </Text>
-        
-        {/* Second line with text and bonus */}
-        {showBonus && (
-          <View style={styles.secondLineContainer}>
+        {layout.showSplit ? (
+          <>
             <Text style={styles.title} numberOfLines={1}>
-              {secondLineText+ ' '}
+              {layout.firstLine}
             </Text>
-            <View style={styles.bonusContainer}>
-              <Text style={styles.bonusText}>BONUS!</Text>
+            <View style={styles.secondLineWrapper}>
+              <Text style={styles.title} numberOfLines={1}>
+                {layout.secondLine}
+              </Text>
+              
             </View>
-          </View>
+          </>
+        ) : (
+          <Text style={styles.title} numberOfLines={2}>
+            {layout.fullText}
+          </Text>
         )}
       </View>
     </View>
@@ -64,6 +68,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightWhite,
     borderRadius: Border.br_xs,
     marginBottom: Padding.p_5xl,
+    paddingVertical: Padding.p_xs,
   },
   iconContainer: {
     width: 40,
@@ -73,28 +78,33 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: Padding.p_xs,
+    flexShrink: 0,
   },
   contentContainer: {
     flex: 1,
     justifyContent: 'center',
+    paddingRight: Padding.p_xs,
   },
-  secondLineContainer: {
+  secondLineWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'nowrap',
   },
   title: {
     fontFamily: 'Effra',
     fontSize: 20,
+    lineHeight: 26,
     color: Color.sparklightGray1,
     fontWeight: '700',
+    flexShrink: 1,
   },
   bonusContainer: {
     backgroundColor: Color.sparklightGreen,
     borderRadius: 4,
-    borderWidth: 1,
-    borderColor: Color.sparklightGreen,
-    paddingHorizontal: 4,
-    paddingVertical: 2,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    marginLeft: 6,
+    flexShrink: 0,
   },
   bonusText: {
     fontFamily: FontFamily.openSansSemiBold,

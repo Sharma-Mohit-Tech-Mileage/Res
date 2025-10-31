@@ -1,22 +1,3 @@
-/**
- * ============================================================================
- * TAB CONFIGURATION - SINGLE SOURCE OF TRUTH
- * ============================================================================
- * 
- * This file defines ALL bottom navigation tabs for the application.
- * 
- * HOW TO USE:
- * 1. To add a new tab: Add a new object to the TABS array
- * 2. To hide a tab: Set visibility rule in `isVisible` function
- * 3. To change walkthrough text: Edit `walkthrough` object
- * 
- * VISIBILITY RULES:
- * - alwaysVisible: true = Tab shows for everyone
- * - isVisible: (userInfo, flags) => boolean = Custom logic
- * 
- * ============================================================================
- */
-
 import { Color } from '../../../GlobalStyles';
 
 export const TABS = [
