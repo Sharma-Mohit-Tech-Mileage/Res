@@ -103,7 +103,7 @@ const MobilePilotLandingPage = ({
                 
               
               </View>
-              <View style={{ flexDirection: "row", flexWrap: "wrap" , marginTop:8}}>
+              <View style={{ flexDirection: "row", flexWrap: "wrap" , marginTop:16}}>
               <Text style={styles.subText}>
                 If you have any questions, please call{" "}
               </Text>

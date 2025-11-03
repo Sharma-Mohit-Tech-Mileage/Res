@@ -14,7 +14,7 @@ const PromoImage = require("../../../assets/sparklight-tech-app.jpg");
 const PilotFaqs = ({ navigation }) => {
   return (
     <View
-      style={[AppStyles.card, { marginVertical: 10, marginHorizontal: 24 }]}
+      style={[AppStyles.card, { marginVertical: 16, marginHorizontal: 24, paddingTop:8,shadowOffset: { width: 1, height:-2 } }]}
       
     >
       <View
@@ -28,6 +28,7 @@ const PilotFaqs = ({ navigation }) => {
       </View>
       <Text
         style={styles.title2}
+        accessible={false}
       >
         For more information about Service Activation, please visit our FAQ
         page by clicking the link below.
@@ -55,7 +56,7 @@ const PilotFaqs = ({ navigation }) => {
       >
         Service Activation FAQ’s
       </Text>
-      <View style={{ minWidth:wp("80%"), overflow: "hidden" }} >
+      <View style={{ minWidth:wp("80%"), overflow: "hidden", marginBottom: 10 }} >
       <Image
         source={PromoImage}
         resizeMode="cover"
