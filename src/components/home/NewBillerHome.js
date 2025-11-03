@@ -32,6 +32,7 @@ import {
 import {
   getFcmToken,
   requestUserPermission,
+  notifyPermission
 } from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
 const NewBillerHome = ({ navigation }) => {
@@ -169,23 +170,26 @@ const NewBillerHome = ({ navigation }) => {
           } else {
             askNotification = false;
           }
+        }else{
+          askNotification = true;
         }
       }
     }
 
     if (askNotification) {
       const enabledPermission = await requestUserPermission();
-
       if (enabledPermission) {
         const token = await getFcmToken();
         console.log("FCM HOME WITH PERMISSION", token);
-
         const localData = {
           status: "accepted",
           date: new Date(),
         };
         storePushNotificationStatus(localData);
         //await dispatch(updatePushNotifications(data, null));
+      }else {
+        console.log("FCM HOME DENIED");
+            await notifyPermission();
       }
     }
   };
@@ -223,49 +227,7 @@ const NewBillerHome = ({ navigation }) => {
     });
   };
 
-  const enableNotifications = async () => {
-    console.log("enableNotifications called");
-    const enabledPermission = await requestUserPermission();
-    if (enabledPermission) {
-      // const token = await getFcmToken();
-      // const data = {
-      //   accountNumber: userInfo?.accountNumber,
-      //   deviceToken: token,
-      //   deviceTokenTimestamp: moment().format(),
-      //   optOut: true,
-      //   outageOptOut: true,
-      //   billingOptOutStatus: true,
-      //   userName: userInfo.userName,
-      //   isAndroid: Platform.OS == "android",
-      // };
-      const localData = {
-        status: "accepted",
-        date: new Date(),
-        permanentSkip: false,
-      };
-      storePushNotificationStatus(localData);
-      //await dispatch(updatePushNotificationsv2(data, null));
-    } else {
-      // const token = await getFcmToken();
-      // const dataWithoutPermission = {
-      //   accountNumber: userInfo.accountNumber,
-      //   deviceToken: token,
-      //   deviceTokenTimestamp: moment().format(),
-      //   optOut: true,
-      //   outageOptOut: true,
-      //   billingOptOutStatus: true,
-      //   userName: userInfo.userName,
-      //   isAndroid: Platform.OS == "android",
-      // };
-      const localData = {
-        status: "skip",
-        date: new Date(),
-        permanentSkip: true,
-      };
-      storePushNotificationStatus(localData);
-      //await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
-    }
-  };
+  
 
   const renderHeader = () => (
     <View

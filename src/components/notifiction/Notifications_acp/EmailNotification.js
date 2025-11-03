@@ -335,12 +335,12 @@ const updateAccountDetails = async () => {
                 name="email"
                 render={({ field: { onChange, onBlur, value } }) => (
                   <SparkLightInput
-                    placeholder="Email Address *"
+                    placeholder="Email Address"
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value ? value.toLowerCase() : ""}
                     error={errors.email?.message}
-                    label="Email Address"
+                    label="Email Address *"
                     accessibilityLabel="Email address input"
                     keyboardType="email-address"
                     autoCapitalize="none"

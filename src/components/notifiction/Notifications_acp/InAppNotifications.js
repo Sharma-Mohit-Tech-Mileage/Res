@@ -1,6 +1,20 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, Pressable, View, Animated, ScrollView, Platform, } from "react-native";
-import { Color, FontSize, FontFamily, Padding, Border, } from "../../../../GlobalStyles";
+import {
+  StyleSheet,
+  Text,
+  Pressable,
+  View,
+  Animated,
+  ScrollView,
+  Platform,
+} from "react-native";
+import {
+  Color,
+  FontSize,
+  FontFamily,
+  Padding,
+  Border,
+} from "../../../../GlobalStyles";
 import * as yup from "yup";
 import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
@@ -50,7 +64,10 @@ const InAppNotifications = ({ navigation }) => {
   const isFocused = useIsFocused();
   const [notification, setNotification] = useState(null);
   const formatedData = route.params?.additionalData || {};
-  const checkNotifData=formatedData?.optOut || formatedData?.outageOptOut || formatedData?.billingOptOutStatus;
+  const checkNotifData =
+    formatedData?.optOut ||
+    formatedData?.outageOptOut ||
+    formatedData?.billingOptOutStatus;
   console.log("checkNotifData", checkNotifData);
 
   const translateY = animatedValue;
@@ -121,20 +138,34 @@ const InAppNotifications = ({ navigation }) => {
     //   return updatedSettings;
     // });
     const checkNofif = async () => {
-      console.log("Toggle data", JSON.stringify(formatedData));
       if (
         formatedData?.optOut ||
         formatedData?.outageOptOut ||
-        formatedData?.billingOptOutStatus 
+        formatedData?.billingOptOutStatus
       ) {
-        if(!checkNotifData){
-        const pushNotification = await getPushNotificationStatus();
-        if (pushNotification?.permanentSkip) {
-          await notifyPermission();
-        } else {
-          await requestUserPermission();
+        if (!checkNotifData) {
+          const pushNotification = await getPushNotificationStatus();
+          if (pushNotification?.permanentSkip) {
+            await notifyPermission();
+          } else {
+            const enabledPermission = await requestUserPermission();
+            if (enabledPermission) {
+              const token = await getFcmToken();
+              console.log("FCM HOME WITH PERMISSION", token);
+              const localData = {
+                status: "accepted",
+                date: new Date(),
+              };
+              //storePushNotificationStatus(localData);
+              //await dispatch(updatePushNotifications(data, null));
+            } else {
+              console.log("FCM HOME DENIED");
+              await notifyPermission();
+            }
+          }
+        }else{
+          console.log("FCM HOME ALREADY ENABLED");
         }
-      }
       }
     };
     checkNofif();
@@ -189,21 +220,16 @@ const InAppNotifications = ({ navigation }) => {
     data["optOut"] = !data.optOut;
     data["outageOptOut"] = !data.outageOptOut;
     data["billingOptOutStatus"] = !data.billingOptOutStatus;
-
-    console.log("postPushNotifications", data);
     setIsLoading(true);
     PostApiRequest(
       `api/mobilenotificationpreferences/${userName}/mobilepreferences`,
       data,
       (res) => {
         setIsLoading(false);
-        console.log(
-          "Response  postRequestInAppNotification",
-          JSON.stringify(res)
-        );
         if (res) {
           setNotification({
-            message: "Your in-app notification preferences have been updated successfully.",
+            message:
+              "Your in-app notification preferences have been updated successfully.",
             type: "success",
           });
           //navigation.navigate("Notifications", { updateSuccess: true, successMessage: "In-App Notifications updated successfully." });

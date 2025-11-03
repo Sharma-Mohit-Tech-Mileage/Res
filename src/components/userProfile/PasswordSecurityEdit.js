@@ -243,7 +243,7 @@ const PasswordSecurityEdit = () => {
                       <SparkLightInput
                         onBlur={onBlur}
                         onChangeText={onChange}
-                        label="Password Reset Answer*"
+                        label="Password Reset Answer *"
                         value={value}
                         error={error?.message}
                         accessibilityLabel="Security question answer input"
