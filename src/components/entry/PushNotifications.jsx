@@ -12,8 +12,8 @@ import NavigationUtils from "./NavigationUtils";
 
 const PushNotifications = ({ navigation }) => {
   const dispatch = useDispatch();
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
-  const user = useSelector((state) => state.combinedReducers.user.userData);
+  const profile = useSelector((state) => state.profile || {});
+  const user = useSelector((state) => state.user.userData);
   const accountNumber = user?.userInfo?.accountNumber || "";
 
   const enableNotifications = async () => {

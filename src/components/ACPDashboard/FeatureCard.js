@@ -1,4 +1,3 @@
-// components/FeatureCard.js
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { FontFamily, FontSize, Color, Padding, } from "../../../GlobalStyles";
@@ -37,7 +36,7 @@ const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primar
             <Icon
               name="green-checkcircle"
               size={18}
-              color={Color.sparklightGreen}
+              color={Color.sparklightWhite}
               style={styles.checkIcon}
             />
             <Text style={styles.featureText}>{feature}</Text>

@@ -26,16 +26,18 @@ const config = {
 // Environment-based Firebase configuration keys
 const FIREBASE_CONFIG_KEYS = {
   PRODUCTION: "maintenance_configuration",
-  UAT: "dev_config"
+  UAT: "dev_config",
 };
 
 // Get the appropriate config key based on environment
 const getFirebaseConfigKey = () => {
-  const configKey = ISUAT ? FIREBASE_CONFIG_KEYS.UAT : FIREBASE_CONFIG_KEYS.PRODUCTION;
+  const configKey = ISUAT
+    ? FIREBASE_CONFIG_KEYS.UAT
+    : FIREBASE_CONFIG_KEYS.PRODUCTION;
   console.log("Environment-based config:", {
     isUAT: ISUAT,
     environment: ISUAT ? "UAT/DEV" : "PRODUCTION",
-    configKey: configKey
+    configKey: configKey,
   });
   return configKey;
 };
@@ -64,9 +66,7 @@ export const MaintenanceProvider = ({ children }) => {
     blockingTimestamp: null,
   });
 
-  const userData = useSelector(
-    (state) => state.combinedReducers.user?.userData
-  );
+  const userData = useSelector((state) => state.user?.userData);
   const dispatch = useDispatch();
 
   // Simple user audience detection using ONLY  flag
@@ -101,8 +101,6 @@ export const MaintenanceProvider = ({ children }) => {
       return { isLoggedIn: false, userData: null };
     }
   };
-
-  // Enhanced immediate blocking check function
   const performImmediateBlockingCheck = (userAudience) => {
     const { pageConfig } = maintenanceConfig;
 
@@ -110,7 +108,6 @@ export const MaintenanceProvider = ({ children }) => {
       return;
     }
 
-    // Check time validity
     const now = new Date();
     let isTimeValid = true;
 
@@ -180,32 +177,26 @@ export const MaintenanceProvider = ({ children }) => {
     checkLoginStatus();
   }, []);
 
-  // Watch Redux userData changes with immediate blocking
   useEffect(() => {
     if (
       userData &&
       userData.userInfo &&
       Object.keys(userData.userInfo).length > 0
     ) {
-      // User just logged in via Redux
       setIsUserLoggedIn(true);
       const audience = getUserAudience(userData.userInfo);
       setCurrentUserAudience(audience);
 
-      // IMMEDIATE BLOCKING CHECK: Don't wait for other effects
       performImmediateBlockingCheck(audience);
     } else {
-      // User logged out or no user info
       checkLoginStatus();
     }
   }, [userData]);
 
-  // Determine maintenance state when config or login status changes
   useEffect(() => {
     determineMaintenanceState();
   }, [maintenanceConfig, isUserLoggedIn, currentUserAudience, blockingState]);
 
-  // Session invalidation - only when logged in
   useEffect(() => {
     if (!isUserLoggedIn) {
       return;
@@ -228,7 +219,10 @@ export const MaintenanceProvider = ({ children }) => {
         );
 
         if (shouldInvalidate && sessionConfig.redirectToSplash) {
-          console.log("SESSION LOGOUT TRIGGERED for audience:", currentUserAudience);
+          console.log(
+            "SESSION LOGOUT TRIGGERED for audience:",
+            currentUserAudience
+          );
           await performLogout(false);
         }
       }
@@ -239,7 +233,6 @@ export const MaintenanceProvider = ({ children }) => {
 
   const fetchMaintenanceConfig = async () => {
     try {
-      // Get environment-specific config key
       const configKey = getFirebaseConfigKey();
 
       await remoteConfig().setConfigSettings({
@@ -259,7 +252,6 @@ export const MaintenanceProvider = ({ children }) => {
         },
       };
 
-      // Set defaults using environment-specific key
       await remoteConfig().setDefaults({
         [configKey]: JSON.stringify(defaultConfig),
       });
@@ -267,10 +259,7 @@ export const MaintenanceProvider = ({ children }) => {
       await remoteConfig().fetch(0);
       const activated = await remoteConfig().activate();
 
-      // Get config using environment-specific key
-      const configString = remoteConfig()
-        .getValue(configKey)
-        .asString();
+      const configString = remoteConfig().getValue(configKey).asString();
 
       const parsedConfig = JSON.parse(configString);
 
@@ -287,7 +276,6 @@ export const MaintenanceProvider = ({ children }) => {
         pageConfig: finalConfig.maintenancePage,
         sessionConfig: finalConfig.sessionManagement,
       });
-
     } catch (error) {
       console.error("Error fetching config:", error);
     }
@@ -298,7 +286,6 @@ export const MaintenanceProvider = ({ children }) => {
       maintenanceConfig;
     const now = new Date();
 
-    // Step 1: Check if maintenance window is active
     let isMaintenanceActive = false;
 
     if (!maintenanceWindow || !maintenanceWindow.enabled) {
@@ -307,47 +294,80 @@ export const MaintenanceProvider = ({ children }) => {
       return;
     }
 
-    // Step 2: Determine if maintenance is active based on mode
     switch (maintenanceWindow.mode) {
       case "IMMEDIATE":
-        // IMMEDIATE mode = always active when enabled
         isMaintenanceActive = true;
         break;
-
       case "SCHEDULED":
-        // SCHEDULED mode = check global time window
         if (maintenanceWindow.startTime && maintenanceWindow.endTime) {
           try {
-            const startTime = new Date(maintenanceWindow.startTime);
-            const endTime = new Date(maintenanceWindow.endTime);
+            const startTimeUTC = new Date(
+              maintenanceWindow.startTime
+            ).getTime();
+            const endTimeUTC = new Date(maintenanceWindow.endTime).getTime();
+            const nowUTC = Date.now();
+            if (isNaN(startTimeUTC) || isNaN(endTimeUTC)) {
+              const errorData = {
+                startTime: maintenanceWindow.startTime,
+                endTime: maintenanceWindow.endTime,
+                mode: "SCHEDULED",
+                reason: "Invalid date format - not a valid ISO 8601 string",
+              };
 
-            if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
+
+              console.warn(
+                "MAINTENANCE CONFIG ERROR: Invalid times - falling back to DISABLED",
+                errorData
+              );
               isMaintenanceActive = false;
             } else {
-              // Use same flexible logic: active if before end time
-              isMaintenanceActive = now <= endTime;
+              isMaintenanceActive =
+                nowUTC >= startTimeUTC && nowUTC <= endTimeUTC;
+              console.log("Maintenance SCHEDULED mode check:", {
+                currentTime: new Date(nowUTC).toISOString(),
+                startTime: new Date(startTimeUTC).toISOString(),
+                endTime: new Date(endTimeUTC).toISOString(),
+                isActive: isMaintenanceActive,
+                timeUntilStart:
+                  startTimeUTC > nowUTC
+                    ? `${Math.round((startTimeUTC - nowUTC) / 60000)} minutes`
+                    : "Started",
+                timeUntilEnd:
+                  endTimeUTC > nowUTC
+                    ? `${Math.round((endTimeUTC - nowUTC) / 60000)} minutes`
+                    : "Ended",
+              });
             }
           } catch (error) {
-            console.error("Error parsing scheduled window times:", error);
+            console.error(
+              "MAINTENANCE ERROR: Exception in SCHEDULED mode check:",
+              error
+            );
+
             isMaintenanceActive = false;
           }
         } else {
-          isMaintenanceActive = true;
+          console.warn(
+            "MAINTENANCE CONFIG ERROR: Missing startTime or endTime for SCHEDULED mode - falling back to DISABLED",
+            {
+              hasStartTime: !!maintenanceWindow.startTime,
+              hasEndTime: !!maintenanceWindow.endTime,
+              mode: maintenanceWindow.mode,
+            }
+          );
+          isMaintenanceActive = false;
         }
         break;
-
       default:
         isMaintenanceActive = true;
     }
 
-    // Step 3: If maintenance not active, disable everything
     if (!isMaintenanceActive) {
       setShowBanner(false);
       setShowMaintenancePage(false);
       return;
     }
 
-    // Step 4: Maintenance is active - check individual features
     if (
       bannerConfig &&
       bannerConfig.enabled &&
@@ -363,22 +383,17 @@ export const MaintenanceProvider = ({ children }) => {
       });
     }
 
-    // MAINTENANCE PAGE LOGIC (No Individual Time Checks)
     if (pageConfig && pageConfig.enabled) {
-      // Handle persistent blocking state first
       if (blockingState.wasBlocked && blockingState.blockingConfig) {
         setShowMaintenancePage(true);
         setShowBanner(false);
         return;
       }
 
-      // Determine based on login state and audience
       if (!isUserLoggedIn) {
-        // Pre-login: Show for "BOTH" audience only
         const shouldShowForNotLoggedIn = pageConfig.audience === "BOTH";
         setShowMaintenancePage(shouldShowForNotLoggedIn);
       } else {
-        // Post-login: Check audience match
         const isAudienceValid = isAudienceMatch(
           pageConfig.audience,
           currentUserAudience
@@ -396,7 +411,6 @@ export const MaintenanceProvider = ({ children }) => {
       setShowMaintenancePage(false);
     }
 
-    // BANNER LOGIC (No Individual Time Checks)
     if (bannerConfig && bannerConfig.enabled && isUserLoggedIn) {
       const isAudienceValid = isAudienceMatch(
         bannerConfig.audience,
@@ -424,7 +438,6 @@ export const MaintenanceProvider = ({ children }) => {
     setShowBanner(false);
   };
 
-  // Function to clear blocking state (for manual override)
   const clearBlockingState = () => {
     setBlockingState({
       isBlocking: false,
@@ -439,9 +452,6 @@ export const MaintenanceProvider = ({ children }) => {
   const performLogout = async (isBlockingLogout = false) => {
     try {
       if (isBlockingLogout) {
-        console.log("STARTING ENHANCED SILENT LOGOUT");
-
-        // THOROUGH STORAGE CLEARING
         await Promise.all([
           storeUser({}),
           storeUser(null),
@@ -452,10 +462,7 @@ export const MaintenanceProvider = ({ children }) => {
 
         dispatch(saveUserInfo({}));
 
-        // WAIT FOR ASYNC OPERATIONS TO COMPLETE
         await new Promise((resolve) => setTimeout(resolve, 200));
-
-        // Reset states
         setIsUserLoggedIn(false);
         setCurrentUserAudience(null);
         setBlockingState((prev) => ({
@@ -465,7 +472,6 @@ export const MaintenanceProvider = ({ children }) => {
 
         console.log("Enhanced silent logout completed");
       } else {
-        // NORMAL LOGOUT: Keep existing browser-based logout for regular scenarios
         console.log("STARTING NORMAL SESSION LOGOUT");
 
         const storedSsoToken = await getSsoToken();
@@ -482,7 +488,6 @@ export const MaintenanceProvider = ({ children }) => {
         await cleanUserData();
         dispatch(saveUserInfo({}));
 
-        // Reset all states for normal logout
         setIsUserLoggedIn(false);
         setCurrentUserAudience(null);
         setShowBanner(false);
@@ -505,7 +510,6 @@ export const MaintenanceProvider = ({ children }) => {
     } catch (error) {
       console.error("Error during logout:", error);
 
-      // Fallback cleanup (always silent for blocking logout)
       try {
         await storeUser({});
         await storeSsoToken({});
@@ -550,7 +554,6 @@ export const MaintenanceProvider = ({ children }) => {
         dismissBanner,
         refreshConfig: fetchMaintenanceConfig,
         clearBlockingState,
-        // Expose for debugging
         isUserLoggedIn,
         currentUserAudience,
         blockingState,
@@ -558,7 +561,7 @@ export const MaintenanceProvider = ({ children }) => {
     >
       {children}
     </MaintenanceContext.Provider>
-    );
+  );
 };
 
 export const useMaintenance = () => useContext(MaintenanceContext);

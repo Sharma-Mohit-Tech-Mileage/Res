@@ -29,12 +29,9 @@ import base64 from "react-native-base64";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 //import ZendDesk from '@pagopa/io-react-native-zendesk';
 
-import {
-  startChatWithConfig,
-  startChat,
-} from "../utility/RNZendeskChat";
+import { startChatWithConfig, startChat } from "../utility/RNZendeskChat";
 import CustomerErrorPage from "../utility/SystemErrorPopup";
-import AppStyles from "../common/styles/AppStyles";
+import AppStyles from "../utility/AppStyles";
 import SupportIcon from "../../res/svgIcons/NewSupportIcon";
 import RighIcon from "../../../assets/svgs/Chevonright";
 import Searchmd from "../../../assets/svgs/Searchmd";
@@ -43,14 +40,13 @@ const Support = ({ route }) => {
   const navigation = useNavigation();
   const [showModal, setShowModal] = useState(false);
   const [department, setDepartment] = useState("");
-  const userData = useSelector((state) => state.combinedReducers.user.userData);
+  const userData = useSelector((state) => state.user.userData);
   const scrollViewRef = useRef(null);
   const [isAgentAvailable, setisAgentAvailable] = useState(false);
   const [istechAgentAvailable, setIstechAgentAvailable] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [isAgentNotAvailable, setIsAgentNotAvailable] = useState(false);
 
-  
   const makeCall = (number) => {
     let phoneNumber = "";
 
@@ -360,9 +356,7 @@ const Support = ({ route }) => {
       <View style={[styles.mainContainer]}>
         <View style={styles.header}>
           <View style={styles.featuredIcon}>
-            
-            <SupportIcon white={'#fff'}/>
-            
+            <SupportIcon white={"#fff"} />
           </View>
           <View style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}>
             <Text style={styles.wereHereTo}>We’re Here to Help</Text>
@@ -382,7 +376,7 @@ const Support = ({ route }) => {
             />
           }
         >
-          <View style={[AppStyles.card,{marginTop:Padding.p_5xs}]}>
+          <View style={[AppStyles.card, { marginTop: Padding.p_5xs }]}>
             <View
               style={[
                 styles.headingContainer,
@@ -431,7 +425,7 @@ const Support = ({ route }) => {
                           : styles.iconLeft,
                       ]}
                     >
-                      <item.icon/>
+                      <item.icon />
                     </View>
                     {item.iconAlignment === "right" ? (
                       <Text style={[styles.searchChild, styles.textTypoRight]}>
@@ -456,69 +450,73 @@ const Support = ({ route }) => {
               </React.Fragment>
             ))}
           </View>
-         
-            <>
+
+          <>
+            <View style={[AppStyles.card, { marginBottom: 150 }]}>
               <View
-                style={[AppStyles.card,{marginBottom:150}]}
+                style={[
+                  styles.headingContainer,
+                  styles.headingContainerSpaceBlock,
+                  { flexDirection: "column", paddingHorizontal: 0 },
+                ]}
               >
-                <View
+                <Text
                   style={[
-                    styles.headingContainer,
-                    styles.headingContainerSpaceBlock,
-                    { flexDirection: "column", paddingHorizontal:0 },
+                    styles.heading,
+                    styles.headingTypo,
+                    { paddingHorizontal: Padding.p_base },
                   ]}
                 >
-                  <Text style={[styles.heading, styles.headingTypo,{ paddingHorizontal: Padding.p_base}]}>
-                    Contact Us
-                  </Text>
+                  Contact Us
+                </Text>
 
-                  <View style={styles.separator} />
+                <View style={styles.separator} />
 
-                  <Pressable
-                    accessibilityLabel="Sparklight Customer Support"
-                    accessibilityRole="button"
-                    onPress={() => {
-                      navigation.navigate("ArticalWindowUtility", {
-                        url: "https://support.sparklight.com/hc/en-us/articles/26787209205911-SPARKLIGHT-CUSTOMER-SUPPORT?isMobile=true",
-                        name: "Sparklight Customer Support",
-                      });
+                <Pressable
+                  accessibilityLabel="Sparklight Customer Support"
+                  accessibilityRole="button"
+                  onPress={() => {
+                    navigation.navigate("ArticalWindowUtility", {
+                      url: "https://support.sparklight.com/hc/en-us/articles/26787209205911-SPARKLIGHT-CUSTOMER-SUPPORT?isMobile=true",
+                      name: "Sparklight Customer Support",
+                    });
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: "row-reverse",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      paddingHorizontal: Padding.p_base,
                     }}
                   >
                     <View
-                      style={{
-                        flexDirection: "row-reverse",
-                        justifyContent: "space-between",
-                        width: "100%",
-                        paddingHorizontal: Padding.p_base,
-                      }}
+                      style={[
+                        {
+                          width: 20,
+                          height: 20,
+                          alignSelf: "center",
+                          resizeMode: "contain",
+                          marginTop: 10,
+                        },
+                      ]}
                     >
-                      <View
-                        style={[
-                          {
-                            width: 20,
-                            height: 20,
-                            alignSelf: "center",
-                            resizeMode: "contain",
-                            marginTop:10
-                          },
-                        ]}
-                      >
-                        <RighIcon/>
-                      </View>
-                      <Text
-                        style={[
-                          styles.textTypoRight,
-                          { paddingVertical: Padding.p_xs, marginTop: 10 },
-                        ]}
-                      >
-                        {"Sparklight Customer Support"}
-                      </Text>
+                      <RighIcon />
                     </View>
-                  </Pressable>
-                </View>
+                    <Text
+                      style={[
+                        styles.textTypoRight,
+                        { paddingVertical: Padding.p_xs, marginTop: 10 },
+                      ]}
+                    >
+                      {"Sparklight Customer Support"}
+                    </Text>
+                  </View>
+                </Pressable>
               </View>
-            </>
-          
+            </View>
+          </>
+
           <CustomerErrorPage
             visible={isAgentNotAvailable}
             message={
@@ -567,7 +565,7 @@ const styles = StyleSheet.create({
   separator: {
     backgroundColor: Color.sparklightGray,
     height: 1,
-    width: '100%',
+    width: "100%",
     marginTop: 16,
   },
   iconRight: {

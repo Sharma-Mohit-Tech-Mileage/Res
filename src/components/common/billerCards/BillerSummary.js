@@ -6,13 +6,11 @@ import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
-import AppStyles from "../styles/AppStyles";
+import AppStyles from "../../utility/AppStyles";
 import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
 import Tooltip from "rn-tooltip";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-const Card = ({ billAmt, dueDate, navigation, style}) => {
-
-
+const Card = ({ billAmt, dueDate, navigation, style }) => {
   const NotAvailable = () => {
     return (
       <View style={{ flexDirection: "column" }}>
@@ -54,10 +52,11 @@ const Card = ({ billAmt, dueDate, navigation, style}) => {
   };
 
   return (
-
     <View style={[AppStyles.card, style]}>
       <View style={styles.cardHreader}>
-        <View style={{ marginLeft: 10, flexDirection: "row", alignItems: "center", }} >
+        <View
+          style={{ marginLeft: 10, flexDirection: "row", alignItems: "center" }}
+        >
           <View style={{ alignSelf: "center" }}>
             <WalletSummaryIcon />
           </View>
@@ -71,11 +70,8 @@ const Card = ({ billAmt, dueDate, navigation, style}) => {
           flexDirection: "row",
           marginHorizontal: 20,
           justifyContent: "center",
-
-      
         }}
       >
-
         <View
           style={{
             flexDirection: "column",
@@ -84,43 +80,44 @@ const Card = ({ billAmt, dueDate, navigation, style}) => {
             marginVertical: 15,
           }}
         >
-          <Text 
-          style={[
+          <Text
+            style={[
               styles.label,
               {
                 fontWeight: "700",
                 color: colors.sparklight_purple_blue,
                 fontSize: 18,
                 paddingBottom: 5,
-                alignSelf:'center',
-            
-              }
-            ]}>Total Amount Due</Text>
+                alignSelf: "center",
+              },
+            ]}
+          >
+            Total Amount Due
+          </Text>
           {billAmt == undefined ? (
             <View style={{ alignSelf: "center" }}>
-            <SkeletonPlaceholder>
-              <>
-              <View
-                style={{
-                  width: wp("30%"),
-                  height: 20,
-                  alignSelf: "flex-end",
-                  borderRadius: 4,
-                  marginVertical: 5,
-                }}
-              />
-              <View
-                style={{
-                  width: wp("30%"),
-                  height: 20,
-                  alignSelf: "flex-end",
-                  borderRadius: 4,
-                  marginVertical: 5,
-                }}
-              />
-              </>
-            </SkeletonPlaceholder>
-            
+              <SkeletonPlaceholder>
+                <>
+                  <View
+                    style={{
+                      width: wp("30%"),
+                      height: 20,
+                      alignSelf: "flex-end",
+                      borderRadius: 4,
+                      marginVertical: 5,
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: wp("30%"),
+                      height: 20,
+                      alignSelf: "flex-end",
+                      borderRadius: 4,
+                      marginVertical: 5,
+                    }}
+                  />
+                </>
+              </SkeletonPlaceholder>
             </View>
           ) : (
             <Text style={styles.amount}>${billAmt}</Text>
@@ -175,44 +172,44 @@ const Card = ({ billAmt, dueDate, navigation, style}) => {
         </View>
       </View>
 
-     { billAmt !=undefined ? (
-      <View style={styles.cardFooter}>
-        <TouchableOpacity
-          onPress={() => {
-            let billingURL = `${Env.ACP_BILLING}/billing`
-            console.log("Billing URL", billingURL);
-            navigation.navigate("ArticalWindowUtility", {
-              url: billingURL,
-              name: "Billing Details",
-            });
-          }}
-          accessible={true}
-          accessibilityLabel="Make a Payment"
-          accessibilityRole="button"
-          style={styles.paymentButton}
-        >
-          <Text style={styles.paymentButtonText}>Make a Payment</Text>
-          <View style={{ marginLeft: 2, alignSelf: "center" }}>
-            <RightArrow color={colors.snow_white} />
-          </View>
-        </TouchableOpacity>
-      </View>
-     ):<>
-     <SkeletonPlaceholder>
-        <View
-          style={{
-            width: wp("70%"),
-            height: 40,
-            alignSelf: "center",
-            borderRadius: 4,
-            marginVertical: 10,
-          }}
-        />
-      </SkeletonPlaceholder>
-     </>
-     }
+      {billAmt != undefined ? (
+        <View style={styles.cardFooter}>
+          <TouchableOpacity
+            onPress={() => {
+              let billingURL = `${Env.ACP_BILLING}/billing`;
+              console.log("Billing URL", billingURL);
+              navigation.navigate("ArticalWindowUtility", {
+                url: billingURL,
+                name: "Billing Details",
+              });
+            }}
+            accessible={true}
+            accessibilityLabel="Make a Payment"
+            accessibilityRole="button"
+            style={styles.paymentButton}
+          >
+            <Text style={styles.paymentButtonText}>Make a Payment</Text>
+            <View style={{ marginLeft: 2, alignSelf: "center" }}>
+              <RightArrow color={colors.snow_white} />
+            </View>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <>
+          <SkeletonPlaceholder>
+            <View
+              style={{
+                width: wp("70%"),
+                height: 40,
+                alignSelf: "center",
+                borderRadius: 4,
+                marginVertical: 10,
+              }}
+            />
+          </SkeletonPlaceholder>
+        </>
+      )}
     </View>
-
   );
 };
 
@@ -289,14 +286,13 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
     fontFamily: FontFamily.openSansRegular,
     color: colors.sp_black,
-    
   },
   dueDate: {
     fontSize: 14,
     fontWeight: "700",
     color: colors.dark_grey,
     alignSelf: "center",
-    paddingBottom:5,
+    paddingBottom: 5,
     fontFamily: FontFamily.openSansRegular,
     color: colors.sparklight_purple_blue,
   },
@@ -335,8 +331,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.sparklight_purple_blue,
     width: wp("70%"),
     paddingVertical: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 5,
     alignSelf: "center",
     marginLeft: wp("9%"),
@@ -345,7 +341,7 @@ const styles = StyleSheet.create({
     color: colors.snow_white,
     fontSize: 16,
     fontWeight: "600",
-    alignSelf: 'center',
+    alignSelf: "center",
     fontFamily: FontFamily.openSansRegular,
   },
   cardHreader: {

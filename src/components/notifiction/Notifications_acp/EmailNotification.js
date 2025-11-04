@@ -34,7 +34,7 @@ const AddNotificationScreen = () => {
   const [notification, setNotification] = useState(null);
   const [isTermRequired, setIsTermRequired] = useState(false);
   const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
-  const user = useSelector((state) => state.combinedReducers.user.userData);
+  const user = useSelector((state) => state.user.userData);
   const [isCheckboxVisible, setIsCheckboxVisible] = useState(null);
   const scrollViewRef = useRef(null);
   const animatedValue = useRef(new Animated.Value(-100)).current;
@@ -43,10 +43,10 @@ const AddNotificationScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const accountDetails = useSelector(
-    (state) => state.combinedReducers.profile?.accountDetails
+    (state) => state.profile?.accountDetails
   );
   const paperlessStatusAcp = useSelector(
-    (state) => state.combinedReducers.profile?.paperlessStatusAcp
+    (state) => state.profile?.paperlessStatusAcp
   );
   const emailNotificationUpdate = useSelector(
     (state) => state.combinedReducers?.notification

@@ -28,7 +28,7 @@ const ChangePassword = () => {
   const [securityQuestionsNew,setSecurityQuestionsNew] =useState(securityQuestions)
   const route = useRoute(); 
   const dispatch = useDispatch();
-  const profile = useSelector(state => state.combinedReducers.profile || {});
+  const profile = useSelector(state => state.profile || {});
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const scrollViewRef = useRef(null);

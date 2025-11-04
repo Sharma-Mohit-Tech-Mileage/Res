@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-  Text,
-  StyleSheet,
-  AccessibilityInfo
-} from "react-native";
+import { Text, StyleSheet, AccessibilityInfo } from "react-native";
 import { FontFamily, Color } from "../../../GlobalStyles";
 
-// Utility function to process text and make emails bold
 const processText = (text) => {
   const emailRegex = /[\w.-]+@[\w.-]+\.\w+/g;
   const parts = [];
@@ -14,11 +9,9 @@ const processText = (text) => {
   let match;
 
   while ((match = emailRegex.exec(text)) !== null) {
-    // Text before the email
     if (match.index > lastIndex) {
       parts.push(text.substring(lastIndex, match.index));
     }
-    // Email in bold
     parts.push(
       <Text style={{ fontWeight: 'bold',color:Color.colorMidnightblue }} key={`email-${match.index}`}>
         {match[0]}
@@ -26,7 +19,6 @@ const processText = (text) => {
     );
     lastIndex = emailRegex.lastIndex;
   }
-  // Remaining text after the last email
   if (lastIndex < text.length) {
     parts.push(text.substring(lastIndex));
   }

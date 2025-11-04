@@ -1,38 +1,19 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  AccessibilityInfo,
-  findNodeHandle,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, AccessibilityInfo, } from "react-native"; 
 import { Color, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { resentEmailVerifiction } from "../../../redux/actions/ProfileActionSuite";
 import { useDispatch } from "react-redux";
 import RenderText from "../RenderText";
-
 import InfoIcon from "../../../../assets/svgs/InfoIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
-import WarningIcon from "../../../../assets/svgs/Alerttriangle"
 
-const NotificationAlert = ({
-  type,
-  title,
-  message,
-  onClose,
-  showCloseIcon = true,
-  isVisible = true,
-  resentemail = false,
-  splitKey = "contact us",
-}) => {
+const NotificationAlert = ({ type, title, message, onClose, showCloseIcon = true, isVisible = true, resentemail = false, splitKey = "contact us", }) => {
   if (!isVisible) return null;
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
-  const notificationRef = useRef(null);
 
   const typeStyles = {
     info: {
@@ -40,44 +21,36 @@ const NotificationAlert = ({
       borderColor: "#0060AE",
       iconColor: Color.sparklightBrightPurple,
       textColor: "#000000",
-      titleColor: "#000000",
+      titleColor: "#0060AE",
       closeButtonColor: "#0060AE",
-      IconComponent: InfoIcon,
-      iconLabel: "Information icon",
-      labelPrefix: "Information Notification: ",
+      IconComponent: InfoIcon, 
     },
     error: {
       backgroundColor: "#FEF3F2",
       borderColor: "#B92A1C",
       iconColor: Color.sparkLightRed,
       textColor: "#000000",
-      titleColor: "#000000",
+      titleColor: "#B92A1C",
       closeButtonColor: "#B92A1C",
       IconComponent: InfoIcon,
-      iconLabel: "Error icon",
-      labelPrefix: "Error Notification: ",
     },
     success: {
       backgroundColor: "#F1FCF2",
       borderColor: "#1D7832",
       iconColor: Color.sparklightGreen,
       textColor: "#000000",
-      titleColor: "#000000",
+      titleColor: "#1D7832",
       closeButtonColor: "#1D7832",
       IconComponent: SuccessIcon,
-      iconLabel: "Success icon",
-      labelPrefix: "Success Notification: ",
     },
     warning: {
       backgroundColor: "#FFFAEB",
       borderColor: "#DD6D02",
       iconColor: Color.sparkLightInfo,
       textColor: "#000000",
-      titleColor: "#000000",
+      titleColor: "#DD6D02",
       closeButtonColor: "#DD6D02",
-      IconComponent: WarningIcon,
-      iconLabel: "Warning icon",
-      labelPrefix: "Warning Notification: ",
+      IconComponent: InfoIcon,
     },
   };
 
@@ -89,6 +62,7 @@ const NotificationAlert = ({
         const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
         setIsScreenReaderEnabled(isEnabled);
       } catch (error) {
+        console.log("AccessibilityInfo error:", error.message);
         setIsScreenReaderEnabled(false);
       }
     };
@@ -101,16 +75,6 @@ const NotificationAlert = ({
 
     return () => subscription.remove();
   }, []);
-
-  // Focus on notification when it appears
-  useEffect(() => {
-    if (isVisible && notificationRef.current) {
-      const reactTag = findNodeHandle(notificationRef.current);
-      if (reactTag) {
-        AccessibilityInfo.setAccessibilityFocus(reactTag);
-      }
-    }
-  }, [isVisible]);
 
   const handleClose = () => onClose?.();
   const handleResendEmail = () => dispatch(resentEmailVerifiction(navigation));
@@ -164,12 +128,12 @@ const NotificationAlert = ({
     );
   };
 
+  // Get the SVG component
   const IconComponent = currentTypeStyle.IconComponent;
 
   return (
     <View style={styles.outerContainer}>
       <View
-        ref={notificationRef}
         style={[
           styles.notificationContainer,
           {
@@ -177,28 +141,20 @@ const NotificationAlert = ({
             borderColor: currentTypeStyle.borderColor,
           },
         ]}
-        accessible={true}
-        accessibilityLabel={
-          currentTypeStyle.labelPrefix +
-          (message || "")
-        }
+        accessibilityLabel={`${type} notification: ${title || ""} ${
+          message || ""
+        }`}
         accessibilityLiveRegion="polite"
-        importantForAccessibility="yes"
       >
-        <View
-          style={[styles.iconStyle, { marginTop: !title ? 1 : 1, marginEnd: 10 }]}
-          accessible={true}
-          accessibilityLabel={currentTypeStyle.iconLabel}
-          accessibilityRole="image"
-        >
-          <IconComponent
-            width={24}
-            height={24}
-            color={currentTypeStyle.iconColor}
-            accessible={false}
-            importantForAccessibility="no"
-          />
-        </View>
+        {/* Replace Image with SVG Component */}
+        <IconComponent
+          width={20}
+          height={22}
+          color={currentTypeStyle.titleColor}
+          style={{ marginTop: !title ? 1 : 1 }}
+          accessible={false}
+          importantForAccessibility="no"
+        />
 
         <View
           style={[
@@ -237,7 +193,7 @@ const NotificationAlert = ({
             onPress={handleClose}
             style={styles.closeButton}
             accessible={true}
-            accessibilityLabel="Close notification button"
+            accessibilityLabel="Close notification"
             accessibilityHint="Double tap to close"
             accessibilityRole="button"
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -248,7 +204,7 @@ const NotificationAlert = ({
                 { color: currentTypeStyle.closeButtonColor },
               ]}
             >
-              {' ✕'}
+              ✕
             </Text>
           </TouchableOpacity>
         )}
@@ -273,12 +229,13 @@ const styles = StyleSheet.create({
   },
   textContentContainer: {
     flex: 1,
-    marginLeft: 10,
+    marginLeft: 12,
     paddingRight: 10,
   },
   textContentContainerNoClose: {
     paddingRight: 0,
   },
+  // Removed iconStyle since SVG handles sizing via props
   closeButton: {
     justifyContent: "center",
     alignItems: "center",

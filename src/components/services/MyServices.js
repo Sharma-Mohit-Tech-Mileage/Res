@@ -14,7 +14,6 @@ import { GetApiRequest } from "../../network/APIClient";
 
 const MyServices = ({ route }) => {
   const navigation = useNavigation();
-  // const userData = useSelector((state) => state.combinedReducers.user.userData);
   const scrollViewRef = useRef(null);
   const [isAgentAvailable, setisAgentAvailable] = useState(false);
   const [istechAgentAvailable, setIstechAgentAvailable] = useState(false);

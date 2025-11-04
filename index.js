@@ -7,10 +7,8 @@ import notifee from '@notifee/react-native';
 import { name as appName } from './app.json';
 import PilotServiceStatus from './src/components/ACPDashboard/MobilePilotLandingPage.js';
 
-// Store processed message IDs to prevent duplicates
 const processedMessages = new Set();
 
-// Register background handler
 messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log('Message handled in the background!', remoteMessage);
 
@@ -35,8 +33,6 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
                     },
                 });
 
-                // Optional: Clear notification if required
-                // await notifee.cancelNotification(messageId);
             } catch (error) {
                 console.log('Error when setting background message: ', error);
             }

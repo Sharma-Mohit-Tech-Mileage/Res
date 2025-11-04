@@ -27,7 +27,7 @@ const MenuCard = ({ item, style }) => {
       accessibilityHint={`Navigate to ${item.title} screen`}
     >
       <View style={styles.content}>
-        <Icon name={item.icon} size={30} color={item.color || Color.sparklightBrightPurple} />
+        <Icon name={item.icon} size={30} color={ Color.sparklightBrightPurple} />
         <Text 
           style={[
             styles.title, 

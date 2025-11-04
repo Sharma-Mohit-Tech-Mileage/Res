@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 
 // Basic selectors
-const getPaymentHistoryState = state => state.combinedReducers.paymentHistory;
+const getPaymentHistoryState = state => state.paymentHistory;
 
 // Select all payments
 export const selectAllPayments = createSelector(

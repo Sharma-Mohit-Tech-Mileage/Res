@@ -21,8 +21,8 @@ const Terms = ({ navigation }) => {
   const [isError, setIsError] = useState(false);
   const dispatch = useDispatch();
 
-  const userData = useSelector((state) => state.combinedReducers.user.userData);
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const userData = useSelector((state) => state.user.userData);
+  const profile = useSelector((state) => state.profile || {});
   const accountNumber = userData?.userInfo?.accountNumber || "";
   const url =
     "https://www.sparklight.com/legal/mobile-app-terms-and-conditions";

@@ -2,32 +2,27 @@ import React, { Suspense } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NewBillerHome from "../../components/home/NewBillerHome";
 import ArticalWindowUtility from "../../components/utility/ArticalWindowUtility";
-import { useTabBarVisibility } from "../TabBarVisibilityContext";
-import AutoPayPCIConnector from '../../components/utility/AutoPayPCIConnector'
+import AutoPayPCIConnector from "../../components/utility/AutoPayPCIConnector";
 import { ActivityIndicator } from "react-native";
 
 const HomeStack = createNativeStackNavigator();
 
 function HomeStackScreen() {
-  const { setTabBarVisible } = useTabBarVisibility();
   return (
     <HomeStack.Navigator
       initialRouteName="Dashboard"
       defaultNavigationOptions={{ gestureEnabled: true }}
     >
-      {/* Dashboard Screen */}
-      <HomeStack.Screen
-        name="Dashboard"
-        options={{ headerShown: false }}
-      >
+      <HomeStack.Screen name="Dashboard" options={{ headerShown: false }}>
         {({ navigation }) => (
-          <Suspense fallback={<ActivityIndicator size="large" color="#0000ff" />}>
+          <Suspense
+            fallback={<ActivityIndicator size="large" color="#0000ff" />}
+          >
             <NewBillerHome navigation={navigation} />
           </Suspense>
         )}
       </HomeStack.Screen>
 
-   
       <HomeStack.Screen
         name="ArticalWindowUtility"
         component={ArticalWindowUtility}
@@ -35,28 +30,13 @@ function HomeStackScreen() {
           headerBackVisible: false,
           headerShown: false,
         }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
       />
 
-  
-      
-
-  
       <HomeStack.Screen
         name="AutoPayPCIConnector"
         component={AutoPayPCIConnector}
         options={{ headerShown: false }}
-        listeners={{
-          focus: () => setTabBarVisible(true),
-          blur: () => setTabBarVisible(true),
-        }}
       />
-
-    
-      
     </HomeStack.Navigator>
   );
 }

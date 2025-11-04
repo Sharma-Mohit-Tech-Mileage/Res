@@ -36,8 +36,8 @@ const PasswordSecurityEdit = () => {
   const [dropdownFocused, setDropdownFocused] = useState(false);
   const [securityQuestionsNew, setSecurityQuestionsNew] = useState(securityQuestions);
 
-  const profile = useSelector(state => state.combinedReducers.profile || {});
-  const user = useSelector(state => state.combinedReducers.user.userData);
+  const profile = useSelector(state => state.profile || {});
+  const user = useSelector(state => state.user.userData);
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({

@@ -25,7 +25,7 @@ const ProfileSettingsEdit = () => {
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
   const [initialEmailAddress, setInitialEmailAddress] = useState("");
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const profile = useSelector((state) => state.profile || {});
   const profileDetailsfromStore = profile.profileDetails || {};
   const isPrimaryUser = isPrimaryAdmin(profileDetailsfromStore.memberType);
   const scrollViewRef = useRef(null);
