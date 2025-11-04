@@ -213,11 +213,15 @@ const NewBillerHome = ({ navigation }) => {
         (res) => {
           console.log("getInAppNotificationsData res", JSON.stringify(res));
           if (res) {
-            res[0]?.pushMessageType.forEach((value, index) => {
-              if (!value?.optOutFlag) {
-                setIsNotificationEnable(true);
+            const pushMessageType = res[0]?.pushMessageType;
+            if (pushMessageType && Array.isArray(pushMessageType)) {
+              for (let i = 0; i < pushMessageType.length; i++) {
+                if (!pushMessageType[i]?.optOutFlag) {
+                  setIsNotificationEnable(true);
+                  break;
+                }
               }
-            });
+            }
           }
         },
         (error) => {
