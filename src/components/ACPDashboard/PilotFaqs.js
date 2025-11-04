@@ -19,8 +19,7 @@ const PilotFaqs = ({ navigation }) => {
     >
       <View
         accessible={true}
-        accessibilityLabel="Service Activation section, heading level 2. For more information about Service Activation, please visit our FAQ
-        page by clicking the link below."
+        accessibilityLabel="Service Activation section, heading level 2."
         //accessibilityRole="header"
         accessibilityRole="none"
       >
@@ -28,7 +27,9 @@ const PilotFaqs = ({ navigation }) => {
       </View>
       <Text
         style={styles.title2}
-        accessible={false}
+        accessible={true}
+        accessibilityRole="text"
+        accessibilityLabel="For more information about Service Activation, please visit our FAQ page by clicking the link below."
       >
         For more information about Service Activation, please visit our FAQ
         page by clicking the link below.
@@ -61,7 +62,7 @@ const PilotFaqs = ({ navigation }) => {
         source={PromoImage}
         resizeMode="cover"
         style={styles.promoImageSty}
-        accessibilityLabel="Decorative image of technician standing near service vehicle"
+        accessibilityLabel="Decorative image of technician standing near service vehicle."
         accessible={true}
       />
       </View>
