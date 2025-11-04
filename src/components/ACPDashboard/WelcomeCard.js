@@ -36,7 +36,6 @@ const styles = StyleSheet.create({
   videoContainer: {
     borderRadius: Border.br_5xs,
     overflow: 'hidden',
-    height: 200,
   }
 });
 

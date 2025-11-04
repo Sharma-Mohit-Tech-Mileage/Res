@@ -1,138 +1,43 @@
-// components/common/AccessibleYoutubePlayer.js
-import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, AppState } from 'react-native';
-import { WebView } from 'react-native-webview';
+// components/common/AccessibleYoutubePlayer.jsx
+import React, { useState, useCallback, useRef } from 'react';
+import { StyleSheet, View, Dimensions } from 'react-native'; // 🛑 ADD Dimensions
+import YoutubeIframe from 'react-native-youtube-iframe'; 
 
 const AccessibleYoutubePlayer = ({ videoId }) => {
-  const webViewRef = useRef(null);
-  const [key, setKey] = useState(0);
-  const appState = useRef(AppState.currentState);
+  const [playing, setPlaying] = useState(false);
+  const playerRef = useRef(null);
+  
+  const screenWidth = Dimensions.get('window').width;
+  const playerWidth = screenWidth * 0.92; 
+  
+  const height = Math.max(playerWidth * (9 / 16), 150); 
+  
 
-  // Handle app state changes (background/foreground)
-  useEffect(() => {
-    const subscription = AppState.addEventListener('change', nextAppState => {
-      if (
-        appState.current.match(/inactive|background/) &&
-        nextAppState === 'active'
-      ) {
-        // App has come to the foreground, reload WebView by changing key
-        setKey(prevKey => prevKey + 1);
-      }
-
-      appState.current = nextAppState;
-    });
-
-    return () => {
-      subscription.remove();
-    };
+  const onStateChange = useCallback((state) => {
+    if (state === 'ended') {
+      setPlaying(false);
+    }
   }, []);
 
-  const generateHtml = () => `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-        <style>
-          /* Ensure iframe and body take full size */
-          html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-          }
-
-          iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-          }
-
-          /* Initially hide content until fully loaded */
-          .content {
-            visibility: hidden;
-            height: 100%;
-            width: 100%;
-          }
-          
-          /* Loading indicator */
-          .loader {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid #8D3B90;
-            animation: spin 1s linear infinite;
-          }
-          
-          @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-          }
-        </style>
-        <script>
-          // Make content visible after iframe loads
-          function showContent() {
-            document.querySelector('.content').style.visibility = 'visible';
-            document.querySelector('.loader').style.display = 'none';
-          }
-          
-          // Handle messages from React Native
-          window.addEventListener('message', function(event) {
-            if (event.data === 'reload') {
-              location.reload();
-            }
-          });
-        </script>
-      </head>
-      <body>
-        <div class="loader"></div>
-        <div class="content">
-          <iframe
-            src="https://www.youtube.com/embed/${videoId}?controls=1&modestbranding=1&rel=0&playsinline=1"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            onload="showContent()"
-          ></iframe>
-        </div>
-      </body>
-    </html>
-  `;
-
-  const handleWebViewLoad = () => {
-    // Additional handling if needed when WebView loads
-  };
-
-  // Force reload of WebView if needed
-  const reloadWebView = () => {
-    if (webViewRef.current) {
-      webViewRef.current.postMessage('reload');
-    }
-  };
-
   return (
-    <View style={styles.container}>
-      <WebView
-        key={key}
-        ref={webViewRef}
-        style={styles.webView}
-        accessibilityLabel="YouTube Video Player"
-        source={{ html: generateHtml() }}
-        allowsInlineMediaPlayback={true}
-        mediaPlaybackRequiresUserAction={false}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        mixedContentMode="always"
-        androidHardwareAccelerationDisabled={false}
-        originWhitelist={['*']}
-        onLoad={handleWebViewLoad}
-        startInLoadingState={true}
-        cacheEnabled={false}
-        onError={(error) => console.log('WebView error:', error)}
+    <View 
+      style={[styles.container, { height: height }]} 
+      accessibilityRole="image"
+      accessibilityLabel={`YouTube Video Player for SparkLight welcome video`}
+      importantForAccessibility="yes"
+    >
+      <YoutubeIframe
+        ref={playerRef}
+        height={height} // Pass the calculated dynamic height
+        play={playing} 
+        videoId={videoId}
+        onChangeState={onStateChange}
+        playerParams={{
+          controls: 1, 
+          rel: 0, 
+          playsinline: 1,
+          showClosedCaptions: true, 
+        }}
       />
     </View>
   );
@@ -140,13 +45,7 @@ const AccessibleYoutubePlayer = ({ videoId }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#8D3B90', // Purple background to match brand
-  },
-  webView: {
-    flex: 1,
-    borderRadius: 8,
-    overflow: 'hidden',
+    backgroundColor: '#000', 
   },
 });
 
