@@ -35,6 +35,8 @@
     "react-native": "0.77.2",
     "react-native-app-auth": "^7.2.0",
     "react-native-base64": "^0.2.1",
+    "react-native-blob-util": "^0.23.2",
+    "@react-native-masked-view/masked-view": "^0.3.2",
     "react-native-calendars": "^1.1312.1",
     "react-native-config": "^1.5.1",
     "react-native-device-info": "^10.13.1",
