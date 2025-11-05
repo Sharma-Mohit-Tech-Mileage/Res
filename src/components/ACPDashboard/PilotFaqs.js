@@ -7,7 +7,7 @@ import {
   Padding,
   Border,
 } from "../../../GlobalStyles";
-import AppStyles from "../common/styles/AppStyles";
+import AppStyles from "../utility/AppStyles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 const PromoImage = require("../../../assets/sparklight-tech-app.jpg");
 

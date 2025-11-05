@@ -7,7 +7,7 @@ import {
   Padding,
   Border,
 } from "../../../GlobalStyles";
-import AppStyles from "../common/styles/AppStyles";
+import AppStyles from "../utility/AppStyles";
 import FeatureCard from "./FeatureCardMobile";
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 
