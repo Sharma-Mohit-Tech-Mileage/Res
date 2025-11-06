@@ -27,7 +27,7 @@ export function useVisibleTabs() {
     return {
       // Example flags - modify based on your needs
       enableServices: false,        // Set to true to enable Services tab
-      disableBilling: false,         // Set to true to hide Billing tab
+      disableBilling: true,         // Set to true to hide Billing tab
     };
   }, []);
 

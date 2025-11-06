@@ -18,8 +18,10 @@ import SupportIcon from "../res/svgIcons/SupportIcon";
 import NewSupportIcon from "../res/svgIcons/NewSupportIcon";
 import HomeAccountIcon from "../res/svgIcons/HomeAccountIcon";
 import { FontFamily, Color, FontSize } from "../../GlobalStyles";
+import MobilePilotLandingPage from "../../src/components/ACPDashboard/MobilePilotLandingPage";
 
 const Tab = createBottomTabNavigator();
+const isMobilePilotEnabled = true; // Feature flag placeholder
 
 const TAB_BAR_HEIGHT = {
   IOS: 90,
@@ -28,7 +30,7 @@ const TAB_BAR_HEIGHT = {
 };
 
 const COMPONENT_MAP = {
-  HomeStackScreen,
+  HomeStackScreen: isMobilePilotEnabled ? MobilePilotLandingPage : HomeStackScreen,
   BillingStackScreen,
   MyServicesStack,
   SupportStack,
