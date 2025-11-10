@@ -14,7 +14,7 @@ import { GetApiRequest,PutApiRequest } from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { passwordSchema } from '../utility/validationSchema'; // Update the path as necessary
 import colors from "../../res/Colors";
-import AppStyles from "../common/styles/AppStyles";
+import AppStyles from "../utility/AppStyles";
 const ChangePassword = () => {
 
   const navigation = useNavigation();
