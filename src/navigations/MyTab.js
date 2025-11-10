@@ -125,43 +125,54 @@ const createTabBarButton = useCallback(
     }
     
     const isAccessible = isTabAccessible(tab.index);
-    const shouldPreventPress = !isAccessible && 
-      (isScreenReaderEnabled || isWalkthroughActive);
+    
+    // During walkthrough, determine if this is the active tab
+    const isActiveTabInWalkthrough = isWalkthroughActive && isAccessible;
+    const isNonActiveTabInWalkthrough = isWalkthroughActive && !isAccessible;
 
     return (
       <Pressable
         {...props}
-        accessible={isAccessible && !isWalkthroughActive}
-        // Fix for Android - use proper importantForAccessibility
+        accessible={isActiveTabInWalkthrough || !isWalkthroughActive}
+        accessibilityRole="button"
+        accessibilityLabel={`${tab.name} tab`}
+        accessibilityState={{
+          disabled: isActiveTabInWalkthrough,
+          selected: !isWalkthroughActive && props.accessibilityState?.selected,
+        }}
+        accessibilityHint={
+          isActiveTabInWalkthrough 
+            ? "Disabled during walkthrough. Use walkthrough controls to continue." 
+            : undefined
+        }
         importantForAccessibility={
-          !isAccessible || isWalkthroughActive 
-            ? "no-hide-descendants" 
+          isNonActiveTabInWalkthrough 
+            ? "no" 
             : "yes"
         }
-        // iOS only - keep it
-        accessibilityElementsHidden={!isAccessible || isWalkthroughActive}
-        accessibilityLabel={`${tab.name} tab`}
-        accessibilityRole="tab"
-        accessibilityState={{
-          disabled: !isAccessible,
-        }}
+        accessibilityElementsHidden={isNonActiveTabInWalkthrough}
         style={[
           props.style,
-          !isAccessible && styles.disabledTab,
+          isNonActiveTabInWalkthrough && styles.disabledTab,
         ]}
-        // Add pointerEvents for better Android handling
-        pointerEvents={!isAccessible && isWalkthroughActive ? "none" : "auto"}
+        pointerEvents={isNonActiveTabInWalkthrough ? "none" : "auto"}
         onPress={(e) => {
-          if (isWalkthroughActive || shouldPreventPress) {
+          if (isActiveTabInWalkthrough) {
             e.preventDefault();
             return;
           }
+          
+          if (isNonActiveTabInWalkthrough) {
+            e.preventDefault();
+            return;
+          }
+          
           props.onPress(e);
         }}
       />
     );
   },
-  [visibleTabs, isTabAccessible, isScreenReaderEnabled, isWalkthroughActive]
+  [visibleTabs, isTabAccessible, isWalkthroughActive]
 );
 
 
@@ -246,9 +257,9 @@ const createTabBarButton = useCallback(
       headerShown: false,
       swipeEnabled: false,
       tabBarButton: createTabBarButton,
-      tabBarAccessibilityLabel: isWalkthroughActive ? undefined : "Navigation tabs",
+      tabBarAccessibilityLabel: "Navigation tabs",
     }),
-    [tabBarHeight, createTabBarButton, isWalkthroughActive]
+    [tabBarHeight, createTabBarButton]
   );
 
 
@@ -263,25 +274,31 @@ const createTabBarButton = useCallback(
         />
       )}
 
-      <Tab.Navigator
-        initialRouteName="Home"
-        screenOptions={screenOptions}
+      <View
+        style={{ flex: 1 }}
+        importantForAccessibility={isWalkthroughActive ? "no-hide-descendants" : "auto"}
+        accessibilityElementsHidden={isWalkthroughActive}
       >
-        {visibleTabs.map((tab) => (
-          <Tab.Screen
-            key={tab.id}
-            name={tab.screenName}
-            component={getComponent(tab.component)}
-            initialParams={{ data: route }}
-            options={{
-              tabBarLabel: tab.name,
-              tabBarAccessibilityLabel: `${tab.name} tab`,
-              tabBarIcon: ({ focused }) => renderTabIcon(tab, focused),
-            }}
-            listeners={createTabListeners(tab)}
-          />
-        ))}
-      </Tab.Navigator>
+        <Tab.Navigator
+          initialRouteName="Home"
+          screenOptions={screenOptions}
+        >
+          {visibleTabs.map((tab) => (
+            <Tab.Screen
+              key={tab.id}
+              name={tab.screenName}
+              component={getComponent(tab.component)}
+              initialParams={{ data: route }}
+              options={{
+                tabBarLabel: tab.name,
+                tabBarAccessibilityLabel: `${tab.name}`,
+                tabBarIcon: ({ focused }) => renderTabIcon(tab, focused),
+              }}
+              listeners={createTabListeners(tab)}
+            />
+          ))}
+        </Tab.Navigator>
+      </View>
     </>
   );
 };
