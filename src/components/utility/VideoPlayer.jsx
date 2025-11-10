@@ -1,21 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, AppState, Platform } from 'react-native';
-import { WebView } from 'react-native-webview';
+import React, { useState, useRef, useEffect } from "react";
+import { StyleSheet, View, AppState, Platform } from "react-native";
+import { WebView } from "react-native-webview";
 
-const VideoPlayer = ({ videoId, bundleId = 'com.sparklight.app' }) => {  // ✅ ADDED: bundleId prop
+const VideoPlayer = ({ videoId, bundleId = "com.sparklight.app" }) => {
   const webViewRef = useRef(null);
   const [key, setKey] = useState(0);
   const appState = useRef(AppState.currentState);
-
-  // Handle app state changes (background/foreground)
   useEffect(() => {
-    const subscription = AppState.addEventListener('change', nextAppState => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
       if (
         appState.current.match(/inactive|background/) &&
-        nextAppState === 'active'
+        nextAppState === "active"
       ) {
-        // App has come to the foreground, reload WebView by changing key
-        setKey(prevKey => prevKey + 1);
+        setKey((prevKey) => prevKey + 1);
       }
 
       appState.current = nextAppState;
@@ -106,18 +103,6 @@ const VideoPlayer = ({ videoId, bundleId = 'com.sparklight.app' }) => {  // ✅ 
     </html>
   `;
 
-  const handleWebViewLoad = () => {
-    // Additional handling if needed when WebView loads
-  };
-
-  // Force reload of WebView if needed
-  const reloadWebView = () => {
-    if (webViewRef.current) {
-      webViewRef.current.postMessage('reload');
-    }
-  };
-
-  // ✅ ADDED: Inject JavaScript to set Referer headers
   const injectedJavaScript = `
     (function() {
       const originalOpen = XMLHttpRequest.prototype.open;
@@ -147,26 +132,25 @@ const VideoPlayer = ({ videoId, bundleId = 'com.sparklight.app' }) => {  // ✅ 
         ref={webViewRef}
         style={styles.webView}
         accessibilityLabel="YouTube Video Player"
-        source={{ 
+        source={{
           html: generateHtml(),
-          baseUrl: `https://${bundleId}/`  // ✅ ADDED: Set base URL with bundle ID
+          baseUrl: `https://${bundleId}/`,
         }}
         allowsInlineMediaPlayback={true}
         mediaPlaybackRequiresUserAction={false}
         javaScriptEnabled={true}
         domStorageEnabled={true}
         mixedContentMode="always"
-        androidLayerType="hardware"  // ✅ CHANGED: from androidHardwareAccelerationDisabled
-        thirdPartyCookiesEnabled={true}  // ✅ ADDED: Enable third-party cookies
-        originWhitelist={['*']}
-        onLoad={handleWebViewLoad}
+        androidLayerType="hardware"
+        thirdPartyCookiesEnabled={true}
+        originWhitelist={["*"]}
         startInLoadingState={true}
         cacheEnabled={false}
-        onError={(error) => console.log('WebView error:', error)}
-        injectedJavaScript={injectedJavaScript}  // ✅ ADDED: Inject header script
-        {...(Platform.OS === 'ios' && {  // ✅ ADDED: iOS optimizations
+        onError={(error) => console.log("WebView error:", error)}
+        injectedJavaScript={injectedJavaScript}
+        {...(Platform.OS === "ios" && {
           allowsLinkPreview: false,
-          dataDetectorTypes: 'none',
+          dataDetectorTypes: "none",
         })}
       />
     </View>
@@ -176,12 +160,12 @@ const VideoPlayer = ({ videoId, bundleId = 'com.sparklight.app' }) => {  // ✅ 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#8D3B90', // Purple background to match brand
+    backgroundColor: "#8D3B90",
   },
   webView: {
     flex: 1,
     borderRadius: 8,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
 });
 
