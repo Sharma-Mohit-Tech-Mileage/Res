@@ -26,7 +26,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const [name, setTitle] = useState(route.params?.name);
     const [navStateReloading, setNavStateReloading] = useState(false);
     const [ isServiceDown, setIsServiceDown ] = useState(false);
-    const user = useSelector(state => state.combinedReducers.user.userData);
+    const user = useSelector(state => state.user.userData);
     const webViewRef = useRef();
     const [html, setHtml] = useState('');
     const [appState, setAppState] = useState(AppState.currentState);

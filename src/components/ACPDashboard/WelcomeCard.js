@@ -2,20 +2,19 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { FontFamily, FontSize, Color, Padding, Border } from '../../../GlobalStyles';
-import AccessibleYoutubePlayer from '../common/AccessibleYoutubePlayer';
+import VideoPlayer from '../utility/VideoPlayer';
 
 
 const WelcomeCard = () => {
-  // Example YouTube video ID - replace with your actual video ID
+  // YouTube video ID
   const videoId = 'C3cMQoWxv6I'; 
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>We're Excited to Connect with you!</Text>
       
-      {/* Direct YouTube video player without image or button */}
       <View style={styles.videoContainer}>
-        <AccessibleYoutubePlayer videoId={videoId} />
+        <VideoPlayer videoId={videoId} />
       </View>
     </View>
   );

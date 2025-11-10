@@ -1,9 +1,9 @@
 // components/common/AccessibleYoutubePlayer.js
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, AppState } from 'react-native';
+import { StyleSheet, View, AppState, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-const AccessibleYoutubePlayer = ({ videoId }) => {
+const AccessibleYoutubePlayer = ({ videoId, bundleId = 'com.sparklight.app' }) => {  // ✅ ADDED: bundleId prop
   const webViewRef = useRef(null);
   const [key, setKey] = useState(0);
   const appState = useRef(AppState.currentState);
@@ -32,6 +32,8 @@ const AccessibleYoutubePlayer = ({ videoId }) => {
     <html>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+        <meta name="referrer" content="strict-origin-when-cross-origin">
+        <base href="https://${bundleId}/">
         <style>
           /* Ensure iframe and body take full size */
           html, body {
@@ -93,10 +95,12 @@ const AccessibleYoutubePlayer = ({ videoId }) => {
         <div class="loader"></div>
         <div class="content">
           <iframe
-            src="https://www.youtube.com/embed/${videoId}?controls=1&modestbranding=1&rel=0&playsinline=1"
+            src="https://www.youtube-nocookie.com/embed/${videoId}?controls=1&modestbranding=1&rel=0&playsinline=1"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"
             onload="showContent()"
+            title="YouTube video player"
           ></iframe>
         </div>
       </body>
@@ -114,6 +118,29 @@ const AccessibleYoutubePlayer = ({ videoId }) => {
     }
   };
 
+  // ✅ ADDED: Inject JavaScript to set Referer headers
+  const injectedJavaScript = `
+    (function() {
+      const originalOpen = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function(method, url) {
+        originalOpen.apply(this, arguments);
+        if (url.includes('youtube')) {
+          this.setRequestHeader('Referer', 'https://${bundleId}/');
+        }
+      };
+      
+      const originalFetch = window.fetch;
+      window.fetch = function(url, options = {}) {
+        if (typeof url === 'string' && url.includes('youtube')) {
+          options.headers = options.headers || {};
+          options.headers['Referer'] = 'https://${bundleId}/';
+        }
+        return originalFetch(url, options);
+      };
+    })();
+    true;
+  `;
+
   return (
     <View style={styles.container}>
       <WebView
@@ -121,18 +148,27 @@ const AccessibleYoutubePlayer = ({ videoId }) => {
         ref={webViewRef}
         style={styles.webView}
         accessibilityLabel="YouTube Video Player"
-        source={{ html: generateHtml() }}
+        source={{ 
+          html: generateHtml(),
+          baseUrl: `https://${bundleId}/`  // ✅ ADDED: Set base URL with bundle ID
+        }}
         allowsInlineMediaPlayback={true}
         mediaPlaybackRequiresUserAction={false}
         javaScriptEnabled={true}
         domStorageEnabled={true}
         mixedContentMode="always"
-        androidHardwareAccelerationDisabled={false}
+        androidLayerType="hardware"  // ✅ CHANGED: from androidHardwareAccelerationDisabled
+        thirdPartyCookiesEnabled={true}  // ✅ ADDED: Enable third-party cookies
         originWhitelist={['*']}
         onLoad={handleWebViewLoad}
         startInLoadingState={true}
         cacheEnabled={false}
         onError={(error) => console.log('WebView error:', error)}
+        injectedJavaScript={injectedJavaScript}  // ✅ ADDED: Inject header script
+        {...(Platform.OS === 'ios' && {  // ✅ ADDED: iOS optimizations
+          allowsLinkPreview: false,
+          dataDetectorTypes: 'none',
+        })}
       />
     </View>
   );

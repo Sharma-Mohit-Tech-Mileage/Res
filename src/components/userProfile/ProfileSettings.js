@@ -30,13 +30,13 @@ const ProfileSettings = () => {
   const route = useRoute();
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {};
   const convertedRole = getUserType(profileDetails.memberType || "");
   const roleBasedInfo = getRoleBasedMessage(profileDetails.memberType || "");
 
   const userInfo = useSelector(
-    (state) => state.combinedReducers?.user?.userData?.userInfo
+    (state) => state.user.userData.userInfo
   );
 
   const showReconnectMessage = userInfo

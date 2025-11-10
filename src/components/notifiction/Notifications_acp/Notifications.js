@@ -20,14 +20,14 @@ const Notifications = () => {
   const [phoneNumber, setPhoneNumber] = useState(undefined);
 
   const accountDetails = useSelector(
-    (state) => state.combinedReducers.profile?.accountDetails
+    (state) => state.profile?.accountDetails
   );
   const paperlessStatusAcp = useSelector(
-    (state) => state.combinedReducers.profile?.paperlessStatusAcp
+    (state) => state.profile?.paperlessStatusAcp
   );
 
   const paperlessLoading = useSelector(
-    (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
+    (state) => state.profile?.isPaperLessStatusLoading
   );
   
   const profileData = useMemo(() => {

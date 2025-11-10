@@ -17,7 +17,7 @@ const PasswordSecurity = () => {
   const route = useRoute(); // Use the useRoute hook
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   useEffect(() => {
     if (route.params?.updateSuccess) {

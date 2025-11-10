@@ -6,7 +6,7 @@ import { FontFamily, Color } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
 import AutoPayIcon from "../../../res/svgIcons/AutoPayIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-import AppStyles from "../styles/AppStyles";
+import AppStyles from "../../utility/AppStyles";
 const AutoPayCard = ({
   isAutoPayStatus,
   paymentDetails,

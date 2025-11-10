@@ -4,16 +4,12 @@ import colors from "../../../res/Colors";
 import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
-import AppStyles from "../styles/AppStyles";
+import AppStyles from "../../utility/AppStyles";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
-const PeperLessCard = ({
-  paperlessStatus,
-  navigation,
-  isStatusLoading,
-}) => {
+const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
   const handleCardPress = () => {
-    if (!isStatusLoading){
+    if (!isStatusLoading) {
       navigation.navigate("account", { screen: "Notifications" });
     }
   };
@@ -25,8 +21,9 @@ const PeperLessCard = ({
       activeOpacity={0.8}
       accessible={true}
       accessibilityLabel={
-        (paperlessStatus ? "Paperless Billing is On. " : "Paperless Billing is Off. ") +
-        "Manage Paperless Billing"
+        (paperlessStatus
+          ? "Paperless Billing is On. "
+          : "Paperless Billing is Off. ") + "Manage Paperless Billing"
       }
       accessibilityRole="link"
     >
@@ -43,19 +40,18 @@ const PeperLessCard = ({
           <PaperIconBg />
         </View>
         <View style={{ flexDirection: "column" }}>
-          <Text 
-          style={styles.leftTitle}>Paperless Billing</Text>
+          <Text style={styles.leftTitle}>Paperless Billing</Text>
           {isStatusLoading ? (
             <SkeletonPlaceholder>
               <View
                 style={{
-                 width: wp("16%"),
-                    height: 25,
-                    marginLeft: 10,
-                    borderRadius: 4,
-                    paddingVertical: 4,
-                    paddingHorizontal: 8,
-                    marginTop: 5,
+                  width: wp("16%"),
+                  height: 25,
+                  marginLeft: 10,
+                  borderRadius: 4,
+                  paddingVertical: 4,
+                  paddingHorizontal: 8,
+                  marginTop: 5,
                 }}
               />
             </SkeletonPlaceholder>

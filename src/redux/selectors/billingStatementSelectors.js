@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 
 // Basic selectors
-const getBillingStatementState = state => state.combinedReducers.billingStatements;
+const getBillingStatementState = state => state.billingStatements;
 
 // Select all statements
 export const selectAllStatements = createSelector(

@@ -26,7 +26,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [loadStartTime, setLoadStartTime] = useState(0);
     const [forceWebViewRecreation, setForceWebViewRecreation] = useState(false);
     const [appBackgroundTime, setAppBackgroundTime] = useState(0);
-    const user = useSelector(state => state.combinedReducers.user.userData);
+    const user = useSelector(state => state.user.userData);
     const webViewRef = useRef();
 
     // FIXED: Simplified and more compatible script
