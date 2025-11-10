@@ -7,6 +7,7 @@ import {
   Animated,
   ScrollView,
   Platform,
+  AppState,
 } from "react-native";
 import {
   Color,
@@ -27,6 +28,7 @@ import { getUser } from "../../../redux/utils/LocalStorage";
 import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
 import { PostApiRequest } from "../../../network/APIClient";
 import LoadingOverlay from "../../common/customui/CustomLoading";
+import { useFocusEffect } from "@react-navigation/native";
 
 import {
   getFcmToken,
@@ -62,6 +64,7 @@ const InAppNotifications = ({ navigation }) => {
   const timeoutRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
+  const [isNotificationRquired, setIsNotificationRequired] = useState(false);
   const [notification, setNotification] = useState(null);
   const formatedData = route.params?.additionalData || {};
   const checkNotifData =
@@ -116,8 +119,10 @@ const InAppNotifications = ({ navigation }) => {
 
   useEffect(() => {
     if (isFocused) {
+     
       const initializedSettings = additionalData;
       setInitializeSettings(initializedSettings);
+      
     }
 
     return () => {
@@ -125,7 +130,22 @@ const InAppNotifications = ({ navigation }) => {
         setInitializeSettings({});
       }
     };
-  }, [isFocused, additionalData]);
+  }, [isFocused]);
+
+
+   // Handle app state changes
+    useEffect(() => {
+      const subscription = AppState.addEventListener("change", (nextAppState) => {
+        if (nextAppState === "active") {
+          initialNotificationStatus();
+        }
+      });
+  
+      return () => {
+        subscription.remove();
+      };
+    }, []);
+  
 
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
@@ -137,38 +157,47 @@ const InAppNotifications = ({ navigation }) => {
     //   };
     //   return updatedSettings;
     // });
-    const checkNofif = async () => {
-      if (
-        formatedData?.optOut ||
-        formatedData?.outageOptOut ||
-        formatedData?.billingOptOutStatus
-      ) {
-        if (!checkNotifData) {
-          const pushNotification = await getPushNotificationStatus();
-          if (pushNotification?.permanentSkip) {
-            await notifyPermission();
-          } else {
-            const enabledPermission = await requestUserPermission();
-            if (enabledPermission) {
-              const token = await getFcmToken();
-              console.log("FCM HOME WITH PERMISSION", token);
-              const localData = {
-                status: "accepted",
-                date: new Date(),
-              };
-              //storePushNotificationStatus(localData);
-              //await dispatch(updatePushNotifications(data, null));
-            } else {
-              console.log("FCM HOME DENIED");
-              await notifyPermission();
-            }
-          }
-        }else{
-          console.log("FCM HOME ALREADY ENABLED");
+
+    checkNofif(value);
+  };
+
+  const initialNotificationStatus = async () => {
+    const enabledPermission = await requestUserPermission();
+    console.log("FCM INITIAL ENABLED?", enabledPermission);
+    if (enabledPermission) {
+      setIsNotificationRequired(false);
+    } else {
+      setIsNotificationRequired(true);
+    }
+  };
+
+  const checkNofif = async (value) => {
+    if (value) {
+      const pushNotification = await getPushNotificationStatus();
+      if (pushNotification?.permanentSkip) {
+        await notifyPermission();
+      } else {
+        const enabledPermission = await requestUserPermission();
+        console.log("FCM HOME ENABLED?", enabledPermission);
+        if (enabledPermission) {
+          const token = await getFcmToken();
+          console.log("FCM HOME WITH PERMISSION", token);
+          const localData = {
+            status: "accepted",
+            date: new Date(),
+          };
+          setIsNotificationRequired(false);
+          //storePushNotificationStatus(localData);
+          //await dispatch(updatePushNotifications(data, null));
+        } else {
+          setIsNotificationRequired(true);
+          console.log("FCM HOME DENIED");
+          await notifyPermission();
         }
       }
-    };
-    checkNofif();
+    } else {
+      console.log("FCM HOME ALREADY ENABLED");
+    }
   };
 
   useEffect(() => {
@@ -191,19 +220,24 @@ const InAppNotifications = ({ navigation }) => {
   }, [route.params]);
 
   const handleSave = async () => {
-    const token = await getFcmToken();
-    formatedData.deviceToken = token;
-    formatedData.deviceTokenTimestamp = moment().format();
-    formatedData.isAndroid = Platform.OS === "android";
-    const request = {
-      optOut: formatedData.optOut,
-      outageOptOut: formatedData.outageOptOut,
-      billingOptOutStatus: formatedData.billingOptOutStatus,
-      deviceToken: formatedData.deviceToken,
-      deviceTokenTimestamp: formatedData.deviceTokenTimestamp,
-      isAndroid: formatedData.isAndroid,
-    };
-    await postRequestInAppNotification(request);
+    console.log("isNotificationRquired", isNotificationRquired);
+    if (!isNotificationRquired) {
+      const token = await getFcmToken();
+      formatedData.deviceToken = token;
+      formatedData.deviceTokenTimestamp = moment().format();
+      formatedData.isAndroid = Platform.OS === "android";
+      const request = {
+        optOut: formatedData.optOut,
+        outageOptOut: formatedData.outageOptOut,
+        billingOptOutStatus: formatedData.billingOptOutStatus,
+        deviceToken: formatedData.deviceToken,
+        deviceTokenTimestamp: formatedData.deviceTokenTimestamp,
+        isAndroid: formatedData.isAndroid,
+      };
+      await postRequestInAppNotification(request);
+    } else {
+      checkNofif(true);
+    }
   };
 
   const postRequestInAppNotification = async (data) => {
