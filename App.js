@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AppState, Text } from "react-native";
+import { AppState, Text,Appearance } from "react-native";
 import UserNavigations from "./src/navigations/UserNavigations";
 import { Provider } from "react-redux";
 import store from "./src/redux/configureStore.js";
@@ -24,6 +24,7 @@ const App = () => {
       await analytics().setAnalyticsCollectionEnabled(!__DEV__ && !ISUAT);
     };
     enableAnalytics();
+    Appearance.setColorScheme('light');
   }, []);
 
   useEffect(() => {
