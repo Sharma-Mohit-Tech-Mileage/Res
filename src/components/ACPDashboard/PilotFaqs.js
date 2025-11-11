@@ -39,12 +39,12 @@ const PilotFaqs = ({ navigation }) => {
           styles.title,
           {
             fontSize: 16,
-            fontFamily: FontFamily.openSansRegular,
+            fontFamily: FontFamily.openSansSemiBold,
             marginBottom: 24,
-            fontWeight: "600",
+            fontWeight: "500",
             color: Color.sparklightBrightPurple,
             textDecorationLine: "underline",
-            lineHeight: 18,
+            
           },
         ]}
         onPress={() => {
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansSemiBold,
     fontSize: 20,
     color: Color.sparklightBrightPurple,
-    fontWeight: "600",
+    fontWeight: "500",
     marginHorizontal: 24,
     marginTop: 5,
   },

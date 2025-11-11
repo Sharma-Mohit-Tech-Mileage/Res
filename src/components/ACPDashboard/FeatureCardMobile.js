@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_5xl,
+    fontSize: 20,
     color: Color.sparklightBrightPurple,
     fontWeight: "700",
     margin: 24,
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
   featureText: {
     fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_lg,
+    fontSize: FontSize.size_base,
     color: Color.sparklightGray1,
     fontWeight: "400",
   },
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_lg,
+    fontSize: FontSize.size_base,
     fontWeight: "700",
   },
   buttonTextPrimary: {

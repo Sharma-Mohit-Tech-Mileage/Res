@@ -43,11 +43,11 @@ const MobilePromo = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     title: {
-        fontFamily: FontFamily.openSansSemiBold,
-        fontSize: FontSize.size_5xl,
+        fontFamily: FontFamily.openSansRegular,
+        fontSize: FontSize.size_base,
         color: Color.colorGray_200,
         marginBottom: Padding.p_5xl,
-        fontWeight: "700",
+        fontWeight: "400",
     },
     imageContainer: {
         alignSelf: "center",
