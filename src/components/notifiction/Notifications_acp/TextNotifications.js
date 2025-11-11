@@ -38,7 +38,7 @@ import {
 import Toggle from "../../common/Toggle";
 import AlertIcon from "../../../../assets/svgs/Alerttriangle";
 import { widthPercentageToDP } from "react-native-responsive-screen";
-import AppStyles from "../../../components/common/styles/AppStyles";
+import AppStyles from "../../utility/AppStyles";
 
 // Define your validation schema
 const validationSchema = yup.object().shape({

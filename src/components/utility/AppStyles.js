@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Color, FontFamily,FontSize } from '../../../../GlobalStyles';
+import { Color, FontFamily,FontSize } from '../../../GlobalStyles';
 
 const AppStyles = StyleSheet.create({
     container: {

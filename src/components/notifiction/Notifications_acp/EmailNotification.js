@@ -19,7 +19,7 @@ import { getPrimaryEmail } from "../../utility/constant";
 import AlertIcon from "../../../res/svgIcons/AlertIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-import AppStyles from "../../../components/common/styles/AppStyles";
+import AppStyles from "../../utility/AppStyles";
 
 const validationSchema = yup.object().shape({
   email: yup

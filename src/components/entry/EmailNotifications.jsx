@@ -22,7 +22,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch } from "react-redux";
 import { addPrimaryEmailRequest } from "../../redux/actions/NotificationActionSuite";
-import AppStyles from "../common/styles/AppStyles";
+import AppStyles from "../utility/AppStyles";
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 const validationSchema = yup.object().shape({

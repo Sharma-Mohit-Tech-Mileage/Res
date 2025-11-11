@@ -28,7 +28,6 @@ import { getUser } from "../../../redux/utils/LocalStorage";
 import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
 import { PostApiRequest } from "../../../network/APIClient";
 import LoadingOverlay from "../../common/customui/CustomLoading";
-import { useFocusEffect } from "@react-navigation/native";
 
 import {
   getFcmToken,

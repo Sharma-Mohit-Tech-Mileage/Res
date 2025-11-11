@@ -15,7 +15,7 @@ import { GetApiRequest} from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import { securitySchema } from '../utility/validationSchema'; // Update the path as necessary
 import colors from "../../res/Colors";
-import AppStyles from "../common/styles/AppStyles";
+import AppStyles from  "../utility/AppStyles";
 const announceForAccessibility = (message) => {
   AccessibilityInfo.announceForAccessibility(message);
 };

@@ -27,7 +27,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateTextNotification } from "../../redux/actions/ProfileActionSuite";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import NavigationUtils from "./NavigationUtils";
-import AppStyles from "../common/styles/AppStyles";
+import AppStyles from "../utility/AppStyles";
 const validationSchema = yup.object().shape({
   phoneNumber: yup
     .string()

@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
-import WalkthroughOverlay from "../common/WalkthroughOverlay";
+import WalkthroughOverlay from "../walkthrough/WalkthroughOverlay";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
@@ -56,18 +56,18 @@ const NewBillerHome = ({ navigation }) => {
   });
 
   // Redux selectors
-  const user = useSelector((state) => state.combinedReducers.user.userData);
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
-  const home = useSelector((state) => state.combinedReducers.home);
+  //const user = useSelector((state) => state.combinedReducers.user.userData);
+  //const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const home = useSelector((state) => state.combinedReducers?.home);
   const accountDetails = useSelector(
-    (state) => state.combinedReducers.profile?.accountDetails
+    (state) => state.combinedReducers?.profile?.accountDetails
   );
   const dispatch = useDispatch();
   const paperlessStatusAcp = useSelector(
-    (state) => state.combinedReducers.profile?.paperlessStatusAcp
+    (state) => state.combinedReducers?.profile?.paperlessStatusAcp
   );
   const paperlessLoading = useSelector(
-    (state) => state.combinedReducers.profile?.isPaperLessStatusLoading
+    (state) => state.combinedReducers?.profile?.isPaperLessStatusLoading
   );
   const userInfo = useSelector(
     (state) => state.combinedReducers?.user?.userData?.userInfo
@@ -141,10 +141,10 @@ const NewBillerHome = ({ navigation }) => {
   );
 
   useEffect(() => {
-    if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
+    if (home?.walkThroughStep !== null && home?.walkThroughStep !== undefined) {
       setShowWalkThrough(true);
     }
-  }, [home.walkThroughStep]);
+  }, [home?.walkThroughStep]);
 
   useEffect(() => {
     if (isNotificationEnable) {
