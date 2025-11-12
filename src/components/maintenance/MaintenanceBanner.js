@@ -119,7 +119,9 @@ const MaintenanceBanner = ({
           )}
         </View>
 
-        {onDismiss && (
+        
+      </View>
+      {onDismiss && (
           <TouchableOpacity
             style={styles.closeButtonContainer}
             onPress={onDismiss}
@@ -131,7 +133,6 @@ const MaintenanceBanner = ({
             <CloseIcon color="#0060AE" />
           </TouchableOpacity>
         )}
-      </View>
     </View>
   );
 };
@@ -169,6 +170,11 @@ const styles = StyleSheet.create({
   closeButtonContainer: {
     alignContent: "center",
     justifyContent: "center",
+    position: "absolute",
+    bottom: 8,
+    right: 8,
+    width: 24,
+    height: 24,
   },
   alertTitle: {
     color: "#000",

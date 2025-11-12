@@ -27,7 +27,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateTextNotification } from "../../redux/actions/ProfileActionSuite";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import NavigationUtils from "./NavigationUtils";
-import AppStyles from "../utility/AppStyles"
+import AppStyles from "../utility/AppStyles";
 const validationSchema = yup.object().shape({
   phoneNumber: yup
     .string()
@@ -155,7 +155,11 @@ const TextNotifications = ({ navigation }) => {
                   from Sparklight.
                 </Text>
               </View>
-              <Text style={AppStyles.requiredField}>
+              <Text style={AppStyles.requiredField}
+                  accessibilityRole="text"
+                  accessible={true}
+                  accessibilityLabel="Required fields information. Fields marked with asterisk are required."
+                >
               {" "}
               Fields marked with * are required.
             </Text>
@@ -164,7 +168,7 @@ const TextNotifications = ({ navigation }) => {
               style={[styles.subInput, { width: "85%" }]}
               onLayout={(event) => {}}
             >
-              <Text style={styles.fieldLabel}>Mobile Number*</Text>
+              <Text style={styles.fieldLabel}>Mobile Number *</Text>
               <Controller
                 control={control}
                 name="phoneNumber"

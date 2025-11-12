@@ -140,7 +140,12 @@ const EmailNotifications = ({ navigation }) => {
                   from Sparklight.
                 </Text>
 
-                <Text style={AppStyles.requiredField}>
+                <Text
+                  style={AppStyles.requiredField}
+                  accessibilityRole="text"
+                  accessible={true}
+                  accessibilityLabel="Required fields information. Fields marked with asterisk are required."
+                >
                   {" "}
                   Fields marked with * are required.
                 </Text>
@@ -155,7 +160,7 @@ const EmailNotifications = ({ navigation }) => {
                 accessibilityRole="none"
                 accessibilityLabel="Email address input section"
               >
-                <Text style={styles.fieldLabel}>Email Address*</Text>
+                <Text style={styles.fieldLabel}>Email Address *</Text>
                 <Controller
                   control={control}
                   name="email"

@@ -722,8 +722,12 @@ const addSVEmailMktFlag = async (email) => {
 };
 
 const fetchACPUserAccountDetails = async (signal) => {
+  console.log("[DEBUG] fetchACPUserAccountDetails called, signal:", !!signal); // <--- debug entry log
+
   let user = await getUser();
   const accountNumber = user.userInfo?.accountNumber || null;
+
+  console.log("[DEBUG] accountNumber:", accountNumber); // verify user/account present
 
   const config = {
     headers: {
@@ -747,6 +751,7 @@ const fetchACPUserAccountDetails = async (signal) => {
   };
 
   try {
+    console.log("[DEBUG] calling _axios.post", requestUrl, data);
     const response = await _axios.post(requestUrl, data, config);
     console.log("API Call Successful:", response.data);
     return response.data;

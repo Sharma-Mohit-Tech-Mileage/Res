@@ -3,7 +3,7 @@ import Svg, { Path } from 'react-native-svg';
 
 const InfoIcon = ({ 
   size = 18, 
-  color = '#8D3B90',
+  color = '#0060AE',
   strokeWidth = 2,
   ...props 
 }) => (

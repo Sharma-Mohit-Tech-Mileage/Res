@@ -107,6 +107,7 @@ const Support = ({ route }) => {
               },
               {
                 text: "Open Settings",
+                style: 'cancel',
                 onPress: () => {
                   Linking.openSettings();
                 },

@@ -209,7 +209,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     // User validation
     useEffect(() => {
         if (!user?.token) {
-            console.log('No user token found');
             Alert.alert(
                 'Authentication Required',
                 'Please log in to continue.',

@@ -352,7 +352,10 @@ const TextNotifications = ({ navigation }) => {
               <Text style={[styles.mobilePhoneTypo]}>{message}</Text>
 
               <Text
-               style={AppStyles.requiredField}>
+               style={AppStyles.requiredField} 
+                  accessibilityRole="text"  
+                  accessible={true}
+                  accessibilityLabel="Required fields information. Fields marked with asterisk are required.">
                 {" "}
                 Fields marked with * are required.
               </Text>
@@ -372,7 +375,7 @@ const TextNotifications = ({ navigation }) => {
                     render={({ field: { onChange, onBlur, value } }) => (
                       <SparkLightInput
                         placeholder="Mobile Number"
-                        label={"Mobile Number*"}
+                        label={"Mobile Number *"}
                         onBlur={onBlur}
                         onChangeText={onChange}
                         keyboardType="number-pad"
