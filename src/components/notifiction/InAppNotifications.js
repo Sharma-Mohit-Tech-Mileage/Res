@@ -1,25 +1,25 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { StyleSheet, Text, Pressable, View, Animated, ScrollView, Platform, } from "react-native";
-import { Color, FontSize, FontFamily, Padding, Border, } from "../../../../GlobalStyles";
+import { Color, FontSize, FontFamily, Padding, Border, } from "../../../GlobalStyles";
 import * as yup from "yup";
-import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
+import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { widthPercentageToDP } from "react-native-responsive-screen";
-import NotificationAlert from "../../common/customui/NotificationAlert";
+import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
-import Toggle from "../../common/Toggle";
-import { getUser } from "../../../redux/utils/LocalStorage";
-import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
-import { PostApiRequest } from "../../../network/APIClient";
-import LoadingOverlay from "../../common/customui/CustomLoading";
+import Toggle from "../common/Toggle";
+import { getUser } from "../../redux/utils/LocalStorage";
+import { getDeviceUniqueId } from "../../firebase/FirebaseUtils";
+import { PostApiRequest } from "../../network/APIClient";
+import LoadingOverlay from "../common/customui/CustomLoading";
 
 import {
   getFcmToken,
   notifyPermission,
   requestUserPermission,
-} from "../../../firebase/FirebaseUtils";
-import { getPushNotificationStatus } from "../../../redux/utils/LocalStorage";
+} from "../../firebase/FirebaseUtils";
+import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
 
 // Define your validation schema
 const validationSchema = yup.object().shape({

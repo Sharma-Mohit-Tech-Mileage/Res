@@ -1,23 +1,23 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { StyleSheet, Text, View, ScrollView, Animated, Platform, TouchableOpacity, AccessibilityInfo, } from "react-native";
-import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
+import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import CheckBox from "@react-native-community/checkbox";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Toggle from "../../common/Toggle";
-import SparkLightInput from "../../common/customui/SparkLightInput";
+import Toggle from "../common/Toggle";
+import SparkLightInput from "../common/customui/SparkLightInput";
 import { useDispatch, useSelector } from "react-redux";
-import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
-import NotificationAlert from "../../common/customui/NotificationAlert";
-import SecondaryButton from "../../common/customui/PrimaryButton";
-import LoadingOverlay from "../../common/customui/CustomLoading";
-import { updatePrimaryAndPaperlessRequest } from "../../../redux/actions/NotificationActionSuite";
-import { fetchACPUserAccountDetails } from "../../../redux/actions/ProfileActionSuite";
-import { getPrimaryEmail } from "../../utility/constant";
-import AlertIcon from "../../../res/svgIcons/AlertIcon";
-import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
+import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import NotificationAlert from "../common/customui/NotificationAlert";
+import SecondaryButton from "../common/customui/PrimaryButton";
+import LoadingOverlay from "../common/customui/CustomLoading";
+import { updatePrimaryAndPaperlessRequest } from "../../redux/actions/NotificationActionSuite";
+import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
+import { getPrimaryEmail } from "../utility/constant";
+import AlertIcon from "../../res/svgIcons/AlertIcon";
+import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 const validationSchema = yup.object().shape({

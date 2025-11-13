@@ -14,6 +14,8 @@ import { AlertUtils } from "../utility/AlertUtils";
 import { Env } from "../../network/apis/account/Constants";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
 import MenuGrid from "../ACPDashboard/MenuGrid";
+import { useFeatureFlag } from '../../contexts/Featureflagscontext';
+import FeatureFlags from '../../config/Featureflags';
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
@@ -36,6 +38,9 @@ const NewBillerHome = ({ navigation }) => {
   const [isNotificationEnable, setIsNotificationEnable] = useState(false);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [loadingAutoPay, setloadingAutoPay] = useState(false);
+  const showSparklightMobile = useFeatureFlag(
+    FeatureFlags.DASHBOARD_SPARKLIGHT_MOBILE_SECTION
+  );
   const { showBanner, bannerConfig, dismissBanner } = useMaintenance();
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
@@ -50,7 +55,7 @@ const NewBillerHome = ({ navigation }) => {
   });
   const accountDetails = useSelector((state) => state.profile?.accountDetails);
   const home = useSelector((state) => state.home);
-  const isWalkthroughActive = 
+  const isWalkthroughActive =
     home.walkThroughStep !== null && home.walkThroughStep !== undefined;
   const dispatch = useDispatch();
   const paperlessStatusAcp = useSelector(
@@ -232,10 +237,12 @@ const NewBillerHome = ({ navigation }) => {
           <WelcomeCard />
         )}
         {/* <MenuGrid /> */}
-        <PromoBanner
-          title="Sign up for Auto Pay and Paperless Billing to start saving"
-          showBonus={true}
-        />
+        {showSparklightMobile && (
+          <PromoBanner
+            title="Sign up for Auto Pay and Paperless Billing to start saving"
+            showBonus={true}
+          />
+        )}
         <FeatureCard
           title="Auto Pay"
           isLoading={loadingAutoPay}
@@ -273,57 +280,61 @@ const NewBillerHome = ({ navigation }) => {
   );
 
   return (
-  <LinearGradient
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 0 }}
-    colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
-    style={styles.container}
-  >
-    <View style={{ flex: 1 }}>
-      <SafeAreaView 
-        style={{ flex: 1 }}
-        importantForAccessibility={isWalkthroughActive ? "no-hide-descendants" : "auto"}
-        accessibilityElementsHidden={isWalkthroughActive}
-      >
-        <View 
-          accessibilityLabel="SparkLight" 
-          style={styles.headerContainer}
-          importantForAccessibility={isWalkthroughActive ? "no-hide-descendants" : "auto"}
-        accessibilityElementsHidden={isWalkthroughActive}
+    <LinearGradient
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 0 }}
+      colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+      style={styles.container}
+    >
+      <View style={{ flex: 1 }}>
+        <SafeAreaView
+          style={{ flex: 1 }}
+          importantForAccessibility={
+            isWalkthroughActive ? "no-hide-descendants" : "auto"
+          }
+          accessibilityElementsHidden={isWalkthroughActive}
         >
-          <Logo width={120} height={33.32} />
-        </View>
-        <ScrollView 
-          style={styles.scrollContainer}
-        >
-          <View 
-            style={styles.mainContentContainer}
-            importantForAccessibility={isWalkthroughActive ? "no-hide-descendants" : "auto"}
+          <View
+            accessibilityLabel="SparkLight"
+            style={styles.headerContainer}
+            importantForAccessibility={
+              isWalkthroughActive ? "no-hide-descendants" : "auto"
+            }
             accessibilityElementsHidden={isWalkthroughActive}
           >
-            {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
-            {isOutageAlert && renderOutageAlert()}
-            {showBanner && bannerConfig && (
-              <MaintenanceBanner
-                title={bannerConfig.title}
-                message={bannerConfig.message}
-                link={bannerConfig.link}
-                linkText={bannerConfig.linkText}
-                showPhoneNumber={bannerConfig.showPhoneNumber}
-                phoneNumber={bannerConfig.phoneNumber}
-                onDismiss={
-                  bannerConfig.dismissible ? dismissBanner : undefined
-                }
-                severity={bannerConfig.severity || "info"}
-              />
-            )}
-            {renderWelcomeCard()}
+            <Logo width={120} height={33.32} />
           </View>
-        </ScrollView>
-      </SafeAreaView>
-    </View>
-  </LinearGradient>
-);
+          <ScrollView style={styles.scrollContainer}>
+            <View
+              style={styles.mainContentContainer}
+              importantForAccessibility={
+                isWalkthroughActive ? "no-hide-descendants" : "auto"
+              }
+              accessibilityElementsHidden={isWalkthroughActive}
+            >
+              {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
+              {isOutageAlert && renderOutageAlert()}
+              {showBanner && bannerConfig && (
+                <MaintenanceBanner
+                  title={bannerConfig.title}
+                  message={bannerConfig.message}
+                  link={bannerConfig.link}
+                  linkText={bannerConfig.linkText}
+                  showPhoneNumber={bannerConfig.showPhoneNumber}
+                  phoneNumber={bannerConfig.phoneNumber}
+                  onDismiss={
+                    bannerConfig.dismissible ? dismissBanner : undefined
+                  }
+                  severity={bannerConfig.severity || "info"}
+                />
+              )}
+              {renderWelcomeCard()}
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </View>
+    </LinearGradient>
+  );
 };
 
 const styles = StyleSheet.create({

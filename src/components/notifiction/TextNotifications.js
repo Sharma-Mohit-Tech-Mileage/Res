@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
-  Image,
   Animated,
   StyleSheet,
   Text,
@@ -9,7 +8,6 @@ import {
   Keyboard,
   ScrollView,
   TouchableOpacity,
-  AccessibilityInfo,
   Platform
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
@@ -18,14 +16,12 @@ import CheckBox from "@react-native-community/checkbox";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRoute } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
-import { updateTextNotification } from "../../../redux/actions/ProfileActionSuite";
-import SparkLightInput from "../../common/customui/SparkLightInput";
-import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
-import NotificationAlert from "../../common/customui/NotificationAlert";
-import { getUser } from "../../../redux/utils/LocalStorage";
-import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
-import LoadingOverlay from "../../common/customui/CustomLoading";
-import { PostApiRequest } from "../../../network/APIClient";
+import SparkLightInput from "../common/customui/SparkLightInput";
+import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import NotificationAlert from "../common/customui/NotificationAlert";
+import { getUser } from "../../redux/utils/LocalStorage";
+import LoadingOverlay from "../common/customui/CustomLoading";
+import { PostApiRequest } from "../../network/APIClient";
 
 import {
   Color,
@@ -33,10 +29,10 @@ import {
   FontSize,
   Padding,
   Border,
-} from "../../../../GlobalStyles";
+} from "../../../GlobalStyles";
 
-import Toggle from "../../common/Toggle";
-import AlertIcon from "../../../../assets/svgs/Alerttriangle";
+import Toggle from "../common/Toggle";
+import AlertIcon from "../../../assets/svgs/Alerttriangle";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 
 // Define your validation schema
@@ -54,7 +50,6 @@ const validationSchema = yup.object().shape({
 });
 const TextNotifications = ({ navigation }) => {
   const scrollViewRef = useRef(null);
-  const [isScreenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
   const route = useRoute();
   const dispatch = useDispatch();
   const animatedValue = useRef(new Animated.Value(-100)).current;

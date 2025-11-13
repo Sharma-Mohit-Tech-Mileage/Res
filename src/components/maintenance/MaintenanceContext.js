@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import remoteConfig from "@react-native-firebase/remote-config";
-import { AppState } from "react-native";
+import RemoteConfigManager from "../../config/Remoteconfigmanager";
 import { useSelector, useDispatch } from "react-redux";
 import { saveUserInfo } from "../../redux/actions/UserAction";
 import {
@@ -11,7 +10,7 @@ import {
   getUser,
 } from "../../redux/utils/LocalStorage";
 import { logout } from "react-native-app-auth";
-import { Env, ISUAT } from "../../network/apis/account/Constants";
+import { Env } from "../../network/apis/account/Constants";
 import { navigationRef } from "../../navigations/UserNavigations";
 
 const config = {
@@ -21,25 +20,6 @@ const config = {
     "com.sparklight.customer.app.auth0://sparklight-customer.us.auth0.com/ios/com.sparklight.customer.app/callback",
   scopes: ["openid", "profile", "email", "phone", "address"],
   iosPrefersEphemeralSession: true,
-};
-
-// Environment-based Firebase configuration keys
-const FIREBASE_CONFIG_KEYS = {
-  PRODUCTION: "maintenance_configuration",
-  UAT: "dev_config",
-};
-
-// Get the appropriate config key based on environment
-const getFirebaseConfigKey = () => {
-  const configKey = ISUAT
-    ? FIREBASE_CONFIG_KEYS.UAT
-    : FIREBASE_CONFIG_KEYS.PRODUCTION;
-  console.log("Environment-based config:", {
-    isUAT: ISUAT,
-    environment: ISUAT ? "UAT/DEV" : "PRODUCTION",
-    configKey: configKey,
-  });
-  return configKey;
 };
 
 export const MaintenanceContext = createContext();
@@ -101,6 +81,7 @@ export const MaintenanceProvider = ({ children }) => {
       return { isLoggedIn: false, userData: null };
     }
   };
+
   const performImmediateBlockingCheck = (userAudience) => {
     const { pageConfig } = maintenanceConfig;
 
@@ -157,24 +138,35 @@ export const MaintenanceProvider = ({ children }) => {
     }
   };
 
-  // Handle app state changes
+  // Initial setup - Subscribe to RemoteConfigManager
   useEffect(() => {
-    const subscription = AppState.addEventListener("change", (nextAppState) => {
-      if (nextAppState === "active") {
-        fetchMaintenanceConfig();
-        checkLoginStatus();
-      }
+    // Get initial config
+    const initialConfig = RemoteConfigManager.getMaintenanceConfig();
+    setMaintenanceConfig({
+      maintenanceWindow: initialConfig.maintenanceWindow,
+      bannerConfig: initialConfig.maintenanceBanner,
+      pageConfig: initialConfig.maintenancePage,
+      sessionConfig: initialConfig.sessionManagement,
     });
 
-    return () => {
-      subscription.remove();
-    };
-  }, []);
+    // Subscribe to config changes
+    const unsubscribe = RemoteConfigManager.subscribeToMaintenance(
+      (newConfig) => {
+        console.log("[Maintenance] Config updated from RemoteConfigManager");
+        setMaintenanceConfig({
+          maintenanceWindow: newConfig.maintenanceWindow,
+          bannerConfig: newConfig.maintenanceBanner,
+          pageConfig: newConfig.maintenancePage,
+          sessionConfig: newConfig.sessionManagement,
+        });
+      }
+    );
 
-  // Initial setup
-  useEffect(() => {
-    fetchMaintenanceConfig();
     checkLoginStatus();
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -231,56 +223,6 @@ export const MaintenanceProvider = ({ children }) => {
     handleSessionInvalidation();
   }, [maintenanceConfig.sessionConfig, isUserLoggedIn, currentUserAudience]);
 
-  const fetchMaintenanceConfig = async () => {
-    try {
-      const configKey = getFirebaseConfigKey();
-
-      await remoteConfig().setConfigSettings({
-        minimumFetchIntervalMillis: 0,
-      });
-
-      const defaultConfig = {
-        maintenanceWindow: {
-          mode: "IMMEDIATE",
-          enabled: false,
-        },
-        maintenanceBanner: { enabled: false },
-        maintenancePage: { enabled: false },
-        sessionManagement: {
-          invalidateSessionsForAudience: "NONE",
-          redirectToSplash: false,
-        },
-      };
-
-      await remoteConfig().setDefaults({
-        [configKey]: JSON.stringify(defaultConfig),
-      });
-
-      await remoteConfig().fetch(0);
-      const activated = await remoteConfig().activate();
-
-      const configString = remoteConfig().getValue(configKey).asString();
-
-      const parsedConfig = JSON.parse(configString);
-
-      let finalConfig;
-      if (parsedConfig.maintenance_configuration) {
-        finalConfig = parsedConfig.maintenance_configuration;
-      } else {
-        finalConfig = parsedConfig;
-      }
-
-      setMaintenanceConfig({
-        maintenanceWindow: finalConfig.maintenanceWindow,
-        bannerConfig: finalConfig.maintenanceBanner,
-        pageConfig: finalConfig.maintenancePage,
-        sessionConfig: finalConfig.sessionManagement,
-      });
-    } catch (error) {
-      console.error("Error fetching config:", error);
-    }
-  };
-
   const determineMaintenanceState = () => {
     const { maintenanceWindow, bannerConfig, pageConfig, sessionConfig } =
       maintenanceConfig;
@@ -313,7 +255,6 @@ export const MaintenanceProvider = ({ children }) => {
                 mode: "SCHEDULED",
                 reason: "Invalid date format - not a valid ISO 8601 string",
               };
-
 
               console.warn(
                 "MAINTENANCE CONFIG ERROR: Invalid times - falling back to DISABLED",
@@ -552,7 +493,7 @@ export const MaintenanceProvider = ({ children }) => {
         bannerConfig: maintenanceConfig.bannerConfig,
         pageConfig: maintenanceConfig.pageConfig,
         dismissBanner,
-        refreshConfig: fetchMaintenanceConfig,
+        refreshConfig: () => RemoteConfigManager.refresh(),
         clearBlockingState,
         isUserLoggedIn,
         currentUserAudience,
