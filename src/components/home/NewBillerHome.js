@@ -14,8 +14,6 @@ import { AlertUtils } from "../utility/AlertUtils";
 import { Env } from "../../network/apis/account/Constants";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
 import MenuGrid from "../ACPDashboard/MenuGrid";
-import { useFeatureFlag } from '../../contexts/Featureflagscontext';
-import FeatureFlags from '../../config/Featureflags';
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
@@ -38,9 +36,6 @@ const NewBillerHome = ({ navigation }) => {
   const [isNotificationEnable, setIsNotificationEnable] = useState(false);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [loadingAutoPay, setloadingAutoPay] = useState(false);
-  const showSparklightMobile = useFeatureFlag(
-    FeatureFlags.DASHBOARD_SPARKLIGHT_MOBILE_SECTION
-  );
   const { showBanner, bannerConfig, dismissBanner } = useMaintenance();
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
@@ -237,12 +232,10 @@ const NewBillerHome = ({ navigation }) => {
           <WelcomeCard />
         )}
         {/* <MenuGrid /> */}
-        {showSparklightMobile && (
-          <PromoBanner
-            title="Sign up for Auto Pay and Paperless Billing to start saving"
-            showBonus={true}
-          />
-        )}
+        <PromoBanner
+          title="Sign up and save with Auto Pay and Paperless Billing"
+          showBonus={true}
+        />
         <FeatureCard
           title="Auto Pay"
           isLoading={loadingAutoPay}
