@@ -6,10 +6,10 @@ import {
   FontSize,
   FontFamily,
   Border,
-} from "../../../../GlobalStyles";
-import InfoICon from "../../../../assets/svgs/InfoIcon";
+} from "../../../GlobalStyles";
+import InfoICon from "../../../assets/svgs/InfoIcon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
+import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 
 const digitToWord = {
   0: "zero",

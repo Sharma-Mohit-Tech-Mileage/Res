@@ -13,6 +13,8 @@ import analytics from "@react-native-firebase/analytics";
 import { ISUAT } from "./src/network/apis/account/Constants";
 import { MaintenanceProvider } from "./src/components/maintenance/MaintenanceContext";
 import { GlobalErrorModal } from "./src/components/common/GlobalErrorModal";
+import RemoteConfigManager from "./src/config/Remoteconfigmanager";
+import { FeatureFlagsProvider } from "./src/contexts/Featureflagscontext";
 Text.defaultProps = { ...Text.defaultProps, maxFontSizeMultiplier: 1.25 };
 
 const App = () => {
@@ -44,6 +46,7 @@ const App = () => {
   useEffect(() => {
     async function init() {
       await initializeApp();
+      await RemoteConfigManager.initialize();
     }
     init();
   }, []);
@@ -100,14 +103,16 @@ const App = () => {
               analytics().logEvent(eventName, eventData),
           }}
         >
-          <MaintenanceProvider>
-            <UserNavigations />
-            <AppUpdateAlert
-              visible={majorUpdateVisible}
-              onClose={() => setMajorUpdateVisible(false)}
-            />
-            <GlobalErrorModal />
-          </MaintenanceProvider>
+          <FeatureFlagsProvider>
+            <MaintenanceProvider>
+              <UserNavigations />
+              <AppUpdateAlert
+                visible={majorUpdateVisible}
+                onClose={() => setMajorUpdateVisible(false)}
+              />
+              <GlobalErrorModal />
+            </MaintenanceProvider>
+          </FeatureFlagsProvider>
         </AnalyticsContext.Provider>
       </NativeBaseProvider>
     </Provider>

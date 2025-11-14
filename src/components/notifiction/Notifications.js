@@ -3,25 +3,23 @@ import { View, ScrollView, StyleSheet } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import NotificationSection from "./NotificationSection";
-import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
-import { getUser } from "../../..//redux/utils/LocalStorage";
-import { Color, Padding } from "../../../../GlobalStyles";
-import { getPrimaryEmail } from "../../utility/constant";
-import { GetApiRequest } from "../../../network/APIClient";
-import { fetchACPUserAccountDetails, } from "../../../redux/actions/ProfileActionSuite";
-
+import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import { getUser } from "../../redux/utils/LocalStorage";
+import { Color, Padding } from "../../../GlobalStyles";
+import { getPrimaryEmail } from "../utility/constant";
+import { GetApiRequest } from "../../network/APIClient";
+import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 
 const Notifications = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  
+
   const [textNotificationLoading, setTextNotificationLoading] = useState(false);
-  const [inAppNotificationLoading, setInAppNotificationLoading] = useState(false);
+  const [inAppNotificationLoading, setInAppNotificationLoading] =
+    useState(false);
   const [phoneNumber, setPhoneNumber] = useState(undefined);
 
-  const accountDetails = useSelector(
-    (state) => state.profile?.accountDetails
-  );
+  const accountDetails = useSelector((state) => state.profile?.accountDetails);
   const paperlessStatusAcp = useSelector(
     (state) => state.profile?.paperlessStatusAcp
   );
@@ -29,7 +27,7 @@ const Notifications = () => {
   const paperlessLoading = useSelector(
     (state) => state.profile?.isPaperLessStatusLoading
   );
-  
+
   const profileData = useMemo(() => {
     return accountDetails
       ? {
@@ -105,8 +103,9 @@ const Notifications = () => {
         title: "Text Notifications",
         isComingSoon: false,
         settings: TextNotifSettings,
-        infoMessage: phoneNumber ? `Text alert are sent to ${phoneNumber}`
-        : "You have not enabled text notifications.",
+        infoMessage: phoneNumber
+          ? `Text alert are sent to ${phoneNumber}`
+          : "You have not enabled text notifications.",
         isLoading: textNotificationLoading,
       },
       {
@@ -116,7 +115,7 @@ const Notifications = () => {
         infoMessage: profileData.emailAddress
           ? `Emails are sent to ${profileData.emailAddress}`
           : "You have not enabled email notifications.",
-        isLoading: paperlessLoading, 
+        isLoading: paperlessLoading,
       },
       {
         id: "app",
@@ -127,7 +126,14 @@ const Notifications = () => {
         isLoading: inAppNotificationLoading,
       },
     ],
-    [profileData, emailSettings, textNotificationLoading, paperlessLoading, inAppNotificationLoading, phoneNumber]
+    [
+      profileData,
+      emailSettings,
+      textNotificationLoading,
+      paperlessLoading,
+      inAppNotificationLoading,
+      phoneNumber,
+    ]
   );
 
   const handleEdit = (section) => {
@@ -136,7 +142,11 @@ const Notifications = () => {
     if (section == "app") {
       navigation.navigate("InAppNotifications", {
         is_enrolled: profileData.emailAddress,
-        additionalData:{optOut:InAppSettings[0].status=='On'? true:false,outageOptOut:InAppSettings[1].status=='On'? true:false,billingOptOutStatus:InAppSettings[2].status=='On'? true:false}
+        additionalData: {
+          optOut: InAppSettings[0].status == "On" ? true : false,
+          outageOptOut: InAppSettings[1].status == "On" ? true : false,
+          billingOptOutStatus: InAppSettings[2].status == "On" ? true : false,
+        },
       });
     } else if (section == "email") {
       navigation.navigate("EmailNotifications", {
@@ -144,10 +154,16 @@ const Notifications = () => {
         isPaperlessEnabled: paperlessStatusAcp,
       });
     } else if (section == "text") {
-      console.log('status',TextNotifSettings[1].status)
+      console.log("status", TextNotifSettings[1].status);
       navigation.navigate("TextNotifications", {
         is_enrolled: profileData.emailAddress,
-         additionalData:{optOut:TextNotifSettings[0].status=='On'? true:false,outageOptOut:TextNotifSettings[1].status=='On'? true:false,billingOptOutStatus:TextNotifSettings[2].status=='On'? true:false,phoneNumber:phoneNumber}
+        additionalData: {
+          optOut: TextNotifSettings[0].status == "On" ? true : false,
+          outageOptOut: TextNotifSettings[1].status == "On" ? true : false,
+          billingOptOutStatus:
+            TextNotifSettings[2].status == "On" ? true : false,
+          phoneNumber: phoneNumber,
+        },
       });
     }
   };
@@ -155,10 +171,10 @@ const Notifications = () => {
   const handleBackPress = () => navigation.navigate("Account");
 
   const getInAppNotificationsData = () => {
-    setInAppNotificationLoading(true); 
+    setInAppNotificationLoading(true);
     getUser().then((res1) => {
       let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
-      console.log('REQUEST',requestUrl);
+      console.log("REQUEST", requestUrl);
       GetApiRequest(
         requestUrl,
         (res) => {
@@ -168,10 +184,10 @@ const Notifications = () => {
               InAppSettings[index].status = value?.optOutFlag ? "Off" : "On";
             });
           }
-          setInAppNotificationLoading(false); 
+          setInAppNotificationLoading(false);
         },
         (error) => {
-          setInAppNotificationLoading(false); 
+          setInAppNotificationLoading(false);
           console.error("Error on retrying getInAppNotificationsData", error);
         }
       );
@@ -179,7 +195,7 @@ const Notifications = () => {
   };
 
   const getTextNotificationsData = () => {
-    setTextNotificationLoading(true); 
+    setTextNotificationLoading(true);
     getUser().then((res1) => {
       let requestUrl = `api/SMS/sms?AccountNumber=${res1.userInfo?.accountNumber}`;
       console.log(requestUrl);
@@ -189,12 +205,14 @@ const Notifications = () => {
           if (res) {
             res[0]?.smsMessageType.forEach((value, index) => {
               console.log(`Index: ${index}, Value: ${value}`);
-              TextNotifSettings[index].status = (value?.optOutFlag) ? "Off" : "On";
+              TextNotifSettings[index].status = value?.optOutFlag
+                ? "Off"
+                : "On";
             });
-            let phoneNum=res[0]?.phoneNum ||''
-            setPhoneNumber(phoneNum)
+            let phoneNum = res[0]?.phoneNum || "";
+            setPhoneNumber(phoneNum);
           }
-          setTextNotificationLoading(false); 
+          setTextNotificationLoading(false);
         },
         (error) => {
           setTextNotificationLoading(false);
@@ -214,7 +232,10 @@ const Notifications = () => {
 
   return (
     <View style={styles.container}>
-      <ProfileSettingsHeader title="Notifications" onPressBack={handleBackPress} />
+      <ProfileSettingsHeader
+        title="Notifications"
+        onPressBack={handleBackPress}
+      />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.sectionsContainer}>
           {sections.map((section) => (
@@ -223,7 +244,7 @@ const Notifications = () => {
               {...section}
               onEdit={() => handleEdit(section.id)}
               isAdmin={profileData.isAdmin}
-              isLoading={section.isLoading} 
+              isLoading={section.isLoading}
               phoneNumber={phoneNumber}
             />
           ))}

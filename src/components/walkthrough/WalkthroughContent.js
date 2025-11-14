@@ -44,6 +44,8 @@ const WalkthroughContent = ({
         <View style={styles.stepInfo}>
           <Animated.View
             style={[styles.iconCircle, { transform: [{ scale: pulseAnim }] }]}
+            accessible={true}
+            accessibilityLabel={`${tab.name} tab icon`}
           >
             <LinearGradient
               colors={["#edf1f4", "#edf1f4"]}

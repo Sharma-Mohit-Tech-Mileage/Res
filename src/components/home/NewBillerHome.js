@@ -8,7 +8,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import colors from "../../res/Colors";
 import { Color, Padding } from "../../../GlobalStyles";
-import WalkthroughOverlay from "../walkthrough/WalkthroughOverlay";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
@@ -25,20 +24,15 @@ import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
 import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
-import {
-  storePushNotificationStatus,
-  getPushNotificationStatus,
-} from "../../redux/utils/LocalStorage";
+import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
 import {
   getFcmToken,
   requestUserPermission,
-  notifyPermission
 } from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
 const NewBillerHome = ({ navigation }) => {
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
-  const [showWalkThrough, setShowWalkThrough] = useState(false);
   const [isNotificationEnable, setIsNotificationEnable] = useState(false);
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [loadingAutoPay, setloadingAutoPay] = useState(false);
@@ -54,24 +48,18 @@ const NewBillerHome = ({ navigation }) => {
     currentVersion: "",
     latestVersion: "",
   });
-
-  // Redux selectors
-  //const user = useSelector((state) => state.combinedReducers.user.userData);
-  //const profile = useSelector((state) => state.combinedReducers.profile || {});
-  const home = useSelector((state) => state.combinedReducers?.home);
-  const accountDetails = useSelector(
-    (state) => state.combinedReducers?.profile?.accountDetails
-  );
+  const accountDetails = useSelector((state) => state.profile?.accountDetails);
+  const home = useSelector((state) => state.home);
+  const isWalkthroughActive =
+    home.walkThroughStep !== null && home.walkThroughStep !== undefined;
   const dispatch = useDispatch();
   const paperlessStatusAcp = useSelector(
-    (state) => state.combinedReducers?.profile?.paperlessStatusAcp
+    (state) => state.profile?.paperlessStatusAcp
   );
   const paperlessLoading = useSelector(
-    (state) => state.combinedReducers?.profile?.isPaperLessStatusLoading
+    (state) => state.profile?.isPaperLessStatusLoading
   );
-  const userInfo = useSelector(
-    (state) => state.combinedReducers?.user?.userData?.userInfo
-  );
+  const userInfo = useSelector((state) => state.user?.userData?.userInfo);
 
   const showDisconnectedBanner = userInfo
     ? isAccountDisconnected(
@@ -141,58 +129,10 @@ const NewBillerHome = ({ navigation }) => {
   );
 
   useEffect(() => {
-    if (home?.walkThroughStep !== null && home?.walkThroughStep !== undefined) {
-      setShowWalkThrough(true);
-    }
-  }, [home?.walkThroughStep]);
-
-  useEffect(() => {
     if (isNotificationEnable) {
-      checkNotifications();
+      enableNotifications();
     }
   }, [isNotificationEnable]);
-
-  const checkNotifications = async () => {
-    const pushNotification = await getPushNotificationStatus();
-    let askNotification = false;
-    if (pushNotification === null) {
-      askNotification = true;
-    } else {
-      if (pushNotification.permanentSkip) {
-        askNotification = false;
-      } else {
-        if (pushNotification.status === "skip") {
-          const now = moment();
-          const days = now.diff(pushNotification.date, "days");
-
-          if (days >= 15) {
-            askNotification = true;
-          } else {
-            askNotification = false;
-          }
-        }else{
-          askNotification = true;
-        }
-      }
-    }
-
-    if (askNotification) {
-      const enabledPermission = await requestUserPermission();
-      if (enabledPermission) {
-        const token = await getFcmToken();
-        console.log("FCM HOME WITH PERMISSION", token);
-        const localData = {
-          status: "accepted",
-          date: new Date(),
-        };
-        storePushNotificationStatus(localData);
-        //await dispatch(updatePushNotifications(data, null));
-      }else {
-        console.log("FCM HOME DENIED");
-            await notifyPermission();
-      }
-    }
-  };
 
   useEffect(() => {
     if (accountDetails) {
@@ -211,17 +151,12 @@ const NewBillerHome = ({ navigation }) => {
       GetApiRequest(
         requestUrl,
         (res) => {
-          console.log("getInAppNotificationsData res", JSON.stringify(res));
           if (res) {
-            const pushMessageType = res[0]?.pushMessageType;
-            if (pushMessageType && Array.isArray(pushMessageType)) {
-              for (let i = 0; i < pushMessageType.length; i++) {
-                if (!pushMessageType[i]?.optOutFlag) {
-                  setIsNotificationEnable(true);
-                  break;
-                }
+            res[0]?.pushMessageType.forEach((value, index) => {
+              if (!value?.optOutFlag) {
+                setIsNotificationEnable(true);
               }
-            }
+            });
           }
         },
         (error) => {
@@ -231,18 +166,48 @@ const NewBillerHome = ({ navigation }) => {
     });
   };
 
-  
-
-  const renderHeader = () => (
-    <View
-      accessibilityElementsHidden={showWalkThrough}
-      importantForAccessibility={showWalkThrough ? "no-hide-descendants" : "no"}
-      accessibilityLabel="SparkLight"
-      style={styles.headerContainer}
-    >
-      <Logo width={120} height={33.32} />
-    </View>
-  );
+  const enableNotifications = async () => {
+    const enabledPermission = await requestUserPermission();
+    if (enabledPermission) {
+      const token = await getFcmToken();
+      const data = {
+        accountNumber: userInfo?.accountNumber,
+        deviceToken: token,
+        deviceTokenTimestamp: moment().format(),
+        optOut: true,
+        outageOptOut: true,
+        billingOptOutStatus: true,
+        userName: userInfo.userName,
+        isAndroid: Platform.OS == "android",
+      };
+      const localData = {
+        status: "accepted",
+        date: new Date(),
+        permanentSkip: false,
+      };
+      storePushNotificationStatus(localData);
+      await dispatch(updatePushNotificationsv2(data, null));
+    } else {
+      const token = await getFcmToken();
+      const dataWithoutPermission = {
+        accountNumber: userInfo.accountNumber,
+        deviceToken: token,
+        deviceTokenTimestamp: moment().format(),
+        optOut: true,
+        outageOptOut: true,
+        billingOptOutStatus: true,
+        userName: userInfo.userName,
+        isAndroid: Platform.OS == "android",
+      };
+      const localData = {
+        status: "skip",
+        date: new Date(),
+        permanentSkip: true,
+      };
+      storePushNotificationStatus(localData);
+      await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
+    }
+  };
 
   const renderOutageAlert = () =>
     AlertUtils.createOutageAlert(estimatedRestoreTime, () =>
@@ -266,9 +231,9 @@ const NewBillerHome = ({ navigation }) => {
         ) : (
           <WelcomeCard />
         )}
-        <MenuGrid />
+        {/* <MenuGrid /> */}
         <PromoBanner
-          title="Auto Pay + Paperless is a Winning Combination!"
+          title="Sign up and save with Auto Pay and Paperless Billing"
           showBonus={true}
         />
         <FeatureCard
@@ -314,21 +279,32 @@ const NewBillerHome = ({ navigation }) => {
       colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
-      {showWalkThrough && <View style={styles.shadowFullScreen} />}
-      {showWalkThrough && (
-        <WalkthroughOverlay onFinish={() => setShowWalkThrough(false)} />
-      )}
-      <View
-        accessibilityElementsHidden={showWalkThrough}
-        importantForAccessibility={
-          showWalkThrough ? "no-hide-descendants" : "auto"
-        }
-        style={{ flex: 1 }}
-      >
-        <SafeAreaView style={{ flex: 1 }}>
-          {renderHeader()}
+      <View style={{ flex: 1 }}>
+        <SafeAreaView
+          style={{ flex: 1 }}
+          importantForAccessibility={
+            isWalkthroughActive ? "no-hide-descendants" : "auto"
+          }
+          accessibilityElementsHidden={isWalkthroughActive}
+        >
+          <View
+            accessibilityLabel="SparkLight"
+            style={styles.headerContainer}
+            importantForAccessibility={
+              isWalkthroughActive ? "no-hide-descendants" : "auto"
+            }
+            accessibilityElementsHidden={isWalkthroughActive}
+          >
+            <Logo width={120} height={33.32} />
+          </View>
           <ScrollView style={styles.scrollContainer}>
-            <View style={styles.mainContentContainer}>
+            <View
+              style={styles.mainContentContainer}
+              importantForAccessibility={
+                isWalkthroughActive ? "no-hide-descendants" : "auto"
+              }
+              accessibilityElementsHidden={isWalkthroughActive}
+            >
               {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
               {isOutageAlert && renderOutageAlert()}
               {showBanner && bannerConfig && (
@@ -392,15 +368,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: -2, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
-  },
-  shadowFullScreen: {
-    backgroundColor: "black",
-    height: "100%",
-    width: "100%",
-    position: "absolute",
-    top: 0,
-    zIndex: 5,
-    opacity: 0.7,
   },
   contentWrapper: {
     flex: 1,

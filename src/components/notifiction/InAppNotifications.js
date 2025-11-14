@@ -1,40 +1,25 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  StyleSheet,
-  Text,
-  Pressable,
-  View,
-  Animated,
-  ScrollView,
-  Platform,
-  AppState,
-} from "react-native";
-import {
-  Color,
-  FontSize,
-  FontFamily,
-  Padding,
-  Border,
-} from "../../../../GlobalStyles";
+import { StyleSheet, Text, Pressable, View, Animated, ScrollView, Platform, } from "react-native";
+import { Color, FontSize, FontFamily, Padding, Border, } from "../../../GlobalStyles";
 import * as yup from "yup";
-import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
+import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { widthPercentageToDP } from "react-native-responsive-screen";
-import NotificationAlert from "../../common/customui/NotificationAlert";
+import NotificationAlert from "../common/customui/NotificationAlert";
 import moment from "moment";
-import Toggle from "../../common/Toggle";
-import { getUser } from "../../../redux/utils/LocalStorage";
-import { getDeviceUniqueId } from "../../../firebase/FirebaseUtils";
-import { PostApiRequest } from "../../../network/APIClient";
-import LoadingOverlay from "../../common/customui/CustomLoading";
+import Toggle from "../common/Toggle";
+import { getUser } from "../../redux/utils/LocalStorage";
+import { getDeviceUniqueId } from "../../firebase/FirebaseUtils";
+import { PostApiRequest } from "../../network/APIClient";
+import LoadingOverlay from "../common/customui/CustomLoading";
 
 import {
   getFcmToken,
   notifyPermission,
   requestUserPermission,
-} from "../../../firebase/FirebaseUtils";
-import { getPushNotificationStatus } from "../../../redux/utils/LocalStorage";
+} from "../../firebase/FirebaseUtils";
+import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
 
 // Define your validation schema
 const validationSchema = yup.object().shape({
@@ -63,13 +48,9 @@ const InAppNotifications = ({ navigation }) => {
   const timeoutRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
-  const [isNotificationRquired, setIsNotificationRequired] = useState(false);
   const [notification, setNotification] = useState(null);
   const formatedData = route.params?.additionalData || {};
-  const checkNotifData =
-    formatedData?.optOut ||
-    formatedData?.outageOptOut ||
-    formatedData?.billingOptOutStatus;
+  const checkNotifData=formatedData?.optOut || formatedData?.outageOptOut || formatedData?.billingOptOutStatus;
   console.log("checkNotifData", checkNotifData);
 
   const translateY = animatedValue;
@@ -118,10 +99,8 @@ const InAppNotifications = ({ navigation }) => {
 
   useEffect(() => {
     if (isFocused) {
-     
       const initializedSettings = additionalData;
       setInitializeSettings(initializedSettings);
-      
     }
 
     return () => {
@@ -129,74 +108,29 @@ const InAppNotifications = ({ navigation }) => {
         setInitializeSettings({});
       }
     };
-  }, [isFocused]);
-
-
-   // Handle app state changes
-    useEffect(() => {
-      const subscription = AppState.addEventListener("change", (nextAppState) => {
-        if (nextAppState === "active") {
-          initialNotificationStatus();
-        }
-      });
-  
-      return () => {
-        subscription.remove();
-      };
-    }, []);
-  
+  }, [isFocused, additionalData]);
 
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
     formatedData[name] = value;
-    // setInitializeSettings((initialize) => {
-    //   const updatedSettings = {
-    //     ...initialize,
-    //     [name]: !value,
-    //   };
-    //   return updatedSettings;
-    // });
-
-    checkNofif(value);
-  };
-
-  const initialNotificationStatus = async () => {
-    const enabledPermission = await requestUserPermission();
-    console.log("FCM INITIAL ENABLED?", enabledPermission);
-    if (enabledPermission) {
-      setIsNotificationRequired(false);
-    } else {
-      setIsNotificationRequired(true);
-    }
-  };
-
-  const checkNofif = async (value) => {
-    if (value) {
-      const pushNotification = await getPushNotificationStatus();
-      if (pushNotification?.permanentSkip) {
-        await notifyPermission();
-      } else {
-        const enabledPermission = await requestUserPermission();
-        console.log("FCM HOME ENABLED?", enabledPermission);
-        if (enabledPermission) {
-          const token = await getFcmToken();
-          console.log("FCM HOME WITH PERMISSION", token);
-          const localData = {
-            status: "accepted",
-            date: new Date(),
-          };
-          setIsNotificationRequired(false);
-          //storePushNotificationStatus(localData);
-          //await dispatch(updatePushNotifications(data, null));
-        } else {
-          setIsNotificationRequired(true);
-          console.log("FCM HOME DENIED");
+    const checkNofif = async () => {
+      console.log("Toggle data", JSON.stringify(formatedData));
+      if (
+        formatedData?.optOut ||
+        formatedData?.outageOptOut ||
+        formatedData?.billingOptOutStatus 
+      ) {
+        if(!checkNotifData){
+        const pushNotification = await getPushNotificationStatus();
+        if (pushNotification?.permanentSkip) {
           await notifyPermission();
+        } else {
+          await requestUserPermission();
         }
       }
-    } else {
-      console.log("FCM HOME ALREADY ENABLED");
-    }
+      }
+    };
+    checkNofif();
   };
 
   useEffect(() => {
@@ -219,24 +153,19 @@ const InAppNotifications = ({ navigation }) => {
   }, [route.params]);
 
   const handleSave = async () => {
-    console.log("isNotificationRquired", isNotificationRquired);
-    if (!isNotificationRquired) {
-      const token = await getFcmToken();
-      formatedData.deviceToken = token;
-      formatedData.deviceTokenTimestamp = moment().format();
-      formatedData.isAndroid = Platform.OS === "android";
-      const request = {
-        optOut: formatedData.optOut,
-        outageOptOut: formatedData.outageOptOut,
-        billingOptOutStatus: formatedData.billingOptOutStatus,
-        deviceToken: formatedData.deviceToken,
-        deviceTokenTimestamp: formatedData.deviceTokenTimestamp,
-        isAndroid: formatedData.isAndroid,
-      };
-      await postRequestInAppNotification(request);
-    } else {
-      checkNofif(true);
-    }
+    const token = await getFcmToken();
+    formatedData.deviceToken = token;
+    formatedData.deviceTokenTimestamp = moment().format();
+    formatedData.isAndroid = Platform.OS === "android";
+    const request = {
+      optOut: formatedData.optOut,
+      outageOptOut: formatedData.outageOptOut,
+      billingOptOutStatus: formatedData.billingOptOutStatus,
+      deviceToken: formatedData.deviceToken,
+      deviceTokenTimestamp: formatedData.deviceTokenTimestamp,
+      isAndroid: formatedData.isAndroid,
+    };
+    await postRequestInAppNotification(request);
   };
 
   const postRequestInAppNotification = async (data) => {
@@ -253,16 +182,21 @@ const InAppNotifications = ({ navigation }) => {
     data["optOut"] = !data.optOut;
     data["outageOptOut"] = !data.outageOptOut;
     data["billingOptOutStatus"] = !data.billingOptOutStatus;
+
+    console.log("postPushNotifications", data);
     setIsLoading(true);
     PostApiRequest(
       `api/mobilenotificationpreferences/${userName}/mobilepreferences`,
       data,
       (res) => {
         setIsLoading(false);
+        console.log(
+          "Response  postRequestInAppNotification",
+          JSON.stringify(res)
+        );
         if (res) {
           setNotification({
-            message:
-              "Your in-app notification preferences have been updated successfully.",
+            message: "Your in-app notification preferences have been updated successfully.",
             type: "success",
           });
           //navigation.navigate("Notifications", { updateSuccess: true, successMessage: "In-App Notifications updated successfully." });

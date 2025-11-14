@@ -1,25 +1,24 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { StyleSheet, Text, View, ScrollView, Animated, Platform, TouchableOpacity, AccessibilityInfo, } from "react-native";
-import { Color, Padding, FontSize, FontFamily } from "../../../../GlobalStyles";
+import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import CheckBox from "@react-native-community/checkbox";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import Toggle from "../../common/Toggle";
-import SparkLightInput from "../../common/customui/SparkLightInput";
+import Toggle from "../common/Toggle";
+import SparkLightInput from "../common/customui/SparkLightInput";
 import { useDispatch, useSelector } from "react-redux";
-import ProfileSettingsHeader from "../../common/ProfileSettingsHeader";
-import NotificationAlert from "../../common/customui/NotificationAlert";
-import SecondaryButton from "../../common/customui/PrimaryButton";
-import LoadingOverlay from "../../common/customui/CustomLoading";
-import { updatePrimaryAndPaperlessRequest } from "../../../redux/actions/NotificationActionSuite";
-import { fetchACPUserAccountDetails } from "../../../redux/actions/ProfileActionSuite";
-import { getPrimaryEmail } from "../../utility/constant";
-import AlertIcon from "../../../res/svgIcons/AlertIcon";
-import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
+import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import NotificationAlert from "../common/customui/NotificationAlert";
+import SecondaryButton from "../common/customui/PrimaryButton";
+import LoadingOverlay from "../common/customui/CustomLoading";
+import { updatePrimaryAndPaperlessRequest } from "../../redux/actions/NotificationActionSuite";
+import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
+import { getPrimaryEmail } from "../utility/constant";
+import AlertIcon from "../../res/svgIcons/AlertIcon";
+import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-import AppStyles from "../../utility/AppStyles";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -47,9 +46,6 @@ const AddNotificationScreen = () => {
   );
   const paperlessStatusAcp = useSelector(
     (state) => state.profile?.paperlessStatusAcp
-  );
-  const emailNotificationUpdate = useSelector(
-    (state) => state.combinedReducers?.notification
   );
 
   const [formState, setFormState] = useState({
@@ -79,29 +75,6 @@ const AddNotificationScreen = () => {
     AccessibilityInfo.isScreenReaderEnabled().then(setScreenReaderEnabled);
   }, []);
 
-
-  useEffect(() => {
-    console.log("emailNotificationUpdate changed:", emailNotificationUpdate);
-const updateAccountDetails = async () => {
-    if (emailNotificationUpdate && emailNotificationUpdate.primaryEmailStatus && isSubmitting) {
-      const { error, success, message } =
-        emailNotificationUpdate.primaryEmailStatus;
-      if (error) {
-        setNotification({ message: error, type: "error" });
-        setIsSubmitting(false);
-        setToggleCheckBoxTerm(false);
-        
-      } else if (success) {
-        //await dispatch(fetchACPUserAccountDetails());
-        setNotification({ message: message, type: "success" });
-        //setIsSubmitting(false);
-        
-      }
-      setIsSubmitting(false);
-    }}
-    updateAccountDetails();
-  }, [emailNotificationUpdate,dispatch]);
-
   useEffect(() => {
     if (notification && screenReaderEnabled) {
       AccessibilityInfo.announceForAccessibility(notification.message);
@@ -112,36 +85,36 @@ const updateAccountDetails = async () => {
     setIsCheckboxVisible(!paperlessStatusAcp);
   }, [paperlessStatusAcp, isCheckboxVisible]);
 
-  // useEffect(() => {
-  //   const updateAccountDetails = async () => {
-  //     if (route.params?.updateSuccess) {
-  //       try {
-  //         await dispatch(fetchACPUserAccountDetails());
-  //         setNotification({
-  //           message: route.params.successMessage,
-  //           type: "success",
-  //         });
-  //       } catch (error) {
-  //         setNotification({
-  //           message: "Error updating account details",
-  //           type: "error",
-  //         });
-  //       } finally {
-  //         setIsSubmitting(false);
-  //         setToggleCheckBoxTerm(false);
-  //       }
-  //     } else if (route.params?.updateFailed) {
-  //       setNotification({
-  //         message: route.params.failureMessage,
-  //         type: "error",
-  //       });
-  //       setIsSubmitting(false);
-  //       setToggleCheckBoxTerm(false);
-  //     }
-  //   };
+  useEffect(() => {
+    const updateAccountDetails = async () => {
+      if (route.params?.updateSuccess) {
+        try {
+          await dispatch(fetchACPUserAccountDetails());
+          setNotification({
+            message: route.params.successMessage,
+            type: "success",
+          });
+        } catch (error) {
+          setNotification({
+            message: "Error updating account details",
+            type: "error",
+          });
+        } finally {
+          setIsSubmitting(false);
+          setToggleCheckBoxTerm(false);
+        }
+      } else if (route.params?.updateFailed) {
+        setNotification({
+          message: route.params.failureMessage,
+          type: "error",
+        });
+        setIsSubmitting(false);
+        setToggleCheckBoxTerm(false);
+      }
+    };
 
-  //   updateAccountDetails();
-  // }, [route.params, dispatch]);
+    updateAccountDetails();
+  }, [route.params, dispatch]);
 
   const animateNotification = useCallback(() => {
     // Clear any existing timeout
@@ -200,6 +173,7 @@ const updateAccountDetails = async () => {
     (data) => {
       const { email } = data;
       const { paperlessBilling } = formState;
+
       if (isCheckboxVisible && paperlessBilling && !toggleCheckBoxTerm) {
         setIsTermRequired(true);
         return;
@@ -319,17 +293,7 @@ const updateAccountDetails = async () => {
                 {!isEnrolled
                   ? "Please enter your email address below and stay connected with us."
                   : "Please enter the email address you would like to receive all future customer communications. You may opt out at any time."}
-
               </Text>
-              <Text
-               style={AppStyles.requiredField}
-                  accessibilityRole="text" 
-                  accessible={true}
-                  accessibilityLabel="Required fields information. Fields marked with asterisk are required.">
-                {" "}
-                Fields marked with * are required.
-              </Text>
-              
               <Controller
                 control={control}
                 name="email"
@@ -340,7 +304,7 @@ const updateAccountDetails = async () => {
                     onChangeText={onChange}
                     value={value ? value.toLowerCase() : ""}
                     error={errors.email?.message}
-                    label="Email Address *"
+                    label="Email Address"
                     accessibilityLabel="Email address input"
                     keyboardType="email-address"
                     autoCapitalize="none"
