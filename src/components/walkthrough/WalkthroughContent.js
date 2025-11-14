@@ -67,6 +67,7 @@ const WalkthroughContent = ({
             style={[styles.iconCircle, { transform: [{ scale: pulseAnim }] }]}
             accessible={true}
             accessibilityLabel={`${tab.name} tab icon`}
+             ref={titleRef}
           >
             <LinearGradient
               colors={["#edf1f4", "#edf1f4"]}
@@ -96,7 +97,6 @@ const WalkthroughContent = ({
       {/* Content */}
       <View style={styles.content}>
         <Text
-          ref={titleRef}
           style={styles.title}
           accessible={true}
           accessibilityRole="header"

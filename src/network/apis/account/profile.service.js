@@ -409,7 +409,7 @@ const handleSubmitFeedback = async (obj) => {
       customer_support: "Customer Support",
       feature_request: "Feature Request",
       equipment_issue: "Equipment Issue",
-      other: "Other",
+      other_issue: "Other",
     };
     return labels[id] || id;
   });

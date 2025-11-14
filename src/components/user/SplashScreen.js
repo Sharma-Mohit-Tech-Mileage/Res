@@ -1,13 +1,33 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { View, StyleSheet, Text, Linking, Modal, Platform, Animated, Easing, TouchableOpacity, Dimensions, } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Linking,
+  Modal,
+  Platform,
+  Animated,
+  Easing,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
 import { saveUserInfo, logInfo } from "../../redux/actions/UserAction";
-import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
+import {
+  storeUser,
+  storeSsoToken,
+  getSsoToken,
+  getUser,
+  cleanUserData,
+} from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
-import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import strings from "../../res/Strings";
 import { Color, FontFamily } from "../../../GlobalStyles";
@@ -704,7 +724,6 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
 
-  // Normal device styles (default)
   splashContainer: {
     marginTop: hp("20%"),
     justifyContent: "center",
@@ -730,99 +749,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     fontSize: 14,
     textAlign: "center",
-    fontWeight: "400",
-    color: colors.snow_white,
-    alignSelf: "center",
-    paddingHorizontal: wp("3%"),
-  },
-
-  // Small device styles
-  splashContainer_small: {
-    marginTop: hp("15%"),
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  logo_small: {
-    width: 300,
-    height: 90,
-  },
-  buttonWrapper_small: {
-    marginTop: hp("20%"),
-    paddingHorizontal: wp("10%"),
-  },
-  version_small: {
-    color: "white",
-    alignSelf: "center",
-    marginTop: hp("4%"),
-    fontSize: 16,
-  },
-  copyright_small: {
-    position: "absolute",
-    bottom: hp("3%"),
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: 14,
-    fontWeight: "400",
-    color: colors.snow_white,
-    alignSelf: "center",
-    paddingHorizontal: wp("3%"),
-  },
-
-  // Very small device styles
-  splashContainer_verySmall: {
-    marginTop: hp("10%"),
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  logo_verySmall: {
-    width: 280,
-    height: 85,
-  },
-  buttonWrapper_verySmall: {
-    marginTop: hp("18%"),
-    paddingHorizontal: wp("10%"),
-  },
-  version_verySmall: {
-    color: "white",
-    alignSelf: "center",
-    marginTop: hp("3.5%"),
-    fontSize: 15,
-  },
-  copyright_verySmall: {
-    position: "absolute",
-    bottom: hp("2%"),
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: 14,
-    fontWeight: "400",
-    color: colors.snow_white,
-    alignSelf: "center",
-    paddingHorizontal: wp("3%"),
-  },
-
-  // Tiny device styles
-  splashContainer_tiny: {
-    marginTop: hp("8%"),
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  logo_tiny: {
-    width: 240,
-    height: 75,
-  },
-  buttonWrapper_tiny: {
-    marginTop: hp("15%"),
-    paddingHorizontal: wp("10%"),
-  },
-  version_tiny: {
-    color: "white",
-    alignSelf: "center",
-    marginTop: hp("3%"),
-    fontSize: 14,
-  },
-  copyright_tiny: {
-    position: "absolute",
-    bottom: hp("1%"),
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: 12,
     fontWeight: "400",
     color: colors.snow_white,
     alignSelf: "center",
