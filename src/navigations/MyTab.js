@@ -150,32 +150,30 @@ const MyTabs = ({ route }) => {
         );
       }
 
-      // Active tab during walkthrough OR all tabs in normal mode
-      return (
-        <Pressable
-          {...props}
-          accessible={true}
-          accessibilityRole="tab"
-          accessibilityLabel={`${tab.name}`}
-          accessibilityState={{
-            ...props.accessibilityState,
-            disabled: isActiveTabInWalkthrough,
-          }}
-          accessibilityHint={
-            isActiveTabInWalkthrough
-              ? "Disabled during walkthrough. Use walkthrough controls to continue."
-              : props.accessibilityHint
-          }
-          importantForAccessibility="yes"
-          onPress={(e) => {
-            if (isActiveTabInWalkthrough) {
-              e.preventDefault?.();
-              return;
-            }
-            props.onPress?.(e);
-          }}
-        />
-      );
+    return (
+  <Pressable
+    {...props}
+    accessible={true}
+    accessibilityRole="tab"
+    accessibilityLabel={`${tab.name}`}
+    accessibilityState={{
+      ...props.accessibilityState,
+    }}
+    accessibilityHint={
+      isActiveTabInWalkthrough
+        ? "Use walkthrough controls to continue. This tab is temporarily not clickable."
+        : props.accessibilityHint
+    }
+    importantForAccessibility="yes"
+    onPress={(e) => {
+      if (isActiveTabInWalkthrough) {
+        e.preventDefault?.();
+        return;
+      }
+      props.onPress?.(e);
+    }}
+  />
+);
     },
     [isTabAccessible, isWalkthroughActive]
   );
