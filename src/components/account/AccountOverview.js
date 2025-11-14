@@ -60,6 +60,7 @@ const logoutConfirmationPopup = (dispatch, navigation) => {
         onPress: () => {
           logoutAction(dispatch, navigation);
         },
+        style: "default", // ok button (right)
       },
     ],
     { cancelable: true }

@@ -218,7 +218,7 @@ const EmailNotifications = ({ navigation }) => {
                 onPress={() => {
                   navigation.reset({
                     index: 0,
-                    routes: [{ name: "MyTab" }],
+                    routes: [{ name: "MyTab"}],
                   });
                 }}
                 accessibilityRole="button"

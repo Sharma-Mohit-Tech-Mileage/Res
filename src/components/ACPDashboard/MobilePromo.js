@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, Linking } from "react-native";
 import {
   FontFamily,
   FontSize,
@@ -9,9 +9,12 @@ import {
 } from "../../../GlobalStyles";
 import AppStyles from "../utility/AppStyles";
 import FeatureCard from "./FeatureCardMobile";
+import { useNavigation } from "@react-navigation/native";
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 
-const MobilePromo = ({ navigation }) => {
+const MobilePromo = () => {
+
+  const navigation=useNavigation();
   return (
     <View
       style={[AppStyles.card, { marginVertical: 10, marginHorizontal: 24 }]}
@@ -33,7 +36,9 @@ const MobilePromo = ({ navigation }) => {
         buttonVariant={"primary"}
         isActive={true}
         onButtonPress={() =>
-          navigation.navigate("account", { screen: "Notifications" })
+          navigation.navigate("ArticalWindowUtility", { url: "https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=pendingact", name: "Sparklight Mobile" })
+           
+          //Linking.openURL(" https://sparklightmobile.com/?utm_source=mobileapp&utm_medium=pendingact")
         }
 
       />

@@ -21,13 +21,27 @@ import { FontFamily, Color, FontSize } from "../../GlobalStyles";
 import MobilePilotLandingPage from "../../src/components/ACPDashboard/MobilePilotLandingPage";
 
 const Tab = createBottomTabNavigator();
-const isMobilePilotEnabled = true; // Feature flag placeholder
+
 
 const TAB_BAR_HEIGHT = {
   IOS: 90,
   ANDROID_MIN: 55,
   ANDROID_PADDING: 60,
 };
+const calculateTabBarHeight = (insets) => {
+  return Platform.OS === "ios"
+    ? TAB_BAR_HEIGHT.IOS
+    : Math.max(TAB_BAR_HEIGHT.ANDROID_MIN, insets.bottom + TAB_BAR_HEIGHT.ANDROID_PADDING);
+};
+
+
+const MyTabs = ({ route }) => {
+
+const isMobilePilotEnabled = useSelector(
+  (state) => state.user.userData?.userInfo?.pending_activation === true
+);
+
+  
 
 const COMPONENT_MAP = {
   HomeStackScreen: isMobilePilotEnabled ? MobilePilotLandingPage : HomeStackScreen,
@@ -50,7 +64,6 @@ const getComponent = (componentName) => {
   return COMPONENT_MAP[componentName] || HomeStackScreen;
 };
 
-
 const getIconComponent = (tabId, focused) => {
   const IconComponent = ICON_MAP[tabId] || HomeIcon;
   const iconColor = focused 
@@ -59,15 +72,6 @@ const getIconComponent = (tabId, focused) => {
   
   return <IconComponent color={iconColor} filled={focused} />;
 };
-
-const calculateTabBarHeight = (insets) => {
-  return Platform.OS === "ios"
-    ? TAB_BAR_HEIGHT.IOS
-    : Math.max(TAB_BAR_HEIGHT.ANDROID_MIN, insets.bottom + TAB_BAR_HEIGHT.ANDROID_PADDING);
-};
-
-
-const MyTabs = ({ route }) => {
   
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
