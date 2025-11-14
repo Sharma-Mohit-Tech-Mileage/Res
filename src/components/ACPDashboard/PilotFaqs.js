@@ -1,17 +1,18 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image,Linking } from "react-native";
 import {
   FontFamily,
   FontSize,
   Color,
-  Padding,
   Border,
 } from "../../../GlobalStyles";
 import AppStyles from "../utility/AppStyles";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { useNavigation } from "@react-navigation/native";
 const PromoImage = require("../../../assets/sparklight-tech-app.jpg");
 
-const PilotFaqs = ({ navigation }) => {
+const PilotFaqs = () => {
+  const navigation = useNavigation();
   return (
     <View
       style={[AppStyles.card, { marginVertical: 16, marginHorizontal: 24, paddingTop:8,shadowOffset: { width: 1, height:-2 } }]}
@@ -48,7 +49,8 @@ const PilotFaqs = ({ navigation }) => {
           },
         ]}
         onPress={() => {
-          Linking.openURL("https://www.sparklight.com/support/service-activation-faq");
+          //Linking.openURL(" https://www.sparklight.com/Activation-faqs");
+           navigation.navigate("ArticalWindowUtility", { url: "https://www.sparklight.com/Activation-faqs", name: "Activation-Faqs" })
         }}
         accessibilityRole="link"
         accessible={true}
