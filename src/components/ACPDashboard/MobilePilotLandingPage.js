@@ -207,11 +207,11 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
         <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
           <Text style={styles.subText} >
             Your equipment will arrive within{" "}
-            <Text style={[styles.subText, { color: "#353091" }]}>
+            <Text style={[styles.subText, { color: "#353091", fontFamily: FontFamily.openSansSemiBold, fontWeight: "600" }]}>
               2-4 bussiness days{" "}
             </Text>{" "}
             from your purchase. Just plug it in and follow the instructions
-            included in your kit."
+            included in your kit
           </Text>
         </View>
         <View
@@ -230,7 +230,8 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
               {
                 color: "#353091",
                 textDecorationLine: "underline",
-                fontWeight: "bold",
+                fontFamily: FontFamily.openSansSemiBold, 
+                fontWeight: "600", // <-- changed to semi-bold
               },
             ]}
             onPress={() => Linking.openURL("tel:8776922253")}
