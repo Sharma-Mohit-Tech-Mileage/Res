@@ -52,7 +52,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
       userData?.fulfillment_type.toLowerCase() ==
       "Self-Install (pickup)".toLowerCase()
     ) {
-      setAction("Awaiting Customer Equipment Pickup.");
+      setAction("Awaiting Customer Equipment Pickup");
     }
   }, [userData]);
 
@@ -145,9 +145,9 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
         <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
           <Text style={styles.subText} accessible={true}
           accessibilityRole="text"
-          accessibilityLabel="Drop by any of our Sparklight stores to pick up your equipment. Just a quick reminder to bring your photo ID and account number along with you. See you soon!. ">
+          accessibilityLabel="Drop by any of our Sparklight stores to pick up your equipment. Just a quick reminder to bring your photo ID and account number along with you. See you soon! ">
             {
-              "Drop by any of our Sparklight stores to pick up your equipment. Just a quick reminder to bring your photo ID and account number along with you. See you soon!. "
+              "Drop by any of our Sparklight stores to pick up your equipment. Just a quick reminder to bring your photo ID and account number along with you. See you soon! "
             }
           </Text>
           <Text
@@ -196,6 +196,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
           >
             877-692-2253
           </Text>
+          <Text style={styles.subText}>.</Text>
         </View>
       </View>
     );
@@ -207,11 +208,11 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
         <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
           <Text style={styles.subText} >
             Your equipment will arrive within{" "}
-            <Text style={[styles.subText, { color: "#353091" }]}>
-              2-4 bussiness days{" "}
+            <Text style={[styles.subText, { color: "#353091", fontFamily: FontFamily.openSansSemiBold, fontWeight: "600" }]}>
+              2-4 business days{""}
             </Text>{" "}
             from your purchase. Just plug it in and follow the instructions
-            included in your kit."
+            included in your kit.
           </Text>
         </View>
         <View
@@ -230,7 +231,8 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
               {
                 color: "#353091",
                 textDecorationLine: "underline",
-                fontWeight: "bold",
+                fontFamily: FontFamily.openSansSemiBold, 
+                fontWeight: "600",
               },
             ]}
             onPress={() => Linking.openURL("tel:8776922253")}
@@ -240,6 +242,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
           >
             877-692-2253
           </Text>
+          <Text style={styles.subText}>.</Text>
         </View>
       </View>
     );
