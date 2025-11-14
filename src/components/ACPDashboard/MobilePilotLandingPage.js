@@ -41,7 +41,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
       userData?.fulfillment_type.toLowerCase() ==
       "Professional Install".toLowerCase()
     ) {
-      setAction("Awaiting Professional Install.");
+      setAction("Awaiting Professional Install");
     } else if (
       userData?.fulfillment_type.toLowerCase() ==
       "Self-Install (shipped)".toLowerCase()
@@ -104,7 +104,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
         accessibilityRole="text"
         >
           <Text style={styles.subText} accessible={false}>
-            {`Your appointment is scheduled for ${scheduled_date} from ${time_slot}. If you have any questions or need to reschedule, please `}
+            {`Your appointment is scheduled for ${scheduled_date} from ${time_slot}. `}
           </Text>
         </View>
         <View
@@ -134,6 +134,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
           >
             877-692-2253
           </Text>
+          <Text style={styles.subText}>.</Text>
         </View>
       </View>
     );
