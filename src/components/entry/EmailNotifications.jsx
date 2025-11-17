@@ -160,7 +160,7 @@ const EmailNotifications = ({ navigation }) => {
                 accessibilityRole="none"
                 accessibilityLabel="Email address input section"
               >
-                <Text style={styles.fieldLabel}>Email Address *</Text>
+                <Text style={styles.fieldLabel} accessible={false}>Email Address *</Text>
                 <Controller
                   control={control}
                   name="email"

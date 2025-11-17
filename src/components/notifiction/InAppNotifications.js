@@ -8,6 +8,8 @@ import {
   ScrollView,
   Platform,
   AppState,
+  Linking,
+  Alert,
 } from "react-native";
 import {
   Color,
@@ -190,8 +192,31 @@ const InAppNotifications = ({ navigation }) => {
           //await dispatch(updatePushNotifications(data, null));
         } else {
           setIsNotificationRequired(true);
-          console.log("FCM HOME DENIED");
-          await notifyPermission();
+          console.log("FCM HOME DENIED",enabledPermission);
+          //await notifyPermission();
+
+          Alert.alert(
+                'Sparklight Would Like to Send You Notifications',
+                'Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.',
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                    onPress: () => { setIsNotificationRequired(false)}, 
+                  },
+                  {
+                    text: 'Go to Settings',
+                    style: 'cancel',
+                    onPress: () => {
+                      if (Platform.OS === 'ios') {
+                        Linking.openURL('app-settings:');
+                      } else {
+                        Linking.openSettings();
+                      }
+                    },
+                  },
+                ],
+              );
         }
       }
     } else {
@@ -258,6 +283,7 @@ const InAppNotifications = ({ navigation }) => {
       `api/mobilenotificationpreferences/${userName}/mobilepreferences`,
       data,
       (res) => {
+        console.log("postRequestInAppNotification response", res);
         setIsLoading(false);
         if (res) {
           setNotification({
