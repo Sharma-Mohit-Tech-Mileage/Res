@@ -4,6 +4,7 @@ import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import AppStyles from "../utility/AppStyles";
 import CheckBox from "@react-native-community/checkbox";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Toggle from "../common/Toggle";
@@ -294,6 +295,15 @@ const AddNotificationScreen = () => {
                   ? "Please enter your email address below and stay connected with us."
                   : "Please enter the email address you would like to receive all future customer communications. You may opt out at any time."}
               </Text>
+
+              <Text
+               style={AppStyles.requiredField}
+                  accessibilityRole="text" 
+                  accessible={true}
+                  accessibilityLabel="Required fields information. Fields marked with asterisk are required.">
+                {" "}
+                Fields marked with * are required.
+              </Text>
               <Controller
                 control={control}
                 name="email"
@@ -304,7 +314,7 @@ const AddNotificationScreen = () => {
                     onChangeText={onChange}
                     value={value ? value.toLowerCase() : ""}
                     error={errors.email?.message}
-                    label="Email Address"
+                    label="Email Address *"
                     accessibilityLabel="Email address input"
                     keyboardType="email-address"
                     autoCapitalize="none"

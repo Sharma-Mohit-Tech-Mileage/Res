@@ -109,7 +109,7 @@ const SparkLightInput = ({
     >
       <View style={styles.labelContainer}>
         {label && (
-          <Text style={[styles.label, error && styles.errorLabel]}>
+          <Text style={[styles.label, error && styles.errorLabel]} accessible={false}>
             {label}
           </Text>
         )}

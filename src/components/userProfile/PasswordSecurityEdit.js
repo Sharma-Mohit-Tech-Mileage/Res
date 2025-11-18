@@ -194,6 +194,7 @@ const PasswordSecurityEdit = () => {
                     <Text
                       style={[styles.firstName1, styles.firstTypo]}
                       accessible={!dropdownFocused}
+                      
                     >
                       Password Reset Question *
                     </Text>
