@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import { View, StyleSheet, Text, Linking, Modal, Platform, Animated, Easing, TouchableOpacity, Dimensions, } from "react-native";
+import { View, StyleSheet, Text, Linking, Modal, Platform, Animated, Easing, TouchableOpacity, Dimensions, Image} from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { authorize, refresh, logout } from "react-native-app-auth";
@@ -556,8 +556,14 @@ const SplashScreen = ({ navigation, route }) => {
           accessibilityLabel="SparkLight"
           accessible={true}
         >
+          <View>
+            <Image
+              source={require("../../res/images/hat.png")}
+              style={{ width: "50%", height: "50%", resizeMode: "contain", position: 'absolute', top: -2, left: -30 }}
+            />
           <View style={{ alignSelf: "center", marginTop: hp("5%") }}>
             <Logo width={300} height={84} />
+          </View>
           </View>
         </Animated.View>
       </View>
