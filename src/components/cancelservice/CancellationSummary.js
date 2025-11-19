@@ -263,7 +263,7 @@ const CancellationSummary = ({ navigation, route }) => {
       },
     };
 
-    const requestURL = `/api/Order/CommitDisconnect`;
+    const requestURL = `api/Order/CommitDisconnect`;
     console.log("Request body for cancellation service:", requestBody);
     PostApiRequest(
       requestURL,

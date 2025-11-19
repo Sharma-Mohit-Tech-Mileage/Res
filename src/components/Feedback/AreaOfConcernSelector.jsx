@@ -22,7 +22,7 @@ const concernOptions = [
   { id: "customer_support", label: "Customer Support" },
   { id: "feature_request", label: "Feature Request" },
   { id: "equipment_issue", label: "Equipment Issue" },
-  { id: "other", label: "Other" },
+  { id: "other_issues", label: "Other" },
 ];
 
 const AreaOfConcernSelector = ({

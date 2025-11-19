@@ -1,5 +1,14 @@
 import React, { useRef, useEffect } from "react";
-import { View, Text, StyleSheet, Pressable, Animated, Easing, } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Animated,
+  Easing,
+  AccessibilityInfo,
+  findNodeHandle,
+} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import Icon from "../common/Icon";
 import WalkthroughProgress from "./WalkthroughProgress";
@@ -13,7 +22,7 @@ const WalkthroughContent = ({
   onSkip,
 }) => {
   const pulseAnim = useRef(new Animated.Value(1)).current;
-
+  const titleRef = useRef(null);
   useEffect(() => {
     // Pulse animation for icon
     Animated.loop(
@@ -34,6 +43,18 @@ const WalkthroughContent = ({
     ).start();
   }, []);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (titleRef.current) {
+        const node = findNodeHandle(titleRef.current);
+        if (node) {
+          AccessibilityInfo.setAccessibilityFocus(node);
+        }
+      }
+    }, 350);
+    return () => clearTimeout(timeout);
+  }, [currentStep]);
+
   const { walkthrough } = tab;
   const isLastStep = currentStep === totalSteps - 1;
 
@@ -46,6 +67,7 @@ const WalkthroughContent = ({
             style={[styles.iconCircle, { transform: [{ scale: pulseAnim }] }]}
             accessible={true}
             accessibilityLabel={`${tab.name} tab icon`}
+             ref={titleRef}
           >
             <LinearGradient
               colors={["#edf1f4", "#edf1f4"]}
@@ -77,6 +99,7 @@ const WalkthroughContent = ({
         <Text
           style={styles.title}
           accessible={true}
+          accessibilityRole="header"
           accessibilityLabel={walkthrough.title}
         >
           {walkthrough.title}

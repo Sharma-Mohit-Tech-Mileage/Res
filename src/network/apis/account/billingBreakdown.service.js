@@ -18,7 +18,7 @@ const billingStatementApi = {
         }
       };
       
-      const response = await _axios.get(`/api/Statement/${accountNumber}/get`, {...config});
+      const response = await _axios.get(`api/Statement/${accountNumber}/get`, {...config});
      
       return response.data;
     } catch (error) {
@@ -42,7 +42,7 @@ const billingStatementApi = {
         },
       };
       const response = await _axios.get(
-        `/api/Statement/${accountNumber}/getbyId/${statementId}`,
+        `api/Statement/${accountNumber}/getbyId/${statementId}`,
         {...config}
       );
       

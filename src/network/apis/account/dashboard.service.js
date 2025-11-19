@@ -11,7 +11,7 @@ const getInternetPlan = async(accountId) =>{
             }
         };
 
-    return _axios.get(`/internet/api/internet/${accountId}/plan`,{...config}).then(res=>res.data).catch(error=>{ throw error})
+    return _axios.get(`internet/api/internet/${accountId}/plan`,{...config}).then(res=>res.data).catch(error=>{ throw error})
 };
 
 const getAccountInfo = async(accountId) =>{
@@ -22,7 +22,7 @@ const getAccountInfo = async(accountId) =>{
                 }
             };
 
-        return _axios.get(`/account/api/account/${accountId}`,{...config}).then(res=>res.data).catch(error=>{ throw error})
+        return _axios.get(`account/api/account/${accountId}`,{...config}).then(res=>res.data).catch(error=>{ throw error})
 };
 
 const getCurrentSpeedInfo = async()=> {
@@ -34,7 +34,7 @@ const getCurrentSpeedInfo = async()=> {
                 }
             };
             console.log('config',config)
-        return _axios.get(`/Internet/api/internet/${res.userInfo.accountNumber}/speedTest/Get`,{...config}).then(res=>res.data).catch(error=>{ throw error})
+        return _axios.get(`internet/api/internet/${res.userInfo.accountNumber}/speedTest/Get`,{...config}).then(res=>res.data).catch(error=>{ throw error})
 };
 
 const postCurrentSpeedInfo = async(params)=> {
@@ -57,7 +57,7 @@ const postCurrentSpeedInfo = async(params)=> {
                 }
         };
 
-        return _axios.post(`/Internet/api/internet/${user.userInfo.accountNumber}/speedTest/Post`, data, {...config}).then(res=>res.data).catch(error=>{ throw error})
+        return _axios.post(`internet/api/internet/${user.userInfo.accountNumber}/speedTest/Post`, data, {...config}).then(res=>res.data).catch(error=>{ throw error})
 };
 
 export {getAccountInfo, getCurrentSpeedInfo, postCurrentSpeedInfo, getInternetPlan}
