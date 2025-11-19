@@ -18,7 +18,7 @@ const paymentHistoryApi = {
       };
       
       // Use the actual API endpoint from your requirements
-      const response = await _axios.get(`/api/payments/${accountNumber}/paymentHistory`, {...config});
+      const response = await _axios.get(`api/payments/${accountNumber}/paymentHistory`, {...config});
       return response.data;
     } catch (error) {
       console.error("Error fetching payment history:", error);
@@ -42,7 +42,7 @@ const paymentHistoryApi = {
       };
       
       const response = await _axios.get(
-        `/api/payments/${accountNumber}/receipt/${paymentId}`,
+        `api/payments/${accountNumber}/receipt/${paymentId}`,
         {...config}
       );
       

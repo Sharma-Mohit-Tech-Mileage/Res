@@ -3,28 +3,25 @@ import { Env } from "./apis/account/Constants";
 import axios from "axios";
 import { RefreshToken } from '../components/user/Session';
 import { navigationRef } from '../navigations/UserNavigations';
-const API_ACP_BASEURL = Env.API_ACP_BASEURL.endsWith('/') ? Env.API_ACP_BASEURL : `${API_ACP_BASEURL}/`;
+const API_ACP_BASEURL = Env.API_ACP_BASEURL;
 const SUPPORT_URL = "https://support.sparklight.com/api/v2/help_center/";
 
 export let UserAuthorized = false;
 let isRefreshing = false;
 let failedQueue = [];
 
-// Function to set user authorization status
 export const isUserAuthorized = (authorize) => {
     UserAuthorized = authorize;
 };
 
 const handleFetchResponse = async (response, url, onSuccess, onError) => {
     try {
-        const rawResponse = await response.text(); // Read response as plain text
+        const rawResponse = await response.text(); 
 
         if (response.status === 204 || !rawResponse) {
-            onSuccess({ message: 'No content', code: response.status }); // Pass a success message for no content
-            return;
+            onSuccess({ message: 'No content', code: response.status });
         }
 
-        // Try parsing the response as JSON if not empty
         try {
             const json = JSON.parse(rawResponse);
             if (response.ok) {
@@ -40,7 +37,6 @@ const handleFetchResponse = async (response, url, onSuccess, onError) => {
     }
 };
 
-// Function to process the queue of requests during token refresh
 const processQueue = (error, token = null) => {
     failedQueue.forEach(({ resolve, reject }, index) => {
         if (error) {
@@ -52,7 +48,6 @@ const processQueue = (error, token = null) => {
     failedQueue = [];
 };
 
-// Function to handle API calls with token refresh logic
 const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess, onError) => {
     try {
         
@@ -99,7 +94,6 @@ export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => 
     const requestBody = { ...body };
     delete requestBody.idTokenGuid;
     delete requestBody.refreshToken;
-    
     const res = await axios.post(`${API_ACP_BASEURL}${endpoint}`, requestBody, {
       headers: {
         'Accept': 'application/json',
@@ -145,7 +139,6 @@ export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => 
 
 export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     const user = await getUser();
-    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
     const options = {
         method: 'POST',
         headers: {
@@ -155,13 +148,12 @@ export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
         body: JSON.stringify(body)
     };
 
-    fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, `${baseUrl}${endpoint}`, onSuccess, onError));
+    fetchWithTokenRefresh(fetch, `${API_ACP_BASEURL}${endpoint}`, options, onSuccess, onError)
+        .then(response => handleFetchResponse(response, `${API_ACP_BASEURL}${endpoint}`, onSuccess, onError));
 };
 
 export const UploadMultipartData = async (endpoint, data, onSuccess, onError) => {
     const user = await getUser();
-    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
     const formData = new FormData();
     formData.append("file", {
         name: data.name,
@@ -180,7 +172,7 @@ export const UploadMultipartData = async (endpoint, data, onSuccess, onError) =>
 
     const fetchFunction = (url, opts) => axios.post(url, opts.data, { headers: opts.headers });
 
-    fetchWithTokenRefresh(fetchFunction, `${baseUrl}${endpoint}`, options, onSuccess, onError)
+    fetchWithTokenRefresh(fetchFunction, `${API_ACP_BASEURL}${endpoint}`, options, onSuccess, onError)
         .then(response => onSuccess(response.data))
         .catch(error => {
             onError(error.message);
@@ -190,7 +182,6 @@ export const UploadMultipartData = async (endpoint, data, onSuccess, onError) =>
 // Function for PUT API requests
 export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
     const user = await getUser();
-    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
     const options = {
         method: 'PUT',
         headers: {
@@ -200,14 +191,13 @@ export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
         body: JSON.stringify(body)
     };
 
-    fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, `${baseUrl}${endpoint}`, onSuccess, onError));
+    fetchWithTokenRefresh(fetch, `${API_ACP_BASEURL}${endpoint}`, options, onSuccess, onError)
+        .then(response => handleFetchResponse(response, `${API_ACP_BASEURL}${endpoint}`, onSuccess, onError));
 };
 
 // Function for GET API requests
 export const GetApiRequest = async (endpoint, onSuccess, onError) => {
     const user = await getUser();
-    const baseUrl = await getBaseUrl(); 
     const options = {
         method: 'GET',
         headers: {
@@ -216,20 +206,18 @@ export const GetApiRequest = async (endpoint, onSuccess, onError) => {
         }
     };
 
-    fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
+    fetchWithTokenRefresh(fetch, `${API_ACP_BASEURL}${endpoint}`, options, onSuccess, onError)
         .then(response => {
             if (response.status === 204) {
                 onError(response.status);
             } else {
-                return handleFetchResponse(response, `${baseUrl}${endpoint}`, onSuccess, onError);
+                return handleFetchResponse(response, `${API_ACP_BASEURL}${endpoint}`, onSuccess, onError);
             }
         });
 };
 
-// Function to search API requests using support URL
 export const GetApiRequestSearch = async (endpoint, onSuccess, onError) => {
     const user = await getUser();
-
     const options = {
         method: 'GET',
         headers: {
@@ -263,26 +251,4 @@ export const GetModemStatusApiRequest = async (endpoint, onSuccess, onError) => 
         })
         .then(json => onSuccess(json))
         .catch(exception => onError(exception.message));
-};
-
-// Truck roll API request function
-export const PostruckRollApi = (endpoint, body, onSuccess, onError) => {
-    fetch(Env.TRUCK_ROLL_BASE_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            'Authorization': "Bearer dapie2a2368f30bbec7fd55a0cadbce8d388"
-        },
-        body: JSON.stringify(body),
-    })
-        .then((response) => Promise.all([response, response.json()]))
-        .then(([response, json]) => {
-            onSuccess(json);
-        })
-        .catch((exception) => onError(exception.message));
-};
-
-// Helper method to decide the base URL based on user type
-const getBaseUrl = async () => {
-    return API_ACP_BASEURL;
 };

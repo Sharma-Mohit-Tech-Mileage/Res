@@ -222,8 +222,9 @@ const SplashScreen = ({ navigation, route }) => {
       hasIdToken: !!request.idToken,
       hasAccessToken: !!request.accessToken,
     });
+    console.log("Calling SSO Login API with request:", JSON.stringify(request));
 
-    PostAuthApiRequest("/api/mobile/gettoken", request, onSuccess, onError);
+    PostAuthApiRequest("api/mobile/gettoken", request, onSuccess, onError);
   }, []);
 
   const onSuccess = useCallback(

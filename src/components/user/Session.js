@@ -46,7 +46,7 @@ const onError = (error) => {
 const retryRequest = async (data, retries = 1) => {
   try {
     return await new Promise((resolve, reject) => {
-      PostAuthApiRequest("/api/mobile/gettoken", data, resolve, reject);
+      PostAuthApiRequest("api/mobile/gettoken", data, resolve, reject);
     });
   } catch (error) {
     if (retries > 0) {

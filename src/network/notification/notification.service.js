@@ -22,7 +22,7 @@ export const getAllEmails = async () => {
         const accountNumber = await getUserAccountNumber();
         
         const response = await _axios.get(
-            `/api/Paperless/GetAllEmails?account=${accountNumber}`, 
+            `api/Paperless/GetAllEmails?account=${accountNumber}`, 
             {...config}
         );
         console.log(' Emails fetched successfully:', response.data);
@@ -41,7 +41,7 @@ export const isPaperlessEnabled = async (email) => {
         console.log('🔍 Checking paperless status for:', { email, accountNumber });
         
         const response = await _axios.get(
-            `/api/Paperless/IsPaperless?account=${accountNumber}&email=${email}`, 
+            `api/Paperless/IsPaperless?account=${accountNumber}&email=${email}`, 
             {...config}
         );
         console.log(' Paperless status checked:', response.data);
@@ -59,7 +59,7 @@ export const enrollPaperless = async (data) => {
         const accountNumber = await getUserAccountNumber();
         
         const response = await _axios.post(
-            `/api/Paperless/PaperlessEnrollment?emailAddress=${data.emailAddress}&account=${accountNumber}`, 
+            `api/Paperless/PaperlessEnrollment?emailAddress=${data.emailAddress}&account=${accountNumber}`, 
             null, 
             {...config}
         );
@@ -77,7 +77,7 @@ export const unenrollPaperless = async (data) => {
         const accountNumber = await getUserAccountNumber();
         const { emailAddress } = data;
         const response = await _axios.post(
-            `/api/Paperless/PaperlessUnenroll?emailAddress=${emailAddress}&account=${accountNumber}`,
+            `api/Paperless/PaperlessUnenroll?emailAddress=${emailAddress}&account=${accountNumber}`,
             null,
             { ...config }
         );
@@ -129,7 +129,7 @@ export const updatePrimaryEmail = async ({ newEmail, oldEmail }) => {
         };
         
         const response = await _axios.post(
-            '/api/UpdateEmail/UpdatePrimaryEmail', 
+            'api/UpdateEmail/UpdatePrimaryEmail', 
             payload, 
             {...config}
         );

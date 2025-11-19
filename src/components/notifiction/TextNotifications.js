@@ -235,7 +235,7 @@ const TextNotifications = ({ navigation }) => {
     console.log("postTextNotifications", postData);
     setIsLoading(true);
     PostApiRequest(
-      `/api/SMS`,
+      `api/SMS`,
       postData,
       (res) => {
         console.log(

@@ -16,10 +16,10 @@ const getProfileDetails = async () => {
   };
 
   return _axios
-    .get(`/api/profile/${accountNumber}`, { ...config })
+    .get(`api/profile/${accountNumber}`, { ...config })
     .then((res) => res.data)
     .catch((error) => {
-      console.error(`Error fetching /api/profile/${accountNumber}`, error);
+      console.error(`Error fetching api/profile/${accountNumber}`, error);
       throw error;
     });
 };
@@ -74,7 +74,7 @@ const fetchBillingStatus = async () => {
   };
 
   return _axios
-    .get(`/account/api/account/${accountNumber}/paperless/status`, {
+    .get(`account/api/account/${accountNumber}/paperless/status`, {
       ...config,
     })
     .then((res) => {
@@ -96,7 +96,7 @@ const fetchPaperLessDetails = async () => {
   };
 
   return _axios
-    .get(`/account/api/account/${accountNumber}/paperless`, { ...config })
+    .get(`account/api/account/${accountNumber}/paperless`, { ...config })
     .then((res) => {
       return res.data;
     })
@@ -136,7 +136,7 @@ const postProfileInfo = async (data) => {
       },
     };
 
-    const response = await _axios.put(`/api/profile`, data, config);
+    const response = await _axios.put(`api/profile`, data, config);
 
     return response.data;
   } catch (error) {
@@ -164,7 +164,7 @@ const postTextNotifictionInfo = async (data) => {
   };
   console.log("Making API Call to api/SMS with data:", postData); // Log the request data
   try {
-    const response = await _axios.post(`/api/SMS`, postData, config);
+    const response = await _axios.post(`api/SMS`, postData, config);
     return response.data;
   } catch (error) {
     console.error("API Call Failed, Error:", error); // Log the error
@@ -183,19 +183,19 @@ const putEmailNotification = async (email) => {
 
   try {
     const response = await _axios.put(
-      `/api/account/${accountNumber}/paperless/${email}`,
+      `api/account/${accountNumber}/paperless/${email}`,
       {},
       config
     );
 
     console.log(
-      `API Call Successful to /api/account/${accountNumber}/paperless/${email}, Response:`,
+      `API Call Successful to api/account/${accountNumber}/paperless/${email}, Response:`,
       response
     );
     return response;
   } catch (error) {
     console.error(
-      `Error in API Call to /api/account/${accountNumber}/paperless/${email}:`,
+      `Error in API Call to api/account/${accountNumber}/paperless/${email}:`,
       error
     );
     throw error;
@@ -213,19 +213,19 @@ const resendEmailVerification = async () => {
 
   try {
     const response = await _axios.post(
-      `/api/account/${accountNumber}/paperless/resend`,
+      `api/account/${accountNumber}/paperless/resend`,
       {},
       config
     );
 
     console.log(
-      `API Call Successful to /api/account/${accountNumber}/paperless/resend, Response:`,
+      `API Call Successful to api/account/${accountNumber}/paperless/resend, Response:`,
       response
     );
     return response;
   } catch (error) {
     console.error(
-      `Error in API Call to /api/account/${accountNumber}/paperless/resend:`,
+      `Error in API Call to api/account/${accountNumber}/paperless/resend:`,
       error
     );
     throw error;
@@ -243,20 +243,20 @@ const postEmailNotification = async (email) => {
 
   try {
     const response = await _axios.post(
-      `/api/account/${accountNumber}/paperless/${email}`,
+      `api/account/${accountNumber}/paperless/${email}`,
       {},
       config
     );
 
     console.log(
-      `API Call Successful to /api/account/${accountNumber}/paperless, Response:`,
+      `API Call Successful to api/account/${accountNumber}/paperless, Response:`,
       response
     );
     return response;
   } catch (error) {
     // Log the error with a descriptive message
     console.error(
-      `Error in API Call to /api/account/${accountNumber}/paperless:`,
+      `Error in API Call to api/account/${accountNumber}/paperless:`,
       error
     );
     throw error;
@@ -283,7 +283,7 @@ const postTermsAndConditions = async (flag) => {
     return response;
   } catch (error) {
     console.error(
-      `Error in API Call to /api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}:`,
+      `Error in API Call to api/mobileuser/${accountNumber}/updatemobiletcacceptanceflag/${userName}/${flag}:`,
       error
     );
     throw error;
@@ -313,18 +313,18 @@ const postTermsAndConditionsv2 = async (flag) => {
   };
   try {
     const response = await _axios.put(
-      "/api/Mobile/UpdateMobileAspnetUserData",
+      "api/Mobile/UpdateMobileAspnetUserData",
       payload,
       config
     );
     console.log(
-      `API Call Successful to /api/Mobile/UpdateMobileAspnetUserData, Response:`,
+      `API Call Successful to api/Mobile/UpdateMobileAspnetUserData, Response:`,
       response
     );
     return response;
   } catch (error) {
     console.error(
-      `Error in API Call to /api/Mobile/UpdateMobileAspnetUserData:`,
+      `Error in API Call to api/Mobile/UpdateMobileAspnetUserData:`,
       error
     );
     throw error;
@@ -358,7 +358,7 @@ const postPushNotifications = async (data) => {
     return response;
   } catch (error) {
     console.error(
-      `Error in API Call to /api/mobilenotificationpreferences/${userName}/mobilepreferences`,
+      `Error in API Call to api/mobilenotificationpreferences/${userName}/mobilepreferences`,
       error
     );
     throw error;
@@ -376,14 +376,14 @@ const unsubscribPaperLess = async () => {
   };
   try {
     const response = await _axios.put(
-      `/account/api/account/${accountNumber}/paperless/unsubscribe`,
+      `account/api/account/${accountNumber}/paperless/unsubscribe`,
       {},
       config
     );
     return response;
   } catch (error) {
     console.error(
-      `Error in API Call to /account/api/account/${accountNumber}/paperless/unsubscribe:`,
+      `Error in API Call to account/api/account/${accountNumber}/paperless/unsubscribe:`,
       error
     );
     throw error;
@@ -409,7 +409,7 @@ const handleSubmitFeedback = async (obj) => {
       customer_support: "Customer Support",
       feature_request: "Feature Request",
       equipment_issue: "Equipment Issue",
-      other_issues: "Other",
+      other_issues: "Other Issues",
     };
     return labels[id] || id;
   });
@@ -472,7 +472,7 @@ const handleSubmitFeedback = async (obj) => {
 
 const logError = async (errorData) => {
   try {
-    await _axios.post("/api/log/error", errorData);
+    await _axios.post("api/log/error", errorData);
     console.log("Error logged successfully");
   } catch (logErr) {
     console.error("Failed to log error:", logErr);
@@ -481,7 +481,7 @@ const logError = async (errorData) => {
 
 const logInfo = async (infoData) => {
   try {
-    const response = await _axios.post("/api/log/info", infoData);
+    const response = await _axios.post("api/log/info", infoData);
     console.log("Info logged successfully");
   } catch (logErr) {
     console.error("Failed to log info:", logErr);
@@ -498,7 +498,7 @@ const addUserAction = async (data) => {
   };
 
   try {
-    const response = await _axios.post("/api/users", data, config);
+    const response = await _axios.post("api/users", data, config);
     console.log("API Call Successful, Response:", response.data);
     return response.data;
   } catch (error) {
@@ -541,11 +541,11 @@ const removeUser = async (data) => {
     },
   };
 
-  console.log(`/api/users/remove/${data.accountNumber}/${data.userName}`); // Log the request data
+  console.log(`api/users/remove/${data.accountNumber}/${data.userName}`); // Log the request data
 
   try {
     const response = await _axios.put(
-      `/api/users/remove/${data.accountNumber}/${data.userName}`,
+      `api/users/remove/${data.accountNumber}/${data.userName}`,
       data,
       config
     );
@@ -564,7 +564,7 @@ const fetchAllSvEmails = async (data) => {
       Authorization: "Bearer " + user.token,
     },
   };
-  console.log(`/api/email/${accountNumber}/GetAllSVEmails`);
+  console.log(`api/email/${accountNumber}/GetAllSVEmails`);
   try {
     const response = await _axios.get(
       `api/email/${accountNumber}/GetAllSVEmails`,
@@ -589,7 +589,7 @@ const addSVEmailNoFlags = async (email) => {
 
   try {
     const response = await _axios.post(
-      `Mobile/api/email/${accountNumber}/${email}/AddSVEmailNoFlags`,
+      `mobile/api/email/${accountNumber}/${email}/AddSVEmailNoFlags`,
       {},
       config
     );
@@ -646,7 +646,7 @@ const updateSVEmails = async (emailList) => {
 
   try {
     const response = await _axios.post(
-      `Mobile/api/email/${accountNumber}/UpdateSVEmails`,
+      `mobile/api/email/${accountNumber}/UpdateSVEmails`,
       body,
       config
     );
@@ -670,7 +670,7 @@ const manageSVEmails = async (emailList) => {
     console.log("Request Config:", config);
     console.log("Email List:", emailList);
     const response = await _axios.post(
-      `Mobile/api/email/${accountNumber}/UpdateSVEmails`,
+      `mobile/api/email/${accountNumber}/UpdateSVEmails`,
       emailList,
       config
     );
@@ -691,7 +691,7 @@ const addSVEmailMktFlag = async (email) => {
   };
   try {
     const response = await _axios.post(
-      `/api/email/${accountNumber}/${email}/AddSVEmailMktFlag`,
+      `api/email/${accountNumber}/${email}/AddSVEmailMktFlag`,
       {},
       config
     );
@@ -712,7 +712,7 @@ const addSVEmailMktFlag = async (email) => {
  const isPaperlessEnabled = async (email, signal) => {
   const user = await getUser();
   const response = await _axios.get(
-    `/api/Paperless/IsPaperless?account=${user.userInfo.accountNumber}&email=${encodeURIComponent(email)}`,
+    `api/Paperless/IsPaperless?account=${user.userInfo.accountNumber}&email=${encodeURIComponent(email)}`,
     {
       headers: { Authorization: `Bearer ${user.token}` },
       signal, // <-- allows cancellation from saga
@@ -732,7 +732,7 @@ const fetchACPUserAccountDetails = async (signal) => {
     signal: signal,
   };
 
-  const requestUrl = `/api/Accounts/GetAccountDetails`;
+  const requestUrl = `api/Accounts/GetAccountDetails`;
   const data = {
     accountNumber: accountNumber,
     fieldList: [

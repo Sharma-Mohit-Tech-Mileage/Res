@@ -18,7 +18,7 @@ const Search = ({ navigation }) => {
 
   // Function to filter suggestions
   const filterSuggestions = (query) => {
-    const request = `/articles/search.json?page=${pageNo}&per_page=25&query=${query}&sort_by=created_at&sort_order=desc`;
+    const request = `articles/search.json?page=${pageNo}&per_page=25&query=${query}&sort_by=created_at&sort_order=desc`;
     GetApiRequestSearch(
       request,
       (res) => {
