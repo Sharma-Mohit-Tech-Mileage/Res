@@ -115,10 +115,9 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
           }}
         >
           <Text style={styles.subText}
-          accessible={false}>
+          >
             If you have any questions or need to reschedule, please call{" "}
-          </Text>
-          <Text
+            <Text
             style={[
               styles.subText,
               {
@@ -134,7 +133,8 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
           >
             877-692-2253
           </Text>
-          <Text style={styles.subText}>.</Text>
+          </Text>
+          
         </View>
       </View>
     );

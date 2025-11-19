@@ -100,17 +100,17 @@ const Support = ({ route }) => {
             `This app requires access to the camera to take photos for chat support.
                 If you deny camera access to MySparklight, you can enable it later in Settings.`,
             [
-              {
-                text: "Cancel",
-                onPress: () => null,
-                style: "cancel",
-              },
+              
               {
                 text: "Open Settings",
                 style: 'cancel',
                 onPress: () => {
                   Linking.openSettings();
                 },
+              },{
+                text: "Cancel",
+                onPress: () => null,
+                style: "cancel",
               },
             ],
             { cancelable: true }

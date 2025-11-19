@@ -98,7 +98,7 @@ const InAppNotifications = ({ navigation }) => {
             duration: 500,
             useNativeDriver: true,
           }).start(() => setNotification(null));
-        }, 3000);
+        }, 2000);
       }
     });
   }, [animatedValue, notification]);
@@ -159,7 +159,7 @@ const InAppNotifications = ({ navigation }) => {
     //   return updatedSettings;
     // });
 
-    checkNofif(value);
+    //checkNofif(value);
   };
 
   const initialNotificationStatus = async () => {
@@ -179,31 +179,17 @@ const InAppNotifications = ({ navigation }) => {
         await notifyPermission();
       } else {
         const enabledPermission = await requestUserPermission();
-        console.log("FCM HOME ENABLED?", enabledPermission);
         if (enabledPermission) {
-          const token = await getFcmToken();
-          console.log("FCM HOME WITH PERMISSION", token);
-          const localData = {
-            status: "accepted",
-            date: new Date(),
-          };
           setIsNotificationRequired(false);
           //storePushNotificationStatus(localData);
           //await dispatch(updatePushNotifications(data, null));
         } else {
           setIsNotificationRequired(true);
-          console.log("FCM HOME DENIED",enabledPermission);
-          //await notifyPermission();
-
           Alert.alert(
                 'Sparklight Would Like to Send You Notifications',
                 'Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.',
                 [
-                  {
-                    text: 'Cancel',
-                    style: 'cancel',
-                    onPress: () => { setIsNotificationRequired(false)}, 
-                  },
+                  
                   {
                     text: 'Go to Settings',
                     style: 'cancel',
@@ -214,7 +200,11 @@ const InAppNotifications = ({ navigation }) => {
                         Linking.openSettings();
                       }
                     },
-                  },
+                  },{
+                    text: 'Cancel',
+                    style: 'cancel',
+                    onPress: () => { setIsNotificationRequired(false)}, 
+                  }
                 ],
               );
         }
@@ -245,12 +235,26 @@ const InAppNotifications = ({ navigation }) => {
 
   const handleSave = async () => {
     console.log("isNotificationRquired", isNotificationRquired);
-    if (!isNotificationRquired) {
+    
+      await postRequestInAppNotification();
+    
+  };
+
+  const postRequestInAppNotification = async () => {
+
+       const pushNotification = await getPushNotificationStatus();
+      if (pushNotification?.permanentSkip) {
+        await notifyPermission();
+      } else {
+        await requestUserPermission();
+      }  
       const token = await getFcmToken();
+      let user = await getUser();
+      let deviceToken = await getDeviceUniqueId();
       formatedData.deviceToken = token;
       formatedData.deviceTokenTimestamp = moment().format();
       formatedData.isAndroid = Platform.OS === "android";
-      const request = {
+      const data = {
         optOut: formatedData.optOut,
         outageOptOut: formatedData.outageOptOut,
         billingOptOutStatus: formatedData.billingOptOutStatus,
@@ -258,15 +262,7 @@ const InAppNotifications = ({ navigation }) => {
         deviceTokenTimestamp: formatedData.deviceTokenTimestamp,
         isAndroid: formatedData.isAndroid,
       };
-      await postRequestInAppNotification(request);
-    } else {
-      checkNofif(true);
-    }
-  };
-
-  const postRequestInAppNotification = async (data) => {
-    let user = await getUser();
-    let deviceToken = await getDeviceUniqueId();
+    
     const accountNumber = user.userInfo?.accountNumber || null;
     const userName = user.userInfo?.userName || null;
     data.accountNumber = accountNumber;

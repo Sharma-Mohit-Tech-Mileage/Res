@@ -119,7 +119,8 @@ const NewBillerHome = ({ navigation }) => {
           setUpdateStatus(status);
           dispatch(fetchACPUserAccountDetails());
           getStatus();
-          getInAppNotificationsData();
+          //getInAppNotificationsData();
+          setIsNotificationEnable(true);
         } catch (error) {
           console.error("Error refreshing data on focus", error);
         }

@@ -57,10 +57,6 @@ const notifyPermission = async () => {
       'Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.',
       [
         {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
           text: 'Go to Settings',
           style: 'cancel',
           onPress: () => {
@@ -70,6 +66,10 @@ const notifyPermission = async () => {
               Linking.openSettings();
             }
           },
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
         },
       ],
     );

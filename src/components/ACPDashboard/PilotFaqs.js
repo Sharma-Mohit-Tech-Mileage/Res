@@ -50,7 +50,7 @@ const PilotFaqs = () => {
         ]}
         onPress={() => {
           //Linking.openURL(" https://www.sparklight.com/Activation-faqs");
-           navigation.navigate("ArticalWindowUtility", { url: "https://www.sparklight.com/Activation-faqs", name: "Activation-Faqs" })
+           navigation.navigate("ArticalWindowUtility", { url: "https://www.sparklight.com/Activation-faqs", name: "Sparklight Service Activation FAQs" })
         }}
         accessibilityRole="link"
         accessible={true}
