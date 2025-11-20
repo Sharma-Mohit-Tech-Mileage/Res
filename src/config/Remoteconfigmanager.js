@@ -5,7 +5,7 @@ import { ISUAT } from '../network/apis/account/Constants';
 const CACHE_KEY_MAINTENANCE = 'maintenance_config_cache';
 const CACHE_KEY_FEATURES = 'feature_flags_cache';
 const CACHE_KEY_LAST_FETCH = 'remote_config_last_fetch';
-const FETCH_INTERVAL_PROD = 3600000; // 1 hour
+const FETCH_INTERVAL_PROD = 300000; // 1 hour
 const FETCH_INTERVAL_DEV = 0; // Always fetch in dev/UAT
 
 // Config keys based on environment
