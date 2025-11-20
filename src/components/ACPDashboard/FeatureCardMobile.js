@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { FontFamily, FontSize, Color, Padding } from "../../../GlobalStyles";
 import Icon from "../common/Icon";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+
 const FeatureCardMobile = ({
   title,
   features = [],

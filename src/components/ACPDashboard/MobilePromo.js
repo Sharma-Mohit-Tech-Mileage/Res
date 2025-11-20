@@ -10,9 +10,15 @@ import {
 import AppStyles from "../utility/AppStyles";
 import FeatureCard from "./FeatureCardMobile";
 import { useNavigation } from "@react-navigation/native";
+import { useFeatureFlag } from '../../contexts/Featureflagscontext';
+import FeatureFlags from '../../config/Featureflags'
 const PromoImage = require("../../../assets/man-on-mobile-phone-app.jpg");
 
 const MobilePromo = () => {
+
+  const showSparklightMobile = useFeatureFlag(
+    FeatureFlags.DASHBOARD_SPARKLIGHT_MOBILE_SECTION
+  );
 
   const navigation=useNavigation();
   return (
@@ -27,7 +33,7 @@ const MobilePromo = () => {
       accessibilityRole='none'
       source={PromoImage} resizeMode='stretch' style={styles.promoImageSty}  />
       </View>
-
+    { showSparklightMobile &&
       <FeatureCard
         isLoading={false}
         title="Paperless Billing"
@@ -42,6 +48,7 @@ const MobilePromo = () => {
         }
 
       />
+   }
     </View>
   );
 };
