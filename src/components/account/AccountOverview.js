@@ -55,7 +55,7 @@ const logoutConfirmationPopup = (dispatch, navigation) => {
         style: "cancel",
       },
       {
-        text: "Ok",
+        text: "OK",
         style: "cancel",
         onPress: () => {
           logoutAction(dispatch, navigation);

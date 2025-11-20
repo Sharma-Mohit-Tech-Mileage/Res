@@ -18,7 +18,7 @@ import {
   Padding,
   Border,
 } from "../../../GlobalStyles";
-import * as yup from "yup";
+
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import { useRoute, useIsFocused } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
@@ -38,20 +38,6 @@ import {
 } from "../../firebase/FirebaseUtils";
 import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
 
-// Define your validation schema
-const validationSchema = yup.object().shape({
-  phoneNumber: yup
-    .string()
-    .matches(
-      /^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/,
-      "Invalid mobile phone number."
-    )
-    .required("Phone number is required"),
-  optOut: yup.boolean(),
-  outageOptOut: yup.boolean(),
-  billingOptOutStatus: yup.boolean(),
-});
-
 const InAppNotifications = ({ navigation }) => {
   const route = useRoute();
   const [initialize, setInitializeSettings] = useState(
@@ -68,12 +54,7 @@ const InAppNotifications = ({ navigation }) => {
   const [isNotificationRquired, setIsNotificationRequired] = useState(false);
   const [notification, setNotification] = useState(null);
   const formatedData = route.params?.additionalData || {};
-  const checkNotifData =
-    formatedData?.optOut ||
-    formatedData?.outageOptOut ||
-    formatedData?.billingOptOutStatus;
-  console.log("checkNotifData", checkNotifData);
-
+  
   const translateY = animatedValue;
   const animateNotification = useCallback(() => {
     // Clear any existing timeout
@@ -120,10 +101,8 @@ const InAppNotifications = ({ navigation }) => {
 
   useEffect(() => {
     if (isFocused) {
-     
       const initializedSettings = additionalData;
       setInitializeSettings(initializedSettings);
-      
     }
 
     return () => {
@@ -133,20 +112,18 @@ const InAppNotifications = ({ navigation }) => {
     };
   }, [isFocused]);
 
+  // Handle app state changes
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        initialNotificationStatus();
+      }
+    });
 
-   // Handle app state changes
-    useEffect(() => {
-      const subscription = AppState.addEventListener("change", (nextAppState) => {
-        if (nextAppState === "active") {
-          initialNotificationStatus();
-        }
-      });
-  
-      return () => {
-        subscription.remove();
-      };
-    }, []);
-  
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   const handleToggleChange = (e) => {
     const { name, value } = e.target;
@@ -186,27 +163,29 @@ const InAppNotifications = ({ navigation }) => {
         } else {
           setIsNotificationRequired(true);
           Alert.alert(
-                'Sparklight Would Like to Send You Notifications',
-                'Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.',
-                [
-                  
-                  {
-                    text: 'Go to Settings',
-                    style: 'cancel',
-                    onPress: () => {
-                      if (Platform.OS === 'ios') {
-                        Linking.openURL('app-settings:');
-                      } else {
-                        Linking.openSettings();
-                      }
-                    },
-                  },{
-                    text: 'Cancel',
-                    style: 'cancel',
-                    onPress: () => { setIsNotificationRequired(false)}, 
+            "Sparklight Would Like to Send You Notifications",
+            "Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.",
+            [
+              {
+                text: "Go to Settings",
+                style: "cancel",
+                onPress: () => {
+                  if (Platform.OS === "ios") {
+                    Linking.openURL("app-settings:");
+                  } else {
+                    Linking.openSettings();
                   }
-                ],
-              );
+                },
+              },
+              {
+                text: "Cancel",
+                style: "cancel",
+                onPress: () => {
+                  setIsNotificationRequired(false);
+                },
+              },
+            ]
+          );
         }
       }
     } else {
@@ -235,49 +214,39 @@ const InAppNotifications = ({ navigation }) => {
 
   const handleSave = async () => {
     console.log("isNotificationRquired", isNotificationRquired);
-    
-      await postRequestInAppNotification();
-    
+
+    await postRequestInAppNotification();
   };
 
   const postRequestInAppNotification = async () => {
-
-       const pushNotification = await getPushNotificationStatus();
-      if (pushNotification?.permanentSkip) {
-        await notifyPermission();
-      } else {
-        await requestUserPermission();
-      }  
-      const token = await getFcmToken();
-      let user = await getUser();
-      let deviceToken = await getDeviceUniqueId();
-      formatedData.deviceToken = token;
-      formatedData.deviceTokenTimestamp = moment().format();
-      formatedData.isAndroid = Platform.OS === "android";
-      const data = {
-        optOut: formatedData.optOut,
-        outageOptOut: formatedData.outageOptOut,
-        billingOptOutStatus: formatedData.billingOptOutStatus,
-        deviceToken: formatedData.deviceToken,
-        deviceTokenTimestamp: formatedData.deviceTokenTimestamp,
-        isAndroid: formatedData.isAndroid,
-      };
-    
+    if(formatedData.optOut || formatedData.outageOptOut || formatedData.billingOptOutStatus){
+    checkNofif(true);
+  }
+    const token = await getFcmToken();
+    let user = await getUser();
+    let deviceId = await getDeviceUniqueId();
     const accountNumber = user.userInfo?.accountNumber || null;
     const userName = user.userInfo?.userName || null;
-    data.accountNumber = accountNumber;
-    data.userName = userName;
 
-    data["id"] = 0;
-    data["DeviceId"] = deviceToken;
-    data["customerType"] = "Residential";
-    data["optOut"] = !data.optOut;
-    data["outageOptOut"] = !data.outageOptOut;
-    data["billingOptOutStatus"] = !data.billingOptOutStatus;
+    
     setIsLoading(true);
+    const requestData = {
+        accountNumber: accountNumber,
+        deviceToken: token || deviceId,
+        DeviceId: deviceId,
+        deviceTokenTimestamp: moment().format(),
+        isAndroid: Platform.OS === "android",
+        optOut: !formatedData.optOut,
+        outageOptOut: !formatedData.outageOptOut,
+        userName: userName,
+        billingOptOutStatus: !formatedData.billingOptOutStatus,
+        customerType: "Residential",
+      };
+      console.log("postRequestInAppNotification requestData", requestData);
+    const requestUrl = `api/mobilenotificationpreferences/${userName}/mobilepreferences`;
     PostApiRequest(
-      `api/mobilenotificationpreferences/${userName}/mobilepreferences`,
-      data,
+      requestUrl,
+      requestData,
       (res) => {
         console.log("postRequestInAppNotification response", res);
         setIsLoading(false);

@@ -113,6 +113,10 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
             flexWrap: "wrap",
             marginTop: 4,
           }}
+           accessibilityLabel="877-692-2253"
+            accessibilityRole="link"
+            accessibilityHint="Double tap to open link"
+            accessible={true}
         >
           <Text style={styles.subText}
           >
@@ -127,12 +131,11 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
               },
             ]}
             onPress={() => Linking.openURL("tel:8776922253")}
-            accessibilityLabel="Call 877-692-2253"
-            accessibilityRole="link"
-            accessible={true}
+            
           >
             877-692-2253
           </Text>
+          <Text style={styles.subText} accessible={false}>.</Text>
           </Text>
           
         </View>
@@ -191,13 +194,14 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
               },
             ]}
             onPress={() => Linking.openURL("tel:8776922253")}
-            accessibilityLabel="Call 877-692-2253"
+            accessibilityLabel="877-692-2253"
             accessibilityRole="link"
+            accessibilityHint="Double tap to open link"
             accessible={true}
           >
             877-692-2253
           </Text>
-          <Text style={styles.subText}>.</Text>
+          <Text style={styles.subText} accessible={false}>.</Text>
         </View>
       </View>
     );
@@ -237,13 +241,14 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
               },
             ]}
             onPress={() => Linking.openURL("tel:8776922253")}
-            accessibilityLabel="Call 877-692-2253"
+            accessibilityLabel="877-692-2253"
             accessibilityRole="link"
+            accessibilityHint="Double tap to open link"
             accessible={true}
           >
             877-692-2253
           </Text>
-          <Text style={styles.subText}>.</Text>
+          <Text style={styles.subText} accessible={false}>.</Text>
         </View>
       </View>
     );

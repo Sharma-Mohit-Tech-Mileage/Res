@@ -19,7 +19,8 @@ import NewSupportIcon from "../res/svgIcons/NewSupportIcon";
 import HomeAccountIcon from "../res/svgIcons/HomeAccountIcon";
 import { FontFamily, Color, FontSize } from "../../GlobalStyles";
 import MobilePilotLandingPage from "../../src/components/ACPDashboard/MobilePilotLandingPage";
-
+//import { useFeatureFlag } from '../contexts/FeatureFlagsContext';
+//import FeatureFlags from '../config/FeatureFlags';
 const Tab = createBottomTabNavigator();
 
 
@@ -40,8 +41,6 @@ const MyTabs = ({ route }) => {
 const isMobilePilotEnabled = useSelector(
   (state) => state.user.userData?.userInfo?.pending_activation === true
 );
-
-  
 
 const COMPONENT_MAP = {
   HomeStackScreen: isMobilePilotEnabled ? MobilePilotLandingPage : HomeStackScreen,
