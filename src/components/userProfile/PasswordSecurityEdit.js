@@ -182,7 +182,7 @@ const PasswordSecurityEdit = () => {
                   >
                     Security Question
                   </Text>
-                  <Text style={[AppStyles.requiredField]} accessible={true} accessibilityRole="text" accessibilityLabel="Required fields information. Fields marked with asterisk are required">
+                  <Text style={[AppStyles.requiredField]} accessible={true} accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
                   {" "}
                   Fields marked with * are required.
                 </Text>
@@ -203,7 +203,7 @@ const PasswordSecurityEdit = () => {
                       selectedValue={customSecurityQuestion}
                       onValueChange={handleSecurityQuestionChange}
                       isDropDownOpen={handleDropdownStateChange}
-                      accessibilityLabel="Select security question"
+                      accessibilityLabel="Select security question Required"
                       accessibilityHint="Double tap to open security question options"
                     />
                   </View>
@@ -244,7 +244,7 @@ const PasswordSecurityEdit = () => {
                       <SparkLightInput
                         onBlur={onBlur}
                         onChangeText={onChange}
-                        label="Password Reset Answer *"
+                        label="Password Reset Answer Required"
                         value={value}
                         error={error?.message}
                         accessibilityLabel="Security question answer input"

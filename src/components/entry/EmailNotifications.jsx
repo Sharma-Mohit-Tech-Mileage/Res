@@ -144,7 +144,7 @@ const EmailNotifications = ({ navigation }) => {
                   style={AppStyles.requiredField}
                   accessibilityRole="text"
                   accessible={true}
-                  accessibilityLabel="Required fields information. Fields marked with asterisk are required."
+                  accessibilityLabel="Fields marked with asterisk are required."
                 >
                   {" "}
                   Fields marked with * are required.
