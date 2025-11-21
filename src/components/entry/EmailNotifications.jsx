@@ -174,7 +174,7 @@ const EmailNotifications = ({ navigation }) => {
                       }}
                       value={value ? value.toLowerCase() : ""}
                       error={errors.email?.message}
-                      accessibilityLabel="Email address input"
+                      accessibilityLabel="Email address Required"
                       keyboardType="email-address"
                       autoCapitalize="none"
                       textContentType="emailAddress"

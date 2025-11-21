@@ -204,6 +204,8 @@ const ChangePassword = () => {
                             placeholder="New Password"
                             onBlur={onBlur}
                             label={'New Password *'}
+                            accessibilityHint="Enter your new password"
+                            accessibilityLabel={'New Password Required'}
                             onChangeText={onChange}
                             value={value}
                             secure={true}

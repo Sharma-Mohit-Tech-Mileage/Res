@@ -187,7 +187,7 @@ const NewBillerHome = ({ navigation }) => {
         permanentSkip: false,
       };
       storePushNotificationStatus(localData);
-      await dispatch(updatePushNotificationsv2(data, null));
+      //await dispatch(updatePushNotificationsv2(data, null));
     } else {
       const token = await getFcmToken();
       const dataWithoutPermission = {
@@ -206,7 +206,7 @@ const NewBillerHome = ({ navigation }) => {
         permanentSkip: true,
       };
       storePushNotificationStatus(localData);
-      await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
+      //await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
     }
   };
 

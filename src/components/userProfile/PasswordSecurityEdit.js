@@ -194,6 +194,7 @@ const PasswordSecurityEdit = () => {
                     <Text
                       style={[styles.firstName1, styles.firstTypo]}
                       accessible={!dropdownFocused}
+                      accessibilityLabel="Password Reset Question Required"
                       
                     >
                       Password Reset Question *
@@ -237,6 +238,15 @@ const PasswordSecurityEdit = () => {
                 <View
                   style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}
                 >
+
+                  <Text
+                      style={[styles.firstName1, styles.firstTypo,{marginBottom:8}]}
+                      accessible={!dropdownFocused}
+                      accessibilityLabel="Password Reset Answer Required"
+                      
+                    >
+                      Password Reset Answer *
+                    </Text>
                   <Controller
                     control={control}
                     name="securityAnswer"
@@ -244,10 +254,9 @@ const PasswordSecurityEdit = () => {
                       <SparkLightInput
                         onBlur={onBlur}
                         onChangeText={onChange}
-                        label="Password Reset Answer Required"
+                        
                         value={value}
                         error={error?.message}
-                        accessibilityLabel="Security question answer input"
                         accessibilityHint="Enter your answer to the security question"
                       />
                     )}

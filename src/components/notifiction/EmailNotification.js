@@ -315,7 +315,7 @@ const AddNotificationScreen = () => {
                     value={value ? value.toLowerCase() : ""}
                     error={errors.email?.message}
                     label="Email Address *"
-                    accessibilityLabel="Email address input"
+                    accessibilityLabel="Email address Required"
                     keyboardType="email-address"
                     autoCapitalize="none"
                     textContentType="emailAddress"
