@@ -14,6 +14,8 @@ import MobilePromo from "./MobilePromo";
 import PilotFaqs from "./PilotFaqs";
 import { useSelector } from "react-redux";
 import moment from "moment";
+import { useFeatureFlag } from '../../contexts/Featureflagscontext';
+import FeatureFlags from '../../config/Featureflags'
 
 const DEFAULT_DATE_FORMAT = "MM/DD/YYYY";
 
@@ -22,7 +24,9 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
   const [isMobileServiceActive, setIsMobileServiceActive] =
     React.useState(false);
   const [action, setAction] = React.useState("");
-
+ const showSparklightMobile = useFeatureFlag(
+    FeatureFlags.DASHBOARD_SPARKLIGHT_MOBILE_SECTION
+  );
   useEffect(() => {
     /* Determine if the mobile service should be active based on user data */
     if (userData?.mobile_eligible === true && userData?.has_mobile === false) {
@@ -309,7 +313,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
           <PilotServiceStatus currentStage={2} />
         </View>
 
-        {isMobileServiceActive && <MobilePromo />}
+        {isMobileServiceActive && showSparklightMobile && <MobilePromo />}
         <PilotFaqs />
       </ScrollView>
     </View>
