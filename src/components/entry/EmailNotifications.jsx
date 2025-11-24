@@ -141,10 +141,10 @@ const EmailNotifications = ({ navigation }) => {
                 </Text>
 
                 <Text
-                  style={AppStyles.requiredField}
+                  style={[AppStyles.requiredField, { textAlign: "center" }]}
                   accessibilityRole="text"
                   accessible={true}
-                  accessibilityLabel="Fields marked with asterisk are required."
+                  accessibilityLabel="Fields marked with an asterisk are required"
                 >
                   {" "}
                   Fields marked with * are required.
@@ -160,7 +160,14 @@ const EmailNotifications = ({ navigation }) => {
                 accessibilityRole="none"
                 accessibilityLabel="Email address input section"
               >
-                <Text style={styles.fieldLabel} accessible={false}>Email Address *</Text>
+                <Text
+                  style={styles.fieldLabel}
+                  accessible={true}
+                  accessibilityRole="text"
+                  accessibilityLabel="Email Address required"
+                >
+                  Email Address *
+                </Text>
                 <Controller
                   control={control}
                   name="email"

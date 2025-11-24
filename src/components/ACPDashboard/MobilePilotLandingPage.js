@@ -117,8 +117,8 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
             flexWrap: "wrap",
             marginTop: 4,
           }}
-           accessibilityLabel="877-692-2253"
-            accessibilityRole="link"
+           accessibilityLabel="If you have any questions or need to reschedule, please call 877-692-2253 "
+            accessibilityRole="text"
             accessibilityHint="Double tap to open link"
             accessible={true}
         >

@@ -27,6 +27,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateTextNotification } from "../../redux/actions/ProfileActionSuite";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import NavigationUtils from "./NavigationUtils";
+import AppStyles from "../utility/AppStyles";
 const validationSchema = yup.object().shape({
   phoneNumber: yup
     .string()
@@ -149,9 +150,22 @@ const TextNotifications = ({ navigation }) => {
                 </Text>
               </View>
               <View style={styles.subHeader}>
-                <Text style={styles.subHeaderText}>
+                <Text
+                  style={styles.subHeaderText}
+                  accessibilityRole="text"
+                  accessible={true}
+                  accessibilityLabel="Receive text alerts related to your account, updates and more from Sparklight"
+                >
                   Receive text alerts related to your account, updates and more
                   from Sparklight.
+                </Text>
+                <Text
+                  style={[AppStyles.requiredField, { textAlign: "center" }]}
+                  accessibilityRole="text"
+                  accessible={true}
+                  accessibilityLabel="Fields marked with an asterisk are required"
+                >
+                  Fields marked with * are required.
                 </Text>
               </View>
             </View>
@@ -163,18 +177,27 @@ const TextNotifications = ({ navigation }) => {
                 control={control}
                 name="phoneNumber"
                 render={({ field: { onChange, onBlur, value } }) => (
-                  <SparkLightInput
-                    placeholder="Mobile Number"
-                    keyboardType="number-pad"
-                    onBlur={onBlur}
-                    onChangeText={(text) => {
-                      onChangeText(text);
-                      onChange(text);
-                    }}
-                    value={value}
-                    error={errors.phoneNumber?.message}
-                    maxLength={11}
-                  />
+                  <>
+                    <Text
+                      style={styles.inputLabel}
+                      accessibilityRole="text"
+                      accessibilityLabel="Mobile Number required"
+                    >
+                      Mobile Number *
+                    </Text>
+                    <SparkLightInput
+                      placeholder="Mobile Number"
+                      keyboardType="number-pad"
+                      onBlur={onBlur}
+                      onChangeText={(text) => {
+                        onChangeText(text);
+                        onChange(text);
+                      }}
+                      value={value}
+                      error={errors.phoneNumber?.message}
+                      maxLength={11}
+                    />
+                  </>
                 )}
               />
             </View>
@@ -464,6 +487,15 @@ const styles = StyleSheet.create({
   },
   subInput: {
     marginTop: 25,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontFamily: FontFamily.openSansSemiBold,
+    color: Color.colorGray_100,
+    marginBottom: 8,
+    textAlign: "left",
+    width: "100%",
+    paddingHorizontal: 4,
   },
   viewContainer: {
     flex: 1,
