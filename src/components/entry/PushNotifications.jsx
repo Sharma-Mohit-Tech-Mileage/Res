@@ -64,7 +64,7 @@ const PushNotifications = ({ navigation }) => {
       await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
       await NavigationUtils.navigateToNext(
         navigation,
-        "EntryPushNotifications",
+        "EntryTextNotifications",
         profile,
         accountNumber
       );
@@ -80,7 +80,7 @@ const PushNotifications = ({ navigation }) => {
     storePushNotificationStatus(data);
     await NavigationUtils.navigateToNext(
       navigation,
-      "EntryPushNotifications",
+      "EntryTextNotifications",
       profile,
       accountNumber
     );

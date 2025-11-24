@@ -276,7 +276,12 @@ const InAppNotifications = ({ navigation }) => {
     <View style={styles.inAppNotifications}>
       <ProfileSettingsHeader
         title="Edit In-App Notifications"
-        onPressBack={() => navigation.navigate("Notifications")}
+        onPressBack={() => {
+          console.log("Navigating back to Notifications route",JSON.stringify(route));
+          
+          navigation.navigate("Notifications")
+        }
+      }
       />
 
       {isLoading && (

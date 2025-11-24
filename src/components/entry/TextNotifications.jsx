@@ -18,7 +18,7 @@ import {
 } from "../../../GlobalStyles";
 import * as yup from "yup";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { useRoute, useIsFocused } from "@react-navigation/native";
+import { useRoute, useIsFocused,useNavigationState,useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 import NotificationAlert from "../common/customui/NotificationAlert";
@@ -28,6 +28,7 @@ import { getUser } from "../../redux/utils/LocalStorage";
 import { getDeviceUniqueId } from "../../firebase/FirebaseUtils";
 import { PostApiRequest } from "../../network/APIClient";
 import LoadingOverlay from "../common/customui/CustomLoading";
+
 
 import {
   getFcmToken,
@@ -50,8 +51,11 @@ const validationSchema = yup.object().shape({
   billingOptOutStatus: yup.boolean(),
 });
 
-const InAppNotifications = ({ navigation }) => {
+const InAppNotifications = () => {
+  const navigation = useNavigation();
   const route = useRoute();
+   const routes = useNavigationState(state => state.routes);
+
   const [initialize, setInitializeSettings] = useState(
     route.params?.additionalData
   );
@@ -281,7 +285,17 @@ const InAppNotifications = ({ navigation }) => {
     <View style={styles.inAppNotifications}>
       <ProfileSettingsHeader
         title="Edit In-App Notifications"
-        onPressBack={() => navigation.navigate("Notifications")}
+        onPressBack={() => {
+          console.log("Navigating back to Notifications routec2",JSON.stringify(route));
+           const screenExists = routes.some(route => route.name === 'Notifications');
+
+  if (!screenExists) {
+    navigation.navigate("MyTabs", { screen: "Account", params: { screen: "Notifications" } });
+  }else {
+    navigation.navigate("Notifications");
+    }
+           
+        } }
       />
 
       {isLoading && (

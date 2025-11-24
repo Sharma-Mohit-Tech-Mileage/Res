@@ -12,6 +12,7 @@ import Terms from '../components/entry/Terms';
 import MyTabs from "./MyTab";
 import { AxiosInterceptorProvider } from '../network/RestApiClient';
 import MaintenanceWrapper from '../components/maintenance/MaintenanceWrapper';
+import Notifications from "../components/notifiction/Notifications";
 
 const Stack = createNativeStackNavigator();
 
