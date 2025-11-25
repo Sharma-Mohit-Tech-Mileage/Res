@@ -62,7 +62,6 @@ setup_permissions([
 # …
 
 target 'My Sparklight' do
-  
   config = use_native_modules!
   use_frameworks! :linkage => :static
   # Flags change depending on the env values.
@@ -77,6 +76,7 @@ target 'My Sparklight' do
     
  use_react_native!(
   :path => config[:reactNativePath],
+  :hermes_enabled => false,
   :new_arch_enabled => false,
   :app_path => "#{Pod::Config.instance.installation_root}/.."
 )
