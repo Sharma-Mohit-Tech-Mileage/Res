@@ -52,6 +52,7 @@ const SparkLightInput = ({
   onChangeText,
   style,
   accessibilityLabel,
+  accessibilityHint,
   secure = false,
   error,
   editable = true,
@@ -172,7 +173,7 @@ const SparkLightInput = ({
           accessibilityLabel={getAccessibilityLabel()}
           accessibilityRole="text"
           accessibilityHint={
-            getKeyboardType() === "phone-pad" ? "Enter phone number" : undefined
+            getKeyboardType() === "phone-pad" ? "Mobile number required text field. double tap to edit." : accessibilityHint
           }
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}

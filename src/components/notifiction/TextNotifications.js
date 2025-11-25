@@ -343,7 +343,22 @@ const TextNotifications = ({ navigation }) => {
               {/* <Text style={[styles.mobilePhoneTypo]}>
                 Edit Mobile Phone Number
                 </Text> */}
-              <Text style={[styles.mobilePhoneTypo]}>{message}</Text>
+              <Text
+                style={[styles.mobilePhoneTypo]}
+                accessibilityRole="text"
+                accessible={true}
+                accessibilityLabel={message}
+              >
+                {message}
+              </Text>
+              <Text
+                style={styles.requiredFieldsText}
+                accessibilityRole="text"
+                accessible={true}
+                accessibilityLabel="Fields marked with an asterisk are required"
+              >
+                Fields marked with * are required.
+              </Text>
             </View>
 
             <View style={styles.frameGroup}>
@@ -360,7 +375,11 @@ const TextNotifications = ({ navigation }) => {
                     render={({ field: { onChange, onBlur, value } }) => (
                       <SparkLightInput
                         placeholder="Mobile Number"
-                        label={"Mobile Number"}
+                        label={"Mobile Number *"}
+                        accessible={true}
+                        accessibilityRole="text"
+                        accessibilityLabel="Mobile Number required"
+                        accessibilityHint="Mobile number required text field. double tap to edit."
                         onBlur={onBlur}
                         onChangeText={onChange}
                         keyboardType="number-pad"
@@ -563,6 +582,13 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     textAlign: "left",
     fontFamily: FontFamily.openSansRegular,
+  },
+  requiredFieldsText: {
+    fontSize: 14,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.gray600,
+    marginTop: Padding.p_base,
+    textAlign: "left",
   },
   buttonsLayout: {
     width: "100%",
