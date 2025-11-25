@@ -379,7 +379,7 @@ const TextNotifications = ({ navigation }) => {
                         accessible={true}
                         accessibilityRole="text"
                         accessibilityLabel="Mobile Number required"
-                        accessibilityHint="Mobile number required text field. double tap to edit."
+                        //accessibilityHint="required text field. double tap to edit."
                         onBlur={onBlur}
                         onChangeText={onChange}
                         keyboardType="number-pad"

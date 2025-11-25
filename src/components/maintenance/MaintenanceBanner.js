@@ -125,7 +125,7 @@ const MaintenanceBanner = ({
           <TouchableOpacity
             style={styles.closeButtonContainer}
             onPress={onDismiss}
-            accessibilityLabel="Dismiss maintenance banner"
+            accessibilityLabel="Close "
             accessibilityRole="button"
             accessibilityHint="Double tap to close this message"
             accessible={true}

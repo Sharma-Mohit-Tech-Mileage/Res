@@ -43,7 +43,7 @@ const NotificationAlert = ({
       titleColor: "#000000",
       closeButtonColor: "#0060AE",
       IconComponent: InfoIcon,
-      iconLabel: "Information icon.",
+      iconLabel: "Information icon",
       labelPrefix: "Information Notification: ",
     },
     error: {
@@ -54,7 +54,7 @@ const NotificationAlert = ({
       titleColor: "#000000",
       closeButtonColor: "#B92A1C",
       IconComponent: InfoIcon,
-      iconLabel: "Error icon.",
+      iconLabel: "Error icon",
       labelPrefix: "Error Notification: ",
     },
     success: {
@@ -65,7 +65,7 @@ const NotificationAlert = ({
       titleColor: "#000000",
       closeButtonColor: "#1D7832",
       IconComponent: SuccessIcon,
-      iconLabel: "Success icon.",
+      iconLabel: "Success icon",
       labelPrefix: "Success Notification: ",
     },
     warning: {
@@ -76,7 +76,7 @@ const NotificationAlert = ({
       titleColor: "#000000",
       closeButtonColor: "#DD6D02",
       IconComponent: WarningIcon,
-      iconLabel: "Warning icon.",
+      iconLabel: "Warning icon",
       labelPrefix: "Warning Notification: ",
     },
   };
@@ -124,6 +124,13 @@ const NotificationAlert = ({
             !title ? styles.messageOnEmpty : styles.message,
             { color: currentTypeStyle.textColor },
           ]}
+          accessible={true}
+        accessibilityLabel={
+          currentTypeStyle.labelPrefix +
+          (message || "")
+        }
+        accessibilityLiveRegion="polite"
+        importantForAccessibility="yes"
         >
           {parts.map((part, i) => (
             <React.Fragment key={i}>
@@ -177,19 +184,13 @@ const NotificationAlert = ({
             borderColor: currentTypeStyle.borderColor,
           },
         ]}
-        accessible={true}
-        accessibilityLabel={
-          currentTypeStyle.labelPrefix +
-          (message || "")
-        }
-        accessibilityLiveRegion="polite"
-        importantForAccessibility="yes"
+        
       >
         <View
           style={[styles.iconStyle, { marginTop: !title ? 1 : 1, marginEnd: 10 }]}
           accessible={true}
           accessibilityLabel={currentTypeStyle.iconLabel}
-          accessibilityRole="image"
+          accessibilityRole="text"
         >
           <IconComponent
             width={24}
@@ -202,7 +203,8 @@ const NotificationAlert = ({
 
         <View
           style={[
-            styles.textContentContainer,
+            styles.textContentContainer, {flex: 1},
+            
             !showCloseIcon && styles.textContentContainerNoClose,
           ]}
         >
@@ -238,7 +240,7 @@ const NotificationAlert = ({
             onPress={handleClose}
             style={styles.closeButton}
             accessible={true}
-            accessibilityLabel="Close notification button"
+            accessibilityLabel="Close  button"
             accessibilityHint="Double tap to close"
             accessibilityRole="button"
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}

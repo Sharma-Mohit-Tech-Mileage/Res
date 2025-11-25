@@ -170,10 +170,10 @@ const SparkLightInput = ({
                 : Color.sparklightDarkGray,
             },
           ]}
-          accessibilityLabel={getAccessibilityLabel()}
+          //accessibilityLabel={getAccessibilityLabel()}
           accessibilityRole="text"
           accessibilityHint={
-            getKeyboardType() === "phone-pad" ? "Mobile number required text field. double tap to edit." : accessibilityHint
+            getKeyboardType() === "phone-pad" ? "Required text field. double tap to edit." : accessibilityHint
           }
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}

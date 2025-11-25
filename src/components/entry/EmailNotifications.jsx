@@ -129,7 +129,7 @@ const EmailNotifications = ({ navigation }) => {
                   Turn on Email Notifications
                 </Text>
               </View>
-              <View style={styles.subHeader} accessible={true}>
+              <View style={styles.subHeader} >
                 <Text
                   style={styles.subHeaderText}
                   accessibilityRole="text"
@@ -182,6 +182,7 @@ const EmailNotifications = ({ navigation }) => {
                       value={value ? value.toLowerCase() : ""}
                       error={errors.email?.message}
                       accessibilityLabel="Email address Required"
+                      accessibilityHint={"required text field. double tap to edit"}
                       keyboardType="email-address"
                       autoCapitalize="none"
                       textContentType="emailAddress"
@@ -382,6 +383,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
     fontSize: FontSize.size_sm,
+    marginBottom: 5,
     fontWeight: "600",
   },
 });
