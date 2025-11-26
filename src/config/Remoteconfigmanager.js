@@ -2,10 +2,13 @@ import remoteConfig from '@react-native-firebase/remote-config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppState } from 'react-native';
 import { ISUAT } from '../network/apis/account/Constants';
+
 const CACHE_KEY_MAINTENANCE = 'maintenance_config_cache';
 const CACHE_KEY_FEATURES = 'feature_flags_cache';
 const CACHE_KEY_LAST_FETCH = 'remote_config_last_fetch';
-const FETCH_INTERVAL_PROD = 300000; // 1 hour
+
+// Fetch intervals
+const FETCH_INTERVAL_PROD = 300000; // 5 minutes
 const FETCH_INTERVAL_DEV = 0; // Always fetch in dev/UAT
 
 // Config keys based on environment
@@ -102,11 +105,16 @@ class RemoteConfigManager {
       // Setup AppState listener for background/foreground
       this._setupAppStateListener();
 
-      // Fetch in background (non-blocking)
-      this._fetchInBackground();
-
       this._initialized = true;
       console.log('[RemoteConfig] Initialized successfully');
+
+      // CRITICAL: Notify subscribers with cached values immediately
+      // This ensures MaintenanceContext gets cached config on cold start
+      this._notifyMaintenanceSubscribers();
+      this._notifyFeatureSubscribers();
+
+      // Fetch in background (non-blocking) - will notify again if changed
+      this._fetchInBackground();
     } catch (error) {
       console.error('[RemoteConfig] Initialization error:', error);
       // Use defaults on error
@@ -203,60 +211,72 @@ class RemoteConfigManager {
       await remoteConfig().fetch(0);
       
       // Activate
-      const activated = await remoteConfig().activate();
+      await remoteConfig().activate();
 
-      if (activated || force) {
-        console.log('[RemoteConfig] Config activated');
+      console.log('[RemoteConfig] Config activated, processing values...');
 
-        // Parse maintenance config
-        const maintenanceJson = remoteConfig().getValue(CONFIG_KEY_MAINTENANCE).asString();
-        let parsedMaintenance = JSON.parse(maintenanceJson);
-        
+      // Parse maintenance config
+      const maintenanceJson = remoteConfig().getValue(CONFIG_KEY_MAINTENANCE).asString();
+      let parsedMaintenance = {};
+      
+      try {
+        parsedMaintenance = JSON.parse(maintenanceJson);
         // Handle nested structure (dev_config contains maintenance_configuration)
         if (parsedMaintenance.maintenance_configuration) {
           parsedMaintenance = parsedMaintenance.maintenance_configuration;
         }
-
-        // Parse feature flags
-        const featuresJson = remoteConfig().getValue(CONFIG_KEY_FEATURES).asString();
-        const parsedFeatures = JSON.parse(featuresJson);
-
-        // Update caches
-        const maintenanceChanged = JSON.stringify(this._maintenanceCache) !== JSON.stringify(parsedMaintenance);
-        const featuresChanged = JSON.stringify(this._featuresCache) !== JSON.stringify(parsedFeatures);
-
-        this._maintenanceCache = parsedMaintenance;
-        this._featuresCache = parsedFeatures;
-        this._lastFetchTime = Date.now();
-
-        // Save to AsyncStorage
-        await Promise.all([
-          AsyncStorage.setItem(CACHE_KEY_MAINTENANCE, JSON.stringify(parsedMaintenance)),
-          AsyncStorage.setItem(CACHE_KEY_FEATURES, JSON.stringify(parsedFeatures)),
-          AsyncStorage.setItem(CACHE_KEY_LAST_FETCH, this._lastFetchTime.toString())
-        ]);
-
-        // Notify subscribers only if configs changed
-        if (maintenanceChanged) {
-          console.log('[RemoteConfig] Maintenance config changed, notifying subscribers');
-          this._notifyMaintenanceSubscribers();
-        }
-
-        if (featuresChanged) {
-          console.log('[RemoteConfig] Feature flags changed, notifying subscribers');
-          this._notifyFeatureSubscribers();
-        }
-
-        return { maintenanceChanged, featuresChanged };
-      } else {
-        console.log('[RemoteConfig] No changes detected');
-        return { maintenanceChanged: false, featuresChanged: false };
+      } catch (e) {
+        console.warn('[RemoteConfig] Failed to parse maintenance config:', e.message);
+        parsedMaintenance = this._maintenanceCache || DEFAULT_MAINTENANCE;
       }
+
+      // Parse feature flags
+      const featuresJson = remoteConfig().getValue(CONFIG_KEY_FEATURES).asString();
+      let parsedFeatures = {};
+      
+      try {
+        parsedFeatures = JSON.parse(featuresJson);
+      } catch (e) {
+        console.warn('[RemoteConfig] Failed to parse feature flags:', e.message);
+        parsedFeatures = this._featuresCache || DEFAULT_FEATURES;
+      }
+
+      // Check for changes
+      const maintenanceChanged = JSON.stringify(this._maintenanceCache) !== JSON.stringify(parsedMaintenance);
+      const featuresChanged = JSON.stringify(this._featuresCache) !== JSON.stringify(parsedFeatures);
+
+      // Update caches
+      this._maintenanceCache = parsedMaintenance;
+      this._featuresCache = parsedFeatures;
+      this._lastFetchTime = Date.now();
+
+      // Save to AsyncStorage
+      await Promise.all([
+        AsyncStorage.setItem(CACHE_KEY_MAINTENANCE, JSON.stringify(parsedMaintenance)),
+        AsyncStorage.setItem(CACHE_KEY_FEATURES, JSON.stringify(parsedFeatures)),
+        AsyncStorage.setItem(CACHE_KEY_LAST_FETCH, this._lastFetchTime.toString())
+      ]);
+
+      console.log('[RemoteConfig] Maintenance changed:', maintenanceChanged, '| Features changed:', featuresChanged);
+
+      // ALWAYS notify subscribers so they have latest values
+      console.log('[RemoteConfig] Notifying all subscribers');
+      this._notifyMaintenanceSubscribers();
+      this._notifyFeatureSubscribers();
+
+      return { maintenanceChanged, featuresChanged };
+
     } catch (error) {
-      // Suppress fetch errors in production (use cached values)
-      if (__DEV__ || ISUAT) {
-        console.warn('[RemoteConfig] Fetch failed:', error.message);
+      console.warn('[RemoteConfig] Fetch failed:', error.message);
+      
+      // Even on error, notify with cached values
+      if (this._maintenanceCache) {
+        this._notifyMaintenanceSubscribers();
       }
+      if (this._featuresCache) {
+        this._notifyFeatureSubscribers();
+      }
+      
       return { maintenanceChanged: false, featuresChanged: false };
     } finally {
       this._isFetching = false;
