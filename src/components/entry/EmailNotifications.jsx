@@ -129,7 +129,7 @@ const EmailNotifications = ({ navigation }) => {
                   Turn on Email Notifications
                 </Text>
               </View>
-              <View style={styles.subHeader} accessible={true}>
+              <View style={styles.subHeader} >
                 <Text
                   style={styles.subHeaderText}
                   accessibilityRole="text"
@@ -141,10 +141,10 @@ const EmailNotifications = ({ navigation }) => {
                 </Text>
 
                 <Text
-                  style={AppStyles.requiredField}
+                  style={[AppStyles.requiredField, { textAlign: "center" }]}
                   accessibilityRole="text"
                   accessible={true}
-                  accessibilityLabel="Fields marked with asterisk are required."
+                  accessibilityLabel="Fields marked with an asterisk are required"
                 >
                   {" "}
                   Fields marked with * are required.
@@ -160,7 +160,14 @@ const EmailNotifications = ({ navigation }) => {
                 accessibilityRole="none"
                 accessibilityLabel="Email address input section"
               >
-                <Text style={styles.fieldLabel} accessible={false}>Email Address *</Text>
+                <Text
+                  style={styles.fieldLabel}
+                  accessible={true}
+                  accessibilityRole="text"
+                  accessibilityLabel="Email Address required"
+                >
+                  Email Address *
+                </Text>
                 <Controller
                   control={control}
                   name="email"
@@ -175,6 +182,7 @@ const EmailNotifications = ({ navigation }) => {
                       value={value ? value.toLowerCase() : ""}
                       error={errors.email?.message}
                       accessibilityLabel="Email address Required"
+                      accessibilityHint={"required text field. double tap to edit"}
                       keyboardType="email-address"
                       autoCapitalize="none"
                       textContentType="emailAddress"
@@ -375,6 +383,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: Color.sparklightGray1,
     fontSize: FontSize.size_sm,
+    marginBottom: 5,
     fontWeight: "600",
   },
 });

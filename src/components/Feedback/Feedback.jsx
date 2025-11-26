@@ -162,6 +162,14 @@ const Feedback = () => {
             <Text style={styles.question}>
               How would you rate your experience using the MySparklight app?
             </Text>
+            <Text
+              style={styles.requiredFieldsText}
+              accessibilityRole="text"
+              accessible={true}
+              accessibilityLabel="Fields marked with an asterisk are required"
+            >
+              Fields marked with * are required.
+            </Text>
           </Animated.View>
 
           <Animated.View
@@ -217,7 +225,7 @@ const Feedback = () => {
               render={({ field: { onChange, onBlur, value } }) => (
                 <>
                   <SparkLightInput
-                    label="Additional Feedback"
+                    label="Additional Feedback *"
                     textAlignVertical="top"
                     onChangeText={onChange}
                     onBlur={onBlur}
@@ -226,6 +234,7 @@ const Feedback = () => {
                     maxLength={500}
                     height={130}
                     error={errors.feedbackText?.message}
+                    accessibilityLabel="Additional Feedback required"
                   />
                   <Text
                     style={styles.charCount}
@@ -250,13 +259,14 @@ const Feedback = () => {
               name="feedbackEmail"
               render={({ field: { onChange, onBlur, value } }) => (
                 <SparkLightInput
-                  label="Email"
+                  label="Email *"
                   onChangeText={onChange}
                   onBlur={onBlur}
                   value={value ? value.toLowerCase() : ""}
                   error={errors.feedbackEmail?.message}
                   keyboardType="email-address"
                   autoCapitalize="none"
+                  accessibilityLabel="Email required"
                 />
               )}
             />
@@ -326,6 +336,13 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     fontFamily: FontFamily.openSansRegular,
     color: Color.gray600,
+  },
+  requiredFieldsText: {
+    fontSize: 14,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.gray600,
+    marginTop: Padding.p_base,
+    textAlign: "left",
   },
   ratingWrapper: {
     paddingTop: Padding.p_5xl,

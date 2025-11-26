@@ -33,8 +33,13 @@ const AreaOfConcernSelector = ({
 }) => {
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, hasError && styles.labelError]}>
-        Area of Concern
+      <Text
+        style={[styles.label, hasError && styles.labelError]}
+        accessible={true}
+        accessibilityRole="text"
+        accessibilityLabel="Area of Concern required"
+      >
+        Area of Concern *
       </Text>
       <View style={styles.chipsContainer}>
         {concernOptions.map((option) => (

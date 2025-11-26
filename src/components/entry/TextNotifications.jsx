@@ -1,582 +1,511 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import {
+  View,
   StyleSheet,
   Text,
-  Pressable,
-  View,
-  Animated,
   ScrollView,
+  Pressable,
   Platform,
-  AppState,
+  TouchableOpacity,
+  Linking,
 } from "react-native";
 import {
   Color,
-  FontSize,
   FontFamily,
+  FontSize,
   Padding,
   Border,
 } from "../../../GlobalStyles";
-import * as yup from "yup";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { useRoute, useIsFocused } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
-import { widthPercentageToDP } from "react-native-responsive-screen";
-import NotificationAlert from "../common/customui/NotificationAlert";
-import moment from "moment";
-import Toggle from "../common/Toggle";
-import { getUser } from "../../redux/utils/LocalStorage";
-import { getDeviceUniqueId } from "../../firebase/FirebaseUtils";
-import { PostApiRequest } from "../../network/APIClient";
-import LoadingOverlay from "../common/customui/CustomLoading";
-
-import {
-  getFcmToken,
-  notifyPermission,
-  requestUserPermission,
-} from "../../firebase/FirebaseUtils";
-import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
-
-// Define your validation schema
+import PhoneRingingIcon from "../../res/svgIcons/PhoneRingingIcon";
+import { useForm, Controller } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import SparkLightInput from "../common/customui/SparkLightInput";
+import CheckBox from "@react-native-community/checkbox";
+import { useSelector, useDispatch } from "react-redux";
+import { updateTextNotification } from "../../redux/actions/ProfileActionSuite";
+import AlertIcon from "../../res/svgIcons/AlertIcon";
+import NavigationUtils from "./NavigationUtils";
+import AppStyles from "../utility/AppStyles";
 const validationSchema = yup.object().shape({
   phoneNumber: yup
     .string()
     .matches(
-      /^(?:(\+1|1)?\s*(?:\([2-9]\d{2}\)\ ?|[2-9]\d{2}[- ]?)[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?)?$/,
+      /^(?:1)?\s*(?:\([2-9]\d{2}\)\s*|[2-9]\d{2}[- ]?)?[2-9]\d{2}[- ]?\d{4}(?:\s*(?:ext|x)\s*\d{2,6})?$/,
       "Invalid mobile phone number."
     )
     .required("Phone number is required"),
-  optOut: yup.boolean(),
-  outageOptOut: yup.boolean(),
-  billingOptOutStatus: yup.boolean(),
 });
 
-const InAppNotifications = ({ navigation }) => {
-  const route = useRoute();
-  const [initialize, setInitializeSettings] = useState(
-    route.params?.additionalData
-  );
-  const [showErrorAlert, setShowErrorAlert] = useState(false);
-  const additionalData = route.params?.additionalData;
+const TextNotifications = ({ navigation }) => {
   const dispatch = useDispatch();
-  const scrollViewRef = useRef(null);
-  const animatedValue = useRef(new Animated.Value(-100)).current;
-  const timeoutRef = useRef(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const isFocused = useIsFocused();
-  const [isNotificationRquired, setIsNotificationRequired] = useState(false);
-  const [notification, setNotification] = useState(null);
-  const formatedData = route.params?.additionalData || {};
-  const checkNotifData =
-    formatedData?.optOut ||
-    formatedData?.outageOptOut ||
-    formatedData?.billingOptOutStatus;
-  console.log("checkNotifData", checkNotifData);
+  const [input, setInput] = useState("");
+  const [toggleCheckBox, setToggleCheckBox] = useState(false);
+  const [enableButton, setEnableButton] = useState(false);
+  const [nextScreen, setNextScreen] = useState("EntryEmailNotifications");
+  const [keyboardHidden, setKeyboardHidden] = useState(true);
+  const [isTermRequired, setIsTermRequired] = useState(false);
+  const scrollRef = useRef();
+  const user = useSelector((state) => state.user.userData);
+  const profile = useSelector((state) => state.profile || {});
+  const accountNumber = user?.userInfo?.accountNumber || "";
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+    defaultValues: {
+      phoneNumber: "",
+    },
+  });
 
-  const translateY = animatedValue;
-  const animateNotification = useCallback(() => {
-    // Clear any existing timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-
-    // Always animate in notification from off-screen
-    animatedValue.setValue(-100);
-
-    Animated.timing(animatedValue, {
-      toValue: 0,
-      duration: 500,
-      useNativeDriver: true,
-    }).start(() => {
-      // Only auto-dismiss if notification is NOT an error type
-      if (notification && notification.type !== "error") {
-        timeoutRef.current = setTimeout(() => {
-          Animated.timing(animatedValue, {
-            toValue: -100,
-            duration: 500,
-            useNativeDriver: true,
-          }).start(() => setNotification(null));
-        }, 3000);
-      }
-    });
-  }, [animatedValue, notification]);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (notification) {
-      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-      animateNotification();
-    }
-  }, [notification, animateNotification]);
-
-  useEffect(() => {
-    if (isFocused) {
-      const initializedSettings = additionalData;
-      setInitializeSettings(initializedSettings);
-    }
-
-    return () => {
-      if (isFocused) {
-        setInitializeSettings({});
-      }
-    };
-  }, [isFocused]);
-
-  // Handle app state changes
-  useEffect(() => {
-    const subscription = AppState.addEventListener("change", (nextAppState) => {
-      if (nextAppState === "active") {
-        initialNotificationStatus();
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
-
-  const handleToggleChange = (e) => {
-    const { name, value } = e.target;
-    formatedData[name] = value;
-    // setInitializeSettings((initialize) => {
-    //   const updatedSettings = {
-    //     ...initialize,
-    //     [name]: !value,
-    //   };
-    //   return updatedSettings;
-    // });
-
-    checkNofif(value);
-  };
-
-  const initialNotificationStatus = async () => {
-    const enabledPermission = await requestUserPermission();
-    console.log("FCM INITIAL ENABLED?", enabledPermission);
-    if (enabledPermission) {
-      setIsNotificationRequired(false);
+  const onChangeText = (text) => {
+    setInput(text);
+    if (toggleCheckBox && text.length > 0) {
+      setEnableButton(true);
     } else {
-      setIsNotificationRequired(true);
+      setEnableButton(false);
     }
   };
 
-  const checkNofif = async (value) => {
-    if (value) {
-      const pushNotification = await getPushNotificationStatus();
-      if (pushNotification?.permanentSkip) {
-        await notifyPermission();
-      } else {
-        const enabledPermission = await requestUserPermission();
-        console.log("FCM HOME ENABLED?", enabledPermission);
-        if (enabledPermission) {
-          const token = await getFcmToken();
-          console.log("FCM HOME WITH PERMISSION", token);
-          const localData = {
-            status: "accepted",
-            date: new Date(),
-          };
-          setIsNotificationRequired(false);
-          //storePushNotificationStatus(localData);
-          //await dispatch(updatePushNotifications(data, null));
-        } else {
-          setIsNotificationRequired(true);
-          console.log("FCM HOME DENIED");
-          await notifyPermission();
-        }
-      }
+  const onCheckBox = (value) => {
+    setToggleCheckBox(value);
+    if (value && input !== undefined && input !== null && input.length > 0) {
+      setEnableButton(true);
     } else {
-      console.log("FCM HOME ALREADY ENABLED");
+      setEnableButton(false);
     }
   };
 
-  useEffect(() => {
-    if (route.params?.updateFailed) {
-      setShowErrorAlert(true);
-      scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
-      navigation.setParams({ updateFailed: undefined });
-    }
-  }, [route.params?.updateFailed, navigation, dispatch]);
+  const handleTermsLinkPress = useCallback(
+    (event) => {
+      event.stopPropagation();
+      Linking.openURL(
+        "https://www.sparklight.com/legal/text-messaging-terms-and-conditions"
+      );
+    },
+    [navigation]
+  );
 
-  useEffect(() => {
-    if (route.params?.updateSuccess) {
-      setNotification({
-        message: route.params.successMessage,
-        type: "success",
-      });
-    } else if (route.params?.updateFailed) {
-      //setNotification({ message: route.params.failureMessage, type: "error" });
-    }
-  }, [route.params]);
-
-  const handleSave = async () => {
-    console.log("isNotificationRquired", isNotificationRquired);
-    if (!isNotificationRquired) {
-      const token = await getFcmToken();
-      formatedData.deviceToken = token;
-      formatedData.deviceTokenTimestamp = moment().format();
-      formatedData.isAndroid = Platform.OS === "android";
-      const request = {
-        optOut: formatedData.optOut,
-        outageOptOut: formatedData.outageOptOut,
-        billingOptOutStatus: formatedData.billingOptOutStatus,
-        deviceToken: formatedData.deviceToken,
-        deviceTokenTimestamp: formatedData.deviceTokenTimestamp,
-        isAndroid: formatedData.isAndroid,
-      };
-      await postRequestInAppNotification(request);
-    } else {
-      checkNofif(true);
-    }
-  };
-
-  const postRequestInAppNotification = async (data) => {
-    let user = await getUser();
-    let deviceToken = await getDeviceUniqueId();
-    const accountNumber = user.userInfo?.accountNumber || null;
-    const userName = user.userInfo?.userName || null;
-    data.accountNumber = accountNumber;
-    data.userName = userName;
-
-    data["id"] = 0;
-    data["DeviceId"] = deviceToken;
-    data["customerType"] = "Residential";
-    data["optOut"] = !data.optOut;
-    data["outageOptOut"] = !data.outageOptOut;
-    data["billingOptOutStatus"] = !data.billingOptOutStatus;
-    setIsLoading(true);
-    PostApiRequest(
-      `api/mobilenotificationpreferences/${userName}/mobilepreferences`,
-      data,
-      (res) => {
-        setIsLoading(false);
-        if (res) {
-          setNotification({
-            message:
-              "Your in-app notification preferences have been updated successfully.",
-            type: "success",
-          });
-          //navigation.navigate("Notifications", { updateSuccess: true, successMessage: "In-App Notifications updated successfully." });
-        }
-      },
-      (error) => {
-        setIsLoading(false);
-        console.error("Error on retrying postRequestInAppNotification", error);
-        setNotification({
-          message: "In-App Notifications update failed.",
-          type: "error",
-        });
-        //setShowErrorAlert(true);
-        //navigation.navigate("Notifications", { updateFailed: true, failureMessage: "In-App Notifications update failed." });
-      }
+   const handleSkip = async () => {
+    await NavigationUtils.navigateToNext(
+      navigation,
+      "EntryTextNotifications",
+      profile,
+      accountNumber
     );
   };
 
+  const enableTextNotifications = async() => {
+    const data = {
+      accountNumber: user.userInfo.accountNumber,
+      billingOptOutStatus: true,
+      optOut: true,
+      outageOptOut: true,
+      phoneNumber: input,
+    };
+    
+    if (toggleCheckBox && input.length > 0) {
+      await dispatch(updateTextNotification(data, null));
+      await NavigationUtils.navigateToNext(
+        navigation,
+        "EntryTextNotifications",
+        profile,
+        accountNumber
+      );
+    } else {
+      setIsTermRequired(true);
+    }
+  };
+
   return (
-    <View style={styles.inAppNotifications}>
-      <ProfileSettingsHeader
-        title="Edit In-App Notifications"
-        onPressBack={() => navigation.navigate("Notifications")}
-      />
-
-      {isLoading && (
-        <LoadingOverlay
-          loading={isLoading}
-          loadingTxt="Saving"
-          accessibilityLiveRegion="polite"
-        />
-      )}
-
-      <ScrollView>
-        <View style={styles.inAppNotificationsInner}>
-          <View style={{ alignSelf: "stretch" }}>
-            <View style={[styles.frameGroup, styles.frameBorder]}>
-              {notification && (
-                <Animated.View
-                  style={{
-                    transform: [{ translateY }],
-                    paddingHorizontal: Padding.p_5xl,
-                  }}
-                  accessible={true}
-                >
-                  <View style={styles.spaceBottom}>
-                    <NotificationAlert
-                      type={notification.type}
-                      title={
-                        notification.type === "error" ? "Error" : "Success"
-                      }
-                      message={notification.message}
-                      showCloseIcon={false}
-                      onClose={() => setNotification(null)}
-                      accessibilityLiveRegion="assertive"
-                      accessibilityRole="alert"
-                      accessibilityLabel={notification.message}
-                    />
-                  </View>
-                </Animated.View>
-              )}
-
-              <View style={styles.infoWrapper}>
-                <NotificationAlert
-                  type="error"
-                  title="Error"
-                  message="Notifications updated failed."
-                  showCloseIcon={true}
-                  isVisible={showErrorAlert}
-                  onClose={() => setShowErrorAlert(false)}
-                />
+    <View style={styles.container}>
+      <ProfileSettingsHeader showIcon={false} title={"Notifications"} />
+      <ScrollView
+        style={styles.inner}
+        contentContainerStyle={styles.innerContent}
+        ref={scrollRef}
+        keyboardShouldPersistTaps="always"
+      >
+        <>
+          <View style={styles.headerTabView}>
+            <View style={styles.headerTabOne} />
+            <View style={styles.headerTabTwo} />
+            <View style={styles.headerTabThree} />
+          </View>
+          <View style={styles.viewContainer}>
+            <View>
+              <View style={styles.headerIconViewContainer}>
+                <View style={styles.headerIconView}>
+                  <PhoneRingingIcon />
+                </View>
               </View>
-              <NotificationSetting
-                title="Appointments"
-                name="optOut"
-                value={formatedData.optOut}
-                description="Receive app notifications when your appointments have updates."
-                onChange={handleToggleChange}
-              />
-              <NotificationSetting
-                title="Outage Alerts"
-                name="outageOptOut"
-                value={formatedData.outageOptOut}
-                description="Receive app notifications when outage occur."
-                onChange={handleToggleChange}
-              />
-              <NotificationSetting
-                title="Billing"
-                name="billingOptOutStatus"
-                value={formatedData.billingOptOutStatus}
-                description="Receive app notifications for billing."
-                onChange={handleToggleChange}
+              <View style={styles.header}>
+                <Text style={styles.headerText}>
+                  Turn on Text Notifications
+                </Text>
+              </View>
+              <View style={styles.subHeader}>
+                <Text
+                  style={styles.subHeaderText}
+                  accessibilityRole="text"
+                  accessible={true}
+                  accessibilityLabel="Receive text alerts related to your account, updates and more from Sparklight"
+                >
+                  Receive text alerts related to your account, updates and more
+                  from Sparklight.
+                </Text>
+                <Text
+                  style={[AppStyles.requiredField, { textAlign: "center" }]}
+                  accessibilityRole="text"
+                  accessible={true}
+                  accessibilityLabel="Fields marked with an asterisk are required"
+                >
+                  Fields marked with * are required.
+                </Text>
+              </View>
+            </View>
+            <View
+              style={[styles.subInput, { width: "85%" }]}
+              onLayout={(event) => {}}
+            >
+              <Controller
+                control={control}
+                name="phoneNumber"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <>
+                    <Text
+                      style={styles.inputLabel}
+                      accessibilityRole="text"
+                      accessibilityLabel="Mobile Number required"
+                    >
+                      Mobile Number *
+                    </Text>
+                    <SparkLightInput
+                      placeholder="Mobile Number"
+                      keyboardType="number-pad"
+                      onBlur={onBlur}
+                      onChangeText={(text) => {
+                        onChangeText(text);
+                        onChange(text);
+                      }}
+                      value={value}
+                      error={errors.phoneNumber?.message}
+                      maxLength={11}
+                    />
+                  </>
+                )}
               />
             </View>
+          </View>
+          <View style={styles.bottomContainer}></View>
 
-            <View style={styles.buttonsParent}>
-              <Pressable
-                accessible={true}
-                accessibilityLabel="Save"
-                accessibilityRole="button"
-                style={({ pressed }) => [
-                  {
-                    backgroundColor: Color.colorMidnightblue,
-                    opacity: pressed ? 0.7 : 1.0,
-                  }, // Changes opacity based on press state
-                  styles.buttonsLayout,
-                ]}
-                onPress={handleSave}
+          <View
+            style={{
+              marginHorizontal: 20,
+              marginVertical: 20,
+            }}
+          >
+            <View style={styles.checkBoxArea}>
+              <TouchableOpacity
+                style={styles.checkboxTouchable}
+                onPress={onCheckBox.bind(null, !toggleCheckBox)}
+                accessibilityRole="checkbox"
+                accessibilityLabel="I agree to Text Messaging Terms and Conditions"
+                accessibilityState={{ checked: toggleCheckBox }}
+              >
+                <View style={styles.checkboxContainer}>
+                  <CheckBox
+                    disabled={true}
+                    value={toggleCheckBox}
+                    onValueChange={onCheckBox.bind(null, !toggleCheckBox)}
+                    style={styles.checkBox}
+                    boxType="square"
+                    tintColor={
+                      isTermRequired ? "#EF4E3E" : Color.colorWhitesmoke_300
+                    }
+                    tintColors={{
+                      true: "#1B99FF",
+                      false: isTermRequired ? "#EF4E3E" : "#D0D5DD",
+                    }}
+                    accessible={false}
+                  />
+                  <Text
+                    style={[styles.checkBoxAreaViewText, { marginLeft: 4 }]}
+                    allowFontScaling={true}
+                    maxFontSizeMultiplier={1}
+                  >
+                    I agree to{" "}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleTermsLinkPress}
+                accessibilityRole="link"
+                accessibilityLabel="View Text Messaging Terms and Conditions"
+                accessibilityHint="Opens Text Messaging Terms and Conditions in a new window"
               >
                 <Text
-                  style={[{ color: Color.sparklightWhite }, styles.makeTypo]}
+                  style={[
+                    styles.checkBoxAreaViewText,
+                    {
+                      color: Color.sparklightBrightPurple,
+                      textDecorationLine: "underline",
+                    },
+                  ]}
+                  allowFontScaling={true}
+                  maxFontSizeMultiplier={1}
                 >
-                  Save
+                  Text Messaging Terms & Conditions
                 </Text>
-              </Pressable>
-              <Pressable
-                accessible={true}
-                accessibilityLabel="Cancel"
-                accessibilityRole="button"
-                style={({ pressed }) => [
-                  styles.buttons1,
-                  styles.buttonsLayout,
-                  { opacity: pressed ? 0.7 : 1.0 },
-                ]}
-                onPress={() => navigation.navigate("Notifications")}
+              </TouchableOpacity>
+            </View>
+            {isTermRequired && (
+              <View style={{ paddingTop: 8, flexDirection: "row" }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                  }}
+                >
+                  <AlertIcon />
+                  <Text style={styles.ErrorToggle}>
+                    Please agree to the Terms & Conditions to proceed.
+                  </Text>
+                </View>
+              </View>
+            )}
+          </View>
+          <View style={styles.bottomBar}>
+            <Pressable
+              disabled={!enableButton}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !enableButton }}
+              accessibilityLabel="Enable Text Notifications"
+              accessibilityHint="Activates text message notifications for your account."
+              style={
+                enableButton
+                  ? [styles.button, styles.buttonsLayout]
+                  : [styles.button, styles.buttonsLayout, styles.buttonDisabled]
+              }
+              onPress={handleSubmit(enableTextNotifications)}
+            >
+              <Text
+                style={
+                  enableButton
+                    ? styles.accept
+                    : [styles.accept, styles.buttonDisabledText]
+                }
               >
-                <Text
-                  style={[{ color: Color.colorMidnightblue }, styles.makeTypo]}
-                >
-                  Cancel
-                </Text>
+                Enable Text Notifications
+              </Text>
+            </Pressable>
+            <View
+              style={styles.buttonsParent}
+              accessibilityLabel="Buttons Section"
+            >
+              <Pressable
+                style={[styles.buttonDecline, styles.buttonsLayout]}
+                onPress={handleSkip}
+                accessibilityLabel="Skip Button"
+                accessibilityRole="button"
+                accessibilityHint="Skip Terms and Conditions"
+              >
+                <Text style={styles.decline}>Skip for now</Text>
               </Pressable>
             </View>
           </View>
-        </View>
+          {!keyboardHidden && <View style={styles.textBottomHeight} />}
+        </>
       </ScrollView>
     </View>
   );
 };
 
-const NotificationSetting = ({ name, value, title, description, onChange }) => (
-  <View style={[styles.frameContainer, styles.frameBorder]}>
-    <View style={styles.frameView}>
-      <View style={styles.appointmentsParent}>
-        <View style={{ flexDirection: "column", flex: 1.7, marginRight: 10 }}>
-          <Text style={styles.appointments}>{title}</Text>
-          <Text
-            style={[
-              styles.receiveAppNotifications1,
-              styles.receiveTypo,
-              { marginTop: 8 },
-            ]}
-          >
-            {description}
-          </Text>
-        </View>
-
-        <View style={{ flex: 0.2 }}>
-          <Toggle
-            name={name}
-            initialValue={value}
-            section="inAppNotif"
-            label={title}
-            onToggle={onChange}
-          />
-        </View>
-      </View>
-    </View>
-  </View>
-);
-
 const styles = StyleSheet.create({
-  frameBorder: {
-    borderColor: Color.sparklightGray,
-    backgroundColor: Color.sparklightWhite,
+  bottomBar: {
+    backgroundColor: "#FFF",
+    justifyContent: "center",
     alignItems: "center",
-    borderStyle: "solid",
   },
-  tabsParentFlexBox: {
-    justifyContent: "center",
+  bottomContainer: {
+    height: 65,
   },
-  frameParent3: {
-    justifyContent: "center",
-    flex: 1,
+  buttonDecline: {
+    marginBottom: 50,
   },
-  mobilePhoneTypo: {
-    color: Color.sparklightGray1,
-    fontSize: FontSize.size_base,
-    lineHeight: 22,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
+  button: {
+    backgroundColor: Color.colorMidnightblue,
+    marginBottom: 20,
+    width: "90%",
   },
-  receiveTypo: {
-    fontSize: FontSize.textXsSemibold_size,
+  buttonDisabled: {
+    backgroundColor: Color.colorWhitesmoke_300,
+    color: Color.colorGray_200,
+  },
+  buttonDisabledText: {
     color: Color.sparklightaddGray,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-    alignSelf: "stretch",
   },
   buttonsLayout: {
-    paddingHorizontal: 0,
-    width: "100%",
     paddingVertical: Padding.p_base,
+    paddingHorizontal: 0,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: Border.br_11xs,
-    height: 56,
-  },
-  makeTypo: {
-    width: 282,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    textAlign: "center",
-  },
-  appointments: {
-    color: Color.colorGray_100,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_base,
-    lineHeight: 22,
-    flex: 1,
-  },
-  appointmentsParent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  frameView: {
-    paddingVertical: Padding.p_base,
-    flexDirection: "row",
-    //alignItems: "center",
-    paddingHorizontal: Padding.p_5xl,
-    //flex: 1,
-  },
-  frameContainer: {
-    borderBottomWidth: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "stretch",
-  },
-  receiveAppNotifications1: {
-    color: Color.colorGray_100,
-    lineHeight: 22,
-  },
-  frameGroup: {
-    borderWidth: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    backgroundColor: Color.sparklightWhite,
-    alignSelf: "stretch",
-    overflow: "hidden",
-  },
-  infoWrapper: {
-    paddingHorizontal: Padding.p_5xl,
-    alignSelf: "stretch",
-  },
-  spaceBottom: {
-    marginVertical: 16,
-    width: widthPercentageToDP("85%"),
-  },
-  buttons1: {
-    marginTop: 16,
-    backgroundColor: Color.colorWhitesmoke_200,
-    paddingHorizontal: 0,
+    minHeight: 50,
   },
   buttonsParent: {
-    marginTop: 16,
-    alignSelf: "stretch",
+    width: "90%",
   },
-  inAppNotificationsInner: {
-    paddingTop: Padding.p_xl,
-    paddingBottom: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
-    width: "100%",
-    overflow: "hidden",
+  checkBox: {
+    marginLeft: 10,
+    marginRight: 20,
+    width: 12,
+    height: 12,
+    backgroundColor: Color.colorWhitesmoke_100,
   },
-  inAppNotifications: {
-    flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
-  },
-  infoCircleIcon: {
-    width: 16,
-    height: 16,
-    overflow: "hidden",
-  },
-  infoCircleWrapper: {
-    paddingVertical: Padding.p_8xs,
+  checkboxContainer: {
     flexDirection: "row",
+    alignItems: "center",
   },
-  youAreSubscribed: {
-    lineHeight: 22,
+  checkBox: {
+    width: 12,
+    height: 12,
+    marginRight: Platform.OS === "ios" ? 2 : 16,
+    backgroundColor: Color.colorWhitesmoke_100,
   },
-  youAreSubscribedContainer: {
-    marginLeft: 8,
-    color: Color.colorGray_200,
-    textAlign: "left",
+  checkBoxArea: {
+    flexDirection: "row",
+    marginLeft: 4,
+    alignSelf: "center",
+  },
+  checkboxTouchable: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 0,
+  },
+  checkBoxAreaViewText: {
+    fontSize: 14,
     fontFamily: FontFamily.openSansRegular,
-    fontSize: FontSize.size_sm,
+    color: Color.colorGray_200,
+  },
+  accept: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+    color: Color.sparklightWhite,
+  },
+  decline: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorMidnightblue,
+    textAlign: "center",
+  },
+  inner: {
     flex: 1,
   },
-  containerTypo: {
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
+  innerContent: {
+    justifyContent: "space-around",
+    //flex: 1
   },
-  receiveTextNotifications1: {
-    color: Color.sparklightaddGray,
-    lineHeight: 22,
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "left",
-    alignSelf: "stretch",
-    fontSize: FontSize.size_sm,
+  container: {
+    flex: 1,
+    backgroundColor: "#FFF",
+    alignContent: "center",
+    justifyContent: "center",
+    height: "100%",
   },
-  frameChild: {
-    height: 1,
-    backgroundColor: Color.sparklightGray,
-    alignSelf: "stretch",
+  ErrorToggle: {
+    color: Color.sparkLightRed,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "600",
+    fontSize: 14,
+    marginLeft: 4,
+  },
+  headerIconViewContainer: {
+    alignItems: "center",
+  },
+  headerIconView: {
+    backgroundColor: "#FEFEFE",
+    padding: 20,
+    borderRadius: 100,
+    borderColor: "#EEE",
+    borderWidth: 1,
+    shadowColor: "#171717",
+    shadowOffset: { width: -2, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    marginBottom: 10,
+  },
+  headerTabView: {
+    flexDirection: "row",
+    width: "100%",
+    marginTop: 30,
+    justifyContent: "center",
+  },
+  headerTabOne: {
+    backgroundColor: Color.colorMidnightblue,
+    width: 100,
+    height: 5,
+  },
+  headerTabTwo: {
+    backgroundColor: Color.colorMidnightblue,
+    width: 100,
+    height: 5,
+    marginLeft: 10,
+  },
+  headerTabThree: {
+    backgroundColor: Color.colorWhitesmoke_300,
+    width: 100,
+    height: 5,
+    marginLeft: 10,
+  },
+  header: {
+    paddingTop: 20,
+  },
+  headerText: {
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 22,
+    textAlign: "center",
+    color: Color.colorGray_100,
+  },
+  subHeader: {
+    paddingTop: 10,
+  },
+  subHeaderText: {
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: 16,
+    lineHeight: 25,
+    textAlign: "center",
+    color: Color.colorGray_100,
+    paddingHorizontal: 20,
+  },
+  subInput: {
+    marginTop: 25,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontFamily: FontFamily.openSansSemiBold,
+    color: Color.colorGray_100,
+    marginBottom: 8,
+    textAlign: "left",
+    width: "100%",
+    paddingHorizontal: 4,
+  },
+  viewContainer: {
+    flex: 1,
+    width: "100%",
+    alignItems: "center",
+    marginTop: 50,
+  },
+  textBottomHeight: {
+    height: 150,
   },
 });
 
-export default InAppNotifications;
+export default TextNotifications;

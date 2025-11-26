@@ -316,6 +316,7 @@ const AddNotificationScreen = () => {
                     error={errors.email?.message}
                     label="Email Address *"
                     accessibilityLabel="Email address Required"
+                    accessibilityHint={"required text field. double tap to edit"}
                     keyboardType="email-address"
                     autoCapitalize="none"
                     textContentType="emailAddress"

@@ -13,7 +13,6 @@ import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
 import { Env } from "../../network/apis/account/Constants";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
-import MenuGrid from "../ACPDashboard/MenuGrid";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
@@ -23,8 +22,8 @@ import { useMaintenance } from "../maintenance/MaintenanceContext";
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
 import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
 import { isAccountDisconnected } from "../utility/disconnectHelpers";
-import { updatePushNotificationsv2 } from "../../redux/actions/ProfileActionSuite";
 import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
+import MobilePilotLandingPage from "../../components/ACPDashboard/MobilePilotLandingPage";
 import {
   getFcmToken,
   requestUserPermission,
@@ -60,6 +59,9 @@ const NewBillerHome = ({ navigation }) => {
     (state) => state.profile?.isPaperLessStatusLoading
   );
   const userInfo = useSelector((state) => state.user?.userData?.userInfo);
+  const isMobilePilotEnabled = useSelector(
+    (state) => state.user.userData?.userInfo?.pending_activation === true
+  );
 
   const showDisconnectedBanner = userInfo
     ? isAccountDisconnected(
@@ -322,7 +324,17 @@ const NewBillerHome = ({ navigation }) => {
                   severity={bannerConfig.severity || "info"}
                 />
               )}
-              {renderWelcomeCard()}
+              {isMobilePilotEnabled ? (
+                <View
+                  style={[styles.card, styles.shadowProp, styles.welcomeCard]}
+                >
+                  <View style={[styles.contentWrapper,{ paddingHorizontal: Padding.p_base,}]}>
+                    <MobilePilotLandingPage />
+                  </View>
+                </View>
+              ) : (
+                renderWelcomeCard()
+              )}
             </View>
           </ScrollView>
         </SafeAreaView>

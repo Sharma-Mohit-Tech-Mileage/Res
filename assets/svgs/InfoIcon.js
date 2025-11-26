@@ -5,6 +5,9 @@ const InfoIcon = ({
   size = 18, 
   color = '#0060AE',
   strokeWidth = 2,
+  accessible = true,
+  accessibilityLabel = "Information icon",
+  accessibilityRole = "Text",
   ...props 
 }) => (
   <Svg
@@ -13,6 +16,9 @@ const InfoIcon = ({
     viewBox="0 0 18 18"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
+    accessible={accessible}
+    accessibilityLabel={accessibilityLabel}
+    accessibilityRole={accessibilityRole}
     {...props}
   >
     <Path
