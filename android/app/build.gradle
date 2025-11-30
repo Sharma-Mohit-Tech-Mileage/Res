@@ -84,10 +84,10 @@ def enableProguardInReleaseBuilds = false
 def jscFlavor = 'org.webkit:android-jsc:+'
 
 project.ext.react = [
-    entryFile: "index.js",
-    nodeExecutableAndArgs: ["/opt/homebrew/bin/node"]
-
+        entryFile: "index.js",
+        nodeExecutableAndArgs: ["/Users/mohitsharma/.nvm/versions/node/v20.18.1/bin/node"]
 ]
+
 
 
 android {
@@ -104,8 +104,8 @@ android {
                                  appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
-        versionCode 357
-        versionName "22.4.0"
+        versionCode 363
+        versionName "23.0.0"
     }
 
     
