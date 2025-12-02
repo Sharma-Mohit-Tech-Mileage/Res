@@ -96,7 +96,7 @@ android {
                                  appAuthRedirectScheme: 'com.sparklight.customer.app.auth0'
         ]
         missingDimensionStrategy 'react-native-camera', 'general'
-        versionCode 356
+        versionCode 361
         versionName "22.4.0"
     }
 

@@ -87,7 +87,31 @@ class AuthenticationManager {
    * Handle authentication errors with user-friendly messages
    */
   static handleAuthError(error) {
+    console.log("Authentication error:", JSON.stringify(error, null, 2));
+    
     const errorMessage = error.message || error.toString();
+    const errorCode = error.code || '';
+    const errorDomain = error.domain || '';
+    
+    // Check for user cancellation - multiple possible indicators
+    const isCancelled = 
+      errorCode === 'user_cancelled' ||
+      errorCode === '-3' || // iOS user cancel code
+      errorCode === 'a0.session.user_cancelled' ||
+      errorMessage.toLowerCase().includes('user cancel') ||
+      errorMessage.toLowerCase().includes('user dismissed') ||
+      errorMessage.toLowerCase().includes('authentication was canceled') ||
+      errorMessage.toLowerCase().includes('the user canceled') ||
+      (errorDomain && errorDomain.includes('appauth') && errorMessage.toLowerCase().includes('cancel'));
+    
+    if (true) {
+      return {
+        success: false,
+        error: 'Login was cancelled.',
+        code: 'USER_CANCELLED',
+        userAction: 'RETRY',
+      };
+    }
     
     // Parse different error types
     if (errorMessage.includes('AUTH_TIMEOUT')) {
@@ -105,15 +129,6 @@ class AuthenticationManager {
         error: 'Unable to open browser for login. Please check your device settings.',
         code: 'BROWSER_UNAVAILABLE',
         userAction: 'CHECK_SETTINGS',
-      };
-    }
-    
-    if (errorMessage.includes('User cancelled') || errorMessage.includes('user_cancelled')) {
-      return {
-        success: false,
-        error: 'Login was cancelled.',
-        code: 'USER_CANCELLED',
-        userAction: 'RETRY',
       };
     }
     

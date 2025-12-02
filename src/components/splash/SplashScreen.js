@@ -1,31 +1,13 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  Linking,
-  Platform,
-  Animated,
-  Easing,
-  Dimensions,
-} from "react-native";
+import { View, StyleSheet, Text, Linking, Platform, Animated, Easing, Dimensions, } from "react-native";
 import colors from "../../res/Colors";
 import LinearGradient from "react-native-linear-gradient";
 import { logout } from "react-native-app-auth";
 import { useDispatch } from "react-redux";
 import { saveUserInfo, logInfo } from "../../redux/actions/UserAction";
-import {
-  storeUser,
-  storeSsoToken,
-  getSsoToken,
-  getUser,
-  cleanUserData,
-} from "../../redux/utils/LocalStorage";
+import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
 import { Color, FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env, ISUAT } from "../../network/apis/account/Constants";
@@ -36,8 +18,6 @@ import LoginLogger from "../../components/utility/LoginLogger";
 import analytics from "@react-native-firebase/analytics";
 import { shouldBlockLogin } from "../utility/disconnectHelpers";
 import Logo from "../../res/images/SpalshLogo";
-
-// Import new utilities
 import NetworkManager from "../../utils/NetworkManager";
 import AuthenticationManager from "../../utils/AuthenticationManager";
 import ErrorModal, { ErrorType } from "../common/ErrorModal";
@@ -52,9 +32,8 @@ const config = {
   iosPrefersEphemeralSession: true,
 };
 
-// Constants for timeouts
-const ANIMATION_DURATION = 2000; // Reduced from 3500ms
-const SESSION_CHECK_TIMEOUT = 10000; // 10 seconds max for session check
+const ANIMATION_DURATION = 2000;
+const SESSION_CHECK_TIMEOUT = 10000;
 
 const getDeviceSize = () => {
   const screenHeight = Dimensions.get("window").height;
@@ -78,7 +57,6 @@ const SplashScreen = ({ navigation, route }) => {
 
   const dispatch = useDispatch();
   
-  // State management
   const [loadingState, setLoadingState] = useState(LoadingState.NONE);
   const [errorState, setErrorState] = useState({ visible: false, type: null, message: null });
   const [authInProgress, setAuthInProgress] = useState(false);
@@ -357,6 +335,18 @@ const SplashScreen = ({ navigation, route }) => {
         refreshToken: res.refreshToken,
       };
 
+      // Check for business account first
+      if (res.userInfo.customerType === "COM") {
+        setLoadingState(LoadingState.NONE);
+        setLoginEnable(true);
+        setErrorState({
+          visible: true,
+          type: ErrorType.BUSINESS_ACCOUNT,
+          message: null,
+        });
+        return;
+      }
+
       if (shouldBlockLogin(userInfo.acctStatus, userInfo.daysSinceDisconnectDate)) {
         setLoadingState(LoadingState.NONE);
         setDisconnected(true);
@@ -373,14 +363,6 @@ const SplashScreen = ({ navigation, route }) => {
           visible: true,
           type: ErrorType.API_ERROR,
           message: "Your account does not have the necessary permissions to use this app.",
-        });
-      } else if (res.userInfo.customerType === "COM") {
-        setLoadingState(LoadingState.NONE);
-        setLoginEnable(true);
-        setErrorState({
-          visible: true,
-          type: ErrorType.API_ERROR,
-          message: "Business accounts should use the MySparklight Business app.",
         });
       } else {
         moveAfterLogin(user);
@@ -451,7 +433,7 @@ const SplashScreen = ({ navigation, route }) => {
 
     try {
       const result = await AuthenticationManager.authorizeWithTimeout(config);
-      
+      console.log("Authorization result:", JSON.stringify(result));
       if (!result.success) {
         // Handle specific error types
         if (result.code === 'USER_CANCELLED') {
@@ -614,6 +596,14 @@ const SplashScreen = ({ navigation, route }) => {
       case 'CONTACT_SUPPORT':
         Linking.openURL('tel:1-877-692-2253');
         break;
+      case 'DOWNLOAD_BUSINESS_APP':
+        logoutAction(() => {
+          const businessAppUrl = Platform.OS === 'android'
+            ? 'https://play.google.com/store/apps/details?id=com.sparklight.customer.business.app&pcampaignid=web_share'
+            : 'https://apps.apple.com/us/app/mysparklight-business/id6478375256';
+          Linking.openURL(businessAppUrl);
+        });
+        break;
       case 'CANCEL':
         // Just close the modal
         break;
@@ -642,10 +632,9 @@ const SplashScreen = ({ navigation, route }) => {
       colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
-      
+      <NetworkStatusBar />
       
       <View style={getStyle("splashContainer")}>
-        <NetworkStatusBar />
         <Animated.View
           style={[
             getStyle("logo"),

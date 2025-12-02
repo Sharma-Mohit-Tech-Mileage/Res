@@ -7,6 +7,7 @@ export const ErrorType = {
   BROWSER_UNAVAILABLE: 'BROWSER_UNAVAILABLE',
   USER_CANCELLED: 'USER_CANCELLED',
   API_ERROR: 'API_ERROR',
+  BUSINESS_ACCOUNT: 'BUSINESS_ACCOUNT',
   SESSION_EXPIRED: 'SESSION_EXPIRED',
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
   SERVER_ERROR: 'SERVER_ERROR',
@@ -41,6 +42,11 @@ export const ERROR_MESSAGES = {
     title: 'Service Error',
     message: 'We encountered an issue connecting to our services. Please try again.',
     icon: 'server',
+  },
+  [ErrorType.BUSINESS_ACCOUNT]: {
+    title: 'Business Account Detected',
+    message: 'This app is for residential customers. Please download the MySparklight Business app.',
+    icon: 'business',
   },
   [ErrorType.SESSION_EXPIRED]: {
     title: 'Session Expired',

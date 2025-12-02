@@ -10,6 +10,7 @@ export const ErrorType = {
   BROWSER_UNAVAILABLE: 'BROWSER_UNAVAILABLE',
   USER_CANCELLED: 'USER_CANCELLED',
   API_ERROR: 'API_ERROR',
+  BUSINESS_ACCOUNT: 'BUSINESS_ACCOUNT',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 };
 
@@ -55,12 +56,19 @@ const ERROR_MESSAGES = {
       { label: 'Cancel', action: 'CANCEL', primary: false },
     ],
   },
+  [ErrorType.BUSINESS_ACCOUNT]: {
+    title: 'Business Account Detected',
+    message: 'This app is for residential customers. Please download the MySparklight Business app to manage your business services.',
+    actions: [
+      { label: 'Download Business App', action: 'DOWNLOAD_BUSINESS_APP', primary: true },
+      { label: 'Cancel', action: 'CANCEL', primary: false },
+    ],
+  },
   [ErrorType.UNKNOWN_ERROR]: {
     title: 'Something Went Wrong',
     message: 'An unexpected error occurred. Please try again or contact support if the issue persists.',
     actions: [
       { label: 'Retry', action: 'RETRY', primary: true },
-      { label: 'Contact Support', action: 'CONTACT_SUPPORT', primary: false },
       { label: 'Cancel', action: 'CANCEL', primary: false },
     ],
   },
