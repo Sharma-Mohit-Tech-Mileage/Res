@@ -116,7 +116,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
           accessibilityHint="Opens Sparklight Store Locator webpage"
           accessible={true}
           onPress={() => {
-            Linking.openURL("https://www.sparklight.com/store-locator");
+            Linking.openURL("https://www.google.com/maps/search/Sparklight+Stores+Near+Me");
           }}
         >
           Sparklight Store Locations and Hours.
