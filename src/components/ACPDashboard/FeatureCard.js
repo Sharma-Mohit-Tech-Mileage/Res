@@ -26,13 +26,35 @@ const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primar
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{title}</Text>
+      <View
+        style={styles.header}
+        accessible={true}
+        accessibilityLabel={`Heading level 2,${title}`}
+        accessibilityRole="text"
+      >
+      <Text style={styles.title}>{title}</Text>
       </View>
 
-      <View style={styles.features}>
-        {features.map((feature, index) => (
-          <View key={index} style={styles.featureRow}>
+      {
+        // Build an accessible label that reads the list and items in order
+      }
+      {(() => {
+        const listLabel = `List with ${features.length} items: ${features.join(', ')}`;
+        return (
+          <View
+            style={styles.features}
+            accessible={true}
+            accessibilityRole="list"
+            accessibilityLabel={listLabel}
+          >
+            {features.map((feature, index) => (
+              <View
+                key={index}
+                style={styles.featureRow}
+                accessible={true}
+                //accessibilityRole="listitem"
+                accessibilityLabel={`${index + 1}. ${feature}`}
+              >
             <Icon
               name="green-checkcircle"
               size={18}
@@ -43,6 +65,8 @@ const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primar
           </View>
         ))}
       </View>
+        );
+      })()}
 
       {isLoading ? (
         <SkeletonPlaceholder>
