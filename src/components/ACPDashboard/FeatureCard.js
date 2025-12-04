@@ -77,7 +77,7 @@ const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primar
           style={[styles.button, getButtonStyle()]}
           onPress={onButtonPress}
           accessibilityRole="button"
-          accessibilityLabel={buttonText}
+          accessibilityLabel={isActive? `${title} status is ${buttonText}` :buttonText}
         >
           <Text style={[styles.buttonText, getButtonTextStyle()]}>
             {buttonText}

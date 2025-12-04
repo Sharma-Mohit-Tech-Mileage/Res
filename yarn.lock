@@ -6397,6 +6397,13 @@ jsonfile@^4.0.0:
     object.assign "^4.1.4"
     object.values "^1.1.6"
 
+jwt-encode@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/jwt-encode/-/jwt-encode-1.0.1.tgz#6602a0475f757c7d5d559a7e923f3d3d5ecd938c"
+  integrity sha512-QrGiNhynbAYyFdbC1GbjborzenSFs5Ga+2nE0uBokGXsH11xrgd1AX55HR7P+wGQyyZOn6LUO5iKlh74dlhBkA==
+  dependencies:
+    ts.cryptojs256 "^1.0.1"
+
 keyv@^4.5.3:
   version "4.5.3"
   resolved "https://registry.npmjs.org/keyv/-/keyv-4.5.3.tgz"
@@ -8618,6 +8625,11 @@ ts-object-utils@0.0.5:
   version "0.0.5"
   resolved "https://registry.npmjs.org/ts-object-utils/-/ts-object-utils-0.0.5.tgz"
   integrity sha512-iV0GvHqOmilbIKJsfyfJY9/dNHCs969z3so90dQWsO1eMMozvTpnB1MEaUbb3FYtZTGjv5sIy/xmslEz0Rg2TA==
+
+ts.cryptojs256@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/ts.cryptojs256/-/ts.cryptojs256-1.0.1.tgz#56a3d3a3bc022ad358b3e62cd8dae3224d9384f1"
+  integrity sha512-9XtEgRVOZBCdpPcCEhfvv9I2AVXdvfI81I/KpFM0wEfbq5JVHlXH7bfIjGQmYrIHGiBEHKsIaStQ87k926J7dA==
 
 tslib@^1.8.1:
   version "1.14.1"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { View, StyleSheet, ScrollView, Platform } from "react-native";
+import { View, StyleSheet, ScrollView, Platform,TouchableOpacity } from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
@@ -29,6 +29,19 @@ import {
   requestUserPermission,
 } from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
+import sign from "jwt-encode"; // npm method for signing JWT
+import ChatIcon from "../../res/svgIcons/ChatIcon";
+import VersionCheck from 'react-native-version-check';
+import DeviceInfo from "react-native-device-info";
+
+import {
+  startChatWithConfig,
+  initChat,
+  startChat,
+  loginWithJWT,
+  setConversationalFields,
+} from "../utility/RNZendeskChat";
+
 const NewBillerHome = ({ navigation }) => {
   const [isOutageAlert, setIsOutageAlert] = useState(false);
   const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
@@ -145,6 +158,15 @@ const NewBillerHome = ({ navigation }) => {
         pastPaymentDue: accountDetails.past_due_amount,
         email: getPrimaryEmail(accountDetails),
       });
+       DeviceInfo.getUserAgent().then((userAgent) => {
+      // iOS: "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143"
+      // tvOS: not available
+      // Android: "Mozilla/5.0 (Linux; Android 12; sdk_gphone64_arm64 Build/SE1A.220630.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36"
+      // Windows: ?
+      //getZendeskChatToken(userAgent);
+      loginWithToken(userAgent);
+    });
+
     }
   }, [accountDetails]);
 
@@ -211,6 +233,107 @@ const NewBillerHome = ({ navigation }) => {
       //await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
     }
   };
+
+
+  // get IP address
+
+const getIPAddress = async () => {
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    if (!response.ok) {
+      throw new Error('Failed to fetch IP address');
+    }
+
+    const data = await response.json();
+    return data.ip; // The IP address
+  } catch (error) {
+    console.error('Error fetching IP address:', error);
+    return null;
+  }
+}
+
+ // zendesk chat login
+
+ 
+ const loginWithToken = async (userAgent,firstName,lastName) => {
+    const user = await getUser();
+    const secret ="0DE686CBBBF20A367D096D466BC5A895D8F62223CCB36C00A198E64F148E0D84"
+    // const secret =
+    //   (Platform.OS=='ios')?"JQ8sVOU9Hl3fnUf1gyt9xfRn9XVMZ44ilfSo5e3SnrutkSCXDmMVSdTOCVQMduayJwptKtfPrMNaUDz3LfzLxQ":"Rcmym7uJfKq-hqjXyhlC9y09AyPyw0K6Pt6cvqvBmR335YCChrSBS6rnSdEUT-9-YIIkSYS_AYU36ETkuCxnYA"
+    //data payload
+    const data = {
+      scope: "user",
+      external_id: user?.userInfo.accountNumber,
+      //email: defaultPaymentDetails.email || "",
+      //name: `${firstName} ${lastName}` || "",
+      //email_verified: true, // optional
+      // exp: new Date().getTime() + 3600 * 1000,
+    };
+    // header ID
+    const options = {
+      alg: "HS256",
+      typ: "JWT",
+      //kid: (Platform.OS=='ios')? "app_683930d35c8351994c5bff40":"app_683933455c8351994c6542b3",
+    };
+    const jwttoken = sign(data, secret, options);
+    console.log("request data for jwt", data);
+    console.log("request options for jwt", options);
+    console.log("Loggin jwt", jwttoken);
+    loginWithJWT(jwttoken);
+    //loginWithJWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6InVzZXIiLCJleHRlcm5hbF9pZCI6IjEyODM4NzI2MyJ9.5d8kzoZS4Jp_9KDdvAPmqj_mETDFfI7C2C3VU3ZrDRA")
+
+    const fields = {
+      userAgent: userAgent,
+      appVersion: VersionCheck.getCurrentVersion(),
+      timezoneOffsetId: new Date().getTimezoneOffset().toString(),
+      platform: Platform.OS,
+      locationHrefId: Env.URL,
+      ipAddress: await getIPAddress(),
+      accountNumber: user?.userInfo.accountNumber,
+      email: defaultPaymentDetails.email || "",
+      firstName: firstName || "",
+      lastName: lastName || "",
+      name: `${firstName} ${lastName}` || "",
+      phone: "3",
+      accountNumber: user?.userInfo.accountNumber,
+      userName: user?.userInfo.userName,
+      customerType: user?.userInfo.customerType,
+      authLevel: user?.userInfo.authLevel,
+      // jwtId:
+      // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6InVzZXIiLCJleHRlcm5hbF9pZCI6IjEyODM4NzI2MyJ9.5d8kzoZS4Jp_9KDdvAPmqj_mETDFfI7C2C3VU3ZrDRA",
+    jwtId: jwttoken,
+  };
+
+    setTimeout(() => {
+      //console.log("Setting conversational fields", fields);
+      setConversationalFields(fields);
+    }, 1000);
+  };
+
+
+  const renderHeader = () => (
+    <View
+      accessibilityElementsHidden={isWalkthroughActive}
+      importantForAccessibility={isWalkthroughActive ? "no-hide-descendants" : "no"}
+      accessibilityLabel="SparkLight"
+      style={styles.headerContainer}
+    >
+       <Logo width={120} height={33.32}/>
+
+       <TouchableOpacity
+              onPress={() => {
+                if (Platform.OS === "ios") {
+                  startChat();
+                } else {
+                  startChatWithConfig({});
+                }
+              }}
+            >
+              <ChatIcon />
+            </TouchableOpacity>
+    </View>
+  );
+
 
   const renderOutageAlert = () =>
     AlertUtils.createOutageAlert(estimatedRestoreTime, () =>
@@ -283,6 +406,7 @@ const NewBillerHome = ({ navigation }) => {
       style={styles.container}
     >
       <View style={{ flex: 1 }}>
+        
         <SafeAreaView
           style={{ flex: 1 }}
           importantForAccessibility={
@@ -290,7 +414,9 @@ const NewBillerHome = ({ navigation }) => {
           }
           accessibilityElementsHidden={isWalkthroughActive}
         >
-          <View
+
+          {renderHeader()}
+          {/* <View
             accessibilityLabel="SparkLight"
             style={styles.headerContainer}
             importantForAccessibility={
@@ -299,7 +425,7 @@ const NewBillerHome = ({ navigation }) => {
             accessibilityElementsHidden={isWalkthroughActive}
           >
             <Logo width={120} height={33.32} />
-          </View>
+          </View> */}
           <ScrollView style={styles.scrollContainer}>
             <View
               style={styles.mainContentContainer}
