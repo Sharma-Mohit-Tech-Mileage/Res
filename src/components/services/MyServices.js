@@ -1,224 +1,74 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { StyleSheet, View, Image, ScrollView, RefreshControl, Platform, Text } from "react-native";
-
-import { Border, Padding, Color, FontSize, FontFamily, } from "../../../GlobalStyles";
-import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import React, { useState, useCallback } from "react";
+import {
+  View,
+  ScrollView,
+  RefreshControl,
+  StyleSheet,
+  StatusBar,
+  SafeAreaView,
+} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import PubSub from "pubsub-js";
-import base64 from "react-native-base64";
-import { startChatWithConfig, startChat, } from "../utility/RNZendeskChat";
-import CustomerErrorPage from "../utility/SystemErrorPopup";
-import { getUser } from "../../redux/utils/LocalStorage";
-import { GetApiRequest } from "../../network/APIClient";
+import { Color, Padding } from "../../../GlobalStyles";
+import ServiceHeader from "./components/ServiceHeader";
+import InternetServiceCard from "./components/InternetServiceCard";
+import VideoServiceCard from "./components/VideoServiceCard";
+import PhoneServiceCard from "./components/PhoneServiceCard";
+import ServiceStatusSection from "./components/ServiceStatusSection";
+import { useServiceDetails } from "./hooks/useServiceDetails";
+import { useOutageStatus } from "./hooks/useOutageStatus";
+import CustomLoading from "../common/customui/CustomLoading";
 
+/**
+ * MyServices Screen
+ * Main container for the Services tab
+ * Displays all service cards and status checking functionality
+ */
 const MyServices = ({ route }) => {
-  const navigation = useNavigation();
-  const scrollViewRef = useRef(null);
-  const [isAgentAvailable, setisAgentAvailable] = useState(false);
-  const [istechAgentAvailable, setIstechAgentAvailable] = useState(false);
+  // Get account number from route params or use mock
+  const accountNumber = route?.params?.accountNumber || "123456789";
+
+  // Fetch service details
+  const { data, loading, error, refetch } = useServiceDetails(accountNumber);
+
+  // Outage status checking
+  const { outageData, checking, checkStatus, clearOutageData } =
+    useOutageStatus();
+
+  // Pull to refresh state
   const [refreshing, setRefreshing] = useState(false);
-  const [isAgentNotAvailable, setIsAgentNotAvailable] = useState(false);
-  const [plans, setPlans] = React.useState([]);
-  const [hasEeroDevice, setHasEeroDevice] = React.useState(false);
-  const [networkId, setNetworkId] = React.useState(null);
-  const [tvPlan, setTVPlan] = useState('');
-  const [phonePlan, setPhonePlan] = useState([]);
-  function getPhoneServiceDetails() {
-    getUser().then((res) => {
-      const request = `phone/api/phones/${res.userInfo.accountNumber}/phonelines`;
-      GetApiRequest(request, onSuccessPhonePlan, onError);
-    });
-  }
-  function getPhoneServicePlans(tgcCode) {
-    getUser().then((res) => {
-      const request = `phone/api/Plans/${tgcCode}`;
-      GetApiRequest(request, onFetchedPlan, onError);
-    });
-  }
-  const onFetchedPlan = (res) => {
-    setPhonePlan(res);
-  }
-  const onSuccessPhonePlan = (res) => {
-    if (res.length && res[0].tcgCode) {
-      getPhoneServicePlans(res[0].tcgCode);
-    }
-  };
- const getTVServiceDetails = () => {
-    getUser().then((res) => {
-      const request = `sparklighttv/api/sparklighttv/${res.userInfo.accountNumber}/plan`;
-      GetApiRequest(request, onSuccessTVPlan, onError);
-    });
-  };
-  const onSuccessTVPlan = (res) => {
-    setTVPlan(res || '');
-  };
-  const onError = (error) => {
-    console.log("error", error);
-  };
-  const checkAgentAvailibilty = async (group_id, data) => {
-    const username = "mobile-support@sparklight.biz/token";
-    const password = "ek20PJEI1zZd4sm1LJr3JuYw7ujt1F1ic82b4Jjc";
-    const auth = base64.encode(`${username}:${password}`);
 
-    try {
-      const response = await fetch(
-        `https://cableone.zendesk.com/api/v2/account_groups/availability/${group_id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Basic ${auth}`,
-          },
-        }
-      );
-      setRefreshing(false);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const json = await response.json();
-      console.log(
-        "Agent is availibility",
-        data?.department,
-        "Count=" + json.channel_group_statuses.chat.state_counts.online
-      );
-      console.log("Agent group_id", group_id);
-      if (json.channel_group_statuses.chat.state_counts.online > 0) {
-        if (group_id == "1500003312422") {
-          setisAgentAvailable(true);
-          if (data) {
-            if (Platform.OS === "ios") {
-              startChat(data);
-            } else {
-              startChatWithConfig(data);
-            }
-          }
-        } else if (group_id == "1500003304341") {
-          setIstechAgentAvailable(true);
-          if (data) {
-            if (Platform.OS === "ios") {
-              startChat(data);
-            } else {
-              startChatWithConfig(data);
-            }
-          }
-        }
-      } else {
-        if (group_id == "1500003312422") {
-          setisAgentAvailable(false);
-          if (data) {
-            //PromptForAgentOffline()
-            setIsAgentNotAvailable(true);
-          }
-        } else if (group_id == "1500003304341") {
-          setIstechAgentAvailable(false);
-          if (data) {
-            setIsAgentNotAvailable(true);
-          }
-        }
-      }
-      setRefreshing(false);
-    } catch (error) {
-      setRefreshing(false);
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  const fetchNetworkId = async () => {
-    try {
-      const user = await getUser();
-      const accountNumber = user?.userInfo?.accountNumber;
-      const request = `api/Eero/GetEeroAccountDetails?accountnumber=${accountNumber}`;
-      GetApiRequest(
-        request,
-        (response) => {
-          const networks = response?.data?.networks;
-          if (networks && networks.length > 0) {
-            const networkId = networks[0].split("/").pop();
-            setHasEeroDevice(!!networkId);
-            setNetworkId(networkId || null);
-          } else {
-            setHasEeroDevice(false);
-          }
-        },
-        (error) => {
-          setHasEeroDevice(false);
-        }
-      );
-    } catch (error) {
-      setHasEeroDevice(false);
-    }
-  };
-
-  const getInternetPlanDetails = () => {
-    let re = getUser().then((res) => {
-      const request = `internet/api/internet/${res.userInfo.accountNumber}/plan`;
-      GetApiRequest(
-        request,
-        (response) => {
-          setPlans(response);
-        },
-        (error) => {
-          console.error("Error", error);
-        }
-      );
-    });
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      checkAgentAvailibilty("1500003304341");
-      checkAgentAvailibilty("1500003312422");
-      fetchNetworkId();
-      getInternetPlanDetails();
-      getPhoneServiceDetails();
-      getTVServiceDetails();
-    }, [])
-  );
-
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      setTimeout(() => {
-        if (route.params?.isContactUs) {
-          scrollViewRef.current?.scrollTo({ y: 0, x: 0, animated: true });
-        }
-      }, 500);
-    });
-    return unsubscribe;
-  }, [navigation]);
-
-
-  var mySubscriber = function (msg, data) {
-    console.log(msg, data);
-    scrollViewRef.current?.scrollToEnd({ animated: true });
-  };
-
-  useEffect(() => {
-    if (route.params?.isContactUs) {
-      setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }, 500);
-    }
-
-    var token = PubSub.subscribe("event.contactUsEvent", mySubscriber);
-    return () => {
-      PubSub.unsubscribe(token);
-    };
-  }, []);
-
-  const onRefresh = () => {
+  /**
+   * Handle pull to refresh
+   */
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    checkAgentAvailibilty("1500003304341");
-    checkAgentAvailibilty("1500003312422");
-  };
+    await refetch();
+    clearOutageData();
+    setRefreshing(false);
+  }, [refetch, clearOutageData]);
+
+  /**
+   * Handle check service status button press
+   */
+  const handleCheckStatus = useCallback(() => {
+    checkStatus();
+  }, [checkStatus]);
+
+  /**
+   * Handle closing outage notification
+   */
+  const handleCloseNotification = useCallback(() => {
+    clearOutageData();
+  }, [clearOutageData]);
 
   return (
-    <View style={styles.support}>
-      <ProfileSettingsHeader
-        title="Support"
-        iconAlignment="right"
-        showIcon={false}
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={Color.sparklightBrightPurple}
       />
+
+      {/* Purple Gradient Header Background */}
       <LinearGradient
         style={styles.linearGradientStyle}
         locations={[0, 1]}
@@ -226,318 +76,73 @@ const MyServices = ({ route }) => {
         useAngle={true}
         angle={90}
       />
-      <View style={[styles.mainContainer]}>
-        <View style={styles.header}>
-          <View style={styles.featuredIcon}>
-            <Image
-              style={[styles.lifeBuoy02IconLayout]}
-              resizeMode="stretch"
-            />
-          </View>
-          <View style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}>
-            <Text style={styles.wereHereTo}>Let's Connect</Text>
-          </View>
-        </View>
+      <ServiceHeader />
+      {loading && !data ? (
+        <CustomLoading loading={true} loadingTxt="Loading services" />
+      ) : (
         <ScrollView
-          ref={scrollViewRef}
-          style={{ paddingHorizontal: Padding.p_base }}
-          contentContainerStyle={{ flexGrow: 1 }}
+          style={styles.container}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              title="Pull to refresh"
               tintColor={Color.sparklightBrightPurple}
-              titleColor={Color.colorMidnightblue}
+              colors={[Color.sparklightBrightPurple]}
             />
           }
         >
-          
-          <CustomerErrorPage
-            visible={isAgentNotAvailable}
-            message={
-              "Our agents are currently unavailable. Please reach out during our business hours, and we’ll be happy to assist you.Thank you for your understanding!"
-            }
-            title={"Agent Unavailibity"}
-            onActionTxt={"OK"}
-            onAction={() => {
-              setIsAgentNotAvailable(false);
-            }}
-            onClose={undefined}
+          {/* Header Section */}
+
+          {/* Service Cards Container */}
+          <View style={styles.servicesContainer}>
+            {/* Internet Service */}
+            {data?.internet?.hasService && (
+              <InternetServiceCard
+                planName={data.internet.planName}
+                downloadSpeed={data.internet.downloadSpeed}
+                uploadSpeed={data.internet.uploadSpeed}
+                loading={loading}
+              />
+            )}
+
+            {/* Video Service */}
+            {data?.video?.hasService && (
+              <VideoServiceCard
+                planName={data.video.planName}
+                zipCode={data.video.zipCode}
+                loading={loading}
+              />
+            )}
+
+            {/* Phone Service */}
+            {data?.phone?.hasService && (
+              <PhoneServiceCard
+                planName={data.phone.planName}
+                legacyBrand={data.phone.legacyBrand}
+                loading={loading}
+              />
+            )}
+          </View>
+
+          {/* Service Status Section */}
+          <ServiceStatusSection
+            onCheckStatus={handleCheckStatus}
+            outageData={outageData}
+            checking={checking}
+            onCloseNotification={handleCloseNotification}
           />
         </ScrollView>
-      </View>
-    </View>
+      )}
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  pressableContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    height: "100%",
-  },
-  textTypoRight: {
-    fontFamily: FontFamily.openSansRegular,
-    fontWeight: 600,
-    fontSize: FontSize.size_base,
-    lineHeight: 20,
-    color: Color.colorMidnightblue,
-  },
-  frameChild: {
-    paddingHorizontal: Padding.p_5xl,
-    height: 1,
-    backgroundColor: Color.sparklightGray,
-  },
-  navigationBorder: {
-    borderColor: Color.sparklightGray,
-    backgroundColor: Color.sparklightWhite,
-    borderStyle: "solid",
-    justifyContent: "center",
-  },
-  iconLeft: {
-    marginLeft: Padding.p_xs,
-  },
-  iconRight: {
-    marginRight: Padding.p_xs,
-  },
-  containerFlexBox: {
-    alignSelf: "stretch",
-    alignItems: "center",
-  },
-  lifeBuoy02IconLayout: {
-    height: 32,
-    width: 32,
-  },
-  supportIcon: {
-    height: 24,
-    width: 24,
-  },
-  integrationCardBorder: {
-    borderWidth: 1,
-    borderStyle: "solid",
-  },
-  icon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: "center",
-    alignItems: "center",
-    borderColor: "#F4F4F5",
-    backgroundColor: "#F4F4F5",
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-    resizeMode: "contain",
-    marginRight: 8,
-  },
-  headingContainerSpaceBlock: {
-    paddingBottom: Padding.p_base,
-    backgroundColor: Color.sparklightWhite,
-    alignItems: "flex-start",
-  },
-  headingTypo: {
-    textAlign: "auto",
-    color: Color.colorGray_100,
-    lineHeight: 18,
-    fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.openSansRegular,
+  safeArea: {
     flex: 1,
-  },
-  headingTypo1: {
-    textAlign: "auto",
-    color: Color.sparklightaddGray,
-    lineHeight: 18,
-    fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.openSansRegular,
-    flex: 1,
-  },
-  contentSpaceBlock: {
-    paddingHorizontal: Padding.p_base,
-    alignSelf: "stretch",
-  },
-  chevronIconLayout: {
-    marginLeft: 8,
-    height: 20,
-    width: 20,
-    overflow: "hidden",
-  },
-  supportActiveText: {
-    color: Color.colorMidnightblue,
-    textAlign: "auto",
-    lineHeight: 18,
-    fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.openSansRegular,
-    flex: 1,
-  },
-  supportingTypo1: {
-    lineHeight: 20,
-    fontSize: FontSize.textXsSemibold_size,
-    textAlign: "left",
-  },
-  support1Typo: {
-    color: Color.colorMidnightblue,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "700",
-  },
-  supportingTypo: {
-    lineHeight: 14,
-    marginTop: 10,
-    fontSize: FontSize.textXsSemibold_size,
-    textAlign: "left",
-    color: Color.colorGray_100,
-    alignSelf: "stretch",
-  },
-  issuesFlexBox: {
-    marginTop: 24,
-    alignSelf: "stretch",
-    alignItems: "center",
-  },
-  featuredIcon: {
-    backgroundColor: Color.colorMidnightblue,
-    borderColor: Color.colorWhitesmoke_200,
-    borderWidth: 4,
-    width: 72,
-    height: 72,
-    padding: Padding.p_xs,
-    justifyContent: "center",
-    flexDirection: "row",
-    borderStyle: "solid",
-    borderRadius: Border.br_81xl,
-    alignItems: "center",
-  },
-  wereHereTo: {
-    fontSize: FontSize.size_3xl,
-    width: 210,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorGray_200,
-    lineHeight: 28,
-    textAlign: "center",
-  },
-  wereHereToHelpWrapper: {
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  header: {
-    alignSelf: "stretch",
-    alignItems: "center",
-    paddingBottom: Padding.p_base,
-  },
-  searchChild: {
-    flex: 1,
-    paddingHorizontal: Padding.p_base,
-    paddingVertical: Padding.p_base,
-    fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.openSansRegular,
-    fontWeight: "400",
-  },
-  search: {
-    justifyContent: "center",
-    alignSelf: "stretch",
-    height: 58,
-  },
-  heading: {
-    color: Color.colorGray_100,
-    textAlign: "left",
-    lineHeight: 18,
-    fontSize: FontSize.size_lg,
-  },
-  headingContainer: {
-    paddingTop: Padding.p_5xl,
-    paddingHorizontal: Padding.p_base,
-    paddingBottom: Padding.p_base,
-    flexDirection: "row",
-    alignSelf: "stretch",
-    borderTopRightRadius: Border.br_11xs,
-    borderTopLeftRadius: Border.br_11xs,
-  },
-  headingAndToggle: {
-    flexDirection: "row",
-    alignSelf: "stretch",
-    alignItems: "center",
-  },
-  supportingText: {
-    marginTop: 8,
-    color: Color.sparklightaddGray,
-    fontFamily: FontFamily.openSansRegular,
-    alignSelf: "stretch",
-  },
-  frameParent: {
-    marginLeft: Padding.p_xs,
-    flex: 1,
-  },
-  headingAndIcon: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  content: {
-    paddingVertical: Padding.p_xl,
-  },
-  integrationCardMobile: {
-    backgroundColor: Color.colorWhitesmoke_100,
-    borderColor: Color.sparklightGray,
-    borderRadius: Border.br_11xs,
-    alignSelf: "stretch",
-  },
-  integrationCardMobile1: {
-    borderColor: Color.sparklightGray,
-    backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_11xs,
-    alignSelf: "stretch",
-  },
-  integrationCardMobileContainer: {
-    paddingBottom: Padding.p_base,
-    backgroundColor: Color.sparklightWhite,
-    alignItems: "center",
-  },
-  additionalSupport: {
-    borderColor: Color.sparklightGray,
-    borderRadius: Border.br_11xs,
-    marginTop: 24,
-    alignSelf: "stretch",
-    alignItems: "center",
-  },
-  supportChatText: {
-    paddingTop: 5,
-    paddingBottom: 5,
-  },
-  supportingText4: {
-    lineHeight: 20,
-    fontSize: FontSize.textXsSemibold_size,
-    textAlign: "left",
-    flex: 1,
-  },
-  supportingTextWrapper: {
-    marginTop: 10,
-    flexDirection: "row",
-    alignSelf: "stretch",
-    alignItems: "center",
-  },
-  supportingText5: {
-    marginTop: 10,
-    color: Color.sparklightaddGray,
-    fontFamily: FontFamily.openSansRegular,
-    alignSelf: "stretch",
-  },
-  supportingText7: {
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: "700",
-  },
-  headingAndIcon4: {
-    flexDirection: "row",
-    flex: 1,
-  },
-  mainContainer: {
-    paddingVertical: Padding.p_base,
-    alignSelf: "stretch",
-    marginBottom: 280,
-  },
-  support: {
-    flex: 1,
-    backgroundColor: Color.colorWhitesmoke_200,
-    width: "100%",
+    backgroundColor: Color.backgroundBlur,
   },
   linearGradientStyle: {
     position: "absolute",
@@ -545,6 +150,16 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     height: 150,
+  },
+  container: {
+    flex: 1,
+  },
+  contentContainer: {
+    paddingBottom: Padding.p_37xl,
+  },
+  servicesContainer: {
+    backgroundColor: Color.backgroundBlur,
+    paddingTop: Padding.p_base,
   },
 });
 

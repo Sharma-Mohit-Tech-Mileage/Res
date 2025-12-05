@@ -68,14 +68,14 @@ export const TABS = [
     },
     
     isVisible: (userInfo, featureFlags) => {
-      if (!featureFlags?.enableServices) {
-        return false;
-      }
+      // if (!featureFlags?.enableServices) {
+      //   return false;
+      // }
       
-      // Only show for active accounts
-      if (userInfo?.acctStatus !== 'ACTIVE') {
-        return false;
-      }
+      // // Only show for active accounts
+      // if (userInfo?.acctStatus !== 'ACTIVE') {
+      //   return false;
+      // }
       
       return true;
     },
