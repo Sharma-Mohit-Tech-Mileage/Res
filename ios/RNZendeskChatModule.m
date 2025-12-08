@@ -18,6 +18,9 @@ RCT_EXPORT_MODULE(RNZendeskChatModule);
   
       dispatch_async(dispatch_get_main_queue(), ^{
         [Zendesk initializeWithChannelKey:@"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lLnplbmRlc2suY29tL21vYmlsZV9zZGtfYXBpL3NldHRpbmdzLzAxSlEwOTk0WUpERVpLMVdCWjlFVDdCRURYLmpzb24ifQ=="
+         
+         
+         
                          messagingFactory:[[ZDKDefaultMessagingFactory alloc] init]
                         completionHandler:^(Zendesk * _Nullable zendesk, NSError * _Nullable error) {
           ZDKLogger.enabled = YES;
