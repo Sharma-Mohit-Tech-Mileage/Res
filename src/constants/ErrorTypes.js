@@ -7,6 +7,8 @@ export const ErrorType = {
   BROWSER_UNAVAILABLE: 'BROWSER_UNAVAILABLE',
   USER_CANCELLED: 'USER_CANCELLED',
   API_ERROR: 'API_ERROR',
+  API_ERROR_204: 'API_ERROR_204',
+  ADMIN_PERMISSION: 'ADMIN_PERMISSION',
   BUSINESS_ACCOUNT: 'BUSINESS_ACCOUNT',
   SESSION_EXPIRED: 'SESSION_EXPIRED',
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
@@ -19,7 +21,7 @@ export const ErrorType = {
  */
 export const ERROR_MESSAGES = {
   [ErrorType.NETWORK_ERROR]: {
-    title: 'Connection Issue',
+    title: 'Connection Error',
     message: 'Please check your internet connection and try again.',
     icon: 'wifi-off',
   },
@@ -43,9 +45,19 @@ export const ERROR_MESSAGES = {
     message: 'We encountered an issue connecting to our services. Please try again.',
     icon: 'server',
   },
+  [ErrorType.API_ERROR_204]: {
+    title: 'Login Unavailable',
+    message: "We're unable to complete your login right now due to a technical issue. Please try again or contact us at 877-692-2253 if the issue continues.",
+    icon: 'server',
+  },
+  [ErrorType.ADMIN_PERMISSION]: {
+    title: 'Access Denied',
+    message: 'Please sign in using your Primary Admin account to continue.',
+    icon: 'lock',
+  },
   [ErrorType.BUSINESS_ACCOUNT]: {
-    title: 'Business Account Detected',
-    message: 'This app is for residential customers. Please download the MySparklight Business app.',
+    title: 'App Mismatch Detected',
+    message: 'Only customers with a Sparklight Business services can use the MySparklight Business mobile app for account management. Please download the MySparklight mobile app to manage your Sparklight home internet account.',
     icon: 'business',
   },
   [ErrorType.SESSION_EXPIRED]: {
@@ -77,7 +89,7 @@ export const ERROR_CODES = {
   30801: ErrorType.AUTH_TIMEOUT,
   30802: ErrorType.SESSION_EXPIRED,
   30803: ErrorType.API_ERROR,
-  204: ErrorType.API_ERROR,
+  204: ErrorType.API_ERROR_204,
   401: ErrorType.INVALID_CREDENTIALS,
   500: ErrorType.SERVER_ERROR,
   503: ErrorType.SERVER_ERROR,

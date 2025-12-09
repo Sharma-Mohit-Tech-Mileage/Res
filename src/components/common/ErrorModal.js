@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Modal, View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 import { Color, FontFamily } from '../../../GlobalStyles';
 import colors from '../../res/Colors';
 import AlertIcon from '../../res/svgIcons/AlertIcon';
@@ -10,13 +10,15 @@ export const ErrorType = {
   BROWSER_UNAVAILABLE: 'BROWSER_UNAVAILABLE',
   USER_CANCELLED: 'USER_CANCELLED',
   API_ERROR: 'API_ERROR',
+  API_ERROR_204: 'API_ERROR_204',
+  ADMIN_PERMISSION: 'ADMIN_PERMISSION',
   BUSINESS_ACCOUNT: 'BUSINESS_ACCOUNT',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 };
 
 const ERROR_MESSAGES = {
   [ErrorType.NETWORK_ERROR]: {
-    title: 'Connection Issue',
+    title: 'Connection Error',
     message: 'Please check your internet connection and try again.',
     actions: [
       { label: 'Retry', action: 'RETRY', primary: true },
@@ -56,9 +58,24 @@ const ERROR_MESSAGES = {
       { label: 'Cancel', action: 'CANCEL', primary: false },
     ],
   },
+  [ErrorType.API_ERROR_204]: {
+    title: 'Login Unavailable',
+    message: "We're unable to complete your login right now due to a technical issue. Please try again or contact us at 877-692-2253 if the issue continues.",
+    actions: [
+      { label: 'Retry', action: 'RETRY', primary: true },
+      { label: 'Cancel', action: 'CANCEL', primary: false },
+    ],
+  },
+  [ErrorType.ADMIN_PERMISSION]: {
+    title: 'Access Denied',
+    message: 'Please sign in using your Primary Admin account to continue.',
+    actions: [
+      { label: 'Close', action: 'CANCEL', primary: true },
+    ],
+  },
   [ErrorType.BUSINESS_ACCOUNT]: {
-    title: 'Business Account Detected',
-    message: 'This app is for residential customers. Please download the MySparklight Business app to manage your business services.',
+    title: 'App Mismatch Detected',
+    message: 'Only customers with a Sparklight Business services can use the MySparklight Business mobile app for account management. Please download the MySparklight mobile app to manage your Sparklight home internet account.',
     actions: [
       { label: 'Download Business App', action: 'DOWNLOAD_BUSINESS_APP', primary: true },
       { label: 'Cancel', action: 'CANCEL', primary: false },
@@ -78,6 +95,31 @@ const ErrorModal = ({ visible, errorType, onAction, customMessage }) => {
   const errorConfig = ERROR_MESSAGES[errorType] || ERROR_MESSAGES[ErrorType.UNKNOWN_ERROR];
   const displayMessage = customMessage || errorConfig.message;
   
+  // Helper to render message with hyperlinked phone numbers
+  const renderMessage = (message) => {
+    const phoneRegex = /(\d{3}-\d{3}-\d{4})/g;
+    const parts = message.split(phoneRegex);
+    
+    return (
+      <Text style={styles.message}>
+        {parts.map((part, index) => {
+          if (phoneRegex.test(part)) {
+            return (
+              <Text
+                key={index}
+                style={[styles.message, styles.phoneLink]}
+                onPress={() => Linking.openURL(`tel:${part}`)}
+              >
+                {part}
+              </Text>
+            );
+          }
+          return part;
+        })}
+      </Text>
+    );
+  };
+  
   return (
     <Modal
       visible={visible}
@@ -94,7 +136,7 @@ const ErrorModal = ({ visible, errorType, onAction, customMessage }) => {
           
           <View style={styles.divider} />
           
-          <Text style={styles.message}>{displayMessage}</Text>
+          {renderMessage(displayMessage)}
           
           <View style={styles.buttonContainer}>
             {errorConfig.actions.map((action, index) => (
@@ -165,6 +207,11 @@ const styles = StyleSheet.create({
     color: colors.darkest_grey,
     marginBottom: 20,
     textAlign: 'center',
+  },
+  phoneLink: {
+    color: colors.sparklight_purple_blue,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
   buttonContainer: {
     gap: 8,

@@ -8,7 +8,7 @@ import { saveUserInfo, logInfo } from "../../redux/actions/UserAction";
 import { storeUser, storeSsoToken, getSsoToken, getUser, cleanUserData, } from "../../redux/utils/LocalStorage";
 import { PostAuthApiRequest } from "../../network/APIClient";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from "react-native-responsive-screen";
-import { Color, FontFamily } from "../../../GlobalStyles";
+import { FontFamily } from "../../../GlobalStyles";
 import CustomerDisconnectPage from "../common/CustomerDisconnectPage";
 import { Env, ISUAT } from "../../network/apis/account/Constants";
 import VersionCheck from "react-native-version-check";
@@ -21,7 +21,7 @@ import Logo from "../../res/images/SpalshLogo";
 import NetworkManager from "../../utils/NetworkManager";
 import AuthenticationManager from "../../utils/AuthenticationManager";
 import ErrorModal, { ErrorType } from "../common/ErrorModal";
-import LoadingStateIndicator, { LoadingState } from "../common/LoadingStateIndicator";
+import LoadingStateIndicator, { LoadingState, } from "../common/LoadingStateIndicator";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -51,31 +51,27 @@ const ANIMATION_CONFIG = {
 };
 
 const SplashScreen = ({ navigation, route }) => {
-  const { isLogout } = route?.params?.isLogout
-    ? route.params
-    : { isLogout: false };
+  const { isLogout } = route?.params?.isLogout ? route.params : { isLogout: false };
 
   const dispatch = useDispatch();
-  
+
   const [loadingState, setLoadingState] = useState(LoadingState.NONE);
-  const [errorState, setErrorState] = useState({ visible: false, type: null, message: null });
+  const [errorState, setErrorState] = useState({ visible: false, type: null, message: null, });
   const [authInProgress, setAuthInProgress] = useState(false);
   const authLockRef = useRef(false);
   const [loginEnable, setLoginEnable] = useState(false);
   const [disconnected, setDisconnected] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [deviceSize, setDeviceSize] = useState(getDeviceSize());
-  const [networkState, setNetworkState] = useState({ isConnected: true, type: 'unknown' });
-  
-  // Refs for cleanup
+  const [networkState, setNetworkState] = useState({ isConnected: true, type: "unknown", });
+  const [showConnectedBanner, setShowConnectedBanner] = useState(false);
+
   const networkUnsubscribe = useRef(null);
   const sessionCheckTimeout = useRef(null);
+  const wasDisconnected = useRef(false);
 
-  // Animation refs
   const logoFade = useRef(new Animated.Value(0)).current;
-  const logoMovement = useRef(
-    new Animated.Value(ANIMATION_CONFIG[deviceSize].logoStart)
-  ).current;
+  const logoMovement = useRef( new Animated.Value(ANIMATION_CONFIG[deviceSize].logoStart) ).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const getStyle = (baseStyle) => {
@@ -83,19 +79,31 @@ const SplashScreen = ({ navigation, route }) => {
     return styles[sizeStyle] || styles[baseStyle];
   };
 
-  // Network monitoring
   useEffect(() => {
     const networkManager = NetworkManager.getInstance();
-    
-    networkUnsubscribe.current = networkManager.subscribeToNetworkChanges((state) => {
-      setNetworkState(state);
-      
-      // If connection restored and we have an error, allow retry
-      if (state.isConnected && errorState.type === ErrorType.NETWORK_ERROR) {
-        setErrorState({ visible: false, type: null, message: null });
+
+    networkUnsubscribe.current = networkManager.subscribeToNetworkChanges(
+      (state) => {
+        const wasOffline = !networkState.isConnected;
+        setNetworkState(state);
+        if (wasOffline && state.isConnected) {
+          wasDisconnected.current = false;
+          setShowConnectedBanner(true);
+          setTimeout(() => {
+            setShowConnectedBanner(false);
+          }, 3000);
+
+          if (errorState.type === ErrorType.NETWORK_ERROR) {
+            setErrorState({ visible: false, type: null, message: null });
+          }
+        }
+
+        if (!state.isConnected) {
+          wasDisconnected.current = true;
+        }
       }
-    });
-    
+    );
+
     return () => {
       if (networkUnsubscribe.current) {
         networkUnsubscribe.current();
@@ -104,9 +112,8 @@ const SplashScreen = ({ navigation, route }) => {
         clearTimeout(sessionCheckTimeout.current);
       }
     };
-  }, [errorState.type]);
+  }, [errorState.type, networkState.isConnected]);
 
-  // Animation effects
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: isVisible ? 1 : 0,
@@ -115,12 +122,10 @@ const SplashScreen = ({ navigation, route }) => {
     }).start();
   }, [isVisible, fadeAnim]);
 
-  // Initialize
   useEffect(() => {
     startAnimations();
 
     if (!isLogout) {
-      // Add delay to ensure network state is established
       setTimeout(() => {
         refreshTokenIfAvailable();
       }, 500);
@@ -129,7 +134,6 @@ const SplashScreen = ({ navigation, route }) => {
     }
   }, []);
 
-  // Handle dimension changes
   useEffect(() => {
     const updateDimensions = () => {
       const newSize = getDeviceSize();
@@ -137,11 +141,13 @@ const SplashScreen = ({ navigation, route }) => {
       logoMovement.setValue(ANIMATION_CONFIG[newSize].logoStart);
     };
 
-    const subscription = Dimensions.addEventListener("change", updateDimensions);
+    const subscription = Dimensions.addEventListener(
+      "change",
+      updateDimensions
+    );
     return () => subscription?.remove();
   }, []);
 
-  // Start animations - now faster
   const startAnimations = () => {
     Animated.parallel([
       Animated.timing(logoFade, {
@@ -165,14 +171,15 @@ const SplashScreen = ({ navigation, route }) => {
     }, 500);
   };
 
-  // Refresh token with network check and timeout
   const refreshTokenIfAvailable = async () => {
     try {
-      // Check network first
       const networkManager = NetworkManager.getInstance();
       const connectivity = await networkManager.checkConnectivity();
-      
-      if (!connectivity.isConnected || connectivity.isInternetReachable === false) {
+
+      if (
+        !connectivity.isConnected ||
+        connectivity.isInternetReachable === false
+      ) {
         setErrorState({
           visible: true,
           type: ErrorType.NETWORK_ERROR,
@@ -183,16 +190,14 @@ const SplashScreen = ({ navigation, route }) => {
       }
 
       setLoadingState(LoadingState.CHECKING_SESSION);
-      
-      // Set timeout for session check
       sessionCheckTimeout.current = setTimeout(() => {
         setLoadingState(LoadingState.NONE);
         setLoginEnable(true);
-        console.warn('Session check timeout');
+        console.warn("Session check timeout");
       }, SESSION_CHECK_TIMEOUT);
 
       const user = await getUser();
-      
+
       if (!user?.refreshToken) {
         clearTimeout(sessionCheckTimeout.current);
         setLoadingState(LoadingState.NONE);
@@ -204,13 +209,13 @@ const SplashScreen = ({ navigation, route }) => {
         config,
         user.refreshToken
       );
-      
+
       clearTimeout(sessionCheckTimeout.current);
 
       if (!result.success) {
         setLoadingState(LoadingState.NONE);
         setLoginEnable(true);
-        
+
         LoginLogger.logFailedLogin(
           dispatch,
           logInfo,
@@ -240,7 +245,7 @@ const SplashScreen = ({ navigation, route }) => {
       clearTimeout(sessionCheckTimeout.current);
       setLoadingState(LoadingState.NONE);
       setLoginEnable(true);
-      
+
       LoginLogger.logFailedLogin(
         dispatch,
         logInfo,
@@ -258,7 +263,7 @@ const SplashScreen = ({ navigation, route }) => {
 
   const callSSOLoginApi = useCallback((request) => {
     setLoadingState(LoadingState.LOADING_DATA);
-    
+
     PostAuthApiRequest("api/mobile/gettoken", request, onSuccess, onError);
   }, []);
 
@@ -277,23 +282,23 @@ const SplashScreen = ({ navigation, route }) => {
 
   const onError = useCallback(
     (error) => {
-      console.error("Login API Error:", error);
       setLoadingState(LoadingState.NONE);
       setLoginEnable(true);
-      
-      // Handle specific error cases
       if (error.status === 204) {
-        // Handle 204 with custom modal if needed
         setErrorState({
           visible: true,
-          type: ErrorType.API_ERROR,
-          message: "Unable to retrieve account information. Please contact support at 1-877-692-2253.",
+          type: ErrorType.API_ERROR_204,
+          message:
+            "Unable to retrieve account information. Please contact support at 1-877-692-2253.",
         });
         return;
       }
-      
+
       // Network error
-      if (error.message?.includes('Network') || error.message?.includes('timeout')) {
+      if (
+        error.message?.includes("Network") ||
+        error.message?.includes("timeout")
+      ) {
         setErrorState({
           visible: true,
           type: ErrorType.NETWORK_ERROR,
@@ -347,7 +352,9 @@ const SplashScreen = ({ navigation, route }) => {
         return;
       }
 
-      if (shouldBlockLogin(userInfo.acctStatus, userInfo.daysSinceDisconnectDate)) {
+      if (
+        shouldBlockLogin(userInfo.acctStatus, userInfo.daysSinceDisconnectDate)
+      ) {
         setLoadingState(LoadingState.NONE);
         setDisconnected(true);
         return;
@@ -361,8 +368,9 @@ const SplashScreen = ({ navigation, route }) => {
         setLoginEnable(true);
         setErrorState({
           visible: true,
-          type: ErrorType.API_ERROR,
-          message: "Your account does not have the necessary permissions to use this app.",
+          type: ErrorType.ADMIN_PERMISSION,
+          message:
+            "Your account does not have the necessary permissions to use this app.",
         });
       } else {
         moveAfterLogin(user);
@@ -377,8 +385,6 @@ const SplashScreen = ({ navigation, route }) => {
     try {
       storeUser(user);
       dispatch(saveUserInfo(user));
-
-      // Analytics tracking
       if (user.userInfo && user.userInfo.userName) {
         await analytics().setUserId(user.userInfo.userName.toString());
         await analytics().setUserProperty(
@@ -389,7 +395,7 @@ const SplashScreen = ({ navigation, route }) => {
           Sparklight_user_id: user.userInfo.userName.toString(),
         });
       }
-      
+
       if (user.userInfo.mobileTCAcceptanceFlag) {
         navigation.reset({ index: 0, routes: [{ name: "MyTab" }] });
       } else {
@@ -408,16 +414,22 @@ const SplashScreen = ({ navigation, route }) => {
   };
 
   const loginAuth = async () => {
-    if (authLockRef.current || authInProgress || loadingState !== LoadingState.NONE) {
+    if (
+      authLockRef.current ||
+      authInProgress ||
+      loadingState !== LoadingState.NONE
+    ) {
       console.log("Auth already in progress, ignoring duplicate request");
       return;
     }
 
-    // Check network before attempting auth
     const networkManager = NetworkManager.getInstance();
     const connectivity = await networkManager.checkConnectivity();
-    
-    if (!connectivity.isConnected || connectivity.isInternetReachable === false) {
+
+    if (
+      !connectivity.isConnected ||
+      connectivity.isInternetReachable === false
+    ) {
       setErrorState({
         visible: true,
         type: ErrorType.NETWORK_ERROR,
@@ -433,14 +445,11 @@ const SplashScreen = ({ navigation, route }) => {
 
     try {
       const result = await AuthenticationManager.authorizeWithTimeout(config);
-      console.log("Authorization result:", JSON.stringify(result));
       if (!result.success) {
-        // Handle specific error types
-        if (result.code === 'USER_CANCELLED') {
+        if (result.code === "USER_CANCELLED") {
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
-          // Don't show error for user cancellation
-        } else if (result.code === 'AUTH_TIMEOUT') {
+        } else if (result.code === "AUTH_TIMEOUT") {
           setErrorState({
             visible: true,
             type: ErrorType.AUTH_TIMEOUT,
@@ -448,7 +457,7 @@ const SplashScreen = ({ navigation, route }) => {
           });
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
-        } else if (result.code === 'BROWSER_UNAVAILABLE') {
+        } else if (result.code === "BROWSER_UNAVAILABLE") {
           setErrorState({
             visible: true,
             type: ErrorType.BROWSER_UNAVAILABLE,
@@ -456,7 +465,7 @@ const SplashScreen = ({ navigation, route }) => {
           });
           setLoadingState(LoadingState.NONE);
           setLoginEnable(true);
-        } else if (result.code === 'NETWORK_ERROR') {
+        } else if (result.code === "NETWORK_ERROR") {
           setErrorState({
             visible: true,
             type: ErrorType.NETWORK_ERROR,
@@ -489,14 +498,14 @@ const SplashScreen = ({ navigation, route }) => {
         );
         return;
       }
-      
+
       const data = {
         idToken: result.data.idToken,
         accessToken: result.data.accessToken,
         idTokenGuid: result.data.authorizeAdditionalParameters.session_state,
         refreshToken: result.data.refreshToken,
       };
-      
+
       storeSsoToken(data);
       setLoadingState(LoadingState.AUTHENTICATING);
       callSSOLoginApi(data);
@@ -547,12 +556,18 @@ const SplashScreen = ({ navigation, route }) => {
                 try {
                   await analytics().resetAnalyticsData();
                   cleanUserData();
-                  if (postLogoutCallback && typeof postLogoutCallback === "function") {
+                  if (
+                    postLogoutCallback &&
+                    typeof postLogoutCallback === "function"
+                  ) {
                     postLogoutCallback();
                   }
                 } catch (error) {
                   console.error("Error during logout cleanup:", error);
-                  if (postLogoutCallback && typeof postLogoutCallback === "function") {
+                  if (
+                    postLogoutCallback &&
+                    typeof postLogoutCallback === "function"
+                  ) {
                     postLogoutCallback();
                   }
                 }
@@ -560,13 +575,19 @@ const SplashScreen = ({ navigation, route }) => {
               .catch((error) => {
                 console.error("Logout error:", error);
                 cleanUserData();
-                if (postLogoutCallback && typeof postLogoutCallback === "function") {
+                if (
+                  postLogoutCallback &&
+                  typeof postLogoutCallback === "function"
+                ) {
                   postLogoutCallback();
                 }
               });
           } else {
             cleanUserData();
-            if (postLogoutCallback && typeof postLogoutCallback === "function") {
+            if (
+              postLogoutCallback &&
+              typeof postLogoutCallback === "function"
+            ) {
               postLogoutCallback();
             }
           }
@@ -583,46 +604,77 @@ const SplashScreen = ({ navigation, route }) => {
 
   const handleErrorAction = (action) => {
     setErrorState({ visible: false, type: null, message: null });
-    
+
     switch (action) {
-      case 'RETRY':
-        if (!authLockRef.current && !authInProgress && loadingState === LoadingState.NONE) {
+      case "RETRY":
+        if (
+          !authLockRef.current &&
+          !authInProgress &&
+          loadingState === LoadingState.NONE
+        ) {
           loginAuth();
         }
         break;
-      case 'OPEN_SETTINGS':
+      case "OPEN_SETTINGS":
         Linking.openSettings();
         break;
-      case 'CONTACT_SUPPORT':
-        Linking.openURL('tel:1-877-692-2253');
+      case "CONTACT_SUPPORT":
+        Linking.openURL("tel:1-877-692-2253");
         break;
-      case 'DOWNLOAD_BUSINESS_APP':
+      case "DOWNLOAD_BUSINESS_APP":
         logoutAction(() => {
-          const businessAppUrl = Platform.OS === 'android'
-            ? 'https://play.google.com/store/apps/details?id=com.sparklight.customer.business.app&pcampaignid=web_share'
-            : 'https://apps.apple.com/us/app/mysparklight-business/id6478375256';
+          const businessAppUrl =
+            Platform.OS === "android"
+              ? "https://play.google.com/store/apps/details?id=com.sparklight.customer.business.app&pcampaignid=web_share"
+              : "https://apps.apple.com/us/app/mysparklight-business/id6478375256";
           Linking.openURL(businessAppUrl);
         });
         break;
-      case 'CANCEL':
-        // Just close the modal
+      case "CANCEL":
         break;
       default:
         break;
     }
   };
 
-  // Network status indicator
   const NetworkStatusBar = () => {
-    if (networkState.isConnected) return null;
-    
-    return (
-      <View style={styles.networkStatusBar}>
-        <Text style={styles.networkStatusText}>
-          No Internet Connection
-        </Text>
-      </View>
-    );
+    const connectedFade = useRef(new Animated.Value(1)).current;
+
+    useEffect(() => {
+      if (showConnectedBanner) {
+        connectedFade.setValue(1);
+        setTimeout(() => {
+          Animated.timing(connectedFade, {
+            toValue: 0,
+            duration: 1000,
+            useNativeDriver: true,
+          }).start();
+        }, 2000);
+      }
+    }, [showConnectedBanner]);
+
+    if (!networkState.isConnected) {
+      return (
+        <View style={styles.networkStatusBarBottom}>
+          <Text style={styles.networkStatusText}>No Internet Connection</Text>
+        </View>
+      );
+    }
+
+    if (showConnectedBanner) {
+      return (
+        <Animated.View
+          style={[
+            styles.networkStatusBarBottomGreen,
+            { opacity: connectedFade },
+          ]}
+        >
+          <Text style={styles.networkStatusText}>✓ Connected</Text>
+        </Animated.View>
+      );
+    }
+
+    return null;
   };
 
   return (
@@ -633,7 +685,7 @@ const SplashScreen = ({ navigation, route }) => {
       style={styles.container}
     >
       <NetworkStatusBar />
-      
+
       <View style={getStyle("splashContainer")}>
         <Animated.View
           style={[
@@ -674,9 +726,9 @@ const SplashScreen = ({ navigation, route }) => {
             }}
             buttonText={"Login"}
             disabled={
-              authLockRef.current || 
-              authInProgress || 
-              loadingState !== LoadingState.NONE || 
+              authLockRef.current ||
+              authInProgress ||
+              loadingState !== LoadingState.NONE ||
               !loginEnable ||
               !networkState.isConnected
             }
@@ -705,7 +757,11 @@ const SplashScreen = ({ navigation, route }) => {
         visible={disconnected}
         onLogin={() => {
           setDisconnected(false);
-          if (!authLockRef.current && !authInProgress && loadingState === LoadingState.NONE) {
+          if (
+            !authLockRef.current &&
+            !authInProgress &&
+            loadingState === LoadingState.NONE
+          ) {
             loginAuth();
           }
         }}
@@ -725,21 +781,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.splash_bg,
   },
-  networkStatusBar: {
-    position: 'absolute',
-    top: 0,
+  networkStatusBarBottom: {
+    position: "absolute",
+    bottom: hp("12%"),
     left: 0,
     right: 0,
     backgroundColor: colors.sparklight_red,
-    paddingVertical: 8,
-    zIndex: 1000,
+    paddingVertical: 10,
+    zIndex: 999,
+  },
+  networkStatusBarBottomGreen: {
+    position: "absolute",
+    bottom: hp("12%"),
+    left: 0,
+    right: 0,
+    backgroundColor: colors.sparklight_green,
+    paddingVertical: 10,
+    zIndex: 999,
   },
   networkStatusText: {
     color: colors.snow_white,
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 14,
     fontFamily: FontFamily.openSansRegular,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   splashContainer: {
     marginTop: hp("20%"),
