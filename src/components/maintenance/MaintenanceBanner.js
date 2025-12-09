@@ -4,7 +4,7 @@ import { Border, Color, FontFamily} from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import InfoIcon from "../../../assets/svgs/InfoIcon";
-
+import { A11y } from "react-native-a11y-order";
 /**
  * MaintenanceBanner Component
  * Styled to match AlertComponent from AlertUtils
@@ -52,9 +52,18 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
   
   return (
     <View style={styles.errorBox}>
+      <A11y.Order
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+        }}
+      >
       <View style={styles.alertRowContainer}>
         <View style={[{ backgroundColor: severityStyles.indicatorColor }]} />
+        
         <View style={styles.alertContentContainer}>
+          <A11y.Index index={1}>
           <View style={styles.alertTitleRow}>
             <View accessible={true} accessibilityRole="text" accessibilityLabel="Information Icon">
             <InfoIcon  
@@ -64,21 +73,28 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
             <Text 
               style={[styles.alertTitle, severityStyles.titleStyle]}
               accessibilityRole="header"
+              accessible={true}
               accessibilityLabel={title}
             >
               {title}
             </Text>
+            
           </View>
-          
+          </A11y.Index>
+          <A11y.Index index={2}>
           <Text style={styles.alertMessage}>{message}</Text>
+          </A11y.Index>
           
           {link && (
+            <A11y.Index index={3}>
             <TouchableOpacity onPress={handleLinkPress} accessibilityRole="link">
               <Text style={[styles.actionText, { marginLeft: 20, textDecorationLine: 'underline' }]}>{linkText}</Text>
             </TouchableOpacity>
+            </A11y.Index>
           )}
           
           {showPhoneNumber && (
+            <A11y.Index index={4}>
             <TouchableOpacity 
               onPress={handlePhonePress}
               accessibilityRole="link"
@@ -92,14 +108,15 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
                 </Text>
               </Text>
             </TouchableOpacity>
+            </A11y.Index>
           )}
         </View>
         
         
       </View>
       {onDismiss && (
+        <A11y.Index index={5} style={styles.closeButtonContainer}>
           <TouchableOpacity
-            style={styles.closeButtonContainer}
             onPress={onDismiss}
             accessibilityLabel="Close button"
             accessibilityRole="button"
@@ -108,7 +125,9 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
           >
             <CloseIcon color="#0060AE" />
           </TouchableOpacity>
+        </A11y.Index>
         )}
+        </A11y.Order>
     </View>
   );
 };

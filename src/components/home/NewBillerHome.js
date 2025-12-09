@@ -318,7 +318,9 @@ const getIPAddress = async () => {
       accessibilityLabel="SparkLight"
       style={styles.headerContainer}
     >
+      <View accessible={true} accessibilityRole="text" accessibilityLabel="SparkLight Logo"  >
        <Logo width={120} height={33.32}/>
+      </View>
 
        <TouchableOpacity
               onPress={() => {
