@@ -1,23 +1,98 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Color, FontSize, FontFamily, Padding, Border } from '../../../../GlobalStyles';
 import NotificationAlert from '../../common/customui/NotificationAlert';
 import SmallLoader from '../../common/customui/SmallLoader';
 import SupportIcon from "../../../res/svgIcons/SupportIcon";
 
-// Placeholder icon (you'll replace with your SVG)
-const LaptopWifiIcon = () => (
-  <View style={styles.iconPlaceholder}>
-   <SupportIcon color={Color.sparklightBrightPurple} filled={true} />
-  </View>
-);
+// WiFi Icon with Ultra-Smooth Pulse Animation
+const WiFiIconWithPulse = ({ size = 28, isAnimating = false }) => {
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const glowAnim = useRef(new Animated.Value(0)).current;
+  
+  useEffect(() => {
+    if (isAnimating) {
+      // Ultra-smooth pulse animation
+      const pulse = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1.15,
+            duration: 1500, // Slower = smoother
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 1500,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+
+      // Smooth glow effect - PURPLE
+      const glow = Animated.loop(
+        Animated.sequence([
+          Animated.timing(glowAnim, {
+            toValue: 1,
+            duration: 1500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(glowAnim, {
+            toValue: 0,
+            duration: 1500,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+
+      pulse.start();
+      glow.start();
+
+      return () => {
+        pulse.stop();
+        glow.stop();
+      };
+    } else {
+      pulseAnim.setValue(1);
+      glowAnim.setValue(0);
+    }
+  }, [isAnimating]);
+
+  const glowOpacity = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 0.4], // Subtle glow
+  });
+
+  return (
+    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+      {/* Outer PURPLE glow circle */}
+      {isAnimating && (
+        <Animated.View
+          style={[
+            styles.glowCircle,
+            {
+              opacity: glowOpacity,
+              transform: [{ scale: pulseAnim }],
+            },
+          ]}
+        />
+      )}
+      
+      {/* WiFi Icon with smooth pulse */}
+      <Animated.View
+        style={{
+          transform: [{ scale: pulseAnim }],
+        }}
+      >
+        <SupportIcon color={Color.sparklightBrightPurple} filled={true} size={size} />
+      </Animated.View>
+    </View>
+  );
+};
 
 /**
  * ServiceStatusSection Component
- * Displays "Stay Connected with Confidence" section
- * Handles service status checking
- * Shows outage/no outage notifications
+ * Smooth pulsing animation while checking
  */
 const ServiceStatusSection = ({ 
   onCheckStatus, 
@@ -26,13 +101,28 @@ const ServiceStatusSection = ({
   onCloseNotification 
 }) => {
   const navigation = useNavigation();
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleNotificationLink = () => {
-    // Navigate to Account Settings > Notifications
     navigation.navigate('account', {
       screen: 'AccountSettings',
       params: { focusNotifications: true }
     });
+  };
+
+  const handleCheckStatus = () => {
+    // Start animation
+    setIsAnimating(true);
+    
+    // Call original function
+    if (onCheckStatus) {
+      onCheckStatus();
+    }
+    
+    // Auto-stop after 30 seconds
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 30000);
   };
 
   return (
@@ -54,8 +144,11 @@ const ServiceStatusSection = ({
 
       {/* Stay Connected Section */}
       <View style={styles.card}>
+        {/* Circular WiFi Icon with Smooth Pulse */}
         <View style={styles.iconContainer}>
-          <LaptopWifiIcon />
+          <View style={styles.circularBg}>
+            <WiFiIconWithPulse size={28} isAnimating={isAnimating || checking} />
+          </View>
         </View>
 
         <Text 
@@ -73,18 +166,17 @@ const ServiceStatusSection = ({
           When your connection pauses, we hit play.
         </Text>
 
+        {/* Button */}
         <TouchableOpacity
           style={[
             styles.button,
-            checking && styles.buttonDisabled
+            (checking || isAnimating) && styles.buttonDisabled
           ]}
-          onPress={onCheckStatus}
-          disabled={checking}
+          onPress={handleCheckStatus}
+          disabled={checking || isAnimating}
           accessible={true}
           accessibilityRole="button"
           accessibilityLabel="Check Service Status"
-          accessibilityHint="Double tap to check for service outages in your area"
-          accessibilityState={{ disabled: checking, busy: checking }}
         >
           {checking ? (
             <SmallLoader isWhite={true} width={60} height={40} />
@@ -114,7 +206,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: Color.colorWhitesmoke_200,
-    // Subtle shadow
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -127,18 +218,21 @@ const styles = StyleSheet.create({
   iconContainer: {
     marginBottom: Padding.p_base,
   },
-  iconPlaceholder: {
+  circularBg: {
     width: 80,
     height: 80,
-    borderRadius: Border.br_xs,
-    backgroundColor: Color.gray50,
+    borderRadius: 40,
+    backgroundColor: '#E6D5F5',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: Color.sparklightBrightPurple,
   },
-  iconText: {
-    fontSize: 40,
+  // PURPLE glow effect circle
+  glowCircle: {
+    position: 'absolute',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: Color.sparklightBrightPurple, // PURPLE
   },
   title: {
     fontSize: FontSize.size_3xl,

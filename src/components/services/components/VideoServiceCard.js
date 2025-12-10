@@ -1,13 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, Linking, Alert } from 'react-native';
+import { View, Text, StyleSheet, Linking, Alert, TouchableOpacity } from 'react-native';
 import { Color, FontSize, FontFamily, Padding, Border } from '../../../../GlobalStyles';
-import PrimaryButton from '../../common/customui/PrimaryButton';
-import SmallLoader from '../../common/customui/SmallLoader';
 import { getChannelLineupURL } from '../utils/constants';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 /**
  * VideoServiceCard Component
- * Displays video plan name and channel lineup button
+ * Horizontal layout with circular icon
  */
 const VideoServiceCard = ({ planName, zipCode, loading = false }) => {
   const handleChannelLineup = async () => {
@@ -15,7 +14,6 @@ const VideoServiceCard = ({ planName, zipCode, loading = false }) => {
     
     try {
       const supported = await Linking.canOpenURL(url);
-      
       if (supported) {
         await Linking.openURL(url);
       } else {
@@ -27,12 +25,18 @@ const VideoServiceCard = ({ planName, zipCode, loading = false }) => {
     }
   };
 
+  // Loading Skeleton
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.sectionLabel}>TV/Video Service</Text>
         <View style={styles.card}>
-          <SmallLoader />
+          <View style={styles.skeletonRow}>
+            <View style={[styles.skeleton, styles.skeletonIcon]} />
+            <View style={styles.skeletonContent}>
+              <View style={[styles.skeleton, styles.skeletonTitle]} />
+            </View>
+            <View style={[styles.skeleton, styles.skeletonButton]} />
+          </View>
         </View>
       </View>
     );
@@ -48,29 +52,39 @@ const VideoServiceCard = ({ planName, zipCode, loading = false }) => {
       accessible={true}
       accessibilityLabel={`TV Video Service: ${planName}`}
     >
-      <Text 
-        style={styles.sectionLabel}
-        accessible={true}
-        accessibilityRole="header"
-      >
-        TV/Video Service
-      </Text>
-      
       <View style={styles.card}>
-        <Text 
-          style={styles.planName}
-          accessible={true}
-          accessibilityLabel={`Plan name: ${planName}`}
-        >
-          {planName}
-        </Text>
-        
-        <View style={styles.buttonContainer}>
-          <PrimaryButton
-            title="View Channel Lineup"
+        <View style={styles.cardContent}>
+          {/* CIRCULAR Purple Icon Background */}
+          <View style={styles.iconBg}>
+            <MaterialCommunityIcons 
+              name="television" 
+              size={24} 
+              color={Color.sparklightBrightPurple} 
+            />
+          </View>
+          
+          {/* Service Info - NO "Active subscription" text */}
+          <View style={styles.serviceInfo}>
+            <Text 
+              style={styles.serviceName}
+              accessible={true}
+              accessibilityLabel={`Service: ${planName}`}
+            >
+              {planName}
+            </Text>
+          </View>
+
+          {/* Action Button */}
+          <TouchableOpacity
+            style={styles.actionButton}
             onPress={handleChannelLineup}
-            buttonType="submit"
-          />
+            activeOpacity={0.7}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="View Channel Lineup"
+          >
+            <Text style={styles.actionButtonText}>View</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -79,24 +93,16 @@ const VideoServiceCard = ({ planName, zipCode, loading = false }) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: Padding.p_base,
+    marginBottom: Padding.p_xs,
+    marginHorizontal: Padding.p_base,
   },
-  sectionLabel: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontWeight: '600',
-    color: Color.colorGray_200,
-    marginBottom: Padding.p_5xs,
-    paddingHorizontal: Padding.p_base,
-  },
+  
   card: {
     backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_5xs,
+    borderRadius: Border.br_xs,
     padding: Padding.p_base,
-    marginHorizontal: Padding.p_base,
     borderWidth: 1,
     borderColor: Color.colorWhitesmoke_200,
-    // Subtle shadow
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -106,15 +112,74 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 1,
   },
-  planName: {
-    fontSize: FontSize.size_lg,
+  
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  
+  // CIRCULAR Icon Background - Purple theme
+  iconBg: {
+    width: 48,
+    height: 48,
+    borderRadius: 24, // CIRCULAR
+    backgroundColor: '#E6D5F5', // Light purple background
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: Padding.p_xs,
+  },
+  
+  serviceInfo: {
+    flex: 1,
+  },
+  serviceName: {
+    fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansSemiBold,
     fontWeight: '600',
-    color: Color.sparklightBrightPurple,
-    marginBottom: Padding.p_xs,
+    color: Color.colorGray_200,
   },
-  buttonContainer: {
-    marginTop: Padding.p_xs,
+  
+  // Action Button - Purple TEXT only
+  actionButton: {
+    backgroundColor: 'transparent',
+    paddingVertical: Padding.p_5xs,
+    paddingHorizontal: Padding.p_xs,
+    borderRadius: Border.br_11xs,
+    minWidth: 70,
+    alignItems: 'center',
+  },
+  actionButtonText: {
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: '700',
+    color: Color.sparklightBrightPurple,
+  },
+  
+  // Loading Skeleton
+  skeletonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  skeleton: {
+    backgroundColor: Color.colorWhitesmoke_200,
+    borderRadius: Border.br_7xs,
+  },
+  skeletonIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24, // CIRCULAR
+    marginRight: Padding.p_xs,
+  },
+  skeletonContent: {
+    flex: 1,
+  },
+  skeletonTitle: {
+    height: 16,
+    width: '70%',
+  },
+  skeletonButton: {
+    width: 70,
+    height: 32,
   },
 });
 

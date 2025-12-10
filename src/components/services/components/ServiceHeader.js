@@ -21,7 +21,7 @@ const ServiceHeader = () => {
           accessibilityRole="header"
           accessibilityLabel="My Sparklight Services"
         >
-          My Sparklight Services
+        Services
         </Text>
       </View>
 
@@ -40,7 +40,6 @@ const ServiceHeader = () => {
 const styles = StyleSheet.create({
   container: {
     paddingTop: 50,
-    paddingBottom: Padding.p_xl,
     paddingHorizontal: Padding.p_base,
   },
   rightActionableParent: {

@@ -16,7 +16,6 @@ import PhoneServiceCard from "./components/PhoneServiceCard";
 import ServiceStatusSection from "./components/ServiceStatusSection";
 import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
-import CustomLoading from "../common/customui/CustomLoading";
 
 /**
  * MyServices Screen
@@ -77,64 +76,61 @@ const MyServices = ({ route }) => {
         angle={90}
       />
       <ServiceHeader />
-      {loading && !data ? (
-        <CustomLoading loading={true} loadingTxt="Loading services" />
-      ) : (
-        <ScrollView
-          style={styles.container}
-          contentContainerStyle={styles.contentContainer}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={Color.sparklightBrightPurple}
-              colors={[Color.sparklightBrightPurple]}
-            />
-          }
-        >
-          {/* Header Section */}
 
-          {/* Service Cards Container */}
-          <View style={styles.servicesContainer}>
-            {/* Internet Service */}
-            {data?.internet?.hasService && (
-              <InternetServiceCard
-                planName={data.internet.planName}
-                downloadSpeed={data.internet.downloadSpeed}
-                uploadSpeed={data.internet.uploadSpeed}
-                loading={loading}
-              />
-            )}
-
-            {/* Video Service */}
-            {data?.video?.hasService && (
-              <VideoServiceCard
-                planName={data.video.planName}
-                zipCode={data.video.zipCode}
-                loading={loading}
-              />
-            )}
-
-            {/* Phone Service */}
-            {data?.phone?.hasService && (
-              <PhoneServiceCard
-                planName={data.phone.planName}
-                legacyBrand={data.phone.legacyBrand}
-                loading={loading}
-              />
-            )}
-          </View>
-
-          {/* Service Status Section */}
-          <ServiceStatusSection
-            onCheckStatus={handleCheckStatus}
-            outageData={outageData}
-            checking={checking}
-            onCloseNotification={handleCloseNotification}
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={Color.sparklightBrightPurple}
+            colors={[Color.sparklightBrightPurple]}
           />
-        </ScrollView>
-      )}
+        }
+      >
+        {/* Header Section */}
+
+        {/* Service Cards Container */}
+        <View style={styles.servicesContainer}>
+          {/* Internet Service */}
+          {data?.internet?.hasService && (
+            <InternetServiceCard
+              planName={data.internet.planName}
+              downloadSpeed={data.internet.downloadSpeed}
+              uploadSpeed={data.internet.uploadSpeed}
+              loading={loading}
+            />
+          )}
+
+          {/* Video Service */}
+          {data?.video?.hasService && (
+            <VideoServiceCard
+              planName={data.video.planName}
+              zipCode={data.video.zipCode}
+              loading={loading}
+            />
+          )}
+
+          {/* Phone Service */}
+          {data?.phone?.hasService && (
+            <PhoneServiceCard
+              planName={data.phone.planName}
+              legacyBrand={data.phone.legacyBrand}
+              loading={loading}
+            />
+          )}
+        </View>
+
+        {/* Service Status Section */}
+        <ServiceStatusSection
+          onCheckStatus={handleCheckStatus}
+          outageData={outageData}
+          checking={checking}
+          onCloseNotification={handleCloseNotification}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 };
