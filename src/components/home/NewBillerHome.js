@@ -38,6 +38,7 @@ import {
   startChatWithConfig,
   initChat,
   startChat,
+  logoutZendesk,
   loginWithJWT,
   setConversationalFields,
 } from "../utility/RNZendeskChat";
@@ -140,6 +141,7 @@ const NewBillerHome = ({ navigation }) => {
           console.error("Error refreshing data on focus", error);
         }
       };
+    
       refreshData();
     }, [dispatch])
   );
@@ -299,6 +301,7 @@ const getIPAddress = async () => {
       userName: user?.userInfo.userName,
       customerType: user?.userInfo.customerType,
       authLevel: user?.userInfo.authLevel,
+      mobileApp:"mobileApp",
       // jwtId:
       // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6InVzZXIiLCJleHRlcm5hbF9pZCI6IjEyODM4NzI2MyJ9.5d8kzoZS4Jp_9KDdvAPmqj_mETDFfI7C2C3VU3ZrDRA",
     jwtId: jwttoken,

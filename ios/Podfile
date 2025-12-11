@@ -71,7 +71,7 @@ target 'My Sparklight' do
     pod 'GoogleUtilities', :modular_headers => true
     pod 'FirebaseCore', :modular_headers => true
     
-    pod 'ZendeskSDKMessaging', '2.31.0'
+    pod 'ZendeskSDKMessaging', '2.36.0'
     
  use_react_native!(
   :path => config[:reactNativePath],
