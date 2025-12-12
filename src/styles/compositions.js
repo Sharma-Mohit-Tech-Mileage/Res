@@ -171,9 +171,8 @@ export const statusSection = {
 export const header = {
   container: {
     paddingTop: 50,
-   // paddingHorizontal: theme.spacing.base,
+    paddingHorizontal: theme.spacing.base,
   },
-  
   iconWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
