@@ -84,23 +84,37 @@ RCT_EXPORT_METHOD(startChat:(RCTPromiseResolveBlock)resolve
 RCT_EXPORT_METHOD(loginWithJWT:(NSString *)jwtToken resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   dispatch_async(dispatch_get_main_queue(), ^{
     @try {
-      NSLog(@"Zendesk jWt.: %@", jwtToken);
-      [[Zendesk instance] loginUserWith:jwtToken completionHandler:^(ZDKZendeskUser * _Nullable user, NSError * _Nullable error) {
+      if (jwtToken == nil || jwtToken.length == 0) {
+        reject(@"ZendeskLoginError", @"JWT token is empty", nil);
+        return;
+      }
+
+      Zendesk *sdk = [Zendesk instance];
+      if (sdk == nil) {
+        reject(@"ZendeskLoginError", @"Zendesk is not initialized", nil);
+        return;
+      }
+
+      NSLog(@"Attempting Zendesk JWT login");
+
+      [sdk loginUserWith:jwtToken completionHandler:^(ZDKZendeskUser * _Nullable user, NSError * _Nullable error) {
         if (error) {
-          //NSLog(@"Zendesk jWt.\nError: %@", error);
-          reject(@"ZendeskLoginError", @"Login failed", error);
-          NSLog(@"Zendesk jWt.\nError: %@", error);
+          NSLog(@"Zendesk login error: %@, userInfo: %@", error.localizedDescription, error.userInfo);
+          reject(@"ZendeskLoginError", error.localizedDescription ?: @"Login failed", error);
+        } else if (user == nil) {
+          NSLog(@"Zendesk login returned no user and no error");
+          reject(@"ZendeskLoginError", @"Login returned no user", nil);
         } else {
+          //NSLog(@"Zendesk login succeeded for user: %@", user.externalId ?: user.name ?: @"<unknown>");
           resolve(@"User logged in successfully");
         }
       }];
     }
     @catch (NSException *exception) {
-      NSLog(@"Zendesk jWt.\nError: %@", exception.reason);
+      NSLog(@"Zendesk login exception: %@", exception.reason);
       reject(@"Exception", @"Exception occurred", nil);
     }
   });
-  
 }
 
 RCT_EXPORT_METHOD(logoutZendesk:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
