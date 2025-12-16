@@ -3,7 +3,7 @@ export const config = {
     URL: "https://customer.sparklight.com/residential",
     SSO_LOGIN: "https://login.cableone.net/auth/realms/external-sso-realm",
     API_BASEURL: "https://publicservices.sparklight.com/portalservices/",
-    API_ACP_BASEURL: "https://publicservices.sparklight.com/PortalSvcs/",
+    API_ACP_BASEURL: "https://publicservices.sparklight.com/Portalservices/",
     API_SHOPPING_CART_BASEURL:
       "https://publicservices.sparklight.com/ShoppingCart",
     MODEM_BASE_URL: "https://mule-gateway.cableone.net/customer-api",

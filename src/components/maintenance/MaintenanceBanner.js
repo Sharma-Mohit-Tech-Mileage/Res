@@ -136,7 +136,7 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
 const styles = StyleSheet.create({
   errorBox: {
     flexDirection: "column",
-    marginHorizontal: 4,
+    marginHorizontal: 10,
     marginVertical: 20,
     borderColor: '#0060AE',
     backgroundColor:'#F0F8FF',

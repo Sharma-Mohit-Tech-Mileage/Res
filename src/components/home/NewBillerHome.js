@@ -106,6 +106,12 @@ const NewBillerHome = ({ navigation }) => {
           } else {
             setIsOutageAlert(false);
           }
+         // hardcode for testing
+          if(res.userInfo.accountNumber=="8160110010005227"){
+            setIsOutageAlert(true);
+            setEstimatedRestoreTime(moment().add(2, 'hours').format("LT"));
+          }
+
         },
         (errorCode) => {
           console.log("error in checOutagStatus", errorCode);
@@ -139,6 +145,13 @@ const NewBillerHome = ({ navigation }) => {
           checOutagStatus();
           const status = await checkForMinorUpdate();
           setUpdateStatus(status);
+// hardcode for testing update app feature
+          if(userInfo?.accountNumber=="8160110010005227"){
+        setUpdateStatus({
+          isMinorUpdateAvailable: true,
+          
+        });
+      }
           dispatch(fetchACPUserAccountDetails());
           getStatus();
           //getInAppNotificationsData();
@@ -148,6 +161,9 @@ const NewBillerHome = ({ navigation }) => {
         }
       };
 
+      
+      
+     
       refreshData();
     }, [dispatch])
   );
