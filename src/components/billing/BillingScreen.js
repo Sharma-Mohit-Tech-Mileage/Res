@@ -15,7 +15,6 @@ import {
   Border,
 } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
-import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import BillingIconWhite from "../../res/svgIcons/BillingIconWhite";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { GetApiRequest } from "../../network/APIClient";
@@ -32,12 +31,14 @@ import AppStyles from "../utility/AppStyles";
 import { getPrimaryEmail } from "../utility/constant";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import RightIcon from "../../../assets/svgs/Chevonright";
-
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 const BillingScreen = ({ navigation }) => {
+  const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
-  const accountDetails = useSelector(
-    (state) => state.profile?.accountDetails
-  );
+  const accountDetails = useSelector((state) => state.profile?.accountDetails);
   const paperlessStatusAcp = useSelector(
     (state) => state.profile?.paperlessStatusAcp
   );
@@ -121,192 +122,189 @@ const BillingScreen = ({ navigation }) => {
   }, [accountDetails]);
 
   return (
-    <View style={styles.account} accessibilityLabel="Billing Services screen">
-      <ProfileSettingsHeader
-        title="Billing Services"
-        iconAlignment="right"
-        showIcon={false}
-      />
-      <LinearGradient
-        style={styles.linearGradientStyle}
-        locations={[0, 1]}
-        colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
-        useAngle={true}
-        angle={90}
-      />
-      <View style={styles.frameParent}>
-        <View style={styles.rightActionableParent}>
-          <View
-            style={[
-              styles.rightActionable,
-              { justifyContent: "center", alignItems: "center" },
-            ]}
-          >
-            <BillingIconWhite isSelected={false} />
+    <SafeAreaProvider>
+      <View style={styles.account} accessibilityLabel="Billing Services screen">
+        <LinearGradient
+          style={[styles.linearGradientStyle, { height: 88 + insets.top }]}
+          locations={[0, 1]}
+          colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+          useAngle={true}
+          angle={90}
+        />
+        <View style={styles.frameParent}>
+          <View style={[styles.rightActionableParent, { paddingTop: insets.top + 35 }]}>
+            <View
+              style={[
+                styles.rightActionable,
+                { justifyContent: "center", alignItems: "center" },
+              ]}
+            >
+              <BillingIconWhite isSelected={false} />
+            </View>
+            <Text style={styles.melissaSmith}>Billing Services</Text>
           </View>
-          <Text style={styles.melissaSmith}>Billing Services</Text>
-        </View>
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{ marginHorizontal: 20 }}
-        >
-          <View style={{ paddingBottom: 80, marginTop: Padding.p_5xl }}>
-            {isContentLoading ? (
-              <View style={styles.loadingContainer}>
-                <LoadingOverlay
-                  loading={isContentLoading}
-                  onRequestClose={() => {
-                    setIsContentLoading(false);
-                  }}
-                />
-              </View>
-            ) : (
-              <>
-                <Card
-                  billAmt={billAmt}
-                  dueDate={dueDate}
-                  navigation={navigation}
-                  style={styles.card}
-                />
-                <AutoPayCard
-                  isAutoPayStatus={isAutoPayStatus}
-                  paymentDetails={defaultPaymentDetails}
-                  navigation={navigation}
-                  isStatusLoading={isAutoPayStatusLoad}
-                />
-                <PeperLessCard
-                  paperlessStatus={paperlessStatusAcp}
-                  navigation={navigation}
-                  isStatusLoading={paperlessLoading}
-                />
-                <View style={[AppStyles.card, styles.myModemSpaceBlock]}>
-                  <View
-                    style={[
-                      styles.myModemWrapper,
-                      styles.frameParentSpaceBlock1,
-                    ]}
-                  >
-                    <Text style={styles.leftTitle}>Billing Options</Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.supportAccordionParent,
-                      styles.supportParentFlexBox,
-                    ]}
-                  >
-                    <View style={styles.frameLayout} />
-                    <TouchableOpacity
-                      style={styles.frame9defaultSpaceBlock}
-                      onPress={() => {
-                        navigation.navigate("AutoPayPCIConnector", {
-                          url: Env.PAY_METHOD,
-                          name: "Manage Payment Method",
-                          useNewPayment: true,
-                          status: isAutoPayStatus,
-                          paymentDetails: defaultPaymentDetails,
-                          customPaymentUrl: Env.PAY_METHOD,
-                        });
-                      }}
-                      accessible={true}
-                      accessibilityRole="button"
-                      accessibilityLabel="Manage Payment Method"
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={{ marginHorizontal: 20 }}
+          >
+            <View style={{ paddingBottom: 80, marginTop: Padding.p_5xl }}>
+              {isContentLoading ? (
+                <View style={styles.loadingContainer}>
+                  <LoadingOverlay
+                    loading={isContentLoading}
+                    onRequestClose={() => {
+                      setIsContentLoading(false);
+                    }}
+                  />
+                </View>
+              ) : (
+                <>
+                  <Card
+                    billAmt={billAmt}
+                    dueDate={dueDate}
+                    navigation={navigation}
+                    style={styles.card}
+                  />
+                  <AutoPayCard
+                    isAutoPayStatus={isAutoPayStatus}
+                    paymentDetails={defaultPaymentDetails}
+                    navigation={navigation}
+                    isStatusLoading={isAutoPayStatusLoad}
+                  />
+                  <PeperLessCard
+                    paperlessStatus={paperlessStatusAcp}
+                    navigation={navigation}
+                    isStatusLoading={paperlessLoading}
+                  />
+                  <View style={[AppStyles.card, styles.myModemSpaceBlock]}>
+                    <View
+                      style={[
+                        styles.myModemWrapper,
+                        styles.frameParentSpaceBlock1,
+                      ]}
                     >
-                      {
-                        <Icon
-                          name="building-doc"
-                          color={Color.colorMidnightblue}
-                          size={20}
-                          style={{ marginRight: 16 }}
-                        />
-                      }
-                      <Text style={styles.modemHealthSupport}>
-                        Manage Payment Method
-                      </Text>
-                      <RightIcon />
-                    </TouchableOpacity>
-
-                    <View style={styles.frameLayout} />
-                    {
+                      <Text style={styles.leftTitle}>Billing Options</Text>
+                    </View>
+                    <View
+                      style={[
+                        styles.supportAccordionParent,
+                        styles.supportParentFlexBox,
+                      ]}
+                    >
+                      <View style={styles.frameLayout} />
                       <TouchableOpacity
                         style={styles.frame9defaultSpaceBlock}
                         onPress={() => {
-                          navigation.navigate("BillingBreakDown");
+                          navigation.navigate("AutoPayPCIConnector", {
+                            url: Env.PAY_METHOD,
+                            name: "Manage Payment Method",
+                            useNewPayment: true,
+                            status: isAutoPayStatus,
+                            paymentDetails: defaultPaymentDetails,
+                            customPaymentUrl: Env.PAY_METHOD,
+                          });
                         }}
                         accessible={true}
                         accessibilityRole="button"
-                        accessibilityLabel="View Bill Breakdown"
+                        accessibilityLabel="Manage Payment Method"
                       >
                         {
                           <Icon
-                            name="search-book"
+                            name="building-doc"
                             color={Color.colorMidnightblue}
                             size={20}
                             style={{ marginRight: 16 }}
                           />
                         }
                         <Text style={styles.modemHealthSupport}>
-                          {"View Bill Breakdown"}
+                          Manage Payment Method
                         </Text>
                         <RightIcon />
                       </TouchableOpacity>
-                    }
-                    <View style={styles.frameLayout} />
-                    <TouchableOpacity
-                      style={styles.frame9defaultSpaceBlock}
-                      onPress={() => {
-                        navigation.navigate("PaymentHistory");
-                      }}
-                      accessible={true}
-                      accessibilityRole="button"
-                      accessibilityLabel="View Payment History"
-                    >
-                      {
-                        <Icon
-                          name="document"
-                          color={Color.colorMidnightblue}
-                          size={20}
-                          style={{ marginRight: 16 }}
-                        />
-                      }
 
-                      <Text style={styles.modemHealthSupport}>
-                        View Payment History
-                      </Text>
-                      <RightIcon />
-                    </TouchableOpacity>
-                    <View style={styles.frameLayout} />
-
-                    <TouchableOpacity
-                      style={styles.frame9defaultSpaceBlock}
-                      onPress={() => {
-                        navigation.navigate("BillingStatements");
-                      }}
-                      accessible={true}
-                      accessibilityRole="button"
-                      accessibilityLabel="View Billing Statements"
-                    >
+                      <View style={styles.frameLayout} />
                       {
-                        <Icon
-                          name="bill-paid"
-                          color={Color.colorMidnightblue}
-                          size={20}
-                          style={{ marginRight: 16 }}
-                        />
+                        <TouchableOpacity
+                          style={styles.frame9defaultSpaceBlock}
+                          onPress={() => {
+                            navigation.navigate("BillingBreakDown");
+                          }}
+                          accessible={true}
+                          accessibilityRole="button"
+                          accessibilityLabel="View Bill Breakdown"
+                        >
+                          {
+                            <Icon
+                              name="search-book"
+                              color={Color.colorMidnightblue}
+                              size={20}
+                              style={{ marginRight: 16 }}
+                            />
+                          }
+                          <Text style={styles.modemHealthSupport}>
+                            {"View Bill Breakdown"}
+                          </Text>
+                          <RightIcon />
+                        </TouchableOpacity>
                       }
-                      <Text style={styles.modemHealthSupport}>
-                        View Billing Statements
-                      </Text>
-                      <RightIcon />
-                    </TouchableOpacity>
+                      <View style={styles.frameLayout} />
+                      <TouchableOpacity
+                        style={styles.frame9defaultSpaceBlock}
+                        onPress={() => {
+                          navigation.navigate("PaymentHistory");
+                        }}
+                        accessible={true}
+                        accessibilityRole="button"
+                        accessibilityLabel="View Payment History"
+                      >
+                        {
+                          <Icon
+                            name="document"
+                            color={Color.colorMidnightblue}
+                            size={20}
+                            style={{ marginRight: 16 }}
+                          />
+                        }
+
+                        <Text style={styles.modemHealthSupport}>
+                          View Payment History
+                        </Text>
+                        <RightIcon />
+                      </TouchableOpacity>
+                      <View style={styles.frameLayout} />
+
+                      <TouchableOpacity
+                        style={styles.frame9defaultSpaceBlock}
+                        onPress={() => {
+                          navigation.navigate("BillingStatements");
+                        }}
+                        accessible={true}
+                        accessibilityRole="button"
+                        accessibilityLabel="View Billing Statements"
+                      >
+                        {
+                          <Icon
+                            name="bill-paid"
+                            color={Color.colorMidnightblue}
+                            size={20}
+                            style={{ marginRight: 16 }}
+                          />
+                        }
+                        <Text style={styles.modemHealthSupport}>
+                          View Billing Statements
+                        </Text>
+                        <RightIcon />
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-              </>
-            )}
-          </View>
-        </ScrollView>
+                </>
+              )}
+            </View>
+          </ScrollView>
+        </View>
       </View>
-    </View>
+    </SafeAreaProvider>
   );
 };
 

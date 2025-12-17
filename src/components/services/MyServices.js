@@ -5,12 +5,14 @@ import {
   RefreshControl,
   StyleSheet,
   StatusBar,
-  SafeAreaView,
 } from "react-native";
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import LinearGradient from "react-native-linear-gradient";
 import { theme } from "../../styles/theme";
 import { container } from "../../styles/utilities";
-import { gradientHeader } from "../../styles/compositions";
 import ServiceHeader from "./sections/ServiceHeader";
 import InternetCard from "./cards/InternetCard";
 import VideoCard from "./cards/VideoCard";
@@ -18,8 +20,10 @@ import PhoneCard from "./cards/PhoneCard";
 import StatusSection from "./sections/StatusSection";
 import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
-
-const MyServices = ({ route }) => {
+import { useSelector } from "react-redux";
+const MyServicesContent = ({ route }) => {
+  const insets = useSafeAreaInsets();
+  const accountDetails = useSelector((state) => state.profile?.accountDetails);
   const accountNumber = route?.params?.accountNumber || "123456789";
   const { data, loading, error, refetch } = useServiceDetails(accountNumber);
   const { outageData, checking, checkStatus, clearOutageData } =
@@ -42,21 +46,24 @@ const MyServices = ({ route }) => {
   }, [clearOutageData]);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <StatusBar
         barStyle="light-content"
-        backgroundColor={theme.colors.primary}
+        backgroundColor="transparent"
+        translucent={true}
       />
 
       <LinearGradient
-        style={styles.gradientHeader}
+        style={[styles.gradientHeader, { height: 88 + insets.top }]}
         locations={[0, 1]}
         colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
         useAngle={true}
         angle={90}
       />
 
-      <ServiceHeader />
+      <View style={{ paddingTop: insets.top + 27 }}>
+        <ServiceHeader />
+      </View>
 
       <ScrollView
         style={styles.scrollView}
@@ -109,16 +116,27 @@ const MyServices = ({ route }) => {
           onCloseNotification={handleCloseNotification}
         />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
+
+const MyServices = (props) => (
+  <SafeAreaProvider>
+    <MyServicesContent {...props} />
+  </SafeAreaProvider>
+);
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
-  gradientHeader,
+  gradientHeader: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+  },
   scrollView: container.page,
   scrollContent: {
     paddingBottom: theme.spacing["3xl"],

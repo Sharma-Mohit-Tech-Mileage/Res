@@ -38,19 +38,37 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
       <View style={styles.card}>
         {/* Service Header */}
         <View style={styles.serviceHeader}>
-          <View style={styles.iconWrapper}>
+          <View 
+            style={styles.iconWrapper}
+            accessible={false}
+            importantForAccessibility="no"
+          >
             <MaterialCommunityIcons
               name="phone"
               size={16}
               color={theme.colors.primary}
             />
           </View>
-          <Text style={styles.serviceType}>VOICE SERVICE</Text>
+          <Text 
+            style={styles.serviceType}
+            accessible={true}
+            accessibilityRole="header"
+            accessibilityLabel="Phone Service"
+            accessibilityLevel={2}
+          >
+            VOICE SERVICE
+          </Text>
         </View>
 
         {/* Plan Name & Action */}
         <View style={styles.content}>
-          <Text style={styles.planName}>{planName}</Text>
+          <Text 
+            style={styles.planName}
+            accessible={true}
+            accessibilityLabel={`Plan Name - ${planName}`}
+          >
+            {planName}
+          </Text>
         </View>
         {showManageButton && (
           <SecondaryButton
@@ -58,6 +76,9 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
             buttonType="submit"
             onPress={handleManagePhone}
             style={styles.bottomButton}
+            accessibilityLabel="Manage Phone Service, Opens in your browser"
+            accessibilityRole="button"
+            accessibilityHint="Opens in your browser, button"
           />
         )}
       </View>

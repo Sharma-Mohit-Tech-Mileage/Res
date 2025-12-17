@@ -16,7 +16,6 @@ import {
   Border,
 } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
-
 import ProfileSettingsIcon from "../../../assets/svgs/Rightactionable15";
 import PasswordSecurityIcon from "../../../assets/svgs/Rightactionable16";
 import NotificationsIcon from "../../../assets/svgs/Rightactinable17";
@@ -42,6 +41,7 @@ import moment from "moment";
 import analytics from "@react-native-firebase/analytics";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { SafeAreaProvider, useSafeAreaInsets, } from "react-native-safe-area-context";
 const config = { issuer: Env.SSO_LOGIN, iosPrefersEphemeralSession: true };
 
 const logoutConfirmationPopup = (dispatch, navigation) => {
@@ -98,9 +98,9 @@ const logoutAction = (dispatch, navigation) => {
 };
 
 const AccountOverview = () => {
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const [fullName, setFullName] = useState("");
-  const [initials, setInitials] = useState("");
   const [menues, setMenues] = useState([]);
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.profile || {});
@@ -202,21 +202,17 @@ const AccountOverview = () => {
   );
 
   return (
+    <SafeAreaProvider>
     <View style={styles.account} accessibilityLabel="Account screen">
-      <ProfileSettingsHeader
-        title="Account"
-        iconAlignment="right"
-        showIcon={false}
-      />
       <LinearGradient
-        style={styles.linearGradientStyle}
+        style={[styles.linearGradientStyle, { height: 88 + insets.top }]}
         locations={[0, 1]}
         colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
         useAngle={true}
         angle={90}
       />
       <View style={[styles.frameParent]}>
-        <View style={styles.rightActionableParent}>
+        <View style={[styles.rightActionableParent, { paddingTop: insets.top + 35 }]}>
           <View style={styles.rightActionable}>
             <UserIconWhite width={28} height={26} />
           </View>
@@ -369,6 +365,7 @@ const AccountOverview = () => {
         </ScrollView>
       </View>
     </View>
+    </SafeAreaProvider>
   );
 };
 
@@ -378,7 +375,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0,
-    height: 150,
   },
   buttonsSpaceBlock: {
     paddingVertical: Padding.p_base,

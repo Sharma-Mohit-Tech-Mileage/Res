@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import { Env } from "./apis/account/Constants";
-import { getUser, storeUser } from "../redux/utils/LocalStorage";
+import { getUser } from "../redux/utils/LocalStorage";
 import { RefreshToken } from '../components/user/Session';
 import { useAuthInterceptor } from '../network/useAuthInterceptor';
+
 const API_ACP_BASEURL = Env.API_ACP_BASEURL;
 
 const _axios = axios.create({
@@ -19,7 +20,6 @@ const _axios = axios.create({
 
 let isRefreshing = false;
 let failedQueue = [];
-let navigationPending = false;
 
 const processQueue = (error, token = null) => {
     failedQueue.forEach(prom => {
@@ -45,13 +45,13 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const retryRequest = async (axiosInstance, originalRequest, retryCount = 0) => {
     const maxRetries = 3;
-    const baseDelay = 1000; // 1 second base delay
+    const baseDelay = 1000;
     
     if (retryCount >= maxRetries) {
         throw new Error('Max retries exceeded');
     }
     
-    const delayMs = baseDelay * Math.pow(2, retryCount); // Exponential backoff
+    const delayMs = baseDelay * Math.pow(2, retryCount);
     await delay(delayMs);
     
     try {
@@ -68,13 +68,13 @@ const AxiosInterceptorProvider = ({ children }) => {
     const { redirectToLogin } = useAuthInterceptor();
 
     useEffect(() => {
-        const interceptor = _axios.interceptors.request.use(
+        const requestInterceptor = _axios.interceptors.request.use(
             async config => {
                 try {
                     config.baseURL = API_ACP_BASEURL;
                 } catch (error) {
                     console.error("[Interceptor] Error determining baseURL:", error);
-                    config.baseURL = BASE_URL;
+                    config.baseURL = API_ACP_BASEURL;
                 }
                 return config;
             },
@@ -88,15 +88,19 @@ const AxiosInterceptorProvider = ({ children }) => {
             async error => {
                 const originalRequest = error.config;
 
-                // Handle 401 errors (existing token refresh logic)
+                // ✅ ONLY handle 401 errors for token refresh
                 if (error.response && error.response.status === 401 && !originalRequest._retry) {
+                    
+                    // ✅ If already refreshing, queue this request
                     if (isRefreshing) {
                         return new Promise((resolve, reject) => {
                             failedQueue.push({ resolve, reject });
-                        }).then(token => {
+                        })
+                        .then(token => {
                             originalRequest.headers['Authorization'] = 'Bearer ' + token;
                             return _axios(originalRequest);
-                        }).catch(err => {
+                        })
+                        .catch(err => {
                             return Promise.reject(err);
                         });
                     }
@@ -105,43 +109,54 @@ const AxiosInterceptorProvider = ({ children }) => {
                     isRefreshing = true;
 
                     try {
-                        const refreshedData = await RefreshToken();
+                        // ✅ Refresh token
+                        const newToken = await RefreshToken();
+                        
+                        // ✅ Get updated user (RefreshToken already stored it)
                         const user = await getUser();
-                        await storeUser(user);
+                        
+                        // ✅ Update axios default headers
                         _axios.defaults.headers.common['Authorization'] = 'Bearer ' + user.token;
                         originalRequest.headers['Authorization'] = 'Bearer ' + user.token;
+                        
+                        // ✅ Process all queued requests
                         processQueue(null, user.token);
                         isRefreshing = false;
+                        
+                        // ✅ Retry original request
                         return _axios(originalRequest);
+                        
                     } catch (tokenRefreshError) {
+                        // ✅ Refresh failed - reject all queued requests
                         processQueue(tokenRefreshError, null);
                         isRefreshing = false;
-                        if (!navigationPending) {
-                            navigationPending = true; 
-                            setTimeout(async () => {
-                                await redirectToLogin();
-                                navigationPending = false; 
-                            }, 500); 
-                        }
+                        
+                        // ✅ Clean redirect to login
+                        console.log('[Interceptor] Token refresh failed, redirecting to login');
+                        await redirectToLogin();
+                        
                         return Promise.reject(tokenRefreshError);
                     }
                 }
 
+                // ✅ Handle retryable errors (timeout, network, 5xx)
                 if (isRetryableError(error) && !originalRequest._retryAttempted) {
                     originalRequest._retryAttempted = true;
                     try {
                         return await retryRequest(_axios, originalRequest);
                     } catch (retryError) {
+                        console.error('[Interceptor] Retry failed:', retryError);
                         return Promise.reject(retryError);
                     }
                 }
 
+                // ✅ For all other errors (404, 403, 400, etc.), just reject
                 return Promise.reject(error);
             }
         );
 
         return () => {
-            _axios.interceptors.request.eject(interceptor);
+            _axios.interceptors.request.eject(requestInterceptor);
             _axios.interceptors.response.eject(responseInterceptor);
         };
     }, [redirectToLogin]);

@@ -8,14 +8,20 @@ const ServiceHeader = () => {
   return (
     <View style={styles.container}>
       <View style={styles.iconWrapper}>
-        <View style={styles.iconBadge}>
+        <View 
+          style={styles.iconBadge}
+          accessible={false}
+          importantForAccessibility="no"
+        >
           <SupportIcon color={theme.colors.text.onPrimary} filled={true} />
         </View>
         <Text
           style={styles.title}
           accessible={true}
           accessibilityRole="header"
-          accessibilityLabel="My Sparklight Services"
+          accessibilityLabel="Services"
+          accessibilityLevel={1}
+          nativeID="services-header"
         >
           Services
         </Text>

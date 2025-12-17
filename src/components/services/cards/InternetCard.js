@@ -32,26 +32,52 @@ const InternetCard = ({
       <View style={styles.card}>
         {/* Service Header */}
         <View style={styles.serviceHeader}>
-          <View style={styles.iconWrapper}>
+          <View 
+            style={styles.iconWrapper}
+            accessible={false}
+            importantForAccessibility="no"
+          >
             <MaterialCommunityIcons
               name="wifi"
               size={16}
               color={theme.colors.primary}
             />
           </View>
-          <Text style={styles.serviceType}>INTERNET</Text>
+          <Text 
+            style={styles.serviceType}
+            accessible={true}
+            accessibilityRole="header"
+            accessibilityLabel="Internet"
+            accessibilityLevel={2}
+          >
+            INTERNET
+          </Text>
         </View>
 
         {/* Plan Name */}
         <View style={styles.content}>
-          <Text style={styles.planName}>{planName}</Text>
+          <Text 
+            style={styles.planName}
+            accessible={true}
+            accessibilityLabel={`Plan Name - ${planName}`}
+          >
+            {planName}
+          </Text>
         </View>
 
         {/* Speed Display */}
         <View style={styles.speedContainer}>
           {/* Download Speed */}
-          <View style={styles.speedItem}>
-            <View style={styles.speedIcon}>
+          <View 
+            style={styles.speedItem}
+            accessible={true}
+            accessibilityLabel={`Download Speed: ${downloadSpeed} Mbps`}
+          >
+            <View 
+              style={styles.speedIcon}
+              accessible={false}
+              importantForAccessibility="no"
+            >
               <Text style={styles.speedArrow}>↓</Text>
             </View>
             <View style={styles.speedInfo}>
@@ -64,8 +90,16 @@ const InternetCard = ({
           </View>
 
           {/* Upload Speed */}
-          <View style={styles.speedItem}>
-            <View style={styles.speedIcon}>
+          <View 
+            style={styles.speedItem}
+            accessible={true}
+            accessibilityLabel={`Upload Speed: ${uploadSpeed} Mbps`}
+          >
+            <View 
+              style={styles.speedIcon}
+              accessible={false}
+              importantForAccessibility="no"
+            >
               <Text style={styles.speedArrow}>↑</Text>
             </View>
             <View style={styles.speedInfo}>

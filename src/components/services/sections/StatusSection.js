@@ -10,36 +10,33 @@ const RotatingCirclesAnimation = ({ isAnimating = false }) => {
   const rotation1 = useRef(new Animated.Value(0)).current;
   const rotation2 = useRef(new Animated.Value(0)).current;
 
-  useEffect(() => {
-    if (isAnimating) {
-      const anim1 = Animated.loop(
-        Animated.timing(rotation1, {
-          toValue: 1,
-          duration: 2000,
-          useNativeDriver: true,
-        })
-      );
+ useEffect(() => {
+  if (isAnimating) {
+    const anim1 = Animated.loop(
+      Animated.timing(rotation1, {
+        toValue: 1,
+        duration: 2000,
+        useNativeDriver: true,
+      })
+    );
+    
+    const anim2 = Animated.loop(
+      Animated.timing(rotation2, {
+        toValue: 1,
+        duration: 1500,
+        useNativeDriver: true,
+      })
+    );
 
-      const anim2 = Animated.loop(
-        Animated.timing(rotation2, {
-          toValue: 1,
-          duration: 1500,
-          useNativeDriver: true,
-        })
-      );
+    anim1.start();
+    anim2.start();
 
-      anim1.start();
-      anim2.start();
-
-      return () => {
-        anim1.stop();
-        anim2.stop();
-      };
-    } else {
-      rotation1.setValue(0);
-      rotation2.setValue(0);
-    }
-  }, [isAnimating]);
+    return () => {
+      anim1.stop();
+      anim2.stop();
+    };
+  }
+}, [isAnimating]);
 
   const rotate1 = rotation1.interpolate({
     inputRange: [0, 1],
@@ -89,18 +86,12 @@ const StatusSection = ({
   checking,
   onCloseNotification,
 }) => {
-  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleCheckStatus = () => {
-    setIsAnimating(true);
-
     if (onCheckStatus) {
       onCheckStatus();
     }
 
-    setTimeout(() => {
-      setIsAnimating(false);
-    }, 30000);
   };
 
   return (
@@ -109,7 +100,7 @@ const StatusSection = ({
         {outageData && (
           <View style={styles.alertInsideCard}>
             <NotificationAlert
-              type={outageData.hasOutage ? "warning" : "error"}
+              type={outageData.hasOutage ? "warning" : "info"}
               title={outageData.title}
               message={outageData.message}
               onClose={onCloseNotification}
@@ -121,22 +112,38 @@ const StatusSection = ({
         )}
 
        
-        <View style={styles.iconWrapper}>
+        <View 
+          style={styles.iconWrapper}
+          accessible={false}
+          importantForAccessibility="no"
+        >
           <View style={styles.iconBadge}>
             <RotatingCirclesAnimation
-              isAnimating={isAnimating || checking}
+              isAnimating={checking}
             />
           </View>
         </View>
 
         
-        <Text style={styles.title} accessible={true} accessibilityRole="header">
+        <Text 
+          style={styles.title} 
+          accessible={true} 
+          accessibilityRole="header"
+          accessibilityLabel="Stay Connected with Confidence"
+          accessibilityLevel={2}
+        >
           Stay Connected with Confidence
         </Text>
 
         
-        <Text style={styles.subtitle} accessible={true}>
-          {isAnimating || checking
+        <Text 
+          style={styles.subtitle} 
+          accessible={true}
+          accessibilityLabel={checking 
+            ? "Checking your service status..." 
+            : "When your connection pauses, we hit play."}
+        >
+          { checking
             ? "Checking your service status..."
             : "When your connection pauses, we hit play."}
         </Text>
@@ -147,6 +154,7 @@ const StatusSection = ({
           onPress={handleCheckStatus}
           accessibilityLabel="Check Service Status"
           accessibilityRole="button"
+          accessibilityHint="Button"
         />
       </View>
     </View>
