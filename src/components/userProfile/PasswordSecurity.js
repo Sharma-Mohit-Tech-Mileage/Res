@@ -52,7 +52,7 @@ const PasswordSecurity = () => {
             />
           </View>
           <View style={[styles.passwordParent, styles.tabsFlexBox]}>
-            <Text style={[styles.password, styles.passwordFlexBox]}>
+            <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="text" accessibilityLabel="Password, heading level 2">
               Password
             </Text>
             <Pressable
@@ -73,6 +73,7 @@ const PasswordSecurity = () => {
               <Text
                 style={[styles.text, styles.passwordFlexBox]}
                 accessibilityRole="text"
+                accessibilityLabel="Password: hidden."
               >
                 **********
               </Text>
@@ -86,7 +87,7 @@ const PasswordSecurity = () => {
               <View
                 style={[styles.securityQuestionWrapper, styles.tabsFlexBox]}
               >
-                <Text style={[styles.password, styles.passwordFlexBox]}>
+                <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="text" accessibilityLabel="Security Question, heading level 2">
                   Security Question
                 </Text>
                 <Pressable
@@ -106,7 +107,7 @@ const PasswordSecurity = () => {
                   <Text style={[styles.passwordFlexBox]}>
                     {profileDetails.securityQuestion}
                   </Text>
-                  <Text style={[styles.text, styles.passwordFlexBox]}>
+                  <Text style={[styles.text, styles.passwordFlexBox]} accessibilityRole="text" accessibilityLabel="Security Answer: hidden.">
                     ******
                   </Text>
                 </View>

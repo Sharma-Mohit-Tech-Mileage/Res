@@ -187,7 +187,7 @@ const BillingScreen = ({ navigation }) => {
                       styles.frameParentSpaceBlock1,
                     ]}
                   >
-                    <Text style={styles.leftTitle}>Billing Options</Text>
+                    <Text style={styles.leftTitle} accessibilityLabel="Billing Options, heading level 2">Billing Options</Text>
                   </View>
                   <View
                     style={[

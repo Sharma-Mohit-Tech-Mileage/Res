@@ -45,7 +45,7 @@ const ThumbsUp = () => {
       <ProfileSettingsHeader
         title="Feedback"
         onPressBack={() => navigation.navigate("Account")}
-        accessibilityRole="header"
+        accessibilityRole="text"
         accessibilityLabel="Feedback header"
       />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>

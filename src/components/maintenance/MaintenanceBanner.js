@@ -72,9 +72,9 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
             </View>
             <Text 
               style={[styles.alertTitle, severityStyles.titleStyle]}
-              accessibilityRole="header"
+              accessibilityRole="text"
               accessible={true}
-              accessibilityLabel={title}
+              accessibilityLabel={`${title}, heading level 2`}
             >
               {title}
             </Text>

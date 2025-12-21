@@ -32,7 +32,7 @@ export const AlertComponent = ({
         backgroundColor: "#FFFAEB",
         borderColor: "#DD6D02",
         closeButtonColor: "#DD6D02",
-        titleColor: "#DD6D02"
+        titleColor: Color.colorGray_100
       };
     } else if (indicatorColor === Color.sparklightGreen) {
       // App Update -> Info style (following user's specification)
@@ -76,9 +76,9 @@ export const AlertComponent = ({
             />}
         </View>
         <View style={mergedStyles.alertContentContainer}>
-          <View style={mergedStyles.alertTitleRow} accessibilityRole="header"
+          <View style={mergedStyles.alertTitleRow} accessibilityRole="text"
               accessible={true}
-              accessibilityLabel={title}>
+              accessibilityLabel={`${title}, heading level 2`}>
             <Text style={[
               mergedStyles.alertTitle, 
               titleStyle,

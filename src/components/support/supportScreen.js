@@ -235,13 +235,15 @@ const Support = ({ route }) => {
     {
       key: "searchIssues",
       text: "Search",
+      accessibilityLabel: "Search Knowledgebase",
       icon: Searchmd,
       iconAlignment: "left", // Icon to the left of the text
       navigateTo: "searchArticals",
     },
     {
       key: "Faqs",
-      text: "FAQs",
+      text: "FAQs", 
+      accessibilityLabel: "Frequently Asked Questions",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the left of the text
       navigateTo: "ArticalWindowUtility",
@@ -250,6 +252,7 @@ const Support = ({ route }) => {
     {
       key: "moreOptions",
       text: "Billing & Payments",
+      accessibilityLabel: "Billing and Payments",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
@@ -258,6 +261,7 @@ const Support = ({ route }) => {
     {
       key: "moreOptions",
       text: "Internet Service",
+      accessibilityLabel: "Internet Service",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
@@ -266,6 +270,7 @@ const Support = ({ route }) => {
     {
       key: "moreOptions",
       text: "WiFi",
+      accessibilityLabel: "WiFi Support",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
@@ -274,6 +279,7 @@ const Support = ({ route }) => {
     {
       key: "moreOptions",
       text: "More...",
+      accessibilityLabel: "More Support Options",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
@@ -360,7 +366,7 @@ const Support = ({ route }) => {
             <SupportIcon white={"#fff"} />
           </View>
           <View style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}>
-            <Text style={styles.wereHereTo}>We’re Here to Help</Text>
+            <Text style={styles.wereHereTo} accessible={true} accessibilityRole="text" accessibilityLabel="We're Here to Help, heading level 1" >We’re Here to Help</Text>
           </View>
         </View>
         <ScrollView
@@ -384,7 +390,7 @@ const Support = ({ route }) => {
                 styles.headingContainerSpaceBlock,
               ]}
             >
-              <Text style={[styles.heading, styles.headingTypo]}>
+              <Text style={[styles.heading, styles.headingTypo]} accessible={true} accessibilityRole="text" accessibilityLabel="Knowledgebase, heading level 2">
                 Knowledgebase
               </Text>
             </View>
@@ -396,7 +402,7 @@ const Support = ({ route }) => {
                   style={[styles.search, styles.navigationBorder]}
                   accessible={true}
                   accessibilityLabel={
-                    item.text == `More...` ? "More" : item.text
+                    item.accessibilityLabel
                   }
                   accessibilityRole="button"
                   onPress={() => {
@@ -467,6 +473,9 @@ const Support = ({ route }) => {
                     styles.headingTypo,
                     { paddingHorizontal: Padding.p_base },
                   ]}
+                  accessible={true}
+                  accessibilityLabel="Contact Us, heading level 2"
+                  accessibilityRole="text"
                 >
                   Contact Us
                 </Text>

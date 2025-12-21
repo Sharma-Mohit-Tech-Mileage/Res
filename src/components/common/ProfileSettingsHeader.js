@@ -71,7 +71,8 @@ const ProfileSettingsHeader = ({
                         <Text
                             style={styles.title}
                             accessible={true}
-                            accessibilityLabel={`Header: ${accessibleLable ? accessibleLable : title}`}
+                            accessibilityRole='text'
+                            accessibilityLabel={`${accessibleLable ? accessibleLable : title}, heading level 1`}
                         >
                             {title}
                         </Text>

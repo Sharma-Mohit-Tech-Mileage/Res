@@ -119,7 +119,7 @@ const SparkLightDropdown = ({
                 <Text 
                   style={styles.headerTitle}
                   accessible={true}
-                  accessibilityRole="header"
+                  accessibilityRole="text"
                 >
                   {dropdownTitle}
                 </Text>

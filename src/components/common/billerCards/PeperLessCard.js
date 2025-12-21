@@ -40,7 +40,7 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
           <PaperIconBg />
         </View>
         <View style={{ flexDirection: "column" }}>
-          <Text style={styles.leftTitle}>Paperless Billing</Text>
+          <Text style={styles.leftTitle} accessible={true} accessibilityRole="text" accessibilityLabel="Paperless Billing, heading level 2">Paperless Billing</Text>
           {isStatusLoading ? (
             <SkeletonPlaceholder>
               <View

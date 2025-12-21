@@ -50,7 +50,7 @@ const AutoPayCard = ({
           <AutoPayIcon />
         </View>
         <View style={{ flexDirection: "column" }}>
-          <Text style={styles.leftTitle}>Auto Pay</Text>
+          <Text style={styles.leftTitle} accessible={true} accessibilityRole="text" accessibilityLabel="Auto Pay, heading level 2">Auto Pay</Text>
           {isStatusLoading ? (
             <SkeletonPlaceholder>
               <View

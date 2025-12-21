@@ -109,7 +109,7 @@ const MaintenancePage = ({
 
             <Text
               style={styles.titleText}
-              accessibilityRole="header"
+              accessibilityRole="text"
               accessible={true}
               accessibilityLabel={title}
             >
