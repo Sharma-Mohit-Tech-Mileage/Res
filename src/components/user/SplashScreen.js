@@ -42,6 +42,7 @@ import LoadingOverlay from "../common/customui/CustomLoading";
 import analytics from "@react-native-firebase/analytics";
 import { shouldBlockLogin } from "../utility/disconnectHelpers";
 import Logo from "../../res/images/SpalshLogo";
+import AnimatedLogo from "../common/AnimatedLogo";
 
 const config = {
   issuer: Env.SSO_LOGIN,
@@ -578,7 +579,7 @@ const SplashScreen = ({ navigation, route }) => {
           accessible={true}
         >
           <View style={{ alignSelf: "center", marginTop: hp("5%") }}>
-            <Logo width={300} height={84} />
+            <AnimatedLogo width={300} height={84} />
           </View>
         </Animated.View>
       </View>
