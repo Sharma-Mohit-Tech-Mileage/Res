@@ -44,6 +44,10 @@ import RightIcon from "../../../assets/svgs/Chevonright";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 const config = { issuer: Env.SSO_LOGIN, iosPrefersEphemeralSession: true };
 
+import {
+  logoutZendesk,
+} from "../utility/RNZendeskChat";
+
 const logoutConfirmationPopup = (dispatch, navigation) => {
   Alert.alert(
     "Confirm Logout",
@@ -93,6 +97,7 @@ const logoutAction = (dispatch, navigation) => {
       dispatch(saveUserInfo({}));
       dispatch(logoutApp());
       cleanUserData();
+      logoutZendesk();
     });
   });
 };

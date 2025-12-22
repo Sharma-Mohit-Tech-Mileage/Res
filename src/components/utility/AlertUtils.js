@@ -3,13 +3,14 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Linking, Platform } fr
 import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
 import CloseIcon from "../../res/svgIcons/CloseIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import Infocircle from "../../../assets/svgs/Infocircle";
 import WarningIcon from '../../../assets/svgs/Alerttriangle'
+import InfoIcon from "../../../assets/svgs/InfoIcon";
 /**
  * Generic Alert Component that can be customized for different alert types
  * Updated to match finalized notification design
  */
 export const AlertComponent = ({ 
+  type, // New prop to specify alert type: "warning" or "info"
   title, 
   message, 
   indicatorColor, // Now used for determining background and border colors
@@ -69,17 +70,22 @@ export const AlertComponent = ({
         mergedStyles.alertRowContainer,
         !onClose && mergedStyles.alertRowContainerNoClose
       ]}>
-        <View style={mergedStyles.alertIcon}>
-         { IconSource? <IconSource/> :<Infocircle />}
+        <View style={mergedStyles.alertIcon} accessible={true} accessibilityRole="text" accessibilityLabel={type==="warning" ? "Warning Icon":"Information Icon"}>
+         { IconSource? <IconSource/> :<InfoIcon  
+              color={'#0060AE'} 
+            />}
         </View>
         <View style={mergedStyles.alertContentContainer}>
-          <View style={mergedStyles.alertTitleRow}>
+          <View style={mergedStyles.alertTitleRow} accessibilityRole="header"
+              accessible={true}
+              accessibilityLabel={title}>
             <Text style={[
               mergedStyles.alertTitle, 
               titleStyle,
               { color: alertStyles.titleColor }
-            ]}>
-              {" "}{`${title}`}
+            ]}
+              >
+              {title}
             </Text>
           </View>
           <Text style={mergedStyles.alertMessage}>
@@ -126,6 +132,7 @@ export const AlertUtils = {
    */
   createOutageAlert: (estimatedRestoreTime, onClose) => (
     <AlertComponent
+      type="warning"
       title="Outage Notification"
       message="Our systems show that you may be experiencing an outage related to your internet service. We are working to restore service as soon as possible."
       indicatorColor="#F88700" // Maps to warning styling internally
@@ -142,13 +149,14 @@ export const AlertUtils = {
    */
   createAppUpdateAlert: (onClose) => (
     <AlertComponent
+      type="info"
       title="What's New"
       message="Enhance your app experience with the latest version."
       indicatorColor={Color.sparklightGreen} // Maps to info styling internally (per user spec)
       iconTint="#0060AE" // Use finalized info color for icon
       titleStyle={{ color: "#0060AE" }}
       actionText="Update Now"
-      IconSource={Infocircle} // Info icon
+      IconSource={InfoIcon} // Info icon
       onActionPress={() => {
         const storeUrl = Platform.OS === "android"
           ? "https://play.google.com/store/apps/details?id=com.sparklight"
@@ -174,7 +182,7 @@ const styles = StyleSheet.create({
     paddingRight: 12,
     paddingVertical: 16,
     marginBottom: wp("15%"), // Preserving intentional values
-    marginTop: wp("-10%"), // Preserving intentional values
+    marginTop: wp("-5%"), // Preserving intentional values
   },
   alertRowContainer: {
     flexDirection: "row",

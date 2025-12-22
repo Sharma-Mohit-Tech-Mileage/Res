@@ -10,10 +10,10 @@ const WelcomeCard = () => {
   const videoId = 'C3cMQoWxv6I'; 
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container}> 
       <Text style={styles.title}>We're Excited to Connect with you!</Text>
       
-      <View style={styles.videoContainer}>
+      <View style={styles.videoContainer} accessible={true} accessibilityLabel="Welcome Video">
         <VideoPlayer videoId={videoId} />
       </View>
     </View>

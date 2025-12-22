@@ -139,6 +139,7 @@ export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => 
 
 export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
     const user = await getUser();
+    console.log("Bearer Token for API request:", user.token);
     const options = {
         method: 'POST',
         headers: {
@@ -182,6 +183,7 @@ export const UploadMultipartData = async (endpoint, data, onSuccess, onError) =>
 // Function for PUT API requests
 export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
     const user = await getUser();
+    console.log("Bearer Token for API request:", user.token);
     const options = {
         method: 'PUT',
         headers: {
@@ -198,6 +200,7 @@ export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
 // Function for GET API requests
 export const GetApiRequest = async (endpoint, onSuccess, onError) => {
     const user = await getUser();
+    console.log("Bearer Token for API request:", user.token);
     const options = {
         method: 'GET',
         headers: {

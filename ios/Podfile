@@ -71,8 +71,7 @@ target 'My Sparklight' do
     pod 'GoogleUtilities', :modular_headers => true
     pod 'FirebaseCore', :modular_headers => true
     
-    pod 'ZendeskChatSDK'      # Chat-only on the Unified SDK
-    pod 'ZendeskCoreSDK'
+    pod 'ZendeskSDKMessaging', '2.36.0'
     
  use_react_native!(
   :path => config[:reactNativePath],

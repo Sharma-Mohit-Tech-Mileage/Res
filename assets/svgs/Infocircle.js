@@ -3,13 +3,13 @@ import{ Svg ,Path} from "react-native-svg";
 const Infocircle = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
-    width={16}
-    height={16}
+    width={24}
+    height={24}
     fill="none"
     {...props}
   >
     <Path
-      stroke={props.color? props.color:"#353091"}
+      stroke={props.color? props.color:"#0060AE"}
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={1.5}
