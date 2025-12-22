@@ -46,9 +46,7 @@ const InternetCard = ({
           <Text 
             style={styles.serviceType}
             accessible={true}
-            accessibilityRole="header"
-            accessibilityLabel="Internet"
-            accessibilityLevel={2}
+            accessibilityLabel="Internet, Heading level 2"
           >
             INTERNET
           </Text>

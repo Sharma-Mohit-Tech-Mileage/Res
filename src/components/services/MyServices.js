@@ -1,10 +1,9 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback ,useMemo} from "react";
 import {
   View,
   ScrollView,
   RefreshControl,
-  StyleSheet,
-  StatusBar,
+  StyleSheet
 } from "react-native";
 import {
   SafeAreaProvider,
@@ -21,14 +20,20 @@ import StatusSection from "./sections/StatusSection";
 import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
 import { useSelector } from "react-redux";
+import { extractZipCode } from "../utility/constant";
 const MyServicesContent = ({ route }) => {
   const insets = useSafeAreaInsets();
   const accountDetails = useSelector((state) => state.profile?.accountDetails);
+  console.log("Account Details from Redux:", accountDetails);
   const accountNumber = route?.params?.accountNumber || "123456789";
   const { data, loading, error, refetch } = useServiceDetails(accountNumber);
   const { outageData, checking, checkStatus, clearOutageData } =
     useOutageStatus();
   const [refreshing, setRefreshing] = useState(false);
+  
+const zipCodeFromAccount = useMemo(() => {
+    return extractZipCode(accountDetails?.service_address);
+  }, [accountDetails]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -38,6 +43,7 @@ const MyServicesContent = ({ route }) => {
   }, [refetch, clearOutageData]);
 
   const handleCheckStatus = useCallback(() => {
+    clearOutageData();
     checkStatus();
   }, [checkStatus]);
 
@@ -47,11 +53,6 @@ const MyServicesContent = ({ route }) => {
 
   return (
     <View style={styles.safeArea}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="transparent"
-        translucent={true}
-      />
 
       <LinearGradient
         style={[styles.gradientHeader, { height: 88 + insets.top }]}
@@ -80,32 +81,27 @@ const MyServicesContent = ({ route }) => {
       >
         <View style={styles.servicesContainer}>
           {/* Internet Service */}
-          {data?.internet?.hasService && (
+        
             <InternetCard
-              planName={data.internet.planName}
-              downloadSpeed={data.internet.downloadSpeed}
-              uploadSpeed={data.internet.uploadSpeed}
+              planName={data?.internet.planName}
+              downloadSpeed={data?.internet.downloadSpeed}
+              uploadSpeed={data?.internet.uploadSpeed}
               loading={loading}
             />
-          )}
 
           {/* Video Service */}
-          {data?.video?.hasService && (
             <VideoCard
-              planName={data.video.planName}
-              zipCode={data.video.zipCode}
+              planName={data?.video.planName}
+              zipCode={zipCodeFromAccount}
               loading={loading}
             />
-          )}
 
           {/* Phone Service */}
-          {data?.phone?.hasService && (
             <PhoneCard
-              planName={data.phone.planName}
-              legacyBrand={data.phone.legacyBrand}
+              planName={data?.phone.planName}
+              legacyBrand={data?.phone.legacyBrand}
               loading={loading}
             />
-          )}
         </View>
 
         {/* Service Status Section */}

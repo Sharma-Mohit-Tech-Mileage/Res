@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   AccessibilityInfo,
   findNodeHandle,
+  Linking,
 } from "react-native";
 import { Color, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
@@ -15,7 +16,7 @@ import RenderText from "../RenderText";
 
 import InfoIcon from "../../../../assets/svgs/InfoIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
-import WarningIcon from "../../../../assets/svgs/Alerttriangle"
+import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 
 const NotificationAlert = ({
   type,
@@ -33,6 +34,65 @@ const NotificationAlert = ({
   const navigation = useNavigation();
   const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
   const notificationRef = useRef(null);
+
+  const normalizeSplitKey = (key) => {
+    if (typeof key === "string") {
+      return [{ text: key, action: "support", addLineBreak: false }];
+    }
+
+    if (Array.isArray(key)) {
+      return key.map((item) => {
+        if (typeof item === "string") {
+          return { text: item, action: "support", addLineBreak: false };
+        }
+        return { ...item, addLineBreak: item.addLineBreak || false };
+      });
+    }
+
+    return [{ text: "contact us", action: "support", addLineBreak: false }];
+  };
+
+  const handleActionPress = (item) => {
+    if (!item || !item.action) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Support", params: { isContactUs: true } }],
+      });
+      return;
+    }
+
+    switch (item.action) {
+      case "call":
+        if (item.value) {
+          Linking.openURL(`tel:${item.value}`).catch((err) =>
+            console.error("Error opening phone dialer:", err)
+          );
+        }
+        break;
+
+      case "navigate":
+        // ✅ DYNAMIC NAVIGATION
+        if (item.tab) {
+          // Navigate to tab, then to screen within that tab
+          navigation.navigate(item.tab, {
+            screen: item.screen,
+            params: item.params || {},
+          });
+        } else {
+          // Navigate directly to screen (same stack)
+          navigation.navigate(item.screen, item.params || {});
+        }
+        break;
+
+      case "support":
+      default:
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Support", params: { isContactUs: true } }],
+        });
+        break;
+    }
+  };
 
   const typeStyles = {
     info: {
@@ -102,7 +162,6 @@ const NotificationAlert = ({
     return () => subscription.remove();
   }, []);
 
-  // Focus on notification when it appears
   useEffect(() => {
     if (isVisible && notificationRef.current) {
       const reactTag = findNodeHandle(notificationRef.current);
@@ -125,12 +184,9 @@ const NotificationAlert = ({
             { color: currentTypeStyle.textColor },
           ]}
           accessible={true}
-        accessibilityLabel={
-          currentTypeStyle.labelPrefix +
-          (message || "")
-        }
-        accessibilityLiveRegion="polite"
-        importantForAccessibility="yes"
+          accessibilityLabel={currentTypeStyle.labelPrefix + (message || "")}
+          accessibilityLiveRegion="polite"
+          importantForAccessibility="yes"
         >
           {parts.map((part, i) => (
             <React.Fragment key={i}>
@@ -151,10 +207,111 @@ const NotificationAlert = ({
       );
     }
 
+    const normalizedSplitKeys = normalizeSplitKey(splitKey);
+
+    if (
+      normalizedSplitKeys.length > 1 ||
+      (normalizedSplitKeys.length === 1 &&
+        normalizedSplitKeys[0].action &&
+        normalizedSplitKeys[0].action !== "support")
+    ) {
+      let remainingMessage = message;
+      const segments = [];
+
+      normalizedSplitKeys.forEach((item, index) => {
+        const splitIndex = remainingMessage.indexOf(item.text);
+
+        if (splitIndex > -1) {
+          if (splitIndex > 0) {
+            segments.push({
+              type: "text",
+              content: remainingMessage.substring(0, splitIndex),
+              key: `text-${index}`,
+            });
+          }
+
+          segments.push({
+            type: "styled",
+            content: item.text,
+            action: item,
+            key: `styled-${index}`,
+          });
+
+          remainingMessage = remainingMessage.substring(
+            splitIndex + item.text.length
+          );
+
+          if (item.addLineBreak) {
+            segments.push({
+              type: "linebreak",
+              key: `linebreak-${index}`,
+            });
+          }
+        }
+      });
+
+      if (remainingMessage) {
+        segments.push({
+          type: "text",
+          content: remainingMessage,
+          key: "text-end",
+        });
+      }
+
+      return (
+        <Text
+          style={[
+            !title ? styles.messageOnEmpty : styles.message,
+            { color: currentTypeStyle.textColor },
+          ]}
+          accessible={true}
+          accessibilityLabel={currentTypeStyle.labelPrefix + (message || "")}
+          accessibilityLiveRegion="polite"
+          importantForAccessibility="yes"
+        >
+          {segments.map((segment) => {
+            if (segment.type === "text") {
+              const parts = segment.content.split("\n");
+              if (parts.length > 1) {
+                return (
+                  <Text key={segment.key}>
+                    {parts.map((part, idx) => (
+                      <React.Fragment key={`${segment.key}-line-${idx}`}>
+                        {part}
+                        {idx < parts.length - 1 && "\n"}
+                      </React.Fragment>
+                    ))}
+                  </Text>
+                );
+              }
+              return <Text key={segment.key}>{segment.content}</Text>;
+            } else if (segment.type === "linebreak") {
+              return <Text key={segment.key}>{"\n"}</Text>;
+            } else {
+              return (
+                <Text
+                  key={segment.key}
+                  style={styles.styledText}
+                  onPress={() => handleActionPress(segment.action)}
+                  accessible={true}
+                  accessibilityRole="link"
+                  accessibilityHint={`Double tap to ${
+                    segment.action.action === "call" ? "call" : "open"
+                  } ${segment.content}`}
+                >
+                  {segment.content}
+                </Text>
+              );
+            }
+          })}
+        </Text>
+      );
+    }
+
     return (
       <RenderText
         navigation={navigation}
-        splitKey={splitKey}
+        splitKey={typeof splitKey === "string" ? splitKey : splitKey[0]}
         instruction={message}
         isFromNotification={true}
         style={[
@@ -184,17 +341,19 @@ const NotificationAlert = ({
             borderColor: currentTypeStyle.borderColor,
           },
         ]}
-        
       >
         <View
-          style={[styles.iconStyle, { marginTop: !title ? 1 : 1, marginEnd: 10 }]}
+          style={[
+            styles.iconStyle,
+            { marginTop: !title ? 1 : 1, marginEnd: 10 },
+          ]}
           accessible={true}
           accessibilityLabel={currentTypeStyle.iconLabel}
           accessibilityRole="text"
         >
           <IconComponent
-            width={24}
-            height={24}
+            width={18}
+            height={18}
             color={currentTypeStyle.iconColor}
             accessible={false}
             importantForAccessibility="no"
@@ -203,8 +362,9 @@ const NotificationAlert = ({
 
         <View
           style={[
-            styles.textContentContainer, {flex: 1},
-            
+            styles.textContentContainer,
+            { flex: 1 },
+
             !showCloseIcon && styles.textContentContainerNoClose,
           ]}
         >
@@ -240,7 +400,7 @@ const NotificationAlert = ({
             onPress={handleClose}
             style={styles.closeButton}
             accessible={true}
-            accessibilityLabel="Close  button"
+            accessibilityLabel="Close"
             accessibilityHint="Double tap to close"
             accessibilityRole="button"
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -251,7 +411,7 @@ const NotificationAlert = ({
                 { color: currentTypeStyle.closeButtonColor },
               ]}
             >
-              {' ✕'}
+              {" ✕"}
             </Text>
           </TouchableOpacity>
         )}
@@ -336,6 +496,13 @@ const styles = StyleSheet.create({
     fontStyle: "normal",
     fontWeight: "700",
     paddingTop: 8,
+    textDecorationLine: "underline",
+  },
+  styledText: {
+    color: Color.colorMidnightblue,
+    fontFamily: FontFamily.openSansSemiBold,
+    fontSize: FontSize.size_sm,
+    fontWeight: "700",
     textDecorationLine: "underline",
   },
 });

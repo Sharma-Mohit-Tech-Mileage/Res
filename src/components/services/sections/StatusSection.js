@@ -1,76 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
-import { View, Text, Animated, StyleSheet } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { statusSection } from "../../../styles/compositions";
 import { theme } from "../../../styles/theme";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import SupportIcon from "../../../res/svgIcons/SupportIcon";
 import SecondaryButton from "../../common/customui/PrimaryButton";
-
-const RotatingCirclesAnimation = ({ isAnimating = false }) => {
-  const rotation1 = useRef(new Animated.Value(0)).current;
-  const rotation2 = useRef(new Animated.Value(0)).current;
-
- useEffect(() => {
-  if (isAnimating) {
-    const anim1 = Animated.loop(
-      Animated.timing(rotation1, {
-        toValue: 1,
-        duration: 2000,
-        useNativeDriver: true,
-      })
-    );
-    
-    const anim2 = Animated.loop(
-      Animated.timing(rotation2, {
-        toValue: 1,
-        duration: 1500,
-        useNativeDriver: true,
-      })
-    );
-
-    anim1.start();
-    anim2.start();
-
-    return () => {
-      anim1.stop();
-      anim2.stop();
-    };
-  }
-}, [isAnimating]);
-
-  const rotate1 = rotation1.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
-  const rotate2 = rotation2.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['360deg', '0deg'],
-  });
-
+import SmallLoader from "../../common/customui/SmallLoader";
+const WiFiLoadingAnimation = ({ isAnimating = false }) => {
   if (!isAnimating) {
     return <SupportIcon color={theme.colors.primary} filled={true} size={28} />;
   }
 
   return (
     <View style={styles.animationContainer}>
-      <Animated.View
-        style={[
-          styles.rotatingCircle,
-          styles.outerCircle,
-          { transform: [{ rotate: rotate1 }] },
-        ]}
-      >
-      </Animated.View>
-
-      <Animated.View
-        style={[
-          styles.rotatingCircle,
-          styles.innerCircle,
-          { transform: [{ rotate: rotate2 }] },
-        ]}
-      >
-      </Animated.View>
+      <View style={styles.lottieWrapper}>
+        <SmallLoader isWhite={false} width={210} height={210} />
+      </View>
 
       <View style={styles.centerIcon}>
         <SupportIcon color={theme.colors.primary} filled={true} size={28} />
@@ -79,19 +24,16 @@ const RotatingCirclesAnimation = ({ isAnimating = false }) => {
   );
 };
 
-
 const StatusSection = ({
   onCheckStatus,
   outageData,
   checking,
   onCloseNotification,
 }) => {
-
   const handleCheckStatus = () => {
     if (onCheckStatus) {
       onCheckStatus();
     }
-
   };
 
   return (
@@ -103,47 +45,42 @@ const StatusSection = ({
               type={outageData.hasOutage ? "warning" : "info"}
               title={outageData.title}
               message={outageData.message}
+              splitKey={outageData.splitKey || "contact us"}
               onClose={onCloseNotification}
               showCloseIcon={true}
               isVisible={true}
-              splitKey="notification settings"
             />
           </View>
         )}
 
-       
-        <View 
+        <View
           style={styles.iconWrapper}
           accessible={false}
           importantForAccessibility="no"
         >
           <View style={styles.iconBadge}>
-            <RotatingCirclesAnimation
-              isAnimating={checking}
-            />
+            <WiFiLoadingAnimation isAnimating={checking} />
           </View>
         </View>
 
-        
-        <Text 
-          style={styles.title} 
-          accessible={true} 
-          accessibilityRole="header"
-          accessibilityLabel="Stay Connected with Confidence"
-          accessibilityLevel={2}
+        <Text
+          style={styles.title}
+          accessible={true}
+          accessibilityLabel="Stay Connected with Confidence, Heading level 2"
         >
           Stay Connected with Confidence
         </Text>
 
-        
-        <Text 
-          style={styles.subtitle} 
+        <Text
+          style={styles.subtitle}
           accessible={true}
-          accessibilityLabel={checking 
-            ? "Checking your service status..." 
-            : "When your connection pauses, we hit play."}
+          accessibilityLabel={
+            checking
+              ? "Checking your service status..."
+              : "When your connection pauses, we hit play."
+          }
         >
-          { checking
+          {checking
             ? "Checking your service status..."
             : "When your connection pauses, we hit play."}
         </Text>
@@ -154,7 +91,6 @@ const StatusSection = ({
           onPress={handleCheckStatus}
           accessibilityLabel="Check Service Status"
           accessibilityRole="button"
-          accessibilityHint="Button"
         />
       </View>
     </View>
@@ -162,7 +98,7 @@ const StatusSection = ({
 };
 
 const styles = StyleSheet.create({
-  container: statusSection.container, 
+  container: statusSection.container,
   card: statusSection.card,
   alertInsideCard: statusSection.alertInsideCard,
   iconWrapper: statusSection.iconWrapper,
@@ -171,35 +107,25 @@ const styles = StyleSheet.create({
   subtitle: statusSection.subtitle,
 
   animationContainer: {
-    width: 60,
-    height: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  
-  rotatingCircle: {
-    position: 'absolute',
-    borderWidth: 3,
-    borderColor: 'transparent',
-    borderRadius: 9999,
-  },
-  
-  outerCircle: {
-    width: 90, 
+    width: 90,
     height: 90,
-    borderTopColor: theme.colors.primary,
-    borderRightColor: theme.colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
   },
-  
-  innerCircle: {
-    width: 70, 
-    height: 70,
-    borderBottomColor: theme.colors.primary,
-    borderLeftColor: theme.colors.primary,
+
+  lottieWrapper: {
+    position: "absolute",
+    width: 90,
+    height: 90,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  
   centerIcon: {
+    position: "absolute",
     zIndex: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

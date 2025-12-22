@@ -182,3 +182,18 @@ export const getPrimaryEmail = (data) => {
     return null;
   }
 };
+export const extractZipCode = (serviceAddress) => {
+  if (!serviceAddress) return null;
+  
+  // Priority order: zip -> first 5 digits of postal_code
+  if (serviceAddress.zip) {
+    return serviceAddress.zip;
+  }
+  
+  if (serviceAddress.postal_code) {
+    // Extract first 5 digits if postal_code is longer (like "299104401")
+    return serviceAddress.postal_code.substring(0, 5);
+  }
+  
+  return null;
+};

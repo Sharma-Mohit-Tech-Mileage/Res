@@ -18,9 +18,7 @@ const ServiceHeader = () => {
         <Text
           style={styles.title}
           accessible={true}
-          accessibilityRole="header"
-          accessibilityLabel="Services"
-          accessibilityLevel={1}
+          accessibilityLabel="Services, heading level 1"
           nativeID="services-header"
         >
           Services

@@ -49,9 +49,7 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
           <Text 
             style={styles.serviceType}
             accessible={true}
-            accessibilityRole="header"
-            accessibilityLabel="TV & Video"
-            accessibilityLevel={2}
+            accessibilityLabel="TV & Video, Heading level 2"
           >
             TV & VIDEO
           </Text>
@@ -74,7 +72,6 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
           style={styles.bottomButton}
           accessibilityLabel="View Channel Lineup, Opens in your browser"
           accessibilityRole="button"
-          accessibilityHint="Opens in your browser, button"
         />
       </View>
     </View>

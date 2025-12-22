@@ -120,7 +120,6 @@ export const internetSpeed = {
     fontFamily: theme.typography.family.regular,
     color: theme.colors.text.primary,
     marginLeft: 4,
-    fontWeight: "600",
   },
 };
 
@@ -156,14 +155,13 @@ export const statusSection = {
 export const header = {
   container: {
     paddingHorizontal: theme.spacing.base,
-    paddingTop: theme.spacing.xl,  // Consistent spacing from safe area
-    paddingBottom: theme.spacing.lg,
+    paddingTop: theme.spacing.xl,
     alignItems: 'center',
   },
   iconWrapper: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
   },
   iconBadge: {
     borderColor: theme.colors.border,
@@ -178,7 +176,6 @@ export const header = {
   title: {
     ...typography.h1,
     textAlign: 'center',
-    marginTop: theme.spacing.xs,
   },
 };
 

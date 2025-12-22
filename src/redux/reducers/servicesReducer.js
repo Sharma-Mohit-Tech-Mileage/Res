@@ -37,10 +37,10 @@ const servicesReducer = (state = initialState, action) => {
         serviceError: action.payload.error
       };
     
-    // ========== Outage Status ==========
     case types.CHECK_OUTAGE_STATUS_REQUEST:
       return {
         ...state,
+        outageData: null,  
         outageChecking: true,
         outageError: null
       };

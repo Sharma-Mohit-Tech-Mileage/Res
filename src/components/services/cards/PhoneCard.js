@@ -52,9 +52,7 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
           <Text 
             style={styles.serviceType}
             accessible={true}
-            accessibilityRole="header"
-            accessibilityLabel="Phone Service"
-            accessibilityLevel={2}
+            accessibilityLabel="Phone Service, Heading level 2"
           >
             VOICE SERVICE
           </Text>
@@ -78,7 +76,6 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
             style={styles.bottomButton}
             accessibilityLabel="Manage Phone Service, Opens in your browser"
             accessibilityRole="button"
-            accessibilityHint="Opens in your browser, button"
           />
         )}
       </View>

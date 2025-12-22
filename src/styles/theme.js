@@ -8,7 +8,7 @@ export const theme = {
     white: Color.sparklightWhite,
     surface: Color.sparklightWhite,
     surfaceVariant: Color.gray50,
-    background: Color.backgroundBlur,
+    background: Color.colorWhitesmoke_200,
     
     // Text colors
     text: {

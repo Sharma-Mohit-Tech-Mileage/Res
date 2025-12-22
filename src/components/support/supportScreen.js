@@ -243,7 +243,8 @@ const Support = ({ route }) => {
                 ]}
               >
                 <Text style={[styles.heading, styles.headingTypo]}>
-                  Knowledgebase
+                  Knowledv geyg[[m[;lmn0-=-ojn nji
+                  gebase
                 </Text>
               </View>
               <View style={styles.frameChild} />
