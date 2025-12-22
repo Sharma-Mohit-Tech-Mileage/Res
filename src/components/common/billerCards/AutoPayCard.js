@@ -30,9 +30,9 @@ const AutoPayCard = ({
       style={[AppStyles.card]}
       onPress={handleCardPress}
       activeOpacity={0.8}
-      accessible={true}
+     accessible={true}
       accessibilityLabel={
-        (isAutoPayStatus ? "Auto Pay is On. " : "Auto Pay is Off. ") +
+        (isAutoPayStatus ? "Heading level 2, Auto Pay is On. " : "Heading level 2, Auto Pay is Off. ") +
         "Manage Auto Pay"
       }
       accessibilityRole="link"

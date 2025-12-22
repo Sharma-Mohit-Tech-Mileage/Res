@@ -267,7 +267,7 @@ const createTabBarButton = useCallback(
         initialRouteName="Home"
         screenOptions={screenOptions}
       >
-        {visibleTabs.map((tab) => (
+        {visibleTabs.map((tab,index) => (
           <Tab.Screen
             key={tab.id}
             name={tab.screenName}
@@ -275,7 +275,7 @@ const createTabBarButton = useCallback(
             initialParams={{ data: route }}
             options={{
               tabBarLabel: tab.name,
-              tabBarAccessibilityLabel: `${tab.name} tab`,
+              tabBarAccessibilityLabel: `${tab.name} tab, step ${index + 1} of ${visibleTabs.length}`,
               tabBarIcon: ({ focused }) => renderTabIcon(tab, focused),
             }}
             listeners={createTabListeners(tab)}

@@ -22,8 +22,8 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
       accessible={true}
       accessibilityLabel={
         (paperlessStatus
-          ? "Paperless Billing is On. "
-          : "Paperless Billing is Off. ") + "Manage Paperless Billing"
+          ? "Heading level 2, Paperless Billing is On. "
+          : "Heading level 2, Paperless Billing is Off. ") + "Manage Paperless Billing"
       }
       accessibilityRole="link"
     >

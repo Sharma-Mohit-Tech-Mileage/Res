@@ -106,7 +106,7 @@ const ProfileSettingsEdit = () => {
                 styles.informationWrapperFlexBox,
               ]}
             >
-              <Text style={styles.generalInformation}>General Information</Text>
+              <Text style={styles.generalInformation} accessible={true} accessibilityLabel="General Information, heading level 2">General Information</Text>
             </View>
             <View style={styles.frameParent}>
               <View

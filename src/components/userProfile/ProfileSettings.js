@@ -86,7 +86,7 @@ const ProfileSettings = () => {
                 />
               </View>
               <View style={[styles.generalInformationParent]}>
-                <Text style={[styles.generalInformation, styles.melissaTypo]}>
+                <Text style={[styles.generalInformation, styles.melissaTypo]} accessible={true} accessibilityLabel="General Information, heading level 2">
                   General Information
                 </Text>
               </View>
@@ -142,7 +142,7 @@ const ProfileSettings = () => {
           </View>
           <View style={[styles.frameGroup, { marginHorizontal: 16 }]}>
             <View style={{ padding: 20, flexDirection: "column" }}>
-              <Text style={[styles.generalInformation, styles.melissaTypo]}>
+              <Text style={[styles.generalInformation, styles.melissaTypo]} accessible={true} accessibilityLabel="Manage My Service, heading level 2">
                 Manage My Service
               </Text>
               {showReconnectMessage ? (

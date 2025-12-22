@@ -70,7 +70,7 @@ const ProfileSettingsHeader = ({
                     <View style={styles.titleContainer}>
                         <Text
                             style={styles.title}
-                            accessible={true}
+                            accessible={title ? true : false}
                             accessibilityRole='text'
                             accessibilityLabel={`${accessibleLable ? accessibleLable : title}, heading level 1`}
                         >

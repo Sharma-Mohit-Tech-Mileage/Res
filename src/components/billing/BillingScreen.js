@@ -123,7 +123,7 @@ const BillingScreen = ({ navigation }) => {
   return (
     <View style={styles.account} accessibilityLabel="Billing Services screen">
       <ProfileSettingsHeader
-        title="Billing Services"
+        title=""
         iconAlignment="right"
         showIcon={false}
       />
@@ -187,7 +187,12 @@ const BillingScreen = ({ navigation }) => {
                       styles.frameParentSpaceBlock1,
                     ]}
                   >
-                    <Text style={styles.leftTitle} accessibilityLabel="Billing Options, heading level 2">Billing Options</Text>
+                    <Text style={styles.leftTitle} 
+                    accessible={true}
+                    accessibilityLabel="Billing Options"
+                    accessibilityLevel={2}
+                    accessibilityRole="header">
+                      Billing Options</Text>
                   </View>
                   <View
                     style={[

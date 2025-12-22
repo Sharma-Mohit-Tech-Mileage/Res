@@ -108,9 +108,9 @@ const Terms = ({ navigation }) => {
           <Pressable
             style={[styles.buttonDecline, styles.buttonsLayout]}
             onPress={termsCanceled}
-            accessibilityLabel="Decline Button"
-            accessibilityRole="button"
+            //accessibilityLabel="Decline Button"
             accessibilityHint="Decline Terms and Conditions"
+            accessibilityRole="button"
           >
             <Text style={styles.decline}>Decline</Text>
           </Pressable>

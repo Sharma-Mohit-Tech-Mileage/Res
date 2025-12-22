@@ -349,7 +349,7 @@ const Support = ({ route }) => {
   return (
     <View style={styles.support}>
       <ProfileSettingsHeader
-        title="Support"
+        title=""
         iconAlignment="right"
         showIcon={false}
       />

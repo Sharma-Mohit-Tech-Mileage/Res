@@ -60,6 +60,10 @@ const SearchSuggestions = memo(
           <View style={[styles.searchIcon, styles.leftIcon]}>
             <SearchIcon />
           </View>
+          <View accessibilityHint="Double tap to edit"
+          accessibilityRole="text"
+          accessible={true}
+          accessibilityLabel="Search Knowledgebase, type to search.">
           <TextInput
             maxFontSizeMultiplier={1.25}
             ref={inputRef}
@@ -70,7 +74,9 @@ const SearchSuggestions = memo(
             placeholderTextColor={Color.gray600}
             autoCorrect={false}
             clearButtonMode="always"
+            accessible={false}
           />
+          </View>
         </View>
         <View style={{ height: hp("70%") }}>
           <FlatList
