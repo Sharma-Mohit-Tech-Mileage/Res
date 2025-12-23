@@ -1,11 +1,12 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, Text, StyleSheet, AccessibilityInfo, Platform, findNodeHandle } from "react-native";
 import { statusSection } from "../../../styles/compositions";
 import { theme } from "../../../styles/theme";
 import NotificationAlert from "../../common/customui/NotificationAlert";
 import SupportIcon from "../../../res/svgIcons/SupportIcon";
 import SecondaryButton from "../../common/customui/PrimaryButton";
 import SmallLoader from "../../common/customui/SmallLoader";
+
 const WiFiLoadingAnimation = ({ isAnimating = false }) => {
   if (!isAnimating) {
     return <SupportIcon color={theme.colors.primary} filled={true} size={28} />;
@@ -30,6 +31,20 @@ const StatusSection = ({
   checking,
   onCloseNotification,
 }) => {
+  const notificationRef = useRef(null);
+  useEffect(() => {
+    if (outageData && notificationRef.current) {
+      const timeout = setTimeout(() => {
+        const reactTag = findNodeHandle(notificationRef.current);
+        if (reactTag) {
+          AccessibilityInfo.setAccessibilityFocus(reactTag);
+        }
+      }, 100);
+      
+      return () => clearTimeout(timeout);
+    }
+  }, [outageData]);
+
   const handleCheckStatus = () => {
     if (onCheckStatus) {
       onCheckStatus();
@@ -40,7 +55,12 @@ const StatusSection = ({
     <View style={styles.container}>
       <View style={styles.card}>
         {outageData && (
-          <View style={styles.alertInsideCard}>
+          <View 
+            style={styles.alertInsideCard}
+            ref={notificationRef}
+            accessibilityViewIsModal={true}
+            accessibilityLiveRegion="polite"
+          >
             <NotificationAlert
               type={outageData.hasOutage ? "warning" : "info"}
               title={outageData.title}
@@ -55,8 +75,9 @@ const StatusSection = ({
 
         <View
           style={styles.iconWrapper}
-          accessible={false}
-          importantForAccessibility="no"
+          accessible={true}
+          accessibilityLabel={checking ? "Checking service status, loading animation" : "Support icon"}
+          accessibilityRole="image"
         >
           <View style={styles.iconBadge}>
             <WiFiLoadingAnimation isAnimating={checking} />
@@ -66,7 +87,8 @@ const StatusSection = ({
         <Text
           style={styles.title}
           accessible={true}
-          accessibilityLabel="Stay Connected with Confidence, Heading level 2"
+          accessibilityLabel="Stay Connected with Confidence"
+          accessibilityRole="header"
         >
           Stay Connected with Confidence
         </Text>

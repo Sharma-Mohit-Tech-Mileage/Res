@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,412 +7,271 @@ import {
   AccessibilityInfo,
   findNodeHandle,
   Linking,
+  Alert,
 } from "react-native";
 import { Color, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
-import { resentEmailVerifiction } from "../../../redux/actions/ProfileActionSuite";
 import { useDispatch } from "react-redux";
-import RenderText from "../RenderText";
+import { resentEmailVerifiction } from "../../../redux/actions/ProfileActionSuite";
 
 import InfoIcon from "../../../../assets/svgs/InfoIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 
+// ==================== CONSTANTS ====================
+
+const TYPE_CONFIG = {
+  info: {
+    backgroundColor: "#F0F8FF",
+    borderColor: "#0060AE",
+    iconColor: "#0060AE",
+    textColor: "#000000",
+    titleColor: "#000000",
+    closeButtonColor: "#0060AE",
+    IconComponent: InfoIcon,
+    iconLabel: "Information",
+    labelPrefix: "Information: ",
+  },
+  error: {
+    backgroundColor: "#FEF3F2",
+    borderColor: "#B92A1C",
+    iconColor: Color.sparkLightRed,
+    textColor: "#000000",
+    titleColor: "#000000",
+    closeButtonColor: "#B92A1C",
+    IconComponent: InfoIcon,
+    iconLabel: "Error",
+    labelPrefix: "Error: ",
+  },
+  success: {
+    backgroundColor: "#F1FCF2",
+    borderColor: "#1D7832",
+    iconColor: Color.sparklightGreen,
+    textColor: "#000000",
+    titleColor: "#000000",
+    closeButtonColor: "#1D7832",
+    IconComponent: SuccessIcon,
+    iconLabel: "Success",
+    labelPrefix: "Success: ",
+  },
+  warning: {
+    backgroundColor: "#FFFAEB",
+    borderColor: "#DD6D02",
+    iconColor: Color.sparkLightInfo,
+    textColor: "#000000",
+    titleColor: "#000000",
+    closeButtonColor: "#DD6D02",
+    IconComponent: WarningIcon,
+    iconLabel: "Warning",
+    labelPrefix: "Warning: ",
+  },
+};
+
+// ==================== UTILITIES ====================
+
+const normalizeSplitKey = (key) => {
+  if (!key) return [];
+  if (typeof key === "string") return [{ text: key, action: "support" }];
+  if (Array.isArray(key)) {
+    return key.map((item) =>
+      typeof item === "string" ? { text: item, action: "support" } : { ...item }
+    );
+  }
+  return [];
+};
+
+const parseMessage = (message, splitKeys) => {
+  if (!message || splitKeys.length === 0) {
+    return [{ type: "text", content: message || "", key: "text-only" }];
+  }
+  const segments = [];
+  let remaining = message;
+  let segmentIndex = 0;
+
+  splitKeys.forEach((item) => {
+    const index = remaining.indexOf(item.text);
+    if (index === -1) return;
+    if (index > 0) {
+      segments.push({
+        type: "text",
+        content: remaining.substring(0, index),
+        key: `text-${segmentIndex++}`,
+      });
+    }
+    segments.push({
+      type: "styled",
+      content: item.text,
+      action: item,
+      key: `styled-${segmentIndex++}`,
+    });
+    if (item.addLineBreak) {
+      segments.push({ type: "linebreak", key: `br-${segmentIndex++}` });
+    }
+    remaining = remaining.substring(index + item.text.length);
+  });
+
+  if (remaining) {
+    segments.push({ type: "text", content: remaining, key: `text-${segmentIndex}` });
+  }
+  return segments;
+};
+
+const groupSegmentsByLineBreaks = (segments) => {
+  const blocks = [];
+  let currentBlock = [];
+  let blockIndex = 0;
+  segments.forEach((segment) => {
+    if (segment.type === "linebreak") {
+      if (currentBlock.length > 0) {
+        blocks.push({ segments: currentBlock, key: `block-${blockIndex++}` });
+        currentBlock = [];
+      }
+    } else {
+      currentBlock.push(segment);
+    }
+  });
+  if (currentBlock.length > 0) {
+    blocks.push({ segments: currentBlock, key: `block-${blockIndex}` });
+  }
+  return blocks;
+};
+
+const getActionLabel = (action, content) => {
+  switch (action?.action) {
+    case "call": return `Call ${content}`;
+    case "navigate": return `Open ${content}`;
+    default: return `Action: ${content}`;
+  }
+};
+
+const buildPlainText = (segments) =>
+  segments.map((s) => (s.type === "linebreak" ? " " : s.content || "")).join("");
+
+// ==================== MAIN COMPONENT ====================
+
 const NotificationAlert = ({
-  type,
+  type = "info",
   title,
   message,
   onClose,
   showCloseIcon = true,
   isVisible = true,
   resentemail = false,
-  splitKey = "contact us",
+  splitKey = "",
 }) => {
-  if (!isVisible) return null;
-
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const [screenReaderEnabled, setIsScreenReaderEnabled] = useState(false);
-  const notificationRef = useRef(null);
-
-  const normalizeSplitKey = (key) => {
-    if (typeof key === "string") {
-      return [{ text: key, action: "support", addLineBreak: false }];
-    }
-
-    if (Array.isArray(key)) {
-      return key.map((item) => {
-        if (typeof item === "string") {
-          return { text: item, action: "support", addLineBreak: false };
-        }
-        return { ...item, addLineBreak: item.addLineBreak || false };
-      });
-    }
-
-    return [{ text: "contact us", action: "support", addLineBreak: false }];
-  };
-
-  const handleActionPress = (item) => {
-    if (!item || !item.action) {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Support", params: { isContactUs: true } }],
-      });
-      return;
-    }
-
-    switch (item.action) {
-      case "call":
-        if (item.value) {
-          Linking.openURL(`tel:${item.value}`).catch((err) =>
-            console.error("Error opening phone dialer:", err)
-          );
-        }
-        break;
-
-      case "navigate":
-        // ✅ DYNAMIC NAVIGATION
-        if (item.tab) {
-          // Navigate to tab, then to screen within that tab
-          navigation.navigate(item.tab, {
-            screen: item.screen,
-            params: item.params || {},
-          });
-        } else {
-          // Navigate directly to screen (same stack)
-          navigation.navigate(item.screen, item.params || {});
-        }
-        break;
-
-      case "support":
-      default:
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "Support", params: { isContactUs: true } }],
-        });
-        break;
-    }
-  };
-
-  const typeStyles = {
-    info: {
-      backgroundColor: "#F0F8FF",
-      borderColor: "#0060AE",
-      iconColor: "#0060AE",
-      textColor: "#000000",
-      titleColor: "#000000",
-      closeButtonColor: "#0060AE",
-      IconComponent: InfoIcon,
-      iconLabel: "Information icon",
-      labelPrefix: "Information Notification: ",
-    },
-    error: {
-      backgroundColor: "#FEF3F2",
-      borderColor: "#B92A1C",
-      iconColor: Color.sparkLightRed,
-      textColor: "#000000",
-      titleColor: "#000000",
-      closeButtonColor: "#B92A1C",
-      IconComponent: InfoIcon,
-      iconLabel: "Error icon",
-      labelPrefix: "Error Notification: ",
-    },
-    success: {
-      backgroundColor: "#F1FCF2",
-      borderColor: "#1D7832",
-      iconColor: Color.sparklightGreen,
-      textColor: "#000000",
-      titleColor: "#000000",
-      closeButtonColor: "#1D7832",
-      IconComponent: SuccessIcon,
-      iconLabel: "Success icon",
-      labelPrefix: "Success Notification: ",
-    },
-    warning: {
-      backgroundColor: "#FFFAEB",
-      borderColor: "#DD6D02",
-      iconColor: Color.sparkLightInfo,
-      textColor: "#000000",
-      titleColor: "#000000",
-      closeButtonColor: "#DD6D02",
-      IconComponent: WarningIcon,
-      iconLabel: "Warning icon",
-      labelPrefix: "Warning Notification: ",
-    },
-  };
-
-  const currentTypeStyle = typeStyles[type] || typeStyles.info;
+  const containerRef = useRef(null);
+  
+  const config = TYPE_CONFIG[type] || TYPE_CONFIG.info;
+  const IconComponent = config.IconComponent;
+  const normalizedKeys = normalizeSplitKey(splitKey);
+  const segments = parseMessage(message, normalizedKeys);
+  const blocks = groupSegmentsByLineBreaks(segments);
 
   useEffect(() => {
-    const checkAccessibility = async () => {
-      try {
-        const isEnabled = await AccessibilityInfo.isScreenReaderEnabled();
-        setIsScreenReaderEnabled(isEnabled);
-      } catch (error) {
-        setIsScreenReaderEnabled(false);
-      }
-    };
-
-    checkAccessibility();
-    const subscription = AccessibilityInfo.addEventListener(
-      "screenReaderChanged",
-      setIsScreenReaderEnabled
-    );
-
-    return () => subscription.remove();
-  }, []);
-
-  useEffect(() => {
-    if (isVisible && notificationRef.current) {
-      const reactTag = findNodeHandle(notificationRef.current);
-      if (reactTag) {
-        AccessibilityInfo.setAccessibilityFocus(reactTag);
-      }
+    if (isVisible && containerRef.current) {
+      const tag = findNodeHandle(containerRef.current);
+      if (tag) AccessibilityInfo.setAccessibilityFocus(tag);
     }
   }, [isVisible]);
 
-  const handleClose = () => onClose?.();
-  const handleResendEmail = () => dispatch(resentEmailVerifiction(navigation));
-
-  const renderMessageWithBoldAccount = (message) => {
-    if (splitKey === "Account") {
-      const parts = message.split("Account");
-      return (
-        <Text
-          style={[
-            !title ? styles.messageOnEmpty : styles.message,
-            { color: currentTypeStyle.textColor },
-          ]}
-          accessible={true}
-          accessibilityLabel={currentTypeStyle.labelPrefix + (message || "")}
-          accessibilityLiveRegion="polite"
-          importantForAccessibility="yes"
-        >
-          {parts.map((part, i) => (
-            <React.Fragment key={i}>
-              {part}
-              {i < parts.length - 1 && (
-                <Text
-                  style={[
-                    styles.boldText,
-                    { color: currentTypeStyle.textColor },
-                  ]}
-                >
-                  Account
-                </Text>
-              )}
-            </React.Fragment>
-          ))}
-        </Text>
-      );
-    }
-
-    const normalizedSplitKeys = normalizeSplitKey(splitKey);
-
-    if (
-      normalizedSplitKeys.length > 1 ||
-      (normalizedSplitKeys.length === 1 &&
-        normalizedSplitKeys[0].action &&
-        normalizedSplitKeys[0].action !== "support")
-    ) {
-      let remainingMessage = message;
-      const segments = [];
-
-      normalizedSplitKeys.forEach((item, index) => {
-        const splitIndex = remainingMessage.indexOf(item.text);
-
-        if (splitIndex > -1) {
-          if (splitIndex > 0) {
-            segments.push({
-              type: "text",
-              content: remainingMessage.substring(0, splitIndex),
-              key: `text-${index}`,
-            });
-          }
-
-          segments.push({
-            type: "styled",
-            content: item.text,
-            action: item,
-            key: `styled-${index}`,
-          });
-
-          remainingMessage = remainingMessage.substring(
-            splitIndex + item.text.length
-          );
-
-          if (item.addLineBreak) {
-            segments.push({
-              type: "linebreak",
-              key: `linebreak-${index}`,
-            });
-          }
+  const executeAction = (actionConfig) => {
+    if (!actionConfig) return;
+    if (actionConfig.action === "navigate") {
+        if (actionConfig.tab) {
+            navigation.navigate(actionConfig.tab, { screen: actionConfig.screen, params: actionConfig.params || {} });
+        } else {
+            navigation.navigate(actionConfig.screen, actionConfig.params || {});
         }
-      });
-
-      if (remainingMessage) {
-        segments.push({
-          type: "text",
-          content: remainingMessage,
-          key: "text-end",
-        });
-      }
-
-      return (
-        <Text
-          style={[
-            !title ? styles.messageOnEmpty : styles.message,
-            { color: currentTypeStyle.textColor },
-          ]}
-          accessible={true}
-          accessibilityLabel={currentTypeStyle.labelPrefix + (message || "")}
-          accessibilityLiveRegion="polite"
-          importantForAccessibility="yes"
-        >
-          {segments.map((segment) => {
-            if (segment.type === "text") {
-              const parts = segment.content.split("\n");
-              if (parts.length > 1) {
-                return (
-                  <Text key={segment.key}>
-                    {parts.map((part, idx) => (
-                      <React.Fragment key={`${segment.key}-line-${idx}`}>
-                        {part}
-                        {idx < parts.length - 1 && "\n"}
-                      </React.Fragment>
-                    ))}
-                  </Text>
-                );
-              }
-              return <Text key={segment.key}>{segment.content}</Text>;
-            } else if (segment.type === "linebreak") {
-              return <Text key={segment.key}>{"\n"}</Text>;
-            } else {
-              return (
-                <Text
-                  key={segment.key}
-                  style={styles.styledText}
-                  onPress={() => handleActionPress(segment.action)}
-                  accessible={true}
-                  accessibilityRole="link"
-                  accessibilityHint={`Double tap to ${
-                    segment.action.action === "call" ? "call" : "open"
-                  } ${segment.content}`}
-                >
-                  {segment.content}
-                </Text>
-              );
-            }
-          })}
-        </Text>
-      );
+    } else if (actionConfig.action === "call" && actionConfig.value) {
+        Linking.openURL(`tel:${actionConfig.value}`).catch(console.error);
+    } else {
+        navigation.navigate("Support", { isContactUs: true });
     }
+  };
+
+  const showActionSelection = (actions) => {
+    const options = actions.map(seg => ({
+      text: getActionLabel(seg.action, seg.content),
+      onPress: () => executeAction(seg.action)
+    }));
+    Alert.alert("Available Actions", "Select an option:", [...options, { text: "Cancel", style: "cancel" }]);
+  };
+
+  const renderBlock = (block) => {
+    const { segments, key } = block;
+    const actionSegments = segments.filter(s => s.type === "styled");
+    const hasActions = actionSegments.length > 0;
+    const hasMultiple = actionSegments.length > 1;
+
+    const handlePress = () => {
+      if (hasMultiple) {
+        showActionSelection(actionSegments);
+      } else if (actionSegments.length === 1) {
+        executeAction(actionSegments[0].action);
+      }
+    };
 
     return (
-      <RenderText
-        navigation={navigation}
-        splitKey={typeof splitKey === "string" ? splitKey : splitKey[0]}
-        instruction={message}
-        isFromNotification={true}
-        style={[
-          !title ? styles.messageOnEmpty : styles.message,
-          { color: currentTypeStyle.textColor },
-        ]}
-        onTextPress={() => {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "Support", params: { isContactUs: true } }],
-          });
-        }}
-      />
+      <TouchableOpacity
+        key={key}
+        activeOpacity={hasActions ? 0.7 : 1}
+        onPress={handlePress}
+        style={styles.blockWrapper}
+        // EACH BLOCK IS ITS OWN UNIT NOW
+        accessible={true}
+        accessibilityRole={hasActions ? "button" : "text"}
+        accessibilityLabel={config.labelPrefix + buildPlainText(segments)}
+      >
+        <Text style={styles.messageContainer}>
+          {segments.map((segment) => (
+            <Text
+              key={segment.key}
+              style={[
+                styles.messageText,
+                { color: config.textColor },
+                segment.type === "styled" && styles.styledText
+              ]}
+            >
+              {segment.content}
+            </Text>
+          ))}
+        </Text>
+      </TouchableOpacity>
     );
   };
 
-  const IconComponent = currentTypeStyle.IconComponent;
+  if (!isVisible) return null;
 
   return (
-    <View style={styles.outerContainer}>
-      <View
-        ref={notificationRef}
-        style={[
-          styles.notificationContainer,
-          {
-            backgroundColor: currentTypeStyle.backgroundColor,
-            borderColor: currentTypeStyle.borderColor,
-          },
-        ]}
-      >
-        <View
-          style={[
-            styles.iconStyle,
-            { marginTop: !title ? 1 : 1, marginEnd: 10 },
-          ]}
-          accessible={true}
-          accessibilityLabel={currentTypeStyle.iconLabel}
-          accessibilityRole="text"
-        >
-          <IconComponent
-            width={18}
-            height={18}
-            color={currentTypeStyle.iconColor}
-            accessible={false}
-            importantForAccessibility="no"
-          />
+    <View style={styles.outer}>
+      <View ref={containerRef} style={[styles.container, { backgroundColor: config.backgroundColor, borderColor: config.borderColor }]}>
+        <View style={styles.iconWrapper} accessible={true} accessibilityLabel={config.iconLabel} accessibilityRole="image">
+          <IconComponent width={18} height={18} color={config.iconColor} />
         </View>
-
-        <View
-          style={[
-            styles.textContentContainer,
-            { flex: 1 },
-
-            !showCloseIcon && styles.textContentContainerNoClose,
-          ]}
-        >
+        
+        {/* PARENT VIEW HAS accessible={false} TO PREVENT UNIT FLATTENING */}
+        <View style={styles.content} accessible={false}>
           {title && (
-            <Text
-              style={[styles.title, { color: currentTypeStyle.titleColor }]}
-              accessible={true}
-              accessibilityLabel={title}
-              accessibilityRole="text"
-            >
+            <Text style={[styles.title, { color: config.titleColor }]} accessible={true} accessibilityRole="header">
               {title}
             </Text>
           )}
-
-          {message && renderMessageWithBoldAccount(message)}
+          
+          {/* Blocks are separated by line breaks and identified as distinct stops */}
+          {blocks.map(renderBlock)}
 
           {resentemail && (
-            <TouchableOpacity
-              onPress={handleResendEmail}
-              accessible={true}
-              accessibilityRole="link"
-              accessibilityLabel="Resend Confirmation Email."
-              accessibilityHint="Double tap to resend the confirmation email."
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
+            <TouchableOpacity onPress={() => dispatch(resentEmailVerifiction(navigation))} accessible={true} accessibilityRole="button">
               <Text style={styles.resendText}>Resend Confirmation Email</Text>
             </TouchableOpacity>
           )}
         </View>
 
         {showCloseIcon && (
-          <TouchableOpacity
-            onPress={handleClose}
-            style={styles.closeButton}
-            accessible={true}
-            accessibilityLabel="Close"
-            accessibilityHint="Double tap to close"
-            accessibilityRole="button"
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Text
-              style={[
-                styles.closeButtonText,
-                { color: currentTypeStyle.closeButtonColor },
-              ]}
-            >
-              {" ✕"}
-            </Text>
+          <TouchableOpacity onPress={onClose} style={styles.closeBtn} accessible={true} accessibilityLabel="Close notification" accessibilityRole="button">
+            <Text style={[styles.closeBtnText, { color: config.closeButtonColor }]}>✕</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -421,90 +280,18 @@ const NotificationAlert = ({
 };
 
 const styles = StyleSheet.create({
-  outerContainer: {
-    position: "relative",
-  },
-  notificationContainer: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    borderRadius: 8,
-    borderWidth: 1,
-    paddingLeft: 16,
-    paddingRight: 12,
-    paddingVertical: 16,
-    marginVertical: 8,
-  },
-  textContentContainer: {
-    flex: 1,
-    marginLeft: 10,
-    paddingRight: 10,
-  },
-  textContentContainerNoClose: {
-    paddingRight: 0,
-  },
-  closeButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    alignSelf: "center",
-    width: 24,
-    height: 24,
-    marginLeft: 12,
-    marginRight: 0,
-  },
-  closeButtonText: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  title: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.interBold,
-    fontWeight: "700",
-  },
-  message: {
-    paddingTop: 8,
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
-    fontWeight: "400",
-    paddingLeft: 0,
-    paddingRight: 0,
-  },
-  messageOnEmpty: {
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
-    fontWeight: "400",
-    paddingLeft: 0,
-    paddingRight: 0,
-  },
-  boldText: {
-    fontWeight: "700",
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_sm,
-  },
-  contactUsText: {
-    color: "#000000",
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: 16,
-    fontStyle: "normal",
-    fontWeight: "700",
-    paddingLeft: 5,
-    flexWrap: "wrap",
-  },
-  resendText: {
-    color: "#000000",
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: 16,
-    fontStyle: "normal",
-    fontWeight: "700",
-    paddingTop: 8,
-    textDecorationLine: "underline",
-  },
-  styledText: {
-    color: Color.colorMidnightblue,
-    fontFamily: FontFamily.openSansSemiBold,
-    fontSize: FontSize.size_sm,
-    fontWeight: "700",
-    textDecorationLine: "underline",
-  },
+  outer: { position: "relative" },
+  container: { flexDirection: "row", padding: 16, borderWidth: 1, borderRadius: 8, marginVertical: 8 },
+  iconWrapper: { marginTop: 1, marginEnd: 10 },
+  content: { flex: 1, marginLeft: 10 },
+  title: { fontSize: FontSize.size_base, fontFamily: FontFamily.interBold, fontWeight: "700" },
+  blockWrapper: { marginTop: 8 },
+  messageContainer: { /* Natural wrapping container */ },
+  messageText: { fontSize: FontSize.size_sm, fontFamily: FontFamily.openSansRegular },
+  styledText: { color: Color.colorMidnightblue, fontWeight: "700", textDecorationLine: "underline" },
+  resendText: { color: "#000000", fontWeight: "700", paddingTop: 8, textDecorationLine: "underline" },
+  closeBtn: { marginLeft: 12, alignSelf: "center", width: 24, height: 24, justifyContent: "center", alignItems: "center" },
+  closeBtnText: { fontSize: 16, fontWeight: "700" },
 });
 
 export default NotificationAlert;

@@ -181,7 +181,6 @@ export const header = {
 
 export const skeletonLoader = {
   skeleton: {
-    backgroundColor: theme.colors.border,
     borderRadius: theme.radius.sm,
   },
   skeletonHeader: {
@@ -198,10 +197,15 @@ export const skeletonLoader = {
     justifyContent: "space-between",
     marginTop: theme.spacing.sm,
   },
-  skeletonSpeed: {
+  skeletonSpeedRight: {
     flex: 1,
     height: 60,
-    marginHorizontal: 4,
+    marginRight: 4,
+  },
+   skeletonSpeedLeft: {
+    flex: 1,
+    height: 60,
+    marginLeft: 4,
   },
 };
 

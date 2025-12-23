@@ -2,8 +2,12 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../styles/theme";
-import { serviceCard, internetSpeed, skeletonLoader } from "../../../styles/compositions";
-
+import {
+  serviceCard,
+  internetSpeed,
+  skeletonLoader,
+} from "../../../styles/compositions";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 const InternetCard = ({
   planName,
   downloadSpeed,
@@ -14,12 +18,18 @@ const InternetCard = ({
     return (
       <View style={styles.container}>
         <View style={styles.card}>
-          <View style={[styles.skeleton, styles.skeletonHeader]} />
-          <View style={[styles.skeleton, styles.skeletonTitle]} />
-          <View style={styles.skeletonSpeedContainer}>
-            <View style={[styles.skeleton, styles.skeletonSpeed]} />
-            <View style={[styles.skeleton, styles.skeletonSpeed]} />
-          </View>
+          <SkeletonPlaceholder
+            backgroundColor={theme.colors.skeleton.base}
+            highlightColor={theme.colors.skeleton.highlight}
+            speed={1000}
+          >
+            <View style={styles.skeletonHeader} />
+            <View style={styles.skeletonTitle} />
+            <View style={styles.skeletonSpeedContainer}>
+              <View style={styles.skeletonSpeedRight} />
+              <View style={styles.skeletonSpeedLeft} />
+            </View>
+          </SkeletonPlaceholder>
         </View>
       </View>
     );
@@ -32,10 +42,11 @@ const InternetCard = ({
       <View style={styles.card}>
         {/* Service Header */}
         <View style={styles.serviceHeader}>
-          <View 
+          <View
             style={styles.iconWrapper}
-            accessible={false}
-            importantForAccessibility="no"
+            accessible={true}
+            accessibilityLabel="Support icon"
+            accessibilityRole="image"
           >
             <MaterialCommunityIcons
               name="wifi"
@@ -43,10 +54,12 @@ const InternetCard = ({
               color={theme.colors.primary}
             />
           </View>
-          <Text 
+          <Text
             style={styles.serviceType}
             accessible={true}
-            accessibilityLabel="Internet, Heading level 2"
+            accessibilityLabel="Internet"
+            accessibilityLevel={2}
+            accessibilityRole="header"
           >
             INTERNET
           </Text>
@@ -54,7 +67,7 @@ const InternetCard = ({
 
         {/* Plan Name */}
         <View style={styles.content}>
-          <Text 
+          <Text
             style={styles.planName}
             accessible={true}
             accessibilityLabel={`Plan Name - ${planName}`}
@@ -66,12 +79,12 @@ const InternetCard = ({
         {/* Speed Display */}
         <View style={styles.speedContainer}>
           {/* Download Speed */}
-          <View 
+          <View
             style={styles.speedItem}
             accessible={true}
             accessibilityLabel={`Download Speed: ${downloadSpeed} Mbps`}
           >
-            <View 
+            <View
               style={styles.speedIcon}
               accessible={false}
               importantForAccessibility="no"
@@ -88,12 +101,12 @@ const InternetCard = ({
           </View>
 
           {/* Upload Speed */}
-          <View 
+          <View
             style={styles.speedItem}
             accessible={true}
             accessibilityLabel={`Upload Speed: ${uploadSpeed} Mbps`}
           >
-            <View 
+            <View
               style={styles.speedIcon}
               accessible={false}
               importantForAccessibility="no"
@@ -118,16 +131,16 @@ const styles = StyleSheet.create({
   // Container & Card
   container: serviceCard.container,
   card: serviceCard.card,
-  
+
   // Service Header
   serviceHeader: serviceCard.serviceHeader,
   iconWrapper: serviceCard.iconWrapper,
   serviceType: serviceCard.serviceType,
-  
+
   // Content
   content: serviceCard.content,
   planName: serviceCard.planName,
-  
+
   // Speed Display
   speedContainer: internetSpeed.container,
   speedItem: internetSpeed.speedItem,
@@ -138,13 +151,14 @@ const styles = StyleSheet.create({
   speedValueRow: internetSpeed.speedValueRow,
   speedValue: internetSpeed.speedValue,
   speedUnit: internetSpeed.speedUnit,
-  
+
   // Skeleton Loader
   skeleton: skeletonLoader.skeleton,
   skeletonHeader: skeletonLoader.skeletonHeader,
   skeletonTitle: skeletonLoader.skeletonTitle,
   skeletonSpeedContainer: skeletonLoader.skeletonSpeedContainer,
-  skeletonSpeed: skeletonLoader.skeletonSpeed,
+  skeletonSpeedRight: skeletonLoader.skeletonSpeedRight,
+  skeletonSpeedLeft: skeletonLoader.skeletonSpeedLeft,
 });
 
 export default InternetCard;

@@ -1,10 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet, Linking, Alert, } from "react-native";
+import { View, Text, StyleSheet, Linking, Alert } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import { getPhonePortalURL } from "../utils/constants";
 import SecondaryButton from "../../common/customui/PrimaryButton";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
   const phonePortalURL = getPhonePortalURL(legacyBrand);
   const showManageButton = phonePortalURL !== null;
@@ -21,11 +22,18 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
   };
 
   if (loading) {
+    // Change back to loading instead of true
     return (
       <View style={styles.container}>
         <View style={styles.card}>
-          <View style={[styles.skeleton, styles.skeletonHeader]} />
-          <View style={[styles.skeleton, styles.skeletonTitle]} />
+          <SkeletonPlaceholder
+            backgroundColor={theme.colors.skeleton.base}
+            highlightColor={theme.colors.skeleton.highlight}
+            speed={1000}
+          >
+            <View style={styles.skeletonHeader} />
+            <View style={styles.skeletonTitle} />
+          </SkeletonPlaceholder>
         </View>
       </View>
     );
@@ -38,10 +46,11 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
       <View style={styles.card}>
         {/* Service Header */}
         <View style={styles.serviceHeader}>
-          <View 
+          <View
             style={styles.iconWrapper}
-            accessible={false}
-            importantForAccessibility="no"
+            accessible={true}
+            accessibilityLabel="Phone icon"
+            accessibilityRole="image"
           >
             <MaterialCommunityIcons
               name="phone"
@@ -49,10 +58,12 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
               color={theme.colors.primary}
             />
           </View>
-          <Text 
+          <Text
             style={styles.serviceType}
             accessible={true}
-            accessibilityLabel="Phone Service, Heading level 2"
+            accessibilityLabel="Phone Service"
+            accessibilityLevel={2}
+            accessibilityRole="header"
           >
             VOICE SERVICE
           </Text>
@@ -60,7 +71,7 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
 
         {/* Plan Name & Action */}
         <View style={styles.content}>
-          <Text 
+          <Text
             style={styles.planName}
             accessible={true}
             accessibilityLabel={`Plan Name - ${planName}`}

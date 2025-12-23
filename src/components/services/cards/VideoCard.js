@@ -5,6 +5,7 @@ import { theme } from "../../../styles/theme";
 import { serviceCard, skeletonLoader } from "../../../styles/compositions";
 import { getChannelLineupURL } from "../utils/constants";
 import SecondaryButton from "../../common/customui/PrimaryButton";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 const VideoCard = ({ planName, zipCode, loading = false }) => {
   const handleChannelLineup = async () => {
     const url = getChannelLineupURL(zipCode);
@@ -21,8 +22,14 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
     return (
       <View style={styles.container}>
         <View style={styles.card}>
-          <View style={[styles.skeleton, styles.skeletonHeader]} />
-          <View style={[styles.skeleton, styles.skeletonTitle]} />
+          <SkeletonPlaceholder
+            backgroundColor={theme.colors.skeleton.base}
+            highlightColor={theme.colors.skeleton.highlight}
+            speed={1000}
+          >
+            <View style={styles.skeletonHeader} />
+            <View style={styles.skeletonTitle} />
+          </SkeletonPlaceholder>
         </View>
       </View>
     );
@@ -35,10 +42,11 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
       <View style={styles.card}>
         {/* Service Header */}
         <View style={styles.serviceHeader}>
-          <View 
+          <View
             style={styles.iconWrapper}
-            accessible={false}
-            importantForAccessibility="no"
+            accessible={true}
+            accessibilityLabel="Television icon"
+            accessibilityRole="image"
           >
             <MaterialCommunityIcons
               name="television"
@@ -46,10 +54,12 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
               color={theme.colors.primary}
             />
           </View>
-          <Text 
+          <Text
             style={styles.serviceType}
             accessible={true}
-            accessibilityLabel="TV & Video, Heading level 2"
+            accessibilityLabel="TV & Video"
+            accessibilityLevel={2}
+            accessibilityRole="header"
           >
             TV & VIDEO
           </Text>
@@ -57,7 +67,7 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
 
         {/* Plan Name & Action */}
         <View style={styles.content}>
-          <Text 
+          <Text
             style={styles.planName}
             accessible={true}
             accessibilityLabel={`Plan Name - ${planName}`}
