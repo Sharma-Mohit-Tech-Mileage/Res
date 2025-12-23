@@ -1433,6 +1433,8 @@ PODS:
     - React-Core
   - react-native-get-random-values (1.11.0):
     - React-Core
+  - react-native-netinfo (11.4.1):
+    - React-Core
   - react-native-pdf (7.0.3):
     - React-Core
   - react-native-safe-area-context (5.6.1):
@@ -2074,6 +2076,7 @@ DEPENDENCIES:
   - react-native-blob-util (from `../node_modules/react-native-blob-util`)
   - react-native-config (from `../node_modules/react-native-config`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
+  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-pdf (from `../node_modules/react-native-pdf`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-version-check (from `../node_modules/react-native-version-check`)
@@ -2255,6 +2258,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-config"
   react-native-get-random-values:
     :path: "../node_modules/react-native-get-random-values"
+  react-native-netinfo:
+    :path: "../node_modules/@react-native-community/netinfo"
   react-native-pdf:
     :path: "../node_modules/react-native-pdf"
   react-native-safe-area-context:
@@ -2428,6 +2433,7 @@ SPEC CHECKSUMS:
   react-native-blob-util: bc94dcdb71053802bfaa1caaf2c6a84ba7f9d22e
   react-native-config: 86038147314e2e6d10ea9972022aa171e6b1d4d8
   react-native-get-random-values: 21325b2244dfa6b58878f51f9aa42821e7ba3d06
+  react-native-netinfo: f0a9899081c185db1de5bb2fdc1c88c202a059ac
   react-native-pdf: d791024b3d3dad60b4f0152dbf32fa0db6539d4c
   react-native-safe-area-context: aac2745e96999c8633d2f6119e4e39b499c2ac8b
   react-native-version-check: 6cd36aad4e30b8e3216747e3b4ddeb09e0647af8

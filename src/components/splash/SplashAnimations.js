@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Dimensions, View, StyleSheet } from 'react-native';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Logo from '../../res/images/SpalshLogo';
+import AnimatedLogo from "../common/AnimatedLogo";
 
 const getDeviceSize = () => {
   const screenHeight = Dimensions.get('window').height;
@@ -80,7 +81,7 @@ const SplashAnimations = ({ onAnimationComplete }) => {
         accessible={true}
       >
         <View style={{ alignSelf: 'center', marginTop: hp('5%') }}>
-          <Logo width={300} height={84} />
+          <AnimatedLogo width={300} height={84} />
         </View>
       </Animated.View>
     </View>
