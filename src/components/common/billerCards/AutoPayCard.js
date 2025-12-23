@@ -31,11 +31,11 @@ const AutoPayCard = ({
       onPress={handleCardPress}
       activeOpacity={0.8}
      accessible={true}
+      accessibilityRole="header" accessibilityLevel={2}
       accessibilityLabel={
-        (isAutoPayStatus ? "Heading level 2, Auto Pay is On. " : "Heading level 2, Auto Pay is Off. ") +
+        (isAutoPayStatus ? "Auto Pay is On. " : "Auto Pay is Off. ") +
         "Manage Auto Pay"
       }
-      accessibilityRole="link"
     >
       <View
         style={{
@@ -50,7 +50,7 @@ const AutoPayCard = ({
           <AutoPayIcon />
         </View>
         <View style={{ flexDirection: "column" }}>
-          <Text style={styles.leftTitle} accessible={true} accessibilityRole="text" accessibilityLabel="Auto Pay, heading level 2">Auto Pay</Text>
+          <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2} >Auto Pay</Text>
           {isStatusLoading ? (
             <SkeletonPlaceholder>
               <View

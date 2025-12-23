@@ -11,7 +11,7 @@ const WelcomeCard = () => {
 
   return (
     <View style={styles.container}> 
-      <Text style={styles.title} accessibilityRole='text' accessible={true} accessibilityLabel="We're Excited to Connect with you!, heading level 1">We're Excited to Connect with you!</Text>
+      <Text style={styles.title} accessibilityRole="header" accessibilityLevel={1} accessible={true} accessibilityLabel="We're Excited to Connect with you!">We're Excited to Connect with you!</Text>
       
       <View style={styles.videoContainer} accessible={true} accessibilityLabel="Welcome to Sparklight, video title.">
         <VideoPlayer videoId={videoId} />

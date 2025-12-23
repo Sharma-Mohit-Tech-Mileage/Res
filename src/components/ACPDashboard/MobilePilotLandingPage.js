@@ -189,8 +189,7 @@ const MobilePilotLandingPage = ({ status = "Pending Status" }) => {
             <View style={styles.infoTextContainer}>
               <Text
                 style={styles.statusText}
-                accessibilityLabel={`${status} ' ', ${action} heading level 2.`}
-                accessibilityRole="text"
+                accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
               >
                 {status}:
                 <Text style={styles.statusSubText}> {action}</Text>

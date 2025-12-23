@@ -366,7 +366,7 @@ const Support = ({ route }) => {
             <SupportIcon white={"#fff"} />
           </View>
           <View style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}>
-            <Text style={styles.wereHereTo} accessible={true} accessibilityRole="text" accessibilityLabel="We're Here to Help, heading level 1" >We’re Here to Help</Text>
+            <Text style={styles.wereHereTo} accessible={true} accessibilityRole="header" accessibilityLevel={1} accessibilityLabel="We're Here to Help" >We’re Here to Help</Text>
           </View>
         </View>
         <ScrollView
@@ -390,7 +390,7 @@ const Support = ({ route }) => {
                 styles.headingContainerSpaceBlock,
               ]}
             >
-              <Text style={[styles.heading, styles.headingTypo]} accessible={true} accessibilityRole="text" accessibilityLabel="Knowledgebase, heading level 2">
+              <Text style={[styles.heading, styles.headingTypo]} accessible={true}accessibilityRole="header" accessibilityLevel={2}>
                 Knowledgebase
               </Text>
             </View>
@@ -474,8 +474,7 @@ const Support = ({ route }) => {
                     { paddingHorizontal: Padding.p_base },
                   ]}
                   accessible={true}
-                  accessibilityLabel="Contact Us, heading level 2"
-                  accessibilityRole="text"
+                  accessibilityRole="header" accessibilityLevel={2}
                 >
                   Contact Us
                 </Text>

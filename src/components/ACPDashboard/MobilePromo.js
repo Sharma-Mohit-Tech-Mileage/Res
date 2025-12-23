@@ -18,9 +18,8 @@ const MobilePromo = () => {
     <View style={[AppStyles.card, styles.container]}>
       <View style={styles.imageContainer}>
         <Image
-          accessibilityLabel="Smiling man holding a phone. Plans starting at $15 per month, heading level 2."
-          accessible={false}
-          accessibilityRole="none"
+          accessible={true}
+          accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
           source={PromoImage}
           resizeMode="stretch"
           style={styles.promoImage}

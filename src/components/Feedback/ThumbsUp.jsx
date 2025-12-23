@@ -67,8 +67,7 @@ const ThumbsUp = () => {
             >
               <Text
                 style={styles.thankYouFor}
-                accessibilityRole="header"
-                accessibilityLabel="Thank you for your feedback!"
+                accessibilityRole="header" accessibilityLevel={2}
               >
                 Thank you for your feedback!
               </Text>

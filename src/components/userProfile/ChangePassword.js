@@ -180,7 +180,7 @@ const ChangePassword = () => {
               </View>
               <View style={[styles.passwordWrapper, styles.wrapperSpaceBlock1]}>
                 <View style={{flexDirection:'column'}}>
-                <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header">
+                <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header" accessibilityLevel={2}>
                   Password
                 </Text>
                 <Text style={[AppStyles.requiredField,{marginTop:10}]} accessible={true} accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">

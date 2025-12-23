@@ -29,8 +29,7 @@ const FeatureCard = ({ title, features = [], buttonText, buttonVariant = "primar
       <View
         style={styles.header}
         accessible={true}
-        accessibilityLabel={`${title}, heading level 2`}
-        accessibilityRole="text"
+        accessibilityRole="header" accessibilityLevel={2}
       >
       <Text style={styles.title}>{title}</Text>
       </View>

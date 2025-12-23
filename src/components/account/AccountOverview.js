@@ -226,7 +226,7 @@ const AccountOverview = () => {
             <UserIconWhite width={28} height={26} />
           </View>
           {/* Full name for profile */}
-          <Text style={styles.melissaSmith} accessible={true} accessibilityLabel={`Profile for ${fullName}`} accessibilityRole="text" >{fullName}</Text>
+          <Text style={styles.melissaSmith} accessible={true} accessibilityLabel={`Profile for ${fullName}`} accessibilityRole="Header" accessibilityLevel={1} accessibilityHint="Header" >{fullName}</Text>
         </View>
         <ScrollView style={{ flex: 1 }}>
           <View style={{ marginBottom: "30%" }}>

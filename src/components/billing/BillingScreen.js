@@ -121,7 +121,7 @@ const BillingScreen = ({ navigation }) => {
   }, [accountDetails]);
 
   return (
-    <View style={styles.account} accessibilityLabel="Billing Services screen">
+    <View style={styles.account} accessibilityLabel="Billing Services screen"accessibilityRole='Header' accessibilityLevel={1}>
       <ProfileSettingsHeader
         title=""
         iconAlignment="right"
@@ -144,7 +144,8 @@ const BillingScreen = ({ navigation }) => {
           >
             <BillingIconWhite isSelected={false} />
           </View>
-          <Text style={styles.melissaSmith}>Billing Services</Text>
+          <Text style={styles.melissaSmith}
+          accessibilityLabel="Billing Services screen"accessibilityRole='Header' accessibilityLevel={1} accessibilityHint="Header">Billing Services</Text>
         </View>
 
         <ScrollView
@@ -190,8 +191,7 @@ const BillingScreen = ({ navigation }) => {
                     <Text style={styles.leftTitle} 
                     accessible={true}
                     accessibilityLabel="Billing Options"
-                    accessibilityLevel={2}
-                    accessibilityRole="header">
+                    accessibilityRole="header" accessibilityLevel={2}>
                       Billing Options</Text>
                   </View>
                   <View

@@ -184,7 +184,7 @@ const NotificationSection = ({
   return (
     <View style={styles.sectionContainer}>
       <View style={styles.header}>
-        <Text style={styles.title} accessibilityLabel={`${title}, heading level 2`}>{title}</Text>
+        <Text style={styles.title} accessibilityRole="header" accessibilityLevel={2}>{title}</Text>
         {isComingSoon ? (
           <ComingSoonBadge />
         ) : (

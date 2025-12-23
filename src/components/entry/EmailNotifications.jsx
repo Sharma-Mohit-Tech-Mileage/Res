@@ -119,7 +119,7 @@ const EmailNotifications = ({ navigation }) => {
               <View
                 style={styles.header}
                 accessible={true}
-                accessibilityRole="header"
+                accessibilityRole="header" accessibilityLevel={2}
               >
                 <Text
                   style={styles.headerText}

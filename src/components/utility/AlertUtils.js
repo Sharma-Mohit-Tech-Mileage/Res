@@ -76,9 +76,9 @@ export const AlertComponent = ({
             />}
         </View>
         <View style={mergedStyles.alertContentContainer}>
-          <View style={mergedStyles.alertTitleRow} accessibilityRole="text"
+          <View style={mergedStyles.alertTitleRow} accessibilityRole="header" accessibilityLevel={2}
               accessible={true}
-              accessibilityLabel={`${title}, heading level 2`}>
+                accessibilityLabel={`${title}`}>
             <Text style={[
               mergedStyles.alertTitle, 
               titleStyle,

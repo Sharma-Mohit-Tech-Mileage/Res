@@ -99,8 +99,7 @@ const WalkthroughContent = ({
         <Text
           style={styles.title}
           accessible={true}
-          accessibilityRole="header"
-          accessibilityLabel={walkthrough.title}
+          accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
         >
           {walkthrough.title}
         </Text>

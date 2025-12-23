@@ -173,9 +173,7 @@ const BreakDownItem = memo(({ item }) => {
               numberOfLines={2}
               ellipsizeMode="tail"
               accessible={true}
-              accessibilityLabel={`${
-              item.header.description
-            } heading level 2`}
+              accessibilityRole="header" accessibilityLevel={2} 
             >
               {item.header.description}
             </Text>

@@ -399,7 +399,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
     <View style={styles.frameView}>
       <View style={styles.appointmentsParent}>
         <View style={{ flexDirection: "column", flex: 1.7, marginRight: 10 }}>
-          <Text style={styles.appointments} accessibilityLabel={`${title}, heading level 2`}>{title}</Text>
+          <Text style={styles.appointments} accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header">{title}</Text>
           <Text
             style={[
               styles.receiveAppNotifications1,
