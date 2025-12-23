@@ -14,8 +14,7 @@ const PilotFaqs = () => {
     <View style={[AppStyles.card, styles.container]}>
       <View
         accessible={true}
-        accessibilityLabel="Service Activation section, heading level 2."
-        accessibilityRole="none"
+        accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
       >
         <Text style={styles.title} accessible={false}>
           Service Activation

@@ -209,7 +209,7 @@ const AccountOverview = () => {
   return (
     <View style={styles.account} accessibilityLabel="Account screen">
       <ProfileSettingsHeader
-        title="Account"
+        title=""
         iconAlignment="right"
         showIcon={false}
       />
@@ -226,7 +226,7 @@ const AccountOverview = () => {
             <UserIconWhite width={28} height={26} />
           </View>
           {/* Full name for profile */}
-          <Text style={styles.melissaSmith}>{fullName}</Text>
+          <Text style={styles.melissaSmith} accessible={true} accessibilityLabel={`Profile for ${fullName}`} accessibilityRole="Header" accessibilityLevel={1} accessibilityHint="Header" >{fullName}</Text>
         </View>
         <ScrollView style={{ flex: 1 }}>
           <View style={{ marginBottom: "30%" }}>
@@ -353,7 +353,7 @@ const AccountOverview = () => {
                   name: "App Release Notes",
                 })
               }
-              accessibilityLabel={"Version " + VersionCheck.getCurrentVersion()}
+              accessibilityLabel={"Version " + VersionCheck.getCurrentVersion()+" Opens release notes"}
               accessibilityRole="link"
             >
               <Text

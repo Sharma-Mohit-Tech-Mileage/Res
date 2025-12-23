@@ -118,23 +118,22 @@ const DetailItem = memo(({ detail }) => {
   return (
     <View
       style={[styles.detailRow, styles.detailItemBorder]}
-      accessible={true}
-      accessibilityLabel={`${detail.description}: $${parseFloat(
-        detail.amount
-      ).toFixed(2)}`}
+      
     >
       <View style={styles.detailLabelContainer80}>
         <Text
           style={[styles.detailLabelNormal, textStyle]}
           numberOfLines={2}
           ellipsizeMode="tail"
+          accessible={true}
+          accessibilityLabel={`${detail.description}`}
         >
           {detail.description}
         </Text>
         {hasExpiryDate && (
           <View style={styles.discountExpiryContainer}>
             <InfoIcon size="xs" color={Color.colorGray_200} />
-            <Text style={styles.discountExpiryText}>
+            <Text style={styles.discountExpiryText} accessible={true} accessibilityLabel={`Discount expires on ${moment(detail.endDate).format(DEFAULT_DATE_FORMAT)}`}>
               Discount expires on{" "}
               {moment(detail.endDate).format(DEFAULT_DATE_FORMAT)}
             </Text>
@@ -146,6 +145,8 @@ const DetailItem = memo(({ detail }) => {
           style={[styles.detailValueNormal, textStyle]}
           numberOfLines={2}
           ellipsizeMode="tail"
+           accessible={true}
+          accessibilityLabel={`${parseFloat(detail.amount).toFixed(2)}`}
         >
           ${parseFloat(detail.amount).toFixed(2)}
         </Text>
@@ -162,7 +163,7 @@ const BreakDownItem = memo(({ item }) => {
   if (!item || !item.header) return null;
 
   return (
-    <View style={styles.paymentRow} accessible={true}>
+    <View style={styles.paymentRow} >
       {/* Header section */}
       <View style={styles.paymentDetails}>
         <View style={styles.detailRow}>
@@ -171,6 +172,8 @@ const BreakDownItem = memo(({ item }) => {
               style={styles.detailLabel}
               numberOfLines={2}
               ellipsizeMode="tail"
+              accessible={true}
+              accessibilityRole="header" accessibilityLevel={2} 
             >
               {item.header.description}
             </Text>
@@ -180,6 +183,8 @@ const BreakDownItem = memo(({ item }) => {
               style={[styles.detailValue, styles.boldText]}
               numberOfLines={2}
               ellipsizeMode="tail"
+              accessible={true}
+              accessibilityLabel={`${item.total.amount}`}
             >
               ${parseFloat(item.total.amount).toFixed(2)}
             </Text>
@@ -207,8 +212,8 @@ const BreakDownItem = memo(({ item }) => {
  */
 const TotalBalanceFooter = memo(({ totalAmount }) => (
   <View style={[styles.detailRow, styles.footerContainer]}>
-    <Text style={styles.totalBalanceLabel}>Total Balance Due</Text>
-    <Text style={styles.totalBalanceValue}>${totalAmount.toFixed(2)}</Text>
+    <Text style={styles.totalBalanceLabel} accessible={true} accessibilityLabel="Total Balance Due">Total Balance Due</Text>
+    <Text style={styles.totalBalanceValue} accessible={true} accessibilityLabel={`${totalAmount.toFixed(2)}`}>${totalAmount.toFixed(2)}</Text>
   </View>
 ));
 

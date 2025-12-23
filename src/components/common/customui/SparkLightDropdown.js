@@ -148,7 +148,7 @@ const SparkLightDropdown = ({
                   onPress={() => handleSelect(item)}
                   accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel={`${item}${selectedValue === item ? ', selected' : ''}`}
+                  accessibilityLabel={`${item}, ${index+1} of ${validItems.length} ${selectedValue === item ? ', selected' : ''}`}
                   accessibilityHint={`Double tap to select this ${accessibilityItemName}`}
                   accessibilityState={{ 
                     selected: selectedValue === item

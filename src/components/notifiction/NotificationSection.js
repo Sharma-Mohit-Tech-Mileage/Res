@@ -63,7 +63,7 @@ const ComingSoonBadge = () => (
   </View>
 );
 
-const NotificationToggle = ({ type, status, isLast, warn, loading }) => (
+const NotificationToggle = ({ type, status, isLast, warn, loading, title }) => (
   <View
     style={[
       styles.toggleContainer,
@@ -71,7 +71,7 @@ const NotificationToggle = ({ type, status, isLast, warn, loading }) => (
       warn && styles.warnBackground,
     ]}
   >
-    <Text style={styles.toggleText}>{type}</Text>
+    <Text style={styles.toggleText} accessible={true} accessibilityLabel={`${title} for ${type}`}>{type}</Text>
     <View style={styles.statusContainer}>
       {loading ? (
         <SkeletonPlaceholder>
@@ -184,7 +184,7 @@ const NotificationSection = ({
   return (
     <View style={styles.sectionContainer}>
       <View style={styles.header}>
-        <Text style={styles.title} accessibilityLabel={`${title}, heading level 2`}>{title}</Text>
+        <Text style={styles.title} accessibilityRole="header" accessibilityLevel={2}>{title}</Text>
         {isComingSoon ? (
           <ComingSoonBadge />
         ) : (
@@ -224,6 +224,7 @@ const NotificationSection = ({
           {...setting}
           isLast={index === settings.length - 1}
           loading={isLoading}
+          title={title}
         />
       ))}
     </View>

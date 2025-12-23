@@ -3,7 +3,7 @@ import { BackHandler } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import analytics from '@react-native-firebase/analytics';
-import SplashScreen from "../components/user/SplashScreen";
+import SplashScreen from "../components/splash/SplashScreen";
 import ArticalWindowUtility from '../components/utility/ArticalWindowUtility';
 import EmailNotifications from '../components/entry/EmailNotifications';
 import PushNotifications from '../components/entry/PushNotifications';

@@ -212,8 +212,7 @@ const NotificationAlert = ({
             <Text
               style={[styles.title, { color: currentTypeStyle.titleColor }]}
               accessible={true}
-              accessibilityLabel={`${title}, heading level 2`}
-              accessibilityRole="text"
+              accessibilityRole="header" accessibilityLevel={2}
             >
               {title}
             </Text>

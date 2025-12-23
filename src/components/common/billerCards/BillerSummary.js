@@ -61,7 +61,7 @@ const Card = ({ billAmt, dueDate, navigation, style }) => {
             <WalletSummaryIcon />
           </View>
 
-          <Text style={styles.leftTitle} accessible={true}accessibilityRole="text" accessibilityLabel="Bill Summary, heading level 2">Bill Summary</Text>
+          <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2}>Bill Summary</Text>
         </View>
       </View>
 

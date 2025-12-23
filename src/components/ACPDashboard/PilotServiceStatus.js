@@ -42,8 +42,7 @@ export default function PilotServiceStatus({
     <View
       style={styles.wrapper}
       accessible={true}
-      accessibilityLabel="Service Progress, heading level 2. Step 1 of 3. Service Purchased. Completed. Step 2 of 3. Pending Status. In progress. Step 3 of 3. Service Activated. Not started."
-      accessibilityRole="none"
+      accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
     >
       {stages.map((stage, idx) => {
         const index = idx + 1;

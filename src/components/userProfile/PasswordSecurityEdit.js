@@ -178,7 +178,7 @@ const PasswordSecurityEdit = () => {
                   <View style={{flexDirection:'column'}}>
                   <Text
                     style={[styles.password, styles.passwordFlexBox]}
-                    accessibilityRole="header"
+                    accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
                   >
                     Security Question
                   </Text>
