@@ -33,10 +33,14 @@ const SearchSuggestions = memo(
       }
     };
 
-    const renderSuggestion = ({ item }) => (
+    const renderSuggestion = ({ item, index }) => (
       <TouchableOpacity
         onPress={() => handleSuggestionClick(item)}
         style={styles.suggestionItem}
+        accessible={true}
+        accessibilityRole="link"
+        accessibilityHint="Double tap to open in a new window."
+        accessibilityLabel={`Result ${index+1} of ${suggestions.length} ,${item.title}`}
       >
         <View style={{ marginRight: 18, width: 13.333, height: 16.667 }}>
           <File05 />
@@ -56,14 +60,16 @@ const SearchSuggestions = memo(
 
     return (
       <View style={styles.flatList}>
-        <View style={styles.inputContainer}>
+        <View style={styles.inputContainer} accessibilityHint="Double tap to edit"
+          accessibilityRole="text"
+          accessible={true}
+          accessibilityLabel={ suggestions.length > 0 ? `${suggestions.length} results found for ${input}. Use arrow keys to move through them.` : `Search Knowledgebase, type to search.`}
+          
+          >
           <View style={[styles.searchIcon, styles.leftIcon]}>
             <SearchIcon />
           </View>
-          <View accessibilityHint="Double tap to edit"
-          accessibilityRole="text"
-          accessible={true}
-          accessibilityLabel="Search Knowledgebase, type to search.">
+          
           <TextInput
             maxFontSizeMultiplier={1.25}
             ref={inputRef}
@@ -74,15 +80,15 @@ const SearchSuggestions = memo(
             placeholderTextColor={Color.gray600}
             autoCorrect={false}
             clearButtonMode="always"
-            accessible={false}
+            
           />
-          </View>
+          
         </View>
         <View style={{ height: hp("70%") }}>
           <FlatList
             data={suggestions}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={renderSuggestion}
+            renderItem={({ item, index }) => renderSuggestion({ item, index })}
             onEndReached={onEndReached}
             onEndReachedThreshold={0.1}
           />
