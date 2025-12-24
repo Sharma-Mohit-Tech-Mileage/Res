@@ -130,7 +130,7 @@ const ErrorModal = ({ visible, errorType, onAction, customMessage }) => {
       <View style={styles.overlay}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <AlertIcon />
+            <AlertIcon color={errorType === ErrorType.BUSINESS_ACCOUNT ? '#DD6D02' : undefined} />
             <Text style={styles.title}>{errorConfig.title}</Text>
           </View>
           
