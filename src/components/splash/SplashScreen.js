@@ -283,13 +283,13 @@ const SplashScreen = ({ navigation, route }) => {
   const onError = useCallback(
     (error) => {
       setLoadingState(LoadingState.NONE);
-      setLoginEnable(true);
-      if (error.status === 204) {
+      setLoginEnable(error.status === 204);
+      if (true) {
         setErrorState({
           visible: true,
           type: ErrorType.API_ERROR_204,
           message:
-            "Unable to retrieve account information. Please contact support at 1-877-692-2253.",
+            null,
         });
         return;
       }
@@ -369,8 +369,7 @@ const SplashScreen = ({ navigation, route }) => {
         setErrorState({
           visible: true,
           type: ErrorType.ADMIN_PERMISSION,
-          message:
-            "Your account does not have the necessary permissions to use this app.",
+          message: null,
         });
       } else {
         moveAfterLogin(user);
