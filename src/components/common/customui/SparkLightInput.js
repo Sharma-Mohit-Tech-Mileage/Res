@@ -58,6 +58,7 @@ const SparkLightInput = ({
   editable = true,
   showTextIcon = false,
   inputStyle,
+  accessibilityLiveError,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -174,7 +175,7 @@ const SparkLightInput = ({
           //accessibilityLabel={getAccessibilityLabel()}
           accessibilityRole="text"
           accessibilityHint={
-            getKeyboardType() === "phone-pad" ? "Required text field. double tap to edit." : secure ? "secure text field, double tab to edit." : accessibilityHint
+            getKeyboardType() === "phone-pad" ? "Required text field. double tap to edit." : secure ? "secure text field, double tab to edit."+accessibilityLiveError: accessibilityHint
           }
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}
