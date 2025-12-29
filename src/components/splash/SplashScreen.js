@@ -283,8 +283,8 @@ const SplashScreen = ({ navigation, route }) => {
   const onError = useCallback(
     (error) => {
       setLoadingState(LoadingState.NONE);
-      setLoginEnable(error.status === 204);
-      if (true) {
+      setLoginEnable(true);
+      if (error.status === 204) {
         setErrorState({
           visible: true,
           type: ErrorType.API_ERROR_204,
