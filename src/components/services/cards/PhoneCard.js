@@ -48,14 +48,16 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
         <View style={styles.serviceHeader}>
           <View
             style={styles.iconWrapper}
-            accessible={true}
-            accessibilityLabel="Phone icon"
-            accessibilityRole="image"
+            accessible={false}
+            importantForAccessibility="no"
+            accessibilityElementsHidden={true}
           >
             <MaterialCommunityIcons
               name="phone"
               size={16}
               color={theme.colors.primary}
+              accessible={false}
+              importantForAccessibility="no"
             />
           </View>
           <Text

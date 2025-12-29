@@ -44,14 +44,16 @@ const InternetCard = ({
         <View style={styles.serviceHeader}>
           <View
             style={styles.iconWrapper}
-            accessible={true}
-            accessibilityLabel="Support icon"
-            accessibilityRole="image"
+            accessible={false}
+            importantForAccessibility="no"
+            accessibilityElementsHidden={true}
           >
             <MaterialCommunityIcons
               name="wifi"
               size={16}
               color={theme.colors.primary}
+              accessible={false}
+              importantForAccessibility="no"
             />
           </View>
           <Text

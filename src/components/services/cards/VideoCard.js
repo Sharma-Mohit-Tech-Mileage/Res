@@ -44,14 +44,16 @@ const VideoCard = ({ planName, zipCode, loading = false }) => {
         <View style={styles.serviceHeader}>
           <View
             style={styles.iconWrapper}
-            accessible={true}
-            accessibilityLabel="Television icon"
-            accessibilityRole="image"
+            accessible={false}
+            importantForAccessibility="no"
+            accessibilityElementsHidden={true}
           >
             <MaterialCommunityIcons
               name="television"
               size={16}
               color={theme.colors.primary}
+              accessible={false}
+              importantForAccessibility="no"
             />
           </View>
           <Text

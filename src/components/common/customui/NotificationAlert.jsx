@@ -1,5 +1,14 @@
 import React, { useRef, useEffect, useMemo, useCallback } from "react";
-import { View, Text, StyleSheet, Pressable, AccessibilityInfo, findNodeHandle, Linking, Alert, } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  AccessibilityInfo,
+  findNodeHandle,
+  Linking,
+  Alert,
+} from "react-native";
 import { Color, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
@@ -7,7 +16,6 @@ import { resentEmailVerifiction } from "../../../redux/actions/ProfileActionSuit
 import InfoIcon from "../../../../assets/svgs/InfoIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
-
 
 const TYPE_CONFIG = {
   info: {
@@ -18,7 +26,7 @@ const TYPE_CONFIG = {
     titleColor: "#000000",
     closeButtonColor: "#0060AE",
     IconComponent: InfoIcon,
-    iconLabel: "Information",
+    iconLabel: "Information icon",
     labelPrefix: "Information: ",
   },
   error: {
@@ -29,7 +37,7 @@ const TYPE_CONFIG = {
     titleColor: "#000000",
     closeButtonColor: "#B92A1C",
     IconComponent: InfoIcon,
-    iconLabel: "Error",
+    iconLabel: "Error icon",
     labelPrefix: "Error: ",
   },
   success: {
@@ -40,7 +48,7 @@ const TYPE_CONFIG = {
     titleColor: "#000000",
     closeButtonColor: "#1D7832",
     IconComponent: SuccessIcon,
-    iconLabel: "Success",
+    iconLabel: "Success icon",
     labelPrefix: "Success: ",
   },
   warning: {
@@ -51,7 +59,7 @@ const TYPE_CONFIG = {
     titleColor: "#000000",
     closeButtonColor: "#DD6D02",
     IconComponent: WarningIcon,
-    iconLabel: "Warning",
+    iconLabel: "Warning icon",
     labelPrefix: "Warning: ",
   },
 };
@@ -87,7 +95,6 @@ const normalizeSplitKey = (key) => {
   }
   return [];
 };
-
 
 const parseMessage = (message, splitKeys) => {
   const safeMsg = message || "";
@@ -183,13 +190,15 @@ const getActionLabel = (action, content) => {
 };
 
 const buildPlainText = (segments) =>
-  segments.map((s) => (s.type === "linebreak" ? " " : s.content || "")).join("");
+  segments
+    .map((s) => (s.type === "linebreak" ? " " : s.content || ""))
+    .join("");
 
 const buildAccessibilityLabel = (segments, config, hasActions) => {
   const plainText = buildPlainText(segments);
 
   if (!hasActions) {
-    return config.labelPrefix + plainText;
+    return plainText;
   }
 
   const actionSegments = segments.filter((s) => s.type === "styled");
@@ -205,9 +214,8 @@ const buildAccessibilityLabel = (segments, config, hasActions) => {
     })
     .join(", and ");
 
-  return `${config.labelPrefix}${plainText}. Contains ${actionDescriptions}`;
+  return `${plainText}. Contains ${actionDescriptions}`;
 };
-
 
 const NotificationAlert = ({
   type = "info",
@@ -311,7 +319,7 @@ const NotificationAlert = ({
             key={key}
             accessible={true}
             accessibilityRole="text"
-            accessibilityLabel={config.labelPrefix + plainText}
+            accessibilityLabel={plainText}
             style={styles.blockWrapper}
           >
             <Text style={[styles.messageText, { color: config.textColor }]}>
@@ -321,7 +329,6 @@ const NotificationAlert = ({
         );
       }
 
-
       if (actionSegments.length === 1) {
         const action = actionSegments[0].action;
         const actionType = action?.action;
@@ -330,7 +337,7 @@ const NotificationAlert = ({
           <Pressable
             key={key}
             accessible={true}
-            accessibilityRole={actionType === "call" ? "button" : "link"}
+            accessibilityRole={"link"}
             accessibilityLabel={buildAccessibilityLabel(
               blockSegments,
               config,
@@ -346,7 +353,7 @@ const NotificationAlert = ({
             onPress={() => executeAction(action)}
             style={styles.blockWrapper}
           >
-            <Text >
+            <Text>
               {blockSegments.map((segment) => (
                 <Text
                   key={segment.key}
@@ -391,14 +398,18 @@ const NotificationAlert = ({
           key={key}
           accessible={true}
           accessibilityRole="button"
-          accessibilityLabel={buildAccessibilityLabel(blockSegments, config, true)}
+          accessibilityLabel={buildAccessibilityLabel(
+            blockSegments,
+            config,
+            true
+          )}
           accessibilityHint="Actions available. Double tap to show options, or use rotor to access individual actions"
           accessibilityActions={accessibilityActions}
           onAccessibilityAction={handleAccessibilityAction}
           onPress={() => showActionSelection(actionSegments, plainText)}
           style={styles.blockWrapper}
         >
-          <Text >
+          <Text>
             {blockSegments.map((segment) => (
               <Text
                 key={segment.key}
@@ -433,10 +444,7 @@ const NotificationAlert = ({
         ]}
       >
         <View
-          style={[
-            styles.iconWrapper,
-            !title && styles.iconWithoutTitle
-          ]}
+          style={[styles.iconWrapper, !title && styles.iconWithoutTitle]}
           accessible={true}
           accessibilityLabel={config.iconLabel}
           accessibilityRole="image"
@@ -444,9 +452,7 @@ const NotificationAlert = ({
           <IconComponent width={18} height={18} color={config.iconColor} />
         </View>
 
-       
         <View style={styles.content} accessible={false}>
-         
           {title && (
             <View ref={titleRef} accessible={true} accessibilityRole="header">
               <Text style={[styles.title, { color: config.titleColor }]}>
@@ -480,7 +486,9 @@ const NotificationAlert = ({
             accessibilityRole="button"
             accessibilityHint="Double tap to dismiss"
           >
-            <Text style={[styles.closeBtnText, { color: config.closeButtonColor }]}>
+            <Text
+              style={[styles.closeBtnText, { color: config.closeButtonColor }]}
+            >
               ✕
             </Text>
           </Pressable>
