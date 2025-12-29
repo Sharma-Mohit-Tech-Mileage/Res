@@ -1,24 +1,13 @@
 import React, { useRef, useEffect, useMemo, useCallback } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  AccessibilityInfo,
-  findNodeHandle,
-  Linking,
-  Alert,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable, AccessibilityInfo, findNodeHandle, Linking, Alert, } from "react-native";
 import { Color, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { resentEmailVerifiction } from "../../../redux/actions/ProfileActionSuite";
-
 import InfoIcon from "../../../../assets/svgs/InfoIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 
-// ==================== CONSTANTS ====================
 
 const TYPE_CONFIG = {
   info: {
@@ -67,12 +56,6 @@ const TYPE_CONFIG = {
   },
 };
 
-// ==================== UTILITIES ====================
-
-/**
- * Format phone number for screen reader accessibility
- * Converts "8885551234" to "8 8 8. 5 5 5. 1 2 3 4" for natural pronunciation
- */
 const formatPhoneForScreenReader = (phoneNumber) => {
   if (!phoneNumber) return "";
   const digits = phoneNumber.replace(/\D/g, "");
@@ -105,11 +88,7 @@ const normalizeSplitKey = (key) => {
   return [];
 };
 
-/**
- * UPDATED:
- * - Respects real newline(s) in `message` and turns them into "linebreak" segments.
- * - Still supports splitKey styling/action within each line.
- */
+
 const parseMessage = (message, splitKeys) => {
   const safeMsg = message || "";
   const lines = safeMsg.split(/\n+/);
@@ -118,7 +97,6 @@ const parseMessage = (message, splitKeys) => {
   let globalIndex = 0;
 
   lines.forEach((line, lineIdx) => {
-    // No split keys -> single text segment for this line
     if (splitKeys.length === 0) {
       allSegments.push({
         type: "text",
@@ -126,7 +104,6 @@ const parseMessage = (message, splitKeys) => {
         key: `text-${globalIndex++}`,
       });
     } else {
-      // Apply split-key logic per line
       let remaining = line || "";
       splitKeys.forEach((item) => {
         const index = remaining.indexOf(item.text);
@@ -163,7 +140,6 @@ const parseMessage = (message, splitKeys) => {
       }
     }
 
-    // Real newline -> block break
     if (lineIdx < lines.length - 1) {
       allSegments.push({ type: "linebreak", key: `br-${globalIndex++}` });
     }
@@ -232,7 +208,6 @@ const buildAccessibilityLabel = (segments, config, hasActions) => {
   return `${config.labelPrefix}${plainText}. Contains ${actionDescriptions}`;
 };
 
-// ==================== MAIN COMPONENT ====================
 
 const NotificationAlert = ({
   type = "info",
@@ -330,8 +305,6 @@ const NotificationAlert = ({
       const hasActions = actionSegments.length > 0;
       const plainText = buildPlainText(blockSegments);
 
-      // ✅ UPDATED: NO ACTIONS => render *one separate Text element per block*
-      // This makes each block independently focusable + identifiable by SR.
       if (!hasActions) {
         return (
           <View
@@ -503,7 +476,7 @@ const NotificationAlert = ({
             onPress={onClose}
             style={styles.closeBtn}
             accessible={true}
-            accessibilityLabel="Close notification"
+            accessibilityLabel="Close"
             accessibilityRole="button"
             accessibilityHint="Double tap to dismiss"
           >
