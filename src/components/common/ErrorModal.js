@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Linking,
 } from "react-native";
-import { Color, FontFamily } from "../../../GlobalStyles";
+import {  FontFamily } from "../../../GlobalStyles";
 import colors from "../../res/Colors";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 
