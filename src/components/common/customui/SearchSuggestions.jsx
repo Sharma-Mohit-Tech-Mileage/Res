@@ -37,7 +37,7 @@ const SearchSuggestions = memo(
       }, []);
     
       useEffect(() => {
-        if (keyboardHidden) {
+        if (!keyboardHidden) {
           inputRef.current?.focus();
         }
       }, [keyboardHidden]);
@@ -55,6 +55,17 @@ const SearchSuggestions = memo(
         });
       }
     };
+
+    const submitValue = () => {
+    // Handle the submitted value here (e.g., send it to a server)
+    //console.log('Submitted:', value);
+    // You can optionally clear the input if needed
+    // setValue(''); 
+    
+    // The keyboard will remain open because blurOnSubmit is false
+    // If you want to manually dismiss the keyboard at some point, you can use Keyboard.dismiss()
+     Keyboard.dismiss(); 
+  }
 
     const renderSuggestion = ({ item, index }) => (
       <TouchableOpacity
@@ -103,7 +114,8 @@ const SearchSuggestions = memo(
             placeholderTextColor={Color.gray600}
             autoCorrect={false}
             clearButtonMode="always"
-            
+            returnKeyType="done" // or "send", "go", etc.
+            onSubmitEditing={submitValue}
           />
           
         </View>
