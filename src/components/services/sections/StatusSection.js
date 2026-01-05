@@ -77,10 +77,10 @@ const StatusSection = ({
           style={styles.iconWrapper}
           accessible={true}
           accessibilityLabel={checking ? "Checking service status, loading animation" : "Support icon"}
-          accessibilityRole="image"
         >
           <View style={styles.iconBadge}>
-            <WiFiLoadingAnimation isAnimating={checking} />
+            <WiFiLoadingAnimation isAnimating={checking} accessible={false}
+              importantForAccessibility="no"/>
           </View>
         </View>
 

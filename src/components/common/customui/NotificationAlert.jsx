@@ -8,6 +8,7 @@ import {
   findNodeHandle,
   Linking,
   Alert,
+  Platform,
 } from "react-native";
 import { Color, FontSize, FontFamily } from "../../../../GlobalStyles";
 import { useNavigation } from "@react-navigation/native";
@@ -231,6 +232,10 @@ const NotificationAlert = ({
   const navigation = useNavigation();
   const containerRef = useRef(null);
   const titleRef = useRef(null);
+  const contentRef = useRef(null);
+  const closeRef = useRef(null);
+  const resendRef = useRef(null);
+  const blockRefs = useRef([]);
 
   const config = TYPE_CONFIG[type] || TYPE_CONFIG.info;
   const IconComponent = config.IconComponent;
@@ -242,10 +247,17 @@ const NotificationAlert = ({
   );
   const blocks = useMemo(() => groupSegmentsByLineBreaks(segments), [segments]);
 
+  // Initialize block refs array
+  useEffect(() => {
+    blockRefs.current = blockRefs.current.slice(0, blocks.length);
+  }, [blocks.length]);
+
+  // Set accessibility focus and force correct order on iOS
   useEffect(() => {
     if (!isVisible) return;
 
     const timeout = setTimeout(() => {
+      // Set initial focus
       const titleNode = findNodeHandle(titleRef.current);
       if (titleNode) {
         AccessibilityInfo.setAccessibilityFocus(titleNode);
@@ -254,10 +266,53 @@ const NotificationAlert = ({
       AccessibilityInfo.announceForAccessibility(
         `${config.labelPrefix}${title || "Notification"}`
       );
+
+      // Force correct accessibility order on iOS
+      if (Platform.OS === "ios" && containerRef.current) {
+        const elements = [];
+        
+        // Add title
+        if (titleRef.current) {
+          const titleHandle = findNodeHandle(titleRef.current);
+          if (titleHandle) elements.push(titleHandle);
+        }
+        
+        // Add all message blocks in order
+        blockRefs.current.forEach((ref) => {
+          if (ref) {
+            const handle = findNodeHandle(ref);
+            if (handle) elements.push(handle);
+          }
+        });
+        
+        // Add resend button if present
+        if (resentemail && resendRef.current) {
+          const resendHandle = findNodeHandle(resendRef.current);
+          if (resendHandle) elements.push(resendHandle);
+        }
+        
+        // Add close button last
+        if (showCloseIcon && closeRef.current) {
+          const closeHandle = findNodeHandle(closeRef.current);
+          if (closeHandle) elements.push(closeHandle);
+        }
+
+        // Apply the order
+        if (elements.length > 0) {
+          const containerHandle = findNodeHandle(containerRef.current);
+          if (containerHandle) {
+            AccessibilityInfo.setAccessibilityFocus(containerHandle);
+            // This forces iOS to respect our ordering
+            containerRef.current.setNativeProps({
+              accessibilityElements: elements,
+            });
+          }
+        }
+      }
     }, 100);
 
     return () => clearTimeout(timeout);
-  }, [isVisible, title, config.labelPrefix]);
+  }, [isVisible, title, config.labelPrefix, blocks.length, resentemail, showCloseIcon]);
 
   const executeAction = useCallback(
     (actionConfig) => {
@@ -307,7 +362,7 @@ const NotificationAlert = ({
   );
 
   const renderBlock = useCallback(
-    (block) => {
+    (block, index) => {
       const { segments: blockSegments, key } = block;
       const actionSegments = blockSegments.filter((s) => s.type === "styled");
       const hasActions = actionSegments.length > 0;
@@ -317,6 +372,7 @@ const NotificationAlert = ({
         return (
           <View
             key={key}
+            ref={(el) => (blockRefs.current[index] = el)}
             accessible={true}
             accessibilityRole="text"
             accessibilityLabel={plainText}
@@ -336,8 +392,9 @@ const NotificationAlert = ({
         return (
           <Pressable
             key={key}
+            ref={(el) => (blockRefs.current[index] = el)}
             accessible={true}
-            accessibilityRole={"link"}
+            accessibilityRole="link"
             accessibilityLabel={buildAccessibilityLabel(
               blockSegments,
               config,
@@ -373,8 +430,8 @@ const NotificationAlert = ({
 
       const accessibilityActions = [
         { name: "activate", label: "Show all options" },
-        ...actionSegments.map((seg, index) => ({
-          name: `action_${index}`,
+        ...actionSegments.map((seg, idx) => ({
+          name: `action_${idx}`,
           label: getActionLabel(seg.action, seg.content),
         })),
       ];
@@ -387,15 +444,16 @@ const NotificationAlert = ({
           return;
         }
 
-        const index = parseInt(actionName.split("_")[1], 10);
-        if (!Number.isNaN(index) && actionSegments[index]) {
-          executeAction(actionSegments[index].action);
+        const actionIndex = parseInt(actionName.split("_")[1], 10);
+        if (!Number.isNaN(actionIndex) && actionSegments[actionIndex]) {
+          executeAction(actionSegments[actionIndex].action);
         }
       };
 
       return (
         <Pressable
           key={key}
+          ref={(el) => (blockRefs.current[index] = el)}
           accessible={true}
           accessibilityRole="button"
           accessibilityLabel={buildAccessibilityLabel(
@@ -432,9 +490,10 @@ const NotificationAlert = ({
   if (!isVisible) return null;
 
   return (
-    <View style={styles.outer} accessibilityLiveRegion="polite">
+    <View style={styles.outer}>
       <View
         ref={containerRef}
+        accessible={false}
         style={[
           styles.container,
           {
@@ -445,14 +504,18 @@ const NotificationAlert = ({
       >
         <View
           style={[styles.iconWrapper, !title && styles.iconWithoutTitle]}
-          accessible={true}
-          accessibilityLabel={config.iconLabel}
-          accessibilityRole="image"
+          accessible={false}
+          importantForAccessibility="no-hide-descendants"
         >
           <IconComponent width={18} height={18} color={config.iconColor} />
         </View>
 
-        <View style={styles.content} accessible={false}>
+        <View 
+          ref={contentRef}
+          style={styles.content}
+          accessible={false}
+          importantForAccessibility="yes"
+        >
           {title && (
             <View ref={titleRef} accessible={true} accessibilityRole="header">
               <Text style={[styles.title, { color: config.titleColor }]}>
@@ -461,10 +524,11 @@ const NotificationAlert = ({
             </View>
           )}
 
-          {blocks.map(renderBlock)}
+          {blocks.map((block, index) => renderBlock(block, index))}
 
           {resentemail && (
             <Pressable
+              ref={resendRef}
               onPress={() => dispatch(resentEmailVerifiction(navigation))}
               accessible={true}
               accessibilityRole="button"
@@ -479,10 +543,11 @@ const NotificationAlert = ({
 
         {showCloseIcon && (
           <Pressable
+            ref={closeRef}
             onPress={onClose}
             style={styles.closeBtn}
             accessible={true}
-            accessibilityLabel="Close"
+            accessibilityLabel="Close notification"
             accessibilityRole="button"
             accessibilityHint="Double tap to dismiss"
           >

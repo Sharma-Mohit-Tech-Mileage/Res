@@ -67,7 +67,7 @@ const PhoneCard = ({ planName, legacyBrand, loading = false }) => {
             accessibilityLevel={2}
             accessibilityRole="header"
           >
-            VOICE SERVICE
+            PHONE SERVICE
           </Text>
         </View>
 
