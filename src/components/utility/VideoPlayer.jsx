@@ -97,6 +97,7 @@ const VideoPlayer = ({ videoId, bundleId = "com.sparklight.app" }) => {
             referrerpolicy="strict-origin-when-cross-origin"
             onload="showContent()"
             title="YouTube video player"
+            aria-hidden="true"
           ></iframe>
         </div>
       </body>
@@ -126,12 +127,12 @@ const VideoPlayer = ({ videoId, bundleId = "com.sparklight.app" }) => {
   `;
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} accessible={false} importantForAccessibility="no-hide-descendants">
       <WebView
         key={key}
         ref={webViewRef}
         style={styles.webView}
-        accessible={true}
+        accessible={false}
         accessibilityLabel="YouTube Video Player"
         source={{
           html: generateHtml(),

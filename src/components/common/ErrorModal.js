@@ -109,6 +109,9 @@ const ErrorModal = ({ visible, errorType, onAction, customMessage }) => {
                 key={index}
                 style={[styles.message, styles.phoneLink]}
                 onPress={() => Linking.openURL(`tel:${part}`)}
+                accessibilityRole="button"
+                accessibilityLabel={`Call ${part}`}
+                accessibilityHint="Double tap to call this number"
               >
                 {part}
               </Text>
