@@ -58,7 +58,6 @@ const SparkLightInput = ({
   editable = true,
   showTextIcon = false,
   inputStyle,
-  accessibilityLiveError,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -175,7 +174,7 @@ const SparkLightInput = ({
           //accessibilityLabel={getAccessibilityLabel()}
           accessibilityRole="text"
           accessibilityHint={
-            getKeyboardType() === "phone-pad" ? "Required text field. double tap to edit." : secure ? "secure text field, double tab to edit."+accessibilityLiveError: accessibilityHint
+            getKeyboardType() === "phone-pad" ? "Required text field. double tap to edit." : secure ? "secure text field, double tab to edit.": accessibilityHint
           }
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}
@@ -188,10 +187,10 @@ const SparkLightInput = ({
 
       {error && (
         <View style={styles.errorContainer}>
-          <View style={styles.errorIcon}>
+          <View style={styles.errorIcon} accessible={true} accessibilityLabel="Warning Icon">
             <WarningIcon />
           </View>
-          <Text style={styles.errorText}>{error}</Text>
+          <Text style={styles.errorText} accessible={true} accessibilityLabel={error} accessibilityRole="text" accessibilityHint="Please enter valid password">{error}</Text>
         </View>
       )}
     </View>

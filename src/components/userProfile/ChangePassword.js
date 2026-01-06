@@ -51,9 +51,7 @@ const ChangePassword = () => {
   const profileDetailsfromStore = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
   const scrollViewRef = useRef(null);
-  const [accessibilityLabelInput, setAccessibilityLabelInput] = useState(
-    "New Password Required"
-  );
+  const [accessibilityLabelInput, setAccessibilityLabelInput] = useState(undefined);
 
   const handleSavePass = (formData) => {
     setLoading(true);
@@ -171,17 +169,14 @@ const ChangePassword = () => {
   }, []);
 
   useEffect(() => {
-    if (newPassword && newPassword.length > 2) {
+    if (newPassword && newPassword.length > 1) {
       const validations = validatePassword(newPassword, profileDetails.userName);
-      console.log("validations", validations);
       const firstInvalidIndex = validations.findIndex(isValid => !isValid);
-      console.log("firstInvalidIndex", firstInvalidIndex);
       if (firstInvalidIndex !== -1) {
-        setAccessibilityLabelInput(`.${passwordTerms[firstInvalidIndex]}`);
+        setAccessibilityLabelInput(`${passwordTerms[firstInvalidIndex]}`);
       } else {
         setAccessibilityLabelInput("");
       }
-      console.log("accessibilityLabelInput", newPassword, validations);
     } else {
       setAccessibilityLabelInput("");
     }
@@ -278,8 +273,7 @@ const ChangePassword = () => {
                           onChangeText={onChange}
                           value={value}
                           secure={true}
-                          error={error?.message}
-                          accessibilityLiveError={accessibilityLabelInput }
+                          error={accessibilityLabelInput ? accessibilityLabelInput : error?.message}
                         />
                         <View
                           accessibilityElementsHidden={isDropDownOpen}
