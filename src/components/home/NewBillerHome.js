@@ -93,7 +93,7 @@ const NewBillerHome = ({ navigation }) => {
   /* Function to check outage status */
   const checOutagStatus = () => {
     getUser().then((res) => {
-      const request = `api/outage/GetOutages/?accountNumber=${res.userInfo.accountNumber}`;
+      const request = `api/outage/GetOutages?accountNumber=${res.userInfo.accountNumber}`;
       PostApiRequest(
         request,
         {},

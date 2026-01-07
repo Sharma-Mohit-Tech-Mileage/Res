@@ -1,110 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
-	<key>CFBundleDisplayName</key>
-	<string>Sparklight</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>$(PRODUCT_NAME)</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(MARKETING_VERSION)</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleURLTypes</key>
-	<array>
+	<dict>
+		<key>CFBundleDevelopmentRegion</key>
+		<string>en</string>
+		<key>CFBundleDisplayName</key>
+		<string>Sparklight</string>
+		<key>CFBundleExecutable</key>
+		<string>$(EXECUTABLE_NAME)</string>
+		<key>CFBundleIdentifier</key>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+		<key>CFBundleInfoDictionaryVersion</key>
+		<string>6.0</string>
+		<key>CFBundleName</key>
+		<string>$(PRODUCT_NAME)</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+		<key>CFBundleShortVersionString</key>
+		<string>$(MARKETING_VERSION)</string>
+		<key>CFBundleSignature</key>
+		<string>????</string>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLName</key>
+				<string>auth0</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>$(PRODUCT_BUNDLE_IDENTIFIER).auth0</string>
+				</array>
+			</dict>
+		</array>
+		<key>CFBundleVersion</key>
+		<string>$(CURRENT_PROJECT_VERSION)</string>
+		<key>FirebaseAutomaticScreenReportingEnabled</key>
+		<false />
+		<key>LSApplicationCategoryType</key>
+		<false />
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>data</string>
+			<string>data:application/octet-stream</string>
+			<string>data:</string>
+			<string>application/octet-stream</string>
+		</array>
+		<key>LSRequiresIPhoneOS</key>
+		<true />
+		<key>NSAppTransportSecurity</key>
 		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLName</key>
-			<string>auth0</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>$(PRODUCT_BUNDLE_IDENTIFIER).auth0</string>
-			</array>
+			<key>NSExceptionDomains</key>
+			<dict>
+				<key>sparklight.com</key>
+				<dict>
+					<!-- Allow insecure HTTP loads for this domain -->
+					<key>NSExceptionAllowsInsecureHTTPLoads</key>
+					<true />
+					<!-- Allow connections to this domain with subdomains -->
+					<key>NSIncludesSubdomains</key>
+					<true />
+					<!-- Disable the requirement for HTTPS (you should only use this if you cannot
+					update the server to HTTPS) -->
+					<key>NSExceptionRequiresForwardSecrecy</key>
+					<false />
+				</dict>
+			</dict>
 		</dict>
-	</array>
-	<key>CFBundleVersion</key>
-	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>FirebaseAutomaticScreenReportingEnabled</key>
-	<false/>
-	<key>LSApplicationCategoryType</key>
-	<false/>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>data</string>
-		<string>data:application/octet-stream</string>
-		<string>data:</string>
-		<string>application/octet-stream</string>
-	</array>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>NSAppTransportSecurity</key>
-<dict>
-    <key>NSExceptionDomains</key>
-    <dict>
-        <key>sparklight.com</key>
-        <dict>
-            <!-- Allow insecure HTTP loads for this domain -->
-            <key>NSExceptionAllowsInsecureHTTPLoads</key>
-            <true/>
-            <!-- Allow connections to this domain with subdomains -->
-            <key>NSIncludesSubdomains</key>
-            <true/>
-            <!-- Disable the requirement for HTTPS (you should only use this if you cannot update the server to HTTPS) -->
-            <key>NSExceptionRequiresForwardSecrecy</key>
-            <false/>
-        </dict>
-    </dict>
-</dict>
 
-	<key>NSFaceIDUsageDescription</key>
-	<string>$(PRODUCT_NAME) Authentication with TouchId or FaceID</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
-	<key>UIAppFonts</key>
-	<array>
-		<string>InterSemi-Bold.ttf</string>
-		<string>Inter-Bold.ttf</string>
-		<string>OpenSans-Bold.ttf</string>
-		<string>OpenSans-Regular.ttf</string>
-		<string>OpenSans-SemiBold.ttf</string>
-	</array>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>fetch</string>
-		<string>remote-notification</string>
-	</array>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen.storyboard</string>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>arm64</string>
-	</array>
-	<key>UIStatusBarStyle</key>
-	<string></string>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-		<string>UIInterfaceOrientationPortrait</string>
-	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
-  <key>NSCameraUsageDescription</key>
-  <string>This app needs access to your camera to take photos for chat support.If you don’t allow access now, you can enable it later in Settings.</string>
-</dict>
+		<key>NSFaceIDUsageDescription</key>
+		<string>$(PRODUCT_NAME) Authentication with TouchId or FaceID</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string></string>
+		<key>UIAppFonts</key>
+		<array>
+			<string>InterSemi-Bold.ttf</string>
+			<string>Inter-Bold.ttf</string>
+			<string>OpenSans-Bold.ttf</string>
+			<string>OpenSans-Regular.ttf</string>
+			<string>OpenSans-SemiBold.ttf</string>
+			<string>MaterialCommunityIcons.ttf</string>
+		</array>
+		<key>UIDeviceFamily</key>
+		<array>
+			<integer>1</integer> <!-- iPhone -->
+			<integer>2</integer> <!-- iPad -->
+		</array>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>fetch</string>
+			<string>remote-notification</string>
+		</array>
+		<key>UILaunchStoryboardName</key>
+		<string>LaunchScreen</string>
+		<key>UIRequiredDeviceCapabilities</key>
+		<array>
+			<string>arm64</string>
+		</array>
+		<key>UIStatusBarStyle</key>
+		<string></string>
+		<key>UISupportedInterfaceOrientations</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+		</array>
+		<key>UISupportedInterfaceOrientations~ipad</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationPortraitUpsideDown</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>UIViewControllerBasedStatusBarAppearance</key>
+		<false />
+		<key>NSCameraUsageDescription</key>
+		<string>This app needs access to your camera to take photos for chat support.If you don’t
+			allow access now, you can enable it later in Settings.</string>
+	</dict>
 </plist>
