@@ -132,6 +132,7 @@ const Support = ({ route }) => {
     {
       key: "searchIssues",
       text: "Search",
+      accessibilityLabel: "Search Knowledgebase",
       icon: Searchmd,
       iconAlignment: "left", // Icon to the left of the text
       navigateTo: "searchArticals",
@@ -139,6 +140,7 @@ const Support = ({ route }) => {
     {
       key: "Faqs",
       text: "FAQs",
+      accessibilityLabel: "Frequently Asked Questions",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the left of the text
       navigateTo: "ArticalWindowUtility",
@@ -147,6 +149,7 @@ const Support = ({ route }) => {
     {
       key: "moreOptions",
       text: "Billing & Payments",
+      accessibilityLabel: "Billing and Payments",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
@@ -155,6 +158,7 @@ const Support = ({ route }) => {
     {
       key: "moreOptions",
       text: "Internet Service",
+      accessibilityLabel: "Internet Service",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
@@ -163,6 +167,7 @@ const Support = ({ route }) => {
     {
       key: "moreOptions",
       text: "WiFi",
+      accessibilityLabel: "WiFi Support",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
@@ -171,6 +176,7 @@ const Support = ({ route }) => {
     {
       key: "moreOptions",
       text: "More...",
+      accessibilityLabel: "More Support Options",
       icon: RighIcon,
       iconAlignment: "right", // Icon to the right of the text
       navigateTo: "ArticalWindowUtility",
@@ -216,9 +222,8 @@ const Support = ({ route }) => {
               <SupportIcon white={"#fff"} />
             </View>
             <View
-              style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}
-            >
-              <Text style={styles.wereHereTo}>We’re Here to Help</Text>
+              style={[styles.wereHereToHelpWrapper, styles.containerFlexBox]}>
+              <Text style={styles.wereHereTo} accessible={true} accessibilityRole="header" accessibilityLevel={1} accessibilityLabel="We're Here to Help" >We’re Here to Help</Text>
             </View>
           </View>
           <ScrollView
@@ -242,9 +247,8 @@ const Support = ({ route }) => {
                   styles.headingContainerSpaceBlock,
                 ]}
               >
-                <Text style={[styles.heading, styles.headingTypo]}>
-                  Knowledv geyg[[m[;lmn0-=-ojn nji
-                  gebase
+                <Text style={[styles.heading, styles.headingTypo]} accessible={true}accessibilityRole="header" accessibilityLevel={2}>
+                Knowledgebase
                 </Text>
               </View>
               <View style={styles.frameChild} />
@@ -330,6 +334,9 @@ const Support = ({ route }) => {
                       styles.headingTypo,
                       { paddingHorizontal: Padding.p_base },
                     ]}
+                    accessible={true}
+                    accessibilityRole="header"
+                    accessibilityLevel={2}
                   >
                     Contact Us
                   </Text>
