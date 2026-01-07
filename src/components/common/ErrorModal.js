@@ -83,18 +83,18 @@ const ERROR_MESSAGES = {
     actions: [{ label: "Close", action: "CANCEL", primary: true }],
   },
   [ErrorType.BUSINESS_ACCOUNT]: {
-    title: "App Mismatch Detected",
-    message:
-      "Only customers with a Sparklight Business services can use the MySparklight Business mobile app for account management. Please download the MySparklight mobile app to manage your Sparklight home internet account.",
-    actions: [
-      {
-        label: "Download Business App",
-        action: "DOWNLOAD_BUSINESS_APP",
-        primary: true,
-      },
-      { label: "Cancel", action: "CANCEL", primary: false },
-    ],
-  },
+  title: "App Mismatch Detected",
+  message:
+    "Only customers with Sparklight home internet services can use the MySparklight mobile app for account management. Please download the MySparklight Business mobile app to manage your Sparklight Business account.",
+  actions: [
+    {
+      label: "Download Business App",
+      action: "DOWNLOAD_BUSINESS_APP",
+      primary: true,
+    },
+    { label: "Cancel", action: "CANCEL", primary: false },
+  ],
+},
   [ErrorType.UNKNOWN_ERROR]: {
     title: "Something Went Wrong",
     message:
