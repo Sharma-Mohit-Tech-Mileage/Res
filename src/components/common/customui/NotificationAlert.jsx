@@ -519,7 +519,7 @@ const NotificationAlert = ({
           {title && (
             <View ref={titleRef} accessible={true} accessibilityRole="header">
               <Text
-              style={[styles.title, { color: currentTypeStyle.titleColor }]}
+              style={[styles.title, { color: config.titleColor }]}
               accessible={true}
               accessibilityRole="header" accessibilityLevel={2}
             >
