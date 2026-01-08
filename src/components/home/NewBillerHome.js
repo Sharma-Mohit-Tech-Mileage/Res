@@ -376,7 +376,7 @@ const NewBillerHome = ({ navigation }) => {
         <Logo width={120} height={33.32} />
       </View>
 
-      <TouchableOpacity
+      {false && <TouchableOpacity
         onPress={() => {
           if (Platform.OS === "ios") {
             startChat();
@@ -386,7 +386,7 @@ const NewBillerHome = ({ navigation }) => {
         }}
       >
         <ChatIcon />
-      </TouchableOpacity>
+      </TouchableOpacity>}
     </View>
   );
 

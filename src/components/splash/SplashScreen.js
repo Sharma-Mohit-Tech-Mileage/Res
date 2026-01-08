@@ -296,7 +296,7 @@ const SplashScreen = ({ navigation, route }) => {
           visible: true,
           type: ErrorType.API_ERROR_204,
           message:
-            "Unable to retrieve account information. Please contact support at 1-877-692-2253.",
+            null,
         });
         return;
       }
@@ -376,8 +376,7 @@ const SplashScreen = ({ navigation, route }) => {
         setErrorState({
           visible: true,
           type: ErrorType.ADMIN_PERMISSION,
-          message:
-            "Your account does not have the necessary permissions to use this app.",
+          message: null,
         });
       } else {
         moveAfterLogin(user);
@@ -609,40 +608,48 @@ const SplashScreen = ({ navigation, route }) => {
       });
   };
 
-  const handleErrorAction = (action) => {
-    setErrorState({ visible: false, type: null, message: null });
+ const handleErrorAction = (action) => {
+  setErrorState({ visible: false, type: null, message: null });
 
-    switch (action) {
-      case "RETRY":
-        if (
-          !authLockRef.current &&
-          !authInProgress &&
-          loadingState === LoadingState.NONE
-        ) {
-          loginAuth();
-        }
-        break;
-      case "OPEN_SETTINGS":
-        Linking.openSettings();
-        break;
-      case "CONTACT_SUPPORT":
-        Linking.openURL("tel:1-877-692-2253");
-        break;
-      case "DOWNLOAD_BUSINESS_APP":
-        logoutAction(() => {
-          const businessAppUrl =
-            Platform.OS === "android"
-              ? "https://play.google.com/store/apps/details?id=com.sparklight.customer.business.app&pcampaignid=web_share"
-              : "https://apps.apple.com/us/app/mysparklight-business/id6478375256";
-          Linking.openURL(businessAppUrl);
-        });
-        break;
-      case "CANCEL":
-        break;
-      default:
-        break;
-    }
-  };
+  switch (action) {
+    case "RETRY":
+      if (
+        !authLockRef.current &&
+        !authInProgress &&
+        loadingState === LoadingState.NONE
+      ) {
+        loginAuth();
+      }
+      break;
+    case "OPEN_SETTINGS":
+      Linking.openSettings();
+      break;
+    case "CONTACT_SUPPORT":
+      Linking.openURL("tel:1-877-692-2253");
+      break;
+    case "DOWNLOAD_BUSINESS_APP":
+      logoutAction(() => {
+        const businessAppUrl =
+          Platform.OS === "android"
+            ? "https://play.google.com/store/apps/details?id=com.sparklight.customer.business.app&pcampaignid=web_share"
+            : "https://apps.apple.com/us/app/mysparklight-business/id6478375256";
+        Linking.openURL(businessAppUrl);
+      });
+      break;
+    case "CANCEL":
+      // Clear authentication session when user cancels
+      logoutAction(() => {
+        // Reset auth states after logout
+        setAuthInProgress(false);
+        authLockRef.current = false;
+        setLoadingState(LoadingState.NONE);
+        setLoginEnable(true);
+      });
+      break;
+    default:
+      break;
+  }
+};
 
   const NetworkStatusBar = () => {
     const connectedFade = useRef(new Animated.Value(1)).current;

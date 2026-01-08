@@ -1,34 +1,34 @@
-import React from 'react';
-import { Modal, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { Color, FontFamily } from '../../../GlobalStyles';
-import colors from '../../res/Colors';
-import LottieView from 'lottie-react-native';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { FontFamily } from "../../../GlobalStyles";
+import colors from "../../res/Colors";
+import LottieView from "lottie-react-native";
 
 export const LoadingState = {
-  CHECKING_SESSION: 'CHECKING_SESSION',
-  OPENING_BROWSER: 'OPENING_BROWSER',
-  AUTHENTICATING: 'AUTHENTICATING',
-  LOADING_DATA: 'LOADING_DATA',
-  NONE: 'NONE',
+  CHECKING_SESSION: "CHECKING_SESSION",
+  OPENING_BROWSER: "OPENING_BROWSER",
+  AUTHENTICATING: "AUTHENTICATING",
+  LOADING_DATA: "LOADING_DATA",
+  NONE: "NONE",
 };
 
 const LOADING_MESSAGES = {
-  [LoadingState.CHECKING_SESSION]: 'Checking your session...',
-  [LoadingState.OPENING_BROWSER]: 'Opening secure login...',
-  [LoadingState.AUTHENTICATING]: 'Signing you in...',
-  [LoadingState.LOADING_DATA]: 'Loading your account...',
-  [LoadingState.NONE]: '',
+  [LoadingState.CHECKING_SESSION]: "Checking your session...",
+  [LoadingState.OPENING_BROWSER]: "Opening secure login...",
+  [LoadingState.AUTHENTICATING]: "Signing you in...",
+  [LoadingState.LOADING_DATA]: "Loading your account...",
+  [LoadingState.NONE]: "",
 };
 
 const LoadingStateIndicator = ({ state, isWhite = false }) => {
   if (state === LoadingState.NONE) {
     return null;
   }
-  
+
   const animationSource = isWhite
-    ? require('../../../assets/animations/loader-white.json')
-    : require('../../../assets/animations/loader-colored.json');
-  
+    ? require("../../../assets/animations/loader-white.json")
+    : require("../../../assets/animations/loader-colored.json");
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -49,13 +49,13 @@ const LoadingStateIndicator = ({ state, isWhite = false }) => {
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "transparent",
+    justifyContent: "center",
+    alignItems: "center",
     zIndex: 999,
   },
   content: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingHorizontal: 40,
   },
   lottie: {
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.openSansRegular,
     color: colors.snow_white,
     marginTop: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
   whiteText: {
     color: colors.snow_white,
