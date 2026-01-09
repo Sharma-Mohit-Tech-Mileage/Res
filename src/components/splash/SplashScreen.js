@@ -124,14 +124,6 @@ const SplashScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     startAnimations();
-
-    setErrorState({
-          visible: true,
-          type: ErrorType.API_ERROR_204,
-          message:
-            "Unable to retrieve account information. Please contact support at 1-877-692-2253.",
-        });
-
     if (!isLogout) {
       setTimeout(() => {
         refreshTokenIfAvailable();
