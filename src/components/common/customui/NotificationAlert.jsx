@@ -17,6 +17,7 @@ import { resentEmailVerifiction } from "../../../redux/actions/ProfileActionSuit
 import InfoIcon from "../../../../assets/svgs/InfoIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
+import { A11y } from "react-native-a11y-order";
 
 const TYPE_CONFIG = {
   info: {
@@ -491,6 +492,7 @@ const NotificationAlert = ({
 
   return (
     <View style={styles.outer}>
+      <A11y.Order>
       <View
         ref={containerRef}
         accessible={false}
@@ -510,13 +512,16 @@ const NotificationAlert = ({
           <IconComponent width={18} height={18} color={config.iconColor} />
         </View>
 
+       
         <View 
           ref={contentRef}
           style={styles.content}
           accessible={false}
           importantForAccessibility="yes"
         >
+
           {title && (
+            <A11y.Index index={1}>
             <View ref={titleRef} accessible={true} accessibilityRole="header">
               <Text
               style={[styles.title, { color: config.titleColor }]}
@@ -526,11 +531,14 @@ const NotificationAlert = ({
                 {title}
               </Text>
             </View>
+            </A11y.Index>
           )}
-
+          <A11y.Index index={2}> 
           {blocks.map((block, index) => renderBlock(block, index))}
+          </A11y.Index>
 
           {resentemail && (
+            <A11y.Index index={3}>
             <Pressable
               ref={resendRef}
               onPress={() => dispatch(resentEmailVerifiction(navigation))}
@@ -542,14 +550,16 @@ const NotificationAlert = ({
             >
               <Text style={styles.resendText}>Resend Confirmation Email</Text>
             </Pressable>
+            </A11y.Index>
           )}
         </View>
 
         {showCloseIcon && (
+          <A11y.Index index={8} style={styles.closeBtn}>
           <Pressable
             ref={closeRef}
             onPress={onClose}
-            style={styles.closeBtn}
+            
             accessible={true}
             accessibilityLabel="Close notification"
             accessibilityRole="button"
@@ -561,8 +571,10 @@ const NotificationAlert = ({
               ✕
             </Text>
           </Pressable>
+          </A11y.Index>
         )}
       </View>
+      </A11y.Order>
     </View>
   );
 };
