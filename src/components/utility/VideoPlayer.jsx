@@ -127,12 +127,12 @@ const VideoPlayer = ({ videoId, bundleId = "com.sparklight.app" }) => {
   `;
 
   return (
-    <View style={styles.container} accessible={false} importantForAccessibility="no-hide-descendants">
+    <View style={styles.container}>
       <WebView
         key={key}
         ref={webViewRef}
         style={styles.webView}
-        accessible={false}
+        accessible={true}
         accessibilityLabel="YouTube Video Player"
         source={{
           html: generateHtml(),
