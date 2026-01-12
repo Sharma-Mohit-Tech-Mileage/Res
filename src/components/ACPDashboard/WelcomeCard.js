@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { FontFamily, FontSize, Color, Padding, Border } from '../../../GlobalStyles';
 import VideoPlayer from '../utility/VideoPlayer';
+import YoutubePlayer from 'react-native-youtube-iframe';
 
 
 const WelcomeCard = () => {
@@ -15,6 +16,7 @@ const WelcomeCard = () => {
       
       <View style={styles.videoContainer} >
         <VideoPlayer videoId={videoId} />
+        
       </View>
     </View>
   );
