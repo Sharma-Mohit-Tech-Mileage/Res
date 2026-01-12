@@ -27,7 +27,7 @@ const TYPE_CONFIG = {
     titleColor: "#000000",
     closeButtonColor: "#0060AE",
     IconComponent: InfoIcon,
-    iconLabel: "Information",
+    iconLabel: "Information icon",
     labelPrefix: "Information: ",
   },
   error: {
@@ -38,7 +38,7 @@ const TYPE_CONFIG = {
     titleColor: "#000000",
     closeButtonColor: "#B92A1C",
     IconComponent: InfoIcon,
-    iconLabel: "Error",
+    iconLabel: "Error icon",
     labelPrefix: "Error: ",
   },
   success: {
@@ -49,7 +49,7 @@ const TYPE_CONFIG = {
     titleColor: "#000000",
     closeButtonColor: "#1D7832",
     IconComponent: SuccessIcon,
-    iconLabel: "Success",
+    iconLabel: "Success icon",
     labelPrefix: "Success: ",
   },
   warning: {
@@ -60,7 +60,7 @@ const TYPE_CONFIG = {
     titleColor: "#000000",
     closeButtonColor: "#DD6D02",
     IconComponent: WarningIcon,
-    iconLabel: "Warning",
+    iconLabel: "Warning icon",
     labelPrefix: "Warning: ",
   },
 };
@@ -70,17 +70,17 @@ const formatPhoneForScreenReader = (phoneNumber) => {
   const digits = phoneNumber.replace(/\D/g, "");
 
   if (digits.length === 10) {
-    const p1 = digits.slice(0, 3).split("").join(" ");
-    const p2 = digits.slice(3, 6).split("").join(" ");
-    const p3 = digits.slice(6).split("").join(" ");
-    return `${p1}. ${p2}. ${p3}`;
+    const part1 = digits.slice(0, 3).split("").join(" ");
+    const part2 = digits.slice(3, 6).split("").join(" ");
+    const part3 = digits.slice(6).split("").join(" ");
+    return `${part1}. ${part2}. ${part3}`;
   }
 
   if (digits.length === 11 && digits[0] === "1") {
-    const p1 = digits.slice(1, 4).split("").join(" ");
-    const p2 = digits.slice(4, 7).split("").join(" ");
-    const p3 = digits.slice(7).split("").join(" ");
-    return `${p1}. ${p2}. ${p3}`;
+    const part1 = digits.slice(1, 4).split("").join(" ");
+    const part2 = digits.slice(4, 7).split("").join(" ");
+    const part3 = digits.slice(7).split("").join(" ");
+    return `${part1}. ${part2}. ${part3}`;
   }
 
   return digits.split("").join(" ");
@@ -113,7 +113,6 @@ const parseMessage = (message, splitKeys) => {
       });
     } else {
       let remaining = line || "";
-
       splitKeys.forEach((item) => {
         const index = remaining.indexOf(item.text);
         if (index === -1) return;
@@ -192,12 +191,16 @@ const getActionLabel = (action, content) => {
 };
 
 const buildPlainText = (segments) =>
-  segments.map((s) => (s.type === "linebreak" ? " " : s.content || "")).join("");
+  segments
+    .map((s) => (s.type === "linebreak" ? " " : s.content || ""))
+    .join("");
 
 const buildAccessibilityLabel = (segments, config, hasActions) => {
   const plainText = buildPlainText(segments);
 
-  if (!hasActions) return plainText;
+  if (!hasActions) {
+    return plainText;
+  }
 
   const actionSegments = segments.filter((s) => s.type === "styled");
   const actionDescriptions = actionSegments
@@ -224,13 +227,13 @@ const NotificationAlert = ({
   isVisible = true,
   resentemail = false,
   splitKey = "",
+  autoFocusTitle = false,
 }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-
   const containerRef = useRef(null);
-  const iconRef = useRef(null);
   const titleRef = useRef(null);
+  const contentRef = useRef(null);
   const closeRef = useRef(null);
   const resendRef = useRef(null);
   const blockRefs = useRef([]);
@@ -249,63 +252,57 @@ const NotificationAlert = ({
     blockRefs.current = blockRefs.current.slice(0, blocks.length);
   }, [blocks.length]);
 
-  const applyIOSOrder = useCallback(() => {
-    if (Platform.OS !== "ios" || !containerRef.current) return;
-
-    setTimeout(() => {
-      const ordered = [];
-
-      const iconHandle = findNodeHandle(iconRef.current);
-      if (iconHandle) ordered.push(iconHandle);
-
-      const titleHandle = findNodeHandle(titleRef.current);
-      if (titleHandle) ordered.push(titleHandle);
-
-      blockRefs.current.forEach((ref) => {
-        const h = findNodeHandle(ref);
-        if (h) ordered.push(h);
-      });
-
-      if (resentemail && resendRef.current) {
-        const resendHandle = findNodeHandle(resendRef.current);
-        if (resendHandle) ordered.push(resendHandle);
-      }
-
-      if (showCloseIcon && closeRef.current) {
-        const closeHandle = findNodeHandle(closeRef.current);
-        if (closeHandle) ordered.push(closeHandle);
-      }
-
-      if (ordered.length > 0 && containerRef.current) {
-        containerRef.current.setNativeProps({ accessibilityElements: ordered });
-      }
-    }, 50);
-  }, [blocks.length, resentemail, showCloseIcon]);
-
   useEffect(() => {
-    if (!isVisible) return;
+    if (!isVisible || !autoFocusTitle) return;
 
     const timeout = setTimeout(() => {
       const titleNode = findNodeHandle(titleRef.current);
       if (titleNode) {
         AccessibilityInfo.setAccessibilityFocus(titleNode);
       }
+      if (Platform.OS === "ios" && containerRef.current) {
+        const elements = [];
 
-      AccessibilityInfo.announceForAccessibility(
-        `${config.labelPrefix}${title || "Notification"}`
-      );
+        if (titleRef.current) {
+          const titleHandle = findNodeHandle(titleRef.current);
+          if (titleHandle) elements.push(titleHandle);
+        }
 
-      applyIOSOrder();
-    }, 150);
+        blockRefs.current.forEach((ref) => {
+          if (ref) {
+            const handle = findNodeHandle(ref);
+            if (handle) elements.push(handle);
+          }
+        });
+
+        if (resentemail && resendRef.current) {
+          const resendHandle = findNodeHandle(resendRef.current);
+          if (resendHandle) elements.push(resendHandle);
+        }
+
+        if (showCloseIcon && closeRef.current) {
+          const closeHandle = findNodeHandle(closeRef.current);
+          if (closeHandle) elements.push(closeHandle);
+        }
+
+        if (elements.length > 0) {
+          containerRef.current.setNativeProps({
+            accessibilityElements: elements,
+          });
+        }
+      }
+    }, 100);
 
     return () => clearTimeout(timeout);
-  }, [isVisible, title, config.labelPrefix, applyIOSOrder]);
-
-  useEffect(() => {
-    if (isVisible && Platform.OS === "ios") {
-      applyIOSOrder();
-    }
-  }, [isVisible, blocks.length, resentemail, showCloseIcon, applyIOSOrder]);
+  }, [
+    isVisible,
+    autoFocusTitle,
+    title,
+    config.labelPrefix,
+    blocks.length,
+    resentemail,
+    showCloseIcon,
+  ]);
 
   const executeAction = useCallback(
     (actionConfig) => {
@@ -325,7 +322,8 @@ const NotificationAlert = ({
 
       if (actionConfig.action === "call" && actionConfig.value) {
         const phoneNumber = actionConfig.value.replace(/\D/g, "");
-        Linking.openURL(`tel:${phoneNumber}`).catch(() => {
+        Linking.openURL(`tel:${phoneNumber}`).catch((error) => {
+          console.error("Failed to open phone dialer:", error);
           Alert.alert("Error", "Unable to open phone dialer");
         });
         return;
@@ -487,23 +485,28 @@ const NotificationAlert = ({
         ]}
       >
         <View
-          ref={iconRef}
           style={[styles.iconWrapper, !title && styles.iconWithoutTitle]}
           accessible={true}
-          accessibilityLabel={`${config.iconLabel} icon`}
+          accessibilityLabel={`${config.iconLabel}`}
+         
         >
           <IconComponent width={18} height={18} color={config.iconColor} />
         </View>
 
-        <View style={styles.content} accessible={false}>
+        <View
+          ref={contentRef}
+          style={styles.content}
+          accessible={false}
+          importantForAccessibility="yes"
+        >
           {title && (
-            <View accessible={false}>
-              <Text
-                ref={titleRef}
-                accessible={true}
-                accessibilityRole="header"
-                style={[styles.title, { color: config.titleColor }]}
-              >
+            <View
+              ref={titleRef}
+              accessible={true}
+              accessibilityRole="header"
+              accessibilityLabel={`${title}`}
+            >
+              <Text style={[styles.title, { color: config.titleColor }]}>
                 {title}
               </Text>
             </View>
@@ -556,7 +559,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     marginVertical: 8,
-    alignItems: "flex-start",
   },
   iconWrapper: {
     width: 24,
