@@ -133,15 +133,15 @@ const AddNotificationScreen = () => {
       useNativeDriver: true,
     }).start(() => {
       // Only auto-dismiss if notification is NOT an error type
-      if (notification && notification.type !== "error") {
-        timeoutRef.current = setTimeout(() => {
-          Animated.timing(animatedValue, {
-            toValue: -100,
-            duration: 500,
-            useNativeDriver: true,
-          }).start(() => setNotification(null));
-        }, 3000);
-      }
+      // if (notification && notification.type !== "error") {
+      //   timeoutRef.current = setTimeout(() => {
+      //     Animated.timing(animatedValue, {
+      //       toValue: -100,
+      //       duration: 500,
+      //       useNativeDriver: true,
+      //     }).start(() => setNotification(null));
+      //   }, 3000);
+      // }
     });
   }, [animatedValue, notification]);
 
@@ -256,7 +256,7 @@ const AddNotificationScreen = () => {
                     type={notification.type}
                     title={notification.type === "error" ? "Error" : "Success"}
                     message={notification.message}
-                    showCloseIcon={false}
+                    showCloseIcon={true}
                     onClose={() => setNotification(null)}
                     accessibilityLiveRegion="assertive"
                     accessibilityRole="alert"

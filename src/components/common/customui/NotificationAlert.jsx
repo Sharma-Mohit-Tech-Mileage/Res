@@ -492,7 +492,11 @@ const NotificationAlert = ({
 
   return (
     <View style={styles.outer}>
-      <A11y.Order>
+      <A11y.Order style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+        }}>
       <View
         ref={containerRef}
         accessible={false}
@@ -504,14 +508,16 @@ const NotificationAlert = ({
           },
         ]}
       >
+        <A11y.Index index={0}>
         <View
           style={[styles.iconWrapper, !title && styles.iconWithoutTitle]}
-          accessible={false}
-          importantForAccessibility="no-hide-descendants"
+          accessible={true}
+          accessibilityRole="image"
+          accessibilityLabel={config.iconLabel}
         >
-          <IconComponent width={18} height={18} color={config.iconColor} />
+          <IconComponent width={24} height={24} color={config.iconColor} />
         </View>
-
+    </A11y.Index>
        
         <View 
           ref={contentRef}
@@ -534,7 +540,9 @@ const NotificationAlert = ({
             </A11y.Index>
           )}
           <A11y.Index index={2}> 
+           <View > 
           {blocks.map((block, index) => renderBlock(block, index))}
+          </View>
           </A11y.Index>
 
           {resentemail && (
@@ -554,8 +562,10 @@ const NotificationAlert = ({
           )}
         </View>
 
-        {showCloseIcon && (
-          <A11y.Index index={8} style={styles.closeBtn}>
+        
+      </View>
+      {showCloseIcon && (
+          <A11y.Index index={5} style={styles.closeBtn}>
           <Pressable
             ref={closeRef}
             onPress={onClose}
@@ -573,7 +583,6 @@ const NotificationAlert = ({
           </Pressable>
           </A11y.Index>
         )}
-      </View>
       </A11y.Order>
     </View>
   );
@@ -628,12 +637,13 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   closeBtn: {
-    marginLeft: 12,
-    alignSelf: "center",
+    alignContent: "center",
+    justifyContent: "center",
+    position: "absolute",
+    top: 12,
+    right: 8,
     width: 24,
     height: 24,
-    justifyContent: "center",
-    alignItems: "center",
   },
   closeBtnText: {
     fontSize: 16,
