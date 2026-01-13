@@ -1,10 +1,5 @@
-import React, { useState, useCallback ,useMemo} from "react";
-import {
-  View,
-  ScrollView,
-  RefreshControl,
-  StyleSheet
-} from "react-native";
+import React, { useState, useCallback, useMemo } from "react";
+import { View, ScrollView, RefreshControl, StyleSheet } from "react-native";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -24,14 +19,24 @@ import { extractZipCode } from "../utility/constant";
 const MyServicesContent = ({ route }) => {
   const insets = useSafeAreaInsets();
   const accountDetails = useSelector((state) => state.profile?.accountDetails);
-  console.log("Account Details from Redux:", accountDetails);
-  const accountNumber = route?.params?.accountNumber || "123456789";
+
+  const flagsReady = accountDetails?.services != null;
+
+  const showInternet =
+    loading || (!flagsReady ? true : accountDetails?.services?.hsd === true);
+  const showVideo =
+    loading || (!flagsReady ? true : accountDetails?.services?.video === true);
+  const showPhone =
+    loading || (!flagsReady ? true : accountDetails?.services?.phone === true);
+
+  const legacySPA = accountDetails?.legacy_brand_by_spa;
+  const accountNumber =  "123456789";
   const { data, loading, error, refetch } = useServiceDetails(accountNumber);
   const { outageData, checking, checkStatus, clearOutageData } =
     useOutageStatus();
   const [refreshing, setRefreshing] = useState(false);
-  
-const zipCodeFromAccount = useMemo(() => {
+
+  const zipCodeFromAccount = useMemo(() => {
     return extractZipCode(accountDetails?.service_address);
   }, [accountDetails]);
 
@@ -53,7 +58,6 @@ const zipCodeFromAccount = useMemo(() => {
 
   return (
     <View style={styles.safeArea}>
-
       <LinearGradient
         style={[styles.gradientHeader, { height: 88 + insets.top }]}
         locations={[0, 1]}
@@ -80,28 +84,31 @@ const zipCodeFromAccount = useMemo(() => {
         }
       >
         <View style={styles.servicesContainer}>
-          {/* Internet Service */}
-        
+          {showInternet && (
             <InternetCard
               planName={data?.internet.planName}
               downloadSpeed={data?.internet.downloadSpeed}
               uploadSpeed={data?.internet.uploadSpeed}
               loading={loading}
             />
+          )}
 
-          {/* Video Service */}
+          {showVideo && (
             <VideoCard
               planName={data?.video.planName}
               zipCode={zipCodeFromAccount}
+              legacySpa={legacySPA}
               loading={loading}
             />
+          )}
 
-          {/* Phone Service */}
+          {showPhone && (
             <PhoneCard
               planName={data?.phone.planName}
               legacyBrand={data?.phone.legacyBrand}
               loading={loading}
             />
+          )}
         </View>
 
         {/* Service Status Section */}
