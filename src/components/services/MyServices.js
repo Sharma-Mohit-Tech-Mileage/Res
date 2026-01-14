@@ -30,7 +30,6 @@ const MyServicesContent = ({ route }) => {
     loading || (!flagsReady ? true : accountDetails?.services?.phone === true);
 
   const legacySPA = accountDetails?.legacy_brand_by_spa;
-  const accountNumber =  "123456789";
   const { data, loading, error, refetch } = useServiceDetails(accountNumber);
   const { outageData, checking, checkStatus, clearOutageData } =
     useOutageStatus();
