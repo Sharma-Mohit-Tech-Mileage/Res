@@ -42,6 +42,7 @@ import moment from "moment";
 import analytics from "@react-native-firebase/analytics";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
+import { AvatarHeaderScrollView } from 'react-native-sticky-parallax-header';
 const config = { issuer: Env.SSO_LOGIN, iosPrefersEphemeralSession: true };
 
 import {
@@ -204,6 +205,32 @@ const AccountOverview = () => {
         )}`.trim()
       );
     }, [profileDetails])
+  );
+
+  const renderHeader = () => (
+    <View style={styles.account} accessibilityLabel="Account screen">
+      <ProfileSettingsHeader
+        title=""
+        iconAlignment="right"
+        showIcon={false}
+      />
+      <LinearGradient
+        style={styles.linearGradientStyle}
+        locations={[0, 1]}
+        colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+        useAngle={true}
+        angle={90}
+      />
+      <View style={[styles.frameParent]}>
+        <View style={styles.rightActionableParent}>
+          <View style={styles.rightActionable}>
+            <UserIconWhite width={28} height={26} />
+          </View>
+          {/* Full name for profile */}
+          <Text style={styles.melissaSmith} accessible={true} accessibilityLabel={`Profile for ${fullName}`} accessibilityRole="Header" accessibilityLevel={1} accessibilityHint="Header" >{fullName}</Text>
+        </View>
+      </View>
+    </View>
   );
 
   return (

@@ -7726,6 +7726,11 @@ react-native-skeleton-placeholder@^5.2.4:
   resolved "https://registry.npmjs.org/react-native-skeleton-placeholder/-/react-native-skeleton-placeholder-5.2.4.tgz"
   integrity sha512-OZntVq1hU1UX33FltxK2ezT2v9vHIhV8YnEbnMWUCvxT0N9OsgD1qxiHm6qb9YRJVgq2o5z3S7dNPsPnDF/jNg==
 
+react-native-sticky-parallax-header@^1.0.0-rc.9:
+  version "1.0.0-rc.9"
+  resolved "https://registry.yarnpkg.com/react-native-sticky-parallax-header/-/react-native-sticky-parallax-header-1.0.0-rc.9.tgz#86005f2c3ec4e71b6549c2ef0812d9f9b42bd3f6"
+  integrity sha512-dT58HeJxnxUumplgOciegPRSFuFl8c2/pgNR+GEY179CcKnwsyJFmT2T9FcN4Klv11EHzKY21RGHJkLw27Tlyw==
+
 react-native-svg@15.11.2:
   version "15.11.2"
   resolved "https://registry.npmjs.org/react-native-svg/-/react-native-svg-15.11.2.tgz"

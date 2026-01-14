@@ -57,6 +57,7 @@
     "react-native-share": "^10.2.1",
     "react-native-share-pdf": "^0.0.7",
     "react-native-skeleton-placeholder": "^5.2.4",
+    "react-native-sticky-parallax-header": "^1.0.0-rc.9",
     "react-native-svg": "15.11.2",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-vector-icons": "^10.3.0",
