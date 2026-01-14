@@ -1,4 +1,3 @@
-
 #import "RNZendeskChatModule.h"
 #import <ZendeskSDKMessaging/ZendeskSDKMessaging.h>
 #import <ZendeskSDKLogger/ZendeskSDKLogger.h>
@@ -70,6 +69,7 @@ RCT_EXPORT_METHOD(startChat:(RCTPromiseResolveBlock)resolve
       if (viewController != NULL) {
         //UIViewController *rootViewController = [self getRootViewController];
         UINavigationController *chatController = [[UINavigationController alloc] initWithRootViewController: viewController];
+        chatController.modalPresentationStyle = UIModalPresentationFullScreen;
         [rootViewController presentViewController:chatController animated:YES completion:nil];
         resolve(@(YES)); // Resolve the promise with a success value
       }
