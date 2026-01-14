@@ -744,19 +744,19 @@ const isPaperlessEnabled = async (email, signal) => {
     }&email=${encodeURIComponent(email)}`,
     {
       headers: { Authorization: `Bearer ${user.token}` },
-      signal, // <-- allows cancellation from saga
+      signal, 
     }
   );
   return response.data;
 };
 
 const fetchACPUserAccountDetails = async (signal) => {
-  console.log("[DEBUG] fetchACPUserAccountDetails called, signal:", !!signal); // <--- debug entry log
+  console.log("[DEBUG] fetchACPUserAccountDetails called, signal:", !!signal); 
 
   let user = await getUser();
   const accountNumber = user.userInfo?.accountNumber || null;
 
-  console.log("[DEBUG] accountNumber:", accountNumber); // verify user/account present
+  console.log("[DEBUG] accountNumber:", accountNumber); 
 
   const config = {
     headers: {
@@ -779,6 +779,7 @@ const fetchACPUserAccountDetails = async (signal) => {
       "account_status",
       "days_since_disconnect_date",
       "service_address",
+      "legacy_brand_by_spa",
     ],
   };
 

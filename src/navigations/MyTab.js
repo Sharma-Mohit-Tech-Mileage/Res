@@ -132,13 +132,11 @@ const createTabBarButton = useCallback(
       <Pressable
         {...props}
         accessible={isAccessible && !isWalkthroughActive}
-        // Fix for Android - use proper importantForAccessibility
         importantForAccessibility={
           !isAccessible || isWalkthroughActive 
             ? "no-hide-descendants" 
             : "yes"
         }
-        // iOS only - keep it
         accessibilityElementsHidden={!isAccessible || isWalkthroughActive}
         accessibilityLabel={`${tab.name} tab`}
         accessibilityRole="tab"
@@ -149,7 +147,6 @@ const createTabBarButton = useCallback(
           props.style,
           !isAccessible && styles.disabledTab,
         ]}
-        // Add pointerEvents for better Android handling
         pointerEvents={!isAccessible && isWalkthroughActive ? "none" : "auto"}
         onPress={(e) => {
           if (isWalkthroughActive || shouldPreventPress) {
@@ -176,7 +173,7 @@ const createTabBarButton = useCallback(
           return;
         }
 
-        if (["billing", "support"].includes(tab.id)) {
+        if (["billing", "support", "services"].includes(tab.id)) {
           e.preventDefault();
           navigation.reset({
             index: 0,

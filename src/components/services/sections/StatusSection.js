@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from "react";
-import { View, Text, StyleSheet, AccessibilityInfo, Platform, findNodeHandle } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { statusSection } from "../../../styles/compositions";
 import { theme } from "../../../styles/theme";
 import NotificationAlert from "../../common/customui/NotificationAlert";
@@ -31,20 +31,6 @@ const StatusSection = ({
   checking,
   onCloseNotification,
 }) => {
-  const notificationRef = useRef(null);
-  useEffect(() => {
-    if (outageData && notificationRef.current) {
-      const timeout = setTimeout(() => {
-        const reactTag = findNodeHandle(notificationRef.current);
-        if (reactTag) {
-          AccessibilityInfo.setAccessibilityFocus(reactTag);
-        }
-      }, 100);
-      
-      return () => clearTimeout(timeout);
-    }
-  }, [outageData]);
-
   const handleCheckStatus = () => {
     if (onCheckStatus) {
       onCheckStatus();
@@ -55,12 +41,7 @@ const StatusSection = ({
     <View style={styles.container}>
       <View style={styles.card}>
         {outageData && (
-          <View 
-            style={styles.alertInsideCard}
-            ref={notificationRef}
-            accessibilityViewIsModal={true}
-            accessibilityLiveRegion="polite"
-          >
+          <View style={styles.alertInsideCard}>
             <NotificationAlert
               type={outageData.hasOutage ? "warning" : "info"}
               title={outageData.title}
@@ -69,6 +50,7 @@ const StatusSection = ({
               onClose={onCloseNotification}
               showCloseIcon={true}
               isVisible={true}
+              autoFocusTitle={true}
             />
           </View>
         )}
@@ -76,11 +58,18 @@ const StatusSection = ({
         <View
           style={styles.iconWrapper}
           accessible={true}
-          accessibilityLabel={checking ? "Checking service status, loading animation" : "Support icon"}
+          accessibilityLabel={
+            checking
+              ? "Checking service status, loading animation"
+              : "Support icon"
+          }
         >
           <View style={styles.iconBadge}>
-            <WiFiLoadingAnimation isAnimating={checking} accessible={false}
-              importantForAccessibility="no"/>
+            <WiFiLoadingAnimation
+              isAnimating={checking}
+              accessible={false}
+              importantForAccessibility="no"
+            />
           </View>
         </View>
 
@@ -143,6 +132,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+
   centerIcon: {
     position: "absolute",
     zIndex: 10,

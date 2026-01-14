@@ -57,7 +57,6 @@ const BillingScreen = ({ navigation }) => {
     email: null,
   });
 
-  // Content loading state
   const [isContentLoading, setIsContentLoading] = useState(false);
   const [isAutoPayStatusLoad, setIsAutoPayStatusLoad] = useState(false);
 
