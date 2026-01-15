@@ -197,7 +197,6 @@ export const deleteSVEmailRequest = (email, navigation) => ({
     payload: { email },
     navigation
 });
-// actions/ProfileActionSuite.js
 
 export const updateSVEmailsRequest = (emailList, navigation) => ({
     type: UPDATE_SV_EMAILS_REQUEST,
@@ -205,7 +204,6 @@ export const updateSVEmailsRequest = (emailList, navigation) => ({
     navigation
 });
 
-// actions/ProfileActionSuite.js
 
 export const manageEmailRequest = (email, isPaperless, isMarketing,newEmail, navigation) => ({
     type: MANAGE_EMAIL_REQUEST,
@@ -240,7 +238,7 @@ export const clearLoading = () => ({
     
 });
 export const fetchACPUserAccountDetails = () => ({
-    type: FETCH_ACP_USER_ACCOUNT_DETAILS, // No payload needed
+    type: FETCH_ACP_USER_ACCOUNT_DETAILS,
   });
   
   export const saveACPUserAccountDetails = (data) => ({
