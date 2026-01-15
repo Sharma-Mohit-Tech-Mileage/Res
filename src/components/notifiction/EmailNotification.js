@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, View, ScrollView, Animated, Platform, TouchableOpacity, AccessibilityInfo, } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Animated, Platform, TouchableOpacity, AccessibilityInfo, findNodeHandle} from "react-native";
 import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -37,6 +37,7 @@ const AddNotificationScreen = () => {
   const user = useSelector((state) => state.user.userData);
   const [isCheckboxVisible, setIsCheckboxVisible] = useState(null);
   const scrollViewRef = useRef(null);
+  const inputRef = useRef(null);
   const animatedValue = useRef(new Animated.Value(-100)).current;
   const timeoutRef = useRef(null);
   const route = useRoute();
@@ -104,6 +105,7 @@ const AddNotificationScreen = () => {
           setIsSubmitting(false);
           setToggleCheckBoxTerm(false);
         }
+        setFocusEmail();
       } else if (route.params?.updateFailed) {
         setNotification({
           message: route.params.failureMessage,
@@ -112,10 +114,26 @@ const AddNotificationScreen = () => {
         setIsSubmitting(false);
         setToggleCheckBoxTerm(false);
       }
+      setFocusEmail();
     };
-
+  
     updateAccountDetails();
   }, [route.params, dispatch]);
+
+
+
+  //
+  const setFocusEmail = () => {
+      setTimeout(() => {
+        if (inputRef.current) {
+          const handle = findNodeHandle(inputRef.current);
+          if (handle) {
+            AccessibilityInfo.setAccessibilityFocus(handle);
+          }
+        }
+      }, 100);
+    };
+  
 
   const animateNotification = useCallback(() => {
     // Clear any existing timeout
@@ -321,6 +339,8 @@ const AddNotificationScreen = () => {
                     autoCapitalize="none"
                     textContentType="emailAddress"
                     style={styles.emailInput}
+                    ref={inputRef}
+                    
                   />
                 )}
               />
