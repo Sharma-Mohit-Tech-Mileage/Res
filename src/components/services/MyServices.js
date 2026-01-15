@@ -28,7 +28,7 @@ const MyServicesContent = ({ route }) => {
     loading || (!flagsReady ? true : accountDetails?.services?.video === true);
   const showPhone =
     loading || (!flagsReady ? true : accountDetails?.services?.phone === true);
-
+    const accountNumber = accountDetails.accountNumber||"1234567890"; 
   const legacySPA = accountDetails?.legacy_brand_by_spa;
   const { data, loading, error, refetch } = useServiceDetails(accountNumber);
   const { outageData, checking, checkStatus, clearOutageData } =
