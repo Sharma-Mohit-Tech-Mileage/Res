@@ -17,6 +17,7 @@ export const FontSize = {
     size_smi: 13,
     size_5xl: 24,
     size_6xl: 28,
+    size_20:20
 };
 
 /* Colors */

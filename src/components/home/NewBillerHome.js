@@ -93,7 +93,7 @@ const NewBillerHome = ({ navigation }) => {
   /* Function to check outage status */
   const checOutagStatus = () => {
     getUser().then((res) => {
-      const request = `api/outage/GetOutages/?accountNumber=${res.userInfo.accountNumber}`;
+      const request = `api/outage/GetOutages?accountNumber=${res.userInfo.accountNumber}`;
       PostApiRequest(
         request,
         {},
@@ -376,7 +376,7 @@ const NewBillerHome = ({ navigation }) => {
         <Logo width={120} height={33.32} />
       </View>
 
-      <TouchableOpacity
+      {true && <TouchableOpacity
         onPress={() => {
           if (Platform.OS === "ios") {
             startChat();
@@ -386,7 +386,7 @@ const NewBillerHome = ({ navigation }) => {
         }}
       >
         <ChatIcon />
-      </TouchableOpacity>
+      </TouchableOpacity>}
     </View>
   );
 
@@ -468,8 +468,8 @@ const NewBillerHome = ({ navigation }) => {
           }
           accessibilityElementsHidden={isWalkthroughActive}
         >
-          {/* {renderHeader()} */}
-           <View
+          {renderHeader()} 
+           {/* <View
             accessibilityLabel="SparkLight"
             style={styles.headerContainer}
             importantForAccessibility={
@@ -478,7 +478,7 @@ const NewBillerHome = ({ navigation }) => {
             accessibilityElementsHidden={isWalkthroughActive}
           >
             <Logo width={120} height={33.32} />
-          </View> 
+          </View>  */}
           <ScrollView style={styles.scrollContainer}>
             <View
               style={styles.mainContentContainer}

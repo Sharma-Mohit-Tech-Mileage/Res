@@ -65,13 +65,14 @@ const ComingSoonBadge = () => (
 
 const NotificationToggle = ({ type, status, isLast, warn, loading, title }) => (
   <View
+   accessible={true} accessibilityLabel={`${title} for ${type}  is ${loading ? 'loading' : status}`}
     style={[
       styles.toggleContainer,
       !isLast && styles.bottomBorder,
       warn && styles.warnBackground,
     ]}
   >
-    <Text style={styles.toggleText} accessible={true} accessibilityLabel={`${title} for ${type}`}>{type}</Text>
+    <Text style={styles.toggleText} >{type}</Text>
     <View style={styles.statusContainer}>
       {loading ? (
         <SkeletonPlaceholder>

@@ -19,13 +19,8 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
       style={[AppStyles.card]}
       onPress={handleCardPress}
       activeOpacity={0.8}
-      accessible={true}
-      accessibilityRole="header" accessibilityLevel={2} 
-      accessibilityLabel={
-        (paperlessStatus
-          ? "Paperless Billing is On. "
-          : "Paperless Billing is Off. ") + "Manage Paperless Billing"
-      }
+      accessible={false}
+      
     >
       <View
         style={{
@@ -36,11 +31,11 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
           alignItems: "center",
         }}
       >
-        <View style={styles.iconBg}>
+        <View style={styles.iconBg} accessible={true} accessibilityRole="Text" accessibilityLabel="Paperless Billing Icon">
           <PaperIconBg />
         </View>
         <View style={{ flexDirection: "column" }}>
-          <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" >Paperless Billing</Text>
+          <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Paperless Billing">Paperless Billing</Text>
           {isStatusLoading ? (
             <SkeletonPlaceholder>
               <View
@@ -66,6 +61,10 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
                 fontFamily: FontFamily.openSansRegular,
                 marginLeft: 10,
               }}
+              accessible={true}
+              accessibilityRole='link'
+              accessibilityHint="Double tap to navigate to Paperless Billing management page."
+              accessibilityLabel="Manage Paperless Billing"
             >
               Manage
             </Text>
@@ -88,9 +87,9 @@ const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
           ) : (
             <>
               {paperlessStatus ? (
-                <Text style={styles.autoPayStatusText}>ON</Text>
+                <Text style={styles.autoPayStatusText} accessible={true} accessibilityLabel="Paperless Billing is On">ON</Text>
               ) : (
-                <Text style={styles.autoPayStatusTextInActive}>OFF</Text>
+                <Text style={styles.autoPayStatusTextInActive} accessible={true} accessibilityLabel="Paperless Billing is Off">OFF</Text>
               )}
             </>
           )}

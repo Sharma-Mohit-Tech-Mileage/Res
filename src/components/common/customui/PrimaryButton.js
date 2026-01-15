@@ -1,16 +1,24 @@
 import React from 'react';
-import { Text, Pressable, StyleSheet ,View} from 'react-native';
+import { Text, Pressable, StyleSheet, View } from 'react-native';
 import { Color, FontFamily, FontSize, Padding, Border } from "../../../../GlobalStyles";
 
-const PrimaryButtom = ({ title, onPress, buttonType }) => {
-  const buttonStyles = [buttonType === 'submit' ? styles.button : styles.canbutton, buttonType === 'submit' ? styles.submitButton : null];
+const PrimaryButtom = ({ title, onPress, buttonType, accessibilityLabel }) => {
+  const buttonStyles = [
+    buttonType === 'submit' ? styles.button : styles.canbutton,
+    buttonType === 'submit' ? styles.submitButton : null,
+  ];
   const textStyles = [buttonType === 'submit' ? styles.submitText : styles.cancelText];
 
   return (
     <View style={styles.margin}>
-    <Pressable accessibilityRole='button' style={buttonStyles} onPress={onPress}>
-      <Text style={textStyles}>{title}</Text>
-    </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel !== undefined ? accessibilityLabel : undefined}
+        style={buttonStyles}
+        onPress={onPress}
+      >
+        <Text style={textStyles}>{title}</Text>
+      </Pressable>
     </View>
   );
 };
@@ -20,7 +28,7 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     paddingVertical: Padding.p_base,
     paddingHorizontal: Padding.p_base,
-    borderRadius: Border.br_11xs, 
+    borderRadius: Border.br_11xs,
     elevation: Padding.p_5xs,
   },
   canbutton: {
@@ -28,10 +36,9 @@ const styles = StyleSheet.create({
     paddingVertical: Padding.p_base,
     paddingHorizontal: Padding.p_base,
   },
-  margin:{
+  margin: {
     marginTop: Padding.p_base,
   },
-
   submitButton: {
     backgroundColor: Color.colorMidnightblue,
   },
@@ -43,10 +50,10 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     textAlign: "center",
-    color: Color.colorMidnightblue, 
+    color: Color.colorMidnightblue,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
   },
 });
 
-export default PrimaryButtom
+export default PrimaryButtom;

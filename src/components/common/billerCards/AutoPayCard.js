@@ -30,12 +30,7 @@ const AutoPayCard = ({
       style={[AppStyles.card]}
       onPress={handleCardPress}
       activeOpacity={0.8}
-     accessible={true}
-      accessibilityRole="header" accessibilityLevel={2}
-      accessibilityLabel={
-        (isAutoPayStatus ? "Auto Pay is On. " : "Auto Pay is Off. ") +
-        "Manage Auto Pay"
-      }
+     accessible={false}
     >
       <View
         style={{
@@ -46,11 +41,11 @@ const AutoPayCard = ({
           alignItems: "center",
         }}
       >
-        <View style={styles.iconBg}>
+        <View style={styles.iconBg} accessible={true} accessibilityRole="Text" accessibilityLabel="Auto Pay Icon">
           <AutoPayIcon />
         </View>
         <View style={{ flexDirection: "column" }}>
-          <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2} >Auto Pay</Text>
+          <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Auto Pay" >Auto Pay</Text>
           {isStatusLoading ? (
             <SkeletonPlaceholder>
               <View
@@ -76,6 +71,10 @@ const AutoPayCard = ({
                 fontFamily: FontFamily.openSansRegular,
                 marginLeft: 10,
               }}
+              accessible={true}
+              accessibilityRole='link'
+              accessibilityHint="Double tap to navigate to Auto Pay management page."
+              accessibilityLabel={"Manage Auto Pay" }
             >
               Manage
             </Text>
@@ -96,9 +95,9 @@ const AutoPayCard = ({
               />
             </SkeletonPlaceholder>
           ) : isAutoPayStatus ? (
-            <Text style={styles.autoPayStatusText}>ON</Text>
+            <Text style={styles.autoPayStatusText} accessible={true} accessibilityLabel="Auto Pay is On">ON</Text>
           ) : (
-            <Text style={styles.autoPayStatusTextInActive}>OFF</Text>
+            <Text style={styles.autoPayStatusTextInActive} accessible={true} accessibilityLabel="Auto Pay is Off">OFF</Text>
           )}
         </View>
       </View>

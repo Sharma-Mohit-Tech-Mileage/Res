@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   TextInput,
@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Platform,
+  Keyboard,
 } from "react-native";
 import {
   FontFamily,
@@ -27,16 +28,16 @@ const MyPassIcon = (passwordVisible) => {
 const numberToWordsForAccessibility = (numStr) => {
   if (!numStr) return "";
   const digitsMap = {
-    "0": "zero",
-    "1": "one",
-    "2": "two",
-    "3": "three",
-    "4": "four",
-    "5": "five",
-    "6": "six",
-    "7": "seven",
-    "8": "eight",
-    "9": "nine",
+    0: "zero",
+    1: "one",
+    2: "two",
+    3: "three",
+    4: "four",
+    5: "five",
+    6: "six",
+    7: "seven",
+    8: "eight",
+    9: "nine",
   };
   return numStr
     .split("")
@@ -62,6 +63,33 @@ const SparkLightInput = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(!secure);
+  const inputRef = React.useRef(null);
+  const errorRef = React.useRef(null);
+  const [keyboardHidden, setKeyboardHidden] = useState(true);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardHidden(false);
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardHidden(true);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!keyboardHidden) {
+      inputRef.current?.focus();
+    }else{
+      if(error){
+        errorRef.current?.focus();
+      }
+    }
+  }, [keyboardHidden]);
 
   const handleInputChange = (text) => {
     if (onChangeText) {
@@ -110,13 +138,19 @@ const SparkLightInput = ({
     >
       <View style={styles.labelContainer}>
         {label && (
-          <Text style={[styles.label, error && styles.errorLabel]} accessible={true} accessibilityLabel={accessibilityLabel}>
+          <Text
+            style={[styles.label, error && styles.errorLabel]}
+            accessible={true}
+            accessibilityLabel={accessibilityLabel}
+          >
             {label}
           </Text>
         )}
         {secure && (
           <TouchableOpacity
-            accessibilityLabel={passwordVisible ? "Hide password" : "Show password"}
+            accessibilityLabel={
+              passwordVisible ? "Hide password" : "Show password"
+            }
             accessibilityRole="button"
             accessible={true}
             onPress={togglePasswordVisibility}
@@ -152,6 +186,7 @@ const SparkLightInput = ({
         <TextInput
           placeholder={placeholder}
           value={value}
+          ref={inputRef}
           onChangeText={handleInputChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
@@ -170,11 +205,21 @@ const SparkLightInput = ({
                 : Color.sparklightDarkGray,
             },
           ]}
-           accessibilityLabel={value && getKeyboardType() === "phone-pad"  ? `${label || "Phone number"} field}` : secure ? "Password requirements are listed below. Use arrow keys to read them." : undefined}
+          accessibilityLabel={
+            value && getKeyboardType() === "phone-pad"
+              ? `${label || "Phone number"} field}`
+              : secure
+              ? "Password requirements are listed below. Use arrow keys to read them."
+              : undefined
+          }
           //accessibilityLabel={getAccessibilityLabel()}
           accessibilityRole="text"
           accessibilityHint={
-            getKeyboardType() === "phone-pad" ? "Required text field. double tap to edit." : secure ? "secure text field, double tab to edit." : accessibilityHint
+            getKeyboardType() === "phone-pad"
+              ? "Required text field. double tap to edit."
+              : secure
+              ? "secure text field, double tab to edit."
+              : accessibilityHint
           }
           importantForAccessibility="yes"
           keyboardType={getKeyboardType()}
@@ -186,11 +231,23 @@ const SparkLightInput = ({
       </View>
 
       {error && (
-        <View style={styles.errorContainer}>
-          <View style={styles.errorIcon}>
+        <View style={styles.errorContainer} ref={errorRef}>
+          <View
+            style={styles.errorIcon}
+            accessible={true}
+            accessibilityLabel="Warning Icon"
+          >
             <WarningIcon />
           </View>
-          <Text style={styles.errorText}>{error}</Text>
+          <Text
+            style={styles.errorText}
+            accessible={true}
+            accessibilityLabel={error}
+            accessibilityRole="text"
+            accessibilityHint="Please enter valid password"
+          >
+            {error}
+          </Text>
         </View>
       )}
     </View>

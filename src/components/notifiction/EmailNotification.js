@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { StyleSheet, Text, View, ScrollView, Animated, Platform, TouchableOpacity, AccessibilityInfo, } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Animated, Platform, TouchableOpacity, AccessibilityInfo, findNodeHandle} from "react-native";
 import { Color, Padding, FontSize, FontFamily } from "../../../GlobalStyles";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -37,6 +37,7 @@ const AddNotificationScreen = () => {
   const user = useSelector((state) => state.user.userData);
   const [isCheckboxVisible, setIsCheckboxVisible] = useState(null);
   const scrollViewRef = useRef(null);
+  const inputRef = useRef(null);
   const animatedValue = useRef(new Animated.Value(-100)).current;
   const timeoutRef = useRef(null);
   const route = useRoute();
@@ -104,6 +105,7 @@ const AddNotificationScreen = () => {
           setIsSubmitting(false);
           setToggleCheckBoxTerm(false);
         }
+        setFocusEmail();
       } else if (route.params?.updateFailed) {
         setNotification({
           message: route.params.failureMessage,
@@ -112,10 +114,26 @@ const AddNotificationScreen = () => {
         setIsSubmitting(false);
         setToggleCheckBoxTerm(false);
       }
+      setFocusEmail();
     };
-
+  
     updateAccountDetails();
   }, [route.params, dispatch]);
+
+
+
+  //
+  const setFocusEmail = () => {
+      setTimeout(() => {
+        if (inputRef.current) {
+          const handle = findNodeHandle(inputRef.current);
+          if (handle) {
+            AccessibilityInfo.setAccessibilityFocus(handle);
+          }
+        }
+      }, 100);
+    };
+  
 
   const animateNotification = useCallback(() => {
     // Clear any existing timeout
@@ -133,15 +151,15 @@ const AddNotificationScreen = () => {
       useNativeDriver: true,
     }).start(() => {
       // Only auto-dismiss if notification is NOT an error type
-      if (notification && notification.type !== "error") {
-        timeoutRef.current = setTimeout(() => {
-          Animated.timing(animatedValue, {
-            toValue: -100,
-            duration: 500,
-            useNativeDriver: true,
-          }).start(() => setNotification(null));
-        }, 3000);
-      }
+      // if (notification && notification.type !== "error") {
+      //   timeoutRef.current = setTimeout(() => {
+      //     Animated.timing(animatedValue, {
+      //       toValue: -100,
+      //       duration: 500,
+      //       useNativeDriver: true,
+      //     }).start(() => setNotification(null));
+      //   }, 3000);
+      // }
     });
   }, [animatedValue, notification]);
 
@@ -256,7 +274,7 @@ const AddNotificationScreen = () => {
                     type={notification.type}
                     title={notification.type === "error" ? "Error" : "Success"}
                     message={notification.message}
-                    showCloseIcon={false}
+                    showCloseIcon={true}
                     onClose={() => setNotification(null)}
                     accessibilityLiveRegion="assertive"
                     accessibilityRole="alert"
@@ -321,6 +339,8 @@ const AddNotificationScreen = () => {
                     autoCapitalize="none"
                     textContentType="emailAddress"
                     style={styles.emailInput}
+                    ref={inputRef}
+                    
                   />
                 )}
               />

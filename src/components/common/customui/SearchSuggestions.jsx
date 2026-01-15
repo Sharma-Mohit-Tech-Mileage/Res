@@ -6,6 +6,7 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
+  Keyboard,
 } from "react-native";
 import { Padding, Color, FontSize, FontFamily } from "../../../../GlobalStyles";
 import {
@@ -19,6 +20,28 @@ const SearchSuggestions = memo(
   ({ placeholder, onChangeInput, suggestions, navigation, onEndReached }) => {
     const inputRef = useRef(null);
     const [input, setInput] = useState("");
+    const [keyboardHidden, setKeyboardHidden] = useState(true);
+
+    useEffect(() => {
+        const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+          setKeyboardHidden(false);
+        });
+        const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+          setKeyboardHidden(true);
+        });
+    
+        return () => {
+          showSubscription.remove();
+          hideSubscription.remove();
+        };
+      }, []);
+    
+      useEffect(() => {
+        if (!keyboardHidden) {
+          inputRef.current?.focus();
+        }
+      }, [keyboardHidden]);
+    
 
     useEffect(() => {
       onChangeInput(input);
@@ -32,6 +55,17 @@ const SearchSuggestions = memo(
         });
       }
     };
+
+    const submitValue = () => {
+    // Handle the submitted value here (e.g., send it to a server)
+    //console.log('Submitted:', value);
+    // You can optionally clear the input if needed
+    // setValue(''); 
+    
+    // The keyboard will remain open because blurOnSubmit is false
+    // If you want to manually dismiss the keyboard at some point, you can use Keyboard.dismiss()
+     Keyboard.dismiss(); 
+  }
 
     const renderSuggestion = ({ item, index }) => (
       <TouchableOpacity
@@ -80,7 +114,8 @@ const SearchSuggestions = memo(
             placeholderTextColor={Color.gray600}
             autoCorrect={false}
             clearButtonMode="always"
-            
+            returnKeyType="done" // or "send", "go", etc.
+            onSubmitEditing={submitValue}
           />
           
         </View>

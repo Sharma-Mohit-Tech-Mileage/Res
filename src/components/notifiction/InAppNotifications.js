@@ -72,15 +72,15 @@ const InAppNotifications = ({ navigation }) => {
       useNativeDriver: true,
     }).start(() => {
       // Only auto-dismiss if notification is NOT an error type
-      if (notification && notification.type !== "error") {
-        timeoutRef.current = setTimeout(() => {
-          Animated.timing(animatedValue, {
-            toValue: -100,
-            duration: 500,
-            useNativeDriver: true,
-          }).start(() => setNotification(null));
-        }, 2000);
-      }
+      // if (notification && notification.type !== "error") {
+      //   timeoutRef.current = setTimeout(() => {
+      //     Animated.timing(animatedValue, {
+      //       toValue: -100,
+      //       duration: 500,
+      //       useNativeDriver: true,
+      //     }).start(() => setNotification(null));
+      //   }, 2000);
+      // }
     });
   }, [animatedValue, notification]);
 
@@ -306,7 +306,7 @@ const InAppNotifications = ({ navigation }) => {
                         notification.type === "error" ? "Error" : "Success"
                       }
                       message={notification.message}
-                      showCloseIcon={false}
+                      showCloseIcon={true}
                       onClose={() => setNotification(null)}
                       accessibilityLiveRegion="assertive"
                       accessibilityRole="alert"
@@ -395,11 +395,25 @@ const InAppNotifications = ({ navigation }) => {
 };
 
 const NotificationSetting = ({ name, value, title, description, onChange }) => (
-  <View style={[styles.frameContainer, styles.frameBorder]}>
+  <Pressable
+    style={[styles.frameContainer, styles.frameBorder]}
+    accessible={true}
+    accessibilityRole="switch"
+    accessibilityState={{ checked: value }}
+    accessibilityLabel={`In-App Notifications for ${title}: ${value ? 'enabled' : 'disabled'}. ${description}`}
+    accessibilityHint="Double tap to toggle"
+    onPress={() => onChange({ target: { name, value: !value, type: 'toggle' } })}
+  >
     <View style={styles.frameView}>
       <View style={styles.appointmentsParent}>
         <View style={{ flexDirection: "column", flex: 1.7, marginRight: 10 }}>
-          <Text style={styles.appointments} accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header">{title}</Text>
+          <Text 
+            style={styles.appointments} 
+            accessible={true}
+            accessibilityRole="text"
+          >
+            {title}
+          </Text>
           <Text
             style={[
               styles.receiveAppNotifications1,
@@ -415,14 +429,17 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
           <Toggle
             name={name}
             initialValue={value}
-            section="inAppNotif"
             label={title}
-            onToggle={onChange}
+            onToggle={(e) => {
+              onChange({ target: { name, value: !value, type: 'toggle' } });
+            }}
+            accessible={false}
+            section="inAppNotif"
           />
         </View>
       </View>
     </View>
-  </View>
+  </Pressable>
 );
 
 const styles = StyleSheet.create({

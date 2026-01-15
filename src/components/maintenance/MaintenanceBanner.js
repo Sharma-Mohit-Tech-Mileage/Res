@@ -122,7 +122,7 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
             accessibilityHint="Double tap to close this message"
             accessible={true}
           >
-            <CloseIcon color="#0060AE" />
+            <CloseIcon color="#000000" />
           </TouchableOpacity>
         </A11y.Index>
         )}

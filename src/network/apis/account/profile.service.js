@@ -396,9 +396,9 @@ const handleSubmitFeedback = async (obj) => {
   const deviceMetadata = await getDeviceMetadata();
   const fullName = user.userInfo?.fullName;
   const authToken = `${Env.ZENDESK_AUTH.email}/token:${Env.ZENDESK_AUTH.api_token}`;
-  
+
   const base64Auth = base64.encode(authToken);
-  
+
   const concernLabels = (obj.areaOfConcern || []).map((id) => {
     const labels = {
       service_issue: "Service Issue",
@@ -429,13 +429,35 @@ const handleSubmitFeedback = async (obj) => {
         { id: Env.ZENDESK_FEEDBACK.category_id, value: obj.category },
         { id: Env.ZENDESK_FEEDBACK.feedbackValue_id, value: obj.feedbackValue },
         { id: Env.ZENDESK_FEEDBACK.email_id, value: obj.feedbackEmail },
-        { id: Env.ZENDESK_FEEDBACK.app_version_id, value: deviceMetadata.appVersion },
-        { id: Env.ZENDESK_FEEDBACK.platform_id, value: deviceMetadata.platform },
-        { id: Env.ZENDESK_FEEDBACK.os_version_id, value: deviceMetadata.osVersion },
-        { id: Env.ZENDESK_FEEDBACK.device_model_id, value: deviceMetadata.deviceModel },
-        { id: Env.ZENDESK_FEEDBACK.account_no, value: user?.userInfo?.accountNumber },
-        { id: Env.ZENDESK_FEEDBACK.area_of_concern_id, value: concernLabels.map((label) => label.toLowerCase() .replace(/\s*&\s*/g, "_and_") .replace(/\s+/g, "_")
-) },
+        {
+          id: Env.ZENDESK_FEEDBACK.app_version_id,
+          value: deviceMetadata.appVersion,
+        },
+        {
+          id: Env.ZENDESK_FEEDBACK.platform_id,
+          value: deviceMetadata.platform,
+        },
+        {
+          id: Env.ZENDESK_FEEDBACK.os_version_id,
+          value: deviceMetadata.osVersion,
+        },
+        {
+          id: Env.ZENDESK_FEEDBACK.device_model_id,
+          value: deviceMetadata.deviceModel,
+        },
+        {
+          id: Env.ZENDESK_FEEDBACK.account_no,
+          value: user?.userInfo?.accountNumber,
+        },
+        {
+          id: Env.ZENDESK_FEEDBACK.area_of_concern_id,
+          value: concernLabels.map((label) =>
+            label
+              .toLowerCase()
+              .replace(/\s*&\s*/g, "_and_")
+              .replace(/\s+/g, "_")
+          ),
+        },
       ],
       subject: "Residential MobileApp Feedback",
       comment: {
@@ -448,7 +470,12 @@ const handleSubmitFeedback = async (obj) => {
         "resimobileapp",
         `pid_${user.userInfo.accountNumber}`,
         deviceMetadata.platform.toLowerCase(),
-        ...concernLabels.map((label) => label.toLowerCase() .replace(/\s*&\s*/g, "_and_") .replace(/\s+/g, "_") ),
+        ...concernLabels.map((label) =>
+          label
+            .toLowerCase()
+            .replace(/\s*&\s*/g, "_and_")
+            .replace(/\s+/g, "_")
+        ),
       ],
       via: { channel: "MobileApp" },
     },
@@ -459,7 +486,7 @@ const handleSubmitFeedback = async (obj) => {
   try {
     const response = await axios.post(zendeskRequestApiUrl, payload, {
       headers: {
-        'Authorization': `Basic ${base64Auth}`,
+        Authorization: `Basic ${base64Auth}`,
         "Content-Type": "application/json",
       },
     });
@@ -709,25 +736,27 @@ const addSVEmailMktFlag = async (email) => {
   }
 };
 
- const isPaperlessEnabled = async (email, signal) => {
+const isPaperlessEnabled = async (email, signal) => {
   const user = await getUser();
   const response = await _axios.get(
-    `api/Paperless/IsPaperless?account=${user.userInfo.accountNumber}&email=${encodeURIComponent(email)}`,
+    `api/Paperless/IsPaperless?account=${
+      user.userInfo.accountNumber
+    }&email=${encodeURIComponent(email)}`,
     {
       headers: { Authorization: `Bearer ${user.token}` },
-      signal, // <-- allows cancellation from saga
+      signal, 
     }
   );
   return response.data;
 };
 
 const fetchACPUserAccountDetails = async (signal) => {
-  console.log("[DEBUG] fetchACPUserAccountDetails called, signal:", !!signal); // <--- debug entry log
+  console.log("[DEBUG] fetchACPUserAccountDetails called, signal:", !!signal); 
 
   let user = await getUser();
   const accountNumber = user.userInfo?.accountNumber || null;
 
-  console.log("[DEBUG] accountNumber:", accountNumber); // verify user/account present
+  console.log("[DEBUG] accountNumber:", accountNumber); 
 
   const config = {
     headers: {
@@ -747,6 +776,10 @@ const fetchACPUserAccountDetails = async (signal) => {
       "payment_due_date",
       "services",
       "email",
+      "account_status",
+      "days_since_disconnect_date",
+      "service_address",
+      "legacy_brand_by_spa",
     ],
   };
 

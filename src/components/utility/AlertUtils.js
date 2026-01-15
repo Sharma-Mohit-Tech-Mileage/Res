@@ -40,7 +40,7 @@ export const AlertComponent = ({
         backgroundColor: "#F0F8FF",
         borderColor: "#0060AE",
         closeButtonColor: "#0060AE",
-        titleColor: "#0060AE"
+        titleColor: Color.colorGray_100
       };
     } else {
       // Default to info colors for any other cases
@@ -48,7 +48,7 @@ export const AlertComponent = ({
         backgroundColor: "#F0F8FF",
         borderColor: "#0060AE",
         closeButtonColor: "#0060AE",
-        titleColor: "#0060AE"
+        titleColor: Color.colorGray_100
       };
     }
   };
