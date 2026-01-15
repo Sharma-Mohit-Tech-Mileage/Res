@@ -26,7 +26,7 @@ const TYPE_CONFIG = {
     iconColor: "#0060AE",
     textColor: "#000000",
     titleColor: "#000000",
-    closeButtonColor: "#0060AE",
+    closeButtonColor: "#000000",
     IconComponent: InfoIcon,
     iconLabel: "Information icon",
     labelPrefix: "Information: ",
@@ -37,7 +37,7 @@ const TYPE_CONFIG = {
     iconColor: Color.sparkLightRed,
     textColor: "#000000",
     titleColor: "#000000",
-    closeButtonColor: "#B92A1C",
+    closeButtonColor: "#000000",
     IconComponent: InfoIcon,
     iconLabel: "Error icon",
     labelPrefix: "Error: ",
@@ -48,7 +48,7 @@ const TYPE_CONFIG = {
     iconColor: Color.sparklightGreen,
     textColor: "#000000",
     titleColor: "#000000",
-    closeButtonColor: "#1D7832",
+    closeButtonColor: "#000000",
     IconComponent: SuccessIcon,
     iconLabel: "Success icon",
     labelPrefix: "Success: ",
@@ -59,7 +59,7 @@ const TYPE_CONFIG = {
     iconColor: Color.sparkLightInfo,
     textColor: "#000000",
     titleColor: "#000000",
-    closeButtonColor: "#DD6D02",
+    closeButtonColor: "#000000",
     IconComponent: WarningIcon,
     iconLabel: "Warning icon",
     labelPrefix: "Warning: ",
@@ -512,7 +512,7 @@ const NotificationAlert = ({
         <View
           style={[styles.iconWrapper, !title && styles.iconWithoutTitle]}
           accessible={true}
-          accessibilityRole="image"
+          accessibilityRole="text"
           accessibilityLabel={config.iconLabel}
         >
           <IconComponent width={24} height={24} color={config.iconColor} />
@@ -565,11 +565,11 @@ const NotificationAlert = ({
         
       </View>
       {showCloseIcon && (
-          <A11y.Index index={5} style={styles.closeBtn}>
+          <A11y.Index index={5} >
           <Pressable
             ref={closeRef}
             onPress={onClose}
-            
+            style={styles.closeBtn}
             accessible={true}
             accessibilityLabel="Close notification"
             accessibilityRole="button"

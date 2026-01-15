@@ -131,7 +131,7 @@ const VideoPlayer = ({ videoId, bundleId = "com.sparklight.app" }) => {
         key={key}
         ref={webViewRef}
         
-        accessible={true} accessibilityLabel="Welcome to Sparklight Video. Video player loaded" accessibilityHint="Watch on YouTube"
+        accessible={true} accessibilityLabel="Welcome to Sparklight Video. Video player loaded" accessibilityHint="Double tab to Watch on YouTube"
         style={styles.webView}
         source={{
           html: generateHtml(),
