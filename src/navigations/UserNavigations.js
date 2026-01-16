@@ -12,7 +12,7 @@ import Terms from '../components/entry/Terms';
 import MyTabs from "./MyTab";
 import { AxiosInterceptorProvider } from '../network/RestApiClient';
 import MaintenanceWrapper from '../components/maintenance/MaintenanceWrapper';
-
+import { AnnouncementProvider } from '../contexts/AnnouncementContext';
 const Stack = createNativeStackNavigator();
 
 // Export the navigation reference for global use
@@ -54,17 +54,15 @@ const UserNavigations = (props) => {
   };
 
   const handleBackButton = () => {
-    // CRITICAL FIX: Add null checks to prevent crash
     if (!navigationRef.current) {
-      return true; // Allow default back behavior if navigation not ready
+      return true; 
     }
 
     try {
       const currentRoute = navigationRef.current.getRootState();
       
-      // Additional safety check
       if (!currentRoute || !currentRoute.routes) {
-        return true; // Allow default back behavior
+        return true;
       }
       
       const currentTab = currentRoute.routes[currentRoute.index];
@@ -78,12 +76,11 @@ const UserNavigations = (props) => {
       return true;
     } catch (error) {
       console.error('Error in handleBackButton:', error);
-      return true; // Allow default back behavior on error
+      return true; 
     }
   };
 
   useEffect(() => {
-    // Add safety checks and delay listener setup
     let unsubscribe = null;
     let backHandler = null;
 
@@ -98,7 +95,6 @@ const UserNavigations = (props) => {
       }
     };
 
-    // Small delay to ensure navigation is ready
     const timeoutId = setTimeout(() => {
       onReady();
       setupListeners();
@@ -123,6 +119,7 @@ const UserNavigations = (props) => {
      <MaintenanceWrapper>
     <NavigationContainer ref={navigationRef} onReady={onReady} onStateChange={onStateChange}>
       <AxiosInterceptorProvider>
+      <AnnouncementProvider>
           <Stack.Navigator>
             <Stack.Screen
               name="Splash"
@@ -164,7 +161,7 @@ const UserNavigations = (props) => {
             }}
           />
         </Stack.Navigator>
-     
+      </AnnouncementProvider>
     </AxiosInterceptorProvider>
   </NavigationContainer>
    </MaintenanceWrapper>

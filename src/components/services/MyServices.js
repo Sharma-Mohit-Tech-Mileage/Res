@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { View, ScrollView, RefreshControl, StyleSheet } from "react-native";
+import { useFocusEffect } from '@react-navigation/native';
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
@@ -16,7 +17,10 @@ import { useServiceDetails } from "./hooks/useServiceDetails";
 import { useOutageStatus } from "./hooks/useOutageStatus";
 import { useSelector } from "react-redux";
 import { extractZipCode } from "../utility/constant";
+
+import { useAnnouncement } from '../../hooks/useAnnouncement';
 const MyServicesContent = ({ route }) => {
+  const { triggerOnScreenEntry } = useAnnouncement();
   const insets = useSafeAreaInsets();
   const accountDetails = useSelector((state) => state.profile?.accountDetails);
 const profileDetails = useSelector((state) => state.profile?.profileDetails) || {};
@@ -38,7 +42,11 @@ const profileDetails = useSelector((state) => state.profile?.profileDetails) || 
   const zipCodeFromAccount = useMemo(() => {
     return extractZipCode(accountDetails?.service_address);
   }, [accountDetails]);
-
+useFocusEffect(
+    useCallback(() => {
+      triggerOnScreenEntry('MyServices');
+    }, [triggerOnScreenEntry])
+  );
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await refetch();
