@@ -6,6 +6,7 @@ import {
   Pressable,
   Alert,
   ScrollView,
+  StatusBar,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import {
@@ -42,7 +43,7 @@ import moment from "moment";
 import analytics from "@react-native-firebase/analytics";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { AvatarHeaderScrollView } from 'react-native-sticky-parallax-header';
+import { DetailsHeaderScrollView } from 'react-native-sticky-parallax-header';
 const config = { issuer: Env.SSO_LOGIN, iosPrefersEphemeralSession: true };
 
 import {
@@ -233,28 +234,9 @@ const AccountOverview = () => {
     </View>
   );
 
-  return (
+  const renderContent = () => (
     <View style={styles.account} accessibilityLabel="Account screen">
-      <ProfileSettingsHeader
-        title=""
-        iconAlignment="right"
-        showIcon={false}
-      />
-      <LinearGradient
-        style={styles.linearGradientStyle}
-        locations={[0, 1]}
-        colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
-        useAngle={true}
-        angle={90}
-      />
       <View style={[styles.frameParent]}>
-        <View style={styles.rightActionableParent}>
-          <View style={styles.rightActionable}>
-            <UserIconWhite width={28} height={26} />
-          </View>
-          {/* Full name for profile */}
-          <Text style={styles.melissaSmith} accessible={true} accessibilityLabel={`Profile for ${fullName}`} accessibilityRole="Header" accessibilityLevel={1} accessibilityHint="Header" >{fullName}</Text>
-        </View>
         <ScrollView style={{ flex: 1 }}>
           <View style={{ marginBottom: "30%" }}>
             <View style={styles.frameGroup}>
@@ -401,6 +383,28 @@ const AccountOverview = () => {
         </ScrollView>
       </View>
     </View>
+  )
+
+  return (
+    <>
+      <DetailsHeaderScrollView
+        
+        
+        backgroundColor={Color.sparklightBrightPurple}
+        hasBorderRadius
+        //image={Brandon.image}
+        //tag={Brandon.type}
+        //tagTestID={detailsHeaderTestIDs.tag}
+        title={'Account Overview'}
+        //titleStyle={screenStyles.text}
+        //titleTestID={detailsHeaderTestIDs.title}
+        showsVerticalScrollIndicator={false}>
+        <View style={{ flex: 1 }}                             >
+         { renderContent() }
+        </View>
+      </DetailsHeaderScrollView>
+      <StatusBar barStyle="light-content"  translucent />
+    </>
   );
 };
 
