@@ -16,6 +16,7 @@ import { useDispatch } from "react-redux";
 import { resentEmailVerifiction } from "../../../redux/actions/ProfileActionSuite";
 import InfoIcon from "../../../../assets/svgs/InfoIcon";
 import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
+import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import { A11y } from "react-native-a11y-order";
 
@@ -575,11 +576,7 @@ const NotificationAlert = ({
             accessibilityRole="button"
             accessibilityHint="Double tap to dismiss"
           >
-            <Text
-              style={[styles.closeBtnText, { color: config.closeButtonColor }]}
-            >
-              ✕
-            </Text>
+            <CloseIcon color={config.closeButtonColor} width={16} height={16} />
           </Pressable>
           </A11y.Index>
         )}

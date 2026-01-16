@@ -468,8 +468,8 @@ const NewBillerHome = ({ navigation }) => {
           }
           accessibilityElementsHidden={isWalkthroughActive}
         >
-          {renderHeader()} 
-           {/* <View
+          {/* {renderHeader()}  */}
+           <View
             accessibilityLabel="SparkLight"
             style={styles.headerContainer}
             importantForAccessibility={
@@ -478,7 +478,7 @@ const NewBillerHome = ({ navigation }) => {
             accessibilityElementsHidden={isWalkthroughActive}
           >
             <Logo width={120} height={33.32} />
-          </View>  */}
+          </View>  
           <ScrollView style={styles.scrollContainer}>
             <View
               style={styles.mainContentContainer}

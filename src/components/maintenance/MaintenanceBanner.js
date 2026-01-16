@@ -18,20 +18,20 @@ const MaintenanceBanner = ({ title , message , link, linkText,showPhoneNumber=fa
         return {
           indicatorColor: Color.sparkLightRed,
           iconTint: Color.sparkLightRed,
-          titleStyle: { color: Color.sparkLightRed }
+          titleStyle: { color: Color.colorGray_200 }
         };
       case "warning":
         return {
           indicatorColor: Color.sparkLightInfo,
           iconTint: Color.sparkLightInfo,
-          titleStyle: { color: Color.sparkLightInfo }
+          titleStyle: { color: Color.colorGray_200 }
         };
       case "info":
       default:
         return {
           indicatorColor: "#0060AE", // Deep purple/blue color
           iconTint: "#0060AE", // Deep purple/blue color
-          titleStyle: { color: "#0060AE" } // Deep purple/blue color
+          titleStyle: { color: Color.colorGray_200 } // Deep purple/blue color
         };
     }
   };

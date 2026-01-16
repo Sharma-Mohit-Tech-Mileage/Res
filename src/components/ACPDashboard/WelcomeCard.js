@@ -8,15 +8,15 @@ import VideoPlayer from '../utility/VideoPlayer';
 const WelcomeCard = () => {
   const [isAccessibilityEnabled, setIsAccessibilityEnabled] = React.useState(false);
 
-   useEffect(() => {
-      AccessibilityInfo.isScreenReaderEnabled().then(setIsAccessibilityEnabled);
-      const subscription = AccessibilityInfo.addEventListener(
-        'screenReaderChanged',
-        setIsAccessibilityEnabled
-      );
+  //  useEffect(() => {
+  //     AccessibilityInfo.isScreenReaderEnabled().then(setIsAccessibilityEnabled);
+  //     const subscription = AccessibilityInfo.addEventListener(
+  //       'screenReaderChanged',
+  //       setIsAccessibilityEnabled
+  //     );
   
-      return () => subscription?.remove();
-    }, []);
+  //     return () => subscription?.remove();
+  //   }, []);
   // YouTube video ID
   const videoId = 'C3cMQoWxv6I'; 
 

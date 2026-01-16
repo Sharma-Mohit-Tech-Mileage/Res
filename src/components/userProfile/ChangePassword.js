@@ -168,19 +168,19 @@ const ChangePassword = () => {
     getSecurityQuestions();
   }, []);
 
-  useEffect(() => {
-    if (newPassword && newPassword.length > 1) {
-      const validations = validatePassword(newPassword, profileDetails.userName);
-      const firstInvalidIndex = validations.findIndex(isValid => !isValid);
-      if (firstInvalidIndex !== -1) {
-        setAccessibilityLabelInput(`${passwordTerms[firstInvalidIndex]}`);
-      } else {
-        setAccessibilityLabelInput("");
-      }
-    } else {
-      setAccessibilityLabelInput("");
-    }
-  }, [newPassword]);
+  // useEffect(() => {
+  //   if (newPassword && newPassword.length > 1) {
+  //     const validations = validatePassword(newPassword, profileDetails.userName);
+  //     const firstInvalidIndex = validations.findIndex(isValid => !isValid);
+  //     if (firstInvalidIndex !== -1) {
+  //       setAccessibilityLabelInput(`${passwordTerms[firstInvalidIndex]}`);
+  //     } else {
+  //       setAccessibilityLabelInput("");
+  //     }
+  //   } else {
+  //     setAccessibilityLabelInput("");
+  //   }
+  // }, [newPassword]);
 
   useEffect(() => {
     if (route.params?.updateFailed) {
@@ -273,7 +273,7 @@ const ChangePassword = () => {
                           onChangeText={onChange}
                           value={value}
                           secure={true}
-                          error={accessibilityLabelInput ? accessibilityLabelInput : error?.message}
+                          error={error?.message}
                         />
                         <View
                           accessibilityElementsHidden={isDropDownOpen}
