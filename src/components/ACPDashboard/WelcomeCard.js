@@ -3,6 +3,7 @@ import React,{useEffect} from 'react';
 import { View, Text, StyleSheet,AccessibilityInfo , Linking} from 'react-native';
 import { FontFamily, FontSize, Color, Padding, Border } from '../../../GlobalStyles';
 import VideoPlayer from '../utility/VideoPlayer';
+import AppStyles from '../utility/AppStyles';
 
 
 const WelcomeCard = () => {
@@ -36,13 +37,21 @@ const WelcomeCard = () => {
          style={[styles.accessibilityText,{textDecorationLine: 'underline',textDecorationColor: Color.colorMidnightblue}]} accessibilityLabel="Video player loaded" accessibilityHint="Double tap to watch on YouTube">
           Watch on YouTube
         </Text>
-        <Text style={styles.accessibilityText} accessibilityLabel="Video player loaded" accessibilityHint="Double tap to watch on YouTube">
+        <Text style={styles.accessibilityText} accessible={true} accessibilityHint="Double tap to watch on YouTube">
           {`Welcomo to Sparklight Veo Transcription
             What is great intemet? Is it strong? Is it fast? Is liable?
             At Sparklight, we know connection goes way beyond technology. From Monday morning meetings to Friday • nights with friends-and everything in between-the best connections are always there right when you nee d them.
             So how do you know it's great internet? Because it works.
             Were Sparklight, and we're always working for you.`}
         </Text>
+        <View style={AppStyles.card}>
+          <>
+          <Text style={[styles.accessibilityText,{fontWeight: 'bold'}]} accessible={true} > Disclaimer:</Text>
+          <Text style={styles.accessibilityText} accessible={true} >
+             Embedded third-party video content may have limited accessibility due to platform constraints. Use the direct link above as an accessible alternative.
+          </Text>
+          </>
+        </View>
         </>
         
       )}
