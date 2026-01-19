@@ -43,7 +43,7 @@ import moment from "moment";
 import analytics from "@react-native-firebase/analytics";
 import RightIcon from "../../../assets/svgs/Chevonright";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { DetailsHeaderScrollView } from 'react-native-sticky-parallax-header';
+import {  DetailsHeaderScrollView  } from 'react-native-sticky-parallax-header';
 const config = { issuer: Env.SSO_LOGIN, iosPrefersEphemeralSession: true };
 
 import {
@@ -208,20 +208,24 @@ const AccountOverview = () => {
     }, [profileDetails])
   );
 
+  const userImage=()=>(
+    <UserIconWhite width={28} height={26} />
+  )
+
   const renderHeader = () => (
     <View style={styles.account} accessibilityLabel="Account screen">
-      <ProfileSettingsHeader
+      {/* <ProfileSettingsHeader
         title=""
         iconAlignment="right"
         showIcon={false}
-      />
-      <LinearGradient
+      /> */}
+      {/* <LinearGradient
         style={styles.linearGradientStyle}
         locations={[0, 1]}
         colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
         useAngle={true}
         angle={90}
-      />
+      /> */}
       <View style={[styles.frameParent]}>
         <View style={styles.rightActionableParent}>
           <View style={styles.rightActionable}>
@@ -387,23 +391,35 @@ const AccountOverview = () => {
 
   return (
     <>
-      <DetailsHeaderScrollView
+      <LinearGradient
+        colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
+        locations={[0, 1]}
+        useAngle={true}
+        angle={90}
+        style={{ flex: 1 }}
+      >
+        <DetailsHeaderScrollView
+          backgroundColor="transparent"
+          hasBorderRadius
+          title={'Account Overview'}
+          subtitle={fullName}
+          leftTopIcon={userImage}
+          contentIcon={userImage}
+          showsVerticalScrollIndicator={false}
+          headerContainerStyle={{ backgroundColor: 'transparent' }}
+          headerContentContainerStyle={{ backgroundColor: 'transparent' }}
+          titleStyle={{ color: Color.sparklightWhite, fontSize: 20, fontWeight: '600' }}
+          
+          parallaxHeight={180}
+        >
+          <View style={{ flex: 2 }}>
+            {/* {renderHeader()} */}
+            {renderContent()}
+          </View>
+        </DetailsHeaderScrollView>
         
-        
-        backgroundColor={Color.sparklightBrightPurple}
-        hasBorderRadius
-        //image={Brandon.image}
-        //tag={Brandon.type}
-        //tagTestID={detailsHeaderTestIDs.tag}
-        title={'Account Overview'}
-        //titleStyle={screenStyles.text}
-        //titleTestID={detailsHeaderTestIDs.title}
-        showsVerticalScrollIndicator={false}>
-        <View style={{ flex: 1 }}                             >
-         { renderContent() }
-        </View>
-      </DetailsHeaderScrollView>
-      <StatusBar barStyle="light-content"  translucent />
+      </LinearGradient>
+      
     </>
   );
 };
