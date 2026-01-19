@@ -1,78 +1,38 @@
-import { Linking } from 'react-native';
 import analytics from '@react-native-firebase/analytics';
-import DeviceInfo from 'react-native-device-info';
+import { Linking } from 'react-native';
 
-export const compareVersions = (version1, version2) => {
-  const v1Parts = version1.split('.').map(Number);
-  const v2Parts = version2.split('.').map(Number);
+export const compareVersions = (v1, v2) => {
+  const parts1 = v1.split('.').map(Number);
+  const parts2 = v2.split('.').map(Number);
 
-  for (let i = 0; i < 3; i++) {
-    const v1 = v1Parts[i] || 0;
-    const v2 = v2Parts[i] || 0;
+  for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+    const num1 = parts1[i] || 0;
+    const num2 = parts2[i] || 0;
 
-    if (v1 > v2) return 1;
-    if (v1 < v2) return -1;
+    if (num1 > num2) return 1;
+    if (num1 < num2) return -1;
   }
 
   return 0;
 };
 
-export const isVersionInRange = (currentVersion, minVersion, maxVersion) => {
-  const isAboveMin = compareVersions(currentVersion, minVersion) >= 0;
-  const isBelowMax = compareVersions(currentVersion, maxVersion) <= 0;
-  return isAboveMin && isBelowMax;
-};
+export const isDateInRange = (startDate, endDate) => {
+  if (!startDate && !endDate) return true;
 
-export const checkUserStatusEligibility = (userStatus, allowedStatuses) => {
-  if (!allowedStatuses || allowedStatuses.length === 0) {
-    return true;
-  }
-  return allowedStatuses.includes(userStatus);
-};
+  const now = new Date();
 
-export const isWithinTimeWindow = (startDate, windowDays) => {
-  if (!startDate || !windowDays) {
-    return true;
-  }
-
-  try {
-    const now = new Date();
+  if (startDate) {
     const start = new Date(startDate);
-    const daysSinceStart = (now - start) / (1000 * 60 * 60 * 24);
-    return daysSinceStart >= 0 && daysSinceStart <= windowDays;
-  } catch (error) {
-    console.error('[announcementHelpers] Error checking time window:', error);
-    return false;
-  }
-};
-
-export const isCampaignEligible = (campaign, userInfo, currentVersion) => {
-  if (!campaign.enabled) {
-    return false;
-  }
-
-  if (campaign.targeting?.minAppVersion && campaign.targeting?.maxAppVersion) {
-    if (!isVersionInRange(
-      currentVersion,
-      campaign.targeting.minAppVersion,
-      campaign.targeting.maxAppVersion
-    )) {
+    if (now < start) {
+      console.log('[AnnouncementHelpers] Campaign not yet started');
       return false;
     }
   }
 
-  if (campaign.targeting?.userStatus) {
-    const userStatus = userInfo?.acctStatus || userInfo?.accountStatus;
-    if (!checkUserStatusEligibility(userStatus, campaign.targeting.userStatus)) {
-      return false;
-    }
-  }
-
-  if (campaign.targeting?.campaignStartDate && campaign.targeting?.showOnlyOnceWindowDays) {
-    if (!isWithinTimeWindow(
-      campaign.targeting.campaignStartDate,
-      campaign.targeting.showOnlyOnceWindowDays
-    )) {
+  if (endDate) {
+    const end = new Date(endDate);
+    if (now > end) {
+      console.log('[AnnouncementHelpers] Campaign has ended');
       return false;
     }
   }
@@ -80,104 +40,133 @@ export const isCampaignEligible = (campaign, userInfo, currentVersion) => {
   return true;
 };
 
-export const navigateToDestination = (navigationConfig, navigationRef) => {
-  if (!navigationConfig) return;
+export const isCampaignEligible = (campaign, userInfo = {}, currentVersion = '1.0.0') => {
+  if (!campaign || !campaign.enabled) {
+    return false;
+  }
 
-  const { type, destination, params } = navigationConfig;
+  const { targeting } = campaign;
+
+  if (!targeting) {
+    return true;
+  }
+
+  // Time window check
+  if (!isDateInRange(targeting.startDate, targeting.endDate)) {
+    return false;
+  }
+
+  // Version requirements
+  if (targeting.minAppVersion) {
+    if (compareVersions(currentVersion, targeting.minAppVersion) < 0) {
+      console.log('[AnnouncementHelpers] App version too old');
+      return false;
+    }
+  }
+
+  if (targeting.maxAppVersion) {
+    if (compareVersions(currentVersion, targeting.maxAppVersion) > 0) {
+      console.log('[AnnouncementHelpers] App version too new');
+      return false;
+    }
+  }
+
+  // Platform check
+  if (targeting.platforms && targeting.platforms.length > 0) {
+    const platform = require('react-native').Platform.OS;
+    if (!targeting.platforms.includes(platform)) {
+      console.log(`[AnnouncementHelpers] Platform ${platform} not targeted`);
+      return false;
+    }
+  }
+
+  // User segment check (extensible)
+  if (targeting.userSegments && targeting.userSegments.length > 0) {
+    const userSegment = userInfo?.segment || 'default';
+    if (!targeting.userSegments.includes(userSegment)) {
+      console.log(`[AnnouncementHelpers] User segment ${userSegment} not targeted`);
+      return false;
+    }
+  }
+
+  return true;
+};
+
+export const trackAnnouncementImpression = async (campaignId, triggerType) => {
+  try {
+    await analytics().logEvent('feature_announcement_impression', {
+      campaign_id: campaignId,
+      trigger_type: triggerType,
+      timestamp: new Date().toISOString(),
+    });
+    console.log(`[Analytics] Tracked impression: ${campaignId}`);
+  } catch (error) {
+    console.error('[Analytics] Error tracking impression:', error);
+  }
+};
+
+export const trackStepViewed = async (campaignId, stepNumber, stepTitle) => {
+  try {
+    await analytics().logEvent('feature_announcement_step_viewed', {
+      campaign_id: campaignId,
+      step_number: stepNumber,
+      step_title: stepTitle,
+      timestamp: new Date().toISOString(),
+    });
+    console.log(`[Analytics] Tracked step view: ${campaignId} - Step ${stepNumber}`);
+  } catch (error) {
+    console.error('[Analytics] Error tracking step view:', error);
+  }
+};
+
+export const trackAnnouncementCompletion = async (campaignId, totalSteps, timeSpentSeconds) => {
+  try {
+    await analytics().logEvent('feature_announcement_completed', {
+      campaign_id: campaignId,
+      total_steps: totalSteps,
+      time_spent_seconds: timeSpentSeconds,
+      timestamp: new Date().toISOString(),
+    });
+    console.log(`[Analytics] Tracked completion: ${campaignId} (${timeSpentSeconds}s)`);
+  } catch (error) {
+    console.error('[Analytics] Error tracking completion:', error);
+  }
+};
+
+export const trackAnnouncementDismissal = async (campaignId, dismissedAtStep) => {
+  try {
+    await analytics().logEvent('feature_announcement_dismissed', {
+      campaign_id: campaignId,
+      dismissed_at_step: dismissedAtStep,
+      timestamp: new Date().toISOString(),
+    });
+    console.log(`[Analytics] Tracked dismissal: ${campaignId} at step ${dismissedAtStep}`);
+  } catch (error) {
+    console.error('[Analytics] Error tracking dismissal:', error);
+  }
+};
+
+export const navigateToDestination = (navConfig, navigationRef) => {
+  if (!navConfig || !navigationRef.current) return;
+
+  const { type, destination } = navConfig;
 
   try {
     switch (type) {
       case 'tab':
-        navigationRef.current?.navigate('MyTab', {
-          screen: destination,
-          params,
-        });
-        console.log(`[announcementHelpers] Navigating to tab: ${destination}`);
+        navigationRef.current.navigate('MyTab', { screen: destination });
         break;
-
       case 'screen':
-        navigationRef.current?.navigate(destination, params);
-        console.log(`[announcementHelpers] Navigating to screen: ${destination}`);
+        navigationRef.current.navigate(destination);
         break;
-
+      case 'external':
       case 'deep_link':
         Linking.openURL(destination);
-        console.log(`[announcementHelpers] Opening deep link: ${destination}`);
         break;
-
-      case 'external':
-        Linking.openURL(destination);
-        console.log(`[announcementHelpers] Opening external URL: ${destination}`);
-        break;
-
-      case 'none':
       default:
-        console.log('[announcementHelpers] No navigation configured');
-        break;
+        console.warn(`[AnnouncementHelpers] Unknown navigation type: ${type}`);
     }
   } catch (error) {
-    console.error('[announcementHelpers] Navigation error:', error);
-  }
-};
-
-export const trackAnnouncementEvent = async (eventName, data) => {
-  try {
-    await analytics().logEvent(eventName, {
-      timestamp: new Date().toISOString(),
-      app_version: DeviceInfo.getVersion(),
-      ...data,
-    });
-    console.log(`[Analytics] ${eventName}:`, data);
-  } catch (error) {
-    console.error('[announcementHelpers] Analytics error:', error);
-  }
-};
-
-export const trackAnnouncementImpression = (campaignId, triggerType) => {
-  trackAnnouncementEvent('feature_announcement_viewed', {
-    campaign_id: campaignId,
-    trigger_type: triggerType,
-  });
-};
-
-export const trackStepViewed = (campaignId, stepNumber, stepTitle) => {
-  trackAnnouncementEvent('feature_announcement_step_viewed', {
-    campaign_id: campaignId,
-    step_number: stepNumber,
-    step_title: stepTitle,
-  });
-};
-
-export const trackAnnouncementCompletion = (campaignId, totalSteps, timeSpentSeconds) => {
-  trackAnnouncementEvent('feature_announcement_completed', {
-    campaign_id: campaignId,
-    total_steps: totalSteps,
-    time_spent_seconds: timeSpentSeconds,
-  });
-};
-
-export const trackAnnouncementDismissal = (campaignId, dismissedAtStep) => {
-  trackAnnouncementEvent('feature_announcement_dismissed', {
-    campaign_id: campaignId,
-    dismissed_at_step: dismissedAtStep + 1,
-  });
-};
-
-export const formatDate = (isoDate) => {
-  try {
-    const date = new Date(isoDate);
-    return date.toLocaleDateString();
-  } catch (error) {
-    return '';
-  }
-};
-
-export const getDaysSince = (isoDate) => {
-  try {
-    const date = new Date(isoDate);
-    const now = new Date();
-    return Math.floor((now - date) / (1000 * 60 * 60 * 24));
-  } catch (error) {
-    return 0;
+    console.error('[AnnouncementHelpers] Navigation error:', error);
   }
 };

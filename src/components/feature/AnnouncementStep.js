@@ -1,12 +1,10 @@
 import React, { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Linking, AccessibilityInfo, findNodeHandle } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, StyleSheet, Pressable, Linking, AccessibilityInfo, findNodeHandle, Image } from 'react-native';
 import { theme } from '../../styles/theme';
 import { typography } from '../../styles/utilities';
 
-const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive }) => {
+const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive, navigationRef }) => {
   const titleRef = useRef(null);
-  const navigation = useNavigation();
 
   useEffect(() => {
     if (!isActive) return;
@@ -23,18 +21,22 @@ const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive }) => {
     return () => clearTimeout(timeout);
   }, [isActive, currentIndex]);
 
-  const handleLearnMore = () => {
-    if (!step.learnMore) return;
+  const handleNavigation = (navConfig) => {
+    if (!navConfig) return;
 
-    const { type, destination } = step.learnMore;
+    const { type, destination } = navConfig;
 
     try {
       switch (type) {
         case 'tab':
-          navigation.navigate('MyTab', { screen: destination });
+          if (navigationRef?.current) {
+            navigationRef.current.navigate('MyTab', { screen: destination });
+          }
           break;
         case 'screen':
-          navigation.navigate(destination);
+          if (navigationRef?.current) {
+            navigationRef.current.navigate(destination);
+          }
           break;
         case 'external':
         case 'deep_link':
@@ -44,13 +46,53 @@ const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive }) => {
           break;
       }
     } catch (error) {
-      console.error('[AnnouncementStep] Learn more navigation error:', error);
+      console.error('[AnnouncementStep] Navigation error:', error);
     }
+  };
+
+  const renderLearnMoreLinks = () => {
+    const { learnMore } = step;
+    
+    if (!learnMore) return null;
+
+    // Support both single object and array of objects
+    const links = Array.isArray(learnMore) ? learnMore : [learnMore];
+
+    return (
+      <View style={styles.learnMoreWrapper}>
+        {links.map((link, index) => (
+          <Pressable 
+            key={index}
+            onPress={() => handleNavigation(link)}
+            style={styles.learnMoreContainer}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessible={true}
+            accessibilityRole="link"
+            accessibilityLabel={link.text || 'Learn more'}
+          >
+            <Text style={styles.learnMoreText}>
+              {link.text || 'Learn more'}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+    );
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.content}>
+        {/* Image Support */}
+        {step.imageUrl && (
+          <Image 
+            source={{ uri: step.imageUrl }}
+            style={styles.stepImage}
+            resizeMode="contain"
+            accessible={true}
+            accessibilityLabel={step.imageAlt || 'Feature illustration'}
+          />
+        )}
+
         <Text 
           ref={titleRef} 
           style={styles.title} 
@@ -64,17 +106,8 @@ const AnnouncementStep = ({ step, currentIndex, totalSteps, isActive }) => {
           {step.description}
         </Text>
 
-        {step.learnMore && (
-          <Pressable 
-            onPress={handleLearnMore}
-            style={styles.learnMoreContainer}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Text style={styles.learnMoreText}>
-              {step.learnMore.text || 'Learn more'}
-            </Text>
-          </Pressable>
-        )}
+        {/* Multiple Learn More Links */}
+        {renderLearnMoreLinks()}
       </View>
     </View>
   );
@@ -87,6 +120,12 @@ const styles = StyleSheet.create({
   content: {
     marginBottom: theme.spacing.lg,
   },
+  stepImage: {
+    width: '100%',
+    height: 180,
+    marginBottom: theme.spacing.md,
+    borderRadius: theme.radius.sm,
+  },
   title: {
     ...typography.h2,
     marginBottom: theme.spacing.sm,
@@ -97,8 +136,14 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     color: theme.colors.text.secondary,
   },
-  learnMoreContainer: {
+  learnMoreWrapper: {
     marginTop: theme.spacing.md,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: theme.spacing.md,
+  },
+  learnMoreContainer: {
+    marginRight: theme.spacing.sm,
   },
   learnMoreText: {
     fontSize: 14,

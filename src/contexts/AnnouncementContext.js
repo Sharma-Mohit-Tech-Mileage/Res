@@ -1,5 +1,4 @@
 import React, { createContext, useState, useCallback, useContext, useRef } from 'react';
-import { useNavigation } from '@react-navigation/native';
 import AnnouncementModal from '../components/feature/AnnouncementModal';
 import AnnouncementPersistence from '../manager/AnnouncementPersistence';
 import {
@@ -8,18 +7,13 @@ import {
   trackAnnouncementDismissal,
   navigateToDestination,
 } from '../utils/announcementHelpers';
+import { navigationRef } from '../navigations/UserNavigations';
 
 const AnnouncementContext = createContext(null);
 
 export const AnnouncementProvider = ({ children }) => {
   const [activeCampaign, setActiveCampaign] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const navigation = useNavigation();
-  const navigationRef = useRef(navigation);
-
-  React.useEffect(() => {
-    navigationRef.current = navigation;
-  }, [navigation]);
 
   const showAnnouncement = useCallback(async (campaign, triggerType) => {
     if (!campaign) return;
@@ -93,6 +87,7 @@ export const AnnouncementProvider = ({ children }) => {
         campaign={activeCampaign}
         onComplete={handleComplete}
         onDismiss={handleDismiss}
+        navigationRef={navigationRef}
       />
     </AnnouncementContext.Provider>
   );

@@ -1,19 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import {
-  Color,
-  FontFamily,
-  FontSize,
-  Padding,
-  Border,
-} from "../../../GlobalStyles";
+import { Color, FontFamily, FontSize, Padding, Border, } from "../../../GlobalStyles";
 import LinearGradient from "react-native-linear-gradient";
 import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
 import BillingIconWhite from "../../res/svgIcons/BillingIconWhite";
@@ -32,9 +20,16 @@ import AppStyles from "../utility/AppStyles";
 import { getPrimaryEmail } from "../utility/constant";
 import LoadingOverlay from "../common/customui/CustomLoading";
 import RightIcon from "../../../assets/svgs/Chevonright";
-
+import { useAnnouncement } from '../../hooks/useAnnouncement';
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
+  const { triggerOnScreenEntry } = useAnnouncement();
+  
+  useFocusEffect(
+    useCallback(() => {
+      triggerOnScreenEntry('BillingStackScreen');
+    }, [triggerOnScreenEntry])
+  );
   const accountDetails = useSelector(
     (state) => state.profile?.accountDetails
   );

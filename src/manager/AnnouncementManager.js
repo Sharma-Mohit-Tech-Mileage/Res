@@ -41,7 +41,6 @@ class AnnouncementManager {
 
   static async shouldShowCampaign(campaign) {
     const campaignId = campaign.id;
-
     const completed = await AnnouncementPersistence.hasBeenCompleted(campaignId);
     if (completed) {
       console.log(`[AnnouncementManager] Campaign ${campaignId} already completed`);

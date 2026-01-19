@@ -15,6 +15,7 @@ import { MaintenanceProvider } from "./src/components/maintenance/MaintenanceCon
 import { GlobalErrorModal } from "./src/components/common/GlobalErrorModal";
 import RemoteConfigManager from "./src/config/Remoteconfigmanager";
 import { FeatureFlagsProvider } from "./src/contexts/Featureflagscontext";
+import { AnnouncementProvider } from "./src/contexts/AnnouncementContext";
 Text.defaultProps = { ...Text.defaultProps, maxFontSizeMultiplier: 1.25 };
 
 const App = () => {
@@ -105,12 +106,14 @@ const App = () => {
         >
           <FeatureFlagsProvider>
             <MaintenanceProvider>
+              <AnnouncementProvider>
               <UserNavigations />
               <AppUpdateAlert
                 visible={majorUpdateVisible}
                 onClose={() => setMajorUpdateVisible(false)}
               />
               <GlobalErrorModal />
+              </AnnouncementProvider>
             </MaintenanceProvider>
           </FeatureFlagsProvider>
         </AnalyticsContext.Provider>

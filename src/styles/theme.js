@@ -121,7 +121,6 @@ export const theme = {
     },
   },
 
-  // Icon sizes (standardized)
   iconSize: {
     sm: 16,
     base: 24,

@@ -42,9 +42,10 @@ const profileDetails = useSelector((state) => state.profile?.profileDetails) || 
   const zipCodeFromAccount = useMemo(() => {
     return extractZipCode(accountDetails?.service_address);
   }, [accountDetails]);
-useFocusEffect(
+  
+  useFocusEffect(
     useCallback(() => {
-      triggerOnScreenEntry('MyServices');
+      triggerOnScreenEntry('MyServicesStack');
     }, [triggerOnScreenEntry])
   );
   const onRefresh = useCallback(async () => {
