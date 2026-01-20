@@ -209,7 +209,7 @@ const SparkLightInput = ({
             value && getKeyboardType() === "phone-pad"
               ? `${label || "Phone number"} field}`
               : secure
-              ? "Password requirements are listed below. Use arrow keys to read them."
+              ? "Password requirements are listed below. Use swipe to read them."
               : undefined
           }
           //accessibilityLabel={getAccessibilityLabel()}

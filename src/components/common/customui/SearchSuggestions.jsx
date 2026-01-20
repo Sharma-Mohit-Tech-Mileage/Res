@@ -97,7 +97,7 @@ const SearchSuggestions = memo(
         <View style={styles.inputContainer} accessibilityHint="Double tap to edit"
           accessibilityRole="text"
           accessible={true}
-          accessibilityLabel={ suggestions.length > 0 ? `${suggestions.length} results found for ${input}. Use arrow keys to move through them.` : `Search Knowledgebase, type to search.`}
+          accessibilityLabel={ suggestions.length > 0 ? `${suggestions.length} results found for ${input}. Use swipe to move through them.` : `Search Knowledgebase, type to search.`}
           
           >
           <View style={[styles.searchIcon, styles.leftIcon]}>

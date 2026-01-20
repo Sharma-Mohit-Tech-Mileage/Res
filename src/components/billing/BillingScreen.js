@@ -144,7 +144,12 @@ const BillingScreen = ({ navigation }) => {
             <BillingIconWhite isSelected={false} />
           </View>
           <Text style={styles.melissaSmith}
-          accessibilityLabel="Billing Services" accessibilityRole='Header' accessibilityLevel={1} accessibilityHint="Header">Billing Services</Text>
+          accessibilityLabel="Billing Services" accessibilityRole='Header'
+           accessibilityLevel={1} 
+           nativeID="Billing Services-header"
+           //accessibilityHint="Header"
+           >
+          Billing Services</Text>
         </View>
 
         <ScrollView
