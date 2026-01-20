@@ -403,7 +403,7 @@ const AccountOverview = () => {
           hasBorderRadius
           title={'Account Overview'}
           subtitle={fullName}
-          leftTopIcon={userImage}
+         
           contentIcon={userImage}
           showsVerticalScrollIndicator={false}
           headerContainerStyle={{ backgroundColor: 'transparent' }}
