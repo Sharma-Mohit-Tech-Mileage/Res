@@ -82,7 +82,7 @@ export const TABS = [
     walkthrough: {
       title: "Your services hub",
       description:
-        "Manage your internet plans, explore upgrades, and view all available services tailored to your needs.",
+        "Manage your internet plan and view all available services tailored to your needs.",
       iconName: "wifi",
     },
   },
