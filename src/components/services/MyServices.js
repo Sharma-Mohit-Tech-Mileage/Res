@@ -19,7 +19,8 @@ import { extractZipCode } from "../utility/constant";
 const MyServicesContent = ({ route }) => {
   const insets = useSafeAreaInsets();
   const accountDetails = useSelector((state) => state.profile?.accountDetails);
-const profileDetails = useSelector((state) => state.profile?.profileDetails) || {};
+  const profileDetails =
+    useSelector((state) => state.profile?.profileDetails) || {};
   const flagsReady = accountDetails?.services != null;
 
   const showInternet =
@@ -28,9 +29,10 @@ const profileDetails = useSelector((state) => state.profile?.profileDetails) || 
     loading || (!flagsReady ? true : accountDetails?.services?.video === true);
   const showPhone =
     loading || (!flagsReady ? true : accountDetails?.services?.phone === true);
-    const accountNumber = profileDetails.accountNumber||"1234567890"; 
+  const accountNumber = profileDetails.accountNumber || "1234567890";
   const legacySPA = accountDetails?.legacy_brand_by_spa;
   const { data, loading, error, refetch } = useServiceDetails(accountNumber);
+  console.log("Service Details Error:", legacySPA, error);
   const { outageData, checking, checkStatus, clearOutageData } =
     useOutageStatus();
   const [refreshing, setRefreshing] = useState(false);
@@ -104,7 +106,7 @@ const profileDetails = useSelector((state) => state.profile?.profileDetails) || 
           {showPhone && (
             <PhoneCard
               planName={data?.phone.planName}
-              legacyBrand={data?.phone.legacyBrand}
+              legacyBrand={legacySPA}
               loading={loading}
             />
           )}
