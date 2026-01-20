@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Platform, AppState } from 'react-native';
+import { View, StyleSheet, Dimensions, Platform, AppState, AccessibilityInfo } from 'react-native';
 import WebView from 'react-native-webview';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import CryptoJS from 'crypto-js';
@@ -13,6 +13,7 @@ import analytics from '@react-native-firebase/analytics';
 import { getPaymentUrl, getReferralUrl } from './PaymentUrlUtils';
 import LoadingOverlay from '../common/customui/CustomLoading';
 import MaintenanceAlert from './MaintenanceAlert';
+import useAccessibilityFocus from '../../hooks/useAccessibilityFocus';
 
 const { height, width } = Dimensions.get('window');
 
@@ -32,10 +33,17 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     const [appState, setAppState] = useState(AppState.currentState);
     const [hasTrackedInitialScreen, setHasTrackedInitialScreen] = useState(false);
     const [isWebViewLoaded, setIsWebViewLoaded] = useState(false);
-    
+    const [loading, setLoading] = useState(true);
     const customReferUrl = route.params?.customReferUrl || route.params?.customPaymentUrl || null;
 
     console.log('AutoPayPCIConnector', paymentDetails);
+
+    const [mainViewRef, setFocus] = useAccessibilityFocus();
+    
+        useEffect(() => {
+        // Set focus when the component mounts (screen appears)
+        setFocus();
+      }, [setFocus]);
     
     const generateGuid = () => {
         const p8 = (s) => {
@@ -313,6 +321,7 @@ const navigationChange = async (navState) => {
 
     useEffect(() => {
         setProgress(0);
+        setLoading(true);
     }, [url]);
 
     useEffect(() => {
@@ -380,7 +389,11 @@ const navigationChange = async (navState) => {
         <View style={styles.container}>
             <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); }} title={isServiceDown?'Scheduled Maintenance':name} />
             {(!isServiceDown && progress < 1) && (
-                <View style={styles.progressBar}>
+                <View style={styles.progressBar} ref={mainViewRef}
+         accessible={true}
+                    accessibilityLabel={loading ? `${name} content loading` : `${name} content loaded`}
+                    accessibilityLiveRegion="polite"
+                    accessibilityRole="main" >
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
                 </View>
             )}
@@ -392,17 +405,24 @@ const navigationChange = async (navState) => {
                 ) : (
                 <WebView
                     ref={webViewRef}
+                    
                     source={{ html }}
                     onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
                     onLoadStart={() => {
                         console.log("WebView started loading");
                         setIsWebViewLoaded(false);
+                        setLoading(true);
                     }}
                     onLoadEnd={() => {
                         console.log("WebView finished loading");
-                        setProgress(1);
+                        setLoading(false)
                         setIsWebViewLoaded(true);
-                        setTimeout(() => setDynamicCookie(), 500);
+                        setTimeout(() => {
+                            setDynamicCookie()
+                             setProgress(1);
+                            }, 500);
+
+                    AccessibilityInfo.announceForAccessibility("Content loaded");
                     }}
                     onMessage={onMessage}
                     sharedCookiesEnabled={true}
