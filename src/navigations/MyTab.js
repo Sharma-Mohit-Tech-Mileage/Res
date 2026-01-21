@@ -173,7 +173,7 @@ const createTabBarButton = useCallback(
           return;
         }
 
-        if (["billing", "support", "services"].includes(tab.id)) {
+        if (["billing", "support", "services","account"].includes(tab.id)) {
           e.preventDefault();
           navigation.reset({
             index: 0,
