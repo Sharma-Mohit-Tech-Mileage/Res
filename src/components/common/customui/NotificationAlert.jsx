@@ -575,9 +575,18 @@ const NotificationAlert = ({
               accessibilityHint="Double tap to dismiss"
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Text style={[styles.closeBtnText, { color: config.closeButtonColor }]}>
-                ✕
-              </Text>
+
+              {Platform.OS === "ios" ? (
+                <CloseIcon
+                  width={16}
+                  height={16}
+                  color={config.closeButtonColor}
+                />
+              ) : (
+                <Text style={[styles.closeBtnText, { color: config.closeButtonColor }]}>
+                  ✕
+                </Text>
+              )}
             </Pressable>
           </A11y.Index>
         )}

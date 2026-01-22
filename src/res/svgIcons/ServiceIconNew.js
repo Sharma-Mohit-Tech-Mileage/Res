@@ -4,8 +4,8 @@ import Svg, { Path } from 'react-native-svg';
 const ServiceIconNew = ({
   width = 38,
   height = 27,
-  fill = "#A8A8A8",
-  stroke = "#A8A8A8",
+  fill = "#8D3B90",
+  stroke = "#8D3B90",
   ...props
 }) => {
   return (
