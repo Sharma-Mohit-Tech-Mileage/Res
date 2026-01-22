@@ -1,6 +1,7 @@
 import * as React from "react"
-import {Svg,Path} from 'react-native-svg';
-const HomeIcone = (props) => (
+import {Svg, Path} from 'react-native-svg';
+
+const HomeIcon = ({ color = "#767676", filled = false, ...props }) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
     width={27}
@@ -9,7 +10,8 @@ const HomeIcone = (props) => (
     {...props}
   >
     <Path
-      stroke="#353091"
+      stroke={filled ? color : color}
+      fill={filled ? color : "none"}
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth={2}
@@ -17,4 +19,5 @@ const HomeIcone = (props) => (
     />
   </Svg>
 )
-export default HomeIcone
+
+export default HomeIcon

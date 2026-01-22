@@ -46,6 +46,7 @@ const notifyPermission = async () => {
     authStatus = await messaging().requestPermission();
   }
 
+  console.log('Notification permission status:', authStatus);
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
@@ -56,11 +57,8 @@ const notifyPermission = async () => {
       'Receive app alerts related to your account, updates from Sparklight. Please go to your Settings and allow Notifications.',
       [
         {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
           text: 'Go to Settings',
+          style: 'cancel',
           onPress: () => {
             if (Platform.OS === 'ios') {
               Linking.openURL('app-settings:');
@@ -68,6 +66,10 @@ const notifyPermission = async () => {
               Linking.openSettings();
             }
           },
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
         },
       ],
     );

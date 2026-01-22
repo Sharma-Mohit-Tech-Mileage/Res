@@ -10,12 +10,15 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Color, FontFamily, FontSize } from "../../../GlobalStyles";
+import LeftIcon from '../../../assets/svgs/Chevronleft';
+
 
 const ProfileSettingsHeader = ({
     title,
     onPressBack,
+    accessibleLable=undefined,
     iconAlignment = 'right',
-    iconSource = require("../../../assets/chevronleft.png"),
+    iconSource = LeftIcon,
     showIcon = true
 }) => {
     const [iconPressed, setIconPressed] = useState(false);
@@ -53,20 +56,24 @@ const ProfileSettingsHeader = ({
                                 onPressIn={handlePressIn}
                                 onPressOut={handlePressOut}
                             >
-                                <Image
+                                {/* <Image
                                     style={[styles.icon, iconPressed ? styles.iconPressed : null]}
                                     resizeMode="cover"
                                     source={iconSource}
-                                />
+                                /> */}
+                                <View style={[styles.icon, iconPressed ? styles.iconPressed : null]}>
+                                    <LeftIcon/>
+                                </View>
                             </Pressable>
                         </View>
                     )}
                     <View style={styles.titleContainer}>
                         <Text
                             style={styles.title}
-                            accessible={true}
+                            accessible={title ? true : false}
                             accessibilityRole="header"
-                            accessibilityLabel={`Header: ${title}`}
+                            accessibilityLevel={1}
+                            accessibilityLabel={accessibleLable ? accessibleLable : title}
                         >
                             {title}
                         </Text>
@@ -91,16 +98,16 @@ const styles = StyleSheet.create({
         height: 56,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'center', // Center the content
         paddingHorizontal: 8,
     },
     buttonContainer: {
-        flex: 0.1,
+        position: 'absolute', // Position the button absolutely
+        left: 8, // Align to the left
         justifyContent: 'center',
         alignItems: 'center',
     },
     titleContainer: {
-        flex: 0.9,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -119,6 +126,8 @@ const styles = StyleSheet.create({
     icon: {
         height: 24,
         width: 24,
+        marginLeft:10,
+        marginTop:12
     },
     iconPressed: {
         opacity: 0.5,

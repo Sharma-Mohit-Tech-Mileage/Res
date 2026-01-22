@@ -1,117 +1,214 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import colors from "../../../res/Colors";
 import RightArrow from "../../../res/svgIcons/RightArrow";
-import WalletIcon from "../../../res/svgIcons/WalletIcon";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding } from "../../../../GlobalStyles";
 import { Env } from "../../../network/apis/account/Constants";
-import Wallet2icon from "../../../res/svgIcons/Wallet2icon";
 import WalletSummaryIcon from "../../../res/svgIcons/WalletSummaryIcon";
-const Card = ({
-  billAmt,
-  dueDate,
-  isAutoPayStatus,
-  paperlessStatus,
-  navigation,
-  style,
-  acno
-}) => {
- 
-  console.log('BillAmnt',billAmt)
+import AppStyles from "../../utility/AppStyles";
+import InfoIcon1 from "../../../res/svgIcons/InfoIcon1";
+import Tooltip from "rn-tooltip";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+const Card = ({ billAmt, dueDate, navigation, style }) => {
+  const NotAvailable = () => {
+    return (
+      <View style={{ flexDirection: "column" }}>
+        <Tooltip
+          backgroundColor="#4C5458"
+          overlayColor="#00000000"
+          width={180}
+          height={100}
+          popover={
+            <Text style={{ color: "#FFF" }}>
+              Your due date takes 10 business days to generate. Please check
+              back later.
+            </Text>
+          }
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text style={styles.dueDate}>{"Due "}</Text>
+            <Text
+              style={[
+                styles.dueDate,
+                { fontWeight: "400", color: colors.dark_grey },
+              ]}
+            >
+              {"on: "}
+            </Text>
+            <Text
+              style={[
+                styles.dueDate,
+                { textDecorationLine: "underline", marginRight: 5 },
+              ]}
+            >
+              {"Not Available"}
+            </Text>
+            <InfoIcon1 />
+          </View>
+        </Tooltip>
+      </View>
+    );
+  };
 
   return (
-    <View style={styles.shadowContainer}>
-      <View style={[styles.card, style]}>
-        <View style={styles.cardContent}>
-          <View style={styles.cardHreader}>
-            <View
-              style={{
-                marginLeft: 10,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <View style={{ alignSelf: "center" }}>
-                <WalletSummaryIcon />
-              </View>
-
-              <Text style={styles.leftTitle}>Bill Summary</Text>
-            </View>
+    <View style={[AppStyles.card, style]}>
+      <View style={styles.cardHreader}>
+        <View
+          style={{ marginLeft: 10, flexDirection: "row", alignItems: "center" }}
+        >
+          <View style={{ alignSelf: "center" }}>
+            <WalletSummaryIcon />
           </View>
 
-          <View
-            style={{
-              flexDirection: "row",
-              width: "70%",
-              marginHorizontal: 20,
-              justifyContent: "space-between",
-              
-              flex: 0.5,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "column",
-                flex: 1,
-                marginVertical:24,
-                justifyContent: "flex-start",
-              }}
-            >
-              <Text style={[styles.label, { fontWeight: "600",color:colors.sparklight_purple_blue,fontSize:14 }]}>
-                Account Number
-              </Text>
-              <Text style={[styles.label,{fontSize:14}]}>{acno}</Text>
-            </View>
-            <View style={{ flexDirection: "column", flex: 1,
-                justifyContent: 'flex-end', marginEnd:40}}>
-            {billAmt == undefined ? (
-            <ActivityIndicator
-              size="large"
-              color={colors.sparklight_bright_purple}
-              style={{marginLeft:wp("15%")}}
-            />
-          ) : (
-                  <Text style={styles.amount}>${billAmt}</Text>
-                )}
-              <Text style={styles.dueDate}>
-                {dueDate ? "Balance due :" : ""}
-               
-              </Text>
-              <Text style={[styles.dueDate, { fontWeight: "400" }]}>
-                  {dueDate}
-                </Text>
-            </View>
-          </View>
-
-          <View style={styles.cardFooter}>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("ArticalWindowUtility", {
-                  url: `${Env.URL}/billing`,
-                  name: "Billing Details",
-                });
-              }}
-              accessible={true}
-              accessibilityLabel="Make a Payment"
-              accessibilityRole="button"
-              style={styles.paymentButton}
-            >
-              <Text style={styles.paymentButtonText}>Make a Payment</Text>
-              <View style={{ marginLeft: 2, alignSelf: "center" }}>
-                <RightArrow color={colors.snow_white} />
-              </View>
-            </TouchableOpacity>
-          </View>
+          <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2}>Bill Summary</Text>
         </View>
       </View>
+
+      <View
+        style={{
+          flexDirection: "row",
+          marginHorizontal: 20,
+          justifyContent: "center",
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "column",
+            justifyContent: "center",
+            alignSelf: "center",
+            marginVertical: 15,
+          }}
+        >
+          <Text
+            style={[
+              styles.label,
+              {
+                fontWeight: "700",
+                color: colors.sparklight_purple_blue,
+                fontSize: 18,
+                paddingBottom: 5,
+                alignSelf: "center",
+              },
+            ]}
+          >
+            Total Amount Due
+          </Text>
+          {billAmt == undefined ? (
+            <View style={{ alignSelf: "center" }}>
+              <SkeletonPlaceholder>
+                <>
+                  <View
+                    style={{
+                      width: wp("30%"),
+                      height: 20,
+                      alignSelf: "flex-end",
+                      borderRadius: 4,
+                      marginVertical: 5,
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: wp("30%"),
+                      height: 20,
+                      alignSelf: "flex-end",
+                      borderRadius: 4,
+                      marginVertical: 5,
+                    }}
+                  />
+                </>
+              </SkeletonPlaceholder>
+            </View>
+          ) : (
+            <Text style={styles.amount}>${billAmt}</Text>
+          )}
+
+          {dueDate != "Invalid date" && billAmt != undefined && (
+            <Text
+              accessible={true}
+              accessibilityLabel={`${
+                dueDate
+                  ? dueDate == "Immediately"
+                    ? "Due Immediately"
+                    : `By ${dueDate}`
+                  : "Due on Not Available"
+              }`}
+              style={[
+                styles.dueDate,
+                {
+                  color:
+                    dueDate == "Immediately"
+                      ? colors.sparklight_red
+                      : colors.sparklight_purple_blue,
+                  fontWeight: dueDate == "Immediately" ? "400" : "700",
+                },
+              ]}
+            >
+              {dueDate ? (
+                dueDate == "Immediately" ? (
+                  "Due"
+                ) : (
+                  "By"
+                )
+              ) : (
+                <NotAvailable />
+              )}
+              <Text
+                style={[
+                  styles.dueDate,
+                  {
+                    fontWeight: "400",
+                    color:
+                      dueDate == "Immediately"
+                        ? colors.sparklight_red
+                        : colors.sparklight_purple_blue,
+                  },
+                ]}
+              >
+                {" " + dueDate}
+              </Text>
+            </Text>
+          )}
+        </View>
+      </View>
+
+      {billAmt != undefined ? (
+        <View style={styles.cardFooter}>
+          <TouchableOpacity
+            onPress={() => {
+              let billingURL = `${Env.ACP_BILLING}/billing`;
+              console.log("Billing URL", billingURL);
+              navigation.navigate("ArticalWindowUtility", {
+                url: billingURL,
+                name: "Billing Details",
+              });
+            }}
+            accessible={true}
+            accessibilityLabel="Make a Payment"
+            accessibilityRole="button"
+            style={styles.paymentButton}
+          >
+            <Text style={styles.paymentButtonText}>Make a Payment</Text>
+            <View style={{ marginLeft: 2, alignSelf: "center" }}>
+              <RightArrow color={colors.snow_white} />
+            </View>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <>
+          <SkeletonPlaceholder>
+            <View
+              style={{
+                width: wp("70%"),
+                height: 40,
+                alignSelf: "center",
+                borderRadius: 4,
+                marginVertical: 10,
+              }}
+            />
+          </SkeletonPlaceholder>
+        </>
+      )}
     </View>
   );
 };
@@ -183,19 +280,19 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   amount: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: "bold",
-    alignSelf:'flex-end',
+    alignSelf: "center",
+    paddingBottom: 5,
+    fontFamily: FontFamily.openSansRegular,
     color: colors.sp_black,
-    fontWeight: "700",
-    
   },
   dueDate: {
-
     fontSize: 14,
     fontWeight: "700",
     color: colors.dark_grey,
-    alignSelf:'flex-end',
+    alignSelf: "center",
+    paddingBottom: 5,
     fontFamily: FontFamily.openSansRegular,
     color: colors.sparklight_purple_blue,
   },
@@ -232,10 +329,10 @@ const styles = StyleSheet.create({
   paymentButton: {
     flexDirection: "row",
     backgroundColor: colors.sparklight_purple_blue,
-    width:wp("70%"),
+    width: wp("70%"),
     paddingVertical: 8,
-    alignItems:'center',
-    justifyContent:'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 5,
     alignSelf: "center",
     marginLeft: wp("9%"),
@@ -244,23 +341,19 @@ const styles = StyleSheet.create({
     color: colors.snow_white,
     fontSize: 16,
     fontWeight: "600",
-    alignSelf:'center',
+    alignSelf: "center",
     fontFamily: FontFamily.openSansRegular,
   },
   cardHreader: {
     flexDirection: "row",
     backgroundColor: "#F8F8F8",
-    width: "92%",
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    width: "100%",
     padding: 10,
   },
   cardFooter: {
     flexDirection: "row",
     backgroundColor: "#F8F8F8",
     width: "100%",
-    borderBottomEndRadius: 10,
-    borderBottomStartRadius: 10,
     padding: 10,
     position: "absolute",
     bottom: 0,

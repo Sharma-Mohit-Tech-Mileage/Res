@@ -1,17 +1,5 @@
-import {
-    USER_PROFILE_DETAILS, SAVE_USER_LIST,
-    FETCH_USER_LIST, FETCH_PROFILE_DETAILS,
-    FETCH_SMS_SELECTION, SAVE_SMS_SELECTION,
-    UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SECURITY,
-    UPDATE_TEXT_NOTIFICATION, SAVE_EMAIL_SELECTION,
-    FETCH_EMIAL_SELECTION, SAVE_PAPERLESS_DETAILS,
-    FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION,
-    UPDATE_TERMS_AND_CONDITIONS, UNSUBSCRIBE_PAPERLESS,
-    UPDATE_PUSH_NOTIFICATIONS, FETCH_PUSH_NOTIFICATIONS,
-    SAVE_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2,
-    SAVE_USER_FEEDBACK, UPDATE_ENTRY_EMAIL_NOTIFICATION,
-    UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION,SAVE_USER_ACCOUNT_SERVICE,ADD_NEW_USER,DELETE_USER,EDIT_USER
-} from '../constants';
+import { USER_PROFILE_DETAILS, SAVE_USER_LIST, FETCH_USER_LIST, FETCH_PROFILE_DETAILS, FETCH_SMS_SELECTION, SAVE_SMS_SELECTION, UPDATE_PROFILE_REQUEST, UPDATE_PROFILE_SECURITY, UPDATE_TEXT_NOTIFICATION, SAVE_EMAIL_SELECTION, FETCH_EMIAL_SELECTION, SAVE_PAPERLESS_DETAILS, FETCH_PAPERLESS, UPDATE_EMAIL_NOTIFICATION, UPDATE_TERMS_AND_CONDITIONS, UNSUBSCRIBE_PAPERLESS, UPDATE_PUSH_NOTIFICATIONS, FETCH_PUSH_NOTIFICATIONS, SAVE_PUSH_NOTIFICATIONS, UPDATE_PUSH_NOTIFICATIONS_V2, SAVE_USER_FEEDBACK, UPDATE_EXISTING_EMAIL_NOTIFICATION, RESEND_EMAIL_VERIFICTION, SAVE_USER_ACCOUNT_SERVICE,ADD_NEW_USER,DELETE_USER,EDIT_USER, ALLSVEMAILASSOCIATED,SAVEALLSVEMAILASSOCIATED,ADD_SV_EMAIL_NO_FLAGS_REQUEST, DELETE_SV_EMAIL_REQUEST,UPDATE_SV_EMAILS_REQUEST,MANAGE_EMAIL_REQUEST,UPDATE_EMAIL_ASSOCIATIONS, GET_PAPERLESS_STATUS,SET_PAPERLESS_STATUS,FETCH_ACP_USER_ACCOUNT_DETAILS,SAVE_ACP_USER_ACCOUNT_DETAILS,FETCH_PAPERLESS_STATUS,SET_LOADING,CLEAR_LOADING } from '../constants';
+
 export const fetchProfileSuccess = (response) => {
     return {
         type: USER_PROFILE_DETAILS,
@@ -157,11 +145,6 @@ export const saveUserFeedback = (data, navigation) => ({
     navigation,
 });
 
-export const updateEntryEmailNotification = (data, navigation) => ({
-    type: UPDATE_ENTRY_EMAIL_NOTIFICATION,
-    payload: data,
-    navigation,
-});
 
 export const resentEmailVerifiction = (navigation) => ({
     type: RESEND_EMAIL_VERIFICTION,
@@ -191,9 +174,74 @@ export const editNewUser = (data, navigation) => ({
     payload: data,
     navigation,
 });
+export const fetchSvEmailAssociation = () => {
+    return {
+        type: ALLSVEMAILASSOCIATED
+    };
+};
+export const saveSvEmailAssociation = (data) => {
+    return {
+        type: SAVEALLSVEMAILASSOCIATED,
+        payload: data
+    };
+};
+
+export const addSVEmailNoFlagsRequest = (email, navigation) => ({
+    type: ADD_SV_EMAIL_NO_FLAGS_REQUEST,
+    payload: { email },
+    navigation
+});
+
+export const deleteSVEmailRequest = (email, navigation) => ({
+    type: DELETE_SV_EMAIL_REQUEST,
+    payload: { email },
+    navigation
+});
+
+export const updateSVEmailsRequest = (emailList, navigation) => ({
+    type: UPDATE_SV_EMAILS_REQUEST,
+    payload: { emailList },
+    navigation
+});
 
 
+export const manageEmailRequest = (email, isPaperless, isMarketing,newEmail, navigation) => ({
+    type: MANAGE_EMAIL_REQUEST,
+    payload: { email, isPaperless, isMarketing ,newEmail},
+    navigation
+});
 
+export const updateEmailAssociations = (paperlessEmail, marketingEmails, navigation) => ({
+    type: UPDATE_EMAIL_ASSOCIATIONS,
+    payload: {
+        paperlessEmail,  
+        marketingEmails   
+    },
+    navigation,
+});
+export const getPaperlessStatus = (email) => ({
+    type: GET_PAPERLESS_STATUS,
+    payload: { email }
+});
 
+export const setPaperlessStatus = (status) => ({
+    type: SET_PAPERLESS_STATUS,
+    payload: status
+});
 
-
+export const setLoading = () => ({
+    type: SET_LOADING,
+    
+});
+export const clearLoading = () => ({
+    type: CLEAR_LOADING,
+    
+});
+export const fetchACPUserAccountDetails = () => ({
+    type: FETCH_ACP_USER_ACCOUNT_DETAILS,
+  });
+  
+  export const saveACPUserAccountDetails = (data) => ({
+    type: SAVE_ACP_USER_ACCOUNT_DETAILS,
+    payload: data,
+  });

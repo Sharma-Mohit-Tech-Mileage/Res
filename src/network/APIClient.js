@@ -1,305 +1,408 @@
 import { getUser } from "../redux/utils/LocalStorage";
 import { Env } from "./apis/account/Constants";
 import axios from "axios";
-import { RefreshToken } from '../components/user/Session';
-import { navigationRef } from '../navigations/UserNavigations';
+import { RefreshToken } from "../components/user/Session";
+import { navigationRef } from "../navigations/UserNavigations";
 
-// Base URLs with ensured trailing slashes
-const BASE_URL = Env.API_BASEURL.endsWith('/') ? Env.API_BASEURL : `${Env.API_BASEURL}/`;
-const API_ACP_BASEURL = Env.API_ACP_BASEURL.endsWith('/') ? Env.API_ACP_BASEURL : `${Env.API_ACP_BASEURL}/`;
+const API_ACP_BASEURL = Env.API_ACP_BASEURL;
 const SUPPORT_URL = "https://support.sparklight.com/api/v2/help_center/";
-const MODEM_BASE_URL = Env.MODEM_BASE_URL.endsWith('/') ? Env.MODEM_BASE_URL : `${Env.MODEM_BASE_URL}/`;
 
 export let UserAuthorized = false;
 let isRefreshing = false;
 let failedQueue = [];
 
-// Function to set user authorization status
 export const isUserAuthorized = (authorize) => {
-    UserAuthorized = authorize;
+  UserAuthorized = authorize;
 };
 
 const handleFetchResponse = async (response, url, onSuccess, onError) => {
-    try {
-        const rawResponse = await response.text(); // Read response as plain text
-        console.log("Request URL:", url); // Log the full URL being accessed
-        console.log("Raw Response:", response.status); // Log the raw response
+  try {
+    const rawResponse = await response.text();
 
-        if (response.status === 204 || !rawResponse) {
-            onSuccess({ message: 'No content', code: response.status }); // Pass a success message for no content
-            return;
-        }
-
-        // Try parsing the response as JSON if not empty
-        try {
-            const json = JSON.parse(rawResponse);
-            if (response.ok) {
-                onSuccess(json);
-            } else {
-                onError(`Response status ${response.status} (${response.statusText}): ${json.message}`);
-            }
-        } catch (jsonParseError) {
-            console.error('JSON Parse error:', jsonParseError);
-            onError(`Failed to parse response: ${jsonParseError.message} code: ${response.status}`);
-        }
-    } catch (error) {
-        onError(`Error processing response: ${error.message}`);
+    if (response.status === 204 || !rawResponse) {
+      onSuccess({ message: "No content", code: response.status });
+      return;
     }
-};
 
-// Function to process the queue of requests during token refresh
-const processQueue = (error, token = null) => {
-    failedQueue.forEach(prom => {
-        if (error) {
-            prom.reject(error);
-        } else {
-            prom.resolve(token);
-        }
-    });
-    failedQueue = [];
-};
-
-// Function to handle API calls with token refresh logic
-const fetchWithTokenRefresh = async (fetchFunction, endpoint, options, onSuccess, onError) => {
     try {
-        console.log('Attempting API call:', endpoint);
-        let response = await fetchFunction(endpoint, options);
-        if (response.status === 401) {
-            console.log('401 Unauthorized, attempting to refresh token...');
-            if (!isRefreshing) {
-                isRefreshing = true;
-                try {
-                    await RefreshToken();
-                    const user = await getUser();
-                    options.headers['Authorization'] = `Bearer ${user.token}`;
-                    console.log('Token refreshed successfully');
-                    processQueue(null, user.token);
-                } catch (refreshError) {
-                    console.error('Token refresh failed:', refreshError);
-                    processQueue(refreshError, null);
-                    if (navigationRef.current) {
-                        navigationRef.current.navigate('Splash');
-                    }
-                } finally {
-                    isRefreshing = false;
-                }
-            }
+      const json = JSON.parse(rawResponse);
 
-            return new Promise((resolve, reject) => {
-                console.log('Adding request to queue');
-                failedQueue.push({ resolve, reject });
-            }).then(token => {
-                console.log('Retrying request with new token:', token);
-                options.headers['Authorization'] = `Bearer ${token}`;
-                return fetchFunction(endpoint, options);
-            });
-        }
-        return response;
-    } catch (error) {
-        console.error('API call failed:', error.message);
-        onError(error.message);
-    }
-};
-
-// Function to handle authentication responses
-const handleAuthResponse = async (response, idTokenGuid, refreshToken, onSuccess, onError) => {
-    const json = await response.json();
-    if (response.ok) {
-        if (idTokenGuid && refreshToken) {
-            json.idTokenGuid = idTokenGuid;
-            json.refreshToken = refreshToken;
-        }
+      if (response.ok) {
         onSuccess(json);
-    } else {
-        onError(`Response status ${response.status} (${response.statusText}): ${json.message}`);
+      } else {
+        onError({
+          status: response.status,
+          statusText: response.statusText,
+          message: json.message || json.error || "Request failed",
+          data: json,
+          url: url,
+        });
+      }
+    } catch (jsonParseError) {
+      onError({
+        status: response.status,
+        statusText: response.statusText,
+        message: `Failed to parse response: ${jsonParseError.message}`,
+        url: url,
+      });
     }
+  } catch (error) {
+    onError({
+      status: 0,
+      message: `Error processing response: ${error.message}`,
+      url: url,
+    });
+  }
 };
 
-// Post request with authentication for specific endpoints
-export const PostAuthApiRequest = async (endpoint, body, onSuccess, onError) => {
-    const idTokenGuid = body.idTokenGuid;
-    const refreshToken = body.refreshToken;
-    delete body.idTokenGuid;
-    delete body.refreshToken;
-    const options = {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(body)
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+const fetchWithTokenRefresh = async (
+  fetchFunction,
+  endpoint,
+  options,
+  onSuccess,
+  onError
+) => {
+  try {
+    let response = await fetchFunction(endpoint, options);
+    if (response.status === 401) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(async (token) => {
+          options.headers["Authorization"] = `Bearer ${token}`;
+          const retryResponse = await fetchFunction(endpoint, options);
+          return retryResponse;
+        });
+      }
+
+      isRefreshing = true;
+
+      try {
+        const newToken = await RefreshToken();
+        const user = await getUser();
+        options.headers["Authorization"] = `Bearer ${user.token}`;
+        processQueue(null, user.token);
+        isRefreshing = false;
+        response = await fetchFunction(endpoint, options);
+        return response;
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        isRefreshing = false;
+
+        console.log("[APIClient] Token refresh failed, redirecting to login");
+        if (navigationRef.current) {
+          navigationRef.current.reset({
+            index: 0,
+            routes: [{ name: "Splash" }],
+          });
+        }
+
+        throw refreshError;
+      }
+    }
+
+    return response;
+  } catch (error) {
+    console.error("[APIClient] Fetch error:", error);
+    throw error;
+  }
+};
+
+export const PostAuthApiRequest = async (
+  endpoint,
+  body,
+  onSuccess,
+  onError
+) => {
+  const idTokenGuid = body?.idTokenGuid;
+  const refreshToken = body?.refreshToken;
+
+  try {
+    const requestBody = { ...body };
+    delete requestBody.idTokenGuid;
+    delete requestBody.refreshToken;
+
+    const res = await axios.post(`${API_ACP_BASEURL}${endpoint}`, requestBody, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      timeout: 30000,
+      validateStatus: (status) =>
+        status >= 200 && status < 300 && status !== 204,
+    });
+
+    if (res.status === 204) {
+      onError({
+        status: 204,
+        message: "No content received",
+        endpoint,
+        timestamp: new Date().toISOString(),
+      });
+      return;
+    }
+
+    const responseData = { ...res.data };
+    if (idTokenGuid) responseData.idTokenGuid = idTokenGuid;
+    if (refreshToken) responseData.refreshToken = refreshToken;
+
+    onSuccess(responseData);
+  } catch (err) {
+    const errorResponse = {
+      status: err.response?.status || 0,
+      statusText: err.response?.statusText || "Unknown Error",
+      message: err.response?.data?.message || err.message || "Request failed",
+      data: err.response?.data,
+      endpoint,
+      timestamp: new Date().toISOString(),
     };
 
-    fetch(`${BASE_URL}${endpoint}`, options)
-        .then(response => handleAuthResponse(response, idTokenGuid, refreshToken, onSuccess, onError))
-        .catch(exception => onError(exception.message));
+    onError(errorResponse);
+  }
 };
 
-// Generic POST API request function
 export const PostApiRequest = async (endpoint, body, onSuccess, onError) => {
+  try {
     const user = await getUser();
-    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
+    console.log("Bearer Token for API request:", user.token);
     const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
-        },
-        body: JSON.stringify(body)
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+      body: JSON.stringify(body),
     };
 
-    fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, `${baseUrl}${endpoint}`, onSuccess, onError));
+    const response = await fetchWithTokenRefresh(
+      fetch,
+      `${API_ACP_BASEURL}${endpoint}`,
+      options,
+      onSuccess,
+      onError
+    );
+
+    await handleFetchResponse(
+      response,
+      `${API_ACP_BASEURL}${endpoint}`,
+      onSuccess,
+      onError
+    );
+  } catch (error) {
+    console.error("[PostApiRequest] Error:", error);
+    onError({
+      status: 0,
+      message: error.message || "Request failed",
+      endpoint,
+    });
+  }
 };
 
-// Function to upload multipart data
-export const UploadMultipartData = async (endpoint, data, onSuccess, onError) => {
+export const UploadMultipartData = async (
+  endpoint,
+  data,
+  onSuccess,
+  onError
+) => {
+  try {
     const user = await getUser();
-    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
     const formData = new FormData();
     formData.append("file", {
-        name: data.name,
-        type: data.type,
-        uri: data.uri,
+      name: data.name,
+      type: data.type,
+      uri: data.uri,
     });
 
     const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${user.token}`
-        },
-        data: formData
+      method: "POST",
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${user.token}`,
+      },
+      data: formData,
     };
 
-    const fetchFunction = (url, opts) => axios.post(url, opts.data, { headers: opts.headers });
+    const fetchFunction = (url, opts) =>
+      axios.post(url, opts.data, { headers: opts.headers });
 
-    console.log('UploadMultipartData:', `${baseUrl}${endpoint}`);
-    fetchWithTokenRefresh(fetchFunction, `${baseUrl}${endpoint}`, options, onSuccess, onError)
-        .then(response => onSuccess(response.data))
-        .catch(error => {
-            console.error('UploadMultipartData error:', error.message);
-            onError(error.message);
-        });
+    const response = await fetchWithTokenRefresh(
+      fetchFunction,
+      `${API_ACP_BASEURL}${endpoint}`,
+      options,
+      onSuccess,
+      onError
+    );
+
+    onSuccess(response.data);
+  } catch (error) {
+    console.error("[UploadMultipartData] Error:", error);
+    onError({
+      status: error.response?.status || 0,
+      message: error.message || "Upload failed",
+      endpoint,
+    });
+  }
 };
 
-// Function for PUT API requests
 export const PutApiRequest = async (endpoint, body, onSuccess, onError) => {
+  try {
     const user = await getUser();
-    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
+    console.log("Bearer Token for API request:", user.token);
     const options = {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
-        },
-        body: JSON.stringify(body)
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+      body: JSON.stringify(body),
     };
 
-    fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, `${baseUrl}${endpoint}`, onSuccess, onError));
+    const response = await fetchWithTokenRefresh(
+      fetch,
+      `${API_ACP_BASEURL}${endpoint}`,
+      options,
+      onSuccess,
+      onError
+    );
+
+    await handleFetchResponse(
+      response,
+      `${API_ACP_BASEURL}${endpoint}`,
+      onSuccess,
+      onError
+    );
+  } catch (error) {
+    console.error("[PutApiRequest] Error:", error);
+    onError({
+      status: 0,
+      message: error.message || "Request failed",
+      endpoint,
+    });
+  }
 };
 
-// Function for GET API requests
 export const GetApiRequest = async (endpoint, onSuccess, onError) => {
+  try {
     const user = await getUser();
-    const baseUrl = await getBaseUrl(); // Dynamically get the base URL
+    console.log("Bearer Token for API request:", user.token);
     const options = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
-        }
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
     };
 
-    console.log('GetApiRequest:', endpoint);
-    console.log('request Token:', user.token);
-    fetchWithTokenRefresh(fetch, `${baseUrl}${endpoint}`, options, onSuccess, onError)
-        .then(response => {
-            if (response.status === 204) {
-                onError(response.status);
-            } else {
-                return handleFetchResponse(response, `${baseUrl}${endpoint}`, onSuccess, onError);
-            }
-        });
-};
+    const response = await fetchWithTokenRefresh(
+      fetch,
+      `${API_ACP_BASEURL}${endpoint}`,
+      options,
+      onSuccess,
+      onError
+    );
 
-// Function to search API requests using support URL
-export const GetApiRequestSearch = async (endpoint, onSuccess, onError) => {
-    const user = await getUser();
-
-    const options = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.token}`
-        }
-    };
-
-    fetchWithTokenRefresh(fetch, `${SUPPORT_URL}${endpoint}`, options, onSuccess, onError)
-        .then(response => handleFetchResponse(response, `${SUPPORT_URL}${endpoint}`, onSuccess, onError));
-};
-
-// Function for modem status API requests
-export const GetModemStatusApiRequest = async (endpoint, onSuccess, onError) => {
-    const options = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'client_id': '0224e1c5310a45f4a02a244a54e50350',
-            'client_secret': '1237E83e1676480B90BfEdB0aa73c91b'
-        }
-    };
-
-    console.log('GetModemStatusApiRequest:', `${MODEM_BASE_URL}${endpoint}`);
-    fetch(`${MODEM_BASE_URL}${endpoint}`, options)
-        .then(response => {
-            if (response.status >= 400 && response.status < 600) {
-                onError(response.status);
-            } else {
-                return response.json();
-            }
-        })
-        .then(json => onSuccess(json))
-        .catch(exception => onError(exception.message));
-};
-
-// Truck roll API request function
-export const PostruckRollApi = (endpoint, body, onSuccess, onError) => {
-    console.log(`endpoint=endpoint`, JSON.stringify(body));
-    fetch(Env.TRUCK_ROLL_BASE_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            'Authorization': "Bearer dapie2a2368f30bbec7fd55a0cadbce8d388"
-        },
-        body: JSON.stringify(body),
-    })
-        .then((response) => Promise.all([response, response.json()]))
-        .then(([response, json]) => {
-            console.log(response);
-            onSuccess(json);
-        })
-        .catch((exception) => onError(exception.message));
-};
-
-// Helper method to decide the base URL based on user type
-const getBaseUrl = async () => {
-    try {
-        const user = await getUser();
-        console.log("[getBaseUrl] User:", user);
-        // If user exists and is not a normal user, return ACP base URL
-        if (user && user.isNormalUser === false) {
-            console.log("[getBaseUrl] User is ACP user.");
-            return API_ACP_BASEURL;
-        }
-
-        // Default case for normal user
-        console.log("[getBaseUrl] User is normal user:", user?.isNormalUser);
-        return BASE_URL;
-    } catch (error) {
-        // Log the error and return BASE_URL as a fallback
-        console.error("[getBaseUrl] Error determining base URL:", error);
-        return BASE_URL;
+    if (response.status === 204) {
+      onError({
+        status: 204,
+        message: "No content",
+        endpoint,
+      });
+    } else {
+      await handleFetchResponse(
+        response,
+        `${API_ACP_BASEURL}${endpoint}`,
+        onSuccess,
+        onError
+      );
     }
+  } catch (error) {
+    console.error("[GetApiRequest] Error:", error);
+    onError({
+      status: 0,
+      message: error.message || "Request failed",
+      endpoint,
+    });
+  }
+};
+
+export const GetApiRequestSearch = async (endpoint, onSuccess, onError) => {
+  try {
+    const user = await getUser();
+    const options = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
+
+    const response = await fetchWithTokenRefresh(
+      fetch,
+      `${SUPPORT_URL}${endpoint}`,
+      options,
+      onSuccess,
+      onError
+    );
+
+    await handleFetchResponse(
+      response,
+      `${SUPPORT_URL}${endpoint}`,
+      onSuccess,
+      onError
+    );
+  } catch (error) {
+    console.error("[GetApiRequestSearch] Error:", error);
+    onError({
+      status: 0,
+      message: error.message || "Request failed",
+      endpoint,
+    });
+  }
+};
+
+export const GetModemStatusApiRequest = async (
+  endpoint,
+  onSuccess,
+  onError
+) => {
+  const options = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      client_id: "0224e1c5310a45f4a02a244a54e50350",
+      client_secret: "1237E83e1676480B90BfEdB0aa73c91b",
+    },
+  };
+
+  try {
+    const response = await fetch(`${API_ACP_BASEURL}${endpoint}`, options);
+
+    if (response.status >= 400 && response.status < 600) {
+      onError({
+        status: response.status,
+        message: `Request failed with status ${response.status}`,
+        endpoint,
+      });
+    } else {
+      const json = await response.json();
+      onSuccess(json);
+    }
+  } catch (error) {
+    onError({
+      status: 0,
+      message: error.message || "Request failed",
+      endpoint,
+    });
+  }
 };

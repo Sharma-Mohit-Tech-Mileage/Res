@@ -5,8 +5,8 @@ const AutoPayIcon = (props) => (
   <Svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="-1 1 24 24"
-    width="32" // Set your desired width
-    height="32" // Set your desired height
+    width="24" // Set your desired width
+    height="24" // Set your desired height
     {...props}
   >
     <Path

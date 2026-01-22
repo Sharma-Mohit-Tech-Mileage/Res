@@ -1,497 +1,555 @@
-import React, { useState, useEffect,useCallback } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Platform, Dimensions, Linking, } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Platform,
+  TouchableOpacity,
+} from "react-native";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import LinearGradient from "react-native-linear-gradient";
-import colors from "../../res/Colors";
-import { SafeAreaView } from "react-native-safe-area-context";
-import DownArrow from "../../res/svgIcons/DownArrow";
-import UpArrow from "../../res/svgIcons/UpArrow";
-import {getUser,storeUpgradeToken} from "../../redux/utils/LocalStorage";
-import {GetApiRequest} from "../../network/APIClient";
 import moment from "moment";
-import { Border, Color, FontFamily, FontSize } from "../../../GlobalStyles";
-import CloseIcon from "../../res/svgIcons/CloseIcon";
-import YoutubePlayer from "react-native-youtube-iframe";
-import AccessibleYoutubePlayer from "../common/AccessibleYoutubePlayer";
-import {saveAccountServices} from "../../redux/actions/ProfileActionSuite";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector, useDispatch } from "react-redux";
-import { updateWalkThroughStep } from "../../redux/actions/DashboardAction";
-import { Env } from "../../network/apis/account/Constants";
-import { checkForMinorUpdate } from "../utility/constant";
-import MyInternetDetialsBiller from "../common/MyInternetDetailsBiller";
 import { useFocusEffect } from "@react-navigation/native";
-const tabWidth = Number(Dimensions.get("window").width / 4);
-const NewBillerHome = ({ navigation }) => {
-  const [playing, setPlaying] = useState(false);
-  const [isImageDispaly, setIsImageDispaly] = useState(true);
-  const home = useSelector((state) => state.combinedReducers.home);
- 
-  const dispatch = useDispatch();
-  const [phonePlan, setPhonePlan] = useState([]);
-  const [billAmt, setBillAmt] = useState(undefined);
-  const [dueDate, setDueDate] = useState("");
-  const [pastPaymentDue, setPastPaymentDue] = useState(0.0);
-  const [payStatus, setPayStatus] = useState({});
-  const [hasOutage, setHasOutage] = useState(false);
-  const [isOutageAlert, setIsOutageAlert] = useState(false);
-  const [checkModemStatus, setCheckModemStatus] = useState(false);
-  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({ dueDate: null, billAmount: 0, pastPaymentDue: 0, email: null });
-  const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
-  const [walkThroughStep, setWalkThroughStep] = useState(0);
-  const [showWalkThrough, setShowWalkThrough] = useState(false);
-  const [internetHealths, setInternetHealths] = useState([]);
+import colors from "../../res/Colors";
+import { Color, Padding } from "../../../GlobalStyles";
+import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
+import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
+import { AlertUtils } from "../utility/AlertUtils";
+import { Env } from "../../network/apis/account/Constants";
+import WelcomeCard from "../ACPDashboard/WelcomeCard";
+import PromoBanner from "../ACPDashboard/PromoBanner";
+import FeatureCard from "../ACPDashboard/FeatureCard";
+import InfoBanner from "../ACPDashboard/InfoBanner";
+import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
+import { getUser } from "../../redux/utils/LocalStorage";
+import { useMaintenance } from "../maintenance/MaintenanceContext";
+import MaintenanceBanner from "../maintenance/MaintenanceBanner";
+import DisconnectedBanner from "../ACPDashboard/DisconnectedBanner";
+import { isAccountDisconnected } from "../utility/disconnectHelpers";
+import { storePushNotificationStatus } from "../../redux/utils/LocalStorage";
+import MobilePilotLandingPage from "../../components/ACPDashboard/MobilePilotLandingPage";
+import {
+  getFcmToken,
+  requestUserPermission,
+} from "../../firebase/FirebaseUtils";
+import Logo from "../../res/images/SpalshLogo";
+import sign from "jwt-encode"; // npm method for signing JWT
+import ChatIcon from "../../res/svgIcons/ChatIcon";
+import VersionCheck from "react-native-version-check";
+import DeviceInfo from "react-native-device-info";
 
+import {
+  startChatWithConfig,
+  initChat,
+  startChat,
+  logoutZendesk,
+  loginWithJWT,
+  setConversationalFields,
+} from "../utility/RNZendeskChat";
+
+const NewBillerHome = ({ navigation }) => {
+  const [isOutageAlert, setIsOutageAlert] = useState(false);
+  const [estimatedRestoreTime, setEstimatedRestoreTime] = useState("");
+  const [isNotificationEnable, setIsNotificationEnable] = useState(false);
+  const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
+  const [loadingAutoPay, setloadingAutoPay] = useState(false);
+  const { showBanner, bannerConfig, dismissBanner } = useMaintenance();
+  const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
+    dueDate: null,
+    billAmount: 0,
+    pastPaymentDue: 0,
+    email: null,
+  });
   const [updateStatus, setUpdateStatus] = useState({
     isMinorUpdateAvailable: false,
     currentVersion: "",
     latestVersion: "",
   });
+  const accountDetails = useSelector((state) => state.profile?.accountDetails);
+  const home = useSelector((state) => state.home);
+  const isWalkthroughActive =
+    home.walkThroughStep !== null && home.walkThroughStep !== undefined;
+  const dispatch = useDispatch();
+  const paperlessStatusAcp = useSelector(
+    (state) => state.profile?.paperlessStatusAcp
+  );
+  const paperlessLoading = useSelector(
+    (state) => state.profile?.isPaperLessStatusLoading
+  );
+  const userInfo = useSelector((state) => state.user?.userData?.userInfo);
+  const isMobilePilotEnabled = useSelector(
+    (state) => state.user.userData?.userInfo?.pending_activation === true
+  );
 
+  const showDisconnectedBanner = userInfo
+    ? isAccountDisconnected(
+        userInfo.acctStatus,
+        userInfo.daysSinceDisconnectDate
+      )
+    : false;
 
-  const getUpgradeToken = async () => {
-    const url = Env.API_SHOPPING_CART_BASEURL + "/api/UpgradeOrder/token";
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        grant_type: "password",
-        username: "upgr4d3s0rd3rus3r",
-        password: "upgr4d3s0rd3rp4ssw0rd",
-      }).toString(),
-    });
-
-    let json = {};
-
-    if (response !== undefined) {
-      json = response.json();
-    }
-    return json;
-  };
-
-
-  const getUserAccountDetails = () => {
-    setBillAmt(undefined)
+  /* Function to check outage status */
+  const checOutagStatus = () => {
     getUser().then((res) => {
-      const request = `accountsvc/api/Accounts/GetAccountDetailsByAccountNumber?accountNumber=${res.userInfo.accountNumber}`;
-      GetApiRequest(
+      const request = `api/outage/GetOutages?accountNumber=${res.userInfo.accountNumber}`;
+      PostApiRequest(
         request,
-        (res) => {
-          if (res) {
-            dispatch(saveAccountServices(res.services));
-            console.log("getUserAccountDetails **************************************************", res);
-            let userBillAmt=(res.past_due_amount<=0) ? res.current_balance: res.past_due_amount
-            setBillAmt(userBillAmt?.toFixed(2));
-
-            let dueDate =(res.past_due_amount!=0)? 'Immediately': moment(res.payment_due_date).format("ll");
-            setDueDate(dueDate);
-
-            function getFirstEmail(emailArray) {
-              return (emailArray && emailArray.length > 0 && emailArray[0].email_address)
-                ? emailArray[0].email_address
-                : null;
-            }
-            let paymentDetails = { ...defaultPaymentDetails };
-            paymentDetails.dueDate = res.payment_due_date;
-            paymentDetails.billAmount = res.payment_due_amount;
-            paymentDetails.pastPaymentDue = res.past_due_amount;
-            paymentDetails.email = getFirstEmail(res.email_details);
-            setDefaultPaymentDetails(paymentDetails);
-            //let billAmnt=(Math.round(res.payment_due_amount * 100) / 100).toFixed(2);
-            //setBillAmt(res.payment_due_amount.toFixed(2));
+        {},
+        (response) => {
+          console.log("checOutagStatus response", response);
+          if (response?.error == false && response?.outageStatus) {
+            console.log("its outage");
+            setIsOutageAlert(true);
+            setEstimatedRestoreTime(moment(response?.restoredBy).format("LT"));
+          } else {
+            setIsOutageAlert(false);
           }
+         // hardcode for testing
+          if(res.userInfo.accountNumber=="8160110010005227"){
+            setIsOutageAlert(true);
+            setEstimatedRestoreTime(moment().add(2, 'hours').format("LT"));
+          }
+
         },
-        onErrorBill
+        (errorCode) => {
+          console.log("error in checOutagStatus", errorCode);
+        }
       );
     });
   };
 
-
-  const onErrorBill = (error) => {
-    console.log("error", error);
+  const getStatus = () => {
+    setloadingAutoPay(true);
+    getUser().then((res) => {
+      const accountNumber = res.userInfo.accountNumber;
+      GetApiRequest(
+        `api/Accounts/${accountNumber}/easypay`,
+        (res) => {
+          setIsAutoPayStatus(res?.isEasyPay);
+          setloadingAutoPay(false);
+        },
+        (error) => {
+          console.log("error", error);
+          setloadingAutoPay(false);
+        }
+      );
+    });
   };
-
-  useEffect(() => {
-    const fetchUpdateStatus = async () => {
-      const status = await checkForMinorUpdate();
-      setUpdateStatus(status);
-    };
-
-    fetchUpdateStatus();
-  }, []);
-
-  useEffect(() => {
-    if (internetHealths.length >= 3) {
-      setCheckModemStatus(true);
-    }
-  }, [internetHealths]);
-
-  useEffect(() => {
-
-    const fetchData = async () => {
-      try {
-        const result = await getUpgradeToken();
-        console.log("getUpgradeTokenResult: ", JSON.stringify(result));
-        storeUpgradeToken(result);
-      } catch (error) {
-        console.error("Error fetching data", error);
-      }
-      if (home.walkThroughStep !== null && home.walkThroughStep !== undefined) {
-      }
-    };
-    fetchData();
-  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      const fetchUpdateStatus = async () => {
-        const status = await checkForMinorUpdate();
-        setUpdateStatus(status);
+      const refreshData = async () => {
+        try {
+          checOutagStatus();
+          const status = await checkForMinorUpdate();
+          setUpdateStatus(status);
+// hardcode for testing update app feature
+          if(userInfo?.accountNumber=="8160110010005227"){
+        setUpdateStatus({
+          isMinorUpdateAvailable: true,
+          
+        });
+      }
+          dispatch(fetchACPUserAccountDetails());
+          getStatus();
+          //getInAppNotificationsData();
+          setIsNotificationEnable(true);
+        } catch (error) {
+          console.error("Error refreshing data on focus", error);
+        }
       };
-  
-      fetchUpdateStatus();
-      getUserAccountDetails();
-    }, [])
+
+      
+      
+     
+      refreshData();
+    }, [dispatch])
   );
-  const changeWalkThroughStep = (step) => {
-    if (step > 2) {
-      dispatch(updateWalkThroughStep(null));
-      setShowWalkThrough(false);
+
+  useEffect(() => {
+    if (isNotificationEnable) {
+      enableNotifications();
+    }
+  }, [isNotificationEnable]);
+
+  useEffect(() => {
+    if (accountDetails) {
+      setDefaultPaymentDetails({
+        dueDate: accountDetails.payment_due_date,
+        billAmount: accountDetails.payment_due_amount,
+        pastPaymentDue: accountDetails.past_due_amount,
+        email: getPrimaryEmail(accountDetails),
+      });
+      DeviceInfo.getUserAgent().then((userAgent) => {
+        // iOS: "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143"
+        // tvOS: not available
+        // Android: "Mozilla/5.0 (Linux; Android 12; sdk_gphone64_arm64 Build/SE1A.220630.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36"
+        // Windows: ?
+        //getZendeskChatToken(userAgent);
+        loginWithToken(userAgent);
+      });
+    }
+  }, [accountDetails]);
+
+  const getInAppNotificationsData = () => {
+    getUser().then((res1) => {
+      let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
+      GetApiRequest(
+        requestUrl,
+        (res) => {
+          if (res) {
+            res[0]?.pushMessageType.forEach((value, index) => {
+              if (!value?.optOutFlag) {
+                setIsNotificationEnable(true);
+              }
+            });
+          }
+        },
+        (error) => {
+          console.error("Error on retrying getInAppNotificationsData", error);
+        }
+      );
+    });
+  };
+
+  const enableNotifications = async () => {
+    const enabledPermission = await requestUserPermission();
+    if (enabledPermission) {
+      const token = await getFcmToken();
+      const data = {
+        accountNumber: userInfo?.accountNumber,
+        deviceToken: token,
+        deviceTokenTimestamp: moment().format(),
+        optOut: true,
+        outageOptOut: true,
+        billingOptOutStatus: true,
+        userName: userInfo.userName,
+        isAndroid: Platform.OS == "android",
+      };
+      const localData = {
+        status: "accepted",
+        date: new Date(),
+        permanentSkip: false,
+      };
+      storePushNotificationStatus(localData);
+      //await dispatch(updatePushNotificationsv2(data, null));
     } else {
-      dispatch(updateWalkThroughStep(step));
-      setWalkThroughStep(step);
+      const token = await getFcmToken();
+      const dataWithoutPermission = {
+        accountNumber: userInfo.accountNumber,
+        deviceToken: token,
+        deviceTokenTimestamp: moment().format(),
+        optOut: true,
+        outageOptOut: true,
+        billingOptOutStatus: true,
+        userName: userInfo.userName,
+        isAndroid: Platform.OS == "android",
+      };
+      const localData = {
+        status: "skip",
+        date: new Date(),
+        permanentSkip: true,
+      };
+      storePushNotificationStatus(localData);
+      //await dispatch(updatePushNotificationsv2(dataWithoutPermission, null));
     }
   };
 
+  // get IP address
 
-  const OutageAlert = ({ estimatedTime }) => {
-    return (
-      <View style={styles.errorBox}>
-        <View style={{ flexDirection: "row", width: "90%" }}>
-          <View style={{ backgroundColor: "#F88700", width: 4 }} />
-          <View style={{ flexDirection: "column", padding: 10 }}>
-            <View style={{ flexDirection: "row" }}>
-              <Image
-                style={{ alignSelf: "center" }}
-                resizeMode="contain"
-                tintColor={"#F88700"}
-                source={require("../../../assets/info-circle.png")}
-              />
-              <Text style={styles.modemError1}>Outage Alert</Text>
-            </View>
-            <Text style={styles.modemError2}>
-              Our systems show that you may be experiencing an outage related to
-              your Internet service. We are working to restore service as soon
-              as possible.
-              <Text style={[styles.modemError2, { fontWeight: "700" }]}>
-                Estimated Time to Restore: {estimatedTime}
-              </Text>
-            </Text>
-          </View>
+  const getIPAddress = async () => {
+    try {
+      const response = await fetch("https://api.ipify.org?format=json");
+      if (!response.ok) {
+        throw new Error("Failed to fetch IP address");
+      }
 
-          <TouchableOpacity
-            style={{ marginTop: 10 }}
-            onPress={() => {
-              setIsOutageAlert(false);
-            }}
-          >
-            <CloseIcon />
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
+      const data = await response.json();
+      return data.ip; // The IP address
+    } catch (error) {
+      console.error("Error fetching IP address:", error);
+      return null;
+    }
   };
 
-  const AppUpdateAlert = () => {
-    return (
-      <View style={styles.errorBox}>
-        <View style={{ flexDirection: "row", width: "90%" }}>
-          <View style={{ backgroundColor: Color.sparklightGreen, width: 4 }} />
-          <View style={{ flexDirection: "column", padding: 10 }}>
-            <View style={{ flexDirection: "row" }}>
-              <Image
-                style={{ alignSelf: "center" }}
-                resizeMode="contain"
-                tintColor={Color.sparklightGreen}
-                source={require("../../../assets/info-circle.png")}
-              />
-              <Text
-                style={[styles.modemError1, { color: Color.sparklightGreen }]}
-              >
-                What's New
-              </Text>
-            </View>
-            <Text style={styles.modemError2}>
-              Enhance your app experience with the latest version.
-              <Text
-                style={styles.updateNow}
-                onPress={() => {
-                  if (Platform.OS === "android") {
-                    Linking.openURL(
-                      "https://play.google.com/store/apps/details?id=com.sparklight"
-                    );
-                  } else {
-                    Linking.openURL(
-                      "https://apps.apple.com/us/app/mysparklight/6469003880"
-                    );
-                  }
-                }}
-              >
-                {" "}
-                Update Now{" "}
-              </Text>
-              and keep your app running smoothly.
-            </Text>
-          </View>
+  // zendesk chat login
 
-          <TouchableOpacity
-            style={{ marginTop: 10 }}
-            onPress={() => {
-              setUpdateStatus({
-                isMinorUpdateAvailable: false,
-                currentVersion: "",
-                latestVersion: "",
-              });
-            }}
-          >
-            <CloseIcon />
-          </TouchableOpacity>
-        </View>
-      </View>
+  const loginWithToken = async (userAgent, firstName, lastName) => {
+    const user = await getUser();
+    //   const secret ="0DE686CBBBF20A367D096D466BC5A895D8F62223CCB36C00A198E64F148E0D84"
+    //   // const secret =
+    //   //   (Platform.OS=='ios')?"JQ8sVOU9Hl3fnUf1gyt9xfRn9XVMZ44ilfSo5e3SnrutkSCXDmMVSdTOCVQMduayJwptKtfPrMNaUDz3LfzLxQ":"Rcmym7uJfKq-hqjXyhlC9y09AyPyw0K6Pt6cvqvBmR335YCChrSBS6rnSdEUT-9-YIIkSYS_AYU36ETkuCxnYA"
+    //   //data payload
+    //   const data = {
+    //     scope: "user",
+    //     external_id: user?.userInfo.accountNumber,
+    //     //email: defaultPaymentDetails.email || "",
+    //     //name: `${firstName} ${lastName}` || "",
+    //     //email_verified: true, // optional
+    //     // exp: new Date().getTime() + 3600 * 1000,
+    //   };
+    //   // header ID
+    //   const options = {
+    //     alg: "HS256",
+    //     typ: "JWT",
+    //     //kid: (Platform.OS=='ios')? "app_683930d35c8351994c5bff40":"app_683933455c8351994c6542b3",
+    //   };
+    //   const jwttoken = sign(data, secret, options);
+    //   console.log("request data for jwt", data);
+    //   console.log("request options for jwt", options);
+    //   console.log("Loggin jwt", jwttoken);
+    //  // loginWithJWT(jwttoken);
+    //   //loginWithJWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6InVzZXIiLCJleHRlcm5hbF9pZCI6IjEyODM4NzI2MyJ9.5d8kzoZS4Jp_9KDdvAPmqj_mETDFfI7C2C3VU3ZrDRA")
+
+    let requestData = {
+      accountNumber: user?.userInfo.accountNumber,
+      userName: user?.userInfo.userName,
+    };
+
+    PostApiRequest(
+      `api/Zendesk/TokenAuth`,
+      requestData,
+      (response) => {
+        console.log("JWT reponse for zendesk login", response);
+        if (response) {
+          let jwtToken = response.jwt;
+
+          const fields = {
+            userAgent: userAgent,
+            appVersion: VersionCheck.getCurrentVersion(),
+            timezoneOffsetId: new Date().getTimezoneOffset().toString(),
+            platform: Platform.OS,
+            locationHrefId: Env.URL,
+            ipAddress: getIPAddress(),
+            accountNumber: user?.userInfo.accountNumber,
+            email: defaultPaymentDetails.email || "",
+            firstName: firstName || "",
+            lastName: lastName || "",
+            name: `${firstName} ${lastName}` || "",
+            phone: "3",
+            accountNumber: user?.userInfo.accountNumber,
+            userName: user?.userInfo.userName,
+            customerType: user?.userInfo.customerType,
+            authLevel: user?.userInfo.authLevel,
+            mobileApp: "mobileApp",
+            jwtId: jwtToken,
+          };
+
+          loginWithJWT(jwtToken)
+            .then(() => {
+              console.log("Logged in to Zendesk Chat with JWT");
+              // Now set conversational fields
+              setConversationalFields(fields);
+            })
+            .catch((error) => {
+              console.error("Error logging in to Zendesk Chat:", error);
+            });
+        }
+      },
+      (error) => {
+        console.log("error in fetching JWT reponse for zendesk", error);
+      }
     );
+
+    // setTimeout(() => {
+    //   //console.log("Setting conversational fields", fields);
+    //   setConversationalFields(fields);
+    // }, 1000);
   };
+
+  const renderHeader = () => (
+    <View
+      accessibilityElementsHidden={isWalkthroughActive}
+      importantForAccessibility={
+        isWalkthroughActive ? "no-hide-descendants" : "no"
+      }
+      accessibilityLabel="SparkLight"
+      style={styles.headerContainer}
+    >
+      <View
+        accessible={true}
+        accessibilityRole="text"
+        accessibilityLabel="SparkLight Logo"
+      >
+        <Logo width={120} height={33.32} />
+      </View>
+
+      {true && <TouchableOpacity
+        onPress={() => {
+          if (Platform.OS === "ios") {
+            startChat();
+          } else {
+            startChatWithConfig({});
+          }
+        }}
+      >
+        <ChatIcon />
+      </TouchableOpacity>}
+    </View>
+  );
+
+  const renderOutageAlert = () =>
+    AlertUtils.createOutageAlert(estimatedRestoreTime, () =>
+      setIsOutageAlert(false)
+    );
+
+  const renderAppUpdateAlert = () =>
+    AlertUtils.createAppUpdateAlert(() =>
+      setUpdateStatus({
+        isMinorUpdateAvailable: false,
+        currentVersion: "",
+        latestVersion: "",
+      })
+    );
+
+  const renderWelcomeCard = () => (
+    <View style={[styles.card, styles.shadowProp, styles.welcomeCard]}>
+      <View style={styles.contentWrapper}>
+        {showDisconnectedBanner ? (
+          <DisconnectedBanner navigation={navigation} />
+        ) : (
+          <WelcomeCard />
+        )}
+        {/* <MenuGrid /> */}
+        <PromoBanner
+          title="Sign up and save with Auto Pay and Paperless Billing"
+          showBonus={true}
+        />
+        <FeatureCard
+          title="Auto Pay"
+          isLoading={loadingAutoPay}
+          features={["Convenient", "Timely Payments", "Peace of Mind"]}
+          buttonText={isAutoPayStatus ? "Active" : "Activate Auto Pay"}
+          buttonVariant={isAutoPayStatus ? "success" : "primary"}
+          isActive={isAutoPayStatus}
+          onButtonPress={() => {
+            navigation.navigate("AutoPayPCIConnector", {
+              url: `${Env.URL}/billing`,
+              name: isAutoPayStatus ? "Manage Auto Pay" : "Setup Auto Pay",
+              useNewPayment: true,
+              status: isAutoPayStatus,
+              paymentDetails: defaultPaymentDetails,
+            });
+          }}
+        />
+        <FeatureCard
+          isLoading={paperlessLoading}
+          title="Paperless Billing"
+          features={["Keeps you Organized", "Cost Effective", "Eco-Friendly"]}
+          buttonText={paperlessStatusAcp ? "Active" : "Go Paperless Today"}
+          buttonVariant={paperlessStatusAcp ? "success" : "primary"}
+          isActive={paperlessStatusAcp}
+          onButtonPress={() =>
+            navigation.navigate("account", { screen: "Notifications" })
+          }
+        />
+        <InfoBanner
+          message="We are working diligently to enhance your experience"
+          icon="megaphone"
+        />
+      </View>
+    </View>
+  );
 
   return (
     <LinearGradient
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 0 }}
-      colors={["rgba(53, 48, 145, 0.78)", "rgba(141, 59, 144, 0.9)"]}
+      colors={["rgba(53, 48, 145, 1)", "rgba(141, 59, 144, 1)"]}
       style={styles.container}
     >
-
-      <SafeAreaView style={{ flex: 1 }}>
-        <View
-          accessibilityElementsHidden={showWalkThrough}
-          importantForAccessibility={showWalkThrough ? "no-hide-descendants" : 'no'}
-          accessibilityLabel={`SparkLight`}
-          style={{
-            height: Platform.OS == "ios" ? 60 : 50,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginHorizontal: 20,
-            marginTop: Platform.OS == "ios" ? 0 : 20,
-          }}
+      <View style={{ flex: 1 }}>
+        <SafeAreaView
+          style={{ flex: 1 }}
+          importantForAccessibility={
+            isWalkthroughActive ? "no-hide-descendants" : "auto"
+          }
+          accessibilityElementsHidden={isWalkthroughActive}
         >
-          <Image
-            accessible={!showWalkThrough}
-            accessibilityLabel={`SparkLight`}
-            resizeMode="contain"
-            style={{ width: 120, height: 30.324, flexShrink: 0 }}
-            source={require("../../../assets/SparklightEntryLogo.png")}
-          />
-          {/* <View>
-            <BellIcon />
-          </View> */}
-        </View>
-        <ScrollView style={{ height: "100%", paddingBottom: 100 }}>
-          <View
-            style={{
-              backgroundColor: colors.backgound_blue,
-              flex: 2,
-              alignItems: "center",
-              marginTop: 50,
-              paddingBottom: 50
-            }}
+          {/* {renderHeader()}  */}
+           <View
+            accessibilityLabel="SparkLight"
+            style={styles.headerContainer}
+            importantForAccessibility={
+              isWalkthroughActive ? "no-hide-descendants" : "auto"
+            }
+            accessibilityElementsHidden={isWalkthroughActive}
           >
-            {updateStatus.isMinorUpdateAvailable ? <AppUpdateAlert /> : null}
-            {isOutageAlert ? (
-              <OutageAlert estimatedTime={estimatedRestoreTime} />
-            ) : (
-              <></>
-            )}
-            <Text style={[styles.descriptionText, { fontSize: FontSize.size_3xl, fontWeight: '400', zIndex: 100, width: wp("92%"), }]}>Welcome to Sparklight</Text>
-            <View style={[styles.card, styles.shadowProp, { marginTop: -40 }]}>
-              <View/>
-              <Text style={[styles.descriptionText, { fontSize: FontSize.size_3xl, fontWeight: '400', marginBottom: 20 }]}></Text>
-              <View style={{ flexDirection: 'column' }}>
-                <Text style={styles.descriptionText}>
-                  We’re excited to connect with you!
-                  Sparklight is dedicated to offering our customers a variety of
-                  enhanced self-service options including online pay and Auto
-                  Pay through the customer portal and MySparklight app.{"\n"}{"\n"}
-                  As you navigate, please be aware that select features available to
-                  current customers may not be immediately accessible to you. We
-                  are working diligently to add new options and features to
-                  enhance your Sparklight experience. Thank you for your
-                  patience and understanding during this transition period.
-                </Text>
-
-                {isImageDispaly ?
-                  <AccessibleYoutubePlayer
-                    videoId="C3cMQoWxv6I"
-                    videoTitle="SparkLight Video"
-                    height={230}
-                    play={false}
-                    onError={(e) => console.log(e)}
-                    onPlaybackStateChange={(isPlaying) => console.log('Playing:', isPlaying)}
+            <Logo width={120} height={33.32} />
+          </View>  
+          <ScrollView style={styles.scrollContainer}>
+            <View
+              style={styles.mainContentContainer}
+              importantForAccessibility={
+                isWalkthroughActive ? "no-hide-descendants" : "auto"
+              }
+              accessibilityElementsHidden={isWalkthroughActive}
+            >
+              {updateStatus.isMinorUpdateAvailable && renderAppUpdateAlert()}
+              {isOutageAlert && renderOutageAlert()}
+              {showBanner && bannerConfig && (
+                <MaintenanceBanner
+                  title={bannerConfig.title}
+                  message={bannerConfig.message}
+                  link={bannerConfig.link}
+                  linkText={bannerConfig.linkText}
+                  showPhoneNumber={bannerConfig.showPhoneNumber}
+                  phoneNumber={bannerConfig.phoneNumber}
+                  onDismiss={
+                    bannerConfig.dismissible ? dismissBanner : undefined
+                  }
+                  severity={bannerConfig.severity || "info"}
                 />
-                  : null}
-
-                <TouchableOpacity
-                  accessible={true}
-                  accessibilityLabel={isImageDispaly ? 'Collapse' : 'Expand'}
-                  accessibilityRole="button"
-                  onPress={() => {
-                    setIsImageDispaly(!isImageDispaly);
-                  }}
-                  style={{
-                    flexDirection: "row",
-                    alignSelf: 'center',
-                    padding: 5,
-                    marginVertical: 5,
-                    marginHorizontal: 25,
-                  }}
+              )}
+              {isMobilePilotEnabled ? (
+                <View
+                  style={[styles.card, styles.shadowProp, styles.welcomeCard]}
                 >
-                  <Text style={styles.hideShowDetails}>
-                    {isImageDispaly ? 'Collapse' : 'Expand'}
-                  </Text>
-                  <View style={{ marginTop: 5 }}>
-                    {isImageDispaly ? (
-                      <View style={{ marginTop: 2, marginLeft: 5 }}>
-                        <UpArrow />
-                      </View>
-                    ) : (
-                      <View style={{ marginTop: 7, marginLeft: 5 }}>
-                        <DownArrow />
-                      </View>
-                    )}
+                  <View
+                    style={[
+                      styles.contentWrapper,
+                      { paddingHorizontal: Padding.p_base },
+                    ]}
+                  >
+                    <MobilePilotLandingPage />
                   </View>
-                </TouchableOpacity>
-              </View>
+                </View>
+              ) : (
+                renderWelcomeCard()
+              )}
             </View>
-            <ScrollView horizontal={false}>
-              <View>
-                <MyInternetDetialsBiller
-                  plans={payStatus}
-                  billAmt={billAmt}
-                  dueDate={dueDate}
-                  pastPaymentDue={pastPaymentDue}
-                  paymentDetails={defaultPaymentDetails}
-                  navigation={navigation}
-                />
-              </View>
-            </ScrollView>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+          </ScrollView>
+        </SafeAreaView>
+      </View>
     </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  accept: {
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "center",
-    color: Color.sparklightWhite,
-  },
-  bottomCarot: {
-    width: 18,
-    height: 13,
-    position: "absolute",
-    top: 20,
-  },
-  bottomCarotStep2: {
-    left: tabWidth * 2,
-  },
-  bottomCarotStep3: {
-    left: tabWidth * 3,
-  },
-  circle: {
-    width: 8,
-    height: 8,
-    backgroundColor: Color.colorMidnightblue,
-    borderRadius: 8,
-    marginLeft: 10,
-  },
-  circleUnselected: {
-    backgroundColor: "#D9D9D9",
-  },
-  circlePaging: {
-    width: 100,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    marginBottom: 16,
-  },
-  walkThroughBottomArea: {
-    flexDirection: "row",
-    flex: 1,
-  },
-  walkThroughButtons: {
-    justifyContent: "space-between",
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "flex-end",
-  },
-  walkThroughSubButtons: {
-    width: 195,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-  },
-  title: {
-    marginBottom: 5,
-  },
-  titleText: {
-    color: Color.sparklightGray1,
-    fontSize: FontSize.size_lg,
-    fontFamily: FontFamily.openSansSemiBold,
-  },
-  description: {},
-  descriptionText: {
-    color: Color.colorGray_200,
-    fontSize: FontSize.size_base,
-    fontFamily: FontFamily.openSansRegular,
-    lineHeight: 24,
-    paddingHorizontal: 24
-  },
-  decline: {
-    fontSize: FontSize.size_sm,
-    fontFamily: FontFamily.openSansRegular,
-    color: Color.colorMidnightblue,
-    textAlign: "center",
-  },
-  button: {
-    backgroundColor: Color.colorMidnightblue,
-  },
-  buttonDisabled: {
-    backgroundColor: Color.colorWhitesmoke_300,
-    color: Color.colorGray_200,
-  },
-  buttonDisabledText: {
-    color: Color.sparklightaddGray,
-  },
-  buttonNext: {
-    justifyContent: "flex-end",
-    marginLeft: 10,
-  },
-  buttonPrevious: {
-    backgroundColor: Color.colorWhitesmoke_200,
-  },
-  buttonsLayout: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: Border.br_11xs,
-    minHeight: 32,
-    textAlign: "center",
-  },
   container: {
     flex: 1,
     backgroundColor: colors.splash_bg,
     marginBottom: 30,
+  },
+  headerContainer: {
+    height: Platform.OS === "ios" ? 60 : 50,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginHorizontal: 20,
+    marginTop: Platform.OS === "ios" ? 0 : 20,
+  },
+  scrollContainer: {
+    height: "100%",
+    paddingBottom: 100,
+  },
+  mainContentContainer: {
+    backgroundColor: colors.backgound_blue,
+    flex: 2,
+    alignItems: "center",
+    marginTop: 50,
+    paddingBottom: 50,
   },
   card: {
     backgroundColor: "white",
@@ -499,118 +557,21 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     width: wp("92%"),
   },
+  welcomeCard: {
+    marginTop: -40,
+  },
   shadowProp: {
     shadowColor: "#171717",
     shadowOffset: { width: -2, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
-  shadowFullScreen: {
-    backgroundColor: "black",
-    height: "100%",
-    width: "100%",
-    position: "absolute",
-    top: 0,
-    zIndex: 5,
-    opacity: 0.7,
-  },
-  walkThroughBubble: {
-    backgroundColor: "white",
-    position: "absolute",
-    bottom: 90,
-    height: 180,
-    width: Dimensions.get("window").width - 40,
-    left: 20,
-    opacity: 1,
-    zIndex: 10,
-    borderRadius: 10,
-    justifyContent: "space-between",
-    padding: 20,
-  },
-  internetHealth: {
-    color: colors.darkest_grey,
-    fontSize: 22,
-    marginTop: -20,
-    fontFamily: FontFamily.openSansRegular,
-    paddingHorizontal: 25,
-    fontStyle: "normal",
-    fontWeight: "400",
-    lineHeight: 22 /* 100% */,
-  },
-  internetStatusSection: {
-    backgroundColor: "#EBEEF180",
-    borderRadius: 10,
-    padding: 10,
-    marginTop: 15,
-    flexDirection: "row",
-    justifyContent: "center",
-    marginHorizontal: 25,
-  },
-  internetStatusTxt: {
-    color: colors.darkest_grey,
-    fontFamily: FontFamily.openSansRegular,
-    textAlign: "center",
-    alignSelf: "center",
-    fontSize: 14,
-    fontStyle: "normal",
-    fontWeight: "400",
-    lineHeight: 28,
-    paddingHorizontal: 5,
-  },
-  hideShowDetails: {
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: 14,
-    marginVertical: 5,
-    color: colors.sparklight_purple_blue,
-    lineHeight: 20,
-    fontWeight: "400",
-  },
-  modemError1: {
-    color: "#000",
-    fontFamily: FontFamily.textXsSemibold,
-    fontSize: 15,
-    fontStyle: "normal",
-    fontWeight: "700",
-    marginLeft: 5,
-    marginRight: 5,
-  },
-  modemError2: {
-    color: Color.colorGray_200,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: 14,
-    fontStyle: "normal",
-    fontWeight: "400",
-    marginLeft: 20,
-    marginTop: 7,
-    marginRight: 5,
-  },
-  updateNow: {
-    color: Color.colorMidnightblue,
-    fontFamily: FontFamily.openSansRegular,
-    fontSize: 14,
-    fontStyle: "normal",
-    fontWeight: "700",
-    marginLeft: 20,
-    marginTop: 7,
-    marginRight: 5,
-  },
-  errorBox: {
-    flexDirection: "column",
-    marginHorizontal: 20,
-    marginVertical: 20,
-    borderColor: Color.sparklightGray,
+  contentWrapper: {
+    flex: 1,
     backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_11xs,
-    borderWidth: 1,
-    marginBottom: wp("15%"),
-    marginTop: wp("-10%"),
-  },videoContainer:
-    { 
-    width: wp('80%'),
-     borderRadius: 5,
-      alignSelf: 'center',
-       marginTop: 10
-       }
+    paddingHorizontal: Padding.p_5xl,
+    paddingTop: 8,
+  },
 });
 
 export default NewBillerHome;

@@ -1,14 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import {
-  Image,
   StyleSheet,
   Text,
   View,
-  Pressable,
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import {
   Color,
   FontFamily,
@@ -25,22 +23,32 @@ import Card from "../common/billerCards/BillerSummary";
 import { useDispatch, useSelector } from "react-redux";
 import AutoPayCard from "../common/billerCards/AutoPayCard";
 import PeperLessCard from "../common/billerCards/PeperLessCard";
-import {
-  fetchBillingPaper,
-  fetchProfileDetails,
-} from "../../redux/actions/ProfileActionSuite";
+import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import moment from "moment";
+import Icon from "../common/Icon";
 import { Env } from "../../network/apis/account/Constants";
 import colors from "../../res/Colors";
+import AppStyles from "../utility/AppStyles";
+import { getPrimaryEmail } from "../utility/constant";
+import LoadingOverlay from "../common/customui/CustomLoading";
+import RightIcon from "../../../assets/svgs/Chevonright";
 
 const BillingScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-  const user = useSelector(state => state.combinedReducers.user.userData);
+  const accountDetails = useSelector(
+    (state) => state.profile?.accountDetails
+  );
+  const paperlessStatusAcp = useSelector(
+    (state) => state.profile?.paperlessStatusAcp
+  );
+
+  const paperlessLoading = useSelector(
+    (state) => state.profile?.isPaperLessStatusLoading
+  );
+
   const [billAmt, setBillAmt] = useState(undefined);
   const [dueDate, setDueDate] = useState();
-  const [accountNo, setAccountNo] = useState("");
-  const [paperlessStatus, setPaperlessStatus] = useState(false);
-  const [cardDigit, setCardDigit] = useState("");
+
   const [isAutoPayStatus, setIsAutoPayStatus] = useState(false);
   const [defaultPaymentDetails, setDefaultPaymentDetails] = useState({
     dueDate: null,
@@ -48,104 +56,73 @@ const BillingScreen = ({ navigation }) => {
     pastPaymentDue: 0,
     email: null,
   });
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
-  const paperLessInfo = profile.paperLessInfo || {};
-  
 
-  const getUserAccountDetails = () => {
-    setBillAmt(undefined);
-    getUser().then((res) => {
-      setAccountNo(res.userInfo.accountNumber);
-      const request = `account/api/account/${res.userInfo.accountNumber}`;
-      GetApiRequest(
-        request,
-        (res) => {
-          console.log(
-            "getUserAccountDetails for normal user :::::::::::::::::::::::::::::::::::::::",
-            res
-          );
-          if (res) {
-            //dispatch(saveAccountServices(res.services))
-            function getFirstEmail(emailArray) {
-              return emailArray && emailArray.length > 0 && emailArray[0]
-                ? emailArray[0]
-                : null;
-            }
-            let dueDate = moment(res.paymentDueDate).format("ll");
-            setDueDate(dueDate);
-            setBillAmt((Math.round(res.currentBalance * 100) / 100).toFixed(2));
-            let paymentDetails = { ...defaultPaymentDetails };
-            paymentDetails.dueDate = res.paymentDueDate;
-            paymentDetails.billAmount = (
-              Math.round(res.currentBalance * 100) / 100
-            ).toFixed(2);
-            paymentDetails.pastPaymentDue = res.pastDueAmount;
-            paymentDetails.email = getFirstEmail(res.email);
-            setDefaultPaymentDetails(paymentDetails);
-          }
-        },
-        onErrorBill
-      );
-    });
-  };
+  const [isContentLoading, setIsContentLoading] = useState(false);
+  const [isAutoPayStatusLoad, setIsAutoPayStatusLoad] = useState(false);
 
-  const onErrorBill = (error) => {
-    console.log("error", error);
+  const handleError = (error) => {
+    console.log("error on Billing auto pay", error);
+    setIsContentLoading(false);
+    setIsAutoPayStatusLoad(false);
   };
 
   const getStatus = () => {
-    getUser().then((res) => {
-      const accountNumber = res.userInfo.accountNumber;
-      GetApiRequest(
-        `account/api/account/${accountNumber}/easypay`,
-        (res) => {
-          setIsAutoPayStatus(res?.isEasyPay);
-          setCardDigit(res?.epLastfour);
-        },
-        onError
-      );
-      GetApiRequest(
-        `account/api/account/${accountNumber}/paperless/status`,
-        setPaperlessStatus,
-        onError
-      );
-    });
-  };
-
-  const onError = (error) => {
-    console.log("error", error);
+    setIsAutoPayStatusLoad(true);
+    getUser()
+      .then((res) => {
+        const accountNumber = res.userInfo.accountNumber;
+        GetApiRequest(
+          `api/Accounts/${accountNumber}/easypay`,
+          (res) => {
+            setIsAutoPayStatus(res?.isEasyPay);
+            setIsAutoPayStatusLoad(false);
+          },
+          handleError
+        );
+      })
+      .catch((error) => {
+        console.log("Error getting user status:", error);
+        setIsContentLoading(false);
+        setIsAutoPayStatusLoad(false);
+      });
   };
 
   useFocusEffect(
-    useCallback(() => { 
-      // getStatus();
-      // getUserAccountDetails();
-      // dispatch(fetchBillingPaper());
-      // dispatch(fetchProfileDetails());
-   if(user?.isNormalUser){
+    useCallback(() => {
+      setIsContentLoading(false);
       getStatus();
-      getUserAccountDetails();
-      dispatch(fetchBillingPaper());
-      dispatch(fetchProfileDetails());
-   }else{
-    navigation.navigate("ArticalWindowUtility", {
-      url: `${Env.PAYMENTURLNEW}`,
-      name: "Billing Details",
-      isBilling:true
-    });
-  
-   }
-
+      setBillAmt(undefined);
+      dispatch(fetchACPUserAccountDetails());
     }, [])
   );
   useEffect(() => {
-    console.log("Bill Amount", billAmt);
-  }, [billAmt]);
+    if (accountDetails) {
+      const p_email = getPrimaryEmail(accountDetails);
+      const userBillAmt =
+        accountDetails.past_due_amount === 0
+          ? accountDetails.current_balance
+          : accountDetails.past_due_amount;
+      setBillAmt(userBillAmt?.toFixed(2));
+      const formattedDueDate =
+        accountDetails.past_due_amount !== 0
+          ? "Immediately"
+          : moment(accountDetails.payment_due_date).format("ll");
+      setDueDate(formattedDueDate);
+
+      setDefaultPaymentDetails({
+        dueDate: accountDetails.payment_due_date,
+        billAmount: accountDetails.past_due_amount,
+        pastPaymentDue: accountDetails.past_due_amount,
+        email: p_email,
+      });
+      setIsContentLoading(false);
+    }
+  }, [accountDetails]);
 
   return (
-    <View style={styles.account} accessibilityLabel="Billing Services screen">
+    <View style={styles.account} accessibilityLabel="Billing Services screen"accessibilityRole='Header' accessibilityLevel={1}>
       <ProfileSettingsHeader
-        title="Billing Services"
+        title=""
         iconAlignment="right"
         showIcon={false}
       />
@@ -156,146 +133,185 @@ const BillingScreen = ({ navigation }) => {
         useAngle={true}
         angle={90}
       />
-      <View style={[styles.frameParent]}>
+      <View style={styles.frameParent}>
         <View style={styles.rightActionableParent}>
-          <View style={styles.rightActionable}>
-          <Text style={[styles.text,{alignSelf:'center',marginLeft:5,marginTop:5}]}>
-              <BillingIconWhite isSelected={false} /> 
-            </Text>
+          <View
+            style={[
+              styles.rightActionable,
+              { justifyContent: "center", alignItems: "center" },
+            ]}
+          >
+            <BillingIconWhite isSelected={false} />
           </View>
-          {/* Full name for profile */}
-          <Text style={styles.melissaSmith}>{"Billing Services"}</Text>
+          <Text style={styles.melissaSmith}
+          accessibilityLabel="Billing Services" accessibilityRole='Header'
+           accessibilityLevel={1} 
+           nativeID="Billing Services-header"
+           //accessibilityHint="Header"
+           >
+          Billing Services</Text>
         </View>
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{ marginHorizontal: 20 }}
         >
-          <View style={{ paddingBottom: 100 }}>
-            <Card
-              billAmt={billAmt}
-              dueDate={dueDate}
-              acno={accountNo}
-              isAutoPayStatus={isAutoPayStatus}
-              paperlessStatus={paperlessStatus}
-              navigation={navigation}
-              style={styles.card}
-              accessible={true}
-              accessibilityLabel="Billing Summary Card"
-            />
-            <AutoPayCard
-              billAmt={billAmt}
-              cardDigit={cardDigit}
-              isAutoPayStatus={isAutoPayStatus}
-              paperlessStatus={paperlessStatus}
-              paymentDetails={defaultPaymentDetails}
-              navigation={navigation}
-              style={styles.card}
-              accessible={true}
-              accessibilityLabel="Auto Pay Card"
-            />
-
-            <PeperLessCard
-              billAmt={billAmt}
-              paperLessInfo={paperLessInfo}
-              isAutoPayStatus={isAutoPayStatus}
-              paperlessStatus={paperlessStatus}
-              navigation={navigation}
-              style={styles.card}
-              accessible={true}
-              accessibilityLabel="Paperless Billing Card"
-            />
-
-            <View
-              style={[
-                styles.myModem,
-                styles.myModemSpaceBlock,
-                { marginTop: 10 },
-              ]}
-            >
-              <View
-                style={[styles.myModemWrapper, styles.frameParentSpaceBlock1]}
-              >
-                <Text style={[styles.myModem1, styles.myModem1Typo]}>
-                  Billing Options
-                </Text>
+          <View style={{ paddingBottom: 80, marginTop: Padding.p_5xl }}>
+            {isContentLoading ? (
+              <View style={styles.loadingContainer}>
+                <LoadingOverlay
+                  loading={isContentLoading}
+                  onRequestClose={() => {
+                    setIsContentLoading(false);
+                  }}
+                />
               </View>
-              <View
-                style={[
-                  styles.supportAccordionParent,
-                  styles.supportParentFlexBox,
-                ]}
-              >
-                <View style={[styles.frameLayout]} />
+            ) : (
+              <>
+                <Card
+                  billAmt={billAmt}
+                  dueDate={dueDate}
+                  navigation={navigation}
+                  style={styles.card}
+                />
+                <AutoPayCard
+                  isAutoPayStatus={isAutoPayStatus}
+                  paymentDetails={defaultPaymentDetails}
+                  navigation={navigation}
+                  isStatusLoading={isAutoPayStatusLoad}
+                />
+                <PeperLessCard
+                  paperlessStatus={paperlessStatusAcp}
+                  navigation={navigation}
+                  isStatusLoading={paperlessLoading}
+                />
+                <View style={[AppStyles.card, styles.myModemSpaceBlock]}>
+                  <View
+                    style={[
+                      styles.myModemWrapper,
+                      styles.frameParentSpaceBlock1,
+                    ]}
+                  >
+                    <Text style={styles.leftTitle} 
+                    accessible={true}
+                    accessibilityLabel="Billing Options"
+                    accessibilityRole="header" accessibilityLevel={2}>
+                      Billing Options</Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.supportAccordionParent,
+                      styles.supportParentFlexBox,
+                    ]}
+                  >
+                    <View style={styles.frameLayout} />
+                    <TouchableOpacity
+                      style={styles.frame9defaultSpaceBlock}
+                      onPress={() => {
+                        navigation.navigate("AutoPayPCIConnector", {
+                          url: Env.PAY_METHOD,
+                          name: "Manage Payment Method",
+                          useNewPayment: true,
+                          status: isAutoPayStatus,
+                          paymentDetails: defaultPaymentDetails,
+                          customPaymentUrl: Env.PAY_METHOD,
+                        });
+                      }}
+                      accessible={true}
+                      accessibilityRole="button"
+                      accessibilityLabel="Manage Payment Method"
+                    >
+                      {
+                        <Icon
+                          name="building-doc"
+                          color={Color.colorMidnightblue}
+                          size={20}
+                          style={{ marginRight: 16 }}
+                        />
+                      }
+                      <Text style={styles.modemHealthSupport}>
+                        Manage Payment Method
+                      </Text>
+                      <RightIcon />
+                    </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={[styles.frame9defaultSpaceBlock]}
-                  onPress={() => {
-                    navigation.navigate("ArticalWindowUtility", {
-                      url: Env.VIEW_BILLINGS,
-                      name: "View Billing Details",
-                    });
-                  }}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="View Billing Details"
-                >
-                 
-                  <Text style={styles.modemHealthSupport}>
-                    View Billing Details
-                  </Text>
-                  <Image
-                    style={styles.rightIconStyle}
-                    source={require("../../../assets/chevronright.png")}
-                  />
-                </TouchableOpacity>
+                    <View style={styles.frameLayout} />
+                    {
+                      <TouchableOpacity
+                        style={styles.frame9defaultSpaceBlock}
+                        onPress={() => {
+                          navigation.navigate("BillingBreakDown");
+                        }}
+                        accessible={true}
+                        accessibilityRole="button"
+                        accessibilityLabel="View Bill Breakdown"
+                      >
+                        {
+                          <Icon
+                            name="search-book"
+                            color={Color.colorMidnightblue}
+                            size={20}
+                            style={{ marginRight: 16 }}
+                          />
+                        }
+                        <Text style={styles.modemHealthSupport}>
+                          {"View Bill Breakdown"}
+                        </Text>
+                        <RightIcon />
+                      </TouchableOpacity>
+                    }
+                    <View style={styles.frameLayout} />
+                    <TouchableOpacity
+                      style={styles.frame9defaultSpaceBlock}
+                      onPress={() => {
+                        navigation.navigate("PaymentHistory");
+                      }}
+                      accessible={true}
+                      accessibilityRole="button"
+                      accessibilityLabel="View Payment History"
+                    >
+                      {
+                        <Icon
+                          name="document"
+                          color={Color.colorMidnightblue}
+                          size={20}
+                          style={{ marginRight: 16 }}
+                        />
+                      }
 
-                <View style={[styles.frameLayout]} />
-                <TouchableOpacity
-                  style={[styles.frame9defaultSpaceBlock]}
-                  onPress={() => {
-                    navigation.navigate("ArticalWindowUtility", {
-                      url: Env.VIEW_PAYMENT,
-                      name: "View Payment History",
-                    });
-                  }}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="View Payment History"
-                >
-                  
-                  <Text style={styles.modemHealthSupport}>
-                    View Payment History
-                  </Text>
-                  <Image
-                    style={styles.rightIconStyle}
-                    source={require("../../../assets/chevronright.png")}
-                  />
-                </TouchableOpacity>
+                      <Text style={styles.modemHealthSupport}>
+                        View Payment History
+                      </Text>
+                      <RightIcon />
+                    </TouchableOpacity>
+                    <View style={styles.frameLayout} />
 
-                <View style={[styles.frameLayout]} />
-                <TouchableOpacity
-                  style={[styles.frame9defaultSpaceBlock]}
-                  onPress={() => {
-                    navigation.navigate("ArticalWindowUtility", {
-                      url: Env.BILLING_HISTORY,
-                      name: "View Billing History",
-                    });
-                  }}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="View Billing History"
-                >
-                  
-                  <Text style={styles.modemHealthSupport}>
-                    View Billing History
-                  </Text>
-                  <Image
-                    style={styles.rightIconStyle}
-                    source={require("../../../assets/chevronright.png")}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+                    <TouchableOpacity
+                      style={styles.frame9defaultSpaceBlock}
+                      onPress={() => {
+                        navigation.navigate("BillingStatements");
+                      }}
+                      accessible={true}
+                      accessibilityRole="button"
+                      accessibilityLabel="View Billing Statements"
+                    >
+                      {
+                        <Icon
+                          name="bill-paid"
+                          color={Color.colorMidnightblue}
+                          size={20}
+                          style={{ marginRight: 16 }}
+                        />
+                      }
+                      <Text style={styles.modemHealthSupport}>
+                        View Billing Statements
+                      </Text>
+                      <RightIcon />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </>
+            )}
           </View>
         </ScrollView>
       </View>
@@ -311,44 +327,20 @@ const styles = StyleSheet.create({
     top: 0,
     height: 150,
   },
-  buttonsSpaceBlock: {
-    paddingVertical: Padding.p_base,
-    alignItems: "center",
+  leftTitle: {
+    color: colors.sp_black,
+    fontSize: 18,
+    fontWeight: "600",
+    textAlign: "center",
+    fontFamily: FontFamily.openSansRegular,
+    alignContent: "flex-start",
+    alignSelf: "center",
   },
-  navigationBorder: {
-    borderColor: Color.sparklightGray,
-    backgroundColor: Color.sparklightWhite,
-    borderStyle: "solid",
-    justifyContent: "center",
-  },
-
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    width: "100%",
-    paddingTop: Padding.p_5xl,
-  },
-
-  rightIconLayout: {
-    height: 24,
-    width: 24,
-    marginRight: 5,
-  },
-  title: {
-    marginLeft: -35,
-    fontSize: FontSize.size_lg,
-  },
-  button: {
-    backgroundColor: Color.colorMidnightblue,
-    width: "100%",
-  },
-  buttonsLayout: {
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: 0,
+  loadingContainer: {
+    height: 500,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: Border.br_11xs,
-    minHeight: 50,
+    backgroundColor: "transparent",
   },
   rightActionable: {
     borderColor: Color.colorWhitesmoke_200,
@@ -360,14 +352,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-
-  text: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: Color.sparklightWhite,
-    fontFamily: FontFamily.openSansSemiBold,
-  },
-
   melissaSmith: {
     fontSize: FontSize.size_3xl,
     width: 210,
@@ -382,40 +366,6 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     overflow: "hidden",
   },
-  profileSettings: {
-    textAlign: "left",
-    marginLeft: 10,
-    color: Color.colorGray_100,
-    lineHeight: 28,
-    fontSize: FontSize.size_base,
-    flex: 1,
-  },
-  rightActionableGroup: {
-    paddingVertical: Padding.p_base,
-    alignItems: "center",
-    paddingHorizontal: Padding.p_5xl,
-  },
-  frameChild: {
-    paddingHorizontal: Padding.p_5xl,
-    height: 1,
-    backgroundColor: Color.sparklightGray,
-  },
-  makePayment: {
-    width: 282,
-    color: Color.colorMidnightblue,
-    textAlign: "center",
-  },
-  buttons: {
-    width: "100%",
-    paddingHorizontal: 0,
-    justifyContent: "center",
-    paddingVertical: Padding.p_base,
-  },
-  frameGroup: {
-    marginTop: Padding.p_5xl,
-    paddingHorizontal: Padding.p_base,
-    alignSelf: "stretch",
-  },
   frameParent: {
     flex: 1,
     paddingVertical: Padding.p_base,
@@ -427,25 +377,11 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   card: {
-    height: 230, // Set the height for the cards
-    marginVertical: 10,
-  },
-  myModem: {
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: Color.sparklightWhite,
-    backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_11xs,
-    overflow: "hidden",
+    height: 230,
   },
   myModemSpaceBlock: {
     paddingTop: Padding.p_base,
     alignSelf: "stretch",
-  },
-  myModem1: {
-    textAlign: "left",
-    fontSize: FontSize.size_3xl,
-    flex: 1,
   },
   myModemWrapper: {
     paddingTop: Padding.p_5xs,
@@ -457,12 +393,6 @@ const styles = StyleSheet.create({
     paddingBottom: Padding.p_5xl,
     alignSelf: "stretch",
   },
-  myModem1Typo: {
-    color: Color.colorGray_100,
-    textAlign: "left",
-    fontFamily: FontFamily.openSansRegular,
-    lineHeight: 28,
-  },
   frame9defaultSpaceBlock: {
     paddingVertical: Padding.p_base,
     alignItems: "center",
@@ -472,12 +402,6 @@ const styles = StyleSheet.create({
   supportParentFlexBox: {
     alignItems: "flex-end",
     justifyContent: "center",
-  },
-  frame9defaultSpaceBlock: {
-    paddingVertical: Padding.p_base,
-    alignItems: "center",
-    flexDirection: "row",
-    paddingHorizontal: Padding.p_5xl,
   },
   frameLayout: {
     width: "100%",
@@ -498,11 +422,6 @@ const styles = StyleSheet.create({
     textAlign: "left",
     lineHeight: 28,
     flex: 1,
-  },
-  rightIconStyle: {
-    width: 20,
-    height: 20,
-    resizeMode: "contain",
   },
 });
 
