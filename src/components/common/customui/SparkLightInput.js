@@ -19,6 +19,7 @@ import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
 import Passwordlock from "../../../../assets/svgs/Passwordlock";
+import { formatWithMask,Masks } from 'react-native-mask-input'
 
 const MyPassIcon = (passwordVisible) => {
   return passwordVisible ? <EyeSlashIcon /> : <EyeIcon />;
@@ -66,6 +67,15 @@ const SparkLightInput = ({
   const inputRef = React.useRef(null);
   const errorRef = React.useRef(null);
   const [keyboardHidden, setKeyboardHidden] = useState(true);
+
+  const { masked, unmasked, obfuscated } = formatWithMask({
+  text: value,
+  mask: Masks.USA_PHONE,
+});
+
+console.log(masked); // "71680-345"
+console.log(unmasked); // "71680345"
+console.log(obfuscated); 
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -128,6 +138,9 @@ const SparkLightInput = ({
     return accessibilityLabel || label || placeholder;
   };
 
+
+
+
   return (
     <View
       style={[
@@ -185,7 +198,7 @@ const SparkLightInput = ({
 
         <TextInput
           placeholder={placeholder}
-          value={value}
+          value={getKeyboardType() === "phone-pad" ? masked : value}
           ref={inputRef}
           onChangeText={handleInputChange}
           onFocus={() => setIsFocused(true)}
