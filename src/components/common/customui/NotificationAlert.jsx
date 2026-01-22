@@ -563,23 +563,25 @@ const NotificationAlert = ({
           )}
         </View>
 
-        
-      </View>
-      {showCloseIcon && (
-          <A11y.Index index={5} >
-          <Pressable
-            ref={closeRef}
-            onPress={onClose}
-            style={styles.closeBtn}
-            accessible={true}
-            accessibilityLabel="Close notification"
-            accessibilityRole="button"
-            accessibilityHint="Double tap to dismiss"
-          >
-            <CloseIcon color={config.closeButtonColor} width={16} height={16} />
-          </Pressable>
+        {showCloseIcon && (
+          <A11y.Index index={4}>
+            <Pressable
+              ref={closeRef}
+              onPress={onClose}
+              style={styles.closeBtn}
+              accessible={true}
+              accessibilityLabel="Close notification"
+              accessibilityRole="button"
+              accessibilityHint="Double tap to dismiss"
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={[styles.closeBtnText, { color: config.closeButtonColor }]}>
+                ✕
+              </Text>
+            </Pressable>
           </A11y.Index>
         )}
+      </View>
       </A11y.Order>
     </View>
   );
@@ -634,13 +636,10 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   closeBtn: {
-    alignContent: "center",
-    justifyContent: "center",
-    position: "absolute",
-    top: 12,
-    right: 8,
-    width: 24,
-    height: 24,
+    alignSelf: "flex-start",
+    padding: 8,
+    marginTop: 4,
+    marginRight: 4,
   },
   closeBtnText: {
     fontSize: 16,
