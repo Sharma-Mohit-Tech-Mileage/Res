@@ -19,13 +19,11 @@ import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import EyeIcon from "../../../../assets/svgs/EyeIcon";
 import EyeSlashIcon from "../../../../assets/svgs/EyeHide";
 import Passwordlock from "../../../../assets/svgs/Passwordlock";
-import { formatWithMask,Masks } from 'react-native-mask-input'
 
 const MyPassIcon = (passwordVisible) => {
   return passwordVisible ? <EyeSlashIcon /> : <EyeIcon />;
 };
 
-// 🔹 Convert numbers into words for TalkBack accessibility (Android only)
 const numberToWordsForAccessibility = (numStr) => {
   if (!numStr) return "";
   const digitsMap = {
@@ -46,7 +44,7 @@ const numberToWordsForAccessibility = (numStr) => {
     .join(" ");
 };
 
-const SparkLightInput = ({
+const SparkLightInput = React.forwardRef(({
   name,
   label,
   placeholder,
@@ -61,21 +59,18 @@ const SparkLightInput = ({
   showTextIcon = false,
   inputStyle,
   ...props
-}) => {
+}, ref) => {
   const [isFocused, setIsFocused] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(!secure);
   const inputRef = React.useRef(null);
   const errorRef = React.useRef(null);
   const [keyboardHidden, setKeyboardHidden] = useState(true);
 
-  const { masked, unmasked, obfuscated } = formatWithMask({
-  text: value,
-  mask: Masks.USA_PHONE,
-});
-
-console.log(masked); // "71680-345"
-console.log(unmasked); // "71680345"
-console.log(obfuscated); 
+  React.useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current?.focus();
+    }
+  }));
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -101,6 +96,15 @@ console.log(obfuscated);
     }
   }, [keyboardHidden]);
 
+  // Auto-focus input when error appears (for accessibility)
+  useEffect(() => {
+    if (error && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 150);
+    }
+  }, [error]);
+
   const handleInputChange = (text) => {
     if (onChangeText) {
       onChangeText(text);
@@ -111,7 +115,6 @@ console.log(obfuscated);
     setPasswordVisible(!passwordVisible);
   };
 
-  // 🔹 Auto-detect keyboard type based on field name/placeholder
   const getKeyboardType = () => {
     const lowerName = (name || placeholder || "").toLowerCase();
     if (lowerName.includes("phone") || lowerName.includes("mobile")) {
@@ -126,7 +129,6 @@ console.log(obfuscated);
     return "default";
   };
 
-  // 🔹 Accessibility label handling
   const getAccessibilityLabel = () => {
     if (
       Platform.OS === "android" &&
@@ -137,9 +139,6 @@ console.log(obfuscated);
     }
     return accessibilityLabel || label || placeholder;
   };
-
-
-
 
   return (
     <View
@@ -198,7 +197,7 @@ console.log(obfuscated);
 
         <TextInput
           placeholder={placeholder}
-          value={getKeyboardType() === "phone-pad" ? masked : value}
+          value={value}
           ref={inputRef}
           onChangeText={handleInputChange}
           onFocus={() => setIsFocused(true)}
@@ -222,10 +221,9 @@ console.log(obfuscated);
             value && getKeyboardType() === "phone-pad"
               ? `${label || "Phone number"} field}`
               : secure
-              ? "Password requirements are listed below. Use swipe to read them."
+              ? "Password requirements are listed below. Use arrow keys to read them."
               : undefined
           }
-          //accessibilityLabel={getAccessibilityLabel()}
           accessibilityRole="text"
           accessibilityHint={
             getKeyboardType() === "phone-pad"
@@ -265,7 +263,7 @@ console.log(obfuscated);
       )}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   outerContainer: {

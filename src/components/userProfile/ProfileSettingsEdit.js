@@ -1,204 +1,291 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { StyleSheet, Text, Pressable, View, ScrollView } from "react-native";
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { StyleSheet, Text, Pressable, View, ScrollView, AccessibilityInfo } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import {
-  Padding,
-  FontSize,
-  Color,
-  FontFamily,
-  Border,
-} from "../../../GlobalStyles";
-import SparkLightInput from "../common/customui/SparkLightInput";
-import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
-import { useDispatch, useSelector } from "react-redux";
-import { updateProfileRequest } from "../../redux/actions/ProfileActionSuite";
-import NotificationAlert from "../common/customui/NotificationAlert";
-import { profileSchema } from "../utility/validationSchema";
-import { isPrimaryAdmin } from "../utility/constant";
+import { FontFamily, Padding, Color, FontSize, Border } from "../../../GlobalStyles";
+import { securityQuestions } from "../utility/constant";
+import SparkLightInput from '../common/customui/SparkLightInput';
+import SparkLightDropdown from '../common/customui/SparkLightDropdown';
+import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
+import { useDispatch, useSelector } from 'react-redux';
+import NotificationAlert from '../common/customui/NotificationAlert';
+import { updateProfileSecurity } from '../../redux/actions/ProfileActionSuite';
+import { GetApiRequest} from "../../network/APIClient";
+import LoadingOverlay from "../common/customui/CustomLoading";
+import { securitySchema } from '../utility/validationSchema';
+import colors from "../../res/Colors";
+import AppStyles from  "../utility/AppStyles";
 
-const ProfileSettingsEdit = () => {
+const announceForAccessibility = (message) => {
+  AccessibilityInfo.announceForAccessibility(message);
+};
+
+const PasswordSecurityEdit = () => {
+
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useDispatch();
+  const scrollViewRef = useRef(null);
+  const mainContentRef = useRef(null);
+  const [isCustomQuestionSelected, setIsCustomQuestionSelected] = useState(false);
+  const [customSecurityQuestion, setCustomSecurityQuestion] = useState('');
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showValidationAlert, setShowValidationAlert] = useState(false);
-  const [initialEmailAddress, setInitialEmailAddress] = useState("");
-  const profile = useSelector((state) => state.profile || {});
+  const [loading, setLoading] = useState(false);
+  const [loadingTxt, setLoadingTxt] = useState("Please wait...");
+  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
+  const [dropdownFocused, setDropdownFocused] = useState(false);
+  const [securityQuestionsNew, setSecurityQuestionsNew] = useState(securityQuestions);
+
+  const profile = useSelector(state => state.profile || {});
+  const user = useSelector(state => state.user.userData);
   const profileDetailsfromStore = profile.profileDetails || {};
-  const isPrimaryUser = isPrimaryAdmin(profileDetailsfromStore.memberType);
-  const scrollViewRef = useRef(null);
-  const handleSave = async (data) => {
-    const newData = { ...data };
-    dispatch(updateProfileRequest(newData, navigation));
+  const [profileDetails, setLocalProfile] = useState(profileDetailsfromStore);
+  const { control, handleSubmit, setValue, reset, formState: { errors } } = useForm({
+    resolver: yupResolver(securitySchema(isCustomQuestionSelected)),
+    defaultValues: profileDetails
+  });
+
+  const handleDropdownStateChange = (isOpen) => {
+    setIsDropDownOpen(isOpen);
+    setDropdownFocused(isOpen);
+    announceForAccessibility(isOpen ?
+      "Security question dropdown opened. Select a question." :
+      "Security question dropdown closed."
+    );
   };
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(
-      profileSchema(isPrimaryUser, profileDetailsfromStore.multipleEmails)
-    ),
-    defaultValues: {
-      ...profileDetailsfromStore,
-    },
-  });
+  const handleSecurityQuestionChange = (itemValue) => {
+    setLocalProfile({
+      ...profileDetails,
+      securityQuestion: itemValue === "Add your own question" ? '' : itemValue
+    });
+    setCustomSecurityQuestion(itemValue);
+    setIsDropDownOpen(false);
+    setDropdownFocused(false);
+    setIsCustomQuestionSelected(itemValue === "Add your own question");
+    announceForAccessibility(`Selected security question: ${itemValue}`);
+    if (mainContentRef.current) {
+      mainContentRef.current.setNativeProps({
+        accessibilityElementsHidden: false,
+        importantForAccessibility: 'yes'
+      });
+    }
+  };
+
+
+  const handleSave = (formData) => {
+    setLoading(true);
+    formData.securityQuestion = isCustomQuestionSelected ?
+      formData.securityQuestion :
+      customSecurityQuestion;
+    dispatch(updateProfileSecurity(formData, navigation));
+    announceForAccessibility("Saving security question changes");
+  };
 
   const handleValidationError = () => {
     scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     setShowValidationAlert(true);
+    announceForAccessibility("Please fix validation errors before saving");
+  };
+
+
+  const getSecurityQuestions=()=>{
+    const request = 'api/securityquestions/';
+    GetApiRequest(
+      request,
+      (res) => {
+        if (res) {
+          setSecurityQuestionsNew(res);
+          checkCustomSecurityQuestion(res);
+        }
+
+      },
+      (error) => console.log(error)
+    );
+  };
+
+  const checkCustomSecurityQuestion = (questions) => {
+    const storedQuestion = profileDetails.securityQuestion;
+     setCustomSecurityQuestion(storedQuestion);
   };
 
   useEffect(() => {
-    reset({ ...profileDetailsfromStore });
-  }, [profileDetailsfromStore, reset]);
+    setLoading(false);
+  }, [profileDetails]);
+
+  useEffect(() => {
+    const storedQuestion = profileDetails.securityQuestion;
+     setCustomSecurityQuestion(storedQuestion);
+  }, []);
+
+  useEffect(() => {
+     getSecurityQuestions();
+  }, []);
 
   useEffect(() => {
     if (route.params?.updateFailed) {
       setShowErrorAlert(true);
+      setLoading(false);
       scrollViewRef.current?.scrollTo({ x: 0, y: 0, animated: true });
       navigation.setParams({ updateFailed: undefined });
     }
-  }, [route.params?.updateFailed, navigation]);
+  }, [route.params?.updateFailed]);
 
-
-  useEffect(() => {
-    return () => {
-      setShowErrorAlert(false);
-      setShowValidationAlert(false);
-    };
-  }, []);
 
   return (
-    <View style={styles.profileSettingsEdit}>
+    <View
+      style={styles.passwordSecurityEdit}
+      ref={mainContentRef}
+      accessibilityLabel="Password Security Edit Screen"
+    >
       <ProfileSettingsHeader
-        title="Edit Profile"
-        onPressBack={() => navigation.navigate("ProfileSettings")}
+        accessible={!dropdownFocused}
+        accessibilityElementsHidden={dropdownFocused}
+        importantForAccessibility={dropdownFocused ? 'no-hide-descendants' : 'yes'}
+        title="Edit Security Question"
+        onPressBack={() => navigation.navigate('PasswordSecurity')}
       />
-      <ScrollView ref={scrollViewRef}>
-        <View style={[styles.profileSettingsEditInner]}>
-          <View style={[styles.frameGroup, styles.frameGroupSpaceBlock]}>
-            <View style={styles.infoWrapper}>
-              <NotificationAlert
-                type="error"
-                title="Error"
-                message="Your profile update failed."
-                showCloseIcon={true}
-                isVisible={showErrorAlert}
-                onClose={() => setShowErrorAlert(false)}
-              />
-              <NotificationAlert
-                type="error"
-                title="Error"
-                message="Please enter valid information to continue."
-                showCloseIcon={true}
-                isVisible={showValidationAlert}
-                onClose={() => setShowValidationAlert(false)}
-              />
-            </View>
-            <View
-              style={[
-                styles.generalInformationWrapper,
-                styles.informationWrapperFlexBox,
-              ]}
-            >
-              <Text style={styles.generalInformation} accessible={true} accessibilityRole="header" accessibilityLevel={2}>General Information</Text>
-            </View>
-            <View style={styles.frameParent}>
-              <View
-                style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}
-              >
-                <Controller
-                  control={control}
-                  name="firstName"
-                  render={({
-                    field: { onChange, onBlur, value },
-                    fieldState: { error },
-                  }) => (
-                    <SparkLightInput
-                      placeholder="First Name"
-                      label={"First Name"}
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      error={error?.message}
-                    />
-                  )}
+      <ScrollView ref={scrollViewRef} >
+        <View style={styles.passwordSecurityEditInner}>
+          <View style={styles.frameParent}>
+            <View style={[styles.frameGroup, styles.wrapperSpaceBlock1]}>
+              <View style={styles.infoWrapper}>
+                <NotificationAlert
+                  type="error"
+                  title="Error"
+                  message="Password and security question update failed."
+                  showCloseIcon={true}
+                  isVisible={showErrorAlert}
+                  onClose={() => setShowErrorAlert(false)}
+                  accessible={!dropdownFocused}
                 />
               </View>
-              <View
-                style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}
-              >
-                <Controller
-                  control={control}
-                  name="lastName"
-                  render={({
-                    field: { onChange, onBlur, value },
-                    fieldState: { error },
-                  }) => (
-                    <SparkLightInput
-                      label={"Last Name"}
-                      placeholder="First Name"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      error={error?.message}
+              <View style={styles.frameParent1}>
+                <View
+                  style={styles.securityQuestionWrapper}
+                  accessible={!dropdownFocused}
+                  accessibilityElementsHidden={dropdownFocused}
+                >
+                  <View style={{flexDirection:'column'}}>
+                  <Text
+                    style={[styles.password, styles.passwordFlexBox]}
+                    accessibilityRole="header" accessibilityLevel={2} accessibilityHint="Header"
+                  >
+                    Security Question
+                  </Text>
+                  <Text style={[AppStyles.requiredField]} accessible={true} accessibilityRole="text" accessibilityLabel="Fields marked with asterisk are required">
+                  {" "}
+                  Fields marked with * are required.
+                </Text>
+                </View>
+                </View>
+
+                <View style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}>
+                  <View style={styles.textinput}>
+                    <Text
+                      style={[styles.firstName1, styles.firstTypo]}
+                      accessible={!dropdownFocused}
+                      accessibilityLabel="Password Reset Question Required"
+                      
+                    >
+                      Password Reset Question *
+                    </Text>
+                    <SparkLightDropdown
+                      items={securityQuestionsNew}
+                      selectedValue={customSecurityQuestion}
+                      onValueChange={handleSecurityQuestionChange}
+                      isDropDownOpen={handleDropdownStateChange}
+                      accessibilityLabel="Select security question Required"
+                      accessibilityHint="Double tap to open security question options"
                     />
-                  )}
-                />
-              </View>
-              <View
-                style={[styles.textinputWrapper, styles.frameGroupSpaceBlock]}
-              >
-                <Controller
-                  control={control}
-                  name="userName"
-                  render={({
-                    field: { onChange, onBlur, value },
-                    fieldState: { error },
-                  }) => (
-                    <SparkLightInput
-                      label={"Username"}
-                      placeholder="First Name"
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      editable={false}
-                      error={error?.message}
-                    />
-                  )}
-                />
+                  </View>
+                </View>
+                {isCustomQuestionSelected && (
+                  <View
+                    style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}
+                    accessible={!dropdownFocused}
+                    accessibilityElementsHidden={dropdownFocused}
+                  >
+                    <View style={styles.textinput}>
+                      <Controller
+                        control={control}
+                        name="securityQuestion"
+                        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                          <SparkLightInput
+                            onBlur={onBlur}
+                            label="Type your Question"
+                            onChangeText={onChange}
+                            value={value}
+                            error={error?.message}
+                            accessibilityLabel="Custom security question input"
+                            accessibilityHint="Enter your custom security question"
+                          />
+
+                        )}
+                      />
+                    </View>
+                  </View>
+                )}
+                <View
+                  style={[styles.textinputWrapper, styles.wrapperSpaceBlock1]}
+                >
+
+                  <Text
+                      style={[styles.firstName1, styles.firstTypo,{marginBottom:8}]}
+                      accessible={!dropdownFocused}
+                      accessibilityLabel="Password Reset Answer Required"
+                      
+                    >
+                      Password Reset Answer *
+                    </Text>
+                  <Controller
+                    control={control}
+                    name="securityAnswer"
+                    render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                      <SparkLightInput
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        
+                        value={value}
+                        error={error?.message}
+                        accessibilityHint="Enter your answer to the security question"
+                      />
+                    )}
+                  />
+                </View>
               </View>
             </View>
           </View>
-          <View style={{ marginTop: Padding.p_5xl }}>
+          <View
+            style={styles.frameParent1}
+          >
             <Pressable
-              style={[
-                { backgroundColor: Color.colorMidnightblue },
-                styles.buttonsLayout,
-              ]}
+              style={[styles.buttons, styles.buttonsLayout]}
               onPress={handleSubmit(handleSave, handleValidationError)}
+              accessibilityLabel="Save changes"
+              accessibilityRole="button"
+              accessible={!dropdownFocused}
             >
-              <Text style={[{ color: Color.sparklightWhite }, styles.makeTypo]}>
-                Save
-              </Text>
+              <Text style={[styles.makePayment, styles.makeTypo]}> Save </Text>
             </Pressable>
-            <View style={{ padding: 8 }}></View>
             <Pressable
-              style={[styles.buttonsLayout]}
-              onPress={() => navigation.navigate("ProfileSettings")}
+              style={[styles.buttons1, styles.buttonsLayout]}
+              onPress={() => navigation.navigate("PasswordSecurity")}
+              accessibilityLabel="Cancel and return"
+              accessibilityRole="button"
+              accessible={!dropdownFocused}
             >
-              <Text
-                style={[styles.makeTypo, { color: Color.colorMidnightblue }]}
-              >
-                Cancel
-              </Text>
+              <Text style={[styles.makePayment1, styles.makeTypo]}> Cancel</Text>
             </Pressable>
           </View>
+
+          <LoadingOverlay
+            loading={loading}
+            loadingTxt={loadingTxt}
+            onRequestClose={() => setLoading(false)}
+          />
         </View>
       </ScrollView>
     </View>
@@ -206,16 +293,45 @@ const ProfileSettingsEdit = () => {
 };
 
 const styles = StyleSheet.create({
-  frameGroupSpaceBlock: {
+  wrapperSpaceBlock1: {
     paddingVertical: Padding.p_base,
     alignSelf: "stretch",
   },
-  informationWrapperFlexBox: {
-    flexDirection: "row",
+  infoWrapper: {
+    paddingHorizontal: Padding.p_5xl,
+    alignSelf: "stretch",
+  },
+  bulletPoiint: {
+    color: Color.sparklightGray1,
+    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.size_xs,
+    fontStyle: 'normal',
+    fontWeight: '400',
+    lineHeight: 19,
+  },
+  bulletPointContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 5,
+  },
+  passwordFlexBox: {
+    textAlign: "left",
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.sparklightGray1,
+  },
+  firstTypo: {
+    fontSize: FontSize.textXsSemibold_size,
+    textAlign: "left",
+    fontFamily: FontFamily.openSansSemiBold,
+    fontWeight: "600",
+  },
+  wrapperSpaceBlock: {
+    paddingVertical: 0,
+    paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
   },
   buttonsLayout: {
-    width: "100%",
+    width: '100%',
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: Padding.p_base,
@@ -224,46 +340,90 @@ const styles = StyleSheet.create({
     height: 56,
   },
   makeTypo: {
+    width: 282,
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.openSansRegular,
     textAlign: "center",
   },
-  generalInformation: {
+
+  password: {
     fontSize: FontSize.size_3xl,
     lineHeight: 28,
-    textAlign: "left",
+  },
+  passwordWrapper: {
+    alignItems: "center",
+    flexDirection: "row",
+    paddingHorizontal: Padding.p_5xl,
+  },
+  bullet: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    marginRight: 10,
+  },
+  firstName: {
     color: Color.sparklightGray1,
-    fontFamily: FontFamily.openSansRegular,
+    fontSize: FontSize.textXsSemibold_size,
     flex: 1,
   },
-  generalInformationWrapper: {
-    paddingTop: Padding.p_base,
-    paddingBottom: Padding.p_5xs,
+  eyeIcon: {
+    width: 16,
+    height: 16,
+    overflow: "hidden",
+  },
+  show: {
+    marginLeft: 6,
+    color: Color.colorMidnightblue,
+    lineHeight: 28,
+  },
+  eyeParent: {
+    marginLeft: 8,
     alignItems: "center",
-    paddingHorizontal: Padding.p_5xl,
+    flexDirection: "row",
+  },
+  firstNameParent: {
+    alignItems: "center",
+    flexDirection: "row",
+    alignSelf: "stretch",
+  },
+  textinput: {
+    justifyContent: "center",
+    alignSelf: "stretch",
   },
   textinputWrapper: {
     justifyContent: "center",
     paddingHorizontal: Padding.p_5xl,
   },
+  itMustBe: {
+    lineHeight: 19,
+    fontSize: FontSize.size_xs,
+  },
   frameParent: {
     alignSelf: "stretch",
   },
-  frameItem: {
+  frameChild: {
     height: 1,
     backgroundColor: Color.sparklightGray,
     alignSelf: "stretch",
   },
   rectangleWrapper: {
-    paddingVertical: 0,
     marginTop: Padding.p_base,
+  },
+  securityQuestionWrapper: {
+    paddingBottom: Padding.p_5xs,
+    alignItems: "center",
+    flexDirection: "row",
     paddingHorizontal: Padding.p_5xl,
     alignSelf: "stretch",
   },
-  contactInformationWrapper: {
-    paddingBottom: Padding.p_5xs,
-    alignItems: "center",
-    paddingHorizontal: Padding.p_5xl,
+  firstName1: {
+    color: Color.sparklightGray1,
+    fontSize: FontSize.textXsSemibold_size,
+    alignSelf: "stretch",
+  },
+  frameParent1: {
+    marginTop: 16,
+    alignSelf: "stretch",
   },
   frameGroup: {
     paddingHorizontal: 0,
@@ -275,21 +435,40 @@ const styles = StyleSheet.create({
     backgroundColor: Color.sparklightWhite,
     overflow: "hidden",
   },
-  profileSettingsEditInner: {
-    paddingTop: Padding.p_5xl,
+  makePayment: {
+    color: Color.sparklightWhite,
+  },
+  buttons: {
+    backgroundColor: Color.colorMidnightblue,
+  },
+  makePayment1: {
+    color: Color.colorMidnightblue,
+  },
+  buttons1: {
+    marginTop: 16,
+    width: '100%',
+  },
+  passwordSecurityEditInner: {
+    paddingVertical: Padding.p_5xl,
     paddingBottom: Padding.p_base,
     paddingHorizontal: Padding.p_base,
     overflow: "hidden",
-    marginBottom: 300,
+    marginBottom: 300
   },
-  infoWrapper: {
-    paddingHorizontal: Padding.p_5xl,
-    alignSelf: "stretch",
-  },
-  profileSettingsEdit: {
+  passwordSecurityEdit: {
     flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
+  }, BtnContainer: {
+    backgroundColor: colors.sparklight_purple_blue,
+    justifyContent: "center",
+  },
+  Btn: {
+    color: colors.snow_white,
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+    padding: 16,
+    fontSize: 16,
   },
 });
 
-export default ProfileSettingsEdit;
+export default PasswordSecurityEdit;
