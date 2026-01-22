@@ -1,249 +1,362 @@
-import React from 'react';
-import { View, Text, Pressable, Image, StyleSheet } from "react-native";
-import NotificationAlert from "../common/customui/NotificationAlert";
-import { useNavigation } from "@react-navigation/native";
-import { Padding, Color, FontSize, FontFamily, Border } from "../../../GlobalStyles";
+import React from "react";
+import { View, Text, Pressable, StyleSheet, Platform } from "react-native";
+import {
+  Color,
+  Padding,
+  FontSize,
+  FontFamily,
+  Border,
+} from "../../../GlobalStyles";
+import InfoICon from "../../../assets/svgs/InfoIcon";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import SuccessIcon from "../../../assets/svgs/SuccessIcon";
 
-const NotificationSection = ({
-  title,
-  successMessage,
-  showNotification,
-  showSuccessAlert,
-  setShowSuccessAlert,
-  isDisabled,
-  notificationsTitle,
-  infoText,
-  transformedData,
-  email,
-  navigationTarget,
-  additionalSettings = [],
-  isAdmin,
-  screenReaderEnabled,
-  isEmailVerified,
-  dispatch,
-  acknowledgement,
-  isPrimary,
-  isLastSection
-}) => {
-  const navigation = useNavigation();
+const digitToWord = {
+  0: "zero",
+  1: "one",
+  2: "two",
+  3: "three",
+  4: "four",
+  5: "five",
+  6: "six",
+  7: "seven",
+  8: "eight",
+  9: "nine",
+};
 
-  // Check if any additional setting has its status set to "On"
-  const isAnySettingActive = additionalSettings.some(setting => setting.warn === true);
+function phoneNumberToWords(phoneNum) {
+  return phoneNum
+    ? phoneNum
+        .replace(/\D/g, "")
+        .split("")
+        .map((d) => digitToWord[d] || d)
+        .join(" ")
+    : "";
+}
 
-  const handleClose = () => {
-    setShowSuccessAlert(false);
-  };
+const StatusIcon = ({ status }) => (
+  <View style={styles.icon}>
+    {status === "On" ? <SuccessIcon /> : <SuccessIcon color={"#4C5458"} />}
+  </View>
+);
+
+const EditButton = ({ onPress, isLoading }) => (
+  <Pressable
+    style={({ pressed }) => [
+      styles.editButton,
+      pressed && styles.editButtonPressed,
+      isLoading && { backgroundColor: Color.sparklightGray },
+    ]}
+    accessible={true}
+    disabled={isLoading}
+    accessibilityRole="button"
+    accessibilityLabel="Edit notifications"
+    onPress={onPress}
+  >
+    <Text style={styles.editButtonText}>Edit</Text>
+  </Pressable>
+);
+
+const ComingSoonBadge = () => (
+  <View style={styles.comingSoonBadge}>
+    <Text style={styles.comingSoonText}>Coming Soon</Text>
+  </View>
+);
+
+const NotificationToggle = ({ type, status, isLast, warn, loading, title }) => (
+  <View
+   accessible={true} accessibilityLabel={`${title} for ${type}  is ${loading ? 'loading' : status}`}
+    style={[
+      styles.toggleContainer,
+      !isLast && styles.bottomBorder,
+      warn && styles.warnBackground,
+    ]}
+  >
+    <Text style={styles.toggleText} >{type}</Text>
+    <View style={styles.statusContainer}>
+      {loading ? (
+        <SkeletonPlaceholder>
+          <View
+            style={{
+              height: 20,
+              width: 40,
+              marginLeft: Padding.p_5xs,
+              borderRadius: 5,
+            }}
+          />
+        </SkeletonPlaceholder>
+      ) : (
+        <>
+          <StatusIcon status={status} />
+          <Text style={styles.statusText}>{status}</Text>
+        </>
+      )}
+    </View>
+  </View>
+);
+
+const BoldEmailText = ({ message }) => {
+  const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/;
+  const parts = message.split(emailRegex);
+  const emails = message.match(emailRegex);
 
   return (
-    <View style={[styles.frameBorder, isLastSection && styles.noBottomBorder]}>
-      {showNotification && (
-        <View style={styles.infoWrapper}>
-          <NotificationAlert
-            type="success"
-            title="Successful"
-            message={successMessage}
-            showCloseIcon={true}
-            isVisible={showSuccessAlert}
-            onClose={handleClose}
-          />
-        </View>
-      )}
-      <View style={styles.headerRow}>
-        <Text style={styles.title}>{title}</Text>
-        {!isAdmin && (
-          <Pressable
-            accessible={true}
-            accessibilityRole="button"
-            accessibilityLabel="Edit"
-            style={({ pressed }) => [styles.editButton, { opacity: pressed ? 0.7 : 1.0 }]}
-            onPress={() => navigation.navigate(navigationTarget, { additionalData: transformedData, acknowledgement: acknowledgement })}
-          >
-            <Text style={styles.buttonText}>Edit</Text>
-          </Pressable>
-        )}
-      </View>
-      <View>
-        {isAdmin && <View style={styles.infoContainerAdmin}>
-          <Text style={[styles.infoText, {textAlign: 'center'}]}>{'Only Primary Admin can make changes'}</Text>
-        </View>}
-        <View style={{ paddingHorizontal: Padding.p_base }}>
-          {(isDisabled || isAnySettingActive) && (
-            <NotificationAlert
-              type={!isAnySettingActive ? "warning" : "error"}
-              title={notificationsTitle}
-              showCloseIcon={false}
-              message={infoText}
-            />
+    <Text style={styles.infoText}>
+      {parts.map((part, index) => (
+        <React.Fragment key={index}>
+          <Text style={styles.infoText}>{part}</Text>
+          {emails && emails[index] && (
+            <Text
+              style={[styles.infoText, styles.boldText]}
+              accessibilityRole="text"
+              accessibilityLabel={`Email ${emails[index]}`}
+            >
+              {emails[index]}
+            </Text>
           )}
-          {!isDisabled && infoText && !isAnySettingActive && (
-            <View style={styles.infoContainer}>
-              <View style={styles.iconWrapper}>
-                <Image
-                  style={styles.icon}
-                  resizeMode="contain"
-                  source={require("../../../assets/infocircle.png")}
-                />
-              </View>
-              <Text style={styles.infoText}>{infoText}</Text>
-            </View>
-          )}
-
-        </View>
-        {additionalSettings.map((setting, index) => (
-          <NotificationType
-            key={index}
-            type={setting.type}
-            status={setting.status}
-            warn={setting.warn}
-            isLastItem={index === additionalSettings.length - 1}
-          />
-        ))}
-      </View>
-    </View>
+        </React.Fragment>
+      ))}
+    </Text>
   );
 };
 
-const NotificationType = ({ type, status, warn, isLastItem }) => {
-  let displayStatus;
-  let imageSource;
-  switch (status) {
-    case 'On':
-    case 'Subscribed':
-      displayStatus = status;
-      imageSource = require("../../../assets/checkcircle.png");
-      break;
-    case 'Off':
-    case 'Unsubscribed':
-      displayStatus = status;
-      imageSource = require("../../../assets/checkcircle1.png");
-      break;
-    default:
-      displayStatus = 'Unknown';
-      imageSource = require("../../../assets/checkcircle1.png");
-      break;
-  }
+const BoldPhoneText = ({ phoneNum }) => {
+  const phoneNumWords = phoneNumberToWords(phoneNum);
 
   return (
-    <View style={[styles.settingRow, !isLastItem && styles.settingRowBorder, warn && { backgroundColor: Color.colorlightRed }]}>
-      <Text style={styles.settingText}>{type}</Text>
-      <View style={styles.statusWrapper}>
-        <Image style={styles.icon} resizeMode="cover" source={imageSource} />
-        <Text style={styles.statusText}>{displayStatus}</Text>
+    <Text
+      style={styles.infoText}
+      accessibilityLabel={
+        phoneNum
+          ? `Text alert are sent to ${phoneNumWords}`
+          : "You have not enabled text notifications"
+      }
+    >
+      <Text style={styles.infoText}>
+        {phoneNum
+          ? "Text alert are sent to "
+          : "You have not enabled text notifications"}
+      </Text>
+      {phoneNum && (
+        <Text
+          style={[styles.infoText, styles.boldText]}
+          accessibilityRole="text"
+          accessibilityLabel={`Phone number ${phoneNumWords}`}
+        >
+          {phoneNum}
+        </Text>
+      )}
+    </Text>
+  );
+};
+
+const InfoMessage = ({ message, phoneNumber, id }) => (
+  <View style={styles.infoMessage}>
+    <View style={styles.iconContainer}>
+      <InfoICon color="#0060AE" />
+    </View>
+    <View style={styles.textContainer}>
+      {id == "text" ? (
+        <BoldPhoneText phoneNum={phoneNumber} />
+      ) : (
+        <BoldEmailText message={message} />
+      )}
+    </View>
+  </View>
+);
+
+const AdminMessage = () => (
+  <View style={styles.adminMessage}>
+    <Text style={styles.adminText}>Only Primary Admin can make changes</Text>
+  </View>
+);
+
+const NotificationSection = ({
+  id,
+  title,
+  infoMessage,
+  settings = [],
+  isComingSoon = false,
+  isAdmin = false,
+  isLoading = false,
+  onEdit,
+  phoneNumber,
+}) => {
+  return (
+    <View style={styles.sectionContainer}>
+      <View style={styles.header}>
+        <Text style={styles.title} accessibilityRole="header" accessibilityLevel={2}>{title}</Text>
+        {isComingSoon ? (
+          <ComingSoonBadge />
+        ) : (
+          !isAdmin && <EditButton onPress={onEdit} isLoading={isLoading} />
+        )}
       </View>
+
+      {isAdmin && <AdminMessage />}
+
+      {isLoading ? (
+        <SkeletonPlaceholder>
+          <View
+            style={{
+              height: 40,
+              width: "90%",
+              marginHorizontal: Padding.p_base,
+              marginBottom: Padding.p_base,
+              borderRadius: 5,
+            }}
+          />
+        </SkeletonPlaceholder>
+      ) : (
+        infoMessage && (
+          <InfoMessage
+            message={infoMessage}
+            phoneNumber={phoneNumber}
+            id={id}
+          />
+        )
+      )}
+
+      <View style={styles.bottomBorder} />
+
+      {settings.map((setting, index) => (
+        <NotificationToggle
+          key={setting.id}
+          {...setting}
+          isLast={index === settings.length - 1}
+          loading={isLoading}
+          title={title}
+        />
+      ))}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  frameBorder: {
-    borderWidth: 1,
-    justifyContent: "center",
-    borderColor: Color.sparklightGray,
+  sectionContainer: {
     backgroundColor: Color.sparklightWhite,
-    borderRadius: Border.br_11xs,
-    alignSelf: "stretch",
-    paddingTop: Padding.p_base,
-    overflow: "hidden",
+    borderRadius: Border.br_5xs,
+    borderWidth: 1,
+    borderColor: Color.sparklightGray,
     marginBottom: Padding.p_base,
+    overflow: "hidden",
   },
-  noBottomBorder: {
-    borderBottomWidth: 0,
-  },
-  headerRow: {
-    paddingVertical: Padding.p_base,
-    paddingHorizontal: Padding.p_base,
+  header: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: Padding.p_base,
   },
   title: {
     fontSize: FontSize.size_3xl,
-    color: Color.sparklightGray1,
     fontFamily: FontFamily.openSansRegular,
-    flex: 1
+    color: Color.sparklightGray1,
   },
   editButton: {
-    marginLeft: 10,
+    backgroundColor: Color.colorMidnightblue,
+    paddingVertical: Padding.p_7xs,
     paddingHorizontal: Padding.p_base,
-    height: 32,
-    justifyContent: "center",
-    alignItems: "center",
     borderRadius: Border.br_11xs,
-    backgroundColor: Color.colorMidnightblue
+    minWidth: 70,
+    alignItems: "center",
   },
-  buttonText: {
-    fontSize: FontSize.size_xs,
-    color: Color.sparklightWhite,
+  editButtonPressed: {
+    opacity: 0.8,
+  },
+  editButtonText: {
+    fontSize: FontSize.size_sm,
     fontFamily: FontFamily.openSansRegular,
-    textAlign: "center"
+    color: Color.sparklightWhite,
   },
-  infoWrapper: {
-    paddingHorizontal: Padding.p_5xl,
-    alignSelf: "stretch"
+  comingSoonBadge: {
+    backgroundColor: Color.sparklightGray,
+    paddingVertical: Padding.p_9xs,
+    paddingHorizontal: Padding.p_base,
+    borderColor: Color.sparklightGray1,
+    borderWidth: 1,
   },
-  iconWrapper: {
+  comingSoonText: {
+    fontSize: FontSize.textXsSemibold_size,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.sparklightGray1,
+  },
+  infoMessage: {
     flexDirection: "row",
-    paddingHorizontal: 0,
-    paddingVertical: Padding.p_5xs
-  },
-  icon: {
-    width: 18,
-    height: 18,
-    marginTop: -3
-  },
-  infoContainer: {
+    alignItems: "flex-start",
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    marginHorizontal: 20,
+    marginBottom: Padding.p_base,
     borderRadius: Border.br_5xs,
-    backgroundColor: Color.colorWhitesmoke_100,
-    paddingHorizontal: Padding.p_base,
-    paddingVertical: Padding.p_7xs,
-    flexDirection: "row",
-    alignSelf: "stretch",
-    marginTop: Padding.p_7xs
+    borderWidth: 1,
+    borderColor: "#0060AE",
+    backgroundColor: "#F0F8FF",
   },
-  infoContainerAdmin: {
-    backgroundColor: Color.colorWhitesmoke_100,
-    paddingHorizontal: Padding.p_base,
-    paddingVertical: Padding.p_7xs,
-    flexDirection: "row",
-    alignSelf: "stretch",
-    marginVertical: Padding.p_base
+  iconContainer: {
+    paddingTop: 1,
+    paddingRight: 6,
+    paddingLeft: 2,
+  },
+  textContainer: {
+    flex: 1,
+    paddingRight: 4,
   },
   infoText: {
-    color: Color.colorGray_200,
     fontSize: FontSize.textXsSemibold_size,
-    marginLeft: 8,
-    lineHeight: 28,
-    flex: 1,
-    fontFamily: FontFamily.openSansRegular
-  },
-  settingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: Padding.p_base,
-  },
-  settingRowBorder: {
-    borderBottomWidth: 1,
-    borderColor: Color.sparklightGray,
-    width: '100%' // Ensure border stretches across the full width
-  },
-  settingText: {
-    flex: 1,
-    fontSize: FontSize.size_base,
-    color: Color.colorGray_200,
     fontFamily: FontFamily.openSansRegular,
-    lineHeight: 28,
-    paddingLeft: Padding.p_base, // Add padding to the text to maintain spacing
+    color: Color.colorGray_200,
+    lineHeight: FontSize.textXsSemibold_size * 1.3,
   },
-  statusWrapper: {
+  boldText: {
+    color: Color.colorGray_200,
+    ...(Platform.OS === "android"
+      ? {
+          fontFamily: "OpenSans-Bold",
+          letterSpacing: 0.15,
+        }
+      : {
+          fontFamily: FontFamily.openSansSemiBold,
+          fontWeight: "600",
+        }),
+  },
+  toggleContainer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingRight: Padding.p_base, // Add padding to the right side of the status
+    justifyContent: "space-between",
+    padding: Padding.p_base,
+  },
+  bottomBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: Color.sparklightGray,
+  },
+  toggleText: {
+    fontSize: FontSize.size_base,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorGray_200,
+  },
+  statusContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   statusText: {
+    marginLeft: Padding.p_5xs,
     fontSize: FontSize.size_base,
-    color: Color.colorGray_200,
     fontFamily: FontFamily.openSansRegular,
-    lineHeight: 28,
-    marginLeft: 10
+    color: Color.colorGray_200,
+  },
+  adminMessage: {
+    backgroundColor: Color.colorWhitesmoke_100,
+    padding: Padding.p_base,
+    marginBottom: Padding.p_base,
+  },
+  adminText: {
+    textAlign: "center",
+    fontSize: FontSize.textXsSemibold_size,
+    fontFamily: FontFamily.openSansRegular,
+    color: Color.colorGray_200,
+  },
+  warnBackground: {
+    backgroundColor: Color.colorlightRed,
   },
 });
 

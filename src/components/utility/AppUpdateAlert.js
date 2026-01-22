@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   View,
   Platform,
   StyleSheet,
   Text,
-  SafeAreaView,
   TouchableOpacity,
   Modal,
   Linking,
@@ -118,7 +117,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   alertTitle: {
-    color: colors.sparklight_grey,
+    color: colors.black,
     fontFamily: FontFamily.openSansRegular,
     fontSize: 22,
     fontWeight: "600",

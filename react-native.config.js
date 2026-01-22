@@ -1,7 +1,8 @@
 module.exports = {
-    project: {
-      ios: {},
-      android: {},
+  project: {
+    android: {
+      packageName: "com.sparklight", 
     },
-    assets: ['./assets/fonts'],
-  };
+    ios: {},
+  },
+};

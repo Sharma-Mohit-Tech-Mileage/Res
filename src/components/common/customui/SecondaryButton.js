@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import colors from '../../../res/Colors';
+import { FontFamily } from '../../../../GlobalStyles';
  
 const SecondaryButton=(props)=>{
   
@@ -22,8 +23,9 @@ const styles = StyleSheet.create({
   },txtStyle:{
     color:colors.sparklight_purple_blue,
     textAlign:'center',
+    fontFamily:FontFamily.openSansRegular,
     fontStyle:'normal',
-    fontSize:14,
+    fontSize:16,
     
   }
 });

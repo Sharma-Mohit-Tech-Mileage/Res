@@ -17,7 +17,7 @@ const PasswordSecurity = () => {
   const route = useRoute(); // Use the useRoute hook
   const dispatch = useDispatch();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const profile = useSelector((state) => state.combinedReducers.profile || {});
+  const profile = useSelector((state) => state.profile || {});
   const profileDetails = profile.profileDetails || {}; // Defaulting to an empty array if userList is undefined
   useEffect(() => {
     if (route.params?.updateSuccess) {
@@ -44,15 +44,15 @@ const PasswordSecurity = () => {
           <View style={styles.infoWrapper}>
             <NotificationAlert
               type="success"
-              title="Update Successful"
-              message={(route.params?.isPassword)?"Your password has been updated successfully.":"Your Security Questions has been updated successfully."}
+              title="Success"
+              message={(route.params?.isPassword)?"Your password has been updated successfully.":"Your security question has been updated successfully."}
               showCloseIcon={true}
               isVisible={showSuccessAlert}
               onClose={() => setShowSuccessAlert(false)}
             />
           </View>
           <View style={[styles.passwordParent, styles.tabsFlexBox]}>
-            <Text style={[styles.password, styles.passwordFlexBox]}>
+            <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header" accessibilityLevel={2}>
               Password
             </Text>
             <Pressable
@@ -73,6 +73,7 @@ const PasswordSecurity = () => {
               <Text
                 style={[styles.text, styles.passwordFlexBox]}
                 accessibilityRole="text"
+                accessibilityLabel="Password: hidden."
               >
                 **********
               </Text>
@@ -86,7 +87,7 @@ const PasswordSecurity = () => {
               <View
                 style={[styles.securityQuestionWrapper, styles.tabsFlexBox]}
               >
-                <Text style={[styles.password, styles.passwordFlexBox]}>
+                <Text style={[styles.password, styles.passwordFlexBox]} accessibilityRole="header" accessibilityLevel={2} >
                   Security Question
                 </Text>
                 <Pressable
@@ -106,7 +107,7 @@ const PasswordSecurity = () => {
                   <Text style={[styles.passwordFlexBox]}>
                     {profileDetails.securityQuestion}
                   </Text>
-                  <Text style={[styles.text, styles.passwordFlexBox]}>
+                  <Text style={[styles.text, styles.passwordFlexBox]} accessibilityRole="text" accessibilityLabel="Security Answer: hidden.">
                     ******
                   </Text>
                 </View>

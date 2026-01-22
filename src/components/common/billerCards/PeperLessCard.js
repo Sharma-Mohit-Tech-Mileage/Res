@@ -1,64 +1,101 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import colors from "../../../res/Colors";
-import RightArrow from "../../../res/svgIcons/RightArrow";
 import PaperIconBg from "../../../res/svgIcons/PaperIconBg";
 import { widthPercentageToDP as wp } from "react-native-responsive-screen";
 import { FontFamily, Padding, Color } from "../../../../GlobalStyles";
-import { CommonActions } from '@react-navigation/native';
-const PeperLessCard = ({ billAmt, paperLessInfo, isAutoPayStatus, paperlessStatus, navigation, style }) => {
+import AppStyles from "../../utility/AppStyles";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+
+const PeperLessCard = ({ paperlessStatus, navigation, isStatusLoading }) => {
+  const handleCardPress = () => {
+    if (!isStatusLoading) {
+      navigation.navigate("account", { screen: "Notifications" });
+    }
+  };
 
   return (
-    <View style={styles.shadowContainer}>
-      <View style={[styles.card, style]}>
-        <View style={styles.leftSection}>
-          <View style={styles.circleContainerShadow}></View>
-          <View style={styles.circleContainer}></View>
-          <View style={styles.icon}><PaperIconBg /></View>
-          <Text style={styles.leftTitle}>Paperless Billing</Text>
+    <Pressable
+      style={[AppStyles.card]}
+      onPress={handleCardPress}
+      activeOpacity={0.8}
+      accessible={false}
+      
+    >
+      <View
+        style={{
+          margin: 10,
+          flexDirection: "row",
+          flex: 1,
+          padding: 5,
+          alignItems: "center",
+        }}
+      >
+        <View style={styles.iconBg} accessible={true} accessibilityRole="Text" accessibilityLabel="Paperless Billing Icon">
+          <PaperIconBg />
         </View>
-        <View style={styles.cardContent}>
-          {paperlessStatus ? (
-            <>
-              <Text style={[styles.dueDate, { fontWeight: '400', color: colors.gray600 }]}>Email Associated: </Text>
-              <Text style={[styles.dueDate]}>{paperLessInfo.emailAddress}</Text>
-              <Text style={styles.autoPayStatusText}>Paperless Billing On</Text>
-              <Text style={styles.thankYouText}>Thank you for choosing Paperless Billing!</Text>
-            </>
+        <View style={{ flexDirection: "column" }}>
+          <Text style={styles.leftTitle} accessible={true} accessibilityRole="header" accessibilityLevel={2} accessibilityLabel="Paperless Billing">Paperless Billing</Text>
+          {isStatusLoading ? (
+            <SkeletonPlaceholder>
+              <View
+                style={{
+                  width: wp("16%"),
+                  height: 25,
+                  marginLeft: 10,
+                  borderRadius: 4,
+                  paddingVertical: 4,
+                  paddingHorizontal: 8,
+                  marginTop: 5,
+                }}
+              />
+            </SkeletonPlaceholder>
+          ) : (
+            <Text
+              style={{
+                textDecorationStyle: "solid",
+                textDecorationLine: "underline",
+                fontSize: 14,
+                fontWeight: "400",
+                color: colors.sparklight_purple_blue,
+                fontFamily: FontFamily.openSansRegular,
+                marginLeft: 10,
+              }}
+              accessible={true}
+              accessibilityRole='link'
+              accessibilityHint="Double tap to navigate to Paperless Billing management page."
+              accessibilityLabel="Manage Paperless Billing"
+            >
+              Manage
+            </Text>
+          )}
+        </View>
+        <View style={{ position: "absolute", right: 10 }}>
+          {isStatusLoading ? (
+            <SkeletonPlaceholder>
+              <View
+                style={{
+                  width: wp("16%"),
+                  height: 25,
+                  alignSelf: "center",
+                  borderRadius: 4,
+                  paddingVertical: 4,
+                  paddingHorizontal: 8,
+                }}
+              />
+            </SkeletonPlaceholder>
           ) : (
             <>
-              <Text style={styles.autoPayStatusTextInActive}>Paperless Billing Off</Text>
-              <View style={styles.headerContainer}>
-                <Text style={[styles.dueDate]}>Turn on Paperless Billing today! <Text style={styles.subText}>Statements delivered via email.</Text></Text>
-              </View>
+              {paperlessStatus ? (
+                <Text style={styles.autoPayStatusText} accessible={true} accessibilityLabel="Paperless Billing is On">ON</Text>
+              ) : (
+                <Text style={styles.autoPayStatusTextInActive} accessible={true} accessibilityLabel="Paperless Billing is Off">OFF</Text>
+              )}
             </>
           )}
-          <View style={styles.statusRow}>
-            <TouchableOpacity
-             onPress={() => {
-              navigation.dispatch(
-                CommonActions.reset({
-                  index: 0,
-                  routes: [
-                    { name: 'account', params: { screen: 'Notifications' } },
-                  ],
-                })
-              );
-            }}
-              accessible={true}
-              accessibilityLabel="Manage Paperless"
-              accessibilityRole="button"
-              style={styles.paymentButton}
-            >
-              <Text style={styles.paymentButtonText}>Manage Paperless</Text>
-              <View style={{ marginLeft: 2 }}>
-                <RightArrow color={colors.snow_white} />
-              </View>
-            </TouchableOpacity>
-          </View>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
@@ -67,7 +104,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: Padding.p_xs,
-    marginBottom: 23
+    marginBottom: 23,
   },
   shadowContainer: {
     shadowColor: "#171717",
@@ -76,61 +113,59 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   card: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: "white",
     borderRadius: 10,
     alignSelf: "center",
-    overflow: 'hidden',
-    width: wp('85%'),
+    overflow: "hidden",
+    width: wp("92%"),
   },
   leftSection: {
     paddingHorizontal: Padding.p_5xl,
     paddingBottom: Padding.p_xs,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: wp('39%'),
-    height: '100%',
-    position: 'relative',
+    alignItems: "center",
+    justifyContent: "center",
+    width: wp("39%"),
+    height: "100%",
+    position: "relative",
   },
   circleContainerShadow: {
-    position: 'absolute',
-    top: '50%',
-    left: -wp('38.75%') - 20,
-    width: wp('84%'),
-    height: wp('84%'),
-    borderRadius: wp('41.5%'),
-    backgroundColor: 'rgba(71, 84, 103, 0.05)',
-    transform: [{ translateY: -wp('41.5%') }],
+    position: "absolute",
+    top: "50%",
+    left: -wp("38.75%") - 20,
+    width: wp("84%"),
+    height: wp("84%"),
+    borderRadius: wp("41.5%"),
+    backgroundColor: "rgba(71, 84, 103, 0.05)",
+    transform: [{ translateY: -wp("41.5%") }],
   },
   circleContainer: {
-    position: 'absolute',
-    top: '50%',
-    left: -wp('38.75%') - 15,
-    width: wp('77.5%'),
-    height: wp('77.5%'),
-    borderRadius: wp('38.75%'),
+    position: "absolute",
+    top: "50%",
+    left: -wp("38.75%") - 15,
+    width: wp("77.5%"),
+    height: wp("77.5%"),
+    borderRadius: wp("38.75%"),
     backgroundColor: colors.sparklight_bright_purple,
-    transform: [{ translateY: -wp('38.75%') }],
+    transform: [{ translateY: -wp("38.75%") }],
   },
   icon: {
-    alignContent: 'flex-start',
-    alignSelf: 'flex-start',
+    alignContent: "flex-start",
+    alignSelf: "flex-start",
     marginBottom: 10,
   },
   leftTitle: {
-    color: colors.snow_white,
+    color: colors.sp_black,
     fontSize: 18,
-    fontWeight: "400",
-    textAlign: 'center',
-    alignContent: 'flex-start',
-    alignSelf: 'flex-start',
+    fontWeight: "600",
+    fontFamily: FontFamily.openSansRegular,
+    textAlign: "center",
+    marginLeft: 10,
+    alignContent: "flex-start",
+    alignSelf: "center",
   },
   cardContent: {
-    flex: 1,
-    paddingVertical: Padding.p_base,
-    paddingRight: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
   },
   statusRow: {
     flexDirection: "row",
@@ -142,15 +177,16 @@ const styles = StyleSheet.create({
   dueDate: {
     fontSize: 14,
     fontWeight: "700",
-    alignContent: 'center',
+    alignContent: "center",
     fontFamily: FontFamily.openSansRegular,
     color: colors.sparklight_purple_blue,
-    textAlign: 'center',
+    textAlign: "center",
+    marginHorizontal: 20,
   },
   thankYouText: {
     fontSize: 14,
     color: colors.sparklight_purple_blue,
-    textAlign: 'center',
+    textAlign: "center",
     fontWeight: "700",
     FontFamily: FontFamily.openSansRegular,
     marginTop: Padding.p_xs,
@@ -159,51 +195,78 @@ const styles = StyleSheet.create({
   subText: {
     fontSize: 14,
     color: colors.gray600,
-    textAlign: 'center',
+    alignSelf: "center",
     fontFamily: FontFamily.openSansRegular,
     fontWeight: "400",
   },
   autoPayStatusText: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.sparklight_green,
+    color: colors.sp_black,
     backgroundColor: Color.success50,
-    textAlign: 'center',
+    alignSelf: "center",
+    width: wp("16%"),
     borderColor: colors.sparklight_green,
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 5,
-    marginTop: 13,
-    marginBottom: 12,
+    borderRadius: 3,
+    textAlign: "center",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   autoPayStatusTextInActive: {
     fontSize: 14,
     fontWeight: "700",
-    color: colors.dark_grey,
+    color: colors.sp_black,
     backgroundColor: Color.sparklightGray,
-    textAlign: 'center',
+    alignSelf: "center",
+    width: wp("16%"),
+    textAlign: "center",
     borderColor: colors.dark_grey,
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 5,
-    marginVertical: Padding.p_base,
+    borderRadius: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   paymentButton: {
     flexDirection: "row",
-    alignItems: "center",
     backgroundColor: colors.sparklight_purple_blue,
-    paddingLeft: 8,
-    paddingVertical: 5,
+    width: wp("70%"),
+    paddingVertical: 8,
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 5,
+    alignSelf: "center",
+    marginLeft: wp("9%"),
   },
   paymentButtonText: {
     color: colors.snow_white,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "600",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
+    alignSelf: "center",
     fontFamily: FontFamily.openSansRegular,
+  },
+  cardHreader: {
+    flexDirection: "row",
+    width: wp("92%"),
+    padding: 10,
+  },
+  cardFooter: {
+    flexDirection: "row",
+    backgroundColor: "#F8F8F8",
+    width: wp("100%"),
+    padding: 10,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+  },
+  iconBg: {
+    alignSelf: "center",
+    backgroundColor: "#8D3B901A",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

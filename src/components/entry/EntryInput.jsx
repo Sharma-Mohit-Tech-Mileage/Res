@@ -1,28 +1,34 @@
-import React, { memo , useRef, useEffect,useState } from 'react';
+import React, { useRef } from 'react';
 import {
     StyleSheet,
     View,
     TextInput,
-    FlatList,
-    Text,
-    TouchableOpacity,
     Image,
 } from 'react-native';
 import { Padding, Color, FontSize, FontFamily } from '../../../GlobalStyles';
+import Phone from '../../res/svgIcons/Phone';
+import EmailIcon from '../../res/svgIcons/EmailIcone';
 
-const EntryInput = ({ input, placeholder, onChangeText, onSubmitText, iconImage, keyboardType }) => {
+const EntryInput = ({ name,input, placeholder, onChangeText, onSubmitText, IconImage, keyboardType,style }) => {
     const inputRef = useRef(null);
 
     return (
-        <View style={styles.inputContainer}  accessibilityLabel="Input field with icon">
-        <Image
+        <View style={[styles.inputContainer,style]}  accessibilityLabel="Input field with icon">
+        {/* <Image
             source={iconImage}
             style={[styles.searchIcon, styles.leftIcon]}
-        />
+        /> */}
+        {/* <View style={[styles.searchIcon, styles.leftIcon]}>
+           {name=='phone'?<Phone/>: 
+           <View style={{marginTop:4}}>
+           <EmailIcon/>
+           </View>
+           }
+        </View> */}
         <TextInput
             autoCapitalize="none"
             ref={inputRef}
-            style={styles.searchInput}
+            style={[styles.searchInput]}
             placeholder={placeholder}
             value={input}
             onChangeText={onChangeText}
@@ -57,7 +63,7 @@ const styles = StyleSheet.create({
         borderColor: Color.sparklightGray, // Example border color
         borderRadius: 1, // Example border radius
         height: 56, // Example height
-        width: '80%'
+        width: '90%'
     },
     searchIcon: {
         marginLeft: Padding.p_xs, // Example padding
@@ -72,8 +78,7 @@ const styles = StyleSheet.create({
         flex:1,
         flexDirection: 'row', // To align icons and text
         alignItems: 'center', // Vertically center the content
-        alignSelf: 'stretch',
-        flex: 1,
+        alignSelf: 'center',
         paddingHorizontal: Padding.p_base, // Example padding
         fontSize: FontSize.size_base, // Example font size
         color: Color.sparklightGray1, 

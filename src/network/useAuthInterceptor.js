@@ -12,7 +12,7 @@ export const useAuthInterceptor = () => {
 
             navigation.reset({
                 index: 0,
-                routes: [{ name: 'Splash' }], // Ensure 'Splash' is a valid route in your navigator
+                routes: [{ name: 'Splash' }], 
             });
 
             console.log("Navigation reset to Splash screen.");

@@ -1,119 +1,253 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { View, ScrollView, StyleSheet, Text } from "react-native";
-import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
-import { 
-  fetchInitialData, 
-  handleResentNotification, 
-  handleUpdateSuccess, 
-  handleAccessibility 
-} from './notificationHelpers';
+import React, { useCallback, useMemo, useState } from "react";
+import { View, ScrollView, StyleSheet } from "react-native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useSelector, useDispatch } from "react-redux";
 import NotificationSection from "./NotificationSection";
-import { 
-  fetchProfileDetails, 
-  fetchSMSSelection, 
-  fetchPushNotifications, 
-  fetchBillingPaper, 
-  fetchSvEmailAssociation 
-} from '../../redux/actions/ProfileActionSuite';
-import { Padding, Color, FontFamily } from "../../../GlobalStyles";
+import ProfileSettingsHeader from "../common/ProfileSettingsHeader";
+import { getUser } from "../../redux/utils/LocalStorage";
+import { Color, Padding } from "../../../GlobalStyles";
+import { getPrimaryEmail } from "../utility/constant";
+import { GetApiRequest } from "../../network/APIClient";
+import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 
 const Notifications = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const route = useRoute();
 
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [updatedSection, setUpdatedSection] = useState('');
-  const [screenReaderEnabled, setScreenReaderEnabled] = useState(false);
+  const [textNotificationLoading, setTextNotificationLoading] = useState(false);
+  const [inAppNotificationLoading, setInAppNotificationLoading] =
+    useState(false);
+  const [phoneNumber, setPhoneNumber] = useState(undefined);
 
-  const profile = useSelector(state => state.combinedReducers.profile || {});
-  const { transformedNotification, data, emailAddress, isEmailVerified, isPrimary, isAdmin, acknowledgement, additionalSettings, isDisabled, notificationsTitle, infoText } = fetchInitialData(profile);
+  const accountDetails = useSelector((state) => state.profile?.accountDetails);
+  const paperlessStatusAcp = useSelector(
+    (state) => state.profile?.paperlessStatusAcp
+  );
 
-  useEffect(() => {
-    handleAccessibility(setScreenReaderEnabled);
-    dispatch(fetchProfileDetails());
-    dispatch(fetchSMSSelection());
-    dispatch(fetchPushNotifications());
-    dispatch(fetchBillingPaper());
-    dispatch(fetchSvEmailAssociation());
-  }, [dispatch]);
+  const paperlessLoading = useSelector(
+    (state) => state.profile?.isPaperLessStatusLoading
+  );
 
-  useEffect(() => {
-    handleUpdateSuccess(route, dispatch, navigation, setUpdatedSection, setSuccessMessage, setShowSuccessAlert);
-  }, [route.params, navigation, dispatch]);
+  const profileData = useMemo(() => {
+    return accountDetails
+      ? {
+          emailAddress: getPrimaryEmail(accountDetails),
+          isAdmin: accountDetails.isAdmin || false,
+          phoneNumber: accountDetails.phoneNumber || null,
+        }
+      : {};
+  }, [accountDetails]);
 
-  useEffect(() => {
-    handleResentNotification(route, setUpdatedSection, setSuccessMessage, setShowSuccessAlert, navigation);
-  }, [route.params, navigation]);
+  const emailSettings = useMemo(
+    () => [
+      {
+        id: "critical",
+        type: "Critical Notifications",
+        status: profileData.emailAddress ? "On" : "Off",
+      },
+      {
+        id: "paperless",
+        type: "Paperless Billing",
+        status: paperlessStatusAcp ? "On" : "Off",
+      },
+    ],
+    [profileData.emailAddress, paperlessStatusAcp]
+  );
+
+  const InAppSettings = useMemo(
+    () => [
+      {
+        id: "Appointment",
+        type: "Appointments",
+        status: "Off",
+      },
+      {
+        id: "outage",
+        type: "Outage",
+        status: "Off",
+      },
+      {
+        id: "billing",
+        type: "Billing",
+        status: "Off",
+      },
+    ],
+    []
+  );
+
+  const TextNotifSettings = useMemo(
+    () => [
+      {
+        id: "Appointment",
+        type: "Appointments",
+        status: "Off",
+      },
+      {
+        id: "outage",
+        type: "Outage",
+        status: "Off",
+      },
+      {
+        id: "billing",
+        type: "Billing",
+        status: "Off",
+      },
+    ],
+    []
+  );
+
+  const sections = useMemo(
+    () => [
+      {
+        id: "text",
+        title: "Text Notifications",
+        isComingSoon: false,
+        settings: TextNotifSettings,
+        infoMessage: phoneNumber
+          ? `Text alert are sent to ${phoneNumber}`
+          : "You have not enabled text notifications.",
+        isLoading: textNotificationLoading,
+      },
+      {
+        id: "email",
+        title: "Email Notifications",
+        settings: emailSettings,
+        infoMessage: profileData.emailAddress
+          ? `Emails are sent to ${profileData.emailAddress}`
+          : "You have not enabled email notifications.",
+        isLoading: paperlessLoading,
+      },
+      {
+        id: "app",
+        title: "In-App Notifications",
+        isComingSoon: false,
+        settings: InAppSettings,
+        infoMessage: "Notifications sent from your application.",
+        isLoading: inAppNotificationLoading,
+      },
+    ],
+    [
+      profileData,
+      emailSettings,
+      textNotificationLoading,
+      paperlessLoading,
+      inAppNotificationLoading,
+      phoneNumber,
+    ]
+  );
+
+  const handleEdit = (section) => {
+    console.log(`Editing ${section}`);
+
+    if (section == "app") {
+      navigation.navigate("InAppNotifications", {
+        is_enrolled: profileData.emailAddress,
+        additionalData: {
+          optOut: InAppSettings[0].status == "On" ? true : false,
+          outageOptOut: InAppSettings[1].status == "On" ? true : false,
+          billingOptOutStatus: InAppSettings[2].status == "On" ? true : false,
+        },
+      });
+    } else if (section == "email") {
+      navigation.navigate("EmailNotifications", {
+        is_enrolled: profileData.emailAddress,
+        isPaperlessEnabled: paperlessStatusAcp,
+      });
+    } else if (section == "text") {
+      console.log("status", TextNotifSettings[1].status);
+      navigation.navigate("TextNotifications", {
+        is_enrolled: profileData.emailAddress,
+        additionalData: {
+          optOut: TextNotifSettings[0].status == "On" ? true : false,
+          outageOptOut: TextNotifSettings[1].status == "On" ? true : false,
+          billingOptOutStatus:
+            TextNotifSettings[2].status == "On" ? true : false,
+          phoneNumber: phoneNumber,
+        },
+      });
+    }
+  };
+
+  const handleBackPress = () => navigation.navigate("Account");
+
+  const getInAppNotificationsData = () => {
+    setInAppNotificationLoading(true);
+    getUser().then((res1) => {
+      let requestUrl = `api/mobilenotificationpreferences/${res1.userInfo?.userName}/mobilepreferences/${res1.userInfo?.accountNumber}`;
+      console.log("REQUEST", requestUrl);
+      GetApiRequest(
+        requestUrl,
+        (res) => {
+          if (res) {
+            res[0]?.pushMessageType.forEach((value, index) => {
+              console.log(`Index: ${index}, Value: ${value}`);
+              InAppSettings[index].status = value?.optOutFlag ? "Off" : "On";
+            });
+          }
+          setInAppNotificationLoading(false);
+        },
+        (error) => {
+          setInAppNotificationLoading(false);
+          console.error("Error on retrying getInAppNotificationsData", error);
+        }
+      );
+    });
+  };
+
+  const getTextNotificationsData = () => {
+    setTextNotificationLoading(true);
+    getUser().then((res1) => {
+      let requestUrl = `api/SMS/sms?AccountNumber=${res1.userInfo?.accountNumber}`;
+      console.log(requestUrl);
+      GetApiRequest(
+        requestUrl,
+        (res) => {
+          if (res) {
+            res[0]?.smsMessageType.forEach((value, index) => {
+              console.log(`Index: ${index}, Value: ${value}`);
+              TextNotifSettings[index].status = value?.optOutFlag
+                ? "Off"
+                : "On";
+            });
+            let phoneNum = res[0]?.phoneNum || "";
+            setPhoneNumber(phoneNum);
+          }
+          setTextNotificationLoading(false);
+        },
+        (error) => {
+          setTextNotificationLoading(false);
+          console.error("Error on retrying getTextNotificationsData", error);
+        }
+      );
+    });
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchACPUserAccountDetails());
+      getInAppNotificationsData();
+      getTextNotificationsData();
+    }, [dispatch])
+  );
 
   return (
-    <View style={styles.notifications}>
-      <ProfileSettingsHeader title="Notifications" onPressBack={() => navigation.goBack()} />
-      <ScrollView>
-        <View style={styles.notificationsInner}>
-          <NotificationSection
-            title="Text Notifications"
-            successMessage={successMessage}
-            showNotification={updatedSection === 'Text'}
-            showSuccessAlert={showSuccessAlert}
-            setShowSuccessAlert={setShowSuccessAlert}
-            isDisabled={false}
-            notificationsTitle="No mobile phone number on file"
-            infoText={data.phoneNum ? (<Text>Text alerts are sent to <Text style={styles.boldText}>{data.phoneNum}</Text></Text>) : ''}
-            transformedData={data}
-            navigationTarget="TextNotifications"
-            additionalSettings={data.subscriptionDetails}
-            isAdmin={isAdmin}
-            screenReaderEnabled={screenReaderEnabled}
-            isEmailVerified={isEmailVerified}
-            dispatch={dispatch}
-            acknowledgement={acknowledgement}
-            isPrimary={isPrimary}
-          />
-
-          <NotificationSection
-            title="Email Notifications"
-            successMessage={successMessage}
-            showNotification={updatedSection === 'Email'}
-            showSuccessAlert={showSuccessAlert}
-            setShowSuccessAlert={setShowSuccessAlert}
-            isDisabled={isDisabled}
-            notificationsTitle={notificationsTitle}
-            infoText={infoText}
-            email={emailAddress}
-            navigationTarget="EmailNotifications"
-            transformedData={additionalSettings}  // Ensure this is passed correctly
-            additionalSettings={additionalSettings}  // Ensure this is passed correctly
-            isAdmin={isAdmin}
-            screenReaderEnabled={screenReaderEnabled}
-            isEmailVerified={isEmailVerified}
-            dispatch={dispatch}
-            acknowledgement={acknowledgement}
-            isPrimary={isPrimary}
-          />
-
-          <NotificationSection
-            title="In-App Notifications"
-            successMessage={successMessage}
-            showNotification={updatedSection === 'App'}
-            showSuccessAlert={showSuccessAlert}
-            setShowSuccessAlert={setShowSuccessAlert}
-            isDisabled={false}
-            notificationsTitle="Mobile No is missing"
-            infoText="Notifications sent from your application."
-            navigationTarget="InAppNotifications"
-            transformedData={transformedNotification}
-            additionalSettings={transformedNotification}
-            isAdmin={false}
-            screenReaderEnabled={screenReaderEnabled}
-            isEmailVerified={isEmailVerified}
-            dispatch={dispatch}
-            acknowledgement={acknowledgement}
-            isPrimary={isPrimary}
-          />
+    <View style={styles.container}>
+      <ProfileSettingsHeader
+        title="Notifications"
+        onPressBack={handleBackPress}
+      />
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.sectionsContainer}>
+          {sections.map((section) => (
+            <NotificationSection
+              key={section.id}
+              {...section}
+              onEdit={() => handleEdit(section.id)}
+              isAdmin={profileData.isAdmin}
+              isLoading={section.isLoading}
+              phoneNumber={phoneNumber}
+            />
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -121,18 +255,17 @@ const Notifications = () => {
 };
 
 const styles = StyleSheet.create({
-  notifications: {
+  container: {
+    flex: 1,
     backgroundColor: Color.colorWhitesmoke_200,
   },
-  notificationsInner: {
-    paddingVertical: Padding.p_5xl,
+  content: { flex: 1 },
+
+  sectionsContainer: {
     paddingHorizontal: Padding.p_base,
-    marginBottom: 200
-  },
-  boldText: {
-    fontWeight: '600',
-    fontFamily: FontFamily.openSansRegular, // Assuming you have a bold version of the font
-    color: Color.colorGray_100, // Match this to the surrounding text color if needed
+    paddingTop: Padding.p_5xl,
+    paddingBottom: Padding.p_13xl,
+    marginBottom: 200,
   },
 });
 
