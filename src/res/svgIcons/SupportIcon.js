@@ -3,7 +3,6 @@ import { Svg, Path } from "react-native-svg";
 
 const SupportIcon = ({ color = "#767676", filled = false, ...props }) => {
   if (filled) {
-    // Filled/Active state - Make the icon appear bolder
     return (
       <Svg
         xmlns="http://www.w3.org/2000/svg"
@@ -12,7 +11,6 @@ const SupportIcon = ({ color = "#767676", filled = false, ...props }) => {
         viewBox="0 0 38 27"
         {...props}
       >
-        {/* Dot - filled instead of stroked */}
         <Path
           d="M18.697 26.147a2.446 2.446 0 1 0 0-4.892 2.446 2.446 0 0 0 0 4.892Z"
           fill={color}

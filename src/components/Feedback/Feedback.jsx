@@ -278,7 +278,7 @@ const Feedback = () => {
           >
             <Pressable
               accessibilityLabel={
-                isSubmitting ? "Submitting..." : "Submit Feedback"
+                isSubmitting ? "Feedback Submitting in progress" : "Submit Feedback"
               }
               accessibilityRole="button"
               accessible={true}

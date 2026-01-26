@@ -385,7 +385,9 @@ const TextNotifications = ({ navigation }) => {
                         keyboardType="number-pad"
                         value={value}
                         error={errors.phoneNumber?.message}
-                        maxLength={11}
+                        maxLength={14}
+                        isVisible={false}
+                        autoFocusTitle={true}
                       />
                     )}
                   />

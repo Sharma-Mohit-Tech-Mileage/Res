@@ -279,6 +279,8 @@ const AddNotificationScreen = () => {
                     accessibilityLiveRegion="assertive"
                     accessibilityRole="alert"
                     accessibilityLabel={notification.message}
+                    isVisible={true}
+                    autoFocusTitle={true}
                   />
                 </View>
               </Animated.View>

@@ -8,19 +8,37 @@ import SecondaryButton from "../../common/customui/PrimaryButton";
 import SmallLoader from "../../common/customui/SmallLoader";
 
 const WiFiLoadingAnimation = ({ isAnimating = false }) => {
-  if (!isAnimating) {
-    return <SupportIcon color={theme.colors.primary} filled={true} size={28} />;
-  }
-
   return (
-    <View style={styles.animationContainer}>
-      <View style={styles.lottieWrapper}>
-        <SmallLoader isWhite={false} width={210} height={210} />
-      </View>
+    <View
+      accessible={false}
+      importantForAccessibility="no-hide-descendants"
+      accessibilityElementsHidden={true}
+    >
+      {!isAnimating ? (
+        <SupportIcon
+          color={theme.colors.primary}
+          filled={true}
+          size={28}
+        />
+      ) : (
+        <View style={styles.animationContainer}>
+          <View style={styles.lottieWrapper}>
+            <SmallLoader
+              isWhite={false}
+              width={210}
+              height={210}
+            />
+          </View>
 
-      <View style={styles.centerIcon}>
-        <SupportIcon color={theme.colors.primary} filled={true} size={28} />
-      </View>
+          <View style={styles.centerIcon}>
+            <SupportIcon
+              color={theme.colors.primary}
+              filled={true}
+              size={28}
+            />
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -57,14 +75,16 @@ const StatusSection = ({
 
         <View
           style={styles.iconWrapper}
-          accessible={true}
+           accessible={false}
+      importantForAccessibility="no-hide-descendants"
+      accessibilityElementsHidden={true}
           accessibilityLabel={
             checking
               ? "Checking service status, loading animation"
               : "Support icon"
           }
         >
-          <View style={styles.iconBadge}>
+          <View style={styles.iconBadge} >
             <WiFiLoadingAnimation
               isAnimating={checking}
               accessible={false}

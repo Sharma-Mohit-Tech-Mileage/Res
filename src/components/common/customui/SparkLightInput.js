@@ -24,7 +24,6 @@ const MyPassIcon = (passwordVisible) => {
   return passwordVisible ? <EyeSlashIcon /> : <EyeIcon />;
 };
 
-// 🔹 Convert numbers into words for TalkBack accessibility (Android only)
 const numberToWordsForAccessibility = (numStr) => {
   if (!numStr) return "";
   const digitsMap = {
@@ -45,7 +44,7 @@ const numberToWordsForAccessibility = (numStr) => {
     .join(" ");
 };
 
-const SparkLightInput = ({
+const SparkLightInput = React.forwardRef(({
   name,
   label,
   placeholder,
@@ -60,12 +59,18 @@ const SparkLightInput = ({
   showTextIcon = false,
   inputStyle,
   ...props
-}) => {
+}, ref) => {
   const [isFocused, setIsFocused] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(!secure);
   const inputRef = React.useRef(null);
   const errorRef = React.useRef(null);
   const [keyboardHidden, setKeyboardHidden] = useState(true);
+
+  React.useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current?.focus();
+    }
+  }));
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
@@ -91,6 +96,15 @@ const SparkLightInput = ({
     }
   }, [keyboardHidden]);
 
+  // Auto-focus input when error appears (for accessibility)
+  useEffect(() => {
+    if (error && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 150);
+    }
+  }, [error]);
+
   const handleInputChange = (text) => {
     if (onChangeText) {
       onChangeText(text);
@@ -101,7 +115,6 @@ const SparkLightInput = ({
     setPasswordVisible(!passwordVisible);
   };
 
-  // 🔹 Auto-detect keyboard type based on field name/placeholder
   const getKeyboardType = () => {
     const lowerName = (name || placeholder || "").toLowerCase();
     if (lowerName.includes("phone") || lowerName.includes("mobile")) {
@@ -116,7 +129,6 @@ const SparkLightInput = ({
     return "default";
   };
 
-  // 🔹 Accessibility label handling
   const getAccessibilityLabel = () => {
     if (
       Platform.OS === "android" &&
@@ -209,10 +221,9 @@ const SparkLightInput = ({
             value && getKeyboardType() === "phone-pad"
               ? `${label || "Phone number"} field}`
               : secure
-              ? "Password requirements are listed below. Use swipe to read them."
+              ? "Password requirements are listed below. Use arrow keys to read them."
               : undefined
           }
-          //accessibilityLabel={getAccessibilityLabel()}
           accessibilityRole="text"
           accessibilityHint={
             getKeyboardType() === "phone-pad"
@@ -252,7 +263,7 @@ const SparkLightInput = ({
       )}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   outerContainer: {
