@@ -17,7 +17,7 @@ import { Color, Padding } from "../../../GlobalStyles";
 import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSuite";
 import { checkForMinorUpdate, getPrimaryEmail } from "../utility/constant";
 import { AlertUtils } from "../utility/AlertUtils";
-import { Env } from "../../network/apis/account/Constants";
+import { Env ,ISUAT} from "../../network/apis/account/Constants";
 import WelcomeCard from "../ACPDashboard/WelcomeCard";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
@@ -267,6 +267,7 @@ const NewBillerHome = ({ navigation }) => {
       }
 
       const data = await response.json();
+      console.log("IP Address:", data.ip);
       return data.ip; // The IP address
     } catch (error) {
       console.error("Error fetching IP address:", error);
@@ -278,35 +279,12 @@ const NewBillerHome = ({ navigation }) => {
 
   const loginWithToken = async (userAgent, firstName, lastName) => {
     const user = await getUser();
-    //   const secret ="0DE686CBBBF20A367D096D466BC5A895D8F62223CCB36C00A198E64F148E0D84"
-    //   // const secret =
-    //   //   (Platform.OS=='ios')?"JQ8sVOU9Hl3fnUf1gyt9xfRn9XVMZ44ilfSo5e3SnrutkSCXDmMVSdTOCVQMduayJwptKtfPrMNaUDz3LfzLxQ":"Rcmym7uJfKq-hqjXyhlC9y09AyPyw0K6Pt6cvqvBmR335YCChrSBS6rnSdEUT-9-YIIkSYS_AYU36ETkuCxnYA"
-    //   //data payload
-    //   const data = {
-    //     scope: "user",
-    //     external_id: user?.userInfo.accountNumber,
-    //     //email: defaultPaymentDetails.email || "",
-    //     //name: `${firstName} ${lastName}` || "",
-    //     //email_verified: true, // optional
-    //     // exp: new Date().getTime() + 3600 * 1000,
-    //   };
-    //   // header ID
-    //   const options = {
-    //     alg: "HS256",
-    //     typ: "JWT",
-    //     //kid: (Platform.OS=='ios')? "app_683930d35c8351994c5bff40":"app_683933455c8351994c6542b3",
-    //   };
-    //   const jwttoken = sign(data, secret, options);
-    //   console.log("request data for jwt", data);
-    //   console.log("request options for jwt", options);
-    //   console.log("Loggin jwt", jwttoken);
-    //  // loginWithJWT(jwttoken);
-    //   //loginWithJWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6InVzZXIiLCJleHRlcm5hbF9pZCI6IjEyODM4NzI2MyJ9.5d8kzoZS4Jp_9KDdvAPmqj_mETDFfI7C2C3VU3ZrDRA")
-
     let requestData = {
       accountNumber: user?.userInfo.accountNumber,
       userName: user?.userInfo.userName,
     };
+
+    const IPAddress = await getIPAddress();
 
     console.log("request data for zendesk jwt", requestData);
     PostApiRequest(
@@ -318,18 +296,19 @@ const NewBillerHome = ({ navigation }) => {
           let jwtToken = response.jwt;
 
           const fields = {
+            isUAT: ISUAT,
             userAgent: userAgent,
             appVersion: VersionCheck.getCurrentVersion(),
             timezoneOffsetId: new Date().getTimezoneOffset().toString(),
             platform: Platform.OS,
             locationHrefId: Env.URL,
-            ipAddress: getIPAddress(),
+            ipAddress: IPAddress || "",
             accountNumber: user?.userInfo.accountNumber,
             email: defaultPaymentDetails.email || "",
             firstName: firstName || "",
             lastName: lastName || "",
-            name: `${firstName} ${lastName}` || "",
-            phone: "3",
+            name: '',
+            phone: "",
             accountNumber: user?.userInfo.accountNumber,
             userName: user?.userInfo.userName,
             customerType: user?.userInfo.customerType,
