@@ -2,8 +2,8 @@
 import { NativeModules } from 'react-native';
 const { RNZendeskChatModule } = NativeModules;
 
-export const startChatWithConfig = () => {
-    return RNZendeskChatModule.startChatWithConfig() .then(result => { console.log("Zendesk chat started:", result); return result; }) .catch(error => { console.error("Failed to start Zendesk chat:", error); throw error; }); 
+export const startChatWithConfig = (config) => {
+    RNZendeskChatModule.startChatWithConfig(config);
 };
 
 export const clearChatData = () => {

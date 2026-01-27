@@ -1,140 +1,137 @@
-package com.sparklight; // Replace with your actual package name
+// RNZendeskChatModule.java
+package com.sparklight;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
+
 import androidx.annotation.NonNull;
 
-import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-import kotlin.Unit;
+import zendesk.android.FailureCallback;
+import zendesk.android.SuccessCallback;
 import zendesk.android.Zendesk;
-import zendesk.android.ZendeskResult;
+import zendesk.android.ZendeskUser;
 import zendesk.android.events.ZendeskEvent;
 import zendesk.android.events.ZendeskEventListener;
 import zendesk.messaging.android.DefaultMessagingFactory;
+//import zendesk.logger.Logger;
+
 
 public class RNZendeskChatModule extends ReactContextBaseJavaModule {
 
-    private final ReactApplicationContext reactContext;
     private static final String TAG = "RNZendeskChatModule";
+    private static ReactApplicationContext reactContext;
 
-    public RNZendeskChatModule(ReactApplicationContext reactContext) {
-        super(reactContext);
-        this.reactContext = reactContext;
+    RNZendeskChatModule(ReactApplicationContext context) {
+        super(context);
+        reactContext = context;
+        init();
     }
 
-    @NonNull
+    private void init(){
+        Zendesk.initialize(
+                getReactApplicationContext(),
+                BuildConfig.DEBUG ? ZendeskConfig.ZENDESK_CHANNEL_KEY_SANDBOX : ZendeskConfig.ZENDESK_CHANNEL_KEY_PRODUCTION,
+                zendesk -> Log.i("IntegrationApplication", "Initialization successful"),
+                error -> Log.e("IntegrationApplication", "Messaging failed to initialize", error),
+                new DefaultMessagingFactory());
+        // To create and use the event listener:
+        ZendeskEventListener zendeskEventListener =
+                new ZendeskEventListener() {
+                    @Override
+                    public void onEvent(@NonNull ZendeskEvent zendeskEvent) {
+                        Log.d("Zendesk", "Event received: " + zendeskEvent.getClass().getSimpleName());
+                        if (zendeskEvent instanceof ZendeskEvent.UnreadMessageCountChanged) {
+                            // Your custom action...
+                        } else if (zendeskEvent instanceof ZendeskEvent.AuthenticationFailed){
+                            // Your custom action...
+                            Log.e("Zendesk", "AuthenticationFailed : " + ((ZendeskEvent.AuthenticationFailed) zendeskEvent).getError().getMessage());
+                        }
+                    }
+                };
+          Zendesk.getInstance().addEventListener(zendeskEventListener);
+        //Logger.setLoggable(true);
+
+    }
+
     @Override
     public String getName() {
         return "RNZendeskChatModule";
     }
 
-    /**
-     * Initialization method to be called from MainApplication or via a React Method.
-     * In Android, initialization requires a Context.
-     */
-    public static void init(android.content.Context context) {
-        String channelKey;
-        // In Android, BuildConfig.DEBUG is used to check for debug vs release
-        if (BuildConfig.DEBUG) {
-            channelKey = ZendeskConfig.ZENDESK_CHANNEL_KEY_SANDBOX;
-        } else {
-            channelKey = ZendeskConfig.ZENDESK_CHANNEL_KEY_PRODUCTION;;
-        }
-
-        Zendesk.initialize(
-                context,
-                channelKey,
-                zendesk -> {
-                    Log.d(TAG, "Zendesk initialized successfully");
-
-                    // Add Event Observer
-                    Zendesk.getInstance().addEventListener(new ZendeskEventListener() {
-                        @Override
-                        public void onEvent(@NonNull ZendeskEvent event) {
-                            if (event instanceof ZendeskEvent.UnreadMessageCountChanged) {
-                                // Handle unread count
-                            } else if (event instanceof ZendeskEvent.AuthenticationFailed) {
-                                Log.e(TAG, "Zendesk Authentication Failed");
-                            }
-                        }
-                    });
-                },
-                error -> Log.e(TAG, "Zendesk did not initialize. Error: " + error.getMessage()),
-                new DefaultMessagingFactory()
-        );
-    }
+//    @ReactMethod
+//    public void clearChatSession() {
+//        VisitorInfo visitorInfo = VisitorInfo.builder()
+//                .withName("")
+//                .withEmail("")
+//                .withPhoneNumber("")
+//                .build();
+//        Chat.INSTANCE.providers().profileProvider().setVisitorInfo(visitorInfo, null);
+//        Chat.INSTANCE.resetIdentity();
+//
+//    }
 
     @ReactMethod
-    public void startChatWithConfig(Promise promise) {
-        try {
-
-            Activity activity = getCurrentActivity();
-
-
-            if (activity != null) {
-                activity.runOnUiThread(() -> { Zendesk.getInstance().getMessaging().showMessaging(activity); });
-                promise.resolve(true);
-            } else {
-                promise.reject("start_error", "Activity does not exist");
-            }
-        } catch (Exception e) {
-            promise.reject("start_error", "Failed to start Zendesk messaging", e);
-        }
-    }
-
-    @ReactMethod
-    public void loginWithJWT(String jwtToken, Promise promise) {
-        if (jwtToken == null || jwtToken.isEmpty()) {
-            promise.reject("ZendeskLoginError", "JWT token is empty");
-            return;
-        }
-
-        Zendesk zendesk = Zendesk.getInstance();
-
-
-        Log.d(TAG, "Attempting Zendesk JWT login");
-
-        zendesk.loginUser(
-                jwtToken,
-                it -> {
-                   Log.d(TAG, "Zendesk JWT login successful");
-                    //return promise.resolve("User logged in successfully"); // required because the lambda returns Unit in Kotlin
-                },
-                error -> {
-                    Log.e(TAG, "Zendesk login failed")
-;                    //return null;
-                }
-        );
-
-
+    public void startChatWithConfig(ReadableMap config) {
+        Zendesk.getInstance().getMessaging().showMessaging(getReactApplicationContext(), Intent.FLAG_ACTIVITY_NEW_TASK);
 
     }
 
     @ReactMethod
-    public void logoutZendesk(Promise promise) {
-        Zendesk.getInstance().logoutUser(new zendesk.android.SuccessCallback<Unit>() {
+    public void loginWithJWT( String jwt) {
+        Zendesk.getInstance().loginUser(jwt, new SuccessCallback<ZendeskUser>() {
             @Override
-            public void onSuccess(Unit unit) {
-                promise.resolve("User logged out successfully");
+            public void onSuccess(ZendeskUser zendeskUser) {
+                Log.d("Zendesk", "Login successful");
             }
-        }, new zendesk.android.FailureCallback<Throwable>() {
+        }, new FailureCallback<Throwable>() {
             @Override
-            public void onFailure(@NonNull Throwable error) {
-                promise.reject("ZendeskLogoutError", "Logout failed", error);
+            public void onFailure(@NonNull Throwable throwable) {
+                Log.e("Zendesk", "Login failed: " + throwable.getMessage());
             }
         });
     }
 
+//
+//    @ReactMethod
+//    public void setConversationTags(ReadableMap metadata ) {
+//        Map<String,Object> fields = new HashMap<String, Object>();
+//        fields.put("29542407930903", metadata.getString("userAgent"));
+//        fields.put("29542536141335", metadata.getString("appVersion"));
+//        fields.put("29542663925271", metadata.getString("timezoneOffsetId"));
+//        fields.put("29542734993559", metadata.getString("platform"));
+//        fields.put("29230394216983", metadata.getString("locationHrefId"));
+//        fields.put("29542809023767", metadata.getString("ipAddress"));
+//       // fields.put("360003617614", metadata.getString("email"));
+//        fields.put("360004035014", metadata.getString("firstName"));
+//        fields.put("360003976113", metadata.getString("lastName"));
+//        fields.put("360036705974", metadata.getString("name"));
+//        fields.put("360046174754", metadata.getString("phone"));
+//        fields.put("360004035174", metadata.getString("accountNumber"));
+//        fields.put("360004035174", metadata.getString("accountNumber"));
+//        fields.put("29542395738007", metadata.getString("userName"));
+//        fields.put("29542894274711", metadata.getString("customerType"));
+//        fields.put("29542032223895", metadata.getString("authLevel"));
+//        fields.put("29542045878167", metadata.getString("jwtId"));
+//        Zendesk.getInstance().getMessaging().setConversationFields(fields);
+//
+//    }
+
+
     @ReactMethod
-    public void setConversationTags(ReadableMap metadata, Promise promise) {
+    public void setConversationTags(ReadableMap metadata) {
         try {
             boolean isUAT = false;
             if (metadata.hasKey("isUAT")) {
@@ -188,10 +185,12 @@ public class RNZendeskChatModule extends ReactContextBaseJavaModule {
             }
 
             Zendesk.getInstance().getMessaging().setConversationFields(fields);
-            promise.resolve(true);
+
         } catch (Exception e) {
             Log.e(TAG, "Zendesk setConversationFields error: " + e.getMessage());
-            promise.reject("set_tags_error", "Failed to set conversation tags", e);
+
         }
     }
 }
+
+

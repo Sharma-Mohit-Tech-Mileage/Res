@@ -24,6 +24,9 @@ xmlns:tools="http://schemas.android.com/tools">
     android:value="false"
     tools:replace="android:value"/>
 
+        <activity android:name="zendesk.classic.messaging.MessagingActivity"
+            android:theme="@style/CustomCallTheme" />
+
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"
