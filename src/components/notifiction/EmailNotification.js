@@ -124,14 +124,14 @@ const AddNotificationScreen = () => {
 
   //
   const setFocusEmail = () => {
-      setTimeout(() => {
-        if (inputRef.current) {
-          const handle = findNodeHandle(inputRef.current);
-          if (handle) {
-            AccessibilityInfo.setAccessibilityFocus(handle);
-          }
-        }
-      }, 100);
+      // setTimeout(() => {
+      //   if (inputRef.current) {
+      //     const handle = findNodeHandle(inputRef.current);
+      //     if (handle) {
+      //       AccessibilityInfo.setAccessibilityFocus(handle);
+      //     }
+      //   }
+      // }, 100);
     };
   
 

@@ -278,7 +278,7 @@ const ArticalWindowUtility = ({ navigation, route }) => {
 }, [contentLoaded, appBackgroundTime]);
 
     const LoadingComponent = useCallback(() => (
-        <View style={styles.loadingContainer} accessible={true} accessibilityLabel="Loading content" accessibilityHint="Content is loading, please wait">
+        <View style={styles.loadingContainer} accessibilityRole='text' accessible={true} accessibilityLabel="Loading content" accessibilityHint="Content is loading, please wait">
             {name === 'Billing Details' ? (
                 <LoadingSpinner />
             ) : (
@@ -322,13 +322,14 @@ const ArticalWindowUtility = ({ navigation, route }) => {
          accessible={true}
                     accessibilityLabel={loading ? `${name} content loading` : `${name} content loaded`}
                     accessibilityLiveRegion="polite"
-                    accessibilityRole="main">
+                    accessibilityRole="text">
                     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
                 </View>
             ): (
                 <View style={[styles.progressBar,{ backgroundColor: '#8D3B90', width: '100%' }]} 
                     accessible={true}
                     accessibilityLabel={ `${name} content loaded`}
+                    accessibilityRole='text'
                     accessibilityLiveRegion="polite"
                     >
                 

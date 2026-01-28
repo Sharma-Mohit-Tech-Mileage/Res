@@ -41,7 +41,7 @@ import { getPushNotificationStatus } from "../../redux/utils/LocalStorage";
 const InAppNotifications = ({ navigation }) => {
   const route = useRoute();
   const [initialize, setInitializeSettings] = useState(
-    route.params?.additionalData
+    route.params?.additionalData,
   );
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const additionalData = route.params?.additionalData;
@@ -54,7 +54,7 @@ const InAppNotifications = ({ navigation }) => {
   const [isNotificationRquired, setIsNotificationRequired] = useState(false);
   const [notification, setNotification] = useState(null);
   const formatedData = route.params?.additionalData || {};
-  
+
   const translateY = animatedValue;
   const animateNotification = useCallback(() => {
     // Clear any existing timeout
@@ -184,7 +184,7 @@ const InAppNotifications = ({ navigation }) => {
                   setIsNotificationRequired(false);
                 },
               },
-            ]
+            ],
           );
         }
       }
@@ -219,30 +219,33 @@ const InAppNotifications = ({ navigation }) => {
   };
 
   const postRequestInAppNotification = async () => {
-    if(formatedData.optOut || formatedData.outageOptOut || formatedData.billingOptOutStatus){
-    checkNofif(true);
-  }
+    if (
+      formatedData.optOut ||
+      formatedData.outageOptOut ||
+      formatedData.billingOptOutStatus
+    ) {
+      checkNofif(true);
+    }
     const token = await getFcmToken();
     let user = await getUser();
     let deviceId = await getDeviceUniqueId();
     const accountNumber = user.userInfo?.accountNumber || null;
     const userName = user.userInfo?.userName || null;
 
-    
     setIsLoading(true);
     const requestData = {
-        accountNumber: accountNumber,
-        deviceToken: token || deviceId,
-        DeviceId: deviceId,
-        deviceTokenTimestamp: moment().format(),
-        isAndroid: Platform.OS === "android",
-        optOut: !formatedData.optOut,
-        outageOptOut: !formatedData.outageOptOut,
-        userName: userName,
-        billingOptOutStatus: !formatedData.billingOptOutStatus,
-        customerType: "Residential",
-      };
-      console.log("postRequestInAppNotification requestData", requestData);
+      accountNumber: accountNumber,
+      deviceToken: token || deviceId,
+      DeviceId: deviceId,
+      deviceTokenTimestamp: moment().format(),
+      isAndroid: Platform.OS === "android",
+      optOut: !formatedData.optOut,
+      outageOptOut: !formatedData.outageOptOut,
+      userName: userName,
+      billingOptOutStatus: !formatedData.billingOptOutStatus,
+      customerType: "Residential",
+    };
+    console.log("postRequestInAppNotification requestData", requestData);
     const requestUrl = `api/mobilenotificationpreferences/${userName}/mobilepreferences`;
     PostApiRequest(
       requestUrl,
@@ -268,7 +271,7 @@ const InAppNotifications = ({ navigation }) => {
         });
         //setShowErrorAlert(true);
         //navigation.navigate("Notifications", { updateFailed: true, failureMessage: "In-App Notifications update failed." });
-      }
+      },
     );
   };
 
@@ -399,18 +402,16 @@ const InAppNotifications = ({ navigation }) => {
 const NotificationSetting = ({ name, value, title, description, onChange }) => (
   <Pressable
     style={[styles.frameContainer, styles.frameBorder]}
-    accessible={true}
-    accessibilityRole="switch"
-    accessibilityState={{ checked: value }}
-    accessibilityLabel={`In-App Notifications for ${title}: ${value ? 'enabled' : 'disabled'}. ${description}`}
-    accessibilityHint="Double tap to toggle"
-    onPress={() => onChange({ target: { name, value: !value, type: 'toggle' } })}
+    accessible={false}
+    onPress={() =>
+      onChange({ target: { name, value: !value, type: "toggle" } })
+    }
   >
     <View style={styles.frameView}>
       <View style={styles.appointmentsParent}>
         <View style={{ flexDirection: "column", flex: 1.7, marginRight: 10 }}>
-          <Text 
-            style={styles.appointments} 
+          <Text
+            style={styles.appointments}
             accessible={true}
             accessibilityRole="text"
           >
@@ -433,9 +434,13 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
             initialValue={value}
             label={title}
             onToggle={(e) => {
-              onChange({ target: { name, value: !value, type: 'toggle' } });
+              onChange({ target: { name, value: !value, type: "toggle" } });
             }}
-            accessible={false}
+            accessible={true}
+            accessibilityRole="switch"
+            accessibilityState={{ checked: value }}
+            accessibilityLabel={`${value ? "enabled" : "disabled"}`}
+            accessibilityHint="Double tap to toggle"
             section="inAppNotif"
           />
         </View>

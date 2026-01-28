@@ -19,6 +19,7 @@ import SuccessIcon from "../../../../assets/svgs/SuccessIcon";
 import CloseIcon from "../../../res/svgIcons/CloseIcon";
 import WarningIcon from "../../../../assets/svgs/Alerttriangle";
 import { A11y } from "react-native-a11y-order";
+import { useFocusEffect } from "@react-navigation/native";
 
 const TYPE_CONFIG = {
   info: {
@@ -228,6 +229,7 @@ const NotificationAlert = ({
   showCloseIcon = true,
   isVisible = true,
   resentemail = false,
+  autoFocusTitle = false,
   splitKey = "",
 }) => {
   const dispatch = useDispatch();
@@ -238,7 +240,7 @@ const NotificationAlert = ({
   const closeRef = useRef(null);
   const resendRef = useRef(null);
   const blockRefs = useRef([]);
-
+  
   const config = TYPE_CONFIG[type] || TYPE_CONFIG.info;
   const IconComponent = config.IconComponent;
 
@@ -248,6 +250,9 @@ const NotificationAlert = ({
     [message, normalizedKeys]
   );
   const blocks = useMemo(() => groupSegmentsByLineBreaks(segments), [segments]);
+
+
+  // Accessibility focus is now handled in the useEffect below
 
   // Initialize block refs array
   useEffect(() => {
@@ -259,10 +264,18 @@ const NotificationAlert = ({
     if (!isVisible) return;
 
     const timeout = setTimeout(() => {
-      // Set initial focus
-      const titleNode = findNodeHandle(titleRef.current);
-      if (titleNode) {
-        AccessibilityInfo.setAccessibilityFocus(titleNode);
+      // Set initial focus - prefer autoFocusTitle if enabled, otherwise use title
+      let focusTarget = null;
+      if (autoFocusTitle && titleRef.current) {
+        focusTarget = findNodeHandle(titleRef.current);
+      } else if (titleRef.current) {
+        focusTarget = findNodeHandle(titleRef.current);
+      } else if (containerRef.current) {
+        focusTarget = findNodeHandle(containerRef.current);
+      }
+      
+      if (focusTarget) {
+        AccessibilityInfo.setAccessibilityFocus(focusTarget);
       }
 
       AccessibilityInfo.announceForAccessibility(
@@ -311,10 +324,10 @@ const NotificationAlert = ({
           }
         }
       }
-    }, 100);
+    }, 300);
 
     return () => clearTimeout(timeout);
-  }, [isVisible, title, config.labelPrefix, blocks.length, resentemail, showCloseIcon]);
+  }, [isVisible, title, config.labelPrefix, blocks.length, resentemail, showCloseIcon, autoFocusTitle]);
 
   const executeAction = useCallback(
     (actionConfig) => {

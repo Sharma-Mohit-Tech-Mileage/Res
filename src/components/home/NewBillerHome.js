@@ -22,7 +22,7 @@ import WelcomeCard from "../ACPDashboard/WelcomeCard";
 import PromoBanner from "../ACPDashboard/PromoBanner";
 import FeatureCard from "../ACPDashboard/FeatureCard";
 import InfoBanner from "../ACPDashboard/InfoBanner";
-import { GetApiRequest, PostApiRequest } from "../../network/APIClient";
+import { GetApiRequest, PostApiRequest,PostApiReqZendeskToken } from "../../network/APIClient";
 import { getUser } from "../../redux/utils/LocalStorage";
 import { useMaintenance } from "../maintenance/MaintenanceContext";
 import MaintenanceBanner from "../maintenance/MaintenanceBanner";
@@ -35,7 +35,6 @@ import {
   requestUserPermission,
 } from "../../firebase/FirebaseUtils";
 import Logo from "../../res/images/SpalshLogo";
-import sign from "jwt-encode"; // npm method for signing JWT
 import ChatIcon from "../../res/svgIcons/ChatIcon";
 import VersionCheck from "react-native-version-check";
 import DeviceInfo from "react-native-device-info";
@@ -286,8 +285,8 @@ const NewBillerHome = ({ navigation }) => {
 
     const IPAddress = await getIPAddress();
 
-    console.log("request data for zendesk jwt", requestData);
-    PostApiRequest(
+    console.log("request data for zendesk jwt1", requestData);
+    PostApiReqZendeskToken(
       `api/Zendesk/TokenAuth`,
       requestData,
       (response) => {
@@ -362,11 +361,7 @@ const NewBillerHome = ({ navigation }) => {
           if (Platform.OS === "ios") {
             startChat();
           } else {
-            startChatWithConfig().then(() => {
-              console.log("Zendesk chat started successfully");
-            }).catch((error) => {
-              console.error("Error starting Zendesk chat:", error);
-            });
+            startChatWithConfig();
           }
         }}
       >
