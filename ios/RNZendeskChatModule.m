@@ -6,31 +6,30 @@
 
 @implementation RNZendeskChatModule
 
+static const BOOL ISUAT = NO; // Set to YES for UAT, NO for Production
+
 RCT_EXPORT_MODULE(RNZendeskChatModule);
 
 
 
 + (void) init {
   dispatch_async(dispatch_get_main_queue(), ^{
-    // Select channel key based on build configuration
-    /*static NSString * const channelKey = @"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lLnplbmRlc2suY29tL21vYmlsZV9zZGtfYXBpL3NldHRpbmdzLzAxSlEwOTk0WUpERVpLMVdCWjlFVDdCRURYLmpzb24ifQ=="; */
-    #ifdef DEBUG
-      static NSString * const channelKey = @"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTczNDcxNTE4Mi56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUtGRkJKN0RDNTJSREZNWVhRM0c1U1laMC5qc29uIn0=";
-    #else
-      static NSString * const channelKey = @"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lLnplbmRlc2suY29tL21vYmlsZV9zZGtfYXBpL3NldHRpbmdzLzAxSlEwOTk0WUpERVpLMVdCWjlFVDdCRURYLmpzb24ifQ==";
-    #endif
+    // Select channel key based on static environment flag
+    static NSString * const UATChannelKey = @"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTczNDcxNTE4Mi56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUtGRkJKN0RDNTJSREZNWVhRM0c1U1laMC5qc29uIn0=";
+    static NSString * const PRODChannelKey = @"eyJzZXR0aW5nc191cmwiOiJodHRwczovL2NhYmxlb25lMTczNDcxNTE4Mi56ZW5kZXNrLmNvbS9tb2JpbGVfc2RrX2FwaS9zZXR0aW5ncy8wMUtGRkJKN0RDNTJSREZNWVhRM0c1U1laMC5qc29uIn0=";
+    static NSString * const channelKey = ISUAT ? UATChannelKey : PRODChannelKey;
 
     [Zendesk initializeWithChannelKey:channelKey
                      messagingFactory:[[ZDKDefaultMessagingFactory alloc] init]
-                    completionHandler:^(Zendesk * _Nullable zendesk, NSError * _Nullable error) {
+                    completionHandler:^(Zendesk * _Nullable initializedZendesk, NSError * _Nullable initError) {
                       ZDKLogger.enabled = YES;
                       ZDKLogger.level = ZDKLogLevelDefault;
-                      if (error != nil) {
-                        NSLog(@"Zendesk did not initialize.\nError: %@", error.localizedDescription);
+                      if (initError != nil) {
+                        NSLog(@"Zendesk did not initialize.\nError: %@", initError.localizedDescription);
                       } else {
-                        Zendesk *instance = [Zendesk instance];
-                        [instance addEventObserver:self :^(enum ZDKZendeskEvent event, id _Nullable value) {
-                          switch (event) {
+                        Zendesk *sdkInstance = [Zendesk instance];
+                        [sdkInstance addEventObserver:self :^(enum ZDKZendeskEvent zendeskEvent, id _Nullable value) {
+                          switch (zendeskEvent) {
                             case ZDKZendeskEventUnreadMessageCountChanged:
                               break;
                             case ZDKZendeskEventAuthenticationFailed:
@@ -233,6 +232,7 @@ RCT_EXPORT_METHOD(setConversationTags:(NSDictionary *)metadata
 
 
 @end
+
 
 
 
