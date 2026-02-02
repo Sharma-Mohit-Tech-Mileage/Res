@@ -57,8 +57,9 @@ const PasswordSecurity = () => {
             </Text>
             <Pressable
               accessible={true}
-              accessibilityLabel="Edit"
+              accessibilityLabel="Edit Password"
               accessibilityRole="button"
+              accessibilityHint="Double click to open edit password screen"
               style={[styles.buttons, styles.buttonsBg]}
               onPress={() => navigation.navigate("PasswordEdit")}
             >
@@ -92,7 +93,7 @@ const PasswordSecurity = () => {
                 </Text>
                 <Pressable
                   accessible={true}
-                  accessibilityLabel="Edit"
+                  accessibilityLabel="Edit Security Question"
                   accessibilityRole="button"
                   style={[styles.buttons, styles.buttonsBg]}
                   onPress={() => navigation.navigate("PasswordSecurityEdit")}

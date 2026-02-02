@@ -92,7 +92,7 @@ const ProfileSettings = () => {
               </View>
               <View style={styles.frameContainer}>
                 <View style={styles.firstNameParent} accessible={true}>
-                  <Text style={styles.firstName}>{"First Name"}</Text>
+                  <Text style={styles.firstName}>{"Customer Name"}</Text>
                   <Text style={[styles.melissa, styles.melissaTypo]}>
                     {profileDetails.fullName}
                   </Text>
