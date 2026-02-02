@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, Platform, AppState } from 'react-native';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { View, Text, StyleSheet, Platform, AppState, Animated } from 'react-native';
 import WebView from 'react-native-webview';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import CryptoJS from 'crypto-js';
 import { useSelector } from 'react-redux';
 import { getUser, getUpgradeToken } from "../../redux/utils/LocalStorage";
-import { RefreshToken } from '../user/Session';
 import { Env } from '../../network/apis/account/Constants';
 import { GetApiRequest } from '../../network/APIClient';
 import { navigationRef } from '../../navigations/UserNavigations';
@@ -14,29 +13,27 @@ import { getPaymentUrl, getReferralUrl } from './PaymentUrlUtils';
 import LoadingOverlay from '../common/customui/CustomLoading';
 import MaintenanceAlert from './MaintenanceAlert';
 
-const { height, width } = Dimensions.get('window');
-
 const AutoPayPCIConnector = ({ navigation, route }) => {
-    const [initScript, setInitScript] = useState('');
     const [progress, setProgress] = useState(0);
-    const [url, setUrl] = useState(route.params?.url || Env.URL);
     const [currentUser, setCurrentUser] = useState({});
-    const [paymentDetails, setPaymentDetails] = useState(route.params?.paymentDetails || {});
-    const [status, setStatus] = useState(route.params?.status || false);
-    const [name, setTitle] = useState(route.params?.name);
-    const [navStateReloading, setNavStateReloading] = useState(false);
-    const [ isServiceDown, setIsServiceDown ] = useState(false);
+    const [paymentDetails] = useState(route.params?.paymentDetails || {});
+    const [status] = useState(route.params?.status || false);
+    const [name] = useState(route.params?.name);
+    const [isServiceDown, setIsServiceDown] = useState(false);
+    const [html, setHtml] = useState('');
+    const [contentLoaded, setContentLoaded] = useState(false);
+    const [webViewKey, setWebViewKey] = useState(Date.now());
+    const [showToast, setShowToast] = useState(false);
     const user = useSelector(state => state.user.userData);
     const webViewRef = useRef();
-    const [html, setHtml] = useState('');
-    const [appState, setAppState] = useState(AppState.currentState);
-    const [hasTrackedInitialScreen, setHasTrackedInitialScreen] = useState(false);
-    const [isWebViewLoaded, setIsWebViewLoaded] = useState(false);
-    
     const customReferUrl = route.params?.customReferUrl || route.params?.customPaymentUrl || null;
+    const aliveCheckResolver = useRef(null);
+    const backgroundTimestamp = useRef(0);
+    const toastOpacity = useRef(new Animated.Value(0)).current;
+    const initialLoadComplete = useRef(false);
 
-    console.log('AutoPayPCIConnector', paymentDetails);
-    
+    const isLoading = !contentLoaded || progress < 1;
+
     const generateGuid = () => {
         const p8 = (s) => {
             const p = (Math.random().toString(16) + "000000000").substr(2, 8);
@@ -61,7 +58,7 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             TotalDue: paymentDetails.billAmount,
             PastDue: paymentDetails.pastPaymentDue || 0,
             DueDate: paymentDetails.dueDate,
-            CustomerType: 'Residential' || '',
+            CustomerType: 'Residential',
             PastDueAmount: '',
             PaymentDueDate: '',
             Email: paymentDetails.email || '',
@@ -72,7 +69,6 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     const redirectToEBillpay = (paymentObj, makePaymentUrl) => {
-        console.log('Payment object:', paymentObj);
         const data = JSON.stringify(paymentObj);
         const gui = generateGuid();
         const guiTrim = gui.split('-').join('');
@@ -89,11 +85,15 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             padding: CryptoJS.pad.Pkcs7
         }).toString();
 
-        const param = { guid: gui, key: ix, PaymentObj: baX, RefererUrl: makePaymentUrl, apiKey: Env.secretKey };
+        const param = { 
+            guid: gui, 
+            key: ix, 
+            PaymentObj: baX, 
+            RefererUrl: makePaymentUrl, 
+            apiKey: Env.secretKey 
+        };
 
-        const version = 'V3';
-        const paymentUrl = getPaymentUrl(version);
-        
+        const paymentUrl = getPaymentUrl('V3');
         post(param, paymentUrl);
     };
 
@@ -112,7 +112,11 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
                         ${Object.keys(obj).map(key => `<input type="hidden" name="${key}" value="${obj[key]}" />`).join('')}
                     </form>
                     <script>
-                        // Simple script to immediately submit the form
+                        window.addEventListener('message', function(e) {
+                            if (e.data === 'PING') {
+                                window.ReactNativeWebView.postMessage(JSON.stringify({type: 'pong'}));
+                            }
+                        });
                         document.getElementById("paymentForm").submit();
                     </script>
                 </body>
@@ -121,44 +125,130 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
         setHtml(html);
     };
 
-    const setDynamicCookie = () => {
+    const showToastMessage = useCallback(() => {
+        setShowToast(true);
+        Animated.sequence([
+            Animated.timing(toastOpacity, {
+                toValue: 1,
+                duration: 300,
+                useNativeDriver: true,
+            }),
+            Animated.delay(2000),
+            Animated.timing(toastOpacity, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: true,
+            })
+        ]).start(() => setShowToast(false));
+    }, [toastOpacity]);
+
+    const setDynamicCookie = useCallback(async () => {
         if (!webViewRef.current) return;
         
         try {
+            const currentUser = await getUser();
+            const upgradeToken = await getUpgradeToken();
+            
             const script = `(function() {
                 try {
-                    var cookieValue = "MobileApp";
-                    var customerType = "Residential";
                     var domain = document.location.hostname; 
                     var expirationDate = new Date();
                     expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
                     
-                    // Set cookies
-                    document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-                    document.cookie = "CustomerType=" + customerType + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+                    document.cookie = "Source=MobileApp; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
+                    document.cookie = "CustomerType=Residential; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
                     
-                    // Set localStorage
                     localStorage.setItem('jwt_token', '${currentUser.token || ""}');
                     localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo || {}).replace(/'/g, "\\'")}');
-                    localStorage.setItem('upgrades_token', '${currentUser?.upgradeToken || ""}');
+                    localStorage.setItem('upgrades_token', '${upgradeToken?.access_token || ""}');
+                    
+                    window.saveFormState = function() {
+                        const formData = {};
+                        document.querySelectorAll('input, select, textarea').forEach((el, i) => {
+                            if (el.type !== 'password' && el.value) {
+                                formData['field_' + i] = el.value;
+                            }
+                        });
+                        localStorage.setItem('formState', JSON.stringify(formData));
+                        localStorage.setItem('scrollPosition', window.scrollY);
+                    };
+                    
+                    window.restoreFormState = function() {
+                        const saved = localStorage.getItem('formState');
+                        if (saved) {
+                            try {
+                                const formData = JSON.parse(saved);
+                                document.querySelectorAll('input, select, textarea').forEach((el, i) => {
+                                    if (formData['field_' + i] && el.type !== 'password') {
+                                        el.value = formData['field_' + i];
+                                    }
+                                });
+                                const scrollPos = localStorage.getItem('scrollPosition');
+                                if (scrollPos) window.scrollTo(0, parseInt(scrollPos));
+                            } catch(e) {}
+                        }
+                    };
+                    
+                    setInterval(window.saveFormState, 5000);
+                    
+                    if (document.readyState === 'complete') {
+                        window.restoreFormState();
+                    } else {
+                        window.addEventListener('load', window.restoreFormState);
+                    }
                     
                     return true;
                 } catch(e) {
-                    console.error("Error in cookie setting:", e);
                     return true;
                 }
             })();`;
 
             webViewRef.current.injectJavaScript(script);
         } catch (error) {
-            console.warn('WebView reference error:', error);
+            console.warn('Cookie setting error:', error);
         }
-    };
+    }, []);
+
+    const checkWebViewAlive = useCallback(() => {
+        return new Promise((resolve) => {
+            if (aliveCheckResolver.current) {
+                resolve(false);
+                return;
+            }
+            
+            aliveCheckResolver.current = resolve;
+            
+            const timeout = setTimeout(() => {
+                if (aliveCheckResolver.current) {
+                    aliveCheckResolver.current(false);
+                    aliveCheckResolver.current = null;
+                }
+            }, 2000);
+            
+            webViewRef.current?.injectJavaScript(`
+                window.postMessage('PING');
+                true;
+            `);
+        });
+    }, []);
+
+    const recreateWebView = useCallback(() => {
+        webViewRef.current?.injectJavaScript(`
+            if (window.saveFormState) window.saveFormState();
+            true;
+        `);
+        setTimeout(() => {
+            setWebViewKey(Date.now());
+            setContentLoaded(false);
+            setProgress(0);
+            initialLoadComplete.current = false;
+        }, 100);
+    }, []);
 
     const initializePayment = async () => {
         try {
             const userLocal = await getUser();
-            if (!userLocal || !userLocal.userInfo || !userLocal.userInfo.accountNumber) {
+            if (!userLocal?.userInfo?.accountNumber) {
                 navigation.navigate('Billing');
                 return;
             }
@@ -166,64 +256,40 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
             const accountNumber = userLocal.userInfo.accountNumber;
             
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error("API request timed out")), 15000);
+                setTimeout(() => reject(new Error("API timeout")), 15000);
             });
             
             const apiRequest = new Promise((resolve) => {
                 GetApiRequest(
-                   `api/Accounts/${accountNumber}/easypay`,
-                    (res) => {
-                        resolve(res);
-                    },
+                    `api/Accounts/${accountNumber}/easypay`,
+                    (res) => resolve(res),
                     (error) => {
-                        console.error("Error fetching payment details:", error);
                         if(error?.includes('503')) {
                             setIsServiceDown(true);
                         }
-                        resolve(null); 
+                        resolve(null);
                     }
                 );
             });
             
-            const res = await Promise.race([apiRequest, timeoutPromise]).catch(error => {
-                console.error("API request failed:", error);
-                return null;
-            });
+            const res = await Promise.race([apiRequest, timeoutPromise]).catch(() => null);
             
-            if (!res) {
-                const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, false, '');
-                const version = 'V3';
-                const type = status ? 'MANAGE' : 'SETUP';
-                let referralUrl;
-                
-                try {
-                    referralUrl = getReferralUrl(version, type, customReferUrl);
-                } catch (error) {
-                    if (version === 'V3') {
-                        referralUrl = status ? (Env.REFERRAL_URL_MANAGE_V3 ) : (Env.REFERRAL_URL_SETUP_V3 );
-                    } else {
-                        referralUrl = status ? (Env.REFERRAL_URL_MANAGE_V2 ) : (Env.REFERRAL_URL_SETUP_V2 );
-                    }
-                }
-                
-                redirectToEBillpay(paymentObj, referralUrl);
-                return;
-            }
+            const freshUser = await getUser();
             
-            const paymentObj = getPaymentObj(userLocal.token, userLocal.userInfo, res?.isEasyPay, res?.easyPayId);
+            const paymentObj = getPaymentObj(
+                freshUser.token, 
+                freshUser.userInfo, 
+                res?.isEasyPay || false, 
+                res?.easyPayId || ''
+            );
             
-            const version = 'V3';
             const type = status ? 'MANAGE' : 'SETUP';
             let referralUrl;
             
             try {
-                referralUrl = getReferralUrl(version, type, customReferUrl);
+                referralUrl = getReferralUrl('V3', type, customReferUrl);
             } catch (error) {
-                if (version === 'V3') {
-                    referralUrl = status ? (Env.REFERRAL_URL_MANAGE_V3 ) : (Env.REFERRAL_URL_SETUP_V3 );
-                } else {
-                    referralUrl = status ? (Env.REFERRAL_URL_MANAGE_V2 ) : (Env.REFERRAL_URL_SETUP_V2 );
-                }
+                referralUrl = status ? Env.REFERRAL_URL_MANAGE_V3 : Env.REFERRAL_URL_SETUP_V3;
             }
             
             redirectToEBillpay(paymentObj, referralUrl);
@@ -233,219 +299,148 @@ const AutoPayPCIConnector = ({ navigation, route }) => {
     };
 
     useEffect(() => {
-        const refreshAndInitialize = async () => {
-            try {
-                await RefreshToken();
-                await initializePayment();
-            } catch (error) {
-                if (navigationRef.current) {
-                    navigationRef.current.navigate('Splash');
-                }
-            }
-        };
-
-        refreshAndInitialize();
+        initializePayment();
     }, []);
 
-
-const navigationChange = async (navState) => {
-    if (!navState || !navState.url) return;
-    
-    console.log("Navigation change to:", navState.url);
-    
-    if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
-        if (!navStateReloading) {
+    const onShouldStartLoadWithRequest = useCallback((request) => {
+        if (request.url.includes('/postlogout') || request.url.includes(Env.SSO_LOGIN)) {
+            showToastMessage();
             navigation.navigate('Billing');
+            return false;
         }
-    }
-};
-
-    const userUpdate = async () => {
-        const userLocal = await getUser();
-        if (userLocal.token === currentUser.token) {
-            setTimeout(userUpdate, 1000);
-        } else {
-            setNavStateReloading(false);
-            userUpdateScript(userLocal);
-            setUrl(route.params?.url || Env.URL);
-            setProgress(0);
-            setCurrentUser(userLocal);
-        }
-    };
-
-    const userUpdateScript = async (user) => {
-        const upgradeToken = await getUpgradeToken();
-        if (user.token) {
-            // Simplified script to avoid syntax errors
-            const SAVE_FROM_RN = `(function() {
-                try {
-                    localStorage.setItem('jwt_token', '${user.token}');
-                    localStorage.setItem('user_info', '${JSON.stringify(user.userInfo || {}).replace(/'/g, "\\'")}');
-                    localStorage.setItem('upgrades_token', '${upgradeToken?.access_token || ""}');
-                    
-                    var cookieValue = "MobileApp";
-                    var customerType = "Residential";
-                    var domain = document.location.hostname; 
-                    var expirationDate = new Date();
-                    expirationDate.setTime(expirationDate.getTime() + (365*24*60*60*1000)); 
-                    
-                    document.cookie = "Source=" + cookieValue + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-                    document.cookie = "CustomerType=" + customerType + "; domain=" + domain + "; path=/; expires=" + expirationDate.toUTCString() + ";";
-                    
-                    var open = XMLHttpRequest.prototype.open;
-                    XMLHttpRequest.prototype.open = function() {
-                        this.addEventListener("load", function(event) {
-                            if (this.responseURL && this.responseURL.match('/account/.*/statements/') !== null) {
-                                var message = {"status" : this.status, "responseURL" : this.responseURL, "response" : this.response}
-                                window.ReactNativeWebView.postMessage(JSON.stringify(message));
-                            }
-                        });
-                        open.apply(this, arguments);
-                    };
-                } catch(e) {
-                    console.error("Error updating session:", e);
-                }
-                return true;
-            })();`;
-            setInitScript(SAVE_FROM_RN);
-        }
-    };
-
-    useEffect(() => {
-        setProgress(0);
-    }, [url]);
+        return true;
+    }, [navigation, showToastMessage]);
 
     useEffect(() => {
         if (user) {
             setCurrentUser(user);
-            userUpdateScript(user);
-            if (isWebViewLoaded) {
+            if (contentLoaded) {
                 setTimeout(() => setDynamicCookie(), 500);
             }
         }
-    }, [user, isWebViewLoaded]);
+    }, [user, contentLoaded, setDynamicCookie]);
 
     useEffect(() => {
-        const handleAppStateChange = nextAppState => {
-            if (appState.match(/inactive|background/) && nextAppState === 'active') {
-                setTimeout(() => {
-                    if (webViewRef.current && !webViewRef.current.loading) {
-                        webViewRef.current.reload();
+        const handleAppStateChange = async (nextAppState) => {
+            if (nextAppState === 'background') {
+                backgroundTimestamp.current = Date.now();
+                webViewRef.current?.injectJavaScript(`
+                    if (window.saveFormState) window.saveFormState();
+                    true;
+                `);
+            } else if (nextAppState === 'active' && backgroundTimestamp.current > 0) {
+                const backgroundDuration = Date.now() - backgroundTimestamp.current;
+                
+                if (backgroundDuration > 300000) {
+                    const isAlive = await checkWebViewAlive();
+                    if (!isAlive) {
+                        recreateWebView();
+                    } else {
+                        await setDynamicCookie();
                     }
-                }, 500);
-            }
-            setAppState(nextAppState);
-        };
-
-        const subscription = AppState.addEventListener('change', handleAppStateChange);
-
-        return () => {
-            if (subscription) {
-                subscription.remove();
-            }
-        };
-    }, [appState]);
-
-    useEffect(() => {
-        console.log('PCI Screen Tracking useEffect triggered');
-
-        const trackScreen = async () => {
-            if (name && !hasTrackedInitialScreen) {
-                try {
-                    await analytics().logEvent('screen_view', {
-                        screen_name: name,
-                        screen_class: 'AutoPayPCIConnector'
-                    });
-                    setHasTrackedInitialScreen(true);
-                } catch (error) {
-                    console.error('PCI Analytics error:', error.message);
                 }
             }
         };
 
-        trackScreen();
+        const subscription = AppState.addEventListener('change', handleAppStateChange);
+        return () => subscription?.remove();
+    }, [checkWebViewAlive, recreateWebView, setDynamicCookie]);
+
+    useEffect(() => {
+        if (name) {
+            analytics().logEvent('screen_view', {
+                screen_name: name,
+                screen_class: 'AutoPayPCIConnector'
+            }).catch(console.error);
+        }
     }, [name]);
 
-    // Handler for WebView messages
     const onMessage = (event) => {
         try {
             const data = JSON.parse(event.nativeEvent.data);
-            console.log("WebView message received:", data);
+            if (data.type === 'pong' && aliveCheckResolver.current) {
+                aliveCheckResolver.current(true);
+                aliveCheckResolver.current = null;
+            }
         } catch (error) {
-            console.error("Error parsing WebView message:", error);
+            console.error("Message parsing error:", error);
         }
     };
     
     return (
         <View style={styles.container}>
-            <ProfileSettingsHeader onPressBack={() => { navigation.goBack(); }} title={isServiceDown?'Scheduled Maintenance':name} />
-            {(!isServiceDown && progress < 1) && (
-                <View style={styles.progressBar}>
-                    <View style={[styles.progress, { width: `${progress * 100}%` }]} />
-                </View>
-            )}
-            {html ? (
-                isServiceDown ? (
-                    <View style={{ flex: 1, backgroundColor:'#ebeef1' }}> 
-                        <MaintenanceAlert/>
-                    </View>
-                ) : (
-                <WebView
-                    ref={webViewRef}
-                    source={{ html }}
-                    onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
-                    onLoadStart={() => {
-                        console.log("WebView started loading");
-                        setIsWebViewLoaded(false);
-                    }}
-                    onLoadEnd={() => {
-                        console.log("WebView finished loading");
-                        setProgress(1);
-                        setIsWebViewLoaded(true);
-                        setTimeout(() => setDynamicCookie(), 500);
-                    }}
-                    onMessage={onMessage}
-                    sharedCookiesEnabled={true}
-                    injectedJavaScriptBeforeContentLoaded={initScript}
-                    onNavigationStateChange={navigationChange}
-                    originWhitelist={['*']}
-                    incognito={false} // Changed to false to allow cookies
-                    javaScriptEnabled={true}
-                    domStorageEnabled={true}
-                    thirdPartyCookiesEnabled={true}
-                    scalesPageToFit={true}
-                    allowsInlineMediaPlayback={true}
-                    mediaPlaybackRequiresUserAction={false}
-                    mixedContentMode="compatibility"
-                    cacheEnabled={false}
-                    androidHardwareAccelerationDisabled={Platform.OS === 'android'}
-                    onShouldStartLoadWithRequest={(request) => {
-                        console.log("Load request:", request.url);
-                        return true;
-                    }}
-                    style={styles.webView}
-                    onError={(syntheticEvent) => {
-                        const { nativeEvent } = syntheticEvent;
-                        console.error('WebView error: ', nativeEvent);
-                    }}
-                    onHttpError={(syntheticEvent) => {
-                        const { nativeEvent } = syntheticEvent;
-                        console.error('WebView HTTP error: ', nativeEvent);
-                        if (nativeEvent?.statusCode === 503) {
+            <ProfileSettingsHeader 
+                onPressBack={() => navigation.goBack()} 
+                title={isServiceDown ? 'Scheduled Maintenance' : name} 
+            />
+            
+            <View style={styles.contentContainer}>
+                {html && !isServiceDown && (
+                    <WebView
+                        key={webViewKey}
+                        ref={webViewRef}
+                        source={{ html }}
+                        onLoadProgress={({ nativeEvent }) => setProgress(nativeEvent.progress)}
+                        onLoadStart={() => {
+                            if (!initialLoadComplete.current) {
+                                setContentLoaded(false);
+                                setProgress(0);
+                            }
+                        }}
+                        onLoadEnd={() => {
+                            setProgress(1);
+                            setTimeout(() => {
+                                setContentLoaded(true);
+                                initialLoadComplete.current = true;
+                                setDynamicCookie();
+                            }, 300);
+                        }}
+                        onMessage={onMessage}
+                        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+                        sharedCookiesEnabled={true}
+                        originWhitelist={['*']}
+                        javaScriptEnabled={true}
+                        domStorageEnabled={true}
+                        thirdPartyCookiesEnabled={true}
+                        scalesPageToFit={true}
+                        allowsInlineMediaPlayback={true}
+                        mediaPlaybackRequiresUserAction={false}
+                        mixedContentMode="compatibility"
+                        cacheEnabled={false}
+                        androidLayerType="hardware"
+                        nestedScrollEnabled={true}
+                        overScrollMode="never"
+                        style={styles.webView}
+                        onError={(syntheticEvent) => {
+                            console.error('WebView error:', syntheticEvent.nativeEvent);
+                            setContentLoaded(true);
+                        }}
+                        onHttpError={(syntheticEvent) => {
+                            const { nativeEvent } = syntheticEvent;
+                            if (nativeEvent?.statusCode === 503) {
                                 setIsServiceDown(true);
                             }
-                    }}
-                />
-                )
-            ) : (
-                <View style={styles.loadingContainer}>
-                    <LoadingOverlay
-                        loading={true}
-                       
-                        
+                            setContentLoaded(true);
+                        }}
                     />
-                </View>
-            )}
+                )}
+
+                {isServiceDown && (
+                    <MaintenanceAlert/>
+                )}
+
+                {isLoading && !isServiceDown && (
+                    <View style={styles.loadingOverlay}>
+                        <LoadingOverlay loading={true} />
+                    </View>
+                )}
+
+                {showToast && (
+                    <Animated.View style={[styles.toast, { opacity: toastOpacity }]}>
+                        <Text style={styles.toastText}>Session expired</Text>
+                    </Animated.View>
+                )}
+            </View>
         </View>
     );
 };
@@ -454,32 +449,43 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        marginBottom: (Platform.OS === 'ios') ? 90 : 60,
+        marginBottom: Platform.OS === 'ios' ? 90 : 60,
+    },
+    contentContainer: {
+        flex: 1,
+        position: 'relative',
     },
     webView: {
         flex: 1,
         backgroundColor: '#ffffff',
     },
-    loadingContainer: {
-        flex: 1,
+    loadingOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#ffffff',
+        zIndex: 1000,
     },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 16,
-        color: 'rgba(141, 59, 144, 1)',
-        textAlign: 'center',
+    toast: {
+        position: 'absolute',
+        bottom: 100,
+        left: 20,
+        right: 20,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        alignItems: 'center',
+        zIndex: 2000,
     },
-    progressBar: {
-        height: height * 0.004,
-        backgroundColor: 'lightgrey',
-        width: '100%',
-    },
-    progress: {
-        height: '100%',
-        backgroundColor: 'rgba(141, 59, 144, 1)',
+    toastText: {
+        color: '#ffffff',
+        fontSize: 14,
+        fontWeight: '500',
     },
 });
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, Platform, AppState, Alert } from 'react-native';
+import { View, Text, StyleSheet, Platform, AppState, Animated } from 'react-native';
 import ProfileSettingsHeader from '../common/ProfileSettingsHeader';
 import WebView from 'react-native-webview';
 import { useSelector } from 'react-redux';
@@ -10,6 +10,7 @@ import { navigationRef } from '../../navigations/UserNavigations';
 import analytics from '@react-native-firebase/analytics';
 import LoadingOverlay from '../common/customui/CustomLoading';
 import LoadingSpinner from './LoadingSpinner';
+import { getUser, getUpgradeToken } from '../../redux/utils/LocalStorage';
 
 const ArticalWindowUtility = ({ navigation, route }) => {
     const [progress, setProgress] = useState(0);
@@ -17,196 +18,320 @@ const ArticalWindowUtility = ({ navigation, route }) => {
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [url] = useState(route.params?.url);
-    const [modalOpen, setModalOpen] = useState(true);
-    const [navStateReloading, setNavStateReloading] = useState(false);
     const [showPDFModal, setShowPDFModal] = useState(false);
     const [showPDFUrl, setShowPDFUrl] = useState('');
     const [isTokenRefreshing, setIsTokenRefreshing] = useState(false);
     const [contentLoaded, setContentLoaded] = useState(false);
-    const [loadStartTime, setLoadStartTime] = useState(0);
-    const [forceWebViewRecreation, setForceWebViewRecreation] = useState(false);
-    const [appBackgroundTime, setAppBackgroundTime] = useState(0);
+    const [webViewKey, setWebViewKey] = useState(Date.now());
+    const [showToast, setShowToast] = useState(false);
+    const [webViewReady, setWebViewReady] = useState(false);
+    const [injectionScript, setInjectionScript] = useState('');
     const user = useSelector(state => state.user.userData);
     const webViewRef = useRef();
+    const aliveCheckResolver = useRef(null);
+    const backgroundTimestamp = useRef(0);
+    const toastOpacity = useRef(new Animated.Value(0)).current;
+    const initialLoadComplete = useRef(false);
+    const sessionInjected = useRef(false);
 
-    // FIXED: Simplified and more compatible script
-    const enhancedScript = `
-        (function() {
-            try {
-                console.log('Sparklight script injection started');
-                
-                // Simple localStorage setup
-                const token = '${user?.token || ''}';
-                const userInfo = '${JSON.stringify(user?.userInfo || {})}';
-                
-                if (token) {
-                    localStorage.setItem('jwt_token', token);
-                    console.log('JWT token set');
-                }
-                
-                if (userInfo && userInfo !== '{}') {
-                    localStorage.setItem('user_info', userInfo);
-                    console.log('User info set');
-                }
-                
-                // Simplified cookie setting - removed problematic flags
-                try {
-                    const cookieValue = "Source=MobileApp; domain=" + location.hostname + "; path=/; max-age=31536000";
-                    document.cookie = cookieValue;
-                    console.log('Cookie set successfully');
-                } catch (cookieError) {
-                    console.error('Cookie setting failed:', cookieError);
-                }
-                
-                // FIXED: Simplified PDF interceptor setup
-                if (!window.pdfInterceptorSetup) {
-                    const origOpen = XMLHttpRequest.prototype.open;
-                    XMLHttpRequest.prototype.open = function(method, url) {
-                        this.addEventListener('load', function() {
-                            if ((url.includes('/statements/') || url.includes('Statement')) && this.status === 200) {
-                                try {
-                                    const data = JSON.parse(this.response);
-                                    if (data.fileBinary) {
-                                        window.ReactNativeWebView.postMessage(JSON.stringify({
-                                            type: 'pdf',
-                                            data: data.fileBinary
-                                        }));
+    const isLoading = !contentLoaded || progress < 1;
+
+    // Prepare injection script with current user data
+    const prepareInjectionScript = useCallback(async () => {
+        try {
+            const currentUser = await getUser();
+            const upgradeToken = await getUpgradeToken();
+            
+            const script = `
+                (function() {
+                    try {
+                        console.log('Session injection started');
+                        
+                        // Set tokens FIRST
+                        const token = '${currentUser?.token || ''}';
+                        const userInfo = '${JSON.stringify(currentUser?.userInfo || {})}';
+                        const upgradeTokenValue = '${upgradeToken?.access_token || ''}';
+                        
+                        if (token) {
+                            localStorage.setItem('jwt_token', token);
+                            console.log('JWT token set');
+                        }
+                        if (userInfo && userInfo !== '{}') {
+                            localStorage.setItem('user_info', userInfo);
+                            console.log('User info set');
+                        }
+                        if (upgradeTokenValue) {
+                            localStorage.setItem('upgrades_token', upgradeTokenValue);
+                            console.log('Upgrade token set');
+                        }
+                        
+                        // Set cookies SECOND
+                        const domain = location.hostname;
+                        const expires = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
+                        document.cookie = "Source=MobileApp; domain=" + domain + "; path=/; expires=" + expires + "; SameSite=Lax";
+                        document.cookie = "CustomerType=Residential; domain=" + domain + "; path=/; expires=" + expires + "; SameSite=Lax";
+                        console.log('Cookies set');
+                        
+                        // PDF interceptor
+                        if (!window.pdfInterceptorSetup) {
+                            const origOpen = XMLHttpRequest.prototype.open;
+                            XMLHttpRequest.prototype.open = function(method, url) {
+                                this.addEventListener('load', function() {
+                                    if ((url.includes('/statements/') || url.includes('Statement')) && this.status === 200) {
+                                        try {
+                                            const data = JSON.parse(this.response);
+                                            if (data.fileBinary) {
+                                                window.ReactNativeWebView.postMessage(JSON.stringify({
+                                                    type: 'pdf',
+                                                    data: data.fileBinary
+                                                }));
+                                            }
+                                        } catch(e) {}
                                     }
-                                } catch(parseError) {
-                                    console.error('PDF parsing error:', parseError);
+                                });
+                                origOpen.apply(this, arguments);
+                            };
+                            window.pdfInterceptorSetup = true;
+                        }
+                        
+                        // Form state management
+                        window.saveFormState = function() {
+                            const formData = {};
+                            document.querySelectorAll('input, select, textarea').forEach((el, i) => {
+                                if (el.type !== 'password' && el.value) {
+                                    formData['field_' + i] = {
+                                        value: el.value,
+                                        id: el.id,
+                                        name: el.name
+                                    };
                                 }
+                            });
+                            localStorage.setItem('formState', JSON.stringify(formData));
+                            localStorage.setItem('scrollPosition', window.scrollY);
+                        };
+                        
+                        window.restoreFormState = function() {
+                            const saved = localStorage.getItem('formState');
+                            if (saved) {
+                                try {
+                                    const formData = JSON.parse(saved);
+                                    document.querySelectorAll('input, select, textarea').forEach((el, i) => {
+                                        const savedField = formData['field_' + i];
+                                        if (savedField && el.type !== 'password') {
+                                            el.value = savedField.value;
+                                        }
+                                    });
+                                    
+                                    const scrollPos = localStorage.getItem('scrollPosition');
+                                    if (scrollPos) {
+                                        window.scrollTo(0, parseInt(scrollPos));
+                                    }
+                                } catch(e) {}
+                            }
+                        };
+                        
+                        // Ping/pong for alive check
+                        window.addEventListener('message', function(e) {
+                            if (e.data === 'PING') {
+                                window.ReactNativeWebView.postMessage(JSON.stringify({type: 'pong'}));
+                            } else if (e.data === 'SAVE_STATE') {
+                                window.saveFormState();
                             }
                         });
                         
-                        this.addEventListener('error', function() {
-                            console.error('XHR Error:', this.status, url);
-                        });
+                        // Auto-save every 5 seconds
+                        setInterval(window.saveFormState, 5000);
                         
-                        origOpen.apply(this, arguments);
-                    };
-                    
-                    window.pdfInterceptorSetup = true;
-                    console.log('PDF interceptor setup complete');
-                }
-                
-                console.log('Script injection completed successfully');
-                
-            } catch(scriptError) {
-                console.error('Script injection error:', scriptError);
-            }
-        })();
-    `;
+                        // Restore on load
+                        if (document.readyState === 'complete') {
+                            window.restoreFormState();
+                        } else {
+                            window.addEventListener('load', window.restoreFormState);
+                        }
+                        
+                        // Signal injection complete
+                        window.ReactNativeWebView.postMessage(JSON.stringify({type: 'injectionComplete'}));
+                        console.log('Session injection completed');
+                        
+                    } catch(e) {
+                        console.error('Session injection error:', e);
+                        window.ReactNativeWebView.postMessage(JSON.stringify({type: 'injectionError', error: e.toString()}));
+                    }
+                })();
+                true;
+            `;
+            
+            setInjectionScript(script);
+            setWebViewReady(true);
+        } catch (error) {
+            console.error('Failed to prepare injection script:', error);
+            setWebViewReady(true); // Proceed anyway
+        }
+    }, []);
 
-    const navigationChange = useCallback(async (navState) => {
-        console.log('Navigation change:', navState.url);
-        
-        // Check for authentication redirects
-        if (navState.url.includes('/postlogout') || navState.url.includes(Env.SSO_LOGIN)) {
-            if (!navStateReloading) {
-                setIsTokenRefreshing(true);
-                setNavStateReloading(true);
-                
-                try {
-                    await RefreshToken();
-                    console.log('Token refresh successful');
-                    setTimeout(() => {
-                        webViewRef.current?.reload();
-                        setIsTokenRefreshing(false);
-                        setNavStateReloading(false);
-                        console.log('WebView reload completed');
-                    }, 500);
-                } catch (error) {
-                    console.log('Token refresh failed:', error);
-                    setIsTokenRefreshing(false);
-                    setNavStateReloading(false);
-                    Alert.alert(
-                        'Session Expired',
-                        'Please log in again.',
-                        [{ text: 'OK', onPress: () => navigationRef.current?.navigate('Splash') }]
-                    );
-                }
+    useEffect(() => {
+        prepareInjectionScript();
+    }, [prepareInjectionScript]);
+
+    const showToastMessage = useCallback(() => {
+        setShowToast(true);
+        Animated.sequence([
+            Animated.timing(toastOpacity, {
+                toValue: 1,
+                duration: 300,
+                useNativeDriver: true,
+            }),
+            Animated.delay(2000),
+            Animated.timing(toastOpacity, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: true,
+            })
+        ]).start(() => setShowToast(false));
+    }, [toastOpacity]);
+
+    const checkWebViewAlive = useCallback(() => {
+        return new Promise((resolve) => {
+            if (aliveCheckResolver.current) {
+                resolve(false);
+                return;
             }
+            
+            aliveCheckResolver.current = resolve;
+            
+            const timeout = setTimeout(() => {
+                if (aliveCheckResolver.current) {
+                    aliveCheckResolver.current(false);
+                    aliveCheckResolver.current = null;
+                }
+            }, 2000);
+            
+            webViewRef.current?.injectJavaScript(`
+                window.postMessage('PING');
+                true;
+            `);
+        });
+    }, []);
+
+    const refreshTokenInWebView = useCallback(async () => {
+        try {
+            const currentUser = await getUser();
+            const upgradeToken = await getUpgradeToken();
+            
+            webViewRef.current?.injectJavaScript(`
+                (function() {
+                    const domain = location.hostname;
+                    const expires = new Date(Date.now() + 365*24*60*60*1000).toUTCString();
+                    document.cookie = "Source=MobileApp; domain=" + domain + "; path=/; expires=" + expires + "; SameSite=Lax";
+                    document.cookie = "CustomerType=Residential; domain=" + domain + "; path=/; expires=" + expires + "; SameSite=Lax";
+                    
+                    localStorage.setItem('jwt_token', '${currentUser.token}');
+                    localStorage.setItem('user_info', '${JSON.stringify(currentUser.userInfo)}');
+                    localStorage.setItem('upgrades_token', '${upgradeToken?.access_token || ""}');
+                    window.dispatchEvent(new Event('tokenRefreshed'));
+                })();
+                true;
+            `);
+        } catch(e) {
+            console.error('Token refresh in WebView failed:', e);
+        }
+    }, []);
+
+    const recreateWebView = useCallback(() => {
+        webViewRef.current?.injectJavaScript(`window.postMessage('SAVE_STATE'); true;`);
+        setTimeout(() => {
+            sessionInjected.current = false;
+            setWebViewKey(Date.now());
+            setContentLoaded(false);
+            setProgress(0);
+            initialLoadComplete.current = false;
+        }, 100);
+    }, []);
+
+    const onShouldStartLoadWithRequest = useCallback((request) => {
+        // Allow the initial load to proceed
+        if (!sessionInjected.current && !request.url.includes('/postlogout') && !request.url.includes(Env.SSO_LOGIN)) {
+            return true;
         }
         
-    }, [navStateReloading]);
+        // Block logout/login redirects
+        if (request.url.includes('/postlogout') || request.url.includes(Env.SSO_LOGIN)) {
+            console.log('Blocked logout redirect:', request.url);
+            showToastMessage();
+            navigationRef.current?.navigate('Splash');
+            return false;
+        }
+        
+        return true;
+    }, [showToastMessage]);
 
     const onMessage = useCallback((event) => {
         try {
             const data = JSON.parse(event.nativeEvent.data);
-            console.log('WebView message received:', data.type);
             
-            switch (data.type) {
-                case 'pdf':
-                    if (data.data) {
-                        setShowPDFUrl(data.data);
-                        setShowPDFModal(true);
-                        console.log('PDF modal opened');
-                    }
-                    break;
-                    
-                case 'xhr_error':
-                    console.log('XHR Error:', data);
-                    break;
-                    
-                case 'page_error':
-                    console.log('Page Error:', data);
-                    break;
-                    
-                default:
-                    console.log('Unknown message type:', data.type);
+            if (data.type === 'injectionComplete') {
+                sessionInjected.current = true;
+                console.log('Session injection confirmed');
+            } else if (data.type === 'injectionError') {
+                console.error('Injection error:', data.error);
+            } else if (data.type === 'pong' && aliveCheckResolver.current) {
+                aliveCheckResolver.current(true);
+                aliveCheckResolver.current = null;
+            } else if (data.type === 'pdf' && data.data) {
+                setShowPDFUrl(data.data);
+                setShowPDFModal(true);
             }
         } catch (error) {
             console.log('Message parsing error:', error);
         }
     }, []);
 
-    const onLoadStart = useCallback((syntheticEvent) => {
-        const startTime = Date.now();
-        setLoadStartTime(startTime);
-        setProgress(0.1);
+    const onLoadStart = useCallback(() => {
+        if (!initialLoadComplete.current) {
+            setProgress(0);
+            setContentLoaded(false);
+        }
         setIsError(false);
         setErrorMessage('');
-        
-        console.log('WebView load started:', syntheticEvent.nativeEvent.url);
     }, []);
 
     const onLoadProgress = useCallback(({ nativeEvent }) => {
         setProgress(nativeEvent.progress);
     }, []);
 
-    const onLoadEnd = useCallback((syntheticEvent) => {
-        const endTime = Date.now();
-        const loadTime = endTime - loadStartTime;
+    const onLoadEnd = useCallback(() => {
         setProgress(1);
-        setContentLoaded(true);
-        
-        console.log(`Page loaded in: ${loadTime}ms (${(loadTime/1000).toFixed(2)}s)`);
-    }, [loadStartTime]);
+        setTimeout(() => {
+            setContentLoaded(true);
+            initialLoadComplete.current = true;
+        }, 300);
+    }, []);
 
     const onError = useCallback((syntheticEvent) => {
         const { nativeEvent } = syntheticEvent;
-        console.error('WebView error:', nativeEvent);
         setIsError(true);
+        setContentLoaded(true);
         setErrorMessage(`Loading error: ${nativeEvent.description || 'Unknown error'}`);
     }, []);
 
     const onHttpError = useCallback((syntheticEvent) => {
         const { nativeEvent } = syntheticEvent;
-        console.error('HTTP error:', nativeEvent.statusCode);
         
         if (nativeEvent.statusCode === 404) {
             setIsError(true);
-            setErrorMessage('Page not found (404). Please verify your account has access to this feature.');
+            setContentLoaded(true);
+            setErrorMessage('Page not found. Please verify your account has access to this feature.');
         } else if (nativeEvent.statusCode === 403) {
             setIsError(true);
-            setErrorMessage('Access denied (403). Please check your permissions.');
+            setContentLoaded(true);
+            setErrorMessage('Access denied. Please check your permissions.');
         } else if (nativeEvent.statusCode >= 500) {
             setIsError(true);
+            setContentLoaded(true);
             setErrorMessage('Server error. Please try again later.');
         }
     }, []);
 
-    // User validation
     useEffect(() => {
         if (!user?.token) {
             Alert.alert(
@@ -217,7 +342,6 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         }
     }, [user]);
 
-    // Analytics tracking
     useEffect(() => {
         if (name) {
             analytics().logEvent('screen_view', {
@@ -227,74 +351,42 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         }
     }, [name]);
 
-  useEffect(() => {
-    const handleAppStateChange = (nextAppState) => {
-        if (nextAppState === 'background') {
-            // Track when app goes to background
-            setAppBackgroundTime(Date.now());
-        } else if (nextAppState === 'active') {
-            const backgroundDuration = Date.now() - appBackgroundTime;
-            const wasBackgroundedLong = backgroundDuration > 300000; // 5 minutes
-            
-            if (wasBackgroundedLong || !contentLoaded) {
-                // Force WebView recreation for long background periods
-                console.log('App was backgrounded for', Math.round(backgroundDuration/1000), 'seconds - forcing WebView recreation');
-                setForceWebViewRecreation(true);
-                setModalOpen(false);
+    useEffect(() => {
+        const handleAppStateChange = async (nextAppState) => {
+            if (nextAppState === 'background') {
+                backgroundTimestamp.current = Date.now();
+                webViewRef.current?.injectJavaScript(`window.postMessage('SAVE_STATE'); true;`);
+            } else if (nextAppState === 'active' && backgroundTimestamp.current > 0) {
+                const backgroundDuration = Date.now() - backgroundTimestamp.current;
                 
-                // Recreate after brief delay
-                setTimeout(() => {
-                    setForceWebViewRecreation(false);
-                    setModalOpen(true);
-                    setContentLoaded(false);
-                }, 100);
-            } else if (contentLoaded) {
-                // Short background - try gentle reload first
-                setTimeout(() => {
-                    if (webViewRef.current) {
-                        webViewRef.current.reload();
+                if (backgroundDuration > 300000) {
+                    const isAlive = await checkWebViewAlive();
+                    if (!isAlive) {
+                        recreateWebView();
+                    } else {
+                        try {
+                            await RefreshToken();
+                            await refreshTokenInWebView();
+                        } catch(e) {
+                            recreateWebView();
+                        }
                     }
-                }, 500);
+                }
             }
-        }
-    };
+        };
 
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
-    return () => subscription?.remove();
-}, [contentLoaded, appBackgroundTime]);
-
-    const LoadingComponent = useCallback(() => (
-        <View style={styles.loadingContainer}>
-            {name === 'Billing Details' ? (
-                <LoadingSpinner />
-            ) : (
-                <LoadingOverlay loading={true} />
-            )}
-        </View>
-    ), [name]);
-
-    const TokenRefreshOverlay = useCallback(() => (
-        <View style={styles.refreshOverlay}>
-            <LoadingSpinner />
-        </View>
-    ), []);
+        const subscription = AppState.addEventListener('change', handleAppStateChange);
+        return () => subscription?.remove();
+    }, [checkWebViewAlive, recreateWebView, refreshTokenInWebView]);
 
     return (
         <View style={styles.container}>
             <ProfileSettingsHeader 
                 onPressBack={() => {
-                    console.log('Back button pressed');
-                    setModalOpen(false);
                     if (route.params?.isBilling) {
-                        navigation.reset({
-                            index: 0,
-                            routes: [{ name: "MyTab" }],
-                        });
+                        navigation.reset({ index: 0, routes: [{ name: "MyTab" }] });
                     } else if (route.params?.isPayBill) {
-                        navigation.reset({
-                            index: 0,
-                            routes: [{ name: "MyServices" }],
-                        });
+                        navigation.reset({ index: 0, routes: [{ name: "MyServices" }] });
                     } else {
                         navigation.goBack();
                     }
@@ -302,65 +394,68 @@ const ArticalWindowUtility = ({ navigation, route }) => {
                 title={name} 
             />
             
-            {progress < 1 && (
-                <View style={styles.progressBar}>
-                    <View style={[styles.progress, { width: `${progress * 100}%` }]} />
-                </View>
-            )}
-            
-            {modalOpen && !isTokenRefreshing && !forceWebViewRecreation && (
-                <WebView
-                    key={forceWebViewRecreation ? Date.now() : undefined}
-                    ref={webViewRef}
-                    source={{ uri: url }}
-                    // Event handlers
-                    onLoadStart={onLoadStart}
-                    onLoadProgress={onLoadProgress}
-                    onLoadEnd={onLoadEnd}
-                    onError={onError}
-                    onHttpError={onHttpError}
-                    onMessage={onMessage}
-                    onNavigationStateChange={navigationChange}
-                    
-                    // Script injection
-                    injectedJavaScript={enhancedScript}
-                    // Add this property to the WebView (around line 330 where other props are)
-                    injectedJavaScriptBeforeContentLoaded={Platform.OS === 'android' ? enhancedScript : undefined}
-                    // FIXED: Simplified WebView settings to prevent first-load errors
-                    startInLoadingState={true}
-                    renderLoading={LoadingComponent}
-                    javaScriptEnabled={true}
-                    domStorageEnabled={true}
-                    sharedCookiesEnabled={true}
-                    cacheEnabled={true}
-                    
-                    // FIXED: Removed problematic props that cause first-load errors
-                    originWhitelist={['https://*']}
-                    mixedContentMode="compatibility"
-                    allowsInlineMediaPlayback={true}
-                    
-                    // FIXED: Removed dataDetectorTypes and other problematic performance settings
-                    allowsBackForwardNavigationGestures={false}
-                    showsHorizontalScrollIndicator={false}
-                    showsVerticalScrollIndicator={false}
-                />
-            )}
+            <View style={styles.contentContainer}>
+                {webViewReady && !isTokenRefreshing && (
+                    <WebView
+                        key={webViewKey}
+                        ref={webViewRef}
+                        source={{ uri: url }}
+                        onLoadStart={onLoadStart}
+                        onLoadProgress={onLoadProgress}
+                        onLoadEnd={onLoadEnd}
+                        onError={onError}
+                        onHttpError={onHttpError}
+                        onMessage={onMessage}
+                        onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+                        injectedJavaScriptBeforeContentLoaded={injectionScript}
+                        injectedJavaScript={injectionScript}
+                        javaScriptEnabled={true}
+                        domStorageEnabled={true}
+                        sharedCookiesEnabled={true}
+                        cacheEnabled={true}
+                        originWhitelist={['https://*']}
+                        mixedContentMode="compatibility"
+                        allowsInlineMediaPlayback={true}
+                        allowsBackForwardNavigationGestures={false}
+                        showsHorizontalScrollIndicator={false}
+                        showsVerticalScrollIndicator={false}
+                        androidLayerType="hardware"
+                        nestedScrollEnabled={true}
+                        overScrollMode="never"
+                        style={styles.webView}
+                    />
+                )}
 
-            {(isTokenRefreshing || forceWebViewRecreation)&& <TokenRefreshOverlay />}
-            
-            {isError && (
-                <View style={styles.errorContainer}>
-                    <Text style={styles.errorTitle}>Unable to Load Page</Text>
-                    <Text style={styles.errorText}>{errorMessage || 'An error occurred while loading the page.'}</Text>
-                    <Text style={styles.retryText} onPress={() => {
-                        setIsError(false);
-                        setErrorMessage('');
-                        webViewRef.current?.reload();
-                    }}>
-                        Tap to Retry
-                    </Text>
-                </View>
-            )}
+                {(isLoading || isTokenRefreshing || !webViewReady) && !isError && (
+                    <View style={styles.loadingOverlay}>
+                        {name === 'Billing Details' ? <LoadingSpinner /> : <LoadingOverlay loading={true} />}
+                    </View>
+                )}
+                
+                {isError && (
+                    <View style={styles.errorContainer}>
+                        <Text style={styles.errorTitle}>Unable to Load Page</Text>
+                        <Text style={styles.errorText}>{errorMessage}</Text>
+                        <Text style={styles.retryText} onPress={() => {
+                            setIsError(false);
+                            setErrorMessage('');
+                            setContentLoaded(false);
+                            setProgress(0);
+                            initialLoadComplete.current = false;
+                            sessionInjected.current = false;
+                            webViewRef.current?.reload();
+                        }}>
+                            Tap to Retry
+                        </Text>
+                    </View>
+                )}
+
+                {showToast && (
+                    <Animated.View style={[styles.toast, { opacity: toastOpacity }]}>
+                        <Text style={styles.toastText}>Session expired</Text>
+                    </Animated.View>
+                )}
+            </View>
             
             {showPDFModal && (
                 <PDFViewModal
@@ -377,15 +472,14 @@ const styles = StyleSheet.create({
         flex: 1,
         marginBottom: Platform.OS === 'ios' ? 90 : 60,
     },
-    progressBar: {
-        height: 3,
-        backgroundColor: '#E0E0E0',
+    contentContainer: {
+        flex: 1,
+        position: 'relative',
     },
-    progress: {
-        height: '100%',
-        backgroundColor: '#8D3B90',
+    webView: {
+        flex: 1,
     },
-    loadingContainer: {
+    loadingOverlay: {
         position: 'absolute',
         top: 0,
         left: 0,
@@ -393,31 +487,19 @@ const styles = StyleSheet.create({
         bottom: 0,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'transparent',
-    },
-    refreshOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: '#ffffff',
         zIndex: 1000,
-        top: 100,
-    },
-    refreshText: {
-        marginTop: 16,
-        fontSize: 16,
-        color: '#333',
-        fontWeight: '500',
     },
     errorContainer: {
-        flex: 1,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
+        backgroundColor: '#ffffff',
     },
     errorTitle: {
         fontSize: 18,
@@ -437,6 +519,23 @@ const styles = StyleSheet.create({
         color: '#8D3B90',
         fontWeight: '600',
         textDecorationLine: 'underline',
+    },
+    toast: {
+        position: 'absolute',
+        bottom: 100,
+        left: 20,
+        right: 20,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        alignItems: 'center',
+        zIndex: 2000,
+    },
+    toastText: {
+        color: '#ffffff',
+        fontSize: 14,
+        fontWeight: '500',
     },
 });
 
