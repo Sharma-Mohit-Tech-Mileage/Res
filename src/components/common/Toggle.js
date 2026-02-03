@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Animated, TouchableWithoutFeedback, View, StyleSheet, Easing } from 'react-native';
+import { Animated, TouchableWithoutFeedback, View, StyleSheet, Easing, AccessibilityInfo } from 'react-native';
 import { Color } from "../../../GlobalStyles";
 
 const Toggle = ({
@@ -8,6 +8,7 @@ const Toggle = ({
     initialValue = false,
     disabled = false,
     label = '',
+    description = '',
     section = ''
 }) => {
     const [isActive, setIsActive] = useState(initialValue);
@@ -37,6 +38,17 @@ const Toggle = ({
             });
         }
 
+        // Announce immediate state change for screen readers
+        const stateWord = nextState ? 'Enabled' : 'Disabled';
+        const opposite = nextState ? 'Disabled' : 'Enabled';
+        const sectionLabelText = {
+            textNotif: `${label || 'Appointment'} for text notifications`,
+            inAppNotif: `${label || 'Appointment'} for In-app notifications`,
+            paperless: `${label || 'Paperless Billing'} for email notifications`,
+        }[section] || (label || name || 'Notification');
+
+        AccessibilityInfo.announceForAccessibility(`${sectionLabelText}. Toggle button, ${stateWord}. Double tap to turn ${opposite}.`);
+
         Animated.timing(translateX, {
             toValue: nextState ? 8 : -8,
             duration: 300,
@@ -46,25 +58,34 @@ const Toggle = ({
     };
 
     const getAccessibilityLabel = () => {
-        const status = isActive ? 'enabled' : 'disabled';
-        const sectionLabel = {
-            paperless: `Paperless billing notifications ${status}${name && name.trim() !== '' ? ` for ${name}` : ''}`,
-            marketing: `Marketing communications ${status} for ${name}`,
-            iptv: `Sparklight TV notifications ${status} for ${name}`,
-            textNotif: `Text Notification ${status}${label && label.trim() !== '' ? ` for ${label}` : ''}`,
-            inAppNotif: `In-App Notification ${status}${label && label.trim() !== '' ? ` for ${label}` : ''}`,
+        // If control is disabled, report 'disabled' state; otherwise use On/Off
+        const stateWord = disabled ? 'disabled' : (isActive ? 'Enabled' : 'Disabled');
+        const opposite = disabled ? 'enabled' : (isActive ? 'Disabled' : 'Enabled');
 
-        }[section] || label;
+        const sectionLabelText = {
+            paperless: `${label || 'Paperless Billing'} for email notifications`,
+            marketing: `Marketing communications for ${label || name}`,
+            iptv: `Sparklight TV notifications for ${label || name}`,
+            textNotif: `${label || 'Appointment'} for text notifications`,
+            inAppNotif: `${label || 'Appointment'} for In-app notifications`,
+        }[section] || (label || name || 'Notification');
 
-        return `${sectionLabel}${disabled ? '. This setting cannot be changed' : ''}`;
+        // For the toggle control, we prefer to read the description (if present)
+        // followed by the toggle state so users can swipe: title -> description -> toggle.
+        const labelPart = description ? `${description}` : `${sectionLabelText}`;
+
+        // Final format: "[Description or Label]. Toggle button, [Current State]. Double tap to turn [Opposite State]."
+        return `${labelPart}. Toggle button, ${stateWord}. Double tap to turn ${opposite}`;
     };
 
     return (
         <TouchableWithoutFeedback
             onPress={handleToggle}
             accessible={true}
+            accessibilityRole="Button"
+            accessibilityState={{ checked: !!isActive, disabled: !!disabled }}
             accessibilityLabel={getAccessibilityLabel()}
-            accessibilityHint={disabled ? undefined : 'Toggle setting'}
+            accessibilityHint={`Double tap to turn ${disabled ? 'enabled' : (isActive ? 'Off' : 'On')}`}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
             <View style={styles.toggleWrapper}>

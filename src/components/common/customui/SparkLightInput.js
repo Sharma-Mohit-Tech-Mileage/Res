@@ -219,7 +219,7 @@ const SparkLightInput = React.forwardRef(({
           ]}
           accessibilityLabel={
             value && getKeyboardType() === "phone-pad"
-              ? `${label || "Phone number"} field}`
+              ? 'Phone number ' + numberToWordsForAccessibility(value)
               : secure
               ? "Password requirements are listed below. Use arrow keys to read them."
               : undefined

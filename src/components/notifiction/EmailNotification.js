@@ -19,6 +19,7 @@ import { fetchACPUserAccountDetails } from "../../redux/actions/ProfileActionSui
 import { getPrimaryEmail } from "../utility/constant";
 import AlertIcon from "../../res/svgIcons/AlertIcon";
 import SuccessIcon from "../../../assets/svgs/SuccessIcon";
+import { A11y } from "react-native-a11y-order";
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 const validationSchema = yup.object().shape({
@@ -375,33 +376,39 @@ const AddNotificationScreen = () => {
               </Text>
             </View>
             <View style={styles.divider} />
-            <View
-              style={{
-                paddingTop: Padding.p_base,
-                paddingBottom: 8,
-                paddingHorizontal: Padding.p_5xl,
-              }}
+            <A11y.Order
+              style={[styles.section, { paddingHorizontal: Padding.p_5xl }]}
             >
               <View style={styles.toggleHeader}>
-                <Text style={[styles.toggleTitle, { flex: 0.9 }]}>
+                <A11y.Index index={0} style={[styles.toggleTitle, { flex: 0.9 }]}>
+                <Text
+                  
+                  accessible={true}
+                  accessibilityRole="text"
+                  accessibilityLabel="Paperless Billing for email notifications"
+                >
                   Paperless Billing
                 </Text>
+                </A11y.Index>
                 <View style={{ flex: 0.1 }}>
+                  <A11y.Index index={1}>
                   <Toggle
                     name="paperlessBilling"
                     initialValue={paperlessStatusAcp || false}
                     onToggle={handleToggleChange}
                     disabled={!toggleCheckBoxTerm && !paperlessStatusAcp}
                     section="paperless"
+                    description={"Opt for email statements and say goodbye to paper clutter. It's convenient, eco-friendly, and keeps your information at your fingertips."}
                   />
+                  </A11y.Index>
                 </View>
               </View>
-              <Text style={styles.toggleDescription}>
+              <Text style={styles.toggleDescription} accessible={false}>
                 Opt for email statements and say goodbye to paper clutter. It's
                 convenient, eco-friendly, and keeps your information at your
                 fingertips.
               </Text>
-            </View>
+            </A11y.Order>
             {isCheckboxVisible && (
               <View style={styles.checkBoxArea}>
                 <TouchableOpacity

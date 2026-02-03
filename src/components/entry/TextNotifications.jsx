@@ -195,7 +195,7 @@ const TextNotifications = ({ navigation }) => {
                       }}
                       value={value}
                       error={errors.phoneNumber?.message}
-                      maxLength={11}
+                      maxLength={16}
                     />
                   </>
                 )}

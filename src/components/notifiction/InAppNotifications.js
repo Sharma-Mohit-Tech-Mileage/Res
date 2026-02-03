@@ -414,6 +414,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
             style={styles.appointments}
             accessible={true}
             accessibilityRole="text"
+            accessibilityLabel={`${title} for In-app notifications`}
           >
             {title}
           </Text>
@@ -423,6 +424,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
               styles.receiveTypo,
               { marginTop: 8 },
             ]}
+            accessible={false}
           >
             {description}
           </Text>
@@ -433,14 +435,10 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
             name={name}
             initialValue={value}
             label={title}
+            description={description}
             onToggle={(e) => {
               onChange({ target: { name, value: !value, type: "toggle" } });
             }}
-            accessible={true}
-            accessibilityRole="switch"
-            accessibilityState={{ checked: value }}
-            accessibilityLabel={`${value ? "enabled" : "disabled"}`}
-            accessibilityHint="Double tap to toggle"
             section="inAppNotif"
           />
         </View>

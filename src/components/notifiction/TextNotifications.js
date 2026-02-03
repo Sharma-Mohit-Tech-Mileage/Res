@@ -385,7 +385,7 @@ const TextNotifications = ({ navigation }) => {
                         keyboardType="number-pad"
                         value={value}
                         error={errors.phoneNumber?.message}
-                        maxLength={14}
+                        maxLength={16}
                         isVisible={false}
                         autoFocusTitle={true}
                       />
@@ -539,13 +539,21 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
     <View style={styles.frameView}>
       <View style={styles.appointmentsParent}>
         <View style={{ flexDirection: "column", flex: 1.7, marginRight: 10 }}>
-          <Text style={styles.appointments}>{title}</Text>
+          <Text
+            style={styles.appointments}
+            accessible={true}
+            accessibilityRole="text"
+            accessibilityLabel={`${title} for text notifications`}
+          >
+            {title}
+          </Text>
           <Text
             style={[
               styles.receiveAppNotifications1,
               styles.receiveTypo,
               { marginTop: 8 },
             ]}
+            accessible={false}
           >
             {description}
           </Text>
@@ -557,6 +565,7 @@ const NotificationSetting = ({ name, value, title, description, onChange }) => (
             initialValue={value}
             section="textNotif"
             label={title}
+            description={description}
             onToggle={onChange}
           />
         </View>
