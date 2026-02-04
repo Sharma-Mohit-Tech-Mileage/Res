@@ -328,6 +328,7 @@ const InAppNotifications = ({ navigation }) => {
                   message="Notifications updated failed."
                   showCloseIcon={true}
                   isVisible={showErrorAlert}
+                  autoFocusTitle={true}
                   onClose={() => setShowErrorAlert(false)}
                 />
               </View>

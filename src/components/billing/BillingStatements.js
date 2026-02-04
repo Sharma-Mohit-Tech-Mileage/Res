@@ -170,6 +170,7 @@ const BillingStatementsScreen = ({ navigation }) => {
               message="Failed to load statements. Please try again."
               onClose={handleCloseFetchError}
               isVisible={true}
+              autoFocusTitle={true}
             />
           )}
           
@@ -180,6 +181,7 @@ const BillingStatementsScreen = ({ navigation }) => {
               message="Failed to download statement. Please try again."
               onClose={handleCloseDownloadError}
               isVisible={true}
+              autoFocusTitle={true}
             />
           )}
         </View>

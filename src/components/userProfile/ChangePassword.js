@@ -215,6 +215,7 @@ const ChangePassword = () => {
                   message="Password and security update failed."
                   showCloseIcon={true}
                   isVisible={showErrorAlert}
+                  autoFocusTitle={true}
                   onClose={() => setShowErrorAlert(false)}
                 />
                 <NotificationAlert
@@ -223,6 +224,7 @@ const ChangePassword = () => {
                   message="Please enter valid information to continue."
                   showCloseIcon={true}
                   isVisible={showValidationAlert}
+                  autoFocusTitle={true}
                   onClose={() => setShowValidationAlert(false)}
                 />
               </View>

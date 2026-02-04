@@ -150,6 +150,7 @@ const Feedback = () => {
                 message={errormsg}
                 showCloseIcon={true}
                 isVisible={showErrorAlert}
+                autoFocusTitle={true}
                 onClose={() => setShowErrorAlert(false)}
               />
             </Animated.View>

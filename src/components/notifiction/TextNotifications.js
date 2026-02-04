@@ -299,6 +299,7 @@ const TextNotifications = ({ navigation }) => {
                     message={notification.message}
                     showCloseIcon={true}
                     onClose={() => setNotification(null)}
+                    autoFocusTitle={true}
                     accessibilityLiveRegion="assertive"
                     accessibilityRole="alert"
                     accessibilityLabel={notification.message}
@@ -317,6 +318,7 @@ const TextNotifications = ({ navigation }) => {
                   }
                   showCloseIcon={true}
                   isVisible={showErrorAlert}
+                  autoFocusTitle={true}
                   onClose={() => setShowErrorAlert(false)}
                 />
               </View>
