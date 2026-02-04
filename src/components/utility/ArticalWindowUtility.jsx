@@ -13,6 +13,8 @@ import LoadingSpinner from './LoadingSpinner';
 import { getUser, getUpgradeToken } from '../../redux/utils/LocalStorage';
 
 const ArticalWindowUtility = ({ navigation, route }) => {
+    console.log('Navigation available?', !!navigation); // Should log: true
+    console.log('Route params:', route.params); // Should log: { url: "...", name: "..." }
     const [progress, setProgress] = useState(0);
     const [name] = useState(route.params?.name);
     const [isError, setIsError] = useState(false);
@@ -248,22 +250,19 @@ const ArticalWindowUtility = ({ navigation, route }) => {
         }, 100);
     }, []);
 
-    const onShouldStartLoadWithRequest = useCallback((request) => {
-        // Allow the initial load to proceed
-        if (!sessionInjected.current && !request.url.includes('/postlogout') && !request.url.includes(Env.SSO_LOGIN)) {
-            return true;
-        }
-        
-        // Block logout/login redirects
-        if (request.url.includes('/postlogout') || request.url.includes(Env.SSO_LOGIN)) {
-            console.log('Blocked logout redirect:', request.url);
-            showToastMessage();
-            navigationRef.current?.navigate('Splash');
-            return false;
-        }
-        
+const onShouldStartLoadWithRequest = useCallback((request) => {
+    if (!sessionInjected.current && !request.url.includes('/postlogout') && !request.url.includes(Env.SSO_LOGIN)) {
         return true;
-    }, [showToastMessage]);
+    }
+    
+    if (request.url.includes('/postlogout') || request.url.includes(Env.SSO_LOGIN)) {
+        showToastMessage();
+        navigation.goBack();
+        return false;
+    }
+    
+    return true;
+}, [showToastMessage, navigation]);
 
     const onMessage = useCallback((event) => {
         try {
