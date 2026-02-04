@@ -217,6 +217,123 @@ export const gradientHeader = {
   height: 150,
 };
 
+// ==========================================
+// DATA USAGE COMPOSITIONS
+// ==========================================
+
+export const dataUsageSummary = {
+  container: {
+    marginBottom: theme.spacing.base,
+    marginHorizontal: theme.spacing.base,
+  },
+  card: {
+    ...card.base,
+    padding: theme.spacing.lg,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: theme.spacing.base,
+  },
+  label: {
+    fontSize: theme.typography.size.xs,
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: "600",
+    color: theme.colors.text.secondary,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  planName: {
+    fontSize: theme.typography.size.lg,
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: "600",
+    color: theme.colors.primary,
+    marginTop: 2,
+  },
+  usageNumbers: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    justifyContent: "center",
+    marginBottom: theme.spacing.sm,
+  },
+  usageUnit: {
+    fontSize: theme.typography.size.base,
+    fontFamily: theme.typography.family.regular,
+    color: theme.colors.text.secondary,
+    marginLeft: 4,
+  },
+  progressBar: {
+    height: 10,
+    backgroundColor: theme.colors.surfaceVariant,
+    borderRadius: 5,
+    overflow: "hidden",
+    marginBottom: theme.spacing.xs,
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: 5,
+  },
+};
+
+export const dataUsageChart = {
+  container: {
+    marginHorizontal: theme.spacing.base,
+    marginBottom: theme.spacing.base,
+  },
+  card: {
+    ...card.base,
+    padding: theme.spacing.base,
+  },
+  yAxisLabel: {
+    fontSize: theme.typography.size.xs,
+    fontFamily: theme.typography.family.regular,
+    color: theme.colors.text.tertiary,
+    textAlign: "right",
+  },
+  chartArea: {
+    flex: 1,
+    position: "relative",
+  },
+  gridLine: {
+    height: 1,
+    backgroundColor: theme.colors.border,
+  },
+};
+
+export const dataUsageTabs = {
+  tabsContainer: {
+    flexDirection: "row",
+    backgroundColor: theme.colors.surfaceVariant,
+    borderRadius: theme.radius.sm,
+    padding: 2,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.xs,
+    alignItems: "center",
+    borderRadius: theme.radius.xs,
+    minHeight: 44, // Accessibility touch target
+  },
+  activeTab: {
+    backgroundColor: theme.colors.white,
+    ...theme.shadows.sm,
+  },
+  tabText: {
+    fontSize: theme.typography.size.sm,
+    fontFamily: theme.typography.family.semiBold,
+    fontWeight: "600",
+    color: theme.colors.text.secondary,
+  },
+  activeTabText: {
+    color: theme.colors.primary,
+  },
+};
+
+// ==========================================
+// UPDATE DEFAULT EXPORT
+// ==========================================
+
 export default {
   serviceCard,
   internetSpeed,
@@ -224,4 +341,7 @@ export default {
   header,
   skeletonLoader,
   gradientHeader,
+  dataUsageSummary,    // ADD THIS
+  dataUsageChart,      // ADD THIS
+  dataUsageTabs,       // ADD THIS
 };

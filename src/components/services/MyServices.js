@@ -4,6 +4,7 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import MOCK_DATA_USAGE from '../../components/services/dataUsage/mockDataUsage';
 import LinearGradient from "react-native-linear-gradient";
 import { theme } from "../../styles/theme";
 import { container } from "../../styles/utilities";
@@ -86,13 +87,23 @@ const MyServicesContent = ({ route }) => {
       >
         <View style={styles.servicesContainer}>
           {showInternet && (
-            <InternetCard
-              planName={data?.internet.planName}
-              downloadSpeed={data?.internet.downloadSpeed}
-              uploadSpeed={data?.internet.uploadSpeed}
-              loading={loading}
-            />
-          )}
+  <InternetCard
+    planName={data?.internet.planName}
+    downloadSpeed={data?.internet.downloadSpeed}
+    uploadSpeed={data?.internet.uploadSpeed}
+    loading={loading}
+    // NEW: Pass data usage snapshot
+    dataPlan={
+      data?.internet.planName
+        ? {
+            usedGB: MOCK_DATA_USAGE.dataPlan.usedGB,
+            totalGB: MOCK_DATA_USAGE.dataPlan.totalGB,
+            percentageUsed: MOCK_DATA_USAGE.dataPlan.percentageUsed,
+          }
+        : null
+    }
+  />
+)}
 
           {showVideo && (
             <VideoCard
